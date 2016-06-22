@@ -21,9 +21,9 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
 
   case class InlineRequest(callsite: Callsite, post: List[InlineRequest]) {
     // invariant: all post inline requests denote callsites in the callee of the main callsite
-    for (pr <- post) assert(
-        pr.callsite.callsiteMethod == callsite.callee.get.callee,
-        s"Callsite method mismatch: main $callsite - post ${pr.callsite}")
+    for (pr <- post)
+      assert(pr.callsite.callsiteMethod == callsite.callee.get.callee,
+             s"Callsite method mismatch: main $callsite - post ${pr.callsite}")
   }
 
   /**
@@ -47,15 +47,16 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
           case callsite @ Callsite(_,
                                    _,
                                    _,
-                                   Right(Callee(callee,
-                                                calleeDeclClass,
-                                                safeToInline,
-                                                _,
-                                                canInlineFromSource,
-                                                calleeAnnotatedInline,
-                                                _,
-                                                _,
-                                                callsiteWarning)),
+                                   Right(
+                                   Callee(callee,
+                                          calleeDeclClass,
+                                          safeToInline,
+                                          _,
+                                          canInlineFromSource,
+                                          calleeAnnotatedInline,
+                                          _,
+                                          _,
+                                          callsiteWarning)),
                                    _,
                                    _,
                                    _,
@@ -71,8 +72,8 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
                   val annotWarn =
                     if (calleeAnnotatedInline) " is annotated @inline but"
                     else ""
-                  val msg = s"${BackendReporting.methodSignature(
-                      calleeDeclClass.internalName, callee)}$annotWarn could not be inlined:\n$w"
+                  val msg =
+                    s"${BackendReporting.methodSignature(calleeDeclClass.internalName, callee)}$annotWarn could not be inlined:\n$w"
                   backendReporting.inlinerWarning(callsite.callsitePosition,
                                                   msg)
                 }
@@ -93,12 +94,12 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
                     backendReporting.inlinerWarning(
                         pos,
                         s"$initMsg: the trait method call could not be rewritten to the static implementation method." +
-                        warnMsg)
+                          warnMsg)
                   else if (!safeToInline)
                     backendReporting.inlinerWarning(
                         pos,
                         s"$initMsg: the method is not final and may be overridden." +
-                        warnMsg)
+                          warnMsg)
                   else
                     backendReporting.inlinerWarning(pos,
                                                     s"$initMsg." + warnMsg)
@@ -108,7 +109,7 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
                   backendReporting.inlinerWarning(
                       pos,
                       s"there was a problem determining if method ${callee.name} can be inlined: \n" +
-                      callsiteWarning.get)
+                        callsiteWarning.get)
                 }
             }
 

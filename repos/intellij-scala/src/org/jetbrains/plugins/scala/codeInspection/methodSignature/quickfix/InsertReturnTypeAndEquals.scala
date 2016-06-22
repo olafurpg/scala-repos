@@ -21,8 +21,8 @@ class InsertReturnTypeAndEquals(functionDef: ScFunctionDefinition)
     funDef.removeAssignment()
     funDef.removeExplicitType()
     val manager = funDef.getManager
-    val fakeDecl = ScalaPsiElementFactory.createDeclaration(
-        "x", "Unit", isVariable = false, null, manager)
+    val fakeDecl = ScalaPsiElementFactory
+      .createDeclaration("x", "Unit", isVariable = false, null, manager)
     val colon = fakeDecl.findFirstChildByType(ScalaTokenTypes.tCOLON)
     val assign = fakeDecl.findFirstChildByType(ScalaTokenTypes.tASSIGN)
     val body = funDef.body.get

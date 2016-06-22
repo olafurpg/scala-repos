@@ -27,10 +27,11 @@ private[http] object HttpClientDispatcher {
   *
   * @param statsReceiver typically scoped to `clientName/dispatcher`
   */
-class HttpClientDispatcher(
-    trans: Transport[Any, Any], statsReceiver: StatsReceiver)
+class HttpClientDispatcher(trans: Transport[Any, Any],
+                           statsReceiver: StatsReceiver)
     extends GenSerialClientDispatcher[Request, Response, Any, Any](
-        trans, statsReceiver) {
+        trans,
+        statsReceiver) {
 
   import GenSerialClientDispatcher.wrapWriteException
   import HttpClientDispatcher._
@@ -47,7 +48,7 @@ class HttpClientDispatcher(
         dtabHeaders.map({ case (k, v) => s"[$k: $v]" }).mkString(", ")
       log.error(
           s"discarding manually set dtab headers in request: $headersString\n" +
-          s"set Dtab.local instead to send Dtab information.")
+            s"set Dtab.local instead to send Dtab information.")
     }
 
     // It's kind of nasty to modify the request inline like this, but it's
@@ -80,8 +81,9 @@ class HttpClientDispatcher(
                   Future.Done
 
                 case res: HttpResponse if !res.isChunked =>
-                  val response = Response(
-                      res, BufReader(ChannelBufferBuf.Owned(res.getContent)))
+                  val response =
+                    Response(res,
+                             BufReader(ChannelBufferBuf.Owned(res.getContent)))
                   p.updateIfEmpty(Return(response))
                   Future.Done
 

@@ -49,8 +49,8 @@ class ConvertExpressionToSAMInspection
                   res.append(funBody.getText)
                   res.toString()
                 }
-                val fix = new ReplaceExpressionWithSAMQuickFix(
-                    definition, replacement)
+                val fix =
+                  new ReplaceExpressionWithSAMQuickFix(definition, replacement)
                 val extendsBlock = definition.extendsBlock
                 val lBraceInParent = extendsBlock.templateBody.map(
                     _.startOffsetInParent + extendsBlock.startOffsetInParent)
@@ -81,15 +81,16 @@ class ConvertExpressionToSAMInspection
   }
 }
 
-class ReplaceExpressionWithSAMQuickFix(
-    elem: PsiElement, replacement: => String)
+class ReplaceExpressionWithSAMQuickFix(elem: PsiElement,
+                                       replacement: => String)
     extends AbstractFixOnPsiElement(inspectionName, elem) {
 
   override def doApplyFix(project: Project): Unit = {
     val element = getElement
     if (!element.isValid) return
-    element.replace(ScalaPsiElementFactory.createExpressionFromText(
-            replacement, element.getManager))
+    element.replace(
+        ScalaPsiElementFactory.createExpressionFromText(replacement,
+                                                        element.getManager))
   }
 }
 

@@ -131,7 +131,7 @@ trait TableModule[M[+ _]] extends TransSpecModule {
 
   implicit def M: Monad[M]
 
-  type Reducer [α]
+  type Reducer[α]
   type TableMetrics
 
   type Table <: TableLike
@@ -157,12 +157,12 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     def constEmptyObject: Table
     def constEmptyArray: Table
 
-    def fromRValues(
-        values: Stream[RValue], maxSliceSize: Option[Int] = None): Table
+    def fromRValues(values: Stream[RValue],
+                    maxSliceSize: Option[Int] = None): Table
 
     def merge[N[+ _]](grouping: GroupingSpec)(
-        body: (RValue, GroupId => M[Table]) => N[Table])(
-        implicit nt: N ~> M): M[Table]
+        body: (RValue,
+               GroupId => M[Table]) => N[Table])(implicit nt: N ~> M): M[Table]
     def align(sourceLeft: Table,
               alignOnL: TransSpec1,
               sourceRight: Table,
@@ -228,7 +228,9 @@ trait TableModule[M[+ _]] extends TransSpecModule {
       * transformation on rows of the table.
       */
     def cogroup(leftKey: TransSpec1, rightKey: TransSpec1, that: Table)(
-        left: TransSpec1, right: TransSpec1, both: TransSpec2): Table
+        left: TransSpec1,
+        right: TransSpec1,
+        both: TransSpec2): Table
 
     /**
       * Performs a full cartesian cross on this table with the specified table,
@@ -332,8 +334,9 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     def sources: Vector[GroupingSource] = Vector(this)
     def sorted: M[GroupingSource] =
       for {
-        t <- table.sort(trans.DerefObjectStatic(
-                    trans.Leaf(trans.Source), CPathField("key")))
+        t <- table.sort(
+                trans.DerefObjectStatic(trans.Leaf(trans.Source),
+                                        CPathField("key")))
       } yield {
         GroupingSource(t, idTrans, targetTrans, groupId, groupKeySpec)
       }
@@ -348,8 +351,11 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     def sources: Vector[GroupingSource] = left.sources ++ right.sources
     def sorted: M[GroupingAlignment] = (left.sorted |@| right.sorted) {
       (t1, t2) =>
-        GroupingAlignment(
-            groupKeyLeftTrans, groupKeyRightTrans, t1, t2, alignment)
+        GroupingAlignment(groupKeyLeftTrans,
+                          groupKeyRightTrans,
+                          t1,
+                          t2,
+                          alignment)
     }
   }
 }

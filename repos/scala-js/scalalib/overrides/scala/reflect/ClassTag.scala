@@ -111,8 +111,8 @@ trait ClassTag[T]
   def unapply(x: Boolean): Option[T] = unapplyImpl(x, classOf[Boolean])
   def unapply(x: Unit): Option[T] = unapplyImpl(x, classOf[Unit])
 
-  private[this] def unapplyImpl(
-      x: Any, primitiveCls: java.lang.Class[_]): Option[T] =
+  private[this] def unapplyImpl(x: Any,
+                                primitiveCls: java.lang.Class[_]): Option[T] =
     if (runtimeClass.isInstance(x) ||
         runtimeClass.isAssignableFrom(primitiveCls)) Some(x.asInstanceOf[T])
     else None
@@ -121,7 +121,7 @@ trait ClassTag[T]
   override def canEqual(x: Any) = x.isInstanceOf[ClassTag[_]]
   override def equals(x: Any) =
     x.isInstanceOf[ClassTag[_]] &&
-    this.runtimeClass == x.asInstanceOf[ClassTag[_]].runtimeClass
+      this.runtimeClass == x.asInstanceOf[ClassTag[_]].runtimeClass
   override def hashCode = scala.runtime.ScalaRunTime.hash(runtimeClass)
   override def toString = {
     def prettyprint(clazz: jClass[_]): String =

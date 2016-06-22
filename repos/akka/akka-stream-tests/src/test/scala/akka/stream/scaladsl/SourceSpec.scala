@@ -207,7 +207,8 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
     "combine from two inputs with simplified API" in {
       val probes = Seq.fill(2)(TestPublisher.manualProbe[Int]())
       val source =
-        Source.fromPublisher(probes(0)) :: Source.fromPublisher(probes(1)) :: Nil
+        Source
+          .fromPublisher(probes(0)) :: Source.fromPublisher(probes(1)) :: Nil
       val out = TestSubscriber.manualProbe[Int]
 
       Source

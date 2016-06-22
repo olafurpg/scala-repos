@@ -119,8 +119,8 @@ package routers {
   class MyComponents(context: Context)
       extends BuiltInComponentsFromContext(context) {
 
-    lazy val router = new Routes(
-        httpErrorHandler, applicationController, barRoutes, assets)
+    lazy val router =
+      new Routes(httpErrorHandler, applicationController, barRoutes, assets)
 
     lazy val barRoutes = new bar.Routes(httpErrorHandler)
     lazy val applicationController = new controllers.Application()

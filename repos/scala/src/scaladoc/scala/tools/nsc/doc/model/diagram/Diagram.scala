@@ -18,8 +18,8 @@ sealed abstract class Diagram {
   def depthInfo: DepthInfo
 }
 
-case class ContentDiagram(
-    nodes: List[ /*Class*/ Node], edges: List[(Node, List[Node])])
+case class ContentDiagram(nodes: List[ /*Class*/ Node],
+                          edges: List[(Node, List[Node])])
     extends Diagram {
   override def isContentDiagram = true
   lazy val depthInfo = new ContentDiagramDepth(this)
@@ -36,7 +36,7 @@ case class InheritanceDiagram(thisNode: ThisNode,
     thisNode :: superClasses ::: subClasses ::: incomingImplicits ::: outgoingImplicits
   def edges =
     (thisNode -> (superClasses ::: outgoingImplicits)) ::
-    (subClasses ::: incomingImplicits).map(_ -> List(thisNode))
+      (subClasses ::: incomingImplicits).map(_ -> List(thisNode))
 
   override def isInheritanceDiagram = true
   lazy val depthInfo = new DepthInfo {

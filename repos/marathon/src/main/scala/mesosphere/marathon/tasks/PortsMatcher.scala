@@ -68,16 +68,18 @@ class PortsMatcher(app: AppDefinition,
     * Try to find supplied ports in offer. Returns `None` if not all ports were found.
     */
   private[this] def findPortsInOffer(
-      requiredPorts: Seq[Int], failLog: Boolean): Option[Seq[PortWithRole]] = {
+      requiredPorts: Seq[Int],
+      failLog: Boolean): Option[Seq[PortWithRole]] = {
     takeEnoughPortsOrNone(expectedSize = requiredPorts.size) {
       requiredPorts.iterator.map { (port: Int) =>
         offeredPortRanges.find(_.contains(port)).map { offeredRange =>
           PortWithRole(offeredRange.role, port, offeredRange.reservation)
         } orElse {
           if (failLog)
-            log.info(s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
-                s"Couldn't find host port $port (of ${requiredPorts.mkString(", ")}) " +
-                s"in any offered range for app [${app.id}]")
+            log.info(
+                s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
+                  s"Couldn't find host port $port (of ${requiredPorts.mkString(", ")}) " +
+                  s"in any offered range for app [${app.id}]")
           None
         }
       }
@@ -92,8 +94,9 @@ class PortsMatcher(app: AppDefinition,
     takeEnoughPortsOrNone(expectedSize = numberOfPorts) {
       shuffledAvailablePorts.map(Some(_))
     } orElse {
-      log.info(s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
-          s"Couldn't find $numberOfPorts ports in offer for app [${app.id}]")
+      log.info(
+          s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
+            s"Couldn't find $numberOfPorts ports in offer for app [${app.id}]")
       None
     }
   }
@@ -115,12 +118,15 @@ class PortsMatcher(app: AppDefinition,
               !hostPortsFromMappings(portWithRole.port))
 
       mappings.iterator.map {
-        case PortMapping(
-            containerPort, hostPort, servicePort, protocol, name, labels)
-            if hostPort == 0 =>
+        case PortMapping(containerPort,
+                         hostPort,
+                         servicePort,
+                         protocol,
+                         name,
+                         labels) if hostPort == 0 =>
           if (!availablePortsWithoutStaticHostPorts.hasNext) {
             log.info(s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
-                s"Insufficient ports in offer for app [${app.id}]")
+                  s"Insufficient ports in offer for app [${app.id}]")
             None
           } else {
             Option(availablePortsWithoutStaticHostPorts.next())
@@ -132,7 +138,7 @@ class PortsMatcher(app: AppDefinition,
             case None =>
               log.info(
                   s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
-                  s"Cannot find range with host port ${pm.hostPort} for app [${app.id}]")
+                    s"Cannot find range with host port ${pm.hostPort} for app [${app.id}]")
               None
           }
       }
@@ -207,8 +213,8 @@ object PortsMatcher {
               builder += lastRange
             case (Some(lastRange), Some(nextPort))
                 if lastRange.end == nextPort.port - 1 =>
-              process(
-                  Some(lastRange.copy(end = nextPort.port.toLong)), next.tail)
+              process(Some(lastRange.copy(end = nextPort.port.toLong)),
+                      next.tail)
             case (Some(lastRange), Some(nextPort)) =>
               builder += lastRange
               process(Some(nextPort.toRange), next.tail)
@@ -268,8 +274,8 @@ object PortsMatcher {
         //scalastyle:on
       }
 
-      def findStartPort(
-          shuffled: Vector[PortRange], startPortIdx: Int): (Int, Int) = {
+      def findStartPort(shuffled: Vector[PortRange],
+                        startPortIdx: Int): (Int, Int) = {
         var startPortIdxOfCurrentRange = 0
         val rangeIdx = shuffled.indexWhere {
           case range: PortRange

@@ -41,8 +41,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class CheckBoxTableCellSpec[S, T]
-    extends SimpleSFXDelegateSpec[
-        jfxscc.CheckBoxTableCell[S, T], CheckBoxTableCell[S, T]](
+    extends SimpleSFXDelegateSpec[jfxscc.CheckBoxTableCell[S, T],
+                                  CheckBoxTableCell[S, T]](
         classOf[jfxscc.CheckBoxTableCell[S, T]],
         classOf[CheckBoxTableCell[S, T]])
     with RunOnApplicationThread

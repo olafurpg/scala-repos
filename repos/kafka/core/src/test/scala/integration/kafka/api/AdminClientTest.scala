@@ -43,8 +43,8 @@ class AdminClientTest extends IntegrationTestHarness with Logging {
   var client: AdminClient = null
 
   // configure the servers and clients
-  this.serverConfig.setProperty(
-      KafkaConfig.ControlledShutdownEnableProp, "false") // speed up shutdown
+  this.serverConfig.setProperty(KafkaConfig.ControlledShutdownEnableProp,
+                                "false") // speed up shutdown
   this.serverConfig.setProperty(KafkaConfig.OffsetsTopicReplicationFactorProp,
                                 "3") // don't want to lose offset
   this.serverConfig.setProperty(KafkaConfig.OffsetsTopicPartitionsProp, "1")

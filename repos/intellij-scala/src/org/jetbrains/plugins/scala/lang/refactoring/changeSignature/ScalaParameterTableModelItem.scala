@@ -17,8 +17,9 @@ class ScalaParameterTableModelItem(parameter: ScalaParameterInfo,
                                    typeCodeFragment: ScalaCodeFragment,
                                    defaultValue: ScalaCodeFragment,
                                    var startsNewClause: Boolean = false)
-    extends ParameterTableModelItemBase[ScalaParameterInfo](
-        parameter, typeCodeFragment, defaultValue) {
+    extends ParameterTableModelItemBase[ScalaParameterInfo](parameter,
+                                                            typeCodeFragment,
+                                                            defaultValue) {
 
   var typeText: String = generateTypeText(parameter)
 
@@ -39,8 +40,8 @@ class ScalaParameterTableModelItem(parameter: ScalaParameterInfo,
     }
 
     if (typeText.isEmpty) {
-      problems += RefactoringBundle.message(
-          "changeSignature.no.type.for.parameter", parameter.getName)
+      problems += RefactoringBundle
+        .message("changeSignature.no.type.for.parameter", parameter.getName)
       return
     }
 
@@ -59,7 +60,9 @@ class ScalaParameterTableModelItem(parameter: ScalaParameterInfo,
       problems += "Parameter could not be repeated and by-name in the same time"
     }
     val typeElem = ScalaPsiElementFactory.createTypeElementFromText(
-        trimmed, typeCodeFragment, typeCodeFragment.getLastChild)
+        trimmed,
+        typeCodeFragment,
+        typeCodeFragment.getLastChild)
     if (typeElem == null || typeElem.getType().isEmpty) {
       problems += s"Could not understand type $trimmed"
       parameter.scType = null

@@ -73,9 +73,9 @@ class DaemonMsgCreateSerializerSpec extends AkkaSpec {
         val deploy1 =
           Deploy(path = "path1",
                  config = ConfigFactory.parseString("a=1"),
-                 routerConfig =
-                   RoundRobinPool(nrOfInstances = 5,
-                                  supervisorStrategy = supervisorStrategy),
+                 routerConfig = RoundRobinPool(nrOfInstances = 5,
+                                               supervisorStrategy =
+                                                 supervisorStrategy),
                  scope = RemoteScope(Address("akka", "Test", "host1", 1921)),
                  dispatcher = "mydispatcher")
         val deploy2 =
@@ -102,8 +102,8 @@ class DaemonMsgCreateSerializerSpec extends AkkaSpec {
             .asInstanceOf[DaemonMsgCreate])
     }
 
-    def assertDaemonMsgCreate(
-        expected: DaemonMsgCreate, got: DaemonMsgCreate): Unit = {
+    def assertDaemonMsgCreate(expected: DaemonMsgCreate,
+                              got: DaemonMsgCreate): Unit = {
       // can't compare props.creator when function
       got.props.clazz should ===(expected.props.clazz)
       got.props.args.length should ===(expected.props.args.length)

@@ -13,14 +13,14 @@ private[finagle] class ChannelRequestStatsHandler(statsReceiver: StatsReceiver)
     extends SimpleChannelHandler {
   private[this] val requestCount = statsReceiver.stat("connection_requests")
 
-  override def channelOpen(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+  override def channelOpen(ctx: ChannelHandlerContext,
+                           e: ChannelStateEvent): Unit = {
     ctx.setAttachment(new AtomicInteger(0))
     super.channelOpen(ctx, e)
   }
 
-  override def channelClosed(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+  override def channelClosed(ctx: ChannelHandlerContext,
+                             e: ChannelStateEvent): Unit = {
     val attachment = ctx.getAttachment()
     if (attachment != null)
       requestCount.add(attachment.asInstanceOf[AtomicInteger].get)
@@ -28,8 +28,8 @@ private[finagle] class ChannelRequestStatsHandler(statsReceiver: StatsReceiver)
     super.channelClosed(ctx, e)
   }
 
-  override def messageReceived(
-      ctx: ChannelHandlerContext, e: MessageEvent): Unit = {
+  override def messageReceived(ctx: ChannelHandlerContext,
+                               e: MessageEvent): Unit = {
     val counter = ctx.getAttachment().asInstanceOf[AtomicInteger]
     counter.incrementAndGet()
     super.messageReceived(ctx, e)

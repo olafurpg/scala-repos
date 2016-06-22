@@ -52,7 +52,8 @@ object BasicTypesHelpersSpec extends Specification with DataTables {
       "object value" ||
       "boolean value" | (0: Any) !! false | 1 !! true | true !! true | false !! false | "" !! false | "string" !! false | "t" !! true | "total" !! false | "T" !! true | "This" !! false | "0" !! false | "on" !! true | None !! false | Some(
           "t") !! true | Empty !! false | Full("t") !! true | failure !! false | List(
-          "t", "f") !! true |> { (o: Any, result: Boolean) =>
+          "t",
+          "f") !! true |> { (o: Any, result: Boolean) =>
         toBoolean(o) must_== result
       }
     }

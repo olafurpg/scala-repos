@@ -70,11 +70,11 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
     // A thread pool for registering with masters. Because registering with a master is a blocking
     // action, this thread pool must be able to create "masterRpcAddresses.size" threads at the same
     // time so that we can register with all masters.
-    private val registerMasterThreadPool = ThreadUtils
-      .newDaemonCachedThreadPool(
-        "appclient-register-master-threadpool",
-        masterRpcAddresses.length // Make sure we can register with all masters at the same time
-    )
+    private val registerMasterThreadPool =
+      ThreadUtils.newDaemonCachedThreadPool(
+          "appclient-register-master-threadpool",
+          masterRpcAddresses.length // Make sure we can register with all masters at the same time
+      )
 
     // A scheduled executor for scheduling the registration actions
     private val registrationRetryThread =
@@ -186,16 +186,16 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
                          memory: Int) =>
         val fullId = appId + "/" + id
         logInfo(
-            "Executor added: %s on %s (%s) with %d cores".format(
-                fullId, workerId, hostPort, cores))
+            "Executor added: %s on %s (%s) with %d cores"
+              .format(fullId, workerId, hostPort, cores))
         listener.executorAdded(fullId, workerId, hostPort, cores, memory)
 
       case ExecutorUpdated(id, state, message, exitStatus) =>
         val fullId = appId + "/" + id
         val messageText = message.map(s => " (" + s + ")").getOrElse("")
         logInfo(
-            "Executor updated: %s is now %s%s".format(
-                fullId, state, messageText))
+            "Executor updated: %s is now %s%s"
+              .format(fullId, state, messageText))
         if (ExecutorState.isFinished(state)) {
           listener.executorRemoved(fullId, message.getOrElse(""), exitStatus)
         }
@@ -203,7 +203,7 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
       case MasterChanged(masterRef, masterWebUiUrl) =>
         logInfo(
             "Master has changed, new master is at " +
-            masterRef.address.toSparkURL)
+              masterRef.address.toSparkURL)
         master = Some(masterRef)
         alreadyDisconnected = false
         masterRef.send(MasterChangeAcknowledged(appId.get))

@@ -51,8 +51,7 @@ private[streaming] class KafkaInputDStream[K: ClassTag,
     topics: Map[String, Int],
     useReliableReceiver: Boolean,
     storageLevel: StorageLevel
-)
-    extends ReceiverInputDStream[(K, V)](_ssc)
+) extends ReceiverInputDStream[(K, V)](_ssc)
     with Logging {
 
   def getReceiver(): Receiver[(K, V)] = {
@@ -71,8 +70,7 @@ private[streaming] class KafkaReceiver[K: ClassTag,
     kafkaParams: Map[String, String],
     topics: Map[String, Int],
     storageLevel: StorageLevel
-)
-    extends Receiver[(K, V)](storageLevel)
+) extends Receiver[(K, V)](storageLevel)
     with Logging {
 
   // Connection to Kafka
@@ -115,8 +113,8 @@ private[streaming] class KafkaReceiver[K: ClassTag,
     val topicMessageStreams =
       consumerConnector.createMessageStreams(topics, keyDecoder, valueDecoder)
 
-    val executorPool = ThreadUtils.newDaemonFixedThreadPool(
-        topics.values.sum, "KafkaMessageHandler")
+    val executorPool = ThreadUtils
+      .newDaemonFixedThreadPool(topics.values.sum, "KafkaMessageHandler")
     try {
       // Start the messages handler for each partition
       topicMessageStreams.values.foreach { streams =>
@@ -125,7 +123,8 @@ private[streaming] class KafkaReceiver[K: ClassTag,
         }
       }
     } finally {
-      executorPool.shutdown() // Just causes threads to terminate after work is done
+      executorPool
+        .shutdown() // Just causes threads to terminate after work is done
     }
   }
 

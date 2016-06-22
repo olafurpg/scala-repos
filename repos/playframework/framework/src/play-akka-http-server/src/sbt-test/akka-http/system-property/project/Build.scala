@@ -38,20 +38,18 @@ object DevModeBuild {
             s"Resource at $path returned ${conn.getResponseCode} instead of $status")
       }
 
-      val is =
-        if (conn.getResponseCode >= 400) {
-          conn.getErrorStream
-        } else {
-          conn.getInputStream
-        }
+      val is = if (conn.getResponseCode >= 400) {
+        conn.getErrorStream
+      } else {
+        conn.getInputStream
+      }
 
       // The input stream may be null if there's no body
-      val contents =
-        if (is != null) {
-          val c = IO.readStream(is)
-          is.close()
-          c
-        } else ""
+      val contents = if (is != null) {
+        val c = IO.readStream(is)
+        is.close()
+        c
+      } else ""
       conn.disconnect()
 
       assertions.foreach { assertion =>

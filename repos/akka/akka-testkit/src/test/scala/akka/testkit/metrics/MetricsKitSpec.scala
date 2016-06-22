@@ -54,8 +54,10 @@ class MetricsKitSpec
 
     "measure values in histogram" in {
       val maxMillis = 100.millis.toNanos
-      val hist = hdrHistogram(
-          KitKey / "hist", highestTrackableValue = maxMillis, 4, "ns")
+      val hist = hdrHistogram(KitKey / "hist",
+                              highestTrackableValue = maxMillis,
+                              4,
+                              "ns")
 
       for {
         n ← 1 to 11
@@ -68,8 +70,10 @@ class MetricsKitSpec
 
     "fail with human readable error when the histogram overflowed" in {
       val maxMillis = 100.millis.toNanos
-      val hist = hdrHistogram(
-          KitKey / "hist", highestTrackableValue = maxMillis, 4, "ns")
+      val hist = hdrHistogram(KitKey / "hist",
+                              highestTrackableValue = maxMillis,
+                              4,
+                              "ns")
 
       val ex = intercept[IllegalArgumentException] {
         hist.update(10.second.toNanos)

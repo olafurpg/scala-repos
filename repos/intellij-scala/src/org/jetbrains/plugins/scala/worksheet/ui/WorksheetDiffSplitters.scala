@@ -33,8 +33,11 @@ object WorksheetDiffSplitters {
                            intervals: Iterable[(Int, Int)],
                            changes: Iterable[(Int, Int)],
                            prop: Float) = {
-    new SimpleWorksheetSplitter(
-        originalEditor, viewerEditor, intervals, changes, prop)
+    new SimpleWorksheetSplitter(originalEditor,
+                                viewerEditor,
+                                intervals,
+                                changes,
+                                prop)
   }
 
   class WorksheetEditingSides(originalEditor: Editor, viewerEditor: Editor)
@@ -54,8 +57,9 @@ object WorksheetDiffSplitters {
     override def getLineBlocks: LineBlocks = lineBlocks
   }
 
-  private def createLineBlocks(
-      original: Document, viewer: Document, project: Project) =
+  private def createLineBlocks(original: Document,
+                               viewer: Document,
+                               project: Project) =
     ChangeList.build(original, viewer, project).getLineBlocks
 
   private def getVisibleInterval(editor: Editor) = {
@@ -83,7 +87,8 @@ object WorksheetDiffSplitters {
         val f = getProportion
 
         Option(
-            PsiDocumentManager.getInstance(editor1.getProject) getCachedPsiFile editor1.getDocument) foreach {
+            PsiDocumentManager
+              .getInstance(editor1.getProject) getCachedPsiFile editor1.getDocument) foreach {
           case file: ScalaFile =>
             WorksheetEditorPrinter.saveOnlyRatio(file, f)
           case _ =>
@@ -136,8 +141,8 @@ object WorksheetDiffSplitters {
           intervals zip changes collect {
             case ((from, to), (offset, spaces))
                 if spaces != 0 && firstVisible1 <= from &&
-                lastVisible1 >= to && firstVisible2 <= (offset - to + from) &&
-                lastVisible2 >= (offset + spaces) =>
+                  lastVisible1 >= to && firstVisible2 <= (offset - to + from) &&
+                  lastVisible2 >= (offset + spaces) =>
               flag = !flag
               new DividerPolygon(
                   (from + 1) * lineHeight1,

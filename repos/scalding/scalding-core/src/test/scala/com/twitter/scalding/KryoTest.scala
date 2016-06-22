@@ -48,8 +48,8 @@ class KryoTest extends WordSpec with Matchers {
   def getSerialization = {
     val conf = new Configuration
     val chillConf = new HadoopConfig(conf)
-    ConfiguredInstantiator.setReflect(
-        chillConf, classOf[serialization.KryoHadoop])
+    ConfiguredInstantiator
+      .setReflect(chillConf, classOf[serialization.KryoHadoop])
     new KryoSerialization(conf)
   }
 

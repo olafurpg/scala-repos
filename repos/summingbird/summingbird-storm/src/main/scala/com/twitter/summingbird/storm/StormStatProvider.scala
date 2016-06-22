@@ -26,11 +26,12 @@ private[summingbird] object StormStatProvider extends PlatformStatProvider {
   private val metricsForJob =
     new ConcurrentHashMap[JobId, ConcurrentHashMap[String, CountMetric]]
 
-  def registerMetrics(
-      jobID: JobId, context: TopologyContext, metrics: Seq[(Group, Name)]) {
+  def registerMetrics(jobID: JobId,
+                      context: TopologyContext,
+                      metrics: Seq[(Group, Name)]) {
 
-    metricsForJob.putIfAbsent(
-        jobID, new ConcurrentHashMap[String, CountMetric])
+    metricsForJob
+      .putIfAbsent(jobID, new ConcurrentHashMap[String, CountMetric])
     val jobMap = metricsForJob.get(jobID)
 
     metrics.foreach {
@@ -50,10 +51,11 @@ private[summingbird] object StormStatProvider extends PlatformStatProvider {
                          group: Group,
                          name: Name): Option[StormCounterIncrementor] =
     Option(metricsForJob.get(jobID)).map { m =>
-      StormCounterIncrementor(m.asScala.getOrElse(
+      StormCounterIncrementor(
+          m.asScala.getOrElse(
               group.getString +
-              "/" +
-              name.getString,
+                "/" +
+                name.getString,
               sys.error(
                   s"It is only valid to create counter objects during job submission, tried to find $jobID -> $group/$name ")))
     }

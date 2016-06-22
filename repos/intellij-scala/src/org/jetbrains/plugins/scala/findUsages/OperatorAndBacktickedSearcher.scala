@@ -64,8 +64,11 @@ class OperatorAndBacktickedSearcher
         val helper: PsiSearchHelper =
           new ScalaPsiSearchHelper(manager.asInstanceOf[PsiManagerEx])
         try {
-          helper.processElementsWithWord(
-              processor, scope, name, UsageSearchContext.IN_CODE, true)
+          helper.processElementsWithWord(processor,
+                                         scope,
+                                         name,
+                                         UsageSearchContext.IN_CODE,
+                                         true)
         } catch {
           case ignore: IndexNotReadyException =>
         }
@@ -91,17 +94,22 @@ class OperatorAndBacktickedSearcher
       }
       inReadAction {
         FileBasedIndex.getInstance.processFilesContainingAllKeys(
-            IdIndex.NAME, entries, scope, checker, collectProcessor)
+            IdIndex.NAME,
+            entries,
+            scope,
+            checker,
+            collectProcessor)
       }
       val index: FileIndexFacade =
         FileIndexFacade.getInstance(manager.getProject)
       ContainerUtil.process(
-          collectProcessor.getResults, new ReadActionProcessor[VirtualFile] {
-        def processInReadAction(virtualFile: VirtualFile): Boolean = {
-          !index.shouldBeFound(scope, virtualFile) ||
-          processor.process(virtualFile)
-        }
-      })
+          collectProcessor.getResults,
+          new ReadActionProcessor[VirtualFile] {
+            def processInReadAction(virtualFile: VirtualFile): Boolean = {
+              !index.shouldBeFound(scope, virtualFile) ||
+              processor.process(virtualFile)
+            }
+          })
     }
 
     /**
@@ -109,7 +117,8 @@ class OperatorAndBacktickedSearcher
       * because it works only for java identifiers there.
       */
     private def getWordEntries(
-        name: String, caseSensitively: Boolean): util.List[IdIndexEntry] = {
+        name: String,
+        caseSensitively: Boolean): util.List[IdIndexEntry] = {
       val keys = new util.ArrayList[IdIndexEntry]
       if (ScalaNamesUtil.isIdentifier(name))
         keys.add(new IdIndexEntry(name, caseSensitively))

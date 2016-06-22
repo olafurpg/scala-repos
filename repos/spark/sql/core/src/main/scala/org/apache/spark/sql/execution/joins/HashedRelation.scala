@@ -65,8 +65,7 @@ private[execution] sealed trait HashedRelation {
   // This is a helper method to implement Externalizable, and is used by
   // GeneralHashedRelation and UniqueKeyHashedRelation
   protected def readBytes(in: ObjectInput): Array[Byte] = {
-    val serializedSize =
-      in.readInt() // Read the length of serialized bytes first
+    val serializedSize = in.readInt() // Read the length of serialized bytes first
     val bytes = new Array[Byte](serializedSize)
     in.readFully(bytes)
     bytes
@@ -114,8 +113,9 @@ private[execution] trait UniqueHashedRelation extends HashedRelation {
 /**
   * A general [[HashedRelation]] backed by a hash map that maps the key into a sequence of values.
   */
-private[joins] class GeneralHashedRelation(private var hashTable: JavaHashMap[
-        InternalRow, CompactBuffer[InternalRow]])
+private[joins] class GeneralHashedRelation(
+    private var hashTable: JavaHashMap[InternalRow,
+                                       CompactBuffer[InternalRow]])
     extends HashedRelation
     with Externalizable {
 
@@ -168,8 +168,9 @@ private[execution] object HashedRelation {
             sizeEstimate: Int = 64): HashedRelation = {
 
     if (keyGenerator.isInstanceOf[UnsafeProjection]) {
-      return UnsafeHashedRelation(
-          input, keyGenerator.asInstanceOf[UnsafeProjection], sizeEstimate)
+      return UnsafeHashedRelation(input,
+                                  keyGenerator.asInstanceOf[UnsafeProjection],
+                                  sizeEstimate)
     }
 
     // TODO: Use Spark's HashMap implementation.
@@ -187,15 +188,14 @@ private[execution] object HashedRelation {
       val rowKey = keyGenerator(currentRow)
       if (!rowKey.anyNull) {
         val existingMatchList = hashTable.get(rowKey)
-        val matchList =
-          if (existingMatchList == null) {
-            val newMatchList = new CompactBuffer[InternalRow]()
-            hashTable.put(rowKey.copy(), newMatchList)
-            newMatchList
-          } else {
-            keyIsUnique = false
-            existingMatchList
-          }
+        val matchList = if (existingMatchList == null) {
+          val newMatchList = new CompactBuffer[InternalRow]()
+          hashTable.put(rowKey.copy(), newMatchList)
+          newMatchList
+        } else {
+          keyIsUnique = false
+          existingMatchList
+        }
         matchList += currentRow
       }
     }
@@ -319,8 +319,11 @@ private[joins] final class UnsafeHashedRelation(
           if (buffer.length < length) {
             buffer = new Array[Byte](length)
           }
-          Platform.copyMemory(
-              base, offset, buffer, Platform.BYTE_ARRAY_OFFSET, length)
+          Platform.copyMemory(base,
+                              offset,
+                              buffer,
+                              Platform.BYTE_ARRAY_OFFSET,
+                              length)
           out.write(buffer, 0, length)
         }
 
@@ -450,14 +453,13 @@ private[joins] object UnsafeHashedRelation {
       val rowKey = keyGenerator(unsafeRow)
       if (!rowKey.anyNull) {
         val existingMatchList = hashTable.get(rowKey)
-        val matchList =
-          if (existingMatchList == null) {
-            val newMatchList = new CompactBuffer[UnsafeRow]()
-            hashTable.put(rowKey.copy(), newMatchList)
-            newMatchList
-          } else {
-            existingMatchList
-          }
+        val matchList = if (existingMatchList == null) {
+          val newMatchList = new CompactBuffer[UnsafeRow]()
+          hashTable.put(rowKey.copy(), newMatchList)
+          newMatchList
+        } else {
+          existingMatchList
+        }
         matchList += unsafeRow
       }
     }
@@ -548,8 +550,7 @@ private[joins] final class LongArrayRelation(
     private var offsets: Array[Int],
     private var sizes: Array[Int],
     private var bytes: Array[Byte]
-)
-    extends UniqueHashedRelation
+) extends UniqueHashedRelation
     with LongHashedRelation
     with Externalizable {
 
@@ -568,8 +569,8 @@ private[joins] final class LongArrayRelation(
     val idx = (key - start).toInt
     if (idx >= 0 && idx < sizes.length && sizes(idx) > 0) {
       val result = new UnsafeRow(numFields)
-      result.pointTo(
-          bytes, Platform.BYTE_ARRAY_OFFSET + offsets(idx), sizes(idx))
+      result
+        .pointTo(bytes, Platform.BYTE_ARRAY_OFFSET + offsets(idx), sizes(idx))
       result
     } else {
       null
@@ -641,15 +642,14 @@ private[joins] object LongHashedRelation {
         minKey = math.min(minKey, key)
         maxKey = math.max(maxKey, key)
         val existingMatchList = hashTable.get(key)
-        val matchList =
-          if (existingMatchList == null) {
-            val newMatchList = new CompactBuffer[UnsafeRow]()
-            hashTable.put(key, newMatchList)
-            newMatchList
-          } else {
-            keyIsUnique = false
-            existingMatchList
-          }
+        val matchList = if (existingMatchList == null) {
+          val newMatchList = new CompactBuffer[UnsafeRow]()
+          hashTable.put(key, newMatchList)
+          newMatchList
+        } else {
+          keyIsUnique = false
+          existingMatchList
+        }
         matchList += unsafeRow
       }
     }
@@ -676,8 +676,8 @@ private[joins] object LongHashedRelation {
         while (i < length) {
           val rows = hashTable.get(i + minKey)
           if (rows != null) {
-            rows(0).writeToMemory(
-                bytes, Platform.BYTE_ARRAY_OFFSET + offsets(i))
+            rows(0)
+              .writeToMemory(bytes, Platform.BYTE_ARRAY_OFFSET + offsets(i))
           }
           i += 1
         }
@@ -723,7 +723,7 @@ private[execution] case class HashedRelationBroadcastMode(
   override def compatibleWith(other: BroadcastMode): Boolean = other match {
     case m: HashedRelationBroadcastMode =>
       canJoinKeyFitWithinLong == m.canJoinKeyFitWithinLong &&
-      canonicalizedKeys == m.canonicalizedKeys
+        canonicalizedKeys == m.canonicalizedKeys
     case _ => false
   }
 }

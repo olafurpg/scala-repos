@@ -32,10 +32,10 @@ object FutureSequencer {
     val message = s"FutureSequencer timed out after $duration"
   }
 
-  private final class FSequencer(
-      receiveTimeout: Option[FiniteDuration],
-      executionTimeout: Option[FiniteDuration] = None,
-      logger: lila.log.Logger)
+  private final class FSequencer(receiveTimeout: Option[FiniteDuration],
+                                 executionTimeout: Option[FiniteDuration] =
+                                   None,
+                                 logger: lila.log.Logger)
       extends Actor {
 
     receiveTimeout.foreach(context.setReceiveTimeout)

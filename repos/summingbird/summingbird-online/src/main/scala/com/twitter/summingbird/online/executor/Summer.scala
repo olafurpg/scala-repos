@@ -55,8 +55,8 @@ import scala.util.control.NonFatal
   */
 class Summer[Key, Value: Semigroup, Event, S, D, RC](
     @transient storeSupplier: MergeableStoreFactory[Key, Value],
-    @transient flatMapOp: FlatMapOperation[
-        (Key, (Option[Value], Value)), Event],
+    @transient flatMapOp: FlatMapOperation[(Key, (Option[Value], Value)),
+                                           Event],
     @transient successHandler: OnlineSuccessHandler,
     @transient exceptionHandler: OnlineExceptionHandler,
     summerBuilder: SummerBuilder,
@@ -67,7 +67,9 @@ class Summer[Key, Value: Semigroup, Event, S, D, RC](
     pDecoder: Injection[(Int, CMap[Key, Value]), D],
     pEncoder: Injection[Event, D])
     extends AsyncBase[(Int, CMap[Key, Value]), Event, InputState[S], D, RC](
-        maxWaitingFutures, maxWaitingTime, maxEmitPerExec) {
+        maxWaitingFutures,
+        maxWaitingTime,
+        maxEmitPerExec) {
 
   val lockedOp = Externalizer(flatMapOp)
   val encoder = pEncoder
@@ -97,8 +99,8 @@ class Summer[Key, Value: Semigroup, Event, S, D, RC](
       else None
   }
 
-  override def notifyFailure(
-      inputs: Seq[InputState[S]], error: Throwable): Unit = {
+  override def notifyFailure(inputs: Seq[InputState[S]],
+                             error: Throwable): Unit = {
     super.notifyFailure(inputs, error)
     exceptionHandlerBox.get.apply(error)
   }

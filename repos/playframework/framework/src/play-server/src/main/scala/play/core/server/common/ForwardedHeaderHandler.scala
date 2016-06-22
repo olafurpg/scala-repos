@@ -60,8 +60,8 @@ private[server] class ForwardedHeaderHandler(
     remoteConnection(rawConnection, headers)
   }
 
-  def remoteConnection(
-      rawConnection: ConnectionInfo, headers: Headers): ConnectionInfo = {
+  def remoteConnection(rawConnection: ConnectionInfo,
+                       headers: Headers): ConnectionInfo = {
 
     // Use a mutable iterator for performance when scanning the
     // header entries. Go through the headers in reverse order because
@@ -123,11 +123,11 @@ private[server] object ForwardedHeaderHandler {
     * An unparsed address and protocol pair from a forwarded header. Both values are
     * optional.
     */
-  final case class ForwardedEntry(
-      addressString: Option[String], protoString: Option[String])
+  final case class ForwardedEntry(addressString: Option[String],
+                                  protoString: Option[String])
 
-  case class ForwardedHeaderHandlerConfig(
-      version: ForwardedHeaderVersion, trustedProxies: List[Subnet]) {
+  case class ForwardedHeaderHandlerConfig(version: ForwardedHeaderVersion,
+                                          trustedProxies: List[Subnet]) {
 
     val nodeIdentifierParser = new NodeIdentifierParser(version)
 
@@ -203,8 +203,7 @@ private[server] object ForwardedHeaderHandler {
           nodeIdentifierParser.parseNode(addressString) match {
             case Right((Ip(address), _)) =>
               // Parsing was successful, use this connection and scan for another connection.
-              val secure =
-                entry.protoString.fold(false)(_ == "https") // Assume insecure by default
+              val secure = entry.protoString.fold(false)(_ == "https") // Assume insecure by default
               val connection = ConnectionInfo(address, secure)
               Right(connection)
             case errorOrNonIp =>

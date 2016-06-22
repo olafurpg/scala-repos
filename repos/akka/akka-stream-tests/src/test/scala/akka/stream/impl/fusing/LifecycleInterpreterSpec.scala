@@ -33,8 +33,8 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
             PreStartAndPostStopIdentity(onUpstreamCompleted =
                                           () ⇒ testActor ! "complete-b",
                                         onStop = () ⇒ testActor ! "stop-b"),
-            PreStartAndPostStopIdentity(onUpstreamCompleted = () ⇒
-                                          testActor ! "complete-c",
+            PreStartAndPostStopIdentity(onUpstreamCompleted =
+                                          () ⇒ testActor ! "complete-c",
                                         onStop = () ⇒ testActor ! "stop-c"))) {
       upstream.onComplete()
       expectMsg("complete-a")
@@ -92,9 +92,10 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
     }
 
     "onError when preStart fails with stages after" in new OneBoundedSetup[
-        String](Seq(Map((x: Int) ⇒ x, stoppingDecider),
-                    PreStartFailer(() ⇒ throw TE("Boom!")),
-                    Map((x: Int) ⇒ x, stoppingDecider))) {
+        String](
+        Seq(Map((x: Int) ⇒ x, stoppingDecider),
+            PreStartFailer(() ⇒ throw TE("Boom!")),
+            Map((x: Int) ⇒ x, stoppingDecider))) {
       lastEvents() should ===(Set(Cancel, OnError(TE("Boom!"))))
     }
 
@@ -120,9 +121,10 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
     }
 
     "postStop when pushAndFinish called with pushAndFinish if indirect upstream completes with pushAndFinish" in new OneBoundedSetup[
-        String](Seq(Map((x: Any) ⇒ x, stoppingDecider),
-                    new PushFinishStage(onPostStop = () ⇒ testActor ! "stop"),
-                    Map((x: Any) ⇒ x, stoppingDecider))) {
+        String](
+        Seq(Map((x: Any) ⇒ x, stoppingDecider),
+            new PushFinishStage(onPostStop = () ⇒ testActor ! "stop"),
+            Map((x: Any) ⇒ x, stoppingDecider))) {
 
       lastEvents() should be(Set.empty)
 
@@ -165,8 +167,8 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       super.onUpstreamFinish(ctx)
     }
 
-    override def onUpstreamFailure(
-        cause: Throwable, ctx: Context[T]): TerminationDirective = {
+    override def onUpstreamFailure(cause: Throwable,
+                                   ctx: Context[T]): TerminationDirective = {
       onUpstreamFailed(cause)
       super.onUpstreamFailure(cause, ctx)
     }

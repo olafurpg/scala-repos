@@ -33,10 +33,11 @@ class MultilayerPerceptronClassifierSuite
   test(
       "XOR function learning as binary classification problem with two outputs.") {
     val dataFrame = sqlContext
-      .createDataFrame(Seq((Vectors.dense(0.0, 0.0), 0.0),
-                           (Vectors.dense(0.0, 1.0), 1.0),
-                           (Vectors.dense(1.0, 0.0), 1.0),
-                           (Vectors.dense(1.0, 1.0), 0.0)))
+      .createDataFrame(
+          Seq((Vectors.dense(0.0, 0.0), 0.0),
+              (Vectors.dense(0.0, 1.0), 1.0),
+              (Vectors.dense(1.0, 0.0), 1.0),
+              (Vectors.dense(1.0, 1.0), 0.0)))
       .toDF("features", "label")
     val layers = Array[Int](2, 5, 2)
     val trainer = new MultilayerPerceptronClassifier()
@@ -73,10 +74,13 @@ class MultilayerPerceptronClassifierSuite
     val xMean = Array(5.843, 3.057, 3.758, 1.199)
     val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
     // the input seed is somewhat magic, to make this test pass
-    val rdd =
-      sc.parallelize(generateMultinomialLogisticInput(
-                         coefficients, xMean, xVariance, true, nPoints, 1),
-                     2)
+    val rdd = sc.parallelize(generateMultinomialLogisticInput(coefficients,
+                                                              xMean,
+                                                              xVariance,
+                                                              true,
+                                                              nPoints,
+                                                              1),
+                             2)
     val dataFrame = sqlContext.createDataFrame(rdd).toDF("label", "features")
     val numClasses = 3
     val numIterations = 100

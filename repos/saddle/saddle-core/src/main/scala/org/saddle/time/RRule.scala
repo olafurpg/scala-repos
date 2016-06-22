@@ -56,24 +56,24 @@ import org.saddle.Index
   *  -- http://labix.org/python-dateutil
   *  -- https://pypi.python.org/pypi/python-dateutil
   */
-case class RRule private (freq: Frequency = DAILY,
-                          interval: Int = 1,
-                          wkst: Option[Weekday] = None,
-                          count: Option[Int] = None,
-                          until: Option[DateTime] = None,
-                          bysetpos: List[Int] = List.empty,
-                          bymonth: List[Int] = List.empty,
-                          bymonthday: List[Int] = List.empty,
-                          byyearday: List[Int] = List.empty,
-                          byweekno: List[Int] = List.empty,
-                          byday: List[WeekdayNum] = List.empty,
-                          byhour: List[Int] = List.empty,
-                          byminute: List[Int] = List.empty,
-                          bysecond: List[Int] = List.empty,
-                          inzone: DateTimeZone = TZ_LOCAL,
-                          joins: List[(RRule, Option[DateTime])] = List.empty,
-                          excepts: List[(RRule, Option[DateTime])] =
-                            List.empty) {
+case class RRule private (
+    freq: Frequency = DAILY,
+    interval: Int = 1,
+    wkst: Option[Weekday] = None,
+    count: Option[Int] = None,
+    until: Option[DateTime] = None,
+    bysetpos: List[Int] = List.empty,
+    bymonth: List[Int] = List.empty,
+    bymonthday: List[Int] = List.empty,
+    byyearday: List[Int] = List.empty,
+    byweekno: List[Int] = List.empty,
+    byday: List[WeekdayNum] = List.empty,
+    byhour: List[Int] = List.empty,
+    byminute: List[Int] = List.empty,
+    bysecond: List[Int] = List.empty,
+    inzone: DateTimeZone = TZ_LOCAL,
+    joins: List[(RRule, Option[DateTime])] = List.empty,
+    excepts: List[(RRule, Option[DateTime])] = List.empty) {
 
   private def dt2dtv(dt: DateTime): com.google.ical.values.DateTimeValueImpl = {
     new com.google.ical.values.DateTimeValueImpl(dt.getYear,
@@ -279,28 +279,28 @@ case class RRule private (freq: Frequency = DAILY,
     * provided DateTime instance.
     */
   def from(dt: DateTime): Iterator[DateTime] = {
-    val riter = RecurrenceIteratorFactory.createRecurrenceIterator(
-        toICal, dt2dtv(dt), inzone.toTimeZone)
+    val riter = RecurrenceIteratorFactory
+      .createRecurrenceIterator(toICal, dt2dtv(dt), inzone.toTimeZone)
 
     val iterWithJoins = joins.foldLeft(riter) {
       case (i1, (rrule, t)) =>
         val tmpfrom = t.map { dt2dtv } getOrElse dt2dtv(dt)
-        val tmpiter = RecurrenceIteratorFactory.createRecurrenceIterator(
-            rrule.toICal, tmpfrom, inzone.toTimeZone)
+        val tmpiter = RecurrenceIteratorFactory
+          .createRecurrenceIterator(rrule.toICal, tmpfrom, inzone.toTimeZone)
         RecurrenceIteratorFactory.join(i1, tmpiter)
     }
 
     val iterWithJoinsWithExcepts = excepts.foldLeft(iterWithJoins) {
       case (i1, (rrule, t)) =>
         val tmpfrom = t.map { dt2dtv } getOrElse dt2dtv(dt)
-        val tmpiter = RecurrenceIteratorFactory.createRecurrenceIterator(
-            rrule.toICal, tmpfrom, inzone.toTimeZone)
+        val tmpiter = RecurrenceIteratorFactory
+          .createRecurrenceIterator(rrule.toICal, tmpfrom, inzone.toTimeZone)
         RecurrenceIteratorFactory.except(i1, tmpiter)
     }
 
-    DateTimeIteratorFactory.createDateTimeIterator(iterWithJoinsWithExcepts) map {
-      dt =>
-        dt.withZone(inzone)
+    DateTimeIteratorFactory
+      .createDateTimeIterator(iterWithJoinsWithExcepts) map { dt =>
+      dt.withZone(inzone)
     }
   }
 

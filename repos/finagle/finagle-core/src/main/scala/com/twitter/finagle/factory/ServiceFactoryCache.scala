@@ -26,8 +26,7 @@ private class IdlingFactory[Req, Rep](self: ServiceFactory[Req, Rep])
         Future.exception(exc)
 
       case Return(service) =>
-        Future.value(
-            new ServiceProxy(service) {
+        Future.value(new ServiceProxy(service) {
           override def close(deadline: Time) = {
             decr()
             super.close(deadline)
@@ -99,8 +98,8 @@ private[finagle] class ServiceFactoryCache[Key, Req, Rep](
     miss(key, conn)
   }
 
-  private[this] def miss(
-      key: Key, conn: ClientConnection): Future[Service[Req, Rep]] = {
+  private[this] def miss(key: Key,
+                         conn: ClientConnection): Future[Service[Req, Rep]] = {
     writeLock.lock()
 
     if (cache contains key) {

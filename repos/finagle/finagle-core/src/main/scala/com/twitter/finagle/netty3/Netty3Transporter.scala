@@ -31,8 +31,7 @@ private[netty3] class ChannelConnector[In, Out](
     newChannel: () => Channel,
     newTransport: Channel => Transport[In, Out],
     statsReceiver: StatsReceiver
-)
-    extends (SocketAddress => Future[Transport[In, Out]]) {
+) extends (SocketAddress => Future[Transport[In, Out]]) {
   private[this] val connectLatencyStat =
     statsReceiver.stat("connect_latency_ms")
   private[this] val failedConnectLatencyStat =
@@ -96,7 +95,10 @@ object Netty3Transporter {
   )
 
   val channelFactory: NettyChannelFactory = new NioClientSocketChannelFactory(
-      Executor, 1 /*# boss threads*/, WorkerPool, DefaultTimer.netty) {
+      Executor,
+      1 /*# boss threads*/,
+      WorkerPool,
+      DefaultTimer.netty) {
     override def releaseExternalResources() = () // no-op; unreleasable
   }
 
@@ -165,10 +167,12 @@ object Netty3Transporter {
     opts += "reuseAddress" -> (reuseAddr: java.lang.Boolean)
     for (v <- keepAlive) opts += "keepAlive" -> (v: java.lang.Boolean)
     for (s <- sendBufSize) opts += "sendBufferSize" -> (s: java.lang.Integer)
-    for (s <- recvBufSize) opts += "receiveBufferSize" ->
-    (s: java.lang.Integer)
-    for (v <- params[Transporter.TrafficClass].value) opts += "trafficClass" ->
-    (v: java.lang.Integer)
+    for (s <- recvBufSize)
+      opts += "receiveBufferSize" ->
+        (s: java.lang.Integer)
+    for (v <- params[Transporter.TrafficClass].value)
+      opts += "trafficClass" ->
+        (v: java.lang.Integer)
 
     Netty3Transporter[In, Out](
         label,
@@ -222,8 +226,8 @@ object Netty3Transporter {
   * @param verifyHost If specified, checks the session hostname
   * against the given value.
   */
-case class Netty3TransporterTLSConfig(
-    newEngine: SocketAddress => Engine, verifyHost: Option[String])
+case class Netty3TransporterTLSConfig(newEngine: SocketAddress => Engine,
+                                      verifyHost: Option[String])
 
 /**
   * A [[ChannelFutureListener]] instance that fires "channelClosed" upstream event to the
@@ -233,13 +237,13 @@ private[netty3] object FireChannelClosedLater extends ChannelFutureListener {
   override def operationComplete(future: ChannelFuture): Unit = {
     future.getChannel match {
       case nioChannel: NioSocketChannel =>
-        val channelClosed = new ChannelRunnableWrapper(
-            nioChannel, new Runnable() {
-          override def run(): Unit =
-            Channels.fireChannelClosed(nioChannel)
-        })
-        nioChannel.getWorker.executeInIoThread(
-            channelClosed, /* alwaysAsync */ true)
+        val channelClosed =
+          new ChannelRunnableWrapper(nioChannel, new Runnable() {
+            override def run(): Unit =
+              Channels.fireChannelClosed(nioChannel)
+          })
+        nioChannel.getWorker
+          .executeInIoThread(channelClosed, /* alwaysAsync */ true)
 
       case channel =>
         Channels.fireChannelClosedLater(channel)
@@ -299,16 +303,15 @@ case class Netty3Transporter[In, Out](
     channelOptions: Map[String, Object] =
       Netty3Transporter.defaultChannelOptions,
     httpProxyCredentials: Option[Transporter.Credentials] = None
-)
-    extends ((SocketAddress, StatsReceiver) => Future[Transport[In, Out]]) {
+) extends ((SocketAddress, StatsReceiver) => Future[Transport[In, Out]]) {
   private[this] val statsHandlers =
     new IdentityHashMap[StatsReceiver, ChannelHandler]
 
   def channelStatsHandler(statsReceiver: StatsReceiver): ChannelHandler =
     synchronized {
       if (!(statsHandlers containsKey statsReceiver)) {
-        statsHandlers.put(
-            statsReceiver, new ChannelStatsHandler(statsReceiver))
+        statsHandlers.put(statsReceiver,
+                          new ChannelStatsHandler(statsReceiver))
       }
 
       statsHandlers.get(statsReceiver)
@@ -320,8 +323,8 @@ case class Netty3Transporter[In, Out](
   ): ChannelPipeline = {
     val pipeline = pipelineFactory.getPipeline()
 
-    pipeline.addFirst(
-        "channelStatsHandler", channelStatsHandler(statsReceiver))
+    pipeline
+      .addFirst("channelStatsHandler", channelStatsHandler(statsReceiver))
     pipeline.addFirst("channelRequestStatsHandler",
                       new ChannelRequestStatsHandler(statsReceiver))
 
@@ -334,10 +337,12 @@ case class Netty3Transporter[In, Out](
         else 0L
 
       pipeline.addFirst("idleReactor", new IdleChannelHandler(statsReceiver))
-      pipeline.addFirst(
-          "idleDetector",
-          new IdleStateHandler(
-              DefaultTimer.netty, rms, wms, 0, TimeUnit.MILLISECONDS))
+      pipeline.addFirst("idleDetector",
+                        new IdleStateHandler(DefaultTimer.netty,
+                                             rms,
+                                             wms,
+                                             0,
+                                             TimeUnit.MILLISECONDS))
     }
 
     for (Netty3TransporterTLSConfig(newEngine, verifyHost) <- tlsConfig) {
@@ -383,8 +388,8 @@ case class Netty3Transporter[In, Out](
               UsernamePassAuthenticationSetting(username, password)
             case _ => Unauthenticated
           }
-          SocksConnectHandler.addHandler(
-              proxyAddr, inetSockAddr, Seq(authentication), pipeline)
+          SocksConnectHandler
+            .addHandler(proxyAddr, inetSockAddr, Seq(authentication), pipeline)
         }
       case _ =>
     }
@@ -392,19 +397,19 @@ case class Netty3Transporter[In, Out](
     (httpProxy, addr) match {
       case (Some(proxyAddr), inetAddr: InetSocketAddress)
           if !inetAddr.isUnresolved =>
-        HttpConnectHandler.addHandler(
-            proxyAddr, inetAddr, pipeline, httpProxyCredentials)
+        HttpConnectHandler
+          .addHandler(proxyAddr, inetAddr, pipeline, httpProxyCredentials)
       case _ =>
     }
 
-    for (snooper <- channelSnooper) pipeline.addFirst(
-        "channelSnooper", snooper)
+    for (snooper <- channelSnooper)
+      pipeline.addFirst("channelSnooper", snooper)
 
     pipeline
   }
 
-  private def newConfiguredChannel(
-      addr: SocketAddress, statsReceiver: StatsReceiver) = {
+  private def newConfiguredChannel(addr: SocketAddress,
+                                   statsReceiver: StatsReceiver) = {
     val ch = newChannel(newPipeline(addr, statsReceiver))
     ch.getConfig.setOptions(channelOptions.asJava)
     ch

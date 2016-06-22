@@ -14,8 +14,7 @@ class KetamaDistributor[A](
     // clients who depend on those versions of libmemcached, we have to reproduce their result.
     // If the oldLibMemcachedVersionComplianceMode is true the behavior will be reproduced.
     oldLibMemcachedVersionComplianceMode: Boolean = false
-)
-    extends Distributor[A] {
+) extends Distributor[A] {
   private[this] val continuum = {
     val continuum = new TreeMap[Long, KetamaNode[A]]()
 
@@ -23,14 +22,13 @@ class KetamaDistributor[A](
     val totalWeight = _nodes.foldLeft(0) { _ + _.weight }
 
     _nodes foreach { node =>
-      val pointsOnRing =
-        if (oldLibMemcachedVersionComplianceMode) {
-          val percent = node.weight.toFloat / totalWeight.toFloat
-          (percent * numReps / 4 * nodeCount.toFloat + 0.0000000001).toInt
-        } else {
-          val percent = node.weight.toDouble / totalWeight.toDouble
-          (percent * nodeCount * (numReps / 4) + 0.0000000001).toInt
-        }
+      val pointsOnRing = if (oldLibMemcachedVersionComplianceMode) {
+        val percent = node.weight.toFloat / totalWeight.toFloat
+        (percent * numReps / 4 * nodeCount.toFloat + 0.0000000001).toInt
+      } else {
+        val percent = node.weight.toDouble / totalWeight.toDouble
+        (percent * nodeCount * (numReps / 4) + 0.0000000001).toInt
+      }
 
       for (i <- 0 until pointsOnRing) {
         val key = node.identifier + "-" + i

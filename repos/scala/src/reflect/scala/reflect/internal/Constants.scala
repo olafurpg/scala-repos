@@ -260,8 +260,7 @@ trait Constants extends api.Constants { self: SymbolTable =>
       import scala.util.hashing.MurmurHash3._
       val seed = 17
       var h = seed
-      h =
-        mix(h, tag.##) // include tag in the hash, otherwise 0, 0d, 0L, 0f collide.
+      h = mix(h, tag.##) // include tag in the hash, otherwise 0, 0d, 0L, 0f collide.
       h = mix(h, equalHashValue.##)
       finalizeHash(h, length = 2)
     }

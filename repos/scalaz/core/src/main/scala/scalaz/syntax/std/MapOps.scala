@@ -4,9 +4,9 @@ package std
 
 final class MapOps[Map[_, _], BKC[_], K, A](self: Map[K, A])(
     dict: scalaz.std.MapSubFunctions {
-  type XMap[A, B] = Map[A, B]
-  type BuildKeyConstraint[A] = BKC[A]
-}) {
+      type XMap[A, B] = Map[A, B]
+      type BuildKeyConstraint[A] = BKC[A]
+    }) {
   final def alter(k: K)(f: (Option[A] => Option[A]))(
       implicit bk: BKC[K]): Map[K, A] = dict.alter(self, k)(f)
   final def intersectWithKey[B, C](m: Map[K, B])(f: (K, A, B) => C)(
@@ -20,8 +20,8 @@ final class MapOps[Map[_, _], BKC[_], K, A](self: Map[K, A])(
       implicit bk: BKC[K]): Map[K, A] = dict.unionWith(self, m)(f)
   final def insertWith(k: K, v: A)(f: (A, A) => A)(
       implicit bk: BKC[K]): Map[K, A] = dict.insertWith(self, k, v)(f)
-  final def getOrAdd[F[_]](k: K)(
-      fa: => F[A])(implicit F: Applicative[F], bk: BKC[K]): F[(Map[K, A], A)] =
+  final def getOrAdd[F[_]](k: K)(fa: => F[A])(implicit F: Applicative[F],
+                                              bk: BKC[K]): F[(Map[K, A], A)] =
     dict.getOrAdd(self, k)(fa)
 }
 

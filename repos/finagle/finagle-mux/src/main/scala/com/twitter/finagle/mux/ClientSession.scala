@@ -201,8 +201,8 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
     }
   }
 
-  private[this] val detector = FailureDetector(
-      detectorConfig, ping, sr.scope("failuredetector"))
+  private[this] val detector =
+    FailureDetector(detectorConfig, ping, sr.scope("failuredetector"))
 
   override def status: Status =
     Status.worst(detector.status, trans.status match {

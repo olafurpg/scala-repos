@@ -33,16 +33,18 @@ trait AnalysisTest extends PlanTest {
     val caseSensitiveCatalog = new SimpleCatalog(caseSensitiveConf)
     val caseInsensitiveCatalog = new SimpleCatalog(caseInsensitiveConf)
 
-    caseSensitiveCatalog.registerTable(
-        TableIdentifier("TaBlE"), TestRelations.testRelation)
-    caseInsensitiveCatalog.registerTable(
-        TableIdentifier("TaBlE"), TestRelations.testRelation)
+    caseSensitiveCatalog
+      .registerTable(TableIdentifier("TaBlE"), TestRelations.testRelation)
+    caseInsensitiveCatalog
+      .registerTable(TableIdentifier("TaBlE"), TestRelations.testRelation)
 
-    new Analyzer(
-        caseSensitiveCatalog, EmptyFunctionRegistry, caseSensitiveConf) {
+    new Analyzer(caseSensitiveCatalog,
+                 EmptyFunctionRegistry,
+                 caseSensitiveConf) {
       override val extendedResolutionRules = EliminateSubqueryAliases :: Nil
-    } -> new Analyzer(
-        caseInsensitiveCatalog, EmptyFunctionRegistry, caseInsensitiveConf) {
+    } -> new Analyzer(caseInsensitiveCatalog,
+                      EmptyFunctionRegistry,
+                      caseInsensitiveConf) {
       override val extendedResolutionRules = EliminateSubqueryAliases :: Nil
     }
   }
@@ -60,8 +62,8 @@ trait AnalysisTest extends PlanTest {
     comparePlans(actualPlan, expectedPlan)
   }
 
-  protected def assertAnalysisSuccess(
-      inputPlan: LogicalPlan, caseSensitive: Boolean = true): Unit = {
+  protected def assertAnalysisSuccess(inputPlan: LogicalPlan,
+                                      caseSensitive: Boolean = true): Unit = {
     val analyzer = getAnalyzer(caseSensitive)
     val analysisAttempt = analyzer.execute(inputPlan)
     try analyzer.checkAnalysis(analysisAttempt) catch {

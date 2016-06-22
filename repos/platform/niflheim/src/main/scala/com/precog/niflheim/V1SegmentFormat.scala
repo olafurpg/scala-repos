@@ -100,8 +100,11 @@ object V1SegmentFormat extends SegmentFormat {
                     case SegmentId(blockid, cpath, CBoolean) =>
                       readBoolean() map {
                         case (defined, length, values) =>
-                          BooleanSegment(
-                              blockid, cpath, defined, values, length)
+                          BooleanSegment(blockid,
+                                         cpath,
+                                         defined,
+                                         values,
+                                         length)
                       }
 
                     case SegmentId(blockid, cpath, ctype: CValueType[a]) =>
@@ -170,11 +173,11 @@ object V1SegmentFormat extends SegmentFormat {
       }
     }
 
-    private def writeBooleanSegment(
-        channel: WritableByteChannel, segment: BooleanSegment) = {
+    private def writeBooleanSegment(channel: WritableByteChannel,
+                                    segment: BooleanSegment) = {
       val maxSize =
         Codec.BitSetCodec.maxSize(segment.defined) +
-        Codec.BitSetCodec.maxSize(segment.values) + 4
+          Codec.BitSetCodec.maxSize(segment.values) + 4
       writeChunk(channel, maxSize) { buffer =>
         buffer.putInt(segment.length)
         Codec.BitSetCodec.writeUnsafe(segment.defined, buffer)
@@ -183,8 +186,8 @@ object V1SegmentFormat extends SegmentFormat {
       }
     }
 
-    private def writeNullSegment(
-        channel: WritableByteChannel, segment: NullSegment) = {
+    private def writeNullSegment(channel: WritableByteChannel,
+                                 segment: NullSegment) = {
       val maxSize = Codec.BitSetCodec.maxSize(segment.defined) + 4
       writeChunk(channel, maxSize) { buffer =>
         buffer.putInt(segment.length)

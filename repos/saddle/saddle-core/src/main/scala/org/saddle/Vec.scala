@@ -240,8 +240,8 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
     * @tparam B type of other Vec elements
     * @tparam C type of resulting Vec elements
     */
-  def concat[B, C](v: Vec[B])(
-      implicit wd: Promoter[T, B, C], mc: ST[C]): Vec[C]
+  def concat[B, C](v: Vec[B])(implicit wd: Promoter[T, B, C],
+                              mc: ST[C]): Vec[C]
 
   /**
     * Additive inverse of Vec with numeric elements
@@ -379,8 +379,8 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
     * @param f Function Vec[A] => B to operate on sliding window
     * @tparam B Result type of function
     */
-  def rolling[@spec(Boolean, Int, Long, Double) B: ST](
-      winSz: Int, f: Vec[T] => B): Vec[B]
+  def rolling[@spec(Boolean, Int, Long, Double) B: ST](winSz: Int,
+                                                       f: Vec[T] => B): Vec[B]
 
   /**
     * Yield a Vec whose elements have been sorted (in ascending order)

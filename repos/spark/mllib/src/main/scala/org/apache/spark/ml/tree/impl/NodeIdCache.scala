@@ -62,8 +62,8 @@ private[tree] case class NodeIndexUpdater(split: Split, nodeIndex: Int) {
   * @param checkpointInterval The checkpointing interval
   *                           (how often should the cache be checkpointed.).
   */
-private[spark] class NodeIdCache(
-    var nodeIdsForInstances: RDD[Array[Int]], val checkpointInterval: Int)
+private[spark] class NodeIdCache(var nodeIdsForInstances: RDD[Array[Int]],
+                                 val checkpointInterval: Int)
     extends Logging {
 
   // Keep a reference to a previous node Ids for instances.
@@ -141,7 +141,7 @@ private[spark] class NodeIdCache(
             case e: IOException =>
               logError(
                   "Decision Tree learning using cacheNodeIds failed to remove checkpoint" +
-                  s" file: ${old.getCheckpointFile.get}")
+                    s" file: ${old.getCheckpointFile.get}")
           }
         } else {
           canDelete = false
@@ -166,7 +166,7 @@ private[spark] class NodeIdCache(
           case e: IOException =>
             logError(
                 "Decision Tree learning using cacheNodeIds failed to remove checkpoint" +
-                s" file: ${old.getCheckpointFile.get}")
+                  s" file: ${old.getCheckpointFile.get}")
         }
       }
     }
@@ -193,7 +193,7 @@ private[spark] object NodeIdCache {
            numTrees: Int,
            checkpointInterval: Int,
            initVal: Int = 1): NodeIdCache = {
-    new NodeIdCache(
-        data.map(_ => Array.fill[Int](numTrees)(initVal)), checkpointInterval)
+    new NodeIdCache(data.map(_ => Array.fill[Int](numTrees)(initVal)),
+                    checkpointInterval)
   }
 }

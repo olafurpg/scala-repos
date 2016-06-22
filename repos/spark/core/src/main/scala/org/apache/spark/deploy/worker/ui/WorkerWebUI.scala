@@ -29,8 +29,9 @@ import org.apache.spark.util.RpcUtils
 /**
   * Web UI server for the standalone worker.
   */
-private[worker] class WorkerWebUI(
-    val worker: Worker, val workDir: File, requestedPort: Int)
+private[worker] class WorkerWebUI(val worker: Worker,
+                                  val workDir: File,
+                                  requestedPort: Int)
     extends WebUI(worker.securityMgr,
                   worker.securityMgr.getSSLOptions("standalone"),
                   requestedPort,

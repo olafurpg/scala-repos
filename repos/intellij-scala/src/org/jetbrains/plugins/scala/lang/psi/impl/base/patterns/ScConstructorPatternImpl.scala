@@ -56,7 +56,8 @@ class ScConstructorPatternImpl(node: ASTNode)
                   var i = 0
                   while (i < subpatterns.length) {
                     val tp = {
-                      substitutor.subst(params(i)
+                      substitutor.subst(
+                          params(i)
                             .getType(TypingContext.empty)
                             .getOrElse(return false))
                     }
@@ -85,17 +86,17 @@ class ScConstructorPatternImpl(node: ASTNode)
               .calculateReferenceType(ref, shapesOnly = false)
               .getOrElse(ScType.designator(td))
             val newSubst = {
-              val clazzType = ScParameterizedType(
-                  refType,
-                  td.getTypeParameters.map(tp =>
-                        ScUndefinedType(tp match {
-                      case tp: ScTypeParam =>
-                        new ScTypeParameterType(tp, r.substitutor)
-                      case _ => new ScTypeParameterType(tp, r.substitutor)
-                    })))
+              val clazzType =
+                ScParameterizedType(refType, td.getTypeParameters.map(tp =>
+                          ScUndefinedType(tp match {
+                    case tp: ScTypeParam =>
+                      new ScTypeParameterType(tp, r.substitutor)
+                    case _ => new ScTypeParameterType(tp, r.substitutor)
+                  })))
               val emptySubst: ScSubstitutor =
                 new ScSubstitutor(
-                    Map(td.typeParameters.map(tp =>
+                    Map(
+                        td.typeParameters.map(tp =>
                               ((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
                                Any)): _*),
                     Map.empty,
@@ -125,13 +126,14 @@ class ScConstructorPatternImpl(node: ASTNode)
           case obj: ScObject => Success(ScType.designator(obj), Some(this))
           case fun: ScFunction /*It's unapply method*/
               if (fun.name == "unapply" || fun.name == "unapplySeq") &&
-              fun.parameters.length == 1 =>
+                fun.parameters.length == 1 =>
             val substitutor = r.substitutor
             val subst =
               if (fun.typeParameters.isEmpty) substitutor
               else {
                 val undefSubst: ScSubstitutor =
-                  fun.typeParameters.foldLeft(ScSubstitutor.empty)((s, p) =>
+                  fun.typeParameters.foldLeft(ScSubstitutor.empty)(
+                      (s, p) =>
                         s.bindT((p.name, ScalaPsiUtil.getPsiElementId(p)),
                                 ScUndefinedType(
                                     new ScTypeParameterType(p, substitutor))))

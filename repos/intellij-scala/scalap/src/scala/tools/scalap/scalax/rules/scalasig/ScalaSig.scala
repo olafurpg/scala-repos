@@ -43,9 +43,9 @@ object ScalaSigAttributeParsers extends ByteCodeReader {
     def natN(in: ByteCode, x: Int): Result[ByteCode, Int, Nothing] =
       in.nextByte match {
         case Success(out, b) => {
-            val y = (x << 7) + (b & 0x7f)
-            if ((b & 0x80) == 0) Success(out, y) else natN(out, y)
-          }
+          val y = (x << 7) + (b & 0x7f)
+          if ((b & 0x80) == 0) Success(out, y) else natN(out, y)
+        }
         case _ => Failure
       }
     in =>
@@ -61,8 +61,9 @@ object ScalaSigAttributeParsers extends ByteCodeReader {
   val longValue = read(_ toLong)
 }
 
-case class ScalaSig(
-    majorVersion: Int, minorVersion: Int, table: Seq[Int ~ ByteCode])
+case class ScalaSig(majorVersion: Int,
+                    minorVersion: Int,
+                    table: Seq[Int ~ ByteCode])
     extends DefaultMemoisable {
 
   case class Entry(index: Int, entryType: Int, byteCode: ByteCode)
@@ -87,8 +88,8 @@ case class ScalaSig(
 
   override def toString =
     "ScalaSig version " + majorVersion + "." + minorVersion + {
-      for (i <- 0 until table.size) yield
-        i + ":\t" + parseEntry(i) // + "\n\t" + getEntry(i)
+      for (i <- 0 until table.size)
+        yield i + ":\t" + parseEntry(i) // + "\n\t" + getEntry(i)
     }.mkString("\n", "\n", "")
 
   lazy val symbols: Seq[Symbol] = ScalaSigParsers.symbols
@@ -294,11 +295,11 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
   //for now, support only constants and arrays of constants
   lazy val annotArgArray =
     44 -~ (oneOf(constantRef, constAnnotArgRef) *).map(_.toArray)
-  lazy val constAnnotArgRef: Rule[Any, String] = oneOf(
-      constantRef, refTo(annotArgArray))
+  lazy val constAnnotArgRef: Rule[Any, String] =
+    oneOf(constantRef, refTo(annotArgArray))
   lazy val attributeInfo =
     40 -~ symbolRef ~ typeRef ~ (constAnnotArgRef ?) ~
-    (nameRef ~ constAnnotArgRef *) ^~~~^ AttributeInfo // sym_Ref info_Ref {constant_Ref} {nameRef constantRef}
+      (nameRef ~ constAnnotArgRef *) ^~~~^ AttributeInfo // sym_Ref info_Ref {constant_Ref} {nameRef constantRef}
   lazy val children = 41 -~ (nat *) ^^ Children //sym_Ref {sym_Ref}
   lazy val annotInfo =
     43 -~ (nat *) ^^ AnnotInfo // attarg_Ref {constant_Ref attarg_Ref}

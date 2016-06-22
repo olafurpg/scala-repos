@@ -97,7 +97,10 @@ object ShardServiceCombinators extends Logging {
     } yield mimeType
 
     val requested =
-      (request.headers.header[Accept].toSeq.flatMap(_.mimeTypes) ++ requestParamType)
+      (request.headers
+            .header[Accept]
+            .toSeq
+            .flatMap(_.mimeTypes) ++ requestParamType)
 
     val allowed = Set(JSON, CSV, anymaintype / anysubtype)
 
@@ -121,8 +124,8 @@ object ShardServiceCombinators extends Logging {
     import blueeyes.json.serialization.Extractor._
     val onError: Error => String = {
       case err @ Thrown(ex) =>
-        logger.warn(
-            "Exceptiion thrown from JSON parsing of sortOn parameter", ex)
+        logger
+          .warn("Exceptiion thrown from JSON parsing of sortOn parameter", ex)
         err.message
       case other =>
         other.message
@@ -132,14 +135,16 @@ object ShardServiceCombinators extends Logging {
       val parsed: Validation[Error, List[CPath]] =
         ((Thrown(_: Throwable)) <-: JParser.parseFromString(paths)) flatMap {
           case JArray(elems) =>
-            Validation.success(
-                elems collect { case JString(path) => CPath(path) })
+            Validation.success(elems collect {
+              case JString(path) => CPath(path)
+            })
           case JString(path) =>
             Validation.success(CPath(path) :: Nil)
           case badJVal =>
-            Validation.failure(Invalid(
+            Validation.failure(
+                Invalid(
                     "The sortOn query parameter was expected to be JSON string or array, but found " +
-                    badJVal))
+                      badJVal))
         }
 
       onError <-: parsed
@@ -150,7 +155,8 @@ object ShardServiceCombinators extends Logging {
 
   private def getSortOrder(
       request: HttpRequest[_]): Validation[String, DesiredSortOrder] = {
-    request.parameters.get('sortOrder) filter (_ != null) map (_.toLowerCase) map {
+    request.parameters
+      .get('sortOrder) filter (_ != null) map (_.toLowerCase) map {
       case "asc" | "\"asc\"" | "ascending" | "\"ascending\"" =>
         success(TableModule.SortAscending)
       case "desc" | "\"desc\"" | "descending" | "\"descending\"" =>
@@ -273,7 +279,8 @@ trait ShardServiceCombinators
                     query map { q =>
                       q flatMap { f(apiKey, account, path, _: String, opts) }
                     } getOrElse {
-                      Promise.successful(HttpResponse(HttpStatus(
+                      Promise.successful(
+                          HttpResponse(HttpStatus(
                                   BadRequest,
                                   "Neither the query string nor request body contained an identifiable quirrel query.")))
                     }
@@ -290,8 +297,9 @@ trait ShardServiceCombinators
       next: HttpService[ByteChunk,
                         (APIKey, AccountDetails, Path, Query,
                          QueryOptions) => Future[HttpResponse[B]]])(
-      implicit executor: ExecutionContext): HttpService[
-      ByteChunk, ((APIKey, AccountDetails)) => Future[HttpResponse[B]]] = {
+      implicit executor: ExecutionContext)
+    : HttpService[ByteChunk,
+                  ((APIKey, AccountDetails)) => Future[HttpResponse[B]]] = {
     new DelegatingService[
         ByteChunk,
         ((APIKey, AccountDetails)) => Future[HttpResponse[B]],
@@ -316,7 +324,8 @@ trait ShardServiceCombinators
 
   def requireAccount[A, B](accountFinder: AccountFinder[Future])(
       service: HttpService[
-          A, ((APIKey, AccountDetails)) => Future[HttpResponse[B]]])(
+          A,
+          ((APIKey, AccountDetails)) => Future[HttpResponse[B]]])(
       implicit inj: JValue => B,
       M: Monad[Future]): HttpService[A, APIKey => Future[HttpResponse[B]]] = {
     val service0 =
@@ -332,7 +341,8 @@ trait ShardServiceCombinators
 
 final class FindAccountService[A, B](accountFinder: AccountFinder[Future])(
     val delegate: HttpService[
-        A, Validation[String, (APIKey, AccountDetails)] => Future[B]])(
+        A,
+        Validation[String, (APIKey, AccountDetails)] => Future[B]])(
     implicit M: Monad[Future])
     extends DelegatingService[
         A,

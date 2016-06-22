@@ -7,8 +7,8 @@ object Impls {
     val printPrefix = Apply(
         Select(Ident(definitions.PredefModule), TermName("println")),
         List(Literal(Constant("prefix = " + prefix))))
-    val body = Block(
-        List(printPrefix), Literal(Constant("this is deprecated")))
+    val body =
+      Block(List(printPrefix), Literal(Constant("this is deprecated")))
     c.Expr[String](body)
   }
 }

@@ -32,8 +32,8 @@ object Test {
                                 node.label.toLowerCase,
                                 attributes(node.attributes))
         for (m <- node.child) serialize(m, serializer)
-        serializer.endElement(
-            "", node.label.toLowerCase, node.label.toLowerCase)
+        serializer
+          .endElement("", node.label.toLowerCase, node.label.toLowerCase)
     }
   }
   def parse(str: ByteArrayInputStream) = {
@@ -56,8 +56,8 @@ object Test {
       for (attr <- d) {
         val sb = new StringBuilder()
         Utility.sequenceToXML(attr.value, TopScope, sb, true)
-        attrs.addAttribute(
-            new QualifiedName("", "", attr.key.toLowerCase), sb.toString)
+        attrs.addAttribute(new QualifiedName("", "", attr.key.toLowerCase),
+                           sb.toString)
       }
     }
     attrs

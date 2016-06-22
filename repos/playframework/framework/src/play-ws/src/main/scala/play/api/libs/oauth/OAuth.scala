@@ -19,8 +19,9 @@ import play.api.libs.ws.WSSignatureCalculator
 case class OAuth(info: ServiceInfo, use10a: Boolean = true) {
 
   private val provider = {
-    val p = new CommonsHttpOAuthProvider(
-        info.requestTokenURL, info.accessTokenURL, info.authorizationURL)
+    val p = new CommonsHttpOAuthProvider(info.requestTokenURL,
+                                         info.accessTokenURL,
+                                         info.authorizationURL)
     p.setOAuth10a(use10a)
     p
   }
@@ -103,15 +104,16 @@ class OAuthCalculator(consumerKey: ConsumerKey, requestToken: RequestToken)
 
   import org.asynchttpclient.oauth.{ConsumerKey => AHCConsumerKey, RequestToken => AHCRequestToken}
 
-  private val ahcConsumerKey = new AHCConsumerKey(
-      consumerKey.key, consumerKey.secret)
-  private val ahcRequestToken = new AHCRequestToken(
-      requestToken.token, requestToken.secret)
-  private val calculator = new OAuthSignatureCalculator(
-      ahcConsumerKey, ahcRequestToken)
+  private val ahcConsumerKey =
+    new AHCConsumerKey(consumerKey.key, consumerKey.secret)
+  private val ahcRequestToken =
+    new AHCRequestToken(requestToken.token, requestToken.secret)
+  private val calculator =
+    new OAuthSignatureCalculator(ahcConsumerKey, ahcRequestToken)
 
   override def calculateAndAddSignature(
-      request: Request, requestBuilder: RequestBuilderBase[_]): Unit = {
+      request: Request,
+      requestBuilder: RequestBuilderBase[_]): Unit = {
     calculator.calculateAndAddSignature(request, requestBuilder)
   }
 }
@@ -128,8 +130,8 @@ class OAuthCalculator(consumerKey: ConsumerKey, requestToken: RequestToken)
   * }}}
   */
 object OAuthCalculator {
-  def apply(
-      consumerKey: ConsumerKey, token: RequestToken): WSSignatureCalculator = {
+  def apply(consumerKey: ConsumerKey,
+            token: RequestToken): WSSignatureCalculator = {
     new OAuthCalculator(consumerKey, token)
   }
 }

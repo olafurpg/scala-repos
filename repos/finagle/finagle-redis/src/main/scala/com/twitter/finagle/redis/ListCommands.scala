@@ -105,8 +105,9 @@ trait Lists { self: BaseClient =>
     * back or the front of the list.  If count is 0, it will remove all instances, value
     * @return the number of removed elements.
     */
-  def lRem(
-      key: ChannelBuffer, count: JLong, value: ChannelBuffer): Future[JLong] =
+  def lRem(key: ChannelBuffer,
+           count: JLong,
+           value: ChannelBuffer): Future[JLong] =
     doRequest(LRem(key, count, value)) {
       case IntegerReply(n) => Future.value(n)
     }
@@ -118,8 +119,9 @@ trait Lists { self: BaseClient =>
     * @param index
     * @param value
     */
-  def lSet(
-      key: ChannelBuffer, index: JLong, value: ChannelBuffer): Future[Unit] =
+  def lSet(key: ChannelBuffer,
+           index: JLong,
+           value: ChannelBuffer): Future[Unit] =
     doRequest(LSet(key, index, value)) {
       case StatusReply(message) => Future.Unit
     }

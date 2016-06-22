@@ -46,8 +46,8 @@ class TasksResourceTest
     groupManager.app(app2) returns Future.successful(Some(AppDefinition(app2)))
 
     When("we ask to kill both tasks")
-    val response = taskResource.killTasks(
-        scale = false, force = false, body = bodyBytes, auth.request)
+    val response = taskResource
+      .killTasks(scale = false, force = false, body = bodyBytes, auth.request)
 
     Then("The response should be OK")
     response.getStatus shouldEqual 200
@@ -89,8 +89,8 @@ class TasksResourceTest
     groupManager.app(app2) returns Future.successful(Some(AppDefinition(app2)))
 
     When("we ask to kill both tasks")
-    val response = taskResource.killTasks(
-        scale = true, force = true, body = bodyBytes, auth.request)
+    val response = taskResource
+      .killTasks(scale = true, force = true, body = bodyBytes, auth.request)
 
     Then("The response should be OK")
     response.getStatus shouldEqual 200
@@ -178,8 +178,12 @@ class TasksResourceTest
     val taskId3 = Task.Id.forApp(appId).idString
     val body = s"""{"ids": ["$taskId1", "$taskId2", "$taskId3"]}""".getBytes
 
-    taskKiller = new TaskKiller(
-        taskTracker, groupManager, service, config, auth.auth, auth.auth)
+    taskKiller = new TaskKiller(taskTracker,
+                                groupManager,
+                                service,
+                                config,
+                                auth.auth,
+                                auth.auth)
     taskResource = new TasksResource(
         service,
         taskTracker,
@@ -212,8 +216,10 @@ class TasksResourceTest
 
     When("we ask to kill those two tasks")
     val ex = intercept[BadRequestException] {
-      taskResource.killTasks(
-          scale = false, force = false, body = bodyBytes, auth.request)
+      taskResource.killTasks(scale = false,
+                             force = false,
+                             body = bodyBytes,
+                             auth.request)
     }
 
     Then("An exception should be thrown that points to the invalid taskId")

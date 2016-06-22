@@ -116,15 +116,17 @@ object TimeTest {
     val wsString = " " * 1000
     val iterations = 100000
     println("Running ws...")
-    println("...took " + executionTime(() =>
+    println(
+        "...took " + executionTime(() =>
               testParser.runParser(wsString, testParser.ws, iterations))._1 +
-        "ms")
+          "ms")
     //println("Running ws1...")
     //println("...took " + executionTime (() => testParser.runParser(wsString, testParser.ws, iterations)))
     println("Running ws2...")
-    println("...took " + executionTime(() =>
+    println(
+        "...took " + executionTime(() =>
               testParser.runParser(wsString, testParser.ws2, iterations))._1 +
-        "ms")
+          "ms")
   }
 
   def main(args: Array[String]) {

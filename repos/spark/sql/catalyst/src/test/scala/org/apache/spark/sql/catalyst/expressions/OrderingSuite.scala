@@ -100,11 +100,17 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
           val rowOrdering =
             InterpretedOrdering.forSchema(Seq(dataType, dataType))
           val genOrdering = GenerateOrdering.generate(BoundReference(
-                  0, dataType, nullable = true).asc :: BoundReference(
-                  1, dataType, nullable = true).asc :: Nil)
+                  0,
+                  dataType,
+                  nullable = true).asc :: BoundReference(
+                  1,
+                  dataType,
+                  nullable = true).asc :: Nil)
           val rowType = StructType(
               StructField("a", dataType, nullable = true) :: StructField(
-                  "b", dataType, nullable = true) :: Nil)
+                  "b",
+                  dataType,
+                  nullable = true) :: Nil)
           val maybeDataGenerator =
             RandomDataGenerator.forType(rowType, nullable = false)
           assume(maybeDataGenerator.isDefined)

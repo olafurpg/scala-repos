@@ -48,9 +48,9 @@ class InformationGainStats(val gain: Double,
   override def equals(o: Any): Boolean = o match {
     case other: InformationGainStats =>
       gain == other.gain &&
-      impurity == other.impurity && leftImpurity == other.leftImpurity &&
-      rightImpurity == other.rightImpurity &&
-      leftPredict == other.leftPredict && rightPredict == other.rightPredict
+        impurity == other.impurity && leftImpurity == other.leftImpurity &&
+        rightImpurity == other.rightImpurity &&
+        leftPredict == other.leftPredict && rightPredict == other.rightPredict
 
     case _ => false
   }

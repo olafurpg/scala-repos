@@ -48,8 +48,9 @@ class IndexDouble(keys: Vec[Double]) extends Index[Double] {
   def without(locs: Array[Int]): Index[Double] =
     Index(array.remove(keys, locs))
 
-  def concat[B, C](x: Index[B])(
-      implicit wd: Promoter[Double, B, C], mc: ST[C], oc: ORD[C]): Index[C] =
+  def concat[B, C](x: Index[B])(implicit wd: Promoter[Double, B, C],
+                                mc: ST[C],
+                                oc: ORD[C]): Index[C] =
     Index(util.Concat.append[Double, B, C](toArray, x.toArray))
 
   def isMonotonic: Boolean = monotonic

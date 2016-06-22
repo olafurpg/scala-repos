@@ -21,8 +21,7 @@ case class BacktestingParams(
     val exitThreshold: Double,
     val maxPositions: Int = 1,
     val optOutputPath: Option[String] = None
-)
-    extends Params {}
+) extends Params {}
 
 // prediction is Ticker -> ({1:Enter, -1:Exit}, ActualReturn)
 class DailyResult(
@@ -38,22 +37,19 @@ case class DailyStat(
     val ret: Double,
     val market: Double,
     val positionCount: Int
-)
-    extends Serializable
+) extends Serializable
 
 case class OverallStat(
     val ret: Double,
     val vol: Double,
     val sharpe: Double,
     val days: Int
-)
-    extends Serializable
+) extends Serializable
 
 case class BacktestingResult(
     val daily: Seq[DailyStat],
     val overall: OverallStat
-)
-    extends Serializable
+) extends Serializable
     with NiceRendering {
   override def toString(): String = overall.toString
 
@@ -86,13 +82,13 @@ class BacktestingEvaluator(val params: BacktestingParams)
     // Decide enter / exit, also sort by pValue desc
     val data = prediction.data.map {
       case (ticker, pValue) => {
-          val dir = pValue match {
-            case p if p >= params.enterThreshold => 1
-            case p if p <= params.exitThreshold => -1
-            case _ => 0
-          }
-          (ticker, dir, pValue)
+        val dir = pValue match {
+          case p if p >= params.enterThreshold => 1
+          case p if p <= params.exitThreshold => -1
+          case _ => 0
         }
+        (ticker, dir, pValue)
+      }
     }.toArray.sortBy(-_._3)
 
     val toEnter = data.filter(_._2 == 1).map(_._1)

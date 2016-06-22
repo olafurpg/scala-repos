@@ -30,8 +30,8 @@ object ApiBranchProtection {
   case object NonAdmins extends EnforcementLevel("non_admins")
   case object Everyone extends EnforcementLevel("everyone")
   object EnforcementLevel {
-    def apply(
-        enabled: Boolean, includeAdministrators: Boolean): EnforcementLevel =
+    def apply(enabled: Boolean,
+              includeAdministrators: Boolean): EnforcementLevel =
       if (enabled) {
         if (includeAdministrators) {
           Everyone
@@ -44,8 +44,7 @@ object ApiBranchProtection {
   }
 
   implicit val enforcementLevelSerializer =
-    new CustomSerializer[EnforcementLevel](
-        format =>
+    new CustomSerializer[EnforcementLevel](format =>
           ({
         case JString("off") => Off
         case JString("non_admins") => NonAdmins

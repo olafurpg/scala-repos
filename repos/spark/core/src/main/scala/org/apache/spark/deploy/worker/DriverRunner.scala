@@ -97,17 +97,16 @@ private[deploy] class DriverRunner(conf: SparkConf,
           case e: Exception => finalException = Some(e)
         }
 
-        val state =
-          if (killed) {
-            DriverState.KILLED
-          } else if (finalException.isDefined) {
-            DriverState.ERROR
-          } else {
-            finalExitCode match {
-              case Some(0) => DriverState.FINISHED
-              case _ => DriverState.FAILED
-            }
+        val state = if (killed) {
+          DriverState.KILLED
+        } else if (finalException.isDefined) {
+          DriverState.ERROR
+        } else {
+          finalExitCode match {
+            case Some(0) => DriverState.FINISHED
+            case _ => DriverState.FAILED
           }
+        }
 
         finalState = Some(state)
 
@@ -170,8 +169,9 @@ private[deploy] class DriverRunner(conf: SparkConf,
     localJarFilename
   }
 
-  private def launchDriver(
-      builder: ProcessBuilder, baseDir: File, supervise: Boolean) {
+  private def launchDriver(builder: ProcessBuilder,
+                           baseDir: File,
+                           supervise: Boolean) {
     builder.directory(baseDir)
     def initialize(process: Process): Unit = {
       // Redirect stdout and stderr to files

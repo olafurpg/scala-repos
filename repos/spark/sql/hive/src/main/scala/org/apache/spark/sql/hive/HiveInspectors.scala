@@ -230,13 +230,13 @@ private[hive] trait HiveInspectors {
     case c: Class[_] if c == classOf[java.util.List[_]] =>
       throw new AnalysisException(
           "List type in java is unsupported because " +
-          "JVM type erasure makes spark fail to catch a component type in List<>")
+            "JVM type erasure makes spark fail to catch a component type in List<>")
 
     // java map type unsupported
     case c: Class[_] if c == classOf[java.util.Map[_, _]] =>
       throw new AnalysisException(
           "Map type in java is unsupported because " +
-          "JVM type erasure makes spark fail to catch key and value types in Map<>")
+            "JVM type erasure makes spark fail to catch key and value types in Map<>")
 
     case c => throw new AnalysisException(s"Unsupported java type $c")
   }
@@ -390,7 +390,8 @@ private[hive] trait HiveInspectors {
     // currently, hive doesn't provide the ConstantStructObjectInspector
     case si: StructObjectInspector =>
       val allRefs = si.getAllStructFieldRefs
-      InternalRow.fromSeq(allRefs.asScala.map(r =>
+      InternalRow.fromSeq(
+          allRefs.asScala.map(r =>
                 unwrap(si.getStructFieldData(data, r),
                        r.getFieldObjectInspector)))
   }
@@ -399,8 +400,8 @@ private[hive] trait HiveInspectors {
     * Wraps with Hive types based on object inspector.
     * TODO: Consolidate all hive OI/data interface code.
     */
-  protected def wrapperFor(
-      oi: ObjectInspector, dataType: DataType): Any => Any = oi match {
+  protected def wrapperFor(oi: ObjectInspector,
+                           dataType: DataType): Any => Any = oi match {
     case _: JavaHiveVarcharObjectInspector =>
       (o: Any) =>
         if (o != null) {
@@ -460,7 +461,9 @@ private[hive] trait HiveInspectors {
               .foreach {
                 case ((field, wrapper), i) =>
                   soi.setStructFieldData(
-                      struct, field, wrapper(row.get(i, schema(i).dataType)))
+                      struct,
+                      field,
+                      wrapper(row.get(i, schema(i).dataType)))
               }
             struct
           } else {
@@ -488,8 +491,8 @@ private[hive] trait HiveInspectors {
       case moi: MapObjectInspector =>
       val mt = dataType.asInstanceOf[MapType]
       val keyWrapper = wrapperFor(moi.getMapKeyObjectInspector, mt.keyType)
-      val valueWrapper = wrapperFor(
-          moi.getMapValueObjectInspector, mt.valueType)
+      val valueWrapper =
+        wrapperFor(moi.getMapValueObjectInspector, mt.valueType)
 
       (o: Any) =>
         {
@@ -566,7 +569,8 @@ private[hive] trait HiveInspectors {
           // TODO we don't support the HiveVarcharObjectInspector yet.
           case _: StringObjectInspector if x.preferWritable() =>
             getStringWritable(a)
-          case _: StringObjectInspector => a.asInstanceOf[UTF8String].toString()
+          case _: StringObjectInspector =>
+            a.asInstanceOf[UTF8String].toString()
           case _: IntObjectInspector if x.preferWritable() => getIntWritable(a)
           case _: IntObjectInspector => a.asInstanceOf[java.lang.Integer]
           case _: BooleanObjectInspector if x.preferWritable() =>
@@ -696,7 +700,8 @@ private[hive] trait HiveInspectors {
       ObjectInspectorFactory.getStandardListObjectInspector(toInspector(tpe))
     case MapType(keyType, valueType, _) =>
       ObjectInspectorFactory.getStandardMapObjectInspector(
-          toInspector(keyType), toInspector(valueType))
+          toInspector(keyType),
+          toInspector(valueType))
     case StringType =>
       PrimitiveObjectInspectorFactory.javaStringObjectInspector
     case IntegerType => PrimitiveObjectInspectorFactory.javaIntObjectInspector
@@ -761,8 +766,8 @@ private[hive] trait HiveInspectors {
     case Literal(value, ArrayType(dt, _)) =>
       val listObjectInspector = toInspector(dt)
       if (value == null) {
-        ObjectInspectorFactory.getStandardConstantListObjectInspector(
-            listObjectInspector, null)
+        ObjectInspectorFactory
+          .getStandardConstantListObjectInspector(listObjectInspector, null)
       } else {
         val list = new java.util.ArrayList[Object]()
         value
@@ -770,15 +775,15 @@ private[hive] trait HiveInspectors {
           .foreach(dt, (_, e) => {
             list.add(wrap(e, listObjectInspector, dt))
           })
-        ObjectInspectorFactory.getStandardConstantListObjectInspector(
-            listObjectInspector, list)
+        ObjectInspectorFactory
+          .getStandardConstantListObjectInspector(listObjectInspector, list)
       }
     case Literal(value, MapType(keyType, valueType, _)) =>
       val keyOI = toInspector(keyType)
       val valueOI = toInspector(valueType)
       if (value == null) {
-        ObjectInspectorFactory.getStandardConstantMapObjectInspector(
-            keyOI, valueOI, null)
+        ObjectInspectorFactory
+          .getStandardConstantMapObjectInspector(keyOI, valueOI, null)
       } else {
         val map = value.asInstanceOf[MapData]
         val jmap = new java.util.HashMap[Any, Any](map.numElements())
@@ -787,8 +792,8 @@ private[hive] trait HiveInspectors {
           jmap.put(wrap(k, keyOI, keyType), wrap(v, valueOI, valueType))
         })
 
-        ObjectInspectorFactory.getStandardConstantMapObjectInspector(
-            keyOI, valueOI, jmap)
+        ObjectInspectorFactory
+          .getStandardConstantMapObjectInspector(keyOI, valueOI, jmap)
       }
     // We will enumerate all of the possible constant expressions, throw exception if we missed
     case Literal(_, dt) =>
@@ -805,7 +810,8 @@ private[hive] trait HiveInspectors {
     inspector match {
       case s: StructObjectInspector =>
         StructType(
-            s.getAllStructFieldRefs.asScala.map(f =>
+            s.getAllStructFieldRefs.asScala.map(
+                f =>
                   types.StructField(
                       f.getFieldName,
                       inspectorToDataType(f.getFieldObjectInspector),
@@ -858,78 +864,90 @@ private[hive] trait HiveInspectors {
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.stringTypeInfo, getStringWritable(value))
+          TypeInfoFactory.stringTypeInfo,
+          getStringWritable(value))
 
   private def getIntWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
-      .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.intTypeInfo, getIntWritable(value))
+      .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo,
+                                                   getIntWritable(value))
 
   private def getDoubleWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.doubleTypeInfo, getDoubleWritable(value))
+          TypeInfoFactory.doubleTypeInfo,
+          getDoubleWritable(value))
 
   private def getBooleanWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.booleanTypeInfo, getBooleanWritable(value))
+          TypeInfoFactory.booleanTypeInfo,
+          getBooleanWritable(value))
 
   private def getLongWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.longTypeInfo, getLongWritable(value))
+          TypeInfoFactory.longTypeInfo,
+          getLongWritable(value))
 
   private def getFloatWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.floatTypeInfo, getFloatWritable(value))
+          TypeInfoFactory.floatTypeInfo,
+          getFloatWritable(value))
 
   private def getShortWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.shortTypeInfo, getShortWritable(value))
+          TypeInfoFactory.shortTypeInfo,
+          getShortWritable(value))
 
   private def getByteWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.byteTypeInfo, getByteWritable(value))
+          TypeInfoFactory.byteTypeInfo,
+          getByteWritable(value))
 
   private def getBinaryWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.binaryTypeInfo, getBinaryWritable(value))
+          TypeInfoFactory.binaryTypeInfo,
+          getBinaryWritable(value))
 
   private def getDateWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.dateTypeInfo, getDateWritable(value))
+          TypeInfoFactory.dateTypeInfo,
+          getDateWritable(value))
 
   private def getTimestampWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.timestampTypeInfo, getTimestampWritable(value))
+          TypeInfoFactory.timestampTypeInfo,
+          getTimestampWritable(value))
 
   private def getDecimalWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.decimalTypeInfo, getDecimalWritable(value))
+          TypeInfoFactory.decimalTypeInfo,
+          getDecimalWritable(value))
 
   private def getPrimitiveNullWritableConstantObjectInspector: ObjectInspector =
     PrimitiveObjectInspectorFactory
       .getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.voidTypeInfo, null)
+          TypeInfoFactory.voidTypeInfo,
+          null)
 
   private def getStringWritable(value: Any): hadoopIo.Text =
     if (value == null) null

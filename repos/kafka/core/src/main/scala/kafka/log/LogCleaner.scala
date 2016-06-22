@@ -73,13 +73,13 @@ class LogCleaner(val config: CleanerConfig,
   private[log] val cleanerManager = new LogCleanerManager(logDirs, logs)
 
   /* a throttle used to limit the I/O of all the cleaner threads to a user-specified maximum rate */
-  private val throttler = new Throttler(
-      desiredRatePerSec = config.maxIoBytesPerSecond,
-      checkIntervalMs = 300,
-      throttleDown = true,
-      "cleaner-io",
-      "bytes",
-      time = time)
+  private val throttler = new Throttler(desiredRatePerSec =
+                                          config.maxIoBytesPerSecond,
+                                        checkIntervalMs = 300,
+                                        throttleDown = true,
+                                        "cleaner-io",
+                                        "bytes",
+                                        time = time)
 
   /* the threads */
   private val cleaners = (0 until config.numThreads).map(new CleanerThread(_))
@@ -94,8 +94,8 @@ class LogCleaner(val config: CleanerConfig,
     def value: Int = {
       val stats = cleaners.map(_.lastStats)
       val recopyRate =
-        stats.map(_.bytesWritten).sum.toDouble / math.max(
-            stats.map(_.bytesRead).sum, 1)
+        stats.map(_.bytesWritten).sum.toDouble / math
+          .max(stats.map(_.bytesRead).sum, 1)
       (100 * recopyRate).toInt
     }
   })
@@ -138,8 +138,9 @@ class LogCleaner(val config: CleanerConfig,
   /**
     * Truncate cleaner offset checkpoint for the given partition if its checkpointed offset is larger than the given offset
     */
-  def maybeTruncateCheckpoint(
-      dataDir: File, topicAndPartition: TopicAndPartition, offset: Long) {
+  def maybeTruncateCheckpoint(dataDir: File,
+                              topicAndPartition: TopicAndPartition,
+                              offset: Long) {
     cleanerManager.maybeTruncateCheckpoint(dataDir, topicAndPartition, offset)
   }
 
@@ -202,11 +203,12 @@ class LogCleaner(val config: CleanerConfig,
 
     val cleaner = new Cleaner(
         id = threadId,
-        offsetMap = new SkimpyOffsetMap(memory = math
-                                          .min(config.dedupeBufferSize / config.numThreads,
-                                               Int.MaxValue)
-                                          .toInt,
-                                        hashAlgorithm = config.hashAlgorithm),
+        offsetMap = new SkimpyOffsetMap(
+            memory = math
+              .min(config.dedupeBufferSize / config.numThreads,
+                   Int.MaxValue)
+              .toInt,
+            hashAlgorithm = config.hashAlgorithm),
         ioBufferSize = config.ioBufferSize / config.numThreads / 2,
         maxIoBufferSize = config.maxMessageSize,
         dupBufferLoadFactor = config.dedupeBufferLoadFactor,
@@ -267,39 +269,46 @@ class LogCleaner(val config: CleanerConfig,
     /**
       * Log out statistics on a single run of the cleaner.
       */
-    def recordStats(
-        id: Int, name: String, from: Long, to: Long, stats: CleanerStats) {
+    def recordStats(id: Int,
+                    name: String,
+                    from: Long,
+                    to: Long,
+                    stats: CleanerStats) {
       this.lastStats = stats
       cleaner.statsUnderlying.swap
       def mb(bytes: Double) = bytes / (1024 * 1024)
       val message =
         "%n\tLog cleaner thread %d cleaned log %s (dirty section = [%d, %d])%n"
           .format(id, name, from, to) +
-        "\t%,.1f MB of log processed in %,.1f seconds (%,.1f MB/sec).%n"
-          .format(mb(stats.bytesRead),
-                  stats.elapsedSecs,
-                  mb(stats.bytesRead / stats.elapsedSecs)) +
-        "\tIndexed %,.1f MB in %.1f seconds (%,.1f Mb/sec, %.1f%% of total time)%n"
-          .format(mb(stats.mapBytesRead),
-                  stats.elapsedIndexSecs,
-                  mb(stats.mapBytesRead) / stats.elapsedIndexSecs,
-                  100 * stats.elapsedIndexSecs / stats.elapsedSecs) +
-        "\tBuffer utilization: %.1f%%%n".format(100 * stats.bufferUtilization) +
-        "\tCleaned %,.1f MB in %.1f seconds (%,.1f Mb/sec, %.1f%% of total time)%n"
-          .format(mb(stats.bytesRead),
-                  stats.elapsedSecs - stats.elapsedIndexSecs,
-                  mb(stats.bytesRead) / (stats.elapsedSecs -
+          "\t%,.1f MB of log processed in %,.1f seconds (%,.1f MB/sec).%n"
+            .format(mb(stats.bytesRead),
+                    stats.elapsedSecs,
+                    mb(stats.bytesRead / stats.elapsedSecs)) +
+          "\tIndexed %,.1f MB in %.1f seconds (%,.1f Mb/sec, %.1f%% of total time)%n"
+            .format(mb(stats.mapBytesRead),
+                    stats.elapsedIndexSecs,
+                    mb(stats.mapBytesRead) / stats.elapsedIndexSecs,
+                    100 * stats.elapsedIndexSecs / stats.elapsedSecs) +
+          "\tBuffer utilization: %.1f%%%n".format(
+              100 * stats.bufferUtilization) +
+          "\tCleaned %,.1f MB in %.1f seconds (%,.1f Mb/sec, %.1f%% of total time)%n"
+            .format(
+                mb(stats.bytesRead),
+                stats.elapsedSecs - stats.elapsedIndexSecs,
+                mb(stats.bytesRead) / (stats.elapsedSecs -
                       stats.elapsedIndexSecs),
-                  100 * (stats.elapsedSecs -
+                100 * (stats.elapsedSecs -
                       stats.elapsedIndexSecs).toDouble / stats.elapsedSecs) +
-        "\tStart size: %,.1f MB (%,d messages)%n".format(mb(stats.bytesRead),
-                                                         stats.messagesRead) +
-        "\tEnd size: %,.1f MB (%,d messages)%n".format(mb(stats.bytesWritten),
-                                                       stats.messagesWritten) +
-        "\t%.1f%% size reduction (%.1f%% fewer messages)%n".format(
-            100.0 * (1.0 - stats.bytesWritten.toDouble / stats.bytesRead),
-            100.0 * (1.0 -
-                stats.messagesWritten.toDouble / stats.messagesRead))
+          "\tStart size: %,.1f MB (%,d messages)%n".format(
+              mb(stats.bytesRead),
+              stats.messagesRead) +
+          "\tEnd size: %,.1f MB (%,d messages)%n".format(
+              mb(stats.bytesWritten),
+              stats.messagesWritten) +
+          "\t%.1f%% size reduction (%.1f%% fewer messages)%n".format(
+              100.0 * (1.0 - stats.bytesWritten.toDouble / stats.bytesRead),
+              100.0 * (1.0 -
+                    stats.messagesWritten.toDouble / stats.messagesRead))
       info(message)
       if (stats.invalidMessagesRead > 0) {
         warn(
@@ -361,8 +370,10 @@ private[log] class Cleaner(val id: Int,
     info("Building offset map for %s...".format(cleanable.log.name))
     val upperBoundOffset = log.activeSegment.baseOffset
     val endOffset =
-      buildOffsetMap(
-          log, cleanable.firstDirtyOffset, upperBoundOffset, offsetMap) + 1
+      buildOffsetMap(log,
+                     cleanable.firstDirtyOffset,
+                     upperBoundOffset,
+                     offsetMap) + 1
     stats.indexDone()
 
     // figure out the timestamp below which it is safe to remove delete tombstones
@@ -375,12 +386,12 @@ private[log] class Cleaner(val id: Int,
 
     // group the segments and clean the groups
     info(
-        "Cleaning log %s (discarding tombstones prior to %s)...".format(
-            log.name, new Date(deleteHorizonMs)))
+        "Cleaning log %s (discarding tombstones prior to %s)..."
+          .format(log.name, new Date(deleteHorizonMs)))
     for (group <- groupSegmentsBySize(log.logSegments(0, endOffset),
                                       log.config.segmentSize,
-                                      log.config.maxIndexSize)) cleanSegments(
-        log, group, offsetMap, deleteHorizonMs)
+                                      log.config.maxIndexSize))
+      cleanSegments(log, group, offsetMap, deleteHorizonMs)
 
     // record buffer utilization
     stats.bufferUtilization = offsetMap.utilization
@@ -413,8 +424,9 @@ private[log] class Cleaner(val id: Int,
                                       fileAlreadyExists = false,
                                       initFileSize = log.initFileSize(),
                                       preallocate = log.config.preallocate)
-    val index = new OffsetIndex(
-        indexFile, segments.head.baseOffset, segments.head.index.maxIndexSize)
+    val index = new OffsetIndex(indexFile,
+                                segments.head.baseOffset,
+                                segments.head.index.maxIndexSize)
     val cleaned = new LogSegment(messages,
                                  index,
                                  segments.head.baseOffset,
@@ -499,8 +511,8 @@ private[log] class Cleaner(val id: Int,
           if (shouldRetainMessage(source, map, retainDeletes, entry)) {
             val convertedMessage =
               entry.message.toFormatVersion(messageFormatVersion)
-            ByteBufferMessageSet.writeMessage(
-                writeBuffer, convertedMessage, entry.offset)
+            ByteBufferMessageSet
+              .writeMessage(writeBuffer, convertedMessage, entry.offset)
             stats.recopyMessage(size)
           }
           messagesRead += 1
@@ -512,8 +524,10 @@ private[log] class Cleaner(val id: Int,
           val retainedMessages = new mutable.ArrayBuffer[MessageAndOffset]
           messages.foreach { messageAndOffset =>
             messagesRead += 1
-            if (shouldRetainMessage(
-                    source, map, retainDeletes, messageAndOffset)) {
+            if (shouldRetainMessage(source,
+                                    map,
+                                    retainDeletes,
+                                    messageAndOffset)) {
               retainedMessages += {
                 if (messageAndOffset.message.magic != messageFormatVersion) {
                   writeOriginalMessageSet = false
@@ -528,8 +542,8 @@ private[log] class Cleaner(val id: Int,
 
           // There are no messages compacted out and no message format conversion, write the original message set back
           if (writeOriginalMessageSet)
-            ByteBufferMessageSet.writeMessage(
-                writeBuffer, entry.message, entry.offset)
+            ByteBufferMessageSet
+              .writeMessage(writeBuffer, entry.message, entry.offset)
           else if (retainedMessages.nonEmpty)
             compressMessages(writeBuffer,
                              entry.message.compressionCodec,
@@ -561,8 +575,9 @@ private[log] class Cleaner(val id: Int,
     if (messageAndOffsets.isEmpty) {
       MessageSet.Empty.sizeInBytes
     } else if (compressionCodec == NoCompressionCodec) {
-      for (messageOffset <- messageAndOffsets) ByteBufferMessageSet
-        .writeMessage(buffer, messageOffset.message, messageOffset.offset)
+      for (messageOffset <- messageAndOffsets)
+        ByteBufferMessageSet
+          .writeMessage(buffer, messageOffset.message, messageOffset.offset)
       MessageSet.messageSetSize(messages)
     } else {
       val magicAndTimestamp = MessageSet.magicAndLargestTimestamp(messages)
@@ -633,8 +648,9 @@ private[log] class Cleaner(val id: Int,
           "This log contains a message larger than maximum allowable size of %s."
             .format(maxIoBufferSize))
     val newSize = math.min(this.readBuffer.capacity * 2, maxIoBufferSize)
-    info("Growing cleaner I/O buffers from " + readBuffer.capacity +
-        "bytes to " + newSize + " bytes.")
+    info(
+        "Growing cleaner I/O buffers from " + readBuffer.capacity +
+          "bytes to " + newSize + " bytes.")
     this.readBuffer = ByteBuffer.allocate(newSize)
     this.writeBuffer = ByteBuffer.allocate(newSize)
   }
@@ -694,8 +710,10 @@ private[log] class Cleaner(val id: Int,
     *
     * @return The final offset the map covers
     */
-  private[log] def buildOffsetMap(
-      log: Log, start: Long, end: Long, map: OffsetMap): Long = {
+  private[log] def buildOffsetMap(log: Log,
+                                  start: Long,
+                                  end: Long,
+                                  map: OffsetMap): Long = {
     map.clear()
     val dirty = log.logSegments(start, end).toSeq
     info(
@@ -828,8 +846,9 @@ private case class CleanerStats(time: Time = SystemTime) {
 /**
   * Helper class for a log, its topic/partition, and the last clean position
   */
-private case class LogToClean(
-    topicPartition: TopicAndPartition, log: Log, firstDirtyOffset: Long)
+private case class LogToClean(topicPartition: TopicAndPartition,
+                              log: Log,
+                              firstDirtyOffset: Long)
     extends Ordered[LogToClean] {
   val cleanBytes = log.logSegments(-1, firstDirtyOffset).map(_.size).sum
   val dirtyBytes = log

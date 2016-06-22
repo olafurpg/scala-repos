@@ -46,8 +46,7 @@ object CachingAPIKeyFinderSettings {
 
 class CachingAPIKeyFinder[M[+ _]: Monad](
     delegate: APIKeyFinder[M],
-    settings: CachingAPIKeyFinderSettings =
-      CachingAPIKeyFinderSettings.Default)
+    settings: CachingAPIKeyFinderSettings = CachingAPIKeyFinderSettings.Default)
     extends APIKeyFinder[M] {
   private val apiKeyCache =
     Cache.simple[APIKey, v1.APIKeyDetails](settings.apiKeyCacheSettings: _*)

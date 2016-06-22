@@ -97,8 +97,8 @@ object SimpleConsumerShell extends Logging {
       .withRequiredArg
       .describedAs("prop")
       .ofType(classOf[String])
-    val printOffsetOpt = parser.accepts(
-        "print-offsets", "Print the offsets returned by the iterator")
+    val printOffsetOpt = parser
+      .accepts("print-offsets", "Print the offsets returned by the iterator")
     val maxWaitMsOpt = parser
       .accepts("max-wait-ms",
                "The max amount of time each fetch request waits.")
@@ -115,7 +115,7 @@ object SimpleConsumerShell extends Logging {
     val skipMessageOnErrorOpt = parser.accepts(
         "skip-message-on-error",
         "If there is an error when processing a message, " +
-        "skip it instead of halt.")
+          "skip it instead of halt.")
     val noWaitAtEndOfLogOpt = parser.accepts(
         "no-wait-at-logend",
         "If set, when the simple consumer reaches the end of the Log, it will stop, not waiting for new produced messages")
@@ -126,8 +126,11 @@ object SimpleConsumerShell extends Logging {
           "A low-level tool for fetching data directly from a particular replica.")
 
     val options = parser.parse(args: _*)
-    CommandLineUtils.checkRequiredArgs(
-        parser, options, brokerListOpt, topicOpt, partitionIdOpt)
+    CommandLineUtils.checkRequiredArgs(parser,
+                                       options,
+                                       brokerListOpt,
+                                       topicOpt,
+                                       partitionIdOpt)
 
     val topic = options.valueOf(topicOpt)
     val partitionId = options.valueOf(partitionIdOpt).intValue()
@@ -160,13 +163,16 @@ object SimpleConsumerShell extends Logging {
     ToolsUtils.validatePortOrDie(parser, brokerList)
     val metadataTargetBrokers = ClientUtils.parseBrokerList(brokerList)
     val topicsMetadata = ClientUtils
-      .fetchTopicMetadata(
-          Set(topic), metadataTargetBrokers, clientId, maxWaitMs)
+      .fetchTopicMetadata(Set(topic),
+                          metadataTargetBrokers,
+                          clientId,
+                          maxWaitMs)
       .topicsMetadata
     if (topicsMetadata.size != 1 || !topicsMetadata(0).topic.equals(topic)) {
-      System.err.println(("Error: no valid topic metadata for topic: %s, " +
-              "what we get from server is only: %s").format(
-              topic, topicsMetadata))
+      System.err.println(
+          ("Error: no valid topic metadata for topic: %s, " +
+                "what we get from server is only: %s")
+            .format(topic, topicsMetadata))
       System.exit(1)
     }
 
@@ -175,8 +181,9 @@ object SimpleConsumerShell extends Logging {
     val partitionMetadataOpt =
       partitionsMetadata.find(p => p.partitionId == partitionId)
     if (!partitionMetadataOpt.isDefined) {
-      System.err.println("Error: partition %d does not exist for topic %s"
-            .format(partitionId, topic))
+      System.err.println(
+          "Error: partition %d does not exist for topic %s".format(partitionId,
+                                                                   topic))
       System.exit(1)
     }
 
@@ -196,8 +203,8 @@ object SimpleConsumerShell extends Logging {
       replicaOpt = replicasForPartition.find(r => r.id == replicaId)
       if (!replicaOpt.isDefined) {
         System.err.println(
-            "Error: replica %d does not exist for partition (%s, %d)".format(
-                replicaId, topic, partitionId))
+            "Error: replica %d does not exist for partition (%s, %d)"
+              .format(replicaId, topic, partitionId))
         System.exit(1)
       }
     }
@@ -223,7 +230,7 @@ object SimpleConsumerShell extends Logging {
         case t: Throwable =>
           System.err.println(
               "Error in getting earliest or latest offset due to: " +
-              Utils.stackTrace(t))
+                Utils.stackTrace(t))
           System.exit(1)
       } finally {
         if (simpleConsumer != null) simpleConsumer.close()
@@ -267,8 +274,9 @@ object SimpleConsumerShell extends Logging {
                     .format(topic, partitionId, offset))
               return
             }
-            debug("multi fetched " + messageSet.sizeInBytes +
-                " bytes from offset " + offset)
+            debug(
+                "multi fetched " + messageSet.sizeInBytes +
+                  " bytes from offset " + offset)
             for (messageAndOffset <- messageSet
                  if numMessagesConsumed < maxMessages) {
               try {
@@ -298,8 +306,8 @@ object SimpleConsumerShell extends Logging {
               } catch {
                 case e: Throwable =>
                   if (skipMessageOnError)
-                    error(
-                        "Error processing message, skipping this message: ", e)
+                    error("Error processing message, skipping this message: ",
+                          e)
                   else throw e
               }
               if (System.out.checkError()) {

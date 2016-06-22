@@ -61,8 +61,8 @@ object Endpoint {
   def fromSocketAddress(socketAddress: SocketAddress): Endpoint = {
     socketAddress match {
       case inet: InetSocketAddress => {
-          Endpoint(toIpv4(inet.getAddress), inet.getPort.toShort)
-        }
+        Endpoint(toIpv4(inet.getAddress), inet.getPort.toShort)
+      }
       case _ => Endpoint.Unknown
     }
   }

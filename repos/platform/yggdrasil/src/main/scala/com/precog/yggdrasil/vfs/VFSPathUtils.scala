@@ -59,18 +59,16 @@ object VFSPathUtils extends Logging {
   }
 
   def escapePath(path: Path, toEscape: Set[String]) =
-    Path(
-        path.elements.map {
+    Path(path.elements.map {
       case needsEscape
           if toEscape.contains(needsEscape) ||
-          needsEscape.endsWith(escapeSuffix) =>
+            needsEscape.endsWith(escapeSuffix) =>
         needsEscape + escapeSuffix
       case fine => fine
     }.toList)
 
   def unescapePath(path: Path) =
-    Path(
-        path.elements.map {
+    Path(path.elements.map {
       case escaped if escaped.endsWith(escapeSuffix) =>
         escaped.substring(0, escaped.length - escapeSuffix.length)
       case fine => fine
@@ -95,8 +93,8 @@ object VFSPathUtils extends Logging {
     logger.debug(
         "Checking for children of path %s in dir %s".format(path, pathRoot))
     Option(pathRoot.listFiles(pathFileFilter)) map { files =>
-      logger.debug("Filtering children %s in path %s".format(
-              files.mkString("[", ", ", "]"), path))
+      logger.debug("Filtering children %s in path %s"
+            .format(files.mkString("[", ", ", "]"), path))
       val childMetadata =
         files.toList traverse { f =>
           val childPath = unescapePath(path / Path(f.getName))
@@ -121,7 +119,8 @@ object VFSPathUtils extends Logging {
   }
 
   def currentPathMetadata(
-      baseDir: File, path: Path): EitherT[IO, ResourceError, PathMetadata] = {
+      baseDir: File,
+      path: Path): EitherT[IO, ResourceError, PathMetadata] = {
     def containsNonemptyChild(dirs: List[File]): IO[Boolean] = dirs match {
       case f :: xs =>
         val childPath = unescapePath(path / Path(f.getName))

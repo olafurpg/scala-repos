@@ -43,7 +43,8 @@ case class Info(ply: Int,
   }
 
   override def toString =
-    s"Info $color [$ply] ${score.fold("?")(_.showPawns)} ${mate | 0} ${variation.mkString(" ")}"
+    s"Info $color [$ply] ${score
+      .fold("?")(_.showPawns)} ${mate | 0} ${variation.mkString(" ")}"
 }
 
 object Info {

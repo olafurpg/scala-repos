@@ -15,7 +15,7 @@ import akka.remote.EndpointException
 object ThrottlerTransportAdapterSpec {
   val configA: Config =
     ConfigFactory parseString
-    ("""
+      ("""
     akka {
       actor.provider = "akka.remote.RemoteActorRefProvider"
 
@@ -84,8 +84,8 @@ class ThrottlerTransportAdapterSpec
   }
 
   def throttle(direction: Direction, mode: ThrottleMode): Boolean = {
-    val rootBAddress = Address(
-        "akka", "systemB", "localhost", rootB.address.port.get)
+    val rootBAddress =
+      Address("akka", "systemB", "localhost", rootB.address.port.get)
     val transport = system
       .asInstanceOf[ExtendedActorSystem]
       .provider
@@ -97,8 +97,8 @@ class ThrottlerTransportAdapterSpec
   }
 
   def disassociate(): Boolean = {
-    val rootBAddress = Address(
-        "akka", "systemB", "localhost", rootB.address.port.get)
+    val rootBAddress =
+      Address("akka", "systemB", "localhost", rootB.address.port.get)
     val transport = system
       .asInstanceOf[ExtendedActorSystem]
       .provider
@@ -181,6 +181,6 @@ class ThrottlerTransportAdapterGenericSpec
   def transportName = "ThrottlerTransportAdapter"
   def schemeIdentifier = "akka.trttl"
   def freshTransport(testTransport: TestTransport) =
-    new ThrottlerTransportAdapter(
-        testTransport, system.asInstanceOf[ExtendedActorSystem])
+    new ThrottlerTransportAdapter(testTransport,
+                                  system.asInstanceOf[ExtendedActorSystem])
 }

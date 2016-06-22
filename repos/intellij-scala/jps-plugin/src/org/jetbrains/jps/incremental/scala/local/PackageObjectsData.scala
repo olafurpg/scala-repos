@@ -23,11 +23,11 @@ class PackageObjectsData extends Serializable {
     baseSourceToPackageObjects.update(
         baseSource,
         baseSourceToPackageObjects.getOrElse(baseSource, HashSet.empty) +
-        packageObject)
+          packageObject)
     packageObjectToBaseSources.update(
         packageObject,
         packageObjectToBaseSources.getOrElse(packageObject, HashSet.empty) +
-        baseSource)
+          baseSource)
   }
 
   def invalidatedPackageObjects(sources: Seq[File]): Set[File] = synchronized {
@@ -44,7 +44,8 @@ class PackageObjectsData extends Serializable {
   def save(context: CompileContext): Unit = {
     val file = PackageObjectsData.storageFile(context)
     PackageObjectsData.synchronized {
-      using(new ObjectOutputStream(
+      using(
+          new ObjectOutputStream(
               new BufferedOutputStream(new FileOutputStream(file)))) {
         stream =>
           stream.writeObject(this)
@@ -77,7 +78,8 @@ object PackageObjectsData {
     def tryToReadData(file: File) = {
       synchronized {
         try {
-          using(new ObjectInputStream(
+          using(
+              new ObjectInputStream(
                   new BufferedInputStream(new FileInputStream(file)))) {
             stream =>
               stream.readObject().asInstanceOf[PackageObjectsData]

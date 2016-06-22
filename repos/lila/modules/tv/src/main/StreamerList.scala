@@ -4,8 +4,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import scala.collection.JavaConversions._
 import scala.util.{Try, Success, Failure}
 
-final class StreamerList(
-    val store: {
+final class StreamerList(val store: {
   def get: Fu[String]
   def set(text: String): Funit
 }) {

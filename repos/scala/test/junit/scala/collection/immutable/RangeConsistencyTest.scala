@@ -158,8 +158,7 @@ class RangeConsistencyTest {
     assert((-3 to Int.MaxValue).dropRight(4).length == Int.MaxValue)
     assert((-3 to Int.MaxValue).takeRight(1234).length == 1234)
     assert((-3 to Int.MaxValue).dropWhile(_ <= 0).length == Int.MaxValue)
-    assert(
-        (-3 to Int.MaxValue).span(_ <= 0) match {
+    assert((-3 to Int.MaxValue).span(_ <= 0) match {
       case (a, b) => a.length == 4 && b.length == Int.MaxValue
     })
   }

@@ -48,8 +48,9 @@ import org.apache.spark.util.Utils
   * fails, the response will consist of an empty body with a response code that indicates internal
   * server error.
   */
-private[spark] abstract class RestSubmissionServer(
-    val host: String, val requestedPort: Int, val masterConf: SparkConf)
+private[spark] abstract class RestSubmissionServer(val host: String,
+                                                   val requestedPort: Int,
+                                                   val masterConf: SparkConf)
     extends Logging {
   protected val submitRequestServlet: SubmitRequestServlet
   protected val killRequestServlet: KillRequestServlet
@@ -200,8 +201,8 @@ private[rest] abstract class KillRequestServlet extends RestServlet {
     * If a submission ID is specified in the URL, have the Master kill the corresponding
     * driver and return an appropriate response to the client. Otherwise, return error.
     */
-  protected override def doPost(
-      request: HttpServletRequest, response: HttpServletResponse): Unit = {
+  protected override def doPost(request: HttpServletRequest,
+                                response: HttpServletResponse): Unit = {
     val submissionId = parseSubmissionId(request.getPathInfo)
     val responseMessage = submissionId.map(handleKill).getOrElse {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
@@ -222,8 +223,8 @@ private[rest] abstract class StatusRequestServlet extends RestServlet {
     * If a submission ID is specified in the URL, request the status of the corresponding
     * driver from the Master and include it in the response. Otherwise, return error.
     */
-  protected override def doGet(
-      request: HttpServletRequest, response: HttpServletResponse): Unit = {
+  protected override def doGet(request: HttpServletRequest,
+                               response: HttpServletResponse): Unit = {
     val submissionId = parseSubmissionId(request.getPathInfo)
     val responseMessage = submissionId.map(handleStatus).getOrElse {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST)
@@ -280,8 +281,8 @@ private class ErrorServlet extends RestServlet {
   private val serverVersion = RestSubmissionServer.PROTOCOL_VERSION
 
   /** Service a faulty request by returning an appropriate error message to the client. */
-  protected override def service(
-      request: HttpServletRequest, response: HttpServletResponse): Unit = {
+  protected override def service(request: HttpServletRequest,
+                                 response: HttpServletResponse): Unit = {
     val path = request.getPathInfo
     val parts = path.stripPrefix("/").split("/").filter(_.nonEmpty).toList
     var versionMismatch = false
@@ -304,7 +305,7 @@ private class ErrorServlet extends RestServlet {
         s"Malformed path $path."
     }
     msg +=
-      s" Please submit requests through http://[host]:[port]/$serverVersion/submissions/..."
+    s" Please submit requests through http://[host]:[port]/$serverVersion/submissions/..."
     val error = handleError(msg)
     // If there is a version mismatch, include the highest protocol version that
     // this server supports in case the client wants to retry with our version

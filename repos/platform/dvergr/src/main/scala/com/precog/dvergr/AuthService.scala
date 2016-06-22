@@ -50,9 +50,10 @@ trait AuthService[M[+ _]] { self =>
   }
 }
 
-case class WebAuthService(
-    protocol: String, host: String, port: Int, path: String)(
-    implicit executor: ExecutionContext)
+case class WebAuthService(protocol: String,
+                          host: String,
+                          port: Int,
+                          path: String)(implicit executor: ExecutionContext)
     extends WebClient(protocol, host, port, path)
     with AuthService[Response] {
   import scalaz.syntax.monad._
@@ -70,8 +71,8 @@ case class WebAuthService(
   }
 }
 
-case class TestAuthService[M[+ _]](
-    validAPIKeys: Set[APIKey])(implicit M: Applicative[M])
+case class TestAuthService[M[+ _]](validAPIKeys: Set[APIKey])(
+    implicit M: Applicative[M])
     extends AuthService[M] {
   final def isValid(apiKey: APIKey): M[Boolean] =
     M.point(validAPIKeys contains apiKey)

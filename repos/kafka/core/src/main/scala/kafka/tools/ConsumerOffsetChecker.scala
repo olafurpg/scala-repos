@@ -46,8 +46,12 @@ object ConsumerOffsetChecker extends Logging {
               val brokerInfo = m.asInstanceOf[Map[String, Any]]
               val host = brokerInfo.get("host").get.asInstanceOf[String]
               val port = brokerInfo.get("port").get.asInstanceOf[Int]
-              Some(new SimpleConsumer(
-                      host, port, 10000, 100000, "ConsumerOffsetChecker"))
+              Some(
+                  new SimpleConsumer(host,
+                                     port,
+                                     10000,
+                                     100000,
+                                     "ConsumerOffsetChecker"))
             case None =>
               throw new BrokerNotAvailableException(
                   "Broker id %d does not exist".format(bid))
@@ -82,7 +86,8 @@ object ConsumerOffsetChecker extends Logging {
             val topicAndPartition = TopicAndPartition(topic, pid)
             val request = OffsetRequest(
                 immutable.Map(topicAndPartition -> PartitionOffsetRequestInfo(
-                        OffsetRequest.LatestTime, 1)))
+                        OffsetRequest.LatestTime,
+                        1)))
             val logSize = consumer
               .getOffsetsBefore(request)
               .partitionErrorAndOffsets(topicAndPartition)
@@ -167,8 +172,8 @@ object ConsumerOffsetChecker extends Logging {
     parser.accepts("help", "Print this message.")
 
     if (args.length == 0)
-      CommandLineUtils.printUsageAndDie(
-          parser, "Check the offset of your consumers.")
+      CommandLineUtils
+        .printUsageAndDie(parser, "Check the offset of your consumers.")
 
     val options = parser.parse(args: _*)
 
@@ -212,11 +217,14 @@ object ConsumerOffsetChecker extends Logging {
         case (topic, partitionSeq) =>
           partitionSeq.map(TopicAndPartition(topic, _))
       }.toSeq
-      val channel = ClientUtils.channelToOffsetManager(
-          group, zkUtils, channelSocketTimeoutMs, channelRetryBackoffMs)
+      val channel = ClientUtils.channelToOffsetManager(group,
+                                                       zkUtils,
+                                                       channelSocketTimeoutMs,
+                                                       channelRetryBackoffMs)
 
-      debug("Sending offset fetch request to coordinator %s:%d.".format(
-              channel.host, channel.port))
+      debug(
+          "Sending offset fetch request to coordinator %s:%d."
+            .format(channel.host, channel.port))
       channel.send(OffsetFetchRequest(group, topicPartitions))
       val offsetFetchResponse =
         OffsetFetchResponse.readFrom(channel.receive().payload())
@@ -232,7 +240,7 @@ object ConsumerOffsetChecker extends Logging {
             try {
               val offset = zkUtils
                 .readData(topicDirs.consumerOffsetDir +
-                    "/%d".format(topicAndPartition.partition))
+                      "/%d".format(topicAndPartition.partition))
                 ._1
                 .toLong
               offsetMap.put(topicAndPartition, offset)
@@ -254,8 +262,13 @@ object ConsumerOffsetChecker extends Logging {
       channel.disconnect()
 
       println(
-          "%-15s %-30s %-3s %-15s %-15s %-15s %s".format(
-              "Group", "Topic", "Pid", "Offset", "logSize", "Lag", "Owner"))
+          "%-15s %-30s %-3s %-15s %-15s %-15s %s".format("Group",
+                                                         "Topic",
+                                                         "Pid",
+                                                         "Offset",
+                                                         "logSize",
+                                                         "Lag",
+                                                         "Owner"))
       topicList.sorted.foreach { topic =>
         processTopic(zkUtils, group, topic)
       }

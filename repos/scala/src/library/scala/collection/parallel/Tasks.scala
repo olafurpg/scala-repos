@@ -47,8 +47,7 @@ trait Task[R, +Tp] {
     try {
       tryBreakable {
         leaf(lastres)
-        result =
-          result // ensure that effects of `leaf` are visible to readers of `result`
+        result = result // ensure that effects of `leaf` are visible to readers of `result`
       } catchBreak {
         signalAbort()
       }
@@ -447,8 +446,8 @@ trait AdaptiveWorkStealingForkJoinTasks
     with AdaptiveWorkStealingTasks {
 
   class WrappedTask[R, Tp](val body: Task[R, Tp])
-      extends super [ForkJoinTasks].WrappedTask[R, Tp]
-      with super [AdaptiveWorkStealingTasks].WrappedTask[R, Tp] {
+      extends super[ForkJoinTasks].WrappedTask[R, Tp]
+      with super[AdaptiveWorkStealingTasks].WrappedTask[R, Tp] {
     def split = body.split.map(b => newWrappedTask(b))
   }
 
@@ -461,8 +460,8 @@ trait AdaptiveWorkStealingThreadPoolTasks
     with AdaptiveWorkStealingTasks {
 
   class WrappedTask[R, Tp](val body: Task[R, Tp])
-      extends super [ThreadPoolTasks].WrappedTask[R, Tp]
-      with super [AdaptiveWorkStealingTasks].WrappedTask[R, Tp] {
+      extends super[ThreadPoolTasks].WrappedTask[R, Tp]
+      with super[AdaptiveWorkStealingTasks].WrappedTask[R, Tp] {
     def split = body.split.map(b => newWrappedTask(b))
   }
 
@@ -493,8 +492,8 @@ private[parallel] final class FutureTasks(executor: ExecutionContext)
     def compute(task: Task[R, Tp], depth: Int): Future[Task[R, Tp]] = {
       if (task.shouldSplitFurther && depth < maxdepth) {
         val subtasks = task.split
-        val subfutures = for (subtask <- subtasks.iterator) yield
-          compute(subtask, depth + 1)
+        val subfutures = for (subtask <- subtasks.iterator)
+          yield compute(subtask, depth + 1)
         subfutures.reduceLeft { (firstFuture, nextFuture) =>
           for {
             firstTask <- firstFuture

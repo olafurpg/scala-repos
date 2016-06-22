@@ -11,17 +11,17 @@ object ForProps extends QuasiquoteProperties("for") {
     for (cond <- genIdent(genTermName)) yield fq"if $cond"
 
   def genForFrom: Gen[Tree] =
-    for (lhs <- genSimpleBind; rhs <- genIdent(genTermName)) yield
-      fq"$lhs <- $rhs"
+    for (lhs <- genSimpleBind; rhs <- genIdent(genTermName))
+      yield fq"$lhs <- $rhs"
 
   def genForEq: Gen[Tree] =
-    for (lhs <- genSimpleBind; rhs <- genIdent(genTermName)) yield
-      fq"$lhs = $rhs"
+    for (lhs <- genSimpleBind; rhs <- genIdent(genTermName))
+      yield fq"$lhs = $rhs"
 
   def genForEnums(size: Int): Gen[ForEnums] =
     for (first <- genForFrom;
-         rest <- listOfN(size, oneOf(genForFrom, genForFilter, genForEq))) yield
-      new ForEnums(first :: rest)
+         rest <- listOfN(size, oneOf(genForFrom, genForFilter, genForEq)))
+      yield new ForEnums(first :: rest)
 
   implicit val arbForEnums: Arbitrary[ForEnums] = arbitrarySized(genForEnums)
 

@@ -41,9 +41,9 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
         import scala.language.reflectiveCalls
 
         try {
-          val cook30 = cookie.asInstanceOf[ {
-            def setHttpOnly(b: Boolean): Unit
-          }]
+          val cook30 = cookie.asInstanceOf[{
+                def setHttpOnly(b: Boolean): Unit
+              }]
           cook30.setHttpOnly(bv)
         } catch {
           case e: Exception =>

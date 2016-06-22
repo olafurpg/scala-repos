@@ -43,8 +43,8 @@ class GroupManagerTest
 
     lazy val metricRegistry = new MetricRegistry()
     lazy val metrics = new Metrics(metricRegistry)
-    lazy val capMetrics = new CapConcurrentExecutionsMetrics(
-        metrics, classOf[GroupManager])
+    lazy val capMetrics =
+      new CapConcurrentExecutionsMetrics(metrics, classOf[GroupManager])
 
     def serializeExecutions() = CapConcurrentExecutions(
         capMetrics,
@@ -54,14 +54,14 @@ class GroupManagerTest
         maxQueued = 10
     )
 
-    lazy val manager = new GroupManager(
-        serializeUpdates = serializeExecutions(),
-        scheduler = scheduler,
-        groupRepo = groupRepo,
-        appRepo = appRepo,
-        storage = provider,
-        config = config,
-        eventBus = eventBus)
+    lazy val manager = new GroupManager(serializeUpdates =
+                                          serializeExecutions(),
+                                        scheduler = scheduler,
+                                        groupRepo = groupRepo,
+                                        appRepo = appRepo,
+                                        storage = provider,
+                                        config = config,
+                                        eventBus = eventBus)
   }
 
   test("Assign dynamic app ports") {
@@ -90,7 +90,8 @@ class GroupManagerTest
             Docker(
                 image = "busybox",
                 network = Some(Network.BRIDGE),
-                portMappings = Some(Seq(
+                portMappings = Some(
+                    Seq(
                         PortMapping(containerPort = 8080,
                                     hostPort = 0,
                                     servicePort = 0,
@@ -123,11 +124,13 @@ class GroupManagerTest
   test("Reassign dynamic service ports specified in the container") {
     val from =
       Group(PathId.empty,
-            Set(AppDefinition("/app1".toPath,
+            Set(
+                AppDefinition("/app1".toPath,
                               portDefinitions = PortDefinitions(10, 11))))
     val to =
       Group(PathId.empty,
-            Set(AppDefinition("/app1".toPath,
+            Set(
+                AppDefinition("/app1".toPath,
                               portDefinitions = PortDefinitions(10, 0, 11))))
     val update = manager(minServicePort = 10, maxServicePort = 20)
       .assignDynamicServicePorts(from, to)
@@ -145,7 +148,8 @@ class GroupManagerTest
             Docker(
                 image = "busybox",
                 network = Some(Network.BRIDGE),
-                portMappings = Some(Seq(
+                portMappings = Some(
+                    Seq(
                         PortMapping(containerPort = 8080,
                                     hostPort = 0,
                                     servicePort = 80,
@@ -239,7 +243,8 @@ class GroupManagerTest
     import Container.Docker
 
     val container = Container(
-        docker = Some(Docker(
+        docker = Some(
+            Docker(
                 image = "busybox"
             ))
     )
@@ -279,8 +284,9 @@ class GroupManagerTest
   test("Store new apps with correct version infos in groupRepo and appRepo") {
     val f = new Fixture
 
-    val app: AppDefinition = AppDefinition(
-        "/app1".toPath, cmd = Some("sleep 3"), portDefinitions = Seq.empty)
+    val app: AppDefinition = AppDefinition("/app1".toPath,
+                                           cmd = Some("sleep 3"),
+                                           portDefinitions = Seq.empty)
     val group = Group(PathId.empty, Set(app)).copy(version = Timestamp(1))
     when(f.groupRepo.zkRootName).thenReturn(GroupRepository.zkRootName)
     when(f.groupRepo.group(GroupRepository.zkRootName))
@@ -306,8 +312,9 @@ class GroupManagerTest
   test("Expunge removed apps from appRepo") {
     val f = new Fixture
 
-    val app: AppDefinition = AppDefinition(
-        "/app1".toPath, cmd = Some("sleep 3"), portDefinitions = Seq.empty)
+    val app: AppDefinition = AppDefinition("/app1".toPath,
+                                           cmd = Some("sleep 3"),
+                                           portDefinitions = Seq.empty)
     val group = Group(PathId.empty, Set(app)).copy(version = Timestamp(1))
     val groupEmpty = group.copy(apps = Set(), version = Timestamp(2))
     when(f.groupRepo.zkRootName).thenReturn(GroupRepository.zkRootName)

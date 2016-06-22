@@ -449,8 +449,8 @@ case object Nil extends List[Nothing] {
   *  @version 1.0, 15/07/2003
   */
 @SerialVersionUID(0L - 8476791151983527571L)
-final case class ::[@specialized B](
-    private var hd: B, private[scala] var tl: List[B])
+final case class ::[@specialized B](private var hd: B,
+                                    private[scala] var tl: List[B])
     extends List[B] {
   override def head: B = hd
   override def tail: List[B] = tl

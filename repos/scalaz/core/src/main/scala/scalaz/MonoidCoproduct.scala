@@ -74,8 +74,8 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
     * This allows you to add up `N` values while having the opportunity to "track"
     * an evolving `M` value, and vice versa.
     */
-  def untangle[A >: M: Monoid, B >: N: Monoid](
-      f: (B, A) => A, g: (A, B) => B): (A, B) =
+  def untangle[A >: M: Monoid, B >: N: Monoid](f: (B, A) => A,
+                                               g: (A, B) => B): (A, B) =
     rep.foldLeft(mzero[(A, B)]) {
       case ((curm, curn), -\/(m)) =>
         (curm |+| f(curn, m), curn)

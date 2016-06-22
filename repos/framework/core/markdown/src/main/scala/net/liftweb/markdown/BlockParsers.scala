@@ -90,8 +90,9 @@ trait BlockParsers extends Parsers {
   /**
     * Represents a header
     */
-  case class Header(
-      content: String, headerLevel: Int, lookup: Map[String, LinkDefinition])
+  case class Header(content: String,
+                    headerLevel: Int,
+                    lookup: Map[String, LinkDefinition])
       extends MarkdownBlock {
     def addResult(level: Int, out: StringBuilder) {
       out
@@ -134,8 +135,8 @@ trait BlockParsers extends Parsers {
   /**
     * Represents a paragraph of text
     */
-  class Paragraph(
-      lines: List[MarkdownLine], lookup: Map[String, LinkDefinition])
+  class Paragraph(lines: List[MarkdownLine],
+                  lookup: Map[String, LinkDefinition])
       extends MarkdownBlock {
 
     def addResult(level: Int, out: StringBuilder) {
@@ -171,8 +172,8 @@ trait BlockParsers extends Parsers {
   /**
     * Represents a quoted text block. Text in the block is recursively evaluated.
     */
-  class Blockquote(
-      lines: List[MarkdownLine], lookup: Map[String, LinkDefinition])
+  class Blockquote(lines: List[MarkdownLine],
+                   lookup: Map[String, LinkDefinition])
       extends MarkdownBlock {
     def addResult(level: Int, out: StringBuilder) {
       //the block parser needs to recurse:
@@ -192,8 +193,8 @@ trait BlockParsers extends Parsers {
     * Helper class to build lists. Allows easy checking if an item ends with empty lines and
     * recursively builds the content of an item.
     */
-  class ListItem(
-      val lines: List[MarkdownLine], lookup: Map[String, LinkDefinition])
+  class ListItem(val lines: List[MarkdownLine],
+                 lookup: Map[String, LinkDefinition])
       extends LineParsers {
     def endsWithNewline =
       lines.size > 1 && (lines.last.isInstanceOf[EmptyLine])
@@ -227,13 +228,14 @@ trait BlockParsers extends Parsers {
       * called with the first item prepended twice in front of the list. So if the list is
       * a::b::c, call this method with a::a::b::c
       */
-    protected def addResult(
-        level: Int, out: StringBuilder, list: List[ListItem]): Unit =
+    protected def addResult(level: Int,
+                            out: StringBuilder,
+                            list: List[ListItem]): Unit =
       list match {
         case last :: current :: rest => {
-            current.addResult(level + 1, out, last.endsWithNewline)
-            addResult(level, out, current :: rest)
-          }
+          current.addResult(level + 1, out, last.endsWithNewline)
+          addResult(level, out, current :: rest)
+        }
         case _ => {} //end of recursion, list with one item or less
       }
 
@@ -357,7 +359,7 @@ trait BlockParsers extends Parsers {
     */
   def fencedCodeBlock: Parser[FencedCodeBlock] =
     (line(classOf[ExtendedFencedCode]) | line(classOf[FencedCode])) ~
-    (notLine(classOf[FencedCode]) *) ~ opt(line(classOf[FencedCode])) ^^ {
+      (notLine(classOf[FencedCode]) *) ~ opt(line(classOf[FencedCode])) ^^ {
       case (start: ExtendedFencedCode) ~ lines ~ _ =>
         new FencedCodeBlock(start.languageFormat, lines)
       case _ ~ lines ~ _ => new FencedCodeBlock("", lines)
@@ -382,8 +384,8 @@ trait BlockParsers extends Parsers {
     */
   def blockquoteFragment: Parser[List[MarkdownLine]] =
     line(classOf[BlockQuoteLine]) ~
-    ((line(classOf[BlockQuoteLine]) | line(classOf[OtherLine])) *) ~
-    (optEmptyLines) ^^ {
+      ((line(classOf[BlockQuoteLine]) | line(classOf[OtherLine])) *) ~
+      (optEmptyLines) ^^ {
       case l ~ ls ~ e => (l :: ls ++ e)
     }
 
@@ -504,10 +506,10 @@ trait BlockParsers extends Parsers {
   def apply(in: MarkdownLineReader): String = {
     phrase(markdown)(in) match {
       case Success(bs, _) => {
-          val builder = new StringBuilder()
-          bs.foreach(block => block.addResult(0, builder))
-          builder.toString
-        }
+        val builder = new StringBuilder()
+        bs.foreach(block => block.addResult(0, builder))
+        builder.toString
+      }
       case e: NoSuccess =>
         throw new IllegalArgumentException("Could not parse " + in + ": " + e)
     }

@@ -109,27 +109,27 @@ abstract class ClassificationModel[
       val predictRawUDF = udf { (features: Any) =>
         predictRaw(features.asInstanceOf[FeaturesType])
       }
-      outputData = outputData.withColumn(
-          getRawPredictionCol, predictRawUDF(col(getFeaturesCol)))
+      outputData = outputData
+        .withColumn(getRawPredictionCol, predictRawUDF(col(getFeaturesCol)))
       numColsOutput += 1
     }
     if (getPredictionCol != "") {
-      val predUDF =
-        if (getRawPredictionCol != "") {
-          udf(raw2prediction _).apply(col(getRawPredictionCol))
-        } else {
-          val predictUDF = udf { (features: Any) =>
-            predict(features.asInstanceOf[FeaturesType])
-          }
-          predictUDF(col(getFeaturesCol))
+      val predUDF = if (getRawPredictionCol != "") {
+        udf(raw2prediction _).apply(col(getRawPredictionCol))
+      } else {
+        val predictUDF = udf { (features: Any) =>
+          predict(features.asInstanceOf[FeaturesType])
         }
+        predictUDF(col(getFeaturesCol))
+      }
       outputData = outputData.withColumn(getPredictionCol, predUDF)
       numColsOutput += 1
     }
 
     if (numColsOutput == 0) {
-      logWarning(s"$uid: ClassificationModel.transform() was called as NOOP" +
-          " since no output columns were set.")
+      logWarning(
+          s"$uid: ClassificationModel.transform() was called as NOOP" +
+            " since no output columns were set.")
     }
     outputData
   }

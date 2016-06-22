@@ -67,10 +67,12 @@ abstract class MBeanSpec
 
     "change attributes after startup" taggedAs LongRunningTest in {
       runOn(first) {
-        mbeanServer.getAttribute(mbeanName, "Available").asInstanceOf[Boolean] should ===(
-            false)
-        mbeanServer.getAttribute(mbeanName, "Singleton").asInstanceOf[Boolean] should ===(
-            false)
+        mbeanServer
+          .getAttribute(mbeanName, "Available")
+          .asInstanceOf[Boolean] should ===(false)
+        mbeanServer
+          .getAttribute(mbeanName, "Singleton")
+          .asInstanceOf[Boolean] should ===(false)
         mbeanServer.getAttribute(mbeanName, "Leader") should ===("")
         mbeanServer.getAttribute(mbeanName, "Members") should ===("")
         mbeanServer.getAttribute(mbeanName, "Unreachable") should ===("")
@@ -84,13 +86,15 @@ abstract class MBeanSpec
                 "Up"))
         awaitAssert(mbeanServer.getAttribute(mbeanName, "Leader") should ===(
                 address(first).toString))
-        mbeanServer.getAttribute(mbeanName, "Singleton").asInstanceOf[Boolean] should ===(
-            true)
+        mbeanServer
+          .getAttribute(mbeanName, "Singleton")
+          .asInstanceOf[Boolean] should ===(true)
         mbeanServer.getAttribute(mbeanName, "Members") should ===(
             address(first).toString)
         mbeanServer.getAttribute(mbeanName, "Unreachable") should ===("")
-        mbeanServer.getAttribute(mbeanName, "Available").asInstanceOf[Boolean] should ===(
-            true)
+        mbeanServer
+          .getAttribute(mbeanName, "Available")
+          .asInstanceOf[Boolean] should ===(true)
       }
       enterBarrier("after-3")
     }
@@ -109,13 +113,16 @@ abstract class MBeanSpec
       awaitAssert(
           mbeanServer.getAttribute(mbeanName, "MemberStatus") should ===("Up"))
       val expectedMembers = roles.sorted.map(address(_)).mkString(",")
-      awaitAssert(mbeanServer.getAttribute(mbeanName, "Members") should ===(
+      awaitAssert(
+          mbeanServer.getAttribute(mbeanName, "Members") should ===(
               expectedMembers))
       val expectedLeader = address(roleOfLeader())
-      awaitAssert(mbeanServer.getAttribute(mbeanName, "Leader") should ===(
+      awaitAssert(
+          mbeanServer.getAttribute(mbeanName, "Leader") should ===(
               expectedLeader.toString))
-      mbeanServer.getAttribute(mbeanName, "Singleton").asInstanceOf[Boolean] should ===(
-          false)
+      mbeanServer
+        .getAttribute(mbeanName, "Singleton")
+        .asInstanceOf[Boolean] should ===(false)
 
       enterBarrier("after-4")
     }

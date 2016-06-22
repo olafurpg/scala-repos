@@ -32,12 +32,14 @@ object TcpLeakApp extends App {
         Source
           .single(ByteString("FOO"))
           .log("outerFlow-beforeTcpFlow")
-          .withAttributes(ActorAttributes.logLevels(
-                  Logging.DebugLevel, Logging.ErrorLevel, Logging.ErrorLevel))
+          .withAttributes(ActorAttributes.logLevels(Logging.DebugLevel,
+                                                    Logging.ErrorLevel,
+                                                    Logging.ErrorLevel))
           .via(tcpFlow)
           .log("outerFlow-afterTcpFlow")
-          .withAttributes(ActorAttributes.logLevels(
-                  Logging.DebugLevel, Logging.ErrorLevel, Logging.ErrorLevel))
+          .withAttributes(ActorAttributes.logLevels(Logging.DebugLevel,
+                                                    Logging.ErrorLevel,
+                                                    Logging.ErrorLevel))
           .toMat(Sink.head)(Keep.right)
           .run())
     .last
@@ -45,9 +47,10 @@ object TcpLeakApp extends App {
       case error ⇒
         println(s"Error: $error")
         Thread.sleep(10000)
-        println("===================== \n\n" +
-            system.asInstanceOf[ActorSystemImpl].printTree +
-            "\n\n========================")
+        println(
+            "===================== \n\n" +
+              system.asInstanceOf[ActorSystemImpl].printTree +
+              "\n\n========================")
     }
 
   readLine()

@@ -104,8 +104,8 @@ abstract class SessionTest extends ReplTest {
     if (evaled.size != wanted.size)
       Console println s"Expected ${wanted.size} lines, got ${evaled.size}"
     if (evaled != wanted)
-      Console print nest.FileManager.compareContents(
-          wanted, evaled, "expected", "actual")
+      Console print nest.FileManager
+        .compareContents(wanted, evaled, "expected", "actual")
   }
 }
 object SessionTest {

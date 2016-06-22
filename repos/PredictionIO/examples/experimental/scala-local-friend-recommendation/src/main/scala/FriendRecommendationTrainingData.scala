@@ -16,5 +16,4 @@ class FriendRecommendationTrainingData(
     val socialAction: Array[List[(Int, Int)]],
     // Training record for training purpose
     val trainingRecord: Stream[(Int, Int, Boolean)]
-)
-    extends Serializable
+) extends Serializable

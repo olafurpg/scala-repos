@@ -28,8 +28,8 @@ object ClientSideOp {
       f: ResultSetMapping => Node): Node = n match {
     case r: ResultSetMapping => f(r)
     case n: ClientSideOp =>
-      n.nodeMapServerSide(
-          keepType, (ch => mapResultSetMapping(ch, keepType)(f)))
+      n.nodeMapServerSide(keepType, (ch =>
+                                       mapResultSetMapping(ch, keepType)(f)))
     case n => throw new SlickException("No ResultSetMapping found in tree")
   }
 }
@@ -91,8 +91,8 @@ final case class ResultSetMapping(generator: TermSymbol, from: Node, map: Node)
 
 /** A switch for special-cased parameters that needs to be interpreted in order
   * to find the correct query string for the query arguments. */
-final case class ParameterSwitch(
-    cases: ConstArray[((Any => Boolean), Node)], default: Node)
+final case class ParameterSwitch(cases: ConstArray[((Any => Boolean), Node)],
+                                 default: Node)
     extends SimplyTypedNode
     with ClientSideOp {
   type Self = ParameterSwitch

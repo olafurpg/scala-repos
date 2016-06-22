@@ -54,24 +54,24 @@ class GroupVersioningUtilTest
 
   test("No changes for empty group") {
     When("Calculating version infos for an empty group")
-    val updated = GroupVersioningUtil.updateVersionInfoForChangedApps(
-        Timestamp(10), emptyGroup, emptyGroup)
+    val updated = GroupVersioningUtil
+      .updateVersionInfoForChangedApps(Timestamp(10), emptyGroup, emptyGroup)
     Then("nothing is changed")
     updated should be(emptyGroup)
   }
 
   test("No changes for nested app") {
     When("Calculating version infos with no changes")
-    val updated = GroupVersioningUtil.updateVersionInfoForChangedApps(
-        Timestamp(10), nestedApp, nestedApp)
+    val updated = GroupVersioningUtil
+      .updateVersionInfoForChangedApps(Timestamp(10), nestedApp, nestedApp)
     Then("nothing is changed")
     updated should be(nestedApp)
   }
 
   test("A new app should get proper versionInfo") {
     When("Calculating version infos with an added app")
-    val updated = GroupVersioningUtil.updateVersionInfoForChangedApps(
-        Timestamp(10), emptyGroup, nestedApp)
+    val updated = GroupVersioningUtil
+      .updateVersionInfoForChangedApps(Timestamp(10), emptyGroup, nestedApp)
     Then("The timestamp of the app and groups are updated appropriately")
     def update(maybeApp: Option[AppDefinition]): AppDefinition =
       maybeApp
@@ -87,12 +87,15 @@ class GroupVersioningUtilTest
 
   test("A scaled app should get proper versionInfo") {
     When("Calculating version infos with a scaled app")
-    val updated = GroupVersioningUtil.updateVersionInfoForChangedApps(
-        Timestamp(10), nestedApp, nestedAppScaled)
+    val updated =
+      GroupVersioningUtil.updateVersionInfoForChangedApps(Timestamp(10),
+                                                          nestedApp,
+                                                          nestedAppScaled)
     Then("The timestamp of the app and groups are updated appropriately")
     def update(maybeApp: Option[AppDefinition]): AppDefinition =
       maybeApp
-        .map(_.copy(versionInfo = VersionInfo
+        .map(
+            _.copy(versionInfo = VersionInfo
                   .forNewConfig(Timestamp(0))
                   .withScaleOrRestartChange(Timestamp(10))))
         .get
@@ -108,8 +111,10 @@ class GroupVersioningUtilTest
 
   test("A updated app should get proper versionInfo") {
     When("Calculating version infos with an updated app")
-    val updated = GroupVersioningUtil.updateVersionInfoForChangedApps(
-        Timestamp(10), nestedApp, nestedAppUpdated)
+    val updated =
+      GroupVersioningUtil.updateVersionInfoForChangedApps(Timestamp(10),
+                                                          nestedApp,
+                                                          nestedAppUpdated)
     Then("The timestamp of the app and groups are updated appropriately")
     def update(maybeApp: Option[AppDefinition]): AppDefinition =
       maybeApp

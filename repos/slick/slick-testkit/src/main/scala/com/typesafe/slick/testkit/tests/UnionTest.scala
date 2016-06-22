@@ -28,10 +28,10 @@ class UnionTest extends AsyncTest[RelationalTestDB] {
   lazy val employees = TableQuery[Employees]
 
   def testBasicUnions = {
-    val q1 = for (m <- managers filter { _.department === "IT" }) yield
-      (m.id, m.name)
-    val q2 = for (e <- employees filter { _.departmentIs("IT") }) yield
-      (e.id, e.name)
+    val q1 = for (m <- managers filter { _.department === "IT" })
+      yield (m.id, m.name)
+    val q2 = for (e <- employees filter { _.departmentIs("IT") })
+      yield (e.id, e.name)
     val q3 = (q1 union q2).sortBy(_._2.asc)
     val q4 = managers.map(_.id)
     val q4b = q4 union q4
@@ -57,11 +57,12 @@ class UnionTest extends AsyncTest[RelationalTestDB] {
                 r.toSet shouldBe Set((2, "Amy"), (3, "Steve")))
       _ <- mark("q2", q2.result).map(r =>
                 r.toSet shouldBe Set((7, "Ben"), (8, "Greg"), (6, "Leonard")))
-      _ <- mark("q3", q3.result).map(_ shouldBe List((2, "Amy"),
-                                                     (7, "Ben"),
-                                                     (8, "Greg"),
-                                                     (6, "Leonard"),
-                                                     (3, "Steve")))
+      _ <- mark("q3", q3.result).map(
+              _ shouldBe List((2, "Amy"),
+                              (7, "Ben"),
+                              (8, "Greg"),
+                              (6, "Leonard"),
+                              (3, "Steve")))
       _ <- mark("q4b", q4b.result).map(r => r.toSet shouldBe Set(1, 2, 3))
       _ <- mark("q4c", q4c.result).map(r => r.toSet shouldBe Set(1, 2, 3))
       _ <- mark("q5", q5.result).map(
@@ -129,7 +130,8 @@ class UnionTest extends AsyncTest[RelationalTestDB] {
               r.toSet shouldBe Set((10L, 1L), (20L, 2L), (30L, 3L))),
         q2.result.map(r =>
               r.toSet shouldBe Set((100L, 1L), (200L, 2L), (300L, 3L))),
-        q3.result.map(r =>
+        q3.result.map(
+            r =>
               r.toSet shouldBe Set((10L, 1L),
                                    (20L, 2L),
                                    (30L, 3L),

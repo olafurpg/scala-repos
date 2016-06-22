@@ -29,23 +29,23 @@ object product extends UFunc {
     }
   }
 
-  implicit def reduceSemiring[T, S](
-      implicit iter: CanTraverseValues[T, S],
-      semiring: Semiring[S]): Impl[T, S] = new Impl[T, S] {
-    def apply(v: T): S = {
-      class ProductVisitor extends ValuesVisitor[S] {
-        var product: S = semiring.one
-        def visit(a: S): Unit = {
-          product = semiring.*(product, a)
-        }
+  implicit def reduceSemiring[T, S](implicit iter: CanTraverseValues[T, S],
+                                    semiring: Semiring[S]): Impl[T, S] =
+    new Impl[T, S] {
+      def apply(v: T): S = {
+        class ProductVisitor extends ValuesVisitor[S] {
+          var product: S = semiring.one
+          def visit(a: S): Unit = {
+            product = semiring.*(product, a)
+          }
 
-        def zeros(numZero: Int, zeroValue: S): Unit = {
-          if (numZero > 0) product = semiring.zero
+          def zeros(numZero: Int, zeroValue: S): Unit = {
+            if (numZero > 0) product = semiring.zero
+          }
         }
+        val visit = new ProductVisitor
+        iter.traverse(v, visit)
+        visit.product
       }
-      val visit = new ProductVisitor
-      iter.traverse(v, visit)
-      visit.product
     }
-  }
 }

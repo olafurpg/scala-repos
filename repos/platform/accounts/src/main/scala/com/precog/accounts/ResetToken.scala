@@ -43,6 +43,6 @@ object ResetToken {
   val schemaV1 =
     "tokenId" :: "accountId" :: "email" :: "expiresAt" :: "usedAt" :: HNil
 
-  implicit val (decomposerV1, extractorV1) = serializationV(
-      schemaV1, Some("1.0".v))
+  implicit val (decomposerV1, extractorV1) =
+    serializationV(schemaV1, Some("1.0".v))
 }

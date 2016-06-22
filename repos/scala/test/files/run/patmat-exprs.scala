@@ -176,8 +176,7 @@ trait Pattern {
         case Add3(a, b, c) => Add(a :: b :: c :: Nil)
         case Sub(a, b) => Add(a :: Neg(b) :: Nil)
         case Add(x) =>
-          Add(
-              x flatMap {
+          Add(x flatMap {
             case Neg(Add(y)) => y.map(Neg(_))
             case Add(y) => y
             case y => y :: Nil
@@ -198,7 +197,7 @@ trait Pattern {
     private def reduceComponents(components: List[Expr[T]])(
         implicit num: NumericOps[T]): List[Expr[T]] = {
       val pairs = for (a <- components; b <- components if Neg(a) == b ||
-                       a == Neg(b)) yield (a, b)
+                         a == Neg(b)) yield (a, b)
       pairs.foldLeft(components) { (c, pair) =>
         if (c.contains(pair._1) && c.contains(pair._2))
           c.diff(pair._1 :: pair._2 :: Nil)
@@ -221,25 +220,25 @@ trait Pattern {
         case Add(Seq(Add(x), y)) => Add(y :: x.toList).simplify
         case Add(Seq(x, Add(y))) => Add(x :: y.toList).simplify
         case Add(x) => {
-            val noZeros = x.filter(_ != Zero[T])
-            val noOnes = noZeros.map {
-              case y: One[_] => Const(num.one); case y => y
-            }
-            val constant =
-              num.sum(noOnes.collect { case c: Const[T] => c.value })
-            val rest = noOnes.filter(x => !x.isInstanceOf[Const[_]]).toList
-            val reduced = reduceComponents(rest)
-            val args =
-              if (num.similar(constant, num.zero)) reduced
-              else reduced ::: Const(constant) :: Nil
-            args.size match {
-              case 0 => Zero[T]
-              case 1 => args.head
-              case 2 => Add2(args(0), args(1))
-              case 3 => Add3(args(0), args(1), args(2))
-              case _ => Add(args)
-            }
+          val noZeros = x.filter(_ != Zero[T])
+          val noOnes = noZeros.map {
+            case y: One[_] => Const(num.one); case y => y
           }
+          val constant =
+            num.sum(noOnes.collect { case c: Const[T] => c.value })
+          val rest = noOnes.filter(x => !x.isInstanceOf[Const[_]]).toList
+          val reduced = reduceComponents(rest)
+          val args =
+            if (num.similar(constant, num.zero)) reduced
+            else reduced ::: Const(constant) :: Nil
+          args.size match {
+            case 0 => Zero[T]
+            case 1 => args.head
+            case 2 => Add2(args(0), args(1))
+            case 3 => Add3(args(0), args(1), args(2))
+            case _ => Add(args)
+          }
+        }
         case Sub(x: Zero[_], y) => Neg(y)
         case Sub(x, y: Zero[_]) => x
         case Sub(x, y) if x == y => Zero[T]
@@ -396,8 +395,8 @@ trait Pattern {
     override lazy val hashCode = ScalaRunTime._hashCode(this);
   }
 
-  case class Add3[T](
-      a1: Expr[T], a2: Expr[T], a3: Expr[T])(implicit num: NumericOps[T])
+  case class Add3[T](a1: Expr[T], a2: Expr[T], a3: Expr[T])(
+      implicit num: NumericOps[T])
       extends ManyArg[T] {
     val args = List(a1, a2, a3)
     def eval(f: Any => Any) = num.add(a1.eval(f), a2.eval(f), a3.eval(f))
@@ -522,9 +521,10 @@ trait Pattern {
     override lazy val hashCode = ScalaRunTime._hashCode(this);
   }
 
-  abstract class Compare[T](
-      left: Expr[T], right: Expr[T], cmp: (T, T) => Boolean)(
-      implicit num: NumericOps[T])
+  abstract class Compare[T](left: Expr[T],
+                            right: Expr[T],
+                            cmp: (T,
+                                  T) => Boolean)(implicit num: NumericOps[T])
       extends Expr[Boolean] {
     def derivative(v: Var[Boolean]) =
       throw new IllegalStateException("Derivative of Boolean not allowed")
@@ -532,37 +532,38 @@ trait Pattern {
     val args = List(left, right)
   }
 
-  case class LE[T](left: Expr[T], right: Expr[T])(
-      implicit num: NumericOps[T], ord: Ordering[T])
+  case class LE[T](left: Expr[T], right: Expr[T])(implicit num: NumericOps[T],
+                                                  ord: Ordering[T])
       extends Compare[T](left, right, ord.compare(_, _) <= 0) {
     def mapArgs(f: EndoFunction[Expr[_]]) = LE(f(left), f(right))
     override def toString = left.toString + " <= " + right.toString
   }
 
-  case class LT[T](left: Expr[T], right: Expr[T])(
-      implicit num: NumericOps[T], ord: Ordering[T])
+  case class LT[T](left: Expr[T], right: Expr[T])(implicit num: NumericOps[T],
+                                                  ord: Ordering[T])
       extends Compare[T](left, right, ord.compare(_, _) < 0) {
     def mapArgs(f: EndoFunction[Expr[_]]) = LT(f(left), f(right))
     override def toString = left.toString + " < " + right.toString
   }
 
-  case class GE[T](left: Expr[T], right: Expr[T])(
-      implicit num: NumericOps[T], ord: Ordering[T])
+  case class GE[T](left: Expr[T], right: Expr[T])(implicit num: NumericOps[T],
+                                                  ord: Ordering[T])
       extends Compare[T](left, right, ord.compare(_, _) >= 0) {
     def mapArgs(f: EndoFunction[Expr[_]]) = GE(f(left), f(right))
     override def toString = left.toString + " >= " + right.toString
   }
 
-  case class GT[T](left: Expr[T], right: Expr[T])(
-      implicit num: NumericOps[T], ord: Ordering[T])
+  case class GT[T](left: Expr[T], right: Expr[T])(implicit num: NumericOps[T],
+                                                  ord: Ordering[T])
       extends Compare[T](left, right, ord.compare(_, _) > 0) {
     def mapArgs(f: EndoFunction[Expr[_]]) = GT(f(left), f(right))
     override def toString = left.toString + " > " + right.toString
   }
 
   case class IfElse[T <: Numeric[T]](
-      condition: Expr[Boolean], left: Expr[T], right: Expr[T])(
-      implicit num: NumericOps[T])
+      condition: Expr[Boolean],
+      left: Expr[T],
+      right: Expr[T])(implicit num: NumericOps[T])
       extends Expr[T] {
 
     val args = List(condition, left, right)

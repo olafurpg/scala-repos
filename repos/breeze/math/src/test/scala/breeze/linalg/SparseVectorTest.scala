@@ -36,8 +36,16 @@ class SparseVectorTest extends FunSuite {
     val a = SparseVector(0.56390, 0.36231, 0.14601, 0.60294, 0.14535)
     val b = SparseVector(0.15951, 0.83671, 0.56002, 0.57797, 0.54450)
     val bd = DenseVector(0.15951, 0.83671, 0.56002, 0.57797, 0.54450)
-    val bdSplit = DenseVector(
-        0.0, 0.15951, 0.0, 0.83671, 0.0, 0.56002, 0.0, 0.57797, 0.0, 0.54450)
+    val bdSplit = DenseVector(0.0,
+                              0.15951,
+                              0.0,
+                              0.83671,
+                              0.0,
+                              0.56002,
+                              0.0,
+                              0.57797,
+                              0.0,
+                              0.54450)
     val bdd = bdSplit(1 to 9 by 2)
     assertClose(a dot b, .90249)
 //    assertClose(a dot bd, .90249)
@@ -315,7 +323,7 @@ class SparseVectorTest extends FunSuite {
     // do in two stages to ensure that telling the return type doesn't change type inference
     val r =
       v1 +
-      v2 //type mismatch; found : breeze.linalg.Vector[Int] required: breeze.linalg.DenseVector[Int]
+        v2 //type mismatch; found : breeze.linalg.Vector[Int] required: breeze.linalg.DenseVector[Int]
     val q = r: DenseVector[Int]
     assert(q == DenseVector(0, 1, 0, 0))
   }
@@ -327,7 +335,7 @@ class SparseVectorTest extends FunSuite {
     // do in two stages to ensure that telling the return type doesn't change type inference
     val r =
       v2 +
-      v1 //type mismatch; found : breeze.linalg.Vector[Int] required: breeze.linalg.DenseVector[Int]
+        v1 //type mismatch; found : breeze.linalg.Vector[Int] required: breeze.linalg.DenseVector[Int]
     val q = r: DenseVector[Int]
     assert(q == DenseVector(0, 1, 0, 0))
   }

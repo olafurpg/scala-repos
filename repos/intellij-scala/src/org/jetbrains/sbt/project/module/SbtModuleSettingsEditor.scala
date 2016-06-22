@@ -35,8 +35,8 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
   def createComponentImpl() = {
     myForm.sbtImportsList.setEmptyText(
         SbtBundle("sbt.settings.noImplicitImportsFound"))
-    JListCompatibility.setModel(
-        myForm.sbtImportsList, modelWrapper.getModelRaw)
+    JListCompatibility
+      .setModel(myForm.sbtImportsList, modelWrapper.getModelRaw)
 
     myForm.updateButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
@@ -53,7 +53,8 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
     val moduleSettings = SbtSystemSettings
       .getInstance(state.getProject)
       .getLinkedProjectSettings(getModel.getModule)
-    myForm.sbtVersionTextField.setText(moduleSettings
+    myForm.sbtVersionTextField.setText(
+        moduleSettings
           .map(_.sbtVersion)
           .getOrElse(SbtBundle("sbt.settings.sbtVersionNotDetected")))
 

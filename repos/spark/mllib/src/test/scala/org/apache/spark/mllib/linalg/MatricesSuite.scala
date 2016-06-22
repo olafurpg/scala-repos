@@ -82,8 +82,8 @@ class MatricesSuite extends SparkFunSuite {
   }
 
   test("index in matrices incorrect input") {
-    val sm = Matrices.sparse(
-        3, 2, Array(0, 2, 3), Array(1, 2, 1), Array(0.0, 1.0, 2.0))
+    val sm = Matrices
+      .sparse(3, 2, Array(0, 2, 3), Array(1, 2, 1), Array(0.0, 1.0, 2.0))
     val dm = Matrices.dense(3, 2, Array(0.0, 2.3, 1.4, 3.2, 1.0, 9.1))
     Array(sm, dm).foreach { mat =>
       intercept[IllegalArgumentException] { mat.index(4, 1) }
@@ -205,8 +205,11 @@ class MatricesSuite extends SparkFunSuite {
         4,
         3,
         Array(0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3.0))
-    val sA = new SparseMatrix(
-        4, 3, Array(0, 1, 3, 4), Array(1, 0, 2, 3), Array(1.0, 2.0, 1.0, 3.0))
+    val sA = new SparseMatrix(4,
+                              3,
+                              Array(0, 1, 3, 4),
+                              Array(1, 0, 2, 3),
+                              Array(1.0, 2.0, 1.0, 3.0))
 
     val dAT = dA.transpose.asInstanceOf[DenseMatrix]
     val sAT = sA.transpose.asInstanceOf[SparseMatrix]
@@ -508,8 +511,8 @@ class MatricesSuite extends SparkFunSuite {
     assert(dm1.numNonzeros === 3)
     assert(dm1.numActives === 6)
 
-    val sm1 = Matrices.sparse(
-        3, 2, Array(0, 2, 3), Array(0, 2, 1), Array(0.0, -1.2, 0.0))
+    val sm1 = Matrices
+      .sparse(3, 2, Array(0, 2, 3), Array(0, 2, 1), Array(0.0, -1.2, 0.0))
     assert(sm1.numNonzeros === 1)
     assert(sm1.numActives === 3)
   }

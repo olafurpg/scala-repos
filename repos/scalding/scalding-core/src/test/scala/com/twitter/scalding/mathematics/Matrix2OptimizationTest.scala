@@ -308,8 +308,9 @@ object Matrix2Props extends Properties("Matrix2") {
   implicit def arbSeq: Arbitrary[IndexedSeq[MatrixLiteral[Any, Any, Double]]] =
     Arbitrary(genProdSeq)
 
-  def generateRandomPlan(
-      i: Int, j: Int, p: IndexedSeq[MatrixLiteral[Any, Any, Double]])
+  def generateRandomPlan(i: Int,
+                         j: Int,
+                         p: IndexedSeq[MatrixLiteral[Any, Any, Double]])
     : Matrix2[Any, Any, Double] = {
     if (i == j) p(i)
     else {
@@ -342,46 +343,51 @@ object Matrix2Props extends Properties("Matrix2") {
       mf match {
         case element @ MatrixLiteral(_, _) => (None, Nil)
         case Sum(left, right, _) => {
-            val (lastLP, leftR) = toProducts(left)
-            val (lastRP, rightR) = toProducts(right)
-            val total =
-              leftR ++ rightR ++
+          val (lastLP, leftR) = toProducts(left)
+          val (lastRP, rightR) = toProducts(right)
+          val total =
+            leftR ++ rightR ++
               (if (lastLP.isDefined) List(lastLP.get) else Nil) ++
               (if (lastRP.isDefined) List(lastRP.get) else Nil)
-            (None, total)
-          }
-        case Product(
-            leftp @ MatrixLiteral(_, _), rightp @ MatrixLiteral(_, _), _, _) =>
-          {
-            (Some(Product(leftp, rightp, ring)), Nil)
-          }
-        case Product(
-            left @ Product(_, _, _, _), right @ MatrixLiteral(_, _), _, _) => {
-            val (lastLP, leftR) = toProducts(left)
-            if (lastLP.isDefined)
-              (Some(Product(lastLP.get, right, ring)), leftR)
-            else (None, leftR)
-          }
-        case Product(
-            left @ MatrixLiteral(_, _), right @ Product(_, _, _, _), _, _) => {
-            val (lastRP, rightR) = toProducts(right)
-            if (lastRP.isDefined)
-              (Some(Product(left, lastRP.get, ring)), rightR)
-            else (None, rightR)
-          }
+          (None, total)
+        }
+        case Product(leftp @ MatrixLiteral(_, _),
+                     rightp @ MatrixLiteral(_, _),
+                     _,
+                     _) => {
+          (Some(Product(leftp, rightp, ring)), Nil)
+        }
+        case Product(left @ Product(_, _, _, _),
+                     right @ MatrixLiteral(_, _),
+                     _,
+                     _) => {
+          val (lastLP, leftR) = toProducts(left)
+          if (lastLP.isDefined)
+            (Some(Product(lastLP.get, right, ring)), leftR)
+          else (None, leftR)
+        }
+        case Product(left @ MatrixLiteral(_, _),
+                     right @ Product(_, _, _, _),
+                     _,
+                     _) => {
+          val (lastRP, rightR) = toProducts(right)
+          if (lastRP.isDefined)
+            (Some(Product(left, lastRP.get, ring)), rightR)
+          else (None, rightR)
+        }
         case Product(left, right, _, _) => {
-            val (lastLP, leftR) = toProducts(left)
-            val (lastRP, rightR) = toProducts(right)
-            if (lastLP.isDefined && lastRP.isDefined) {
-              (Some(Product(lastLP.get, lastRP.get, ring)), leftR ++ rightR)
-            } else {
-              val newP =
-                if (lastLP.isDefined) List(lastLP.get)
-                else if (lastRP.isDefined) List(lastRP.get)
-                else Nil
-              (None, newP ++ leftR ++ rightR)
-            }
+          val (lastLP, leftR) = toProducts(left)
+          val (lastRP, rightR) = toProducts(right)
+          if (lastLP.isDefined && lastRP.isDefined) {
+            (Some(Product(lastLP.get, lastRP.get, ring)), leftR ++ rightR)
+          } else {
+            val newP =
+              if (lastLP.isDefined) List(lastLP.get)
+              else if (lastRP.isDefined) List(lastRP.get)
+              else Nil
+            (None, newP ++ leftR ++ rightR)
           }
+        }
       }
     }
 
@@ -394,37 +400,45 @@ object Matrix2Props extends Properties("Matrix2") {
       def diff: Int = range._2 - range._1
     }
 
-    def labelTree(
-        p: Matrix2[Any, Any, Double], start: Int): Option[LabeledTree] = {
+    def labelTree(p: Matrix2[Any, Any, Double],
+                  start: Int): Option[LabeledTree] = {
       p match {
-        case Product(
-            left @ MatrixLiteral(_, _), right @ MatrixLiteral(_, _), _, _) => {
-            Some(new LabeledTree((start, start + 1), None, None))
-          }
-        case Product(
-            left @ MatrixLiteral(_, _), right @ Product(_, _, _, _), _, _) => {
-            val labelRight = labelTree(right, start + 1)
-            Some(new LabeledTree(
-                    (start, labelRight.get.range._2), None, labelRight))
-          }
-        case Product(
-            left @ Product(_, _, _, _), right @ MatrixLiteral(_, _), _, _) => {
-            val labelLeft = labelTree(left, start)
-            Some(
-                new LabeledTree(
-                    (labelLeft.get.range._1, labelLeft.get.range._2 + 1),
-                    labelLeft,
-                    None))
-          }
+        case Product(left @ MatrixLiteral(_, _),
+                     right @ MatrixLiteral(_, _),
+                     _,
+                     _) => {
+          Some(new LabeledTree((start, start + 1), None, None))
+        }
+        case Product(left @ MatrixLiteral(_, _),
+                     right @ Product(_, _, _, _),
+                     _,
+                     _) => {
+          val labelRight = labelTree(right, start + 1)
+          Some(
+              new LabeledTree((start, labelRight.get.range._2),
+                              None,
+                              labelRight))
+        }
+        case Product(left @ Product(_, _, _, _),
+                     right @ MatrixLiteral(_, _),
+                     _,
+                     _) => {
+          val labelLeft = labelTree(left, start)
+          Some(
+              new LabeledTree(
+                  (labelLeft.get.range._1, labelLeft.get.range._2 + 1),
+                  labelLeft,
+                  None))
+        }
         case Product(left, right, _, _) => {
-            val labelLeft = labelTree(left, start)
-            val labelRight = labelTree(right, labelLeft.get.range._2 + 1)
-            Some(
-                new LabeledTree(
-                    (labelLeft.get.range._1, labelRight.get.range._2),
-                    labelLeft,
-                    labelRight))
-          }
+          val labelLeft = labelTree(left, start)
+          val labelRight = labelTree(right, labelLeft.get.range._2 + 1)
+          Some(
+              new LabeledTree(
+                  (labelLeft.get.range._1, labelRight.get.range._2),
+                  labelLeft,
+                  labelRight))
+        }
         case _ => None
       }
     }
@@ -434,50 +448,56 @@ object Matrix2Props extends Properties("Matrix2") {
       * as the dynamic programming procedure computes cost
       * (optimizeProductChain - computeCosts in Prototype)
       */
-    def evaluateProduct(
-        p: Matrix2[Any, Any, Double], labels: LabeledTree): Option[
+    def evaluateProduct(p: Matrix2[Any, Any, Double],
+                        labels: LabeledTree): Option[
         (BigInt, Matrix2[Any, Any, Double], Matrix2[Any, Any, Double])] = {
       p match {
-        case Product(
-            left @ MatrixLiteral(_, _), right @ MatrixLiteral(_, _), _, _) => {
-            // reflects optimize when k==i: p(i).sizeHint * (p(k).sizeHint * p(j).sizeHint)
-            Some((left.sizeHint * (left.sizeHint * right.sizeHint)).total.get,
-                 left,
-                 right)
-          }
-        case Product(
-            left @ MatrixLiteral(_, _), right @ Product(_, _, _, _), _, _) => {
-            val (cost, pLeft, pRight) = evaluateProduct(
-                right, labels.right.get).get
-            // reflects optimize when k==i: p(i).sizeHint * (p(k).sizeHint * p(j).sizeHint)
-            // diff is computed in the labeled tree - it measures "spread" of the tree
-            // diff corresponds to (k - i) or (j - k - 1) in optimize: (k - i) * computeCosts(p, i, k) + (j - k - 1) * computeCosts(p, k + 1, j)
-            Some(labels.right.get.diff * cost +
+        case Product(left @ MatrixLiteral(_, _),
+                     right @ MatrixLiteral(_, _),
+                     _,
+                     _) => {
+          // reflects optimize when k==i: p(i).sizeHint * (p(k).sizeHint * p(j).sizeHint)
+          Some((left.sizeHint * (left.sizeHint * right.sizeHint)).total.get,
+               left,
+               right)
+        }
+        case Product(left @ MatrixLiteral(_, _),
+                     right @ Product(_, _, _, _),
+                     _,
+                     _) => {
+          val (cost, pLeft, pRight) =
+            evaluateProduct(right, labels.right.get).get
+          // reflects optimize when k==i: p(i).sizeHint * (p(k).sizeHint * p(j).sizeHint)
+          // diff is computed in the labeled tree - it measures "spread" of the tree
+          // diff corresponds to (k - i) or (j - k - 1) in optimize: (k - i) * computeCosts(p, i, k) + (j - k - 1) * computeCosts(p, k + 1, j)
+          Some(labels.right.get.diff * cost +
                  (left.sizeHint * (left.sizeHint * pRight.sizeHint)).total.get,
-                 left,
-                 pRight)
-          }
-        case Product(
-            left @ Product(_, _, _, _), right @ MatrixLiteral(_, _), _, _) => {
-            val (cost, pLeft, pRight) =
-              evaluateProduct(left, labels.left.get).get
-            Some(
-                labels.left.get.diff * cost +
+               left,
+               pRight)
+        }
+        case Product(left @ Product(_, _, _, _),
+                     right @ MatrixLiteral(_, _),
+                     _,
+                     _) => {
+          val (cost, pLeft, pRight) =
+            evaluateProduct(left, labels.left.get).get
+          Some(
+              labels.left.get.diff * cost +
                 (pLeft.sizeHint * (pRight.sizeHint * right.sizeHint)).total.get,
-                pLeft,
-                right)
-          }
+              pLeft,
+              right)
+        }
         case Product(left, right, _, _) => {
-            val (cost1, p1Left, p1Right) = evaluateProduct(
-                left, labels.left.get).get
-            val (cost2, p2Left, p2Right) = evaluateProduct(
-                right, labels.right.get).get
-            Some(
-                labels.left.get.diff * cost1 + labels.right.get.diff * cost2 +
+          val (cost1, p1Left, p1Right) =
+            evaluateProduct(left, labels.left.get).get
+          val (cost2, p2Left, p2Right) =
+            evaluateProduct(right, labels.right.get).get
+          Some(
+              labels.left.get.diff * cost1 + labels.right.get.diff * cost2 +
                 (p1Left.sizeHint * (p1Right.sizeHint * p2Right.sizeHint)).total.get,
-                p1Left,
-                p2Right)
-          }
+              p1Left,
+              p2Right)
+        }
         case _ => None
       }
     }

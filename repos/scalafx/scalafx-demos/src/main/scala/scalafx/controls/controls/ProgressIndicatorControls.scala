@@ -31,7 +31,8 @@ import scalafx.scene.control.{Label, ProgressIndicator, TextField}
 
 class ProgressIndicatorControls(target: ProgressIndicator)
     extends PropertiesNodes[ProgressIndicator](
-        target, target.getClass.getSimpleName + " Properties") {
+        target,
+        target.getClass.getSimpleName + " Properties") {
 
   val txfValue = new TextField
   txfValue.onAction = handle {

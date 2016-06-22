@@ -52,16 +52,15 @@ object SVDPlusPlus {
     *
     * @return a graph with vertex attributes containing the trained model
     */
-  def run(edges: RDD[Edge[Double]],
-          conf: Conf): (Graph[(Array[Double], Array[Double], Double, Double),
-                              Double],
-                        Double) = {
+  def run(edges: RDD[Edge[Double]], conf: Conf)
+    : (Graph[(Array[Double], Array[Double], Double, Double), Double],
+       Double) = {
     require(conf.maxIters > 0,
             s"Maximum of iterations must be greater than 0," +
-            s" but got ${conf.maxIters}")
+              s" but got ${conf.maxIters}")
     require(conf.maxVal > conf.minVal,
             s"MaxVal must be greater than MinVal," +
-            s" but got {maxVal: ${conf.maxVal}, minVal: ${conf.minVal}}")
+              s" but got {maxVal: ${conf.maxVal}, minVal: ${conf.minVal}}")
 
     // Generate default vertex attribute
     def defaultF(rank: Int): (Array[Double], Array[Double], Double, Double) = {
@@ -133,8 +132,8 @@ object SVDPlusPlus {
     for (i <- 0 until conf.maxIters) {
       // Phase 1, calculate pu + |N(u)|^(-0.5)*sum(y) for user nodes
       g.cache()
-      val t1 = g.aggregateMessages[Array[Double]](
-          ctx => ctx.sendToSrc(ctx.dstAttr._2), (g1, g2) => {
+      val t1 = g.aggregateMessages[Array[Double]](ctx =>
+            ctx.sendToSrc(ctx.dstAttr._2), (g1, g2) => {
         val out = g1.clone()
         blas.daxpy(out.length, 1.0, g2, 1, out, 1)
         out
@@ -188,8 +187,9 @@ object SVDPlusPlus {
 
     // calculate error on training set
     def sendMsgTestF(conf: Conf, u: Double)(
-        ctx: EdgeContext[
-            (Array[Double], Array[Double], Double, Double), Double, Double]) {
+        ctx: EdgeContext[(Array[Double], Array[Double], Double, Double),
+                         Double,
+                         Double]) {
       val (usr, itm) = (ctx.srcAttr, ctx.dstAttr)
       val (p, q) = (usr._1, itm._1)
       var pred = u + usr._3 + itm._3 + blas.ddot(q.length, q, 1, usr._2, 1)

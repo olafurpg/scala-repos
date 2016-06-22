@@ -59,11 +59,12 @@ object FakeKeyStore {
 
       logger.info(
           "Generating HTTPS key pair in " + keyStoreFile.getAbsolutePath +
-          " - this may take some time. If nothing happens, try moving the mouse/typing on the keyboard to generate some entropy.")
+            " - this may take some time. If nothing happens, try moving the mouse/typing on the keyboard to generate some entropy.")
 
       // Generate the key pair
       val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
-      keyPairGenerator.initialize(2048) // 2048 is the NIST acceptable key length until 2030
+      keyPairGenerator
+        .initialize(2048) // 2048 is the NIST acceptable key length until 2030
       val keyPair = keyPairGenerator.generateKeyPair()
 
       // Generate a self signed certificate
@@ -71,8 +72,10 @@ object FakeKeyStore {
 
       // Create the key store, first set the store pass
       keyStore.load(null, "".toCharArray)
-      keyStore.setKeyEntry(
-          "playgenerated", keyPair.getPrivate, "".toCharArray, Array(cert))
+      keyStore.setKeyEntry("playgenerated",
+                           keyPair.getPrivate,
+                           "".toCharArray,
+                           Array(cert))
       keyStore.setCertificateEntry("playgeneratedtrusted", cert)
       val out = new FileOutputStream(keyStoreFile)
       try {
@@ -102,8 +105,8 @@ object FakeKeyStore {
     certInfo.set(
         X509CertInfo.SERIAL_NUMBER,
         new CertificateSerialNumber(new BigInteger(64, new SecureRandom())))
-    certInfo.set(
-        X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3))
+    certInfo
+      .set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3))
 
     // Validity
     val validFrom = new Date()
@@ -125,8 +128,8 @@ object FakeKeyStore {
     // Key and algorithm
     certInfo.set(X509CertInfo.KEY, new CertificateX509Key(keyPair.getPublic))
     val algorithm = new AlgorithmId(SignatureAlgorithmOID)
-    certInfo.set(
-        X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(algorithm))
+    certInfo
+      .set(X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(algorithm))
 
     // Create a new certificate and sign it
     val cert = new X509CertImpl(certInfo)

@@ -42,7 +42,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class TextInputControlSpec
     extends SimpleSFXDelegateSpec[jfxsc.TextInputControl, TextInputControl](
-        classOf[jfxsc.TextInputControl], classOf[TextInputControl])
+        classOf[jfxsc.TextInputControl],
+        classOf[TextInputControl])
     with RunOnApplicationThread {
 
   override protected def getScalaClassInstance = new TextField

@@ -50,8 +50,8 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
       @NotNull file: PsiFile,
       @NotNull manager: InspectionManager,
       isOnTheFly: Boolean): Array[ProblemDescriptor] = {
-    val visitor: UnresolvedPropertyVisitor = new UnresolvedPropertyVisitor(
-        manager, isOnTheFly)
+    val visitor: UnresolvedPropertyVisitor =
+      new UnresolvedPropertyVisitor(manager, isOnTheFly)
     file.accept(visitor)
     val problems: util.List[ProblemDescriptor] = visitor.getProblems
     if (problems.isEmpty) null
@@ -66,8 +66,8 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
         @NotNull manager: InspectionManager,
         @NotNull problems: util.List[ProblemDescriptor],
         onTheFly: Boolean) {
-      val description: String = CodeInsightBundle.message(
-          "inspection.unresolved.property.key.reference.message", key)
+      val description: String = CodeInsightBundle
+        .message("inspection.unresolved.property.key.reference.message", key)
       problems.add(
           manager.createProblemDescriptor(
               expression,
@@ -105,8 +105,8 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
     }
   }
 
-  class UnresolvedPropertyVisitor(
-      myManager: InspectionManager, onTheFly: Boolean)
+  class UnresolvedPropertyVisitor(myManager: InspectionManager,
+                                  onTheFly: Boolean)
       extends ScalaRecursiveElementVisitor {
     override def visitLiteral(expression: ScLiteral) {
       if (expression.isInstanceOf[ScInterpolatedStringLiteral]) return
@@ -116,8 +116,10 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
       if (UnresolvedPropertyVisitor.isComputablePropertyExpression(expression))
         return
       val resourceBundleName: Ref[String] = new Ref[String]
-      if (!ScalaI18nUtil.isValidPropertyReference(
-              myManager.getProject, expression, key, resourceBundleName)) {
+      if (!ScalaI18nUtil.isValidPropertyReference(myManager.getProject,
+                                                  expression,
+                                                  key,
+                                                  resourceBundleName)) {
         UnresolvedPropertyVisitor.appendPropertyKeyNotFoundProblem(
             resourceBundleName.get,
             key,
@@ -140,7 +142,8 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
                   manager.findPropertiesFiles(module, key)
                 if (propFiles.isEmpty) {
                   val description: String = CodeInsightBundle.message(
-                      "inspection.invalid.resource.bundle.reference", key)
+                      "inspection.invalid.resource.bundle.reference",
+                      key)
                   val problem: ProblemDescriptor =
                     myManager.createProblemDescriptor(
                         expression,
@@ -155,10 +158,11 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
           case expressions: ScArgumentExprList
               if expression.getParent.getParent.isInstanceOf[ScMethodCall] =>
             val annotationParams = new mutable.HashMap[String, AnyRef]
-            annotationParams.put(
-                AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
-            if (!ScalaI18nUtil.mustBePropertyKey(
-                    myManager.getProject, expression, annotationParams)) return
+            annotationParams
+              .put(AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
+            if (!ScalaI18nUtil.mustBePropertyKey(myManager.getProject,
+                                                 expression,
+                                                 annotationParams)) return
             val paramsCount: java.lang.Integer =
               ScalaI18nUtil.getPropertyValueParamsMaxCount(expression)
             if (paramsCount == -1) return

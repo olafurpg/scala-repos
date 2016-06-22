@@ -54,12 +54,13 @@ object StepBuilder {
     }
   }
 
-  private def applyAnalysisEvals(
-      steps: List[Step], analysis: Analysis): List[Step] =
+  private def applyAnalysisEvals(steps: List[Step],
+                                 analysis: Analysis): List[Step] =
     steps.zipWithIndex map {
       case (step, index) =>
         analysis.infos.lift(index - 1).fold(step) { info =>
-          step.copy(eval = Step
+          step.copy(
+              eval = Step
                 .Eval(cp = info.score.map(_.ceiled.centipawns),
                       mate = info.mate,
                       best = info.best)
@@ -99,7 +100,8 @@ object StepBuilder {
                             fromStep: Step,
                             info: Info,
                             variant: Variant): List[Step] = {
-    chess.Replay.gameWhileValid(info.variation take 20, fromStep.fen, variant) match {
+    chess.Replay
+      .gameWhileValid(info.variation take 20, fromStep.fen, variant) match {
       case (games, error) =>
         error foreach logChessError(gameId)
         val lastPly = games.lastOption.??(_.turns)

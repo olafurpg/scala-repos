@@ -103,7 +103,7 @@ object Test {
     def act[T](expr: Expr[T]): Unit = {
       idx += 1
       val ts = expr.tree filter (_ => true) map
-      (_.getClass.getName split "[.$]" last) filterNot seen distinct;
+        (_.getClass.getName split "[.$]" last) filterNot seen distinct;
       println(
           "%2d  %60s  %s".format(
               idx,

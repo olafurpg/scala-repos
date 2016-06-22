@@ -30,16 +30,16 @@ object Package {
   final case class ManifestAttributes(attributes: (Attributes.Name, String)*)
       extends PackageOption
   def ManifestAttributes(attributes: (String, String)*): ManifestAttributes = {
-    val converted = for ((name, value) <- attributes) yield
-      (new Attributes.Name(name), value)
+    val converted = for ((name, value) <- attributes)
+      yield (new Attributes.Name(name), value)
     new ManifestAttributes(converted: _*)
   }
 
   def mergeAttributes(a1: Attributes, a2: Attributes) = a1 ++= a2
   // merges `mergeManifest` into `manifest` (mutating `manifest` in the process)
   def mergeManifests(manifest: Manifest, mergeManifest: Manifest): Unit = {
-    mergeAttributes(
-        manifest.getMainAttributes, mergeManifest.getMainAttributes)
+    mergeAttributes(manifest.getMainAttributes,
+                    mergeManifest.getMainAttributes)
     val entryMap = mapAsScalaMap(manifest.getEntries)
     for ((key, value) <- mergeManifest.getEntries) {
       entryMap.get(key) match {
@@ -87,11 +87,12 @@ object Package {
     val version = Attributes.Name.MANIFEST_VERSION
     if (main.getValue(version) eq null) main.put(version, "1.0")
   }
-  def addSpecManifestAttributes(
-      name: String, version: String, orgName: String): PackageOption = {
+  def addSpecManifestAttributes(name: String,
+                                version: String,
+                                orgName: String): PackageOption = {
     import Attributes.Name._
-    val attribKeys = Seq(
-        SPECIFICATION_TITLE, SPECIFICATION_VERSION, SPECIFICATION_VENDOR)
+    val attribKeys =
+      Seq(SPECIFICATION_TITLE, SPECIFICATION_VERSION, SPECIFICATION_VENDOR)
     val attribVals = Seq(name, version, orgName)
     ManifestAttributes(attribKeys zip attribVals: _*)
   }
@@ -106,8 +107,7 @@ object Package {
                          IMPLEMENTATION_VENDOR,
                          IMPLEMENTATION_VENDOR_ID)
     val attribVals = Seq(name, version, orgName, org)
-    ManifestAttributes(
-        (attribKeys zip attribVals) ++ {
+    ManifestAttributes((attribKeys zip attribVals) ++ {
       homepage map (h => (IMPLEMENTATION_URL, h.toString))
     }: _*)
   }

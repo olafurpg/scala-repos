@@ -43,7 +43,8 @@ class AkkaLoader {
   }
 
   private def printBanner() {
-    println("""
+    println(
+        """
 ==============================================================================
 
                                                    ZZ:

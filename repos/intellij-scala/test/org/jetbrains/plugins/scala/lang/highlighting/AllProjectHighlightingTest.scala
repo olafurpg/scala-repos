@@ -121,16 +121,16 @@ class AllProjectHighlightingTest
 
     for ((file, index) <- files.zipWithIndex) {
       val mock = new AnnotatorHolderMock {
-        override def createErrorAnnotation(
-            range: TextRange, message: String): Annotation = {
+        override def createErrorAnnotation(range: TextRange,
+                                           message: String): Annotation = {
           errorCount += 1
           println(
               s"Error in ${file.getName}. Range: $range. Message: $message.")
           super.createErrorAnnotation(range, message)
         }
 
-        override def createErrorAnnotation(
-            elt: PsiElement, message: String): Annotation = {
+        override def createErrorAnnotation(elt: PsiElement,
+                                           message: String): Annotation = {
           errorCount += 1
           println(
               s"Error in ${file.getName}. Range: ${elt.getTextRange}. Message: $message.")

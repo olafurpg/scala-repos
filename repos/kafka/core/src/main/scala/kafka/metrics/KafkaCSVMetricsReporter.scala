@@ -49,8 +49,8 @@ private class KafkaCSVMetricsReporter
         CoreUtils.rm(csvDir)
         csvDir.mkdirs()
         underlying = new CsvReporter(Metrics.defaultRegistry(), csvDir)
-        if (props.getBoolean(
-                "kafka.csv.metrics.reporter.enabled", default = false)) {
+        if (props.getBoolean("kafka.csv.metrics.reporter.enabled",
+                             default = false)) {
           initialized = true
           startReporter(metricsConfig.pollingIntervalSecs)
         }

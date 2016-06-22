@@ -16,8 +16,9 @@ import com.twitter.util.{Future, FuturePool}
 /**
   * Wraps a common.zookeeper.ServerSetImpl to be asynchronous using a FuturePool.
   */
-class ServerSet(
-    val underlying: ServerSetImpl, val path: String, pool: FuturePool) {
+class ServerSet(val underlying: ServerSetImpl,
+                val path: String,
+                pool: FuturePool) {
   import ServerSet._
 
   /** Join a ServerSet */
@@ -25,7 +26,8 @@ class ServerSet(
            additionalEndpoints: Map[String, InetSocketAddress] = Map.empty,
            status: CommonStatus = CommonStatus.ALIVE): Future[EndpointStatus] =
     pool {
-      underlying.join(serviceEndpoint, additionalEndpoints.asJava, status) // blocks
+      underlying
+        .join(serviceEndpoint, additionalEndpoints.asJava, status) // blocks
     } map { new EndpointStatus(_, pool) } // wrap for async updates
 
   /**
@@ -35,19 +37,22 @@ class ServerSet(
     */
   def monitor(): Future[Offer[Set[ServiceInstance]]] = pool {
     val broker = new InstanceBroker
-    underlying.monitor(broker) // blocks until monitor is initialized, or throws an exception
+    underlying
+      .monitor(broker) // blocks until monitor is initialized, or throws an exception
     broker.recv
   }
 }
 
 object ServerSet {
-  def apply(
-      underlying: ServerSetImpl, path: String, pool: FuturePool): ServerSet = {
+  def apply(underlying: ServerSetImpl,
+            path: String,
+            pool: FuturePool): ServerSet = {
     new ServerSet(underlying, path, pool)
   }
 
-  def apply(
-      client: ZooKeeperClient, path: String, pool: FuturePool): ServerSet = {
+  def apply(client: ZooKeeperClient,
+            path: String,
+            pool: FuturePool): ServerSet = {
     apply(new ServerSetImpl(client, path), path, pool)
   }
 
@@ -68,8 +73,8 @@ object ServerSet {
   }
 
   /** Asynchronous wrapper for a common EndpointStatus.  A FuturePool must be provided. */
-  class EndpointStatus(
-      val underlying: CommonServerSet.EndpointStatus, pool: FuturePool) {
+  class EndpointStatus(val underlying: CommonServerSet.EndpointStatus,
+                       pool: FuturePool) {
     def update(status: Status): Future[Unit] = pool {
       underlying.update(status())
     }

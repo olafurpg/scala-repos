@@ -65,7 +65,8 @@ object LocSpec extends Specification {
 
     "matchs a Req when currentValue is Empty, a * was used, and MatchWithoutCurrentValue is a param" in {
       val testMenu =
-        Menu.param[Param]("Test", "Test", s => Empty, p => "bacon") / "foo" / "bar" / * >> Loc.MatchWithoutCurrentValue
+        Menu
+          .param[Param]("Test", "Test", s => Empty, p => "bacon") / "foo" / "bar" / * >> Loc.MatchWithoutCurrentValue
       val testSiteMap = SiteMap(testMenu)
 
       val testLoc = testMenu.toLoc
@@ -80,7 +81,8 @@ object LocSpec extends Specification {
 
     "matchs a Req when currentValue is Empty, and MatchWithoutCurrentValue is a param" in {
       val testMenu =
-        Menu.param[Param]("Test", "Test", s => Empty, p => "bacon") / "foo" / "bar" >> Loc.MatchWithoutCurrentValue
+        Menu
+          .param[Param]("Test", "Test", s => Empty, p => "bacon") / "foo" / "bar" >> Loc.MatchWithoutCurrentValue
       val testSiteMap = SiteMap(testMenu)
 
       val testLoc = testMenu.toLoc

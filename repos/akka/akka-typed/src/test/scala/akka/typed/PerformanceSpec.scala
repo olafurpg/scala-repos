@@ -8,7 +8,8 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 
 class PerformanceSpec
-    extends TypedSpec(ConfigFactory.parseString("""
+    extends TypedSpec(
+        ConfigFactory.parseString("""
       # increase this if you do real benchmarking
       akka.typed.PerformanceSpec.iterations=100000
       """)) {
@@ -36,9 +37,10 @@ class PerformanceSpec
                 msg.ping ! Ping(msg.x, self, msg.report)
             })).withDispatcher(executor)
 
-            val actors = for (i ← 1 to pairs) yield
-              (ctx.spawn(pinger, s"pinger-$i"),
-               ctx.spawn(ponger, s"ponger-$i"))
+            val actors = for (i ← 1 to pairs)
+              yield
+                (ctx.spawn(pinger, s"pinger-$i"),
+                 ctx.spawn(ponger, s"ponger-$i"))
 
             val start = Deadline.now
 

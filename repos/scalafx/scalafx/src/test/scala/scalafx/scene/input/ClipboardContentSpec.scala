@@ -42,4 +42,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ClipboardContentSpec
     extends SimpleSFXDelegateSpec[jfxsi.ClipboardContent, ClipboardContent](
-        classOf[jfxsi.ClipboardContent], classOf[ClipboardContent])
+        classOf[jfxsi.ClipboardContent],
+        classOf[ClipboardContent])

@@ -40,8 +40,8 @@ import org.apache.spark.sql.hive.HiveShim._
 import org.apache.spark.sql.hive.client.HiveClientImpl
 import org.apache.spark.sql.types._
 
-private[hive] class HiveFunctionRegistry(
-    underlying: analysis.FunctionRegistry, executionHive: HiveClientImpl)
+private[hive] class HiveFunctionRegistry(underlying: analysis.FunctionRegistry,
+                                         executionHive: HiveClientImpl)
     extends analysis.FunctionRegistry
     with HiveInspectors {
 
@@ -53,8 +53,8 @@ private[hive] class HiveFunctionRegistry(
     }
   }
 
-  override def lookupFunction(
-      name: String, children: Seq[Expression]): Expression = {
+  override def lookupFunction(name: String,
+                              children: Seq[Expression]): Expression = {
     Try(underlying.lookupFunction(name, children)).getOrElse {
       // We only look it up to see if it exists, but do not include it in the HiveUDF since it is
       // not always serializable.
@@ -79,20 +79,24 @@ private[hive] class HiveFunctionRegistry(
           udf
         } else if (classOf[UDF].isAssignableFrom(
                        functionInfo.getFunctionClass)) {
-          val udf = HiveSimpleUDF(
-              name, new HiveFunctionWrapper(functionClassName), children)
+          val udf = HiveSimpleUDF(name,
+                                  new HiveFunctionWrapper(functionClassName),
+                                  children)
           udf.dataType // Force it to check input data types.
           udf
         } else if (classOf[GenericUDF].isAssignableFrom(
                        functionInfo.getFunctionClass)) {
-          val udf = HiveGenericUDF(
-              name, new HiveFunctionWrapper(functionClassName), children)
+          val udf = HiveGenericUDF(name,
+                                   new HiveFunctionWrapper(functionClassName),
+                                   children)
           udf.dataType // Force it to check input data types.
           udf
         } else if (classOf[AbstractGenericUDAFResolver].isAssignableFrom(
                        functionInfo.getFunctionClass)) {
-          val udaf = HiveUDAFFunction(
-              name, new HiveFunctionWrapper(functionClassName), children)
+          val udaf =
+            HiveUDAFFunction(name,
+                             new HiveFunctionWrapper(functionClassName),
+                             children)
           udaf.dataType // Force it to check input data types.
           udaf
         } else if (classOf[UDAF].isAssignableFrom(
@@ -106,8 +110,10 @@ private[hive] class HiveFunctionRegistry(
           udaf
         } else if (classOf[GenericUDTF].isAssignableFrom(
                        functionInfo.getFunctionClass)) {
-          val udtf = HiveGenericUDTF(
-              name, new HiveFunctionWrapper(functionClassName), children)
+          val udtf =
+            HiveGenericUDTF(name,
+                            new HiveFunctionWrapper(functionClassName),
+                            children)
           udtf.elementTypes // Force it to check input data types.
           udtf
         } else {
@@ -122,19 +128,21 @@ private[hive] class HiveFunctionRegistry(
           // If there is any other error, we throw an AnalysisException.
           val errorMessage =
             s"No handler for Hive udf ${functionInfo.getFunctionClass} " +
-            s"because: ${throwable.getMessage}."
+              s"because: ${throwable.getMessage}."
           throw new AnalysisException(errorMessage)
       }
     }
   }
 
-  override def registerFunction(
-      name: String, info: ExpressionInfo, builder: FunctionBuilder): Unit =
+  override def registerFunction(name: String,
+                                info: ExpressionInfo,
+                                builder: FunctionBuilder): Unit =
     underlying.registerFunction(name, info, builder)
 
   /* List all of the registered function names. */
   override def listFunction(): Seq[String] = {
-    (FunctionRegistry.getFunctionNames.asScala ++ underlying.listFunction()).toList.sorted
+    (FunctionRegistry.getFunctionNames.asScala ++ underlying
+          .listFunction()).toList.sorted
   }
 
   /* Get the class of the registered function by specified name. */
@@ -146,22 +154,25 @@ private[hive] class HiveFunctionRegistry(
         val annotation =
           info.getFunctionClass.getAnnotation(classOf[Description])
         if (annotation != null) {
-          Some(new ExpressionInfo(info.getFunctionClass.getCanonicalName,
-                                  annotation.name(),
-                                  annotation.value(),
-                                  annotation.extended()))
+          Some(
+              new ExpressionInfo(info.getFunctionClass.getCanonicalName,
+                                 annotation.name(),
+                                 annotation.value(),
+                                 annotation.extended()))
         } else {
-          Some(new ExpressionInfo(info.getFunctionClass.getCanonicalName,
-                                  name,
-                                  null,
-                                  null))
+          Some(
+              new ExpressionInfo(info.getFunctionClass.getCanonicalName,
+                                 name,
+                                 null,
+                                 null))
         }
       }.getOrElse(None))
   }
 }
 
-private[hive] case class HiveSimpleUDF(
-    name: String, funcWrapper: HiveFunctionWrapper, children: Seq[Expression])
+private[hive] case class HiveSimpleUDF(name: String,
+                                       funcWrapper: HiveFunctionWrapper,
+                                       children: Seq[Expression])
     extends Expression
     with HiveInspectors
     with CodegenFallback
@@ -199,7 +210,8 @@ private[hive] case class HiveSimpleUDF(
   @transient
   lazy val returnInspector =
     ObjectInspectorFactory.getReflectionObjectInspector(
-        method.getGenericReturnType(), ObjectInspectorOptions.JAVA)
+        method.getGenericReturnType(),
+        ObjectInspectorOptions.JAVA)
 
   @transient
   private lazy val cached: Array[AnyRef] = new Array[AnyRef](children.length)
@@ -210,8 +222,8 @@ private[hive] case class HiveSimpleUDF(
 
   // TODO: Finish input output types.
   override def eval(input: InternalRow): Any = {
-    val inputs = wrap(
-        children.map(c => c.eval(input)), arguments, cached, inputDataTypes)
+    val inputs =
+      wrap(children.map(c => c.eval(input)), arguments, cached, inputDataTypes)
     val ret = FunctionRegistry.invoke(
         method,
         function,
@@ -229,8 +241,8 @@ private[hive] case class HiveSimpleUDF(
 }
 
 // Adapter from Catalyst ExpressionResult to Hive DeferredObject
-private[hive] class DeferredObjectAdapter(
-    oi: ObjectInspector, dataType: DataType)
+private[hive] class DeferredObjectAdapter(oi: ObjectInspector,
+                                          dataType: DataType)
     extends DeferredObject
     with HiveInspectors {
 
@@ -242,8 +254,9 @@ private[hive] class DeferredObjectAdapter(
   override def get(): AnyRef = wrap(func(), oi, dataType)
 }
 
-private[hive] case class HiveGenericUDF(
-    name: String, funcWrapper: HiveFunctionWrapper, children: Seq[Expression])
+private[hive] case class HiveGenericUDF(name: String,
+                                        funcWrapper: HiveFunctionWrapper,
+                                        children: Seq[Expression])
     extends Expression
     with HiveInspectors
     with CodegenFallback
@@ -361,8 +374,11 @@ private[hive] case class HiveGenericUDTF(name: String,
 
     val inputProjection = new InterpretedProjection(children)
 
-    function.process(wrap(
-            inputProjection(input), inputInspectors, udtInput, inputDataTypes))
+    function.process(
+        wrap(inputProjection(input),
+             inputInspectors,
+             udtInput,
+             inputDataTypes))
     collector.collectRows()
   }
 
@@ -419,20 +435,19 @@ private[hive] case class HiveUDAFFunction(
     copy(inputAggBufferOffset = newInputAggBufferOffset)
 
   @transient
-  private lazy val resolver =
-    if (isUDAFBridgeRequired) {
-      new GenericUDAFBridge(funcWrapper.createFunction[UDAF]())
-    } else {
-      funcWrapper.createFunction[AbstractGenericUDAFResolver]()
-    }
+  private lazy val resolver = if (isUDAFBridgeRequired) {
+    new GenericUDAFBridge(funcWrapper.createFunction[UDAF]())
+  } else {
+    funcWrapper.createFunction[AbstractGenericUDAFResolver]()
+  }
 
   @transient
   private lazy val inspectors = children.map(toInspector).toArray
 
   @transient
   private lazy val functionAndInspector = {
-    val parameterInfo = new SimpleGenericUDAFParameterInfo(
-        inspectors, false, false)
+    val parameterInfo =
+      new SimpleGenericUDAFParameterInfo(inspectors, false, false)
     val f = resolver.getEvaluator(parameterInfo)
     f -> f.init(GenericUDAFEvaluator.Mode.COMPLETE, inspectors)
   }

@@ -63,7 +63,8 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
     * Java API: Get the last (most specific) attribute of a given `Class` or subclass thereof.
     */
   def getAttribute[T <: Attribute](c: Class[T]): Optional[T] =
-    Optional.ofNullable(attributeList.foldLeft(
+    Optional.ofNullable(
+        attributeList.foldLeft(
             null.asInstanceOf[T]
         )((acc, attr) ⇒ if (c.isInstance(attr)) c.cast(attr) else acc))
 
@@ -149,8 +150,9 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
   private[akka] def nameOrDefault(
       default: String = "unknown-operation"): String = {
     @tailrec
-    def concatNames(
-        i: Iterator[Attribute], first: String, buf: StringBuilder): String =
+    def concatNames(i: Iterator[Attribute],
+                    first: String,
+                    buf: StringBuilder): String =
       if (i.hasNext)
         i.next() match {
           case Name(n) ⇒

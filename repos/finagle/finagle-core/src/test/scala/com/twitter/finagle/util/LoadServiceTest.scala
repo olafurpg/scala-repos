@@ -46,7 +46,8 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
     val simple = new SimpleRegistry
     GlobalRegistry.withRegistry(simple) {
       assert(LoadService[Resolver]().nonEmpty)
-      assert(GlobalRegistry.get.toSet == Set(
+      assert(
+          GlobalRegistry.get.toSet == Set(
               Entry(Seq("loadservice", "com.twitter.finagle.Resolver"),
                     "com.twitter.finagle.TestResolver,com.twitter.finagle.TestAsyncInetResolver")
           ))
@@ -234,6 +235,6 @@ class MetaInfCodedClassloader(parent: ClassLoader)
 class FooAnnouncer extends Announcer {
   override val scheme: String = "foo"
 
-  override def announce(
-      addr: InetSocketAddress, name: String): Future[Announcement] = null
+  override def announce(addr: InetSocketAddress,
+                        name: String): Future[Announcement] = null
 }

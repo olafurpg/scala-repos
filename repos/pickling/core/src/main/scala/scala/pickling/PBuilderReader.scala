@@ -227,8 +227,8 @@ abstract class AbstractPReader extends PReader with PickleTools
   * @param message error message
   * @param cause exception causing the pickling exception if any
   */
-final case class PicklingException(
-    message: String, cause: Option[Throwable] = None)
+final case class PicklingException(message: String,
+                                   cause: Option[Throwable] = None)
     extends RuntimeException(message, cause.orNull)
 
 /**

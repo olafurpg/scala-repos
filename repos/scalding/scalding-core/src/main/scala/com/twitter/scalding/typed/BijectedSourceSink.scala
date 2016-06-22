@@ -24,8 +24,8 @@ import serialization.Externalizer
 
 object BijectedSourceSink {
   type SourceSink[T] = TypedSource[T] with TypedSink[T]
-  def apply[T, U](
-      parent: SourceSink[T])(implicit transformer: ImplicitBijection[T, U])
+  def apply[T, U](parent: SourceSink[T])(
+      implicit transformer: ImplicitBijection[T, U])
     : BijectedSourceSink[T, U] =
     new BijectedSourceSink(parent)(transformer)
 }

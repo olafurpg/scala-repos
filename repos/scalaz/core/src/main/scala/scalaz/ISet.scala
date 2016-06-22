@@ -232,8 +232,10 @@ sealed abstract class ISet[A] {
     }
 
   final def difference(other: ISet[A])(implicit o: Order[A]): ISet[A] = {
-    def hedgeDiff(
-        blo: Option[A], bhi: Option[A], t1: ISet[A], t2: ISet[A]): ISet[A] =
+    def hedgeDiff(blo: Option[A],
+                  bhi: Option[A],
+                  t1: ISet[A],
+                  t2: ISet[A]): ISet[A] =
       (t1, t2) match {
         case (Tip(), _) =>
           Tip()
@@ -242,7 +244,10 @@ sealed abstract class ISet[A] {
         case (t, Bin(x, l, r)) =>
           val bmi = some(x)
           hedgeDiff(blo, bmi, t.trim(blo, bmi), l) merge hedgeDiff(
-              bmi, bhi, t.trim(bmi, bhi), r)
+              bmi,
+              bhi,
+              t.trim(bmi, bhi),
+              r)
       }
 
     (this, other) match {
@@ -260,8 +265,10 @@ sealed abstract class ISet[A] {
     difference(other)
 
   final def intersection(other: ISet[A])(implicit o: Order[A]) = {
-    def hedgeInt(
-        blo: Option[A], bhi: Option[A], t1: ISet[A], t2: ISet[A]): ISet[A] =
+    def hedgeInt(blo: Option[A],
+                 bhi: Option[A],
+                 t1: ISet[A],
+                 t2: ISet[A]): ISet[A] =
       (t1, t2) match {
         case (_, Tip()) =>
           t2
@@ -321,8 +328,8 @@ sealed abstract class ISet[A] {
         }
     }
 
-  final def splitMember(
-      x: A)(implicit o: Order[A]): (ISet[A], Boolean, ISet[A]) =
+  final def splitMember(x: A)(
+      implicit o: Order[A]): (ISet[A], Boolean, ISet[A]) =
     this match {
       case Tip() =>
         (this, false, this)
@@ -589,29 +596,27 @@ sealed abstract class ISet[A] {
 
   final def filterGt(a: Option[A])(implicit o: Order[A]): ISet[A] =
     cata(a)(s =>
-              this match {
-                case Tip() => ISet.empty
-                case Bin(x, l, r) =>
-                  o.order(s, x) match {
-                    case LT => join(x, l.filterGt(a), r)
-                    case EQ => r
-                    case GT => r.filterGt(a)
-                  }
-            },
-            this)
+          this match {
+        case Tip() => ISet.empty
+        case Bin(x, l, r) =>
+          o.order(s, x) match {
+            case LT => join(x, l.filterGt(a), r)
+            case EQ => r
+            case GT => r.filterGt(a)
+          }
+    }, this)
 
   final def filterLt(a: Option[A])(implicit o: Order[A]): ISet[A] =
     cata(a)(s =>
-              this match {
-                case Tip() => ISet.empty
-                case Bin(x, l, r) =>
-                  o.order(x, s) match {
-                    case LT => join(x, l, r.filterLt(a))
-                    case EQ => l
-                    case GT => l.filterLt(a)
-                  }
-            },
-            this)
+          this match {
+        case Tip() => ISet.empty
+        case Bin(x, l, r) =>
+          o.order(x, s) match {
+            case LT => join(x, l, r.filterLt(a))
+            case EQ => l
+            case GT => l.filterLt(a)
+          }
+    }, this)
 
   override final def equals(other: Any): Boolean =
     other match {
@@ -762,8 +767,8 @@ object ISet extends ISetInstances {
   final def fromList[A](xs: List[A])(implicit o: Order[A]): ISet[A] =
     xs.foldLeft(empty[A])((a, b) => a insert b)
 
-  final def fromFoldable[F[_], A](xs: F[A])(
-      implicit F: Foldable[F], o: Order[A]): ISet[A] =
+  final def fromFoldable[F[_], A](xs: F[A])(implicit F: Foldable[F],
+                                            o: Order[A]): ISet[A] =
     F.foldLeft(xs, empty[A])((a, b) => a insert b)
 
   final def unions[A](xs: List[ISet[A]])(implicit o: Order[A]): ISet[A] =

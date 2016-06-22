@@ -51,7 +51,8 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
                                                 now,
                                                 user1)
       assert(
-          getCommitStatues == Map(("user1", "repo1", 2) -> CommitStatusInfo(
+          getCommitStatues == Map(
+              ("user1", "repo1", 2) -> CommitStatusInfo(
                   1,
                   1,
                   Some("default"),
@@ -69,8 +70,14 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
                                                 Some("exampleService"),
                                                 now,
                                                 user1)
-      assert(getCommitStatues == Map(("user1", "repo1", 2) -> CommitStatusInfo(
-                  2, 1, None, None, None, None)))
+      assert(
+          getCommitStatues == Map(
+              ("user1", "repo1", 2) -> CommitStatusInfo(2,
+                                                        1,
+                                                        None,
+                                                        None,
+                                                        None,
+                                                        None)))
 
       // get only statuses in query issues
       val (is3, pr3) =
@@ -84,8 +91,14 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
                                                 None,
                                                 now,
                                                 user1)
-      assert(getCommitStatues == Map(("user1", "repo1", 2) -> CommitStatusInfo(
-                  2, 1, None, None, None, None)))
+      assert(
+          getCommitStatues == Map(
+              ("user1", "repo1", 2) -> CommitStatusInfo(2,
+                                                        1,
+                                                        None,
+                                                        None,
+                                                        None,
+                                                        None)))
     }
   }
 }

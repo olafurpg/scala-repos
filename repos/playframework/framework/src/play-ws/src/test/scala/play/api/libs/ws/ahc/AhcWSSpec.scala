@@ -77,8 +77,10 @@ object AhcWSSpec extends PlaySpecification with Mockito {
 
       import scala.collection.JavaConverters._
       val paramsList: Seq[Param] = req.getQueryParams.asScala.toSeq
-      paramsList.exists(p => (p.getName == "foo") && (p.getValue == "foo1")) must beTrue
-      paramsList.exists(p => (p.getName == "foo") && (p.getValue == "foo2")) must beTrue
+      paramsList
+        .exists(p => (p.getName == "foo") && (p.getValue == "foo1")) must beTrue
+      paramsList
+        .exists(p => (p.getName == "foo") && (p.getValue == "foo2")) must beTrue
       paramsList.count(p => p.getName == "foo") must beEqualTo(2)
     }
 
@@ -295,8 +297,8 @@ object AhcWSSpec extends PlaySpecification with Mockito {
     }
 
     "not support negative timeout" in new WithApplication {
-      WS.url("http://playframework.com/").withRequestTimeout(-1.millis) should throwAn[
-          IllegalArgumentException]
+      WS.url("http://playframework.com/")
+        .withRequestTimeout(-1.millis) should throwAn[IllegalArgumentException]
     }
 
     "not support a timeout greater than Int.MaxValue" in new WithApplication {
@@ -433,8 +435,14 @@ object AhcWSSpec extends PlaySpecification with Mockito {
          false,
          false)
 
-      val ahcCookie: AHCCookie = new AHCCookie(
-          name, value, wrap, domain, path, maxAge, secure, httpOnly)
+      val ahcCookie: AHCCookie = new AHCCookie(name,
+                                               value,
+                                               wrap,
+                                               domain,
+                                               path,
+                                               maxAge,
+                                               secure,
+                                               httpOnly)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -462,8 +470,14 @@ object AhcWSSpec extends PlaySpecification with Mockito {
          false,
          false)
 
-      val ahcCookie: AHCCookie = new AHCCookie(
-          name, value, wrap, domain, path, maxAge, secure, httpOnly)
+      val ahcCookie: AHCCookie = new AHCCookie(name,
+                                               value,
+                                               wrap,
+                                               domain,
+                                               path,
+                                               maxAge,
+                                               secure,
+                                               httpOnly)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -482,8 +496,14 @@ object AhcWSSpec extends PlaySpecification with Mockito {
     "return -1 values of expires and maxAge as None" in {
       val ahcResponse: AHCResponse = mock[AHCResponse]
 
-      val ahcCookie: AHCCookie = new AHCCookie(
-          "someName", "value", true, "domain", "path", -1L, false, false)
+      val ahcCookie: AHCCookie = new AHCCookie("someName",
+                                               "value",
+                                               true,
+                                               "domain",
+                                               "path",
+                                               -1L,
+                                               false,
+                                               false)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -537,8 +557,8 @@ object AhcWSSpec extends PlaySpecification with Mockito {
 
   "withRequestFilter" should {
 
-    class CallbackRequestFilter(
-        callList: scala.collection.mutable.Buffer[Int], value: Int)
+    class CallbackRequestFilter(callList: scala.collection.mutable.Buffer[Int],
+                                value: Int)
         extends WSRequestFilter {
       override def apply(executor: WSRequestExecutor): WSRequestExecutor = {
         callList.append(value)

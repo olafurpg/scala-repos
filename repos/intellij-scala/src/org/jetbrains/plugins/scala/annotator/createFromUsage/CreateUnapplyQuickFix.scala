@@ -20,8 +20,8 @@ with CreateApplyOrUnapplyQuickFix(clazz) {
 
   override protected def methodText = unapplyMethodText(pattern)
 
-  override protected def addElementsToTemplate(
-      method: ScFunction, builder: TemplateBuilder) = {
+  override protected def addElementsToTemplate(method: ScFunction,
+                                               builder: TemplateBuilder) = {
     addParametersToTemplate(method, builder)
     addUnapplyResultTypesToTemplate(method, builder)
     addQmarksToTemplate(method, builder)

@@ -33,8 +33,8 @@ trait HandlerInvoker[-T] {
 /**
   * An invoker that wraps another invoker, ensuring the request is tagged appropriately.
   */
-private class TaggingInvoker[-A](
-    underlyingInvoker: HandlerInvoker[A], handlerDef: HandlerDef)
+private class TaggingInvoker[-A](underlyingInvoker: HandlerInvoker[A],
+                                 handlerDef: HandlerDef)
     extends HandlerInvoker[A] {
   import HandlerInvokerFactory._
   val cachedHandlerTags = handlerTags(handlerDef)
@@ -90,7 +90,8 @@ object HandlerInvokerFactory {
   )
 
   private[routing] def taggedRequest(
-      rh: RequestHeader, tags: Map[String, String]): RequestHeader = {
+      rh: RequestHeader,
+      tags: Map[String, String]): RequestHeader = {
     val newTags = if (rh.tags.isEmpty) tags else rh.tags ++ tags
     rh.copy(tags = newTags)
   }
@@ -132,14 +133,16 @@ object HandlerInvokerFactory {
     */
   private abstract class JavaActionInvokerFactory[A]
       extends HandlerInvokerFactory[A] {
-    def createInvoker(
-        fakeCall: => A, handlerDef: HandlerDef): HandlerInvoker[A] =
+    def createInvoker(fakeCall: => A,
+                      handlerDef: HandlerDef): HandlerInvoker[A] =
       new HandlerInvoker[A] {
         val cachedHandlerTags = handlerTags(handlerDef)
         val cachedAnnotations = {
           val controller = loadJavaControllerClass(handlerDef)
           val method = MethodUtils.getMatchingAccessibleMethod(
-              controller, handlerDef.method, handlerDef.parameterTypes: _*)
+              controller,
+              handlerDef.method,
+              handlerDef.parameterTypes: _*)
           new JavaActionAnnotations(controller, method)
         }
         def call(call: => A): Handler = new JavaHandler {
@@ -191,8 +194,8 @@ object HandlerInvokerFactory {
   private abstract class JavaWebSocketInvokerFactory[A, B]
       extends HandlerInvokerFactory[A] {
     def webSocketCall(call: => A): WebSocket
-    def createInvoker(
-        fakeCall: => A, handlerDef: HandlerDef): HandlerInvoker[A] =
+    def createInvoker(fakeCall: => A,
+                      handlerDef: HandlerDef): HandlerInvoker[A] =
       new HandlerInvoker[A] {
         val cachedHandlerTags = handlerTags(handlerDef)
         def call(call: => A): WebSocket = webSocketCall(call)
@@ -222,8 +225,9 @@ object HandlerInvokerFactory {
 
   implicit def javaBytesPromiseWebSocket: HandlerInvokerFactory[
       CompletionStage[LegacyWebSocket[Array[Byte]]]] =
-    new JavaWebSocketInvokerFactory[
-        CompletionStage[LegacyWebSocket[Array[Byte]]], Array[Byte]] {
+    new JavaWebSocketInvokerFactory[CompletionStage[
+                                        LegacyWebSocket[Array[Byte]]],
+                                    Array[Byte]] {
       def webSocketCall(
           call: => CompletionStage[LegacyWebSocket[Array[Byte]]]) =
         JavaWebSocket.promiseOfBytes(call)
@@ -231,16 +235,16 @@ object HandlerInvokerFactory {
 
   implicit def javaStringPromiseWebSocket: HandlerInvokerFactory[
       CompletionStage[LegacyWebSocket[String]]] =
-    new JavaWebSocketInvokerFactory[
-        CompletionStage[LegacyWebSocket[String]], String] {
+    new JavaWebSocketInvokerFactory[CompletionStage[LegacyWebSocket[String]],
+                                    String] {
       def webSocketCall(call: => CompletionStage[LegacyWebSocket[String]]) =
         JavaWebSocket.promiseOfString(call)
     }
 
   implicit def javaJsonPromiseWebSocket: HandlerInvokerFactory[
       CompletionStage[LegacyWebSocket[JsonNode]]] =
-    new JavaWebSocketInvokerFactory[
-        CompletionStage[LegacyWebSocket[JsonNode]], JsonNode] {
+    new JavaWebSocketInvokerFactory[CompletionStage[LegacyWebSocket[JsonNode]],
+                                    JsonNode] {
       def webSocketCall(call: => CompletionStage[LegacyWebSocket[JsonNode]]) =
         JavaWebSocket.promiseOfJson(call)
     }
@@ -270,19 +274,18 @@ object HandlerInvokerFactory {
                                              .toJava(code)
                                              .asInstanceOf[Optional[Integer]],
                                            reason)
-                    }.via(resultOrFlow.right.get.asScala)
-                          .map {
-                        case text: JMessage.Text => TextMessage(text.data)
-                        case binary: JMessage.Binary =>
-                          BinaryMessage(binary.data)
-                        case ping: JMessage.Ping => PingMessage(ping.data)
-                        case pong: JMessage.Pong => PongMessage(pong.data)
-                        case close: JMessage.Close =>
-                          CloseMessage(OptionConverters
-                                         .toScala(close.code)
-                                         .asInstanceOf[Option[Int]],
-                                       close.reason)
-                      })
+                    }.via(resultOrFlow.right.get.asScala).map {
+                      case text: JMessage.Text => TextMessage(text.data)
+                      case binary: JMessage.Binary =>
+                        BinaryMessage(binary.data)
+                      case ping: JMessage.Ping => PingMessage(ping.data)
+                      case pong: JMessage.Pong => PongMessage(pong.data)
+                      case close: JMessage.Close =>
+                        CloseMessage(OptionConverters
+                                       .toScala(close.code)
+                                       .asInstanceOf[Option[Int]],
+                                     close.reason)
+                    })
                   }
                 }
             }

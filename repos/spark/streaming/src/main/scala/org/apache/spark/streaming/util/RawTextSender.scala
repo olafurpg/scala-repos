@@ -67,8 +67,8 @@ private[streaming] object RawTextSender extends Logging {
     while (true) {
       val socket = serverSocket.accept()
       logInfo("Got a new connection")
-      val out = new RateLimitedOutputStream(
-          socket.getOutputStream, bytesPerSec)
+      val out =
+        new RateLimitedOutputStream(socket.getOutputStream, bytesPerSec)
       try {
         while (true) {
           out.write(countBuf.array)

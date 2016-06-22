@@ -37,8 +37,8 @@ object Runner extends Logging {
       })
       .toMap
 
-  def argumentValue(
-      arguments: Seq[String], argumentName: String): Option[String] = {
+  def argumentValue(arguments: Seq[String],
+                    argumentName: String): Option[String] = {
     val argumentIndex = arguments.indexOf(argumentName)
     try {
       arguments(argumentIndex) // just to make it error out if index is -1
@@ -157,34 +157,30 @@ object Runner extends Logging {
     val sparkSubmitCommand = Seq(
         Seq(sparkHome, "bin", "spark-submit").mkString(File.separator))
 
-    val sparkSubmitJars =
-      if (extraJars.nonEmpty) {
-        Seq("--jars", deployedJars.map(_.toString).mkString(","))
-      } else {
-        Nil
-      }
+    val sparkSubmitJars = if (extraJars.nonEmpty) {
+      Seq("--jars", deployedJars.map(_.toString).mkString(","))
+    } else {
+      Nil
+    }
 
-    val sparkSubmitFiles =
-      if (extraFiles.nonEmpty) {
-        Seq("--files", extraFiles.mkString(","))
-      } else {
-        Nil
-      }
+    val sparkSubmitFiles = if (extraFiles.nonEmpty) {
+      Seq("--files", extraFiles.mkString(","))
+    } else {
+      Nil
+    }
 
-    val sparkSubmitExtraClasspaths =
-      if (extraClasspaths.nonEmpty) {
-        Seq("--driver-class-path", extraClasspaths.mkString(":"))
-      } else {
-        Nil
-      }
+    val sparkSubmitExtraClasspaths = if (extraClasspaths.nonEmpty) {
+      Seq("--driver-class-path", extraClasspaths.mkString(":"))
+    } else {
+      Nil
+    }
 
-    val sparkSubmitKryo =
-      if (ca.common.sparkKryo) {
-        Seq("--conf",
-            "spark.serializer=org.apache.spark.serializer.KryoSerializer")
-      } else {
-        Nil
-      }
+    val sparkSubmitKryo = if (ca.common.sparkKryo) {
+      Seq("--conf",
+          "spark.serializer=org.apache.spark.serializer.KryoSerializer")
+    } else {
+      Nil
+    }
 
     val verbose = if (ca.common.verbose) Seq("--verbose") else Nil
 
@@ -204,8 +200,7 @@ object Runner extends Logging {
                        None,
                        "CLASSPATH" -> "",
                        "SPARK_YARN_USER_ENV" -> pioEnvVars).run()
-    Runtime.getRuntime.addShutdownHook(
-        new Thread(new Runnable {
+    Runtime.getRuntime.addShutdownHook(new Thread(new Runnable {
       def run(): Unit = {
         cleanup(fs, ca.common.scratchUri)
         proc.destroy()

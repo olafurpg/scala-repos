@@ -33,7 +33,8 @@ import org.apache.spark.sql.DataFrame
   */
 @Since("1.2.0")
 class RegressionMetrics @Since("2.0.0")(
-    predictionAndObservations: RDD[(Double, Double)], throughOrigin: Boolean)
+    predictionAndObservations: RDD[(Double, Double)],
+    throughOrigin: Boolean)
     extends Logging {
 
   @Since("1.2.0")

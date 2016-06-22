@@ -98,7 +98,8 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
 
   def clearGame(g: Game) =
     coll
-      .remove(BSONDocument(
+      .remove(
+          BSONDocument(
               "_id" -> BSONDocument("$in" -> chess.Color.all.map(g.fullIdOf))
           ))
       .void

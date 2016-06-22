@@ -49,11 +49,15 @@ trait ToResponse { self: BaseGetPoster =>
         case (server, responseCode) =>
           val respHeaders = slurpApacheHeaders(getter.getResponseHeaders)
 
-          new HttpResponse(
-              baseUrl, responseCode, getter.getStatusText, respHeaders, for {
-            st <- Box !! getter.getResponseBodyAsStream
-            bytes <- tryo(readWholeStream(st))
-          } yield bytes, httpClient)
+          new HttpResponse(baseUrl,
+                           responseCode,
+                           getter.getStatusText,
+                           respHeaders,
+                           for {
+                             st <- Box !! getter.getResponseBodyAsStream
+                             bytes <- tryo(readWholeStream(st))
+                           } yield bytes,
+                           httpClient)
       }
     } catch {
       case e: IOException => new CompleteFailure(baseUrl + fullUrl, Full(e))
@@ -114,8 +118,8 @@ trait BaseGetPoster {
 
   protected def slurpApacheHeaders(
       in: Array[Header]): Map[String, List[String]] = {
-    val headerSet: List[(String, String)] = for (e <- in.toList) yield
-      (e.getName -> e.getValue)
+    val headerSet: List[(String, String)] = for (e <- in.toList)
+      yield (e.getName -> e.getValue)
 
     headerSet.foldLeft[Map[String, List[String]]](Map.empty)((acc, e) =>
           acc + (e._1 -> (e._2 :: acc.getOrElse(e._1, Nil))))
@@ -266,8 +270,7 @@ trait BaseGetPoster {
     val poster = new PostMethod(baseUrl + url)
     poster.getParams().setCookiePolicy(CookiePolicy.RFC_2965)
     for ((name, value) <- headers) poster.setRequestHeader(name, value)
-    poster.setRequestEntity(
-        new RequestEntity {
+    poster.setRequestEntity(new RequestEntity {
       private val bytes = body
 
       def getContentLength() = bytes.length
@@ -289,8 +292,9 @@ trait BaseGetPoster {
     * @param url - the URL to append to the baseUrl
     * @param headers - any additional headers to include with the request
     */
-  def put(
-      url: String, httpClient: HttpClient, headers: List[(String, String)])(
+  def put(url: String,
+          httpClient: HttpClient,
+          headers: List[(String, String)])(
       implicit capture: (String, HttpClient,
                          HttpMethodBase) => ResponseType): ResponseType = {
     val poster = new PutMethod(baseUrl + url)
@@ -339,8 +343,7 @@ trait BaseGetPoster {
     val poster = new PutMethod(baseUrl + url)
     poster.getParams().setCookiePolicy(CookiePolicy.RFC_2965)
     for ((name, value) <- headers) poster.setRequestHeader(name, value)
-    poster.setRequestEntity(
-        new RequestEntity {
+    poster.setRequestEntity(new RequestEntity {
       private val bytes = body
 
       def getContentLength() = bytes.length
@@ -597,8 +600,8 @@ object TestHelpers {
     *
     * @return the updated sequences
     */
-  def toWatchUpdates(
-      old: Seq[(String, String)], body: String): Seq[(String, String)] = {
+  def toWatchUpdates(old: Seq[(String, String)],
+                     body: String): Seq[(String, String)] = {
     val p = Pattern.compile("""lift_toWatch\[\'([^\']*)\'] \= \'([0-9]*)""")
     val re = new REMatcher(body, p)
     val np = re.eachFound.foldLeft(Map(old: _*))((a, b) => a + ((b(1), b(2))))
@@ -608,7 +611,10 @@ object TestHelpers {
   def getCookie(headers: List[(String, String)],
                 respHeaders: Map[String, List[String]]): Box[String] = {
     val ret = (headers.filter { case ("Cookie", _) => true; case _ => false }
-          .map(_._2) ::: respHeaders.get("Set-Cookie").toList.flatMap(x => x)) match {
+          .map(_._2) ::: respHeaders
+          .get("Set-Cookie")
+          .toList
+          .flatMap(x => x)) match {
       case Nil => Empty
       case "" :: Nil => Empty
       case "" :: xs => Full(xs.mkString(","))
@@ -912,10 +918,10 @@ abstract class BaseResponse(override val baseUrl: String,
       implicit errorFunc: ReportFailure): SelfType =
     if (this.code != code) errorFunc.fail(msg) else this.asInstanceOf[SelfType]
 
-  def xmlMatch(
-      findFunc: Elem => NodeSeq, filterFunc: Node => Boolean): Boolean =
+  def xmlMatch(findFunc: Elem => NodeSeq,
+               filterFunc: Node => Boolean): Boolean =
     xml.toList flatMap (theXml => findFunc(theXml)) exists
-    (n => filterFunc(trim(n)))
+      (n => filterFunc(trim(n)))
 
   def getOrFail(success: Boolean, msg: String, errorFunc: ReportFailure) =
     if (success) this.asInstanceOf[SelfType]

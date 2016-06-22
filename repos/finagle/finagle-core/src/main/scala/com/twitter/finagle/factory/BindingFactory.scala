@@ -27,8 +27,7 @@ private class DynNameFactory[Req, Rep](
       q: immutable.Queue[(ClientConnection,
                           Promise[Service[Req, Rep]],
                           Stopwatch.Elapsed)]
-  )
-      extends State
+  ) extends State
   private case class Named(name: NameTree[Name.Bound]) extends State
   private case class Failed(exc: Throwable) extends State
   private case class Closed() extends State
@@ -178,8 +177,7 @@ private[finagle] object NameTreeFactory {
     case class Weighted(
         drv: Drv,
         factories: Seq[ServiceFactory[Req, Rep]]
-    )
-        extends ServiceFactory[Req, Rep] {
+    ) extends ServiceFactory[Req, Rep] {
       def apply(conn: ClientConnection) = factories(drv(rng)).apply(conn)
 
       override def status =
@@ -252,30 +250,25 @@ private[finagle] class BindingFactory[Req, Rep](
 
   private[this] val tree = NameTree.Leaf(path)
 
-  private[this] val nameCache = new ServiceFactoryCache[Name.Bound, Req, Rep](
-      bound =>
-        new ServiceFactoryProxy(newFactory(bound)) {
-          private val boundShow = Showable.show(bound)
-          override def apply(conn: ClientConnection) = {
-            Trace.recordBinary("namer.name", boundShow)
-            super.apply(conn)
-          }
-      },
-      statsReceiver.scope("namecache"),
-      maxNameCacheSize)
+  private[this] val nameCache =
+    new ServiceFactoryCache[Name.Bound, Req, Rep](bound =>
+          new ServiceFactoryProxy(newFactory(bound)) {
+        private val boundShow = Showable.show(bound)
+        override def apply(conn: ClientConnection) = {
+          Trace.recordBinary("namer.name", boundShow)
+          super.apply(conn)
+        }
+    }, statsReceiver.scope("namecache"), maxNameCacheSize)
 
   private[this] val nameTreeCache =
-    new ServiceFactoryCache[NameTree[Name.Bound], Req, Rep](
-        tree =>
+    new ServiceFactoryCache[NameTree[Name.Bound], Req, Rep](tree =>
           new ServiceFactoryProxy(NameTreeFactory(path, tree, nameCache)) {
-            private val treeShow = tree.show
-            override def apply(conn: ClientConnection) = {
-              Trace.recordBinary("namer.tree", treeShow)
-              super.apply(conn)
-            }
-        },
-        statsReceiver.scope("nametreecache"),
-        maxNameTreeCacheSize)
+        private val treeShow = tree.show
+        override def apply(conn: ClientConnection) = {
+          Trace.recordBinary("namer.tree", treeShow)
+          super.apply(conn)
+        }
+    }, statsReceiver.scope("nametreecache"), maxNameTreeCacheSize)
 
   private[this] val dtabCache = {
     val newFactory: ((Dtab, Dtab)) => ServiceFactory[Req, Rep] = {
@@ -297,15 +290,19 @@ private[finagle] class BindingFactory[Req, Rep](
               // we don't have the dtabs handy at the point we throw
               // the exception; fill them in on the way out
               case e: NoBrokersAvailableException =>
-                Future.exception(new NoBrokersAvailableException(
-                        e.name, baseDtab, localDtab))
+                Future.exception(
+                    new NoBrokersAvailableException(e.name,
+                                                    baseDtab,
+                                                    localDtab))
             }
           }
         }
     }
 
     new ServiceFactoryCache[(Dtab, Dtab), Req, Rep](
-        newFactory, statsReceiver.scope("dtabcache"), maxNamerCacheSize)
+        newFactory,
+        statsReceiver.scope("dtabcache"),
+        maxNamerCacheSize)
   }
 
   def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
@@ -382,11 +379,11 @@ object BindingFactory {
       def newStack(errorLabel: String, bound: Name.Bound) = {
         val client = next.make(
             params +
-            // replace the possibly unbound Dest with the definitely bound
-            // Dest because (1) it's needed by AddrMetadataExtraction and
-            // (2) it seems disingenuous not to.
-            Dest(bound) + LoadBalancerFactory.Dest(bound.addr) +
-            LoadBalancerFactory.ErrorLabel(errorLabel))
+              // replace the possibly unbound Dest with the definitely bound
+              // Dest because (1) it's needed by AddrMetadataExtraction and
+              // (2) it seems disingenuous not to.
+              Dest(bound) + LoadBalancerFactory.Dest(bound.addr) +
+              LoadBalancerFactory.ErrorLabel(errorLabel))
 
         boundPathFilter(bound.path) andThen client
       }
@@ -396,8 +393,10 @@ object BindingFactory {
 
         case Name.Path(path) =>
           val BaseDtab(baseDtab) = params[BaseDtab]
-          new BindingFactory(
-              path, newStack(path.show, _), baseDtab, stats.scope("namer"))
+          new BindingFactory(path,
+                             newStack(path.show, _),
+                             baseDtab,
+                             stats.scope("namer"))
       }
 
       Stack.Leaf(role, factory)

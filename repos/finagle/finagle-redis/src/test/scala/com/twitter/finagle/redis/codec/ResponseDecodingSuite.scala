@@ -19,8 +19,10 @@ final class ResponseDecodingSuite extends RedisResponseTest {
   }
 
   test("Correctly decode OK status reply with message") {
-    assert(codec(wrap("+OK\r\n+Hello World\r\n")) == List(
-            StatusReply("OK"), StatusReply("Hello World")))
+    assert(
+        codec(wrap("+OK\r\n+Hello World\r\n")) == List(
+            StatusReply("OK"),
+            StatusReply("Hello World")))
   }
 
   test("Throw ServerError when decoding BLANK OK reply") {
@@ -66,7 +68,8 @@ final class ResponseDecodingSuite extends RedisResponseTest {
   }
 
   test("Correctly decode Long.MaxValue reply") {
-    assert(codec(wrap(":9223372036854775807\r\n")) == List(
+    assert(
+        codec(wrap(":9223372036854775807\r\n")) == List(
             IntegerReply(9223372036854775807L)))
   }
 
@@ -77,7 +80,8 @@ final class ResponseDecodingSuite extends RedisResponseTest {
   }
 
   test("Correctly decode Long.MinValue") {
-    assert(codec(wrap(":-9223372036854775807\r\n")) == List(
+    assert(
+        codec(wrap(":-9223372036854775807\r\n")) == List(
             IntegerReply(-9223372036854775807L)))
   }
 
@@ -160,8 +164,9 @@ final class ResponseDecodingSuite extends RedisResponseTest {
       case reply :: Nil =>
         reply match {
           case MBulkReply(msgs) =>
-            assert(ReplyFormat.toString(msgs) == List(
-                    "foo", "bar", "Hello", "World"))
+            assert(
+                ReplyFormat
+                  .toString(msgs) == List("foo", "bar", "Hello", "World"))
           case _ => fail("Expected MBulkReply")
         }
       case _ => fail("Expected one element in list")
@@ -375,16 +380,16 @@ final class ResponseDecodingSuite extends RedisResponseTest {
       reply: List[AnyRef]): (String, String) =
     reply match {
       case fooR :: booR :: Nil => {
-          val fooMsg = fooR match {
-            case BulkReply(msg) => CBToString(msg)
-            case _ => "Expected Bulk Reply"
-          }
-          val barMsg = booR match {
-            case BulkReply(msg) => CBToString(msg)
-            case _ => "Expected Bulk Reply"
-          }
-          (fooMsg, barMsg)
+        val fooMsg = fooR match {
+          case BulkReply(msg) => CBToString(msg)
+          case _ => "Expected Bulk Reply"
         }
+        val barMsg = booR match {
+          case BulkReply(msg) => CBToString(msg)
+          case _ => "Expected Bulk Reply"
+        }
+        (fooMsg, barMsg)
+      }
       case _ => fail("Expected two element in list")
     }
 }

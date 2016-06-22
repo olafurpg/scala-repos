@@ -60,8 +60,7 @@ class InlineInfoTest extends ClearAfterClass {
       """.stripMargin
 //    val classes = compile(code) // SD-86
     InlineInfoTest.notPerRun.foreach(_.clear())
-    val classes =
-      compileClasses(compiler)(code, allowMessage = _ => true) // SD-86 inline warnings
+    val classes = compileClasses(compiler)(code, allowMessage = _ => true) // SD-86 inline warnings
 
     val fromSyms = classes.map(
         c =>
@@ -71,8 +70,7 @@ class InlineInfoTest extends ClearAfterClass {
             .get
             .inlineInfo)
 
-    val fromAttrs = classes.map(
-        c => {
+    val fromAttrs = classes.map(c => {
       assert(c.attrs.asScala.exists(_.isInstanceOf[InlineInfoAttribute]),
              c.attrs)
       compiler.genBCode.bTypes.inlineInfoFromClassfile(c)

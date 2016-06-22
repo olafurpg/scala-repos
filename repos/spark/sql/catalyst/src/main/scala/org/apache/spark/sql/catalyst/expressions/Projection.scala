@@ -30,8 +30,7 @@ class InterpretedProjection(expressions: Seq[Expression]) extends Projection {
   def this(expressions: Seq[Expression], inputSchema: Seq[Attribute]) =
     this(expressions.map(BindReferences.bindReference(_, inputSchema)))
 
-  expressions.foreach(
-      _.foreach {
+  expressions.foreach(_.foreach {
     case n: Nondeterministic => n.setInitialValues()
     case _ =>
   })
@@ -66,8 +65,7 @@ case class InterpretedMutableProjection(expressions: Seq[Expression])
 
   private[this] val buffer = new Array[Any](expressions.size)
 
-  expressions.foreach(
-      _.foreach {
+  expressions.foreach(_.foreach {
     case n: Nondeterministic => n.setInitialValues()
     case _ =>
   })
@@ -124,8 +122,7 @@ object UnsafeProjection {
     * Returns an UnsafeProjection for given sequence of Expressions (bounded).
     */
   def create(exprs: Seq[Expression]): UnsafeProjection = {
-    val unsafeExprs = exprs.map(
-        _ transform {
+    val unsafeExprs = exprs.map(_ transform {
       case CreateStruct(children) => CreateStructUnsafe(children)
       case CreateNamedStruct(children) => CreateNamedStructUnsafe(children)
     })
@@ -176,8 +173,7 @@ object FromUnsafeProjection {
     * Returns an UnsafeProjection for given Array of DataTypes.
     */
   def apply(fields: Seq[DataType]): Projection = {
-    create(
-        fields.zipWithIndex.map(x => {
+    create(fields.zipWithIndex.map(x => {
       new BoundReference(x._2, x._1, true)
     }))
   }

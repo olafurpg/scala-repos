@@ -29,7 +29,8 @@ import scala.collection.mutable
   * @since 3/24/15.
   */
 abstract class SbtImportNotificationProvider(
-    project: Project, notifications: EditorNotifications)
+    project: Project,
+    notifications: EditorNotifications)
     extends EditorNotifications.Provider[EditorNotificationPanel] {
 
   private val ignoredFiles = mutable.Set.empty[VirtualFile]
@@ -39,15 +40,17 @@ abstract class SbtImportNotificationProvider(
   def createPanel(file: VirtualFile): EditorNotificationPanel
 
   override def createNotificationPanel(
-      file: VirtualFile, fileEditor: FileEditor): EditorNotificationPanel =
+      file: VirtualFile,
+      fileEditor: FileEditor): EditorNotificationPanel =
     if (!isIgnored(file) && isSbtFile(file) &&
         shouldShowPanel(file, fileEditor)) createPanel(file)
     else null
 
   protected def refreshProject(): Unit = {
     FileDocumentManager.getInstance.saveAllDocuments()
-    ExternalSystemUtil.refreshProjects(new ImportSpecBuilder(
-            project, SbtProjectSystem.Id).forceWhenUptodate(true))
+    ExternalSystemUtil.refreshProjects(
+        new ImportSpecBuilder(project, SbtProjectSystem.Id)
+          .forceWhenUptodate(true))
   }
 
   protected def importProject(file: VirtualFile): Unit = {
@@ -83,7 +86,9 @@ abstract class SbtImportNotificationProvider(
                   val dataManager: ProjectDataManager =
                     ServiceManager.getService(classOf[ProjectDataManager])
                   dataManager.importData[ProjectData](
-                      Collections.singleton(externalProject), project, false)
+                      Collections.singleton(externalProject),
+                      project,
+                      false)
                 }
               })
           }
@@ -103,7 +108,7 @@ abstract class SbtImportNotificationProvider(
 
   protected def getExternalProject(filePath: String): Option[String] =
     (!project.isDisposed &&
-        Sbt.isProjectDefinitionFile(project, filePath.toFile))
+          Sbt.isProjectDefinitionFile(project, filePath.toFile))
       .option(project.getBasePath)
 
   protected def getProjectSettings(
@@ -112,7 +117,8 @@ abstract class SbtImportNotificationProvider(
       externalProjectPath <- Option(file.getCanonicalPath)
                               .flatMap(getExternalProject)
       sbtSettings <- Option(SbtSystemSettings.getInstance(project))
-      projectSettings <- Option(sbtSettings.getLinkedProjectSettings(
+      projectSettings <- Option(
+                            sbtSettings.getLinkedProjectSettings(
                                 externalProjectPath))
     } yield {
       projectSettings

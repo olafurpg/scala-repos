@@ -90,8 +90,8 @@ private[thrift] class TTwitterClientFilter(serviceName: String,
     val dtab = Dtab.local
     if (dtab.nonEmpty) {
       val delegations = new ArrayList[thrift.Delegation](dtab.size)
-      for (Dentry(src, dst) <- dtab) delegations.add(
-          new thrift.Delegation(src.show, dst.show))
+      for (Dentry(src, dst) <- dtab)
+        delegations.add(new thrift.Delegation(src.show, dst.show))
 
       header.setDelegations(delegations)
     }
@@ -126,8 +126,8 @@ private[thrift] class TTwitterClientFilter(serviceName: String,
       reply map { response =>
         if (isUpgraded) {
           // Peel off the ResponseHeader.
-          InputBuffer.peelMessage(
-              response, new thrift.ResponseHeader, protocolFactory)
+          InputBuffer
+            .peelMessage(response, new thrift.ResponseHeader, protocolFactory)
         } else response
       }
     }

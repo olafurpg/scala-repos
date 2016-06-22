@@ -119,8 +119,8 @@ class AlgorithmChecker(val signatureConstraints: Set[AlgorithmConstraint],
     * Checks the algorithms in the given certificate.  Note that this implementation skips signature checking in a
     * root certificate, as a trusted root cert by definition is in the trust store and doesn't need to be signed.
     */
-  def check(
-      cert: Certificate, unresolvedCritExts: java.util.Collection[String]) {
+  def check(cert: Certificate,
+            unresolvedCritExts: java.util.Collection[String]) {
     cert match {
       case x509Cert: X509Certificate =>
         val commonName = getCommonName(x509Cert)

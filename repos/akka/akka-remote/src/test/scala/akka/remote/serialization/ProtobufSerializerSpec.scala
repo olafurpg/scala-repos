@@ -26,8 +26,9 @@ class ProtobufSerializerSpec extends AkkaSpec {
 
     "work for SerializedMessage (just an akka.protobuf message)" in {
       // create a protobuf message
-      val protobufMessage = MessageSerializer.serialize(
-          system.asInstanceOf[ExtendedActorSystem], "hello")
+      val protobufMessage =
+        MessageSerializer.serialize(system.asInstanceOf[ExtendedActorSystem],
+                                    "hello")
       // serialize it with ProtobufSerializer
       val bytes = ser.serialize(protobufMessage).get
       // deserialize the bytes with ProtobufSerializer

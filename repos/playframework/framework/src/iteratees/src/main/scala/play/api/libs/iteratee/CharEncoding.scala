@@ -24,8 +24,8 @@ object CharEncoding {
 
     protected def empty: From
 
-    protected def code(
-        data: From, last: Boolean): Either[CoderResult, (To, From)]
+    protected def code(data: From,
+                       last: Boolean): Either[CoderResult, (To, From)]
 
     protected def concat(a: From, b: From): From
 
@@ -51,8 +51,8 @@ object CharEncoding {
           Error(s"coding error: $result", in)
         }, {
           case (string, remaining) =>
-            val newIt = Iteratee.flatten(it
-                  .feed(Input.El(string))
+            val newIt = Iteratee.flatten(
+                it.feed(Input.El(string))
                   .flatMap(_.feed(in))(defaultExecutionContext))
             Done(newIt)
         })

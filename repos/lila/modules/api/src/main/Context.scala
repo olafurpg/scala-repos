@@ -67,8 +67,8 @@ sealed trait Context extends lila.user.UserContextWrapper {
     userContext.req.session get name orElse { pref get name }
 }
 
-sealed abstract class BaseContext(
-    val userContext: lila.user.UserContext, val pageData: PageData)
+sealed abstract class BaseContext(val userContext: lila.user.UserContext,
+                                  val pageData: PageData)
     extends Context
 
 final class BodyContext[A](val bodyContext: BodyUserContext[A], data: PageData)
@@ -85,11 +85,11 @@ object Context {
   def apply(req: RequestHeader): HeaderContext =
     new HeaderContext(UserContext(req, none), PageData.default)
 
-  def apply(
-      userContext: HeaderUserContext, pageData: PageData): HeaderContext =
+  def apply(userContext: HeaderUserContext,
+            pageData: PageData): HeaderContext =
     new HeaderContext(userContext, pageData)
 
-  def apply[A](
-      userContext: BodyUserContext[A], pageData: PageData): BodyContext[A] =
+  def apply[A](userContext: BodyUserContext[A],
+               pageData: PageData): BodyContext[A] =
     new BodyContext(userContext, pageData)
 }

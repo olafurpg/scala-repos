@@ -42,8 +42,8 @@ class ScalaLocalVariableEvaluator(name: String, sourceName: String)
 
   def evaluate(context: EvaluationContextImpl): AnyRef = {
 
-    def saveContextAndGetValue(
-        framePr: StackFrameProxyImpl, local: LocalVariableProxyImpl) = {
+    def saveContextAndGetValue(framePr: StackFrameProxyImpl,
+                               local: LocalVariableProxyImpl) = {
       myEvaluatedVariable = local
       myContext = context
       Some(framePr.getValue(local))
@@ -130,8 +130,8 @@ class ScalaLocalVariableEvaluator(name: String, sourceName: String)
         myEvaluatedVariable = null
         myContext = null
         throw EvaluationException(
-            DebuggerBundle.message(
-                "evaluation.error.local.variable.missing", myName))
+            DebuggerBundle.message("evaluation.error.local.variable.missing",
+                                   myName))
     }
   }
 

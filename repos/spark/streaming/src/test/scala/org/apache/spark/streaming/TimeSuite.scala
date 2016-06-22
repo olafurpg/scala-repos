@@ -69,11 +69,14 @@ class TimeSuite extends TestSuiteBase {
     assert(new Time(1200).floor(new Duration(200)) == new Time(1200))
     assert(new Time(199).floor(new Duration(200)) == new Time(0))
     assert(new Time(1).floor(new Duration(1)) == new Time(1))
-    assert(new Time(1350).floor(new Duration(200), new Time(50)) == new Time(
+    assert(
+        new Time(1350).floor(new Duration(200), new Time(50)) == new Time(
             1250))
-    assert(new Time(1350).floor(new Duration(200), new Time(150)) == new Time(
+    assert(
+        new Time(1350).floor(new Duration(200), new Time(150)) == new Time(
             1350))
-    assert(new Time(1350).floor(new Duration(200), new Time(200)) == new Time(
+    assert(
+        new Time(1350).floor(new Duration(200), new Time(200)) == new Time(
             1200))
   }
 
@@ -97,19 +100,30 @@ class TimeSuite extends TestSuiteBase {
   }
 
   test("until") {
-    assert(new Time(1000).until(new Time(1100), new Duration(100)) == Seq(
+    assert(
+        new Time(1000).until(new Time(1100), new Duration(100)) == Seq(
             Time(1000)))
     assert(new Time(1000).until(new Time(1000), new Duration(100)) == Seq())
-    assert(new Time(1000).until(new Time(1100), new Duration(30)) == Seq(
-            Time(1000), Time(1030), Time(1060), Time(1090)))
+    assert(
+        new Time(1000).until(new Time(1100), new Duration(30)) == Seq(
+            Time(1000),
+            Time(1030),
+            Time(1060),
+            Time(1090)))
   }
 
   test("to") {
-    assert(new Time(1000).to(new Time(1100), new Duration(100)) == Seq(
-            Time(1000), Time(1100)))
-    assert(new Time(1000).to(new Time(1000), new Duration(100)) == Seq(
+    assert(
+        new Time(1000).to(new Time(1100), new Duration(100)) == Seq(
+            Time(1000),
+            Time(1100)))
+    assert(
+        new Time(1000).to(new Time(1000), new Duration(100)) == Seq(
             Time(1000)))
-    assert(new Time(1000).to(new Time(1100), new Duration(30)) == Seq(
-            Time(1000), Time(1030), Time(1060), Time(1090)))
+    assert(
+        new Time(1000).to(new Time(1100), new Duration(30)) == Seq(Time(1000),
+                                                                   Time(1030),
+                                                                   Time(1060),
+                                                                   Time(1090)))
   }
 }

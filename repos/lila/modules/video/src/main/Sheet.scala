@@ -53,7 +53,8 @@ private[video] final class Sheet(url: String, api: VideoApi) {
         .recover {
           case e: Exception => logger.warn("sheet update", e)
         }
-    }.sequenceFu.void >> api.video.removeNotIn(entries.map(_.youtubeId)) >> api.video.count.clearCache >> api.tag.clearCache
+    }.sequenceFu.void >> api.video
+      .removeNotIn(entries.map(_.youtubeId)) >> api.video.count.clearCache >> api.tag.clearCache
   }
 
   private def fetch: Fu[List[Entry]] = WS.url(url).get() flatMap {
@@ -85,7 +86,10 @@ object Sheet {
     def author = `gsx$youtubeauthor`.toString.trim
     def title = `gsx$title`.toString.trim
     def targets =
-      `gsx$target`.toString.split(';').map(_.trim).toList flatMap parseIntOption
+      `gsx$target`.toString
+        .split(';')
+        .map(_.trim)
+        .toList flatMap parseIntOption
     def tags =
       `gsx$tags`.toString
         .split(';')

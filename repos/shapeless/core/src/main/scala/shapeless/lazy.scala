@@ -126,8 +126,8 @@ object Lazy {
   class Values[T <: HList](val values: T) extends Serializable
   object Values {
     implicit val hnilValues: Values[HNil] = new Values(HNil)
-    implicit def hconsValues[H, T <: HList](
-        implicit lh: Lazy[H], t: Values[T]): Values[H :: T] =
+    implicit def hconsValues[H, T <: HList](implicit lh: Lazy[H],
+                                            t: Values[T]): Values[H :: T] =
       new Values(lh.value :: t.values)
   }
 
@@ -374,7 +374,8 @@ class LazyMacros(val c: whitebox.Context)
         val open0 = open match {
           case Nil => Nil
           case h :: t =>
-            h.copy(dependsOn =
+            h.copy(
+                dependsOn =
                   if (h.instTpe =:= tpe || h.dependsOn.exists(_ =:= tpe))
                     h.dependsOn
                   else tpe :: h.dependsOn) :: t
@@ -391,8 +392,9 @@ class LazyMacros(val c: whitebox.Context)
         (state0.copy(open = inst :: state0.open).update(inst), inst)
       }
 
-      def closeInst(
-          tpe: Type, tree: Tree, actualTpe: Type): (State, Instance) = {
+      def closeInst(tpe: Type,
+                    tree: Tree,
+                    actualTpe: Type): (State, Instance) = {
         assert(open.nonEmpty)
         assert(open.head.instTpe =:= tpe)
         val instance = open.head
@@ -410,8 +412,8 @@ class LazyMacros(val c: whitebox.Context)
 
       def dependsOn(tpe: Type): List[Instance] = {
         import scala.::
-        def helper(
-            tpes: List[List[Type]], acc: List[Instance]): List[Instance] =
+        def helper(tpes: List[List[Type]],
+                   acc: List[Instance]): List[Instance] =
           tpes match {
             case Nil => acc
             case Nil :: t =>
@@ -540,10 +542,10 @@ class LazyMacros(val c: whitebox.Context)
                                List(Ident(nme.SELECTOR_DUMMY))),
                          args) =>
               Apply(transform(qual), transformTrees(args))
-            case UnApply(Apply(TypeApply(
-                               Select(qual, nme.unapply | nme.unapplySeq), _),
-                               List(Ident(nme.SELECTOR_DUMMY))),
-                         args) =>
+            case UnApply(
+                Apply(TypeApply(Select(qual, nme.unapply | nme.unapplySeq), _),
+                      List(Ident(nme.SELECTOR_DUMMY))),
+                args) =>
               Apply(transform(qual), transformTrees(args))
             case t => t
           }

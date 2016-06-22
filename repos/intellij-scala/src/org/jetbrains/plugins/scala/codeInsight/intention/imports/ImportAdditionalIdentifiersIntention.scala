@@ -42,7 +42,7 @@ class ImportAdditionalIdentifiersIntention
     element match {
       case ws: PsiWhiteSpace
           if element.getPrevSibling != null &&
-          editor.getCaretModel.getOffset == element.getPrevSibling.getTextRange.getEndOffset =>
+            editor.getCaretModel.getOffset == element.getPrevSibling.getTextRange.getEndOffset =>
         val prev = element.getContainingFile.findElementAt(
             element.getPrevSibling.getTextRange.getEndOffset - 1)
         check(project, editor, prev)
@@ -63,8 +63,8 @@ class ImportAdditionalIdentifiersIntention
                 replaced
               }
               inWriteAction {
-                editor.getDocument.insertString(
-                    replaced.getTextRange.getEndOffset - 1, ", ")
+                editor.getDocument
+                  .insertString(replaced.getTextRange.getEndOffset - 1, ", ")
                 editor.getCaretModel.moveToOffset(
                     replaced.getTextRange.getEndOffset + 1)
               }

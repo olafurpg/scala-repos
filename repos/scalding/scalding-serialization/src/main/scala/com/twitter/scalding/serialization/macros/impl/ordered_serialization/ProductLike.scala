@@ -21,8 +21,8 @@ import scala.reflect.macros.Context
 import com.twitter.scalding._
 
 object ProductLike {
-  def compareBinary(c: Context)(
-      inputStreamA: c.TermName, inputStreamB: c.TermName)(
+  def compareBinary(c: Context)(inputStreamA: c.TermName,
+                                inputStreamB: c.TermName)(
       elementData: List[(c.universe.Type,
                          c.universe.TermName,
                          TreeOrderedBuf[c.type])]): c.Tree = {
@@ -108,7 +108,7 @@ object ProductLike {
           tBuf.length(q"$element.$accessorSymbol") match {
             case const: ConstantLengthCalculation[_] =>
               (constantLength +
-               const.asInstanceOf[ConstantLengthCalculation[c.type]].toInt,
+                 const.asInstanceOf[ConstantLengthCalculation[c.type]].toInt,
                dynamicLength,
                maybeLength,
                noLength)

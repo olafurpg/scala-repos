@@ -36,10 +36,10 @@ private[math] class FloatIsFractional
   override def fromDouble(n: Double): Float = n.toFloat
   override def toDouble(n: Float): Double = n.toDouble
   override def toRational(n: Float): Rational =
-    super [FloatIsReal].toRational(n)
+    super[FloatIsReal].toRational(n)
   override def toAlgebraic(n: Float): Algebraic =
-    super [FloatIsReal].toAlgebraic(n)
-  override def toReal(n: Float): Real = super [FloatIsReal].toReal(n)
+    super[FloatIsReal].toAlgebraic(n)
+  override def toReal(n: Float): Real = super[FloatIsReal].toReal(n)
 }
 
 @SerialVersionUID(0L)
@@ -55,10 +55,10 @@ private[math] class DoubleIsFractional
   override def fromDouble(n: Double): Double = n
   override def toDouble(n: Double): Double = n.toDouble
   override def toRational(n: Double): Rational =
-    super [DoubleIsReal].toRational(n)
+    super[DoubleIsReal].toRational(n)
   override def toAlgebraic(n: Double): Algebraic =
-    super [DoubleIsReal].toAlgebraic(n)
-  override def toReal(n: Double): Real = super [DoubleIsReal].toReal(n)
+    super[DoubleIsReal].toAlgebraic(n)
+  override def toReal(n: Double): Real = super[DoubleIsReal].toReal(n)
 }
 
 @SerialVersionUID(0L)
@@ -74,10 +74,10 @@ private[math] class BigDecimalIsFractional
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
   override def toDouble(n: BigDecimal): Double = n.toDouble
   override def toRational(n: BigDecimal): Rational =
-    super [BigDecimalIsReal].toRational(n)
+    super[BigDecimalIsReal].toRational(n)
   override def toAlgebraic(n: BigDecimal): Algebraic =
-    super [BigDecimalIsReal].toAlgebraic(n)
-  override def toReal(n: BigDecimal): Real = super [BigDecimalIsReal].toReal(n)
+    super[BigDecimalIsReal].toAlgebraic(n)
+  override def toReal(n: BigDecimal): Real = super[BigDecimalIsReal].toReal(n)
 }
 
 @SerialVersionUID(1L)
@@ -95,8 +95,8 @@ private[math] class RationalIsFractional
   override def toDouble(n: Rational): Double = n.toDouble
   override def toRational(n: Rational): Rational = n
   override def toAlgebraic(n: Rational): Algebraic =
-    super [RationalIsReal].toAlgebraic(n)
-  override def toReal(n: Rational): Real = super [RationalIsReal].toReal(n)
+    super[RationalIsReal].toAlgebraic(n)
+  override def toReal(n: Rational): Real = super[RationalIsReal].toReal(n)
 }
 
 @SerialVersionUID(1L)
@@ -111,7 +111,7 @@ private[math] class AlgebraicIsFractional
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
   override def toDouble(n: Algebraic): Double = n.toDouble
   override def toAlgebraic(n: Algebraic): Algebraic = n
-  override def toReal(n: Algebraic): Real = super [AlgebraicIsReal].toReal(n)
+  override def toReal(n: Algebraic): Real = super[AlgebraicIsReal].toReal(n)
 }
 
 @SerialVersionUID(0L)
@@ -127,8 +127,8 @@ private[math] class NumberIsFractional
   override def fromDouble(n: Double): Number = Number(n)
   override def toDouble(n: Number): Double = n.toDouble
   override def toRational(n: Number): Rational =
-    super [NumberIsReal].toRational(n)
+    super[NumberIsReal].toRational(n)
   override def toAlgebraic(n: Number): Algebraic =
-    super [NumberIsReal].toAlgebraic(n)
-  override def toReal(n: Number): Real = super [NumberIsReal].toReal(n)
+    super[NumberIsReal].toAlgebraic(n)
+  override def toReal(n: Number): Real = super[NumberIsReal].toReal(n)
 }

@@ -42,8 +42,9 @@ object Position {
   }
 
   /** Prints the message with the given position indication. */
-  def formatMessage(
-      posIn: Position, msg: String, shortenFile: Boolean): String = {
+  def formatMessage(posIn: Position,
+                    msg: String,
+                    shortenFile: Boolean): String = {
     val pos = if (posIn eq null) NoPosition else posIn
     val prefix = pos.source match {
       case NoSourceFile => ""
@@ -57,8 +58,10 @@ object Position {
     validate(new OffsetPosition(source, point))
   def range(source: SourceFile, start: Int, point: Int, end: Int): Position =
     validate(new RangePosition(source, start, point, end))
-  def transparent(
-      source: SourceFile, start: Int, point: Int, end: Int): Position =
+  def transparent(source: SourceFile,
+                  start: Int,
+                  point: Int,
+                  end: Int): Position =
     validate(new TransparentPosition(source, start, point, end))
 }
 
@@ -70,15 +73,19 @@ class OffsetPosition(sourceIn: SourceFile, pointIn: Int)
   override def start = point
   override def end = point
 }
-class RangePosition(
-    sourceIn: SourceFile, startIn: Int, pointIn: Int, endIn: Int)
+class RangePosition(sourceIn: SourceFile,
+                    startIn: Int,
+                    pointIn: Int,
+                    endIn: Int)
     extends OffsetPosition(sourceIn, pointIn) {
   override def isRange = true
   override def start = startIn
   override def end = endIn
 }
-class TransparentPosition(
-    sourceIn: SourceFile, startIn: Int, pointIn: Int, endIn: Int)
+class TransparentPosition(sourceIn: SourceFile,
+                          startIn: Int,
+                          pointIn: Int,
+                          endIn: Int)
     extends RangePosition(sourceIn, startIn, pointIn, endIn) {
   override def isTransparent = true
 }
@@ -92,7 +99,7 @@ sealed abstract class DefinedPosition extends Position {
   override def equals(that: Any) = that match {
     case that: DefinedPosition =>
       source.file == that.source.file && start == that.start &&
-      point == that.point && end == that.end
+        point == that.point && end == that.end
     case _ => false
   }
   override def hashCode = Seq[Any](source.file, start, point, end).##
@@ -171,8 +178,7 @@ private[util] trait InternalPositionImpl { self: Position =>
   def union(pos: Position): Position =
     (if (!pos.isRange) this
      else if (this.isRange)
-       copyRange(start = start min pos.start,
-                 end = end max pos.end)
+       copyRange(start = start min pos.start, end = end max pos.end)
      else pos)
 
   def includes(pos: Position): Boolean =

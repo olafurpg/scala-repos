@@ -118,8 +118,9 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
     def columns = Seq.empty
   }
 
-  case class SingleDBColumn(
-      cref: ColumnRef, column: Column, extractor: (ResultSet, Int) => Unit)
+  case class SingleDBColumn(cref: ColumnRef,
+                            column: Column,
+                            extractor: (ResultSet, Int) => Unit)
       extends DBColumns {
     def extract(rs: ResultSet, rowId: Int) = extractor(rs, rowId)
     def columns = Seq(cref -> column)
@@ -292,7 +293,8 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
       case other =>
         logger.warn(
-            "Unsupported JDBC column type %d for %s".format(other, selector)); EmptyDBColumn
+            "Unsupported JDBC column type %d for %s".format(other, selector));
+        EmptyDBColumn
     }
   }
 
@@ -311,33 +313,33 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
     /** Maps a given database name to a JDBC connection URL */
     def databaseMap: Map[String, String]
 
-    private def jTypeToProperties(
-        tpe: JType, current: Set[String]): Set[String] = tpe match {
-      case JArrayFixedT(elements) if current.nonEmpty =>
-        elements.map {
-          case (index, childType) =>
-            val newPaths = current.map { s =>
-              s + "[" + index + "]"
-            }
-            jTypeToProperties(childType, newPaths)
-        }.toSet.flatten
+    private def jTypeToProperties(tpe: JType,
+                                  current: Set[String]): Set[String] =
+      tpe match {
+        case JArrayFixedT(elements) if current.nonEmpty =>
+          elements.map {
+            case (index, childType) =>
+              val newPaths = current.map { s =>
+                s + "[" + index + "]"
+              }
+              jTypeToProperties(childType, newPaths)
+          }.toSet.flatten
 
-      case JObjectFixedT(fields) =>
-        fields.map {
-          case (name, childType) =>
-            val newPaths =
-              if (current.nonEmpty) {
+        case JObjectFixedT(fields) =>
+          fields.map {
+            case (name, childType) =>
+              val newPaths = if (current.nonEmpty) {
                 current.map { s =>
                   s + "." + name
                 }
               } else {
                 Set(name)
               }
-            jTypeToProperties(childType, newPaths)
-        }.toSet.flatten
+              jTypeToProperties(childType, newPaths)
+          }.toSet.flatten
 
-      case _ => current
-    }
+        case _ => current
+      }
 
     case class Query(expr: String, limit: Int) {
       private val baseQuery =
@@ -371,10 +373,11 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
               case InLoad(connGen, query, skip, remaining) =>
                 M.point {
                   val (slice, nextSkip) = makeSlice(connGen, query, skip)
-                  Some((slice,
-                        nextSkip
-                          .map(InLoad(connGen, query, _, remaining))
-                          .getOrElse(InitialLoad(remaining))))
+                  Some(
+                      (slice,
+                       nextSkip
+                         .map(InLoad(connGen, query, _, remaining))
+                         .getOrElse(InitialLoad(remaining))))
                 }
 
               case InitialLoad(path :: xs) =>
@@ -423,7 +426,7 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
                   case err =>
                     sys.error("JDBC path " + path.path +
-                        " does not have the form /dbName/tableName; rollups not yet supported.")
+                          " does not have the form /dbName/tableName; rollups not yet supported.")
                 }
 
               case InitialLoad(Nil) =>
@@ -464,12 +467,11 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
             val columns = valColumns.flatMap(_.columns).toMap
           }
 
-          val nextSkip =
-            if (rowIndex == yggConfig.maxSliceSize) {
-              Some(skip + yggConfig.maxSliceSize)
-            } else {
-              None
-            }
+          val nextSkip = if (rowIndex == yggConfig.maxSliceSize) {
+            Some(skip + yggConfig.maxSliceSize)
+          } else {
+            None
+          }
 
           (slice, nextSkip)
         } finally {

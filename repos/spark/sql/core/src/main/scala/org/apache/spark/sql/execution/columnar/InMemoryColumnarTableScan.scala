@@ -55,8 +55,9 @@ private[sql] object InMemoryRelation {
   * @param buffers The buffers for serialized columns
   * @param stats The stat of columns
   */
-private[columnar] case class CachedBatch(
-    numRows: Int, buffers: Array[Array[Byte]], stats: InternalRow)
+private[columnar] case class CachedBatch(numRows: Int,
+                                         buffers: Array[Array[Byte]],
+                                         stats: InternalRow)
 
 private[sql] case class InMemoryRelation(output: Seq[Attribute],
                                          useCompression: Boolean,
@@ -66,8 +67,8 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
                                          tableName: Option[String])(
     @transient private[sql] var _cachedColumnBuffers: RDD[CachedBatch] = null,
     @transient private[sql] var _statistics: Statistics = null,
-    private[sql] var _batchStats: Accumulable[
-        ArrayBuffer[InternalRow], InternalRow] = null)
+    private[sql] var _batchStats: Accumulable[ArrayBuffer[InternalRow],
+                                              InternalRow] = null)
     extends logical.LeafNode
     with MultiInstanceRelation {
 
@@ -162,7 +163,7 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
               assert(
                   row.numFields == columnBuilders.length,
                   s"Row column number mismatch, expected ${output.size} columns, " +
-                  s"but got ${row.numFields}." + s"\nRow content: $row")
+                    s"but got ${row.numFields}." + s"\nRow content: $row")
 
               var i = 0
               totalSize = 0
@@ -174,7 +175,8 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
               rowCount += 1
             }
 
-            val stats = InternalRow.fromSeq(columnBuilders
+            val stats = InternalRow.fromSeq(
+                columnBuilders
                   .map(_.columnStats.collectedStatistics)
                   .flatMap(_.values))
 
@@ -196,8 +198,12 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
 
   def withOutput(newOutput: Seq[Attribute]): InMemoryRelation = {
     InMemoryRelation(
-        newOutput, useCompression, batchSize, storageLevel, child, tableName)(
-        _cachedColumnBuffers, statisticsToBePropagated, batchStats)
+        newOutput,
+        useCompression,
+        batchSize,
+        storageLevel,
+        child,
+        tableName)(_cachedColumnBuffers, statisticsToBePropagated, batchStats)
   }
 
   override def newInstance(): this.type = {
@@ -341,28 +347,27 @@ private[sql] case class InMemoryColumnarTableScan(
       }.unzip
 
       // Do partition batch pruning if enabled
-      val cachedBatchesToScan =
-        if (inMemoryPartitionPruningEnabled) {
-          cachedBatchIterator.filter { cachedBatch =>
-            if (!partitionFilter(cachedBatch.stats)) {
-              def statsString: String =
-                schemaIndex.map {
-                  case (a, i) =>
-                    val value = cachedBatch.stats.get(i, a.dataType)
-                    s"${a.name}: $value"
-                }.mkString(", ")
-              logInfo(s"Skipping partition based on stats $statsString")
-              false
-            } else {
-              if (enableAccumulators) {
-                readBatches += 1
-              }
-              true
+      val cachedBatchesToScan = if (inMemoryPartitionPruningEnabled) {
+        cachedBatchIterator.filter { cachedBatch =>
+          if (!partitionFilter(cachedBatch.stats)) {
+            def statsString: String =
+              schemaIndex.map {
+                case (a, i) =>
+                  val value = cachedBatch.stats.get(i, a.dataType)
+                  s"${a.name}: $value"
+              }.mkString(", ")
+            logInfo(s"Skipping partition based on stats $statsString")
+            false
+          } else {
+            if (enableAccumulators) {
+              readBatches += 1
             }
+            true
           }
-        } else {
-          cachedBatchIterator
         }
+      } else {
+        cachedBatchIterator
+      }
 
       // update SQL metrics
       val withMetrics = cachedBatchesToScan.map { batch =>
@@ -375,8 +380,8 @@ private[sql] case class InMemoryColumnarTableScan(
         case other => other
       }.toArray
       val columnarIterator = GenerateColumnAccessor.generate(columnTypes)
-      columnarIterator.initialize(
-          withMetrics, columnTypes, requestedColumnIndices.toArray)
+      columnarIterator
+        .initialize(withMetrics, columnTypes, requestedColumnIndices.toArray)
       if (enableAccumulators && columnarIterator.hasNext) {
         readPartitions += 1
       }

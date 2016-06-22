@@ -61,12 +61,11 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
 
   private val supportedMasterPrefixes = Seq("spark://", "mesos://")
 
-  private val masters: Array[String] =
-    if (master.startsWith("spark://")) {
-      Utils.parseStandaloneMasterUrls(master)
-    } else {
-      Array(master)
-    }
+  private val masters: Array[String] = if (master.startsWith("spark://")) {
+    Utils.parseStandaloneMasterUrls(master)
+  } else {
+    Array(master)
+  }
 
   // Set of masters that lost contact with us, used to keep track of
   // whether there are masters still alive for us to communicate with
@@ -102,7 +101,8 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
         case e: SubmitRestConnectionException =>
           if (handleConnectionException(m)) {
             throw new SubmitRestConnectionException(
-                "Unable to connect to server", e)
+                "Unable to connect to server",
+                e)
           }
       }
     }
@@ -133,7 +133,8 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
         case e: SubmitRestConnectionException =>
           if (handleConnectionException(m)) {
             throw new SubmitRestConnectionException(
-                "Unable to connect to server", e)
+                "Unable to connect to server",
+                e)
           }
       }
     }
@@ -141,9 +142,9 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
   }
 
   /** Request the status of a submission from the server. */
-  def requestSubmissionStatus(submissionId: String,
-                              quiet: Boolean =
-                                false): SubmitRestProtocolResponse = {
+  def requestSubmissionStatus(
+      submissionId: String,
+      quiet: Boolean = false): SubmitRestProtocolResponse = {
     logInfo(
         s"Submitting a request for the status of submission $submissionId in $master.")
 
@@ -167,7 +168,8 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
         case e: SubmitRestConnectionException =>
           if (handleConnectionException(m)) {
             throw new SubmitRestConnectionException(
-                "Unable to connect to server", e)
+                "Unable to connect to server",
+                e)
           }
       }
     }
@@ -226,7 +228,8 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
     } catch {
       case e: ConnectException =>
         throw new SubmitRestConnectionException(
-            "Connect Exception when connect to server", e)
+            "Connect Exception when connect to server",
+            e)
     }
     readResponse(conn)
   }
@@ -269,15 +272,16 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
 
     try { Await.result(responseFuture, 10.seconds) } catch {
       case unreachable @ (_: FileNotFoundException | _: SocketException) =>
-        throw new SubmitRestConnectionException(
-            "Unable to connect to server", unreachable)
+        throw new SubmitRestConnectionException("Unable to connect to server",
+                                                unreachable)
       case malformed @ (_: JsonProcessingException |
           _: SubmitRestProtocolException) =>
         throw new SubmitRestProtocolException(
-            "Malformed response received from server", malformed)
+            "Malformed response received from server",
+            malformed)
       case timeout: TimeoutException =>
-        throw new SubmitRestConnectionException(
-            "No response from server", timeout)
+        throw new SubmitRestConnectionException("No response from server",
+                                                timeout)
     }
   }
 
@@ -319,7 +323,7 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
     if (!valid) {
       throw new IllegalArgumentException(
           "This REST client only supports master URLs that start with " +
-          "one of the following: " + supportedMasterPrefixes.mkString(","))
+            "one of the following: " + supportedMasterPrefixes.mkString(","))
     }
   }
 
@@ -431,8 +435,11 @@ private[spark] object RestSubmissionClient {
     }
     val sparkProperties = conf.getAll.toMap
     val client = new RestSubmissionClient(master)
-    val submitRequest = client.constructSubmitRequest(
-        appResource, mainClass, appArgs, sparkProperties, env)
+    val submitRequest = client.constructSubmitRequest(appResource,
+                                                      mainClass,
+                                                      appArgs,
+                                                      sparkProperties,
+                                                      env)
     client.createSubmission(submitRequest)
   }
 

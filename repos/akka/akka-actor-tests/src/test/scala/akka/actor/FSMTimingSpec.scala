@@ -108,7 +108,8 @@ class FSMTimingSpec extends AkkaSpec with ImplicitSender {
       fsm ! TestCancelStateTimerInNamedTimerMessage
       fsm ! Tick
       expectMsg(500 millis, Tick)
-      Thread.sleep(200) // this is ugly: need to wait for StateTimeout to be queued
+      Thread
+        .sleep(200) // this is ugly: need to wait for StateTimeout to be queued
       resume(fsm)
       expectMsg(500 millis,
                 Transition(fsm,

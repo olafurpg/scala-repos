@@ -55,11 +55,11 @@ object Test extends ScaladocModelTest {
     val foo = base._class("A")._method("foo")
     assert(foo.comment.get.body.toString.contains("foo returns a collection"),
            "\"" + foo.comment.get.body.toString +
-           "\".contains(\"foo returns a collection\")")
+             "\".contains(\"foo returns a collection\")")
 
     val bar = base._class("A")._method("bar")
     assert(bar.comment.get.body.toString.contains("bar returns a result"),
            "\"" + bar.comment.get.body.toString +
-           "\".contains(\"bar returns a result\")")
+             "\".contains(\"bar returns a result\")")
   }
 }

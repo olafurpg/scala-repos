@@ -45,9 +45,10 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class JFXAppParametersSpec
-    extends SimpleSFXDelegateSpec[
-        jfxa.Application.Parameters, JFXApp.Parameters](
-        classOf[jfxa.Application.Parameters], classOf[JFXApp.Parameters]) {
+    extends SimpleSFXDelegateSpec[jfxa.Application.Parameters,
+                                  JFXApp.Parameters](
+        classOf[jfxa.Application.Parameters],
+        classOf[JFXApp.Parameters]) {
 
   override protected def getScalaClassInstance =
     new JFXApp.ParametersImpl(Seq.empty[String])

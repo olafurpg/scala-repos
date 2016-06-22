@@ -6,22 +6,22 @@ package org.jetbrains.plugins.scala.testingSupport.scalatest
   */
 trait SpecialCharactersTest extends ScalaTestTestCase {
 
-  val commaTestPath = List(
-      "[root]", "TestComma", "Comma , test", "should contain , comma")
-  val exclamationTestPath = List(
-      "[root]", "TestExclamation", "! test", "should contain !")
-  val tickTestPath = List(
-      "[root]", "TestTick", "tick ' test", "should contain '")
-  val tildeTestPath = List(
-      "[root]", "TestTilde", "tilde ~ test", "should contain ~")
-  val backtickTestPath = List(
-      "[root]", "TestBacktick", "backtick ` test", "should contain `")
+  val commaTestPath =
+    List("[root]", "TestComma", "Comma , test", "should contain , comma")
+  val exclamationTestPath =
+    List("[root]", "TestExclamation", "! test", "should contain !")
+  val tickTestPath =
+    List("[root]", "TestTick", "tick ' test", "should contain '")
+  val tildeTestPath =
+    List("[root]", "TestTilde", "tilde ~ test", "should contain ~")
+  val backtickTestPath =
+    List("[root]", "TestBacktick", "backtick ` test", "should contain `")
 
   private def addSpecialCharactersTest(testName: String) =
     addFileToProject(testName + ".scala",
                      "import org.scalatest._\n\n" + "class " + testName +
-                     " extends FlatSpec with GivenWhenThen {" +
-                     """
+                       " extends FlatSpec with GivenWhenThen {" +
+                       """
           | "Comma , test" should "contain , comma" in {
           | }
           |
@@ -48,8 +48,9 @@ trait SpecialCharactersTest extends ScalaTestTestCase {
         3,
         3,
         testName + ".scala",
-        checkConfigAndSettings(
-            _, testName, "Comma , test should contain , comma"),
+        checkConfigAndSettings(_,
+                               testName,
+                               "Comma , test should contain , comma"),
         root => checkResultTreeHasExactNamedPath(root, commaTestPath: _*))
   }
 
@@ -95,8 +96,9 @@ trait SpecialCharactersTest extends ScalaTestTestCase {
         12,
         3,
         testName + ".scala",
-        checkConfigAndSettings(
-            _, testName, "backtick ` test should contain `"),
+        checkConfigAndSettings(_,
+                               testName,
+                               "backtick ` test should contain `"),
         root => checkResultTreeHasExactNamedPath(root, backtickTestPath: _*))
   }
 }

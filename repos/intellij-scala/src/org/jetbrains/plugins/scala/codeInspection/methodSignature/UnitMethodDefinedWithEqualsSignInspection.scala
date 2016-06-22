@@ -16,10 +16,10 @@ class UnitMethodDefinedWithEqualsSignInspection
   def actionFor(holder: ProblemsHolder) = {
     case f: ScFunctionDefinition
         if !f.hasExplicitType && f.hasUnitResultType &&
-        !f.isSecondaryConstructor =>
+          !f.isSecondaryConstructor =>
       f.assignment.foreach { assignment =>
-        holder.registerProblem(
-            assignment, getDisplayName, new RemoveEqualsSign(f))
+        holder
+          .registerProblem(assignment, getDisplayName, new RemoveEqualsSign(f))
       }
   }
 }

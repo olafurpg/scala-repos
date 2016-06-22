@@ -12,12 +12,12 @@ import cats.laws.discipline.{SemigroupKTests, MonoidKTests}
 
 class CokleisliTests extends SlowCatsSuite {
 
-  implicit def cokleisliEq[F[_], A, B](
-      implicit A: Arbitrary[F[A]], FB: Eq[B]): Eq[Cokleisli[F, A, B]] =
+  implicit def cokleisliEq[F[_], A, B](implicit A: Arbitrary[F[A]],
+                                       FB: Eq[B]): Eq[Cokleisli[F, A, B]] =
     Eq.by[Cokleisli[F, A, B], F[A] => B](_.run)
 
-  def cokleisliEqE[F[_], A](
-      implicit A: Arbitrary[F[A]], FA: Eq[A]): Eq[Cokleisli[F, A, A]] =
+  def cokleisliEqE[F[_], A](implicit A: Arbitrary[F[A]],
+                            FA: Eq[A]): Eq[Cokleisli[F, A, A]] =
     Eq.by[Cokleisli[F, A, A], F[A] => A](_.run)
 
   implicit val iso =

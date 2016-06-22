@@ -23,7 +23,7 @@ class ConvertToCurlyBracesIntention extends PsiElementBaseIntentionAction {
       case e @ Parent(_: ScForStatement) =>
         List(ScalaTokenTypes.tLPARENTHESIS, ScalaTokenTypes.tRPARENTHESIS)
           .contains(e.getNode.getElementType) &&
-        IntentionAvailabilityChecker.checkIntention(this, element)
+          IntentionAvailabilityChecker.checkIntention(this, element)
       case _ => false
     }
   }
@@ -42,8 +42,8 @@ class ConvertToCurlyBracesIntention extends PsiElementBaseIntentionAction {
     for (rParen <- Option(statement.findFirstChildByType(
                           ScalaTokenTypes.tRPARENTHESIS))) {
       val rBrace = rParen.replace(block.getLastChild)
-      statement.addBefore(
-          ScalaPsiElementFactory.createNewLine(manager), rBrace)
+      statement
+        .addBefore(ScalaPsiElementFactory.createNewLine(manager), rBrace)
     }
 
     for (enumerators <- statement.enumerators;

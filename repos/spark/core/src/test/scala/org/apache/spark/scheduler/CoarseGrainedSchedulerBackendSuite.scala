@@ -36,7 +36,8 @@ class CoarseGrainedSchedulerBackendSuite
     val thrown = intercept[SparkException] {
       larger.collect()
     }
-    assert(thrown.getMessage.contains(
+    assert(
+        thrown.getMessage.contains(
             "using broadcast variables for large values"))
     val smaller = sc.parallelize(1 to 4).collect()
     assert(smaller.size === 4)

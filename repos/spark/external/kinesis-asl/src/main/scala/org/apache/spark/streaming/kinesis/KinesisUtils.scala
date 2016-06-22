@@ -500,7 +500,7 @@ private class KinesisUtilsPythonHelper {
       case _ =>
         throw new IllegalArgumentException(
             "Illegal InitialPositionInStream. Please use " +
-            "InitialPositionInStream.LATEST or InitialPositionInStream.TRIM_HORIZON")
+              "InitialPositionInStream.LATEST or InitialPositionInStream.TRIM_HORIZON")
     }
   }
 

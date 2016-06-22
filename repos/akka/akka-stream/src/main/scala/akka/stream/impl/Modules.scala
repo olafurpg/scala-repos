@@ -53,8 +53,8 @@ private[akka] abstract class SourceModule[+Out, +Mat](
   * Holds a `Subscriber` representing the input side of the flow.
   * The `Subscriber` can later be connected to an upstream `Publisher`.
   */
-private[akka] final class SubscriberSource[Out](
-    val attributes: Attributes, shape: SourceShape[Out])
+private[akka] final class SubscriberSource[Out](val attributes: Attributes,
+                                                shape: SourceShape[Out])
     extends SourceModule[Out, Subscriber[Out]](shape) {
 
   override def create(
@@ -77,8 +77,9 @@ private[akka] final class SubscriberSource[Out](
   * that mediate the flow of elements downstream and the propagation of
   * back-pressure upstream.
   */
-private[akka] final class PublisherSource[Out](
-    p: Publisher[Out], val attributes: Attributes, shape: SourceShape[Out])
+private[akka] final class PublisherSource[Out](p: Publisher[Out],
+                                               val attributes: Attributes,
+                                               shape: SourceShape[Out])
     extends SourceModule[Out, NotUsed](shape) {
 
   override protected def label: String = s"PublisherSource($p)"
@@ -95,8 +96,8 @@ private[akka] final class PublisherSource[Out](
 /**
   * INTERNAL API
   */
-private[akka] final class MaybeSource[Out](
-    val attributes: Attributes, shape: SourceShape[Out])
+private[akka] final class MaybeSource[Out](val attributes: Attributes,
+                                           shape: SourceShape[Out])
     extends SourceModule[Out, Promise[Option[Out]]](shape) {
 
   override def create(context: MaterializationContext) = {
@@ -116,8 +117,9 @@ private[akka] final class MaybeSource[Out](
   * Creates and wraps an actor into [[org.reactivestreams.Publisher]] from the given `props`,
   * which should be [[akka.actor.Props]] for an [[akka.stream.actor.ActorPublisher]].
   */
-private[akka] final class ActorPublisherSource[Out](
-    props: Props, val attributes: Attributes, shape: SourceShape[Out])
+private[akka] final class ActorPublisherSource[Out](props: Props,
+                                                    val attributes: Attributes,
+                                                    shape: SourceShape[Out])
     extends SourceModule[Out, ActorRef](shape) {
 
   override def create(context: MaterializationContext) = {

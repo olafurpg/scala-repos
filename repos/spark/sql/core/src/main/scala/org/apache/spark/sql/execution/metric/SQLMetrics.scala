@@ -28,12 +28,13 @@ import org.apache.spark.util.Utils
   * An implementation of SQLMetric should override `+=` and `add` to avoid boxing.
   */
 private[sql] abstract class SQLMetric[R <: SQLMetricValue[T], T](
-    name: String, val param: SQLMetricParam[R, T])
+    name: String,
+    val param: SQLMetricParam[R, T])
     extends Accumulable[R, T](param.zero, param, Some(name), internal = true) {
 
   // Provide special identifier as metadata so we can tell that this is a `SQLMetric` later
-  override def toInfo(
-      update: Option[Any], value: Option[Any]): AccumulableInfo = {
+  override def toInfo(update: Option[Any],
+                      value: Option[Any]): AccumulableInfo = {
     new AccumulableInfo(id,
                         Some(name),
                         update,
@@ -102,8 +103,8 @@ private[sql] class LongSQLMetricValue(private var _value: Long)
   * A specialized long Accumulable to avoid boxing and unboxing when using Accumulator's
   * `+=` and `add`.
   */
-private[sql] class LongSQLMetric private[metric](
-    name: String, param: LongSQLMetricParam)
+private[sql] class LongSQLMetric private[metric] (name: String,
+                                                  param: LongSQLMetricParam)
     extends SQLMetric[LongSQLMetricValue, Long](name, param) {
 
   override def +=(term: Long): Unit = {
@@ -115,15 +116,15 @@ private[sql] class LongSQLMetric private[metric](
   }
 }
 
-private class LongSQLMetricParam(
-    val stringValue: Seq[Long] => String, initialValue: Long)
+private class LongSQLMetricParam(val stringValue: Seq[Long] => String,
+                                 initialValue: Long)
     extends SQLMetricParam[LongSQLMetricValue, Long] {
 
-  override def addAccumulator(
-      r: LongSQLMetricValue, t: Long): LongSQLMetricValue = r.add(t)
+  override def addAccumulator(r: LongSQLMetricValue,
+                              t: Long): LongSQLMetricValue = r.add(t)
 
-  override def addInPlace(
-      r1: LongSQLMetricValue, r2: LongSQLMetricValue): LongSQLMetricValue =
+  override def addInPlace(r1: LongSQLMetricValue,
+                          r2: LongSQLMetricValue): LongSQLMetricValue =
     r1.add(r2.value)
 
   override def zero(initialValue: LongSQLMetricValue): LongSQLMetricValue =
@@ -142,16 +143,15 @@ private object StaticsLongSQLMetricParam
       // it at the end of task and the value will be at least 0.
       val validValues = values.filter(_ >= 0)
       val Seq(sum, min, med, max) = {
-        val metric =
-          if (validValues.length == 0) {
-            Seq.fill(4)(0L)
-          } else {
-            val sorted = validValues.sorted
-            Seq(sorted.sum,
-                sorted(0),
-                sorted(validValues.length / 2),
-                sorted(validValues.length - 1))
-          }
+        val metric = if (validValues.length == 0) {
+          Seq.fill(4)(0L)
+        } else {
+          val sorted = validValues.sorted
+          Seq(sorted.sum,
+              sorted(0),
+              sorted(validValues.length / 2),
+              sorted(validValues.length - 1))
+        }
         metric.map(Utils.bytesToString)
       }
       s"\n$sum ($min, $med, $max)"
@@ -184,8 +184,9 @@ private[sql] object SQLMetrics {
     // The final result of this metric in physical operator UI may looks like:
     // data size total (min, med, max):
     // 100GB (100MB, 1GB, 10GB)
-    createLongMetric(
-        sc, s"$name total (min, med, max)", StaticsLongSQLMetricParam)
+    createLongMetric(sc,
+                     s"$name total (min, med, max)",
+                     StaticsLongSQLMetricParam)
   }
 
   def getMetricParam(

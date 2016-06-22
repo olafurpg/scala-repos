@@ -69,7 +69,7 @@ private[sql] object PreInsertCastAndRename extends Rule[LogicalPlan] {
       if (l.output.size != child.output.size) {
         sys.error(
             s"$l requires that the query in the SELECT clause of the INSERT INTO/OVERWRITE " +
-            s"statement generates the same number of columns as its schema.")
+              s"statement generates the same number of columns as its schema.")
       }
       castAndRenameChildOutput(i, l.output, child)
   }
@@ -109,12 +109,12 @@ private[sql] case class PreWriteCheck(catalog: Catalog)
 
   def apply(plan: LogicalPlan): Unit = {
     plan.foreach {
-      case i @ logical.InsertIntoTable(l @ LogicalRelation(
-                                       t: InsertableRelation, _, _),
-                                       partition,
-                                       query,
-                                       overwrite,
-                                       ifNotExists) =>
+      case i @ logical.InsertIntoTable(
+          l @ LogicalRelation(t: InsertableRelation, _, _),
+          partition,
+          query,
+          overwrite,
+          ifNotExists) =>
         // Right now, we do not support insert into a data source table with partition specs.
         if (partition.nonEmpty) {
           failAnalysis(
@@ -144,15 +144,17 @@ private[sql] case class PreWriteCheck(catalog: Catalog)
         if (existingPartitionColumns != specifiedPartitionColumns) {
           failAnalysis(
               s"Specified partition columns " +
-              s"(${specifiedPartitionColumns.mkString(", ")}) " +
-              s"do not match the partition columns of the table. Please use " +
-              s"(${existingPartitionColumns.mkString(", ")}) as the partition columns.")
+                s"(${specifiedPartitionColumns.mkString(", ")}) " +
+                s"do not match the partition columns of the table. Please use " +
+                s"(${existingPartitionColumns.mkString(", ")}) as the partition columns.")
         } else {
           // OK
         }
 
         PartitioningUtils.validatePartitionColumnDataTypes(
-            r.schema, part.keySet.toSeq, catalog.conf.caseSensitiveAnalysis)
+            r.schema,
+            part.keySet.toSeq,
+            catalog.conf.caseSensitiveAnalysis)
 
         // Get all input data source relations of the query.
         val srcRelations = query.collect {

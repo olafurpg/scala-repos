@@ -77,8 +77,10 @@ class FillTransition(
     * @param fromValue The start value of the color-animation
     * @param toValue The end value of the color-animation
     */
-  def this(
-      duration: Duration, shape: Shape, fromValue: Color, toValue: Color) =
+  def this(duration: Duration,
+           shape: Shape,
+           fromValue: Color,
+           toValue: Color) =
     this(new jfxa.FillTransition(duration, shape, fromValue, toValue))
 
   /**

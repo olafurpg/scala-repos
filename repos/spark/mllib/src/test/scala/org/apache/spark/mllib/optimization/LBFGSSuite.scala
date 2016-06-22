@@ -139,7 +139,7 @@ class LBFGSSuite
            "The last losses of LBFGS and GD should be within 2% difference.")
 
     assert((weightLBFGS(0) ~= weightGD(0) relTol 0.02) &&
-           (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
+             (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
            "The weight differences between LBFGS and GD should be within 2%.")
   }
 
@@ -231,7 +231,7 @@ class LBFGSSuite
 
     // for class LBFGS and the optimize method, we only look at the weights
     assert((weightLBFGS(0) ~= weightGD(0) relTol 0.02) &&
-           (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
+             (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
            "The weight differences between LBFGS and GD should be within 2%.")
   }
 }

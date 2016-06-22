@@ -63,7 +63,8 @@ private[metrics] object MetricsCollector {
         .asInstanceOf[ExtendedActorSystem]
         .dynamicAccess
         .createInstanceFor[MetricsCollector](
-            provider, List(classOf[ActorSystem] -> system))
+            provider,
+            List(classOf[ActorSystem] -> system))
         .get
     }
 
@@ -181,8 +182,8 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
     * Creates a new instance each time.
     */
   def heapMax(heap: MemoryUsage): Option[Metric] =
-    Metric.create(
-        name = HeapMemoryMax, value = heap.getMax, decayFactor = None)
+    Metric
+      .create(name = HeapMemoryMax, value = heap.getMax, decayFactor = None)
 
   override def close(): Unit = ()
 }
@@ -199,15 +200,17 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
   * @param decayFactor how quickly the exponential weighting of past data is decayed
   * @param sigar the org.hyperic.Sigar instance
   */
-class SigarMetricsCollector(
-    address: Address, decayFactor: Double, sigar: SigarProxy)
+class SigarMetricsCollector(address: Address,
+                            decayFactor: Double,
+                            sigar: SigarProxy)
     extends JmxMetricsCollector(address, decayFactor) {
 
   import StandardMetrics._
   import org.hyperic.sigar.CpuPerc
 
-  def this(
-      address: Address, settings: ClusterMetricsSettings, sigar: SigarProxy) =
+  def this(address: Address,
+           settings: ClusterMetricsSettings,
+           sigar: SigarProxy) =
     this(address,
          EWMA.alpha(settings.CollectorMovingAverageHalfLife,
                     settings.CollectorSampleInterval),

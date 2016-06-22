@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Bind` */
-final class BindOps[F[_], A] private[syntax](val self: F[A])(
+final class BindOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Bind[F])
     extends Ops[F[A]] {
   ////

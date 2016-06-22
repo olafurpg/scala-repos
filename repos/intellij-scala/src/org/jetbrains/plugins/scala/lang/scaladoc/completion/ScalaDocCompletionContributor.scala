@@ -44,7 +44,7 @@ class ScalaDocCompletionContributor extends ScalaCompletionContributor {
                       MyScaladocParsing.PARAM_TAG)
                 case _ =>
                   MyScaladocParsing.allTags -- MyScaladocParsing.tagsWithParameters -
-                  MyScaladocParsing.RETURN_TAG
+                    MyScaladocParsing.RETURN_TAG
               }
 
             for (tag <- allowedTags) {

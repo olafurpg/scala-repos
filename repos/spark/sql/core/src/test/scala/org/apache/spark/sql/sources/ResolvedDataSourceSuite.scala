@@ -25,32 +25,38 @@ class ResolvedDataSourceSuite extends SparkFunSuite {
     DataSource(sqlContext = null, className = name).providingClass
 
   test("jdbc") {
-    assert(getProvidingClass("jdbc") === classOf[
+    assert(
+        getProvidingClass("jdbc") === classOf[
             org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
     assert(
         getProvidingClass("org.apache.spark.sql.execution.datasources.jdbc") === classOf[
             org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
-    assert(getProvidingClass("org.apache.spark.sql.jdbc") === classOf[
+    assert(
+        getProvidingClass("org.apache.spark.sql.jdbc") === classOf[
             org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
   }
 
   test("json") {
-    assert(getProvidingClass("json") === classOf[
+    assert(
+        getProvidingClass("json") === classOf[
             org.apache.spark.sql.execution.datasources.json.DefaultSource])
     assert(
         getProvidingClass("org.apache.spark.sql.execution.datasources.json") === classOf[
             org.apache.spark.sql.execution.datasources.json.DefaultSource])
-    assert(getProvidingClass("org.apache.spark.sql.json") === classOf[
+    assert(
+        getProvidingClass("org.apache.spark.sql.json") === classOf[
             org.apache.spark.sql.execution.datasources.json.DefaultSource])
   }
 
   test("parquet") {
-    assert(getProvidingClass("parquet") === classOf[
+    assert(
+        getProvidingClass("parquet") === classOf[
             org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
     assert(getProvidingClass(
             "org.apache.spark.sql.execution.datasources.parquet") === classOf[
             org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
-    assert(getProvidingClass("org.apache.spark.sql.parquet") === classOf[
+    assert(
+        getProvidingClass("org.apache.spark.sql.parquet") === classOf[
             org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
   }
 

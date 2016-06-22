@@ -36,11 +36,13 @@ object BigIntStringConverter {
     if (c != null) c.delegate else null
 }
 
-class BigIntStringConverter(delegate: jfxuc.BigIntegerStringConverter =
+class BigIntStringConverter(
+    delegate: jfxuc.BigIntegerStringConverter =
       new jfxuc.BigIntegerStringConverter)
     extends StringConverterDelegate[
-        java.math.BigInteger, BigInt, jfxuc.BigIntegerStringConverter](
-        delegate) {
+        java.math.BigInteger,
+        BigInt,
+        jfxuc.BigIntegerStringConverter](delegate) {
 
   override def fromString(s: String) = new BigInt(delegate.fromString(s))
 

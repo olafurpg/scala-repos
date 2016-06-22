@@ -22,8 +22,8 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
 
   def toSpan(d: Duration): Span = Span(d.inNanoseconds, Nanoseconds)
 
-  implicit val patienceConfig = PatienceConfig(
-      timeout = toSpan(1.second), interval = toSpan(zkTimeout))
+  implicit val patienceConfig =
+    PatienceConfig(timeout = toSpan(1.second), interval = toSpan(zkTimeout))
 
   /* This can be useful if you want to retain ZK logging output for debugging.
   val app = new org.apache.log4j.ConsoleAppender
@@ -127,7 +127,8 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
 
       // Wait for the initial connect.
       eventually {
-        assert(Var.sample(varZkState) == WatchState.SessionState(
+        assert(
+            Var.sample(varZkState) == WatchState.SessionState(
                 SessionState.SyncConnected))
         assert(sessions.size == 1)
       }

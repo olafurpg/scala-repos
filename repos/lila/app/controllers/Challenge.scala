@@ -80,8 +80,9 @@ object Challenge extends LilaController {
   }
 
   private def withChallengeAnonCookie(
-      cond: Boolean, c: ChallengeModel, owner: Boolean)(res: Result)(
-      implicit ctx: Context): Fu[Result] =
+      cond: Boolean,
+      c: ChallengeModel,
+      owner: Boolean)(res: Result)(implicit ctx: Context): Fu[Result] =
     cond ?? {
       GameRepo.game(c.id).map {
         _ map { game =>
@@ -113,7 +114,9 @@ object Challenge extends LilaController {
 
   def rematchOf(gameId: String) = Auth { implicit ctx => me =>
     OptionFuResult(GameRepo game gameId) { g =>
-      Pov.opponentOfUserId(g, me.id).flatMap(_.userId) ?? UserRepo.byId flatMap {
+      Pov
+        .opponentOfUserId(g, me.id)
+        .flatMap(_.userId) ?? UserRepo.byId flatMap {
         _ ?? { opponent =>
           restriction(opponent) flatMap {
             case Some(r) =>

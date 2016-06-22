@@ -41,7 +41,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TableColumnSpec[S, T]
     extends SimpleSFXDelegateSpec[jfxsc.TableColumn[S, T], TableColumn[S, T]](
-        classOf[jfxsc.TableColumn[S, T]], classOf[TableColumn[S, T]]) {
+        classOf[jfxsc.TableColumn[S, T]],
+        classOf[TableColumn[S, T]]) {
 
   it should " have parametrized default constructor - Issue 40" in {
     // Without correctly parametrized default constructor following line was throwing exception:

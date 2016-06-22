@@ -115,8 +115,9 @@ object Sink {
     * A `Sink` that immediately cancels its upstream after materialization.
     */
   def cancelled[T]: Sink[T, NotUsed] =
-    new Sink[Any, NotUsed](new CancelSink(
-            DefaultAttributes.cancelledSink, shape("CancelledSink")))
+    new Sink[Any, NotUsed](
+        new CancelSink(DefaultAttributes.cancelledSink,
+                       shape("CancelledSink")))
 
   /**
     * A `Sink` that materializes into a `Future` of the first value received.
@@ -204,8 +205,8 @@ object Sink {
           new FanoutPublisherSink[T](DefaultAttributes.fanoutPublisherSink,
                                      shape("FanoutPublisherSink"))
         else
-          new PublisherSink[T](
-              DefaultAttributes.publisherSink, shape("PublisherSink")))
+          new PublisherSink[T](DefaultAttributes.publisherSink,
+                               shape("PublisherSink")))
 
   /**
     * A `Sink` that will consume the stream and discard the elements.
@@ -229,8 +230,7 @@ object Sink {
   def combine[T, U](first: Sink[U, _], second: Sink[U, _], rest: Sink[U, _]*)(
       strategy: Int ⇒ Graph[UniformFanOutShape[T, U], NotUsed])
     : Sink[T, NotUsed] =
-    Sink.fromGraph(
-        GraphDSL.create() { implicit b ⇒
+    Sink.fromGraph(GraphDSL.create() { implicit b ⇒
       import GraphDSL.Implicits._
       val d = b.add(strategy(rest.size + 2))
       d.out(0) ~> first
@@ -259,8 +259,8 @@ object Sink {
     *
     * @see [[#mapAsyncUnordered]]
     */
-  def foreachParallel[T](parallelism: Int)(
-      f: T ⇒ Unit)(implicit ec: ExecutionContext): Sink[T, Future[Done]] =
+  def foreachParallel[T](parallelism: Int)(f: T ⇒ Unit)(
+      implicit ec: ExecutionContext): Sink[T, Future[Done]] =
     Flow[T]
       .mapAsyncUnordered(parallelism)(t ⇒ Future(f(t)))
       .toMat(Sink.ignore)(Keep.right)
@@ -298,7 +298,8 @@ object Sink {
           ctx.pull()
 
         override def onUpstreamFailure(
-            cause: Throwable, ctx: Context[NotUsed]): TerminationDirective = {
+            cause: Throwable,
+            ctx: Context[NotUsed]): TerminationDirective = {
           callback(Failure(cause))
           ctx.fail(cause)
         }

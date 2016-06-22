@@ -103,8 +103,8 @@ object Plugin {
     // XXX Return to this once we have more ARM support
     def read(is: Option[InputStream]) = is match {
       case None =>
-        throw new PluginLoadException(
-            jarp.path, s"Missing $PluginXML in $jarp")
+        throw new PluginLoadException(jarp.path,
+                                      s"Missing $PluginXML in $jarp")
       case Some(is) => PluginDescription.fromXML(is)
     }
     Try(new Jar(jarp.jfile).withEntryStream(PluginXML)(read))
@@ -123,8 +123,10 @@ object Plugin {
       Success[AnyClass](loader loadClass classname)
     } catch {
       case NonFatal(e) =>
-        Failure(new PluginLoadException(
-                classname, s"Error: unable to load class: $classname"))
+        Failure(
+            new PluginLoadException(
+                classname,
+                s"Error: unable to load class: $classname"))
       case e: NoClassDefFoundError =>
         Failure(
             new PluginLoadException(
@@ -146,7 +148,7 @@ object Plugin {
     // List[(jar, Try(descriptor))] in dir
     def scan(d: Directory) =
       d.files.toList sortBy (_.name) filter (Jar isJarOrZip _) map
-      (j => (j, loadDescriptionFromJar(j)))
+        (j => (j, loadDescriptionFromJar(j)))
 
     type PDResults = List[Try[(PluginDescription, ScalaClassLoader)]]
 
@@ -183,7 +185,8 @@ object Plugin {
       (fromPaths ::: fromDirs) map {
         case Success((pd, loader)) if seen(pd.classname) =>
           // a nod to SI-7494, take the plugin classes distinctly
-          Failure(new PluginLoadException(
+          Failure(
+              new PluginLoadException(
                   pd.name,
                   s"Ignoring duplicate plugin ${pd.name} (${pd.classname})"))
         case Success((pd, loader)) if ignoring contains pd.name =>

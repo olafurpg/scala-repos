@@ -56,7 +56,8 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
         }
       }
       "for futures failed with a RejectionError" in {
-        Get() ~> complete(Promise
+        Get() ~> complete(
+            Promise
               .failed[String](RejectionError(AuthorizationFailedRejection))
               .future) ~> check {
           rejection shouldEqual AuthorizationFailedRejection
@@ -102,7 +103,8 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
       val route = get & complete(Data("Ida", 83))
 
       import akka.http.scaladsl.model.headers.Accept
-      Get().withHeaders(Accept(MediaTypes.`application/json`)) ~> route ~> check {
+      Get()
+        .withHeaders(Accept(MediaTypes.`application/json`)) ~> route ~> check {
         responseAs[String] shouldEqual """{
             |  "name": "Ida",
             |  "age": 83
@@ -111,7 +113,8 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
       Get().withHeaders(Accept(MediaTypes.`text/xml`)) ~> route ~> check {
         responseAs[xml.NodeSeq] shouldEqual <data><name>Ida</name><age>83</age></data>
       }
-      Get().withHeaders(Accept(MediaTypes.`text/plain`)) ~> Route.seal(route) ~> check {
+      Get().withHeaders(Accept(MediaTypes.`text/plain`)) ~> Route
+        .seal(route) ~> check {
         status shouldEqual StatusCodes.NotAcceptable
       }
     }

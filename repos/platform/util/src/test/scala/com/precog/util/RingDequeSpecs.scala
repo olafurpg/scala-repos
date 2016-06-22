@@ -24,8 +24,8 @@ import org.specs2.ScalaCheck
 import org.scalacheck._
 
 object RingDequeSpecs extends Specification with ScalaCheck {
-  implicit val params = set(
-      minTestsOk -> 2500, workers -> Runtime.getRuntime.availableProcessors)
+  implicit val params =
+    set(minTestsOk -> 2500, workers -> Runtime.getRuntime.availableProcessors)
 
   "unsafe ring deque" should {
     "implement prepend" in check { (xs: List[Int], x: Int) =>

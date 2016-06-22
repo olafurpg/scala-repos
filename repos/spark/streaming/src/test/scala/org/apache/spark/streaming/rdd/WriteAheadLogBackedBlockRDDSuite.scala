@@ -159,8 +159,8 @@ class WriteAheadLogBackedBlockRDDSuite
         StreamBlockId(Random.nextInt(), Random.nextInt()))
     data.zip(blockIds).take(numPartitionsInBM).foreach {
       case (block, blockId) =>
-        blockManager.putIterator(
-            blockId, block.iterator, StorageLevel.MEMORY_ONLY_SER)
+        blockManager
+          .putIterator(blockId, block.iterator, StorageLevel.MEMORY_ONLY_SER)
     }
 
     // Generate write ahead log record handles
@@ -253,7 +253,8 @@ class WriteAheadLogBackedBlockRDDSuite
   ): Seq[FileBasedWriteAheadLogSegment] = {
     require(blockData.size === blockIds.size)
     val writer = new FileBasedWriteAheadLogWriter(
-        new File(dir, "logFile").toString, hadoopConf)
+        new File(dir, "logFile").toString,
+        hadoopConf)
     val segments = blockData.zip(blockIds).map {
       case (data, id) =>
         writer.write(

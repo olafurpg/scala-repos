@@ -12,8 +12,8 @@ import algebra.laws.GroupLaws
 import cats.laws.discipline.{SemigroupKTests, MonoidKTests}
 
 class KleisliTests extends CatsSuite {
-  implicit def kleisliEq[F[_], A, B](
-      implicit A: Arbitrary[A], FB: Eq[F[B]]): Eq[Kleisli[F, A, B]] =
+  implicit def kleisliEq[F[_], A, B](implicit A: Arbitrary[A],
+                                     FB: Eq[F[B]]): Eq[Kleisli[F, A, B]] =
     Eq.by[Kleisli[F, A, B], A => F[B]](_.run)
 
   implicit val iso =

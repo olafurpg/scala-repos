@@ -104,8 +104,11 @@ private[akka] abstract class AbstractEventsByPersistenceIdPublisher(
         currSeqNo,
         toSequenceNr,
         limit)
-    journal ! ReplayMessages(
-        currSeqNo, toSequenceNr, limit, persistenceId, self)
+    journal ! ReplayMessages(currSeqNo,
+                             toSequenceNr,
+                             limit,
+                             persistenceId,
+                             self)
     context.become(replaying(limit))
   }
 
@@ -153,12 +156,15 @@ private[akka] class LiveEventsByPersistenceIdPublisher(
     refreshInterval: FiniteDuration,
     maxBufSize: Int,
     writeJournalPluginId: String)
-    extends AbstractEventsByPersistenceIdPublisher(
-        persistenceId, fromSequenceNr, maxBufSize, writeJournalPluginId) {
+    extends AbstractEventsByPersistenceIdPublisher(persistenceId,
+                                                   fromSequenceNr,
+                                                   maxBufSize,
+                                                   writeJournalPluginId) {
   import EventsByPersistenceIdPublisher._
 
-  val tickTask = context.system.scheduler.schedule(
-      refreshInterval, refreshInterval, self, Continue)(context.dispatcher)
+  val tickTask = context.system.scheduler
+    .schedule(refreshInterval, refreshInterval, self, Continue)(
+        context.dispatcher)
 
   override def postStop(): Unit =
     tickTask.cancel()
@@ -189,8 +195,10 @@ private[akka] class CurrentEventsByPersistenceIdPublisher(
     var toSeqNr: Long,
     maxBufSize: Int,
     writeJournalPluginId: String)
-    extends AbstractEventsByPersistenceIdPublisher(
-        persistenceId, fromSequenceNr, maxBufSize, writeJournalPluginId) {
+    extends AbstractEventsByPersistenceIdPublisher(persistenceId,
+                                                   fromSequenceNr,
+                                                   maxBufSize,
+                                                   writeJournalPluginId) {
   import EventsByPersistenceIdPublisher._
 
   override def toSequenceNr: Long = toSeqNr

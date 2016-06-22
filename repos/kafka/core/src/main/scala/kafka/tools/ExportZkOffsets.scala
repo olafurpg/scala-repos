@@ -59,8 +59,8 @@ object ExportZkOffsets extends Logging {
     parser.accepts("help", "Print this message.")
 
     if (args.length == 0)
-      CommandLineUtils.printUsageAndDie(
-          parser, "Export consumer offsets to an output file.")
+      CommandLineUtils
+        .printUsageAndDie(parser, "Export consumer offsets to an output file.")
 
     val options = parser.parse(args: _*)
 
@@ -69,8 +69,8 @@ object ExportZkOffsets extends Logging {
       System.exit(0)
     }
 
-    CommandLineUtils.checkRequiredArgs(
-        parser, options, zkConnectOpt, outFileOpt)
+    CommandLineUtils
+      .checkRequiredArgs(parser, options, zkConnectOpt, outFileOpt)
 
     val zkConnect = options.valueOf(zkConnectOpt)
     val groups = options.valuesOf(groupOpt)
@@ -119,14 +119,15 @@ object ExportZkOffsets extends Logging {
     }
   }
 
-  private def getBrokeridPartition(
-      zkUtils: ZkUtils, consumerGroup: String, topic: String): List[String] =
+  private def getBrokeridPartition(zkUtils: ZkUtils,
+                                   consumerGroup: String,
+                                   topic: String): List[String] =
     zkUtils
       .getChildrenParentMayNotExist(
           "/consumers/%s/offsets/%s".format(consumerGroup, topic))
       .toList
 
-  private def getTopicsList(
-      zkUtils: ZkUtils, consumerGroup: String): List[String] =
+  private def getTopicsList(zkUtils: ZkUtils,
+                            consumerGroup: String): List[String] =
     zkUtils.getChildren("/consumers/%s/offsets".format(consumerGroup)).toList
 }

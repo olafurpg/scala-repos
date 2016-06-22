@@ -26,15 +26,16 @@ object MacroUtil {
   def getVariablesForScope(element: PsiElement): Array[ScalaResolveResult] = {
     val completionProcessor = new VariablesCompletionProcessor(
         StdKinds.valuesRef)
-    PsiTreeUtil.treeWalkUp(
-        completionProcessor, element, null, ResolveState.initial)
+    PsiTreeUtil
+      .treeWalkUp(completionProcessor, element, null, ResolveState.initial)
     completionProcessor.candidates
   }
 
-  def resultToScExpr(
-      result: Result, context: ExpressionContext): Option[ScExpression] =
+  def resultToScExpr(result: Result,
+                     context: ExpressionContext): Option[ScExpression] =
     try {
-      Option(PsiDocumentManager
+      Option(
+          PsiDocumentManager
             .getInstance(context.getProject)
             .getPsiFile(context.getEditor.getDocument))
         .map(_.findElementAt(context.getStartOffset))
@@ -51,13 +52,13 @@ object MacroUtil {
       case javaArrType: JavaArrayType => Some(javaArrType.arg)
       case paramType: ScParameterizedType
           if paramType.canonicalText.startsWith("_root_.scala.Array") &&
-          paramType.typeArgs.length == 1 =>
+            paramType.typeArgs.length == 1 =>
         Some(paramType.typeArgs.head)
       case _ => None
     }
 
-  def getTypeLookupItem(
-      scType: ScType, project: Project): Option[ScalaLookupItem] = {
+  def getTypeLookupItem(scType: ScType,
+                        project: Project): Option[ScalaLookupItem] = {
     ScType
       .extractClass(scType, Some(project))
       .filter(_.isInstanceOf[ScTypeDefinition])

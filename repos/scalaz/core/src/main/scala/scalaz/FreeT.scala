@@ -16,8 +16,8 @@ object FreeT extends FreeTInstances {
     val f: C => FreeT[S, M, B]
   }
 
-  def gosub[S[_], M[_], B, C0](
-      a0: FreeT[S, M, C0])(f0: C0 => FreeT[S, M, B]): FreeT[S, M, B] =
+  def gosub[S[_], M[_], B, C0](a0: FreeT[S, M, C0])(
+      f0: C0 => FreeT[S, M, B]): FreeT[S, M, B] =
     new Gosub[S, M, B] {
       override type C = C0
       override val a = a0
@@ -148,7 +148,9 @@ sealed abstract class FreeT[S[_], M[_], A] {
     * Runs to completion, using a function that maps the resumption from `S` to a monad `M`.
     */
   def runM(interp: S[FreeT[S, M, A]] => M[FreeT[S, M, A]])(
-      implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A] = {
+      implicit S: Functor[S],
+      M0: BindRec[M],
+      M1: Applicative[M]): M[A] = {
     def runM2(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ A] =
       M0.bind(ft.resume) {
         case -\/(a) => M1.point(\/-(a))
@@ -202,8 +204,7 @@ sealed abstract class FreeTInstances5 extends FreeTInstances6 {
       override def ask =
         FreeT.liftM(M1.ask)
       override def local[A](f: E => E)(fa: FreeT[S, M, A]) =
-        fa.hoist(
-            new (M ~> M) {
+        fa.hoist(new (M ~> M) {
           def apply[A](a: M[A]) = M1.local(f)(a)
         })
     }
@@ -257,8 +258,8 @@ sealed abstract class FreeTInstances2 extends FreeTInstances3 {
         Monad[FreeT[S, G, ?]]
     }
 
-  implicit def freeTFoldable[
-      S[_]: Foldable: Functor, M[_]: Foldable: Applicative: BindRec]
+  implicit def freeTFoldable[S[_]: Foldable: Functor,
+                             M[_]: Foldable: Applicative: BindRec]
     : Foldable[FreeT[S, M, ?]] =
     new FreeTFoldable[S, M] {
       override def S = implicitly
@@ -270,8 +271,8 @@ sealed abstract class FreeTInstances2 extends FreeTInstances3 {
 }
 
 sealed abstract class FreeTInstances1 extends FreeTInstances2 {
-  implicit def freeTTraverse[
-      S[_]: Traverse, M[_]: Traverse: Applicative: BindRec]
+  implicit def freeTTraverse[S[_]: Traverse,
+                             M[_]: Traverse: Applicative: BindRec]
     : Traverse[FreeT[S, M, ?]] =
     new FreeTTraverse[S, M] {
       override def F = implicitly

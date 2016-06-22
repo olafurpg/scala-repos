@@ -31,8 +31,8 @@ object ModifierType extends Enumeration {
   }
 }
 
-case class ModifiersConstruction(
-    annotations: Seq[IntermediateNode], modifiers: Seq[IntermediateNode])
+case class ModifiersConstruction(annotations: Seq[IntermediateNode],
+                                 modifiers: Seq[IntermediateNode])
     extends IntermediateNode {
   val withoutList = new ArrayBuffer[ModifierType]()
 

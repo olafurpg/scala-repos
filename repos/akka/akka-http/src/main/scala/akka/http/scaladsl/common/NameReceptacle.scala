@@ -42,10 +42,12 @@ class RepeatedValueReceptacle[T](val name: String)
 
 class NameOptionUnmarshallerReceptacle[T](val name: String, val um: FSU[T])
 
-class NameDefaultUnmarshallerReceptacle[T](
-    val name: String, val default: T, val um: FSU[T])
+class NameDefaultUnmarshallerReceptacle[T](val name: String,
+                                           val default: T,
+                                           val um: FSU[T])
 
-class RequiredValueUnmarshallerReceptacle[T](
-    val name: String, val requiredValue: T, val um: FSU[T])
+class RequiredValueUnmarshallerReceptacle[T](val name: String,
+                                             val requiredValue: T,
+                                             val um: FSU[T])
 
 class RepeatedValueUnmarshallerReceptacle[T](val name: String, val um: FSU[T])

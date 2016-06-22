@@ -109,7 +109,8 @@ object JsonExtensionSpec extends Specification {
       //object User {def apply(age:Int):User = User(age,"")}
       implicit val userReads = Json.reads[User]
 
-      Json.fromJson[User](Json.obj("name" -> "toto", "age" -> 45)) must beEqualTo(
+      Json
+        .fromJson[User](Json.obj("name" -> "toto", "age" -> 45)) must beEqualTo(
           JsSuccess(User(45, "toto")))
     }
 
@@ -127,7 +128,8 @@ object JsonExtensionSpec extends Specification {
 
       implicit val userFormat = Json.format[User]
 
-      Json.fromJson[User](Json.obj("name" -> "toto", "age" -> 45)) must beEqualTo(
+      Json
+        .fromJson[User](Json.obj("name" -> "toto", "age" -> 45)) must beEqualTo(
           JsSuccess(User(45, "toto")))
       Json.toJson(User(45, "toto")) must beEqualTo(
           Json.obj("name" -> "toto", "age" -> 45))
@@ -378,7 +380,8 @@ object JsonExtensionSpec extends Specification {
       implicit def genericEntityWrapperFormat[A: Format, B: Format]
         : Format[GenericCaseClass2[A, B]] =
         (((__ \ "obj1").format[A] and (__ \ "obj2").format[B]))(
-            GenericCaseClass2[A, B] _, unlift(GenericCaseClass2.unapply[A, B]))
+            GenericCaseClass2[A, B] _,
+            unlift(GenericCaseClass2.unapply[A, B]))
 
       implicit val genericHolderFormat = Json.format[WrappedGenericIntString]
 
@@ -408,7 +411,9 @@ object JsonExtensionSpec extends Specification {
 
       "reads should be able to read valid Json and ignore invalid Json" in {
         jsObj.as[VarArgsOnly](reads) must beEqualTo(obj)
-        Json.fromJson[VarArgsOnly](Json.obj("hello" -> "world"))(reads).isError must beTrue
+        Json
+          .fromJson[VarArgsOnly](Json.obj("hello" -> "world"))(reads)
+          .isError must beTrue
       }
 
       "writes should be able to spit out valid json" in {
@@ -432,7 +437,9 @@ object JsonExtensionSpec extends Specification {
 
       "reads should be able to read valid Json and ignore invalid Json" in {
         jsObj.as[LastVarArg](reads) must beEqualTo(obj)
-        Json.fromJson[LastVarArg](Json.obj("hello" -> "world"))(reads).isError must beTrue
+        Json
+          .fromJson[LastVarArg](Json.obj("hello" -> "world"))(reads)
+          .isError must beTrue
       }
 
       "writes should be able to spit out valid json" in {
@@ -447,8 +454,9 @@ object JsonExtensionSpec extends Specification {
 
       Json.fromJson[UserMap](
           Json.obj("name" -> "toto",
-                   "friends" -> Json.obj("tutu" -> Json.obj(
-                           "name" -> "tutu", "friends" -> Json.obj())))
+                   "friends" -> Json.obj(
+                       "tutu" -> Json.obj("name" -> "tutu",
+                                          "friends" -> Json.obj())))
       ) must beEqualTo(
           JsSuccess(UserMap("toto", Map("tutu" -> UserMap("tutu"))))
       )
@@ -552,7 +560,8 @@ object JsonExtensionSpec extends Specification {
           ))
 
       Json.fromJson[Toto6](js).get must beEqualTo(
-          Toto6(Seq(
+          Toto6(
+              Seq(
                   Dog("medor", User(45, "toto")),
                   Dog("brutus", User(23, "tata"))
               ))
@@ -565,8 +574,9 @@ object JsonExtensionSpec extends Specification {
     }
 
     "test case single-field in companion object" in {
-      Json.fromJson[Person2](Json.toJson(Person2(List("bob", "bobby")))).get must beEqualTo(
-          Person2(List("bob", "bobby")))
+      Json
+        .fromJson[Person2](Json.toJson(Person2(List("bob", "bobby"))))
+        .get must beEqualTo(Person2(List("bob", "bobby")))
     }
 
     "test hygiene" in {
@@ -589,7 +599,8 @@ object JsonExtensionSpec extends Specification {
 
       implicit val fmt = Json.format[CustomApply]
 
-      Json.fromJson[CustomApply](Json.obj("a" -> 5, "b" -> "foo")) must beEqualTo(
+      Json
+        .fromJson[CustomApply](Json.obj("a" -> 5, "b" -> "foo")) must beEqualTo(
           JsSuccess(CustomApply(5, "foo")))
       Json.toJson(CustomApply(5, "foo")) must beEqualTo(
           Json.obj("a" -> 5, "b" -> "foo"))

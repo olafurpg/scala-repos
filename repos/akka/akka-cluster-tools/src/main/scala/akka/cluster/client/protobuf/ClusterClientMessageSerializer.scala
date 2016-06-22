@@ -31,13 +31,16 @@ private[akka] class ClusterClientMessageSerializer(
 
   private val fromBinaryMap =
     collection.immutable.HashMap[String, Array[Byte] ⇒ AnyRef](
-        ContactsManifest -> contactsFromBinary, GetContactsManifest -> { _ ⇒
-      GetContacts
-    }, HeartbeatManifest -> { _ ⇒
-      Heartbeat
-    }, HeartbeatRspManifest -> { _ ⇒
-      HeartbeatRsp
-    })
+        ContactsManifest -> contactsFromBinary,
+        GetContactsManifest -> { _ ⇒
+          GetContacts
+        },
+        HeartbeatManifest -> { _ ⇒
+          Heartbeat
+        },
+        HeartbeatRspManifest -> { _ ⇒
+          HeartbeatRsp
+        })
 
   override def manifest(obj: AnyRef): String = obj match {
     case _: Contacts ⇒ ContactsManifest
@@ -68,7 +71,10 @@ private[akka] class ClusterClientMessageSerializer(
     }
 
   private def contactsToProto(m: Contacts): cm.Contacts =
-    cm.Contacts.newBuilder().addAllContactPoints(m.contactPoints.asJava).build()
+    cm.Contacts
+      .newBuilder()
+      .addAllContactPoints(m.contactPoints.asJava)
+      .build()
 
   private def contactsFromBinary(bytes: Array[Byte]): Contacts = {
     val m = cm.Contacts.parseFrom(bytes)

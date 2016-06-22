@@ -34,8 +34,8 @@ private[sbt] object TestStatus {
   }
   def write(map: Map[String, Long], label: String, f: File): Unit = {
     val properties = new Properties
-    for ((test, lastSuccessTime) <- map) properties.setProperty(
-        test, lastSuccessTime.toString)
+    for ((test, lastSuccessTime) <- map)
+      properties.setProperty(test, lastSuccessTime.toString)
     IO.write(properties, label, f)
   }
 }

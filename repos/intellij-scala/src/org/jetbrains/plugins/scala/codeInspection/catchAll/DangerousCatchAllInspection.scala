@@ -14,8 +14,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScCatchBlock}
 class DangerousCatchAllInspection extends LocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitCatchBlock(catchBlock: ScCatchBlock) {
         val expr = catchBlock.expression.orNull

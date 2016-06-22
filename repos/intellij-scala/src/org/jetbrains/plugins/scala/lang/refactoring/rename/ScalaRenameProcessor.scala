@@ -12,8 +12,8 @@ import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 trait ScalaRenameProcessor {
   this: RenamePsiElementProcessor =>
 
-  override def setToSearchForTextOccurrences(
-      element: PsiElement, enabled: Boolean): Unit = {
+  override def setToSearchForTextOccurrences(element: PsiElement,
+                                             enabled: Boolean): Unit = {
     ScalaApplicationSettings.getInstance().RENAME_SEARCH_IN_NON_CODE_FILES =
       enabled
   }
@@ -22,8 +22,8 @@ trait ScalaRenameProcessor {
     ScalaApplicationSettings.getInstance().RENAME_SEARCH_IN_NON_CODE_FILES
   }
 
-  override def setToSearchInComments(
-      element: PsiElement, enabled: Boolean): Unit = {
+  override def setToSearchInComments(element: PsiElement,
+                                     enabled: Boolean): Unit = {
     ScalaApplicationSettings
       .getInstance()
       .RENAME_SEARCH_IN_COMMENTS_AND_STRINGS = enabled

@@ -19,8 +19,7 @@ class MapWrapperTest {
     // iterate through every element of the wrapped Map, and thus would crash
     // in this case.
     val scalaMap = new scala.collection.mutable.HashMap[String, String] {
-      var containsCounter =
-        0 // keep track of how often contains() has been called.
+      var containsCounter = 0 // keep track of how often contains() has been called.
       override def iterator = throw new UnsupportedOperationException
 
       override def contains(key: String): Boolean = {

@@ -76,8 +76,8 @@ class ConcurrentMemoryLaws extends WordSpec {
   def singleStepLaw[T: Arbitrary: Manifest,
                     K: Arbitrary,
                     V: Monoid: Arbitrary: Equiv] =
-    testGraph[T, K, V].singleStepChecker(
-        sample[List[T]], sample[T => List[(K, V)]])
+    testGraph[T, K, V]
+      .singleStepChecker(sample[List[T]], sample[T => List[(K, V)]])
 
   /**
     * Tests the in-memory planner against a job with a single flatMap
@@ -86,8 +86,9 @@ class ConcurrentMemoryLaws extends WordSpec {
   def diamondLaw[T: Manifest: Arbitrary,
                  K: Arbitrary,
                  V: Monoid: Arbitrary: Equiv] =
-    testGraph[T, K, V].diamondChecker(
-        sample[List[T]], sample[T => List[(K, V)]], sample[T => List[(K, V)]])
+    testGraph[T, K, V].diamondChecker(sample[List[T]],
+                                      sample[T => List[(K, V)]],
+                                      sample[T => List[(K, V)]])
 
   /**
     * Tests the in-memory planner by generating arbitrary flatMap and
@@ -121,7 +122,8 @@ class ConcurrentMemoryLaws extends WordSpec {
     // supplied store.
     val plan = platform.plan {
       TestGraphs.singleStepMapKeysJob[ConcurrentMemory, T, K1, K2, V](
-          original, currentStore)(fnA, fnB)
+          original,
+          currentStore)(fnA, fnB)
     }
     Await.result(plan.run, Duration.Inf)
     val lookupFn = { k: K2 =>
@@ -165,8 +167,9 @@ class ConcurrentMemoryLaws extends WordSpec {
     val source = sourceMaker(original)
     val store: ConcurrentMemory#Store[K, V] = new ConcurrentHashMap[K, V]()
 
-    val prod = TestGraphs.jobWithStats[ConcurrentMemory, T, K, V](
-        jobID, source, store)(t => fn(t))
+    val prod =
+      TestGraphs.jobWithStats[ConcurrentMemory, T, K, V](jobID, source, store)(
+          t => fn(t))
     Await.result(mem.plan(prod).run, Duration.Inf)
     //mem.run(mem.plan(prod))
 

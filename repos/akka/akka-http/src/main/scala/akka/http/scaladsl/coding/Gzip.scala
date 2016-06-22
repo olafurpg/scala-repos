@@ -30,14 +30,15 @@ object Gzip extends Gzip(Encoder.DefaultFilter) {
 }
 
 class GzipCompressor extends DeflateCompressor {
-  override protected lazy val deflater = new Deflater(
-      Deflater.BEST_COMPRESSION, true)
+  override protected lazy val deflater =
+    new Deflater(Deflater.BEST_COMPRESSION, true)
   private val checkSum = new CRC32 // CRC32 of uncompressed data
   private var headerSent = false
   private var bytesRead = 0L
 
   override protected def compressWithBuffer(
-      input: ByteString, buffer: Array[Byte]): ByteString = {
+      input: ByteString,
+      buffer: Array[Byte]): ByteString = {
     updateCrc(input)
     header() ++ super.compressWithBuffer(input, buffer)
   }
@@ -59,8 +60,7 @@ class GzipCompressor extends DeflateCompressor {
   private def trailer(): ByteString = {
     def int32(i: Int): ByteString = ByteString(i, i >> 8, i >> 16, i >> 24)
     val crc = checkSum.getValue.toInt
-    val tot =
-      bytesRead.toInt // truncated to 32bit as specified in https://tools.ietf.org/html/rfc1952#section-2
+    val tot = bytesRead.toInt // truncated to 32bit as specified in https://tools.ietf.org/html/rfc1952#section-2
     val trailer = int32(crc) ++ int32(tot)
 
     trailer
@@ -72,8 +72,9 @@ class GzipDecompressor(maxBytesPerChunk: Int = Decoder.MaxBytesPerChunkDefault)
   override def createLogic(attr: Attributes) = new DecompressorParsingLogic {
     override val inflater: Inflater = new Inflater(true)
     override def afterInflate: ParseStep[ByteString] = ReadTrailer
-    override def afterBytesRead(
-        buffer: Array[Byte], offset: Int, length: Int): Unit =
+    override def afterBytesRead(buffer: Array[Byte],
+                                offset: Int,
+                                length: Int): Unit =
       crc32.update(buffer, offset, length)
 
     trait Step extends ParseStep[ByteString] {

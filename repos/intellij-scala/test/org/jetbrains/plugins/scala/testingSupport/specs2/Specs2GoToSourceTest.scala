@@ -11,7 +11,7 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
     addFileToProject(
         testName + ".scala",
         "import org.specs2.mutable.Specification\n\n" + "class " + testName +
-        " extends Specification {" + """
+          " extends Specification {" + """
             |  "Successful test" should {
             |    "run fine" in {
             |      success

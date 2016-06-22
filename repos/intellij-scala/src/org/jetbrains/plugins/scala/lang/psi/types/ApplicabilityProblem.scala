@@ -30,8 +30,9 @@ case class UnresolvedParameter(assignment: ScAssignStmt)
 //TODO , parameter
 case class ExpansionForNonRepeatedParameter(argument: ScExpression)
     extends ApplicabilityProblem
-case class ElementApplicabilityProblem(
-    element: PsiElement, actual: ScType, found: ScType)
+case class ElementApplicabilityProblem(element: PsiElement,
+                                       actual: ScType,
+                                       found: ScType)
     extends ApplicabilityProblem("42") //todo 
 
 // applicability problem
@@ -44,8 +45,8 @@ case class MissedValueParameter(parameter: Parameter)
 //TODO expectedType -> parameter
 case class TypeMismatch(expression: ScExpression, expectedType: ScType)
     extends ApplicabilityProblem
-case class DefaultTypeParameterMismatch(
-    expectedType: ScType, actualType: ScType)
+case class DefaultTypeParameterMismatch(expectedType: ScType,
+                                        actualType: ScType)
     extends ApplicabilityProblem
 case object WrongTypeParameterInferred extends ApplicabilityProblem
 

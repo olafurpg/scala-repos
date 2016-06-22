@@ -68,20 +68,19 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
 
     // Keep the qualifier information by using it as sub-query name, if there is only one qualifier
     // present.
-    val finalName =
-      if (qualifiers.length == 1) {
-        qualifiers.head
-      } else {
-        newSubqueryName()
-      }
+    val finalName = if (qualifiers.length == 1) {
+      qualifiers.head
+    } else {
+      newSubqueryName()
+    }
 
     // Canonicalizer will remove all naming information, we should add it back by adding an extra
     // Project and alias the outputs.
     val aliasedOutput = canonicalizedPlan.output.zip(outputNames).map {
       case (attr, name) => Alias(attr.withQualifiers(Nil), name)()
     }
-    val finalPlan = Project(
-        aliasedOutput, SubqueryAlias(finalName, canonicalizedPlan))
+    val finalPlan =
+      Project(aliasedOutput, SubqueryAlias(finalName, canonicalizedPlan))
 
     try {
       val replaced = finalPlan.transformAllExpressions {
@@ -183,8 +182,9 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
 
     case Sort(orders, _, RepartitionByExpression(partitionExprs, child, _))
         if orders.map(_.child) == partitionExprs =>
-      build(
-          toSQL(child), "CLUSTER BY", partitionExprs.map(_.sql).mkString(", "))
+      build(toSQL(child),
+            "CLUSTER BY",
+            partitionExprs.map(_.sql).mkString(", "))
 
     case p: Sort =>
       build(
@@ -268,18 +268,17 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
   private def generateToSQL(g: Generate): String = {
     val columnAliases = g.generatorOutput.map(_.sql).mkString(", ")
 
-    val childSQL =
-      if (g.child == OneRowRelation) {
-        // This only happens when we put UDTF in project list and there is no FROM clause. Because we
-        // always generate LATERAL VIEW for `Generate`, here we use a trick to put a dummy sub-query
-        // after FROM clause, so that we can generate a valid LATERAL VIEW SQL string.
-        // For example, if the original SQL is: "SELECT EXPLODE(ARRAY(1, 2))", we will convert in to
-        // LATERAL VIEW format, and generate:
-        // SELECT col FROM (SELECT 1) sub_q0 LATERAL VIEW EXPLODE(ARRAY(1, 2)) sub_q1 AS col
-        s"(SELECT 1) ${newSubqueryName()}"
-      } else {
-        toSQL(g.child)
-      }
+    val childSQL = if (g.child == OneRowRelation) {
+      // This only happens when we put UDTF in project list and there is no FROM clause. Because we
+      // always generate LATERAL VIEW for `Generate`, here we use a trick to put a dummy sub-query
+      // after FROM clause, so that we can generate a valid LATERAL VIEW SQL string.
+      // For example, if the original SQL is: "SELECT EXPLODE(ARRAY(1, 2))", we will convert in to
+      // LATERAL VIEW format, and generate:
+      // SELECT col FROM (SELECT 1) sub_q0 LATERAL VIEW EXPLODE(ARRAY(1, 2)) sub_q1 AS col
+      s"(SELECT 1) ${newSubqueryName()}"
+    } else {
+      toSQL(g.child)
+    }
 
     // The final SQL string for Generate contains 7 parts:
     //   1. the SQL of child, can be a table or sub-query
@@ -302,10 +301,10 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
     )
   }
 
-  private def sameOutput(
-      output1: Seq[Attribute], output2: Seq[Attribute]): Boolean =
+  private def sameOutput(output1: Seq[Attribute],
+                         output2: Seq[Attribute]): Boolean =
     output1.size == output2.size &&
-    output1.zip(output2).forall(pair => pair._1.semanticEquals(pair._2))
+      output1.zip(output2).forall(pair => pair._1.semanticEquals(pair._2))
 
   private def isGroupingSet(a: Aggregate, e: Expand, p: Project): Boolean = {
     assert(a.child == e && e.child == p)
@@ -314,8 +313,9 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         p.child.output ++ a.groupingExpressions.map(_.asInstanceOf[Attribute]))
   }
 
-  private def groupingSetToSQL(
-      agg: Aggregate, expand: Expand, project: Project): String = {
+  private def groupingSetToSQL(agg: Aggregate,
+                               expand: Expand,
+                               project: Project): String = {
     assert(agg.groupingExpressions.length > 1)
 
     // The last column of Expand is always grouping ID
@@ -445,10 +445,11 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         plan.transformAllExpressions {
           case a: AttributeReference =>
             AttributeReference(normalizedName(a), a.dataType)(
-                exprId = a.exprId, qualifiers = Nil)
+                exprId = a.exprId,
+                qualifiers = Nil)
           case a: Alias =>
-            Alias(a.child, normalizedName(a))(
-                exprId = a.exprId, qualifiers = Nil)
+            Alias(a.child, normalizedName(a))(exprId = a.exprId,
+                                              qualifiers = Nil)
         }
     }
 
@@ -550,8 +551,9 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
 
   object ExtractSQLTable {
     def unapply(plan: LogicalPlan): Option[SQLTable] = plan match {
-      case l @ LogicalRelation(
-          _, _, Some(TableIdentifier(table, Some(database)))) =>
+      case l @ LogicalRelation(_,
+                               _,
+                               Some(TableIdentifier(table, Some(database)))) =>
         Some(SQLTable(database, table, l.output.map(_.withQualifiers(Nil))))
 
       case m: MetastoreRelation =>

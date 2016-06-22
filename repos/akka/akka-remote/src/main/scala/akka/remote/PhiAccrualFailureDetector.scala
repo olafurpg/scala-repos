@@ -53,12 +53,12 @@ import akka.util.Helpers.ConfigOps
   * @param clock The clock, returning current time in milliseconds, but can be faked for testing
   *   purposes. It is only used for measuring intervals (duration).
   */
-class PhiAccrualFailureDetector(val threshold: Double,
-                                val maxSampleSize: Int,
-                                val minStdDeviation: FiniteDuration,
-                                val acceptableHeartbeatPause: FiniteDuration,
-                                val firstHeartbeatEstimate: FiniteDuration)(
-    implicit clock: Clock)
+class PhiAccrualFailureDetector(
+    val threshold: Double,
+    val maxSampleSize: Int,
+    val minStdDeviation: FiniteDuration,
+    val acceptableHeartbeatPause: FiniteDuration,
+    val firstHeartbeatEstimate: FiniteDuration)(implicit clock: Clock)
     extends FailureDetector {
 
   /**
@@ -102,8 +102,8 @@ class PhiAccrualFailureDetector(val threshold: Double,
     * Implement using optimistic lockless concurrency, all state is represented
     * by this immutable case class and managed by an AtomicReference.
     */
-  private final case class State(
-      history: HeartbeatHistory, timestamp: Option[Long])
+  private final case class State(history: HeartbeatHistory,
+                                 timestamp: Option[Long])
 
   private val state = new AtomicReference[State](
       State(history = firstHeartbeat, timestamp = None))
@@ -134,9 +134,9 @@ class PhiAccrualFailureDetector(val threshold: Double,
         else oldState.history
     }
 
-    val newState = oldState.copy(history = newHistory,
-                                 timestamp =
-                                   Some(timestamp)) // record new timestamp
+    val newState = oldState.copy(
+        history = newHistory,
+        timestamp = Some(timestamp)) // record new timestamp
 
     // if we won the race then update else try again
     if (!state.compareAndSet(oldState, newState)) heartbeat() // recur
@@ -176,8 +176,9 @@ class PhiAccrualFailureDetector(val threshold: Double,
     * Error is 0.00014 at +- 3.16
     * The calculated value is equivalent to -log10(1 - CDF(y))
     */
-  private[akka] def phi(
-      timeDiff: Long, mean: Double, stdDeviation: Double): Double = {
+  private[akka] def phi(timeDiff: Long,
+                        mean: Double,
+                        stdDeviation: Double): Double = {
     val y = (timeDiff - mean) / stdDeviation
     val e = math.exp(-y * (1.5976 + 0.070566 * y * y))
     if (timeDiff > mean) -math.log10(e / (1.0 + e))

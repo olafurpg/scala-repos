@@ -19,8 +19,7 @@ object PriorityDispatcherSpec {
     """
 
   class Unbounded(settings: ActorSystem.Settings, config: Config)
-      extends UnboundedPriorityMailbox(
-          PriorityGenerator({
+      extends UnboundedPriorityMailbox(PriorityGenerator({
         case i: Int ⇒ i //Reverse order
         case 'Result ⇒ Int.MaxValue
       }: Any ⇒ Int))

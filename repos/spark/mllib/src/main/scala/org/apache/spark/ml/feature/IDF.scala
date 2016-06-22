@@ -110,8 +110,8 @@ object IDF extends DefaultParamsReadable[IDF] {
   * Model fitted by [[IDF]].
   */
 @Experimental
-class IDFModel private[ml](
-    override val uid: String, idfModel: feature.IDFModel)
+class IDFModel private[ml] (override val uid: String,
+                            idfModel: feature.IDFModel)
     extends Model[IDFModel]
     with IDFBase
     with MLWritable {

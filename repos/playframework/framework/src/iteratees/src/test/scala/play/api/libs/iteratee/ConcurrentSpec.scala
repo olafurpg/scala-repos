@@ -21,7 +21,8 @@ object ConcurrentSpec
     "broadcast the same to already registered iteratees" in {
       mustExecute(38) { foldEC =>
         val (broadcaster, pushHere) = Concurrent.broadcast[String]
-        val results = Future.sequence(Range(1, 20)
+        val results = Future.sequence(
+            Range(1, 20)
               .map(_ =>
                     Iteratee.fold[String, String]("") { (s, e) =>
               s + e
@@ -125,9 +126,9 @@ object ConcurrentSpec
           Enumerator[Long](1, 2, 3, 4, 5, 6, 7, 8, 9, 10) >>> Enumerator.eof
         val preparedMapEC = mapEC.prepare()
         val result =
-          fastEnumerator |>>> (Concurrent.buffer(20) &>> slowIteratee).flatMap {
-            l =>
-              Iteratee.getChunks.map(l ++ (_: List[Long]))(preparedMapEC)
+          fastEnumerator |>>> (Concurrent
+                .buffer(20) &>> slowIteratee).flatMap { l =>
+            Iteratee.getChunks.map(l ++ (_: List[Long]))(preparedMapEC)
           }(flatMapEC)
 
         Await.result(result, Duration.Inf) must not equalTo
@@ -171,16 +172,14 @@ object ConcurrentSpec
         val startCount = new AtomicInteger()
         val completeCount = new AtomicInteger()
         val errorCount = new AtomicInteger()
-        val enumerator = Concurrent.unicast[String](
-            c => {
-              startCount.incrementAndGet()
-              c.push(a)
-              c.push(b)
-              c.eofAndEnd()
-            },
-            () => completeCount.incrementAndGet(),
-            (_: String,
-             _: Input[String]) => errorCount.incrementAndGet())(unicastEC)
+        val enumerator = Concurrent.unicast[String](c => {
+          startCount.incrementAndGet()
+          c.push(a)
+          c.push(b)
+          c.eofAndEnd()
+        }, () =>
+              completeCount.incrementAndGet(), (_: String, _: Input[String]) =>
+              errorCount.incrementAndGet())(unicastEC)
         val promise =
           (enumerator |>> Iteratee.fold[String, String]("")(_ ++ _)(foldEC))
             .flatMap(_.run)
@@ -305,7 +304,8 @@ object ConcurrentSpec
         val e = Concurrent.patchPanel[Int] { pp =>
           pp.patchIn(Enumerator.eof)
         }(ppEC)
-        Await.result(e |>>> Iteratee.getChunks[Int], Duration.Inf) must equalTo(
+        Await
+          .result(e |>>> Iteratee.getChunks[Int], Duration.Inf) must equalTo(
             Nil)
       }
     }
@@ -350,16 +350,16 @@ object ConcurrentSpec
 
   "Concurrent.runPartial" should {
     "redeem the iteratee with the result and the partial enumerator" in {
-      val (a, remaining) =
-        await(Concurrent.runPartial(Enumerator("foo", "bar"),
-                                    Iteratee.head[String]))
+      val (a, remaining) = await(
+          Concurrent.runPartial(Enumerator("foo", "bar"),
+                                Iteratee.head[String]))
       a must beSome("foo")
       await(remaining |>>> Iteratee.getChunks[String]) must_== Seq("bar")
     }
     "work when there is no input left in the enumerator" in {
-      val (a, remaining) =
-        await(Concurrent.runPartial(Enumerator("foo", "bar"),
-                                    Iteratee.getChunks[String]))
+      val (a, remaining) = await(
+          Concurrent.runPartial(Enumerator("foo", "bar"),
+                                Iteratee.getChunks[String]))
       a must_== Seq("foo", "bar")
       await(remaining |>>> Iteratee.getChunks[String]) must_== Nil
     }

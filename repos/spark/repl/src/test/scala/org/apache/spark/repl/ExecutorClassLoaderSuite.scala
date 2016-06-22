@@ -51,8 +51,8 @@ class ExecutorClassLoaderSuite
     with Logging {
 
   val childClassNames = List("ReplFakeClass1", "ReplFakeClass2")
-  val parentClassNames = List(
-      "ReplFakeClass1", "ReplFakeClass2", "ReplFakeClass3")
+  val parentClassNames =
+    List("ReplFakeClass1", "ReplFakeClass2", "ReplFakeClass3")
   val parentResourceNames = List("fake-resource.txt")
   var tempDir1: File = _
   var tempDir2: File = _
@@ -68,8 +68,8 @@ class ExecutorClassLoaderSuite
     urls2 = List(tempDir2.toURI.toURL).toArray
     childClassNames.foreach(TestUtils.createCompiledClass(_, tempDir1, "1"))
     parentResourceNames.foreach { x =>
-      Files.write(
-          "resource".getBytes(StandardCharsets.UTF_8), new File(tempDir2, x))
+      Files.write("resource".getBytes(StandardCharsets.UTF_8),
+                  new File(tempDir2, x))
     }
     parentClassNames.foreach(TestUtils.createCompiledClass(_, tempDir2, "2"))
   }
@@ -206,13 +206,14 @@ class ExecutorClassLoaderSuite
     when(env.rpcEnv).thenReturn(rpcEnv)
     when(rpcEnv.openChannel(anyString()))
       .thenAnswer(new Answer[ReadableByteChannel]() {
-      override def answer(invocation: InvocationOnMock): ReadableByteChannel = {
-        val uri = new URI(invocation.getArguments()(0).asInstanceOf[String])
-        val path =
-          Paths.get(tempDir1.getAbsolutePath(), uri.getPath().stripPrefix("/"))
-        FileChannel.open(path, StandardOpenOption.READ)
-      }
-    })
+        override def answer(
+            invocation: InvocationOnMock): ReadableByteChannel = {
+          val uri = new URI(invocation.getArguments()(0).asInstanceOf[String])
+          val path = Paths.get(tempDir1.getAbsolutePath(),
+                               uri.getPath().stripPrefix("/"))
+          FileChannel.open(path, StandardOpenOption.READ)
+        }
+      })
 
     val classLoader = new ExecutorClassLoader(new SparkConf(),
                                               env,

@@ -18,8 +18,9 @@ trait Printers extends scala.reflect.internal.Printers {
     override def print(args: Any*): Unit = args foreach {
       case tree: Tree =>
         printPosition(tree)
-        printTree(if (tree.isDef && tree.symbol != NoSymbol &&
-                      tree.symbol.isInitialized) {
+        printTree(
+            if (tree.isDef && tree.symbol != NoSymbol &&
+                tree.symbol.isInitialized) {
           tree match {
             case ClassDef(_, _, _, impl @ Template(ps, noSelfType, body))
                 if (tree.symbol.thisSym != tree.symbol) =>
@@ -67,8 +68,10 @@ trait Printers extends scala.reflect.internal.Printers {
     *  punctuation than the standard one.
     */
   class CompactTreePrinter(out: PrintWriter) extends TreePrinter(out) {
-    override def printRow(
-        ts: List[Tree], start: String, sep: String, end: String) {
+    override def printRow(ts: List[Tree],
+                          start: String,
+                          sep: String,
+                          end: String) {
       print(start)
       printSeq(ts)(print(_))(print(sep))
       print(end)

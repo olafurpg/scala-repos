@@ -15,8 +15,8 @@ private[api] final class AnalysisApi {
           .obj(
               "eval" -> info.score.map(_.centipawns),
               "mate" -> info.mate,
-              "variation" -> info.variation.isEmpty.fold(
-                  JsNull, info.variation mkString " "),
+              "variation" -> info.variation.isEmpty
+                .fold(JsNull, info.variation mkString " "),
               "comment" -> adviceOption.map(_.makeComment(false, true))
           )
           .noNull

@@ -48,7 +48,8 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
       reductions.reverse.zipWithIndex map {
         case (red, idx) =>
           trans.WrapObject(
-              trans.DerefArrayStatic(TransSpec1.Id, CPathIndex(idx)), red.name)
+              trans.DerefArrayStatic(TransSpec1.Id, CPathIndex(idx)),
+              red.name)
       }
     val reductionSpec = reductionSpecs reduce { trans.OuterObjectConcat(_, _) }
 
@@ -102,8 +103,9 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
         coalesce(functions map { SingleSummary -> _ })
       }
 
-      def reduceTable(
-          table: Table, jtype: JType, ctx: MorphContext): M[Table] = {
+      def reduceTable(table: Table,
+                      jtype: JType,
+                      ctx: MorphContext): M[Table] = {
         val reduction = makeReduction(jtype)
 
         implicit def monoid = reduction.monoid
@@ -142,9 +144,9 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
         // one JType-with-numeric-leaves per schema
         val jtypes: M[Seq[JType]] =
           jtypes0 map
-          (_ collect {
-                case opt if opt.isDefined => opt.get
-              })
+            (_ collect {
+                  case opt if opt.isDefined => opt.get
+                })
 
         val specs: M[Seq[TransSpec1]] =
           jtypes map {
@@ -154,9 +156,9 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
         // one table per schema
         val tables: M[Seq[Table]] =
           specs map
-          (_ map { spec =>
-                table.transform(spec).compact(TransSpec1.Id, AllDefined)
-              })
+            (_ map { spec =>
+                  table.transform(spec).compact(TransSpec1.Id, AllDefined)
+                })
 
         val tablesWithType: M[Seq[(Table, JType)]] = for {
           tbls <- tables
@@ -178,9 +180,10 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
             _.zipWithIndex map {
               case (tbl, idx) =>
                 val modelId = "model" + (idx + 1)
-                tbl.transform(trans.WrapObject(DerefObjectStatic(TransSpec1.Id,
-                                                                 paths.Value),
-                                               modelId))
+                tbl.transform(
+                    trans.WrapObject(DerefObjectStatic(TransSpec1.Id,
+                                                       paths.Value),
+                                     modelId))
             }
           }
 

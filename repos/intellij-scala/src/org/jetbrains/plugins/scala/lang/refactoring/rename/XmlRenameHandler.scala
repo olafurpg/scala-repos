@@ -137,15 +137,21 @@ class XmlRenameHandler extends RenameHandler {
       val builder = new TemplateBuilderImpl(element.getParent)
 
       builder.replaceElement(
-          element.getTagNameElement, "first", new EmptyExpression {
-        override def calculateQuickResult(context: ExpressionContext): Result =
-          new TextResult(
-              Option(element.getTagName).getOrElse(elementStartName))
-        override def calculateResult(context: ExpressionContext): Result =
-          calculateQuickResult(context)
-      }, true)
-      builder.replaceElement(
-          element.getMatchedTag.getTagNameElement, "second", "first", false)
+          element.getTagNameElement,
+          "first",
+          new EmptyExpression {
+            override def calculateQuickResult(
+                context: ExpressionContext): Result =
+              new TextResult(
+                  Option(element.getTagName).getOrElse(elementStartName))
+            override def calculateResult(context: ExpressionContext): Result =
+              calculateQuickResult(context)
+          },
+          true)
+      builder.replaceElement(element.getMatchedTag.getTagNameElement,
+                             "second",
+                             "first",
+                             false)
 
       builder.buildInlineTemplate()
     }

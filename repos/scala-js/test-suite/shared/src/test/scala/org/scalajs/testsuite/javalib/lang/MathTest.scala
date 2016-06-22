@@ -25,10 +25,12 @@ class MathTest {
     assertTrue(Math.abs(-0.0).equals(0.0))
     assertEquals(42.0, Math.abs(42.0), 0.0)
     assertEquals(42.0, Math.abs(-42.0), 0.0)
-    assertEquals(
-        Double.PositiveInfinity, Math.abs(Double.PositiveInfinity), 0.0)
-    assertEquals(
-        Double.PositiveInfinity, Math.abs(Double.NegativeInfinity), 0.0)
+    assertEquals(Double.PositiveInfinity,
+                 Math.abs(Double.PositiveInfinity),
+                 0.0)
+    assertEquals(Double.PositiveInfinity,
+                 Math.abs(Double.NegativeInfinity),
+                 0.0)
     assertTrue(Math.abs(Double.NaN).isNaN)
     assertEquals(Long.MaxValue, Math.abs(Long.MaxValue))
     assertEquals(Long.MinValue, Math.abs(Long.MinValue))
@@ -44,8 +46,9 @@ class MathTest {
     assertTrue(Math.max(-0.0, 0.0).equals(0.0))
     assertTrue(Math.max(0.0, -0.0).equals(0.0))
     assertTrue(Math.max(-0.0, -0.0).equals(-0.0))
-    assertEquals(
-        Double.PositiveInfinity, Math.max(Double.PositiveInfinity, 0.0), 0.0)
+    assertEquals(Double.PositiveInfinity,
+                 Math.max(Double.PositiveInfinity, 0.0),
+                 0.0)
     assertEquals(0.0, Math.max(Double.NegativeInfinity, 0.0), 0.0)
     assertTrue(Math.max(Double.NaN, 0.0).isNaN)
     assertTrue(Math.max(0.0, Double.NaN).isNaN)
@@ -64,8 +67,9 @@ class MathTest {
     assertTrue(Math.min(0.0, -0.0).equals(-0.0))
     assertTrue(Math.min(-0.0, -0.0).equals(-0.0))
     assertEquals(0.0, Math.min(Double.PositiveInfinity, 0.0), 0.0)
-    assertEquals(
-        Double.NegativeInfinity, Math.min(Double.NegativeInfinity, 0.0), 0.0)
+    assertEquals(Double.NegativeInfinity,
+                 Math.min(Double.NegativeInfinity, 0.0),
+                 0.0)
     assertTrue(Math.min(Double.NaN, 0.0).isNaN)
     assertTrue(Math.min(0.0, Double.NaN).isNaN)
     assertEquals(0L, Math.min(Long.MaxValue, 0))
@@ -119,8 +123,9 @@ class MathTest {
   }
 
   @Test def nextUp_for_Double(): Unit = {
-    assertEquals(
-        Double.PositiveInfinity, Math.nextUp(Double.PositiveInfinity), 0.0)
+    assertEquals(Double.PositiveInfinity,
+                 Math.nextUp(Double.PositiveInfinity),
+                 0.0)
     assertEquals(Double.MinValue, Math.nextUp(Double.NegativeInfinity), 0.0)
     assertEquals(Double.PositiveInfinity, Math.nextUp(Double.MaxValue), 0.0)
     assertEquals(-1.7976931348623155e+308, Math.nextUp(-Double.MaxValue), 0.0)
@@ -129,8 +134,9 @@ class MathTest {
     assertEquals(Double.MinPositiveValue, Math.nextUp(-0.0), 0.0)
     assertEquals(9007199254740992.0, Math.nextUp(9007199254740991.0), 0.0)
     assertEquals(9007199254740994.0, Math.nextUp(9007199254740992.0), 0.0)
-    assertEquals(
-        1 + 2.2204460492503130808472633361816E-16, Math.nextUp(1.0), 0.0)
+    assertEquals(1 + 2.2204460492503130808472633361816E-16,
+                 Math.nextUp(1.0),
+                 0.0)
   }
 
   @Test def nextAfter_for_Double(): Unit = {
@@ -173,8 +179,9 @@ class MathTest {
     assertEquals(0.0, Math.hypot(0.0, 0.0), 0.01)
     assertEquals(5.0, Math.hypot(3.0, 4.0), 0.01)
     assertTrue(Math.hypot(3.0, Double.NaN).isNaN)
-    assertEquals(
-        Double.PositiveInfinity, Math.hypot(Double.NegativeInfinity, 4.0), 0.0)
+    assertEquals(Double.PositiveInfinity,
+                 Math.hypot(Double.NegativeInfinity, 4.0),
+                 0.0)
   }
 
   @Test def expm1(): Unit = {
@@ -183,8 +190,9 @@ class MathTest {
     assertEquals(19.085536923187668, Math.expm1(3.0), 0.01)
     assertEquals(3269016.3724721107, Math.expm1(15.0), 0.01)
     assertEquals(Double.PositiveInfinity, Math.expm1(1.8E10), 0.0)
-    assertEquals(
-        Double.PositiveInfinity, Math.expm1(Double.PositiveInfinity), 0.0)
+    assertEquals(Double.PositiveInfinity,
+                 Math.expm1(Double.PositiveInfinity),
+                 0.0)
     assertEquals(-1.0, Math.expm1(Double.NegativeInfinity), 0.01)
     assertEquals(4.9E-324, Math.expm1(4.9E-324), 0.01)
   }
@@ -193,16 +201,18 @@ class MathTest {
     assertEquals(Double.NegativeInfinity, Math.sinh(-1234.56), 0.0)
     assertEquals(Double.PositiveInfinity, Math.sinh(1234.56), 0.0)
     assertEquals(0.0, Math.sinh(0.0), 0.01)
-    assertEquals(
-        Double.PositiveInfinity, Math.sinh(Double.PositiveInfinity), 0.0)
+    assertEquals(Double.PositiveInfinity,
+                 Math.sinh(Double.PositiveInfinity),
+                 0.0)
   }
 
   @Test def cosh(): Unit = {
     assertEquals(Double.PositiveInfinity, Math.cosh(-1234.56), 0.0)
     assertEquals(Double.PositiveInfinity, Math.cosh(1234.56), 0.0)
     assertEquals(1.0, Math.cosh(-0.0), 0.01)
-    assertEquals(
-        Double.PositiveInfinity, Math.cosh(Double.PositiveInfinity), 0.0)
+    assertEquals(Double.PositiveInfinity,
+                 Math.cosh(Double.PositiveInfinity),
+                 0.0)
   }
 
   @Test def tanh(): Unit = {

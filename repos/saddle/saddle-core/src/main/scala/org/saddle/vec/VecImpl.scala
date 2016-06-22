@@ -20,8 +20,9 @@ import org.saddle._
 
 // Specialized method implementations for code reuse in implementations of Vec; NA-safe
 private[saddle] object VecImpl {
-  def mask[@spec(Boolean, Int, Long, Double) A: ST](
-      v1: Vec[A], v2: Vec[Boolean], value: A): Vec[A] = {
+  def mask[@spec(Boolean, Int, Long, Double) A: ST](v1: Vec[A],
+                                                    v2: Vec[Boolean],
+                                                    value: A): Vec[A] = {
     require(v1.length == v2.length, "Vectors must be the same length")
     val buf = Array.ofDim[A](v1.length)
     var i = 0
@@ -34,8 +35,9 @@ private[saddle] object VecImpl {
     Vec(buf)
   }
 
-  def mask[@spec(Boolean, Int, Long, Double) A: ST](
-      v1: Vec[A], f: A => Boolean, value: A): Vec[A] = {
+  def mask[@spec(Boolean, Int, Long, Double) A: ST](v1: Vec[A],
+                                                    f: A => Boolean,
+                                                    value: A): Vec[A] = {
     val sa = implicitly[ST[A]]
     val buf = Array.ofDim[A](v1.length)
     var i = 0
@@ -198,8 +200,8 @@ private[saddle] object VecImpl {
   }
 
   def rolling[@spec(Boolean, Int, Long, Double) A,
-              @spec(Boolean, Int, Long, Double) B: ST](vec: Vec[A])(
-      winSz: Int, f: Vec[A] => B): Vec[B] = {
+              @spec(Boolean, Int, Long, Double) B: ST](
+      vec: Vec[A])(winSz: Int, f: Vec[A] => B): Vec[B] = {
     if (winSz <= 0) Vec.empty[B]
     else {
       val len = vec.length
@@ -327,8 +329,8 @@ private[saddle] object VecImpl {
     Vec(buf.toArray)
   }
 
-  def pad[@spec(Boolean, Int, Long, Double) A: ST](
-      vec: Vec[A], atMost: Int = 0): Vec[A] = {
+  def pad[@spec(Boolean, Int, Long, Double) A: ST](vec: Vec[A],
+                                                   atMost: Int = 0): Vec[A] = {
     if (vec.length == 0 || vec.length == 1) vec
     else {
       val lim = if (atMost > 0) atMost else vec.length
@@ -365,9 +367,10 @@ private[saddle] object VecImpl {
     Vec(buf)
   }
 
-  def seriesfillNA[
-      @spec(Int, Long, Double) X, @spec(Boolean, Int, Long, Double) A: ST](
-      idx: Vec[X], vec: Vec[A])(f: X => A): Vec[A] = {
+  def seriesfillNA[@spec(Int, Long, Double) X,
+                   @spec(Boolean, Int, Long, Double) A: ST](
+      idx: Vec[X],
+      vec: Vec[A])(f: X => A): Vec[A] = {
     val buf = vec.contents
     var i = 0
     val l = vec.length

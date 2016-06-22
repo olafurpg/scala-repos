@@ -65,8 +65,9 @@ private[summingbird] object HDFSMetadata {
     apply(conf, path).mostRecentVersion.flatMap { _.get[T].toOption }
 
   /** Put to the most recent version */
-  def put[T: JsonNodeInjection](
-      conf: Configuration, path: String, obj: Option[T]) =
+  def put[T: JsonNodeInjection](conf: Configuration,
+                                path: String,
+                                obj: Option[T]) =
     apply(conf, path).mostRecentVersion.get.put(obj)
 }
 
@@ -133,8 +134,10 @@ class HDFSMetadata(conf: Configuration, rootPath: String) {
 /**
   * Refers to a specific version on disk. Allows reading and writing metadata to specific locations
   */
-private[summingbird] class HDFSVersionMetadata private[store](
-    val version: Long, conf: Configuration, val path: Path) {
+private[summingbird] class HDFSVersionMetadata private[store] (
+    val version: Long,
+    conf: Configuration,
+    val path: Path) {
   private def getFS = path.getFileSystem(conf)
   private def getString: Try[String] =
     Try {

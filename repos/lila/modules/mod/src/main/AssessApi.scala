@@ -48,14 +48,17 @@ final class AssessApi(collAssessments: Coll,
 
   def getGameResultsById(gameId: String) =
     getResultsByGameIdAndColor(gameId, Color.White) zip getResultsByGameIdAndColor(
-        gameId, Color.Black) map { a =>
+        gameId,
+        Color.Black) map { a =>
       PlayerAssessments(a._1, a._2)
     }
 
   def getPlayerAggregateAssessment(
-      userId: String, nb: Int = 100): Fu[Option[PlayerAggregateAssessment]] = {
+      userId: String,
+      nb: Int = 100): Fu[Option[PlayerAggregateAssessment]] = {
     val relatedUsers = userIdsSharingIp(userId)
-    UserRepo.byId(userId) zip getPlayerAssessmentsByUserId(userId, nb) zip relatedUsers zip
+    UserRepo
+      .byId(userId) zip getPlayerAssessmentsByUserId(userId, nb) zip relatedUsers zip
     (relatedUsers flatMap UserRepo.filterByEngine) map {
       case (((Some(user), assessedGamesHead :: assessedGamesTail), relatedUs),
             relatedCheaters) =>
@@ -135,8 +138,8 @@ final class AssessApi(collAssessments: Coll,
       case none => funit
     }
 
-  private val assessableSources: Set[Source] = Set(
-      Source.Lobby, Source.Tournament)
+  private val assessableSources: Set[Source] =
+    Set(Source.Lobby, Source.Tournament)
 
   def onGameReady(game: Game, white: User, black: User): Funit = {
 

@@ -64,13 +64,14 @@ object GenerateMIMAIgnore {
         val moduleSymbol = mirror.staticModule(className)
         val directlyPrivateSpark =
           isPackagePrivate(classSymbol) ||
-          isPackagePrivateModule(moduleSymbol) || classSymbol.isPrivate
+            isPackagePrivateModule(moduleSymbol) || classSymbol.isPrivate
         /* Inner classes defined within a private[spark] class or object are effectively
          invisible, so we account for them as package private. */
         lazy val indirectlyPrivateSpark = {
           val maybeOuter = className.toString.takeWhile(_ != '$')
           if (maybeOuter != className) {
-            isPackagePrivate(mirror.classSymbol(
+            isPackagePrivate(
+                mirror.classSymbol(
                     Class.forName(maybeOuter, false, classLoader))) ||
             isPackagePrivateModule(mirror.staticModule(maybeOuter))
           } else {
@@ -109,7 +110,7 @@ object GenerateMIMAIgnore {
         // scalastyle:off println
         println(
             "[WARN] Unable to detect inner functions for class:" +
-            classSymbol.fullName)
+              classSymbol.fullName)
         // scalastyle:on println
         Seq.empty[String]
     }

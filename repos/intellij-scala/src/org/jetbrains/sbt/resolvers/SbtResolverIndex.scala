@@ -36,12 +36,12 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
     val gavMap = mutable.HashMap.empty[String, mutable.Set[String]]
     def processArtifact(artifact: ArtifactInfo) {
       agMap.getOrElseUpdate(artifact.getArtifactId, mutable.Set.empty) +=
-        artifact.getGroupId
+      artifact.getGroupId
       gaMap.getOrElseUpdate(artifact.getGroupId, mutable.Set.empty) +=
-        artifact.getArtifactId
-      gavMap.getOrElseUpdate(
-          SbtResolverUtils.joinGroupArtifact(artifact), mutable.Set.empty) +=
-        artifact.getVersion
+      artifact.getArtifactId
+      gavMap.getOrElseUpdate(SbtResolverUtils.joinGroupArtifact(artifact),
+                             mutable.Set.empty) +=
+      artifact.getVersion
     }
 
     if (kind == SbtResolver.Kind.Maven)
@@ -116,8 +116,9 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
   }
 
   private def createPersistentMap(file: File) =
-    new PersistentHashMap[String, Set[String]](
-        file, new EnumeratorStringDescriptor, new SetDescriptor) {
+    new PersistentHashMap[String, Set[String]](file,
+                                               new EnumeratorStringDescriptor,
+                                               new SetDescriptor) {
       def getOrEmpty(key: String): Set[String] =
         try {
           Option(get(key)).getOrElse(Set.empty)

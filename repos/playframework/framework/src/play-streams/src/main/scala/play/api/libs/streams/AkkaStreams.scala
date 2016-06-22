@@ -37,30 +37,32 @@ object AkkaStreams {
       mergeStrategy: Graph[UniformFanInShape[Out, Out], _] =
         onlyFirstCanFinishMerge[Out](2))
     : Flow[FlowIn, Out, _] => Flow[In, Out, _] = { flow =>
-    val bypasser = Flow.fromGraph(GraphDSL
-          .create[FlowShape[Either[FlowIn, Out], Out]]() { implicit builder =>
-      import GraphDSL.Implicits._
+    val bypasser =
+      Flow.fromGraph(GraphDSL.create[FlowShape[Either[FlowIn, Out], Out]]() {
+        implicit builder =>
+          import GraphDSL.Implicits._
 
-      // Eager cancel must be true so that if the flow cancels, that will be propagated upstream.
-      // However, that means the bypasser must block cancel, since when this flow finishes, the merge
-      // will result in a cancel flowing up through the bypasser, which could lead to dropped messages.
-      val broadcast =
-        builder.add(Broadcast[Either[FlowIn, Out]](2, eagerCancel = true))
-      val merge = builder.add(mergeStrategy)
+          // Eager cancel must be true so that if the flow cancels, that will be propagated upstream.
+          // However, that means the bypasser must block cancel, since when this flow finishes, the merge
+          // will result in a cancel flowing up through the bypasser, which could lead to dropped messages.
+          val broadcast =
+            builder.add(Broadcast[Either[FlowIn, Out]](2, eagerCancel = true))
+          val merge = builder.add(mergeStrategy)
 
-      // Normal flow
-      broadcast.out(0) ~> Flow[Either[FlowIn, Out]].collect {
-        case Left(in) => in
-      } ~> flow ~> merge.in(0)
+          // Normal flow
+          broadcast.out(0) ~> Flow[Either[FlowIn, Out]].collect {
+            case Left(in) => in
+          } ~> flow ~> merge.in(0)
 
-      // Bypass flow, need to ignore downstream finish
-      broadcast.out(1) ~> ignoreAfterCancellation[Either[FlowIn, Out]] ~> Flow[
-          Either[FlowIn, Out]].collect {
-        case Right(out) => out
-      } ~> merge.in(1)
+          // Bypass flow, need to ignore downstream finish
+          broadcast
+            .out(1) ~> ignoreAfterCancellation[Either[FlowIn, Out]] ~> Flow[
+              Either[FlowIn, Out]].collect {
+            case Right(out) => out
+          } ~> merge.in(1)
 
-      FlowShape(broadcast.in, merge.out)
-    })
+          FlowShape(broadcast.in, merge.out)
+      })
 
     splitter via bypasser
   }
@@ -106,8 +108,7 @@ object AkkaStreams {
     * A flow that will ignore downstream cancellation, and instead will continue receiving and ignoring the stream.
     */
   def ignoreAfterCancellation[T]: Flow[T, T, Future[Done]] = {
-    Flow.fromGraph(
-        GraphDSL.create(Sink.ignore) { implicit builder => ignore =>
+    Flow.fromGraph(GraphDSL.create(Sink.ignore) { implicit builder => ignore =>
       import GraphDSL.Implicits._
       // This pattern is an effective way to absorb cancellation, Sink.ignore will keep the broadcast always flowing
       // even after sink.inlet cancels.

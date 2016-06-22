@@ -32,8 +32,8 @@ import org.apache.spark.util.Utils
   * @param dir Directory to store files. Created if non-existent (but not recursively).
   * @param serializer Used to serialize our objects.
   */
-private[master] class FileSystemPersistenceEngine(
-    val dir: String, val serializer: Serializer)
+private[master] class FileSystemPersistenceEngine(val dir: String,
+                                                  val serializer: Serializer)
     extends PersistenceEngine
     with Logging {
 

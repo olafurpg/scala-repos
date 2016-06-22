@@ -89,8 +89,8 @@ object ArrayBuilder {
   }
 
   // Intrinsic
-  private def genericArrayBuilderResult[T](
-      runtimeClass: Class[_], a: js.Array[Any]): Array[T] = {
+  private def genericArrayBuilderResult[T](runtimeClass: Class[_],
+                                           a: js.Array[Any]): Array[T] = {
     val len = a.length
 
     if (classOf[Char] == runtimeClass) {

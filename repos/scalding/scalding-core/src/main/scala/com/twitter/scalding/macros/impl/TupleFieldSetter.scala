@@ -34,8 +34,9 @@ object TupleFieldSetter extends CaseClassFieldSetter {
     q"""()"""
   }
 
-  override def default(c: Context)(
-      idx: Int, container: c.TermName, fieldValue: c.Tree): c.Tree = {
+  override def default(c: Context)(idx: Int,
+                                   container: c.TermName,
+                                   fieldValue: c.Tree): c.Tree = {
     import c.universe._
     q"""$container.set($idx, $fieldValue)"""
   }

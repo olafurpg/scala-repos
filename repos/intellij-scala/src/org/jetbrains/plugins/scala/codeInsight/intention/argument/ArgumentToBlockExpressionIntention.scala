@@ -23,7 +23,7 @@ class ArgumentToBlockExpressionIntention
     (element match {
           case Parent(list: ScArgumentExprList)
               if list.exprs.size == 1 &&
-              !list.exprs(0).isInstanceOf[ScUnderscoreSection] =>
+                !list.exprs(0).isInstanceOf[ScUnderscoreSection] =>
             true
           case _ => false
         })

@@ -61,8 +61,8 @@ object FileJobManager {
   }
 }
 
-class FileJobManager[M[+ _]] private[FileJobManager](
-    workDir: File, monadM: Monad[M])
+class FileJobManager[M[+ _]] private[FileJobManager] (workDir: File,
+                                                      monadM: Monad[M])
     extends JobManager[M]
     with JobStateManager[M]
     with JobResultManager[M]
@@ -205,8 +205,9 @@ class FileJobManager[M[+ _]] private[FileJobManager](
 
     val jval = JObject(
         JField("message", JString(msg)) :: JField("progress", JNum(progress)) :: JField(
-            "unit", JString(unit)) ::
-        (extra map (JField("info", _) :: Nil) getOrElse Nil)
+            "unit",
+            JString(unit)) ::
+          (extra map (JField("info", _) :: Nil) getOrElse Nil)
     )
 
     cache
@@ -216,11 +217,12 @@ class FileJobManager[M[+ _]] private[FileJobManager](
           status match {
             case Some(curStatus)
                 if curStatus.id == prevStatus.getOrElse(curStatus.id) =>
-              for (m <- addMessage(jobId, JobManager.channels.Status, jval)) yield {
-                val Some(s) = Status.fromMessage(m)
-                cache += (jobId -> cache(jobId).copy(status = Some(s)))
-                Right(s)
-              }
+              for (m <- addMessage(jobId, JobManager.channels.Status, jval))
+                yield {
+                  val Some(s) = Status.fromMessage(m)
+                  cache += (jobId -> cache(jobId).copy(status = Some(s)))
+                  Right(s)
+                }
 
             case Some(_) =>
               M.point(Left("Current status did not match expected status."))
@@ -230,11 +232,12 @@ class FileJobManager[M[+ _]] private[FileJobManager](
                   Left("Job has not yet started, yet a status was expected."))
 
             case None =>
-              for (m <- addMessage(jobId, JobManager.channels.Status, jval)) yield {
-                val Some(s) = Status.fromMessage(m)
-                cache += (jobId -> cache(jobId).copy(status = Some(s)))
-                Right(s)
-              }
+              for (m <- addMessage(jobId, JobManager.channels.Status, jval))
+                yield {
+                  val Some(s) = Status.fromMessage(m)
+                  cache += (jobId -> cache(jobId).copy(status = Some(s)))
+                  Right(s)
+                }
           }
       }
       .getOrElse(M.point(Left("No job found for jobId " + jobId)))
@@ -314,8 +317,9 @@ class FileJobManager[M[+ _]] private[FileJobManager](
   }
 }
 
-case class FileJobState(
-    job: Job, status: Option[Status], messages: Map[ChannelId, List[Message]])
+case class FileJobState(job: Job,
+                        status: Option[Status],
+                        messages: Map[ChannelId, List[Message]])
 
 object FileJobState {
   val test = implicitly[Decomposer[Option[Status]]]
@@ -325,8 +329,8 @@ object FileJobState {
 
   val schemaV1 = "job" :: "status" :: "messages" :: HNil
 
-  implicit val fjsDecomposerV1: Decomposer[FileJobState] = decomposerV(
-      schemaV1, Some("1.0".v))
-  implicit val fjsExtractorV1: Extractor[FileJobState] = extractorV(
-      schemaV1, Some("1.0".v))
+  implicit val fjsDecomposerV1: Decomposer[FileJobState] =
+    decomposerV(schemaV1, Some("1.0".v))
+  implicit val fjsExtractorV1: Extractor[FileJobState] =
+    extractorV(schemaV1, Some("1.0".v))
 }

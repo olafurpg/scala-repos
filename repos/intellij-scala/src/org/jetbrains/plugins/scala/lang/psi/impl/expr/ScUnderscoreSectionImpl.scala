@@ -33,11 +33,12 @@ class ScUnderscoreSectionImpl(node: ASTNode)
             case ScTypePolymorphicType(internalType, typeParameters) =>
               ScTypePolymorphicType(
                   ScMethodType(internalType, Nil, isImplicit = false)(
-                      getProject, getResolveScope),
+                      getProject,
+                      getResolveScope),
                   typeParameters)
             case tp: ScType =>
-              ScMethodType(tp, Nil, isImplicit = false)(
-                  getProject, getResolveScope)
+              ScMethodType(tp, Nil, isImplicit = false)(getProject,
+                                                        getResolveScope)
           }
         }
         ref.bind() match {
@@ -90,10 +91,8 @@ class ScUnderscoreSectionImpl(node: ASTNode)
             val i =
               unders.indexWhere(_.getTextRange.getStartOffset == startOffset)
             if (i < 0) return Failure("Not found under", None)
-            var result: Option[ScType] =
-              null //strange logic to handle problems with detecting type
-            var forEqualsParamLength: Boolean =
-              false //this is for working completion
+            var result: Option[ScType] = null //strange logic to handle problems with detecting type
+            var forEqualsParamLength: Boolean = false //this is for working completion
             for (tp <- expr.expectedTypes(fromUnderscore = false)
                  if result != None) {
 

@@ -155,8 +155,8 @@ class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite {
       if (i < numFields1) {
         assert(output.isNullAt(i) === row1.isNullAt(i), dumpDebug())
       } else {
-        assert(
-            output.isNullAt(i) === row2.isNullAt(i - numFields1), dumpDebug())
+        assert(output.isNullAt(i) === row2.isNullAt(i - numFields1),
+               dumpDebug())
       }
     }
   }

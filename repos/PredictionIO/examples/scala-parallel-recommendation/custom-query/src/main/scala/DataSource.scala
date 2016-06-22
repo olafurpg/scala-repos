@@ -21,8 +21,10 @@ object Item {
 }
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[TrainingData,
+                        EmptyEvaluationInfo,
+                        Query,
+                        EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
   private lazy val EntityType = "movie"
@@ -81,5 +83,5 @@ class TrainingData(val ratings: RDD[Rating], val items: RDD[(String, Item)])
 
   override def toString =
     s"ratings: [${ratings.count()}] (${ratings.take(2).toList}...)" +
-    s"items: [${items.count()} (${items.take(2).toList}...)]"
+      s"items: [${items.count()} (${items.take(2).toList}...)]"
 }

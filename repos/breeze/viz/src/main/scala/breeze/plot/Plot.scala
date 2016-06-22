@@ -159,10 +159,10 @@ class Plot() {
 
   // set integer tick units by default
   Array(xaxis, yaxis) foreach
-  (axis => {
-        axis.setAutoRangeIncludesZero(false)
-        axis.setStandardTickUnits(Plot.integerTickUnits)
-      })
+    (axis => {
+          axis.setAutoRangeIncludesZero(false)
+          axis.setStandardTickUnits(Plot.integerTickUnits)
+        })
 
   /** The JFreeChart plot object. */
   lazy val plot = {
@@ -244,13 +244,11 @@ object Plot {
   def stroke(series: Int) =
     strokes(series % strokes.length)
 
-  val fillPaints =
-    paints; // DefaultDrawingSupplier.DEFAULT_FILL_PAINT_SEQUENCE
+  val fillPaints = paints; // DefaultDrawingSupplier.DEFAULT_FILL_PAINT_SEQUENCE
   def fillPaint(series: Int) =
     fillPaints(series % fillPaints.length)
 
-  val outlinePaints =
-    paints; // DefaultDrawingSupplier.DEFAULT_OUTLINE_PAINT_SEQUENCE
+  val outlinePaints = paints; // DefaultDrawingSupplier.DEFAULT_OUTLINE_PAINT_SEQUENCE
   def outlinePaint(series: Int) =
     outlinePaints(series % outlinePaints.length)
 
@@ -386,8 +384,9 @@ object Plot {
       delegate(series)(_.setSeriesVisible(_, visible))
     }
 
-    override def setSeriesVisible(
-        series: Int, visible: lang.Boolean, notify: Boolean) {
+    override def setSeriesVisible(series: Int,
+                                  visible: lang.Boolean,
+                                  notify: Boolean) {
       delegate(series)(_.setSeriesVisible(_, visible, notify))
     }
 
@@ -408,8 +407,9 @@ object Plot {
       delegate(series)(_.setSeriesVisibleInLegend(_, visible))
     }
 
-    override def setSeriesVisibleInLegend(
-        series: Int, visible: lang.Boolean, notify: Boolean) {
+    override def setSeriesVisibleInLegend(series: Int,
+                                          visible: lang.Boolean,
+                                          notify: Boolean) {
       delegate(series)(_.setSeriesVisibleInLegend(_, visible, notify))
     }
 

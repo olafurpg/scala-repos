@@ -185,8 +185,10 @@ class PrefixSpan private (private var minSupport: Double,
       }
     }.persist(StorageLevel.MEMORY_AND_DISK)
 
-    val results = genFreqPatterns(
-        dataInternalRepr, minCount, maxPatternLength, maxLocalProjDBSize)
+    val results = genFreqPatterns(dataInternalRepr,
+                                  minCount,
+                                  maxPatternLength,
+                                  maxLocalProjDBSize)
 
     def toPublicRepr(pattern: Array[Int]): Array[Array[Item]] = {
       val sequenceBuilder = mutable.ArrayBuilder.make[Array[Item]]
@@ -223,8 +225,9 @@ class PrefixSpan private (private var minSupport: Double,
     * @return a [[PrefixSpanModel]] that contains the frequent sequential patterns
     */
   @Since("1.5.0")
-  def run[
-      Item, Itemset <: jl.Iterable[Item], Sequence <: jl.Iterable[Itemset]](
+  def run[Item,
+          Itemset <: jl.Iterable[Item],
+          Sequence <: jl.Iterable[Itemset]](
       data: JavaRDD[Sequence]): PrefixSpanModel[Item] = {
     implicit val tag = fakeClassTag[Item]
     run(data.rdd.map(_.asScala.map(_.asScala.toArray).toArray))
@@ -402,7 +405,7 @@ object PrefixSpan extends Logging {
       require(
           partialStarts.head >= start,
           "The first partial start cannot be smaller than the start index," +
-          s"but got partialStarts.head = ${partialStarts.head} < start = $start.")
+            s"but got partialStarts.head = ${partialStarts.head} < start = $start.")
     }
 
     /**
@@ -553,8 +556,9 @@ object PrefixSpan extends Logging {
       */
     def compressed: Postfix = {
       if (start > 0) {
-        new Postfix(
-            items.slice(start, items.length), 0, partialStarts.map(_ - start))
+        new Postfix(items.slice(start, items.length),
+                    0,
+                    partialStarts.map(_ - start))
       } else {
         this
       }

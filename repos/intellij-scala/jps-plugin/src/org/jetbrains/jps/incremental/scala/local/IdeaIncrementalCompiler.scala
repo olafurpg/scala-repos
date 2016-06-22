@@ -27,8 +27,10 @@ class IdeaIncrementalCompiler(scalac: AnalyzingCompiler)
       else CompileOutput(compilationData.outputGroups: _*)
     val cArgs = new CompilerArguments(scalac.scalaInstance, scalac.cp)
     val options =
-      "IntellijIdea.simpleAnalysis" +: cArgs(
-          Nil, compilationData.classpath, None, compilationData.scalaOptions)
+      "IntellijIdea.simpleAnalysis" +: cArgs(Nil,
+                                             compilationData.classpath,
+                                             None,
+                                             compilationData.scalaOptions)
 
     try scalac.compile(compilationData.sources,
                        emptyChanges,
@@ -59,10 +61,13 @@ private class ClientCallback(client: Client) extends ClientCallbackBase {
 }
 
 abstract class ClientCallbackBase extends xsbti.AnalysisCallback {
+  override def sourceDependency(dependsOn: File,
+                                source: File,
+                                publicInherited: Boolean): Unit = {}
   override def sourceDependency(
-      dependsOn: File, source: File, publicInherited: Boolean): Unit = {}
-  override def sourceDependency(
-      file: File, file1: File, dependencyContext: DependencyContext): Unit = {}
+      file: File,
+      file1: File,
+      dependencyContext: DependencyContext): Unit = {}
   override def binaryDependency(binary: File,
                                 name: String,
                                 source: File,

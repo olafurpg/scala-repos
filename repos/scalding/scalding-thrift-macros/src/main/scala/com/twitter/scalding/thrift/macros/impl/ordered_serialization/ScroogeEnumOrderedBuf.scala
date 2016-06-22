@@ -39,8 +39,8 @@ object ScroogeEnumOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+      override def compareBinary(inputStreamA: ctx.TermName,
+                                 inputStreamB: ctx.TermName) =
         q"""
         _root_.java.lang.Integer.compare($inputStreamA.readPosVarInt, $inputStreamB.readPosVarInt)
         """
@@ -52,8 +52,8 @@ object ScroogeEnumOrderedBuf {
         q"$inputStream.writePosVarInt($element.value)"
       override def get(inputStream: ctx.TermName): ctx.Tree =
         q"${outerType.typeSymbol.companionSymbol}.apply($inputStream.readPosVarInt)"
-      override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
+      override def compare(elementA: ctx.TermName,
+                           elementB: ctx.TermName): ctx.Tree =
         q"""
         _root_.java.lang.Integer.compare($elementA.value, $elementB.value) : Int
         """

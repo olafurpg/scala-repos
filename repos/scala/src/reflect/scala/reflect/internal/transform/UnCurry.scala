@@ -38,8 +38,8 @@ trait UnCurry {
           apply(
               MethodType(params ::: existentiallyAbstractedParam1s,
                          substitutedResult))
-        case MethodType(
-            params, ExistentialType(tparams, restpe @ MethodType(_, _))) =>
+        case MethodType(params,
+                        ExistentialType(tparams, restpe @ MethodType(_, _))) =>
           abort("unexpected curried method types with intervening existential")
         case MethodType(h :: t, restpe) if h.isImplicit =>
           apply(MethodType(h.cloneSymbol.resetFlag(IMPLICIT) :: t, restpe))

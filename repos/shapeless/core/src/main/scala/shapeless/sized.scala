@@ -40,7 +40,8 @@ final class Sized[+Repr, L <: Nat] private (val unsized: Repr) {
   * @author Miles Sabin
   */
 class SizedOps[A0, Repr: AdditiveCollection, L <: Nat](
-    s: Sized[Repr, L], itl: IsTraversableLike[Repr] { type A = A0 }) { outer =>
+    s: Sized[Repr, L],
+    itl: IsTraversableLike[Repr] { type A = A0 }) { outer =>
   import nat._
   import ops.nat._
   import LT._
@@ -187,8 +188,8 @@ class SizedOps[A0, Repr: AdditiveCollection, L <: Nat](
   /**
     * Converts this `Sized` to a tuple whose elements have the same type as in `Repr`.
     */
-  def tupled[L0 <: HList, T](
-      implicit hl: ToHList.Aux[Repr, L, L0], t: Tupler.Aux[L0, T]): T =
+  def tupled[L0 <: HList, T](implicit hl: ToHList.Aux[Repr, L, L0],
+                             t: Tupler.Aux[L0, T]): T =
     t(hl(s))
 }
 

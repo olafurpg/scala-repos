@@ -15,8 +15,10 @@ class MockScheduledExecutorService
     throw new Exception
   def schedule(command: Runnable, delay: Long, unit: TimeUnit) =
     throw new Exception
-  def scheduleWithFixedDelay(
-      command: Runnable, initialDelay: Long, delay: Long, unit: TimeUnit) =
+  def scheduleWithFixedDelay(command: Runnable,
+                             initialDelay: Long,
+                             delay: Long,
+                             unit: TimeUnit) =
     throw new Exception
   def execute(command: Runnable) = throw new Exception
   def awaitTermination(timeout: Long, unit: TimeUnit) = throw new Exception

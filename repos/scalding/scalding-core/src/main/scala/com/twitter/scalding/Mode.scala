@@ -51,8 +51,8 @@ object Mode {
     * a work-around for the fact that Job only accepts an Args object,
     * but needs a Mode inside.
     */
-  private class ArgsWithMode(
-      argsMap: Map[String, List[String]], val mode: Mode)
+  private class ArgsWithMode(argsMap: Map[String, List[String]],
+                             val mode: Mode)
       extends Args(argsMap) {
     override def +(keyvals: (String, Iterable[String])): Args =
       new ArgsWithMode(super.+(keyvals).m, mode)
@@ -75,8 +75,7 @@ object Mode {
 
   val DefaultHadoop2Mr1FlowConnector =
     "cascading.flow.hadoop2.Hadoop2MR1FlowConnector"
-  val DefaultHadoop2Mr1FlowProcess =
-    "cascading.flow.hadoop.HadoopFlowProcess" // no Hadoop2MR1FlowProcess as of Cascading 3.0.0-wip-75?
+  val DefaultHadoop2Mr1FlowProcess = "cascading.flow.hadoop.HadoopFlowProcess" // no Hadoop2MR1FlowProcess as of Cascading 3.0.0-wip-75?
 
   val DefaultHadoop2TezFlowConnector =
     "cascading.flow.tez.Hadoop2TezFlowConnector"
@@ -100,13 +99,13 @@ object Mode {
       config.set(CascadingFlowProcessClassKey, DefaultHadoopFlowProcess)
       Hdfs(strictSources, config)
     } else if (args.boolean("hadoop2-mr1")) {
-      config.set(
-          CascadingFlowConnectorClassKey, DefaultHadoop2Mr1FlowConnector)
+      config
+        .set(CascadingFlowConnectorClassKey, DefaultHadoop2Mr1FlowConnector)
       config.set(CascadingFlowProcessClassKey, DefaultHadoop2Mr1FlowProcess)
       Hdfs(strictSources, config)
     } else if (args.boolean("hadoop2-tez")) {
-      config.set(
-          CascadingFlowConnectorClassKey, DefaultHadoop2TezFlowConnector)
+      config
+        .set(CascadingFlowConnectorClassKey, DefaultHadoop2TezFlowConnector)
       config.set(CascadingFlowProcessClassKey, DefaultHadoop2TezFlowProcess)
       Hdfs(strictSources, config)
     } else
@@ -157,8 +156,8 @@ trait HadoopMode extends Mode {
       case None => asMap
     }
 
-    val flowConnectorClass = jobConf.get(
-        Mode.CascadingFlowConnectorClassKey, Mode.DefaultHadoopFlowConnector)
+    val flowConnectorClass = jobConf.get(Mode.CascadingFlowConnectorClassKey,
+                                         Mode.DefaultHadoopFlowConnector)
 
     try {
       val clazz = Class.forName(flowConnectorClass)
@@ -166,11 +165,11 @@ trait HadoopMode extends Mode {
       ctor.newInstance(finalMap.asJava).asInstanceOf[FlowConnector]
     } catch {
       case ncd: ClassNotFoundException => {
-          throw new ModeLoadException(
-              "Failed to load Cascading flow connector class " +
+        throw new ModeLoadException(
+            "Failed to load Cascading flow connector class " +
               flowConnectorClass,
-              ncd)
-        }
+            ncd)
+      }
     }
   }
 
@@ -181,8 +180,8 @@ trait HadoopMode extends Mode {
     // copy over Config
     config.toMap.foreach { case (k, v) => conf.set(k, v) }
 
-    val flowProcessClass = jobConf.get(
-        Mode.CascadingFlowProcessClassKey, Mode.DefaultHadoopFlowProcess)
+    val flowProcessClass = jobConf
+      .get(Mode.CascadingFlowProcessClassKey, Mode.DefaultHadoopFlowProcess)
 
     val fp = try {
       val clazz = Class.forName(flowProcessClass)
@@ -190,11 +189,11 @@ trait HadoopMode extends Mode {
       ctor.newInstance(conf).asInstanceOf[FlowProcess[JobConf]]
     } catch {
       case ncd: ClassNotFoundException => {
-          throw new ModeLoadException(
-              "Failed to load Cascading flow process class " +
+        throw new ModeLoadException(
+            "Failed to load Cascading flow process class " +
               flowProcessClass,
-              ncd)
-        }
+            ncd)
+      }
     }
 
     htap.retrieveSourceFields(fp)
@@ -266,7 +265,8 @@ case class HadoopTest(@transient conf: Configuration,
   def getWritePathFor(src: Source): String = {
     val rndIdx = new java.util.Random().nextInt(1 << 30)
     writePaths.getOrElseUpdate(
-        src, allocateNewPath(basePath + src.getClass.getName, rndIdx))
+        src,
+        allocateNewPath(basePath + src.getClass.getName, rndIdx))
   }
 
   def finalize(src: Source) {

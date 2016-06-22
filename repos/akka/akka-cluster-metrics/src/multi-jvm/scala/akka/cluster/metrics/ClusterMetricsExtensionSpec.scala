@@ -30,7 +30,7 @@ trait ClusterMetricsCommonConfig extends MultiNodeConfig {
     nodeConfig(role) {
       parseString(
           "akka.cluster.metrics.native-library-extract-folder=${user.dir}/target/native/" +
-          role.name)
+            role.name)
     }
   }
 
@@ -40,14 +40,16 @@ trait ClusterMetricsCommonConfig extends MultiNodeConfig {
 
   // Enable metrics extension in akka-cluster-metrics.
   def enableMetricsExtension =
-    parseString("""
+    parseString(
+        """
     akka.extensions=["akka.cluster.metrics.ClusterMetricsExtension"]
     akka.cluster.metrics.collector.enabled = on
     """)
 
   // Disable metrics extension in akka-cluster-metrics.
   def disableMetricsExtension =
-    parseString("""
+    parseString(
+        """
     akka.extensions=["akka.cluster.metrics.ClusterMetricsExtension"]
     akka.cluster.metrics.collector.enabled = off
     """)

@@ -29,17 +29,20 @@ class ScExtendsBlockElementType
     }
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScExtendsBlockStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScExtendsBlockStub = {
     val n = dataStream.readInt
     val baseClasses = new Array[StringRef](n)
     for (i <- 0 until n) baseClasses(i) = dataStream.readName
     new ScExtendsBlockStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this, baseClasses)
+        parentStub.asInstanceOf[StubElement[PsiElement]],
+        this,
+        baseClasses)
   }
 
   def createStubImpl[ParentPsi <: PsiElement](
-      psi: ScExtendsBlock, parentStub: StubElement[ParentPsi]) = {
+      psi: ScExtendsBlock,
+      parentStub: StubElement[ParentPsi]) = {
     val baseNames = psi.directSupersNames
     new ScExtendsBlockStubImpl(parentStub, this, baseNames.toArray)
   }

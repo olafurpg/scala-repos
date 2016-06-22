@@ -61,7 +61,8 @@ class Word2VecSuite
     )
 
     val expected = doc.map { sentence =>
-      Vectors.dense(sentence
+      Vectors.dense(
+          sentence
             .map(codes.apply)
             .reduce((word1, word2) =>
                   word1.zip(word2).map { case (v1, v2) => v1 + v2 })
@@ -82,8 +83,8 @@ class Word2VecSuite
 
     // These expectations are just magic values, characterizing the current
     // behavior.  The test needs to be updated to be more general, see SPARK-11502
-    val magicExp = Vectors.dense(
-        0.30153007534417237, -0.6833061711354689, 0.5116530778733167)
+    val magicExp = Vectors
+      .dense(0.30153007534417237, -0.6833061711354689, 0.5116530778733167)
     model.transform(docDF).select("result", "expected").collect().foreach {
       case Row(vector1: Vector, vector2: Vector) =>
         assert(vector1 ~== magicExp absTol 1E-5,
@@ -134,12 +135,15 @@ class Word2VecSuite
     // These expectations are just magic values, characterizing the current
     // behavior.  The test needs to be updated to be more general, see SPARK-11502
     val magicExpected = Seq(
-        Vectors.dense(
-            0.3326166272163391, -0.5603077411651611, -0.2309209555387497),
-        Vectors.dense(
-            0.32463887333869934, -0.9306551218032837, 1.393115520477295),
-        Vectors.dense(
-            -0.27150997519493103, 0.4372006058692932, -0.13465698063373566)
+        Vectors.dense(0.3326166272163391,
+                      -0.5603077411651611,
+                      -0.2309209555387497),
+        Vectors.dense(0.32463887333869934,
+                      -0.9306551218032837,
+                      1.393115520477295),
+        Vectors.dense(-0.27150997519493103,
+                      0.4372006058692932,
+                      -0.13465698063373566)
     )
 
     realVectors.zip(magicExpected).foreach {

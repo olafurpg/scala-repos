@@ -82,7 +82,8 @@ object SourceCodeGenerator {
                               password = password.getOrElse(null),
                               keepAliveConnection = true)
     try {
-      val m = Await.result(db.run(profileInstance
+      val m = Await.result(db.run(
+                               profileInstance
                                  .createModel(None, ignoreInvalidDefaults)(
                                      ExecutionContext.global)
                                  .withPinnedSession),
@@ -101,7 +102,8 @@ object SourceCodeGenerator {
     val profile =
       if (dc.profileIsObject) dc.profileName else "new " + dc.profileName
     try {
-      val m = Await.result(dc.db.run(dc.profile
+      val m = Await.result(dc.db.run(
+                               dc.profile
                                  .createModel(None, ignoreInvalidDefaults)(
                                      ExecutionContext.global)
                                  .withPinnedSession),
@@ -137,7 +139,8 @@ object SourceCodeGenerator {
             Some(password),
             ignoreInvalidDefaults.toBoolean)
       case _ => {
-          println("""
+        println(
+            """
             |Usage:
             |  SourceCodeGenerator configURI [outputDir]
             |  SourceCodeGenerator profile jdbcDriver url outputDir pkg [user password]
@@ -158,8 +161,8 @@ object SourceCodeGenerator {
             |slick.basic.DatabaseConfig you can set "codegen.package" and
             |"codegen.outputDir". The latter can be overridden on the command line.
           """.stripMargin.trim)
-          System.exit(1)
-        }
+        System.exit(1)
+      }
     }
   }
 }

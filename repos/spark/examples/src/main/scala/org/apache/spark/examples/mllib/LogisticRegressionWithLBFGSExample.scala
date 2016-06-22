@@ -59,8 +59,8 @@ object LogisticRegressionWithLBFGSExample {
 
     // Save and load model
     model.save(sc, "target/tmp/scalaLogisticRegressionWithLBFGSModel")
-    val sameModel = LogisticRegressionModel.load(
-        sc, "target/tmp/scalaLogisticRegressionWithLBFGSModel")
+    val sameModel = LogisticRegressionModel
+      .load(sc, "target/tmp/scalaLogisticRegressionWithLBFGSModel")
     // $example off$
 
     sc.stop()

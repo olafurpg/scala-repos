@@ -35,8 +35,8 @@ trait MemberLookup extends base.MemberLookupBase { thisFactory: ModelFactory =>
     case _ => link.toString
   }
 
-  override def findExternalLink(
-      sym: Symbol, name: String): Option[LinkToExternal] = {
+  override def findExternalLink(sym: Symbol,
+                                name: String): Option[LinkToExternal] = {
     val sym1 =
       if (sym == AnyClass || sym == AnyRefClass || sym == AnyValClass ||
           sym == NothingClass) ListClass

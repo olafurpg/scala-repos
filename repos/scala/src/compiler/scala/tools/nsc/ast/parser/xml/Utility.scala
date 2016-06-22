@@ -36,8 +36,9 @@ object Utility {
   private final def unescape(ref: String, s: StringBuilder): StringBuilder =
     ((unescMap get ref) map (s append _)).orNull
 
-  def parseAttributeValue[T](
-      value: String, text: String => T, entityRef: String => T): List[T] = {
+  def parseAttributeValue[T](value: String,
+                             text: String => T,
+                             entityRef: String => T): List[T] = {
     val sb = new StringBuilder
     var rfb: StringBuilder = null
     val nb = new mutable.ListBuffer[T]()
@@ -111,8 +112,9 @@ object Utility {
         case 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D' | 'E' |
             'F' =>
           if (!hex)
-            reportSyntaxError("hex char not allowed in decimal char ref\n" +
-                "Did you mean to write &#x ?")
+            reportSyntaxError(
+                "hex char not allowed in decimal char ref\n" +
+                  "Did you mean to write &#x ?")
           else i = i * base + ch().asDigit
         case SU =>
           reportTruncatedError("")

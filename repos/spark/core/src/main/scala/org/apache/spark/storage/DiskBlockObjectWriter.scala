@@ -169,7 +169,7 @@ private[spark] class DiskBlockObjectWriter(
     } catch {
       case e: Exception =>
         logError("Uncaught exception while reverting partial writes to file " +
-                 file,
+                   file,
                  e)
         file
     }

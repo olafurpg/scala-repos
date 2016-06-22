@@ -128,8 +128,9 @@ class DeploymentPlanTest
       AppDefinition("/app2".toPath, Some("cmd2"), versionInfo = versionInfo)
     val app3: AppDefinition =
       AppDefinition("/app3".toPath, Some("cmd3"), versionInfo = versionInfo)
-    val unchanged: AppDefinition = AppDefinition(
-        "/unchanged".toPath, Some("unchanged"), versionInfo = versionInfo)
+    val unchanged: AppDefinition = AppDefinition("/unchanged".toPath,
+                                                 Some("unchanged"),
+                                                 versionInfo = versionInfo)
 
     val apps = Set(app, app2, app3, unchanged)
 
@@ -164,12 +165,12 @@ class DeploymentPlanTest
                     Some("mng1"),
                     instances = 4,
                     upgradeStrategy = strategy,
-                    versionInfo =
-                      versionInfo) -> AppDefinition(mongoId,
-                                                    Some("mng2"),
-                                                    instances = 8,
-                                                    upgradeStrategy = strategy,
-                                                    versionInfo = versionInfo)
+                    versionInfo = versionInfo) -> AppDefinition(
+          mongoId,
+          Some("mng2"),
+          instances = 8,
+          upgradeStrategy = strategy,
+          versionInfo = versionInfo)
 
     val service: (AppDefinition, AppDefinition) =
       AppDefinition(serviceId,
@@ -253,24 +254,24 @@ class DeploymentPlanTest
                     Some("mng1"),
                     instances = 4,
                     upgradeStrategy = strategy,
-                    versionInfo =
-                      versionInfo) -> AppDefinition(mongoId,
-                                                    Some("mng2"),
-                                                    instances = 8,
-                                                    upgradeStrategy = strategy,
-                                                    versionInfo = versionInfo)
+                    versionInfo = versionInfo) -> AppDefinition(
+          mongoId,
+          Some("mng2"),
+          instances = 8,
+          upgradeStrategy = strategy,
+          versionInfo = versionInfo)
 
     val service =
       AppDefinition(serviceId,
                     Some("srv1"),
                     instances = 4,
                     upgradeStrategy = strategy,
-                    versionInfo =
-                      versionInfo) -> AppDefinition(serviceId,
-                                                    Some("srv2"),
-                                                    instances = 10,
-                                                    upgradeStrategy = strategy,
-                                                    versionInfo = versionInfo)
+                    versionInfo = versionInfo) -> AppDefinition(
+          serviceId,
+          Some("srv2"),
+          instances = 10,
+          upgradeStrategy = strategy,
+          versionInfo = versionInfo)
 
     val from: Group = Group("/test".toPath,
                             groups = Set(
@@ -308,33 +309,35 @@ class DeploymentPlanTest
                     Some("mng1"),
                     instances = 4,
                     upgradeStrategy = strategy,
-                    versionInfo =
-                      versionInfo) -> AppDefinition(mongoId,
-                                                    Some("mng2"),
-                                                    instances = 8,
-                                                    upgradeStrategy = strategy,
-                                                    versionInfo = versionInfo)
+                    versionInfo = versionInfo) -> AppDefinition(
+          mongoId,
+          Some("mng2"),
+          instances = 8,
+          upgradeStrategy = strategy,
+          versionInfo = versionInfo)
 
     val service =
       AppDefinition(serviceId,
                     Some("srv1"),
                     instances = 4,
                     upgradeStrategy = strategy,
-                    versionInfo =
-                      versionInfo) -> AppDefinition(serviceId,
-                                                    Some("srv2"),
-                                                    dependencies =
-                                                      Set(mongoId),
-                                                    instances = 10,
-                                                    upgradeStrategy = strategy,
-                                                    versionInfo = versionInfo)
+                    versionInfo = versionInfo) -> AppDefinition(
+          serviceId,
+          Some("srv2"),
+          dependencies = Set(mongoId),
+          instances = 10,
+          upgradeStrategy = strategy,
+          versionInfo = versionInfo)
 
     val independent =
       AppDefinition(appId,
                     Some("app1"),
                     instances = 1,
                     upgradeStrategy = strategy) -> AppDefinition(
-          appId, Some("app2"), instances = 3, upgradeStrategy = strategy)
+          appId,
+          Some("app2"),
+          instances = 3,
+          upgradeStrategy = strategy)
 
     val toStop = AppDefinition("/test/service/toStop".toPath,
                                instances = 1,
@@ -362,7 +365,8 @@ class DeploymentPlanTest
     When("the deployment plan is computed")
     val plan = DeploymentPlan(from, to)
 
-    Then("the deployment contains steps for dependent and independent applications")
+    Then(
+        "the deployment contains steps for dependent and independent applications")
     plan.steps should have size (5)
 
     actionsOf(plan) should have size (6)
@@ -402,8 +406,9 @@ class DeploymentPlanTest
   test("Should create non-empty deployment plan when only args have changed") {
     val versionInfo: FullVersionInfo =
       AppDefinition.VersionInfo.forNewConfig(Timestamp(10))
-    val app = AppDefinition(
-        id = "/test".toPath, cmd = Some("sleep 5"), versionInfo = versionInfo)
+    val app = AppDefinition(id = "/test".toPath,
+                            cmd = Some("sleep 5"),
+                            versionInfo = versionInfo)
     val appNew = app.copy(args = Some(Seq("foo")))
 
     val from = Group("/".toPath, apps = Set(app))
@@ -482,7 +487,9 @@ class DeploymentPlanTest
     Then("DeploymentSteps should include ScaleApplication w/ tasksToKill")
     plan.steps should not be empty
     plan.steps.head.actions.head shouldEqual ScaleApplication(
-        newApp, 5, Some(Set(taskToKill)))
+        newApp,
+        5,
+        Some(Set(taskToKill)))
   }
 
   test("Deployment plan allows valid updates for resident tasks") {
@@ -524,8 +531,8 @@ class DeploymentPlanTest
       PersistentVolume(path, PersistentVolumeInfo(123), mesos.Volume.Mode.RW)
     val zero = UpgradeStrategy(0, 0)
 
-    def residentApp(
-        id: String, volumes: Seq[PersistentVolume]): AppDefinition = {
+    def residentApp(id: String,
+                    volumes: Seq[PersistentVolume]): AppDefinition = {
       AppDefinition(
           id = PathId(id),
           container = Some(Container(mesos.ContainerInfo.Type.MESOS, volumes)),

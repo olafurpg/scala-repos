@@ -26,5 +26,5 @@ object Completion {
 
   def looksLikeInvocation(code: String) =
     ((code != null) && (code startsWith ".") && !(code == ".") &&
-        !(code startsWith "./") && !(code startsWith ".."))
+          !(code startsWith "./") && !(code startsWith ".."))
 }

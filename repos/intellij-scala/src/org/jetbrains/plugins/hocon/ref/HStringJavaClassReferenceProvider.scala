@@ -23,8 +23,9 @@ class HStringJavaClassReferenceProvider extends JavaClassReferenceProvider {
     }
   }
 
-  override def getReferencesByString(
-      str: String, position: PsiElement, offsetInPosition: Int) =
+  override def getReferencesByString(str: String,
+                                     position: PsiElement,
+                                     offsetInPosition: Int) =
     position match {
       case hstr: HString if isEligible(hstr) =>
         super.getReferencesByString(str, position, offsetInPosition)

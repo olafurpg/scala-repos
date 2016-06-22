@@ -71,8 +71,8 @@ trait Dist[@sp A] extends Any { self =>
       }
     }
 
-  def repeat[CC[X] <: Seq[X]](
-      n: Int)(implicit cbf: CanBuildFrom[Nothing, A, CC[A]]): Dist[CC[A]] =
+  def repeat[CC[X] <: Seq[X]](n: Int)(
+      implicit cbf: CanBuildFrom[Nothing, A, CC[A]]): Dist[CC[A]] =
     new Dist[CC[A]] {
       def apply(gen: Generator): CC[A] = {
         val builder = cbf()
@@ -112,7 +112,8 @@ trait Dist[@sp A] extends Any { self =>
   import scala.collection.generic.CanBuildFrom
 
   def sample[CC[X] <: Iterable[X]](n: Int)(
-      implicit gen: Generator, cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+      implicit gen: Generator,
+      cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val b = cbf()
     b.sizeHint(n)
     var i = 0
@@ -251,8 +252,8 @@ object Dist extends DistInstances8 {
   final def apply[A, B](f: A => B)(implicit na: Dist[A]): Dist[B] =
     na.map(f)
 
-  final def apply[A, B, C](f: (A, B) => C)(
-      implicit na: Dist[A], nb: Dist[B]): Dist[C] =
+  final def apply[A, B, C](f: (A, B) => C)(implicit na: Dist[A],
+                                           nb: Dist[B]): Dist[C] =
     na.zipWith(nb)(f)
 
   final def gen[A](f: Generator => A): Dist[A] =
@@ -327,8 +328,8 @@ object Dist extends DistInstances8 {
     Dist(
         (x: A, y: A) => if (order.lt(x, y)) Interval(x, y) else Interval(y, x))
 
-  implicit def option[A](
-      implicit no: Dist[Boolean], na: Dist[A]): Dist[Option[A]] =
+  implicit def option[A](implicit no: Dist[Boolean],
+                         na: Dist[A]): Dist[Option[A]] =
     new DistFromGen(g => if (no(g)) Some(na(g)) else None)
 
   implicit def either[A, B](implicit no: Dist[Boolean],
@@ -391,8 +392,8 @@ object Dist extends DistInstances8 {
   def constant[A](a: A): Dist[A] = new DistFromGen[A](g => a)
   def always[A](a: A): Dist[A] = new DistFromGen[A](g => a)
 
-  implicit def array[A: Dist: ClassTag](
-      minSize: Int, maxSize: Int): Dist[Array[A]] =
+  implicit def array[A: Dist: ClassTag](minSize: Int,
+                                        maxSize: Int): Dist[Array[A]] =
     new Dist[Array[A]] {
       private val d = maxSize - minSize + 1
       def apply(gen: Generator): Array[A] =
@@ -412,8 +413,8 @@ object Dist extends DistInstances8 {
   implicit def set[A: Dist](minInputs: Int, maxInputs: Int): Dist[Set[A]] =
     list[A](minInputs, maxInputs).map(_.toSet)
 
-  implicit def map[A: Dist, B: Dist](
-      minInputs: Int, maxInputs: Int): Dist[Map[A, B]] =
+  implicit def map[A: Dist, B: Dist](minInputs: Int,
+                                     maxInputs: Int): Dist[Map[A, B]] =
     list[(A, B)](minInputs, maxInputs).map(_.toMap)
 
   def oneOf[A: ClassTag](as: A*): Dist[A] = new Dist[A] {

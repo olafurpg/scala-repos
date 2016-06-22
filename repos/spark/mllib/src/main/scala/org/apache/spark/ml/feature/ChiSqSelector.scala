@@ -51,7 +51,7 @@ private[feature] trait ChiSqSelectorParams
       this,
       "numTopFeatures",
       "Number of features that selector will select, ordered by statistics value descending. If the" +
-      " number of features is < numTopFeatures, then this will select all features.",
+        " number of features is < numTopFeatures, then this will select all features.",
       ParamValidators.gtEq(1))
   setDefault(numTopFeatures -> 50)
 
@@ -115,7 +115,7 @@ object ChiSqSelector extends DefaultParamsReadable[ChiSqSelector] {
   * Model fitted by [[ChiSqSelector]].
   */
 @Experimental
-final class ChiSqSelectorModel private[ml](
+final class ChiSqSelectorModel private[ml] (
     override val uid: String,
     private val chiSqSelector: feature.ChiSqSelectorModel)
     extends Model[ChiSqSelectorModel]
@@ -140,8 +140,9 @@ final class ChiSqSelectorModel private[ml](
     val transformedSchema = transformSchema(dataset.schema, logging = true)
     val newField = transformedSchema.last
     val selector = udf { chiSqSelector.transform _ }
-    dataset.withColumn(
-        $(outputCol), selector(col($(featuresCol))), newField.metadata)
+    dataset.withColumn($(outputCol),
+                       selector(col($(featuresCol))),
+                       newField.metadata)
   }
 
   override def transformSchema(schema: StructType): StructType = {

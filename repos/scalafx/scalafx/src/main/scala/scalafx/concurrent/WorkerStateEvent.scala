@@ -125,7 +125,7 @@ class WorkerStateEvent(override val delegate: jfxc.WorkerStateEvent)
     *               EventTarget, otherwise the EventTarget for the event will be null.
     * @param eventType The type of event. This should not be null.
     */
-  def this(
-      worker: Worker[_], eventType: EventType[_ <: jfxc.WorkerStateEvent]) =
+  def this(worker: Worker[_],
+           eventType: EventType[_ <: jfxc.WorkerStateEvent]) =
     this(new jfxc.WorkerStateEvent(worker, eventType))
 }

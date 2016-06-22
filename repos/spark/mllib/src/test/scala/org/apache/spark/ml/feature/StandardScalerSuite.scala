@@ -70,8 +70,10 @@ class StandardScalerSuite
 
   test("params") {
     ParamsSuite.checkParams(new StandardScaler)
-    ParamsSuite.checkParams(new StandardScalerModel(
-            "empty", Vectors.dense(1.0), Vectors.dense(2.0)))
+    ParamsSuite.checkParams(
+        new StandardScalerModel("empty",
+                                Vectors.dense(1.0),
+                                Vectors.dense(2.0)))
   }
 
   test("Standardization with default parameter") {

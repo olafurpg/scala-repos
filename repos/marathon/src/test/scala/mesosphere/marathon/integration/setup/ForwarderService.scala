@@ -54,8 +54,9 @@ object ForwarderService {
     }
   }
 
-  class ForwarderAppModule(
-      myHostPort: String, httpConf: HttpConf, leaderProxyConf: LeaderProxyConf)
+  class ForwarderAppModule(myHostPort: String,
+                           httpConf: HttpConf,
+                           leaderProxyConf: LeaderProxyConf)
       extends BaseRestModule {
     @Named(ModuleNames.HOST_PORT)
     @Provides
@@ -114,8 +115,8 @@ object ForwarderService {
   def createHelloApp(args: String*): Service = {
     val conf = createConf(args: _*)
     log.info(s"Start hello app at ${conf.httpPort()}")
-    startImpl(
-        conf, new LeaderInfoModule(elected = true, leaderHostPort = None))
+    startImpl(conf,
+              new LeaderInfoModule(elected = true, leaderHostPort = None))
   }
 
   def createForwarder(forwardToPort: Int, args: String*): Service = {

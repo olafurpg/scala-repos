@@ -10,17 +10,17 @@ import lila.opening._
 
 object JsData extends lila.Steroids {
 
-  def apply(
-      opening: Opening,
-      identified: List[String],
-      userInfos: Option[lila.opening.UserInfos],
-      play: Boolean,
-      attempt: Option[Attempt],
-      win: Option[Boolean],
-      animationDuration: scala.concurrent.duration.Duration)(
+  def apply(opening: Opening,
+            identified: List[String],
+            userInfos: Option[lila.opening.UserInfos],
+            play: Boolean,
+            attempt: Option[Attempt],
+            win: Option[Boolean],
+            animationDuration: scala.concurrent.duration.Duration)(
       implicit ctx: Context) =
     Html(
-        Json.stringify(Json.obj(
+        Json.stringify(
+            Json.obj(
                 "opening" -> Json.obj(
                     "id" -> opening.id,
                     "rating" -> opening.perf.intRating,

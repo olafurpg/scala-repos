@@ -126,8 +126,8 @@ object NetUtil {
     case (netIp, mask) => (mask & ip) == netIp
   }
 
-  def isInetAddressInBlock(
-      inetAddress: InetAddress, ipBlock: (Int, Int)): Boolean =
+  def isInetAddressInBlock(inetAddress: InetAddress,
+                           ipBlock: (Int, Int)): Boolean =
     isIpInBlock(inetAddressToInt(inetAddress), ipBlock)
 
   def isIpInBlocks(ip: Int, ipBlocks: Iterable[(Int, Int)]): Boolean = {
@@ -140,8 +140,8 @@ object NetUtil {
     isIpInBlocks(ipToInt(ip), ipBlocks)
   }
 
-  def isInetAddressInBlocks(
-      inetAddress: InetAddress, ipBlocks: Iterable[(Int, Int)]): Boolean =
+  def isInetAddressInBlocks(inetAddress: InetAddress,
+                            ipBlocks: Iterable[(Int, Int)]): Boolean =
     isIpInBlocks(inetAddressToInt(inetAddress), ipBlocks)
 
   def getLocalHostName(): String = {

@@ -17,46 +17,56 @@ import org.jetbrains.plugins.scala.lang.completion.lookups.LookupElementManager
   * Date: 17.09.2009
   */
 class ScalaKeywordCompletionContributor extends ScalaCompletionContributor {
-  private def registerStandardCompletion(
-      filter: ElementFilter, keywords: String*) {
-    extend(
-        CompletionType.BASIC,
-        PlatformPatterns.psiElement.and(new FilterPattern(new AndFilter(
-                    new NotFilter(new LeftNeighbour(new TextFilter("."))),
-                    filter))),
-        new CompletionProvider[CompletionParameters] {
-          def addCompletions(parameters: CompletionParameters,
-                             context: ProcessingContext,
-                             result: CompletionResultSet) {
-            for (keyword <- keywords) {
-              result.addElement(LookupElementManager.getKeywrodLookupElement(
-                      keyword, positionFromParameters(parameters)))
-            }
-          }
-        })
+  private def registerStandardCompletion(filter: ElementFilter,
+                                         keywords: String*) {
+    extend(CompletionType.BASIC,
+           PlatformPatterns.psiElement.and(
+               new FilterPattern(new AndFilter(
+                       new NotFilter(new LeftNeighbour(new TextFilter("."))),
+                       filter))),
+           new CompletionProvider[CompletionParameters] {
+             def addCompletions(parameters: CompletionParameters,
+                                context: ProcessingContext,
+                                result: CompletionResultSet) {
+               for (keyword <- keywords) {
+                 result.addElement(
+                     LookupElementManager.getKeywrodLookupElement(
+                         keyword,
+                         positionFromParameters(parameters)))
+               }
+             }
+           })
   }
 
-  private def registerTypeAfterDotCompletion(
-      filter: ElementFilter, keywords: String*) {
-    extend(
-        CompletionType.BASIC,
-        PlatformPatterns.psiElement.and(new FilterPattern(new AndFilter(
-                    new LeftNeighbour(new TextFilter(".")), filter))),
-        new CompletionProvider[CompletionParameters] {
-          def addCompletions(parameters: CompletionParameters,
-                             context: ProcessingContext,
-                             result: CompletionResultSet) {
-            for (keyword <- keywords) {
-              result.addElement(LookupElementManager.getKeywrodLookupElement(
-                      keyword, positionFromParameters(parameters)))
-            }
-          }
-        })
+  private def registerTypeAfterDotCompletion(filter: ElementFilter,
+                                             keywords: String*) {
+    extend(CompletionType.BASIC,
+           PlatformPatterns.psiElement.and(
+               new FilterPattern(
+                   new AndFilter(new LeftNeighbour(new TextFilter(".")),
+                                 filter))),
+           new CompletionProvider[CompletionParameters] {
+             def addCompletions(parameters: CompletionParameters,
+                                context: ProcessingContext,
+                                result: CompletionResultSet) {
+               for (keyword <- keywords) {
+                 result.addElement(
+                     LookupElementManager.getKeywrodLookupElement(
+                         keyword,
+                         positionFromParameters(parameters)))
+               }
+             }
+           })
   }
 
   registerStandardCompletion(new PackageFilter, "package")
-  registerStandardCompletion(
-      new ExpressionFilter, "true", "false", "null", "new", "super", "this")
+  registerStandardCompletion(new ExpressionFilter,
+                             "true",
+                             "false",
+                             "null",
+                             "new",
+                             "super",
+                             "this")
   registerStandardCompletion(new ModifiersFilter,
                              "private",
                              "protected",

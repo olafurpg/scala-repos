@@ -46,12 +46,12 @@ trait EmailTypedField extends TypedField[String] {
   override def validations = validateEmail _ :: Nil
 }
 
-class EmailField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, maxLength: Int)
+class EmailField[OwnerType <: Record[OwnerType]](rec: OwnerType,
+                                                 maxLength: Int)
     extends StringField[OwnerType](rec, maxLength)
     with EmailTypedField
 
-class OptionalEmailField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, maxLength: Int)
+class OptionalEmailField[OwnerType <: Record[OwnerType]](rec: OwnerType,
+                                                         maxLength: Int)
     extends OptionalStringField[OwnerType](rec, maxLength)
     with EmailTypedField

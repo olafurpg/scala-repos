@@ -78,16 +78,18 @@ final class Slave(frameworkName: String,
   private def newRunner(): Try[Unit] = {
     val loader = new ScalaJSClassLoader(js.Dynamic.global)
     Try(
-        runner = framework.slaveRunner(
-            args.toArray, remoteArgs.toArray, loader, outboundRunnerMessage))
+        runner = framework.slaveRunner(args.toArray,
+                                       remoteArgs.toArray,
+                                       loader,
+                                       outboundRunnerMessage))
   }
 
   private def execute(data: js.Dynamic): Unit = {
     ensureRunnerExists()
 
     val sTask = data.serializedTask.asInstanceOf[String]
-    val task = runner.deserializeTask(
-        sTask, str => TaskDefSerializer.deserialize(js.JSON.parse(str)))
+    val task = runner.deserializeTask(sTask, str =>
+          TaskDefSerializer.deserialize(js.JSON.parse(str)))
 
     val eventHandler = new RemoteEventHandler
 

@@ -167,10 +167,10 @@ object Evolutions {
     val txt = scripts.map {
       case UpScript(ev) =>
         "# --- Rev:" + ev.revision + ",Ups - " + ev.hash.take(7) + "\n" +
-        ev.sql_up + "\n"
+          ev.sql_up + "\n"
       case DownScript(ev) =>
         "# --- Rev:" + ev.revision + ",Downs - " + ev.hash.take(7) + "\n" +
-        ev.sql_down + "\n"
+          ev.sql_down + "\n"
     }.mkString("\n")
 
     val hasDownWarning =
@@ -244,11 +244,11 @@ object Evolutions {
     * @param block The block to execute
     * @param schema The schema where all the play evolution tables are saved in
     */
-  def withEvolutions[T](
-      database: Database,
-      evolutionsReader: EvolutionsReader = ThisClassLoaderEvolutionsReader,
-      autocommit: Boolean = true,
-      schema: String = "")(block: => T): T = {
+  def withEvolutions[T](database: Database,
+                        evolutionsReader: EvolutionsReader =
+                          ThisClassLoaderEvolutionsReader,
+                        autocommit: Boolean = true,
+                        schema: String = "")(block: => T): T = {
     applyEvolutions(database, evolutionsReader, autocommit, schema)
     try {
       block
@@ -302,11 +302,12 @@ object OfflineEvolutions {
                   autocommit: Boolean = true,
                   schema: String = ""): Unit = {
     val evolutions = getEvolutions(appPath, classloader, dbApi)
-    val scripts = evolutions.evolutionsApi.scripts(
-        dbName, evolutions.evolutionsReader, schema)
+    val scripts = evolutions.evolutionsApi
+      .scripts(dbName, evolutions.evolutionsReader, schema)
     if (!isTest) {
-      logger.warn("Applying evolution scripts for database '" + dbName +
-          "':\n\n" + Evolutions.toHumanReadableScript(scripts))
+      logger.warn(
+          "Applying evolution scripts for database '" + dbName +
+            "':\n\n" + Evolutions.toHumanReadableScript(scripts))
     }
     evolutions.evolutionsApi.evolve(dbName, scripts, autocommit, schema)
   }
@@ -329,8 +330,9 @@ object OfflineEvolutions {
               schema: String = ""): Unit = {
     val evolutions = getEvolutions(appPath, classloader, dbApi)
     if (!isTest) {
-      logger.warn("Resolving evolution [" + revision + "] for database '" +
-          dbName + "'")
+      logger.warn(
+          "Resolving evolution [" + revision + "] for database '" +
+            dbName + "'")
     }
     evolutions.evolutionsApi.resolve(dbName, revision, schema)
   }

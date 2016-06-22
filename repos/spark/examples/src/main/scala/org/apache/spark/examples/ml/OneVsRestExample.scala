@@ -50,14 +50,14 @@ import org.apache.spark.sql.SQLContext
   */
 object OneVsRestExample {
 
-  case class Params private[ml](input: String = null,
-                                testInput: Option[String] = None,
-                                maxIter: Int = 100,
-                                tol: Double = 1E-6,
-                                fitIntercept: Boolean = true,
-                                regParam: Option[Double] = None,
-                                elasticNetParam: Option[Double] = None,
-                                fracTest: Double = 0.2)
+  case class Params private[ml] (input: String = null,
+                                 testInput: Option[String] = None,
+                                 maxIter: Int = 100,
+                                 tol: Double = 1E-6,
+                                 fitIntercept: Boolean = true,
+                                 regParam: Option[Double] = None,
+                                 elasticNetParam: Option[Double] = None,
+                                 fracTest: Double = 0.2)
       extends AbstractParams[Params]
 
   def main(args: Array[String]) {
@@ -70,8 +70,9 @@ object OneVsRestExample {
         .required()
         .action((x, c) => c.copy(input = x))
       opt[Double]("fracTest")
-        .text(s"fraction of data to hold out for testing.  If given option testInput, " +
-            s"this option is ignored. default: ${defaultParams.fracTest}")
+        .text(
+            s"fraction of data to hold out for testing.  If given option testInput, " +
+              s"this option is ignored. default: ${defaultParams.fracTest}")
         .action((x, c) => c.copy(fracTest = x))
       opt[String]("testInput")
         .text(
@@ -79,16 +80,16 @@ object OneVsRestExample {
         .action((x, c) => c.copy(testInput = Some(x)))
       opt[Int]("maxIter")
         .text(s"maximum number of iterations for Logistic Regression." +
-            s" default: ${defaultParams.maxIter}")
+              s" default: ${defaultParams.maxIter}")
         .action((x, c) => c.copy(maxIter = x))
       opt[Double]("tol")
         .text(
             s"the convergence tolerance of iterations for Logistic Regression." +
-            s" default: ${defaultParams.tol}")
+              s" default: ${defaultParams.tol}")
         .action((x, c) => c.copy(tol = x))
       opt[Boolean]("fitIntercept")
         .text(s"fit intercept for Logistic Regression." +
-            s" default: ${defaultParams.fitIntercept}")
+              s" default: ${defaultParams.fitIntercept}")
         .action((x, c) => c.copy(fitIntercept = x))
       opt[Double]("regParam")
         .text(s"the regularization parameter for Logistic Regression.")
@@ -125,18 +126,18 @@ object OneVsRestExample {
     // compute the train/test split: if testInput is not provided use part of input.
     val data = params.testInput match {
       case Some(t) => {
-          // compute the number of features in the training set.
-          val numFeatures = inputData.first().getAs[Vector](1).size
-          val testData = sqlContext.read
-            .option("numFeatures", numFeatures.toString)
-            .format("libsvm")
-            .load(t)
-          Array[DataFrame](inputData, testData)
-        }
+        // compute the number of features in the training set.
+        val numFeatures = inputData.first().getAs[Vector](1).size
+        val testData = sqlContext.read
+          .option("numFeatures", numFeatures.toString)
+          .format("libsvm")
+          .load(t)
+        Array[DataFrame](inputData, testData)
+      }
       case None => {
-          val f = params.fracTest
-          inputData.randomSplit(Array(1 - f, f), seed = 12345)
-        }
+        val f = params.fracTest
+        inputData.randomSplit(Array(1 - f, f), seed = 12345)
+      }
     }
     val Array(train, test) = data.map(_.cache())
 

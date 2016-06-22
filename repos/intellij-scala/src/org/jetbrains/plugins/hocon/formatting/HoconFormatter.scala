@@ -19,10 +19,10 @@ class HoconFormatter(settings: CodeStyleSettings) {
   val customSettings =
     settings.getCustomSettings(classOf[HoconCustomCodeStyleSettings])
 
-  private def beforeCommentOnNewLineSpacing(
-      parent: ASTNode, comment: ASTNode) = {
-    val maxBlankLines = getMaxBlankLines(
-        parent.getElementType, comment.getElementType)
+  private def beforeCommentOnNewLineSpacing(parent: ASTNode,
+                                            comment: ASTNode) = {
+    val maxBlankLines =
+      getMaxBlankLines(parent.getElementType, comment.getElementType)
     comment.getElementType match {
       case HashComment if customSettings.HASH_COMMENTS_AT_FIRST_COLUMN =>
         Spacing.createKeepingFirstColumnSpacing(0, 0, true, maxBlankLines)
@@ -34,8 +34,8 @@ class HoconFormatter(settings: CodeStyleSettings) {
     }
   }
 
-  private def getMaxBlankLines(
-      parentType: IElementType, rightChildType: IElementType) =
+  private def getMaxBlankLines(parentType: IElementType,
+                               rightChildType: IElementType) =
     (parentType, rightChildType) match {
       case (_, RBrace) => customSettings.KEEP_BLANK_LINES_BEFORE_RBRACE
       case (_, RBracket) => customSettings.KEEP_BLANK_LINES_BEFORE_RBRACKET
@@ -57,13 +57,16 @@ class HoconFormatter(settings: CodeStyleSettings) {
   def getSpacing(parent: ASTNode, leftChild: ASTNode, rightChild: ASTNode) = {
 
     val keepLineBreaks = commonSettings.KEEP_LINE_BREAKS
-    val maxBlankLines = getMaxBlankLines(
-        parent.getElementType, rightChild.getElementType)
+    val maxBlankLines =
+      getMaxBlankLines(parent.getElementType, rightChild.getElementType)
 
     def dependentLFSpacing(shouldBeSpace: Boolean) = {
       val spaces = if (shouldBeSpace) 1 else 0
-      Spacing.createDependentLFSpacing(
-          spaces, spaces, parent.getTextRange, keepLineBreaks, maxBlankLines)
+      Spacing.createDependentLFSpacing(spaces,
+                                       spaces,
+                                       parent.getTextRange,
+                                       keepLineBreaks,
+                                       maxBlankLines)
     }
 
     def normalSpacing(shouldBeSpace: Boolean) = {
@@ -76,9 +79,9 @@ class HoconFormatter(settings: CodeStyleSettings) {
 
     val isLineBreakBetween = parent.getText
       .subSequence(leftChild.getTextRange.getEndOffset -
-                   parent.getTextRange.getStartOffset,
+                     parent.getTextRange.getStartOffset,
                    rightChild.getTextRange.getStartOffset -
-                   parent.getTextRange.getStartOffset)
+                     parent.getTextRange.getStartOffset)
       .charIterator
       .contains('\n')
 
@@ -187,8 +190,8 @@ class HoconFormatter(settings: CodeStyleSettings) {
       case Some(Colon) =>
         Wrap.createWrap(customSettings.OBJECT_FIELDS_WITH_COLON_WRAP, true)
       case Some(Equals | PlusEquals) =>
-        Wrap.createWrap(
-            customSettings.OBJECT_FIELDS_WITH_ASSIGNMENT_WRAP, true)
+        Wrap
+          .createWrap(customSettings.OBJECT_FIELDS_WITH_ASSIGNMENT_WRAP, true)
       case _ => null
     }
 
@@ -239,8 +242,9 @@ class HoconFormatter(settings: CodeStyleSettings) {
       case _ => null
     }
 
-  def getAlignment(
-      alignmentCache: AlignmentCache, parent: ASTNode, child: ASTNode) =
+  def getAlignment(alignmentCache: AlignmentCache,
+                   parent: ASTNode,
+                   child: ASTNode) =
     (parent.getElementType, child.getElementType) match {
       case (Object, Include | KeyedField.extractor() | Comment.extractor()) =>
         alignmentCache.objectEntryAlignment
@@ -283,16 +287,14 @@ class HoconFormatter(settings: CodeStyleSettings) {
         Iterator.empty
       case HoconFileElementType | Object =>
         // immediately expand ObjectEntries element
-        node.childrenIterator.flatMap(
-            child =>
+        node.childrenIterator.flatMap(child =>
               child.getElementType match {
             case ObjectEntries => getChildren(child)
             case _ => Iterator(child)
         })
       case ObjectEntries =>
         // immediately expand ObjectField into its doc comments and keyed field
-        node.childrenIterator.flatMap(
-            child =>
+        node.childrenIterator.flatMap(child =>
               child.getElementType match {
             case ObjectField => getChildren(child)
             case _ => Iterator(child)

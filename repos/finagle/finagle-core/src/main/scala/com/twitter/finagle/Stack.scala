@@ -257,8 +257,9 @@ object Stack {
     * Nodes materialize by transforming the underlying stack in
     * some way.
     */
-  case class Node[T](
-      head: Stack.Head, mk: (Params, Stack[T]) => Stack[T], next: Stack[T])
+  case class Node[T](head: Stack.Head,
+                     mk: (Params, Stack[T]) => Stack[T],
+                     next: Stack[T])
       extends Stack[T] {
     def make(params: Params) = mk(params, next).make(params)
   }
@@ -480,8 +481,8 @@ object Stack {
 
   /** A module of 2 parameters. */
   abstract class Module2[P1: Param, P2: Param, T] extends Stackable[T] {
-    final val parameters: Seq[Stack.Param[_]] = Seq(
-        implicitly[Param[P1]], implicitly[Param[P2]])
+    final val parameters: Seq[Stack.Param[_]] =
+      Seq(implicitly[Param[P1]], implicitly[Param[P2]])
     def make(p1: P1, p2: P2, next: T): T
     def toStack(next: Stack[T]) =
       Node(this,

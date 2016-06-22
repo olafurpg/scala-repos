@@ -57,18 +57,22 @@ object MacroInferUtil {
       expectedType match {
         case Some(tp) =>
           val manager = ScalaPsiManager.instance(place.getProject)
-          val clazz = manager.getCachedClass(
-              "shapeless.Generic", place.getResolveScope, ClassCategory.TYPE)
+          val clazz = manager.getCachedClass("shapeless.Generic",
+                                             place.getResolveScope,
+                                             ClassCategory.TYPE)
           clazz match {
             case c: ScTypeDefinition =>
               val tpt = c.typeParameters
               if (tpt.length == 0) return None
               val undef = new ScUndefinedType(
                   new ScTypeParameterType(tpt(0), ScSubstitutor.empty))
-              val genericType = ScParameterizedType(
-                  ScDesignatorType(c), Seq(undef))
+              val genericType =
+                ScParameterizedType(ScDesignatorType(c), Seq(undef))
               val (res, undefSubst) = Conformance.conformsInner(
-                  genericType, tp, Set.empty, new ScUndefinedSubstitutor())
+                  genericType,
+                  tp,
+                  Set.empty,
+                  new ScUndefinedSubstitutor())
               if (!res) return None
               undefSubst.getSubstitutor match {
                 case Some(subst) =>
@@ -87,8 +91,8 @@ object MacroInferUtil {
                   if (hnil == null) return None
                   val repr = parts.foldRight(ScDesignatorType(hnil): ScType) {
                     case (part, resultType) =>
-                      ScParameterizedType(
-                          ScDesignatorType(coloncolon), Seq(part, resultType))
+                      ScParameterizedType(ScDesignatorType(coloncolon),
+                                          Seq(part, resultType))
                   }
                   ScalaPsiUtil.getCompanionModule(c) match {
                     case Some(obj: ScObject) =>

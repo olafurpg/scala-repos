@@ -78,7 +78,8 @@ private[sql] case class MonotonicallyIncreasingID()
 
     ev.isNull = "false"
     s"""
-      final ${ctx.javaType(dataType)} ${ev.value} = $partitionMaskTerm + $countTerm;
+      final ${ctx
+      .javaType(dataType)} ${ev.value} = $partitionMaskTerm + $countTerm;
       $countTerm++;
     """
   }

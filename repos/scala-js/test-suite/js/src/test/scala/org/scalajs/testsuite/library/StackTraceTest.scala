@@ -27,8 +27,7 @@ class StackTraceTest {
       case e: IllegalArgumentException =>
         val trace = e.getStackTrace()
         for ((className, methodName) <- places) {
-          assertTrue(
-              trace exists { elem =>
+          assertTrue(trace exists { elem =>
             /* We use startsWith for class name because some VMs will add
              * additional information at the end of the class name, for some
              * reason + there can be a '$class' suffix for methods in impl
@@ -63,8 +62,9 @@ class StackTraceTest {
         new Foo().h(78)
       }
 
-      verifyClassMethodNames(
-          "Foo" -> "f", "FooTrait" -> "h", "Baz" -> "<init>") {
+      verifyClassMethodNames("Foo" -> "f",
+                             "FooTrait" -> "h",
+                             "Baz" -> "<init>") {
         new Baz()
       }
 

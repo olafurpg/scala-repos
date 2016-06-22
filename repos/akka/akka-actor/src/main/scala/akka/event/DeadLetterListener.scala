@@ -35,8 +35,8 @@ class DeadLetterListener extends Actor {
               rcp.path.toString,
               rcp.getClass,
               s"Message [${message.getClass.getName}] from $snd to $rcp was not delivered. [$count] dead letters encountered$doneMsg. " +
-              "This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' " +
-              "and 'akka.log-dead-letters-during-shutdown'."))
+                "This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' " +
+                "and 'akka.log-dead-letters-during-shutdown'."))
       if (done) context.stop(self)
   }
 }

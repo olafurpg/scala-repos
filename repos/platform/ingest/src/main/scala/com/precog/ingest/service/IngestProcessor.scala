@@ -56,8 +56,9 @@ object IngestProcessing {
   }
 
   sealed trait IngestResult
-  case class BatchResult(
-      total: Int, ingested: Int, errors: Vector[(Int, String)])
+  case class BatchResult(total: Int,
+                         ingested: Int,
+                         errors: Vector[(Int, String)])
       extends IngestResult
   case class StreamingResult(ingested: Int, error: Option[String])
       extends IngestResult
@@ -110,17 +111,24 @@ trait IngestProcessingSelector {
              request: HttpRequest[_]): Option[IngestProcessing]
 }
 
-class DefaultIngestProcessingSelectors(
-    maxFields: Int, batchSize: Int, tmpdir: File, ingestStore: IngestStore)(
-    implicit M: Monad[Future], executor: ExecutionContext) {
+class DefaultIngestProcessingSelectors(maxFields: Int,
+                                       batchSize: Int,
+                                       tmpdir: File,
+                                       ingestStore: IngestStore)(
+    implicit M: Monad[Future],
+    executor: ExecutionContext) {
   import IngestProcessing._
 
-  class MimeIngestProcessingSelector(
-      apiKey: APIKey, path: Path, authorities: Authorities)
+  class MimeIngestProcessingSelector(apiKey: APIKey,
+                                     path: Path,
+                                     authorities: Authorities)
       extends IngestProcessingSelector {
     def select(partialData: Array[Byte],
                request: HttpRequest[_]): Option[IngestProcessing] = {
-      request.headers.header[`Content-Type`].toSeq.flatMap(_.mimeTypes) collectFirst {
+      request.headers
+        .header[`Content-Type`]
+        .toSeq
+        .flatMap(_.mimeTypes) collectFirst {
         case JSON =>
           new JSONIngestProcessing(apiKey,
                                    path,
@@ -136,21 +144,29 @@ class DefaultIngestProcessingSelectors(
                                    maxFields,
                                    ingestStore)
         case CSV =>
-          new CSVIngestProcessing(
-              apiKey, path, authorities, batchSize, tmpdir, ingestStore)
+          new CSVIngestProcessing(apiKey,
+                                  path,
+                                  authorities,
+                                  batchSize,
+                                  tmpdir,
+                                  ingestStore)
       }
     }
   }
 
-  class JSONIngestProcessingSelector(
-      apiKey: APIKey, path: Path, authorities: Authorities)
+  class JSONIngestProcessingSelector(apiKey: APIKey,
+                                     path: Path,
+                                     authorities: Authorities)
       extends IngestProcessingSelector {
     def select(partialData: Array[Byte],
                request: HttpRequest[_]): Option[IngestProcessing] = {
       val (AsyncParse(errors, values), parser) =
         AsyncParser.stream().apply(More(ByteBuffer.wrap(partialData)))
       if (errors.isEmpty && !values.isEmpty) {
-        request.headers.header[`Content-Type`].toSeq.flatMap(_.mimeTypes) collectFirst {
+        request.headers
+          .header[`Content-Type`]
+          .toSeq
+          .flatMap(_.mimeTypes) collectFirst {
           case JSON_STREAM =>
             new JSONIngestProcessing(apiKey,
                                      path,
@@ -173,11 +189,11 @@ class DefaultIngestProcessingSelectors(
     }
   }
 
-  def selectors(
-      apiKey: APIKey,
-      path: Path,
-      authorities: Authorities): List[IngestProcessingSelector] = List(
-      new MimeIngestProcessingSelector(apiKey, path, authorities),
-      new JSONIngestProcessingSelector(apiKey, path, authorities)
-  )
+  def selectors(apiKey: APIKey,
+                path: Path,
+                authorities: Authorities): List[IngestProcessingSelector] =
+    List(
+        new MimeIngestProcessingSelector(apiKey, path, authorities),
+        new JSONIngestProcessingSelector(apiKey, path, authorities)
+    )
 }

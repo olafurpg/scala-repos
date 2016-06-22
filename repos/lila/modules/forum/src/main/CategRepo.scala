@@ -12,7 +12,8 @@ object CategRepo {
 
   def withTeams(teams: Set[String]): Fu[List[Categ]] =
     $find(
-        $query($or(Seq(
+        $query(
+            $or(Seq(
                     Json.obj("team" -> $exists(false)),
                     Json.obj("team" -> $in(teams))
                 ))) sort $sort.asc("pos"))

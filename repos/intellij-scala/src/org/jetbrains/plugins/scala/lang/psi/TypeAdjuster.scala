@@ -63,8 +63,8 @@ object TypeAdjuster extends ApplicationAdapter {
     adjustFor(elements)
   }
 
-  private def newRef(
-      text: String, position: PsiElement): Option[ScReferenceElement] = {
+  private def newRef(text: String,
+                     position: PsiElement): Option[ScReferenceElement] = {
     findRef(newTypeElem(text, position))
   }
 
@@ -73,8 +73,8 @@ object TypeAdjuster extends ApplicationAdapter {
   }
 
   private def newTypeElem(name: String, position: PsiElement) =
-    ScalaPsiElementFactory.createTypeElementFromText(
-        name, position.getContext, position)
+    ScalaPsiElementFactory
+      .createTypeElementFromText(name, position.getContext, position)
 
   private def toReplacementInfos(
       typeElements: Seq[ScTypeElement],
@@ -186,9 +186,9 @@ object TypeAdjuster extends ApplicationAdapter {
       case _ => None
     }
 
-  private def shortenReference(info: ReplacementInfo,
-                               useTypeAliases: Boolean =
-                                 true): ReplacementInfo = {
+  private def shortenReference(
+      info: ReplacementInfo,
+      useTypeAliases: Boolean = true): ReplacementInfo = {
     object hasStableReplacement {
       def unapply(rInfo: SimpleInfo): Option[ReplacementInfo] = {
         rInfo.resolve.flatMap { resolved =>
@@ -221,7 +221,8 @@ object TypeAdjuster extends ApplicationAdapter {
 
     info match {
       case cmp: CompoundInfo =>
-        cmp.copy(childInfos =
+        cmp.copy(
+            childInfos =
               cmp.childInfos.map(shortenReference(_, useTypeAliases)))
       case hasStableReplacement(rInfo) => rInfo
       case _ => info
@@ -232,9 +233,11 @@ object TypeAdjuster extends ApplicationAdapter {
       rInfos: Set[ReplacementInfo]): Map[ReplacementInfo, ScImportsHolder] = {
     def findMaxHolders(infos: Set[ReplacementInfo])
       : Set[(ReplacementInfo, ScImportsHolder)] = {
-      val infosToHolders = infos.map(info =>
+      val infosToHolders = infos.map(
+          info =>
             info -> ScalaImportTypeFix.getImportHolder(
-                info.origTypeElem, info.origTypeElem.getProject))
+                info.origTypeElem,
+                info.origTypeElem.getProject))
       val holders = infosToHolders.map(_._2)
       val maxHolders = holders.filter(h => !holders.exists(_.isAncestorOf(h)))
       infosToHolders.map {
@@ -255,8 +258,8 @@ object TypeAdjuster extends ApplicationAdapter {
     withMaxHolders.flatten.toMap
   }
 
-  private def replaceAndAddImports(
-      rInfos: Seq[ReplacementInfo], addImports: Boolean): Unit = {
+  private def replaceAndAddImports(rInfos: Seq[ReplacementInfo],
+                                   addImports: Boolean): Unit = {
     assert(rInfos.forall(_.origTypeElem.isValid),
            "Psi shouldn't be modified before this stage!")
 
@@ -272,7 +275,8 @@ object TypeAdjuster extends ApplicationAdapter {
         val holder = importHolders.get(info)
         if (info.pathsToImport.nonEmpty && holder.isDefined) {
           val pathsToAdd =
-            holderToPaths.getOrElseUpdate(holder.get, Set.empty) ++ info.pathsToImport
+            holderToPaths
+              .getOrElseUpdate(holder.get, Set.empty) ++ info.pathsToImport
           holderToPaths += holder.get -> pathsToAdd
         }
       }
@@ -292,12 +296,12 @@ object TypeAdjuster extends ApplicationAdapter {
       class FindTypeAliasProcessor extends BaseProcessor(ValueSet(CLASS)) {
         var collected: Option[ScTypeAliasDefinition] = None
 
-        override def execute(
-            element: PsiElement, state: ResolveState): Boolean = {
+        override def execute(element: PsiElement,
+                             state: ResolveState): Boolean = {
           element match {
             case ta: ScTypeAliasDefinition
                 if ta.isAliasFor(clazz) &&
-                !ScTypePresentation.shouldExpand(ta) =>
+                  !ScTypePresentation.shouldExpand(ta) =>
               collected = Some(ta)
               false
             case _ => true

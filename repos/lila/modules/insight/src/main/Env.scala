@@ -47,8 +47,7 @@ final class Env(config: Config,
                                 pipeline = aggregationPipeline,
                                 indexer = indexer)
 
-  system.actorOf(
-      Props(new Actor {
+  system.actorOf(Props(new Actor {
     system.lilaBus.subscribe(self, 'analysisReady)
     def receive = {
       case lila.analyse.actorApi.AnalysisReady(game, _) => api updateGame game

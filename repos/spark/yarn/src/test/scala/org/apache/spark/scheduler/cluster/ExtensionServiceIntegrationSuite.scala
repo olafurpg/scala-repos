@@ -40,8 +40,8 @@ class ExtensionServiceIntegrationSuite
    */
   before {
     val sparkConf = new SparkConf()
-    sparkConf.set(
-        SCHEDULER_SERVICES, Seq(classOf[SimpleExtensionService].getName()))
+    sparkConf.set(SCHEDULER_SERVICES,
+                  Seq(classOf[SimpleExtensionService].getName()))
     sparkConf.setMaster("local").setAppName("ExtensionServiceIntegrationSuite")
     sc = new SparkContext(sparkConf)
   }

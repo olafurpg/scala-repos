@@ -27,7 +27,7 @@ object IterateeUsage extends App {
 
   val readLn =
     takeWhile[Char, List](_ != '\n') flatMap
-    (ln => drop[Char, Id](1).map(_ => ln))
+      (ln => drop[Char, Id](1).map(_ => ln))
   (collect[List[Char], List] %= readLn.sequenceI &=
         enumStream("Iteratees\nare\ncomposable".toStream)).run assert_===
     List("Iteratees".toList, "are".toList, "composable".toList)
@@ -78,7 +78,7 @@ object IterateeUsage extends App {
 
   val take10And5ThenHead =
     take[Int, List](10) zip take[Int, List](5) flatMap
-    (ab => head[Int, Id] map (h => (ab, h)))
+      (ab => head[Int, Id] map (h => (ab, h)))
   (take10And5ThenHead &= enumStream((1 to 20).toStream)).run assert_===
     (((1 to 10).toList, (1 to 5).toList), Some(11))
 }

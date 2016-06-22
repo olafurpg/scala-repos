@@ -15,8 +15,9 @@ object ParquetSchemaProvider {
           s"""We cannot enforce ${T.tpe} is a case class, either it is not a case class or this macro call is possibly enclosed in a class.
         This will mean the macro is operating on a non-resolved type.""")
 
-    def matchField(
-        fieldType: Type, fieldName: String, isOption: Boolean): Tree = {
+    def matchField(fieldType: Type,
+                   fieldName: String,
+                   isOption: Boolean): Tree = {
       val REPETITION_REQUIRED =
         q"_root_.org.apache.parquet.schema.Type.Repetition.REQUIRED"
       val REPETITION_OPTIONAL =
@@ -42,7 +43,7 @@ object ParquetSchemaProvider {
               q"_root_.org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BOOLEAN")
         case tpe
             if tpe =:= typeOf[Short] || tpe =:= typeOf[Int] ||
-            tpe =:= typeOf[Byte] =>
+              tpe =:= typeOf[Byte] =>
           createPrimitiveTypeField(
               q"_root_.org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT32")
         case tpe if tpe =:= typeOf[Long] =>
@@ -59,10 +60,10 @@ object ParquetSchemaProvider {
           matchField(innerType, fieldName, isOption = true)
         case tpe
             if tpe.erasure =:= typeOf[List[Any]] ||
-            tpe.erasure =:= typeOf[Set[_]] =>
+              tpe.erasure =:= typeOf[Set[_]] =>
           val innerType = tpe.asInstanceOf[TypeRefApi].args.head
-          val innerFieldsType = matchField(
-              innerType, "element", isOption = false)
+          val innerFieldsType =
+            matchField(innerType, "element", isOption = false)
           q"_root_.org.apache.parquet.schema.ConversionPatterns.listType($repetition, $fieldName, ${createListGroupType(innerFieldsType)})"
         case tpe if tpe.erasure =:= typeOf[Map[_, Any]] =>
           val List(keyType, valueType) = tpe.asInstanceOf[TypeRefApi].args

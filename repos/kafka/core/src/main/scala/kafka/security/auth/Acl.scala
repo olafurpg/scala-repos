@@ -20,8 +20,8 @@ import kafka.utils.Json
 import org.apache.kafka.common.security.auth.KafkaPrincipal
 
 object Acl {
-  val WildCardPrincipal: KafkaPrincipal = new KafkaPrincipal(
-      KafkaPrincipal.USER_TYPE, "*")
+  val WildCardPrincipal: KafkaPrincipal =
+    new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "*")
   val WildCardHost: String = "*"
   val AllowAllAcl = new Acl(WildCardPrincipal, Allow, WildCardHost, All)
   val PrincipalKey = "principal"
@@ -113,7 +113,7 @@ case class Acl(principal: KafkaPrincipal,
   }
 
   override def toString: String = {
-    "%s has %s permission for operations: %s from hosts: %s".format(
-        principal, permissionType.name, operation, host)
+    "%s has %s permission for operations: %s from hosts: %s"
+      .format(principal, permissionType.name, operation, host)
   }
 }

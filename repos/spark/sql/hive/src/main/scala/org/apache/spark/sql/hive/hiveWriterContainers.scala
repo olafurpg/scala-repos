@@ -63,8 +63,8 @@ private[hive] class SparkHiveWriterContainer(
   // Add table properties from storage handler to jobConf, so any custom storage
   // handler settings can be set to jobConf
   if (tableDesc != null) {
-    HiveTableUtil.configureJobPropertiesForStorageHandler(
-        tableDesc, jobConf, false)
+    HiveTableUtil
+      .configureJobPropertiesForStorageHandler(tableDesc, jobConf, false)
     Utilities.copyTableJobPropertiesToConf(tableDesc, jobConf)
   }
   protected val conf = new SerializableJobConf(jobConf)
@@ -77,10 +77,10 @@ private[hive] class SparkHiveWriterContainer(
 
   @transient private var writer: FileSinkOperator.RecordWriter = null
   @transient protected lazy val committer = conf.value.getOutputCommitter
-  @transient protected lazy val jobContext = new JobContextImpl(
-      conf.value, jID.value)
-  @transient private lazy val taskContext = new TaskAttemptContextImpl(
-      conf.value, taID.value)
+  @transient protected lazy val jobContext =
+    new JobContextImpl(conf.value, jID.value)
+  @transient private lazy val taskContext =
+    new TaskAttemptContextImpl(conf.value, taID.value)
   @transient private lazy val outputFormat =
     conf.value.getOutputFormat.asInstanceOf[HiveOutputFormat[AnyRef, Writable]]
 
@@ -101,8 +101,8 @@ private[hive] class SparkHiveWriterContainer(
     val numberFormat = NumberFormat.getInstance()
     numberFormat.setMinimumIntegerDigits(5)
     numberFormat.setGroupingUsed(false)
-    val extension = Utilities.getFileExtension(
-        conf.value, fileSinkConf.getCompressed, outputFormat)
+    val extension = Utilities
+      .getFileExtension(conf.value, fileSinkConf.getCompressed, outputFormat)
     "part-" + numberFormat.format(splitID) + extension
   }
 
@@ -148,8 +148,9 @@ private[hive] class SparkHiveWriterContainer(
 
     jID = new SerializableWritable[JobID](
         SparkHadoopWriter.createJobID(now, jobId))
-    taID = new SerializableWritable[TaskAttemptID](new TaskAttemptID(
-            new TaskID(jID.value, TaskType.MAP, splitID), attemptID))
+    taID = new SerializableWritable[TaskAttemptID](
+        new TaskAttemptID(new TaskID(jID.value, TaskType.MAP, splitID),
+                          attemptID))
   }
 
   private def setConfParams() {
@@ -186,12 +187,13 @@ private[hive] class SparkHiveWriterContainer(
   }
 
   // this function is executed on executor side
-  def writeToFile(
-      context: TaskContext, iterator: Iterator[InternalRow]): Unit = {
+  def writeToFile(context: TaskContext,
+                  iterator: Iterator[InternalRow]): Unit = {
     val (serializer, standardOI, fieldOIs, dataTypes, wrappers, outputData) =
       prepareForWrite()
-    executorSideSetup(
-        context.stageId, context.partitionId, context.attemptNumber)
+    executorSideSetup(context.stageId,
+                      context.partitionId,
+                      context.attemptNumber)
 
     iterator.foreach { row =>
       var i = 0
@@ -265,12 +267,13 @@ private[spark] class SparkHiveDynamicPartitionWriterContainer(
   }
 
   // this function is executed on executor side
-  override def writeToFile(
-      context: TaskContext, iterator: Iterator[InternalRow]): Unit = {
+  override def writeToFile(context: TaskContext,
+                           iterator: Iterator[InternalRow]): Unit = {
     val (serializer, standardOI, fieldOIs, dataTypes, wrappers, outputData) =
       prepareForWrite()
-    executorSideSetup(
-        context.stageId, context.partitionId, context.attemptNumber)
+    executorSideSetup(context.stageId,
+                      context.partitionId,
+                      context.attemptNumber)
 
     val partitionOutput = inputSchema.takeRight(dynamicPartColNames.length)
     val dataOutput = inputSchema.take(fieldOIs.length)
@@ -293,8 +296,8 @@ private[spark] class SparkHiveDynamicPartitionWriterContainer(
     }
 
     // Returns the partition path given a partition key.
-    val getPartitionString = UnsafeProjection.create(
-        Concat(partitionStringExpression) :: Nil, partitionOutput)
+    val getPartitionString = UnsafeProjection
+      .create(Concat(partitionStringExpression) :: Nil, partitionOutput)
 
     // If anything below fails, we should abort the task.
     try {
@@ -327,12 +330,11 @@ private[spark] class SparkHiveDynamicPartitionWriterContainer(
 
           var i = 0
           while (i < fieldOIs.length) {
-            outputData(i) =
-              if (sortedIterator.getValue.isNullAt(i)) {
-                null
-              } else {
-                wrappers(i)(sortedIterator.getValue.get(i, dataTypes(i)))
-              }
+            outputData(i) = if (sortedIterator.getValue.isNullAt(i)) {
+              null
+            } else {
+              wrappers(i)(sortedIterator.getValue.get(i, dataTypes(i)))
+            }
             i += 1
           }
           currentWriter.write(serializer.serialize(outputData, standardOI))
@@ -363,7 +365,8 @@ private[spark] class SparkHiveDynamicPartitionWriterContainer(
       // use the path like ${hive_tmp}/_temporary/${attemptId}/
       // to avoid write to the same file when `spark.speculation=true`
       val path = FileOutputFormat.getTaskOutputPath(
-          conf.value, partitionPath.stripPrefix("/") + "/" + getOutputName)
+          conf.value,
+          partitionPath.stripPrefix("/") + "/" + getOutputName)
 
       HiveFileFormatUtils.getHiveRecordWriter(
           conf.value,

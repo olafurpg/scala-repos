@@ -84,8 +84,8 @@ object CreateFromUsageUtil {
     }
   }
 
-  def addParametersToTemplate(
-      elem: PsiElement, builder: TemplateBuilder): Unit = {
+  def addParametersToTemplate(elem: PsiElement,
+                              builder: TemplateBuilder): Unit = {
     elem.depthFirst.filterByType(classOf[ScParameter]).foreach { parameter =>
       val id = parameter.getNameIdentifier
       builder.replaceElement(id, id.getText)
@@ -96,8 +96,8 @@ object CreateFromUsageUtil {
     }
   }
 
-  def addTypeParametersToTemplate(
-      elem: PsiElement, builder: TemplateBuilder): Unit = {
+  def addTypeParametersToTemplate(elem: PsiElement,
+                                  builder: TemplateBuilder): Unit = {
     elem.depthFirst.filterByType(classOf[ScTypeParam]).foreach { tp =>
       builder.replaceElement(tp.nameId, tp.name)
     }
@@ -113,8 +113,8 @@ object CreateFromUsageUtil {
       }
   }
 
-  def addUnapplyResultTypesToTemplate(
-      fun: ScFunction, builder: TemplateBuilder): Unit = {
+  def addUnapplyResultTypesToTemplate(fun: ScFunction,
+                                      builder: TemplateBuilder): Unit = {
     fun.returnTypeElement match {
       case Some(
           ScParameterizedTypeElement(_, Seq(tuple: ScTupleTypeElement))) =>
@@ -130,7 +130,9 @@ object CreateFromUsageUtil {
     val offset = element.getTextRange.getEndOffset
     val project = element.getProject
     val descriptor = new OpenFileDescriptor(
-        project, element.getContainingFile.getVirtualFile, offset)
+        project,
+        element.getContainingFile.getVirtualFile,
+        offset)
     FileEditorManager.getInstance(project).openTextEditor(descriptor, true)
   }
 

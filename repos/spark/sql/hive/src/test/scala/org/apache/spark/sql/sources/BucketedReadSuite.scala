@@ -63,8 +63,7 @@ class BucketedReadSuite
         assert(rdd.partitions.length == 8)
 
         val attrs = table.select("j", "k").queryExecution.analyzed.output
-        val checkBucketId = rdd.mapPartitionsWithIndex(
-            (index, rows) => {
+        val checkBucketId = rdd.mapPartitionsWithIndex((index, rows) => {
           val getBucketId = UnsafeProjection.create(
               HashPartitioning(attrs, 8).partitionIdExpression :: Nil,
               output)
@@ -277,20 +276,23 @@ class BucketedReadSuite
         val joinOperator =
           joined.queryExecution.executedPlan.asInstanceOf[SortMergeJoin]
 
-        assert(joinOperator.left
-                 .find(_.isInstanceOf[ShuffleExchange])
-                 .isDefined == shuffleLeft,
-               s"expected shuffle in plan to be $shuffleLeft but found\n${joinOperator.left}")
-        assert(joinOperator.right
-                 .find(_.isInstanceOf[ShuffleExchange])
-                 .isDefined == shuffleRight,
-               s"expected shuffle in plan to be $shuffleRight but found\n${joinOperator.right}")
+        assert(
+            joinOperator.left
+              .find(_.isInstanceOf[ShuffleExchange])
+              .isDefined == shuffleLeft,
+            s"expected shuffle in plan to be $shuffleLeft but found\n${joinOperator.left}")
+        assert(
+            joinOperator.right
+              .find(_.isInstanceOf[ShuffleExchange])
+              .isDefined == shuffleRight,
+            s"expected shuffle in plan to be $shuffleRight but found\n${joinOperator.right}")
       }
     }
   }
 
-  private def joinCondition(
-      left: DataFrame, right: DataFrame, joinCols: Seq[String]): Column = {
+  private def joinCondition(left: DataFrame,
+                            right: DataFrame,
+                            joinCols: Seq[String]): Column = {
     joinCols.map(col => left(col) === right(col)).reduce(_ && _)
   }
 
@@ -376,7 +378,8 @@ class BucketedReadSuite
       checkAnswer(agged.sort("i", "j"),
                   df1.groupBy("i", "j").agg(max("k")).sort("i", "j"))
 
-      assert(agged.queryExecution.executedPlan
+      assert(
+          agged.queryExecution.executedPlan
             .find(_.isInstanceOf[ShuffleExchange])
             .isEmpty)
     }
@@ -394,7 +397,8 @@ class BucketedReadSuite
       checkAnswer(agged.sort("i", "j"),
                   df1.groupBy("i", "j").agg(max("k")).sort("i", "j"))
 
-      assert(agged.queryExecution.executedPlan
+      assert(
+          agged.queryExecution.executedPlan
             .find(_.isInstanceOf[ShuffleExchange])
             .isEmpty)
     }

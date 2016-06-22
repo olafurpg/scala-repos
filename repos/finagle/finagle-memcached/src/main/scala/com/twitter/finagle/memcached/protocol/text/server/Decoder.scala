@@ -41,8 +41,8 @@ class Decoder(storageCommands: collection.Set[ChannelBuffer])
     }
   }
 
-  final protected[memcached] def awaitData(
-      tokens: Seq[ChannelBuffer], bytesNeeded: Int) {
+  final protected[memcached] def awaitData(tokens: Seq[ChannelBuffer],
+                                           bytesNeeded: Int) {
     state = AwaitingData(tokens, bytesNeeded)
   }
 

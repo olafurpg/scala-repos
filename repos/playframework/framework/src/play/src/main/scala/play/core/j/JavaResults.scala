@@ -31,8 +31,8 @@ object JavaResults
     extends Results
     with DefaultWriteables
     with DefaultContentTypeOfs {
-  def writeContent(
-      mimeType: String)(implicit codec: Codec): Writeable[Content] =
+  def writeContent(mimeType: String)(
+      implicit codec: Codec): Writeable[Content] =
     Writeable((content: Content) => codec.encode(contentBody(content)),
               Some(ContentTypes.withCharset(mimeType)))
   def contentBody(content: Content): String = content match {
@@ -61,8 +61,8 @@ object JavaResults
     )(internalContext)
   }
   //play.api.libs.iteratee.Enumerator.imperative[A](onComplete = onDisconnected)
-  def chunked(
-      stream: java.io.InputStream, chunkSize: Int): Source[ByteString, _] =
+  def chunked(stream: java.io.InputStream,
+              chunkSize: Int): Source[ByteString, _] =
     enumToSource(Enumerator.fromStream(stream, chunkSize)(internalContext))
   def chunked(file: java.io.File, chunkSize: Int) =
     enumToSource(Enumerator.fromFile(file, chunkSize)(internalContext))
@@ -139,8 +139,8 @@ object JavaResultExtractor {
     responseHeader.copy(headers = responseHeader.headers + (name -> value))
 
   @varargs
-  def withHeader(
-      responseHeader: ResponseHeader, nameValues: String*): ResponseHeader = {
+  def withHeader(responseHeader: ResponseHeader,
+                 nameValues: String*): ResponseHeader = {
     if (nameValues.length % 2 != 0) {
       throw new IllegalArgumentException(
           "Unmatched name - withHeaders must be invoked with an even number of string arguments")
@@ -149,8 +149,9 @@ object JavaResultExtractor {
     responseHeader.copy(headers = responseHeader.headers ++ toAdd)
   }
 
-  def getBody(
-      result: JResult, timeout: Long, materializer: Materializer): ByteString =
+  def getBody(result: JResult,
+              timeout: Long,
+              materializer: Materializer): ByteString =
     Await.result(
         FutureConverters.toScala(result.body.consumeData(materializer)),
         timeout.millis)

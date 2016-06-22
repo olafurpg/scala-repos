@@ -9,8 +9,9 @@ import shapeless.testutil.assertTypedEquals
 // Intentionally defined as a top-level class - (compile time) reflection API not behaving
 // the same way compared to definitions in a singleton, like CC below.
 // See https://github.com/milessabin/shapeless/issues/474
-case class DefaultCC(
-    i: Int, s: String = "b", flagOpt: Option[Boolean] = Some(true))
+case class DefaultCC(i: Int,
+                     s: String = "b",
+                     flagOpt: Option[Boolean] = Some(true))
 
 object DefaultTestDefinitions {
 
@@ -22,8 +23,9 @@ object DefaultTestDefinitions {
   trait Dummy
 
   trait Definitions {
-    case class CC(
-        i: Int, s: String = "b", flagOpt: Option[Boolean] = Some(true))
+    case class CC(i: Int,
+                  s: String = "b",
+                  flagOpt: Option[Boolean] = Some(true))
   }
 
   val definitions = new Definitions {}

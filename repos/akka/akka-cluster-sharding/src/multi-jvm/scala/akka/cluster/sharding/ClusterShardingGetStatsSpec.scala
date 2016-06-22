@@ -45,7 +45,9 @@ object ClusterShardingGetStatsSpecConfig extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -118,8 +120,8 @@ abstract class ClusterShardingGetStatsSpec
       // make sure all nodes are up
       within(10.seconds) {
         awaitAssert {
-          Cluster(system).state.members.count(_.status == MemberStatus.Up) should ===(
-              4)
+          Cluster(system).state.members
+            .count(_.status == MemberStatus.Up) should ===(4)
         }
       }
 

@@ -41,8 +41,8 @@ import org.apache.spark.annotation.Private
   * to explore all spaces for each key (see http://en.wikipedia.org/wiki/Quadratic_probing).
   */
 @Private
-class OpenHashSet[@specialized(Long, Int) T: ClassTag](
-    initialCapacity: Int, loadFactor: Double)
+class OpenHashSet[@specialized(Long, Int) T: ClassTag](initialCapacity: Int,
+                                                       loadFactor: Double)
     extends Serializable {
 
   require(
@@ -162,8 +162,9 @@ class OpenHashSet[@specialized(Long, Int) T: ClassTag](
     * @param moveFunc Callback invoked when we move the key from one position (in the old data array)
     *                 to a new position (in the new data array).
     */
-  def rehashIfNeeded(
-      k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit) {
+  def rehashIfNeeded(k: T,
+                     allocateFunc: (Int) => Unit,
+                     moveFunc: (Int, Int) => Unit) {
     if (_size > _growThreshold) {
       rehash(k, allocateFunc, moveFunc)
     }
@@ -224,8 +225,9 @@ class OpenHashSet[@specialized(Long, Int) T: ClassTag](
     * @param moveFunc Callback invoked when we move the key from one position (in the old data array)
     *                 to a new position (in the new data array).
     */
-  private def rehash(
-      k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit) {
+  private def rehash(k: T,
+                     allocateFunc: (Int) => Unit,
+                     moveFunc: (Int, Int) => Unit) {
     val newCapacity = _capacity * 2
     require(
         newCapacity > 0 && newCapacity <= OpenHashSet.MAX_CAPACITY,

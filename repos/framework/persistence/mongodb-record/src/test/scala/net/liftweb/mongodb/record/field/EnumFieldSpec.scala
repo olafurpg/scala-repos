@@ -52,8 +52,8 @@ package enumfieldspecs {
     override def equals(other: Any): Boolean = other match {
       case that: EnumRec =>
         this.id.get == that.id.get && this.dow.value == that.dow.value &&
-        this.dowOptional.valueBox == that.dowOptional.valueBox &&
-        this.jsonobj.value == that.jsonobj.value
+          this.dowOptional.valueBox == that.dowOptional.valueBox &&
+          this.jsonobj.value == that.jsonobj.value
       case _ => false
     }
   }

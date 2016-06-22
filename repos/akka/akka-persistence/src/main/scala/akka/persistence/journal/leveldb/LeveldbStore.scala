@@ -97,8 +97,8 @@ private[persistence] trait LeveldbStore
     result
   }
 
-  def asyncDeleteMessagesTo(
-      persistenceId: String, toSequenceNr: Long): Future[Unit] =
+  def asyncDeleteMessagesTo(persistenceId: String,
+                            toSequenceNr: Long): Future[Unit] =
     try Future.successful {
       withBatch { batch ⇒
         val nid = numericId(persistenceId)
@@ -159,8 +159,8 @@ private[persistence] trait LeveldbStore
                                 batch: WriteBatch): Unit = {
     val persistentBytes = persistentToBytes(persistent)
     val nid = numericId(persistent.persistenceId)
-    batch.put(
-        keyToBytes(counterKey(nid)), counterToBytes(persistent.sequenceNr))
+    batch
+      .put(keyToBytes(counterKey(nid)), counterToBytes(persistent.sequenceNr))
     batch.put(keyToBytes(Key(nid, persistent.sequenceNr, 0)), persistentBytes)
 
     tags.foreach { tag ⇒
@@ -202,8 +202,8 @@ private[persistence] trait LeveldbStore
   protected def hasPersistenceIdSubscribers: Boolean =
     persistenceIdSubscribers.nonEmpty
 
-  protected def addPersistenceIdSubscriber(
-      subscriber: ActorRef, persistenceId: String): Unit =
+  protected def addPersistenceIdSubscriber(subscriber: ActorRef,
+                                           persistenceId: String): Unit =
     persistenceIdSubscribers.addBinding(persistenceId, subscriber)
 
   protected def removeSubscriber(subscriber: ActorRef): Unit = {

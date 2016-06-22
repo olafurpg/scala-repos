@@ -39,8 +39,7 @@ case class DataMapException(msg: String, cause: Exception)
   */
 class DataMap(
     val fields: Map[String, JValue]
-)
-    extends Serializable {
+) extends Serializable {
   @transient lazy implicit private val formats =
     DefaultFormats + new DateTimeJson4sSupport.Serializer
 

@@ -5,7 +5,7 @@ object Util {
   def show[T](x: T): T = { println(x); x }
   def mkArgs(xs: Any*) =
     xs map { case ((k, v)) => k + "=" + v; case x => "" + x } mkString
-    ("(", ", ", ")")
+      ("(", ", ", ")")
 }
 import Util._
 
@@ -95,13 +95,13 @@ object Named extends Dynamic {
 }
 
 object Named2 extends Dynamic {
-  def applyDynamic(name: String)(a: Any)(
-      b: Any = "b", c: Any = "c"): Named2.type = {
+  def applyDynamic(name: String)(a: Any)(b: Any = "b",
+                                         c: Any = "c"): Named2.type = {
     show(this + "." + name + mkArgs(a) + mkArgs(b, c))
     this
   }
-  def applyDynamicNamed(name: String)(a: (String, Any))(
-      b: (String, Any), c: (String, Any)): Named2.type = {
+  def applyDynamicNamed(name: String)(
+      a: (String, Any))(b: (String, Any), c: (String, Any)): Named2.type = {
     show(this + "." + name + mkArgs(a) + mkArgs(b, c))
     this
   }

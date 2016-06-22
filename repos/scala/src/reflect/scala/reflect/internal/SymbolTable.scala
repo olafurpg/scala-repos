@@ -57,7 +57,7 @@ abstract class SymbolTable
 
   protected def elapsedMessage(msg: String, start: Long) =
     msg + " in " + (TimeUnit.NANOSECONDS.toMillis(System.nanoTime()) - start) +
-    "ms"
+      "ms"
 
   def informProgress(msg: String) =
     if (settings.verbose) inform("[" + msg + "]")
@@ -124,7 +124,8 @@ abstract class SymbolTable
   }
   @inline
   final private[scala] def debuglogResultIf[T](
-      msg: => String, cond: T => Boolean)(result: T): T = {
+      msg: => String,
+      cond: T => Boolean)(result: T): T = {
     if (cond(result)) debuglog(msg + ": " + result)
 
     result
@@ -285,7 +286,7 @@ abstract class SymbolTable
   final def isValidForBaseClasses(period: Period): Boolean = {
     def noChangeInBaseClasses(it: InfoTransformer, limit: Phase#Id): Boolean =
       (it.pid >= limit || !it.changesBaseClasses &&
-          noChangeInBaseClasses(it.next, limit))
+            noChangeInBaseClasses(it.next, limit))
     period != 0 && runId(period) == currentRunId && {
       val pid = phaseId(period)
       if (phase.id > pid)
@@ -300,8 +301,8 @@ abstract class SymbolTable
       if (!member.isPrivate && !member.isConstructor) {
         // todo: handle overlapping definitions in some way: mark as errors
         // or treat as abstractions. For now the symbol in the package module takes precedence.
-        for (existing <- dest.info.decl(member.name).alternatives) dest.info.decls
-          .unlink(existing)
+        for (existing <- dest.info.decl(member.name).alternatives)
+          dest.info.decls.unlink(existing)
       }
     }
     // enter non-private decls the class
@@ -329,7 +330,7 @@ abstract class SymbolTable
       val elemtp = formals.last.typeArgs.head match {
         case RefinedType(List(t1, t2), _)
             if (t1.typeSymbol.isAbstractType &&
-                t2.typeSymbol == definitions.ObjectClass) =>
+                  t2.typeSymbol == definitions.ObjectClass) =>
           t1 // drop intersection with Object for abstract types in varargs. UnCurry can handle them.
         case t =>
           t
@@ -395,8 +396,7 @@ abstract class SymbolTable
       val NoCached: T = null.asInstanceOf[T]
       var cached: T = NoCached
       var cachedRunId = NoRunId
-      recordCache(
-          new Clearable {
+      recordCache(new Clearable {
         def clear(): Unit = cached = NoCached
       })
       () =>

@@ -59,8 +59,9 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
     List(clazz, module, module.moduleClass) foreach (_ setInfo info)
   }
 
-  protected def initClassAndModule(
-      clazz: Symbol, module: Symbol, completer: LazyType) =
+  protected def initClassAndModule(clazz: Symbol,
+                                   module: Symbol,
+                                   completer: LazyType) =
     setAllInfos(clazz, module, completer)
 
   /** The type completer for packages.
@@ -138,34 +139,34 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
         currentMirror.tryJavaClass(path) match {
           case Some(cls) =>
             val loadingMirror = currentMirror.mirrorDefining(cls)
-            val (_, module) =
-              if (loadingMirror eq currentMirror) {
-                initAndEnterClassAndModule(
-                    pkgClass, name.toTypeName, new TopClassCompleter(_, _))
-              } else {
-                val origOwner =
-                  loadingMirror.packageNameToScala(pkgClass.fullName)
-                val clazz = origOwner.info decl name.toTypeName
-                val module = origOwner.info decl name.toTermName
-                assert(clazz != NoSymbol)
-                assert(module != NoSymbol)
-                // currentMirror.mirrorDefining(cls) might side effect by entering symbols into pkgClass.info.decls
-                // therefore, even though in the beginning of this method, super.lookupEntry(name) returned null
-                // entering clazz/module now will result in a double-enter assertion in PackageScope.enter
-                // here's how it might happen
-                // 1) we are the rootMirror
-                // 2) cls.getClassLoader is different from our classloader
-                // 3) mirrorDefining(cls) looks up a mirror corresponding to that classloader and cannot find it
-                // 4) mirrorDefining creates a new mirror
-                // 5) that triggers Mirror.init() of the new mirror
-                // 6) that triggers definitions.syntheticCoreClasses
-                // 7) that might materialize symbols and enter them into our scope (because syntheticCoreClasses live in rootMirror)
-                // 8) now we come back here and try to enter one of the now entered symbols => BAM!
-                // therefore we use enterIfNew rather than just enter
-                enterIfNew(clazz)
-                enterIfNew(module)
-                (clazz, module)
-              }
+            val (_, module) = if (loadingMirror eq currentMirror) {
+              initAndEnterClassAndModule(pkgClass,
+                                         name.toTypeName,
+                                         new TopClassCompleter(_, _))
+            } else {
+              val origOwner =
+                loadingMirror.packageNameToScala(pkgClass.fullName)
+              val clazz = origOwner.info decl name.toTypeName
+              val module = origOwner.info decl name.toTermName
+              assert(clazz != NoSymbol)
+              assert(module != NoSymbol)
+              // currentMirror.mirrorDefining(cls) might side effect by entering symbols into pkgClass.info.decls
+              // therefore, even though in the beginning of this method, super.lookupEntry(name) returned null
+              // entering clazz/module now will result in a double-enter assertion in PackageScope.enter
+              // here's how it might happen
+              // 1) we are the rootMirror
+              // 2) cls.getClassLoader is different from our classloader
+              // 3) mirrorDefining(cls) looks up a mirror corresponding to that classloader and cannot find it
+              // 4) mirrorDefining creates a new mirror
+              // 5) that triggers Mirror.init() of the new mirror
+              // 6) that triggers definitions.syntheticCoreClasses
+              // 7) that might materialize symbols and enter them into our scope (because syntheticCoreClasses live in rootMirror)
+              // 8) now we come back here and try to enter one of the now entered symbols => BAM!
+              // therefore we use enterIfNew rather than just enter
+              enterIfNew(clazz)
+              enterIfNew(module)
+              (clazz, module)
+            }
             debugInfo(s"created $module/${module.moduleClass} in $pkgClass")
             lookupEntry(name)
           case none =>

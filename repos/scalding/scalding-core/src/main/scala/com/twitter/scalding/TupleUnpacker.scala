@@ -140,7 +140,7 @@ class ReflectionSetter[T](fields: Fields)(implicit m: Manifest[T])
       .orElse(getValueFromMethod(fieldName))
       .orElse(getValueFromField(fieldName))
       .getOrElse(throw new TupleUnpackerException("Unrecognized field: " +
-              fieldName + " for class: " + m.runtimeClass.getName))
+                fieldName + " for class: " + m.runtimeClass.getName))
   }
 
   private def getValueFromField(fieldName: String): Option[(T => AnyRef)] = {

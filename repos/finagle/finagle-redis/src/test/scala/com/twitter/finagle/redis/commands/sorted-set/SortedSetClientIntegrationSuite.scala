@@ -25,7 +25,8 @@ final class SortedSetClientIntegrationSuite extends RedisClientTest {
   test("Correctly add multiple members and get scores", RedisTest, ClientTest) {
     withRedisClient { client =>
       assert(
-          Await.result(client.zAddMulti(foo, Seq((10.5, bar), (20.1, baz)))) == 2)
+          Await
+            .result(client.zAddMulti(foo, Seq((10.5, bar), (20.1, baz)))) == 2)
       assert(Await.result(client.zScore(foo, bar)).get == 10.5)
       assert(Await.result(client.zScore(foo, baz)).get == 20.1)
     }
@@ -53,8 +54,9 @@ final class SortedSetClientIntegrationSuite extends RedisClientTest {
                                                  true,
                                                  Some(Limit(0, 5))))
                     .left) {
-        assert(CBToString.fromTuplesWithDoubles(left.asTuples) ==
-            (Seq(("bar", 10), ("baz", 20))))
+        assert(
+            CBToString.fromTuplesWithDoubles(left.asTuples) ==
+              (Seq(("bar", 10), ("baz", 20))))
       }
       for (left <- Await
                     .result(client.zRangeByScore(foo,
@@ -81,8 +83,8 @@ final class SortedSetClientIntegrationSuite extends RedisClientTest {
     withRedisClient { client =>
       assert(Await.result(client.zAdd(foo, 10, bar)) == 1)
       assert(Await.result(client.zAdd(foo, 20, baz)) == 1)
-      for (right <- Await.result(client.zRevRange(foo, 0, -1, false)).right) assert(
-          CBToString.fromList(right.toList) == Seq("baz", "bar"))
+      for (right <- Await.result(client.zRevRange(foo, 0, -1, false)).right)
+        assert(CBToString.fromList(right.toList) == Seq("baz", "bar"))
     }
   }
 
@@ -97,7 +99,8 @@ final class SortedSetClientIntegrationSuite extends RedisClientTest {
                                                     true,
                                                     Some(Limit(0, 1))))
                     .left) {
-        assert(CBToString.fromTuplesWithDoubles(left.asTuples) == Seq(
+        assert(
+            CBToString.fromTuplesWithDoubles(left.asTuples) == Seq(
                 ("bar", 10)))
       }
       for (left <- Await
@@ -136,12 +139,12 @@ final class SortedSetClientIntegrationSuite extends RedisClientTest {
       assert(Await.result(client.zAdd(foo, 10, bar)) == 1)
       assert(Await.result(client.zAdd(foo, 20, baz)) == 1)
       assert(Await.result(client.zAdd(foo, 30, boo)) == 1)
-      for (right <- Await.result(client.zRange(foo, 0, -1, false)).right) assert(
-          CBToString.fromList(right.toList) == List("bar", "baz", "boo"))
-      for (right <- Await.result(client.zRange(foo, 2, 3, false)).right) assert(
-          CBToString.fromList(right.toList) == List("boo"))
-      for (right <- Await.result(client.zRange(foo, -2, -1, false)).right) assert(
-          CBToString.fromList(right.toList) == List("baz", "boo"))
+      for (right <- Await.result(client.zRange(foo, 0, -1, false)).right)
+        assert(CBToString.fromList(right.toList) == List("bar", "baz", "boo"))
+      for (right <- Await.result(client.zRange(foo, 2, 3, false)).right)
+        assert(CBToString.fromList(right.toList) == List("boo"))
+      for (right <- Await.result(client.zRange(foo, -2, -1, false)).right)
+        assert(CBToString.fromList(right.toList) == List("baz", "boo"))
     }
   }
 
@@ -161,8 +164,8 @@ final class SortedSetClientIntegrationSuite extends RedisClientTest {
       assert(Await.result(client.zAdd(foo, 20, baz)) == 1)
       assert(Await.result(client.zAdd(foo, 30, boo)) == 1)
       assert(Await.result(client.zRemRangeByRank(foo, 0, 1)) == 2)
-      for (right <- Await.result(client.zRange(foo, 0, -1, false)).right) assert(
-          CBToString.fromList(right.toList) == List("boo"))
+      for (right <- Await.result(client.zRange(foo, 0, -1, false)).right)
+        assert(CBToString.fromList(right.toList) == List("boo"))
     }
   }
 
@@ -171,10 +174,11 @@ final class SortedSetClientIntegrationSuite extends RedisClientTest {
       assert(Await.result(client.zAdd(foo, 10, bar)) == 1)
       assert(Await.result(client.zAdd(foo, 20, baz)) == 1)
       assert(Await.result(client.zAdd(foo, 30, boo)) == 1)
-      assert(Await.result(
+      assert(
+          Await.result(
               client.zRemRangeByScore(foo, ZInterval(10), ZInterval(20))) == 2)
-      for (right <- Await.result(client.zRange(foo, 0, -1, false)).right) assert(
-          CBToString.fromList(right.toList) == List("boo"))
+      for (right <- Await.result(client.zRange(foo, 0, -1, false)).right)
+        assert(CBToString.fromList(right.toList) == List("boo"))
     }
   }
 

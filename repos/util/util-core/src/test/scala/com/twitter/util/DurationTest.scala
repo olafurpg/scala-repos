@@ -55,8 +55,8 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
 
         assert(
             (c >= Long.MaxValue && d == Duration.Top) ||
-            (c <= Long.MinValue && d == Duration.Bottom) ||
-            (d == c.toLong.nanoseconds)
+              (c <= Long.MinValue && d == Duration.Bottom) ||
+              (d == c.toLong.nanoseconds)
         )
       }
     }
@@ -156,8 +156,8 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
 
         assert(
             (c >= Long.MaxValue && d == Duration.Top) ||
-            (c <= Long.MinValue && d == Duration.Bottom) ||
-            (d == c.toLong.nanoseconds)
+              (c <= Long.MinValue && d == Duration.Bottom) ||
+              (d == c.toLong.nanoseconds)
         )
       }
     }

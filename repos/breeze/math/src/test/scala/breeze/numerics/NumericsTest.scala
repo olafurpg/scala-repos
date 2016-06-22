@@ -78,8 +78,7 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
   }
 
   test("sum distributes over softmax") {
-    check(
-        Prop.forAll { (a: Double, b: Double, c: Double) =>
+    check(Prop.forAll { (a: Double, b: Double, c: Double) =>
       Seq(a, b, c).exists(x => x > 1E300 || x < -1E300) ||
       (a + softmax(b, c)) =~=
       (softmax(a + b, a + c))
@@ -87,8 +86,7 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
   }
 
   test("exp(digamma(x)) ≈ x - .5, x >= 10") {
-    check(
-        Prop.forAll { (a: Double) =>
+    check(Prop.forAll { (a: Double) =>
       a.abs < 10 || a.abs > Double.MaxValue / 2 ||
       exp(breeze.numerics.digamma(a.abs)) =~= (a.abs - .5)
     })
@@ -109,12 +107,16 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     import breeze.numerics.gammp
     lg(3.0, 4.0) should be(0.4212028764812177 +- 1E-8)
     lg(3.0, 1.0) should be(-1.828821079471455 +- 1E-8)
-    assert(lg(3.0, DenseVector(4.0, 1.0)) === DenseVector(lg(3.0, 4.0),
-                                                          lg(3.0, 1.0)))
-    assert(lg(DenseVector(3.0, 3.0), 4.0) === DenseVector(lg(3.0, 4.0),
-                                                          lg(3.0, 4.0)))
-    assert(lg(DenseVector(3.0, 3.0), DenseVector(4.0, 1.0)) === DenseVector(
-            lg(3.0, 4.0), lg(3.0, 1.0)))
+    assert(
+        lg(3.0, DenseVector(4.0, 1.0)) === DenseVector(lg(3.0, 4.0),
+                                                       lg(3.0, 1.0)))
+    assert(
+        lg(DenseVector(3.0, 3.0), 4.0) === DenseVector(lg(3.0, 4.0),
+                                                       lg(3.0, 4.0)))
+    assert(
+        lg(DenseVector(3.0, 3.0), DenseVector(4.0, 1.0)) === DenseVector(
+            lg(3.0, 4.0),
+            lg(3.0, 1.0)))
     gammp(3.0, 1.0) should be(0.08030139707139419 +- 1E-8)
     gammp(3.0, 4.0) should be(0.7618966944464557 +- 1E-8)
     gammp(3.0, 10.0) should be(0.9972306042844884 +- 1E-8)
@@ -175,10 +177,11 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
 
     val testDV = DenseVector(-10d, -7d, -4d, -1d)
     assert(
-        norm(sinc(testDV) - DenseVector(-0.05440211108893698,
-                                        0.09385522838839844,
-                                        -0.18920062382698205,
-                                        0.8414709848078965)) < testThreshold)
+        norm(
+            sinc(testDV) - DenseVector(-0.05440211108893698,
+                                       0.09385522838839844,
+                                       -0.18920062382698205,
+                                       0.8414709848078965)) < testThreshold)
   }
 
   test("sincpi") {
@@ -189,10 +192,11 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
 
     val testDV = DenseVector(-3d, -2.5, -2d, -1.5)
     assert(
-        norm(sincpi(testDV) - DenseVector(3.898171832519376E-17,
-                                          0.127323954473516,
-                                          -3.898171832519376E-17,
-                                          -0.212206590789194)) < testThreshold)
+        norm(
+            sincpi(testDV) - DenseVector(3.898171832519376E-17,
+                                         0.127323954473516,
+                                         -3.898171832519376E-17,
+                                         -0.212206590789194)) < testThreshold)
   }
 
   test("nextPower") {

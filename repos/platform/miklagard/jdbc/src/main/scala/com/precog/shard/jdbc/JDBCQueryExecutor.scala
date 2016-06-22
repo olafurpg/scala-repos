@@ -75,17 +75,19 @@ class JDBCQueryExecutorConfig(val config: Configuration)
 object JDBCQueryExecutor {
   def apply(config: Configuration,
             jobManager: JobManager[Future],
-            jobActorSystem: ActorSystem)(
-      implicit ec: ExecutionContext, M: Monad[Future]): ManagedPlatform = {
-    new JDBCQueryExecutor(
-        new JDBCQueryExecutorConfig(config), jobManager, jobActorSystem)
+            jobActorSystem: ActorSystem)(implicit ec: ExecutionContext,
+                                         M: Monad[Future]): ManagedPlatform = {
+    new JDBCQueryExecutor(new JDBCQueryExecutorConfig(config),
+                          jobManager,
+                          jobActorSystem)
   }
 }
 
 class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
                         val jobManager: JobManager[Future],
                         val jobActorSystem: ActorSystem)(
-    implicit val executionContext: ExecutionContext, val M: Monad[Future])
+    implicit val executionContext: ExecutionContext,
+    val M: Monad[Future])
     extends StandaloneQueryExecutor
     with JDBCColumnarTableModule
     with Logging {
@@ -124,7 +126,7 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
 
                     val query =
                       "SELECT count(*) as count FROM " +
-                      tableName.filterNot(_ == ';')
+                        tableName.filterNot(_ == ';')
                     logger.debug("Querying with " + query)
 
                     val result = stmt.executeQuery(query)
@@ -149,8 +151,8 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
         case t => logger.error("Failure during size", t)
       }
 
-    def browse(
-        userUID: String, path: Path): Future[Validation[String, JArray]] = {
+    def browse(userUID: String,
+               path: Path): Future[Validation[String, JArray]] = {
       Future {
         path.elements.toList match {
           case Nil =>
@@ -203,8 +205,7 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
 
     def structure(userUID: String,
                   path: Path,
-                  cpath: CPath)
-      : Future[Validation[String, JObject]] =
+                  cpath: CPath): Future[Validation[String, JObject]] =
       Promise.successful(
           Success(
               JObject(Map("children" -> JArray.empty,

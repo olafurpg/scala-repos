@@ -228,8 +228,7 @@ class TransportTest extends FunSuite with GeneratorDrivenPropertyChecks {
     assertDiscarded(coll1)
   })
 
-  test("Transport.collate: discard while writing")(
-      new Collate {
+  test("Transport.collate: discard while writing")(new Collate {
     readq.offer("hello")
 
     coll.discard()
@@ -237,8 +236,7 @@ class TransportTest extends FunSuite with GeneratorDrivenPropertyChecks {
     assertDiscarded(coll.read(10))
   })
 
-  test("Transport.collate: discard while buffering")(
-      new Collate {
+  test("Transport.collate: discard while buffering")(new Collate {
     readq.offer("hello")
     val r1 = coll.read(1)
     assert(Await.result(r1) == Some(Buf.Utf8("h")))

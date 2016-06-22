@@ -38,8 +38,9 @@ object ContentRange {
   /**
     * Models a satisfiable HTTP content-range.
     */
-  final case class Default(
-      first: Long, last: Long, instanceLength: Option[Long])
+  final case class Default(first: Long,
+                           last: Long,
+                           instanceLength: Option[Long])
       extends ByteContentRange {
     require(0 <= first && first <= last, "first must be >= 0 and <= last")
     require(instanceLength.isEmpty || instanceLength.get > last,

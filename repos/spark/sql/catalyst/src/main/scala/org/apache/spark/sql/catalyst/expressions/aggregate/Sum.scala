@@ -59,8 +59,9 @@ case class Sum(child: Expression) extends DeclarativeAggregate {
     if (child.nullable) {
       Seq(
           /* sum = */
-          Coalesce(Seq(Add(Coalesce(Seq(sum, zero)), Cast(child, sumDataType)),
-                       sum))
+          Coalesce(
+              Seq(Add(Coalesce(Seq(sum, zero)), Cast(child, sumDataType)),
+                  sum))
       )
     } else {
       Seq(

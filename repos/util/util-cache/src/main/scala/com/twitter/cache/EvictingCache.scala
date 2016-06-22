@@ -26,8 +26,7 @@ private[cache] class EvictingCache[K, V](underlying: FutureCache[K, V])
 
 private[cache] class LazilyEvictingCache[K, V](
     underlying: LoadingFutureCache[K, V]
-)
-    extends FutureCacheProxy[K, V](underlying) {
+) extends FutureCacheProxy[K, V](underlying) {
   private[this] def invalidateLazily(k: K, f: Future[V]): Unit = {
     f.poll match {
       case Some(Throw(e)) => underlying.evict(k, f)

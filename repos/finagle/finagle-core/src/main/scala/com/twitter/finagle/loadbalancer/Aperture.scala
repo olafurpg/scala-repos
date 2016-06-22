@@ -111,16 +111,15 @@ private trait Aperture[Req, Rep] { self: Balancer[Req, Rep] =>
       case updown => updown
     }
 
-    private[this] val (ring, unitWidth, maxAperture) =
-      if (up.isEmpty) {
-        (ZeroRing, RingWidth, RingWidth)
-      } else {
-        val numNodes = up.size
-        val ring = Ring(numNodes, RingWidth)
-        val unit = RingWidth / numNodes
-        val max = RingWidth / unit
-        (ring, unit, max)
-      }
+    private[this] val (ring, unitWidth, maxAperture) = if (up.isEmpty) {
+      (ZeroRing, RingWidth, RingWidth)
+    } else {
+      val numNodes = up.size
+      val ring = Ring(numNodes, RingWidth)
+      val unit = RingWidth / numNodes
+      val max = RingWidth / unit
+      (ring, unit, max)
+    }
 
     private[this] val minAperture =
       math.min(Aperture.this.minAperture, maxAperture)
@@ -281,8 +280,7 @@ private trait LoadBand[Req, Rep] {
       adjustNode(this, 1)
       super.apply(conn).transform {
         case Return(svc) =>
-          Future.value(
-              new ServiceProxy(svc) {
+          Future.value(new ServiceProxy(svc) {
             override def close(deadline: Time) =
               super.close(deadline).ensure {
                 adjustNode(Node.this, -1)
@@ -296,8 +294,8 @@ private trait LoadBand[Req, Rep] {
     }
   }
 
-  protected def newNode(
-      factory: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver) =
+  protected def newNode(factory: ServiceFactory[Req, Rep],
+                        statsReceiver: StatsReceiver) =
     Node(factory, new AtomicInteger(0), rng.nextInt())
 
   private[this] val failingLoad = new AtomicInteger(0)

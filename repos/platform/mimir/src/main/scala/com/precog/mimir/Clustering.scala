@@ -79,8 +79,8 @@ trait KMediansCoreSetClustering {
       val coresets =
         tree map {
           case (_, coreset) =>
-            CoreSet.fromWeightedPoints(
-                coreset._1, coreset._2, k, epsilon / 6.0)
+            CoreSet
+              .fromWeightedPoints(coreset._1, coreset._2, k, epsilon / 6.0)
         }
 
       coresets.foldLeft((new Array[Array[Double]](0), new Array[Long](0))) {
@@ -95,8 +95,10 @@ trait KMediansCoreSetClustering {
       val (centers2, weights2) = c2
       val epsilon0 = epsilon / (c * ((level + 1) ** 2))
 
-      CoreSet.fromWeightedPoints(
-          centers1 ++ centers2, weights1 ++ weights2, k, epsilon0)
+      CoreSet.fromWeightedPoints(centers1 ++ centers2,
+                                 weights1 ++ weights2,
+                                 k,
+                                 epsilon0)
     }
 
     private def insertCoreSet(coreset: CoreSet, level: Int): CoreSetTree = {
@@ -196,8 +198,8 @@ trait KMediansCoreSetClustering {
                           centers0: Array[Array[Double]],
                           epsilon: Double): (Double, Array[Array[Double]]) = {
 
-    val minCost0 = kMediansCost(
-        points, weights, centers0, Double.PositiveInfinity)
+    val minCost0 =
+      kMediansCost(points, weights, centers0, Double.PositiveInfinity)
     val centers = java.util.Arrays.copyOf(centers0, centers0.length)
 
     var minCost = minCost0
@@ -455,7 +457,7 @@ trait KMediansCoreSetClustering {
 
         require(j < sideLengths.length,
                 "Point (%d) found outside of grid (%d). What to do..." format
-                (j, sideLengths.length))
+                  (j, sideLengths.length))
 
         val sideLength = sideLengths(j)
         val scaledPoint = {
@@ -467,7 +469,7 @@ trait KMediansCoreSetClustering {
         while (i < scaledPoint.length) {
           scaledPoint(i) =
             center(i) + math.floor(scaledPoint(i)) * sideLength +
-            (sideLength / 2)
+              (sideLength / 2)
           i += 1
         }
         new GridPoint(scaledPoint)
@@ -574,8 +576,8 @@ trait ClusteringLibModule[M[+ _]]
     object KMediansClustering
         extends Morphism2(Stats4Namespace, "kMedians")
         with KMediansCoreSetClustering {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JNumberT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JType.JUniverseT, JNumberT, JObjectUnfixedT)
 
       lazy val alignment =
         MorphismAlignment.Custom(IdentityPolicy.Retain.Cross, alignCustom _)
@@ -747,8 +749,7 @@ trait ClusteringLibModule[M[+ _]]
                       .normalize
                       .reduce(reducerFeatures(k))
 
-                    StreamT(
-                        coreSetTree map { tree =>
+                    StreamT(coreSetTree map { tree =>
                       StreamT.Yield(extract(tree,
                                             k,
                                             jtype,
@@ -794,8 +795,8 @@ trait ClusteringLibModule[M[+ _]]
     object AssignClusters
         extends Morphism2(Vector("std", "stats"), "assignClusters")
         with AssignClusterBase {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JObjectUnfixedT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JType.JUniverseT, JObjectUnfixedT, JObjectUnfixedT)
 
       override val idPolicy = IdentityPolicy.Retain.Merge
 

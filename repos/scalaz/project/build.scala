@@ -117,22 +117,22 @@ object build extends Build {
             "-language:postfixOps",
             "-unchecked"
         ) ++
-        (CrossVersion.partialVersion(scalaVersion.value) match {
-              case Some((2, 10)) => scalac210Options
-              case _ =>
-                Seq(
-                    "-Ybackend:GenBCode",
-                    "-Ydelambdafy:method",
-                    "-target:jvm-1.8"
-                )
-            }),
+          (CrossVersion.partialVersion(scalaVersion.value) match {
+                case Some((2, 10)) => scalac210Options
+                case _ =>
+                  Seq(
+                      "-Ybackend:GenBCode",
+                      "-Ydelambdafy:method",
+                      "-target:jvm-1.8"
+                  )
+              }),
         scalacOptions in (Compile, doc) ++= {
           val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
           Seq("-sourcepath",
               base,
               "-doc-source-url",
               "https://github.com/scalaz/scalaz/tree/" + tagOrHash.value +
-              "€{FILE_PATH}.scala")
+                "€{FILE_PATH}.scala")
         },
         // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
         parallelExecution in Test := false,
@@ -160,7 +160,8 @@ object build extends Build {
         },
         checkGenTypeClasses <<= genTypeClasses.map { classes =>
           if (classes.exists(_._1 != FileStatus.NoChange))
-            sys.error(classes
+            sys.error(
+                classes
                   .groupBy(_._1)
                   .filterKeys(_ != FileStatus.NoChange)
                   .mapValues(_.map(_._2))
@@ -170,12 +171,12 @@ object build extends Build {
         genToSyntax <<= typeClasses map { (tcs: Seq[TypeClass]) =>
           val objects = tcs
             .map(tc =>
-                  "object %s extends To%sSyntax".format(
-                      Util.initLower(tc.name), tc.name))
+                  "object %s extends To%sSyntax"
+                    .format(Util.initLower(tc.name), tc.name))
             .mkString("\n")
           val all =
             "object all extends " +
-            tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
+              tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
           objects + "\n\n" + all
         },
         typeClassTree <<= typeClasses map { tcs =>
@@ -278,8 +279,8 @@ object build extends Build {
             packagedArtifacts <<=
               Classpaths.packaged(Seq(packageDoc in Compile)),
             unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-              jsProjects.foldLeft(inAnyProject)((acc,
-                                                 a) => acc -- inProjects(a))
+              jsProjects.foldLeft(inAnyProject)((acc, a) =>
+                    acc -- inProjects(a))
             }
         ) ++ Defaults.packageTaskSettings(
             packageDoc in Compile,
@@ -311,8 +312,8 @@ object build extends Build {
     .settings(name := "scalaz-core",
               sourceGenerators in Compile <+=
                 (sourceManaged in Compile) map { dir =>
-                Seq(GenerateTupleW(dir), TupleNInstances(dir))
-              },
+                  Seq(GenerateTupleW(dir), TupleNInstances(dir))
+                },
               buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
               buildInfoPackage := "scalaz",
               buildInfoObject := "ScalazBuildInfo",
@@ -457,7 +458,8 @@ object build extends Build {
   lazy val showDoc = TaskKey[Unit]("show-doc")
 
   lazy val typeClassTree = TaskKey[String](
-      "type-class-tree", "Generates scaladoc formatted tree of type classes.")
+      "type-class-tree",
+      "Generates scaladoc formatted tree of type classes.")
 
   lazy val checkGenTypeClasses = TaskKey[Unit]("check-gen-type-classes")
 

@@ -18,13 +18,13 @@ object Unmarshallers {
   def ByteArray: Unmarshaller[Array[Byte]] = implicitInstance
   def CharArray: Unmarshaller[Array[Char]] = implicitInstance
 
-  def fromMessage[T](
-      convert: Function[HttpMessage, T], clazz: Class[T]): Unmarshaller[T] =
+  def fromMessage[T](convert: Function[HttpMessage, T],
+                     clazz: Class[T]): Unmarshaller[T] =
     new UnmarshallerImpl[T](Util.scalaUnmarshallerFromFunction(convert))(
         ClassTag(clazz))
 
-  def fromEntity[T](
-      convert: Function[HttpEntity, T], clazz: Class[T]): Unmarshaller[T] =
+  def fromEntity[T](convert: Function[HttpEntity, T],
+                    clazz: Class[T]): Unmarshaller[T] =
     new UnmarshallerImpl[T](
         ScalaUnmarshaller.messageUnmarshallerFromEntityUnmarshaller(
             Util.scalaUnmarshallerFromFunction[HttpEntity, T](convert)))(

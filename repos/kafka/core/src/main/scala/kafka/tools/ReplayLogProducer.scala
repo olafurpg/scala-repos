@@ -45,15 +45,17 @@ object ReplayLogProducer extends Logging {
     consumerProps.put("consumer.timeout.ms", "10000")
     consumerProps.put("auto.offset.reset", OffsetRequest.SmallestTimeString)
     consumerProps.put("fetch.message.max.bytes", (1024 * 1024).toString)
-    consumerProps.put(
-        "socket.receive.buffer.bytes", (2 * 1024 * 1024).toString)
+    consumerProps
+      .put("socket.receive.buffer.bytes", (2 * 1024 * 1024).toString)
     val consumerConfig = new ConsumerConfig(consumerProps)
     val consumerConnector: ConsumerConnector = Consumer.create(consumerConfig)
     val topicMessageStreams = consumerConnector.createMessageStreams(
         Predef.Map(config.inputTopic -> config.numThreads))
     var threadList = List[ZKConsumerThread]()
-    for ((topic, streamList) <- topicMessageStreams) for (stream <- streamList) threadList ::=
-      new ZKConsumerThread(config, stream)
+    for ((topic, streamList) <- topicMessageStreams)
+      for (stream <- streamList)
+        threadList ::=
+          new ZKConsumerThread(config, stream)
 
     for (thread <- threadList) thread.start
 
@@ -67,7 +69,7 @@ object ReplayLogProducer extends Logging {
       .accepts(
           "zookeeper",
           "REQUIRED: The connection string for the zookeeper connection in the form host:port. " +
-          "Multiple URLS can be given to allow fail-over.")
+            "Multiple URLS can be given to allow fail-over.")
       .withRequiredArg
       .describedAs("zookeeper url")
       .ofType(classOf[String])
@@ -110,7 +112,7 @@ object ReplayLogProducer extends Logging {
       .accepts(
           "property",
           "A mechanism to pass properties in the form key=value to the producer. " +
-          "This allows the user to override producer properties that are not exposed by the existing command line arguments")
+            "This allows the user to override producer properties that are not exposed by the existing command line arguments")
       .withRequiredArg
       .describedAs("producer properties")
       .ofType(classOf[String])
@@ -120,8 +122,8 @@ object ReplayLogProducer extends Logging {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils.checkRequiredArgs(
-        parser, options, brokerListOpt, inputTopicOpt)
+    CommandLineUtils
+      .checkRequiredArgs(parser, options, brokerListOpt, inputTopicOpt)
 
     val zkConnect = options.valueOf(zkConnectOpt)
     val brokerList = options.valueOf(brokerListOpt)
@@ -144,8 +146,8 @@ object ReplayLogProducer extends Logging {
         "org.apache.kafka.common.serialization.ByteArraySerializer")
   }
 
-  class ZKConsumerThread(
-      config: Config, stream: KafkaStream[Array[Byte], Array[Byte]])
+  class ZKConsumerThread(config: Config,
+                         stream: KafkaStream[Array[Byte], Array[Byte]])
       extends Thread
       with Logging {
     val shutdownLatch = new CountDownLatch(1)

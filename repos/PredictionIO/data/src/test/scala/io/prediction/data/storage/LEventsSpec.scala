@@ -179,7 +179,9 @@ class LEventsSpec extends Specification with TestEvents {
 
   def aggregateOneUserProperties(eventClient: LEvents) = {
     val result: Option[PropertyMap] = eventClient.aggregatePropertiesOfEntity(
-        appId = appId, entityType = "user", entityId = "u1")
+        appId = appId,
+        entityType = "user",
+        entityId = "u1")
 
     val expected = Some(PropertyMap(u1, u1BaseTime, u1LastTime))
 
@@ -188,7 +190,9 @@ class LEventsSpec extends Specification with TestEvents {
 
   def aggregateNonExistentUserProperties(eventClient: LEvents) = {
     val result: Option[PropertyMap] = eventClient.aggregatePropertiesOfEntity(
-        appId = appId, entityType = "user", entityId = "u999999")
+        appId = appId,
+        entityType = "user",
+        entityId = "u999999")
 
     result must beEqualTo(None)
   }

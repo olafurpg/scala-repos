@@ -61,12 +61,11 @@ private object ConfigHelpers {
     TimeUnit.MILLISECONDS.convert(v, unit) + "ms"
 
   def byteFromString(str: String, unit: ByteUnit): Long = {
-    val (input, multiplier) =
-      if (str.length() > 0 && str.charAt(0) == '-') {
-        (str.substring(1), -1)
-      } else {
-        (str, 1)
-      }
+    val (input, multiplier) = if (str.length() > 0 && str.charAt(0) == '-') {
+      (str.substring(1), -1)
+    } else {
+      (str, 1)
+    }
     multiplier * JavaUtils.byteStringAs(input, unit)
   }
 
@@ -107,14 +106,18 @@ private[spark] class TypedConfigBuilder[T](val parent: ConfigBuilder,
   }
 
   def toSequence: TypedConfigBuilder[Seq[T]] = {
-    new TypedConfigBuilder(
-        parent, stringToSeq(_, converter), seqToString(_, stringConverter))
+    new TypedConfigBuilder(parent,
+                           stringToSeq(_, converter),
+                           seqToString(_, stringConverter))
   }
 
   /** Creates a [[ConfigEntry]] that does not require a default value. */
   def optional: OptionalConfigEntry[T] = {
-    new OptionalConfigEntry[T](
-        parent.key, converter, stringConverter, parent._doc, parent._public)
+    new OptionalConfigEntry[T](parent.key,
+                               converter,
+                               stringConverter,
+                               parent._doc,
+                               parent._public)
   }
 
   /** Creates a [[ConfigEntry]] that has a default value. */
@@ -186,13 +189,15 @@ private[spark] case class ConfigBuilder(key: String) {
   }
 
   def timeConf(unit: TimeUnit): TypedConfigBuilder[Long] = {
-    new TypedConfigBuilder(
-        this, timeFromString(_, unit), timeToString(_, unit))
+    new TypedConfigBuilder(this,
+                           timeFromString(_, unit),
+                           timeToString(_, unit))
   }
 
   def bytesConf(unit: ByteUnit): TypedConfigBuilder[Long] = {
-    new TypedConfigBuilder(
-        this, byteFromString(_, unit), byteToString(_, unit))
+    new TypedConfigBuilder(this,
+                           byteFromString(_, unit),
+                           byteToString(_, unit))
   }
 
   def fallbackConf[T](fallback: ConfigEntry[T]): ConfigEntry[T] = {

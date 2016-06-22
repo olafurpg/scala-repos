@@ -19,11 +19,18 @@ object Test extends DirectTest {
     val className = "Foo"
 
     val cw = new ClassWriter(0)
-    cw.visit(
-        52, ACC_PUBLIC + ACC_SUPER, className, null, "java/lang/Object", null);
+    cw.visit(52,
+             ACC_PUBLIC + ACC_SUPER,
+             className,
+             null,
+             "java/lang/Object",
+             null);
 
-    val mvC = cw.visitMethod(
-        ACC_PUBLIC, "<init>", "(ILjava/lang/String;JFD)V", null, null);
+    val mvC = cw.visitMethod(ACC_PUBLIC,
+                             "<init>",
+                             "(ILjava/lang/String;JFD)V",
+                             null,
+                             null);
     mvC.visitParameter("a", ACC_FINAL);
     mvC.visitParameter("_", ACC_FINAL);
     mvC.visitParameter("***", ACC_FINAL);
@@ -31,8 +38,11 @@ object Test extends DirectTest {
     mvC.visitParameter("ABC", ACC_FINAL);
     mvC.visitCode();
     mvC.visitVarInsn(ALOAD, 0);
-    mvC.visitMethodInsn(
-        INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+    mvC.visitMethodInsn(INVOKESPECIAL,
+                        "java/lang/Object",
+                        "<init>",
+                        "()V",
+                        false);
     mvC.visitInsn(RETURN);
     mvC.visitMaxs(1, 8);
     mvC.visitEnd();

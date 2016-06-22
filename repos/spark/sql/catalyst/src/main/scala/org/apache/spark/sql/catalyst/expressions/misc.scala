@@ -40,8 +40,7 @@ import org.apache.spark.unsafe.Platform
 @ExpressionDescription(
     usage =
       "_FUNC_(input) - Returns an MD5 128-bit checksum as a hex string of the input",
-    extended =
-      "> SELECT _FUNC_('Spark');\n '8cde774d6f7333752ed72cacddb05126'")
+    extended = "> SELECT _FUNC_('Spark');\n '8cde774d6f7333752ed72cacddb05126'")
 case class Md5(child: Expression)
     extends UnaryExpression
     with ImplicitCastInputTypes {
@@ -290,17 +289,21 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
           hashLong(d.toUnscaledLong)
         } else {
           val bytes = d.toJavaBigDecimal.unscaledValue().toByteArray
-          Murmur3_x86_32.hashUnsafeBytes(
-              bytes, Platform.BYTE_ARRAY_OFFSET, bytes.length, seed)
+          Murmur3_x86_32.hashUnsafeBytes(bytes,
+                                         Platform.BYTE_ARRAY_OFFSET,
+                                         bytes.length,
+                                         seed)
         }
       case c: CalendarInterval =>
         Murmur3_x86_32.hashInt(c.months, hashLong(c.microseconds))
       case a: Array[Byte] =>
-        Murmur3_x86_32.hashUnsafeBytes(
-            a, Platform.BYTE_ARRAY_OFFSET, a.length, seed)
+        Murmur3_x86_32
+          .hashUnsafeBytes(a, Platform.BYTE_ARRAY_OFFSET, a.length, seed)
       case s: UTF8String =>
-        Murmur3_x86_32.hashUnsafeBytes(
-            s.getBaseObject, s.getBaseOffset, s.numBytes(), seed)
+        Murmur3_x86_32.hashUnsafeBytes(s.getBaseObject,
+                                       s.getBaseOffset,
+                                       s.numBytes(),
+                                       seed)
 
       case array: ArrayData =>
         val elementType = dataType match {
@@ -376,8 +379,8 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
 
     ctx.nullSafeExec(nullable, s"$input.isNullAt($index)") {
       s"""
-        final ${ctx.javaType(elementType)} $element = ${ctx.getValue(
-          input, elementType, index)};
+        final ${ctx.javaType(elementType)} $element = ${ctx
+        .getValue(input, elementType, index)};
         ${computeHash(element, elementType, result, ctx)}
       """
     }
@@ -441,8 +444,12 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
           final ArrayData $values = $input.valueArray();
           for (int $index = 0; $index < $input.numElements(); $index++) {
             ${nullSafeElementHash(keys, index, false, kt, result, ctx)}
-            ${nullSafeElementHash(
-            values, index, valueContainsNull, vt, result, ctx)}
+            ${nullSafeElementHash(values,
+                                  index,
+                                  valueContainsNull,
+                                  vt,
+                                  result,
+                                  ctx)}
           }
         """
 

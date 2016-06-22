@@ -25,9 +25,9 @@ object ForkParallelTest extends Build {
                 // we've got at least 4 processors, we'll check the upper end but also 3 and 4 as the upper might not
                 // be reached if the system is under heavy load.
                 if (!(file("max-concurrent-tests_3").exists() ||
-                        file("max-concurrent-tests_4").exists() || file(
+                          file("max-concurrent-tests_4").exists() || file(
                             "max-concurrent-tests_" + (nbProc - 1)).exists() ||
-                        file("max-concurrent-tests_" + nbProc).exists())) {
+                          file("max-concurrent-tests_" + nbProc).exists())) {
                   sys.error("Forked tests were not executed in parallel!")
                 }
               }

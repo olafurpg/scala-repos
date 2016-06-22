@@ -97,7 +97,8 @@ object RequestVals {
   def clientIP(): RequestVal[RemoteAddress] =
     new StandaloneExtractionImpl[RemoteAddress] {
       def directive: Directive1[RemoteAddress] =
-        MiscDirectives.extractClientIP.map(x ⇒ x: RemoteAddress) // missing covariance of Directive
+        MiscDirectives.extractClientIP
+          .map(x ⇒ x: RemoteAddress) // missing covariance of Directive
     }
 
   /**
@@ -105,8 +106,9 @@ object RequestVals {
     * The new RequestVal represents the existing value as looked up in the map. If the key doesn't
     * exist the request is rejected.
     */
-  def lookupInMap[T, U](
-      key: RequestVal[T], clazz: Class[U], map: ju.Map[T, U]): RequestVal[U] =
+  def lookupInMap[T, U](key: RequestVal[T],
+                        clazz: Class[U],
+                        map: ju.Map[T, U]): RequestVal[U] =
     new StandaloneExtractionImpl[U]()(ClassTag(clazz)) {
       import BasicDirectives._
       import RouteDirectives._

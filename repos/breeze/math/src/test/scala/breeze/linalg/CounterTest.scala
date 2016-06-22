@@ -32,17 +32,21 @@ class CounterTest extends FunSuite with Checkers {
     assert(math.abs(a - b) < TOLERANCE)
 
   test("Addition") {
-    assert(Counter("a" -> 1, "b" -> 2) +
-        Counter("a" -> 3) === Counter("a" -> 4, "b" -> 2))
-    assert(Counter("a" -> 3) +
-        Counter("a" -> 1, "b" -> 2) === Counter("a" -> 4, "b" -> 2))
+    assert(
+        Counter("a" -> 1, "b" -> 2) +
+          Counter("a" -> 3) === Counter("a" -> 4, "b" -> 2))
+    assert(
+        Counter("a" -> 3) +
+          Counter("a" -> 1, "b" -> 2) === Counter("a" -> 4, "b" -> 2))
   }
 
   test("Subtraction") {
-    assert(Counter("a" -> 1, "b" -> 2) -
-        Counter("a" -> 3) === Counter("a" -> -2, "b" -> 2))
-    assert(Counter("a" -> 3) -
-        Counter("a" -> 1, "b" -> 2) === Counter("a" -> 2, "b" -> -2))
+    assert(
+        Counter("a" -> 1, "b" -> 2) -
+          Counter("a" -> 3) === Counter("a" -> -2, "b" -> 2))
+    assert(
+        Counter("a" -> 3) -
+          Counter("a" -> 1, "b" -> 2) === Counter("a" -> 2, "b" -> -2))
   }
 
   test("Multiplication") {
@@ -53,10 +57,16 @@ class CounterTest extends FunSuite with Checkers {
   }
 
   test("MulInner") {
-    val a = Counter(
-        1 -> 0.56390, 2 -> 0.36231, 3 -> 0.14601, 4 -> 0.60294, 5 -> 0.14535)
-    val b = Counter(
-        1 -> 0.15951, 2 -> 0.83671, 3 -> 0.56002, 4 -> 0.57797, 5 -> 0.54450)
+    val a = Counter(1 -> 0.56390,
+                    2 -> 0.36231,
+                    3 -> 0.14601,
+                    4 -> 0.60294,
+                    5 -> 0.14535)
+    val b = Counter(1 -> 0.15951,
+                    2 -> 0.83671,
+                    3 -> 0.56002,
+                    4 -> 0.57797,
+                    5 -> 0.54450)
     assertClose(a dot b, .90249)
   }
 

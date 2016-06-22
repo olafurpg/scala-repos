@@ -82,8 +82,9 @@ class RateTransformationDocSpec extends AkkaSpec {
     val driftFlow = Flow[Double].expand(i => Iterator.from(0).map(i -> _))
     //#expand-drift
     val latch = TestLatch(2)
-    val realDriftFlow = Flow[Double].expand(
-        d => { latch.countDown(); Iterator.from(0).map(d -> _) })
+    val realDriftFlow = Flow[Double].expand(d => {
+      latch.countDown(); Iterator.from(0).map(d -> _)
+    })
 
     val (pub, sub) = TestSource
       .probe[Double]

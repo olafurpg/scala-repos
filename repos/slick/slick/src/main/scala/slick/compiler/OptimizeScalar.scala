@@ -23,9 +23,10 @@ class OptimizeScalar extends Phase {
           else LiteralNode(false)
         cast(n.nodeType, res).infer()
 
-      case n @ IfThenElse(ConstArray(
-          Library.Not(Library.==(v, LiteralNode(null))), v2, LiteralNode(z)))
-          if v == v2 && (z == null || z == None) =>
+      case n @ IfThenElse(
+          ConstArray(Library.Not(Library.==(v, LiteralNode(null))),
+                     v2,
+                     LiteralNode(z))) if v == v2 && (z == null || z == None) =>
         logger.debug("Optimizing: if(v != null) v else null", n)
         v
 
@@ -36,7 +37,8 @@ class OptimizeScalar extends Phase {
       case o @ OptionApply(Library.SilentCast(n))
           if o.nodeType == n.nodeType =>
         logger.debug(
-            "Optimizing: Redundant cast to non-nullable within OptionApply", o)
+            "Optimizing: Redundant cast to non-nullable within OptionApply",
+            o)
         n
 
       case n @ Library.<(Library.-(r: RowNumber, LiteralNode(1L)), v) =>

@@ -29,8 +29,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-class ScTypeParamImpl private (
-    stub: StubElement[ScTypeParam], nodeType: IElementType, node: ASTNode)
+class ScTypeParamImpl private (stub: StubElement[ScTypeParam],
+                               nodeType: IElementType,
+                               node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScTypeBoundsOwnerImpl
     with ScTypeParam
@@ -146,16 +147,15 @@ class ScTypeParamImpl private (
     // For Java
     upperBound match {
       case Success(t, _) =>
-        val psiType =
-          if (hasTypeParameters) {
-            t match {
-              case ScParameterizedType(des, _) =>
-                ScType.toPsi(des, getProject, getResolveScope)
-              case _ => ScType.toPsi(t, getProject, getResolveScope)
-            }
-          } else {
-            ScType.toPsi(t, getProject, getResolveScope)
+        val psiType = if (hasTypeParameters) {
+          t match {
+            case ScParameterizedType(des, _) =>
+              ScType.toPsi(des, getProject, getResolveScope)
+            case _ => ScType.toPsi(t, getProject, getResolveScope)
           }
+        } else {
+          ScType.toPsi(t, getProject, getResolveScope)
+        }
         psiType match {
           case x: PsiClassType => Array(x)
           case _ => Array() // TODO

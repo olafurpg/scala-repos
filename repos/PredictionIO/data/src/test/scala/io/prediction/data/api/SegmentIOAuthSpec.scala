@@ -20,8 +20,9 @@ class SegmentIOAuthSpec extends Specification {
   val eventClient = new LEvents {
     override def init(appId: Int, channelId: Option[Int]): Boolean = true
 
-    override def futureInsert(
-        event: Event, appId: Int, channelId: Option[Int])(
+    override def futureInsert(event: Event,
+                              appId: Int,
+                              channelId: Option[Int])(
         implicit ec: ExecutionContext): Future[String] =
       Future successful "event_id"
 
@@ -39,15 +40,17 @@ class SegmentIOAuthSpec extends Specification {
         implicit ec: ExecutionContext): Future[Iterator[Event]] =
       Future successful List.empty[Event].iterator
 
-    override def futureGet(
-        eventId: String, appId: Int, channelId: Option[Int])(
+    override def futureGet(eventId: String,
+                           appId: Int,
+                           channelId: Option[Int])(
         implicit ec: ExecutionContext): Future[Option[Event]] =
       Future successful None
 
     override def remove(appId: Int, channelId: Option[Int]): Boolean = true
 
-    override def futureDelete(
-        eventId: String, appId: Int, channelId: Option[Int])(
+    override def futureDelete(eventId: String,
+                              appId: Int,
+                              channelId: Option[Int])(
         implicit ec: ExecutionContext): Future[Boolean] =
       Future successful true
 

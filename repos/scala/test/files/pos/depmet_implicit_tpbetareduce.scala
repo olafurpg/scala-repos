@@ -1,7 +1,7 @@
 trait HOSeq {
   trait Accumulator[+coll[x], elT]
   trait Iterable[+t] {
-    type m [+x]
+    type m[+x]
     def accumulator[t]: Accumulator[m, t]
   }
   implicit def listAccumulator[elT]: Accumulator[List, elT] =

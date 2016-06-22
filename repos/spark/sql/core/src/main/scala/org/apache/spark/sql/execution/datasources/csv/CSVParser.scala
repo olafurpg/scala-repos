@@ -119,8 +119,9 @@ private[sql] class LineCsvReader(params: CSVOptions)
   * @param params Parameters object
   * @param headers headers for the columns
   */
-private[sql] class BulkCsvReader(
-    iter: Iterator[String], params: CSVOptions, headers: Seq[String])
+private[sql] class BulkCsvReader(iter: Iterator[String],
+                                 params: CSVOptions,
+                                 headers: Seq[String])
     extends CsvReader(params, headers)
     with Iterator[Array[String]] {
 
@@ -205,20 +206,22 @@ private class StringIteratorReader(val iter: Iterator[String])
         // end of input
         n = -1
       } else {
-        n =
-          Math.min(length - next, len).toInt // lesser of amount of input available or buf size
+        n = Math.min(length - next, len).toInt // lesser of amount of input available or buf size
         if (n == length - next) {
-          str.getChars(
-              (next - start).toInt, (next - start + n - 1).toInt, cbuf, off)
+          str.getChars((next - start).toInt,
+                       (next - start + n - 1).toInt,
+                       cbuf,
+                       off)
           cbuf(off + n - 1) = '\n'
         } else {
-          str.getChars(
-              (next - start).toInt, (next - start + n).toInt, cbuf, off)
+          str.getChars((next - start).toInt,
+                       (next - start + n).toInt,
+                       cbuf,
+                       off)
         }
         next += n
         if (n < len) {
-          val m =
-            read(cbuf, off + n, len - n) // have more space, fetch more input from iter
+          val m = read(cbuf, off + n, len - n) // have more space, fetch more input from iter
           if (m != -1) n += m
         }
       }

@@ -42,9 +42,10 @@ object ScaldingPoC extends App {
   val fasterBirds = birds.map(b => b + ("doubleSpeed" ->> b("speed") * 2))
   fasterBirds foreach println
 
-  val britishBirds = birds.map(b =>
+  val britishBirds = birds.map(
+      b =>
         b + ("weightKg" ->> b("weightLb") * 0.454) +
-        ("heightM" ->> b("heightFt") * 0.305))
+          ("heightM" ->> b("heightFt") * 0.305))
   britishBirds foreach println
 
   val items = List(
@@ -60,8 +61,9 @@ object ScaldingPoC extends App {
       "text" ->> "No, no, I can't tell you everything" :: HNil
   )
 
-  val lines = books.flatMap(book =>
-        for (word <- book("text").split("\\s+")) yield
-          book + ("word" ->> word))
+  val lines = books.flatMap(
+      book =>
+        for (word <- book("text").split("\\s+"))
+          yield book + ("word" ->> word))
   lines foreach println
 }

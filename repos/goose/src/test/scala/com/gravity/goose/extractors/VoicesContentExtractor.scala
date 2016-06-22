@@ -18,17 +18,17 @@ class VoicesContentExtractor extends ContentExtractor {
       titleElem.first().text() match {
         case mt if (string.isNullOrEmpty(mt)) => string.empty
         case titleText => {
-            val pieces = DASH_SPLITTER.split(titleText)
-            val titlePiece = pieces(0)
-            if (string.isNullOrEmpty(titlePiece)) return string.empty
-            TITLE_REPLACEMENTS.replaceAll(titlePiece)
-          }
+          val pieces = DASH_SPLITTER.split(titleText)
+          val titlePiece = pieces(0)
+          if (string.isNullOrEmpty(titlePiece)) return string.empty
+          TITLE_REPLACEMENTS.replaceAll(titlePiece)
+        }
       }
     } catch {
       case ex: Exception => {
-          getLogger().warn(ex.toString)
-          string.empty
-        }
+        getLogger().warn(ex.toString)
+        string.empty
+      }
     }
   }
 }

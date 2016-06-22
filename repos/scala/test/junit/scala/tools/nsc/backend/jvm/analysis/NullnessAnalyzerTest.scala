@@ -33,8 +33,8 @@ class NullnessAnalyzerTest extends ClearAfterClass {
   val noOptCompiler = NullnessAnalyzerTest.noOptCompiler
   import noOptCompiler.genBCode.bTypes.backendUtils._
 
-  def newNullnessAnalyzer(
-      methodNode: MethodNode, classInternalName: InternalName = "C") =
+  def newNullnessAnalyzer(methodNode: MethodNode,
+                          classInternalName: InternalName = "C") =
     new AsmAnalyzer(methodNode,
                     classInternalName,
                     new NullnessAnalyzer(noOptCompiler.genBCode.bTypes))
@@ -52,8 +52,8 @@ class NullnessAnalyzerTest extends ClearAfterClass {
   }
 
   // debug / helper for writing tests
-  def showAllNullnessFrames(
-      analyzer: AsmAnalyzer[NullnessValue], method: MethodNode): String = {
+  def showAllNullnessFrames(analyzer: AsmAnalyzer[NullnessValue],
+                            method: MethodNode): String = {
     val instrLength =
       method.instructions.iterator.asScala.map(textify(_).length).max
     val lines = for (i <- method.instructions.iterator.asScala) yield {

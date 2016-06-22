@@ -16,7 +16,7 @@ object Test1 {
   }
 
   class C extends B with M1 {
-    override def f = super [M1].f;
+    override def f = super[M1].f;
   }
 
   def test(): Unit = {
@@ -41,7 +41,7 @@ object Test2 {
   }
 
   class Host extends M1 with M2 with M3 {
-    override def f = super [M1].f + " " + super [M2].f + " " + super [M3].f
+    override def f = super[M1].f + " " + super[M2].f + " " + super[M3].f
   }
 
   def test(): Unit = {

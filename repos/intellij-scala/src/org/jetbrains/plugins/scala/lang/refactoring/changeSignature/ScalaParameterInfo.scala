@@ -49,8 +49,7 @@ class ScalaParameterInfo(@BeanProperty var name: String,
     case _ => false
   }
 
-  val isVarargType =
-    false //overriders in java of method with repeated parameters are not varargs
+  val isVarargType = false //overriders in java of method with repeated parameters are not varargs
 
   protected def psiType: PsiType = {
     if (scType == null) return null
@@ -60,10 +59,10 @@ class ScalaParameterInfo(@BeanProperty var name: String,
       val functionType = ScFunctionType(scType, Seq())(project, allScope)
       ScType.toPsi(functionType, project, allScope)
     } else if (isRepeatedParameter) {
-      val seqType = ScDesignatorType.fromClassFqn(
-          "scala.collection.Seq", project, allScope)
-      ScType.toPsi(
-          ScParameterizedType(seqType, Seq(scType)), project, allScope)
+      val seqType = ScDesignatorType
+        .fromClassFqn("scala.collection.Seq", project, allScope)
+      ScType
+        .toPsi(ScParameterizedType(seqType, Seq(scType)), project, allScope)
     } else ScType.toPsi(scType, project, allScope)
   }
 
@@ -72,19 +71,18 @@ class ScalaParameterInfo(@BeanProperty var name: String,
 
   override def getValue(expr: PsiCallExpression): PsiExpression = {
     if (defaultForJava.isEmpty) return null
-    val defaultText =
-      if (defaultForJava.contains("$default$")) {
-        val qual = expr match {
-          case mc: PsiMethodCallExpression =>
-            mc.getMethodExpression.getQualifierExpression match {
-              case s: PsiSuperExpression => ""
-              case null => ""
-              case q => q.getText + "."
-            }
-          case _ => ""
-        }
-        qual + defaultForJava
-      } else defaultForJava
+    val defaultText = if (defaultForJava.contains("$default$")) {
+      val qual = expr match {
+        case mc: PsiMethodCallExpression =>
+          mc.getMethodExpression.getQualifierExpression match {
+            case s: PsiSuperExpression => ""
+            case null => ""
+            case q => q.getText + "."
+          }
+        case _ => ""
+      }
+      qual + defaultForJava
+    } else defaultForJava
 
     val expression = JavaPsiFacade
       .getElementFactory(project)

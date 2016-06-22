@@ -93,7 +93,8 @@ class DefaultTest extends ApplicabilityTestBase {
     }
     assertProblems("(a: A = null, b: B = null)", "(B, A)") {
       case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(
-          Expression("A"), Type("B")) :: Nil =>
+          Expression("A"),
+          Type("B")) :: Nil =>
     }
   }
 }

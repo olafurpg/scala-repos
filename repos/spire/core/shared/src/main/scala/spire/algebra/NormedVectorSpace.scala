@@ -35,8 +35,11 @@ object NormedVectorSpace
 }
 
 private[algebra] trait NormedVectorSpace0 {
-  implicit def InnerProductSpaceIsNormedVectorSpace[
-      V, @sp(Int, Long, Float, Double) F](
+  implicit def InnerProductSpaceIsNormedVectorSpace[V,
+                                                    @sp(Int,
+                                                        Long,
+                                                        Float,
+                                                        Double) F](
       implicit space: InnerProductSpace[V, F],
       nroot: NRoot[F]): NormedVectorSpace[V, F] = space.normed
 }

@@ -12,5 +12,4 @@ class KeywordSimilarityModel(
     // Weight and threshold trained
     val keywordSimWeight: Double,
     val keywordSimThreshold: Double
-)
-    extends Serializable
+) extends Serializable

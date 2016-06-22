@@ -174,8 +174,8 @@ object Directive {
       underlying.filter(predicate, rejections: _*).tflatMap(_ ⇒ Empty)
 
     def filter(predicate: T ⇒ Boolean, rejections: Rejection*): Directive1[T] =
-      underlying.tfilter({ case Tuple1(value) ⇒ predicate(value) },
-      rejections: _*)
+      underlying
+        .tfilter({ case Tuple1(value) ⇒ predicate(value) }, rejections: _*)
   }
 }
 
@@ -185,8 +185,8 @@ trait ConjunctionMagnet[L] {
 }
 
 object ConjunctionMagnet {
-  implicit def fromDirective[L, R](
-      other: Directive[R])(implicit join: TupleOps.Join[L, R])
+  implicit def fromDirective[L, R](other: Directive[R])(
+      implicit join: TupleOps.Join[L, R])
     : ConjunctionMagnet[L] { type Out = Directive[join.Out] } =
     new ConjunctionMagnet[L] {
       type Out = Directive[join.Out]

@@ -76,8 +76,8 @@ private[reflect] object ScalaSigReader {
       }
   }
 
-  def findConstructor(
-      c: ClassSymbol, argNames: List[String]): Option[MethodSymbol] = {
+  def findConstructor(c: ClassSymbol,
+                      argNames: List[String]): Option[MethodSymbol] = {
     val ms =
       c.children collect {
         case m: MethodSymbol if m.name == "<init>" => m
@@ -112,8 +112,9 @@ private[reflect] object ScalaSigReader {
             s.children(argIdx).asInstanceOf[SymbolInfoSymbol].infoType))
   }
 
-  def findArgType(
-      s: MethodSymbol, argIdx: Int, typeArgIndexes: List[Int]): Class[_] = {
+  def findArgType(s: MethodSymbol,
+                  argIdx: Int,
+                  typeArgIndexes: List[Int]): Class[_] = {
     @tailrec def findPrimitive(t: Type, curr: Int): Symbol = {
       val ii = (typeArgIndexes.length - 1) min curr
       t match {
@@ -131,8 +132,10 @@ private[reflect] object ScalaSigReader {
         case x => fail("Unexpected type info " + x)
       }
     }
-    toClass(findPrimitive(
-            s.children(argIdx).asInstanceOf[SymbolInfoSymbol].infoType, 0))
+    toClass(
+        findPrimitive(
+            s.children(argIdx).asInstanceOf[SymbolInfoSymbol].infoType,
+            0))
   }
 
   private def findArgTypeForField(s: MethodSymbol, typeArgIdx: Int): Class[_] = {
@@ -204,29 +207,30 @@ private[reflect] object ScalaSigReader {
   }
 
   def resolveClass[X <: AnyRef](
-      c: String, classLoaders: Iterable[ClassLoader]): Option[Class[X]] =
+      c: String,
+      classLoaders: Iterable[ClassLoader]): Option[Class[X]] =
     classLoaders match {
       case Nil =>
         sys.error(
             "resolveClass: expected 1+ classloaders but received empty list")
       case List(cl) => Some(Class.forName(c, true, cl).asInstanceOf[Class[X]])
       case many => {
-          try {
-            var clazz: Class[_] = null
-            val iter = many.iterator
-            while (clazz == null && iter.hasNext) {
-              try {
-                clazz = Class.forName(c, true, iter.next())
-              } catch {
-                case e: ClassNotFoundException =>
-                // keep going, maybe it's in the next one
-              }
+        try {
+          var clazz: Class[_] = null
+          val iter = many.iterator
+          while (clazz == null && iter.hasNext) {
+            try {
+              clazz = Class.forName(c, true, iter.next())
+            } catch {
+              case e: ClassNotFoundException =>
+              // keep going, maybe it's in the next one
             }
-
-            if (clazz != null) Some(clazz.asInstanceOf[Class[X]]) else None
-          } catch {
-            case _: Throwable => None
           }
+
+          if (clazz != null) Some(clazz.asInstanceOf[Class[X]]) else None
+        } catch {
+          case _: Throwable => None
         }
+      }
     }
 }

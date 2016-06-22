@@ -94,13 +94,16 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
       lastParent: PsiElement,
       place: PsiElement): Boolean = {
     if (DumbService.getInstance(getProject).isDumb) return true
-    if (!super [ScTemplateDefinition].processDeclarationsForTemplateBody(
-            processor, state, lastParent, place)) return false
+    if (!super[ScTemplateDefinition].processDeclarationsForTemplateBody(
+            processor,
+            state,
+            lastParent,
+            place)) return false
 
     constructor match {
       case Some(constr)
           if place != null &&
-          PsiTreeUtil.isContextAncestor(constr, place, false) =>
+            PsiTreeUtil.isContextAncestor(constr, place, false) =>
       //ignore, should be processed in ScParameters
       case _ =>
         for (p <- parameters) {
@@ -112,16 +115,16 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         }
     }
 
-    super [ScTypeParametersOwner].processDeclarations(
-        processor, state, lastParent, place)
+    super[ScTypeParametersOwner]
+      .processDeclarations(processor, state, lastParent, place)
   }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
-    super [ScTemplateDefinition].processDeclarations(
-        processor, state, lastParent, place)
+    super[ScTemplateDefinition]
+      .processDeclarations(processor, state, lastParent, place)
   }
 
   override def isCase: Boolean = hasModifierProperty("case")
@@ -140,10 +143,10 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         case t: ScTypedDefinition if t.isAbstractMember => true
         case _ => false
       }
-      this.processPsiMethodsForNode(node,
-                                    isStatic = false,
-                                    isInterface =
-                                      isInterface)(res += _, names += _)
+      this.processPsiMethodsForNode(
+          node,
+          isStatic = false,
+          isInterface = isInterface)(res += _, names += _)
     }
 
     for (synthetic <- syntheticMethodsNoOverride) {
@@ -180,8 +183,9 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
           }
         }
         TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(o) { node =>
-          this.processPsiMethodsForNode(
-              node, isStatic = true, isInterface = false)(add)
+          this.processPsiMethodsForNode(node,
+                                        isStatic = true,
+                                        isInterface = false)(add)
         }
 
         for (synthetic <- o.syntheticMethodsNoOverride) {
@@ -201,8 +205,9 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
     val buffer = new ArrayBuffer[PsiMethod]
     buffer ++= functions
       .filter(_.isConstructor)
-      .flatMap(_.getFunctionWrappers(
-              isStatic = false, isInterface = false, Some(this)))
+      .flatMap(_.getFunctionWrappers(isStatic = false,
+                                     isInterface = false,
+                                     Some(this)))
     constructor match {
       case Some(x) => buffer ++= x.getFunctionWrappers
       case _ =>
@@ -224,8 +229,8 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
             !hasCopy && !x.parameterList.clauses.exists(_.hasRepeatedParam)
           if (addCopy) {
             try {
-              val method = ScalaPsiElementFactory.createMethodWithContext(
-                  copyMethodText, this, this)
+              val method = ScalaPsiElementFactory
+                .createMethodWithContext(copyMethodText, this, this)
               method.setSynthetic(this)
               buf += method
             } catch {
@@ -306,7 +311,9 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         case Some(x: ScPrimaryConstructor) =>
           try {
             val method = ScalaPsiElementFactory.createMethodWithContext(
-                implicitMethodText, this.getContext, this)
+                implicitMethodText,
+                this.getContext,
+                this)
             method.setSynthetic(this)
             Some(method)
           } catch {
@@ -329,8 +336,10 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
               val psiTypeText: String =
                 ScType.toPsi(tp, getProject, getResolveScope).getCanonicalText
               val text = s"public final $psiTypeText ${param.name};"
-              val elem = new LightField(
-                  getManager, factory.createFieldFromText(text, this), this)
+              val elem =
+                new LightField(getManager,
+                               factory.createFieldFromText(text, this),
+                               this)
               elem.setNavigationElement(param)
               Option(elem)
             case _ => None

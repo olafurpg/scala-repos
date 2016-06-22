@@ -13,12 +13,12 @@ object Macros {
             val defs1 =
               defs collect {
                 case ddef @ DefDef(mods, name, tparams, vparamss, tpt, body) =>
-                  val future = Select(
-                      Select(Ident(TermName("scala")), TermName("concurrent")),
-                      TermName("Future"))
-                  val Future = Select(
-                      Select(Ident(TermName("scala")), TermName("concurrent")),
-                      TypeName("Future"))
+                  val future = Select(Select(Ident(TermName("scala")),
+                                             TermName("concurrent")),
+                                      TermName("Future"))
+                  val Future = Select(Select(Ident(TermName("scala")),
+                                             TermName("concurrent")),
+                                      TypeName("Future"))
                   val tpt1 =
                     if (tpt.isEmpty) tpt
                     else AppliedTypeTree(Future, List(tpt))

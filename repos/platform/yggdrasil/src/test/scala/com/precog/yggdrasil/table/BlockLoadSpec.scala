@@ -69,15 +69,15 @@ trait BlockLoadSpec[M[+ _]]
           val back = subschema.foldLeft[JValue](
               JObject(JField("key", jv \ "key") :: Nil)) {
             case (obj, (jpath, ctype)) => {
-                val vpath = JPath(JPathField("value") :: jpath.nodes)
-                val valueAtPath = jv.get(vpath)
+              val vpath = JPath(JPathField("value") :: jpath.nodes)
+              val valueAtPath = jv.get(vpath)
 
-                if (compliesWithSchema(valueAtPath, ctype)) {
-                  obj.set(vpath, valueAtPath)
-                } else {
-                  obj
-                }
+              if (compliesWithSchema(valueAtPath, ctype)) {
+                obj.set(vpath, valueAtPath)
+              } else {
+                obj
               }
+            }
           }
 
           if (back \ "value" == JUndefined) None
@@ -95,7 +95,7 @@ trait BlockLoadSpec[M[+ _]]
       sample.data flatMap { jv =>
         val back = module.schema
           .foldLeft[JValue](JObject(JField("key", jv \ "key") :: Nil)) {
-          case (obj, (jpath, ctype)) => {
+            case (obj, (jpath, ctype)) => {
               val vpath = JPath(JPathField("value") :: jpath.nodes)
               val valueAtPath = jv.get(vpath)
 
@@ -105,7 +105,7 @@ trait BlockLoadSpec[M[+ _]]
                 obj
               }
             }
-        }
+          }
 
         (back \ "value" != JUndefined).option(back)
       }
@@ -253,7 +253,8 @@ trait BlockLoadSpec[M[+ _]]
 
   def testLoadSample5 = {
     val sampleData = SampleData(
-        (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe(
+                """[
         {
           "value":{
             "cfnYTg92dg":"gu",

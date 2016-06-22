@@ -14,8 +14,8 @@ abstract class Adaptor[Req, Rep]
     extends Filter[http.Request, http.Response, Req, Rep] {
   private[compat] def in(req: http.Request): Future[Req]
   private[compat] def out(rep: Rep): Future[http.Response]
-  def apply(
-      req: http.Request, next: Service[Req, Rep]): Future[http.Response] =
+  def apply(req: http.Request,
+            next: Service[Req, Rep]): Future[http.Response] =
     in(req) flatMap (next) flatMap (out)
 }
 
@@ -42,8 +42,8 @@ abstract class ClientAdaptor[Req, Rep]
     extends Filter[Req, Rep, http.Request, http.Response] {
   private[compat] def in(req: Req): Future[http.Request]
   private[compat] def out(rep: http.Response): Future[Rep]
-  def apply(
-      req: Req, next: Service[http.Request, http.Response]): Future[Rep] =
+  def apply(req: Req,
+            next: Service[http.Request, http.Response]): Future[Rep] =
     in(req) flatMap (next) flatMap (out)
 }
 
@@ -58,8 +58,7 @@ object NettyClientAdaptor
   private[compat] def in(req: netty.HttpRequest): Future[http.Request] =
     if (req.isChunked) Future.exception(NoStreaming)
     else
-      Future.value(
-          new http.Request {
+      Future.value(new http.Request {
         val httpRequest = req
         lazy val remoteSocketAddress = new InetSocketAddress(0)
       })

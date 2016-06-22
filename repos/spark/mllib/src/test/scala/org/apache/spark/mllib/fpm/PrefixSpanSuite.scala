@@ -43,8 +43,10 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val rdd = sc.parallelize(sequences, 2).cache()
 
-    val result1 = PrefixSpan.genFreqPatterns(
-        rdd, minCount = 2L, maxPatternLength = 50, maxLocalProjDBSize = 16L)
+    val result1 = PrefixSpan.genFreqPatterns(rdd,
+                                             minCount = 2L,
+                                             maxPatternLength = 50,
+                                             maxLocalProjDBSize = 16L)
     val expectedValue1 = Array(
         (Array(0, 1, 0), 4L),
         (Array(0, 1, 0, 3, 0), 2L),
@@ -68,8 +70,10 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
     )
     compareInternalResults(expectedValue1, result1.collect())
 
-    val result2 = PrefixSpan.genFreqPatterns(
-        rdd, minCount = 3, maxPatternLength = 50, maxLocalProjDBSize = 32L)
+    val result2 = PrefixSpan.genFreqPatterns(rdd,
+                                             minCount = 3,
+                                             maxPatternLength = 50,
+                                             maxLocalProjDBSize = 32L)
     val expectedValue2 = Array(
         (Array(0, 1, 0), 4L),
         (Array(0, 3, 0), 5L),
@@ -79,8 +83,10 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
     )
     compareInternalResults(expectedValue2, result2.collect())
 
-    val result3 = PrefixSpan.genFreqPatterns(
-        rdd, minCount = 2, maxPatternLength = 2, maxLocalProjDBSize = 32L)
+    val result3 = PrefixSpan.genFreqPatterns(rdd,
+                                             minCount = 2,
+                                             maxPatternLength = 2,
+                                             maxLocalProjDBSize = 32L)
     val expectedValue3 = Array(
         (Array(0, 1, 0), 4L),
         (Array(0, 1, 0, 3, 0), 2L),
@@ -107,8 +113,10 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
                           Array(0, 5, 6, 0, 1, 2, 0, 4, 6, 0, 3, 0, 2, 0),
                           Array(0, 5, 0, 7, 0, 1, 6, 0, 3, 0, 2, 0, 3, 0))
     val rdd = sc.parallelize(sequences, 2).cache()
-    val result = PrefixSpan.genFreqPatterns(
-        rdd, minCount = 2, maxPatternLength = 5, maxLocalProjDBSize = 128L)
+    val result = PrefixSpan.genFreqPatterns(rdd,
+                                            minCount = 2,
+                                            maxPatternLength = 5,
+                                            maxLocalProjDBSize = 128L)
 
     /*
       To verify results, create file "prefixSpanSeqs" with content

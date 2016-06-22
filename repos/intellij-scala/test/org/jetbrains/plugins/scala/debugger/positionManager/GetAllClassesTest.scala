@@ -28,8 +28,9 @@ class GetAllClassesTest_212
   }
 
   override def testPartialFunctionArg(): Unit = {
-    checkGetAllClasses(
-        "PartialFunctionArg$", "PartialFunctionArg$", "PartialFunctionArg$")
+    checkGetAllClasses("PartialFunctionArg$",
+                       "PartialFunctionArg$",
+                       "PartialFunctionArg$")
   }
 }
 
@@ -142,8 +143,8 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
        |}
     """.stripMargin.trim)
   def testLocalClassInAnonClass(): Unit = {
-    checkGetAllClasses(
-        "LocalClassInAnonClass$$anon$1$A", "LocalClassInAnonClass$$anon$1")
+    checkGetAllClasses("LocalClassInAnonClass$$anon$1$A",
+                       "LocalClassInAnonClass$$anon$1")
   }
 
   setupFile("LocalObject.scala",
@@ -213,8 +214,8 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
        |}
     """.stripMargin.trim)
   def testByNameArgument(): Unit = {
-    checkGetAllClasses(
-        "ByNameArgument$$anonfun$main$1", "ByNameArgument$$anonfun$main$2")
+    checkGetAllClasses("ByNameArgument$$anonfun$main$1",
+                       "ByNameArgument$$anonfun$main$2")
   }
 
   setupFile("ForStmt.scala", s"""

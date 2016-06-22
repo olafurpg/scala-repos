@@ -22,8 +22,8 @@ object HttpStreamingClient {
 
     val request = Request(Method.Get, path)
     val userpass = username + ":" + password
-    request.headerMap.add(
-        "Authorization", "Basic " + Base64.encode(userpass.getBytes("UTF-8")))
+    request.headerMap.add("Authorization",
+                          "Basic " + Base64.encode(userpass.getBytes("UTF-8")))
     request.headerMap.add("User-Agent", "Finagle 0.0")
     request.headerMap.add("Host", host)
     println(request)

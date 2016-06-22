@@ -157,8 +157,8 @@ object M3 {
     else m.map(row => row.head) :: transpose(m.map(row => row.tail))
   }
 
-  def matrixTimesMatrix(
-      m1: List[List[Double]], m2: List[List[Double]]): List[List[Double]] = {
+  def matrixTimesMatrix(m1: List[List[Double]],
+                        m2: List[List[Double]]): List[List[Double]] = {
     val columns = transpose(m2);
     m1.map(row => matrixTimesVector(columns, row))
   }

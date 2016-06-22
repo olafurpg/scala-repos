@@ -16,8 +16,9 @@ trait WSTestRequestBuilding { self: RouteTest ⇒
   def WS(uri: Uri,
          clientSideHandler: Flow[Message, Message, Any],
          subprotocols: Seq[String] = Nil)(): HttpRequest =
-    HttpRequest(uri = uri).addHeader(new InternalCustomHeader(
-            "UpgradeToWebSocketTestHeader") with UpgradeToWebSocket {
+    HttpRequest(uri = uri).addHeader(
+        new InternalCustomHeader("UpgradeToWebSocketTestHeader")
+        with UpgradeToWebSocket {
       def requestedProtocols: immutable.Seq[String] = subprotocols.toList
 
       def handleMessages(handlerFlow: Graph[FlowShape[Message, Message], Any],

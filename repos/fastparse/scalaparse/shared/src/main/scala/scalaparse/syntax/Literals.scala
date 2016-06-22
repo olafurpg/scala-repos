@@ -75,8 +75,9 @@ trait Literals { l =>
     }
 
     class InterpCtx(interp: Option[P0]) {
-      val Literal = P(("-".? ~ (Float | Int)) | Bool | String | "'" ~/
-          (Char | Symbol) | Null)
+      val Literal = P(
+          ("-".? ~ (Float | Int)) | Bool | String | "'" ~/
+            (Char | Symbol) | Null)
       val Interp = interp match {
         case None => P(Fail)
         case Some(p) =>

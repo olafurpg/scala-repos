@@ -17,8 +17,8 @@ import org.jetbrains.plugins.scala.extensions._
 /**
   * @author Pavel Fatin
   */
-class SetupJdkNotificationProvider(
-    project: Project, notifications: EditorNotifications)
+class SetupJdkNotificationProvider(project: Project,
+                                   notifications: EditorNotifications)
     extends EditorNotifications.Provider[EditorNotificationPanel] {
 
   project.getMessageBus
@@ -31,8 +31,8 @@ class SetupJdkNotificationProvider(
 
   override def getKey = ProviderKey
 
-  override def createNotificationPanel(
-      file: VirtualFile, fileEditor: FileEditor) = {
+  override def createNotificationPanel(file: VirtualFile,
+                                       fileEditor: FileEditor) = {
     val jdk = Option(PsiManager.getInstance(project).findFile(file))
       .filter(_.getLanguage == ScalaLanguage.Instance)
       .flatMap(psiFile =>
@@ -48,8 +48,8 @@ class SetupJdkNotificationProvider(
 object SetupJdkNotificationProvider {
   private val ProviderKey = Key.create[EditorNotificationPanel]("Setup JDK")
 
-  private def createPanel(
-      project: Project, file: PsiFile): EditorNotificationPanel = {
+  private def createPanel(project: Project,
+                          file: PsiFile): EditorNotificationPanel = {
     val panel = new EditorNotificationPanel()
     panel.setText("Project JDK is not defined")
     panel.createActionLabel("Setup JDK", new Runnable {

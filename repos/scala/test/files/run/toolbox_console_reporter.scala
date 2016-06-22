@@ -10,8 +10,7 @@ object Test extends App {
   (Console withErr errs) {
     val toolbox =
       cm.mkToolBox(frontEnd = mkConsoleFrontEnd(), options = "-deprecation")
-    toolbox.eval(
-        reify {
+    toolbox.eval(reify {
       object Utils {
         @deprecated("test", "2.10.0")
         def foo { println("hello") }

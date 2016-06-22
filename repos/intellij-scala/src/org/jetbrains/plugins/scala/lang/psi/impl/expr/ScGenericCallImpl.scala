@@ -35,7 +35,7 @@ class ScGenericCallImpl(node: ASTNode)
     }
     val isUpdate =
       curr.getContext.isInstanceOf[ScAssignStmt] &&
-      curr.getContext.asInstanceOf[ScAssignStmt].getLExpression == curr
+        curr.getContext.asInstanceOf[ScAssignStmt].getLExpression == curr
     val methodName = if (isUpdate) "update" else "apply"
     val args: List[Seq[ScExpression]] =
       if (curr == this && !isUpdate) List.empty
@@ -87,8 +87,8 @@ class ScGenericCallImpl(node: ASTNode)
       refType = processType(refType, isShape = false)
     refType match {
       case ScTypePolymorphicType(int, tps) =>
-        val subst = ScalaPsiUtil.genericCallSubstitutor(
-            tps.map(p => (p.name, ScalaPsiUtil.getPsiElementId(p.ptp))), this)
+        val subst = ScalaPsiUtil.genericCallSubstitutor(tps.map(p =>
+                  (p.name, ScalaPsiUtil.getPsiElementId(p.ptp))), this)
         Success(subst.subst(int), Some(this))
       case _ => Success(refType, Some(this))
     }
@@ -100,8 +100,8 @@ class ScGenericCallImpl(node: ASTNode)
       refType = processType(refType, isShape = true)
     refType match {
       case ScTypePolymorphicType(int, tps) =>
-        val subst = ScalaPsiUtil.genericCallSubstitutor(
-            tps.map(p => (p.name, ScalaPsiUtil.getPsiElementId(p.ptp))), this)
+        val subst = ScalaPsiUtil.genericCallSubstitutor(tps.map(p =>
+                  (p.name, ScalaPsiUtil.getPsiElementId(p.ptp))), this)
         Success(subst.subst(int), Some(this))
       case _ => Success(refType, Some(this))
     }

@@ -32,7 +32,7 @@ object TestThrows {
         name + " throws: " + method.getExceptionTypes.mkString("", ", ", ""))
     println(
         name + " annotations: " +
-        method.getDeclaredAnnotations.mkString("", ", ", ""))
+          method.getDeclaredAnnotations.mkString("", ", ", ""))
   }
 
   def run(cls: Class[_]) {

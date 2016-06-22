@@ -31,8 +31,9 @@ trait JsonConverters {
     def values(path: List[JString], test: Tree[(PerfTest, A)]): List[JValue] =
       test match {
         case Tree.Node((RunQuery(query), a), _) =>
-          JObject(JField("path", JArray(path)) :: JField(
-                  "query", JString(query)) :: f(a)) :: Nil
+          JObject(JField("path", JArray(path)) :: JField("query",
+                                                         JString(query)) :: f(
+                  a)) :: Nil
 
         case Tree.Node((Group(name), a), kids) =>
           val newPath = path :+ JString(name)
@@ -52,15 +53,18 @@ trait JsonConverters {
     perfTestToJson(result) {
       case NoChange(baseline, stats) =>
         JField("baseline", baseline.toJson) :: JField("stats", stats.toJson) :: JField(
-            "delta", JString("insignificant")) :: Nil
+            "delta",
+            JString("insignificant")) :: Nil
 
       case Faster(baseline, stats) =>
         JField("baseline", baseline.toJson) :: JField("stats", stats.toJson) :: JField(
-            "delta", JString("faster")) :: Nil
+            "delta",
+            JString("faster")) :: Nil
 
       case Slower(baseline, stats) =>
         JField("baseline", baseline.toJson) :: JField("stats", stats.toJson) :: JField(
-            "delta", JString("slower")) :: Nil
+            "delta",
+            JString("slower")) :: Nil
 
       case MissingBaseline(stats) =>
         JField("stats", stats.toJson) :: Nil
@@ -109,9 +113,9 @@ trait PrettyPrinters {
             case Nil => Nil
             case head :: tail =>
               ("-> " + head) ::
-              (tail.foldRight(List(" ' " + prettyResult(result), "")) {
-                    " | " + _ :: _
-                  })
+                (tail.foldRight(List(" ' " + prettyResult(result), "")) {
+                      " | " + _ :: _
+                    })
           }
       }
     }
@@ -127,10 +131,10 @@ trait PrettyPrinters {
         "NO CHANGE  %.1f ms (s = %.1f ms)" format (stats.mean, stats.stdDev)
       case Faster(baseline, stats) =>
         "FASTER     %.1f ms (%.1 ms faster)" format
-        (stats.mean, baseline.mean - stats.mean)
+          (stats.mean, baseline.mean - stats.mean)
       case Slower(baseline, stats) =>
         "SLOWER     %.1f ms (%.1 ms slower)" format
-        (stats.mean, stats.mean - baseline.mean)
+          (stats.mean, stats.mean - baseline.mean)
       case MissingBaseline(stats) =>
         "TOTAL      %.1f ms" format stats.mean
       case MissingStats(_) | Missing =>

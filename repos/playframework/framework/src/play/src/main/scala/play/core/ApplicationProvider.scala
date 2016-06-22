@@ -14,8 +14,8 @@ import play.api.mvc._
   */
 trait SourceMapper {
 
-  def sourceOf(
-      className: String, line: Option[Int] = None): Option[(File, Option[Int])]
+  def sourceOf(className: String,
+               line: Option[Int] = None): Option[(File, Option[Int])]
 
   def sourceFor(e: Throwable): Option[(File, Option[Int])] = {
     e.getStackTrace

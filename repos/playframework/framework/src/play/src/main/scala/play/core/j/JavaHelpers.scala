@@ -130,7 +130,8 @@ trait JavaHelpers {
     val javaContext = createJavaContext(request)
     try {
       JContext.current.set(javaContext)
-      Option(f(javaContext.request())).map(cs =>
+      Option(f(javaContext.request())).map(
+          cs =>
             FutureConverters
               .toScala(cs)
               .map(createResult(javaContext, _))(trampoline))

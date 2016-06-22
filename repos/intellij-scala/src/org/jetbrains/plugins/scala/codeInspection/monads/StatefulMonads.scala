@@ -12,13 +12,13 @@ import scala.util.Try
   * @since 29.09.15
   */
 object StatefulMonads {
-  private[monads] final lazy val StatefulMonadsTypes: Set[Class[_]] = Set(
-      classOf[Future[_]], classOf[Try[_]])
+  private[monads] final lazy val StatefulMonadsTypes: Set[Class[_]] =
+    Set(classOf[Future[_]], classOf[Try[_]])
   private[monads] final lazy val StatefulMonadsTypesNames =
     StatefulMonadsTypes.map(_.getCanonicalName)
 
-  private[monads] def isStatefulMonadType(
-      t: ScType, projection: Project): Boolean = {
+  private[monads] def isStatefulMonadType(t: ScType,
+                                          projection: Project): Boolean = {
     StatefulMonadsTypesNames.exists(typeName =>
           InspectionsUtil.conformsToTypeFromClass(t, typeName, projection))
   }

@@ -56,8 +56,9 @@ class SocketServerTest extends JUnitSuite {
   val server = new SocketServer(config, metrics, new SystemTime)
   server.startup()
 
-  def sendRequest(
-      socket: Socket, request: Array[Byte], id: Option[Short] = None) {
+  def sendRequest(socket: Socket,
+                  request: Array[Byte],
+                  id: Option[Short] = None) {
     val outgoing = new DataOutputStream(socket.getOutputStream)
     id match {
       case Some(id) =>
@@ -111,7 +112,9 @@ class SocketServerTest extends JUnitSuite {
 
     val emptyHeader = new RequestHeader(apiKey, clientId, correlationId)
     val emptyRequest = new ProduceRequest(
-        ack, ackTimeoutMs, new HashMap[TopicPartition, ByteBuffer]())
+        ack,
+        ackTimeoutMs,
+        new HashMap[TopicPartition, ByteBuffer]())
 
     val byteBuffer =
       ByteBuffer.allocate(emptyHeader.sizeOf + emptyRequest.sizeOf)
@@ -221,7 +224,9 @@ class SocketServerTest extends JUnitSuite {
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 0)
     val serverMetrics = new Metrics()
     val overrideServer: SocketServer = new SocketServer(
-        KafkaConfig.fromProps(overrideProps), serverMetrics, new SystemTime())
+        KafkaConfig.fromProps(overrideProps),
+        serverMetrics,
+        new SystemTime())
     try {
       overrideServer.startup()
       // make the maximum allowable number of connections and then leak them
@@ -250,7 +255,9 @@ class SocketServerTest extends JUnitSuite {
 
     val serverMetrics = new Metrics
     val overrideServer: SocketServer = new SocketServer(
-        KafkaConfig.fromProps(overrideProps), serverMetrics, new SystemTime)
+        KafkaConfig.fromProps(overrideProps),
+        serverMetrics,
+        new SystemTime)
     overrideServer.startup()
     try {
       val sslContext = SSLContext.getInstance("TLSv1.2")
@@ -259,8 +266,8 @@ class SocketServerTest extends JUnitSuite {
                       new java.security.SecureRandom())
       val socketFactory = sslContext.getSocketFactory
       val sslSocket = socketFactory
-        .createSocket(
-            "localhost", overrideServer.boundPort(SecurityProtocol.SSL))
+        .createSocket("localhost",
+                      overrideServer.boundPort(SecurityProtocol.SSL))
         .asInstanceOf[SSLSocket]
       sslSocket.setNeedClientAuth(false)
 
@@ -271,7 +278,9 @@ class SocketServerTest extends JUnitSuite {
       val ack = 0: Short
       val emptyHeader = new RequestHeader(apiKey, clientId, correlationId)
       val emptyRequest = new ProduceRequest(
-          ack, ackTimeoutMs, new HashMap[TopicPartition, ByteBuffer]())
+          ack,
+          ackTimeoutMs,
+          new HashMap[TopicPartition, ByteBuffer]())
 
       val byteBuffer =
         ByteBuffer.allocate(emptyHeader.sizeOf() + emptyRequest.sizeOf())

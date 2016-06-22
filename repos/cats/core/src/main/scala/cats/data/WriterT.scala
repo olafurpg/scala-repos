@@ -10,10 +10,9 @@ final case class WriterT[F[_], L, V](run: F[(L, V)]) {
   def value(implicit functorF: Functor[F]): F[V] =
     functorF.map(run)(_._2)
 
-  def ap[Z](f: WriterT[F, L, V => Z])(
-      implicit F: Apply[F], L: Semigroup[L]): WriterT[F, L, Z] =
-    WriterT(
-        F.map2(f.run, run) {
+  def ap[Z](f: WriterT[F, L, V => Z])(implicit F: Apply[F],
+                                      L: Semigroup[L]): WriterT[F, L, Z] =
+    WriterT(F.map2(f.run, run) {
       case ((l1, fvz), (l2, v)) => (L.combine(l1, l2), fvz(v))
     })
 
@@ -50,8 +49,8 @@ final case class WriterT[F[_], L, V](run: F[(L, V)]) {
   def swap(implicit functorF: Functor[F]): WriterT[F, V, L] =
     mapBoth((l, v) => (v, l))
 
-  def reset(
-      implicit monoidL: Monoid[L], functorF: Functor[F]): WriterT[F, L, V] =
+  def reset(implicit monoidL: Monoid[L],
+            functorF: Functor[F]): WriterT[F, L, V] =
     mapWritten(_ => monoidL.empty)
 
   def show(implicit F: Show[F[(L, V)]]): String = F.show(run)
@@ -72,8 +71,8 @@ private[data] sealed abstract class WriterTInstances
 
   implicit def writerTBifunctor[F[_]: Functor]: Bifunctor[WriterT[F, ?, ?]] =
     new Bifunctor[WriterT[F, ?, ?]] {
-      def bimap[A, B, C, D](fab: WriterT[F, A, B])(
-          f: A => C, g: B => D): WriterT[F, C, D] =
+      def bimap[A, B, C, D](
+          fab: WriterT[F, A, B])(f: A => C, g: B => D): WriterT[F, C, D] =
         fab.bimap(f, g)
     }
 
@@ -125,8 +124,8 @@ private[data] sealed abstract class WriterTInstances1
 }
 private[data] sealed abstract class WriterTInstances2
     extends WriterTInstances3 {
-  implicit def writerTMonad[F[_], L](
-      implicit F: Monad[F], L: Monoid[L]): Monad[WriterT[F, L, ?]] =
+  implicit def writerTMonad[F[_], L](implicit F: Monad[F],
+                                     L: Monoid[L]): Monad[WriterT[F, L, ?]] =
     new WriterTMonad[F, L] {
       implicit val F0: Monad[F] = F
       implicit val L0: Monoid[L] = L
@@ -164,7 +163,8 @@ private[data] sealed abstract class WriterTInstances4
 private[data] sealed abstract class WriterTInstances5
     extends WriterTInstances6 {
   implicit def writerTFlatMap[F[_], L](
-      implicit F: FlatMap[F], L: Semigroup[L]): FlatMap[WriterT[F, L, ?]] =
+      implicit F: FlatMap[F],
+      L: Semigroup[L]): FlatMap[WriterT[F, L, ?]] =
     new WriterTFlatMap[F, L] {
       implicit val F0: FlatMap[F] = F
       implicit val L0: Semigroup[L] = L
@@ -180,7 +180,8 @@ private[data] sealed abstract class WriterTInstances5
 private[data] sealed abstract class WriterTInstances6
     extends WriterTInstances7 {
   implicit def writerTApply[F[_], L](
-      implicit F: Apply[F], L: Semigroup[L]): Apply[WriterT[F, L, ?]] =
+      implicit F: Apply[F],
+      L: Semigroup[L]): Apply[WriterT[F, L, ?]] =
     new WriterTApply[F, L] {
       implicit val F0: Apply[F] = F
       implicit val L0: Semigroup[L] = L
@@ -212,10 +213,9 @@ private[data] sealed trait WriterTApply[F[_], L]
   def ap[A, B](f: WriterT[F, L, A => B])(
       fa: WriterT[F, L, A]): WriterT[F, L, B] =
     fa ap f
-  def product[A, B](
-      fa: WriterT[F, L, A], fb: WriterT[F, L, B]): WriterT[F, L, (A, B)] =
-    WriterT(
-        F0.map(F0.product(fa.run, fb.run)) {
+  def product[A, B](fa: WriterT[F, L, A],
+                    fb: WriterT[F, L, B]): WriterT[F, L, (A, B)] =
+    WriterT(F0.map(F0.product(fa.run, fb.run)) {
       case ((l1, a), (l2, b)) => (L0.combine(l1, l2), (a, b))
     })
 }
@@ -307,7 +307,7 @@ trait WriterTFunctions {
                               monoidL: Monoid[L]): WriterT[F, L, V] =
     WriterT.put[F, L, V](v)(monoidL.empty)
 
-  def valueT[F[_], L, V](vf: F[V])(
-      implicit functorF: Functor[F], monoidL: Monoid[L]): WriterT[F, L, V] =
+  def valueT[F[_], L, V](vf: F[V])(implicit functorF: Functor[F],
+                                   monoidL: Monoid[L]): WriterT[F, L, V] =
     WriterT.putT[F, L, V](vf)(monoidL.empty)
 }

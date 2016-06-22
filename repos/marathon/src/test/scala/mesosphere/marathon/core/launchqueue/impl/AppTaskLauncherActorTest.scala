@@ -158,8 +158,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     Await
-      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
-                  clock.now() + 1.seconds, offer),
+      .result(launcherRef ? ActorOfferMatcher
+                .MatchOffer(clock.now() + 1.seconds, offer),
               3.seconds)
       .asInstanceOf[MatchedTaskOps]
 
@@ -192,8 +192,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     val matched = Await
-      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
-                  clock.now() + 1.seconds, offer),
+      .result(launcherRef ? ActorOfferMatcher
+                .MatchOffer(clock.now() + 1.seconds, offer),
               3.seconds)
       .asInstanceOf[MatchedTaskOps]
 
@@ -224,8 +224,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     val matchedTasks = Await
-      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
-                  clock.now() + 1.seconds, offer),
+      .result(launcherRef ? ActorOfferMatcher
+                .MatchOffer(clock.now() + 1.seconds, offer),
               3.seconds)
       .asInstanceOf[MatchedTaskOps]
     matchedTasks.opsWithSource.foreach(_.reject("stuff"))
@@ -269,7 +269,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
             tasksToLaunch = 1
         ) {
           override protected def scheduleTaskOperationTimeout(
-              context: ActorContext, message: TaskOpRejected): Cancellable = {
+              context: ActorContext,
+              message: TaskOpRejected): Cancellable = {
             scheduleCalled = true
             mock[Cancellable]
           }
@@ -280,16 +281,16 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     Await
-      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
-                  clock.now() + 1.seconds, offer),
+      .result(launcherRef ? ActorOfferMatcher
+                .MatchOffer(clock.now() + 1.seconds, offer),
               3.seconds)
       .asInstanceOf[MatchedTaskOps]
 
     // just make sure that prior messages have been processed, will not launch further tasks
 
     Await
-      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
-                  clock.now() + 1.seconds, offer),
+      .result(launcherRef ? ActorOfferMatcher
+                .MatchOffer(clock.now() + 1.seconds, offer),
               3.seconds)
       .asInstanceOf[MatchedTaskOps]
 
@@ -314,8 +315,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     val matchedTasks = Await
-      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
-                  clock.now() + 1.seconds, offer),
+      .result(launcherRef ? ActorOfferMatcher
+                .MatchOffer(clock.now() + 1.seconds, offer),
               3.seconds)
       .asInstanceOf[MatchedTaskOps]
     matchedTasks.opsWithSource.foreach(_.accept())
@@ -479,15 +480,16 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
   private[this] var rateLimiterActor: TestProbe = _
 
   private[this] def createLauncherRef(
-      instances: Int, appToLaunch: AppDefinition = app): ActorRef = {
-    val props = AppTaskLauncherActor.props(
-        launchQueueConfig,
-        offerMatcherManager,
-        clock,
-        taskOpFactory,
-        maybeOfferReviver = Some(offerReviver),
-        taskTracker,
-        rateLimiterActor.ref) _
+      instances: Int,
+      appToLaunch: AppDefinition = app): ActorRef = {
+    val props = AppTaskLauncherActor.props(launchQueueConfig,
+                                           offerMatcherManager,
+                                           clock,
+                                           taskOpFactory,
+                                           maybeOfferReviver =
+                                             Some(offerReviver),
+                                           taskTracker,
+                                           rateLimiterActor.ref) _
     actorSystem.actorOf(
         props(appToLaunch, instances),
         "launcher"

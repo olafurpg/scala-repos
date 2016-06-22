@@ -29,8 +29,8 @@ class HttpEntitySpec
   val fgh = ByteString("fgh")
   val ijk = ByteString("ijk")
 
-  val testConf: Config =
-    ConfigFactory.parseString("""
+  val testConf: Config = ConfigFactory.parseString(
+      """
   akka.event-handlers = ["akka.testkit.TestEventListener"]
   akka.loglevel = WARNING""")
   implicit val system = ActorSystem(getClass.getSimpleName, testConf)
@@ -57,11 +57,15 @@ class HttpEntitySpec
       }
       "Chunked w/o LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk))) must collectBytesTo(
-            abc, fgh, ijk)
+            abc,
+            fgh,
+            ijk)
       }
       "Chunked with LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk)) must collectBytesTo(
-            abc, fgh, ijk)
+            abc,
+            fgh,
+            ijk)
       }
     }
     "support contentLength" - {
@@ -206,11 +210,12 @@ class HttpEntitySpec
               .withoutSizeLimit)
       }
       "Chunked" in {
-        withReturnType[Chunked](Chunked(tpe,
-                                        source(Chunk(abc),
-                                               Chunk(fgh),
-                                               Chunk(ijk),
-                                               LastChunk)).withoutSizeLimit)
+        withReturnType[Chunked](
+            Chunked(tpe,
+                    source(Chunk(abc),
+                           Chunk(fgh),
+                           Chunk(ijk),
+                           LastChunk)).withoutSizeLimit)
         withReturnType[RequestEntity](
             Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk))
               .asInstanceOf[RequestEntity]

@@ -47,8 +47,8 @@ object JsonUtil {
     : M[Validation[Seq[Throwable], JValue]] = {
     def rec(stream: StreamT[M, Array[Byte]],
             parser: AsyncParser): M[Validation[Seq[Throwable], JValue]] = {
-      def handle(
-          ap: AsyncParse, next: => M[Validation[Seq[Throwable], JValue]])
+      def handle(ap: AsyncParse,
+                 next: => M[Validation[Seq[Throwable], JValue]])
         : M[Validation[Seq[Throwable], JValue]] = ap match {
         case AsyncParse(errors, _) if errors.nonEmpty =>
           Failure(errors).point[M]

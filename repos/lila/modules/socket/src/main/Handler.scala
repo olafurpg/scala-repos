@@ -23,12 +23,12 @@ object Handler {
   lazy val AnaRateLimit =
     new lila.memo.RateLimit(90, 60 seconds, "socket analysis move")
 
-  def apply(hub: lila.hub.Env,
-            socket: ActorRef,
-            uid: String,
-            join: Any,
-            userId: Option[String])(
-      connecter: Connecter): Fu[JsSocketHandler] = {
+  def apply(
+      hub: lila.hub.Env,
+      socket: ActorRef,
+      uid: String,
+      join: Any,
+      userId: Option[String])(connecter: Connecter): Fu[JsSocketHandler] = {
 
     def baseController(member: SocketMember): Controller = {
       case ("p", _) => socket ! Ping(uid)
@@ -38,8 +38,9 @@ object Handler {
         }
       case ("startWatching", o) =>
         o str "d" foreach { ids =>
-          hub.actor.moveBroadcast ! StartWatching(
-              uid, member, ids.split(' ').toSet)
+          hub.actor.moveBroadcast ! StartWatching(uid,
+                                                  member,
+                                                  ids.split(' ').toSet)
         }
       case ("moveLat", o) =>
         hub.channel.roundMoveTime ! (~(o boolean "d"))

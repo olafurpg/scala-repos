@@ -34,15 +34,14 @@ object iq {
     /* Test is empty and dequeue.
      * Expected: Head: 42
      */
-    val q4 =
-      if (q2.isEmpty) {
-        Console.println("Empty")
-        q2
-      } else {
-        val (head, q3) = q2.dequeue
-        Console.println("Head: " + head)
-        q3
-      }
+    val q4 = if (q2.isEmpty) {
+      Console.println("Empty")
+      q2
+    } else {
+      val (head, q3) = q2.dequeue
+      Console.println("Head: " + head)
+      q3
+    }
 
     /* Test sequence enqueing. */
     val q5: Queue[Any] = q4.enqueue(List(1, 2, 3, 4, 5, 6, 7, 8, 9))

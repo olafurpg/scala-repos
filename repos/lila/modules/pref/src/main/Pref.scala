@@ -229,8 +229,8 @@ object Pref {
     val SLOW = 1
     val ALWAYS = 2
 
-    val choices = Seq(
-        NEVER -> "Never", SLOW -> "On slow games", ALWAYS -> "Always")
+    val choices =
+      Seq(NEVER -> "Never", SLOW -> "On slow games", ALWAYS -> "Always")
   }
 
   object ClockTenths {
@@ -266,7 +266,8 @@ object Pref {
         "{{user}} only accepts challenges from friends.".some
       case RATING if from.perfs.bestRating > to.perfs.bestRating => none
       case RATING
-          if math.abs(from.perfs.bestRating - to.perfs.bestRating) > ratingThreshold =>
+          if math
+            .abs(from.perfs.bestRating - to.perfs.bestRating) > ratingThreshold =>
         s"{{user}} only accepts challenges if rating is ± $ratingThreshold.".some
       case FRIEND if !follow =>
         "{{user}} only accepts challenges from friends.".some
@@ -279,8 +280,8 @@ object Pref {
     val FRIEND = 2
     val ALWAYS = 3
 
-    val choices = Seq(
-        NEVER -> "Never", FRIEND -> "Only friends", ALWAYS -> "Always")
+    val choices =
+      Seq(NEVER -> "Never", FRIEND -> "Only friends", ALWAYS -> "Always")
   }
 
   def create(id: String) = default.copy(_id = id)

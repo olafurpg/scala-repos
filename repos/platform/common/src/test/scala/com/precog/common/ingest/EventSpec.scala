@@ -49,10 +49,10 @@ class EventSpec
 
   "Event serialization" should {
     "Handle V0 format" in {
-      (JObject(
-          "tokenId" -> JString("1234"),
-          "path" -> JString("/test/"),
-          "data" -> JObject("test" -> JNum(1)))).validated[Ingest] must beLike {
+      (JObject("tokenId" -> JString("1234"),
+               "path" -> JString("/test/"),
+               "data" -> JObject("test" -> JNum(1))))
+        .validated[Ingest] must beLike {
         case Success(_) => ok
       }
     }

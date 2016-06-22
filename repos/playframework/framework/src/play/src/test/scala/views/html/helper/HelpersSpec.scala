@@ -36,8 +36,9 @@ object HelpersSpec extends Specification {
     }
 
     "default to a type of text" in {
-      inputText.apply(Form(single("foo" -> Forms.text))("foo")).body must contain(
-          "type=\"text\"")
+      inputText
+        .apply(Form(single("foo" -> Forms.text))("foo"))
+        .body must contain("type=\"text\"")
     }
 
     "allow setting a custom type" in {
@@ -122,8 +123,9 @@ object HelpersSpec extends Specification {
       val form =
         Form(single("foo" -> Forms.list(Forms.text))).fill(List("0", "1"))
       val body = select
-        .apply(
-            form("foo"), Seq(("0", "test"), ("1", "test")), 'multiple -> None)
+        .apply(form("foo"),
+               Seq(("0", "test"), ("1", "test")),
+               'multiple -> None)
         .body
 
       // Append [] to the name for the form binding
@@ -159,7 +161,8 @@ object HelpersSpec extends Specification {
         .map(_.toString)
 
     val complexForm = Form(
-        single("foo" -> Forms.seq(tuple(
+        single(
+            "foo" -> Forms.seq(tuple(
                     "a" -> Forms.text,
                     "b" -> Forms.text
                 ))))
@@ -180,18 +183,25 @@ object HelpersSpec extends Specification {
     }
 
     "render a sequence of fields in an unfilled form" in {
-      renderFoo(form, 4) must exactly(
-          "foo[0]:", "foo[1]:", "foo[2]:", "foo[3]:").inOrder
+      renderFoo(form, 4) must exactly("foo[0]:",
+                                      "foo[1]:",
+                                      "foo[2]:",
+                                      "foo[3]:").inOrder
     }
 
     "fill the fields out if less than the min" in {
-      renderFoo(form.fill(Seq("a", "b")), 4) must exactly(
-          "foo[0]:a", "foo[1]:b", "foo[2]:", "foo[3]:").inOrder
+      renderFoo(form.fill(Seq("a", "b")), 4) must exactly("foo[0]:a",
+                                                          "foo[1]:b",
+                                                          "foo[2]:",
+                                                          "foo[3]:").inOrder
     }
 
     "fill the fields out if less than the min but the maximum is high" in {
       renderFoo(form.bind(Map("foo[0]" -> "a", "foo[123]" -> "b")), 4) must exactly(
-          "foo[0]:a", "foo[123]:b", "foo[124]:", "foo[125]:").inOrder
+          "foo[0]:a",
+          "foo[123]:b",
+          "foo[124]:",
+          "foo[125]:").inOrder
     }
 
     "render the right number of fields if there's multiple sub fields at a given index when filled" in {

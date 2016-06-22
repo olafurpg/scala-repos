@@ -26,7 +26,7 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
   /**
     * Represents a prospective TCP server binding.
     */
-  class ServerBinding private[akka](delegate: scaladsl.Tcp.ServerBinding) {
+  class ServerBinding private[akka] (delegate: scaladsl.Tcp.ServerBinding) {
 
     /**
       * The local address of the endpoint bound by the materialization of the `connections` [[Source]].
@@ -45,7 +45,7 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
   /**
     * Represents an accepted incoming TCP connection.
     */
-  class IncomingConnection private[akka](
+  class IncomingConnection private[akka] (
       delegate: scaladsl.Tcp.IncomingConnection) {
 
     /**
@@ -78,7 +78,7 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
   /**
     * Represents a prospective outgoing TCP connection.
     */
-  class OutgoingConnection private[akka](
+  class OutgoingConnection private[akka] (
       delegate: scaladsl.Tcp.OutgoingConnection) {
 
     /**
@@ -200,7 +200,8 @@ class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
     */
   def outgoingConnection(host: String, port: Int)
     : Flow[ByteString, ByteString, CompletionStage[OutgoingConnection]] =
-    Flow.fromGraph(delegate
+    Flow.fromGraph(
+        delegate
           .outgoingConnection(new InetSocketAddress(host, port))
           .mapMaterializedValue(_.map(new OutgoingConnection(_))(ec).toJava))
 }

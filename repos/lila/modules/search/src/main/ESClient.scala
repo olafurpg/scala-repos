@@ -15,8 +15,9 @@ sealed trait ESClient {
   def deleteByIds(ids: List[Id]): Funit
 }
 
-final class ESClientHttp(
-    endpoint: String, val index: Index, writeable: Boolean)
+final class ESClientHttp(endpoint: String,
+                         val index: Index,
+                         writeable: Boolean)
     extends ESClient {
   import play.api.libs.ws.WS
   import play.api.Play.current
@@ -40,8 +41,8 @@ final class ESClientHttp(
     writeable ?? HTTP(s"delete/id/${index.name}/${id.value}", Json.obj())
 
   def deleteByIds(ids: List[lila.search.Id]) =
-    writeable ?? HTTP(
-        s"delete/ids/${index.name}", Json.obj("ids" -> ids.map(_.value)))
+    writeable ?? HTTP(s"delete/ids/${index.name}",
+                      Json.obj("ids" -> ids.map(_.value)))
 
   def putMapping =
     HTTP(s"mapping/${index.name}/${index.name}", Json.obj())
@@ -51,8 +52,9 @@ final class ESClientHttp(
       case (Id(id), doc) => id -> JsString(Json.stringify(doc))
     }))
 
-  private[search] def HTTP[D: Writes, R](
-      url: String, data: D, read: String => R): Fu[R] =
+  private[search] def HTTP[D: Writes, R](url: String,
+                                         data: D,
+                                         read: String => R): Fu[R] =
     WS.url(s"$endpoint/$url").post(Json toJson data) flatMap {
       case res if res.status == 200 => fuccess(read(res.body))
       case res => fufail(s"$url ${res.status}")

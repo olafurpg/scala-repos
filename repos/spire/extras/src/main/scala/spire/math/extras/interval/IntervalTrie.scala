@@ -28,8 +28,8 @@ object IntervalTrie {
 
       def and(a: IntervalTrie[T], b: IntervalTrie[T]): IntervalTrie[T] = a & b
 
-      override def xor(
-          a: IntervalTrie[T], b: IntervalTrie[T]): IntervalTrie[T] =
+      override def xor(a: IntervalTrie[T],
+                       b: IntervalTrie[T]): IntervalTrie[T] =
         a ^ b
     }
 

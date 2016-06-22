@@ -15,7 +15,8 @@ abstract class SchemeDirectives extends RangeDirectives {
     * Rejects all requests whose Uri scheme does not match the given one.
     */
   @varargs
-  def scheme(
-      scheme: String, innerRoute: Route, moreInnerRoutes: Route*): Route =
+  def scheme(scheme: String,
+             innerRoute: Route,
+             moreInnerRoutes: Route*): Route =
     SchemeFilter(scheme)(innerRoute, moreInnerRoutes.toList)
 }

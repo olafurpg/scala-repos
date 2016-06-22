@@ -17,7 +17,8 @@ object TestOptions {
   def karafOptions(useDeployFolder: Boolean = false,
                    extractInTargetFolder: Boolean = true): PaxOption = {
     val kdc = karafDistributionConfiguration
-      .frameworkUrl(maven
+      .frameworkUrl(
+          maven
             .groupId("org.apache.karaf")
             .artifactId("apache-karaf")
             .`type`("zip")
@@ -30,8 +31,9 @@ object TestOptions {
         if (extractInTargetFolder)
           kdc.unpackDirectory(new File("target/paxexam/unpack/"))
         else kdc,
-        editConfigurationFilePut(
-            "etc/config.properties", "karaf.framework", "equinox"))
+        editConfigurationFilePut("etc/config.properties",
+                                 "karaf.framework",
+                                 "equinox"))
   }
 
   def testBundles(): PaxOption = {
@@ -58,7 +60,8 @@ object TestOptions {
       useDeployFolder: Boolean = false,
       extractInTargetFolder: Boolean = true): PaxOption = {
     new DefaultCompositeOption(
-        karafOptions(useDeployFolder, extractInTargetFolder), testBundles())
+        karafOptions(useDeployFolder, extractInTargetFolder),
+        testBundles())
   }
 
   def featureDiningHakkers(): PaxOption = {

@@ -17,8 +17,9 @@ import play.doc.{FileRepository, PlayDoc, RenderedPage, PageIndex}
   * Documentation is located in the given repository - either a JAR file or directly from
   * the filesystem.
   */
-class DocumentationHandler(
-    repo: FileRepository, apiRepo: FileRepository, toClose: Closeable)
+class DocumentationHandler(repo: FileRepository,
+                           apiRepo: FileRepository,
+                           toClose: Closeable)
     extends BuildDocHandler
     with Closeable {
 
@@ -101,10 +102,12 @@ class DocumentationHandler(
               case None =>
                 NotFound(views.html.play20.manual(page, None, None, locator))
               case Some(RenderedPage(mainPage, None, _)) =>
-                Ok(views.html.play20
+                Ok(
+                    views.html.play20
                       .manual(page, Some(mainPage), None, locator))
               case Some(RenderedPage(mainPage, Some(sidebar), _)) =>
-                Ok(views.html.play20
+                Ok(
+                    views.html.play20
                       .manual(page, Some(mainPage), Some(sidebar), locator))
             }
         )

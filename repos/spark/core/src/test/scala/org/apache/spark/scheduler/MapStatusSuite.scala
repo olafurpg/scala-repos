@@ -44,7 +44,7 @@ class MapStatusSuite extends SparkFunSuite {
       val size2 = MapStatus.decompressSize(MapStatus.compressSize(size))
       assert(size2 >= 0.99 * size && size2 <= 1.11 * size,
              "size " + size + " decompressed to " + size2 +
-             ", which is out of range")
+               ", which is out of range")
     }
   }
 

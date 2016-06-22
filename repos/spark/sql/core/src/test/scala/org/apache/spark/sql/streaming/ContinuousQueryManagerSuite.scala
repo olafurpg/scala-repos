@@ -236,8 +236,9 @@ class ContinuousQueryManagerSuite
           try {
             val df = ds.toDF
             query = sqlContext.streams
-              .startQuery(
-                  StreamExecution.nextName, df, new MemorySink(df.schema))
+              .startQuery(StreamExecution.nextName,
+                          df,
+                          new MemorySink(df.schema))
               .asInstanceOf[StreamExecution]
           } catch {
             case NonFatal(e) =>
@@ -274,13 +275,13 @@ class ContinuousQueryManagerSuite
       }
     }
 
-    AwaitTerminationTester.test(
-        expectedBehavior, awaitTermFunc, testBehaviorFor)
+    AwaitTerminationTester
+      .test(expectedBehavior, awaitTermFunc, testBehaviorFor)
   }
 
   /** Stop a random active query either with `stop()` or with an error */
-  private def stopRandomQueryAsync(
-      stopAfter: Span, withError: Boolean): ContinuousQuery = {
+  private def stopRandomQueryAsync(stopAfter: Span,
+                                   withError: Boolean): ContinuousQuery = {
 
     import scala.concurrent.ExecutionContext.Implicits.global
 

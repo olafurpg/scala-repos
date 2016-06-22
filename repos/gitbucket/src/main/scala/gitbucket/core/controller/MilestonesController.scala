@@ -27,13 +27,13 @@ trait MilestonesControllerBase extends ControllerBase {
       "dueDate" -> trim(label("Due Date", optional(date())))
   )(MilestoneForm.apply)
 
-  get("/:owner/:repository/issues/milestones")(
-      referrersOnly { repository =>
+  get("/:owner/:repository/issues/milestones")(referrersOnly { repository =>
     html.list(params.getOrElse("state", "open"),
               getMilestonesWithIssueCount(repository.owner, repository.name),
               repository,
-              hasWritePermission(
-                  repository.owner, repository.name, context.loginAccount))
+              hasWritePermission(repository.owner,
+                                 repository.name,
+                                 context.loginAccount))
   })
 
   get("/:owner/:repository/issues/milestones/new")(collaboratorsOnly {
@@ -63,9 +63,10 @@ trait MilestonesControllerBase extends ControllerBase {
     params("milestoneId").toIntOpt.flatMap { milestoneId =>
       getMilestone(repository.owner, repository.name, milestoneId).map {
         milestone =>
-          updateMilestone(milestone.copy(title = form.title,
-                                         description = form.description,
-                                         dueDate = form.dueDate))
+          updateMilestone(
+              milestone.copy(title = form.title,
+                             description = form.description,
+                             dueDate = form.dueDate))
           redirect(
               s"/${repository.owner}/${repository.name}/issues/milestones")
       }
@@ -104,8 +105,9 @@ trait MilestonesControllerBase extends ControllerBase {
       milestoneId =>
         getMilestone(repository.owner, repository.name, milestoneId).map {
           milestone =>
-            deleteMilestone(
-                repository.owner, repository.name, milestone.milestoneId)
+            deleteMilestone(repository.owner,
+                            repository.name,
+                            milestone.milestoneId)
             redirect(
                 s"/${repository.owner}/${repository.name}/issues/milestones")
         }

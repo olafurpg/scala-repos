@@ -47,7 +47,8 @@ private[opening] final class OpeningApi(openingColl: Coll,
 
     def find(openingId: Opening.ID, userId: String): Fu[Option[Attempt]] =
       attemptColl
-        .find(BSONDocument(
+        .find(
+            BSONDocument(
                 Attempt.BSONFields.id -> Attempt.makeId(openingId, userId)
             ))
         .one[Attempt]
@@ -55,7 +56,8 @@ private[opening] final class OpeningApi(openingColl: Coll,
     def add(a: Attempt) = attemptColl insert a void
 
     def hasPlayed(user: User, opening: Opening): Fu[Boolean] =
-      attemptColl.count(BSONDocument(
+      attemptColl.count(
+          BSONDocument(
               Attempt.BSONFields.id -> Attempt.makeId(opening.id, user.id)
           ).some) map (0 !=)
 

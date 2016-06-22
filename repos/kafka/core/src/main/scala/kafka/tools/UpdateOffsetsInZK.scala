@@ -68,8 +68,9 @@ object UpdateOffsetsInZK {
       val broker = brokerHostingPartition match {
         case Some(b) => b
         case None =>
-          throw new KafkaException("Broker " + brokerHostingPartition +
-              " is unavailable. Cannot issue " + "getOffsetsBefore request")
+          throw new KafkaException(
+              "Broker " + brokerHostingPartition +
+                " is unavailable. Cannot issue " + "getOffsetsBefore request")
       }
 
       zkUtils.getBrokerInfo(broker) match {
@@ -93,9 +94,10 @@ object UpdateOffsetsInZK {
 
           println(
               "updating partition " + partition + " with new offset: " +
-              offset)
+                offset)
           zkUtils.updatePersistentPath(
-              topicDirs.consumerOffsetDir + "/" + partition, offset.toString)
+              topicDirs.consumerOffsetDir + "/" + partition,
+              offset.toString)
           numParts += 1
         case None =>
           throw new KafkaException(
@@ -107,8 +109,9 @@ object UpdateOffsetsInZK {
   }
 
   private def usage() = {
-    println("USAGE: " + UpdateOffsetsInZK.getClass.getName +
-        " [earliest | latest] consumer.properties topic")
+    println(
+        "USAGE: " + UpdateOffsetsInZK.getClass.getName +
+          " [earliest | latest] consumer.properties topic")
     System.exit(1)
   }
 }

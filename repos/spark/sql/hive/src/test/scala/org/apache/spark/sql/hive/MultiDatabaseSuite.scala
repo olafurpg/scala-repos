@@ -32,7 +32,7 @@ class MultiDatabaseSuite
       hiveContext.sessionState.catalog.client.getTable(dbName, tableName)
     val expectedPath =
       hiveContext.sessionState.catalog.client.getDatabase(dbName).locationUri +
-      "/" + tableName
+        "/" + tableName
 
     assert(metastoreTable.storage.serdeProperties("path") === expectedPath)
   }

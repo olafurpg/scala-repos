@@ -109,15 +109,15 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       case Some(AnnotationInfo(_, Nil, _)) =>
         specializableTypes.map(_.typeSymbol)
       case Some(ann @ AnnotationInfo(_, args, _)) => {
-          args map (_.tpe) flatMap { tp =>
-            tp baseType GroupOfSpecializable match {
-              case TypeRef(_, GroupOfSpecializable, arg :: Nil) =>
-                arg.typeArgs map (_.typeSymbol)
-              case _ =>
-                tp.typeSymbol :: Nil
-            }
+        args map (_.tpe) flatMap { tp =>
+          tp baseType GroupOfSpecializable match {
+            case TypeRef(_, GroupOfSpecializable, arg :: Nil) =>
+              arg.typeArgs map (_.typeSymbol)
+            case _ =>
+              tp.typeSymbol :: Nil
           }
         }
+      }
       case _ => Nil
     }
   }
@@ -172,7 +172,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       case (sym, tpe) =>
         t2 get sym exists { t2tp =>
           (tpe == t2tp) || !(isPrimitiveValueType(tpe) ||
-              isPrimitiveValueType(t2tp)) // u.t.b. (t2tp <:< AnyRefTpe)
+                isPrimitiveValueType(t2tp)) // u.t.b. (t2tp <:< AnyRefTpe)
         }
     }
 
@@ -201,8 +201,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     def matchesSym(sym1: Symbol) = sym.info =:= sym1.info
     def matchesEnv(env1: TypeEnv) = TypeEnv.includes(env, env1)
   }
-  private def newOverload(
-      method: Symbol, specializedMethod: Symbol, env: TypeEnv) = {
+  private def newOverload(method: Symbol,
+                          specializedMethod: Symbol,
+                          env: TypeEnv) = {
     assert(!specializedMethod.isOverloaded, specializedMethod.defString)
     val om = Overload(specializedMethod, env)
     overloads(method) ::= om
@@ -282,8 +283,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           target.info.typeParams map (_.info))
       val stvResult = specializedTypeVars(target.info.resultType)
 
-      debuglog("degenerate: " + target + " stv tparams: " + stvTypeParams +
-          " stv info: " + stvResult)
+      debuglog(
+          "degenerate: " + target + " stv tparams: " + stvTypeParams +
+            " stv info: " + stvResult)
 
       (stvTypeParams -- stvResult).nonEmpty
     }
@@ -303,7 +305,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     */
   def survivingArgs(sym: Symbol, args: List[Type]): List[Type] =
     for ((tvar, tpe) <- sym.info.typeParams.zip(args) if !tvar.isSpecialized ||
-         !isPrimitiveValueType(tpe)) yield tpe
+           !isPrimitiveValueType(tpe)) yield tpe
 
   val specializedType = new TypeMap {
     override def apply(tp: Type): Type = tp match {
@@ -314,7 +316,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         val args1 = map2(args, sym.info.typeParams)((tp, orig) =>
               if (isSpecializedAnyRefSubtype(tp, orig)) AnyRefTpe
               else tp)
-        specializedClass.get((sym, TypeEnv.fromSpecialization(sym, args1))) match {
+        specializedClass
+          .get((sym, TypeEnv.fromSpecialization(sym, args1))) match {
           case Some(sym1) => typeRef(pre1, sym1, survivingArgs(sym, args))
           case None => typeRef(pre1, sym, args)
         }
@@ -348,8 +351,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     specializedName(sym.name, tvars, env)
   }
 
-  private def specializedName(
-      name: Name, tvars: immutable.Set[Symbol], env: TypeEnv): TermName = {
+  private def specializedName(name: Name,
+                              tvars: immutable.Set[Symbol],
+                              env: TypeEnv): TermName = {
     val (methparams, others) =
       tvars.toList sortBy ("" + _.name) partition (_.owner.isMethod)
     // debuglog("specName(" + sym + ") env: " + env + " tvars: " + tvars)
@@ -360,8 +364,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
   /** Specialize name for the two list of types. The first one denotes
     *  specialization on method type parameters, the second on outer environment.
     */
-  private def specializedName(
-      name: Name, types1: List[Type], types2: List[Type]): TermName =
+  private def specializedName(name: Name,
+                              types1: List[Type],
+                              types2: List[Type]): TermName =
     (if (name == nme.CONSTRUCTOR || (types1.isEmpty && types2.isEmpty))
        name.toTermName
      else if (nme.isSetterName(name))
@@ -370,10 +375,13 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
        specializedName(name.getterName, types1, types2).localName
      else {
        val (base, cs, ms) = nme.splitSpecializedName(name)
-       newTermName(base.toString + "$" + "m" + ms +
-           types1.map(t => abbrvTag(t.typeSymbol)).mkString("", "", "") + "c" +
-           cs +
-           types2.map(t => abbrvTag(t.typeSymbol)).mkString("", "", "$sp"))
+       newTermName(
+           base.toString + "$" + "m" + ms +
+             types1
+               .map(t => abbrvTag(t.typeSymbol))
+               .mkString("", "", "") + "c" +
+             cs +
+             types2.map(t => abbrvTag(t.typeSymbol)).mkString("", "", "$sp"))
      })
 
   lazy val specializableTypes = ScalaValueClasses map (_.tpe) sorted
@@ -399,8 +407,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         specializedOn(sym) map (s => specializesClass(s).tpe) sorted
 
     if (isBoundedGeneric(sym.tpe) && (types contains AnyRefClass))
-      reporter.warning(
-          sym.pos, sym + " is always a subtype of " + AnyRefTpe + ".")
+      reporter
+        .warning(sym.pos, sym + " is always a subtype of " + AnyRefTpe + ".")
 
     types
   }
@@ -439,8 +447,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
             .intersect(env.keySet)
             .diff(wasSpecializedForTypeVars(sym))
             .nonEmpty || sym.isClassConstructor &&
-          (sym.enclClass.typeParams exists (_.isSpecialized)) ||
-          isNormalizedMember(sym) && info(sym).typeBoundsIn(env)
+            (sym.enclClass.typeParams exists (_.isSpecialized)) ||
+            isNormalizedMember(sym) && info(sym).typeBoundsIn(env)
       )
   )
 
@@ -483,8 +491,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       else if (args.isEmpty)
         Set()
       else
-        specializedTypeVars(
-            sym.typeParams zip args collect {
+        specializedTypeVars(sym.typeParams zip args collect {
           case (tp, arg) if tp.isSpecialized => arg
         })
 
@@ -541,8 +548,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     *  For instance, a @specialized(AnyRef) T, will become T$sp <: AnyRef.
     */
   def produceTypeParameters(syms: List[Symbol], nowner: Symbol, env: TypeEnv) = {
-    val cloned = for (s <- syms) yield
-      if (!env.contains(s)) s.cloneSymbol(nowner) else env(s).typeSymbol
+    val cloned = for (s <- syms)
+      yield if (!env.contains(s)) s.cloneSymbol(nowner) else env(s).typeSymbol
     // log("producing type params: " + cloned.map(t => (t, t.tpe.bounds.hi)))
     foreach2(syms, cloned) { (orig, cln) =>
       cln.removeAnnotation(SpecializedClass)
@@ -555,8 +562,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
   /** Maps AnyRef bindings from a raw environment (holding AnyRefs) into type parameters from
     *  the specialized symbol (class (specialization) or member (normalization)), leaves everything else as-is.
     */
-  private def mapAnyRefsInSpecSym(
-      env: TypeEnv, origsym: Symbol, specsym: Symbol): TypeEnv = env map {
+  private def mapAnyRefsInSpecSym(env: TypeEnv,
+                                  origsym: Symbol,
+                                  specsym: Symbol): TypeEnv = env map {
     case (sym, AnyRefTpe) if sym.owner == origsym =>
       (sym, typeParamSubAnyRef(sym, specsym))
     case x => x
@@ -595,12 +603,14 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       // debuglog("Specializing " + clazz + ", but found " + bytecodeClazz + " already there")
       bytecodeClazz.info
 
-      val sClass = clazz.owner.newClass(
-          clazzName, clazz.pos, (clazz.flags | SPECIALIZED) & ~CASE)
-      sClass.setAnnotations(clazz.annotations) // SI-8574 important that the subclass picks up @SerialVersionUID, @strictfp, etc.
+      val sClass = clazz.owner
+        .newClass(clazzName, clazz.pos, (clazz.flags | SPECIALIZED) & ~CASE)
+      sClass
+        .setAnnotations(clazz.annotations) // SI-8574 important that the subclass picks up @SerialVersionUID, @strictfp, etc.
 
-      def cloneInSpecializedClass(
-          member: Symbol, flagFn: Long => Long, newName: Name = null) =
+      def cloneInSpecializedClass(member: Symbol,
+                                  flagFn: Long => Long,
+                                  newName: Name = null) =
         member.cloneSymbol(sClass, flagFn(member.flags | SPECIALIZED), newName)
 
       sClass.associatedFile = clazz.sourceFile
@@ -610,12 +620,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       typeEnv(sClass) = env
       this.specializedClass((clazz, env0)) = sClass
 
-      val decls1 =
-        newScope // declarations of the newly specialized class 'sClass'
-      var oldClassTParams: List[Symbol] =
-        Nil // original unspecialized type parameters
-      var newClassTParams: List[Symbol] =
-        Nil // unspecialized type parameters of 'specializedClass' (cloned)
+      val decls1 = newScope // declarations of the newly specialized class 'sClass'
+      var oldClassTParams: List[Symbol] = Nil // original unspecialized type parameters
+      var newClassTParams: List[Symbol] = Nil // unspecialized type parameters of 'specializedClass' (cloned)
 
       // has to be a val in order to be computed early. It is later called
       // within 'enteringPhase(next)', which would lead to an infinite cycle otherwise
@@ -626,8 +633,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         // log("new tparams " + newClassTParams.zip(newClassTParams map {s => (s.tpe, s.tpe.bounds.hi)}) + ", in env: " + env)
 
         def applyContext(tpe: Type) =
-          subst(env, tpe).instantiateTypeParams(
-              oldClassTParams, newClassTParams map (_.tpe))
+          subst(env, tpe).instantiateTypeParams(oldClassTParams,
+                                                newClassTParams map (_.tpe))
 
         /* Return a list of specialized parents to be re-mixed in a specialized subclass.
          * Assuming env = [T -> Int] and
@@ -647,8 +654,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                 reporter.warning(
                     clazz.pos,
                     p.typeSymbol +
-                    " must be a trait. Specialized version of " + clazz +
-                    " will inherit generic " + p) // TODO change to error
+                      " must be a trait. Specialized version of " + clazz +
+                      " will inherit generic " + p) // TODO change to error
           }
           res
         }
@@ -662,7 +669,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         if (extraSpecializedMixins.nonEmpty)
           debuglog(
               "extra specialized mixins for %s: %s".format(
-                  clazz.name.decode, extraSpecializedMixins.mkString(", ")))
+                  clazz.name.decode,
+                  extraSpecializedMixins.mkString(", ")))
         // If the class being specialized has a self-type, the self type may
         // require specialization.  First exclude classes whose self types have
         // the same type constructor as the class itself, since they will
@@ -672,8 +680,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           sClass.typeOfThis = applyContext(clazz.typeOfThis)
           debuglog(
               "Rewriting self-type for specialized class:\n" + "    " +
-              clazz.defStringSeenAs(clazz.typeOfThis) + "\n" + " => " +
-              sClass.defStringSeenAs(sClass.typeOfThis))
+                clazz.defStringSeenAs(clazz.typeOfThis) + "\n" + " => " +
+                sClass.defStringSeenAs(sClass.typeOfThis))
         }
         GenPolyType(
             newClassTParams,
@@ -691,7 +699,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       def enterMember(sym: Symbol): Symbol = {
         typeEnv(sym) = fullEnv ++ typeEnv(sym) // append the full environment
         sym modifyInfo (_.substThis(clazz, sClass).instantiateTypeParams(
-                oldClassTParams, newClassTParams map (_.tpe)))
+                oldClassTParams,
+                newClassTParams map (_.tpe)))
         // we remove any default parameters. At this point, they have been all
         // resolved by the type checker. Later on, erasure re-typechecks everything and
         // chokes if it finds default parameters for specialized members, even though
@@ -714,9 +723,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
        *   def m$I(x: Int) = <body>/adapted to env {A -> Int} // om
        */
       def forwardToOverload(m: Symbol): Symbol = {
-        val specMember = enterMember(
-            cloneInSpecializedClass(
-                m, f => (f | OVERRIDE) & ~(DEFERRED | CASEACCESSOR)))
+        val specMember = enterMember(cloneInSpecializedClass(m, f =>
+                  (f | OVERRIDE) & ~(DEFERRED | CASEACCESSOR)))
         val om = specializedOverload(sClass, m, env).setFlag(OVERRIDE)
         val original = info.get(m) match {
           case Some(NormalizedMember(tg)) => tg
@@ -734,7 +742,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       }
 
       for (m <- normMembers; if needsSpecialization(outerEnv ++ env, m) &&
-           satisfiable(fullEnv)) {
+             satisfiable(fullEnv)) {
         if (!m.isDeferred)
           addConcreteSpecMethod(m)
         // specialized members have to be overridable.
@@ -757,7 +765,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
               typeEnv(specMember) = env ++ typeEnv(m)
             } else {
               val om = forwardToOverload(m)
-              debuglog("normalizedMember " + m + " om: " + om + " " + pp(
+              debuglog(
+                  "normalizedMember " + m + " om: " + om + " " + pp(
                       typeEnv(om)))
             }
           } else
@@ -782,7 +791,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           // concrete value definition
           def mkAccessor(field: Symbol, name: Name) = {
             val newFlags =
-              (SPECIALIZED | m.getterIn(clazz).flags) & ~(LOCAL | CASEACCESSOR | PARAMACCESSOR)
+              (SPECIALIZED | m
+                    .getterIn(clazz)
+                    .flags) & ~(LOCAL | CASEACCESSOR | PARAMACCESSOR)
             // we rely on the super class to initialize param accessors
             val sym = sClass.newMethod(name.toTermName, field.pos, newFlags)
             info(sym) = SpecializedAccessor(field)
@@ -805,7 +816,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           if (nme.isLocalName(m.name)) {
             val specGetter =
               mkAccessor(specVal, specVal.getterName) setInfo MethodType(
-                  Nil, specVal.info)
+                  Nil,
+                  specVal.info)
             val origGetter = overrideIn(sClass, m.getterIn(clazz))
             info(origGetter) = Forward(specGetter)
             enterMember(specGetter)
@@ -821,8 +833,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                 val cfaGetter = overrideIn(sClass, cfa)
                 info(cfaGetter) = SpecializedAccessor(specVal)
                 enterMember(cfaGetter)
-                debuglog("override case field accessor %s -> %s".format(
-                        m.name.decode, cfaGetter.name.decode))
+                debuglog(
+                    "override case field accessor %s -> %s"
+                      .format(m.name.decode, cfaGetter.name.decode))
             }
 
             if (specVal.isVariable && m.setterIn(clazz) != NoSymbol) {
@@ -862,8 +875,10 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         if (m.isAnonymousClass) List(m)
         else {
           normalizeMember(m.owner, m, outerEnv) flatMap { normalizedMember =>
-            val ms = specializeMember(
-                m.owner, normalizedMember, outerEnv, clazz.info.typeParams)
+            val ms = specializeMember(m.owner,
+                                      normalizedMember,
+                                      outerEnv,
+                                      clazz.info.typeParams)
             // interface traits have concrete members now
             if (ms.nonEmpty && clazz.isTrait && clazz.isInterface)
               clazz.resetFlag(INTERFACE)
@@ -906,8 +921,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     *     m$D[ U](x: Double, y: U)
     *     // etc.
     */
-  private def normalizeMember(
-      owner: Symbol, sym: Symbol, outerEnv: TypeEnv): List[Symbol] = {
+  private def normalizeMember(owner: Symbol,
+                              sym: Symbol,
+                              outerEnv: TypeEnv): List[Symbol] = {
     sym :: (
         if (!sym.isMethod || enteringTyper(sym.typeParams.isEmpty)) Nil
         else if (sym.hasDefault) {
@@ -962,8 +978,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
               .cloneInfo(specMember)
             specMember setInfo GenPolyType(tps1, methodType)
 
-            debuglog("%s expands to %s in %s".format(
-                    sym, specMember.name.decode, pp(env)))
+            debuglog(
+                "%s expands to %s in %s"
+                  .format(sym, specMember.name.decode, pp(env)))
             info(specMember) = NormalizedMember(sym)
             newOverload(sym, specMember, env)
             specMember
@@ -1009,8 +1026,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
 
         val wasSpec = wasSpecializedForTypeVars(specMember)
         if (wasSpec.nonEmpty)
-          debuglog("specialized overload for %s in %s".format(
-                  specMember, pp(typeEnv(specMember))))
+          debuglog(
+              "specialized overload for %s in %s"
+                .format(specMember, pp(typeEnv(specMember))))
 
         newOverload(sym, specMember, spec)
         info(specMember) = SpecialOverload(sym, typeEnv(specMember))
@@ -1024,8 +1042,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         val stvars = specializedTypeVars(sym)
         if (stvars.nonEmpty)
           debuglog(
-              "specialized %s on %s".format(
-                  sym.fullLocationString, stvars.map(_.name).mkString(", ")))
+              "specialized %s on %s".format(sym.fullLocationString,
+                                            stvars.map(_.name).mkString(", ")))
 
         val tps1 =
           if (sym.isConstructor) tps filter (sym.info.paramTypes contains _)
@@ -1082,7 +1100,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                 reporter.error(
                     derivedTvar.pos,
                     "Type parameter has to be specialized at least for the same types as in the overridden method. Missing " +
-                    "types: " + missing.mkString("", ", ", ""))
+                      "types: " + missing.mkString("", ", ", ""))
               }
           }
         }
@@ -1103,7 +1121,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
               val env =
                 unify(overridden.info, overriding.info, emptyEnv, false, true)
               def atNext =
-                exitingSpecialize(overridden.owner.info
+                exitingSpecialize(
+                    overridden.owner.info
                       .decl(specializedName(overridden, env)))
 
               if (TypeEnv.restrict(env, stvars).nonEmpty &&
@@ -1143,19 +1162,18 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                 clazz.info.decls.enter(om)
                 foreachWithIndex(om.paramss) { (params, i) =>
                   foreachWithIndex(params) { (param, j) =>
-                    param.name =
-                      overriding.paramss(i)(j).name // SI-6555 Retain the parameter names from the subclass.
+                    param.name = overriding.paramss(i)(j).name // SI-6555 Retain the parameter names from the subclass.
                   }
                 }
-                debuglog("specialized overload %s for %s in %s: %s".format(
-                        om, overriding.name.decode, pp(env), om.info))
+                debuglog("specialized overload %s for %s in %s: %s"
+                      .format(om, overriding.name.decode, pp(env), om.info))
                 if (overriding.isAbstractOverride) om.setFlag(ABSOVERRIDE)
                 typeEnv(om) = env
                 addConcreteSpecMethod(overriding)
                 if (overriding.isDeferred) {
                   // abstract override
                   debuglog("abstract override " + overriding.fullName +
-                      " with specialized " + om.fullName)
+                        " with specialized " + om.fullName)
                   info(om) = Forward(overriding)
                 } else {
                   // if the override is a normalized member, 'om' gets the
@@ -1173,10 +1191,11 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                 }
 
                 newOverload(overriding, om, env)
-                ifDebug(exitingSpecialize(
+                ifDebug(
+                    exitingSpecialize(
                         assert(overridden.owner.info.decl(om.name) != NoSymbol,
                                "Could not find " + om.name +
-                               " in " + overridden.owner.info.decls)))
+                                 " in " + overridden.owner.info.decls)))
                 Some(om)
             }
           }).toList
@@ -1253,8 +1272,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       unify(List(lo1, hi1), List(lo2, hi2), env, strict)
     case _ =>
       debuglog(
-          "don't know how to unify %s [%s] with %s [%s]".format(
-              tp1, tp1.getClass, tp2, tp2.getClass))
+          "don't know how to unify %s [%s] with %s [%s]"
+            .format(tp1, tp1.getClass, tp2, tp2.getClass))
       env
   }
 
@@ -1270,8 +1289,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           val nenv = unify(args._1, args._2, emptyEnv, strict)
           if (env.keySet intersect nenv.keySet isEmpty) env ++ nenv
           else {
-            debuglog("could not unify: u(" + args._1 + ", " + args._2 +
-                ") yields " + nenv + ", env: " + env)
+            debuglog(
+                "could not unify: u(" + args._1 + ", " + args._2 +
+                  ") yields " + nenv + ", env: " + env)
             unifyError(tp1, tp2)
           }
         }
@@ -1313,7 +1333,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
 
   private def unspecializableClass(tp: Type) = (
       isRepeatedParamType(tp) // ???
-      || tp.typeSymbol.isJavaDefined || tp.typeSymbol.isPackageClass
+        || tp.typeSymbol.isJavaDefined || tp.typeSymbol.isPackageClass
   )
 
   /** Type transformation. It is applied to all symbols, compiled or loaded.
@@ -1333,7 +1353,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           if (parents ne parents1) {
             debuglog(
                 "specialization transforms %s%s parents to %s".format(
-                    if (tparams.nonEmpty) "(poly) " else "", clazz, parents1))
+                    if (tparams.nonEmpty) "(poly) " else "",
+                    clazz,
+                    parents1))
           }
           val newScope =
             newScopeWith(
@@ -1354,7 +1376,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
   def nonConflicting(env: TypeEnv) = env forall {
     case (tvar, tpe) =>
       (subst(env, tvar.info.bounds.lo) <:< tpe) &&
-      (tpe <:< subst(env, tvar.info.bounds.hi))
+        (tpe <:< subst(env, tvar.info.bounds.hi))
   }
 
   /** The type environment is sound w.r.t. to all type bounds or only soft
@@ -1375,15 +1397,16 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     env forall {
       case (tvar, tpe) =>
         matches(tvar.info.bounds.lo, tpe) &&
-        matches(tpe, tvar.info.bounds.hi) || {
+          matches(tpe, tvar.info.bounds.hi) || {
           if (warnings)
             reporter.warning(tvar.pos,
                              "Bounds prevent specialization of " + tvar)
 
-          debuglog("specvars: " + tvar.info.bounds.lo + ": " +
-              specializedTypeVars(tvar.info.bounds.lo) +
-              " " + subst(env, tvar.info.bounds.hi) + ": " +
-              specializedTypeVars(subst(env, tvar.info.bounds.hi)))
+          debuglog(
+              "specvars: " + tvar.info.bounds.lo + ": " +
+                specializedTypeVars(tvar.info.bounds.lo) +
+                " " + subst(env, tvar.info.bounds.hi) + ": " +
+                specializedTypeVars(subst(env, tvar.info.bounds.hi)))
           false
         }
     }
@@ -1411,8 +1434,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         val loconstraints = matches(tvar.info.bounds.lo, tpe)
         val hiconstraints = matches(tpe, tvar.info.bounds.hi)
         val allconstraints =
-          for (c <- constraints; l <- loconstraints; h <- hiconstraints) yield
-            c ++ l ++ h
+          for (c <- constraints; l <- loconstraints; h <- hiconstraints)
+            yield c ++ l ++ h
         allconstraints
     }
   }
@@ -1429,13 +1452,12 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       override def castType(tree: Tree, pt: Type): Tree = {
         tree modifyType fixType
         // log(" tree type: " + tree.tpe)
-        val ntree =
-          if (tree.tpe != null && !(tree.tpe <:< pt)) {
-            val casttpe = CastMap(tree.tpe)
-            if (casttpe <:< pt) gen.mkCast(tree, casttpe)
-            else if (casttpe <:< CastMap(pt)) gen.mkCast(tree, pt)
-            else tree
-          } else tree
+        val ntree = if (tree.tpe != null && !(tree.tpe <:< pt)) {
+          val casttpe = CastMap(tree.tpe)
+          if (casttpe <:< pt) gen.mkCast(tree, casttpe)
+          else if (casttpe <:< CastMap(pt)) gen.mkCast(tree, pt)
+          else tree
+        } else tree
 
         ntree.clearType()
       }
@@ -1510,7 +1532,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
 
     private def shouldMakePublic(sym: Symbol): Boolean =
       sym.hasFlag(PRIVATE | PROTECTED) &&
-      (addressFields || !nme.isLocalName(sym.name))
+        (addressFields || !nme.isLocalName(sym.name))
 
     /** All private members that are referenced are made protected,
       *  in order to be accessible from specialized subclasses.
@@ -1581,14 +1603,17 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       }
     }
 
-    def doesConform(
-        origSymbol: Symbol, treeType: Type, memberType: Type, env: TypeEnv) = {
+    def doesConform(origSymbol: Symbol,
+                    treeType: Type,
+                    memberType: Type,
+                    env: TypeEnv) = {
       (treeType =:= memberType) || {
         // anyref specialization
         memberType match {
           case PolyType(_, resTpe) =>
-            debuglog("Conformance for anyref - polytype with result type: " +
-                resTpe + " and " + treeType + "\nOrig. sym.: " + origSymbol)
+            debuglog(
+                "Conformance for anyref - polytype with result type: " +
+                  resTpe + " and " + treeType + "\nOrig. sym.: " + origSymbol)
             try {
               val e = unify(origSymbol.tpe, memberType, emptyEnv, true)
               debuglog("obtained env: " + e)
@@ -1644,10 +1669,12 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         else qual.tpe member specializedName(symbol, env) suchThat isMatch
       }
 
-      def matchingSymbolInPrefix(
-          pre: Type, member: Symbol, env: TypeEnv): Symbol = {
+      def matchingSymbolInPrefix(pre: Type,
+                                 member: Symbol,
+                                 env: TypeEnv): Symbol = {
         pre member specializedName(member, env) suchThat (_.tpe matches subst(
-                env, member.tpe))
+                env,
+                member.tpe))
       }
 
       def transformSelect(sel: Select) = {
@@ -1697,17 +1724,18 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           symbol.info.typeParams zip baseTargs collect {
             case (tvar, targ)
                 if !env.contains(tvar) ||
-                !isPrimitiveValueClass(env(tvar).typeSymbol) =>
+                  !isPrimitiveValueClass(env(tvar).typeSymbol) =>
               targ
           }
         ifDebug(
             assert(residualTargs.length == specMember.info.typeParams.length,
-                   "residual: %s, tparams: %s, env: %s".format(
-                       residualTargs, specMember.info.typeParams, env)))
+                   "residual: %s, tparams: %s, env: %s"
+                     .format(residualTargs, specMember.info.typeParams, env)))
 
         val tree1 = gen.mkTypeApply(specTree, residualTargs)
         debuglog("rewrote " + tree + " to " + tree1)
-        localTyper.typedOperator(atPos(tree.pos)(tree1)) // being polymorphic, it must be a method
+        localTyper
+          .typedOperator(atPos(tree.pos)(tree1)) // being polymorphic, it must be a method
       }
 
       curTree = tree
@@ -1715,8 +1743,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         case Apply(Select(New(tpt), nme.CONSTRUCTOR), args) =>
           def transformNew = {
             debuglog(
-                "Attempting to specialize new %s(%s)".format(
-                    tpt, args.mkString(", ")))
+                "Attempting to specialize new %s(%s)"
+                  .format(tpt, args.mkString(", ")))
             val found = specializedType(tpt.tpe)
             if (found.typeSymbol ne tpt.tpe.typeSymbol) {
               // the ctor can be specialized
@@ -1732,8 +1760,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
             if hasNewParents(sup) =>
           def transformSuperApply = {
             val sup1 = Super(qual, name) setPos sup.pos
-            val tree1 = Apply(
-                Select(sup1, name1) setPos sel.pos, transformTrees(args))
+            val tree1 =
+              Apply(Select(sup1, name1) setPos sel.pos, transformTrees(args))
             val res = localTyper.typedPos(tree.pos)(tree1)
             debuglog(s"retyping call to super, from: $symbol to ${res.symbol}")
             res
@@ -1747,10 +1775,10 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         // }
         case TypeApply(sel @ Select(qual, name), targs)
             if (specializedTypeVars(symbol.info).nonEmpty &&
-                name != nme.CONSTRUCTOR) =>
+                  name != nme.CONSTRUCTOR) =>
           debuglog(
               "checking typeapp for rerouting: " + tree + " with sym.tpe: " +
-              symbol.tpe + " tree.tpe: " + tree.tpe)
+                symbol.tpe + " tree.tpe: " + tree.tpe)
           val qual1 = transform(qual)
           log(">>> TypeApply: " + tree + ", qual1: " + qual1)
           specSym(qual1) match {
@@ -1785,8 +1813,11 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           else {
             overloads(symbol) find (_ matchesEnv env) match {
               case Some(Overload(specMember, _)) =>
-                computeResidualTypeVars(
-                    tree, specMember, Ident(specMember), targs, env)
+                computeResidualTypeVars(tree,
+                                        specMember,
+                                        Ident(specMember),
+                                        targs,
+                                        env)
               case _ => super.transform(tree)
             }
           }
@@ -1796,8 +1827,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           val pos = tree.pos
           debuglog(
               pos.source.file.name + ":" + pos.line +
-              ": not specializing call to super inside illegal specialized inheritance class.\n" +
-              pos.lineContent)
+                ": not specializing call to super inside illegal specialized inheritance class.\n" +
+                pos.lineContent)
           tree
 
         case sel @ Select(_, _) =>
@@ -1836,8 +1867,11 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
             if info.isDefinedAt(symbol) =>
           def transformDefDef = {
             if (symbol.isConstructor) {
-              val t = atOwner(symbol)(forwardCtorCall(
-                      tree.pos, gen.mkSuperInitCall, vparamss, symbol.owner))
+              val t = atOwner(symbol)(
+                  forwardCtorCall(tree.pos,
+                                  gen.mkSuperInitCall,
+                                  vparamss,
+                                  symbol.owner))
               if (symbol.isPrimaryConstructor)
                 localTyper.typedPos(symbol.pos)(deriveDefDef(tree)(_ =>
                           Block(List(t), Literal(Constant(())))))
@@ -1850,7 +1884,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                 case Implementation(target) =>
                   assert(body.isDefinedAt(target),
                          "sym: " + symbol.fullName + " target: " +
-                         target.fullName)
+                           target.fullName)
                   // we have an rhs, specialize it
                   val tree1 =
                     reportError(duplicateBody(ddef, target))(_ => ddef)
@@ -1867,7 +1901,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                       debuglog("implementation: " + tree1)
                       deriveDefDef(tree1)(transform)
                     case _ =>
-                      deriveDefDef(tree)(_ =>
+                      deriveDefDef(tree)(
+                          _ =>
                             localTyper typed gen.mkSysErrorCall(
                                 "Fatal error in code generation: this should never be called."))
                   }
@@ -1875,11 +1910,11 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                 case SpecialOverride(target) =>
                   assert(body.isDefinedAt(target),
                          "sym: " + symbol.fullName + " target: " +
-                         target.fullName)
+                           target.fullName)
                   //debuglog("moving implementation, body of target " + target + ": " + body(target))
                   log(
-                      "%s is param accessor? %b".format(
-                          ddef.symbol, ddef.symbol.isParamAccessor))
+                      "%s is param accessor? %b"
+                        .format(ddef.symbol, ddef.symbol.isParamAccessor))
                   // we have an rhs, specialize it
                   val tree1 = addBody(ddef, target)
                   (new ChangeOwnerTraverser(target, tree1.symbol))(tree1.rhs)
@@ -1887,15 +1922,17 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                   deriveDefDef(tree1)(transform)
 
                 case SpecialOverload(original, env) =>
-                  debuglog("completing specialized " + symbol.fullName +
-                      " calling " + original)
+                  debuglog(
+                      "completing specialized " + symbol.fullName +
+                        " calling " + original)
                   debuglog("special overload " + original + " -> " + env)
                   val t = DefDef(symbol, { vparamss: List[List[Symbol]] =>
                     val fun = Apply(Select(This(symbol.owner), original),
                                     makeArguments(original, vparamss.head))
 
-                    debuglog("inside defdef: " + symbol + "; type: " +
-                        symbol.tpe + "; owner: " + symbol.owner)
+                    debuglog(
+                        "inside defdef: " + symbol + "; type: " +
+                          symbol.tpe + "; owner: " + symbol.owner)
                     gen.maybeMkAsInstanceOf(fun,
                                             symbol.owner.thisType
                                               .memberType(symbol)
@@ -1920,7 +1957,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                       vparamss)
                   debuglog(
                       "-->d completed forwarder to specialized overload: " +
-                      fwd.target + ": " + rhs1)
+                        fwd.target + ": " + rhs1)
                   reportError {
                     localTyper.typed(deriveDefDef(tree)(_ => rhs1))
                   } { _ =>
@@ -1987,8 +2024,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     private def expandInnerNormalizedMembers(tree: Tree) = tree match {
       case ddef @ DefDef(_, _, _, vparams :: Nil, _, rhs)
           if ddef.symbol.owner.isMethod &&
-          specializedTypeVars(ddef.symbol.info).nonEmpty &&
-          !ddef.symbol.hasFlag(SPECIALIZED) =>
+            specializedTypeVars(ddef.symbol.info).nonEmpty &&
+            !ddef.symbol.hasFlag(SPECIALIZED) =>
         val sym = ddef.symbol
         val owner = sym.owner
         val norm = normalizeMember(owner, sym, emptyEnv)
@@ -2001,12 +2038,10 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           // flag. nobody has to see this anyway :)
           sym.setFlag(SPECIALIZED)
           // create empty bodies for specializations
-          localTyper.typed(
-              Block(norm.tail.map(sym =>
-                          DefDef(sym, { vparamss: List[List[Symbol]] =>
-                    EmptyTree
-                  })),
-                    ddef))
+          localTyper.typed(Block(norm.tail.map(sym =>
+                        DefDef(sym, { vparamss: List[List[Symbol]] =>
+              EmptyTree
+            })), ddef))
         } else
           tree
       case _ =>
@@ -2019,8 +2054,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       *  this method will insert casts for all the expressions of types mappend in the
       *  `castmap`.
       */
-    private def duplicateBody(
-        tree: DefDef, source: Symbol, castmap: TypeEnv = emptyEnv) = {
+    private def duplicateBody(tree: DefDef,
+                              source: Symbol,
+                              castmap: TypeEnv = emptyEnv) = {
       val symbol = tree.symbol
       val meth = addBody(tree, source)
 
@@ -2059,7 +2095,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
 
       // create fresh symbols for value parameters to hold the skolem types
       val newSyms = cloneSymbolsAtOwnerAndModify(
-          vparams map (_.symbol), symbol, _.substSym(oldtparams, newtparams))
+          vparams map (_.symbol),
+          symbol,
+          _.substSym(oldtparams, newtparams))
 
       // replace value and type parameters of the old method with the new ones
       // log("Adding body for " + tree.symbol + " - origtparams: " + origtparams + "; tparams: " + tparams)
@@ -2074,8 +2112,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
 
       val newBody = symSubstituter(body(source).duplicate)
       tpt modifyType (_.substSym(oldtparams, newtparams))
-      copyDefDef(tree)(
-          vparamss = List(newSyms map ValDef.apply), rhs = newBody)
+      copyDefDef(tree)(vparamss = List(newSyms map ValDef.apply),
+                       rhs = newBody)
     }
 
     /** Create trees for specialized members of 'sClass', based on the
@@ -2090,14 +2128,15 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
 
       for (m <- sClass.info.decls
            if m.hasFlag(SPECIALIZED) && (m.sourceFile ne null) &&
-           satisfiable(typeEnv(m), !sClass.hasFlag(SPECIALIZED))) {
+             satisfiable(typeEnv(m), !sClass.hasFlag(SPECIALIZED))) {
         debuglog("creating tree for " + m.fullName)
         if (m.isMethod) {
           if (info(m).target.hasAccessorFlag) hasSpecializedFields = true
           if (m.isClassConstructor) {
             val origParams = parameters(info(m).target)
             val vparams = (
-                map2(m.info.paramTypes, origParams)((tp, sym) =>
+                map2(m.info.paramTypes, origParams)(
+                    (tp, sym) =>
                       m.newValue(specializedName(sym, typeEnv(sClass)),
                                  sym.pos,
                                  sym.flags) setInfo tp)
@@ -2106,8 +2145,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
             if (m.isPrimaryConstructor) {
               for (param <- vparams;
                    if sClass.info.nonPrivateMember(param.name) == NoSymbol) {
-                val acc = param.cloneSymbol(
-                    sClass, param.flags | PARAMACCESSOR | PRIVATE)
+                val acc = param
+                  .cloneSymbol(sClass, param.flags | PARAMACCESSOR | PRIVATE)
                 sClass.info.decls.enter(acc)
                 mbrs += ValDef(acc, EmptyTree).setType(NoType).setPos(m.pos)
               }
@@ -2136,11 +2175,14 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
         val isSpecializedInstance =
           sClass :: sClass.parentSymbols exists (_ hasFlag SPECIALIZED)
         val sym =
-          sClass.newMethod(nme.SPECIALIZED_INSTANCE, sClass.pos) setInfoAndEnter MethodType(
-              Nil, BooleanTpe)
+          sClass
+            .newMethod(nme.SPECIALIZED_INSTANCE, sClass.pos) setInfoAndEnter MethodType(
+              Nil,
+              BooleanTpe)
 
         mbrs += DefDef(
-            sym, Literal(Constant(isSpecializedInstance)).setType(BooleanTpe))
+            sym,
+            Literal(Constant(isSpecializedInstance)).setType(BooleanTpe))
           .setType(NoType)
       }
       mbrs.toList
@@ -2153,8 +2195,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           tree.symbol.info // force specialization
           for (((sym1, env), specCls) <- specializedClass
                if sym1 == tree.symbol) yield {
-            debuglog("created synthetic class: " + specCls + " of " + sym1 +
-                " in " + pp(env))
+            debuglog(
+                "created synthetic class: " + specCls + " of " + sym1 +
+                  " in " + pp(env))
             val parents = specCls.info.parents.map(TypeTree)
             ClassDef(
                 specCls,
@@ -2206,8 +2249,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
      */
     def initializesSpecializedField(f: Symbol) = (
         (f.name endsWith nme.SPECIALIZED_SUFFIX) &&
-        clazz.info.member(f.unexpandedName).isPublic &&
-        clazz.info.decl(f.name).suchThat(_.isGetter) != NoSymbol
+          clazz.info.member(f.unexpandedName).isPublic &&
+          clazz.info.decl(f.name).suchThat(_.isGetter) != NoSymbol
     )
 
     val argss = mmap(paramss)(
@@ -2249,11 +2292,11 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
       // final and @inline.
       info.foreach {
         case (sym, SpecialOverload(target, _)) => {
-            sym.resetFlag(FINAL)
-            target.resetFlag(FINAL)
-            sym.removeAnnotation(ScalaInlineClass)
-            target.removeAnnotation(ScalaInlineClass)
-          }
+          sym.resetFlag(FINAL)
+          target.resetFlag(FINAL)
+          sym.removeAnnotation(ScalaInlineClass)
+          target.removeAnnotation(ScalaInlineClass)
+        }
         case _ => {}
       }
 

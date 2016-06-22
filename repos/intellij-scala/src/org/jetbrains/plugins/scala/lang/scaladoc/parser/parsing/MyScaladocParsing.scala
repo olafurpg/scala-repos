@@ -111,13 +111,13 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
     if (tokenType == DOC_LINK_TAG &&
         builder.getTokenType == ScalaTokenTypes.tIDENTIFIER &&
         !isEndOfComment) {
-      StableId.parse(
-          new ScalaPsiBuilderImpl(builder), true, DOC_CODE_LINK_VALUE)
+      StableId
+        .parse(new ScalaPsiBuilderImpl(builder), true, DOC_CODE_LINK_VALUE)
     }
 
     while (!isEndOfComment) {
       if (!(builder.getTokenType == DOC_WHITESPACE &&
-              builder.getTokenText.contains("\n")) &&
+                builder.getTokenText.contains("\n")) &&
           builder.getTokenType != DOC_COMMENT_LEADING_ASTERISKS) {
         hasClosingElementsInWikiSyntax = false
       }
@@ -176,8 +176,9 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
           closedBy("Inner code tag")
           return true
         case DOC_INLINE_TAG_START
-            if ParserUtils.lookAhead(
-                builder, DOC_INLINE_TAG_START, DOC_TAG_NAME) && canHaveTags =>
+            if ParserUtils.lookAhead(builder,
+                                     DOC_INLINE_TAG_START,
+                                     DOC_TAG_NAME) && canHaveTags =>
           isInInlinedTag = true
           parseTag
         case DOC_WHITESPACE if tokenType != DOC_MONOSPACE_TAG =>
@@ -241,7 +242,7 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
 
     assert(builder.getTokenType eq DOC_TAG_NAME,
            builder.getTokenText + "  " + builder.getTokenType + "  " +
-           builder.getCurrentOffset)
+             builder.getCurrentOffset)
 
     val tagName = builder.getTokenText
     if (!isEndOfComment) builder.advanceLexer()
@@ -254,11 +255,11 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
           if (!isEndOfComment) {
             builder.advanceLexer()
           }
-          StableId.parse(
-              new ScalaPsiBuilderImpl(builder), true, DOC_TAG_VALUE_TOKEN)
+          StableId
+            .parse(new ScalaPsiBuilderImpl(builder), true, DOC_TAG_VALUE_TOKEN)
         case PARAM_TAG | TYPE_PARAM_TAG | DEFINE_TAG =>
-          if (!ParserUtils.lookAhead(
-                  builder, builder.getTokenType, DOC_TAG_VALUE_TOKEN))
+          if (!ParserUtils
+                .lookAhead(builder, builder.getTokenType, DOC_TAG_VALUE_TOKEN))
             builder.error("Missing tag param")
         case SEE_TAG | AUTHOR_TAG | NOTE_TAG | RETURN_TAG | SINCE_TAG |
             VERSION_TAG | USECASE_TAG | EXAMPLE_TAG | TODO_TAG |
@@ -288,7 +289,8 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
       } else if (DOC_TAG_NAME eq builder.getTokenType) {
         marker.done(DOC_TAG)
         return true
-      } else if (builder.getTokenType.isInstanceOf[ScaladocSyntaxElementType]) {
+      } else if (builder.getTokenType
+                   .isInstanceOf[ScaladocSyntaxElementType]) {
         parseWikiSyntax
       } else if (builder.getTokenType == DOC_TAG_VALUE_TOKEN) {
         val tagValMarker = builder.mark()

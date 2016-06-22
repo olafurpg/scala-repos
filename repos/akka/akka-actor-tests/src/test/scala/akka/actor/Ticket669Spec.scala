@@ -30,8 +30,9 @@ class Ticket669Spec
   "A supervised actor with lifecycle PERMANENT" should {
     "be able to reply on failure during preRestart" in {
       filterEvents(EventFilter[Exception]("test", occurrences = 1)) {
-        val supervisor = system.actorOf(Props(new Supervisor(AllForOneStrategy(
-                        5, 10 seconds)(List(classOf[Exception])))))
+        val supervisor =
+          system.actorOf(Props(new Supervisor(AllForOneStrategy(5, 10 seconds)(
+                          List(classOf[Exception])))))
         val supervised =
           Await.result((supervisor ? Props[Supervised]).mapTo[ActorRef],
                        timeout.duration)

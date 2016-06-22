@@ -24,8 +24,9 @@ import org.apache.kafka.common.utils.Utils
 object DeleteZKPath {
   def main(args: Array[String]) {
     if (args.length < 2) {
-      println("USAGE: " + DeleteZKPath.getClass.getName +
-          " consumer.properties zk_path")
+      println(
+          "USAGE: " + DeleteZKPath.getClass.getName +
+            " consumer.properties zk_path")
       System.exit(1)
     }
 

@@ -29,8 +29,9 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
   }
 
   def sum: Accumulator[Int, Int] =
-    Accumulator.fromSink(Sink.fold[Int, Int](
-            0, new JFn2[Int, Int, Int] { def apply(a: Int, b: Int) = a + b }))
+    Accumulator.fromSink(Sink.fold[Int, Int](0, new JFn2[Int, Int, Int] {
+      def apply(a: Int, b: Int) = a + b
+    }))
 
   def source = Source from asJavaIterable(1 to 3)
   def sawait[T](f: Future[T]) = Await.result(f, 10.seconds)
@@ -38,8 +39,7 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
     f.toCompletableFuture.get(10, TimeUnit.SECONDS)
 
   def errorSource[T] =
-    Source.fromPublisher(
-        new Publisher[T] {
+    Source.fromPublisher(new Publisher[T] {
       def subscribe(s: Subscriber[_ >: T]) = {
         s.onSubscribe(new Subscription {
           def cancel() = s.onComplete()
@@ -96,7 +96,8 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
             FutureConverters.toScala(f)
         })
 
-        sawait(play.api.libs.streams
+        sawait(
+            play.api.libs.streams
               .Accumulator(sink.asScala)
               .run(source.asScala)) must_== 6
       }

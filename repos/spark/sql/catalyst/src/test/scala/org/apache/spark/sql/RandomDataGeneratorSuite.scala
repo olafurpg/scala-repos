@@ -32,8 +32,8 @@ class RandomDataGeneratorSuite extends SparkFunSuite {
     * Tests random data generation for the given type by using it to generate random values then
     * converting those values into their Catalyst equivalents using CatalystTypeConverters.
     */
-  def testRandomDataGeneration(
-      dataType: DataType, nullable: Boolean = true): Unit = {
+  def testRandomDataGeneration(dataType: DataType,
+                               nullable: Boolean = true): Unit = {
     val toCatalyst = CatalystTypeConverters.createToCatalystConverter(dataType)
     val generator = RandomDataGenerator
       .forType(dataType, nullable, new Random(33))

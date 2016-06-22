@@ -42,7 +42,8 @@ import scalafx.testutil.{DimensionDelegateSpec, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class DropShadowSpec
     extends SimpleSFXDelegateSpec[jfxse.DropShadow, DropShadow](
-        classOf[jfxse.DropShadow], classOf[DropShadow])
+        classOf[jfxse.DropShadow],
+        classOf[DropShadow])
     with ColorDelegateSpec[DropShadow]
     with DimensionDelegateSpec[DropShadow]
     with InputDelegateSpec[DropShadow] {

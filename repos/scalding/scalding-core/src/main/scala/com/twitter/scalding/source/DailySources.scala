@@ -19,18 +19,20 @@ import com.twitter.scalding._
 import Dsl._
 import cascading.tuple.Fields
 
-abstract class DailyPrefixSuffixSource(
-    prefixTemplate: String, suffixTemplate: String, dateRange: DateRange)
+abstract class DailyPrefixSuffixSource(prefixTemplate: String,
+                                       suffixTemplate: String,
+                                       dateRange: DateRange)
     extends TimePathedSource(prefixTemplate + TimePathedSource.YEAR_MONTH_DAY +
-                             suffixTemplate + "/*",
+                               suffixTemplate + "/*",
                              dateRange,
                              DateOps.UTC)
 
-abstract class DailyPrefixSuffixMostRecentSource(
-    prefixTemplate: String, suffixTemplate: String, dateRange: DateRange)
+abstract class DailyPrefixSuffixMostRecentSource(prefixTemplate: String,
+                                                 suffixTemplate: String,
+                                                 dateRange: DateRange)
     extends MostRecentGoodSource(
         prefixTemplate +
-        TimePathedSource.YEAR_MONTH_DAY + suffixTemplate + "/*",
+          TimePathedSource.YEAR_MONTH_DAY + suffixTemplate + "/*",
         dateRange,
         DateOps.UTC)
 
@@ -40,8 +42,8 @@ abstract class DailySuffixSource(prefixTemplate: String, dateRange: DateRange)
         dateRange,
         DateOps.UTC)
 
-abstract class DailySuffixMostRecentSource(
-    prefixTemplate: String, dateRange: DateRange)
+abstract class DailySuffixMostRecentSource(prefixTemplate: String,
+                                           dateRange: DateRange)
     extends MostRecentGoodSource(
         prefixTemplate + TimePathedSource.YEAR_MONTH_DAY + "/*",
         dateRange,

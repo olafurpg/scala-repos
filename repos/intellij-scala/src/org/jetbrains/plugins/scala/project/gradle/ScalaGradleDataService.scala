@@ -28,8 +28,10 @@ class ScalaGradleDataService
       projectData: ProjectData,
       project: Project,
       modelsProvider: IdeModifiableModelsProvider): Importer[ScalaModelData] =
-    new ScalaGradleDataService.Importer(
-        toImport, projectData, project, modelsProvider)
+    new ScalaGradleDataService.Importer(toImport,
+                                        projectData,
+                                        project,
+                                        modelsProvider)
 }
 
 private object ScalaGradleDataService {
@@ -38,8 +40,10 @@ private object ScalaGradleDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[ScalaModelData](
-          dataToImport, projectData, project, modelsProvider) {
+      extends AbstractImporter[ScalaModelData](dataToImport,
+                                               projectData,
+                                               project,
+                                               modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach(doImport)
@@ -54,8 +58,8 @@ private object ScalaGradleDataService {
         configureScalaSdk(module, compilerClasspath)
       }
 
-    private def configureScalaSdk(
-        module: Module, compilerClasspath: Seq[File]): Unit = {
+    private def configureScalaSdk(module: Module,
+                                  compilerClasspath: Seq[File]): Unit = {
       val compilerVersionOption =
         findScalaLibraryIn(compilerClasspath).flatMap(getVersionFromJar)
       if (compilerVersionOption.isEmpty) {

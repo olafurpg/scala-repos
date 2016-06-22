@@ -130,7 +130,9 @@ class UISeleniumSuite
                 "Completed Batches \\(last \\d+ out of \\d+\\)")) should be(
             true)
 
-        findAll(cssSelector("""#active-batches-table th""")).map(_.text).toSeq should be {
+        findAll(cssSelector("""#active-batches-table th"""))
+          .map(_.text)
+          .toSeq should be {
           List("Batch Time",
                "Input Size",
                "Scheduling Delay (?)",
@@ -163,7 +165,9 @@ class UISeleniumSuite
         summaryText should contain("Processing time:")
         summaryText should contain("Total delay:")
 
-        findAll(cssSelector("""#batch-job-table th""")).map(_.text).toSeq should be {
+        findAll(cssSelector("""#batch-job-table th"""))
+          .map(_.text)
+          .toSeq should be {
           List("Output Op Id",
                "Description",
                "Output Op Duration",
@@ -189,12 +193,14 @@ class UISeleniumSuite
         jobLinks.size should be(4)
 
         // Check stage progress
-        findAll(cssSelector(""".stage-progress-cell""")).map(_.text).toList should be(
-            List("1/1", "1/1", "1/1", "0/1 (1 failed)"))
+        findAll(cssSelector(""".stage-progress-cell"""))
+          .map(_.text)
+          .toList should be(List("1/1", "1/1", "1/1", "0/1 (1 failed)"))
 
         // Check job progress
-        findAll(cssSelector(""".progress-cell""")).map(_.text).toList should be(
-            List("4/4", "4/4", "4/4", "0/4 (1 failed)"))
+        findAll(cssSelector(""".progress-cell"""))
+          .map(_.text)
+          .toList should be(List("4/4", "4/4", "4/4", "0/4 (1 failed)"))
 
         // Check stacktrace
         val errorCells =

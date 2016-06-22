@@ -38,7 +38,8 @@ class FormattedStringParserTest extends SimpleTestCase {
   def testFormatSpecifierWithArgumentAfterEscapeChar() {
     assertMatches(parse("\\n%d", 1)) {
       case Text("\n") :: Injection(
-          ElementText("1"), Some(Specifier(Span(_, 3, 5), "%d"))) :: Nil =>
+          ElementText("1"),
+          Some(Specifier(Span(_, 3, 5), "%d"))) :: Nil =>
     }
   }
 
@@ -60,7 +61,8 @@ class FormattedStringParserTest extends SimpleTestCase {
   def testTextThanFormatSpecifier() {
     assertMatches(parse("foo %d", 1)) {
       case Text("foo ") :: Injection(
-          ElementText("1"), Some(Specifier(Span(_, 5, 7), "%d"))) :: Nil =>
+          ElementText("1"),
+          Some(Specifier(Span(_, 5, 7), "%d"))) :: Nil =>
     }
   }
 
@@ -74,16 +76,20 @@ class FormattedStringParserTest extends SimpleTestCase {
   def testMixedFormatString() {
     assertMatches(parse("A%dB%sC%cD", 1, 2, 3)) {
       case Text("A") :: Injection(
-          ElementText("1"), Some(Specifier(Span(_, 2, 4), "%d"))) :: Text("B") :: Injection(
-          ElementText("2"), Some(Specifier(Span(_, 5, 7), "%s"))) :: Text("C") :: Injection(
-          ElementText("3"), Some(Specifier(Span(_, 8, 10), "%c"))) :: Text("D") :: Nil =>
+          ElementText("1"),
+          Some(Specifier(Span(_, 2, 4), "%d"))) :: Text("B") :: Injection(
+          ElementText("2"),
+          Some(Specifier(Span(_, 5, 7), "%s"))) :: Text("C") :: Injection(
+          ElementText("3"),
+          Some(Specifier(Span(_, 8, 10), "%c"))) :: Text("D") :: Nil =>
     }
 
     assertMatches(parse("%dA%sB%c", 1, 2, 3)) {
       case Injection(ElementText("1"), Some(Specifier(Span(_, 1, 3), "%d"))) :: Text(
-          "A") :: Injection(
-          ElementText("2"), Some(Specifier(Span(_, 4, 6), "%s"))) :: Text("B") :: Injection(
-          ElementText("3"), Some(Specifier(Span(_, 7, 9), "%c"))) :: Nil =>
+          "A") :: Injection(ElementText("2"),
+                            Some(Specifier(Span(_, 4, 6), "%s"))) :: Text("B") :: Injection(
+          ElementText("3"),
+          Some(Specifier(Span(_, 7, 9), "%c"))) :: Nil =>
     }
   }
 
@@ -101,14 +107,16 @@ class FormattedStringParserTest extends SimpleTestCase {
     }
     assertMatches(parse("foo %1$d")) {
       case Text("foo ") :: UnboundPositionalSpecifier(
-          Specifier(Span(_, 5, 9), "%d"), 1) :: Nil =>
+          Specifier(Span(_, 5, 9), "%d"),
+          1) :: Nil =>
     }
   }
 
   def testPositionalArgumentThanOrdinaryArgument() {
     assertMatches(parse("%2$d%s", 3, 5)) {
       case Injection(ElementText("5"), Some(Specifier(Span(_, 1, 5), "%d"))) :: Injection(
-          ElementText("3"), Some(Specifier(Span(_, 5, 7), "%s"))) :: Nil =>
+          ElementText("3"),
+          Some(Specifier(Span(_, 5, 7), "%s"))) :: Nil =>
     }
   }
 
@@ -123,9 +131,10 @@ class FormattedStringParserTest extends SimpleTestCase {
 
   private def parse(formatString: String, arguments: Int*): List[StringPart] = {
     val manager = PsiManager.getInstance(fixture.getProject)
-    val expressions = arguments.map(it =>
-          ScalaPsiElementFactory.createExpressionFromText(
-              it.toString, manager))
+    val expressions = arguments.map(
+        it =>
+          ScalaPsiElementFactory.createExpressionFromText(it.toString,
+                                                          manager))
     val literal = ScalaPsiElementFactory
       .parseElement('"' + formatString + '"', manager)
       .asInstanceOf[ScLiteral]

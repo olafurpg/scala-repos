@@ -27,7 +27,7 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
 
   def isAvailable(project: Project, editor: Editor, element: PsiElement) =
     check(project, editor, element).isDefined &&
-    IntentionAvailabilityChecker.checkIntention(this, element)
+      IntentionAvailabilityChecker.checkIntention(this, element)
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
     if (element == null || !element.isValid) return
@@ -97,9 +97,11 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
                 case Regex(code) =>
                   val replacement = ScalaPsiElementFactory
                     .createBlockExpressionWithoutBracesFromText(
-                      code, element.getManager)
-                  CodeEditUtil.replaceChild(
-                      x.getParent.getNode, x.getNode, replacement.getNode)
+                        code,
+                        element.getManager)
+                  CodeEditUtil.replaceChild(x.getParent.getNode,
+                                            x.getNode,
+                                            replacement.getNode)
                   CodeEditUtil.markToReformat(caseClause.getNode, true)
                 case _ =>
                   ()
@@ -137,8 +139,9 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
         () =>
           {
             IntentionUtil.addComments(comments, blkExpr.getParent, blkExpr)
-            CodeEditUtil.replaceChild(
-                blkExpr.getParent.getNode, blkExpr.getNode, onlyExpr.getNode)
+            CodeEditUtil.replaceChild(blkExpr.getParent.getNode,
+                                      blkExpr.getNode,
+                                      onlyExpr.getNode)
           }
     }
   }

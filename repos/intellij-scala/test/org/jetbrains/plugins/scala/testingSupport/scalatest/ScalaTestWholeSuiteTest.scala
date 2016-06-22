@@ -44,8 +44,10 @@ trait ScalaTestWholeSuiteTest
            "A FreeSpecTest",
            "should not run tests that are not selected"))
   val funSpecTestPaths = List(
-      List(
-          "[root]", "FunSpecTest", "FunSpecTest", "should launch single test"),
+      List("[root]",
+           "FunSpecTest",
+           "FunSpecTest",
+           "should launch single test"),
       List("[root]",
            "FunSpecTest",
            "FunSpecTest",

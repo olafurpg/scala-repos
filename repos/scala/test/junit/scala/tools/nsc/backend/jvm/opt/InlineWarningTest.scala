@@ -148,24 +148,29 @@ class InlineWarningTest extends ClearAfterClass {
         |Note that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: A""".stripMargin)
 
     var c = 0
-    val List(b) = compile(
-        scalaCode, List((javaCode, "A.java")), allowMessage = i => {
-      c += 1; warns.tail.exists(i.msg contains _)
-    })
+    val List(b) =
+      compile(scalaCode, List((javaCode, "A.java")), allowMessage = i => {
+        c += 1; warns.tail.exists(i.msg contains _)
+      })
     assert(c == 1, c)
 
     // no warnings here
-    compileClasses(newCompiler(extraArgs =
+    compileClasses(
+        newCompiler(extraArgs =
               InlineWarningTest.argsNoWarn + " -Yopt-warnings:none"))(
-        scalaCode, List((javaCode, "A.java")))
+        scalaCode,
+        List((javaCode, "A.java")))
 
     c = 0
-    compileClasses(newCompiler(extraArgs =
+    compileClasses(
+        newCompiler(extraArgs =
               InlineWarningTest.argsNoWarn +
-              " -Yopt-warnings:no-inline-mixed"))(
-        scalaCode, List((javaCode, "A.java")), allowMessage = i => {
-      c += 1; warns.exists(i.msg contains _)
-    })
+                " -Yopt-warnings:no-inline-mixed"))(
+        scalaCode,
+        List((javaCode, "A.java")),
+        allowMessage = i => {
+          c += 1; warns.exists(i.msg contains _)
+        })
     assert(c == 2, c)
   }
 

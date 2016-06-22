@@ -19,8 +19,11 @@ object ReliableProxy {
             retryAfter: FiniteDuration,
             reconnectAfter: Option[FiniteDuration],
             maxReconnects: Option[Int]): Props = {
-    Props(new ReliableProxy(
-            targetPath, retryAfter, reconnectAfter, maxReconnects))
+    Props(
+        new ReliableProxy(targetPath,
+                          retryAfter,
+                          reconnectAfter,
+                          maxReconnects))
   }
 
   /**
@@ -254,12 +257,13 @@ class ReliableProxy(targetPath: ActorPath,
   val resendTimer = "resend"
   val reconnectTimer = "reconnect"
 
-  val retryGateClosedFor = Try(context.system.settings.config.getDuration(
-          "akka.remote.retry-gate-closed-for", TimeUnit.MILLISECONDS))
-    .map(_.longValue)
-    .getOrElse(5000L)
+  val retryGateClosedFor = Try(
+      context.system.settings.config.getDuration(
+          "akka.remote.retry-gate-closed-for",
+          TimeUnit.MILLISECONDS)).map(_.longValue).getOrElse(5000L)
 
-  val defaultConnectInterval = Try(context.system.settings.config.getDuration(
+  val defaultConnectInterval = Try(
+      context.system.settings.config.getDuration(
           "akka.reliable-proxy.default-connect-interval",
           TimeUnit.MILLISECONDS))
     .map(_.longValue)
@@ -273,8 +277,8 @@ class ReliableProxy(targetPath: ActorPath,
   def createTunnel(target: ActorRef): Unit = {
     logDebug("Creating new tunnel for {}", target)
     tunnel = context.actorOf(
-        receiver(target, lastAckSerial)
-          .withDeploy(Deploy(scope = RemoteScope(target.path.address))),
+        receiver(target, lastAckSerial).withDeploy(
+            Deploy(scope = RemoteScope(target.path.address))),
         "tunnel")
 
     context.watch(tunnel)
@@ -285,8 +289,8 @@ class ReliableProxy(targetPath: ActorPath,
 
   if (targetPath.address.host.isEmpty &&
       self.path.address == targetPath.address) {
-    logDebug(
-        "Unnecessary to use ReliableProxy for local target: {}", targetPath)
+    logDebug("Unnecessary to use ReliableProxy for local target: {}",
+             targetPath)
   }
 
   override def supervisorStrategy = OneForOneStrategy() {

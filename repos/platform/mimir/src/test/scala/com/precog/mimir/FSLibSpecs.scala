@@ -87,15 +87,18 @@ trait FSLibSpecs[M[+ _]]
                    "testAPIKey",
                    Path.Root,
                    AccountPlan.Free)
-  val defaultEvaluationContext = EvaluationContext(
-      testAPIKey, testAccount, Path.Root, Path.Root, new DateTime)
-  val defaultMorphContext = MorphContext(
-      defaultEvaluationContext, new MorphLogger {
-    def info(msg: String): M[Unit] = M.point(())
-    def warn(msg: String): M[Unit] = M.point(())
-    def error(msg: String): M[Unit] = M.point(())
-    def die(): M[Unit] = M.point(sys.error("MorphContext#die()"))
-  })
+  val defaultEvaluationContext = EvaluationContext(testAPIKey,
+                                                   testAccount,
+                                                   Path.Root,
+                                                   Path.Root,
+                                                   new DateTime)
+  val defaultMorphContext =
+    MorphContext(defaultEvaluationContext, new MorphLogger {
+      def info(msg: String): M[Unit] = M.point(())
+      def warn(msg: String): M[Unit] = M.point(())
+      def error(msg: String): M[Unit] = M.point(())
+      def die(): M[Unit] = M.point(sys.error("MorphContext#die()"))
+    })
 
   def runExpansion(table: Table): List[JValue] = {
     expandGlob(table, defaultMorphContext)

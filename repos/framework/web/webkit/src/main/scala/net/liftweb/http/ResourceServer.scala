@@ -102,7 +102,8 @@ object ResourceServer {
       lastModified = calcLastModified(url)
     } yield
       request.testFor304(
-          lastModified, "Expires" -> toInternetDate(millis + 30.days)) openOr {
+          lastModified,
+          "Expires" -> toInternetDate(millis + 30.days)) openOr {
         val stream = url.openStream
         val uc = url.openConnection
         StreamingResponse(
@@ -135,7 +136,9 @@ object ResourceServer {
   def detectContentType(path: String): String = {
     // Configure response with content type of resource
     (LiftRules.context.mimeType(path) or
-        (Box !! URLConnection.getFileNameMap().getContentTypeFor(path))) openOr "application/octet-stream"
+        (Box !! URLConnection
+              .getFileNameMap()
+              .getContentTypeFor(path))) openOr "application/octet-stream"
   }
 
   private def isAllowed(path: List[String]) =

@@ -108,8 +108,9 @@ trait ExtractValue extends Expression
   * Note that we can pass in the field name directly to keep case preserving in `toString`.
   * For example, when get field `yEAr` from `<year: int, month: int>`, we should pass in `yEAr`.
   */
-case class GetStructField(
-    child: Expression, ordinal: Int, name: Option[String] = None)
+case class GetStructField(child: Expression,
+                          ordinal: Int,
+                          name: Option[String] = None)
     extends UnaryExpression
     with ExtractValue {
 
@@ -122,7 +123,7 @@ case class GetStructField(
     s"$child.${name.getOrElse(childSchema(ordinal).name)}"
   override def sql: String =
     child.sql +
-    s".${quoteIdentifier(name.getOrElse(childSchema(ordinal).name))}"
+      s".${quoteIdentifier(name.getOrElse(childSchema(ordinal).name))}"
 
   protected override def nullSafeEval(input: Any): Any =
     input.asInstanceOf[InternalRow].get(ordinal, childSchema(ordinal).dataType)
@@ -203,8 +204,8 @@ case class GetArrayStructFields(child: Expression,
             if ($row.isNullAt($ordinal)) {
               $values[$j] = null;
             } else {
-              $values[$j] = ${ctx.getValue(
-          row, field.dataType, ordinal.toString)};
+              $values[$j] = ${ctx
+        .getValue(row, field.dataType, ordinal.toString)};
             }
           }
         }
@@ -333,8 +334,8 @@ case class GetMapValue(child: Expression, key: Expression)
         int $index = 0;
         boolean $found = false;
         while ($index < $length && !$found) {
-          final ${ctx.javaType(keyType)} $key = ${ctx.getValue(
-          keys, keyType, index)};
+          final ${ctx.javaType(keyType)} $key = ${ctx
+        .getValue(keys, keyType, index)};
           if (${ctx.genEqual(keyType, key, eval2)}) {
             $found = true;
           } else {

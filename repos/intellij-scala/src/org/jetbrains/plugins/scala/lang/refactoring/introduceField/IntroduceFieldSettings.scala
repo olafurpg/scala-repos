@@ -63,7 +63,7 @@ class IntroduceFieldSettings[T <: PsiElement](ifc: IntroduceFieldContext[T]) {
     replAll = value
     initLocallyEnabled =
       replaceAll && canBeInitLocalIfReplaceAll || !replaceAll &&
-      canBeInitLocalOneOccurrence
+        canBeInitLocalOneOccurrence
   }
   def setReplaceAll(value: Boolean) { replaceAll = value }
 

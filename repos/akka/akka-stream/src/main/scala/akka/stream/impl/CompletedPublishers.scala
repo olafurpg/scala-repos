@@ -47,7 +47,8 @@ private[akka] final case class ErrorPublisher(t: Throwable, name: String)
   * INTERNAL API
   */
 private[akka] final case class MaybePublisher[T](
-    promise: Promise[Option[T]], name: String)(implicit ec: ExecutionContext)
+    promise: Promise[Option[T]],
+    name: String)(implicit ec: ExecutionContext)
     extends Publisher[T] {
   import ReactiveStreamsCompliance._
 

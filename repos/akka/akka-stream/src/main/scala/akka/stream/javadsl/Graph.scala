@@ -176,8 +176,8 @@ object Partition {
     */
   def create[T](outputCount: Int, partitioner: function.Function[T, Int])
     : Graph[UniformFanOutShape[T, T], NotUsed] =
-    scaladsl.Partition(
-        outputCount, partitioner = (t: T) ⇒ partitioner.apply(t))
+    scaladsl
+      .Partition(outputCount, partitioner = (t: T) ⇒ partitioner.apply(t))
 
   /**
     * Create a new `Partition` stage with the specified input type.
@@ -236,8 +236,9 @@ object Balance {
     * @param waitForAllDownstreams if `true` it will not start emitting
     *   elements to downstream outputs until all of them have requested at least one element
     */
-  def create[T](
-      clazz: Class[T], outputCount: Int, waitForAllDownstreams: Boolean)
+  def create[T](clazz: Class[T],
+                outputCount: Int,
+                waitForAllDownstreams: Boolean)
     : Graph[UniformFanOutShape[T, T], NotUsed] =
     create(outputCount, waitForAllDownstreams)
 }

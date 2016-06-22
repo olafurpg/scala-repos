@@ -278,7 +278,8 @@ object TestGraphGenerators {
     } yield
       IdentityKeyedProducer(
           FlatMappedProducer[P, (Int, (Int, Option[Int])), (Int, Int)](
-              in.leftJoin(service), postMerge))
+              in.leftJoin(service),
+              postMerge))
 
   def summed[P <: Platform[P]](
       implicit genSource1: Arbitrary[Producer[P, Int]],

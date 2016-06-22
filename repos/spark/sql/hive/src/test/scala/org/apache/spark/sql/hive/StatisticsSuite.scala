@@ -49,8 +49,8 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
       }
     }
 
-    assertAnalyzeCommand(
-        "ANALYZE TABLE Table1 COMPUTE STATISTICS", classOf[HiveNativeCommand])
+    assertAnalyzeCommand("ANALYZE TABLE Table1 COMPUTE STATISTICS",
+                         classOf[HiveNativeCommand])
     assertAnalyzeCommand(
         "ANALYZE TABLE Table1 PARTITION(ds='2008-04-09', hr=11) COMPUTE STATISTICS",
         classOf[HiveNativeCommand])
@@ -149,8 +149,8 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
       }
       assert(
           sizes.size === 2 &&
-          sizes(0) <= hiveContext.conf.autoBroadcastJoinThreshold &&
-          sizes(1) <= hiveContext.conf.autoBroadcastJoinThreshold,
+            sizes(0) <= hiveContext.conf.autoBroadcastJoinThreshold &&
+            sizes(1) <= hiveContext.conf.autoBroadcastJoinThreshold,
           s"query should contain two relations, each of which has size smaller than autoConvertSize")
 
       // Using `sparkPlan` because for relevant patterns in HashJoin to be
@@ -220,8 +220,8 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
     }
     assert(
         sizes.size === 2 &&
-        sizes(1) <= hiveContext.conf.autoBroadcastJoinThreshold &&
-        sizes(0) <= hiveContext.conf.autoBroadcastJoinThreshold,
+          sizes(1) <= hiveContext.conf.autoBroadcastJoinThreshold &&
+          sizes(0) <= hiveContext.conf.autoBroadcastJoinThreshold,
         s"query should contain two relations, each of which has size smaller than autoConvertSize")
 
     // Using `sparkPlan` because for relevant patterns in HashJoin to be

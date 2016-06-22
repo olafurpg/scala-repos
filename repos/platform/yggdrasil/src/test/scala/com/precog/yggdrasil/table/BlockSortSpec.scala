@@ -68,14 +68,13 @@ trait BlockSortSpec[M[+ _]]
 
     val globalIdPath = JPath(".globalId")
 
-    val original =
-      if (unique) {
-        sample.data.map { jv =>
-          JArray(sortKeys.map(_.extract(jv \ "value")).toList) -> jv
-        }.toMap.toList.unzip._2.toStream
-      } else {
-        sample.data
-      }
+    val original = if (unique) {
+      sample.data.map { jv =>
+        JArray(sortKeys.map(_.extract(jv \ "value")).toList) -> jv
+      }.toMap.toList.unzip._2.toStream
+    } else {
+      sample.data
+    }
 
     // We have to add in and then later remove the global Id (insert
     // order) to match real sort semantics for disambiguation of equal
@@ -202,8 +201,11 @@ trait BlockSortSpec[M[+ _]]
         )
     )
 
-    testSortDense(
-        sampleData, SortAscending, false, JPath(".uid"), JPath(".hW"))
+    testSortDense(sampleData,
+                  SortAscending,
+                  false,
+                  JPath(".uid"),
+                  JPath(".hW"))
   }
 
   def heterogeneousBaseValueTypeSample = {
@@ -273,7 +275,8 @@ trait BlockSortSpec[M[+ _]]
   // Simple test of sorting on heterogeneous data
   def heterogeneousSortSample2 = {
     val sampleData = SampleData(
-        (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe(
+                """[
         {"key":[1,4,3],"value":{"b0":["",{"alxk":-1},-5.170005125478374E+307],"y":{"pvbT":[-1458654748381439976,{}]}}},
         {"key":[1,4,4],"value":{"y":false,"qvd":[],"aden":{}}},
         {"key":[3,3,3],"value":{"b0":["gxy",{"alxk":-1},6.614267528783459E+307],"y":{"pvbT":[1,{}]}}}

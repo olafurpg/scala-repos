@@ -77,8 +77,8 @@ case object Eating extends FSMHakkerState
 /**
   * Some state container to keep track of which chopsticks we have
   */
-final case class TakenChopsticks(
-    left: Option[ActorRef], right: Option[ActorRef])
+final case class TakenChopsticks(left: Option[ActorRef],
+                                 right: Option[ActorRef])
 
 /*
  * A fsm hakker is an awesome dude or dudette who either thinks about hacking or has to eat ;-)
@@ -134,8 +134,8 @@ class FSMHakker(name: String, left: ActorRef, right: ActorRef)
 
   private def startEating(left: ActorRef, right: ActorRef): State = {
     println(
-        "%s has picked up %s and %s and starts to eat".format(
-            name, left.path.name, right.path.name))
+        "%s has picked up %s and %s and starts to eat"
+          .format(name, left.path.name, right.path.name))
     goto(Eating) using TakenChopsticks(Some(left), Some(right)) forMax
     (5.seconds)
   }
@@ -180,8 +180,8 @@ object DiningHakkersOnFsm {
 
   def run(): Unit = {
     // Create 5 chopsticks
-    val chopsticks = for (i <- 1 to 5) yield
-      system.actorOf(Props[Chopstick], "Chopstick" + i)
+    val chopsticks = for (i <- 1 to 5)
+      yield system.actorOf(Props[Chopstick], "Chopstick" + i)
     // Create 5 awesome fsm hakkers and assign them their left and right chopstick
     val hakkers = for {
       (name, i) <- List("Ghosh", "Boner", "Klang", "Krasser", "Manie").zipWithIndex

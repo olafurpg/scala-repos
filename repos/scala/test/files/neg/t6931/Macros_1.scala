@@ -10,8 +10,8 @@ object Macros {
     import c.universe._
     val q"Macros.Error(scala.StringContext.apply($arg)).err()" =
       c.macroApplication
-    for (i <- 1 to 3) c.error(
-        arg.pos.withPoint(arg.pos.point + i - 1), i.toString)
+    for (i <- 1 to 3)
+      c.error(arg.pos.withPoint(arg.pos.point + i - 1), i.toString)
     q"()"
   }
 }

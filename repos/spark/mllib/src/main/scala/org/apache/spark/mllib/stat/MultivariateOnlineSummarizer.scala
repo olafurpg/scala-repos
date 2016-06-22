@@ -69,8 +69,8 @@ class MultivariateOnlineSummarizer
     if (weight == 0.0) return this
 
     if (n == 0) {
-      require(
-          instance.size > 0, s"Vector should have dimension larger than zero.")
+      require(instance.size > 0,
+              s"Vector should have dimension larger than zero.")
       n = instance.size
 
       currMean = Array.ofDim[Double](n)
@@ -84,7 +84,7 @@ class MultivariateOnlineSummarizer
 
     require(n == instance.size,
             s"Dimensions mismatch when adding new sample." +
-            s" Expecting $n but got ${instance.size}.")
+              s" Expecting $n but got ${instance.size}.")
 
     val localCurrMean = currMean
     val localCurrM2n = currM2n
@@ -106,7 +106,7 @@ class MultivariateOnlineSummarizer
         val diff = value - prevMean
         localCurrMean(index) =
           prevMean + weight * diff /
-          (localNnz(index) + weight)
+            (localNnz(index) + weight)
         localCurrM2n(index) += weight * (value - localCurrMean(index)) * diff
         localCurrM2(index) += weight * value * value
         localCurrL1(index) += weight * math.abs(value)
@@ -133,7 +133,7 @@ class MultivariateOnlineSummarizer
     if (this.weightSum != 0.0 && other.weightSum != 0.0) {
       require(n == other.n,
               s"Dimensions mismatch when merging with another summarizer. " +
-              s"Expecting $n but got ${other.n}.")
+                s"Expecting $n but got ${other.n}.")
       totalCnt += other.totalCnt
       weightSum += other.weightSum
       weightSquareSum += other.weightSquareSum
@@ -213,7 +213,7 @@ class MultivariateOnlineSummarizer
       while (i < len) {
         realVariance(i) =
           (currM2n(i) + deltaMean(i) * deltaMean(i) * nnz(i) *
-              (weightSum - nnz(i)) / weightSum) / denominator
+                (weightSum - nnz(i)) / weightSum) / denominator
         i += 1
       }
     }

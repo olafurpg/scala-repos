@@ -13,7 +13,8 @@ class LabelSelectorParsersTest extends MarathonSpec with Matchers {
     existence.selectors should have size 1
     existence.selectors.head.key should be("existence")
     existence.selectors.head.value should have size 0
-    existence.matches(AppDefinition(labels = Map("existence" -> "one"))) should be(
+    existence
+      .matches(AppDefinition(labels = Map("existence" -> "one"))) should be(
         true)
     existence.matches(AppDefinition(labels = Map("none" -> "one"))) should be(
         false)

@@ -27,10 +27,11 @@ private[http4] object HttpClientDispatcher {
   *
   * @param statsReceiver typically scoped to `clientName/dispatcher`
   */
-private[http4] class HttpClientDispatcher(
-    trans: Transport[Any, Any], statsReceiver: StatsReceiver)
+private[http4] class HttpClientDispatcher(trans: Transport[Any, Any],
+                                          statsReceiver: StatsReceiver)
     extends GenSerialClientDispatcher[Request, Response, Any, Any](
-        trans, statsReceiver) {
+        trans,
+        statsReceiver) {
 
   import GenSerialClientDispatcher.wrapWriteException
   import HttpClientDispatcher._
@@ -47,7 +48,7 @@ private[http4] class HttpClientDispatcher(
         dtabHeaders.map({ case (k, v) => s"[$k: $v]" }).mkString(", ")
       log.error(
           s"discarding manually set dtab headers in request: $headersString\n" +
-          s"set Dtab.local instead to send Dtab information.")
+            s"set Dtab.local instead to send Dtab information.")
     }
     HttpDtab.write(Dtab.local, req)
 

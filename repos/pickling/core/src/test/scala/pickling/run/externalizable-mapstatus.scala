@@ -39,8 +39,7 @@ class BlockManagerId private (
     private var host_ : String,
     private var port_ : Int,
     private var nettyPort_ : Int
-)
-    extends Externalizable {
+) extends Externalizable {
 
   private def this() = this(null, null, 0, 0) // For deserialization only
 
@@ -92,7 +91,7 @@ class BlockManagerId private (
   override def equals(that: Any) = that match {
     case id: BlockManagerId =>
       executorId == id.executorId && port == id.port && host == id.host &&
-      nettyPort == id.nettyPort
+        nettyPort == id.nettyPort
     case _ =>
       false
   }

@@ -41,7 +41,8 @@ class ServerTransportParams[A <: Stack.Parameterized[A]](
   ): A =
     self.configured(
         Transport.TLSServerEngine(
-            Some(() =>
+            Some(
+                () =>
                   Ssl.server(
                       certificatePath,
                       keyPath,

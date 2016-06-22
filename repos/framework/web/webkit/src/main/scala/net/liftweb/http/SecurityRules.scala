@@ -50,12 +50,11 @@ final case class HttpsRules(
     requiredTime.toList.map { duration =>
       val age = s"max-age=${duration.toSeconds}"
 
-      val header =
-        if (includeSubDomains) {
-          s"$age ; includeSubDomains"
-        } else {
-          age
-        }
+      val header = if (includeSubDomains) {
+        s"$age ; includeSubDomains"
+      } else {
+        age
+      }
 
       ("Strict-Transport-Security" -> header)
     }
@@ -275,7 +274,7 @@ final case class ContentSecurityPolicy(
     val restrictionString = allRestrictions.collect {
       case (category, restrictions) if restrictions.nonEmpty =>
         category + " " +
-        restrictions.map(_.sourceRestrictionString).mkString(" ")
+          restrictions.map(_.sourceRestrictionString).mkString(" ")
     }.mkString("; ")
 
     reportUri.map { uri =>
@@ -378,7 +377,8 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
         {
           violation match {
             case Full(violation) =>
-              LiftRules.contentSecurityPolicyViolationReport(violation) or Full(
+              LiftRules
+                .contentSecurityPolicyViolationReport(violation) or Full(
                   OkResponse())
 
             case _ =>
@@ -387,7 +387,8 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
                     .map(new String(_, "UTF-8"))}'."
               )
 
-              Full(BadRequestResponse(
+              Full(
+                  BadRequestResponse(
                       "Unrecognized format for content security policy report."))
           }
         }

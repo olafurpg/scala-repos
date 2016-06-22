@@ -91,8 +91,12 @@ object FileHandler {
       level: Option[Level] = None
   ) =
     () =>
-      new FileHandler(
-          filename, rollPolicy, append, rotateCount, formatter, level)
+      new FileHandler(filename,
+                      rollPolicy,
+                      append,
+                      rotateCount,
+                      formatter,
+                      level)
 }
 
 /**
@@ -219,21 +223,21 @@ class FileHandler(path: String,
     val rv = rollPolicy match {
       case Policy.MaxSize(_) | Policy.Never | Policy.SigHup => None
       case Policy.Hourly => {
-          next.add(Calendar.HOUR_OF_DAY, 1)
-          Some(next)
-        }
+        next.add(Calendar.HOUR_OF_DAY, 1)
+        Some(next)
+      }
       case Policy.Daily => {
-          next.set(Calendar.HOUR_OF_DAY, 0)
-          next.add(Calendar.DAY_OF_MONTH, 1)
-          Some(next)
-        }
+        next.set(Calendar.HOUR_OF_DAY, 0)
+        next.add(Calendar.DAY_OF_MONTH, 1)
+        Some(next)
+      }
       case Policy.Weekly(weekday) => {
-          next.set(Calendar.HOUR_OF_DAY, 0)
-          do {
-            next.add(Calendar.DAY_OF_MONTH, 1)
-          } while (next.get(Calendar.DAY_OF_WEEK) != weekday)
-          Some(next)
-        }
+        next.set(Calendar.HOUR_OF_DAY, 0)
+        do {
+          next.add(Calendar.DAY_OF_MONTH, 1)
+        } while (next.get(Calendar.DAY_OF_WEEK) != weekday)
+        Some(next)
+      }
     }
 
     rv map { _.getTimeInMillis }
@@ -253,7 +257,7 @@ class FileHandler(path: String,
             new FilenameFilter {
               def accept(f: File, fname: String): Boolean =
                 fname != name && fname.startsWith(prefixName) &&
-                fname.endsWith(filenameSuffix)
+                  fname.endsWith(filenameSuffix)
             }
         )
         .sortBy(_.getName)

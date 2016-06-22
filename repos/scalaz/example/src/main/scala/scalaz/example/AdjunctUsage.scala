@@ -100,16 +100,16 @@ object AdjunctUsage extends App {
   }
 
   // but this can be done more generically for any two of these Reader/Writer adjunctions
-  def run2RWState[A, S1, S2, B, C, R](
-      rws1: A ⇒ RWState[S1, B], rws2: A ⇒ RWState[S2, C], f: (B, C) ⇒ R) = {
-    a: A ⇒
-      rws1(a).map(b ⇒ rws2(a).map(_.map(c ⇒ Writer(b.run._1, f(b.run._2, c)))))
+  def run2RWState[A, S1, S2, B, C, R](rws1: A ⇒ RWState[S1, B],
+                                      rws2: A ⇒ RWState[S2, C],
+                                      f: (B, C) ⇒ R) = { a: A ⇒
+    rws1(a).map(b ⇒ rws2(a).map(_.map(c ⇒ Writer(b.run._1, f(b.run._2, c)))))
   }
 
   // with the above function we can combine the two stateful
   // computations with a function that throws away the Unit from sum.
-  val checkForRepeatsAdjAndSum: Int ⇒ ROIRIWW[Boolean] = run2RWState(
-      checkForRepeatsAdj, sum, (a: Boolean, _: Any) ⇒ a)
+  val checkForRepeatsAdjAndSum: Int ⇒ ROIRIWW[Boolean] =
+    run2RWState(checkForRepeatsAdj, sum, (a: Boolean, _: Any) ⇒ a)
 
   // since the adjunctions compose, we can run both stateful
   // computations with a single traverse of the list. This

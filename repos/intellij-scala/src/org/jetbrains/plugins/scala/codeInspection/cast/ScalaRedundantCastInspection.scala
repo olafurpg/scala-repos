@@ -29,8 +29,8 @@ class ScalaRedundantCastInspection
             val descriptor = {
               val range = new TextRange(left.getTextLength, call.getTextLength)
 
-              val message = "Casting '%s' to '%s' is redundant".format(
-                  left.getText, castType.presentableText)
+              val message = "Casting '%s' to '%s' is redundant"
+                .format(left.getText, castType.presentableText)
 
               new ProblemDescriptorImpl(
                   call,

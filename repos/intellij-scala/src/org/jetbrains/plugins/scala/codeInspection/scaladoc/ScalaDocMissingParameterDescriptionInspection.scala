@@ -18,8 +18,8 @@ class ScalaDocMissingParameterDescriptionInspection
 
   override def getDisplayName: String = "Missing Parameter Description"
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitTag(s: ScDocTag) {
         if (!ScalaDocMissingParameterDescriptionInspection.OurTags.contains(

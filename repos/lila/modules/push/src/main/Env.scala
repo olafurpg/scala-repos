@@ -37,8 +37,8 @@ final class Env(config: Config,
       password = ApplePushPassword,
       enabled = ApplePushEnabled)
 
-  private lazy val pushApi = new PushApi(
-      googlePush, applePush, getLightUser, roundSocketHub)
+  private lazy val pushApi =
+    new PushApi(googlePush, applePush, getLightUser, roundSocketHub)
 
   system.actorOf(Props(new Actor {
     override def preStart() {

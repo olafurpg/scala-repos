@@ -21,8 +21,8 @@ object Macros {
   def impl1_1_inf(c: Context)(x: c.Expr[Int], y: c.Expr[Int]*) = {
     import c.universe._; c.Expr[Unit](q"""println("hello world")""")
   }
-  def impl1_2_inf(c: Context)(
-      x: c.Expr[Int], y: c.Expr[Int], z: c.Expr[Int]*) = {
+  def impl1_2_inf(
+      c: Context)(x: c.Expr[Int], y: c.Expr[Int], z: c.Expr[Int]*) = {
     import c.universe._; c.Expr[Unit](q"""println("hello world")""")
   }
   def m1_0_inf(x: Int*) = macro impl1_0_inf
@@ -48,8 +48,8 @@ object Macros {
   def impl2_1_inf(c: Context)()(x: c.Expr[Int], y: c.Expr[Int]*) = {
     import c.universe._; c.Expr[Unit](q"""println("hello world")""")
   }
-  def impl2_2_inf(c: Context)()(
-      x: c.Expr[Int], y: c.Expr[Int], z: c.Expr[Int]*) = {
+  def impl2_2_inf(
+      c: Context)()(x: c.Expr[Int], y: c.Expr[Int], z: c.Expr[Int]*) = {
     import c.universe._; c.Expr[Unit](q"""println("hello world")""")
   }
   def m2_0_inf()(x: Int*) = macro impl2_0_inf

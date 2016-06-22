@@ -123,9 +123,10 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       lastEvents() should ===(Set.empty)
 
       source2.onNext("Meaning of life")
-      lastEvents() should ===(Set(OnNext(sink, (42, "Meaning of life")),
-                                  RequestOne(source1),
-                                  RequestOne(source2)))
+      lastEvents() should ===(
+          Set(OnNext(sink, (42, "Meaning of life")),
+              RequestOne(source1),
+              RequestOne(source2)))
     }
 
     "implement Broadcast" in new TestSetup {
@@ -203,10 +204,11 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       lastEvents() should ===(Set.empty)
 
       source2.onNext(2)
-      lastEvents() should ===(Set(OnNext(sink1, (1, 2)),
-                                  OnNext(sink2, (1, 2)),
-                                  RequestOne(source1),
-                                  RequestOne(source2)))
+      lastEvents() should ===(
+          Set(OnNext(sink1, (1, 2)),
+              OnNext(sink2, (1, 2)),
+              RequestOne(source1),
+              RequestOne(source2)))
     }
 
     "implement merge" in new TestSetup {

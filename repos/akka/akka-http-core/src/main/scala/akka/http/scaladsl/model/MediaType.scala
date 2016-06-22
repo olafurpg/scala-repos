@@ -92,8 +92,8 @@ object MediaType {
       override def isApplication = true
     }
 
-  def applicationWithOpenCharset(
-      subType: String, fileExtensions: String*): WithOpenCharset =
+  def applicationWithOpenCharset(subType: String,
+                                 fileExtensions: String*): WithOpenCharset =
     new NonMultipartWithOpenCharset("application/" + subType,
                                     "application",
                                     subType,
@@ -104,16 +104,22 @@ object MediaType {
   def audio(subType: String,
             comp: Compressibility,
             fileExtensions: String*): Binary =
-    new Binary(
-        "audio/" + subType, "audio", subType, comp, fileExtensions.toList) {
+    new Binary("audio/" + subType,
+               "audio",
+               subType,
+               comp,
+               fileExtensions.toList) {
       override def isAudio = true
     }
 
   def image(subType: String,
             comp: Compressibility,
             fileExtensions: String*): Binary =
-    new Binary(
-        "image/" + subType, "image", subType, comp, fileExtensions.toList) {
+    new Binary("image/" + subType,
+               "image",
+               subType,
+               comp,
+               fileExtensions.toList) {
       override def isImage = true
     }
 
@@ -129,16 +135,21 @@ object MediaType {
     }
 
   def text(subType: String, fileExtensions: String*): WithOpenCharset =
-    new NonMultipartWithOpenCharset(
-        "text/" + subType, "text", subType, fileExtensions.toList) {
+    new NonMultipartWithOpenCharset("text/" + subType,
+                                    "text",
+                                    subType,
+                                    fileExtensions.toList) {
       override def isText = true
     }
 
   def video(subType: String,
             comp: Compressibility,
             fileExtensions: String*): Binary =
-    new Binary(
-        "video/" + subType, "video", subType, comp, fileExtensions.toList) {
+    new Binary("video/" + subType,
+               "video",
+               subType,
+               comp,
+               fileExtensions.toList) {
       override def isVideo = true
     }
 
@@ -226,8 +237,8 @@ object MediaType {
     }
   }
 
-  def customMultipart(
-      subType: String, params: Map[String, String]): Multipart = {
+  def customMultipart(subType: String,
+                      params: Map[String, String]): Multipart = {
     require(
         subType != "*",
         "Cannot create a MediaRange here, use MediaRanges.`multipart/*` instead!")
@@ -305,8 +316,11 @@ object MediaType {
     def params: Map[String, String] = Map.empty
     def withParams(
         params: Map[String, String]): WithFixedCharset with MediaType =
-      customWithFixedCharset(
-          mainType, subType, charset, fileExtensions, params)
+      customWithFixedCharset(mainType,
+                             subType,
+                             charset,
+                             fileExtensions,
+                             params)
 
     /**
       * JAVA API
@@ -349,7 +363,8 @@ object MediaType {
     def withParams(params: Map[String, String]): MediaType.Multipart =
       new MediaType.Multipart(subType, params)
     def withBoundary(boundary: String): MediaType.Multipart =
-      withParams(if (boundary.isEmpty) params - "boundary"
+      withParams(
+          if (boundary.isEmpty) params - "boundary"
           else params.updated("boundary", boundary))
   }
 

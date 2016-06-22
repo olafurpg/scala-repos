@@ -29,7 +29,7 @@ class ScEnumeratorsImpl(node: ASTNode)
 
   def namings: Seq[ScPatterned] =
     for (c <- getChildren if c.isInstanceOf[ScGenerator] ||
-         c.isInstanceOf[ScEnumerator]) yield c.asInstanceOf[ScPatterned]
+           c.isInstanceOf[ScEnumerator]) yield c.asInstanceOf[ScPatterned]
 
   type Patterned = {
     def pattern: ScPattern
@@ -51,15 +51,17 @@ class ScEnumeratorsImpl(node: ASTNode)
     for (c <- children) {
       c match {
         case c: ScGenerator =>
-          for (b <- c.pattern.bindings) if (!processor.execute(b, state))
-            return false
+          for (b <- c.pattern.bindings)
+            if (!processor.execute(b, state))
+              return false
           processor match {
             case b: BaseProcessor => b.changedLevel
             case _ =>
           }
         case c: ScEnumerator =>
-          for (b <- c.pattern.bindings) if (!processor.execute(b, state))
-            return false
+          for (b <- c.pattern.bindings)
+            if (!processor.execute(b, state))
+              return false
         case _ =>
       }
     }

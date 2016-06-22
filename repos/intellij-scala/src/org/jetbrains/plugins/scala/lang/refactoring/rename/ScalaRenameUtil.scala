@@ -132,7 +132,8 @@ object ScalaRenameUtil {
           else {
             val needEncodedName: UsageInfo => Boolean = { u =>
               val ref = u.getReference.getElement
-              !ref.getLanguage.isInstanceOf[ScalaLanguage] //todo more concise condition?
+              !ref.getLanguage
+                .isInstanceOf[ScalaLanguage] //todo more concise condition?
             }
             val (usagesEncoded, usagesPlain) =
               usagez.partition(needEncodedName)
@@ -180,13 +181,15 @@ object ScalaRenameUtil {
     }
     modified.foreach {
       case UsagesWithName(name, usagez) if usagez.nonEmpty =>
-        RenameUtil.doRenameGenericNamedElement(
-            namedElement, name, usagez, listener)
+        RenameUtil
+          .doRenameGenericNamedElement(namedElement, name, usagez, listener)
       case _ =>
     }
     //to guarantee correct name of namedElement itself
-    RenameUtil.doRenameGenericNamedElement(
-        namedElement, newName, Array.empty[UsageInfo], listener)
+    RenameUtil.doRenameGenericNamedElement(namedElement,
+                                           newName,
+                                           Array.empty[UsageInfo],
+                                           listener)
   }
 
   def setterSuffix(name: String) = {
@@ -198,8 +201,9 @@ object ScalaRenameUtil {
   def sameElement(range: RangeMarker, element: PsiElement): Boolean = {
     val newElemRange = Option(ScalaRenameUtil.findSubstituteElement(element))
       .map(_.getTextRange)
-    newElemRange.exists(nr =>
+    newElemRange.exists(
+        nr =>
           nr.getStartOffset == range.getStartOffset &&
-          nr.getEndOffset == range.getEndOffset)
+            nr.getEndOffset == range.getEndOffset)
   }
 }

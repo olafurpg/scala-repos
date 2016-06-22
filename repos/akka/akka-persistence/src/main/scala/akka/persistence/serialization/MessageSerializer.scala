@@ -124,9 +124,9 @@ class MessageSerializer(val system: ExtendedActorSystem)
       .iterator()
       .asScala foreach { next ⇒
       unconfirmedDeliveries +=
-        UnconfirmedDelivery(next.getDeliveryId,
-                            ActorPath.fromString(next.getDestination),
-                            payload(next.getPayload))
+      UnconfirmedDelivery(next.getDeliveryId,
+                          ActorPath.fromString(next.getDestination),
+                          payload(next.getPayload))
     }
 
     AtLeastOnceDeliverySnapshot(
@@ -138,7 +138,8 @@ class MessageSerializer(val system: ExtendedActorSystem)
     : StateChangeEvent = {
     StateChangeEvent(persistentStateChange.getStateIdentifier,
                      if (persistentStateChange.hasTimeout)
-                       Some(Duration(persistentStateChange.getTimeout)
+                       Some(
+                           Duration(persistentStateChange.getTimeout)
                              .asInstanceOf[duration.FiniteDuration])
                      else None)
   }

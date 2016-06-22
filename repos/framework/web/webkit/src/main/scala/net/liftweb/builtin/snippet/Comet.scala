@@ -44,8 +44,8 @@ object Comet extends DispatchSnippet with LazyLoggable {
     * specified by the comet actor's `cometRenderTimeout` property and
     * then fails if the actor has not yet properly rendered.
     */
-  def containerForCometActor(
-      cometActor: LiftCometActor, cometHtml: Box[NodeSeq] = Empty): NodeSeq = {
+  def containerForCometActor(cometActor: LiftCometActor,
+                             cometHtml: Box[NodeSeq] = Empty): NodeSeq = {
     if (Props.devMode) {
       cometHtml.map { updatedHtml =>
         cometActor ! UpdateDefaultHtml(updatedHtml)
@@ -105,8 +105,11 @@ object Comet extends DispatchSnippet with LazyLoggable {
     try {
       theType match {
         case Full(cometType) =>
-          S.findOrCreateComet(
-                cometType, cometName, cometHtml, S.attrsFlattenToMap, true)
+          S.findOrCreateComet(cometType,
+                               cometName,
+                               cometHtml,
+                               S.attrsFlattenToMap,
+                               true)
             .map { foundComet =>
               containerForCometActor(foundComet, Full(cometHtml))
             } match {

@@ -84,9 +84,9 @@ class FileUploadSupportTest extends ScalatraFunSuite {
     val boundary = "---------------------------3924013385056820061124200860"
 
     post(path,
-         headers =
-           Map("Content-Type" -> "multipart/form-data; boundary=%s".format(
-                   boundary)),
+         headers = Map(
+             "Content-Type" -> "multipart/form-data; boundary=%s".format(
+                 boundary)),
          body = reqBody) {
       response
     }
@@ -150,8 +150,8 @@ class FileUploadSupportTest extends ScalatraFunSuite {
   }
 
   test("query parameters don't shadow post parameters") {
-    multipartResponse("/multipart-param?string=bar").getHeader("string") should equal(
-        "bar;foo")
+    multipartResponse("/multipart-param?string=bar")
+      .getHeader("string") should equal("bar;foo")
   }
 
   test("max size is respected") {

@@ -51,8 +51,8 @@ class CleanWorksheetAction() extends AnAction with TopComponentAction {
       inWriteAction {
         CleanWorksheetAction.resetScrollModel(viewer)
 
-        CleanWorksheetAction.cleanWorksheet(
-            psiFile.getNode, editor, viewer, project)
+        CleanWorksheetAction
+          .cleanWorksheet(psiFile.getNode, editor, viewer, project)
 
         parent.remove(splitPane)
         parent.add(editor.getComponent, BorderLayout.CENTER)

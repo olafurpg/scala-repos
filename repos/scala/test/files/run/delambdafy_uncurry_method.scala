@@ -5,7 +5,7 @@ object Test extends DirectTest {
 
   override def extraSettings: String =
     "-usejavacp -Xprint:uncurry -Ydelambdafy:method -Ystop-after:uncurry -d " +
-    testOutput.path
+      testOutput.path
 
   override def code = """class Foo {
                         |  def bar = {

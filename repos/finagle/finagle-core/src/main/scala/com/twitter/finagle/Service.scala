@@ -189,11 +189,11 @@ abstract class ServiceFactory[-Req, +Rep]
 object ServiceFactory {
   def const[Req, Rep](service: Service[Req, Rep]): ServiceFactory[Req, Rep] =
     new ServiceFactory[Req, Rep] {
-      private[this] val noRelease = Future.value(
-          new ServiceProxy[Req, Rep](service) {
-        // close() is meaningless on connectionless services.
-        override def close(deadline: Time) = Future.Done
-      })
+      private[this] val noRelease =
+        Future.value(new ServiceProxy[Req, Rep](service) {
+          // close() is meaningless on connectionless services.
+          override def close(deadline: Time) = Future.Done
+        })
 
       def apply(conn: ClientConnection): Future[Service[Req, Rep]] = noRelease
       def close(deadline: Time): Future[Unit] = Future.Done

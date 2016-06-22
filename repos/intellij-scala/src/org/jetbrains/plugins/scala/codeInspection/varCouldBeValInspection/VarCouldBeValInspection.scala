@@ -13,8 +13,8 @@ class VarCouldBeValInspection
     with UnfairLocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new PsiElementVisitor {}
   }
 }

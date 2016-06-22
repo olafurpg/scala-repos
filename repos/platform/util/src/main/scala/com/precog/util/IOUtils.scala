@@ -62,8 +62,9 @@ object IOUtils extends Logging {
     props
   }
 
-  def writeToFile(
-      s: String, f: File, append: Boolean = false): IO[PrecogUnit] = IO {
+  def writeToFile(s: String,
+                  f: File,
+                  append: Boolean = false): IO[PrecogUnit] = IO {
     FileUtils.writeStringToFile(f, s, UTF8, append)
     PrecogUnit
   }
@@ -77,8 +78,8 @@ object IOUtils extends Logging {
     * if the file was completely written, false otherwise
     */
   def safeWriteToFile(s: String, f: File): IO[Boolean] = {
-    val tmpFile = new File(
-        f.getParentFile, f.getName + "-" + System.nanoTime + ".tmp")
+    val tmpFile =
+      new File(f.getParentFile, f.getName + "-" + System.nanoTime + ".tmp")
 
     writeToFile(s, tmpFile) flatMap { _ =>
       IO(tmpFile.renameTo(f)) // TODO: This is only atomic on POSIX systems
@@ -113,7 +114,8 @@ object IOUtils extends Logging {
       } else {
         IO {
           logger.debug(
-              "Stopping recursive clean on non-empty directory: " + startDir); PrecogUnit
+              "Stopping recursive clean on non-empty directory: " + startDir);
+          PrecogUnit
         }
       }
     } else {

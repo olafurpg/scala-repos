@@ -24,8 +24,8 @@ object Agent {
   /**
     * Default agent implementation.
     */
-  private final class SecretAgent[T](
-      initialValue: T, context: ExecutionContext)
+  private final class SecretAgent[T](initialValue: T,
+                                     context: ExecutionContext)
       extends Agent[T] {
     private val ref = Ref(initialValue)
     private val updater = SerializedSuspendableExecutionContext(10)(context)
@@ -39,8 +39,7 @@ object Agent {
       withinTransaction(new Runnable { def run = ref.single.transform(f) })
 
     def sendOff(f: T ⇒ T)(implicit ec: ExecutionContext): Unit =
-      withinTransaction(
-          new Runnable {
+      withinTransaction(new Runnable {
         def run =
           try updater.suspend() finally ec.execute(new Runnable {
             def run = try ref.single.transform(f) finally updater.resume()
@@ -54,8 +53,7 @@ object Agent {
 
     def alterOff(f: T ⇒ T)(implicit ec: ExecutionContext): Future[T] = {
       val result = Promise[T]()
-      withinTransaction(
-          new Runnable {
+      withinTransaction(new Runnable {
         def run = {
           updater.suspend()
           result completeWith Future(

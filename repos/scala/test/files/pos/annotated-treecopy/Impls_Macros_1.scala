@@ -42,7 +42,7 @@ object Macros {
         val template = c.universe.reify(new (T => U) with TypedFunction {
           override def toString =
             c.Expr[String](q"""${tp +
-              " => " + ttag.tpe + " { " + b1.toString + " } "}""")
+                " => " + ttag.tpe + " { " + b1.toString + " } "}""")
               .splice // DEBUG
           def tree = reifiedExpr.splice.tree
           val typeIn = c.Expr[String](q"${tp.toString}").splice

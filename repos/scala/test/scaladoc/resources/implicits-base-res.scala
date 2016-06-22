@@ -41,8 +41,8 @@ object A {
   implicit def enrichA2(a: A[Int]) = new IntA(a)
   implicit def enrichA3(a: A[T] forSome { type T <: Double }) =
     new GtColonDoubleA(a)
-  implicit def enrichA4[S](a: A[Foo[Bar[S]]])(
-      implicit foo: Foo[S], bar: Bar[S]): EnrichedA[S] =
+  implicit def enrichA4[S](a: A[Foo[Bar[S]]])(implicit foo: Foo[S],
+                                              bar: Bar[S]): EnrichedA[S] =
     sys.error("not implemented")
   implicit def enrichA5[Z](a: A[Z]): EnrichedA[Bar[Foo[Z]]] =
     sys.error("not implemented")

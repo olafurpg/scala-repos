@@ -57,7 +57,7 @@ class MulticlassClassificationEvaluator @Since("1.5.0")(
     new Param(this,
               "metricName",
               "metric name in evaluation " +
-              "(f1|precision|recall|weightedPrecision|weightedRecall)",
+                "(f1|precision|recall|weightedPrecision|weightedRecall)",
               allowedParams)
   }
 

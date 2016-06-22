@@ -66,8 +66,9 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
     val conf = new SparkConf
     conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     conf.set("spark.broadcast.compress", "true")
-    sc = new SparkContext(
-        "local-cluster[%d, 1, 1024]".format(numSlaves), "test", conf)
+    sc = new SparkContext("local-cluster[%d, 1, 1024]".format(numSlaves),
+                          "test",
+                          conf)
     val list = List[Int](1, 2, 3, 4)
     val broadcast = sc.broadcast(list)
     val results =
@@ -107,8 +108,8 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
   }
 
   test("Unpersisting TorrentBroadcast on executors only in local mode") {
-    testUnpersistTorrentBroadcast(
-        distributed = false, removeFromDriver = false)
+    testUnpersistTorrentBroadcast(distributed = false,
+                                  removeFromDriver = false)
   }
 
   test("Unpersisting TorrentBroadcast on executors and driver in local mode") {
@@ -154,8 +155,8 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
     * In between each step, this test verifies that the broadcast blocks are present only on the
     * expected nodes.
     */
-  private def testUnpersistTorrentBroadcast(
-      distributed: Boolean, removeFromDriver: Boolean) {
+  private def testUnpersistTorrentBroadcast(distributed: Boolean,
+                                            removeFromDriver: Boolean) {
     val numSlaves = if (distributed) 2 else 0
 
     // Verify that blocks are persisted only on the driver
@@ -218,22 +219,22 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
       afterUnpersist: (Long, BlockManagerMaster) => Unit,
       removeFromDriver: Boolean) {
 
-    sc =
-      if (distributed) {
-        val _sc = new SparkContext(
-            "local-cluster[%d, 1, 1024]".format(numSlaves), "test")
-        // Wait until all salves are up
-        try {
-          _sc.jobProgressListener.waitUntilExecutorsUp(numSlaves, 60000)
-          _sc
-        } catch {
-          case e: Throwable =>
-            _sc.stop()
-            throw e
-        }
-      } else {
-        new SparkContext("local", "test")
+    sc = if (distributed) {
+      val _sc = new SparkContext(
+          "local-cluster[%d, 1, 1024]".format(numSlaves),
+          "test")
+      // Wait until all salves are up
+      try {
+        _sc.jobProgressListener.waitUntilExecutorsUp(numSlaves, 60000)
+        _sc
+      } catch {
+        case e: Throwable =>
+          _sc.stop()
+          throw e
       }
+    } else {
+      new SparkContext("local", "test")
+    }
     val blockManagerMaster = sc.env.blockManager.master
     val list = List[Int](1, 2, 3, 4)
 

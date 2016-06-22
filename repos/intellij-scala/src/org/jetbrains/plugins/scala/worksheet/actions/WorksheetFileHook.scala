@@ -58,7 +58,8 @@ class WorksheetFileHook(private val project: Project)
           if (editor == null) return
 
           val file =
-            PsiDocumentManager.getInstance(project) getPsiFile editor.getDocument
+            PsiDocumentManager
+              .getInstance(project) getPsiFile editor.getDocument
           if (file == null) return
 
           val vFile = file.getVirtualFile
@@ -93,8 +94,7 @@ class WorksheetFileHook(private val project: Project)
         case ref =>
           val p = ref.get()
 
-          ApplicationManager.getApplication.invokeLater(
-              new Runnable {
+          ApplicationManager.getApplication.invokeLater(new Runnable {
             override def run() {
               if (p != null) myFileEditorManager.removeTopComponent(editor, p)
             }
@@ -119,13 +119,14 @@ class WorksheetFileHook(private val project: Project)
 
   def enableRun(file: VirtualFile, hasErrors: Boolean) {
     cleanAndAdd(file, Some(new RunWorksheetAction))
-    statusDisplay.foreach(display =>
+    statusDisplay.foreach(
+        display =>
           if (hasErrors) display.onFailedCompiling()
           else display.onSuccessfulCompiling())
   }
 
-  private def cleanAndAdd(
-      file: VirtualFile, action: Option[TopComponentDisplayable]) {
+  private def cleanAndAdd(file: VirtualFile,
+                          action: Option[TopComponentDisplayable]) {
     WorksheetFileHook getPanel file foreach {
       case panelRef =>
         val panel = panelRef.get()
@@ -176,19 +177,20 @@ class WorksheetFileHook(private val project: Project)
       WorksheetFileHook.this.initTopComponent(file, run = true)
       loadEvaluationResult(source, file)
 
-      WorksheetAutoRunner.getInstance(source.getProject) addListener doc(
-          source, file)
+      WorksheetAutoRunner
+        .getInstance(source.getProject) addListener doc(source, file)
     }
 
-    private def loadEvaluationResult(
-        source: FileEditorManager, file: VirtualFile) {
+    private def loadEvaluationResult(source: FileEditorManager,
+                                     file: VirtualFile) {
       source getSelectedEditor file match {
         case txt: TextEditor =>
           txt.getEditor match {
             case ext: EditorEx =>
               PsiDocumentManager getInstance project getPsiFile ext.getDocument match {
                 case scalaFile: ScalaFile =>
-                  WorksheetEditorPrinter.loadWorksheetEvaluation(scalaFile) foreach {
+                  WorksheetEditorPrinter
+                    .loadWorksheetEvaluation(scalaFile) foreach {
                     case (result, ratio) if !result.isEmpty =>
                       val viewer =
                         WorksheetEditorPrinter.createRightSideViewer(
@@ -209,8 +211,8 @@ class WorksheetFileHook(private val project: Project)
 
                         if (splitter != null) {
                           splitter setProportion ratio
-                          WorksheetFoldGroup.load(
-                              viewer, ext, project, splitter, scalaFile)
+                          WorksheetFoldGroup
+                            .load(viewer, ext, project, splitter, scalaFile)
                         }
                       }
                     case _ =>

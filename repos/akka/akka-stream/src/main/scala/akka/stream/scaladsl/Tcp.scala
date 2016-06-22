@@ -50,8 +50,8 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
   /**
     * Represents a prospective outgoing TCP connection.
     */
-  final case class OutgoingConnection(
-      remoteAddress: InetSocketAddress, localAddress: InetSocketAddress)
+  final case class OutgoingConnection(remoteAddress: InetSocketAddress,
+                                      localAddress: InetSocketAddress)
 
   def apply()(implicit system: ActorSystem): Tcp = super.apply(system)
 
@@ -95,8 +95,8 @@ final class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
            backlog: Int = 100,
            options: immutable.Traversable[SocketOption] = Nil,
            halfClose: Boolean = false,
-           idleTimeout: Duration =
-             Duration.Inf): Source[IncomingConnection, Future[ServerBinding]] =
+           idleTimeout: Duration = Duration.Inf)
+    : Source[IncomingConnection, Future[ServerBinding]] =
     Source.fromGraph(
         new ConnectionSourceStage(IO(IoTcp)(system),
                                   new InetSocketAddress(interface, port),

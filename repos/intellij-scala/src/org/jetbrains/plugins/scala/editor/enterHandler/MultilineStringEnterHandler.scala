@@ -49,20 +49,21 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
 
     whiteSpaceAfterCaret =
       text.substring(caretOffset).takeWhile(c => c == ' ' || c == '\t')
-    document.deleteString(
-        caretOffset, caretOffset + whiteSpaceAfterCaret.length)
+    document
+      .deleteString(caretOffset, caretOffset + whiteSpaceAfterCaret.length)
 
     if ((ch1 != '(' || ch2 != ')') && (ch1 != '{' || ch2 != '}') ||
         !CodeInsightSettings.getInstance.SMART_INDENT_ON_ENTER)
       return Result.Continue
 
-    originalHandler.execute(
-        editor, editor.getCaretModel.getCurrentCaret, dataContext)
+    originalHandler
+      .execute(editor, editor.getCaretModel.getCurrentCaret, dataContext)
     Result.DefaultForceIndent
   }
 
-  override def postProcessEnter(
-      file: PsiFile, editor: Editor, dataContext: DataContext): Result = {
+  override def postProcessEnter(file: PsiFile,
+                                editor: Editor,
+                                dataContext: DataContext): Result = {
     if (!file.isInstanceOf[ScalaFile]) return Result.Continue
 
     val caretModel = editor.getCaretModel
@@ -92,15 +93,16 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
         offset - literalOffset < firstMLQuoteLength) return Result.Continue
 
     def getLineByNumber(number: Int): String =
-      document.getText(new TextRange(document.getLineStartOffset(number),
-                                     document.getLineEndOffset(number)))
+      document.getText(
+          new TextRange(document.getLineStartOffset(number),
+                        document.getLineEndOffset(number)))
 
     def getSpaces(count: Int) = StringUtil.repeat(" ", count)
 
     def getSmartSpaces(count: Int) =
       if (useTabs) {
-        StringUtil.repeat("\t", count / tabSize) + StringUtil.repeat(
-            " ", count % tabSize)
+        StringUtil.repeat("\t", count / tabSize) + StringUtil
+          .repeat(" ", count % tabSize)
       } else {
         StringUtil.repeat(" ", count)
       }
@@ -160,8 +162,8 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
       val marginCharOpt = marginCharFromSettings match {
         case Some(mChar)
             if hasMarginChars(element, mChar.toString) ||
-            (!hasMarginChars(element, mChar.toString) && lines.length > 3) ||
-            needAddByType(literal) =>
+              (!hasMarginChars(element, mChar.toString) && lines.length > 3) ||
+              needAddByType(literal) =>
           marginCharFromSettings
         case _ => None
       }
@@ -177,15 +179,16 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
             Option(lit)
           case ScInfixExpr(expr, op, `literal`)
               if op.refName == "+" &&
-              StringConcatenationParser.isString(expr) =>
+                StringConcatenationParser.isString(expr) =>
             Option(expr)
           case _ => None
         }
         val needInsertNLBefore =
           (!trimmedStartLine.startsWith(firstMLQuote) ||
-              inConcatenation.isDefined) && quotesOnNewLine
+                inConcatenation.isDefined) && quotesOnNewLine
 
-        selectBySettings()(if (needAddByType(literal))
+        selectBySettings()(
+            if (needAddByType(literal))
               insertStripMargin(document, literal, marginChar))
 
         val prevIndent =
@@ -210,13 +213,15 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
 
         val indentSize =
           prevIndent + needInsertIndentInt +
-          interpolatorPrefixLength(literal) + marginIndent
+            interpolatorPrefixLength(literal) + marginIndent
 
-        if (literal.getText.substring(offset - literalOffset) == multilineQuotes) {
+        if (literal.getText
+              .substring(offset - literalOffset) == multilineQuotes) {
           forceIndent(caretOffset, indentSize, marginCharOpt)
           caretMarker.setGreedyToRight(false)
-          insertNewLine(
-              caretOffset, indentSize - marginIndent, trimPreviousLine = false)
+          insertNewLine(caretOffset,
+                        indentSize - marginIndent,
+                        trimPreviousLine = false)
           caretMarker.setGreedyToRight(true)
         } else {
           forceIndent(caretOffset, indentSize, marginCharOpt)
@@ -225,8 +230,9 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
         if (!wasSingleLine) {
           val currentPrefix =
             getPrefix(getLineByNumber(document.getLineNumber(caretOffset)))
-          forceIndent(
-              caretOffset + 1, getSmartLength(currentPrefix), marginCharOpt)
+          forceIndent(caretOffset + 1,
+                      getSmartLength(currentPrefix),
+                      marginCharOpt)
         }
       } else {
         val isCurrentLineEmpty = currentLine.trim.length == 0
@@ -271,7 +277,7 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
           else if (isPrevLineTrimmedFirst) {
             val wsAfterQuotes =
               prevLinePrefixAfterDelimiter(wsPrefix + firstMLQuoteLength) +
-              firstMLQuoteLength
+                firstMLQuoteLength
             forceIndent(caretOffset, wsAfterQuotes, None)
           }
         } else {
@@ -282,7 +288,7 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
           if (!currentLine.trim.startsWith(Seq(marginChar))) {
             val inBraces =
               prevLine.endsWith("{") && nextLine.trim.startsWith("}") ||
-              prevLine.endsWith("(") && nextLine.trim.startsWith(")")
+                prevLine.endsWith("(") && nextLine.trim.startsWith(")")
             val prefix =
               if (inBraces) getPrefix(nextLine)
               else if (prevLine.trim.startsWith(Seq(marginChar)))
@@ -297,8 +303,8 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
               val nextLineOffset =
                 document.getLineStartOffset(prevLineNumber + 2)
               forceIndent(nextLineOffset, 0, None)
-              document.insertString(
-                  nextLineOffset, marginChar + getSpaces(wsAfterMargin))
+              document.insertString(nextLineOffset,
+                                    marginChar + getSpaces(wsAfterMargin))
               forceIndent(nextLineOffset, getSmartLength(prefix), None)
             }
           }

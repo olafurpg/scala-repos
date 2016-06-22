@@ -5,7 +5,7 @@ object WithSemicolon {
     val y = 0
     println(i)
     y + 1
-/*end*/
+    /*end*/
   }
 
   def foofoo() {

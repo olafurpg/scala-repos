@@ -31,8 +31,10 @@ class TopicMetadataRequest(val versionId: Short,
 
   val underlying: kafka.api.TopicMetadataRequest = {
     import scala.collection.JavaConversions._
-    new kafka.api.TopicMetadataRequest(
-        versionId, correlationId, clientId, topics: mutable.Buffer[String])
+    new kafka.api.TopicMetadataRequest(versionId,
+                                       correlationId,
+                                       clientId,
+                                       topics: mutable.Buffer[String])
   }
 
   def this(topics: java.util.List[String]) =

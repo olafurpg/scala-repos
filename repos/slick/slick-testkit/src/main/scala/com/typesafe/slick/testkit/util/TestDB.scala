@@ -201,18 +201,15 @@ abstract class JdbcTestDB(val confName: String) extends SqlTestDB {
     }
   def assertTablesExist(tables: String*) =
     DBIO.seq(tables.map(t =>
-              sql"""select 1 from #${profile.quoteIdentifier(t)} where 1 < 0"""
-                .as[Int]): _*)
+              sql"""select 1 from #${profile
+        .quoteIdentifier(t)} where 1 < 0""".as[Int]): _*)
   def assertNotTablesExist(tables: String*) =
-    DBIO.seq(
-        tables.map(t =>
-              sql"""select 1 from #${profile.quoteIdentifier(t)} where 1 < 0"""
-                .as[Int]
-                .failed): _*)
-  def createSingleSessionDatabase(
-      implicit session: profile.Backend#Session,
-      executor: AsyncExecutor =
-        AsyncExecutor.default()): profile.Backend#Database = {
+    DBIO.seq(tables.map(t =>
+              sql"""select 1 from #${profile
+        .quoteIdentifier(t)} where 1 < 0""".as[Int].failed): _*)
+  def createSingleSessionDatabase(implicit session: profile.Backend#Session,
+                                  executor: AsyncExecutor = AsyncExecutor
+                                    .default()): profile.Backend#Database = {
     val wrappedConn = new DelegateConnection(session.conn) {
       override def close(): Unit = ()
     }

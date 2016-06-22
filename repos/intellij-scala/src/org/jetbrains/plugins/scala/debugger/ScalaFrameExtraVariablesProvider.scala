@@ -70,8 +70,8 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
                                   alreadyCollected: util.Set[String]) = {
     val initialCandidates = inReadAction {
       val completionProcessor = new CollectingProcessor(elem)
-      PsiTreeUtil.treeWalkUp(
-          completionProcessor, elem, null, ResolveState.initial)
+      PsiTreeUtil
+        .treeWalkUp(completionProcessor, elem, null, ResolveState.initial)
       completionProcessor.candidates
         .filter(srr =>
               !alreadyCollected.asScala
@@ -81,7 +81,8 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
     }
     val candidates =
       initialCandidates.filter(canEvaluateLong(_, elem, evaluationContext))
-    val sorted = mutable.SortedSet()(Ordering.by[ScalaResolveResult, Int](
+    val sorted = mutable.SortedSet()(
+        Ordering.by[ScalaResolveResult, Int](
             _.getElement.getTextRange.getStartOffset))
     inReadAction {
       candidates.foreach(sorted += _)
@@ -105,8 +106,8 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
         }
         val funDef =
           PsiTreeUtil.getParentOfType(place, classOf[ScFunctionDefinition])
-        val lazyVal = PsiTreeUtil.getParentOfType(
-            place, classOf[ScPatternDefinition]) match {
+        val lazyVal = PsiTreeUtil
+          .getParentOfType(place, classOf[ScPatternDefinition]) match {
           case null => null
           case LazyVal(lzy) => lzy
           case _ => null
@@ -164,8 +165,8 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
     }
   }
 
-  private def notUsedInCurrentClass(
-      named: PsiNamedElement, place: PsiElement): Boolean = {
+  private def notUsedInCurrentClass(named: PsiNamedElement,
+                                    place: PsiElement): Boolean = {
     inReadAction {
       val contextClass =
         ScalaEvaluatorBuilderUtil.getContextClass(place, strict = false)
@@ -192,8 +193,8 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
           new PsiSearchHelperImpl(place.getManager.asInstanceOf[PsiManagerEx])
         var used = false
         val processor = new TextOccurenceProcessor {
-          override def execute(
-              element: PsiElement, offsetInElement: Int): Boolean = {
+          override def execute(element: PsiElement,
+                               offsetInElement: Int): Boolean = {
             used = true
             false
           }
@@ -210,8 +211,8 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
     }
   }
 
-  private def generatorNotFromBody(
-      named: PsiNamedElement, place: PsiElement): Boolean = {
+  private def generatorNotFromBody(named: PsiNamedElement,
+                                   place: PsiElement): Boolean = {
     inReadAction {
       val forStmt = ScalaPsiUtil.nameContext(named) match {
         case nc @ (_: ScEnumerator | _: ScGenerator) =>
@@ -234,12 +235,11 @@ private class CollectingProcessor(element: PsiElement)
       classOf[ScBlock],
       classOf[ScTemplateDefinition],
       classOf[PsiFile])
-  val usedNames: Set[String] =
-    if (containingBlock != null) {
-      containingBlock.depthFirst.collect {
-        case ref: ScReferenceExpression if ref.qualifier.isEmpty => ref.refName
-      }.toSet
-    } else Set.empty
+  val usedNames: Set[String] = if (containingBlock != null) {
+    containingBlock.depthFirst.collect {
+      case ref: ScReferenceExpression if ref.qualifier.isEmpty => ref.refName
+    }.toSet
+  } else Set.empty
 
   override def execute(element: PsiElement, state: ResolveState): Boolean = {
     val result = super.execute(element, state)

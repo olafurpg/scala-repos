@@ -195,8 +195,9 @@ final class BackoffSupervisor(val childProps: Props,
                         oneForOne.withinTimeRange,
                         oneForOne.loggingEnabled) {
         case ex ⇒
-          val defaultDirective: Directive = super.supervisorStrategy.decider
-            .applyOrElse(ex, (_: Any) ⇒ Escalate)
+          val defaultDirective: Directive =
+            super.supervisorStrategy.decider.applyOrElse(ex, (_: Any) ⇒
+                  Escalate)
 
           strategy.decider.applyOrElse(ex, (_: Any) ⇒ defaultDirective)
       }
@@ -234,8 +235,8 @@ final class BackoffSupervisor(val childProps: Props,
   def onTerminated: Receive = {
     case Terminated(ref) if child.contains(ref) ⇒
       child = None
-      val restartDelay = calculateDelay(
-          restartCount, minBackoff, maxBackoff, randomFactor)
+      val restartDelay =
+        calculateDelay(restartCount, minBackoff, maxBackoff, randomFactor)
       context.system.scheduler.scheduleOnce(restartDelay, self, StartChild)
       restartCount += 1
   }

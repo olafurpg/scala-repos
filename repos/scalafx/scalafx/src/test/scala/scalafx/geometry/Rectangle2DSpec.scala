@@ -41,7 +41,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class Rectangle2DSpec
     extends SimpleSFXDelegateSpec[jfxg.Rectangle2D, Rectangle2D](
-        classOf[jfxg.Rectangle2D], classOf[Rectangle2D]) {
+        classOf[jfxg.Rectangle2D],
+        classOf[Rectangle2D]) {
 
   override protected def getScalaClassInstance = new Rectangle2D(0, 0, 0, 0)
 

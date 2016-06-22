@@ -28,9 +28,9 @@ import breeze.storage.Zero
   * Represents a Dirichlet distribution, the conjugate prior to the multinomial.
   * @author dlwh
   */
-case class Dirichlet[T, @specialized(Int) I](
-    params: T)(implicit space: EnumeratedCoordinateField[T, I, Double],
-               rand: RandBasis = Rand)
+case class Dirichlet[T, @specialized(Int) I](params: T)(
+    implicit space: EnumeratedCoordinateField[T, I, Double],
+    rand: RandBasis = Rand)
     extends ContinuousDistr[T] {
   import space._
 
@@ -67,8 +67,8 @@ case class Dirichlet[T, @specialized(Int) I](
     * Returns the log pdf function of the Dirichlet up to a constant evaluated at m
     */
   override def unnormalizedLogPdf(m: T) = {
-    val parts = for ((k, v) <- params.activeIterator) yield
-      (v - 1) * math.log(m(k))
+    val parts = for ((k, v) <- params.activeIterator)
+      yield (v - 1) * math.log(m(k))
     parts.sum
   }
 
@@ -104,8 +104,8 @@ object Dirichlet {
   def apply(arr: Array[Double]): Dirichlet[DenseVector[Double], Int] =
     Dirichlet(new DenseVector[Double](arr))
 
-  class ExpFam[T, I](
-      exemplar: T)(implicit space: MutableFiniteCoordinateField[T, I, Double])
+  class ExpFam[T, I](exemplar: T)(
+      implicit space: MutableFiniteCoordinateField[T, I, Double])
       extends ExponentialFamily[Dirichlet[T, I], T] {
     import space._
     type Parameter = T

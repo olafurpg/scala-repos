@@ -109,7 +109,7 @@ class OpenHashMapSuite extends SparkFunSuite with Matchers {
     }
     val expected =
       (1 to 1000).map(_.toString).map(x => (x, x)) :+
-      (null.asInstanceOf[String], "-1")
+        (null.asInstanceOf[String], "-1")
     assert(set === expected.toSet)
   }
 

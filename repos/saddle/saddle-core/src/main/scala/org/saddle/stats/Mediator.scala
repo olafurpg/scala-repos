@@ -13,12 +13,9 @@ class Mediator(winSz: Int) {
 
   // auxiliary data
   private val data = Array.ofDim[Double](winSz) // circular buffer of values
-  private val loc =
-    Array.ofDim[Int](winSz) // ith value's location within heap array
-  private val heap =
-    Array.ofDim[Int](winSz) // orders data array into [max heap] :: median :: [min heap]
-  private val sawNa =
-    Array.ofDim[Boolean](winSz) // circular buffer of na markers
+  private val loc = Array.ofDim[Int](winSz) // ith value's location within heap array
+  private val heap = Array.ofDim[Int](winSz) // orders data array into [max heap] :: median :: [min heap]
+  private val sawNa = Array.ofDim[Boolean](winSz) // circular buffer of na markers
   private var idx = 0 // position in circular buffer
   private var naIdx = 0 // position in circular buffer
   private var minCt = 0 // # items in minheap
@@ -300,8 +297,9 @@ class Mediator(winSz: Int) {
     for (i <- 0 until winSz) {
       val star1 = if (i == idx) "*" else " "
       val star2 = if (i == naIdx) " *" else "  "
-      println("%s%3d|%12.6f|%12d|%12d |%5s%s|" format
-          (star1, i, data(i), heap(i), loc(i), sawNa(i), star2))
+      println(
+          "%s%3d|%12.6f|%12d|%12d |%5s%s|" format
+            (star1, i, data(i), heap(i), loc(i), sawNa(i), star2))
     }
     println("-----------------------------------------------------")
   }

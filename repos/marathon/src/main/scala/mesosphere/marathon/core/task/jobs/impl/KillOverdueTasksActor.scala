@@ -17,7 +17,8 @@ private[jobs] object KillOverdueTasksActor {
             taskTracker: TaskTracker,
             driverHolder: MarathonSchedulerDriverHolder,
             clock: Clock): Props = {
-    Props(new KillOverdueTasksActor(
+    Props(
+        new KillOverdueTasksActor(
             new Support(config, taskTracker, driverHolder, clock)))
   }
 
@@ -53,15 +54,16 @@ private[jobs] object KillOverdueTasksActor {
           launched.status.mesosStatus.map(_.getState) match {
             case None | Some(TaskState.TASK_STARTING)
                 if launched.status.stagedAt < unconfirmedExpire =>
-              log.warn(s"Should kill: ${task.taskId} was launched " +
-                  s"${(launched.status.stagedAt.until(now).toSeconds)}s ago and was not confirmed yet")
+              log.warn(
+                  s"Should kill: ${task.taskId} was launched " +
+                    s"${(launched.status.stagedAt.until(now).toSeconds)}s ago and was not confirmed yet")
               true
 
             case Some(TaskState.TASK_STAGING)
                 if launched.status.stagedAt < stagedExpire =>
               log.warn(
                   s"Should kill: ${task.taskId} was staged ${(launched.status.stagedAt.until(now).toSeconds)}s" +
-                  s" ago and has not yet started")
+                    s" ago and has not yet started")
               true
 
             case _ =>

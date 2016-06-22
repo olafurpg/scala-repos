@@ -123,10 +123,12 @@ class VersionedBatchedStoreTest extends WordSpec {
       def buildStore(
           ): (String, batch.BatchedStore[Int, Int], Long => Map[Int, Int]) = {
         val rootFolder = createTempDirectory().getAbsolutePath
-        val testStoreVBS = VersionedBatchStore[Int, Int, (Long, Int), Int](
-            rootFolder, 1)(packFn)(unpackFn)
+        val testStoreVBS =
+          VersionedBatchStore[Int, Int, (Long, Int), Int](rootFolder, 1)(
+              packFn)(unpackFn)
         val testStore = new InitialBatchedStore(
-            batcher.batchOf(Timestamp(inWithTime.head._1)), testStoreVBS)
+            batcher.batchOf(Timestamp(inWithTime.head._1)),
+            testStoreVBS)
         val testStoreReader = { version: Long =>
           VersionedKeyValSource[(Long, Int), Int](
               rootFolder,
@@ -149,9 +151,11 @@ class VersionedBatchedStoreTest extends WordSpec {
       {
         val tail = TestGraphs
           .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-            source, testStoreA, testStoreB)({ t =>
-          fnA(t._2)
-        }, fnB, fnC)
+              source,
+              testStoreA,
+              testStoreB)({ t =>
+            fnA(t._2)
+          }, fnB, fnC)
         val scald = Scalding("scalaCheckMultipleSumJob")
         val ws = new LoopState(intr)
         scald.run(ws, mode, scald.plan(tail))
@@ -162,9 +166,11 @@ class VersionedBatchedStoreTest extends WordSpec {
       {
         val tail = TestGraphs
           .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-            source, testStoreC, testStoreB)({ t =>
-          fnA(t._2)
-        }, fnB, fnC)
+              source,
+              testStoreC,
+              testStoreB)({ t =>
+            fnA(t._2)
+          }, fnB, fnC)
         val scald = Scalding("scalaCheckMultipleSumJob")
         val ws = new LoopState(intr)
         scald.run(ws, mode, scald.plan(tail))
@@ -176,9 +182,11 @@ class VersionedBatchedStoreTest extends WordSpec {
       {
         val tail = TestGraphs
           .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-            source, testStoreC, testStoreB)({ t =>
-          fnA(t._2)
-        }, fnB, fnC)
+              source,
+              testStoreC,
+              testStoreB)({ t =>
+            fnA(t._2)
+          }, fnB, fnC)
         val scald = Scalding("scalaCheckMultipleSumJob")
         val ws = new LoopState(intr)
         scald.run(ws, mode, scald.plan(tail))

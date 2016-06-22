@@ -32,8 +32,9 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
   private val myHashCodeFields =
     collection.mutable.LinkedHashSet[ScNamedElement]()
 
-  def chooseOriginalMembers(
-      aClass: ScClass, project: Project, editor: Editor): Boolean = {
+  def chooseOriginalMembers(aClass: ScClass,
+                            project: Project,
+                            editor: Editor): Boolean = {
     val equalsMethod = hasEquals(aClass)
     val hashCodeMethod = hasHashCode(aClass)
     var needEquals = equalsMethod.isEmpty
@@ -76,7 +77,8 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
     val allFields: Seq[ScNamedElement] = GenerationUtil.getAllFields(aClass)
     if (allFields.isEmpty) {
       HintManager.getInstance.showErrorHint(
-          editor, "No fields to include in equals/hashCode have been found")
+          editor,
+          "No fields to include in equals/hashCode have been found")
       return false
     }
 
@@ -84,8 +86,10 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
       myEqualsFields ++= allFields
       myHashCodeFields ++= allFields.filterNot(GenerationUtil.isVar)
     } else {
-      val wizard = new ScalaGenerateEqualsWizard(
-          project, aClass, needEquals, needHashCode)
+      val wizard = new ScalaGenerateEqualsWizard(project,
+                                                 aClass,
+                                                 needEquals,
+                                                 needHashCode)
       wizard.show()
       if (!wizard.isOK) return false
       myEqualsFields ++= wizard.getEqualsFields
@@ -102,8 +106,9 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
   protected def createHashCode(aClass: ScClass): ScFunction = {
     val declText = "def hashCode(): Int"
     val signature = new PhysicalSignature(
-        ScalaPsiElementFactory.createMethodWithContext(
-            declText + " = 0", aClass, aClass.extendsBlock),
+        ScalaPsiElementFactory.createMethodWithContext(declText + " = 0",
+                                                       aClass,
+                                                       aClass.extendsBlock),
         ScSubstitutor.empty)
     val superCall = Option(
         if (!overridesFromJavaObject(aClass, signature)) "super.hashCode()"
@@ -118,20 +123,21 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
         |  $firstStmtText
         |  $calculationText
         |}""".stripMargin.replace("\r", "")
-    ScalaPsiElementFactory.createMethodWithContext(
-        methodText, aClass, aClass.extendsBlock)
+    ScalaPsiElementFactory
+      .createMethodWithContext(methodText, aClass, aClass.extendsBlock)
   }
 
   protected def createCanEqual(aClass: ScClass, project: Project): ScFunction = {
     val declText = "def canEqual(other: Any): Boolean"
     val sign = new PhysicalSignature(
-        ScalaPsiElementFactory.createMethodWithContext(
-            declText + " = true", aClass, aClass.extendsBlock),
+        ScalaPsiElementFactory.createMethodWithContext(declText + " = true",
+                                                       aClass,
+                                                       aClass.extendsBlock),
         ScSubstitutor.empty)
     val overrideMod = overrideModifier(aClass, sign)
     val text = s"$overrideMod $declText = other.isInstanceOf[${aClass.name}]"
-    ScalaPsiElementFactory.createMethodWithContext(
-        text, aClass, aClass.extendsBlock)
+    ScalaPsiElementFactory
+      .createMethodWithContext(text, aClass, aClass.extendsBlock)
   }
 
   protected def createEquals(aClass: ScClass, project: Project): ScFunction = {
@@ -139,8 +145,9 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
       myEqualsFields.map(_.name).map(name => s"$name == that.$name")
     val declText = "def equals(other: Any): Boolean"
     val signature = new PhysicalSignature(
-        ScalaPsiElementFactory.createMethodWithContext(
-            declText + " = false", aClass, aClass.extendsBlock),
+        ScalaPsiElementFactory.createMethodWithContext(declText + " = false",
+                                                       aClass,
+                                                       aClass.extendsBlock),
         ScSubstitutor.empty)
     val superCheck = Option(
         if (!overridesFromJavaObject(aClass, signature)) "super.equals(that)"
@@ -155,14 +162,14 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
                  |    $checksText
                  |  case _ $arrow false
                  |}""".stripMargin.replace("\r", "")
-    ScalaPsiElementFactory.createMethodWithContext(
-        text, aClass, aClass.extendsBlock)
+    ScalaPsiElementFactory
+      .createMethodWithContext(text, aClass, aClass.extendsBlock)
   }
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     if (!CodeInsightUtilBase.prepareEditorForWrite(editor)) return
-    if (!FileDocumentManager.getInstance.requestWriting(
-            editor.getDocument, project)) return
+    if (!FileDocumentManager.getInstance.requestWriting(editor.getDocument,
+                                                        project)) return
 
     try {
       val aClass = GenerationUtil.classAtCaret(editor, file).getOrElse(return )
@@ -206,19 +213,21 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
 
   private def hasEquals(aClass: ScClass): Option[ScFunction] = {
     val method = ScalaPsiElementFactory.createMethodFromText(
-        "def equals(that: Any): Boolean", aClass.getManager)
+        "def equals(that: Any): Boolean",
+        aClass.getManager)
     findSuchMethod(aClass, "equals", method.methodType)
   }
 
   private def hasHashCode(aClass: ScClass): Option[ScFunction] = {
-    val method = ScalaPsiElementFactory.createMethodFromText(
-        "def hashCode(): Int", aClass.getManager)
+    val method = ScalaPsiElementFactory
+      .createMethodFromText("def hashCode(): Int", aClass.getManager)
     findSuchMethod(aClass, "hashCode", method.methodType)
   }
 
   private def hasCanEqual(aClass: ScClass): Option[ScFunction] = {
     val method = ScalaPsiElementFactory.createMethodFromText(
-        "def canEqual(that: Any): Boolean", aClass.getManager)
+        "def canEqual(that: Any): Boolean",
+        aClass.getManager)
     findSuchMethod(aClass, "canEqual", method.methodType)
   }
 
@@ -230,8 +239,8 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
       .find(fun => fun.methodType(None) equiv methodType)
   }
 
-  private def overrideModifier(
-      aClass: ScTemplateDefinition, signature: Signature): String = {
+  private def overrideModifier(aClass: ScTemplateDefinition,
+                               signature: Signature): String = {
     val needModifier = ScalaOIUtil
       .methodSignaturesToOverride(aClass, withSelfType = false)
       .exists {
@@ -241,8 +250,8 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
     if (needModifier) ScalaKeyword.OVERRIDE else ""
   }
 
-  private def overridesFromJavaObject(
-      aClass: ScTemplateDefinition, signature: Signature): Boolean = {
+  private def overridesFromJavaObject(aClass: ScTemplateDefinition,
+                                      signature: Signature): Boolean = {
     val methodsToOverride =
       ScalaOIUtil.methodSignaturesToOverride(aClass, withSelfType = false)
     methodsToOverride exists {

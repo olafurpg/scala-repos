@@ -26,13 +26,13 @@ object Analyse extends LilaController {
 
   def requestAnalysis(id: String) = Auth { implicit ctx => me =>
     OptionFuResult(GameRepo game id) { game =>
-      Env.fishnet.analyser(game,
-                           lila.fishnet.Work.Sender(
-                               userId = me.id.some,
-                               ip =
-                                 HTTPRequest.lastRemoteAddress(ctx.req).some,
-                               mod = isGranted(_.Hunter),
-                               system = false)) map {
+      Env.fishnet.analyser(
+          game,
+          lila.fishnet.Work.Sender(
+              userId = me.id.some,
+              ip = HTTPRequest.lastRemoteAddress(ctx.req).some,
+              mod = isGranted(_.Hunter),
+              system = false)) map {
         case true => Ok(html.analyse.computing(id))
         case false => Unauthorized
       }

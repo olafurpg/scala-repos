@@ -139,10 +139,10 @@ trait ScalatraBase
     * $ 3. Binds the current `request`, `response`, and `multiParams`, and calls
     * `executeRoutes()`.
     */
-  override def handle(
-      request: HttpServletRequest, response: HttpServletResponse): Unit = {
-    request(CookieSupport.SweetCookiesKey) = new SweetCookies(
-        request.cookies, response)
+  override def handle(request: HttpServletRequest,
+                      response: HttpServletResponse): Unit = {
+    request(CookieSupport.SweetCookiesKey) =
+      new SweetCookies(request.cookies, response)
     response.characterEncoding = Some(defaultCharacterEncoding)
     withRequestResponse(request, response) {
       executeRoutes()
@@ -231,16 +231,16 @@ trait ScalatraBase
   private[this] def cradleHalt(body: => Any, error: Throwable => Any): Any = {
     try body catch {
       case e: HaltException => {
-          try {
-            handleStatusCode(extractStatusCode(e)) match {
-              case Some(result) => renderResponse(result)
-              case _ => renderHaltException(e)
-            }
-          } catch {
-            case e: HaltException => renderHaltException(e)
-            case e: Throwable => error(e)
+        try {
+          handleStatusCode(extractStatusCode(e)) match {
+            case Some(result) => renderResponse(result)
+            case _ => renderHaltException(e)
           }
+        } catch {
+          case e: HaltException => renderHaltException(e)
+          case e: Throwable => error(e)
         }
+      }
       case e: Throwable => error(e)
     }
   }
@@ -390,8 +390,8 @@ trait ScalatraBase
     }
   }
 
-  protected def setMultiparams[S](
-      matchedRoute: Option[MatchedRoute], originalParams: MultiParams)(
+  protected def setMultiparams[S](matchedRoute: Option[MatchedRoute],
+                                  originalParams: MultiParams)(
       implicit request: HttpServletRequest): Unit = {
     val routeParams =
       matchedRoute.map(_.multiParams).getOrElse(Map.empty).map {
@@ -494,7 +494,8 @@ trait ScalatraBase
     // If an action returns Unit, it assumes responsibility for the response
     case _: Unit | Unit | null =>
     // If an action returns Unit, it assumes responsibility for the response
-    case ActionResult(ResponseStatus(404, _), _: Unit | Unit, _) => doNotFound()
+    case ActionResult(ResponseStatus(404, _), _: Unit | Unit, _) =>
+      doNotFound()
     case actionResult: ActionResult =>
       response.status = actionResult.status
       actionResult.headers.foreach {
@@ -678,9 +679,9 @@ trait ScalatraBase
   def relativeUrl(path: String,
                   params: Iterable[(String, Any)] = Iterable.empty,
                   includeContextPath: Boolean = true,
-                  includeServletPath: Boolean =
-                    true)(implicit request: HttpServletRequest,
-                          response: HttpServletResponse): String = {
+                  includeServletPath: Boolean = true)(
+      implicit request: HttpServletRequest,
+      response: HttpServletResponse): String = {
     url(path,
         params,
         includeContextPath,
@@ -805,8 +806,11 @@ trait ScalatraBase
       response: HttpServletResponse): String = {
     if (path.startsWith("http")) path
     else {
-      val p = url(
-          path, params, includeContextPath, includeServletPath, withSessionId)
+      val p = url(path,
+                  params,
+                  includeContextPath,
+                  includeServletPath,
+                  withSessionId)
       if (p.startsWith("http")) p else buildBaseUrl + ensureSlash(p)
     }
   }
@@ -827,11 +831,14 @@ trait ScalatraBase
   }
 
   def serverHost(implicit request: HttpServletRequest): String = {
-    initParameter(HostNameKey).flatMap(_.blankOption) getOrElse request.getServerName
+    initParameter(HostNameKey)
+      .flatMap(_.blankOption) getOrElse request.getServerName
   }
 
   def serverPort(implicit request: HttpServletRequest): Int = {
-    initParameter(PortKey).flatMap(_.blankOption).map(_.toInt) getOrElse request.getServerPort
+    initParameter(PortKey)
+      .flatMap(_.blankOption)
+      .map(_.toInt) getOrElse request.getServerPort
   }
 
   protected def contextPath: String = servletContext.contextPath
@@ -851,7 +858,8 @@ trait ScalatraBase
   }
 
   def environment: String = {
-    sys.props.get(EnvironmentKey) orElse initParameter(EnvironmentKey) getOrElse "DEVELOPMENT"
+    sys.props
+      .get(EnvironmentKey) orElse initParameter(EnvironmentKey) getOrElse "DEVELOPMENT"
   }
 
   /**
@@ -884,8 +892,8 @@ trait ScalatraBase
     val read = request.contains("MultiParamsRead")
     val found =
       request.get(MultiParamsKey) map
-      (_.asInstanceOf[MultiParams] ++
-          (if (read) Map.empty else request.multiParameters))
+        (_.asInstanceOf[MultiParams] ++
+              (if (read) Map.empty else request.multiParameters))
     val multi = found getOrElse request.multiParameters
     request("MultiParamsRead") = new {}
     request(MultiParamsKey) = multi

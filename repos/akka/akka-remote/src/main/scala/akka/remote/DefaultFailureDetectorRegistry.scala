@@ -75,8 +75,9 @@ class DefaultFailureDetectorRegistry[A](detectorFactory: () ⇒ FailureDetector)
 
     val oldTable = resourceToFailureDetector.get
     // if we won the race then update else try again
-    if (!resourceToFailureDetector.compareAndSet(
-            oldTable, Map.empty[A, FailureDetector])) reset() // recur
+    if (!resourceToFailureDetector
+          .compareAndSet(oldTable, Map.empty[A, FailureDetector]))
+      reset() // recur
   }
 
   /**

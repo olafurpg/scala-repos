@@ -84,7 +84,8 @@ object OAuthRequestVerifier {
 
         // Verify the signature
         val collectedParams =
-          oauthParams.filterNot(_._1 == "oauth_signature") ++ request.queryString.toSeq.flatMap {
+          oauthParams
+            .filterNot(_._1 == "oauth_signature") ++ request.queryString.toSeq.flatMap {
             case (key, values) => values.map(value => key -> value)
           }
         // If the body is form URL encoded, must include body parameters
@@ -131,8 +132,8 @@ object OAuthRequestVerifier {
     val signingKey =
       s"${percentEncode(consumerSecret)}&${percentEncode(tokenSecret)}"
 
-    val keySpec = new SecretKeySpec(
-        signingKey.getBytes("US-ASCII"), "HmacSHA1")
+    val keySpec =
+      new SecretKeySpec(signingKey.getBytes("US-ASCII"), "HmacSHA1")
     val mac = Mac.getInstance("HmacSHA1")
     mac.init(keySpec)
     val signature = mac.doFinal(signatureBaseString.getBytes("US-ASCII"))

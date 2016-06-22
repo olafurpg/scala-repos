@@ -56,12 +56,12 @@ abstract class ScalaObjectEvaluationTestBase extends ScalaDebuggerTestCase {
       waitForBreakpoint()
       evalStartsWith("Simple", "Simple$")
       evalStartsWith("qual.Simple", "qual.Simple$")
-      evalStartsWith(
-          "collection.JavaConversions", "scala.collection.JavaConversions$")
+      evalStartsWith("collection.JavaConversions",
+                     "scala.collection.JavaConversions$")
       evalEquals("qual.SimpleCaseClass", "SimpleCaseClass")
       evalStartsWith("qual.StableInner.Inner", "qual.StableInner$Inner$")
-      evalStartsWith(
-          "val x = new qual.ClassInner(); x.Inner", "qual.ClassInner$Inner$")
+      evalStartsWith("val x = new qual.ClassInner(); x.Inner",
+                     "qual.ClassInner$Inner$")
     }
   }
 

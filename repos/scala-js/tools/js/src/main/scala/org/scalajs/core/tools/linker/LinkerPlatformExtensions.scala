@@ -32,8 +32,10 @@ trait LinkerPlatformExtensions {
                                       withSourceMap,
                                       frontendConfig,
                                       optOptimizerFactory)
-    val backend = new BasicLinkerBackend(
-        semantics, outputMode, withSourceMap, backendConfig)
+    val backend = new BasicLinkerBackend(semantics,
+                                         outputMode,
+                                         withSourceMap,
+                                         backendConfig)
     new Linker(frontend, backend)
   }
 }

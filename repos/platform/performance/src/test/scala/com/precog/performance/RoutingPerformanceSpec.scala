@@ -95,10 +95,12 @@ trait RoutingPerformanceSpec extends Specification with PerformanceSpec {
                          Duration(60, "seconds"),
                          new Timeout(60000),
                          ExecutionContext.defaultExecutionContext(system))
-        system.actorOf(
-            Props(new BatchStoreActor(
-                    eventStore, 1000, Some(ingestActor), system.scheduler)),
-            "router")
+        system.actorOf(Props(
+                           new BatchStoreActor(eventStore,
+                                               1000,
+                                               Some(ingestActor),
+                                               system.scheduler)),
+                       "router")
       }
 
       def testIngest() = {

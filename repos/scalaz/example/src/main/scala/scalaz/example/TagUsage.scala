@@ -71,7 +71,8 @@ object TagUsage extends App {
   // Tags have an unwrap method which converts the value back to a untagged type:
   assert(Disjunction.unwrap(Disjunction(true)) === true)
   assert(
-      Conjunction.unwrap(Conjunction.subst(List(false, true, false)).suml) === false)
+      Conjunction
+        .unwrap(Conjunction.subst(List(false, true, false)).suml) === false)
 
   // Some other Tags in scalaz:
 

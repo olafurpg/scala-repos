@@ -37,7 +37,8 @@ abstract class BinaryInput {
   private val chunk = Array.ofDim[Byte](chunkSize)
 
   protected def getArrayByChunk[T <: AnyVal: ClassTag](
-      offset: Long, eltSize: Int): Array[T] = {
+      offset: Long,
+      eltSize: Int): Array[T] = {
     val size = getIntWithLookahead
     val array = Array.ofDim[T](size)
     var toCopy = size * eltSize
@@ -45,8 +46,11 @@ abstract class BinaryInput {
     while (toCopy > 0) {
       val byteLen = math.min(chunkSize, toCopy)
       getBytes(chunk, byteLen)
-      UnsafeMemory.unsafe.copyMemory(
-          chunk, UnsafeMemory.byteArrayOffset, array, destOffset, byteLen)
+      UnsafeMemory.unsafe.copyMemory(chunk,
+                                     UnsafeMemory.byteArrayOffset,
+                                     array,
+                                     destOffset,
+                                     byteLen)
       toCopy -= byteLen
       destOffset += byteLen
     }
@@ -199,12 +203,16 @@ class ByteArrayInput(data: Array[Byte]) extends BinaryInput {
 
   //override array for faster copy (get rid of ckunk)
   override protected def getArrayByChunk[T <: AnyVal: ClassTag](
-      offset: Long, eltSize: Int): Array[T] = {
+      offset: Long,
+      eltSize: Int): Array[T] = {
     val size = getIntWithLookahead
     val array = Array.ofDim[T](size)
     var toCopy = size * eltSize
-    UnsafeMemory.unsafe.copyMemory(
-        data, UnsafeMemory.byteArrayOffset + idx, array, offset, toCopy)
+    UnsafeMemory.unsafe.copyMemory(data,
+                                   UnsafeMemory.byteArrayOffset + idx,
+                                   array,
+                                   offset,
+                                   toCopy)
     idx += toCopy
     array
   }

@@ -28,16 +28,16 @@ object BundleDelegatingClassLoader {
   def apply(
       context: BundleContext,
       fallBackCLassLoader: Option[ClassLoader]): BundleDelegatingClassLoader =
-    new BundleDelegatingClassLoader(
-        context.getBundle, fallBackCLassLoader.orNull)
+    new BundleDelegatingClassLoader(context.getBundle,
+                                    fallBackCLassLoader.orNull)
 }
 
 /*
  * A bundle delegating ClassLoader implementation - this will try to load classes and resources from the bundle
  * and the bundles transitive dependencies. If there's a ClassLoader specified, that will be used as a fallback.
  */
-class BundleDelegatingClassLoader(
-    bundle: Bundle, fallBackClassLoader: ClassLoader)
+class BundleDelegatingClassLoader(bundle: Bundle,
+                                  fallBackClassLoader: ClassLoader)
     extends ClassLoader(fallBackClassLoader) {
 
   private val bundles = findTransitiveBundles(bundle).toList

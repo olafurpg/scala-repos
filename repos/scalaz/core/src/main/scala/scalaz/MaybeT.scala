@@ -24,8 +24,8 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) { self =>
           Foldable[Maybe].foldRight[A, Z](a, b)(f))
   }
 
-  def traverse[G[_], B](f: A => G[B])(
-      implicit F: Traverse[F], G: Applicative[G]): G[MaybeT[F, B]] = {
+  def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F],
+                                      G: Applicative[G]): G[MaybeT[F, B]] = {
     G.map(F.traverse(run)(o => Traverse[Maybe].traverse(o)(f)))(MaybeT.apply)
   }
 
@@ -36,8 +36,7 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) { self =>
     * both `F`s.  It is not compatible with `Monad#bind`.
     */
   def app[B](f: => MaybeT[F, A => B])(implicit F: Apply[F]): MaybeT[F, B] =
-    MaybeT(
-        F.apply2(f.run, run) {
+    MaybeT(F.apply2(f.run, run) {
       case (ff, aa) => maybeInstance.ap(aa)(ff)
     })
 
@@ -115,8 +114,8 @@ sealed abstract class MaybeTInstances1 extends MaybeTInstances2 {
       implicit def F: Foldable[F] = F0
     }
 
-  implicit def maybeTBindRec[F[_]](
-      implicit F0: BindRec[F], F1: Monad[F]): BindRec[MaybeT[F, ?]] =
+  implicit def maybeTBindRec[F[_]](implicit F0: BindRec[F],
+                                   F1: Monad[F]): BindRec[MaybeT[F, ?]] =
     new MaybeTBindRec[F] {
       implicit def B: BindRec[F] = F0
       implicit def F: Monad[F] = F1

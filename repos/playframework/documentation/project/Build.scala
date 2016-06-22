@@ -17,7 +17,8 @@ object ApplicationBuild extends Build {
     .enablePlugins(PlayDocsPlugin)
     .disablePlugins(PlayEnhancer)
     .settings(
-        resolvers += Resolver.sonatypeRepo("releases"), // TODO: Delete this eventually, just needed for lag between deploying to sonatype and getting on maven central
+        resolvers += Resolver
+          .sonatypeRepo("releases"), // TODO: Delete this eventually, just needed for lag between deploying to sonatype and getting on maven central
         version := PlayVersion.current,
         libraryDependencies ++= Seq(
             "org.mockito" % "mockito-core" % "1.9.5" % "test"
@@ -25,12 +26,13 @@ object ApplicationBuild extends Build {
         PlayDocsKeys.docsJarFile :=
           Some((packageBin in (playDocs, Compile)).value),
         PlayDocsKeys.playDocsValidationConfig :=
-          PlayDocsValidation.ValidationConfig(downstreamWikiPages = Set(
-                "ScalaAnorm",
-                "PlaySlickMigrationGuide",
-                "ScalaTestingWithScalaTest",
-                "ScalaFunctionalTestingWithScalaTest"
-            )),
+          PlayDocsValidation.ValidationConfig(
+              downstreamWikiPages = Set(
+                  "ScalaAnorm",
+                  "PlaySlickMigrationGuide",
+                  "ScalaTestingWithScalaTest",
+                  "ScalaFunctionalTestingWithScalaTest"
+              )),
         PlayDocsKeys.javaManualSourceDirectories :=
           (baseDirectory.value / "manual" / "working" / "javaGuide" ** "code").get,
         PlayDocsKeys.scalaManualSourceDirectories :=

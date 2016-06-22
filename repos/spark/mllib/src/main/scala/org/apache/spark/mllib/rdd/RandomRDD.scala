@@ -75,8 +75,8 @@ private[mllib] class RandomVectorRDD(
   require(math.ceil(size.toDouble / numPartitions) <= Int.MaxValue,
           "Partition size cannot exceed Int.MaxValue")
 
-  override def compute(
-      splitIn: Partition, context: TaskContext): Iterator[Vector] = {
+  override def compute(splitIn: Partition,
+                       context: TaskContext): Iterator[Vector] = {
     val split = splitIn.asInstanceOf[RandomRDDPartition[Double]]
     RandomRDD.getVectorIterator(split, vectorSize)
   }
@@ -100,8 +100,8 @@ private[mllib] object RandomRDD {
     val random = new Random(seed)
     while (i < numPartitions) {
       end = ((i + 1) * size) / numPartitions
-      partitions(i) = new RandomRDDPartition(
-          i, (end - start).toInt, rng, random.nextLong())
+      partitions(i) =
+        new RandomRDDPartition(i, (end - start).toInt, rng, random.nextLong())
       start = end
       i += 1
     }

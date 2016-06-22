@@ -4,7 +4,9 @@ object CompoundTypeUnapply {
   }
 
   "text" match {
-    case Length(length) => /*start*/ length /*end*/
+    case Length(length) =>
+      /*start*/
+      length /*end*/
   }
 }
 //Int

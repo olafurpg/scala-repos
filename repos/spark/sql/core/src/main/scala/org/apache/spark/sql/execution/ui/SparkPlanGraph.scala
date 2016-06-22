@@ -32,8 +32,8 @@ import org.apache.spark.sql.execution.metric.SQLMetrics
   * Each graph is defined with a set of nodes and a set of edges. Each node represents a node in the
   * SparkPlan tree, and each edge represents a parent-child relationship between two nodes.
   */
-private[ui] case class SparkPlanGraph(
-    nodes: Seq[SparkPlanGraphNode], edges: Seq[SparkPlanGraphEdge]) {
+private[ui] case class SparkPlanGraph(nodes: Seq[SparkPlanGraphNode],
+                                      edges: Seq[SparkPlanGraphEdge]) {
 
   def makeDotFile(metrics: Map[Long, String]): String = {
     val dotFile = new StringBuilder
@@ -65,8 +65,13 @@ private[sql] object SparkPlanGraph {
     val nodes = mutable.ArrayBuffer[SparkPlanGraphNode]()
     val edges = mutable.ArrayBuffer[SparkPlanGraphEdge]()
     val exchanges = mutable.HashMap[SparkPlanInfo, SparkPlanGraphNode]()
-    buildSparkPlanGraphNode(
-        planInfo, nodeIdGenerator, nodes, edges, null, null, exchanges)
+    buildSparkPlanGraphNode(planInfo,
+                            nodeIdGenerator,
+                            nodes,
+                            edges,
+                            null,
+                            null,
+                            exchanges)
     new SparkPlanGraph(nodes, edges)
   }
 
@@ -103,8 +108,13 @@ private[sql] object SparkPlanGraph {
                                 exchanges)
       case "Subquery" if subgraph != null =>
         // Subquery should not be included in WholeStageCodegen
-        buildSparkPlanGraphNode(
-            planInfo, nodeIdGenerator, nodes, edges, parent, null, exchanges)
+        buildSparkPlanGraphNode(planInfo,
+                                nodeIdGenerator,
+                                nodes,
+                                edges,
+                                parent,
+                                null,
+                                exchanges)
       case "ReusedExchange" =>
         // Point to the re-used exchange
         val node = exchanges(planInfo.children.head)
@@ -132,8 +142,14 @@ private[sql] object SparkPlanGraph {
         if (parent != null) {
           edges += SparkPlanGraphEdge(node.id, parent.id)
         }
-        planInfo.children.foreach(buildSparkPlanGraphNode(
-                _, nodeIdGenerator, nodes, edges, node, subgraph, exchanges))
+        planInfo.children.foreach(
+            buildSparkPlanGraphNode(_,
+                                    nodeIdGenerator,
+                                    nodes,
+                                    edges,
+                                    node,
+                                    subgraph,
+                                    exchanges))
     }
   }
 }

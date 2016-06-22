@@ -30,8 +30,7 @@ case class InvalidThriftConnectionException() extends ServiceException {
 class ValidateThriftService(
     self: Service[ThriftClientRequest, Array[Byte]],
     protocolFactory: TProtocolFactory
-)
-    extends ServiceProxy[ThriftClientRequest, Array[Byte]](self) {
+) extends ServiceProxy[ThriftClientRequest, Array[Byte]](self) {
   @volatile private[this] var isValid = true
 
   override def apply(req: ThriftClientRequest) =

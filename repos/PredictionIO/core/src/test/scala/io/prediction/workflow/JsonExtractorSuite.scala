@@ -31,38 +31,38 @@ class JsonExtractorSuite extends FunSuite with Matchers {
 
   test(
       "Extract Scala object using option Json4sNative works with optional and default value " +
-      "provided") {
+        "provided") {
 
     val json =
       """{"string": "query string", "optional": "optional string", "default": "d"}"""
 
-    val query = JsonExtractor.extract(
-        JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
+    val query = JsonExtractor
+      .extract(JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
 
     query should be(ScalaQuery("query string", Some("optional string"), "d"))
   }
 
   test(
       "Extract Scala object using option Json4sNative works with no optional and no default " +
-      "value provided") {
+        "value provided") {
 
     val json = """{"string": "query string"}"""
 
-    val query = JsonExtractor.extract(
-        JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
+    val query = JsonExtractor
+      .extract(JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
 
     query should be(ScalaQuery("query string", None, "default"))
   }
 
   test(
       "Extract Scala object using option Json4sNative works with null optional and null default" +
-      " value") {
+        " value") {
 
     val json =
       """{"string": "query string", "optional": null, "default": null}"""
 
-    val query = JsonExtractor.extract(
-        JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
+    val query = JsonExtractor
+      .extract(JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
 
     query should be(ScalaQuery("query string", None, "default"))
   }
@@ -73,20 +73,20 @@ class JsonExtractorSuite extends FunSuite with Matchers {
     val json =
       """{"string": "query string", "optional": "optional string", "default": "d"}"""
 
-    val query = JsonExtractor.extract(
-        JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
+    val query = JsonExtractor
+      .extract(JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
 
     query should be(ScalaQuery("query string", Some("optional string"), "d"))
   }
 
   test(
       "Extract Scala object using option Both works with no optional and no default value " +
-      "provided") {
+        "provided") {
 
     val json = """{"string": "query string"}"""
 
-    val query = JsonExtractor.extract(
-        JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
+    val query = JsonExtractor
+      .extract(JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
 
     query should be(ScalaQuery("query string", None, "default"))
   }
@@ -97,32 +97,33 @@ class JsonExtractorSuite extends FunSuite with Matchers {
     val json =
       """{"string": "query string", "optional": null, "default": null}"""
 
-    val query = JsonExtractor.extract(
-        JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
+    val query = JsonExtractor
+      .extract(JsonExtractorOption.Json4sNative, json, classOf[ScalaQuery])
 
     query should be(ScalaQuery("query string", None, "default"))
   }
 
   test(
       "Extract Scala object using option Gson should not get default value and optional none" +
-      " value") {
+        " value") {
 
     val json = """{"string": "query string"}"""
-    val query = JsonExtractor.extract(
-        JsonExtractorOption.Gson, json, classOf[ScalaQuery])
+    val query = JsonExtractor
+      .extract(JsonExtractorOption.Gson, json, classOf[ScalaQuery])
 
     query should be(ScalaQuery("query string", null, null))
   }
 
   test(
       "Extract Scala object using option Gson should throw an exception with optional " +
-      "value provided") {
+        "value provided") {
 
     val json =
       """{"string": "query string", "optional": "o", "default": "d"}"""
     intercept[RuntimeException] {
-      JsonExtractor.extract(
-          JsonExtractorOption.Gson, json, classOf[ScalaQuery])
+      JsonExtractor.extract(JsonExtractorOption.Gson,
+                            json,
+                            classOf[ScalaQuery])
     }
   }
 
@@ -309,7 +310,8 @@ class JsonExtractorSuite extends FunSuite with Matchers {
                      ("algo2", AlgorithmParams("parameter2")))
     val json = JsonExtractor.paramsToJson(JsonExtractorOption.Both, params)
 
-    json should be(org.json4s.native.Serialization
+    json should be(
+        org.json4s.native.Serialization
           .write(params)(Utils.json4sDefaultFormats))
   }
 
@@ -319,7 +321,8 @@ class JsonExtractorSuite extends FunSuite with Matchers {
     val json =
       JsonExtractor.paramsToJson(JsonExtractorOption.Json4sNative, params)
 
-    json should be(org.json4s.native.Serialization
+    json should be(
+        org.json4s.native.Serialization
           .write(params)(Utils.json4sDefaultFormats))
   }
 
@@ -333,17 +336,17 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Serializing Scala EngineParams works using option Json4sNative") {
-    val ep =
-      new EngineParams(dataSourceParams = ("ds", DataSourceParams("dsp")),
-                       algorithmParamsList =
-                         Seq(("a0", AlgorithmParams("ap"))))
+    val ep = new EngineParams(dataSourceParams =
+                                ("ds", DataSourceParams("dsp")),
+                              algorithmParamsList =
+                                Seq(("a0", AlgorithmParams("ap"))))
 
     val json =
       JsonExtractor.engineParamsToJson(JsonExtractorOption.Json4sNative, ep)
 
     json should be(
         """{"dataSourceParams":{"ds":{"a":"dsp"}},"preparatorParams":{"":{}},""" +
-        """"algorithmParamsList":[{"a0":{"a":"ap"}}],"servingParams":{"":{}}}""")
+          """"algorithmParamsList":[{"a0":{"a":"ap"}}],"servingParams":{"":{}}}""")
   }
 
   test("Serializing Java EngineParams works using option Gson") {
@@ -356,7 +359,7 @@ class JsonExtractorSuite extends FunSuite with Matchers {
 
     json should be(
         """{"dataSourceParams":{"ds":{"p":"dsp"}},"preparatorParams":{"":{}},""" +
-        """"algorithmParamsList":[{"a0":{"p":"ap"}},{"a1":{"p":"ap2"}}],"servingParams":{"":{}}}""")
+          """"algorithmParamsList":[{"a0":{"p":"ap"}},{"a1":{"p":"ap2"}}],"servingParams":{"":{}}}""")
   }
 
   test("Serializing Java EngineParams works using option Both") {
@@ -369,7 +372,7 @@ class JsonExtractorSuite extends FunSuite with Matchers {
 
     json should be(
         """{"dataSourceParams":{"ds":{"p":"dsp"}},"preparatorParams":{"":{}},""" +
-        """"algorithmParamsList":[{"a0":{"p":"ap"}},{"a1":{"p":"ap2"}}],"servingParams":{"":{}}}""")
+          """"algorithmParamsList":[{"a0":{"p":"ap"}},{"a1":{"p":"ap2"}}],"servingParams":{"":{}}}""")
   }
 }
 
@@ -377,15 +380,17 @@ private case class AlgorithmParams(a: String) extends Params
 
 private case class DataSourceParams(a: String) extends Params
 
-private case class ScalaQuery(
-    string: String, optional: Option[String], default: String = "default")
+private case class ScalaQuery(string: String,
+                              optional: Option[String],
+                              default: String = "default")
 
 private class UpperCaseFormat
     extends CustomSerializer[ScalaQuery](format =>
           ({
-        case JObject(JField("string", JString(string)) :: JField(
-            "optional", JString(optional)) :: JField(
-            "default", JString(default)) :: Nil) =>
+        case JObject(
+            JField("string", JString(string)) :: JField(
+            "optional",
+            JString(optional)) :: JField("default", JString(default)) :: Nil) =>
           ScalaQuery(string.toUpperCase,
                      Some(optional.toUpperCase),
                      default.toUpperCase)

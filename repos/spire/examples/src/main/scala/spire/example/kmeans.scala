@@ -19,11 +19,11 @@ object KMeansExample extends App {
     * Returns a collection of k points which are the centers of k clusters of
     * `points0`.
     */
-  def kMeans[V, @sp(Double) A, CC[V] <: Iterable[V]](
-      points0: CC[V], k: Int)(implicit vs: NormedVectorSpace[V, A],
-                              order: Order[A],
-                              cbf: CanBuildFrom[Nothing, V, CC[V]],
-                              ct: ClassTag[V]): CC[V] = {
+  def kMeans[V, @sp(Double) A, CC[V] <: Iterable[V]](points0: CC[V], k: Int)(
+      implicit vs: NormedVectorSpace[V, A],
+      order: Order[A],
+      cbf: CanBuildFrom[Nothing, V, CC[V]],
+      ct: ClassTag[V]): CC[V] = {
 
     val points = points0.toArray
 

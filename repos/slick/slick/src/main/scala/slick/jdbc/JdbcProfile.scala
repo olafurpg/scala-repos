@@ -110,7 +110,8 @@ trait JdbcProfile
   def runSynchronousQuery[R](tree: Node, param: Any)(
       implicit session: Backend#Session): R = tree match {
     case rsm @ ResultSetMapping(_, _, CompiledMapping(_, elemType)) :@ CollectionType(
-        cons, el) =>
+        cons,
+        el) =>
       val b = cons.createBuilder(el.classTag).asInstanceOf[Builder[Any, R]]
       createQueryInvoker[Any](rsm, param, null).foreach({ x =>
         b += x

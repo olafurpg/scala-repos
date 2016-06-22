@@ -113,8 +113,8 @@ class ZkNodeChangeNotificationListener(
     * @param now
     * @param notifications
     */
-  private def purgeObsoleteNotifications(
-      now: Long, notifications: Seq[String]) {
+  private def purgeObsoleteNotifications(now: Long,
+                                         notifications: Seq[String]) {
     for (notification <- notifications.sorted) {
       val notificationNode = seqNodeRoot + "/" + notification
       val (data, stat) = zkUtils.readDataMaybeNull(notificationNode)
@@ -135,8 +135,8 @@ class ZkNodeChangeNotificationListener(
     * A listener that gets invoked when a node is created to notify changes.
     */
   object NodeChangeListener extends IZkChildListener {
-    override def handleChildChange(
-        path: String, notifications: java.util.List[String]) {
+    override def handleChildChange(path: String,
+                                   notifications: java.util.List[String]) {
       try {
         import scala.collection.JavaConverters._
         if (notifications != null)

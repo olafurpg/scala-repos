@@ -62,8 +62,8 @@ trait SecurityDirectives {
   def authenticateBasic[T](
       realm: String,
       authenticator: Authenticator[T]): AuthenticationDirective[T] =
-    authenticateBasicAsync(
-        realm, cred ⇒ FastFuture.successful(authenticator(cred)))
+    authenticateBasicAsync(realm, cred ⇒
+          FastFuture.successful(authenticator(cred)))
 
   /**
     * Wraps the inner route with Http Basic authentication support.
@@ -117,8 +117,8 @@ trait SecurityDirectives {
   def authenticateOAuth2[T](
       realm: String,
       authenticator: Authenticator[T]): AuthenticationDirective[T] =
-    authenticateOAuth2Async(
-        realm, cred ⇒ FastFuture.successful(authenticator(cred)))
+    authenticateOAuth2Async(realm, cred ⇒
+          FastFuture.successful(authenticator(cred)))
 
   /**
     * A directive that wraps the inner route with OAuth2 Bearer Token authentication support.

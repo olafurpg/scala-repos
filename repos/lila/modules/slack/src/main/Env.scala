@@ -17,8 +17,8 @@ final class Env(config: Config,
 
   lazy val api = new SlackApi(client, getLightUser)
 
-  private lazy val client = new SlackClient(
-      url = IncomingUrl, defaultChannel = IncomingDefaultChannel)
+  private lazy val client =
+    new SlackClient(url = IncomingUrl, defaultChannel = IncomingDefaultChannel)
 
   system.actorOf(Props(new Actor {
     override def preStart() {

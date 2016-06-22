@@ -14,8 +14,8 @@ import scala.reflect.ClassTag
 private[twitter] object ThriftUtil {
   private type BinaryService = Service[Array[Byte], Array[Byte]]
 
-  private val thriftFinagleClientParamTypes = Seq(
-      classOf[Service[_, _]], classOf[TProtocolFactory])
+  private val thriftFinagleClientParamTypes =
+    Seq(classOf[Service[_, _]], classOf[TProtocolFactory])
 
   private val scrooge2FinagleClientParamTypes = Seq(classOf[Service[_, _]],
                                                     classOf[TProtocolFactory],
@@ -44,16 +44,17 @@ private[twitter] object ThriftUtil {
       cls <- findClass1(name)
     } yield cls.asInstanceOf[Class[A]]
 
-  def findConstructor[A](
-      clz: Class[A], paramTypes: Class[_]*): Option[Constructor[A]] =
+  def findConstructor[A](clz: Class[A],
+                         paramTypes: Class[_]*): Option[Constructor[A]] =
     try {
       Some(clz.getConstructor(paramTypes: _*))
     } catch {
       case _: NoSuchMethodException => None
     }
 
-  def findMethod(
-      clz: Class[_], name: String, params: Class[_]*): Option[Method] =
+  def findMethod(clz: Class[_],
+                 name: String,
+                 params: Class[_]*): Option[Method] =
     try Some(clz.getMethod(name, params: _*)) catch {
       case _: NoSuchMethodException => None
     }
@@ -112,8 +113,8 @@ private[twitter] object ThriftUtil {
                    clientCls,
                    scrooge3FinagleClientWithRepClassifierParamTypes: _*)
       } yield
-        cons.newInstance(
-            underlying, protocolFactory, "", sr, responseClassifier)
+        cons
+          .newInstance(underlying, protocolFactory, "", sr, responseClassifier)
 
     def tryScrooge3FinagledClient: Option[Iface] =
       for {
@@ -184,8 +185,8 @@ private[twitter] object ThriftUtil {
                                 classOf[StatsReceiver],
                                 Integer.TYPE)
         val newParameters = oldParameters :+ classOf[String]
-        val oldArgs = Seq(
-            impl, protocolFactory, stats, Int.box(maxThriftBufferSize))
+        val oldArgs =
+          Seq(impl, protocolFactory, stats, Int.box(maxThriftBufferSize))
         val newArgs = oldArgs :+ label
         def newConsCall: Option[BinaryService] =
           findConstructor(serviceCls, newParameters: _*).map(
@@ -220,9 +221,9 @@ private[twitter] object ThriftUtil {
     def tryClass(cls: Class[_]): Option[BinaryService] =
       tryThriftFinagleService(cls) orElse tryScroogeFinagleService(cls) orElse tryLegacyScroogeFinagleService(
           cls) orElse trySwiftService(cls) orElse
-      (Option(cls.getSuperclass) ++ cls.getInterfaces).view
-        .flatMap(tryClass)
-        .headOption
+        (Option(cls.getSuperclass) ++ cls.getInterfaces).view
+          .flatMap(tryClass)
+          .headOption
 
     tryClass(impl.getClass).getOrElse {
       throw new IllegalArgumentException(
@@ -361,8 +362,8 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
   /**
     * $clientUse
     */
-  @deprecated(
-      "Use destination names via newIface(String) or newIface(Name)", "6.7.x")
+  @deprecated("Use destination names via newIface(String) or newIface(Name)",
+              "6.7.x")
   def newIface[Iface: ClassTag](group: Group[SocketAddress]): Iface = {
     val cls = implicitly[ClassTag[Iface]].runtimeClass
     newIface[Iface](group, cls)
@@ -371,8 +372,8 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
   /**
     * $clientUse
     */
-  @deprecated(
-      "Use destination names via newIface(String) or newIface(Name)", "6.7.x")
+  @deprecated("Use destination names via newIface(String) or newIface(Name)",
+              "6.7.x")
   def newIface[Iface](group: Group[SocketAddress], cls: Class[_]): Iface =
     group match {
       case LabelledGroup(g, label) => newIface(Name.fromGroup(g), label, cls)

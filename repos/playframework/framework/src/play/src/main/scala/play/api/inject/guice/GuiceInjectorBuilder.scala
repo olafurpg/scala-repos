@@ -76,8 +76,8 @@ abstract class GuiceBuilder[Self] protected (environment: Environment,
   final def configure(conf: (String, Any)*): Self =
     configure(conf.toMap)
 
-  private def withBinderOption(
-      opt: BinderOption, enabled: Boolean = false): Self = {
+  private def withBinderOption(opt: BinderOption,
+                               enabled: Boolean = false): Self = {
     copyBuilder(
         binderOptions =
           if (enabled) binderOptions + opt
@@ -172,8 +172,9 @@ abstract class GuiceBuilder[Self] protected (environment: Environment,
     val bindingModules =
       GuiceableModule.guiced(environment, configuration, binderOptions)(
           enabledModules) :+ injectorModule
-    val overrideModules = GuiceableModule.guiced(
-        environment, configuration, binderOptions)(overrides)
+    val overrideModules =
+      GuiceableModule.guiced(environment, configuration, binderOptions)(
+          overrides)
     GuiceModules
       .`override`(bindingModules.asJava)
       .`with`(overrideModules.asJava)
@@ -196,12 +197,12 @@ abstract class GuiceBuilder[Self] protected (environment: Environment,
         e.getCause match {
           case p: PlayException => throw p
           case _ => {
-              e.getErrorMessages.asScala.foreach(_.getCause match {
-                case p: PlayException => throw p
-                case _ => // do nothing
-              })
-              throw e
-            }
+            e.getErrorMessages.asScala.foreach(_.getCause match {
+              case p: PlayException => throw p
+              case _ => // do nothing
+            })
+            throw e
+          }
         }
     }
   }
@@ -318,8 +319,9 @@ object GuiceableModule extends GuiceableModuleConversions {
   /**
     * Apply GuiceableModules to create Guice modules.
     */
-  def guiced(
-      env: Environment, conf: Configuration, binderOptions: Set[BinderOption])(
+  def guiced(env: Environment,
+             conf: Configuration,
+             binderOptions: Set[BinderOption])(
       builders: Seq[GuiceableModule]): Seq[GuiceModule] =
     builders flatMap { module =>
       module.guiced(env, conf, binderOptions)
@@ -381,8 +383,9 @@ trait GuiceableModuleConversions {
     * Convert the given Play module to a Guice module.
     */
   def guice(
-      env: Environment, conf: Configuration, binderOptions: Set[BinderOption])(
-      module: PlayModule): GuiceModule =
+      env: Environment,
+      conf: Configuration,
+      binderOptions: Set[BinderOption])(module: PlayModule): GuiceModule =
     guice(module.bindings(env, conf), binderOptions)
 
   /**
@@ -412,7 +415,7 @@ trait GuiceableModuleConversions {
             case (Some(scope), true) =>
               throw new GuiceLoadException(
                   "A binding must either declare a scope or be eager: " +
-                  binding)
+                    binding)
             case _ => // do nothing
           }
         }

@@ -42,7 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class Dimension2DSpec
     extends SimpleSFXDelegateSpec[jfxg.Dimension2D, Dimension2D](
-        classOf[jfxg.Dimension2D], classOf[Dimension2D]) {
+        classOf[jfxg.Dimension2D],
+        classOf[Dimension2D]) {
 
   override protected def getScalaClassInstance = new Dimension2D(0, 0)
 

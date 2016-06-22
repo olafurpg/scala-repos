@@ -77,8 +77,9 @@ object Output {
   def lastLines(key: ScopedKey[_], mgr: Streams): Seq[String] =
     lastLines(key, mgr, None)
 
-  def lastLines(
-      key: ScopedKey[_], mgr: Streams, sid: Option[String]): Seq[String] =
+  def lastLines(key: ScopedKey[_],
+                mgr: Streams,
+                sid: Option[String]): Seq[String] =
     mgr.use(key) { s =>
       // Workaround for #1155 - Keys.streams are always scoped by the task they're included in
       // but are keyed by the Keys.streams key.  I think this isn't actually a workaround, but

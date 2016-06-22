@@ -190,8 +190,8 @@ private class DoneAccumulator[+A](future: Future[A])
   }
 }
 
-private class FlattenedAccumulator[-E, +A](
-    future: Future[Accumulator[E, A]])(implicit materializer: Materializer)
+private class FlattenedAccumulator[-E, +A](future: Future[Accumulator[E, A]])(
+    implicit materializer: Materializer)
     extends SinkAccumulator[E, A](Accumulator.futureToSink(future)) {
 
   override def run(source: Source[E, _])(
@@ -212,7 +212,8 @@ object Accumulator {
     Sink.asPublisher[E](fanout = false).mapMaterializedValue { publisher =>
       future.recover {
         case error =>
-          new SinkAccumulator(Sink
+          new SinkAccumulator(
+              Sink
                 .cancelled[E]
                 .mapMaterializedValue(_ => Future.failed(error)))
       }.flatMap { accumulator =>

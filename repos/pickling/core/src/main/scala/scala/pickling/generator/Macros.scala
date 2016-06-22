@@ -20,25 +20,24 @@ private[pickling] trait PicklingMacros
   // TODO - We should have more customization than this
   val handleCaseClassSubclasses = !configOption(
       typeOf[IsIgnoreCaseClassSubclasses])
-  val generator =
-    if (isStaticOnly) {
-      // TODO - should we consider externalizable "safe" or "static only" since we know it's externalizable at compile time?
-      PicklingAlgorithm.aggregate(
-          Seq(new CaseClassPickling(allowReflection = false,
-                                    careAboutSubclasses =
-                                      handleCaseClassSubclasses),
-              AdtPickling,
-              ScalaSingleton))
-    } else {
-      PicklingAlgorithm.aggregate(
-          Seq(new CaseClassPickling(allowReflection = true,
-                                    careAboutSubclasses =
-                                      handleCaseClassSubclasses),
-              AdtPickling,
-              ScalaSingleton,
-              new ExternalizablePickling,
-              WillRobinsonPickling))
-    }
+  val generator = if (isStaticOnly) {
+    // TODO - should we consider externalizable "safe" or "static only" since we know it's externalizable at compile time?
+    PicklingAlgorithm.aggregate(
+        Seq(new CaseClassPickling(allowReflection = false,
+                                  careAboutSubclasses =
+                                    handleCaseClassSubclasses),
+            AdtPickling,
+            ScalaSingleton))
+  } else {
+    PicklingAlgorithm.aggregate(
+        Seq(new CaseClassPickling(allowReflection = true,
+                                  careAboutSubclasses =
+                                    handleCaseClassSubclasses),
+            AdtPickling,
+            ScalaSingleton,
+            new ExternalizablePickling,
+            WillRobinsonPickling))
+  }
 
   object logger extends AlgorithmLogger {
     def warn(msg: String): Unit = c.warning(c.enclosingPosition, msg)
@@ -101,8 +100,8 @@ private[pickling] trait PicklingMacros
         }
       tree2 match {
         case None =>
-          c.error(
-              c.enclosingPosition, s"Failed to generate unpickler for $tpe")
+          c.error(c.enclosingPosition,
+                  s"Failed to generate unpickler for $tpe")
           ???
         case Some(tree) =>
           //System.err.println(s" --=== $tpe ===--\n$tree\n --=== / $tpe ===--")

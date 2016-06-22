@@ -481,5 +481,5 @@ class StringPropertySpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   it should "support concatenation starting with nulls/primitives/strings" is
-  (pending)
+    (pending)
 }

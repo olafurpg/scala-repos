@@ -39,8 +39,8 @@ private[collection] final class INode[K, V](bn: MainNode[K, V], g: Gen)
     else GCAS_Complete(m, ct)
   }
 
-  @tailrec private def GCAS_Complete(
-      m: MainNode[K, V], ct: TrieMap[K, V]): MainNode[K, V] =
+  @tailrec private def GCAS_Complete(m: MainNode[K, V],
+                                     ct: TrieMap[K, V]): MainNode[K, V] =
     if (m eq null) null
     else {
       // complete the GCAS
@@ -74,8 +74,9 @@ private[collection] final class INode[K, V](bn: MainNode[K, V], g: Gen)
       }
     }
 
-  def GCAS(
-      old: MainNode[K, V], n: MainNode[K, V], ct: TrieMap[K, V]): Boolean = {
+  def GCAS(old: MainNode[K, V],
+           n: MainNode[K, V],
+           ct: TrieMap[K, V]): Boolean = {
     n.WRITE_PREV(old)
     if (CAS(old, n)) {
       GCAS_Complete(n, ct)
@@ -137,11 +138,15 @@ private[collection] final class INode[K, V](bn: MainNode[K, V], g: Gen)
                 GCAS(cn, cn.updatedAt(pos, new SNode(k, v, hc), gen), ct)
               else {
                 val rn = if (cn.gen eq gen) cn else cn.renewed(gen, ct)
-                val nn = rn.updatedAt(
-                    pos,
-                    inode(CNode.dual(
-                            sn, sn.hc, new SNode(k, v, hc), hc, lev + 5, gen)),
-                    gen)
+                val nn = rn.updatedAt(pos,
+                                      inode(
+                                          CNode.dual(sn,
+                                                     sn.hc,
+                                                     new SNode(k, v, hc),
+                                                     hc,
+                                                     lev + 5,
+                                                     gen)),
+                                      gen)
                 GCAS(cn, nn, ct)
               }
           }
@@ -489,8 +494,9 @@ private[concurrent] trait KVNode[K, V] {
   def kvPair: (K, V)
 }
 
-private[collection] final class SNode[K, V](
-    final val k: K, final val v: V, final val hc: Int)
+private[collection] final class SNode[K, V](final val k: K,
+                                            final val v: V,
+                                            final val hc: Int)
     extends BasicNode
     with KVNode[K, V] {
   final def copy = new SNode(k, v, hc)
@@ -501,8 +507,9 @@ private[collection] final class SNode[K, V](
     ("  " * lev) + "SNode(%s, %s, %x)".format(k, v, hc)
 }
 
-private[collection] final class TNode[K, V](
-    final val k: K, final val v: V, final val hc: Int)
+private[collection] final class TNode[K, V](final val k: K,
+                                            final val v: V,
+                                            final val hc: Int)
     extends MainNode[K, V]
     with KVNode[K, V] {
   final def copy = new TNode(k, v, hc)
@@ -535,8 +542,9 @@ private[collection] final class LNode[K, V](
     (" " * lev) + "LNode(%s)".format(listmap.mkString(", "))
 }
 
-private[collection] final class CNode[K, V](
-    val bitmap: Int, val array: Array[BasicNode], val gen: Gen)
+private[collection] final class CNode[K, V](val bitmap: Int,
+                                            val array: Array[BasicNode],
+                                            val gen: Gen)
     extends CNodeBase[K, V] {
   // this should only be called from within read-only snapshots
   def cachedSize(ct: AnyRef) = {
@@ -710,7 +718,9 @@ private[concurrent] object CNode {
 }
 
 private[concurrent] case class RDCSS_Descriptor[K, V](
-    old: INode[K, V], expectedmain: MainNode[K, V], nv: INode[K, V]) {
+    old: INode[K, V],
+    expectedmain: MainNode[K, V],
+    nv: INode[K, V]) {
   @volatile var committed = false
 }
 
@@ -750,8 +760,8 @@ final class TrieMap[K, V] private (
 
   def this(hashf: Hashing[K], ef: Equiv[K]) = this(
       INode.newRootNode,
-      AtomicReferenceFieldUpdater.newUpdater(
-          classOf[TrieMap[K, V]], classOf[AnyRef], "root"),
+      AtomicReferenceFieldUpdater
+        .newUpdater(classOf[TrieMap[K, V]], classOf[AnyRef], "root"),
       hashf,
       ef
   )
@@ -775,8 +785,8 @@ final class TrieMap[K, V] private (
 
   private def readObject(in: java.io.ObjectInputStream) {
     root = INode.newRootNode
-    rootupdater = AtomicReferenceFieldUpdater.newUpdater(
-        classOf[TrieMap[K, V]], classOf[AnyRef], "root")
+    rootupdater = AtomicReferenceFieldUpdater
+      .newUpdater(classOf[TrieMap[K, V]], classOf[AnyRef], "root")
 
     hashingobj = in.readObject().asInstanceOf[Hashing[K]]
     equalityobj = in.readObject().asInstanceOf[Equiv[K]]
@@ -851,8 +861,10 @@ final class TrieMap[K, V] private (
     if (!r.rec_insert(k, v, hc, 0, null, r.gen, this)) inserthc(k, hc, v)
   }
 
-  @tailrec private def insertifhc(
-      k: K, hc: Int, v: V, cond: AnyRef): Option[V] = {
+  @tailrec private def insertifhc(k: K,
+                                  hc: Int,
+                                  v: V,
+                                  cond: AnyRef): Option[V] = {
     val r = RDCSS_READ_ROOT()
 
     val ret = r.rec_insertif(k, v, hc, cond, 0, null, r.gen, this)
@@ -1063,8 +1075,8 @@ final class TrieMap[K, V] private (
 }
 
 object TrieMap extends MutableMapFactory[TrieMap] {
-  val inodeupdater = AtomicReferenceFieldUpdater.newUpdater(
-      classOf[INodeBase[_, _]], classOf[MainNode[_, _]], "mainnode")
+  val inodeupdater = AtomicReferenceFieldUpdater
+    .newUpdater(classOf[INodeBase[_, _]], classOf[MainNode[_, _]], "mainnode")
 
   implicit def canBuildFrom[K, V]: CanBuildFrom[Coll, (K, V), TrieMap[K, V]] =
     new MapCanBuildFrom[K, V]
@@ -1076,8 +1088,9 @@ object TrieMap extends MutableMapFactory[TrieMap] {
   }
 }
 
-private[collection] class TrieMapIterator[K, V](
-    var level: Int, private var ct: TrieMap[K, V], mustInit: Boolean = true)
+private[collection] class TrieMapIterator[K, V](var level: Int,
+                                                private var ct: TrieMap[K, V],
+                                                mustInit: Boolean = true)
     extends Iterator[(K, V)] {
   private val stack = new Array[Array[BasicNode]](7)
   private val stackpos = new Array[Int](7)
@@ -1146,8 +1159,9 @@ private[collection] class TrieMapIterator[K, V](
       }
     } else current = null
 
-  protected def newIterator(
-      _lev: Int, _ct: TrieMap[K, V], _mustInit: Boolean) =
+  protected def newIterator(_lev: Int,
+                            _ct: TrieMap[K, V],
+                            _mustInit: Boolean) =
     new TrieMapIterator[K, V](_lev, _ct, _mustInit)
 
   protected def dupTo(it: TrieMapIterator[K, V]) = {
@@ -1232,8 +1246,8 @@ private[concurrent] object Debug {
   def log(s: AnyRef) = logbuffer.add(s)
 
   def flush() {
-    for (s <- JavaConversions.asScalaIterator(logbuffer.iterator())) Console.out
-      .println(s.toString)
+    for (s <- JavaConversions.asScalaIterator(logbuffer.iterator()))
+      Console.out.println(s.toString)
     logbuffer.clear()
   }
 

@@ -13,8 +13,9 @@ import java.util.concurrent.atomic.AtomicLong
   * to balancing load by work-stealing, it implements managed
   * blocking to ensure desired parallelism is retained.
   */
-private class ForkJoinScheduler(
-    nthreads: Int, statsReceiver: StatsReceiver = NullStatsReceiver)
+private class ForkJoinScheduler(nthreads: Int,
+                                statsReceiver: StatsReceiver =
+                                  NullStatsReceiver)
     extends Scheduler {
   private trait IsManagedThread
 

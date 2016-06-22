@@ -41,7 +41,8 @@ object HttpExecutionContext {
     */
   def unprepared(delegate: ExecutionContext) = new ExecutionContext {
     def execute(runnable: Runnable) =
-      delegate.execute(runnable) // FIXME: Make calling this an error once SI-7383 is fixed
+      delegate
+        .execute(runnable) // FIXME: Make calling this an error once SI-7383 is fixed
     def reportFailure(t: Throwable) = delegate.reportFailure(t)
     override def prepare(): ExecutionContext = fromThread(delegate)
   }
@@ -79,8 +80,9 @@ class HttpExecutionContext(contextClassLoader: ClassLoader,
     if (delegatePrepared eq delegate) {
       this
     } else {
-      new HttpExecutionContext(
-          contextClassLoader, httpContext, delegatePrepared)
+      new HttpExecutionContext(contextClassLoader,
+                               httpContext,
+                               delegatePrepared)
     }
   }
 }

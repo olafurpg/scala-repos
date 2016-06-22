@@ -35,8 +35,10 @@ class ScalaMoveClassesOrPackagesProcessor(project: Project,
                                       searchInNonJavaFiles,
                                       moveCallback) {
   extensions.inWriteAction {
-    expandedElements.foreach(c =>
+    expandedElements.foreach(
+        c =>
           ScalaMoveUtil.saveMoveDestination(
-              c, moveDestination.getTargetDirectory(c.getContainingFile)))
+              c,
+              moveDestination.getTargetDirectory(c.getContainingFile)))
   }
 }

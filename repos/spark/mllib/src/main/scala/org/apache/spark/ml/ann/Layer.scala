@@ -129,8 +129,8 @@ private[ann] class AffineLayerModel private (w: BDM[Double], b: BDV[Double])
     z
   }
 
-  override def prevDelta(
-      nextDelta: BDM[Double], input: BDM[Double]): BDM[Double] = {
+  override def prevDelta(nextDelta: BDM[Double],
+                         input: BDM[Double]): BDM[Double] = {
     if (d == null || d.cols != nextDelta.cols)
       d = new BDM[Double](w.cols, nextDelta.cols)
     BreezeUtil.dgemm(1.0, w.t, nextDelta, 0.0, d)
@@ -160,8 +160,9 @@ private[ann] object AffineLayerModel {
     * @param position position of weights in the vector
     * @return model of Affine layer
     */
-  def apply(
-      layer: AffineLayer, weights: Vector, position: Int): AffineLayerModel = {
+  def apply(layer: AffineLayer,
+            weights: Vector,
+            position: Int): AffineLayerModel = {
     val (w, b) = unroll(weights, position, layer.numIn, layer.numOut)
     new AffineLayerModel(w, b)
   }
@@ -260,8 +261,9 @@ private[ann] trait ActivationFunction extends Serializable {
     * @param result intermediate result
     * @return cross-entropy
     */
-  def crossEntropy(
-      target: BDM[Double], output: BDM[Double], result: BDM[Double]): Double
+  def crossEntropy(target: BDM[Double],
+                   output: BDM[Double],
+                   result: BDM[Double]): Double
 
   /**
     * Implements a mean squared error of a function
@@ -270,8 +272,9 @@ private[ann] trait ActivationFunction extends Serializable {
     * @param result intermediate result
     * @return mean squared error
     */
-  def squared(
-      target: BDM[Double], output: BDM[Double], result: BDM[Double]): Double
+  def squared(target: BDM[Double],
+              output: BDM[Double],
+              result: BDM[Double]): Double
 }
 
 /**
@@ -434,8 +437,8 @@ private[ann] class FunctionalLayerModel private (
     f
   }
 
-  override def prevDelta(
-      nextDelta: BDM[Double], input: BDM[Double]): BDM[Double] = {
+  override def prevDelta(nextDelta: BDM[Double],
+                         input: BDM[Double]): BDM[Double] = {
     if (d == null || d.cols != nextDelta.cols)
       d = new BDM[Double](nextDelta.rows, nextDelta.cols)
     activationFunction.derivative(input, d)
@@ -447,16 +450,16 @@ private[ann] class FunctionalLayerModel private (
 
   override def weights(): Vector = Vectors.dense(new Array[Double](0))
 
-  def crossEntropy(
-      output: BDM[Double], target: BDM[Double]): (BDM[Double], Double) = {
+  def crossEntropy(output: BDM[Double],
+                   target: BDM[Double]): (BDM[Double], Double) = {
     if (e == null || e.cols != output.cols)
       e = new BDM[Double](output.rows, output.cols)
     val error = activationFunction.crossEntropy(output, target, e)
     (e, error)
   }
 
-  def squared(
-      output: BDM[Double], target: BDM[Double]): (BDM[Double], Double) = {
+  def squared(output: BDM[Double],
+              target: BDM[Double]): (BDM[Double], Double) = {
     if (e == null || e.cols != output.cols)
       e = new BDM[Double](output.rows, output.cols)
     val error = activationFunction.squared(output, target, e)
@@ -561,17 +564,16 @@ private[ml] object FeedForwardTopology {
     *                Softmax is default
     * @return multilayer perceptron topology
     */
-  def multiLayerPerceptron(
-      layerSizes: Array[Int], softmax: Boolean = true): FeedForwardTopology = {
+  def multiLayerPerceptron(layerSizes: Array[Int],
+                           softmax: Boolean = true): FeedForwardTopology = {
     val layers = new Array[Layer]((layerSizes.length - 1) * 2)
     for (i <- 0 until layerSizes.length - 1) {
       layers(i * 2) = new AffineLayer(layerSizes(i), layerSizes(i + 1))
-      layers(i * 2 + 1) =
-        if (softmax && i == layerSizes.length - 2) {
-          new FunctionalLayer(new SoftmaxFunction())
-        } else {
-          new FunctionalLayer(new SigmoidFunction())
-        }
+      layers(i * 2 + 1) = if (softmax && i == layerSizes.length - 2) {
+        new FunctionalLayer(new SoftmaxFunction())
+      } else {
+        new FunctionalLayer(new SigmoidFunction())
+      }
     }
     FeedForwardTopology(layers)
   }
@@ -583,8 +585,8 @@ private[ml] object FeedForwardTopology {
   * @param layerModels models of layers
   * @param topology topology of the network
   */
-private[ml] class FeedForwardModel private (
-    val layerModels: Array[LayerModel], val topology: FeedForwardTopology)
+private[ml] class FeedForwardModel private (val layerModels: Array[LayerModel],
+                                            val topology: FeedForwardTopology)
     extends TopologyModel {
   override def forward(data: BDM[Double]): Array[BDM[Double]] = {
     val outputs = new Array[BDM[Double]](layerModels.length)
@@ -686,8 +688,8 @@ private[ann] object FeedForwardModel {
     * @param seed seed for generating the weights
     * @return model
     */
-  def apply(
-      topology: FeedForwardTopology, seed: Long = 11L): FeedForwardModel = {
+  def apply(topology: FeedForwardTopology,
+            seed: Long = 11L): FeedForwardModel = {
     val layers = topology.layers
     val layerModels = new Array[LayerModel](layers.length)
     var offset = 0
@@ -707,8 +709,9 @@ private[ann] object FeedForwardModel {
 private[ann] class ANNGradient(topology: Topology, dataStacker: DataStacker)
     extends Gradient {
 
-  override def compute(
-      data: Vector, label: Double, weights: Vector): (Vector, Double) = {
+  override def compute(data: Vector,
+                       label: Double,
+                       weights: Vector): (Vector, Double) = {
     val gradient = Vectors.zeros(weights.size)
     val loss = compute(data, label, weights, gradient)
     (gradient, loss)
@@ -742,35 +745,35 @@ private[ann] class DataStacker(stackSize: Int, inputSize: Int, outputSize: Int)
     * @return RDD of double (always zero) and vector that contains the stacked vectors
     */
   def stack(data: RDD[(Vector, Vector)]): RDD[(Double, Vector)] = {
-    val stackedData =
-      if (stackSize == 1) {
-        data.map { v =>
-          (0.0,
-           Vectors.fromBreeze(BDV.vertcat(v._1.toBreeze.toDenseVector,
-                                          v._2.toBreeze.toDenseVector)))
-        }
-      } else {
-        data.mapPartitions { it =>
-          it.grouped(stackSize).map { seq =>
-            val size = seq.size
-            val bigVector =
-              new Array[Double](inputSize * size + outputSize * size)
-            var i = 0
-            seq.foreach {
-              case (in, out) =>
-                System.arraycopy(
-                    in.toArray, 0, bigVector, i * inputSize, inputSize)
-                System.arraycopy(out.toArray,
-                                 0,
-                                 bigVector,
-                                 inputSize * size + i * outputSize,
-                                 outputSize)
-                i += 1
-            }
-            (0.0, Vectors.dense(bigVector))
+    val stackedData = if (stackSize == 1) {
+      data.map { v =>
+        (0.0,
+         Vectors.fromBreeze(
+             BDV.vertcat(v._1.toBreeze.toDenseVector,
+                         v._2.toBreeze.toDenseVector)))
+      }
+    } else {
+      data.mapPartitions { it =>
+        it.grouped(stackSize).map { seq =>
+          val size = seq.size
+          val bigVector =
+            new Array[Double](inputSize * size + outputSize * size)
+          var i = 0
+          seq.foreach {
+            case (in, out) =>
+              System
+                .arraycopy(in.toArray, 0, bigVector, i * inputSize, inputSize)
+              System.arraycopy(out.toArray,
+                               0,
+                               bigVector,
+                               inputSize * size + i * outputSize,
+                               outputSize)
+              i += 1
           }
+          (0.0, Vectors.dense(bigVector))
         }
       }
+    }
     stackedData
   }
 
@@ -783,8 +786,8 @@ private[ann] class DataStacker(stackSize: Int, inputSize: Int, outputSize: Int)
     val arrData = data.toArray
     val realStackSize = arrData.length / (inputSize + outputSize)
     val input = new BDM(inputSize, realStackSize, arrData)
-    val target = new BDM(
-        outputSize, realStackSize, arrData, inputSize * realStackSize)
+    val target =
+      new BDM(outputSize, realStackSize, arrData, inputSize * realStackSize)
     (input, target, realStackSize)
   }
 }
@@ -812,8 +815,9 @@ private[ann] class ANNUpdater extends Updater {
   * @param inputSize input size
   * @param outputSize output size
   */
-private[ml] class FeedForwardTrainer(
-    topology: Topology, val inputSize: Int, val outputSize: Int)
+private[ml] class FeedForwardTrainer(topology: Topology,
+                                     val inputSize: Int,
+                                     val outputSize: Int)
     extends Serializable {
 
   // TODO: what if we need to pass random seed?

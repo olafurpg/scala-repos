@@ -59,9 +59,9 @@ case class HandlerCall(packageName: String,
   val dynamic = if (instantiate) "@" else ""
   override def toString =
     dynamic + packageName + "." + controller + dynamic + "." + method +
-    parameters.map { params =>
-      "(" + params.mkString(", ") + ")"
-    }.getOrElse("")
+      parameters.map { params =>
+        "(" + params.mkString(", ") + ")"
+      }.getOrElse("")
 }
 
 /**
@@ -79,7 +79,7 @@ case class Parameter(name: String,
     extends Positional {
   override def toString =
     name + ":" + typeName + fixed.map(" = " + _).getOrElse("") +
-    default.map(" ?= " + _).getOrElse("")
+      default.map(" ?= " + _).getOrElse("")
 }
 
 /**
@@ -104,7 +104,7 @@ case class DynamicPart(name: String, constraint: String, encode: Boolean)
     with Positional {
   override def toString =
     """DynamicPart("""" + name + "\", \"\"\"" + constraint + "\"\"\"," +
-    encode + ")" //"
+      encode + ")" //"
 }
 
 /**
@@ -143,8 +143,10 @@ case class PathPattern(parts: Seq[PathPart]) {
   * @param line The line that the error occurred on
   * @param column The column that the error occurred on
   */
-case class RoutesCompilationError(
-    source: File, message: String, line: Option[Int], column: Option[Int])
+case class RoutesCompilationError(source: File,
+                                  message: String,
+                                  line: Option[Int],
+                                  column: Option[Int])
 
 /**
   * Information about the routes source file

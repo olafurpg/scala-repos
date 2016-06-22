@@ -116,8 +116,9 @@ package scala.collection.mutable {
       from.fold(true)(_ <= key) && until.fold(true)(_ > key)
 
     def keysInView[This <: TraversableOnce[K], That](
-        keys: This, from: Option[K], until: Option[K])(
-        implicit bf: CanBuildFrom[This, K, That]) = {
+        keys: This,
+        from: Option[K],
+        until: Option[K])(implicit bf: CanBuildFrom[This, K, That]) = {
       (bf.apply(keys) ++= keys.filter(in(_, from, until))).result()
     }
 
@@ -193,7 +194,9 @@ package scala.collection.mutable {
 
         val setView = set.rangeImpl(from, until)
         val newLower = Some(from.fold(k)(ord.max(_, k)))
-        setView.iteratorFrom(k).toSeq == keysInView(ks, newLower, until).toSeq.sorted
+        setView
+          .iteratorFrom(k)
+          .toSeq == keysInView(ks, newLower, until).toSeq.sorted
     }
 
     property("headOption") = forAll {

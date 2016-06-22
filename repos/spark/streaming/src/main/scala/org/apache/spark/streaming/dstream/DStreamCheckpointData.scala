@@ -102,7 +102,7 @@ private[streaming] class DStreamCheckpointData[T: ClassTag](
             } catch {
               case e: Exception =>
                 logWarning("Error deleting old checkpoint file '" + file +
-                           "' for time " + time,
+                             "' for time " + time,
                            e)
                 fileSystem = null
             }
@@ -121,11 +121,12 @@ private[streaming] class DStreamCheckpointData[T: ClassTag](
     // Create RDDs from the checkpoint data
     currentCheckpointFiles.foreach {
       case (time, file) => {
-          logInfo("Restoring checkpointed RDD for time " + time +
+        logInfo(
+            "Restoring checkpointed RDD for time " + time +
               " from file '" + file + "'")
-          dstream.generatedRDDs +=
-            ((time, dstream.context.sparkContext.checkpointFile[T](file)))
-        }
+        dstream.generatedRDDs +=
+        ((time, dstream.context.sparkContext.checkpointFile[T](file)))
+      }
     }
   }
 
@@ -145,11 +146,11 @@ private[streaming] class DStreamCheckpointData[T: ClassTag](
           } else {
             val msg =
               "Object of " + this.getClass.getName + " is being serialized " +
-              " possibly as a part of closure of an RDD operation. This is because " +
-              " the DStream object is being referred to from within the closure. " +
-              " Please rewrite the RDD operation inside this DStream to avoid this. " +
-              " This has been enforced to avoid bloating of Spark tasks " +
-              " with unnecessary objects."
+                " possibly as a part of closure of an RDD operation. This is because " +
+                " the DStream object is being referred to from within the closure. " +
+                " Please rewrite the RDD operation inside this DStream to avoid this. " +
+                " This has been enforced to avoid bloating of Spark tasks " +
+                " with unnecessary objects."
             throw new java.io.NotSerializableException(msg)
           }
         }

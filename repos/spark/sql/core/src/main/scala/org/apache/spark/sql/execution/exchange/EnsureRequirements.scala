@@ -47,8 +47,8 @@ case class EnsureRequirements(conf: SQLConf) extends Rule[SparkPlan] {
   /**
     * Given a required distribution, returns a partitioning that satisfies that distribution.
     */
-  private def createPartitioning(
-      requiredDistribution: Distribution, numPartitions: Int): Partitioning = {
+  private def createPartitioning(requiredDistribution: Distribution,
+                                 numPartitions: Int): Partitioning = {
     requiredDistribution match {
       case AllTuples => SinglePartition
       case ClusteredDistribution(clustering) =>
@@ -196,46 +196,45 @@ case class EnsureRequirements(conf: SQLConf) extends Rule[SparkPlan] {
                 createPartitioning(distribution, maxChildrenNumPartitions))
         }
 
-      children =
-        if (useExistingPartitioning) {
-          // We do not need to shuffle any child's output.
-          children
-        } else {
-          // We need to shuffle at least one child's output.
-          // Now, we will determine the number of partitions that will be used by created
-          // partitioning schemes.
-          val numPartitions = {
-            // Let's see if we need to shuffle all child's outputs when we use
-            // maxChildrenNumPartitions.
-            val shufflesAllChildren =
-              children.zip(requiredChildDistributions).forall {
-                case (child, distribution) =>
-                  !child.outputPartitioning.guarantees(createPartitioning(
-                          distribution, maxChildrenNumPartitions))
-              }
-            // If we need to shuffle all children, we use defaultNumPreShufflePartitions as the
-            // number of partitions. Otherwise, we use maxChildrenNumPartitions.
-            if (shufflesAllChildren) defaultNumPreShufflePartitions
-            else maxChildrenNumPartitions
-          }
-
-          children.zip(requiredChildDistributions).map {
-            case (child, distribution) =>
-              val targetPartitioning =
-                createPartitioning(distribution, numPartitions)
-              if (child.outputPartitioning.guarantees(targetPartitioning)) {
-                child
-              } else {
-                child match {
-                  // If child is an exchange, we replace it with
-                  // a new one having targetPartitioning.
-                  case ShuffleExchange(_, c, _) =>
-                    ShuffleExchange(targetPartitioning, c)
-                  case _ => ShuffleExchange(targetPartitioning, child)
-                }
-              }
-          }
+      children = if (useExistingPartitioning) {
+        // We do not need to shuffle any child's output.
+        children
+      } else {
+        // We need to shuffle at least one child's output.
+        // Now, we will determine the number of partitions that will be used by created
+        // partitioning schemes.
+        val numPartitions = {
+          // Let's see if we need to shuffle all child's outputs when we use
+          // maxChildrenNumPartitions.
+          val shufflesAllChildren =
+            children.zip(requiredChildDistributions).forall {
+              case (child, distribution) =>
+                !child.outputPartitioning.guarantees(
+                    createPartitioning(distribution, maxChildrenNumPartitions))
+            }
+          // If we need to shuffle all children, we use defaultNumPreShufflePartitions as the
+          // number of partitions. Otherwise, we use maxChildrenNumPartitions.
+          if (shufflesAllChildren) defaultNumPreShufflePartitions
+          else maxChildrenNumPartitions
         }
+
+        children.zip(requiredChildDistributions).map {
+          case (child, distribution) =>
+            val targetPartitioning =
+              createPartitioning(distribution, numPartitions)
+            if (child.outputPartitioning.guarantees(targetPartitioning)) {
+              child
+            } else {
+              child match {
+                // If child is an exchange, we replace it with
+                // a new one having targetPartitioning.
+                case ShuffleExchange(_, c, _) =>
+                  ShuffleExchange(targetPartitioning, c)
+                case _ => ShuffleExchange(targetPartitioning, child)
+              }
+            }
+        }
+      }
     }
 
     // Now, we need to add ExchangeCoordinator if necessary.

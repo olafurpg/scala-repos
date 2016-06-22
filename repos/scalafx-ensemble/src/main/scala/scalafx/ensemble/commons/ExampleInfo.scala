@@ -40,7 +40,7 @@ object ExampleInfo {
 
   def thumbnailPath(exampleName: String, groupName: String): String =
     examplesDir + groupName.toLowerCase + "/" + formatNoSpaces(exampleName) +
-    "Sample.png"
+      "Sample.png"
 
   def sourcecodePath(exampleName: String, groupName: String): String =
     examplesDir + groupName.toLowerCase + "/" + "Ensemble" + formatNoSpaces(
@@ -48,7 +48,7 @@ object ExampleInfo {
 
   def className(exampleName: String, groupName: String): String =
     "scalafx.ensemble.example." + groupName.toLowerCase + ".Ensemble" +
-    ExampleInfo.formatNoSpaces(exampleName)
+      ExampleInfo.formatNoSpaces(exampleName)
 }
 
 /** Creates stand alone example source code. */
@@ -80,8 +80,8 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
   lazy val resources: Set[String] = {
     def extract(pattern: Regex): Seq[String] = {
       val resources =
-        for (pattern(resourcePath) <- pattern findAllIn sourceCode) yield
-          resourcePath
+        for (pattern(resourcePath) <- pattern findAllIn sourceCode)
+          yield resourcePath
       resources
         .map(r => if (r.startsWith("/")) r else "/" + packagePath + "/" + r)
         .toSeq
@@ -109,9 +109,8 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
 
   private def extractStageProperties(sourceRaw: String): Seq[String] = {
     val pattern = """@stage-property\s*(.*)""".r
-    val properties =
-      for (pattern(property) <- pattern findAllIn sourceRaw) yield
-        property.trim
+    val properties = for (pattern(property) <- pattern findAllIn sourceRaw)
+      yield property.trim
     properties.toSeq
   }
 
@@ -139,11 +138,11 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
     // Append copyright, package, and required imports
     source =
       "" + "/*\n" + " * Copyright 2013 ScalaFX Project\n" +
-      " * All right reserved.\n" + " */\n" +
-      (if (!originalPackageName.isEmpty)
-         "package " + originalPackageName + "\n"
-       else "") + "\n" + "import scalafx.application.JFXApp\n" +
-      "import scalafx.scene.Scene\n" + source
+        " * All right reserved.\n" + " */\n" +
+        (if (!originalPackageName.isEmpty)
+           "package " + originalPackageName + "\n"
+         else "") + "\n" + "import scalafx.application.JFXApp\n" +
+        "import scalafx.scene.Scene\n" + source
 
     // Remove local imports
     source = source.replaceAll("""import scalafx.ensemble.\S*\s*""", "")
@@ -157,11 +156,11 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
     // Replace `getContent` method with stage and scene creation
     val stageHeader =
       "" + "\n\n" + "  stage = new JFXApp.PrimaryStage {\n" +
-      "    title = \"" + formatAddSpaces(extractSampleName(sourceRaw)) +
-      " Example\"\n" + (if (stageProperties.isEmpty) ""
-                        else
-                          stageProperties.mkString("    ", "\n    ", "\n")) +
-      "    scene = new Scene {\n" + "      root ="
+        "    title = \"" + formatAddSpaces(extractSampleName(sourceRaw)) +
+        " Example\"\n" + (if (stageProperties.isEmpty) ""
+                          else
+                            stageProperties.mkString("    ", "\n    ", "\n")) +
+        "    scene = new Scene {\n" + "      root ="
     source = source.replaceFirst("""\s*def\s*getContent\s*=""", stageHeader)
 
     // Cleanup extra carriage-return characters

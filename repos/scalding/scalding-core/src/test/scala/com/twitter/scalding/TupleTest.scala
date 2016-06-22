@@ -32,8 +32,8 @@ class TupleTest extends WordSpec with Matchers {
     tc.arity == ar
   }
 
-  def roundTrip[T](t: T)(
-      implicit tc: TupleConverter[T], ts: TupleSetter[T]): Boolean = {
+  def roundTrip[T](t: T)(implicit tc: TupleConverter[T],
+                         ts: TupleSetter[T]): Boolean = {
     tc(new TupleEntry(ts(t))) == t
   }
 
@@ -41,8 +41,10 @@ class TupleTest extends WordSpec with Matchers {
 
     "TupleGetter should work as a type-class" in {
       val emptyTup = new CTuple
-      val ctup = new CTuple(
-          "hey", new java.lang.Long(2), new java.lang.Integer(3), emptyTup)
+      val ctup = new CTuple("hey",
+                            new java.lang.Long(2),
+                            new java.lang.Integer(3),
+                            emptyTup)
       TupleGetter.get[String](ctup, 0) shouldBe "hey"
       TupleGetter.get[Long](ctup, 1) shouldBe 2L
       TupleGetter.get[Int](ctup, 2) shouldBe 3

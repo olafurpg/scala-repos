@@ -4,7 +4,7 @@ object O {
     override type T[F1 <: X] = F1
   }
   trait A {
-    type T [F <: X]
+    type T[F <: X]
   }
 }
 

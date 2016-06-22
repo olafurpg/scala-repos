@@ -39,8 +39,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class TableViewTableSelectionModelSpec[T]
-    extends SimpleSFXDelegateSpec[
-        jfxsc.TableSelectionModel[T], TableSelectionModel[T]](
+    extends SimpleSFXDelegateSpec[jfxsc.TableSelectionModel[T],
+                                  TableSelectionModel[T]](
         classOf[jfxsc.TableSelectionModel[T]],
         classOf[TableSelectionModel[T]]) {
 

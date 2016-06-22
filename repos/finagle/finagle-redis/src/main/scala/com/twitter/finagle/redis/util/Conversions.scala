@@ -38,8 +38,8 @@ object BytesToString {
       (BytesToString(arg._1), BytesToString(arg._2))
     }
 
-  def fromTuplesWithDoubles(
-      args: Seq[(Array[Byte], Double)], charset: Charset = Charsets.Utf8) =
+  def fromTuplesWithDoubles(args: Seq[(Array[Byte], Double)],
+                            charset: Charset = Charsets.Utf8) =
     args map { arg =>
       (BytesToString(arg._1, charset), arg._2)
     }
@@ -78,8 +78,8 @@ object CBToString {
       (CBToString(arg._1), CBToString(arg._2))
     }
 
-  def fromTuplesWithDoubles(
-      args: Seq[(ChannelBuffer, Double)], charset: Charset = Charsets.Utf8) =
+  def fromTuplesWithDoubles(args: Seq[(ChannelBuffer, Double)],
+                            charset: Charset = Charsets.Utf8) =
     args map { arg =>
       (CBToString(arg._1, charset), arg._2)
     }

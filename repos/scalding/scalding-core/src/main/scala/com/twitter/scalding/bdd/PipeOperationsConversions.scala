@@ -11,8 +11,8 @@ trait PipeOperationsConversions {
       require(
           pipes.size == expectedSize,
           "Cannot apply an operation for " + expectedSize + "pipes to " +
-          pipes.size + " pipes. " +
-          "Verify matching of given and when clauses in test case definition")
+            pipes.size + " pipes. " +
+            "Verify matching of given and when clauses in test case definition")
 
     def apply(pipes: List[RichPipe]): Pipe
   }

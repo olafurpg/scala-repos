@@ -24,7 +24,8 @@ private[json] trait TestJsonData {
   protected def sqlContext: SQLContext
 
   def primitiveFieldAndType: RDD[String] =
-    sqlContext.sparkContext.parallelize("""{"string":"this is a simple string.",
+    sqlContext.sparkContext.parallelize(
+        """{"string":"this is a simple string.",
           "integer":10,
           "long":21474836470,
           "bigInteger":92233720368547758070,
@@ -34,8 +35,8 @@ private[json] trait TestJsonData {
       }""" :: Nil)
 
   def primitiveFieldValueTypeConflict: RDD[String] =
-    sqlContext.sparkContext
-      .parallelize("""{"num_num_1":11, "num_num_2":null, "num_num_3": 1.1,
+    sqlContext.sparkContext.parallelize(
+        """{"num_num_1":11, "num_num_2":null, "num_num_3": 1.1,
           "num_bool":true, "num_str":13.1, "str_bool":"str1"}""" :: """{"num_num_1":null, "num_num_2":21474836470.9, "num_num_3": null,
           "num_bool":12, "num_str":null, "str_bool":true}""" :: """{"num_num_1":21474836470, "num_num_2":92233720368547758070, "num_num_3": 100,
           "num_bool":false, "num_str":"str1", "str_bool":false}""" :: """{"num_num_1":21474836570, "num_num_2":1.1, "num_num_3": 21474836470,
@@ -63,7 +64,8 @@ private[json] trait TestJsonData {
         """{"a":true}""" :: """{"b":21474836470}""" :: """{"c":[33, 44]}""" :: """{"d":{"field":true}}""" :: """{"e":"str"}""" :: Nil)
 
   def complexFieldAndType1: RDD[String] =
-    sqlContext.sparkContext.parallelize("""{"struct":{"field1": true, "field2": 92233720368547758070},
+    sqlContext.sparkContext.parallelize(
+        """{"struct":{"field1": true, "field2": 92233720368547758070},
           "structWithArrayFields":{"field1":[4, 5, 6], "field2":["str1", "str2"]},
           "arrayOfString":["str1", "str2"],
           "arrayOfInteger":[1, 2147483647, -2147483648],
@@ -78,7 +80,8 @@ private[json] trait TestJsonData {
          }""" :: Nil)
 
   def complexFieldAndType2: RDD[String] =
-    sqlContext.sparkContext.parallelize("""{"arrayOfStruct":[{"field1": true, "field2": "str1"}, {"field1": false}, {"field3": null}],
+    sqlContext.sparkContext.parallelize(
+        """{"arrayOfStruct":[{"field1": true, "field2": "str1"}, {"field1": false}, {"field3": null}],
           "complexArrayOfStruct": [
           {
             "field1": [

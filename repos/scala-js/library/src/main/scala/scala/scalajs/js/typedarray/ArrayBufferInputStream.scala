@@ -23,8 +23,9 @@ import java.io.InputStream
   *  @param offset Offset in bytes in [[buffer]]
   *  @param length Length in bytes in [[buffer]]
   */
-class ArrayBufferInputStream(
-    val buffer: ArrayBuffer, val offset: Int, val length: Int)
+class ArrayBufferInputStream(val buffer: ArrayBuffer,
+                             val offset: Int,
+                             val length: Int)
     extends InputStream {
 
   /** Convenience constructor. Strictly equivalent to

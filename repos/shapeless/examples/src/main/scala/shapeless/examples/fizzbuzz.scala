@@ -112,7 +112,8 @@ object FizzBuzzExample {
     type Aux[N <: Nat, L <: HList] = FizzBuzzResult[N] { type Out = L }
 
     implicit def fizzBuzzResult[N <: Nat, L <: HList](
-        implicit rfb: RevFizzBuzz.Aux[N, L], r: Reverse[L]): Aux[N, r.Out] =
+        implicit rfb: RevFizzBuzz.Aux[N, L],
+        r: Reverse[L]): Aux[N, r.Out] =
       new FizzBuzzResult[N] {
         type Out = r.Out
         def apply() = r(rfb())

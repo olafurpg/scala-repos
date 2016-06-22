@@ -51,8 +51,9 @@ abstract class GeneralizedLinearModel @Since("1.0.0")(
     * @param weightMatrix Column vector containing the weights of the model
     * @param intercept Intercept of the model.
     */
-  protected def predictPoint(
-      dataMatrix: Vector, weightMatrix: Vector, intercept: Double): Double
+  protected def predictPoint(dataMatrix: Vector,
+                             weightMatrix: Vector,
+                             intercept: Double): Double
 
   /**
     * Predict values for the given data set using the model trained.
@@ -251,7 +252,7 @@ abstract class GeneralizedLinearAlgorithm[M <: GeneralizedLinearModel]
     if (input.getStorageLevel == StorageLevel.NONE) {
       logWarning(
           "The input data is not directly cached, which may hurt performance if its" +
-          " parent RDDs are also uncached.")
+            " parent RDDs are also uncached.")
     }
 
     // Check the data properties before running the optimizer
@@ -278,32 +279,30 @@ abstract class GeneralizedLinearAlgorithm[M <: GeneralizedLinearModel]
       *
       * Currently, it's only enabled in LogisticRegressionWithLBFGS
       */
-    val scaler =
-      if (useFeatureScaling) {
-        new StandardScaler(withStd = true, withMean = false)
-          .fit(input.map(_.features))
-      } else {
-        null
-      }
+    val scaler = if (useFeatureScaling) {
+      new StandardScaler(withStd = true, withMean = false)
+        .fit(input.map(_.features))
+    } else {
+      null
+    }
 
     // Prepend an extra variable consisting of all 1.0's for the intercept.
     // TODO: Apply feature scaling to the weight vector instead of input data.
-    val data =
-      if (addIntercept) {
-        if (useFeatureScaling) {
-          input
-            .map(lp => (lp.label, appendBias(scaler.transform(lp.features))))
-            .cache()
-        } else {
-          input.map(lp => (lp.label, appendBias(lp.features))).cache()
-        }
+    val data = if (addIntercept) {
+      if (useFeatureScaling) {
+        input
+          .map(lp => (lp.label, appendBias(scaler.transform(lp.features))))
+          .cache()
       } else {
-        if (useFeatureScaling) {
-          input.map(lp => (lp.label, scaler.transform(lp.features))).cache()
-        } else {
-          input.map(lp => (lp.label, lp.features))
-        }
+        input.map(lp => (lp.label, appendBias(lp.features))).cache()
       }
+    } else {
+      if (useFeatureScaling) {
+        input.map(lp => (lp.label, scaler.transform(lp.features))).cache()
+      } else {
+        input.map(lp => (lp.label, lp.features))
+      }
+    }
 
     /**
       * TODO: For better convergence, in logistic regression, the intercepts should be computed
@@ -322,20 +321,18 @@ abstract class GeneralizedLinearAlgorithm[M <: GeneralizedLinearModel]
     val weightsWithIntercept =
       optimizer.optimize(data, initialWeightsWithIntercept)
 
-    val intercept =
-      if (addIntercept && numOfLinearPredictor == 1) {
-        weightsWithIntercept(weightsWithIntercept.size - 1)
-      } else {
-        0.0
-      }
+    val intercept = if (addIntercept && numOfLinearPredictor == 1) {
+      weightsWithIntercept(weightsWithIntercept.size - 1)
+    } else {
+      0.0
+    }
 
-    var weights =
-      if (addIntercept && numOfLinearPredictor == 1) {
-        Vectors.dense(weightsWithIntercept.toArray.slice(
-                0, weightsWithIntercept.size - 1))
-      } else {
-        weightsWithIntercept
-      }
+    var weights = if (addIntercept && numOfLinearPredictor == 1) {
+      Vectors.dense(
+          weightsWithIntercept.toArray.slice(0, weightsWithIntercept.size - 1))
+    } else {
+      weightsWithIntercept
+    }
 
     /**
       * The weights and intercept are trained in the scaled space; we're converting them back to
@@ -381,7 +378,7 @@ abstract class GeneralizedLinearAlgorithm[M <: GeneralizedLinearModel]
     if (input.getStorageLevel == StorageLevel.NONE) {
       logWarning(
           "The input data was not directly cached, which may hurt performance if its" +
-          " parent RDDs are also uncached.")
+            " parent RDDs are also uncached.")
     }
 
     // Unpersist cached data

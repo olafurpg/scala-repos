@@ -30,8 +30,10 @@ class ConsumerIntegrationTest
     implicit def ec: ExecutionContext = system.dispatcher
 
     "Consumer must throw FailedToCreateRouteException, while awaiting activation, if endpoint is invalid" in {
-      filterEvents(EventFilter[FailedToCreateRouteException](
-              pattern = "failed to activate.*", occurrences = 1)) {
+      filterEvents(
+          EventFilter[FailedToCreateRouteException](pattern =
+                                                      "failed to activate.*",
+                                                    occurrences = 1)) {
         val actorRef =
           system.actorOf(Props(new TestActor(uri = "some invalid uri")),
                          "invalidActor")

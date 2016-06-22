@@ -37,8 +37,11 @@ object BroadcastedRows {
   }
 
   implicit def canMapValues[T, RowType, ResultRow, Result](
-      implicit cc: CanCollapseAxis[
-          T, Axis._1.type, RowType, ResultRow, Result])
+      implicit cc: CanCollapseAxis[T,
+                                   Axis._1.type,
+                                   RowType,
+                                   ResultRow,
+                                   Result])
     : CanMapValues[BroadcastedRows[T, RowType], RowType, ResultRow, Result] = {
     new CanMapValues[BroadcastedRows[T, RowType], RowType, ResultRow, Result] {
       def apply(from: BroadcastedRows[T, RowType],
@@ -105,8 +108,8 @@ object BroadcastedRows {
     new CanForeachValues[BroadcastedRows[T, RowType], RowType] {
 
       /** Maps all key-value pairs from the given collection. */
-      override def foreach[U](
-          from: BroadcastedRows[T, RowType], fn: (RowType) => U): Unit = {
+      override def foreach[U](from: BroadcastedRows[T, RowType],
+                              fn: (RowType) => U): Unit = {
         iter(from.underlying, Axis._1)(fn)
       }
     }

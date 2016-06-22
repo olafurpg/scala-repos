@@ -43,8 +43,8 @@ private[clustering] trait BisectingKMeansParams
     * @group param
     */
   @Since("2.0.0")
-  final val k = new IntParam(
-      this, "k", "number of clusters to create", (x: Int) => x > 1)
+  final val k =
+    new IntParam(this, "k", "number of clusters to create", (x: Int) => x > 1)
 
   /** @group getParam */
   @Since("2.0.0")
@@ -81,11 +81,10 @@ private[clustering] trait BisectingKMeansParams
   */
 @Since("2.0.0")
 @Experimental
-class BisectingKMeansModel private[ml](
+class BisectingKMeansModel private[ml] (
     @Since("2.0.0") override val uid: String,
     private val parentModel: MLlibBisectingKMeansModel
-)
-    extends Model[BisectingKMeansModel]
+) extends Model[BisectingKMeansModel]
     with BisectingKMeansParams {
 
   @Since("2.0.0")

@@ -21,7 +21,8 @@ object MessagesSpec extends Specification {
   val api = new DefaultMessagesApi(
       new Environment(new File("."), this.getClass.getClassLoader, Mode.Dev),
       Configuration.reference,
-      new DefaultLangs(Configuration.reference ++ Configuration.from(
+      new DefaultLangs(
+          Configuration.reference ++ Configuration.from(
               Map("play.i18n.langs" -> Seq("en", "fr", "fr-CH"))))) {
     override protected def loadAllMessages = testMessages
   }
@@ -62,7 +63,8 @@ object MessagesSpec extends Specification {
 
     "support setting the language on a result" in {
       val cookie = Cookies
-        .decodeSetCookieHeader(api
+        .decodeSetCookieHeader(
+            api
               .setLang(Results.Ok, Lang("en-AU"))
               .header
               .headers("Set-Cookie"))

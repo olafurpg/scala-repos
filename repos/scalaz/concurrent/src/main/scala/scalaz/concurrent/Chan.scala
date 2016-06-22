@@ -22,12 +22,11 @@ object Chan {
 
 import Chan._
 private[this] case class ChItem[A](a: A, end: ChStream[A])
-private[this] class ChanImpl[A](
-    readVar: MVar[ChStream[A]], writeVar: MVar[ChStream[A]])
+private[this] class ChanImpl[A](readVar: MVar[ChStream[A]],
+                                writeVar: MVar[ChStream[A]])
     extends Chan[A] {
   def read =
-    readVar.modify(
-        readEnd =>
+    readVar.modify(readEnd =>
           for {
         item <- readEnd.read
       } yield (item.end, item.a))

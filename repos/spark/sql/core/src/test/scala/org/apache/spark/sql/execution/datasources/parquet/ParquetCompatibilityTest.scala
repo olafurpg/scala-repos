@@ -41,8 +41,8 @@ private[sql] abstract class ParquetCompatibilityTest
     })
   }
 
-  protected def readParquetSchema(
-      path: String, pathFilter: Path => Boolean): MessageType = {
+  protected def readParquetSchema(path: String,
+                                  pathFilter: Path => Boolean): MessageType = {
     val fsPath = new Path(path)
     val fs = fsPath.getFileSystem(hadoopConfiguration)
     val parquetFiles = fs
@@ -52,8 +52,8 @@ private[sql] abstract class ParquetCompatibilityTest
       .toSeq
       .asJava
 
-    val footers = ParquetFileReader.readAllFootersInParallel(
-        hadoopConfiguration, parquetFiles, true)
+    val footers = ParquetFileReader
+      .readAllFootersInParallel(hadoopConfiguration, parquetFiles, true)
     footers.asScala.head.getParquetMetadata.getFileMetaData.getSchema
   }
 
@@ -89,8 +89,8 @@ private[sql] object ParquetCompatibilityTest {
     * A testing Parquet [[WriteSupport]] implementation used to write manually constructed Parquet
     * records with arbitrary structures.
     */
-  private class DirectWriteSupport(
-      schema: MessageType, metadata: Map[String, String])
+  private class DirectWriteSupport(schema: MessageType,
+                                   metadata: Map[String, String])
       extends WriteSupport[RecordConsumer => Unit] {
 
     private var recordConsumer: RecordConsumer = _
@@ -130,6 +130,7 @@ private[sql] object ParquetCompatibilityTest {
     val writeSupport = new DirectWriteSupport(messageType, metadata)
     val parquetWriter =
       new ParquetWriter[RecordConsumer => Unit](new Path(path), writeSupport)
-    try recordWriters.foreach(parquetWriter.write) finally parquetWriter.close()
+    try recordWriters.foreach(parquetWriter.write) finally parquetWriter
+      .close()
   }
 }

@@ -35,8 +35,9 @@ class VM(val mode: VmMode,
         // breakpoints (see vm start  event), otherwise we have a race condition.
         arguments.get("suspend").setValue("true")
 
-        log.info("Using Connector: " + connector.name + " : " +
-            connector.description())
+        log.info(
+            "Using Connector: " + connector.name + " : " +
+              connector.description())
         log.info("Connector class: " + connector.getClass.getName)
         log.info("Debugger VM args: " + allVMOpts)
         log.info("Debugger program args: " + commandLine)
@@ -51,8 +52,9 @@ class VM(val mode: VmMode,
         env.get("port").setValue(port)
         env.get("hostname").setValue(hostname)
 
-        log.info("Using Connector: " + connector.name + " : " +
-            connector.description())
+        log.info(
+            "Using Connector: " + connector.name + " : " +
+              connector.description())
         log.info("Debugger arguments: " + env)
         log.info("Attach to VM")
         val vm = connector.attach(env)
@@ -209,8 +211,8 @@ class VM(val mode: VmMode,
       override def equals(that: Any): Boolean = that match {
         case that: Location =>
           loc.sourcePath == that.sourcePath &&
-          loc.sourceName == that.sourceName &&
-          loc.lineNumber == that.lineNumber
+            loc.sourceName == that.sourceName &&
+            loc.lineNumber == that.lineNumber
         case _ => false
       }
       override def hashCode: Int =
@@ -370,8 +372,8 @@ class VM(val mode: VmMode,
     }
   }
 
-  def locationForName(
-      thread: ThreadReference, name: String): Option[DebugLocation] = {
+  def locationForName(thread: ThreadReference,
+                      name: String): Option[DebugLocation] = {
     val stackFrame = thread.frame(0)
     val objRef = stackFrame.thisObject()
     if (name == "this") {
@@ -379,8 +381,9 @@ class VM(val mode: VmMode,
     } else {
       stackSlotForName(thread, name)
         .map({ slot =>
-          DebugStackSlot(
-              DebugThreadId(thread.uniqueID), slot.frame, slot.offset)
+          DebugStackSlot(DebugThreadId(thread.uniqueID),
+                         slot.frame,
+                         slot.offset)
         })
         .orElse(
             fieldByName(objRef, name).flatMap { f =>
@@ -420,17 +423,20 @@ class VM(val mode: VmMode,
       log.info("Sorry, this debug VM is read-only.")
       None
     } else {
-      log.info("DebugManager.callMethod(obj = " + obj + " of type " +
-          obj.referenceType + ", name = " + name + ", signature = " +
-          signature + ", args = " + args)
+      log.info(
+          "DebugManager.callMethod(obj = " + obj + " of type " +
+            obj.referenceType + ", name = " + name + ", signature = " +
+            signature + ", args = " + args)
       obj.referenceType
         .methodsByName("toString", "()Ljava/lang/String;")
         .headOption match {
         case Some(m) =>
           log.info("Invoking: " + m)
           Some(
-              obj.invokeMethod(
-                  thread, m, args, ObjectReference.INVOKE_SINGLE_THREADED))
+              obj.invokeMethod(thread,
+                               m,
+                               args,
+                               ObjectReference.INVOKE_SINGLE_THREADED))
         case other =>
           log.error("toString method not found: " + other)
           None
@@ -438,8 +444,8 @@ class VM(val mode: VmMode,
     }
   }
 
-  def debugValueAtLocationToString(
-      threadId: DebugThreadId, location: DebugLocation): Option[String] = {
+  def debugValueAtLocationToString(threadId: DebugThreadId,
+                                   location: DebugLocation): Option[String] = {
     valueAtLocation(location) match {
       case Some(arr: ArrayReference) =>
         val quantifier = if (arr.length == 1) "element" else "elements"
@@ -470,24 +476,25 @@ class VM(val mode: VmMode,
     savedObjects.get(objectId)
   }
 
-  private def valueForField(
-      objectId: DebugObjectId, name: String): Option[Value] = {
+  private def valueForField(objectId: DebugObjectId,
+                            name: String): Option[Value] = {
     for (obj <- savedObjects.get(objectId);
          f <- fieldByName(obj, name)) yield {
       remember(obj.getValue(f))
     }
   }
 
-  private def valueForIndex(
-      objectId: DebugObjectId, index: Int): Option[Value] = {
+  private def valueForIndex(objectId: DebugObjectId,
+                            index: Int): Option[Value] = {
     savedObjects.get(objectId) match {
       case Some(arr: ArrayReference) => Some(remember(arr.getValue(index)))
       case _ => None
     }
   }
 
-  private def valueForStackVar(
-      thread: ThreadReference, frame: Int, offset: Int): Option[Value] = {
+  private def valueForStackVar(thread: ThreadReference,
+                               frame: Int,
+                               offset: Int): Option[Value] = {
     if (thread.frameCount > frame &&
         thread.frame(frame).visibleVariables.length > offset) {
       val stackFrame = thread.frame(frame)
@@ -498,8 +505,8 @@ class VM(val mode: VmMode,
 
   case class StackSlot(frame: Int, offset: Int)
 
-  private def stackSlotForName(
-      thread: ThreadReference, name: String): Option[StackSlot] = {
+  private def stackSlotForName(thread: ThreadReference,
+                               name: String): Option[StackSlot] = {
     var result: Option[StackSlot] = None
     var frame = 0
     while (result.isEmpty && frame < thread.frameCount) {
@@ -525,8 +532,10 @@ class VM(val mode: VmMode,
     val locals = ignoreErr({
       frame.visibleVariables.zipWithIndex.map {
         case (v, i) =>
-          DebugStackLocal(
-              i, v.name, valueSummary(frame.getValue(v)), v.typeName())
+          DebugStackLocal(i,
+                          v.name,
+                          valueSummary(frame.getValue(v)),
+                          v.typeName())
       }.toList
     }, List.empty)
 
@@ -551,8 +560,9 @@ class VM(val mode: VmMode,
                     DebugObjectId(thisObjId))
   }
 
-  def backtrace(
-      thread: ThreadReference, index: Int, count: Int): DebugBacktrace = {
+  def backtrace(thread: ThreadReference,
+                index: Int,
+                count: Int): DebugBacktrace = {
     val frames = ListBuffer[DebugStackFrame]()
     var i = index
     while (i < thread.frameCount && (count == -1 || i < count)) {
@@ -560,8 +570,9 @@ class VM(val mode: VmMode,
       frames += makeStackFrame(i, stackFrame)
       i += 1
     }
-    DebugBacktrace(
-        frames.toList, DebugThreadId(thread.uniqueID()), thread.name())
+    DebugBacktrace(frames.toList,
+                   DebugThreadId(thread.uniqueID()),
+                   thread.name())
   }
 
   private def mirrorFromString(tpe: Type, toMirror: String): Option[Value] = {

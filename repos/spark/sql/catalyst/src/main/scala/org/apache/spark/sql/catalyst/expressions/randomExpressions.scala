@@ -62,8 +62,7 @@ case class Rand(seed: Long) extends RDG {
   def this() = this(Utils.random.nextLong())
 
   def this(seed: Expression) =
-    this(
-        seed match {
+    this(seed match {
       case IntegerLiteral(s) => s
       case _ =>
         throw new AnalysisException(
@@ -92,8 +91,7 @@ case class Randn(seed: Long) extends RDG {
   def this() = this(Utils.random.nextLong())
 
   def this(seed: Expression) =
-    this(
-        seed match {
+    this(seed match {
       case IntegerLiteral(s) => s
       case _ =>
         throw new AnalysisException(

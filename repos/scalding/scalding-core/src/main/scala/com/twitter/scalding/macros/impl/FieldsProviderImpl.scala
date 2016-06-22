@@ -82,8 +82,9 @@ object FieldsProviderImpl {
       implicit T: c.WeakTypeTag[T]): c.Expr[cascading.tuple.Fields] =
     toFieldsCommonImpl(c, Indexed, true)(T)
 
-  def toFieldsCommonImpl[T](
-      c: Context, namingScheme: NamingScheme, allowUnknownTypes: Boolean)(
+  def toFieldsCommonImpl[T](c: Context,
+                            namingScheme: NamingScheme,
+                            allowUnknownTypes: Boolean)(
       implicit T: c.WeakTypeTag[T]): c.Expr[cascading.tuple.Fields] = {
     import c.universe._
 
@@ -165,7 +166,7 @@ object FieldsProviderImpl {
           OptionBuilder(matchField(innerType, name))
         case tpe
             if (tpe.typeSymbol.isClass &&
-                tpe.typeSymbol.asClass.isCaseClass) =>
+                  tpe.typeSymbol.asClass.isCaseClass) =>
           CaseClassBuilder(name, expandMethod(tpe).map {
             case (t, s) => matchField(t, s)
           })
@@ -179,8 +180,8 @@ object FieldsProviderImpl {
         case m: MethodSymbol if m.isCaseAccessor => m
       }.map { accessorMethod =>
         val fieldName = accessorMethod.name.toTermName.toString
-        val fieldType = accessorMethod.returnType.asSeenFrom(
-            outerTpe, outerTpe.typeSymbol.asClass)
+        val fieldType = accessorMethod.returnType
+          .asSeenFrom(outerTpe, outerTpe.typeSymbol.asClass)
         (fieldType, fieldName)
       }.toVector
 

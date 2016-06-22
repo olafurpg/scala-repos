@@ -53,10 +53,10 @@ final case class OAuth2BearerToken(token: String)
   override def params: Map[String, String] = Map.empty
 }
 
-final case class GenericHttpCredentials(scheme: String,
-                                        token: String,
-                                        params: Map[String, String] =
-                                          Map.empty)
+final case class GenericHttpCredentials(
+    scheme: String,
+    token: String,
+    params: Map[String, String] = Map.empty)
     extends HttpCredentials {
   def render[R <: Rendering](r: R): r.type = {
     r ~~ scheme
@@ -76,7 +76,7 @@ final case class GenericHttpCredentials(scheme: String,
 }
 
 object GenericHttpCredentials {
-  def apply(
-      scheme: String, params: Map[String, String]): GenericHttpCredentials =
+  def apply(scheme: String,
+            params: Map[String, String]): GenericHttpCredentials =
     apply(scheme, "", params)
 }

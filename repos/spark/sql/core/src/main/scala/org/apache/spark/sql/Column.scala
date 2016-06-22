@@ -49,8 +49,8 @@ private[sql] object Column {
   *
   * @since 1.6.0
   */
-class TypedColumn[-T, U](
-    expr: Expression, private[sql] val encoder: ExpressionEncoder[U])
+class TypedColumn[-T, U](expr: Expression,
+                         private[sql] val encoder: ExpressionEncoder[U])
     extends Column(expr) {
 
   /**
@@ -235,7 +235,7 @@ class Column(protected[sql] val expr: Expression) extends Logging {
     if (this.expr == right) {
       logWarning(
           s"Constructing trivially true equals predicate, '${this.expr} = $right'. " +
-          "Perhaps you need to use aliases.")
+            "Perhaps you need to use aliases.")
     }
     EqualTo(expr, right)
   }
@@ -290,8 +290,8 @@ class Column(protected[sql] val expr: Expression) extends Logging {
     * @group expr_ops
     * @since 1.3.0
     */
-  @deprecated(
-      "!== does not have the same precedence as ===, use =!= instead", "2.0.0")
+  @deprecated("!== does not have the same precedence as ===, use =!= instead",
+              "2.0.0")
   def !==(other: Any): Column = this =!= other
 
   /**

@@ -46,8 +46,8 @@ private[hive] class HiveSessionState(ctx: HiveContext)
     * Note that HiveUDFs will be overridden by functions registered in this context.
     */
   override lazy val functionRegistry: FunctionRegistry = {
-    new HiveFunctionRegistry(
-        FunctionRegistry.builtin.copy(), ctx.executionHive)
+    new HiveFunctionRegistry(FunctionRegistry.builtin.copy(),
+                             ctx.executionHive)
   }
 
   /**
@@ -57,7 +57,7 @@ private[hive] class HiveSessionState(ctx: HiveContext)
     new Analyzer(catalog, functionRegistry, conf) {
       override val extendedResolutionRules =
         catalog.ParquetConversions :: catalog.CreateTables :: catalog.PreInsertionCasts :: python.ExtractPythonUDFs :: PreInsertCastAndRename :: DataSourceAnalysis ::
-        (if (conf.runSQLOnFile) new ResolveDataSource(ctx) :: Nil else Nil)
+          (if (conf.runSQLOnFile) new ResolveDataSource(ctx) :: Nil else Nil)
 
       override val extendedCheckRules = Seq(PreWriteCheck(catalog))
     }

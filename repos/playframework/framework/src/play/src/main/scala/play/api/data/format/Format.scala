@@ -86,9 +86,11 @@ object Formats {
     * @param key Key name of the field to parse
     * @param data Field data
     */
-  private def parsing[T](
-      parse: String => T, errMsg: String, errArgs: Seq[Any])(
-      key: String, data: Map[String, String]): Either[Seq[FormError], T] = {
+  private def parsing[T](parse: String => T,
+                         errMsg: String,
+                         errArgs: Seq[Any])(
+      key: String,
+      data: Map[String, String]): Either[Seq[FormError], T] = {
     stringFormat.bind(key, data).right.flatMap { s =>
       scala.util.control.Exception
         .allCatch[T]
@@ -98,8 +100,8 @@ object Formats {
     }
   }
 
-  private def numberFormatter[T](
-      convert: String => T, real: Boolean = false): Formatter[T] = {
+  private def numberFormatter[T](convert: String => T,
+                                 real: Boolean = false): Formatter[T] = {
     val (formatString, errorString) =
       if (real) ("format.real", "error.real")
       else ("format.numeric", "error.number")
@@ -254,9 +256,9 @@ object Formats {
     * @param pattern a date pattern as specified in `org.joda.time.format.DateTimeFormat`.
     * @param timeZone the `java.util.TimeZone` to use for parsing and formatting
     */
-  def sqlDateFormat(pattern: String,
-                    timeZone: TimeZone =
-                      TimeZone.getDefault): Formatter[java.sql.Date] =
+  def sqlDateFormat(
+      pattern: String,
+      timeZone: TimeZone = TimeZone.getDefault): Formatter[java.sql.Date] =
     new Formatter[java.sql.Date] {
 
       val dateFormatter = dateFormat(pattern, timeZone)

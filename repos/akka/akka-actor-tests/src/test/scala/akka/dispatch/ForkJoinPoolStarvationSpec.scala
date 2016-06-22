@@ -5,8 +5,8 @@ import akka.testkit.{ImplicitSender, AkkaSpec}
 import com.typesafe.config.ConfigFactory
 
 object ForkJoinPoolStarvationSpec {
-  val config =
-    ConfigFactory.parseString("""
+  val config = ConfigFactory.parseString(
+      """
       |actorhang {
       |
       |  task-dispatcher {

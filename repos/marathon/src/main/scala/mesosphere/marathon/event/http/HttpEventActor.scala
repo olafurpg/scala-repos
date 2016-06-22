@@ -28,20 +28,20 @@ object HttpEventActor {
   case class NotificationFailed(url: String)
   case class NotificationSuccess(url: String)
 
-  case class EventNotificationLimit(
-      failedCount: Long, backoffUntil: Option[Deadline]) {
+  case class EventNotificationLimit(failedCount: Long,
+                                    backoffUntil: Option[Deadline]) {
     def nextFailed: EventNotificationLimit = {
       val next = failedCount + 1
-      EventNotificationLimit(
-          next, Some(math.pow(2, next.toDouble).seconds.fromNow))
+      EventNotificationLimit(next,
+                             Some(math.pow(2, next.toDouble).seconds.fromNow))
     }
     def notLimited: Boolean = backoffUntil.fold(true)(_.isOverdue())
     def limited: Boolean = !notLimited
   }
   val NoLimit = EventNotificationLimit(0, None)
 
-  private case class Broadcast(
-      event: MarathonEvent, subscribers: EventSubscribers)
+  private case class Broadcast(event: MarathonEvent,
+                               subscribers: EventSubscribers)
 
   class HttpEventActorMetrics @Inject()(metrics: Metrics) {
     private val pre = MetricPrefixes.SERVICE

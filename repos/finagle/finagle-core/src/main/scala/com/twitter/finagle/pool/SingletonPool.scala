@@ -69,8 +69,8 @@ private[finagle] object SingletonPool {
   * service. A new Service is established whenever the service factory
   * fails or the current service has become unavailable.
   */
-class SingletonPool[Req, Rep](
-    underlying: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver)
+class SingletonPool[Req, Rep](underlying: ServiceFactory[Req, Rep],
+                              statsReceiver: StatsReceiver)
     extends ServiceFactory[Req, Rep] {
   import SingletonPool._
 

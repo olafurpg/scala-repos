@@ -53,8 +53,8 @@ class MyUnboundedMailbox
   }
 
   // The create method is called to create the MessageQueue
-  final override def create(
-      owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
+  final override def create(owner: Option[ActorRef],
+                            system: Option[ActorSystem]): MessageQueue =
     new MyMessageQueue()
 }
 //#mailbox-implementation-example

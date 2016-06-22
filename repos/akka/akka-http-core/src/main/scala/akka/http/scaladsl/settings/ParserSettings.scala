@@ -19,7 +19,7 @@ import scala.compat.java8.OptionConverters
 /**
   * Public API but not intended for subclassing
   */
-abstract class ParserSettings private[akka]()
+abstract class ParserSettings private[akka] ()
     extends akka.http.javadsl.settings.ParserSettings {
   self: ParserSettingsImpl ⇒
   def maxUriLength: Int

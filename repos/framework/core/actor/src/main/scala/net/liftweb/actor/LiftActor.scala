@@ -72,8 +72,7 @@ object LAScheduler extends LAScheduler with Loggable {
                              })
 
       def execute(f: () => Unit): Unit =
-        es.execute(
-            new Runnable {
+        es.execute(new Runnable {
           def run() {
             try {
               f()
@@ -162,8 +161,8 @@ trait SpecializedLiftActor[T] extends SimpleActor[T] {
     prev = this
   }
 
-  private def findMailboxItem(
-      start: MailboxItem, f: MailboxItem => Boolean): Box[MailboxItem] =
+  private def findMailboxItem(start: MailboxItem,
+                              f: MailboxItem => Boolean): Box[MailboxItem] =
     start match {
       case x: SpecialMailbox => Empty
       case x if f(x) => Full(x)
@@ -409,8 +408,8 @@ trait LiftActor
   @volatile
   private[this] var responseFuture: LAFuture[Any] = null
 
-  protected final def forwardMessageTo(
-      msg: Any, forwardTo: TypedActor[Any, Any]) {
+  protected final def forwardMessageTo(msg: Any,
+                                       forwardTo: TypedActor[Any, Any]) {
     if (null ne responseFuture) {
       forwardTo match {
         case la: LiftActor => la ! MsgWithResp(msg, responseFuture)
@@ -540,10 +539,10 @@ object LiftActorJ {
       methods.get(clz) match {
         case Some(pf) => pf.vend(what)
         case _ => {
-            val pf = buildPF(clz)
-            methods += clz -> pf
-            pf.vend(what)
-          }
+          val pf = buildPF(clz)
+          methods += clz -> pf
+          pf.vend(what)
+        }
       }
     }
 
@@ -561,8 +560,7 @@ object LiftActorJ {
     val methods =
       getBaseClasses(clz).flatMap(_.getDeclaredMethods.toList.filter(receiver))
 
-    val clzMap: Map[Class[_], Method] = Map(
-        methods.map { m =>
+    val clzMap: Map[Class[_], Method] = Map(methods.map { m =>
       m.setAccessible(true) // access private and protected methods
       m.getParameterTypes().apply(0) -> m
     }: _*)
@@ -572,8 +570,9 @@ object LiftActorJ {
 }
 
 private final class DispatchVendor(map: Map[Class[_], Method]) {
-  private val baseMap: Map[Class[_], Option[Method]] = Map(
-      map.map { case (k, v) => (k, Some(v)) }.toList: _*)
+  private val baseMap: Map[Class[_], Option[Method]] = Map(map.map {
+    case (k, v) => (k, Some(v))
+  }.toList: _*)
 
   def vend(actor: LiftActorJ): PartialFunction[Any, Unit] =
     new PartialFunction[Any, Unit] {
@@ -587,10 +586,10 @@ private final class DispatchVendor(map: Map[Class[_], Method]) {
         theMap.get(clz) match {
           case Some(Some(_)) => true
           case None => {
-              val answer = findClass(clz)
-              theMap += clz -> answer
-              answer.isDefined
-            }
+            val answer = findClass(clz)
+            theMap += clz -> answer
+            answer.isDefined
+          }
           case _ => false
         }
       }

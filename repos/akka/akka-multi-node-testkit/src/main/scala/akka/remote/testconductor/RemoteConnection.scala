@@ -20,8 +20,9 @@ import org.jboss.netty.buffer.ChannelBuffer
   * INTERNAL API.
   */
 private[akka] class ProtobufEncoder extends OneToOneEncoder {
-  override def encode(
-      ctx: ChannelHandlerContext, ch: Channel, msg: AnyRef): AnyRef =
+  override def encode(ctx: ChannelHandlerContext,
+                      ch: Channel,
+                      msg: AnyRef): AnyRef =
     msg match {
       case m: Message ⇒
         val bytes = m.toByteArray()
@@ -36,8 +37,9 @@ private[akka] class ProtobufEncoder extends OneToOneEncoder {
   */
 private[akka] class ProtobufDecoder(prototype: Message)
     extends OneToOneDecoder {
-  override def decode(
-      ctx: ChannelHandlerContext, ch: Channel, obj: AnyRef): AnyRef =
+  override def decode(ctx: ChannelHandlerContext,
+                      ch: Channel,
+                      obj: AnyRef): AnyRef =
     obj match {
       case buf: ChannelBuffer ⇒
         val len = buf.readableBytes()
@@ -63,8 +65,8 @@ private[akka] class TestConductorPipelineFactory(
     val msg = List(new MsgEncoder, new MsgDecoder)
     (encap ::: proto ::: msg ::: handler :: Nil)
       .foldLeft(new DefaultChannelPipeline) { (pipe, handler) ⇒
-      pipe.addLast(Logging.simpleName(handler.getClass), handler); pipe
-    }
+        pipe.addLast(Logging.simpleName(handler.getClass), handler); pipe
+      }
   }
 }
 
@@ -120,6 +122,6 @@ private[akka] object RemoteConnection {
   }
 
   def shutdown(channel: Channel) =
-    try channel.close() finally try channel.getFactory.shutdown() finally channel.getFactory
-      .releaseExternalResources()
+    try channel.close() finally try channel.getFactory
+      .shutdown() finally channel.getFactory.releaseExternalResources()
 }

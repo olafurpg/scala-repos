@@ -48,8 +48,8 @@ trait Bindings {
     * @param values Collection of values
     * @return The highest Value
     */
-  def min(
-      v1: jfxbv.ObservableNumberValue, values: jfxbv.ObservableNumberValue*) =
+  def min(v1: jfxbv.ObservableNumberValue,
+          values: jfxbv.ObservableNumberValue*) =
     (v1 /: values)(jfxbb.Bindings.min)
 
   /**
@@ -60,8 +60,8 @@ trait Bindings {
     * @param values Collection of values
     * @return The Lowest Value
     */
-  def max(
-      v1: jfxbv.ObservableNumberValue, values: jfxbv.ObservableNumberValue*) =
+  def max(v1: jfxbv.ObservableNumberValue,
+          values: jfxbv.ObservableNumberValue*) =
     (v1 /: values)(jfxbb.Bindings.max)
 
   /**
@@ -72,8 +72,8 @@ trait Bindings {
     * @param values Collection of values
     * @return The Value sum.
     */
-  def add(
-      v1: jfxbv.ObservableNumberValue, values: jfxbv.ObservableNumberValue*) =
+  def add(v1: jfxbv.ObservableNumberValue,
+          values: jfxbv.ObservableNumberValue*) =
     (v1 /: values)(jfxbb.Bindings.add)
 
   /**
@@ -192,7 +192,8 @@ trait Bindings {
 
     // explicit conversion needed due to T(Any) typed method
     def choose[T](chooseExpression: ObservableValue[T, T]) =
-      new ObjectConditionBuilder[T](whenBuilder.`then`(ObservableValue
+      new ObjectConditionBuilder[T](
+          whenBuilder.`then`(ObservableValue
                 .sfxObservableValue2jfxObjectValue[T](chooseExpression)))
     def choose[T](chooseExpression: jfxbv.ObservableObjectValue[T]) =
       new ObjectConditionBuilder[T](whenBuilder.`then`(chooseExpression))
@@ -242,8 +243,9 @@ trait Bindings {
       whenBuilder: jfxbb.When#ObjectConditionBuilder[T]) {
     // explicit conversion needed due to T(Any) typed method
     def otherwise(otherwiseExpression: ObservableValue[T, T]) =
-      whenBuilder.otherwise(ObservableValue
-            .sfxObservableValue2jfxObjectValue[T](otherwiseExpression))
+      whenBuilder.otherwise(
+          ObservableValue.sfxObservableValue2jfxObjectValue[T](
+              otherwiseExpression))
     def otherwise(otherwiseExpression: jfxbv.ObservableObjectValue[T]) =
       whenBuilder.otherwise(otherwiseExpression)
     def otherwise(otherwiseExpression: T) =

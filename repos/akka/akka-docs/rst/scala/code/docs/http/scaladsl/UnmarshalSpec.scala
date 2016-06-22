@@ -18,13 +18,11 @@ class UnmarshalSpec extends AkkaSpec {
     import scala.concurrent.duration._
 
     val intFuture = Unmarshal("42").to[Int]
-    val int =
-      Await.result(intFuture, 1.second) // don't block in non-test code!
+    val int = Await.result(intFuture, 1.second) // don't block in non-test code!
     int shouldEqual 42
 
     val boolFuture = Unmarshal("off").to[Boolean]
-    val bool =
-      Await.result(boolFuture, 1.second) // don't block in non-test code!
+    val bool = Await.result(boolFuture, 1.second) // don't block in non-test code!
     bool shouldBe false
   }
 }

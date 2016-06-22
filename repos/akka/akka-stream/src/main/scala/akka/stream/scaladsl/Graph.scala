@@ -124,8 +124,8 @@ object MergePreferred {
     * @param secondaryPorts number of secondary input ports
     * @param eagerComplete if true, the merge will complete as soon as one of its inputs completes.
     */
-  def apply[T](
-      secondaryPorts: Int, eagerComplete: Boolean = false): MergePreferred[T] =
+  def apply[T](secondaryPorts: Int,
+               eagerComplete: Boolean = false): MergePreferred[T] =
     new MergePreferred(secondaryPorts, eagerComplete)
 }
 
@@ -146,8 +146,8 @@ object MergePreferred {
   *
   * A `Broadcast` has one `in` port and 2 or more `out` ports.
   */
-final class MergePreferred[T] private (
-    val secondaryPorts: Int, val eagerComplete: Boolean)
+final class MergePreferred[T] private (val secondaryPorts: Int,
+                                       val eagerComplete: Boolean)
     extends GraphStage[MergePreferred.MergePreferredShape[T]] {
   require(secondaryPorts >= 1,
           "A MergePreferred must have more than 0 secondary input ports")
@@ -246,10 +246,10 @@ object Interleave {
     * @param segmentSize number of elements to send downstream before switching to next input port
     * @param eagerClose if true, interleave completes upstream if any of its upstream completes.
     */
-  def apply[T](inputPorts: Int,
-               segmentSize: Int,
-               eagerClose: Boolean =
-                 false): Graph[UniformFanInShape[T, T], NotUsed] =
+  def apply[T](
+      inputPorts: Int,
+      segmentSize: Int,
+      eagerClose: Boolean = false): Graph[UniformFanInShape[T, T], NotUsed] =
     GraphStages.withDetachedInputs(
         new Interleave[T](inputPorts, segmentSize, eagerClose))
 }
@@ -267,8 +267,9 @@ object Interleave {
   * '''Cancels when''' downstream cancels
   *
   */
-final class Interleave[T] private (
-    val inputPorts: Int, val segmentSize: Int, val eagerClose: Boolean)
+final class Interleave[T] private (val inputPorts: Int,
+                                   val segmentSize: Int,
+                                   val eagerClose: Boolean)
     extends GraphStage[UniformFanInShape[T, T]] {
   require(inputPorts > 1, "input ports must be > 1")
   require(segmentSize > 0, "segmentSize must be > 0")
@@ -371,9 +372,11 @@ final class MergeSorted[T: Ordering] extends GraphStage[FanInShape2[T, T, T]] {
 
     val dispatchR = dispatch(other, _: T)
     val dispatchL = dispatch(_: T, other)
-    val passR = () ⇒
-      emit(
-          out, other, () ⇒ { nullOut(); passAlong(right, out, doPull = true) })
+    val passR =
+      () ⇒
+        emit(out, other, () ⇒ {
+          nullOut(); passAlong(right, out, doPull = true)
+        })
     val passL = () ⇒
       emit(out, other, () ⇒ { nullOut(); passAlong(left, out, doPull = true) })
     val readR = () ⇒ read(right)(dispatchR, passL)
@@ -424,8 +427,8 @@ final class Broadcast[T](private val outputPorts: Int, eagerCancel: Boolean)
   val out: immutable.IndexedSeq[Outlet[T]] =
     Vector.tabulate(outputPorts)(i ⇒ Outlet[T]("Broadcast.out" + i))
   override def initialAttributes = DefaultAttributes.broadcast
-  override val shape: UniformFanOutShape[T, T] = UniformFanOutShape(
-      in, out: _*)
+  override val shape: UniformFanOutShape[T, T] =
+    UniformFanOutShape(in, out: _*)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) {
@@ -542,7 +545,7 @@ final class Partition[T](outputPorts: Int, partitioner: T ⇒ Int)
             failStage(
                 PartitionOutOfBoundsException(
                     s"partitioner must return an index in the range [0,${outputPorts -
-            1}]. returned: [$idx] for input [${elem.getClass.getName}]."))
+              1}]. returned: [$idx] for input [${elem.getClass.getName}]."))
           else if (!isClosed(out(idx))) {
             if (isAvailable(out(idx))) {
               push(out(idx), elem)
@@ -605,8 +608,8 @@ object Balance {
     *   elements to downstream outputs until all of them have requested at least one element,
     *   default value is `false`
     */
-  def apply[T](
-      outputPorts: Int, waitForAllDownstreams: Boolean = false): Balance[T] =
+  def apply[T](outputPorts: Int,
+               waitForAllDownstreams: Boolean = false): Balance[T] =
     new Balance(outputPorts, waitForAllDownstreams)
 }
 
@@ -845,14 +848,14 @@ final class Concat[T](inputPorts: Int)
 
 object GraphDSL extends GraphApply {
 
-  class Builder[+M] private[stream]() {
+  class Builder[+M] private[stream] () {
     private var moduleInProgress: Module = EmptyModule
 
     /**
       * INTERNAL API
       */
-    private[GraphDSL] def addEdge[T, U >: T](
-        from: Outlet[T], to: Inlet[U]): Unit =
+    private[GraphDSL] def addEdge[T, U >: T](from: Outlet[T],
+                                             to: Inlet[U]): Unit =
       moduleInProgress = moduleInProgress.wire(from, to)
 
     /**
@@ -875,8 +878,8 @@ object GraphDSL extends GraphApply {
       * This is only used by the materialization-importing apply methods of Source,
       * Flow, Sink and Graph.
       */
-    private[stream] def add[S <: Shape, A](
-        graph: Graph[S, _], transform: (A) ⇒ Any): S = {
+    private[stream] def add[S <: Shape, A](graph: Graph[S, _],
+                                           transform: (A) ⇒ Any): S = {
       if (StreamLayout.Debug) StreamLayout.validate(graph.module)
       val copy = graph.module.carbonCopy
       moduleInProgress = moduleInProgress.compose(
@@ -892,8 +895,8 @@ object GraphDSL extends GraphApply {
       * This is only used by the materialization-importing apply methods of Source,
       * Flow, Sink and Graph.
       */
-    private[stream] def add[S <: Shape, A, B](
-        graph: Graph[S, _], combine: (A, B) ⇒ Any): S = {
+    private[stream] def add[S <: Shape, A, B](graph: Graph[S, _],
+                                              combine: (A, B) ⇒ Any): S = {
       if (StreamLayout.Debug) StreamLayout.validate(graph.module)
       val copy = graph.module.carbonCopy
       moduleInProgress = moduleInProgress.compose(copy, combine)
@@ -929,8 +932,8 @@ object GraphDSL extends GraphApply {
        * the source would not be triggered.
        */
       if (moduleInProgress.isInstanceOf[CopiedModule]) {
-        moduleInProgress = CompositeModule(
-            moduleInProgress, moduleInProgress.shape)
+        moduleInProgress =
+          CompositeModule(moduleInProgress, moduleInProgress.shape)
       }
       val source = new MaterializedValueSource[M](
           moduleInProgress.materializedValueComputation)
@@ -938,8 +941,8 @@ object GraphDSL extends GraphApply {
       source.out
     }
 
-    private[stream] def deprecatedAndThen(
-        port: OutPort, op: StageModule): Unit = {
+    private[stream] def deprecatedAndThen(port: OutPort,
+                                          op: StageModule): Unit = {
       moduleInProgress = moduleInProgress.compose(op).wire(port, op.inPort)
     }
 
@@ -965,8 +968,9 @@ object GraphDSL extends GraphApply {
     }
 
     @tailrec
-    private[stream] def findIn[I, O](
-        b: Builder[_], junction: UniformFanInShape[I, O], n: Int): Inlet[I] = {
+    private[stream] def findIn[I, O](b: Builder[_],
+                                     junction: UniformFanInShape[I, O],
+                                     n: Int): Inlet[I] = {
       if (n == junction.inSeq.length)
         throw new IllegalArgumentException(s"no more inlets free on $junction")
       else if (b.module.upstreams.contains(junction.in(n)))
@@ -1078,7 +1082,8 @@ object GraphDSL extends GraphApply {
     }
 
     private class PortOpsImpl[+Out](
-        override val outlet: Outlet[Out @uncheckedVariance], b: Builder[_])
+        override val outlet: Outlet[Out @uncheckedVariance],
+        b: Builder[_])
         extends PortOps[Out] {
 
       override def withAttributes(attr: Attributes): Repr[Out] =

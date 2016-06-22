@@ -102,8 +102,7 @@ abstract class SimpleRetryPolicy[A](i: Int)
         case Duration.Top =>
           None
         case howlong =>
-          Some(
-              (howlong, new SimpleRetryPolicy[A](i + 1) {
+          Some((howlong, new SimpleRetryPolicy[A](i + 1) {
             def shouldRetry(a: A) = SimpleRetryPolicy.this.shouldRetry(a)
             def backoffAt(retry: Int) = SimpleRetryPolicy.this.backoffAt(retry)
           }))

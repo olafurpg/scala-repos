@@ -42,8 +42,8 @@ trait ScalaClassLoader extends JClassLoader {
   def tryToInitializeClass[T <: AnyRef](path: String): Option[Class[T]] =
     tryClass(path, initialize = true)
 
-  private def tryClass[T <: AnyRef](
-      path: String, initialize: Boolean): Option[Class[T]] =
+  private def tryClass[T <: AnyRef](path: String,
+                                    initialize: Boolean): Option[Class[T]] =
     catching(classOf[ClassNotFoundException], classOf[SecurityException]) opt Class
       .forName(path, initialize, this)
       .asInstanceOf[Class[T]]
@@ -63,21 +63,20 @@ trait ScalaClassLoader extends JClassLoader {
         val ctor = {
           val maybes =
             clazz.getConstructors filter
-            (c =>
-                  c.getParameterCount == args.size &&
-                  (c.getParameterTypes zip args).forall {
-                    case (k, a) => k isAssignableFrom a.getClass
-                })
+              (c =>
+                    c.getParameterCount == args.size &&
+                      (c.getParameterTypes zip args).forall {
+                        case (k, a) => k isAssignableFrom a.getClass
+                    })
           if (maybes.size == 1) maybes.head
           else
             fail(s"Constructor must accept arg list (${args map
-            (_.getClass.getName) mkString ", "}): ${path}")
+              (_.getClass.getName) mkString ", "}): ${path}")
         }
         (ctor.newInstance(args: _*)).asInstanceOf[T]
       } else {
-        errorFn(
-            s"""Loader for ${classTag[T]}:   [${show(
-               classTag[T].runtimeClass.getClassLoader)}]
+        errorFn(s"""Loader for ${classTag[T]}:   [${show(
+                   classTag[T].runtimeClass.getClassLoader)}]
                    |Loader for ${clazz.getName}: [${show(clazz.getClassLoader)}]""".stripMargin)
         fail(s"Not a ${classTag[T]}: ${path}")
       }
@@ -106,7 +105,7 @@ trait ScalaClassLoader extends JClassLoader {
   def run(objectName: String, arguments: Seq[String]) {
     val clsToRun =
       tryToInitializeClass(objectName) getOrElse
-      (throw new ClassNotFoundException(objectName))
+        (throw new ClassNotFoundException(objectName))
     val method = clsToRun.getMethod("main", classOf[Array[String]])
     if (!Modifier.isStatic(method.getModifiers))
       throw new NoSuchMethodException(objectName + ".main is not static")
@@ -168,5 +167,5 @@ object ScalaClassLoader {
   /** Finding what jar a clazz or instance came from */
   def originOfClass(x: Class[_]): Option[URL] =
     Option(x.getProtectionDomain.getCodeSource) flatMap
-    (x => Option(x.getLocation))
+      (x => Option(x.getLocation))
 }

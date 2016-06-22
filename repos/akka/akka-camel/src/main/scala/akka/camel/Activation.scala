@@ -21,7 +21,8 @@ trait Activation {
     * @param timeout the timeout for the Future
     */
   def activationFutureFor(endpoint: ActorRef)(
-      implicit timeout: Timeout, executor: ExecutionContext): Future[ActorRef]
+      implicit timeout: Timeout,
+      executor: ExecutionContext): Future[ActorRef]
 
   /**
     * Produces a Future which will be completed when the given endpoint has been deactivated or
@@ -31,5 +32,6 @@ trait Activation {
     * @param timeout the timeout of the Future
     */
   def deactivationFutureFor(endpoint: ActorRef)(
-      implicit timeout: Timeout, executor: ExecutionContext): Future[ActorRef]
+      implicit timeout: Timeout,
+      executor: ExecutionContext): Future[ActorRef]
 }

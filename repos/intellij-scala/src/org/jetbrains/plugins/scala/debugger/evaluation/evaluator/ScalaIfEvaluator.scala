@@ -8,8 +8,9 @@ import com.sun.jdi.BooleanValue
   * User: Alefas
   * Date: 19.10.11
   */
-class ScalaIfEvaluator(
-    condition: Evaluator, ifBranch: Evaluator, elseBranch: Option[Evaluator])
+class ScalaIfEvaluator(condition: Evaluator,
+                       ifBranch: Evaluator,
+                       elseBranch: Option[Evaluator])
     extends Evaluator {
   private var modifier: Modifier = null
 

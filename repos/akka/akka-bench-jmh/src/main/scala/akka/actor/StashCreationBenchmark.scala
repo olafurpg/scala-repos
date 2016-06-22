@@ -31,8 +31,8 @@ class StashCreationBenchmark {
       stash-capacity = 1000
     }
     """)
-  implicit val system: ActorSystem = ActorSystem(
-      "StashCreationBenchmark", conf)
+  implicit val system: ActorSystem =
+    ActorSystem("StashCreationBenchmark", conf)
   val probe = TestProbe()
 
   @TearDown(Level.Trial)

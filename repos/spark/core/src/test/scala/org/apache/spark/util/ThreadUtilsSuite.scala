@@ -33,8 +33,7 @@ class ThreadUtilsSuite extends SparkFunSuite {
     val executor =
       ThreadUtils.newDaemonSingleThreadExecutor("this-is-a-thread-name")
     @volatile var threadName = ""
-    executor.submit(
-        new Runnable {
+    executor.submit(new Runnable {
       override def run(): Unit = {
         threadName = Thread.currentThread().getName()
       }
@@ -73,8 +72,7 @@ class ThreadUtilsSuite extends SparkFunSuite {
         keepAliveSeconds = 2)
     try {
       for (_ <- 1 to maxThreadNumber) {
-        cachedThreadPool.execute(
-            new Runnable {
+        cachedThreadPool.execute(new Runnable {
           override def run(): Unit = {
             startThreadsLatch.countDown()
             latch.await(10, TimeUnit.SECONDS)
@@ -87,8 +85,7 @@ class ThreadUtilsSuite extends SparkFunSuite {
 
       // Submit a new task and it should be put into the queue since the thread number reaches the
       // limitation
-      cachedThreadPool.execute(
-          new Runnable {
+      cachedThreadPool.execute(new Runnable {
         override def run(): Unit = {
           latch.await(10, TimeUnit.SECONDS)
         }
@@ -135,15 +132,18 @@ class ThreadUtilsSuite extends SparkFunSuite {
       }
     }
     assert(
-        exception.asInstanceOf[IllegalArgumentException].getMessage === uniqueExceptionMessage)
+        exception
+          .asInstanceOf[IllegalArgumentException]
+          .getMessage === uniqueExceptionMessage)
     assert(
         exception.getStackTrace
           .mkString("\n")
           .contains(
               "... run in separate thread using org.apache.spark.util.ThreadUtils ...") === true,
         "stack trace does not contain expected place holder")
-    assert(
-        exception.getStackTrace.mkString("\n").contains("ThreadUtils.scala") === false,
-        "stack trace contains unexpected references to ThreadUtils")
+    assert(exception.getStackTrace
+             .mkString("\n")
+             .contains("ThreadUtils.scala") === false,
+           "stack trace contains unexpected references to ThreadUtils")
   }
 }

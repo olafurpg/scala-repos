@@ -29,14 +29,15 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
 
   override def getDisplayName: String = "Error highlighting for Scala"
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new PsiElementVisitor {
       override def visitElement(element: PsiElement) {
         val file = element.getContainingFile
         if (file.isInstanceOf[PsiJavaFile]) {
           val highlightVisitors = Extensions.getExtensions(
-              HighlightVisitor.EP_HIGHLIGHT_VISITOR, element.getProject)
+              HighlightVisitor.EP_HIGHLIGHT_VISITOR,
+              element.getProject)
           val highlightInfoHolder = new HighlightInfoHolder(file)
 
           highlightVisitors.headOption.map {
@@ -62,7 +63,11 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
                 element: PsiElement): Boolean = true
           }
           val FakeAnnotation = new com.intellij.lang.annotation.Annotation(
-              0, 0, HighlightSeverity.WEAK_WARNING, "message", "tooltip")
+              0,
+              0,
+              HighlightSeverity.WEAK_WARNING,
+              "message",
+              "tooltip")
           val annotationHolder = new AnnotationHolder {
             override def createAnnotation(severity: HighlightSeverity,
                                           range: TextRange,
@@ -70,32 +75,39 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
                                           htmlTooltip: String): Annotation =
               FakeAnnotation
 
-            def createAnnotation(
-                severity: HighlightSeverity, range: TextRange, str: String) =
+            def createAnnotation(severity: HighlightSeverity,
+                                 range: TextRange,
+                                 str: String) =
               FakeAnnotation
 
             def isBatchMode: Boolean = false
 
-            def createInfoAnnotation(
-                range: TextRange, message: String): Annotation = FakeAnnotation
+            def createInfoAnnotation(range: TextRange,
+                                     message: String): Annotation =
+              FakeAnnotation
 
-            def createInfoAnnotation(
-                node: ASTNode, message: String): Annotation = FakeAnnotation
+            def createInfoAnnotation(node: ASTNode,
+                                     message: String): Annotation =
+              FakeAnnotation
 
-            def createInfoAnnotation(
-                elt: PsiElement, message: String): Annotation = FakeAnnotation
+            def createInfoAnnotation(elt: PsiElement,
+                                     message: String): Annotation =
+              FakeAnnotation
 
-            def createInformationAnnotation(
-                range: TextRange, message: String): Annotation = FakeAnnotation
+            def createInformationAnnotation(range: TextRange,
+                                            message: String): Annotation =
+              FakeAnnotation
 
-            def createInformationAnnotation(
-                node: ASTNode, message: String): Annotation = FakeAnnotation
+            def createInformationAnnotation(node: ASTNode,
+                                            message: String): Annotation =
+              FakeAnnotation
 
-            def createInformationAnnotation(
-                elt: PsiElement, message: String): Annotation = FakeAnnotation
+            def createInformationAnnotation(elt: PsiElement,
+                                            message: String): Annotation =
+              FakeAnnotation
 
-            def createWarningAnnotation(
-                range: TextRange, message: String): Annotation = {
+            def createWarningAnnotation(range: TextRange,
+                                        message: String): Annotation = {
               holder.registerProblem(
                   element,
                   s"Warning: $message",
@@ -103,8 +115,8 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
               FakeAnnotation
             }
 
-            def createWarningAnnotation(
-                node: ASTNode, message: String): Annotation = {
+            def createWarningAnnotation(node: ASTNode,
+                                        message: String): Annotation = {
               holder.registerProblem(
                   element,
                   s"Warning: $message",
@@ -112,8 +124,8 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
               FakeAnnotation
             }
 
-            def createWarningAnnotation(
-                elt: PsiElement, message: String): Annotation = {
+            def createWarningAnnotation(elt: PsiElement,
+                                        message: String): Annotation = {
               holder.registerProblem(
                   element,
                   s"Warning: $message",
@@ -121,8 +133,8 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
               FakeAnnotation
             }
 
-            def createErrorAnnotation(
-                range: TextRange, message: String): Annotation = {
+            def createErrorAnnotation(range: TextRange,
+                                      message: String): Annotation = {
               if (message != null) {
                 holder.registerProblem(element,
                                        s"Error detected: $message",
@@ -131,8 +143,8 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
               FakeAnnotation
             }
 
-            def createErrorAnnotation(
-                node: ASTNode, message: String): Annotation = {
+            def createErrorAnnotation(node: ASTNode,
+                                      message: String): Annotation = {
               if (message != null) {
                 holder.registerProblem(element,
                                        s"Error detected: $message",
@@ -141,8 +153,8 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
               FakeAnnotation
             }
 
-            def createErrorAnnotation(
-                elt: PsiElement, message: String): Annotation = {
+            def createErrorAnnotation(elt: PsiElement,
+                                      message: String): Annotation = {
               if (message != null) {
                 holder.registerProblem(element,
                                        s"Error detected: $message",
@@ -155,14 +167,17 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
               new AnnotationSession(element.getContainingFile)
             }
 
-            def createWeakWarningAnnotation(
-                p1: TextRange, p2: String): Annotation = FakeAnnotation
+            def createWeakWarningAnnotation(p1: TextRange,
+                                            p2: String): Annotation =
+              FakeAnnotation
 
-            def createWeakWarningAnnotation(
-                p1: ASTNode, p2: String): Annotation = FakeAnnotation
+            def createWeakWarningAnnotation(p1: ASTNode,
+                                            p2: String): Annotation =
+              FakeAnnotation
 
-            def createWeakWarningAnnotation(
-                p1: PsiElement, p2: String): Annotation = FakeAnnotation
+            def createWeakWarningAnnotation(p1: PsiElement,
+                                            p2: String): Annotation =
+              FakeAnnotation
           }
           annotator.annotate(element, annotationHolder)
         }

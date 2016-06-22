@@ -6,7 +6,8 @@ trait Monad[T <: Bound[T], MyType[x <: Bound[x]], Bound[_]] {
               RContainer[x <: RBound[x]],
               RBound[_],
               Result[x <: RBound[x]] <: Monad[x, RContainer, RBound]](
-      f: T => Result[S], foo: String): Result[S]
+      f: T => Result[S],
+      foo: String): Result[S]
   def flatMap[S <: Bound[S]](f: T => MyType[S], foo: Int): MyType[S]
 }
 
@@ -22,7 +23,8 @@ trait Test {
                 RContainer[x <: RBound[x]],
                 RBound[_],
                 Result[x <: RBound[x]] <: Monad[x, RContainer, RBound]](
-        f: T => Result[S], foo: String): Result[S] = sys.error("foo")
+        f: T => Result[S],
+        foo: String): Result[S] = sys.error("foo")
     def flatMap[S](f: T => List[S], foo: Int): List[S] = sys.error("foo")
   }
   val l: MList[String] =

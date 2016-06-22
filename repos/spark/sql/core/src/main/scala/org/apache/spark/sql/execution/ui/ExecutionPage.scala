@@ -43,7 +43,7 @@ private[sql] class ExecutionPage(parent: SQLTab)
           val currentTime = System.currentTimeMillis()
           val duration =
             executionUIData.completionTime.getOrElse(currentTime) -
-            executionUIData.submissionTime
+              executionUIData.submissionTime
 
           val summary = <div>
           <ul class="unstyled">
@@ -91,8 +91,10 @@ private[sql] class ExecutionPage(parent: SQLTab)
           <div>No information to display for Plan {executionId}</div>
         }
 
-      UIUtils.headerSparkPage(
-          s"Details for Query $executionId", content, parent, Some(5000))
+      UIUtils.headerSparkPage(s"Details for Query $executionId",
+                              content,
+                              parent,
+                              Some(5000))
     }
 
   private def planVisualizationResources: Seq[Node] = {
@@ -105,8 +107,8 @@ private[sql] class ExecutionPage(parent: SQLTab)
     // scalastyle:on
   }
 
-  private def planVisualization(
-      metrics: Map[Long, String], graph: SparkPlanGraph): Seq[Node] = {
+  private def planVisualization(metrics: Map[Long, String],
+                                graph: SparkPlanGraph): Seq[Node] = {
     val metadata = graph.allNodes.flatMap { node =>
       val nodeId = s"plan-meta-data-${node.id}"
       <div id={nodeId}>{node.desc}</div>

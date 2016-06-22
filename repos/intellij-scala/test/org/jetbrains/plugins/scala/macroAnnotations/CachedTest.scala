@@ -58,12 +58,10 @@ class CachedTest extends CachedTestBase {
 
     def setUpThreads(): (Thread, Thread) = {
       Foo.allThreadsStartedLock.lock()
-      val thread1 = new Thread(
-          new Runnable {
+      val thread1 = new Thread(new Runnable {
         override def run(): Unit = Foo.runSynchronized()
       })
-      val thread2 = new Thread(
-          new Runnable {
+      val thread2 = new Thread(new Runnable {
         override def run(): Unit = Foo.runSynchronized()
       })
 
@@ -78,7 +76,8 @@ class CachedTest extends CachedTestBase {
       thread2.setUncaughtExceptionHandler(eh)
 
       thread1.start() //this thread should be waiting on acquiring the lock
-      thread2.start() //this thread should be waiting outside synchronized block
+      thread2
+        .start() //this thread should be waiting outside synchronized block
       //NOTE: we are not guaranteed which thread will be waiting where. They might switch, but that's still fine
 
       while (thread1.getState != Thread.State.WAITING &&
@@ -109,7 +108,8 @@ class CachedTest extends CachedTestBase {
     val firstRes = Foo.currentTime
     Thread.sleep(1)
     Assert.assertEquals(firstRes, Foo.currentTime)
-    Foo.getManager.getModificationTracker.incOutOfCodeBlockModificationCounter()
+    Foo.getManager.getModificationTracker
+      .incOutOfCodeBlockModificationCounter()
     Assert.assertTrue(firstRes < Foo.currentTime)
   }
 

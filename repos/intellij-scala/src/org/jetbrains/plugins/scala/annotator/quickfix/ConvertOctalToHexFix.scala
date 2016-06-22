@@ -36,8 +36,8 @@ class ConvertOctalToHexFix(literal: ScLiteral) extends IntentionAction {
     if (!literal.isValid) return
     val text = literal.getText
     if (!(text.length >= 2 && text(0) == '0' && text(1).toLower != 'x')) return
-    val psi = ScalaPsiElementFactory.createExpressionFromText(
-        convertOctalToHex(text), literal.getManager)
+    val psi = ScalaPsiElementFactory
+      .createExpressionFromText(convertOctalToHex(text), literal.getManager)
     literal.replace(psi)
   }
 }

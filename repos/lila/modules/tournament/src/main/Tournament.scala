@@ -99,8 +99,8 @@ case class Tournament(id: String,
     } map { this -> _ }
 }
 
-case class EnterableTournaments(
-    tours: List[Tournament], scheduled: List[Tournament])
+case class EnterableTournaments(tours: List[Tournament],
+                                scheduled: List[Tournament])
 
 object Tournament {
 

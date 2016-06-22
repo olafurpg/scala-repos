@@ -6,8 +6,8 @@ import mesosphere.mesos.protos.TaskID
 import org.apache.mesos.Protos.{TaskState, TaskStatus}
 
 object MarathonTaskStatusTestHelper {
-  def mesosStatus(
-      state: TaskState, maybeHealthy: Option[Boolean] = None): TaskStatus = {
+  def mesosStatus(state: TaskState,
+                  maybeHealthy: Option[Boolean] = None): TaskStatus = {
     import mesosphere.mesos.protos.Implicits._
     val builder = TaskStatus.newBuilder()
     builder.setTaskId(TaskID(UUID.randomUUID().toString)).setState(state)
@@ -17,9 +17,11 @@ object MarathonTaskStatusTestHelper {
 
   val running = MarathonTaskStatus.Running(
       mesosStatus = Some(mesosStatus(TaskState.TASK_RUNNING)))
-  val runningHealthy = MarathonTaskStatus.Running(mesosStatus =
+  val runningHealthy = MarathonTaskStatus.Running(
+      mesosStatus =
         Some(mesosStatus(TaskState.TASK_RUNNING, maybeHealthy = Some(true))))
-  val runningUnhealthy = MarathonTaskStatus.Running(mesosStatus =
+  val runningUnhealthy = MarathonTaskStatus.Running(
+      mesosStatus =
         Some(mesosStatus(TaskState.TASK_RUNNING, maybeHealthy = Some(false))))
   val staging = MarathonTaskStatus.Staging(
       mesosStatus = Some(mesosStatus(TaskState.TASK_STAGING)))

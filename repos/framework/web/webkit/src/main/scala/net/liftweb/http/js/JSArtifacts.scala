@@ -104,12 +104,22 @@ trait JSArtifacts {
   */
 object AjaxInfo {
   def apply(data: JsExp, post: Boolean) =
-    new AjaxInfo(
-        data, if (post) "POST" else "GET", 1000, false, "script", Empty, Empty)
+    new AjaxInfo(data,
+                 if (post) "POST" else "GET",
+                 1000,
+                 false,
+                 "script",
+                 Empty,
+                 Empty)
 
   def apply(data: JsExp, dataType: String, post: Boolean) =
-    new AjaxInfo(
-        data, if (post) "POST" else "GET", 1000, false, dataType, Empty, Empty)
+    new AjaxInfo(data,
+                 if (post) "POST" else "GET",
+                 1000,
+                 false,
+                 dataType,
+                 Empty,
+                 Empty)
 
   def apply(data: JsExp) =
     new AjaxInfo(data, "POST", 1000, false, "script", Empty, Empty)

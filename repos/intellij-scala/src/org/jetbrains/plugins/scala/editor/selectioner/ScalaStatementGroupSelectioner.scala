@@ -39,9 +39,11 @@ class ScalaStatementGroupSelectioner extends ExtendWordSelectionHandlerBase {
     def back(e: PsiElement) = e.getPrevSibling
     def forward(e: PsiElement) = e.getNextSibling
     val startElement = skipWhitespace(
-        findGroupBoundary(e, back, ScalaTokenTypes.tLBRACE), forward)
+        findGroupBoundary(e, back, ScalaTokenTypes.tLBRACE),
+        forward)
     val endElement = skipWhitespace(
-        findGroupBoundary(e, forward, ScalaTokenTypes.tRBRACE), back)
+        findGroupBoundary(e, forward, ScalaTokenTypes.tRBRACE),
+        back)
 
     val range: TextRange = new TextRange(
         startElement.getTextRange.getStartOffset,
@@ -72,8 +74,8 @@ class ScalaStatementGroupSelectioner extends ExtendWordSelectionHandlerBase {
     current
   }
 
-  def skipWhitespace(
-      start: PsiElement, step: PsiElement => PsiElement): PsiElement = {
+  def skipWhitespace(start: PsiElement,
+                     step: PsiElement => PsiElement): PsiElement = {
     var current = start
     while (current.isInstanceOf[PsiWhiteSpace]) {
       current = step(current)

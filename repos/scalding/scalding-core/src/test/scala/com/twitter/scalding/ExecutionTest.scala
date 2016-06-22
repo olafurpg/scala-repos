@@ -264,8 +264,9 @@ class ExecutionTest extends WordSpec with Matchers {
         .arg("output", "out")
         .source(TextLine("in"), List((0, "hello world"), (1, "goodbye world")))
         .typedSink(TypedTsv[(String, Long)]("out")) { outBuf =>
-          outBuf.toMap shouldBe Map(
-              "hello" -> 1L, "world" -> 2L, "goodbye" -> 1L)
+          outBuf.toMap shouldBe Map("hello" -> 1L,
+                                    "world" -> 2L,
+                                    "goodbye" -> 1L)
         }
         .run
         .runHadoop
@@ -420,11 +421,9 @@ class ExecutionTest extends WordSpec with Matchers {
     "Ability to do isolated caches so we don't exhaust memory" in {
 
       def memoryWastingExecutionGenerator(id: Int): Execution[Array[Long]] =
-        Execution.withNewCache(Execution
-              .from(id)
-              .flatMap { idx =>
-            Execution.from(Array.fill(4000000)(idx.toLong))
-          })
+        Execution.withNewCache(Execution.from(id).flatMap { idx =>
+          Execution.from(Array.fill(4000000)(idx.toLong))
+        })
 
       def writeAll(numExecutions: Int): Execution[Unit] = {
         if (numExecutions > 0) {
@@ -439,8 +438,8 @@ class ExecutionTest extends WordSpec with Matchers {
       writeAll(400).shouldSucceed()
     }
     "handle failure" in {
-      val result = Execution.withParallelism(
-          Seq(Execution.failed(new Exception("failed"))), 1)
+      val result = Execution
+        .withParallelism(Seq(Execution.failed(new Exception("failed"))), 1)
 
       assert(result.waitFor(Config.default, Local(true)).isFailure)
     }

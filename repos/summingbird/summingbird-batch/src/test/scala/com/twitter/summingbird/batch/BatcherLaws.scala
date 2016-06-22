@@ -85,9 +85,9 @@ object BatcherLaws extends Properties("Batcher") {
 
   def batcherLaws(batcher: Batcher) =
     earliestIs_<=(batcher) && batchesAreWeakOrderings(batcher) &&
-    batchesIncreaseByAtMostOne(batcher) && batchesCoveredByIdent(batcher) &&
-    batchIntervalTransformToTs(batcher, Interval.leftOpenRightClosed(_, _)) &&
-    batchIntervalTransformToTs(batcher, Interval.leftClosedRightOpen(_, _))
+      batchesIncreaseByAtMostOne(batcher) && batchesCoveredByIdent(batcher) &&
+      batchIntervalTransformToTs(batcher, Interval.leftOpenRightClosed(_, _)) &&
+      batchIntervalTransformToTs(batcher, Interval.leftClosedRightOpen(_, _))
 
   property("UnitBatcher should always return the same batch") = {
     val batcher = Batcher.unit
@@ -123,7 +123,8 @@ object BatcherLaws extends Properties("Batcher") {
     // sure that our index is floored toward negative inf.
     val flooredBatch = BatchID(if (millis < 0) (hourIndex - 1) else hourIndex)
 
-    (hourlyBatcher.batchOf(Timestamp(millis)) == flooredBatch) && (hourlyBatcher
+    (hourlyBatcher
+          .batchOf(Timestamp(millis)) == flooredBatch) && (hourlyBatcher
           .earliestTimeOf(flooredBatch)
           .milliSinceEpoch == hourlyBatchFloor(flooredBatch.id))
   }

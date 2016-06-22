@@ -40,7 +40,8 @@ class WorksheetFoldingBuilder extends FoldingBuilder {
   }
 
   override def buildFoldRegions(
-      astNode: ASTNode, document: Document): Array[FoldingDescriptor] = {
+      astNode: ASTNode,
+      document: Document): Array[FoldingDescriptor] = {
     val descriptors = new ArrayBuffer[FoldingDescriptor]
     val processedComments = new util.HashSet[PsiElement]
     appendDescriptors(astNode, document, descriptors, processedComments)
@@ -57,18 +58,18 @@ class WorksheetFoldingBuilder extends FoldingBuilder {
       val length = Math.max(WorksheetFoldingBuilder.FIRST_LINE_PREFIX.length,
                             WorksheetFoldingBuilder.LINE_PREFIX.length)
       descriptors +=
-        (new FoldingDescriptor(node,
-                               new TextRange(node.getPsi
-                                               .asInstanceOf[PsiComment]
-                                               .getTextRange
-                                               .getStartOffset,
-                                             node.getPsi
-                                               .asInstanceOf[PsiComment]
-                                               .getTextRange
-                                               .getStartOffset + length),
-                               null,
-                               Collections.emptySet[AnyRef],
-                               true))
+      (new FoldingDescriptor(node,
+                             new TextRange(node.getPsi
+                                             .asInstanceOf[PsiComment]
+                                             .getTextRange
+                                             .getStartOffset,
+                                           node.getPsi
+                                             .asInstanceOf[PsiComment]
+                                             .getTextRange
+                                             .getStartOffset + length),
+                             null,
+                             Collections.emptySet[AnyRef],
+                             true))
     }
 
     for (child <- node.getChildren(null)) {

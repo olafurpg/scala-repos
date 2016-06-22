@@ -135,7 +135,7 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     */
   def retain(p: A => Boolean): Unit =
     for (elem <- this.toList) // SI-7269 toList avoids ConcurrentModificationException
-    if (!p(elem)) this -= elem
+      if (!p(elem)) this -= elem
 
   /** Removes all elements from the set. After this operation is completed,
     *  the set will be empty.

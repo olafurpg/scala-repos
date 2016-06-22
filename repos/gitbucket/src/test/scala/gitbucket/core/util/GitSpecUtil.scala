@@ -16,8 +16,8 @@ import java.io.File
 
 object GitSpecUtil {
   def withTestFolder[U](f: File => U): U = {
-    val folder = new File(
-        System.getProperty("java.io.tmpdir"), "test-" + System.nanoTime)
+    val folder =
+      new File(System.getProperty("java.io.tmpdir"), "test-" + System.nanoTime)
     if (!folder.mkdirs()) {
       throw new java.io.IOException(
           "can't create folder " + folder.getAbsolutePath)
@@ -50,8 +50,10 @@ object GitSpecUtil {
     if (headId != null) {
       JGitUtil.processTree(git, headId) { (path, tree) =>
         if (name != path) {
-          builder.add(JGitUtil.createDirCacheEntry(
-                  path, tree.getEntryFileMode, tree.getEntryObjectId))
+          builder.add(
+              JGitUtil.createDirCacheEntry(path,
+                                           tree.getEntryFileMode,
+                                           tree.getEntryObjectId))
         }
       }
     }
@@ -88,8 +90,10 @@ object GitSpecUtil {
     }
     JGitUtil.getContentInfo(git, path, objectId)
   }
-  def mergeAndCommit(
-      git: Git, into: String, branch: String, message: String = null): Unit = {
+  def mergeAndCommit(git: Git,
+                     into: String,
+                     branch: String,
+                     message: String = null): Unit = {
     val repository = git.getRepository
     val merger = MergeStrategy.RECURSIVE.newMerger(repository, true)
     val mergeBaseTip = repository.resolve(into)

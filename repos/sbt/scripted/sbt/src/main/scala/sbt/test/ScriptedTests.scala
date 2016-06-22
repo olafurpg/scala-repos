@@ -31,8 +31,9 @@ final class ScriptedTests(resourceBaseDirectory: File,
                    name: String,
                    log: xsbti.Logger): Seq[() => Option[String]] =
     scriptedTest(group, name, Logger.xlog2Log(log))
-  def scriptedTest(
-      group: String, name: String, log: Logger): Seq[() => Option[String]] =
+  def scriptedTest(group: String,
+                   name: String,
+                   log: Logger): Seq[() => Option[String]] =
     scriptedTest(group, name, emptyCallback, log)
   def scriptedTest(group: String,
                    name: String,
@@ -74,8 +75,8 @@ final class ScriptedTests(resourceBaseDirectory: File,
 
     def createParser() = {
       val fileHandler = new FileCommands(testDirectory)
-      val sbtHandler = new SbtHandler(
-          testDirectory, launcher, buffered, launchOpts)
+      val sbtHandler =
+        new SbtHandler(testDirectory, launcher, buffered, launchOpts)
       new TestScriptParser(
           Map('$' -> fileHandler, '>' -> sbtHandler, '#' -> CommentHandler))
     }
@@ -215,8 +216,10 @@ class ScriptedRunner {
           bootProperties: File,
           launchOpts: Array[String],
           prescripted: File => Unit): Unit = {
-    val runner = new ScriptedTests(
-        resourceBaseDirectory, bufferLog, bootProperties, launchOpts)
+    val runner = new ScriptedTests(resourceBaseDirectory,
+                                   bufferLog,
+                                   bootProperties,
+                                   launchOpts)
     val allTests =
       get(tests, resourceBaseDirectory, logger) flatMap {
         case ScriptedTest(group, name) =>
@@ -250,8 +253,9 @@ private[test] object ListTests {
     wrapNull(directory.listFiles(filter))
 }
 import ListTests._
-private[test] final class ListTests(
-    baseDirectory: File, accept: ScriptedTest => Boolean, log: Logger)
+private[test] final class ListTests(baseDirectory: File,
+                                    accept: ScriptedTest => Boolean,
+                                    log: Logger)
     extends NotNull {
   def filter = DirectoryFilter -- HiddenFileFilter
   def listTests: Seq[ScriptedTest] = {

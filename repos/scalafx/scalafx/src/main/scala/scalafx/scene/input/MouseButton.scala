@@ -36,18 +36,18 @@ object MouseButton
     extends SFXEnumDelegateCompanion[jfxsi.MouseButton, MouseButton] {
 
   val None = new MouseButton(jfxsi.MouseButton.NONE)
-  @deprecated(
-      "Use None; NONE will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use None; NONE will be removed in a future release",
+              "8.0.60-R10")
   val NONE = None
 
   val Primary = new MouseButton(jfxsi.MouseButton.PRIMARY)
-  @deprecated(
-      "Use Primary; PRIMARY will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Primary; PRIMARY will be removed in a future release",
+              "8.0.60-R10")
   val PRIMARY = Primary
 
   val Middle = new MouseButton(jfxsi.MouseButton.MIDDLE)
-  @deprecated(
-      "Use Middle; MIDDLE will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Middle; MIDDLE will be removed in a future release",
+              "8.0.60-R10")
   val MIDDLE = Middle
 
   val Secondary = new MouseButton(jfxsi.MouseButton.SECONDARY)

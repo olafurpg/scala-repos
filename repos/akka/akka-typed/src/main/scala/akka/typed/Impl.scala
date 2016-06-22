@@ -104,8 +104,9 @@ private[typed] class ActorContextAdapter[T](ctx: akka.actor.ActorContext)
   def unwatch(other: a.ActorRef) = { ctx.unwatch(other); other }
   def setReceiveTimeout(d: Duration) = ctx.setReceiveTimeout(d)
   def executionContext: ExecutionContextExecutor = ctx.dispatcher
-  def schedule[U](
-      delay: FiniteDuration, target: ActorRef[U], msg: U): a.Cancellable = {
+  def schedule[U](delay: FiniteDuration,
+                  target: ActorRef[U],
+                  msg: U): a.Cancellable = {
     import ctx.dispatcher
     ctx.system.scheduler.scheduleOnce(delay, target.untypedRef, msg)
   }

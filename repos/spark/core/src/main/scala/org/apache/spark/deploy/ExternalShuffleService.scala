@@ -38,8 +38,8 @@ import org.apache.spark.util.{ShutdownHookManager, Utils}
   *
   * Optionally requires SASL authentication in order to read. See [[SecurityManager]].
   */
-private[deploy] class ExternalShuffleService(
-    sparkConf: SparkConf, securityManager: SecurityManager)
+private[deploy] class ExternalShuffleService(sparkConf: SparkConf,
+                                             securityManager: SecurityManager)
     extends Logging {
 
   private val enabled =
@@ -50,8 +50,8 @@ private[deploy] class ExternalShuffleService(
   private val transportConf =
     SparkTransportConf.fromSparkConf(sparkConf, "shuffle", numUsableCores = 0)
   private val blockHandler = newShuffleBlockHandler(transportConf)
-  private val transportContext: TransportContext = new TransportContext(
-      transportConf, blockHandler, true)
+  private val transportContext: TransportContext =
+    new TransportContext(transportConf, blockHandler, true)
 
   private var server: TransportServer = _
 
@@ -72,12 +72,11 @@ private[deploy] class ExternalShuffleService(
   def start() {
     require(server == null, "Shuffle server already started")
     logInfo(s"Starting shuffle service on port $port with useSasl = $useSasl")
-    val bootstraps: Seq[TransportServerBootstrap] =
-      if (useSasl) {
-        Seq(new SaslServerBootstrap(transportConf, securityManager))
-      } else {
-        Nil
-      }
+    val bootstraps: Seq[TransportServerBootstrap] = if (useSasl) {
+      Seq(new SaslServerBootstrap(transportConf, securityManager))
+    } else {
+      Nil
+    }
     server = transportContext.createServer(port, bootstraps.asJava)
   }
 

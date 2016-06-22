@@ -65,8 +65,8 @@ object SortPrefixUtils {
     if (schema.nonEmpty) {
       val field = schema.head
       getPrefixComparator(
-          SortOrder(
-              BoundReference(0, field.dataType, field.nullable), Ascending))
+          SortOrder(BoundReference(0, field.dataType, field.nullable),
+                    Ascending))
     } else {
       new PrefixComparator {
         override def compare(prefix1: Long, prefix2: Long): Int = 0
@@ -80,8 +80,8 @@ object SortPrefixUtils {
   def createPrefixGenerator(
       schema: StructType): UnsafeExternalRowSorter.PrefixComputer = {
     if (schema.nonEmpty) {
-      val boundReference = BoundReference(
-          0, schema.head.dataType, nullable = true)
+      val boundReference =
+        BoundReference(0, schema.head.dataType, nullable = true)
       val prefixProjection = UnsafeProjection.create(
           SortPrefix(SortOrder(boundReference, Ascending)))
       new UnsafeExternalRowSorter.PrefixComputer {

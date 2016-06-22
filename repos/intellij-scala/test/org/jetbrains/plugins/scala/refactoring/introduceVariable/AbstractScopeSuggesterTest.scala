@@ -34,8 +34,9 @@ abstract class AbstractScopeSuggesterTest
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
 
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+        FileUtil.loadFile(new File(file.getCanonicalPath),
+                          CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
 
     val startOffset = fileText.indexOf(BEGIN_MARKER) + BEGIN_MARKER.length
@@ -54,8 +55,10 @@ abstract class AbstractScopeSuggesterTest
     var element = CommonDataKeys.PSI_ELEMENT.getData(
         DataManager.getInstance().getDataContextFromFocus.getResult)
     if (element == null) {
-      element = PsiTreeUtil.findElementOfClassAtRange(
-          scalaFile, startOffset, endOffset, classOf[PsiElement])
+      element = PsiTreeUtil.findElementOfClassAtRange(scalaFile,
+                                                      startOffset,
+                                                      endOffset,
+                                                      classOf[PsiElement])
     }
 
     assert(element.isInstanceOf[ScTypeElement],

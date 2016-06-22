@@ -39,8 +39,8 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
   import GBTClassifierSuite.compareAPIs
 
   // Combinations for estimators, learning rates and subsamplingRate
-  private val testCombinations = Array(
-      (10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
+  private val testCombinations =
+    Array((10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
 
   private var data: RDD[LabeledPoint] = _
   private var trainData: RDD[LabeledPoint] = _
@@ -63,8 +63,10 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
     ParamsSuite.checkParams(new GBTClassifier)
     val model = new GBTClassificationModel(
         "gbtc",
-        Array(new DecisionTreeRegressionModel(
-                "dtr", new LeafNode(0.0, 0.0, null), 1)),
+        Array(
+            new DecisionTreeRegressionModel("dtr",
+                                            new LeafNode(0.0, 0.0, null),
+                                            1)),
         Array(1.0),
         1)
     ParamsSuite.checkParams(model)

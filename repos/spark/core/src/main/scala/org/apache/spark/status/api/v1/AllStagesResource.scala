@@ -50,8 +50,10 @@ private[v1] class AllStagesResource(ui: SparkUI) {
                                         stageInfo.attemptId))
                                  }
     } yield {
-      AllStagesResource.stageUiToStageData(
-          status, stageInfo, stageUiData, includeDetails = false)
+      AllStagesResource.stageUiToStageData(status,
+                                           stageInfo,
+                                           stageUiData,
+                                           includeDetails = false)
     }
   }
 }
@@ -65,41 +67,37 @@ private[v1] object AllStagesResource {
     val taskLaunchTimes =
       stageUiData.taskData.values.map(_.taskInfo.launchTime).filter(_ > 0)
 
-    val firstTaskLaunchedTime: Option[Date] =
-      if (taskLaunchTimes.nonEmpty) {
-        Some(new Date(taskLaunchTimes.min))
-      } else {
-        None
-      }
+    val firstTaskLaunchedTime: Option[Date] = if (taskLaunchTimes.nonEmpty) {
+      Some(new Date(taskLaunchTimes.min))
+    } else {
+      None
+    }
 
-    val taskData =
-      if (includeDetails) {
-        Some(
-            stageUiData.taskData.map {
-          case (k, v) => k -> convertTaskData(v)
-        })
-      } else {
-        None
-      }
-    val executorSummary =
-      if (includeDetails) {
-        Some(stageUiData.executorSummary.map {
-          case (k, summary) =>
-            k -> new ExecutorStageSummary(
-                taskTime = summary.taskTime,
-                failedTasks = summary.failedTasks,
-                succeededTasks = summary.succeededTasks,
-                inputBytes = summary.inputBytes,
-                outputBytes = summary.outputBytes,
-                shuffleRead = summary.shuffleRead,
-                shuffleWrite = summary.shuffleWrite,
-                memoryBytesSpilled = summary.memoryBytesSpilled,
-                diskBytesSpilled = summary.diskBytesSpilled
-            )
-        })
-      } else {
-        None
-      }
+    val taskData = if (includeDetails) {
+      Some(stageUiData.taskData.map {
+        case (k, v) => k -> convertTaskData(v)
+      })
+    } else {
+      None
+    }
+    val executorSummary = if (includeDetails) {
+      Some(stageUiData.executorSummary.map {
+        case (k, summary) =>
+          k -> new ExecutorStageSummary(
+              taskTime = summary.taskTime,
+              failedTasks = summary.failedTasks,
+              succeededTasks = summary.succeededTasks,
+              inputBytes = summary.inputBytes,
+              outputBytes = summary.outputBytes,
+              shuffleRead = summary.shuffleRead,
+              shuffleWrite = summary.shuffleWrite,
+              memoryBytesSpilled = summary.memoryBytesSpilled,
+              diskBytesSpilled = summary.diskBytesSpilled
+          )
+      })
+    } else {
+      None
+    }
 
     val accumulableInfo = stageUiData.accumulables.values.map {
       convertAccumulableInfo
@@ -185,7 +183,8 @@ private[v1] object AllStagesResource {
 
     val inputMetrics: Option[InputMetricDistributions] =
       new MetricHelper[InternalInputMetrics, InputMetricDistributions](
-          rawMetrics, quantiles) {
+          rawMetrics,
+          quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalInputMetrics] = {
           raw.inputMetrics
@@ -199,7 +198,8 @@ private[v1] object AllStagesResource {
 
     val outputMetrics: Option[OutputMetricDistributions] =
       new MetricHelper[InternalOutputMetrics, OutputMetricDistributions](
-          rawMetrics, quantiles) {
+          rawMetrics,
+          quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalOutputMetrics] = {
           raw.outputMetrics
@@ -231,8 +231,8 @@ private[v1] object AllStagesResource {
 
     val shuffleWriteMetrics: Option[ShuffleWriteMetricDistributions] =
       new MetricHelper[
-          InternalShuffleWriteMetrics, ShuffleWriteMetricDistributions](
-          rawMetrics, quantiles) {
+          InternalShuffleWriteMetrics,
+          ShuffleWriteMetricDistributions](rawMetrics, quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalShuffleWriteMetrics] = {
           raw.shuffleWriteMetrics
@@ -333,7 +333,8 @@ private[v1] object AllStagesResource {
   * metric.  After creating an instance, call metricOption to get the result type.
   */
 private[v1] abstract class MetricHelper[I, O](
-    rawMetrics: Seq[InternalTaskMetrics], quantiles: Array[Double]) {
+    rawMetrics: Seq[InternalTaskMetrics],
+    quantiles: Array[Double]) {
 
   def getSubmetrics(raw: InternalTaskMetrics): Option[I]
 

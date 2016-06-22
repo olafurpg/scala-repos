@@ -57,8 +57,7 @@ object Name {
       val addr: Var[Addr],
       val id: Any,
       val path: com.twitter.finagle.Path
-  )
-      extends Name
+  ) extends Name
       with Proxy {
     def self = id
 
@@ -73,8 +72,9 @@ object Name {
   }
 
   object Bound {
-    def apply(
-        addr: Var[Addr], id: Any, path: com.twitter.finagle.Path): Name.Bound =
+    def apply(addr: Var[Addr],
+              id: Any,
+              path: com.twitter.finagle.Path): Name.Bound =
       new Bound(addr, id, path)
 
     def apply(addr: Var[Addr], id: Any): Name.Bound =

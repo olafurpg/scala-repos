@@ -36,8 +36,9 @@ class ClientBuilderTest
       .asInstanceOf[ServiceFactory[Any, Nothing]]
 
     val m = new MockChannel
-    when(m.codec.prepareConnFactory(any[ServiceFactory[String, String]],
-                                    any[Stack.Params]))
+    when(
+        m.codec.prepareConnFactory(any[ServiceFactory[String, String]],
+                                   any[Stack.Params]))
       .thenReturn(preparedFactory)
   }
 
@@ -46,8 +47,8 @@ class ClientBuilderTest
       val client = m.build()
       val requestFuture = client("123")
 
-      verify(m.codec).prepareConnFactory(
-          any[ServiceFactory[String, String]], any[Stack.Params])
+      verify(m.codec).prepareConnFactory(any[ServiceFactory[String, String]],
+                                         any[Stack.Params])
       verify(preparedFactory)()
 
       assert(!requestFuture.isDefined)

@@ -35,6 +35,7 @@ case class AnonymousClass(mType: IntermediateNode,
     mType.asInstanceOf[TypedElement].getType
 }
 
-case class Enum(
-    name: String, modifiers: IntermediateNode, enumConstants: Seq[String])
+case class Enum(name: String,
+                modifiers: IntermediateNode,
+                enumConstants: Seq[String])
     extends IntermediateNode

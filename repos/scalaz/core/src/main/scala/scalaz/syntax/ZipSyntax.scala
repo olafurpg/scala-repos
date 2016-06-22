@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Zip` */
-final class ZipOps[F[_], A] private[syntax](val self: F[A])(
+final class ZipOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Zip[F])
     extends Ops[F[A]] {
   ////

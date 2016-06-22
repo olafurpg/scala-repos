@@ -42,8 +42,8 @@ private[tree] case class NodeIndexUpdater(split: Split, nodeIndex: Int) {
     * @param bins Bin information to convert the bin indices to approximate feature values.
     * @return Child node index to update to.
     */
-  def updateNodeIndex(
-      binnedFeatures: Array[Int], bins: Array[Array[Bin]]): Int = {
+  def updateNodeIndex(binnedFeatures: Array[Int],
+                      bins: Array[Array[Bin]]): Int = {
     if (split.featureType == Continuous) {
       val featureIndex = split.feature
       val binIndex = binnedFeatures(featureIndex)
@@ -76,8 +76,8 @@ private[tree] case class NodeIndexUpdater(split: Split, nodeIndex: Int) {
   *                           (how often should the cache be checkpointed.).
   */
 @DeveloperApi
-private[spark] class NodeIdCache(
-    var nodeIdsForInstances: RDD[Array[Int]], val checkpointInterval: Int) {
+private[spark] class NodeIdCache(var nodeIdsForInstances: RDD[Array[Int]],
+                                 val checkpointInterval: Int) {
 
   // Keep a reference to a previous node Ids for instances.
   // Because we will keep on re-persisting updated node Ids,
@@ -109,22 +109,22 @@ private[spark] class NodeIdCache(
     prevNodeIdsForInstances = nodeIdsForInstances
     nodeIdsForInstances = data.zip(nodeIdsForInstances).map {
       case (point, node) => {
-          var treeId = 0
-          while (treeId < nodeIdUpdaters.length) {
-            val nodeIdUpdater =
-              nodeIdUpdaters(treeId).getOrElse(node(treeId), null)
-            if (nodeIdUpdater != null) {
-              val newNodeIndex = nodeIdUpdater.updateNodeIndex(
-                  binnedFeatures = point.datum.binnedFeatures,
-                  bins = bins)
-              node(treeId) = newNodeIndex
-            }
-
-            treeId += 1
+        var treeId = 0
+        while (treeId < nodeIdUpdaters.length) {
+          val nodeIdUpdater =
+            nodeIdUpdaters(treeId).getOrElse(node(treeId), null)
+          if (nodeIdUpdater != null) {
+            val newNodeIndex = nodeIdUpdater.updateNodeIndex(
+                binnedFeatures = point.datum.binnedFeatures,
+                bins = bins)
+            node(treeId) = newNodeIndex
           }
 
-          node
+          treeId += 1
         }
+
+        node
+      }
     }
 
     // Keep on persisting new ones.
@@ -190,7 +190,7 @@ private[spark] object NodeIdCache {
            numTrees: Int,
            checkpointInterval: Int,
            initVal: Int = 1): NodeIdCache = {
-    new NodeIdCache(
-        data.map(_ => Array.fill[Int](numTrees)(initVal)), checkpointInterval)
+    new NodeIdCache(data.map(_ => Array.fill[Int](numTrees)(initVal)),
+                    checkpointInterval)
   }
 }

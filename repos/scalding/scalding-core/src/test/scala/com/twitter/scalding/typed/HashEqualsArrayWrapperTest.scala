@@ -8,7 +8,8 @@ import scala.reflect.ClassTag
 object HashArrayEqualsWrapperLaws {
 
   def check2[T](ordToTest: Ordering[HashEqualsArrayWrapper[T]])(
-      implicit ord: Ordering[T], arb: Arbitrary[Array[T]]): Prop =
+      implicit ord: Ordering[T],
+      arb: Arbitrary[Array[T]]): Prop =
     Prop.forAll { (left: Array[T], right: Array[T]) =>
       val leftWrapped = HashEqualsArrayWrapper.wrap(left)
       val rightWrapped = HashEqualsArrayWrapper.wrap(right)
@@ -30,8 +31,8 @@ object HashArrayEqualsWrapperLaws {
       }
     }
 
-  def check[T](ordToTest: Ordering[Array[T]])(
-      implicit ord: Ordering[T], arb: Arbitrary[Array[T]]): Prop =
+  def check[T](ordToTest: Ordering[Array[T]])(implicit ord: Ordering[T],
+                                              arb: Arbitrary[Array[T]]): Prop =
     Prop.forAll { (left: Array[T], right: Array[T]) =>
       import scala.Ordering.Implicits.seqDerivedOrdering
 
@@ -63,30 +64,40 @@ class HashArrayEqualsWrapperProps
         HashArrayEqualsWrapperLaws.check(HashEqualsArrayWrapper.charArrayOrd))
     check(
         HashArrayEqualsWrapperLaws.check(HashEqualsArrayWrapper.byteArrayOrd))
-    check(HashArrayEqualsWrapperLaws.check(
+    check(
+        HashArrayEqualsWrapperLaws.check(
             HashEqualsArrayWrapper.booleanArrayOrd))
     check(
         HashArrayEqualsWrapperLaws.check(HashEqualsArrayWrapper.floatArrayOrd))
-    check(HashArrayEqualsWrapperLaws.check(
+    check(
+        HashArrayEqualsWrapperLaws.check(
             HashEqualsArrayWrapper.doubleArrayOrd))
   }
 
   property("Specialized orderings obey all laws for wrapped Arrays") {
-    check(HashArrayEqualsWrapperLaws.check2(
+    check(
+        HashArrayEqualsWrapperLaws.check2(
             HashEqualsArrayWrapper.hashEqualsLongOrdering))
-    check(HashArrayEqualsWrapperLaws.check2(
+    check(
+        HashArrayEqualsWrapperLaws.check2(
             HashEqualsArrayWrapper.hashEqualsIntOrdering))
-    check(HashArrayEqualsWrapperLaws.check2(
+    check(
+        HashArrayEqualsWrapperLaws.check2(
             HashEqualsArrayWrapper.hashEqualsShortOrdering))
-    check(HashArrayEqualsWrapperLaws.check2(
+    check(
+        HashArrayEqualsWrapperLaws.check2(
             HashEqualsArrayWrapper.hashEqualsCharOrdering))
-    check(HashArrayEqualsWrapperLaws.check2(
+    check(
+        HashArrayEqualsWrapperLaws.check2(
             HashEqualsArrayWrapper.hashEqualsByteOrdering))
-    check(HashArrayEqualsWrapperLaws.check2(
+    check(
+        HashArrayEqualsWrapperLaws.check2(
             HashEqualsArrayWrapper.hashEqualsBooleanOrdering))
-    check(HashArrayEqualsWrapperLaws.check2(
+    check(
+        HashArrayEqualsWrapperLaws.check2(
             HashEqualsArrayWrapper.hashEqualsFloatOrdering))
-    check(HashArrayEqualsWrapperLaws.check2(
+    check(
+        HashArrayEqualsWrapperLaws.check2(
             HashEqualsArrayWrapper.hashEqualsDoubleOrdering))
   }
 }
@@ -105,19 +116,19 @@ class HashArrayEqualsWrapperTest extends FunSuite {
     testWrap[Short](Array[Short](1), classOf[HashEqualsShortArrayWrapper])
     testWrap[Char](Array[Char]('a'), classOf[HashEqualsCharArrayWrapper])
     testWrap[Byte](Array[Byte](1), classOf[HashEqualsByteArrayWrapper])
-    testWrap[Boolean](
-        Array[Boolean](true), classOf[HashEqualsBooleanArrayWrapper])
+    testWrap[Boolean](Array[Boolean](true),
+                      classOf[HashEqualsBooleanArrayWrapper])
     testWrap[Float](Array[Float](1), classOf[HashEqualsFloatArrayWrapper])
     testWrap[Double](Array[Double](1), classOf[HashEqualsDoubleArrayWrapper])
 
-    testWrap[String](
-        Array[String]("hi"), classOf[HashEqualsObjectArrayWrapper[String]])
+    testWrap[String](Array[String]("hi"),
+                     classOf[HashEqualsObjectArrayWrapper[String]])
   }
 
   test("classForTag works correctly") {
     assert(
-        HashEqualsArrayWrapper.classForTag(implicitly[ClassTag[String]]) === classOf[
-            String])
+        HashEqualsArrayWrapper
+          .classForTag(implicitly[ClassTag[String]]) === classOf[String])
     assert(HashEqualsArrayWrapper.classForTag(
             implicitly[ClassTag[Array[Byte]]]) === classOf[Array[Byte]])
   }

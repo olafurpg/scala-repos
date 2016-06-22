@@ -41,8 +41,8 @@ object ToHeadUsages extends Specification {
     }
   }
 
-  private val host_ = System.getProperty(
-      "net.liftweb.webapptest.oneshot.host", reachableLocalAddress)
+  private val host_ = System
+    .getProperty("net.liftweb.webapptest.oneshot.host", reachableLocalAddress)
   private val port_ = System
     .getProperty("net.liftweb.webapptest.toheadusages.port", "8282")
     .toInt
@@ -59,7 +59,8 @@ object ToHeadUsages extends Specification {
       jetty.browse(
           "/htmlFragmentWithHead",
           html =>
-            html.getElementByXPath("/html/head/script[@id='fromFrag']") must not(
+            html
+              .getElementByXPath("/html/head/script[@id='fromFrag']") must not(
                 beNull when jetty.running)
       )
     }
@@ -68,8 +69,10 @@ object ToHeadUsages extends Specification {
       jetty.browse(
           "/htmlFragmentWithHead",
           html =>
-            html.getElementsByXPath("/html/body/script[@id='fromFrag']").size must
-            (be_==(0) when jetty.running)
+            html
+              .getElementsByXPath("/html/body/script[@id='fromFrag']")
+              .size must
+              (be_==(0) when jetty.running)
       )
     }
 
@@ -201,13 +204,17 @@ object ToHeadUsages extends Specification {
           </span>)
         }
 
-      ((first \\ "a").filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
+      ((first \\ "a")
+            .filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
           "/wombat/foo").when(jetty.running)
-      ((first \\ "a").filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
+      ((first \\ "a")
+            .filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
           "/wombat/bar").when(jetty.running)
-      ((second \\ "a").filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
+      ((second \\ "a")
+            .filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
           "/wombat/foo").when(jetty.running)
-      ((second \\ "a").filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
+      ((second \\ "a")
+            .filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
           "/bar").when(jetty.running)
     }
   }

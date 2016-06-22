@@ -124,7 +124,9 @@ object ScalaJSPlugin extends AutoPlugin {
 
     val scalaJSIR =
       TaskKey[Attributed[Seq[VirtualScalaJSIRFile with RelativeVirtualFile]]](
-          "scalaJSIR", "All the *.sjsir files on the classpath", CTask)
+          "scalaJSIR",
+          "All the *.sjsir files on the classpath",
+          CTask)
 
     val scalaJSNativeLibraries =
       TaskKey[Attributed[Seq[VirtualJSFile with RelativeVirtualFile]]](
@@ -150,11 +152,13 @@ object ScalaJSPlugin extends AutoPlugin {
     val packageMinifiedJSDependencies = TaskKey[File](
         "packageMinifiedJSDependencies",
         "Packages minified version (if available) of dependencies of the preLink " +
-        "classpath in a single file.",
+          "classpath in a single file.",
         AMinusTask)
 
     val jsDependencyManifest = TaskKey[File](
-        "jsDependencyManifest", "Writes the JS_DEPENDENCIES file.", DTask)
+        "jsDependencyManifest",
+        "Writes the JS_DEPENDENCIES file.",
+        DTask)
 
     val jsDependencyManifests =
       TaskKey[Attributed[Traversable[JSDependencyManifest]]](
@@ -165,7 +169,7 @@ object ScalaJSPlugin extends AutoPlugin {
     val scalaJSLinkedFile = TaskKey[VirtualJSFile](
         "scalaJSLinkedFile",
         "Linked Scala.js file. This is the result of fastOptJS or fullOptJS, " +
-        "depending on the stage.",
+          "depending on the stage.",
         DTask)
 
     val scalaJSLauncher = TaskKey[Attributed[VirtualJSFile]](
@@ -178,8 +182,9 @@ object ScalaJSPlugin extends AutoPlugin {
         "The JS console used by the Scala.js runner/tester",
         DTask)
 
-    val scalaJSUseRhino = SettingKey[Boolean](
-        "scalaJSUseRhino", "Whether Rhino should be used", APlusSetting)
+    val scalaJSUseRhino = SettingKey[Boolean]("scalaJSUseRhino",
+                                              "Whether Rhino should be used",
+                                              APlusSetting)
 
     val jsEnv = TaskKey[JSEnv](
         "jsEnv",
@@ -189,7 +194,7 @@ object ScalaJSPlugin extends AutoPlugin {
     val resolvedJSEnv = TaskKey[JSEnv](
         "resolvedJSEnv",
         "The JSEnv used for execution. This equals the setting of jsEnv or a " +
-        "reasonable default value if jsEnv is not set.",
+          "reasonable default value if jsEnv is not set.",
         DTask)
 
     @deprecated("Use jsEnv instead.", "0.6.6")
@@ -228,8 +233,9 @@ object ScalaJSPlugin extends AutoPlugin {
         "Configurable semantics of Scala.js.",
         BPlusSetting)
 
-    val scalaJSOutputMode = SettingKey[OutputMode](
-        "scalaJSOutputMode", "Output mode of Scala.js.", BPlusSetting)
+    val scalaJSOutputMode = SettingKey[OutputMode]("scalaJSOutputMode",
+                                                   "Output mode of Scala.js.",
+                                                   BPlusSetting)
 
     val jsDependencyFilter = SettingKey[DependencyFilter](
         "jsDependencyFilter",
@@ -243,18 +249,20 @@ object ScalaJSPlugin extends AutoPlugin {
 
     val resolvedJSDependencies =
       TaskKey[Attributed[Seq[ResolvedJSDependency]]](
-          "resolvedJSDependencies", "JS dependencies after resolution.", DTask)
+          "resolvedJSDependencies",
+          "JS dependencies after resolution.",
+          DTask)
 
     val checkScalaJSSemantics = SettingKey[Boolean](
         "checkScalaJSSemantics",
         "Whether to check that the current semantics meet compliance " +
-        "requirements of dependencies.",
+          "requirements of dependencies.",
         CSetting)
 
     val persistLauncher = SettingKey[Boolean](
         "persistLauncher",
         "Tell optimize/package tasks to write the laucher file to disk. " +
-        "If this is set, your project may only have a single mainClass or you must explicitly set it",
+          "If this is set, your project may only have a single mainClass or you must explicitly set it",
         AMinusSetting)
 
     val scalaJSOptimizerOptions = SettingKey[OptimizerOptions](
@@ -271,7 +279,7 @@ object ScalaJSPlugin extends AutoPlugin {
     val scalaJSPhantomJSClassLoader = TaskKey[ClassLoader](
         "scalaJSPhantomJSClassLoader",
         "Private class loader to load jetty8 without polluting classpath. Only use this " +
-        "as the `jettyClassLoader` argument of the PhantomJSEnv",
+          "as the `jettyClassLoader` argument of the PhantomJSEnv",
         KeyRanks.Invisible)
 
     /** Prints the content of a .sjsir file in human readable form. */

@@ -25,7 +25,8 @@ import org.apache.spark.deploy.SparkCuratorUtil
 import org.apache.spark.internal.Logging
 
 private[master] class ZooKeeperLeaderElectionAgent(
-    val masterInstance: LeaderElectable, conf: SparkConf)
+    val masterInstance: LeaderElectable,
+    conf: SparkConf)
     extends LeaderLatchListener
     with LeaderElectionAgent
     with Logging {

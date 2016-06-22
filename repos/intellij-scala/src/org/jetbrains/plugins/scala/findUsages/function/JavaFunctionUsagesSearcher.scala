@@ -30,18 +30,18 @@ class JavaFunctionUsagesSearcher
             val references = inReadAction(element.getReferences)
             for (ref <- references
                  if ref.getRangeInElement.contains(offsetInElement) &&
-                 !collectedReferences.contains(ref)) {
+                   !collectedReferences.contains(ref)) {
               inReadAction {
                 ref match {
                   case refElement: PsiReferenceExpression =>
                     refElement.resolve match {
                       case f: ScFunctionWrapper
                           if f.function == method &&
-                          !consumer.process(refElement) =>
+                            !consumer.process(refElement) =>
                         return false
                       case t: StaticPsiMethodWrapper
                           if t.getNavigationElement == method &&
-                          !consumer.process(refElement) =>
+                            !consumer.process(refElement) =>
                         return false
                       case _ =>
                     }
@@ -55,8 +55,11 @@ class JavaFunctionUsagesSearcher
         val helper: PsiSearchHelper =
           PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
         if (name == "") return true
-        helper.processElementsWithWord(
-            processor, scope, name, UsageSearchContext.IN_CODE, true)
+        helper.processElementsWithWord(processor,
+                                       scope,
+                                       name,
+                                       UsageSearchContext.IN_CODE,
+                                       true)
       case _ =>
     }
     true

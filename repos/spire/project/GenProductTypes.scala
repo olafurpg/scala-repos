@@ -1,19 +1,19 @@
 object GenProductTypes {
   val spec = "@spec(Int,Long,Float,Double) "
 
-  case class ProductType(
-      structure: String, parentStructure: Option[String], arity: Int) {
+  case class ProductType(structure: String,
+                         parentStructure: Option[String],
+                         arity: Int) {
     val prefix = "structure"
     def typeName(i: Int): String = (64 + i).toChar.toString
     val types = (1 to arity) map (typeName(_)) mkString ", "
-    val specTypes =
-      if (arity == 2) {
-        (1 to arity) map { i =>
-          spec + typeName(i)
-        } mkString ","
-      } else {
-        types
-      }
+    val specTypes = if (arity == 2) {
+      (1 to arity) map { i =>
+        spec + typeName(i)
+      } mkString ","
+    } else {
+      types
+    }
     val name = structure + "Product" + arity
   }
 
@@ -225,8 +225,16 @@ object ProductTypes {
   val eq = Definition("Eq")(eqv :: Nil)
   val order = Definition("Order", Some("Eq"))(compare :: overrideEqv :: Nil)
 
-  val algebra = List(
-      semigroup, monoid, group, abGroup, semiring, rng, rig, ring, eq, order)
+  val algebra = List(semigroup,
+                     monoid,
+                     group,
+                     abGroup,
+                     semiring,
+                     rng,
+                     rig,
+                     ring,
+                     eq,
+                     order)
 
   def algebraProductTypes: String =
     renderAll("spire.std", "spire.algebra._" :: Nil, 2, 22)(algebra)

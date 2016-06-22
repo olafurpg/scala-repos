@@ -26,20 +26,19 @@ object CompilerData {
     val target = chunk.representativeTarget
     val module = target.getModule
 
-    val compilerJars =
-      if (SettingsManager.hasScalaSdk(module)) {
-        compilerJarsIn(module).flatMap {
-          case jars: CompilerJars =>
-            val absentJars = jars.files.filter(!_.exists)
-            Either.cond(absentJars.isEmpty,
-                        Some(jars),
-                        "Scala compiler JARs not found (module '" +
+    val compilerJars = if (SettingsManager.hasScalaSdk(module)) {
+      compilerJarsIn(module).flatMap {
+        case jars: CompilerJars =>
+          val absentJars = jars.files.filter(!_.exists)
+          Either.cond(absentJars.isEmpty,
+                      Some(jars),
+                      "Scala compiler JARs not found (module '" +
                         chunk.representativeTarget().getModule.getName +
                         "'): " + absentJars.map(_.getPath).mkString(", "))
-        }
-      } else {
-        Right(None)
       }
+    } else {
+      Right(None)
+    }
 
     compilerJars.flatMap { jars =>
       val incrementalityType = SettingsManager
@@ -114,8 +113,9 @@ object CompilerData {
     library.flatMap { libraryJar =>
       val compiler = find(files, "scala-compiler", ".jar") match {
         case Left(error) =>
-          Left(error + " in Scala compiler classpath in Scala SDK " +
-              sdk.getName)
+          Left(
+              error + " in Scala compiler classpath in Scala SDK " +
+                sdk.getName)
         case right => right
       }
 
@@ -128,7 +128,7 @@ object CompilerData {
             case version if version.startsWith("2.10") =>
               // TODO implement a better version comparison
               find(extraJars, "scala-reflect", ".jar").left.toOption.map(_ +
-                  " in Scala compiler classpath in Scala SDK " + sdk.getName)
+                    " in Scala compiler classpath in Scala SDK " + sdk.getName)
             case _ => None
           }
         }
@@ -151,7 +151,9 @@ object CompilerData {
       case Seq(duplicates @ _ *) =>
         Left(
             "Multiple '%s*%s' files (%s)".format(
-                prefix, suffix, duplicates.map(_.getName).mkString(", ")))
+                prefix,
+                suffix,
+                duplicates.map(_.getName).mkString(", ")))
     }
   }
 }

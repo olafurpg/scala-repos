@@ -39,8 +39,9 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
   t
 }, tolerance: Double = 1e-6, suffDec: Double = 1e-4, fvalMemory: Int = 30, alphaMax: Double = 1e10, alphaMin: Double = 1e-10, bbMemory: Int = 10, maxIter: Int = -1, val initFeas: Boolean = false, val curvilinear: Boolean = false, val bbType: Int = 1, val maxSrcht: Int = 30)(
     implicit space: MutableVectorField[T, Double])
-    extends FirstOrderMinimizer[T, DiffFunction[T]](
-        fvalMemory = fvalMemory, maxIter = maxIter, tolerance = tolerance)
+    extends FirstOrderMinimizer[T, DiffFunction[T]](fvalMemory = fvalMemory,
+                                                    maxIter = maxIter,
+                                                    tolerance = tolerance)
     with Projecting[T]
     with SerializableLogging {
   import space._
@@ -82,14 +83,15 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
     qq
   }
 
-  override protected def chooseDescentDirection(
-      state: State, f: DiffFunction[T]): T = {
+  override protected def chooseDescentDirection(state: State,
+                                                f: DiffFunction[T]): T = {
     if (curvilinear) state.x - state.grad * state.history.alphaBB
     else projection(state.x - state.grad * state.history.alphaBB) - state.x
   }
 
-  override protected def determineStepSize(
-      state: State, f: DiffFunction[T], direction: T): Double = {
+  override protected def determineStepSize(state: State,
+                                           f: DiffFunction[T],
+                                           direction: T): Double = {
     val fb =
       if (state.history.fvals.isEmpty) state.value
       else state.value max state.history.fvals.max
@@ -117,8 +119,10 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
   }
 
   // because of the projection, we have to do our own verstion
-  private def functionFromSearchDirection[T, I](
-      f: DiffFunction[T], x: T, direction: T, project: T => T)(
+  private def functionFromSearchDirection[T, I](f: DiffFunction[T],
+                                                x: T,
+                                                direction: T,
+                                                project: T => T)(
       implicit prod: InnerProductModule[T, Double]): DiffFunction[Double] =
     new DiffFunction[Double] {
       import prod._

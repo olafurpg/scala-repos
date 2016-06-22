@@ -94,17 +94,16 @@ package net.liftweb {
           }
         }
 
-        val r =
-          if (liftRulesEnabled) {
-            // Apply stateless rewrites
-            Req(req,
-                LiftRules.statelessRewrite.toList,
-                Nil,
-                LiftRules.statelessReqTest.toList,
-                System.nanoTime)
-          } else {
-            Req(req, Nil, System.nanoTime)
-          }
+        val r = if (liftRulesEnabled) {
+          // Apply stateless rewrites
+          Req(req,
+              LiftRules.statelessRewrite.toList,
+              Nil,
+              LiftRules.statelessReqTest.toList,
+              System.nanoTime)
+        } else {
+          Req(req, Nil, System.nanoTime)
+        }
 
         f(r)
       }

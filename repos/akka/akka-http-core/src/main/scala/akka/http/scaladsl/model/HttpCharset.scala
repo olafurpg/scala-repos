@@ -58,8 +58,8 @@ object HttpCharsetRange {
     One(charset, qValue)
 }
 
-final case class HttpCharset private[http](
-    override val value: String)(val aliases: immutable.Seq[String])
+final case class HttpCharset private[http] (override val value: String)(
+    val aliases: immutable.Seq[String])
     extends jm.HttpCharset
     with SingletonValueRenderable
     with WithQValue[HttpCharsetRange] {

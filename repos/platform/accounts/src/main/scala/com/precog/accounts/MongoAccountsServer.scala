@@ -66,11 +66,12 @@ object MongoAccountServer
       val resetTokenExpirationMinutes = config[Int]("resetTokenTimeout", 60)
     }
 
-    val accountManager = new MongoAccountManager(
-        mongo, mongo.database(database), settings0) with ZKAccountIdSource {
-      val zkc = new ZkClient(zkHosts)
-      val settings = settings0
-    }
+    val accountManager =
+      new MongoAccountManager(mongo, mongo.database(database), settings0)
+      with ZKAccountIdSource {
+        val zkc = new ZkClient(zkHosts)
+        val settings = settings0
+      }
 
     (accountManager, Stoppable.fromFuture(accountManager.close()))
   }
@@ -79,18 +80,18 @@ object MongoAccountServer
     new CachingAPIKeyFinder(
         WebAPIKeyFinder(config).map(_.withM[Future]) valueOr { errs =>
       sys.error("Unable to build new WebAPIKeyFinder: " +
-          errs.list.mkString("\n", "\n", ""))
+            errs.list.mkString("\n", "\n", ""))
     })
 
   def RootKey(config: Configuration) = config[String]("rootKey")
 
   def Emailer(config: Configuration) = {
     val emailProps = new java.util.Properties
-    emailProps.setProperty(
-        "mail.smtp.host", config[String]("host", "localhost"))
+    emailProps
+      .setProperty("mail.smtp.host", config[String]("host", "localhost"))
     emailProps.setProperty("mail.smtp.port", config[String]("port", "25"))
-    emailProps.setProperty(
-        "mail.from", config[String]("from", "support@precog.com"))
+    emailProps
+      .setProperty("mail.from", config[String]("from", "support@precog.com"))
     val templateDir = new File(config[String]("template_dir"))
     require(templateDir.isDirectory,
             "Provided template directory %s is not a directory".format(
@@ -98,7 +99,8 @@ object MongoAccountServer
     require(
         templateDir.canRead,
         "Provided template directory %s is not readable".format(templateDir))
-    new DirectoryTemplateEmailer(
-        templateDir, config.detach("params").data, Some(emailProps))
+    new DirectoryTemplateEmailer(templateDir,
+                                 config.detach("params").data,
+                                 Some(emailProps))
   }
 }

@@ -91,8 +91,8 @@ object Status {
   def fromMessage(message: Message): Option[Status] = {
     (message.channel == channels.Status) option {
       ((message.value \ "message").validated[String] |@|
-          (message.value \ "progress").validated[BigDecimal] |@|
-          (message.value \ "unit").validated[String]) {
+            (message.value \ "progress").validated[BigDecimal] |@|
+            (message.value \ "unit").validated[String]) {
         (msg, progress, unit) =>
           Status(message.job,
                  message.id,
@@ -107,14 +107,14 @@ object Status {
   }
 
   def toMessage(status: Status): Message = {
-    Message(
-        status.job,
-        status.id,
-        channels.Status,
-        JObject(
-            jfield("message", status.message) :: jfield(
-                "progress", status.progress) :: jfield("unit", status.unit) ::
-            (status.info map (jfield("info", _) :: Nil) getOrElse Nil)
-        ))
+    Message(status.job,
+            status.id,
+            channels.Status,
+            JObject(
+                jfield("message", status.message) :: jfield(
+                    "progress",
+                    status.progress) :: jfield("unit", status.unit) ::
+                  (status.info map (jfield("info", _) :: Nil) getOrElse Nil)
+            ))
   }
 }

@@ -50,8 +50,9 @@ abstract class LAlgorithm[PD, M: ClassTag, Q, P]
     */
   def train(pd: PD): M
 
-  def batchPredictBase(
-      sc: SparkContext, bm: Any, qs: RDD[(Long, Q)]): RDD[(Long, P)] = {
+  def batchPredictBase(sc: SparkContext,
+                       bm: Any,
+                       qs: RDD[(Long, Q)]): RDD[(Long, P)] = {
     val mRDD = bm.asInstanceOf[RDD[M]]
     batchPredict(mRDD, qs)
   }
@@ -108,8 +109,10 @@ abstract class LAlgorithm[PD, M: ClassTag, Q, P]
     *         persistence, or Unit for re-training on deployment
     */
   @DeveloperApi
-  override def makePersistentModel(
-      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any = {
+  override def makePersistentModel(sc: SparkContext,
+                                   modelId: String,
+                                   algoParams: Params,
+                                   bm: Any): Any = {
     // Check RDD[M].count == 1
     val m = bm.asInstanceOf[RDD[M]].first()
     if (m.isInstanceOf[PersistentModel[_]]) {

@@ -19,8 +19,7 @@ class TCPConnectionActor(
     protocol: Protocol,
     project: ActorRef,
     broadcaster: ActorRef
-)
-    extends Actor
+) extends Actor
     with Stash
     with ActorLogging {
 
@@ -114,8 +113,8 @@ class TCPConnectionActor(
     envelopeOpt match {
       case Some(rawEnvelope: RpcRequestEnvelope) =>
         val envelope = Canonised(rawEnvelope)
-        context.actorOf(
-            RequestHandler(envelope, project, self), s"${envelope.callId}")
+        context.actorOf(RequestHandler(envelope, project, self),
+                        s"${envelope.callId}")
         repeatedDecode()
       case None =>
     }

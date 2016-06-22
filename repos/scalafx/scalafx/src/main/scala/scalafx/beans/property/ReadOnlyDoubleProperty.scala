@@ -44,8 +44,7 @@ class ReadOnlyDoubleProperty(
     with ReadOnlyProperty[Double, Number]
     with SFXDelegate[jfxbp.ReadOnlyDoubleProperty] {
   def this(bean: Object, name: String, value: Double) =
-    this(
-        new jfxbp.ReadOnlyDoublePropertyBase() {
+    this(new jfxbp.ReadOnlyDoublePropertyBase() {
       def getBean = bean
       def getName = name
       def get = value

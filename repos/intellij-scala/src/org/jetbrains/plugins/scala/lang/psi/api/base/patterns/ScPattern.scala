@@ -63,8 +63,7 @@ trait ScPattern extends ScalaPsiElement {
     def inner(p: ScPattern) {
       p match {
         case ScTypedPattern(te) =>
-          te.accept(
-              new ScalaRecursiveElementVisitor {
+          te.accept(new ScalaRecursiveElementVisitor {
             override def visitTypeVariableTypeElement(
                 tvar: ScTypeVariableTypeElement): Unit = {
               b += tvar
@@ -193,8 +192,8 @@ trait ScPattern extends ScalaPsiElement {
                     (p.name, ScalaPsiUtil.getPsiElementId(p)),
                     ScUndefinedType(new ScTypeParameterType(p, substitutor)))
             }
-            val clazz = ScalaPsiUtil.getContextOfType(
-                this, true, classOf[ScTemplateDefinition])
+            val clazz = ScalaPsiUtil
+              .getContextOfType(this, true, classOf[ScTemplateDefinition])
             clazz match {
               case clazz: ScTemplateDefinition =>
                 undefSubst =
@@ -229,7 +228,9 @@ trait ScPattern extends ScalaPsiElement {
             if (subbedRetTp.equiv(lang.psi.types.Boolean)) None
             else {
               val args = ScPattern.extractorParameters(
-                  subbedRetTp, this, ScPattern.isOneArgCaseClassMethod(fun))
+                  subbedRetTp,
+                  this,
+                  ScPattern.isOneArgCaseClassMethod(fun))
               if (totalNumberOfPatterns == 1 && args.length > 1)
                 Some(ScTupleType(args)(getProject, getResolveScope))
               else if (argIndex < args.length)
@@ -265,7 +266,9 @@ trait ScPattern extends ScalaPsiElement {
         fun.returnType match {
           case Success(rt, _) =>
             val args = ScPattern.extractorParameters(
-                subst.subst(rt), this, ScPattern.isOneArgCaseClassMethod(fun))
+                subst.subst(rt),
+                this,
+                ScPattern.isOneArgCaseClassMethod(fun))
             if (args.isEmpty) return None
             if (argIndex < args.length - 1)
               return Some(subst.subst(args(argIndex)))
@@ -298,13 +301,14 @@ trait ScPattern extends ScalaPsiElement {
         val types = params
           .map(_.getType(TypingContext.empty).getOrAny)
           .map(undefSubst.subst)
-        val args =
-          if (types.nonEmpty && params.last.isVarArgs) {
-            val lastType = types.last
-            val tp = ScalaPsiElementFactory.createTypeFromText(
-                s"scala.collection.Seq[${lastType.canonicalText}]", cl, cl)
-            types.dropRight(1) :+ tp
-          } else types
+        val args = if (types.nonEmpty && params.last.isVarArgs) {
+          val lastType = types.last
+          val tp = ScalaPsiElementFactory.createTypeFromText(
+              s"scala.collection.Seq[${lastType.canonicalText}]",
+              cl,
+              cl)
+          types.dropRight(1) :+ tp
+        } else types
         if (argIndex < args.length) Some(args(argIndex))
         else None
       case _ => None
@@ -353,15 +357,18 @@ trait ScPattern extends ScalaPsiElement {
                   case Some(pat) => pat.patterns.length
                   case _ => -1 //is it possible to get here?
                 }
-                return expectedTypeForExtractorArg(
-                    infix.reference, i + 1, infix.expectedType, patternLength)
+                return expectedTypeForExtractorArg(infix.reference,
+                                                   i + 1,
+                                                   infix.expectedType,
+                                                   patternLength)
               }
             case _ =>
           }
 
           tuple.expectedType.flatMap {
             case ScTupleType(comps) =>
-              for ((t, p) <- comps.iterator.zip(patternList.patterns.iterator)) {
+              for ((t, p) <- comps.iterator
+                              .zip(patternList.patterns.iterator)) {
                 if (p == this) return Some(t)
               }
               None
@@ -459,10 +466,11 @@ object ScPattern {
     }
   }
 
-  private def findMember(
-      name: String, tp: ScType, place: PsiElement): Option[ScType] = {
-    val cp = new CompletionProcessor(
-        StdKinds.methodRef, place, forName = Some(name))
+  private def findMember(name: String,
+                         tp: ScType,
+                         place: PsiElement): Option[ScType] = {
+    val cp =
+      new CompletionProcessor(StdKinds.methodRef, place, forName = Some(name))
     cp.processType(tp, place)
     cp.candidatesS.flatMap {
       case ScalaResolveResult(fun: ScFunction, subst)
@@ -500,8 +508,9 @@ object ScPattern {
     extractPossibleProductParts(tp, place, isOneArgCaseClass = false)
   }
 
-  def expectedNumberOfExtractorArguments(
-      returnType: ScType, place: PsiElement, isOneArgCaseClass: Boolean): Int =
+  def expectedNumberOfExtractorArguments(returnType: ScType,
+                                         place: PsiElement,
+                                         isOneArgCaseClass: Boolean): Int =
     extractorParameters(returnType, place, isOneArgCaseClass).size
 
   def extractorParameters(returnType: ScType,
@@ -526,7 +535,7 @@ object ScPattern {
           ScType.extractClass(des) match {
             case Some(clazz)
                 if clazz.qualifiedName == "scala.Option" ||
-                clazz.qualifiedName == "scala.Some" =>
+                  clazz.qualifiedName == "scala.Some" =>
               if (args.length == 1) {
                 def checkProduct(tp: ScType): Seq[ScType] = {
                   val productChance = collectFor2_11
@@ -541,7 +550,7 @@ object ScPattern {
                       clazz <- ScType.extractClass(tp, Some(place.getProject))
                     } yield
                       clazz == productClass ||
-                      clazz.isInheritor(productClass, true))
+                        clazz.isInheritor(productClass, true))
                       .filter(identity)
                       .fold(Seq(tp))(_ => productChance)
                   }
@@ -561,8 +570,9 @@ object ScPattern {
 
   def isQuasiquote(fun: ScFunction) = {
     val fqnO = Option(fun.containingClass).map(_.qualifiedName)
-    fqnO.exists(fqn =>
+    fqnO.exists(
+        fqn =>
           fqn.contains('.') &&
-          fqn.substring(0, fqn.lastIndexOf('.')) == "scala.reflect.api.Quasiquotes.Quasiquote")
+            fqn.substring(0, fqn.lastIndexOf('.')) == "scala.reflect.api.Quasiquotes.Quasiquote")
   }
 }

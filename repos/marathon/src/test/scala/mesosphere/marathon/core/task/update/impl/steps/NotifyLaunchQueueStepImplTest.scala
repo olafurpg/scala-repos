@@ -26,8 +26,9 @@ class NotifyLaunchQueueStepImplTest
   test("notifying launch queue") {
     val f = new Fixture
     val status = runningTaskStatus
-    val expectedUpdate = TaskStatusUpdate(
-        updateTimestamp, Task.Id(taskId), MarathonTaskStatus(status))
+    val expectedUpdate = TaskStatusUpdate(updateTimestamp,
+                                          Task.Id(taskId),
+                                          MarathonTaskStatus(status))
 
     Given("a status update")
     f.launchQueue.notifyOfTaskUpdate(expectedUpdate) returns Future.successful(

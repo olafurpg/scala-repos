@@ -30,8 +30,7 @@ class PolynomialSamplingCheck
   runSparse[Rational]("rational")
 
   def runDense[A: Arbitrary: Eq: Field: ClassTag](typ: String): Unit = {
-    implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(
-        for {
+    implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
       Polynomial(ts.take(6)).toDense
@@ -40,8 +39,7 @@ class PolynomialSamplingCheck
   }
 
   def runSparse[A: Arbitrary: Eq: Field: ClassTag](typ: String): Unit = {
-    implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(
-        for {
+    implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
       Polynomial(ts.take(6)).toSparse
@@ -50,7 +48,8 @@ class PolynomialSamplingCheck
   }
 
   def runTest[A: Eq: Field: ClassTag](name: String)(
-      implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]): Unit = {
+      implicit arb: Arbitrary[Polynomial[A]],
+      arb2: Arbitrary[A]): Unit = {
     type P = Polynomial[A]
 
     val zero = Polynomial.zero[A]

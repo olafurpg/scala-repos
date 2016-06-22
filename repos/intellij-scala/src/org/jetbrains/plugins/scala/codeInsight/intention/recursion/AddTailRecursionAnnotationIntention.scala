@@ -21,7 +21,7 @@ class AddTailRecursionAnnotationIntention
     element match {
       case it @ Parent(f: ScFunctionDefinition) if f.nameId == it =>
         !f.hasTailRecursionAnnotation &&
-        f.recursionType == RecursionType.TailRecursion
+          f.recursionType == RecursionType.TailRecursion
       case _ => false
     }
 

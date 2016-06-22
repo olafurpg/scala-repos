@@ -45,8 +45,8 @@ class ESApps(client: Client, config: StorageClientConfig, index: String)
   if (!typeExistResponse.isExists) {
     val json =
       (estype ->
-          ("properties" ->
-              ("name" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
+            ("properties" ->
+                  ("name" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
     indices
       .preparePutMapping(index)
       .setType(estype)
@@ -55,12 +55,11 @@ class ESApps(client: Client, config: StorageClientConfig, index: String)
   }
 
   def insert(app: App): Option[Int] = {
-    val id =
-      if (app.id == 0) {
-        var roll = seq.genNext("apps")
-        while (!get(roll).isEmpty) roll = seq.genNext("apps")
-        roll
-      } else app.id
+    val id = if (app.id == 0) {
+      var roll = seq.genNext("apps")
+      while (!get(roll).isEmpty) roll = seq.genNext("apps")
+      roll
+    } else app.id
     val realapp = app.copy(id = id)
     update(realapp)
     Some(id)

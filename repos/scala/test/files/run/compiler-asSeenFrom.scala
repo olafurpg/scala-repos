@@ -135,7 +135,10 @@ package ll {
     }
 
     def permute(targs: List[Type]): List[String] = {
-      permuteAsSeenFrom(targs).groupBy(_._1).toList.sortBy(_._1.toString) flatMap {
+      permuteAsSeenFrom(targs)
+        .groupBy(_._1)
+        .toList
+        .sortBy(_._1.toString) flatMap {
         case (site, xs) =>
           block(fmt(site)) {
             fmt("type", "seen from prefix", "is") :: fmt("----",
@@ -158,9 +161,9 @@ package ll {
 
   def signaturesIn(info: Type): List[String] =
     (info.members.toList filterNot
-        (s =>
-              s.isType || s.owner == ObjectClass || s.owner == AnyClass ||
-              s.isConstructor) map (_.defString))
+          (s =>
+                s.isType || s.owner == ObjectClass || s.owner == AnyClass ||
+                  s.isConstructor) map (_.defString))
 
   def check(source: String, unit: global.CompilationUnit) = {
     import syms._

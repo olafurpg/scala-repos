@@ -22,7 +22,7 @@ import ir.Utils
 private object SourceMapWriter {
   private val Base64Map =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" +
-    "0123456789+/"
+      "0123456789+/"
 
   // Some constants for writeBase64VLQ
   // Each base-64 digit covers 6 bits, but 1 is used for the continuation
@@ -166,8 +166,9 @@ class SourceMapWriter(val out: Writer,
     startSegment(column, nodePosStack.topPos, nodePosStack.topName)
   }
 
-  private def startSegment(
-      startColumn: Int, originalPos: Position, originalName: String): Unit = {
+  private def startSegment(startColumn: Int,
+                           originalPos: Position,
+                           originalName: String): Unit = {
     // There is no point in outputting a segment with the same information
     if ((originalPos == pendingPos) && (originalName == pendingName)) return
 

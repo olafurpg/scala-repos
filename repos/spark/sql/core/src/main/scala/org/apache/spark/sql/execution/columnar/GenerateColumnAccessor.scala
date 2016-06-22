@@ -68,8 +68,8 @@ object GenerateColumnAccessor
     with Logging {
 
   protected def canonicalize(in: Seq[DataType]): Seq[DataType] = in
-  protected def bind(
-      in: Seq[DataType], inputSchema: Seq[Attribute]): Seq[DataType] = in
+  protected def bind(in: Seq[DataType],
+                     inputSchema: Seq[Attribute]): Seq[DataType] = in
 
   protected def create(columnTypes: Seq[DataType]): ColumnarIterator = {
     val ctx = newCodeGenContext()
@@ -95,8 +95,9 @@ object GenerateColumnAccessor
           case array: ArrayType => classOf[ArrayColumnAccessor].getName
           case t: MapType => classOf[MapColumnAccessor].getName
         }
-        ctx.addMutableState(
-            accessorCls, accessorName, s"$accessorName = null;")
+        ctx.addMutableState(accessorCls,
+                            accessorName,
+                            s"$accessorName = null;")
 
         val createCode = dt match {
           case t if ctx.isPrimitiveType(dt) =>

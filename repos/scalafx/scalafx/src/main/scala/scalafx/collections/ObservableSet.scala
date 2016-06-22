@@ -215,7 +215,7 @@ trait ObservableSet[T]
             case _ =>
               throw new IllegalStateException(
                   "Irregular Change. Added: " + change.getElementAdded +
-                  ", Removed: " + change.getElementRemoved)
+                    ", Removed: " + change.getElementRemoved)
           }
 
         op(ObservableSet.this, changeEvent)
@@ -229,8 +229,7 @@ trait ObservableSet[T]
     * @param op No-argument function to be activated when some change in this $OS was made.
     */
   def onChange(op: => Unit) {
-    delegate.addListener(
-        new jfxc.SetChangeListener[T] {
+    delegate.addListener(new jfxc.SetChangeListener[T] {
       def onChanged(change: jfxc.SetChangeListener.Change[_ <: T]) {
         op
       }

@@ -15,8 +15,8 @@ object ServerResultUtils {
   /**
     * Determine whether the connection should be closed, and what header, if any, should be added to the response.
     */
-  def determineConnectionHeader(
-      request: RequestHeader, result: Result): ConnectionHeader = {
+  def determineConnectionHeader(request: RequestHeader,
+                                result: Result): ConnectionHeader = {
     if (request.version == HttpProtocol.HTTP_1_1) {
       if (result.header.headers
             .get(CONNECTION)

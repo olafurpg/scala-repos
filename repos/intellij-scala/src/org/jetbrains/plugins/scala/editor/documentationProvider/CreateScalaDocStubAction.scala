@@ -33,8 +33,8 @@ class CreateScalaDocStubAction
     val editor = CommonDataKeys.EDITOR.getData(context)
 
     if (editor == null) return
-    val file = PsiUtilBase.getPsiFileInEditor(
-        editor, CommonDataKeys.PROJECT.getData(context))
+    val file = PsiUtilBase
+      .getPsiFileInEditor(editor, CommonDataKeys.PROJECT.getData(context))
     if (file.getLanguage != ScalaFileType.SCALA_LANGUAGE) return
 
     file findElementAt editor.getCaretModel.getOffset match {
@@ -78,8 +78,8 @@ class CreateScalaDocStubAction
       }, "Create ScalaDoc stub", null, psiDocument)
   }
 
-  private def recreateStub(
-      docOwner: ScDocCommentOwner, psiDocument: Document) {
+  private def recreateStub(docOwner: ScDocCommentOwner,
+                           psiDocument: Document) {
     val oldComment = docOwner.getDocComment.asInstanceOf[ScDocComment]
     val oldTags = oldComment findTagsByName (_ => true)
 
@@ -97,8 +97,8 @@ class CreateScalaDocStubAction
     @inline def convertToParamMap[T <: ScNamedElement](params: Seq[T]) =
       mutable.HashMap(params map (p => (p.getName, p)): _*)
 
-    def processParams[T <: ScNamedElement](
-        groupNames: List[String], params: List[Seq[T]]) {
+    def processParams[T <: ScNamedElement](groupNames: List[String],
+                                           params: List[Seq[T]]) {
       val paramMaps =
         groupNames zip params map {
           case (name, param) =>

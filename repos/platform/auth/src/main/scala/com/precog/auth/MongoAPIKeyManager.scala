@@ -91,18 +91,20 @@ object MongoAPIKeyManager extends Logging {
 
     val cached = config[Boolean]("cached", false)
 
-    val dbStop = Stoppable.fromFuture(
-        database.disconnect.fallbackTo(Future(())) flatMap { _ =>
-      mongo.close
-    })
+    val dbStop =
+      Stoppable.fromFuture(database.disconnect.fallbackTo(Future(())) flatMap {
+        _ =>
+          mongo.close
+      })
 
     (if (cached) new CachingAPIKeyManager(mongoAPIKeyManager)
      else mongoAPIKeyManager,
      dbStop)
   }
 
-  def createRootAPIKey(
-      db: Database, keyCollection: String, grantCollection: String)(
+  def createRootAPIKey(db: Database,
+                       keyCollection: String,
+                       grantCollection: String)(
       implicit timeout: Timeout): Future[APIKeyRecord] = {
     import Permission._
     logger.info("Creating new root key")
@@ -153,7 +155,8 @@ object MongoAPIKeyManager extends Logging {
 
       case None =>
         logger.error("Could not locate existing root API key!")
-        Promise.failed(new IllegalStateException(
+        Promise.failed(
+            new IllegalStateException(
                 "Could not locate existing root API key!"))
     }
   }
@@ -189,9 +192,14 @@ class MongoAPIKeyManager(
                    description: Option[String],
                    issuerKey: APIKey,
                    grants: Set[GrantId]): Future[APIKeyRecord] = {
-    val apiKey = APIKeyRecord(
-        APIKeyManager.newAPIKey(), name, description, issuerKey, grants, false)
-    database(insert(apiKey.serialize.asInstanceOf[JObject])
+    val apiKey = APIKeyRecord(APIKeyManager.newAPIKey(),
+                              name,
+                              description,
+                              issuerKey,
+                              grants,
+                              false)
+    database(
+        insert(apiKey.serialize.asInstanceOf[JObject])
           .into(settings.apiKeys)) map { _ =>
       apiKey
     }
@@ -218,8 +226,9 @@ class MongoAPIKeyManager(
     }
   }
 
-  private def findOneMatching[A](
-      keyName: String, keyValue: MongoPrimitive, collection: String)(
+  private def findOneMatching[A](keyName: String,
+                                 keyValue: MongoPrimitive,
+                                 collection: String)(
       implicit extractor: Extractor[A]): Future[Option[A]] = {
     database {
       selectOne().from(collection).where(keyName === keyValue)
@@ -229,8 +238,9 @@ class MongoAPIKeyManager(
   }
 
   private def findAllMatching[A](
-      keyName: String, keyValue: MongoPrimitive, collection: String)(
-      implicit extractor: Extractor[A]): Future[Set[A]] = {
+      keyName: String,
+      keyValue: MongoPrimitive,
+      collection: String)(implicit extractor: Extractor[A]): Future[Set[A]] = {
     database {
       selectAll.from(collection).where(keyName === keyValue)
     } map {
@@ -239,8 +249,9 @@ class MongoAPIKeyManager(
   }
 
   private def findAllIncluding[A](
-      keyName: String, keyValue: MongoPrimitive, collection: String)(
-      implicit extractor: Extractor[A]): Future[Set[A]] = {
+      keyName: String,
+      keyValue: MongoPrimitive,
+      collection: String)(implicit extractor: Extractor[A]): Future[Set[A]] = {
     database {
       selectAll
         .from(collection)
@@ -283,7 +294,9 @@ class MongoAPIKeyManager(
             "apiKey",
             apiKey,
             settings.deletedAPIKeys)) <+> findOneMatching[APIKeyRecord](
-        "tid", apiKey, settings.deletedAPIKeys)
+        "tid",
+        apiKey,
+        settings.deletedAPIKeys)
 
   def findDeletedGrant(gid: GrantId) =
     ToPlusOps[({ type λ[α] = Future[Option[α]] })#λ, Grant](findOneMatching[
@@ -297,7 +310,9 @@ class MongoAPIKeyManager(
   private def findGrantChildren(gid: GrantId, collection: String) =
     ToPlusOps[({ type λ[α] = Future[Set[α]] })#λ, Grant](findAllIncluding[
             Grant]("parentIds", gid, collection)) <+> findAllMatching[Grant](
-        "issuer", gid, collection)
+        "issuer",
+        gid,
+        collection)
 
   def addGrants(apiKey: APIKey, add: Set[GrantId]) = updateAPIKey(apiKey) {
     r =>
@@ -335,7 +350,8 @@ class MongoAPIKeyManager(
     findAPIKey(apiKey).flatMap {
       case ot @ Some(t) =>
         for {
-          _ <- database(insert(t.serialize.asInstanceOf[JObject])
+          _ <- database(
+                  insert(t.serialize.asInstanceOf[JObject])
                     .into(settings.deletedAPIKeys))
           _ <- database(
                   remove.from(settings.apiKeys).where("apiKey" === apiKey))
@@ -355,7 +371,8 @@ class MongoAPIKeyManager(
                    _ <- database(
                            insert(leafGrant.serialize.asInstanceOf[JObject])
                              .into(settings.deletedGrants))
-                   _ <- database(remove
+                   _ <- database(
+                           remove
                              .from(settings.grants)
                              .where("grantId" === gid))
                  } yield { deletedChildren + leafGrant }

@@ -28,8 +28,8 @@ import scala.collection.generic.Growable
   * class and modifies it such that only the top K elements are retained.
   * The top K elements are defined by an implicit Ordering[A].
   */
-private[spark] class BoundedPriorityQueue[A](
-    maxSize: Int)(implicit ord: Ordering[A])
+private[spark] class BoundedPriorityQueue[A](maxSize: Int)(
+    implicit ord: Ordering[A])
     extends Iterable[A]
     with Growable[A]
     with Serializable {

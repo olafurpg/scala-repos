@@ -40,15 +40,14 @@ abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
 
     val isDepr =
       psi.isInstanceOf[ScTypeDefinition] && psi.getModifierList != null &&
-      !psi.getModifierList.getAnnotations.forall(
-          p =>
-            p match {
-          case a: ScAnnotation => {
+        !psi.getModifierList.getAnnotations.forall(p =>
+              p match {
+            case a: ScAnnotation => {
               val typeText = a.constructor.typeElement.getText
               typeText != "deprecated" && typeText != "scala.deprecated"
             }
-          case _ => true
-      })
+            case _ => true
+        })
 
     val isImplicitObject =
       psi.isInstanceOf[ScObject] && psi.hasModifierProperty("implicit")
@@ -73,7 +72,7 @@ abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
 
     val isLocal: Boolean =
       psi.containingClass == null &&
-      PsiTreeUtil.getParentOfType(psi, classOf[ScTemplateDefinition]) != null
+        PsiTreeUtil.getParentOfType(psi, classOf[ScTemplateDefinition]) != null
 
     new ScTemplateDefinitionStubImpl[ParentPsi](parent,
                                                 this,
@@ -171,8 +170,8 @@ abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
     }
     val javaFqn = stub.javaQualName
     if (javaFqn != null && !stub.isLocal && stub.isVisibleInJava) {
-      sink.occurrence[PsiClass, java.lang.Integer](
-          JavaStubIndexKeys.CLASS_FQN, javaFqn.hashCode)
+      sink.occurrence[PsiClass, java.lang.Integer](JavaStubIndexKeys.CLASS_FQN,
+                                                   javaFqn.hashCode)
       val i = javaFqn.lastIndexOf(".")
       val pack =
         if (i == -1) ""
@@ -181,8 +180,8 @@ abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
     }
     val fqn = stub.qualName
     if (fqn != null && !stub.isLocal) {
-      sink.occurrence[PsiClass, java.lang.Integer](
-          ScalaIndexKeys.FQN_KEY, fqn.hashCode)
+      sink.occurrence[PsiClass, java.lang.Integer](ScalaIndexKeys.FQN_KEY,
+                                                   fqn.hashCode)
       val i = fqn.lastIndexOf(".")
       val pack =
         if (i == -1) ""
@@ -203,9 +202,11 @@ abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
         else packageName.substring(index + 1, packageName.size)
       }
       sink.occurrence[PsiClass, java.lang.Integer](
-          ScalaIndexKeys.PACKAGE_OBJECT_KEY, packageName.hashCode)
+          ScalaIndexKeys.PACKAGE_OBJECT_KEY,
+          packageName.hashCode)
       sink.occurrence[PsiClass, String](
-          ScalaIndexKeys.PACKAGE_OBJECT_SHORT_NAME_KEY, shortName)
+          ScalaIndexKeys.PACKAGE_OBJECT_SHORT_NAME_KEY,
+          shortName)
     }
   }
 }

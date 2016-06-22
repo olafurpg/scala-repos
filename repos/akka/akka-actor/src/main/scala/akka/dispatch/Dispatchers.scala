@@ -125,7 +125,8 @@ class Dispatchers(val settings: ActorSystem.Settings,
     * the specified configurator was successfully registered.
     */
   def registerConfigurator(
-      id: String, configurator: MessageDispatcherConfigurator): Boolean =
+      id: String,
+      configurator: MessageDispatcherConfigurator): Boolean =
     dispatcherConfigurators.putIfAbsent(id, configurator) == null
 
   /**
@@ -188,8 +189,8 @@ class Dispatchers(val settings: ActorSystem.Settings,
         // FIXME remove this case in 2.4
         throw new IllegalArgumentException(
             "BalancingDispatcher is deprecated, use a BalancingPool instead. " +
-            "During a migration period you can still use BalancingDispatcher by specifying the full class name: " +
-            classOf[BalancingDispatcherConfigurator].getName)
+              "During a migration period you can still use BalancingDispatcher by specifying the full class name: " +
+              classOf[BalancingDispatcherConfigurator].getName)
       case "PinnedDispatcher" ⇒
         new PinnedDispatcherConfigurator(cfg, prerequisites)
       case fqn ⇒
@@ -201,8 +202,8 @@ class Dispatchers(val settings: ActorSystem.Settings,
             case exception ⇒
               throw new ConfigurationException(
                   ("Cannot instantiate MessageDispatcherConfigurator type [%s], defined in [%s], " +
-                      "make sure it has constructor with [com.typesafe.config.Config] and " +
-                      "[akka.dispatch.DispatcherPrerequisites] parameters")
+                        "make sure it has constructor with [com.typesafe.config.Config] and " +
+                        "[akka.dispatch.DispatcherPrerequisites] parameters")
                     .format(fqn, cfg.getString("id")),
                   exception)
           })
@@ -216,8 +217,8 @@ class Dispatchers(val settings: ActorSystem.Settings,
   * Returns the same dispatcher instance for for each invocation
   * of the `dispatcher()` method.
   */
-class DispatcherConfigurator(
-    config: Config, prerequisites: DispatcherPrerequisites)
+class DispatcherConfigurator(config: Config,
+                             prerequisites: DispatcherPrerequisites)
     extends MessageDispatcherConfigurator(config, prerequisites) {
 
   private val instance = new Dispatcher(
@@ -241,7 +242,8 @@ private[akka] object BalancingDispatcherConfigurator {
   private val defaultRequirement = ConfigFactory.parseString(
       "mailbox-requirement = akka.dispatch.MultipleConsumerSemantics")
   def amendConfig(config: Config): Config =
-    if (config.getString("mailbox-requirement") != Mailboxes.NoMailboxRequirement)
+    if (config
+          .getString("mailbox-requirement") != Mailboxes.NoMailboxRequirement)
       config
     else defaultRequirement.withFallback(config)
 }
@@ -251,10 +253,11 @@ private[akka] object BalancingDispatcherConfigurator {
   * Returns the same dispatcher instance for for each invocation
   * of the `dispatcher()` method.
   */
-class BalancingDispatcherConfigurator(
-    _config: Config, _prerequisites: DispatcherPrerequisites)
+class BalancingDispatcherConfigurator(_config: Config,
+                                      _prerequisites: DispatcherPrerequisites)
     extends MessageDispatcherConfigurator(
-        BalancingDispatcherConfigurator.amendConfig(_config), _prerequisites) {
+        BalancingDispatcherConfigurator.amendConfig(_config),
+        _prerequisites) {
 
   private val instance = {
     val mailboxes = prerequisites.mailboxes
@@ -263,23 +266,22 @@ class BalancingDispatcherConfigurator(
     if (!classOf[MultipleConsumerSemantics].isAssignableFrom(requirement))
       throw new IllegalArgumentException(
           "BalancingDispatcher must have 'mailbox-requirement' which implements akka.dispatch.MultipleConsumerSemantics; " +
-          s"dispatcher [$id] has [$requirement]")
-    val mailboxType =
-      if (config.hasPath("mailbox")) {
-        val mt = mailboxes.lookup(config.getString("mailbox"))
-        if (!requirement.isAssignableFrom(
-                mailboxes.getProducedMessageQueueType(mt)))
-          throw new IllegalArgumentException(
-              s"BalancingDispatcher [$id] has 'mailbox' [${mt.getClass}] which is incompatible with 'mailbox-requirement' [$requirement]")
-        mt
-      } else if (config.hasPath("mailbox-type")) {
-        val mt = mailboxes.lookup(id)
-        if (!requirement.isAssignableFrom(
-                mailboxes.getProducedMessageQueueType(mt)))
-          throw new IllegalArgumentException(
-              s"BalancingDispatcher [$id] has 'mailbox-type' [${mt.getClass}] which is incompatible with 'mailbox-requirement' [$requirement]")
-        mt
-      } else mailboxes.lookupByQueueType(requirement)
+            s"dispatcher [$id] has [$requirement]")
+    val mailboxType = if (config.hasPath("mailbox")) {
+      val mt = mailboxes.lookup(config.getString("mailbox"))
+      if (!requirement.isAssignableFrom(
+              mailboxes.getProducedMessageQueueType(mt)))
+        throw new IllegalArgumentException(
+            s"BalancingDispatcher [$id] has 'mailbox' [${mt.getClass}] which is incompatible with 'mailbox-requirement' [$requirement]")
+      mt
+    } else if (config.hasPath("mailbox-type")) {
+      val mt = mailboxes.lookup(id)
+      if (!requirement.isAssignableFrom(
+              mailboxes.getProducedMessageQueueType(mt)))
+        throw new IllegalArgumentException(
+            s"BalancingDispatcher [$id] has 'mailbox-type' [${mt.getClass}] which is incompatible with 'mailbox-requirement' [$requirement]")
+      mt
+    } else mailboxes.lookupByQueueType(requirement)
     create(mailboxType)
   }
 
@@ -305,8 +307,8 @@ class BalancingDispatcherConfigurator(
   * Returns new dispatcher instance for for each invocation
   * of the `dispatcher()` method.
   */
-class PinnedDispatcherConfigurator(
-    config: Config, prerequisites: DispatcherPrerequisites)
+class PinnedDispatcherConfigurator(config: Config,
+                                   prerequisites: DispatcherPrerequisites)
     extends MessageDispatcherConfigurator(config, prerequisites) {
 
   private val threadPoolConfig: ThreadPoolConfig = configureExecutor() match {

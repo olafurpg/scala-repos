@@ -36,10 +36,10 @@ abstract class Specs2WholeSuiteTest extends Specs2TestCase {
                                            "SpecificationTest",
                                            "The 'SpecificationTest' should",
                                            "run single test") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "SpecificationTest",
-                                           "The 'SpecificationTest' should",
-                                           "ignore other test"))
+            checkResultTreeHasExactNamedPath(root,
+                                             "[root]",
+                                             "SpecificationTest",
+                                             "The 'SpecificationTest' should",
+                                             "ignore other test"))
   }
 }

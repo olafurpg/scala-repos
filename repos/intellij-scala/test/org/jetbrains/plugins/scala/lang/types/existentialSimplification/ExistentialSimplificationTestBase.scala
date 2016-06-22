@@ -31,8 +31,9 @@ abstract class ExistentialSimplificationTestBase
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+        FileUtil.loadFile(new File(file.getCanonicalPath),
+                          CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(startExprMarker)
@@ -51,7 +52,10 @@ abstract class ExistentialSimplificationTestBase
                                       classOf[ScExpression]) != null) 0
       else 1 //for xml tests
     val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
-        scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
+        scalaFile,
+        startOffset + addOne,
+        endOffset,
+        classOf[ScExpression])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.getType(TypingContext.empty)
     typez match {
@@ -68,8 +72,8 @@ abstract class ExistentialSimplificationTestBase
         }
         assertEquals(output, res)
       case Success(_, _) =>
-        assert(
-            assertion = false, message = "Expression has not existential type")
+        assert(assertion = false,
+               message = "Expression has not existential type")
       case Failure(msg, elem) =>
         assert(assertion = false,
                message =

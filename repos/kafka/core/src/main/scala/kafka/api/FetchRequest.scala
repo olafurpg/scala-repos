@@ -156,14 +156,17 @@ case class FetchRequest(
     val fetchResponsePartitionData = requestInfo.map {
       case (topicAndPartition, data) =>
         (topicAndPartition,
-         FetchResponsePartitionData(
-             Errors.forException(e).code, -1, MessageSet.Empty))
+         FetchResponsePartitionData(Errors.forException(e).code,
+                                    -1,
+                                    MessageSet.Empty))
     }
     val fetchRequest = request.requestObj.asInstanceOf[FetchRequest]
-    val errorResponse = FetchResponse(
-        correlationId, fetchResponsePartitionData, fetchRequest.versionId)
+    val errorResponse = FetchResponse(correlationId,
+                                      fetchResponsePartitionData,
+                                      fetchRequest.versionId)
     // Magic value does not matter here because the message set is empty
-    requestChannel.sendResponse(new RequestChannel.Response(
+    requestChannel.sendResponse(
+        new RequestChannel.Response(
             request,
             new FetchResponseSend(request.connectionId, errorResponse)))
   }

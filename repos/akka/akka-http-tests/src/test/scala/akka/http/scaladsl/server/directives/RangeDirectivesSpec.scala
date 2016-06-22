@@ -72,7 +72,8 @@ class RangeDirectivesSpec extends RoutingSpec with Inspectors with Inside {
     }
 
     "be transparent to non-200 responses" in {
-      Get() ~> addHeader(Range(ByteRange(1, 2))) ~> Route.seal(wrs(reject())) ~> check {
+      Get() ~> addHeader(Range(ByteRange(1, 2))) ~> Route
+        .seal(wrs(reject())) ~> check {
         status == NotFound
         headers.exists { case `Content-Range`(_, _) ⇒ true; case _ ⇒ false } shouldEqual false
       }
@@ -82,7 +83,8 @@ class RangeDirectivesSpec extends RoutingSpec with Inspectors with Inside {
       Get() ~> addHeader(Range(ByteRange(100, 200))) ~> completeWithRangedBytes(
           10) ~> check {
         rejection shouldEqual UnsatisfiableRangeRejection(
-            ByteRange(100, 200) :: Nil, 10)
+            ByteRange(100, 200) :: Nil,
+            10)
       }
     }
 
@@ -90,14 +92,16 @@ class RangeDirectivesSpec extends RoutingSpec with Inspectors with Inside {
       Get() ~> addHeader(Range(ByteRange.suffix(0))) ~> completeWithRangedBytes(
           42) ~> check {
         rejection shouldEqual UnsatisfiableRangeRejection(
-            ByteRange.suffix(0) :: Nil, 42)
+            ByteRange.suffix(0) :: Nil,
+            42)
       }
     }
 
     "return a mediaType of 'multipart/byteranges' for a ranged request with multiple ranges" in {
       Get() ~> addHeader(Range(ByteRange(0, 10), ByteRange(0, 10))) ~> completeWithRangedBytes(
           10) ~> check {
-        mediaType.withParams(Map.empty) shouldEqual MediaTypes.`multipart/byteranges`
+        mediaType
+          .withParams(Map.empty) shouldEqual MediaTypes.`multipart/byteranges`
       }
     }
 
@@ -135,9 +139,10 @@ class RangeDirectivesSpec extends RoutingSpec with Inspectors with Inside {
       Get() ~> addHeader(
           Range(ByteRange(5, 10), ByteRange(0, 1), ByteRange(1, 2))) ~> {
         wrs {
-          complete(HttpEntity.Default(ContentTypes.`text/plain(UTF-8)`,
-                                      content.length,
-                                      entityData()))
+          complete(
+              HttpEntity.Default(ContentTypes.`text/plain(UTF-8)`,
+                                 content.length,
+                                 entityData()))
         }
       } ~> check {
         header[`Content-Range`] should be(None)

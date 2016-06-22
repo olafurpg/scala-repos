@@ -82,8 +82,7 @@ object Cache {
   case class OnRemoval[K, V](onRemove: (K, V, RemovalCause) => PrecogUnit)
       extends CacheOption[K, V] {
     def apply(builder: CacheBuilder[K, V]) =
-      builder.removalListener(
-          new RemovalListener[K, V] {
+      builder.removalListener(new RemovalListener[K, V] {
         def onRemoval(notification: RemovalNotification[K, V]) =
           onRemove(notification.getKey,
                    notification.getValue,
@@ -95,8 +94,8 @@ object Cache {
       options: Seq[CacheOption[K, V]]): CacheBuilder[K, V] =
     options
       .foldLeft(CacheBuilder.newBuilder.asInstanceOf[CacheBuilder[K, V]]) {
-      case (acc, opt) => opt.apply(acc)
-    }
+        case (acc, opt) => opt.apply(acc)
+      }
 
   def simple[K, V](options: CacheOption[K, V]*): SimpleCache[K, V] = {
     new SimpleCache[K, V](createBuilder(options).build())

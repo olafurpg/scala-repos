@@ -87,8 +87,8 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal {
     * positive terms on the right. If either side has no terms at all, then that
     * side is `None`.
     */
-  def splitSemigroup[B](
-      f: A => B)(implicit B: CSemigroup[B]): (Option[B], Option[B]) =
+  def splitSemigroup[B](f: A => B)(
+      implicit B: CSemigroup[B]): (Option[B], Option[B]) =
     split[Option[B]] { a =>
       Some(f(a))
     }
@@ -125,7 +125,7 @@ object FreeAbGroup { companion =>
       def id: FreeAbGroup[A] = companion.id
       def op(a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |+| b
       def inverse(a: FreeAbGroup[A]): FreeAbGroup[A] = a.inverse
-      override def opInverse(
-          a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |-| b
+      override def opInverse(a: FreeAbGroup[A],
+                             b: FreeAbGroup[A]): FreeAbGroup[A] = a |-| b
     }
 }

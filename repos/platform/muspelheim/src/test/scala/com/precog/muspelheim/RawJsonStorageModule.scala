@@ -109,8 +109,8 @@ trait RawJsonStorageModule[M[+ _]] { self =>
         .setUrls(ClasspathHelper.forPackage("test_data"))
         .setScanners(new ResourcesScanner()))
   val jsonFiles = reflections.getResources(Pattern.compile(".*\\.json"))
-  for (resource <- jsonFiles.asScala) load(
-      Path(resource.replaceAll("test_data/", "").replaceAll("\\.json", "")))
+  for (resource <- jsonFiles.asScala)
+    load(Path(resource.replaceAll("test_data/", "").replaceAll("\\.json", "")))
 
   val vfs: VFSMetadata[M] = new VFSMetadata[M] {
     import com.precog.yggdrasil.metadata._

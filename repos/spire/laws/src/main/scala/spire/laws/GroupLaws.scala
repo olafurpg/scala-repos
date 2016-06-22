@@ -65,13 +65,14 @@ trait GroupLaws[A] extends Laws {
         "sumn(a, 1) === a" → forAll((a: A) => A.sumn(a, 1) === a),
         "combinen(a, 2) === a + a" → forAll(
             (a: A) => A.sumn(a, 2) === (a + a)),
-        "sumOption" → forAll((a: A) =>
+        "sumOption" → forAll(
+            (a: A) =>
               (A.sumOption(Seq.empty[A]) === Option.empty[A]) &&
-              (A.sumOption(Seq(a)) === Option(a)) &&
-              (A.sumOption(Seq(a, a)) === Option(a + a)) && (A.sumOption(Seq(a,
-                                                                             a,
-                                                                             a)) === Option(
-                      a + a + a)))
+                (A.sumOption(Seq(a)) === Option(a)) &&
+                (A.sumOption(Seq(a, a)) === Option(a + a)) && (A.sumOption(
+                      Seq(a,
+                          a,
+                          a)) === Option(a + a + a)))
     )
 
   def additiveMonoid(implicit A: AdditiveMonoid[A]) = new AdditiveProperties(
@@ -99,15 +100,13 @@ trait GroupLaws[A] extends Laws {
       name: String,
       parent: Option[GroupProperties],
       props: (String, Prop)*
-  )
-      extends DefaultRuleSet(name, parent, props: _*)
+  ) extends DefaultRuleSet(name, parent, props: _*)
 
   class AdditiveProperties(
       val base: GroupProperties,
       val parent: Option[AdditiveProperties],
       val props: (String, Prop)*
-  )
-      extends RuleSet
+  ) extends RuleSet
       with HasOneParent {
     val name = base.name
     val bases = Seq("base" → base)

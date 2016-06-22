@@ -33,8 +33,8 @@ with AbstractTestConfigurationProducer {
     if (element.isInstanceOf[PsiPackage] ||
         element.isInstanceOf[PsiDirectory]) {
       if (!configuration.isInstanceOf[UTestRunConfiguration]) return false
-      return TestConfigurationUtil.isPackageConfiguration(
-          element, configuration)
+      return TestConfigurationUtil
+        .isPackageConfiguration(element, configuration)
     }
     val (testClass, testClassName) = getLocationClassAndTest(location)
     if (testClass == null) return false
@@ -42,12 +42,12 @@ with AbstractTestConfigurationProducer {
     configuration match {
       case configuration: UTestRunConfiguration
           if configuration.getTestKind == TestKind.CLASS &&
-          testClassName == null =>
+            testClassName == null =>
         testClassPath == configuration.getTestClassPath
       case configuration: UTestRunConfiguration
           if configuration.getTestKind == TestKind.TEST_NAME =>
         testClassPath == configuration.getTestClassPath &&
-        testClassName != null && testClassName == configuration.getTestName
+          testClassName != null && testClassName == configuration.getTestName
       case _ => false
     }
   }
@@ -79,9 +79,10 @@ with AbstractTestConfigurationProducer {
     val testClassPath = testClass.qualifiedName
     val settings = RunManager
       .getInstance(location.getProject)
-      .createRunConfiguration(StringUtil.getShortName(testClassPath) +
-                              (if (testName != null) "\\" + testName else ""),
-                              confFactory)
+      .createRunConfiguration(
+          StringUtil.getShortName(testClassPath) +
+            (if (testName != null) "\\" + testName else ""),
+          confFactory)
     val runConfiguration =
       settings.getConfiguration.asInstanceOf[UTestRunConfiguration]
     runConfiguration.setTestClassPath(testClassPath)
@@ -133,8 +134,8 @@ with AbstractTestConfigurationProducer {
     }
   }
 
-  private def buildTestPath(
-      testExpr: ScExpression, testScopeName: String): Option[String] = {
+  private def buildTestPath(testExpr: ScExpression,
+                            testScopeName: String): Option[String] = {
     testExpr match {
       case (_: ScInfixExpr) | (_: ScMethodCall) =>
         testExpr.getParent match {
@@ -167,8 +168,8 @@ with AbstractTestConfigurationProducer {
 
   private def buildPathFromTestExpr(expr: ScExpression): Option[String] =
     expr.firstChild
-      .flatMap(TestConfigurationUtil.getStaticTestName(
-              _, allowSymbolLiterals = true))
+      .flatMap(TestConfigurationUtil
+            .getStaticTestName(_, allowSymbolLiterals = true))
       .flatMap(buildTestPath(expr, _))
 
   override def getLocationClassAndTest(
@@ -180,10 +181,11 @@ with AbstractTestConfigurationProducer {
       PsiTreeUtil.getParentOfType(element, classOf[ScTypeDefinition], false)
     if (containingObject == null) return fail
     while (!containingObject.isInstanceOf[ScObject] &&
-           PsiTreeUtil.getParentOfType(
-               containingObject, classOf[ScTypeDefinition], true) != null) {
-      containingObject = PsiTreeUtil.getParentOfType(
-          containingObject, classOf[ScTypeDefinition], true)
+           PsiTreeUtil.getParentOfType(containingObject,
+                                       classOf[ScTypeDefinition],
+                                       true) != null) {
+      containingObject = PsiTreeUtil
+        .getParentOfType(containingObject, classOf[ScTypeDefinition], true)
     }
     if (!containingObject.isInstanceOf[ScObject]) return fail
     if (!suitePaths.exists(suitePath =>
@@ -196,8 +198,8 @@ with AbstractTestConfigurationProducer {
         strict = false,
         e =>
           TestNodeProvider.isUTestInfixExpr(e) ||
-          TestNodeProvider.isUTestSuiteApplyCall(e) ||
-          TestNodeProvider.isUTestApplyCall(e))
+            TestNodeProvider.isUTestSuiteApplyCall(e) ||
+            TestNodeProvider.isUTestApplyCall(e))
     val testName = nameContainer.flatMap {
       case infixExpr: ScInfixExpr =>
         //test location is a scope defined through infix '-'

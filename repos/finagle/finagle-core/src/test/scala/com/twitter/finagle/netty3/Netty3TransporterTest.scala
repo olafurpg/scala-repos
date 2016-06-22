@@ -33,47 +33,54 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
     it("creates a Netty3Transporter instance based on Stack params") {
       val inputParams =
         Stack.Params.empty + Label("test") +
-        Netty3Transporter.TransportFactory.param.default +
-        Transporter.ConnectTimeout(1.seconds) +
-        LatencyCompensation.Compensation(12.millis) +
-        Transporter.TLSHostname(Some("tls.host")) +
-        Transporter.HttpProxy(Some(new InetSocketAddress(0)),
-                              Some(Credentials("user", "pw"))) +
-        Transporter.SocksProxy(Some(new InetSocketAddress(0)),
-                               Some(("user", "pw"))) +
-        Transport.BufferSizes(Some(100), Some(200)) +
-        Transport.TLSClientEngine.param.default +
-        Transport.Liveness(1.seconds, 2.seconds, Some(true)) +
-        Transport.Verbose(true)
+          Netty3Transporter.TransportFactory.param.default +
+          Transporter.ConnectTimeout(1.seconds) +
+          LatencyCompensation.Compensation(12.millis) +
+          Transporter.TLSHostname(Some("tls.host")) +
+          Transporter.HttpProxy(Some(new InetSocketAddress(0)),
+                                Some(Credentials("user", "pw"))) +
+          Transporter.SocksProxy(Some(new InetSocketAddress(0)),
+                                 Some(("user", "pw"))) +
+          Transport.BufferSizes(Some(100), Some(200)) +
+          Transport.TLSClientEngine.param.default +
+          Transport.Liveness(1.seconds, 2.seconds, Some(true)) +
+          Transport.Verbose(true)
 
       val pipelineFactory = Channels.pipelineFactory(Channels.pipeline())
       val transporter = Netty3Transporter.make(pipelineFactory, inputParams)
       assert(transporter.name == inputParams[Label].label)
       assert(transporter.pipelineFactory == pipelineFactory)
-      assert(transporter.tlsConfig == inputParams[Transport.TLSClientEngine].e
+      assert(
+          transporter.tlsConfig == inputParams[Transport.TLSClientEngine].e
             .map(Netty3TransporterTLSConfig(
-                  _, inputParams[Transporter.TLSHostname].hostname)))
+                    _,
+                    inputParams[Transporter.TLSHostname].hostname)))
       assert(transporter.httpProxy == inputParams[Transporter.HttpProxy].sa)
-      assert(transporter.httpProxyCredentials == inputParams[
+      assert(
+          transporter.httpProxyCredentials == inputParams[
               Transporter.HttpProxy].credentials)
       assert(transporter.socksProxy == inputParams[Transporter.SocksProxy].sa)
-      assert(transporter.socksUsernameAndPassword == inputParams[
+      assert(
+          transporter.socksUsernameAndPassword == inputParams[
               Transporter.SocksProxy].credentials)
       assert(transporter.channelReaderTimeout == inputParams[
               Transport.Liveness].readTimeout)
       assert(transporter.channelWriterTimeout == inputParams[
               Transport.Liveness].writeTimeout)
-      assert(transporter.channelOptions.get("sendBufferSize") == inputParams[
-              Transport.BufferSizes].send)
+      assert(
+          transporter.channelOptions
+            .get("sendBufferSize") == inputParams[Transport.BufferSizes].send)
       assert(
           transporter.channelOptions.get("receiveBufferSize") == inputParams[
               Transport.BufferSizes].recv)
-      assert(transporter.channelOptions.get("keepAlive") == inputParams[
-              Transport.Liveness].keepAlive)
       assert(
-          transporter.channelOptions.get("connectTimeoutMillis").get == inputParams[
-              Transporter.ConnectTimeout].howlong.inMilliseconds +
-          inputParams[LatencyCompensation.Compensation].howlong.inMilliseconds)
+          transporter.channelOptions
+            .get("keepAlive") == inputParams[Transport.Liveness].keepAlive)
+      assert(
+          transporter.channelOptions
+            .get("connectTimeoutMillis")
+            .get == inputParams[Transporter.ConnectTimeout].howlong.inMilliseconds +
+            inputParams[LatencyCompensation.Compensation].howlong.inMilliseconds)
       assert(transporter.channelSnooper.nonEmpty == inputParams[
               Transport.Verbose].enabled)
     }
@@ -98,7 +105,8 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
     // CSL-2175
     ignore("expose UnresolvedAddressException") {
       val transporter = Netty3Transporter[Int, Int](
-          "name", Channels.pipelineFactory(Channels.pipeline()))
+          "name",
+          Channels.pipelineFactory(Channels.pipeline()))
       val addr = InetSocketAddressUtil.parseHosts("localhost/127.0.0.1:1234")
       intercept[UnresolvedAddressException] {
         Await.result(transporter(addr.head, new InMemoryStatsReceiver))
@@ -200,8 +208,10 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
 
       it("is not added if proxy address is given but address isLoopback") {
         val pipelineFactory = Channels.pipelineFactory(Channels.pipeline())
-        val transporter = new Netty3Transporter[Int, Int](
-            "name", pipelineFactory, socksProxy = Some(loopbackSockAddr))
+        val transporter =
+          new Netty3Transporter[Int, Int]("name",
+                                          pipelineFactory,
+                                          socksProxy = Some(loopbackSockAddr))
         val pipeline =
           transporter.newPipeline(loopbackSockAddr, NullStatsReceiver)
         assert(!hasSocksConnectHandler(pipeline))
@@ -209,8 +219,10 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
 
       it("is not added if proxy address is given but address isLinkLocal") {
         val pipelineFactory = Channels.pipelineFactory(Channels.pipeline())
-        val transporter = new Netty3Transporter[Int, Int](
-            "name", pipelineFactory, socksProxy = Some(loopbackSockAddr))
+        val transporter =
+          new Netty3Transporter[Int, Int]("name",
+                                          pipelineFactory,
+                                          socksProxy = Some(loopbackSockAddr))
         val pipeline =
           transporter.newPipeline(linkLocalSockAddr, NullStatsReceiver)
         assert(!hasSocksConnectHandler(pipeline))
@@ -218,8 +230,10 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
 
       it("is added if proxy address is given and addr is routable") {
         val pipelineFactory = Channels.pipelineFactory(Channels.pipeline())
-        val transporter = new Netty3Transporter[Int, Int](
-            "name", pipelineFactory, socksProxy = Some(loopbackSockAddr))
+        val transporter =
+          new Netty3Transporter[Int, Int]("name",
+                                          pipelineFactory,
+                                          socksProxy = Some(loopbackSockAddr))
         val pipeline =
           transporter.newPipeline(routableSockAddr, NullStatsReceiver)
         assert(hasSocksConnectHandler(pipeline))

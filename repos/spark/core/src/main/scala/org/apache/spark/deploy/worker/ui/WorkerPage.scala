@@ -43,8 +43,8 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
     val workerState =
       workerEndpoint.askWithRetry[WorkerStateResponse](RequestWorkerState)
 
-    val executorHeaders = Seq(
-        "ExecutorID", "Cores", "State", "Memory", "Job Details", "Logs")
+    val executorHeaders =
+      Seq("ExecutorID", "Cores", "State", "Memory", "Job Details", "Logs")
     val runningExecutors = workerState.executors
     val runningExecutorTable =
       UIUtils.listingTable(executorHeaders, executorRow, runningExecutors)
@@ -52,8 +52,13 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
     val finishedExecutorTable =
       UIUtils.listingTable(executorHeaders, executorRow, finishedExecutors)
 
-    val driverHeaders = Seq(
-        "DriverID", "Main Class", "State", "Cores", "Memory", "Logs", "Notes")
+    val driverHeaders = Seq("DriverID",
+                            "Main Class",
+                            "State",
+                            "Cores",
+                            "Memory",
+                            "Logs",
+                            "Notes")
     val runningDrivers = workerState.drivers.sortBy(_.driverId).reverse
     val runningDriverTable =
       UIUtils.listingTable(driverHeaders, driverRow, runningDrivers)

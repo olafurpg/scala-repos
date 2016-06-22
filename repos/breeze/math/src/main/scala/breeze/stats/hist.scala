@@ -13,11 +13,14 @@ object hist extends UFunc {
     def hist: DenseVector[S]
     def binEdges: DenseVector[Double]
   }
-  private class HistogramImpl[S](
-      val hist: DenseVector[S], start: Double, end: Double, bins: Double)
+  private class HistogramImpl[S](val hist: DenseVector[S],
+                                 start: Double,
+                                 end: Double,
+                                 bins: Double)
       extends Histogram[S] {
-    lazy val binEdges = DenseVector.rangeD(
-        start, end + ((end - start) / bins), step = ((end - start) / bins))
+    lazy val binEdges = DenseVector.rangeD(start,
+                                           end + ((end - start) / bins),
+                                           step = ((end - start) / bins))
   }
 
   @expand
@@ -42,8 +45,8 @@ object hist extends UFunc {
     }
 
   @expand
-  implicit def canTraverseValuesImpl[
-      T, @expand.args(Int, Double, Float, Long) S](
+  implicit def canTraverseValuesImpl[T,
+                                     @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseValues[T, S])
     : Impl3[T, Int, (Double, Double), Histogram[S]] =
     new Impl3[T, Int, (Double, Double), Histogram[S]] {
@@ -83,8 +86,9 @@ object hist extends UFunc {
     }
 
   @expand
-  implicit def defaultHistWeights[
-      T, U, @expand.args(Int, Double, Float, Long) S](
+  implicit def defaultHistWeights[T,
+                                  U,
+                                  @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanZipAndTraverseValues[T, U, S, S],
       iter2: CanTraverseValues[T, S]): Impl2[T, U, Histogram[S]] =
     new Impl2[T, U, Histogram[S]] {
@@ -94,7 +98,9 @@ object hist extends UFunc {
 
   @expand
   implicit def defaultHistBinsWeights[
-      T, U, @expand.args(Int, Double, Float, Long) S](
+      T,
+      U,
+      @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanZipAndTraverseValues[T, U, S, S],
       iter2: CanTraverseValues[T, S]): Impl3[T, Int, U, Histogram[S]] =
     new Impl3[T, Int, U, Histogram[S]] {
@@ -108,8 +114,12 @@ object hist extends UFunc {
     }
 
   @expand
-  implicit def canTraverseValuesImplWeighted[
-      T, U, @expand.args(Int, Double, Float, Long) S](
+  implicit def canTraverseValuesImplWeighted[T,
+                                             U,
+                                             @expand.args(Int,
+                                                          Double,
+                                                          Float,
+                                                          Long) S](
       implicit iter: CanZipAndTraverseValues[T, U, S, S])
     : Impl4[T, Int, (Double, Double), U, Histogram[S]] =
     new Impl4[T, Int, (Double, Double), U, Histogram[S]] {

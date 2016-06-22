@@ -79,8 +79,7 @@ object ValidationError {
   */
 class ErrorCodeSerializer(knownCodes: ErrorCode*)
     extends Serializer[ErrorCode] {
-  val ecs = Map(
-      knownCodes map { c ⇒
+  val ecs = Map(knownCodes map { c ⇒
     c.getClass.getSimpleName.replaceAll("\\$$", "").toUpperCase -> c
   }: _*)
   val Class = classOf[ErrorCode]
@@ -116,8 +115,8 @@ class ErrorCodeSerializer(knownCodes: ErrorCode*)
   * @param includeCode Include the code field if an error code is provided
   * @param includeArgs Include the args field when args are provided
   */
-class ValidationErrorSerializer(
-    includeCode: Boolean = true, includeArgs: Boolean = true)
+class ValidationErrorSerializer(includeCode: Boolean = true,
+                                includeArgs: Boolean = true)
     extends CustomSerializer[ValidationError]((formats: Formats) ⇒
           ({
         case jo @ JObject(JField("message", _) :: _) ⇒

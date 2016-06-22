@@ -163,10 +163,10 @@ trait EnumerateeTFunctions {
       def apply[A] = take[E, F](n).up[G].sequenceI.apply[A]
     }
 
-  def splitOn[E, F[_], G[_]](
-      p: E => Boolean)(implicit F: Applicative[F],
-                       FE: Monoid[F[E]],
-                       G: Monad[G]): EnumerateeT[E, F[E], G] =
+  def splitOn[E, F[_], G[_]](p: E => Boolean)(
+      implicit F: Applicative[F],
+      FE: Monoid[F[E]],
+      G: Monad[G]): EnumerateeT[E, F[E], G] =
     new EnumerateeT[E, F[E], G] {
       def apply[A] = {
         (takeWhile[E, F](p).up[G] flatMap (xs =>

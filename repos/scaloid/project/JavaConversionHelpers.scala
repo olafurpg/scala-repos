@@ -58,8 +58,8 @@ trait JavaConversionHelpers {
         tpe match {
           case null => throw new Error("Property cannot be null")
           case ga: GenericArrayType =>
-            ScalaType(
-                "Array", List(step(ga.getGenericComponentType, nextLevel)))
+            ScalaType("Array",
+                      List(step(ga.getGenericComponentType, nextLevel)))
           case p: ParameterizedType =>
             ScalaType(
                 step(p.getRawType, nextLevel).name,
@@ -77,23 +77,22 @@ trait JavaConversionHelpers {
               .filter(_.name != "Any")
             ScalaType("_", Nil, bounds = bs)
           case c: Class[_] => {
-              if (c.isArray) {
-                ScalaType("Array", List(step(c.getComponentType, nextLevel)))
-              } else if (c.isPrimitive) {
-                ScalaType(
-                    c.getName match {
-                  case "void" => "Unit"
-                  case n => n.capitalize
-                })
-              } else if (c == classOf[java.lang.Object]) {
-                ScalaType("Any")
-              } else {
-                ScalaType(
-                    name = c.getName.replace("$", innerClassDelim(c)),
-                    params = c.getTypeParameters.map(step(_, nextLevel)).toList
-                )
-              }
+            if (c.isArray) {
+              ScalaType("Array", List(step(c.getComponentType, nextLevel)))
+            } else if (c.isPrimitive) {
+              ScalaType(c.getName match {
+                case "void" => "Unit"
+                case n => n.capitalize
+              })
+            } else if (c == classOf[java.lang.Object]) {
+              ScalaType("Any")
+            } else {
+              ScalaType(
+                  name = c.getName.replace("$", innerClassDelim(c)),
+                  params = c.getTypeParameters.map(step(_, nextLevel)).toList
+              )
             }
+          }
           case _ =>
             throw new Error(
                 "Cannot find type of " + tpe.getClass + " ::" + tpe.toString)

@@ -24,8 +24,8 @@ import net.liftweb.http.{S, SHtml}
 import scala.xml.NodeSeq
 import net.liftweb.http.js._
 
-abstract class MappedUniqueId[T <: Mapper[T]](
-    override val fieldOwner: T, override val maxLen: Int)
+abstract class MappedUniqueId[T <: Mapper[T]](override val fieldOwner: T,
+                                              override val maxLen: Int)
     extends MappedString[T](fieldOwner, maxLen) {
   override def writePermission_? = false
   override lazy val defaultValue = randomString(maxLen)
@@ -68,8 +68,8 @@ object Genders extends Enumeration {
   }
 }
 
-abstract class MappedStringIndex[T <: Mapper[T]](
-    override val fieldOwner: T, override val maxLen: Int)
+abstract class MappedStringIndex[T <: Mapper[T]](override val fieldOwner: T,
+                                                 override val maxLen: Int)
     extends MappedUniqueId[T](fieldOwner, maxLen)
     with IndexedField[String] {
 

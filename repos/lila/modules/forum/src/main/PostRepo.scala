@@ -41,8 +41,8 @@ sealed abstract class PostRepo(troll: Boolean) {
   def lastByTopics(topics: List[String]): Fu[Option[Post]] =
     $find.one($query(selectTopics(topics)) sort $sort.createdDesc)
 
-  def recentInCategs(
-      nb: Int)(categIds: List[String], langs: List[String]): Fu[List[Post]] =
+  def recentInCategs(nb: Int)(categIds: List[String],
+                              langs: List[String]): Fu[List[Post]] =
     $find($query(
               selectCategs(categIds) ++ selectLangs(langs) ++ selectNotHidden
           ) sort $sort.createdDesc,
@@ -83,8 +83,10 @@ sealed abstract class PostRepo(troll: Boolean) {
   def sortQuery = $sort.createdAsc
 
   def userIdsByTopicId(topicId: String): Fu[List[String]] =
-    postTube.coll.distinct("userId", BSONDocument("topicId" -> topicId).some) map lila.db.BSON.asStrings
+    postTube.coll
+      .distinct("userId", BSONDocument("topicId" -> topicId).some) map lila.db.BSON.asStrings
 
   def idsByTopicId(topicId: String): Fu[List[String]] =
-    postTube.coll.distinct("_id", BSONDocument("topicId" -> topicId).some) map lila.db.BSON.asStrings
+    postTube.coll
+      .distinct("_id", BSONDocument("topicId" -> topicId).some) map lila.db.BSON.asStrings
 }

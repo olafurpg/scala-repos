@@ -182,8 +182,8 @@ final case class ConsistentHashingRoutingLogic(
     new AtomicReference[(immutable.IndexedSeq[Routee],
                          ConsistentHash[ConsistentRoutee])]((null, null))
 
-  override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+  override def select(message: Any,
+                      routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else {
 
@@ -201,8 +201,8 @@ final case class ConsistentHashingRoutingLogic(
               ConsistentHash(routees.map(ConsistentRoutee(_, selfAddress)),
                              vnodes) // re-hash
           // ignore, don't update, in case of CAS failure
-          consistentHashRef.compareAndSet(
-              oldConsistentHashTuple, (routees, consistentHash))
+          consistentHashRef
+            .compareAndSet(oldConsistentHashTuple, (routees, consistentHash))
           consistentHash
         } else oldConsistentHash
       }
@@ -449,8 +449,8 @@ final case class ConsistentHashingGroup(
   * isn't a good representation, because LocalActorRef doesn't include the
   * host and port.
   */
-private[akka] final case class ConsistentRoutee(
-    routee: Routee, selfAddress: Address) {
+private[akka] final case class ConsistentRoutee(routee: Routee,
+                                                selfAddress: Address) {
 
   override def toString: String = routee match {
     case ActorRefRoutee(ref) ⇒ toStringWithfullAddress(ref.path)

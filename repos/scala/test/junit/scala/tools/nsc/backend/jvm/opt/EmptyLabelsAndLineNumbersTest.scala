@@ -57,8 +57,10 @@ class EmptyLabelsAndLineNumbersTest {
   @Test
   def removeEmptyLabels(): Unit = {
     val handler = List(
-        ExceptionHandler(
-            Label(4), Label(5), Label(6), Some("java/lang/Throwable")))
+        ExceptionHandler(Label(4),
+                         Label(5),
+                         Label(6),
+                         Some("java/lang/Throwable")))
     def ops(target1: Int,
             target2: Int,
             target3: Int,
@@ -99,10 +101,9 @@ class EmptyLabelsAndLineNumbersTest {
       genMethod(handlers = handler)(ops(2, 3, 8, 8, 9, 11).map(_._1): _*)
     assertTrue(LocalOptImpls.removeEmptyLabelNodes(method))
     val m = convertMethod(method)
-    assertSameCode(
-        m.instructions, ops(1, 1, 7, 7, 7, 10).filter(_._2).map(_._1))
-    assertTrue(
-        m.handlers match {
+    assertSameCode(m.instructions,
+                   ops(1, 1, 7, 7, 7, 10).filter(_._2).map(_._1))
+    assertTrue(m.handlers match {
       case List(ExceptionHandler(Label(4), Label(4), Label(4), _)) => true
       case _ => false
     })

@@ -36,8 +36,7 @@ case class AppDefinition(
     constraints: Set[Constraint] = AppDefinition.DefaultConstraints,
     fetch: Seq[FetchUri] = AppDefinition.DefaultFetch,
     storeUrls: Seq[String] = AppDefinition.DefaultStoreUrls,
-    portDefinitions: Seq[PortDefinition] =
-      AppDefinition.DefaultPortDefinitions,
+    portDefinitions: Seq[PortDefinition] = AppDefinition.DefaultPortDefinitions,
     requirePorts: Boolean = AppDefinition.DefaultRequirePorts,
     backoff: FiniteDuration = AppDefinition.DefaultBackoff,
     backoffFactor: Double = AppDefinition.DefaultBackoffFactor,
@@ -414,8 +413,8 @@ object AppDefinition {
   }
 
   val RandomPortValue: Int = 0
-  val RandomPortDefinition: PortDefinition = PortDefinition(
-      RandomPortValue, "tcp", None, Map.empty[String, String])
+  val RandomPortDefinition: PortDefinition =
+    PortDefinition(RandomPortValue, "tcp", None, Map.empty[String, String])
 
   // App defaults
   val DefaultId: PathId = PathId.empty

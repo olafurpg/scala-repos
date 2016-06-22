@@ -60,8 +60,8 @@ abstract class Universe extends scala.reflect.api.Universe {
       *  Replaces an existing payload of the same type, if exists.
       *  Returns the symbol itself.
       */
-    def updateAttachment[T: ClassTag](
-        symbol: Symbol, attachment: T): symbol.type
+    def updateAttachment[T: ClassTag](symbol: Symbol,
+                                      attachment: T): symbol.type
 
     /** Update the attachment with the payload of the given class type `T` removed.
       *  Returns the symbol itself.
@@ -163,7 +163,7 @@ abstract class Universe extends scala.reflect.api.Universe {
     trait MacroDecoratorApi extends DecoratorApi {
 
       /** Extension methods for scopes */
-      type ScopeDecorator [T <: Scope] <: MacroScopeDecoratorApi[T]
+      type ScopeDecorator[T <: Scope] <: MacroScopeDecoratorApi[T]
 
       /** @see [[ScopeDecorator]] */
       implicit def scopeDecorator[T <: Scope](tree: T): ScopeDecorator[T]
@@ -179,7 +179,7 @@ abstract class Universe extends scala.reflect.api.Universe {
       }
 
       /** @inheritdoc */
-      override type TreeDecorator [T <: Tree] <: MacroTreeDecoratorApi[T]
+      override type TreeDecorator[T <: Tree] <: MacroTreeDecoratorApi[T]
 
       /** @see [[TreeDecorator]] */
       class MacroTreeDecoratorApi[T <: Tree](override val tree: T)
@@ -215,7 +215,7 @@ abstract class Universe extends scala.reflect.api.Universe {
       }
 
       /** Extension methods for typetrees */
-      type TypeTreeDecorator [T <: TypeTree] <: MacroTypeTreeDecoratorApi[T]
+      type TypeTreeDecorator[T <: TypeTree] <: MacroTypeTreeDecoratorApi[T]
 
       /** @see [[TypeTreeDecorator]] */
       implicit def typeTreeDecorator[T <: TypeTree](
@@ -229,7 +229,7 @@ abstract class Universe extends scala.reflect.api.Universe {
       }
 
       /** @inheritdoc */
-      override type SymbolDecorator [T <: Symbol] <: MacroSymbolDecoratorApi[T]
+      override type SymbolDecorator[T <: Symbol] <: MacroSymbolDecoratorApi[T]
 
       /** @see [[TreeDecorator]] */
       class MacroSymbolDecoratorApi[T <: Symbol](override val symbol: T)
@@ -337,8 +337,9 @@ abstract class Universe extends scala.reflect.api.Universe {
 
     def mkMethodCall(target: Tree, args: List[Tree]): Tree
 
-    def mkMethodCall(
-        receiver: Symbol, methodName: Name, args: List[Tree]): Tree
+    def mkMethodCall(receiver: Symbol,
+                     methodName: Name,
+                     args: List[Tree]): Tree
 
     def mkMethodCall(receiver: Tree,
                      method: Symbol,

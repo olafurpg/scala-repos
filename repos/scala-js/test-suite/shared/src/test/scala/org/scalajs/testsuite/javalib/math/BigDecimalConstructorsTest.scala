@@ -113,8 +113,8 @@ class BigDecimalConstructorsTest {
     val resScale = 46
     assertEquals(result.toString, res)
     assertEquals(result.scale(), resScale)
-    expectThrows(
-        classOf[NumberFormatException], new BigDecimal(Array[Char](), 0, 0))
+    expectThrows(classOf[NumberFormatException],
+                 new BigDecimal(Array[Char](), 0, 0))
   }
 
   @Test def testConstrCharIntIntMathContext(): Unit = {
@@ -170,8 +170,8 @@ class BigDecimalConstructorsTest {
     val precision = 4
     val rm = RoundingMode.CEILING
     val mc = new MathContext(precision, rm)
-    expectThrows(
-        classOf[NumberFormatException], new BigDecimal(value, offset, len, mc))
+    expectThrows(classOf[NumberFormatException],
+                 new BigDecimal(value, offset, len, mc))
   }
 
   @Test def testConstrCharIntIntMathContextException2(): Unit = {
@@ -196,13 +196,13 @@ class BigDecimalConstructorsTest {
     val precision = 4
     val rm = RoundingMode.CEILING
     val mc = new MathContext(precision, rm)
-    expectThrows(
-        classOf[NumberFormatException], new BigDecimal(value, offset, len, mc))
+    expectThrows(classOf[NumberFormatException],
+                 new BigDecimal(value, offset, len, mc))
   }
 
   @Test def testConstrCharMathContext(): Unit = {
-    val value = Array(
-        '3', '8', '0', '.', '4', '7', '3', '8', 'E', '-', '4', '2')
+    val value =
+      Array('3', '8', '0', '.', '4', '7', '3', '8', 'E', '-', '4', '2')
     val precision = 4
     val rm = RoundingMode.CEILING
     val mc = new MathContext(precision, rm)

@@ -40,7 +40,8 @@ object Validation {
         if (violations.isEmpty) Success
         else
           Failure(
-              Set(GroupViolation(seq,
+              Set(
+                  GroupViolation(seq,
                                  "Seq contains elements, which are not valid.",
                                  None,
                                  violations.toSet)))
@@ -67,8 +68,9 @@ object Validation {
       violation: Violation,
       parentDesc: Option[String] = None,
       prependSlash: Boolean = false): Set[RuleViolation] = {
-    def concatPath(
-        parent: String, child: Option[String], slash: Boolean): String = {
+    def concatPath(parent: String,
+                   child: Option[String],
+                   slash: Boolean): String = {
       child.map(c => parent + { if (slash) "/" else "" } + c).getOrElse(parent)
     }
 
@@ -119,8 +121,10 @@ object Validation {
               http.setRequestMethod("HEAD")
               if (http.getResponseCode == HttpURLConnection.HTTP_OK) Success
               else
-                Failure(Set(RuleViolation(
-                            url, "URL could not be resolved.", None)))
+                Failure(
+                    Set(RuleViolation(url,
+                                      "URL could not be resolved.",
+                                      None)))
             case other: URLConnection =>
               other.getInputStream
               Success //if we come here, we could read the stream
@@ -155,24 +159,24 @@ object Validation {
     }
   }
 
-  def elementsAreUniqueBy[A, B](
-      fn: A => B,
-      errorMessage: String = "Elements must be unique.",
-      filter: B => Boolean = { _: B =>
-        true
-      }): Validator[Seq[A]] = {
+  def elementsAreUniqueBy[A, B](fn: A => B,
+                                errorMessage: String =
+                                  "Elements must be unique.",
+                                filter: B => Boolean = { _: B =>
+                                  true
+                                }): Validator[Seq[A]] = {
     new Validator[Seq[A]] {
       def apply(seq: Seq[A]) =
         areUnique(seq.map(fn).filter(filter), errorMessage)
     }
   }
 
-  def elementsAreUniqueByOptional[A, B](
-      fn: A => GenTraversableOnce[B],
-      errorMessage: String = "Elements must be unique.",
-      filter: B => Boolean = { _: B =>
-        true
-      }): Validator[Seq[A]] = {
+  def elementsAreUniqueByOptional[A, B](fn: A => GenTraversableOnce[B],
+                                        errorMessage: String =
+                                          "Elements must be unique.",
+                                        filter: B => Boolean = { _: B =>
+                                          true
+                                        }): Validator[Seq[A]] = {
     new Validator[Seq[A]] {
       def apply(seq: Seq[A]) =
         areUnique(seq.flatMap(fn).filter(filter), errorMessage)
@@ -206,7 +210,8 @@ object Validation {
             if (n == 1) Success
             else
               Failure(
-                  Set(RuleViolation(
+                  Set(
+                      RuleViolation(
                           product,
                           s"not allowed in conjunction with other properties.",
                           None)))
@@ -232,10 +237,9 @@ object Validation {
   }
 
   def configValueSet[T <: AnyRef](config: String*): Validator[T] =
-    isTrue(
-        s"""You have to supply ${config.mkString(", ")} on the command line.""") {
-      _ =>
-        config.forall(AllConf.suppliedOptionNames)
+    isTrue(s"""You have to supply ${config
+      .mkString(", ")} on the command line.""") { _ =>
+      config.forall(AllConf.suppliedOptionNames)
     }
 
   def isTrue[T](constraint: String)(test: T => Boolean): Validator[T] =

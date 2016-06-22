@@ -20,8 +20,8 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
   var inst: ZkInstance = _
   val factory = new ZkClientFactory(zkTimeout)
 
-  implicit val patienceConfig = PatienceConfig(
-      timeout = toSpan(1.second), interval = toSpan(zkTimeout))
+  implicit val patienceConfig =
+    PatienceConfig(timeout = toSpan(1.second), interval = toSpan(zkTimeout))
 
   before {
     inst = new ZkInstance
@@ -115,10 +115,10 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
       val serverSet = new ServerSetImpl(inst.zookeeperClient, "/foo/bar/baz")
       val port1 = RandomSocket.nextPort()
       val port2 = RandomSocket.nextPort()
-      val sockAddr = Address.Inet(
-          new InetSocketAddress("127.0.0.1", port1), Addr.Metadata.empty)
-      val blahAddr = Address.Inet(
-          new InetSocketAddress("10.0.0.1", port2), Addr.Metadata.empty)
+      val sockAddr = Address.Inet(new InetSocketAddress("127.0.0.1", port1),
+                                  Addr.Metadata.empty)
+      val blahAddr = Address.Inet(new InetSocketAddress("10.0.0.1", port2),
+                                  Addr.Metadata.empty)
 
       val status = serverSet.join(
           sockAddr.addr,
@@ -135,7 +135,8 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
           ALIVE)
       eventually { assert(Var.sample(va) == Addr.Bound(sockAddr)) }
 
-      val blahVa = res.bind("localhost:%d!/foo/bar/baz!blah".format(
+      val blahVa = res.bind(
+          "localhost:%d!/foo/bar/baz!blah".format(
               inst.zookeeperAddress.getPort))
       eventually { assert(Var.sample(blahVa) == Addr.Bound(blahAddr)) }
     }
@@ -178,7 +179,8 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
     }
 
     test("resolves from the main resolver") {
-      Resolver.eval("zk!localhost:%d!/foo/bar/baz!blah".format(
+      Resolver.eval(
+          "zk!localhost:%d!/foo/bar/baz!blah".format(
               inst.zookeeperAddress.getPort))
     }
   }

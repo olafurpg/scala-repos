@@ -65,7 +65,8 @@ final case class StructType(elements: ConstArray[(TermSymbol, Type)])
     extends Type {
   override def toString =
     "{" +
-    elements.iterator.map { case (s, t) => s + ": " + t }.mkString(", ") + "}"
+      elements.iterator.map { case (s, t) => s + ": " + t }
+        .mkString(", ") + "}"
   lazy val symbolToIndex: Map[TermSymbol, Int] = elements.zipWithIndex.map {
     case ((sym, _), idx) => (sym, idx)
   }.toMap
@@ -151,8 +152,8 @@ final case class ProductType(elements: ConstArray[Type]) extends Type {
   def classTag = TupleSupport.classTagForArity(elements.length)
 }
 
-final case class CollectionType(
-    cons: CollectionTypeConstructor, elementType: Type)
+final case class CollectionType(cons: CollectionTypeConstructor,
+                                elementType: Type)
     extends Type {
   override def toString = cons + "[" + elementType + "]"
   def mapChildren(f: Type => Type): CollectionType = {
@@ -210,7 +211,8 @@ abstract class TypedCollectionTypeConstructor[C[_]](
 }
 
 class ErasedCollectionTypeConstructor[C[_]](
-    canBuildFrom: CanBuild[Any, C[Any]], classTag: ClassTag[C[_]])
+    canBuildFrom: CanBuild[Any, C[Any]],
+    classTag: ClassTag[C[_]])
     extends TypedCollectionTypeConstructor[C](classTag) {
   val isSequential =
     classOf[scala.collection.Seq[_]].isAssignableFrom(classTag.runtimeClass)
@@ -268,8 +270,9 @@ final class MappedScalaType(val baseType: Type,
 }
 
 object MappedScalaType {
-  case class Mapper(
-      toBase: Any => Any, toMapped: Any => Any, fastPath: Option[Any => Any])
+  case class Mapper(toBase: Any => Any,
+                    toMapped: Any => Any,
+                    fastPath: Option[Any => Any])
 }
 
 /** The standard type for freshly constructed nodes without an explicit type. */
@@ -349,7 +352,8 @@ class TypeUtil(val tpe: Type) extends AnyVal {
   def replace(f: PartialFunction[Type, Type]): Type =
     f.applyOrElse(
         tpe, { case t: Type => t.mapChildren(_.replace(f)) }: PartialFunction[
-            Type, Type])
+            Type,
+            Type])
 
   def collect[T](pf: PartialFunction[Type, T]): ConstArray[T] = {
     val retNull: (Type => T) = (_ => null.asInstanceOf[T])
@@ -408,8 +412,8 @@ trait ScalaType[T] extends TypedType[T] {
   final def isPrimitive = classTag.runtimeClass.isPrimitive
 }
 
-class ScalaBaseType[T](
-    implicit val classTag: ClassTag[T], val ordering: scala.math.Ordering[T])
+class ScalaBaseType[T](implicit val classTag: ClassTag[T],
+                       val ordering: scala.math.Ordering[T])
     extends ScalaType[T]
     with BaseTypedType[T] {
   override def toString = classTag.toString.replaceFirst("^java.lang.", "")
@@ -438,8 +442,8 @@ class ScalaBaseType[T](
   }
 }
 
-class ErasedScalaBaseType[T, E](
-    implicit val erasure: ScalaBaseType[E], val ct: ClassTag[T])
+class ErasedScalaBaseType[T, E](implicit val erasure: ScalaBaseType[E],
+                                val ct: ClassTag[T])
     extends ScalaBaseType[T]()(ct, null) {
   override def toString =
     classTag.toString.replaceFirst("^slick.ast.", "") + "/" + erasure
@@ -487,7 +491,8 @@ object ScalaBaseType {
 sealed trait OptionDisc
 
 class ScalaNumericType[T](val fromDouble: Double => T)(
-    implicit tag: ClassTag[T], val numeric: Numeric[T])
+    implicit tag: ClassTag[T],
+    val numeric: Numeric[T])
     extends ScalaBaseType[T]()(tag, numeric)
     with NumericTypedType {
   def toDouble(v: T) = numeric.toDouble(v)

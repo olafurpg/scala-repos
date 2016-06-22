@@ -11,8 +11,9 @@ trait MonadCombineLaws[F[_]]
     with AlternativeLaws[F] {
   implicit override def F: MonadCombine[F]
 
-  def monadCombineLeftDistributivity[A, B](
-      fa: F[A], fa2: F[A], f: A => F[B]): IsEq[F[B]] =
+  def monadCombineLeftDistributivity[A, B](fa: F[A],
+                                           fa2: F[A],
+                                           f: A => F[B]): IsEq[F[B]] =
     F.combineK(fa, fa2).flatMap(f) <-> F.combineK(fa flatMap f, fa2 flatMap f)
 }
 

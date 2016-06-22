@@ -37,10 +37,10 @@ object Limit {
   val LIMIT = "LIMIT"
   val LIMIT_CB = StringToChannelBuffer(LIMIT)
   def apply(args: Seq[String]) = {
-    RequireClientProtocol(
-        args != null && args.length == 3, "LIMIT requires two arguments")
-    RequireClientProtocol(
-        args.head == LIMIT, "LIMIT must start with LIMIT clause")
+    RequireClientProtocol(args != null && args.length == 3,
+                          "LIMIT requires two arguments")
+    RequireClientProtocol(args.head == LIMIT,
+                          "LIMIT must start with LIMIT clause")
     RequireClientProtocol.safe {
       val offset = NumberFormat.toLong(args(1))
       val count = NumberFormat.toLong(args(2))
@@ -80,8 +80,8 @@ object Weights {
                           "WEIGHTS can not be specified with an empty list")
     args.head.toUpperCase match {
       case WEIGHTS =>
-        RequireClientProtocol(
-            argLength > 1, "WEIGHTS requires additional arguments")
+        RequireClientProtocol(argLength > 1,
+                              "WEIGHTS requires additional arguments")
         val weights: Array[Double] = RequireClientProtocol.safe {
           args.tail.map { item =>
             NumberFormat.toDouble(item)
@@ -117,8 +117,8 @@ object Aggregate {
                           "AGGREGATE can not be specified with empty list")
     args.head.toUpperCase match {
       case AGGREGATE =>
-        RequireClientProtocol(
-            argLength == 2, "AGGREGATE requires a type (MIN, MAX, SUM)")
+        RequireClientProtocol(argLength == 2,
+                              "AGGREGATE requires a type (MIN, MAX, SUM)")
         args(1).toUpperCase match {
           case Aggregate.Sum.name => Some(Aggregate.Sum)
           case Aggregate.Max.name => Some(Aggregate.Max)

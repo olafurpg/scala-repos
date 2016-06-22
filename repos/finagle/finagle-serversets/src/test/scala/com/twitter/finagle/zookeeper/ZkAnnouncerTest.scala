@@ -20,8 +20,8 @@ class ZkAnnouncerTest extends FunSuite with BeforeAndAfter {
   var inst: ZkInstance = _
   val factory = new ZkClientFactory(zkTimeout)
 
-  implicit val patienceConfig = PatienceConfig(
-      timeout = toSpan(zkTimeout * 3), interval = toSpan(zkTimeout))
+  implicit val patienceConfig = PatienceConfig(timeout = toSpan(zkTimeout * 3),
+                                               interval = toSpan(zkTimeout))
 
   before {
     inst = new ZkInstance
@@ -89,12 +89,12 @@ class ZkAnnouncerTest extends FunSuite with BeforeAndAfter {
 
         if (va1 != null) {
           exceptionString +=
-            "va1 status: %s\n".format(Var.sample(va1).toString)
+          "va1 status: %s\n".format(Var.sample(va1).toString)
         }
 
         if (va2 != null) {
           exceptionString +=
-            "va2 status: %s\n".format(Var.sample(va2).toString)
+          "va2 status: %s\n".format(Var.sample(va2).toString)
         }
 
         val endpoint = "/services/ci"

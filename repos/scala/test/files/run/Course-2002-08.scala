@@ -180,10 +180,10 @@ object M5 {
     private def next: Unit = agenda match {
       case List() => ()
       case (time, action) :: ag1 => {
-          agenda = ag1;
-          curtime = time;
-          action();
-        }
+        agenda = ag1;
+        curtime = time;
+        action();
+      }
     }
 
     def run: Unit = {
@@ -436,10 +436,10 @@ class Simulator() {
   def next: Unit = agenda match {
     case List() => ()
     case (time, action) :: rest => {
-        agenda = rest;
-        curtime = time;
-        action();
-      }
+      agenda = rest;
+      curtime = time;
+      action();
+    }
   }
 
   protected def currentTime: Int = curtime;

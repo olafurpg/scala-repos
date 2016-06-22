@@ -64,12 +64,12 @@ object RemotingSpec {
 
   val cfg: Config =
     ConfigFactory parseString
-    (s"""
+      (s"""
     common-ssl-settings {
       key-store = "${getClass.getClassLoader.getResource("keystore").getPath}"
       trust-store = "${getClass.getClassLoader
-          .getResource("truststore")
-          .getPath}"
+            .getResource("truststore")
+            .getPath}"
       key-store-password = "changeme"
       key-password = "changeme"
       trust-store-password = "changeme"
@@ -152,8 +152,9 @@ class RemotingSpec
 
   for ((name, proto) ← Seq("/gonk" -> "tcp",
                            "/zagzag" -> "udp",
-                           "/roghtaar" -> "ssl.tcp")) deploy(
-      system, Deploy(name, scope = RemoteScope(addr(remoteSystem, proto))))
+                           "/roghtaar" -> "ssl.tcp"))
+    deploy(system,
+           Deploy(name, scope = RemoteScope(addr(remoteSystem, proto))))
 
   def addr(sys: ActorSystem, proto: String) =
     sys
@@ -187,24 +188,23 @@ class RemotingSpec
     val bigBounceHere = system.actorFor(
         s"akka.test://remote-sys@localhost:12346/user/$bigBounceId")
 
-    val eventForwarder = system.actorOf(
-        Props(new Actor {
+    val eventForwarder = system.actorOf(Props(new Actor {
       def receive = {
         case x ⇒ testActor ! x
       }
     }).withDeploy(Deploy.local))
-    system.eventStream.subscribe(
-        eventForwarder, classOf[AssociationErrorEvent])
+    system.eventStream
+      .subscribe(eventForwarder, classOf[AssociationErrorEvent])
     system.eventStream.subscribe(eventForwarder, classOf[DisassociatedEvent])
     try {
       bigBounceHere ! msg
       afterSend
       expectNoMsg(500.millis.dilated)
     } finally {
-      system.eventStream.unsubscribe(
-          eventForwarder, classOf[AssociationErrorEvent])
-      system.eventStream.unsubscribe(
-          eventForwarder, classOf[DisassociatedEvent])
+      system.eventStream
+        .unsubscribe(eventForwarder, classOf[AssociationErrorEvent])
+      system.eventStream
+        .unsubscribe(eventForwarder, classOf[DisassociatedEvent])
       eventForwarder ! PoisonPill
       bigBounceOther ! PoisonPill
     }
@@ -271,16 +271,17 @@ class RemotingSpec
       val moreSystems =
         Vector.fill(5)(ActorSystem(remoteSystem.name, tcpOnlyConfig))
       moreSystems foreach { sys ⇒
-        sys.eventStream.publish(TestEvent.Mute(
+        sys.eventStream.publish(
+            TestEvent.Mute(
                 EventFilter[EndpointDisassociatedException](),
                 EventFilter.warning(pattern = "received dead letter.*")))
         sys.actorOf(Props[Echo2], name = "echo")
       }
       val moreRefs =
         moreSystems map
-        (sys ⇒
-              system.actorSelection(
-                  RootActorPath(addr(sys, "tcp")) / "user" / "echo"))
+          (sys ⇒
+                system.actorSelection(
+                    RootActorPath(addr(sys, "tcp")) / "user" / "echo"))
       val aliveEcho = system.actorSelection(
           RootActorPath(addr(remoteSystem, "tcp")) / "user" / "echo")
       val n = 100
@@ -351,7 +352,8 @@ class RemotingSpec
       remoteSystem.actorFor("/user/otherEcho1") ! 75
       expectMsg(75)
 
-      system.actorFor("akka.test://remote-sys@localhost:12346/user/otherEcho1") ! 76
+      system
+        .actorFor("akka.test://remote-sys@localhost:12346/user/otherEcho1") ! 76
       expectMsg(76)
 
       remoteSystem.actorSelection("/user/otherEcho1") ! 77
@@ -467,13 +469,16 @@ class RemotingSpec
       system.actorSelection(child.path / "*") ! Identify("idReq8")
       expectMsg(ActorIdentity("idReq8", Some(grandchild)))
 
-      system.actorSelection("/user/looker2/child/grandchild/grandgrandchild") ! Identify(
+      system
+        .actorSelection("/user/looker2/child/grandchild/grandgrandchild") ! Identify(
           "idReq9")
       expectMsg(ActorIdentity("idReq9", Some(grandgrandchild)))
-      system.actorSelection(child.path / "grandchild" / "grandgrandchild") ! Identify(
+      system
+        .actorSelection(child.path / "grandchild" / "grandgrandchild") ! Identify(
           "idReq10")
       expectMsg(ActorIdentity("idReq10", Some(grandgrandchild)))
-      system.actorSelection("/user/looker2/child/*/grandgrandchild") ! Identify(
+      system
+        .actorSelection("/user/looker2/child/*/grandgrandchild") ! Identify(
           "idReq11")
       expectMsg(ActorIdentity("idReq11", Some(grandgrandchild)))
       system.actorSelection("/user/looker2/child/*/*") ! Identify("idReq12")
@@ -514,16 +519,17 @@ class RemotingSpec
 
     "not fail ask across node boundaries" in within(5.seconds) {
       import system.dispatcher
-      val f = for (_ ← 1 to 1000) yield
-        here ? "ping" mapTo manifest[(String, ActorRef)]
-      Await.result(Future.sequence(f), timeout.duration).map(_._1).toSet should ===(
-          Set("pong"))
+      val f = for (_ ← 1 to 1000)
+        yield here ? "ping" mapTo manifest[(String, ActorRef)]
+      Await
+        .result(Future.sequence(f), timeout.duration)
+        .map(_._1)
+        .toSet should ===(Set("pong"))
     }
 
     "be able to use multiple transports and use the appropriate one (TCP)" in {
       val r = system.actorOf(Props[Echo1], "gonk")
-      r.path.toString should be === s"akka.tcp://remote-sys@localhost:${port(
-          remoteSystem, "tcp")}/remote/akka.tcp/RemotingSpec@localhost:${port(system, "tcp")}/user/gonk"
+      r.path.toString should be === s"akka.tcp://remote-sys@localhost:${port(remoteSystem, "tcp")}/remote/akka.tcp/RemotingSpec@localhost:${port(system, "tcp")}/user/gonk"
       r ! 42
       expectMsg(42)
       EventFilter[Exception]("crash", occurrences = 1).intercept {
@@ -538,8 +544,7 @@ class RemotingSpec
 
     "be able to use multiple transports and use the appropriate one (UDP)" in {
       val r = system.actorOf(Props[Echo1], "zagzag")
-      r.path.toString should be === s"akka.udp://remote-sys@localhost:${port(
-          remoteSystem, "udp")}/remote/akka.udp/RemotingSpec@localhost:${port(system, "udp")}/user/zagzag"
+      r.path.toString should be === s"akka.udp://remote-sys@localhost:${port(remoteSystem, "udp")}/remote/akka.udp/RemotingSpec@localhost:${port(system, "udp")}/user/zagzag"
       r ! 42
       expectMsg(10.seconds, 42)
       EventFilter[Exception]("crash", occurrences = 1).intercept {
@@ -579,8 +584,7 @@ class RemotingSpec
     }
 
     "allow messages up to payload size" in {
-      val maxProtocolOverhead =
-        500 // Make sure we're still under size after the message is serialized, etc
+      val maxProtocolOverhead = 500 // Make sure we're still under size after the message is serialized, etc
       val big = byteStringOfSize(maxPayloadBytes - maxProtocolOverhead)
       verifySend(big) {
         expectMsg(3.seconds, big)
@@ -611,7 +615,8 @@ class RemotingSpec
 
     "be able to serialize a local actor ref from another actor system" in {
       val config = ConfigFactory
-        .parseString("""
+        .parseString(
+            """
             # Additional internal serialization verification need so be off, otherwise it triggers two error messages
             # instead of one: one for the internal check, and one for the actual remote send -- tripping off this test
             akka.actor.serialize-messages = off
@@ -627,8 +632,9 @@ class RemotingSpec
             addr(otherSystem, "tcp"))
         val remoteEchoHereTcp = system.actorFor(
             s"akka.tcp://remote-sys@localhost:${port(remoteSystem, "tcp")}/user/echo")
-        val proxyTcp = system.actorOf(
-            Props(classOf[Proxy], remoteEchoHereTcp, testActor), "proxy-tcp")
+        val proxyTcp =
+          system.actorOf(Props(classOf[Proxy], remoteEchoHereTcp, testActor),
+                         "proxy-tcp")
         proxyTcp ! otherGuy
         expectMsg(3.seconds, ("pong", otherGuyRemoteTcp))
         // now check that we fall back to default when we haven't got a corresponding transport
@@ -636,8 +642,9 @@ class RemotingSpec
           .toSerializationFormatWithAddress(addr(otherSystem, "test"))
         val remoteEchoHereSsl = system.actorFor(
             s"akka.ssl.tcp://remote-sys@localhost:${port(remoteSystem, "ssl.tcp")}/user/echo")
-        val proxySsl = system.actorOf(
-            Props(classOf[Proxy], remoteEchoHereSsl, testActor), "proxy-ssl")
+        val proxySsl =
+          system.actorOf(Props(classOf[Proxy], remoteEchoHereSsl, testActor),
+                         "proxy-ssl")
         EventFilter
           .warning(start = "Error while resolving address", occurrences = 1)
           .intercept {
@@ -760,10 +767,10 @@ class RemotingSpec
 
         val remoteHandle =
           remoteTransportProbe.expectMsgType[Transport.InboundAssociation]
-        remoteHandle.association.readHandlerPromise.success(
-            new HandleEventListener {
-          override def notify(ev: HandleEvent): Unit = ()
-        })
+        remoteHandle.association.readHandlerPromise
+          .success(new HandleEventListener {
+            override def notify(ev: HandleEvent): Unit = ()
+          })
 
         // Now we initiate an emulated inbound connection to the real system
         val inboundHandleProbe = TestProbe()
@@ -856,10 +863,10 @@ class RemotingSpec
 
         val remoteHandle =
           remoteTransportProbe.expectMsgType[Transport.InboundAssociation]
-        remoteHandle.association.readHandlerPromise.success(
-            new HandleEventListener {
-          override def notify(ev: HandleEvent): Unit = ()
-        })
+        remoteHandle.association.readHandlerPromise
+          .success(new HandleEventListener {
+            override def notify(ev: HandleEvent): Unit = ()
+          })
 
         // Now we initiate an emulated inbound connection to the real system
         val inboundHandleProbe = TestProbe()
@@ -927,7 +934,9 @@ class RemotingSpec
             awaitAssert {
               otherSelection.tell("ping", probeSender)
               assert(
-                  probe.expectMsgType[(String, ActorRef)](500.millis)._1 == "pong")
+                  probe
+                    .expectMsgType[(String, ActorRef)](500.millis)
+                    ._1 == "pong")
             }
           }
         } finally {
@@ -969,7 +978,8 @@ class RemotingSpec
           within(5.seconds) {
             awaitAssert {
               thisSelection.tell("ping", otherSender)
-              assert(otherProbe
+              assert(
+                  otherProbe
                     .expectMsgType[(String, ActorRef)](500.millis)
                     ._1 == "pong")
             }

@@ -71,8 +71,8 @@ class DataFrameJoinSuite extends QueryTest with SharedSQLContext {
     val df = Seq((1, 2, "1"), (3, 4, "3")).toDF("int", "int2", "str")
     val df2 = Seq((1, 3, "1"), (5, 6, "5")).toDF("int", "int2", "str")
 
-    checkAnswer(
-        df.join(df2, Seq("int", "str"), "inner"), Row(1, "1", 2, 3) :: Nil)
+    checkAnswer(df.join(df2, Seq("int", "str"), "inner"),
+                Row(1, "1", 2, 3) :: Nil)
 
     checkAnswer(df.join(df2, Seq("int", "str"), "left"),
                 Row(1, "1", 2, 3) :: Row(3, "3", 4, null) :: Nil)
@@ -86,8 +86,8 @@ class DataFrameJoinSuite extends QueryTest with SharedSQLContext {
                                                                  null,
                                                                  6) :: Nil)
 
-    checkAnswer(
-        df.join(df2, Seq("int", "str"), "left_semi"), Row(1, "1", 2) :: Nil)
+    checkAnswer(df.join(df2, Seq("int", "str"), "left_semi"),
+                Row(1, "1", 2) :: Nil)
   }
 
   test("join - join using self join") {

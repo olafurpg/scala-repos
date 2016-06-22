@@ -46,7 +46,7 @@ private[reconcile] class OffersWantedForReconciliationActor(
   /** Make certain that the normal number of revives that the user specified will be executed. */
   private[this] val interestDuration =
     (reviveOffersConfig.minReviveOffersInterval() *
-        (reviveOffersConfig.reviveOffersRepetitions() + 0.5)).millis
+          (reviveOffersConfig.reviveOffersRepetitions() + 0.5)).millis
 
   override def preStart(): Unit = {
     super.preStart()
@@ -99,8 +99,8 @@ private[reconcile] class OffersWantedForReconciliationActor(
     )(context.dispatcher)
   }
 
-  private[this] def subscribedToOffers(
-      until: Timestamp, nextCheck: Cancellable): Receive =
+  private[this] def subscribedToOffers(until: Timestamp,
+                                       nextCheck: Cancellable): Receive =
     LoggingReceive.withLabel("subscribedToOffers") {
 
       handleRequestOfferIndicators orElse {

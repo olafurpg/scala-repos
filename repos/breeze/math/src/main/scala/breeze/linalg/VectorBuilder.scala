@@ -141,8 +141,10 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
   }
 
   def zerosLike: VectorBuilder[E] = {
-    new VectorBuilder[E](
-        new Array[Int](0), ArrayUtil.newArrayLike(data, 0), 0, size)
+    new VectorBuilder[E](new Array[Int](0),
+                         ArrayUtil.newArrayLike(data, 0),
+                         0,
+                         size)
   }
 
   def reserve(nnz: Int) {
@@ -319,12 +321,15 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
 object VectorBuilder extends VectorBuilderOps {
 
   def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero](
-      size: Int, initialNonzero: Int = 16) =
+      size: Int,
+      initialNonzero: Int = 16) =
     new VectorBuilder(size, initialNonzero)
   def apply[@spec(Double, Int, Float, Long) V: Semiring: Zero](
       values: Array[V]) =
-    new VectorBuilder(
-        Array.range(0, values.length), values, values.length, values.length)
+    new VectorBuilder(Array.range(0, values.length),
+                      values,
+                      values.length,
+                      values.length)
 
   def apply[V: ClassTag: Semiring: Zero](values: V*): VectorBuilder[V] =
     apply(values.toArray)

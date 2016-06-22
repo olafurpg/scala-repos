@@ -14,8 +14,8 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
   * @author Nikolay.Tropin
   */
 class FieldFromDelayedInitInspection
-    extends AbstractInspection(
-        "FieldFromDelayedInit", "Field from DelayedInit") {
+    extends AbstractInspection("FieldFromDelayedInit",
+                               "Field from DelayedInit") {
   override def actionFor(
       holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case ref: ScReferenceExpression =>
@@ -26,7 +26,7 @@ class FieldFromDelayedInitInspection
           }
           if (!classContainers.exists(c =>
                     c == delayedInitClass ||
-                    c.isInheritor(delayedInitClass, deep = true)))
+                      c.isInheritor(delayedInitClass, deep = true)))
             holder.registerProblem(
                 ref.nameId,
                 "Field defined in DelayedInit is likely to be null")
@@ -40,8 +40,11 @@ class FieldFromDelayedInitInspection
         case LazyVal(_) => None
         case Both((_: ScPatternDefinition | _: ScVariableDefinition),
                   ContainingClass(clazz @ (_: ScClass | _: ScObject))) =>
-          if (srr.fromType.exists(InspectionsUtil.conformsToTypeFromClass(
-                      _, "scala.DelayedInit", clazz.getProject))) Some(clazz)
+          if (srr.fromType.exists(
+                  InspectionsUtil.conformsToTypeFromClass(_,
+                                                          "scala.DelayedInit",
+                                                          clazz.getProject)))
+            Some(clazz)
           else None
         case _ => None
       }

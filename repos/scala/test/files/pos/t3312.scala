@@ -11,7 +11,7 @@ trait B extends Root {
 }
 
 object Foo extends A with B {
-  override def say: String = foo(super [A].say)
+  override def say: String = foo(super[A].say)
 
   def foo(p: => String): String = p
 }

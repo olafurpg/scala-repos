@@ -62,8 +62,8 @@ object Doc {
   // @deprecated("Use `javadoc`", "0.13.0")
   // def apply(maximumErrors: Int, compiler: sbt.compiler.Javadoc) = new Javadoc(maximumErrors, compiler)
 
-  private[sbt] final class Scaladoc(
-      maximumErrors: Int, compiler: AnalyzingCompiler)
+  private[sbt] final class Scaladoc(maximumErrors: Int,
+                                    compiler: AnalyzingCompiler)
       extends Doc {
     def apply(label: String,
               sources: Seq[File],
@@ -82,8 +82,8 @@ object Doc {
                log)
     }
   }
-  private[sbt] final class Javadoc(
-      maximumErrors: Int, doc: sbt.internal.inc.Javadoc)
+  private[sbt] final class Javadoc(maximumErrors: Int,
+                                   doc: sbt.internal.inc.Javadoc)
       extends Doc {
     def apply(label: String,
               sources: Seq[File],
@@ -123,8 +123,9 @@ sealed trait Doc {
     if (sources.isEmpty)
       log.info("No sources available, skipping " + logSnip + "...")
     else {
-      log.info("Generating " + logSnip + " for " + label + " sources to " +
-          outputDirectory.absolutePath + "...")
+      log.info(
+          "Generating " + logSnip + " for " + label + " sources to " +
+            outputDirectory.absolutePath + "...")
       IO.delete(outputDirectory)
       IO.createDirectory(outputDirectory)
       docf(sources, classpath, outputDirectory, options, maxErrors, log)

@@ -50,7 +50,7 @@ object APIKeyRecord {
       "2.1.5")
   val schemaV0 =
     "tid" :: "name" :: "description" :: ("cid" ||| "(undefined)") :: "gids" ::
-    ("isRoot" ||| false) :: HNil
+      ("isRoot" ||| false) :: HNil
 
   val decomposerV1: Decomposer[APIKeyRecord] =
     decomposerV[APIKeyRecord](schemaV1, Some("1.0".v))

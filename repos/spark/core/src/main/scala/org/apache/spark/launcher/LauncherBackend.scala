@@ -89,8 +89,7 @@ private[spark] abstract class LauncherBackend {
   protected def onDisconnected(): Unit = {}
 
   private def fireStopRequest(): Unit = {
-    val thread = LauncherBackend.threadFactory.newThread(
-        new Runnable() {
+    val thread = LauncherBackend.threadFactory.newThread(new Runnable() {
       override def run(): Unit = Utils.tryLogNonFatalError {
         onStopRequest()
       }

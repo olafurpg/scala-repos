@@ -42,7 +42,7 @@ class IfFilter extends ElementFilter {
             val text = clause.getText
             while (text(position - 1).isWhitespace) position -= 1
             return leaf.getTextRange.getEndOffset == clause.getTextRange.getStartOffset +
-            position
+              position
           case _ =>
         }
         parent = parent.getParent

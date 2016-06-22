@@ -48,7 +48,8 @@ private[evaluation] trait BinaryConfusionMatrix {
   * @param totalCount label counter for all labels
   */
 private[evaluation] case class BinaryConfusionMatrixImpl(
-    count: BinaryLabelCounter, totalCount: BinaryLabelCounter)
+    count: BinaryLabelCounter,
+    totalCount: BinaryLabelCounter)
     extends BinaryConfusionMatrix {
 
   /** number of true positives */

@@ -76,9 +76,9 @@ trait PasswordTypedField extends TypedField[String] {
       case Full(hash: String) if (hash.startsWith("$2a$")) =>
         setBox(Full(hash))
       case _ => {
-          invalidPw = true; invalidMsg = S.?("passwords.do.not.match");
-          Failure(invalidMsg)
-        }
+        invalidPw = true; invalidMsg = S.?("passwords.do.not.match");
+        Failure(invalidMsg)
+      }
     }
   }
 
@@ -114,12 +114,13 @@ trait PasswordTypedField extends TypedField[String] {
   protected def validatePassword(pwdValue: Box[String]): Boolean = {
     pwdValue match {
       case Empty | Full("" | null) if !optional_? => {
-          invalidPw = true; invalidMsg = notOptionalErrorMessage
-        }
+        invalidPw = true; invalidMsg = notOptionalErrorMessage
+      }
       case Full(s)
           if s == "" || s == PasswordField.blankPw ||
-          s.length < PasswordField.minPasswordLength =>
-        { invalidPw = true; invalidMsg = S.?("password.too.short") }
+            s.length < PasswordField.minPasswordLength => {
+        invalidPw = true; invalidMsg = S.?("password.too.short")
+      }
       case _ => { invalidPw = false; invalidMsg = "" }
     }
     invalidPw

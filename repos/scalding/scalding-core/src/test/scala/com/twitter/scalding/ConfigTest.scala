@@ -35,7 +35,8 @@ class ConfigTest extends WordSpec with Matchers {
       (classOf[com.twitter.chill.hadoop.KryoSerialization].getName)
     }
     "default has chill configured" in {
-      Config.default.get(com.twitter.chill.config.ConfiguredInstantiator.KEY) should not be empty
+      Config.default
+        .get(com.twitter.chill.config.ConfiguredInstantiator.KEY) should not be empty
     }
     "setting timestamp twice does not change it" in {
       val date = RichDate.now

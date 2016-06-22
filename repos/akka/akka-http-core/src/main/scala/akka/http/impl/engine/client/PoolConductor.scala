@@ -81,7 +81,9 @@ private object PoolConductor {
 
       retryMerge.out ~> slotSelector.in0
       slotSelector.out ~> route.in
-      retrySplit.out(0).filter(!_.isInstanceOf[SlotEvent.RetryRequest]) ~> flatten ~> slotSelector.in1
+      retrySplit
+        .out(0)
+        .filter(!_.isInstanceOf[SlotEvent.RetryRequest]) ~> flatten ~> slotSelector.in1
       retrySplit.out(1).collect { case SlotEvent.RetryRequest(r) ⇒ r } ~> retryMerge.preferred
 
       Ports(retryMerge.in(0), retrySplit.in, route.outArray.toList)
@@ -110,8 +112,9 @@ private object PoolConductor {
   }
   private object Busy extends Busy(1)
 
-  private class SlotSelector(
-      slotCount: Int, pipeliningLimit: Int, log: LoggingAdapter)
+  private class SlotSelector(slotCount: Int,
+                             pipeliningLimit: Int,
+                             log: LoggingAdapter)
       extends GraphStage[FanInShape2[RequestContext, SlotEvent, SwitchCommand]] {
 
     private val ctxIn = Inlet[RequestContext]("requestContext")
@@ -167,8 +170,8 @@ private object PoolConductor {
           pull(slotIn)
         }
 
-        def slotStateAfterDispatch(
-            slotState: SlotState, method: HttpMethod): SlotState =
+        def slotStateAfterDispatch(slotState: SlotState,
+                                   method: HttpMethod): SlotState =
           slotState match {
             case Unconnected | Idle ⇒
               if (method.isIdempotent) Loaded(1) else Busy(1)
@@ -190,8 +193,8 @@ private object PoolConductor {
                   s"RequestCompleted on $slotState connection?")
           }
 
-        def slotStateAfterDisconnect(
-            slotState: SlotState, failed: Int): SlotState =
+        def slotStateAfterDisconnect(slotState: SlotState,
+                                     failed: Int): SlotState =
           slotState match {
             case Idle if failed == 0 ⇒ Unconnected
             case Loaded(n) if n > failed ⇒ Loaded(n - failed)

@@ -28,26 +28,31 @@ object ThreadRepo {
     import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework._
     threadTube.coll
       .aggregate(
-          Match(BSONDocument(
+          Match(
+              BSONDocument(
                   "visibleByUserIds" -> userId,
                   "posts.isRead" -> false
               )),
           List(
-              Project(BSONDocument(
+              Project(
+                  BSONDocument(
                       "m" -> BSONDocument(
                           "$eq" -> BSONArray("$creatorId", userId)),
                       "posts.isByCreator" -> true,
                       "posts.isRead" -> true
                   )),
               Unwind("posts"),
-              Match(BSONDocument(
+              Match(
+                  BSONDocument(
                       "posts.isRead" -> false
                   )),
-              Project(BSONDocument(
+              Project(
+                  BSONDocument(
                       "u" -> BSONDocument(
                           "$ne" -> BSONArray("$posts.isByCreator", "$m"))
                   )),
-              Match(BSONDocument(
+              Match(
+                  BSONDocument(
                       "u" -> true
                   )),
               Group(BSONBoolean(true))("ids" -> AddToSet("_id"))
@@ -74,9 +79,10 @@ object ThreadRepo {
   def reallyDeleteByCreatorId(user: ID) =
     $remove(Json.obj("creatorId" -> user))
 
-  def visibleByUserContainingExists(
-      user: ID, containing: String): Fu[Boolean] =
-    $count.exists(visibleByUserQuery(user) ++ Json.obj(
+  def visibleByUserContainingExists(user: ID,
+                                    containing: String): Fu[Boolean] =
+    $count.exists(
+        visibleByUserQuery(user) ++ Json.obj(
             "posts.0.text" -> $regex(containing)))
 
   def userQuery(user: String) = Json.obj("userIds" -> user)

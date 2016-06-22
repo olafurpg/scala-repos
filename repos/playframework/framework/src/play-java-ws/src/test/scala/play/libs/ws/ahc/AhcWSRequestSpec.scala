@@ -110,16 +110,19 @@ class AhcWSRequestSpec extends Specification with Mockito {
       queryParams.size must beEqualTo(2)
       queryParams.exists(p =>
             (p.getName == "q") && (p.getValue == "playframework")) must beTrue
-      queryParams.exists(p => (p.getName == "src") && (p.getValue == "typd")) must beTrue
+      queryParams
+        .exists(p => (p.getName == "src") && (p.getValue == "typd")) must beTrue
     }
 
     "support several query string values for a parameter" in {
       val queryParams = requestWithQueryString("q=scala&q=playframework&q=fp")
       queryParams.size must beEqualTo(3)
-      queryParams.exists(p => (p.getName == "q") && (p.getValue == "scala")) must beTrue
+      queryParams
+        .exists(p => (p.getName == "q") && (p.getValue == "scala")) must beTrue
       queryParams.exists(p =>
             (p.getName == "q") && (p.getValue == "playframework")) must beTrue
-      queryParams.exists(p => (p.getName == "q") && (p.getValue == "fp")) must beTrue
+      queryParams
+        .exists(p => (p.getName == "q") && (p.getValue == "fp")) must beTrue
       queryParams.count(p => p.getName == "q") must beEqualTo(3)
     }
 
@@ -167,8 +170,8 @@ class AhcWSRequestSpec extends Specification with Mockito {
 
   def requestWithTimeout(timeout: Long) = {
     val client = mock[AhcWSClient]
-    val request = new AhcWSRequest(
-        client, "http://example.com", /*materializer*/ null)
+    val request =
+      new AhcWSRequest(client, "http://example.com", /*materializer*/ null)
     request.setRequestTimeout(timeout)
     request.buildRequest().getRequestTimeout()
   }
@@ -176,8 +179,8 @@ class AhcWSRequestSpec extends Specification with Mockito {
   def requestWithQueryString(query: String) = {
     import scala.collection.JavaConverters._
     val client = mock[AhcWSClient]
-    val request = new AhcWSRequest(
-        client, "http://example.com", /*materializer*/ null)
+    val request =
+      new AhcWSRequest(client, "http://example.com", /*materializer*/ null)
     request.setQueryString(query)
     val queryParams = request.buildRequest().getQueryParams
     queryParams.asScala.toSeq

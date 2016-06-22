@@ -215,8 +215,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     case None => buildError("Member '" + name + "' is empty.")
     case Some(x) => x.list.toList map nameToFile
   }
-  private def createNewPath(
-      getter: () => Option[Path], setter: (Option[Path]) => Unit) = {
+  private def createNewPath(getter: () => Option[Path],
+                            setter: (Option[Path]) => Unit) = {
     if (getter().isEmpty) setter(Some(new Path(getProject)))
 
     getter().get.createPath()
@@ -608,8 +608,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
           if (javaFiles.isEmpty)
             "%d source file%s".format(list.length, plural(list))
           else
-            "%d scala and %d java source files".format(
-                scalaFiles.length, javaFiles.length)
+            "%d scala and %d java source files"
+              .format(scalaFiles.length, javaFiles.length)
         log("Compiling %s to %s".format(str, getDestination.toString))
       } else log("No files selected for compilation", Project.MSG_VERBOSE)
 
@@ -620,10 +620,11 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     // If force is false, only files were the .class file in destination is
     // older than the .scala file will be used.
     val sourceFiles: List[File] = for (originDir <- getOrigin;
-                                       originFile <- getOriginFiles(originDir)) yield {
-      log(originFile, Project.MSG_DEBUG)
-      nameToFile(originDir)(originFile)
-    }
+                                       originFile <- getOriginFiles(originDir))
+      yield {
+        log(originFile, Project.MSG_DEBUG)
+        nameToFile(originDir)(originFile)
+      }
 
     // Builds-up the compilation settings for Scalac with the existing Ant
     // parameters.
@@ -665,8 +666,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     log("Scalac params = '" + addParams + "'", Project.MSG_DEBUG)
 
     // let CompilerCommand processes all params
-    val command = new CompilerCommand(
-        settings.splitParams(addParams), settings)
+    val command =
+      new CompilerCommand(settings.splitParams(addParams), settings)
 
     // resolve dependenciesFile path from project's basedir, so <ant antfile ...> call from other project works.
     // the dependenciesFile may be relative path to basedir or absolute path, in either case, the following code
@@ -724,18 +725,19 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
       val out = new PrintWriter(new BufferedWriter(new FileWriter(file)))
 
       try {
-        for (setting <- settings.visibleSettings; arg <- setting.unparse) out println escapeArgument(
-            arg)
-        for (file <- sourceFiles) out println escapeArgument(
-            file.getAbsolutePath)
+        for (setting <- settings.visibleSettings; arg <- setting.unparse)
+          out println escapeArgument(arg)
+        for (file <- sourceFiles)
+          out println escapeArgument(file.getAbsolutePath)
       } finally out.close()
 
       file
     }
     val res = execWithArgFiles(java, List(writeSettings().getAbsolutePath))
     if (failonerror && res != 0)
-      buildError("Compilation failed because of an internal compiler error;" +
-          " see the error output for details.")
+      buildError(
+          "Compilation failed because of an internal compiler error;" +
+            " see the error output for details.")
   }
 
   /** Performs the compilation. */
@@ -751,7 +753,7 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
           else ex.getMessage
         buildError(
             "Compile failed because of an internal compiler error (" + msg +
-            "); see the error output for details.")
+              "); see the error output for details.")
     }
 
     reporter.printSummary()
@@ -761,7 +763,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
           .format(reporter.ERROR.count, plural(reporter.ERROR.count))
       if (failonerror) buildError(msg) else log(msg)
     } else if (reporter.WARNING.count > 0)
-      log("Compile succeeded with %d warning%s; see the compiler output for details."
+      log(
+          "Compile succeeded with %d warning%s; see the compiler output for details."
             .format(reporter.WARNING.count, plural(reporter.WARNING.count)))
   }
 }

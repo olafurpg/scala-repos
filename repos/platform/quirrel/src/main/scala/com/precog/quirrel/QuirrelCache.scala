@@ -44,8 +44,10 @@ trait QuirrelCache extends AST { parser: Parser =>
   private case class Ignore(r: Regex) extends Rule(r)
 
   private case class Slot(lineNum: Int, colNum: Int, width: Int)
-  private case class Binding(
-      tpe: String, name: String, rawValue: String, pos: Int) {
+  private case class Binding(tpe: String,
+                             name: String,
+                             rawValue: String,
+                             pos: Int) {
     def value: String = tpe match {
       case "p" => canonicalizePath(rawValue)
       case "s" => canonicalizeStr(rawValue)
@@ -148,7 +150,7 @@ trait QuirrelCache extends AST { parser: Parser =>
             else {
               sys.error(
                   "error recovering boolean literal from %s (%s at %s)" format
-                  (s, original, i))
+                    (s, original, i))
             }
           case _: NumLit =>
             parser.numLiteralRegex
@@ -157,7 +159,7 @@ trait QuirrelCache extends AST { parser: Parser =>
               .getOrElse {
                 sys.error(
                     "error recovering number literal from %s (%s at %s)" format
-                    (s, original, i))
+                      (s, original, i))
               }
           case _: StrLit =>
             parser.pathLiteralRegex
@@ -176,7 +178,7 @@ trait QuirrelCache extends AST { parser: Parser =>
               .getOrElse {
                 sys.error(
                     "error recovering string literal from %s (%s at %s)" format
-                    (s, original, i))
+                      (s, original, i))
               }
         }
       }
@@ -240,8 +242,8 @@ trait QuirrelCache extends AST { parser: Parser =>
         (b, index(i))
     }.sortBy(_._2).map(_._1).toList
 
-    val result = replaceLiteralsS(
-        expr, sortedBindings, locUpdates(bindings, slots))
+    val result =
+      replaceLiteralsS(expr, sortedBindings, locUpdates(bindings, slots))
     result
   }
 
@@ -311,8 +313,8 @@ trait QuirrelCache extends AST { parser: Parser =>
         }
 
       case Let(loc, name, params, lchild0, rchild0) =>
-        for (lchild <- repl(lchild0); rchild <- repl(rchild0)) yield
-          Let(updateLoc(loc), name, params, lchild, rchild)
+        for (lchild <- repl(lchild0); rchild <- repl(rchild0))
+          yield Let(updateLoc(loc), name, params, lchild, rchild)
 
       case Solve(loc, constraints0, child0) =>
         for {
@@ -324,12 +326,12 @@ trait QuirrelCache extends AST { parser: Parser =>
         repl(child) map (Import(updateLoc(loc), spec, _))
 
       case Assert(loc, pred0, child0) =>
-        for (pred <- repl(pred0); child <- repl(child0)) yield
-          Assert(updateLoc(loc), pred, child)
+        for (pred <- repl(pred0); child <- repl(child0))
+          yield Assert(updateLoc(loc), pred, child)
 
       case Observe(loc, data0, samples0) =>
-        for (data <- repl(data0); samples <- repl(data0)) yield
-          Observe(updateLoc(loc), data, samples)
+        for (data <- repl(data0); samples <- repl(data0))
+          yield Observe(updateLoc(loc), data, samples)
 
       case New(loc, child0) =>
         repl(child0) map (New(updateLoc(loc), _))
@@ -368,8 +370,8 @@ trait QuirrelCache extends AST { parser: Parser =>
         repl(child0) map (MetaDescent(updateLoc(loc), _, property))
 
       case Deref(loc, lchild0, rchild0) =>
-        for (lchild <- repl(lchild0); rchild <- repl(rchild0)) yield
-          Deref(updateLoc(loc), lchild, rchild)
+        for (lchild <- repl(lchild0); rchild <- repl(rchild0))
+          yield Deref(updateLoc(loc), lchild, rchild)
 
       case Dispatch(loc, name, actuals) =>
         (actuals map repl).sequence map (Dispatch(updateLoc(loc), name, _))
@@ -382,80 +384,80 @@ trait QuirrelCache extends AST { parser: Parser =>
         } yield Cond(updateLoc(loc), pred, left, right)
 
       case Where(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Where(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Where(updateLoc(loc), left, right)
 
       case With(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          With(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield With(updateLoc(loc), left, right)
 
       case Union(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Union(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Union(updateLoc(loc), left, right)
 
       case Intersect(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Intersect(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Intersect(updateLoc(loc), left, right)
 
       case Difference(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Difference(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Difference(updateLoc(loc), left, right)
 
       case Add(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Add(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Add(updateLoc(loc), left, right)
 
       case Sub(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Sub(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Sub(updateLoc(loc), left, right)
 
       case Mul(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Mul(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Mul(updateLoc(loc), left, right)
 
       case Div(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Div(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Div(updateLoc(loc), left, right)
 
       case Mod(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Mod(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Mod(updateLoc(loc), left, right)
 
       case Pow(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Pow(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Pow(updateLoc(loc), left, right)
 
       case Lt(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Lt(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Lt(updateLoc(loc), left, right)
 
       case LtEq(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          LtEq(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield LtEq(updateLoc(loc), left, right)
 
       case Gt(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Gt(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Gt(updateLoc(loc), left, right)
 
       case GtEq(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          GtEq(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield GtEq(updateLoc(loc), left, right)
 
       case Eq(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Eq(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Eq(updateLoc(loc), left, right)
 
       case NotEq(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          NotEq(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield NotEq(updateLoc(loc), left, right)
 
       case And(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          And(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield And(updateLoc(loc), left, right)
 
       case Or(loc, left0, right0) =>
-        for (left <- repl(left0); right <- repl(right0)) yield
-          Or(updateLoc(loc), left, right)
+        for (left <- repl(left0); right <- repl(right0))
+          yield Or(updateLoc(loc), left, right)
 
       case Comp(loc, expr) =>
         repl(expr) map (Comp(updateLoc(loc), _))

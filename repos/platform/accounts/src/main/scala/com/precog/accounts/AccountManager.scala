@@ -47,8 +47,8 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
 
   def updateAccount(account: Account): M[Boolean]
 
-  def updateAccountPassword(
-      account: Account, newPassword: String): M[Boolean] = {
+  def updateAccountPassword(account: Account,
+                            newPassword: String): M[Boolean] = {
     val salt = randomSalt()
     updateAccount(
         account.copy(passwordHash = saltAndHashSHA256(newPassword, salt),
@@ -73,14 +73,15 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
 
   def markResetTokenUsed(tokenId: ResetTokenId): M[PrecogUnit]
 
-  def findResetToken(
-      accountId: AccountId, tokenId: ResetTokenId): M[Option[ResetToken]]
+  def findResetToken(accountId: AccountId,
+                     tokenId: ResetTokenId): M[Option[ResetToken]]
 
   // The accountId is used here as a sanity/security check only, not for lookup
-  def findAccountByResetToken(
-      accountId: AccountId, tokenId: ResetTokenId): M[String \/ Account] = {
-    logger.debug("Locating account for token id %s, account id %s".format(
-            tokenId, accountId))
+  def findAccountByResetToken(accountId: AccountId,
+                              tokenId: ResetTokenId): M[String \/ Account] = {
+    logger.debug(
+        "Locating account for token id %s, account id %s".format(tokenId,
+                                                                 accountId))
     findResetToken(accountId, tokenId).flatMap {
       case Some(token) =>
         if (token.expiresAt.isBefore(new DateTime)) {
@@ -94,7 +95,8 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
           logger.debug(
               "Located reset token, but with the wrong account (expected %s): %s"
                 .format(accountId, token))
-          M.point(-\/("Reset token %s does not match provided account %s"
+          M.point(
+              -\/("Reset token %s does not match provided account %s"
                     .format(tokenId, accountId)))
         } else {
           logger.debug("Located reset token " + token)
@@ -108,13 +110,13 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
     }
   }
 
-  def createAccount(email: String,
-                    password: String,
-                    creationDate: DateTime,
-                    plan: AccountPlan,
-                    parentId: Option[AccountId] = None,
-                    profile: Option[JValue] = None)(
-      f: AccountId => M[APIKey]): M[Account]
+  def createAccount(
+      email: String,
+      password: String,
+      creationDate: DateTime,
+      plan: AccountPlan,
+      parentId: Option[AccountId] = None,
+      profile: Option[JValue] = None)(f: AccountId => M[APIKey]): M[Account]
 
   def findAccountByEmail(email: String): M[Option[Account]]
 
@@ -141,10 +143,10 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
       case Some(account)
           if account.passwordHash == saltAndHashSHA1(password,
                                                      account.passwordSalt) ||
-          account.passwordHash == saltAndHashSHA256(password,
-                                                    account.passwordSalt) ||
-          account.passwordHash == saltAndHashLegacy(password,
-                                                    account.passwordSalt) =>
+            account.passwordHash == saltAndHashSHA256(password,
+                                                      account.passwordSalt) ||
+            account.passwordHash == saltAndHashLegacy(password,
+                                                      account.passwordSalt) =>
         Success(account)
       case Some(account) => Failure("password mismatch")
       case None => Failure("account not found")

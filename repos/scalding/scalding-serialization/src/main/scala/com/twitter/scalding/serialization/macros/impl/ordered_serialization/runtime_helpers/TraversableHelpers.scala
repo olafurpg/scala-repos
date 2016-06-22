@@ -114,8 +114,7 @@ object TraversableHelpers {
               partition(pivot, pivotStart, pivotEnd, newEnd, x)
             } else {
               // t < pivot so we need to push this value below the pivots:
-              val ps =
-                x(pivotStart) // might not be pivot if the pivot size is 0
+              val ps = x(pivotStart) // might not be pivot if the pivot size is 0
               x(pivotStart) = t
               x(pivotEnd) = ps
               partition(pivot, pivotStart + 1, pivotEnd + 1, endX, x)

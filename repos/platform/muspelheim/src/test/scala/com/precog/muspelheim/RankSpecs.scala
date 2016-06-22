@@ -119,12 +119,12 @@ trait RankSpecs extends EvalStackSpecs {
 
       result must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            ids.length must_== 1
-            obj must haveSize(3)
-            obj must haveKey("rank")
-            obj must haveKey("country")
-            obj must haveKey("athletesPerMillion")
-          }
+          ids.length must_== 1
+          obj must haveSize(3)
+          obj must haveKey("rank")
+          obj must haveKey("country")
+          obj must haveKey("athletesPerMillion")
+        }
       }
     }
 
@@ -227,10 +227,10 @@ trait RankSpecs extends EvalStackSpecs {
 
         results must haveAllElementsLike {
           case (ids, SObject(obj)) => {
-              ids.length must_== 1
-              obj must haveSize(5)
-              obj must contain("cpm" -> SDecimal(6))
-            }
+            ids.length must_== 1
+            obj must haveSize(5)
+            obj must contain("cpm" -> SDecimal(6))
+          }
           case r => failure("Result has wrong shape: " + r)
         }
       }
@@ -246,10 +246,10 @@ trait RankSpecs extends EvalStackSpecs {
 
         results must haveAllElementsLike {
           case (ids, SObject(obj)) => {
-              ids.length must_== 1
-              obj must haveSize(5)
-              obj must contain("cpm" -> SDecimal(6))
-            }
+            ids.length must_== 1
+            obj must haveSize(5)
+            obj must contain("cpm" -> SDecimal(6))
+          }
           case r => failure("Result has wrong shape: " + r)
         }
       }
@@ -332,10 +332,10 @@ trait RankSpecs extends EvalStackSpecs {
 
         results must haveAllElementsLike {
           case (ids, SObject(obj)) => {
-              ids.length must_== 1
-              obj must haveSize(5)
-              obj must contain("cpm" -> SDecimal(6))
-            }
+            ids.length must_== 1
+            obj must haveSize(5)
+            obj must contain("cpm" -> SDecimal(6))
+          }
           case r => failure("Result has wrong shape: " + r)
         }
       }

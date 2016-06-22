@@ -119,7 +119,7 @@ object SessionMaster extends LiftActor with Loggable {
     lockAndBump {
       val dead =
         killedSessions.containsKey(id) ||
-        (otherId.map(killedSessions.containsKey(_)) openOr false)
+          (otherId.map(killedSessions.containsKey(_)) openOr false)
 
       if (dead)(Failure("Dead session", Empty, Empty))
       else {
@@ -138,8 +138,8 @@ object SessionMaster extends LiftActor with Loggable {
   /**
     * Returns a LiftSession or Empty if not found
     */
-  def getSession(
-      httpSession: => HTTPSession, otherId: Box[String]): Box[LiftSession] =
+  def getSession(httpSession: => HTTPSession,
+                 otherId: Box[String]): Box[LiftSession] =
     lockAndBump {
       otherId.flatMap(a => Box !! nsessions.get(a)) or
       (Box !! nsessions.get(httpSession.sessionId))
@@ -260,8 +260,7 @@ object SessionMaster extends LiftActor with Loggable {
         killedSessions.filter(_._2 < now).map(_._1)
       removeKeys.foreach(s => killedSessions.remove(s))
 
-      val ses = Map(
-          lockRead {
+      val ses = Map(lockRead {
         nsessions
       }.toList: _*)
 
@@ -276,16 +275,14 @@ object SessionMaster extends LiftActor with Loggable {
             }
           })
         } else {
-          Schedule.schedule(
-              () =>
+          Schedule.schedule(() =>
                 f(ses, shutDown => {
-                  if (!shutDown.session.markedForShutDown_?) {
-                    shutDown.session.markedForShutDown_? = true
+              if (!shutDown.session.markedForShutDown_?) {
+                shutDown.session.markedForShutDown_? = true
 
-                    this ! RemoveSession(shutDown.session.underlyingId)
-                  }
-                }),
-              0.seconds)
+                this ! RemoveSession(shutDown.session.underlyingId)
+              }
+            }), 0.seconds)
         }
       }
 

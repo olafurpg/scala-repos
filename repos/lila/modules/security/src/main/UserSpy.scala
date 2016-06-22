@@ -41,8 +41,8 @@ object UserSpy {
 
   case class IPData(ip: IP, blocked: Boolean, location: Location)
 
-  private[security] def apply(
-      firewall: Firewall, geoIP: GeoIP)(userId: String): Fu[UserSpy] =
+  private[security] def apply(firewall: Firewall, geoIP: GeoIP)(
+      userId: String): Fu[UserSpy] =
     for {
       user ← UserRepo named userId flatten "[spy] user not found"
       infos ← Store.findInfoByUser(user.id)
@@ -81,8 +81,8 @@ object UserSpy {
       _.flatMap(_.getAs[Value](field)).toSet
     }
 
-  private def nextUsers(
-      field: String)(values: Set[Value], user: User): Fu[Set[User]] =
+  private def nextUsers(field: String)(values: Set[Value],
+                                       user: User): Fu[Set[User]] =
     values.nonEmpty ?? {
       storeColl.distinct("user",
                          BSONDocument(

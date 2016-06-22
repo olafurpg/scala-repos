@@ -12,9 +12,9 @@ object Main {
 
   def foo[E](tree: BinaryTree[E]): Unit = tree match {
     case NonEmptyCons(_, tail) => {
-        tail match {
-          case NonEmptyCons(_, _) => {}
-        }
+      tail match {
+        case NonEmptyCons(_, _) => {}
       }
+    }
   }
 }

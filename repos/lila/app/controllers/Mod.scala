@@ -63,7 +63,8 @@ object Mod extends LilaController {
           err => fuccess(redirect(username, mod = true)),
           title =>
             modApi.setTitle(me.id, username, title) inject redirect(
-                username, mod = false)
+                username,
+                mod = false)
       )
     else fuccess(authorizationFailed(ctx.req))
   }
@@ -79,7 +80,8 @@ object Mod extends LilaController {
               err => BadRequest(err.toString).fuccess,
               email =>
                 modApi.setEmail(me.id, user.id, email) inject redirect(
-                    user.username, mod = true)
+                    user.username,
+                    mod = true)
           )
       else fuccess(authorizationFailed(ctx.req))
     }
@@ -154,7 +156,8 @@ object Mod extends LilaController {
   }
 
   def gamify = Secure(_.SeeReport) { implicit ctx => me =>
-    Env.mod.gamify.leaderboards zip Env.mod.gamify.history(orCompute = true) map {
+    Env.mod.gamify.leaderboards zip Env.mod.gamify
+      .history(orCompute = true) map {
       case (leaderboards, history) =>
         Ok(html.mod.gamify.index(leaderboards, history))
     }

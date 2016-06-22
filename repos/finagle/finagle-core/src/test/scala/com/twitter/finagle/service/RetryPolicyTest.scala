@@ -40,7 +40,8 @@ class RetryPolicyTest extends FunSpec {
       assert(weo(Throw(Failure(new Exception, Failure.Interrupted))) == false)
       // it's important that this failure isn't retried, despite being "restartable".
       // interrupted futures should never be retried.
-      assert(weo(Throw(Failure(
+      assert(
+          weo(Throw(Failure(
                       new Exception,
                       Failure.Interrupted | Failure.Restartable))) == false)
       assert(weo(Throw(Failure(new Exception, Failure.Restartable))) == true)
@@ -117,8 +118,9 @@ class RetryPolicyTest extends FunSpec {
     }
 
     it("returns underlying result if filterEach accepts") {
-      val actual = getBackoffs(
-          policy, Stream(IException(2), IException(2), IException(0)))
+      val actual =
+        getBackoffs(policy,
+                    Stream(IException(2), IException(2), IException(0)))
       assert(actual == backoffs.take(2))
     }
   }

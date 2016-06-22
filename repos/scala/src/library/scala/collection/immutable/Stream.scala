@@ -377,8 +377,8 @@ abstract class Stream[+A]
       )
     else super.++(that)(bf)
 
-  override def +:[B >: A, That](
-      elem: B)(implicit bf: CanBuildFrom[Stream[A], B, That]): That =
+  override def +:[B >: A, That](elem: B)(
+      implicit bf: CanBuildFrom[Stream[A], B, That]): That =
     if (isStreamBuilder(bf)) asThat(cons(elem, this))
     else super.+:(elem)(bf)
 
@@ -396,8 +396,8 @@ abstract class Stream[+A]
     * @return A new collection containing the modifications from the application
     * of `op`.
     */
-  override final def scanLeft[B, That](z: B)(
-      op: (B, A) => B)(implicit bf: CanBuildFrom[Stream[A], B, That]): That =
+  override final def scanLeft[B, That](z: B)(op: (B, A) => B)(
+      implicit bf: CanBuildFrom[Stream[A], B, That]): That =
     if (isStreamBuilder(bf))
       asThat(
           if (isEmpty) Stream(z)
@@ -511,8 +511,8 @@ abstract class Stream[+A]
       )
     else super.flatMap(f)(bf)
 
-  override private[scala] def filterImpl(
-      p: A => Boolean, isFlipped: Boolean): Stream[A] = {
+  override private[scala] def filterImpl(p: A => Boolean,
+                                         isFlipped: Boolean): Stream[A] = {
     // optimization: drop leading prefix of elems for which f returns false
     // var rest = this dropWhile (!p(_)) - forget DRY principle - GC can't collect otherwise
     var rest = this
@@ -1267,8 +1267,9 @@ object Stream extends SeqFactory[Stream] {
     else cons(start, range(start + step, end, step))
   }
 
-  private[immutable] def filteredTail[A](
-      stream: Stream[A], p: A => Boolean, isFlipped: Boolean) = {
+  private[immutable] def filteredTail[A](stream: Stream[A],
+                                         p: A => Boolean,
+                                         isFlipped: Boolean) = {
     cons(stream.head, stream.tail.filterImpl(p, isFlipped))
   }
 
@@ -1287,8 +1288,8 @@ object Stream extends SeqFactory[Stream] {
     * head, it is now possible for GC to collect any leading and filtered-out elements
     * which do not satisfy the filter, while the tail is still processing (see SI-8990).
     */
-  private[immutable] final class StreamWithFilter[A](
-      sl: => Stream[A], p: A => Boolean)
+  private[immutable] final class StreamWithFilter[A](sl: => Stream[A],
+                                                     p: A => Boolean)
       extends FilterMonadic[A, Stream[A]] {
     private var s = sl // set to null to allow GC after filtered
     private lazy val filtered = { val f = s filter p; s = null; f } // don't set to null if throw during filter

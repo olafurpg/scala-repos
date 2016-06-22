@@ -27,8 +27,8 @@ class ShowTypeInfoAction extends AnAction(ScalaBundle.message("type.info")) {
     val editor = CommonDataKeys.EDITOR.getData(context)
 
     if (editor == null) return
-    val file = PsiUtilBase.getPsiFileInEditor(
-        editor, CommonDataKeys.PROJECT.getData(context))
+    val file = PsiUtilBase
+      .getPsiFileInEditor(editor, CommonDataKeys.PROJECT.getData(context))
     if (file.getLanguage != ScalaFileType.SCALA_LANGUAGE) return
 
     val selectionModel = editor.getSelectionModel
@@ -96,8 +96,9 @@ class ShowTypeInfoAction extends AnAction(ScalaBundle.message("type.info")) {
 }
 
 object ShowTypeInfoAction {
-  def getTypeInfoHint(
-      editor: Editor, file: PsiFile, offset: Int): Option[String] = {
+  def getTypeInfoHint(editor: Editor,
+                      file: PsiFile,
+                      offset: Int): Option[String] = {
     val typeInfoFromRef = file.findReferenceAt(offset) match {
       case ResolvedWithSubst(e, subst) => typeTextOf(e, subst)
       case _ =>
@@ -111,7 +112,10 @@ object ShowTypeInfoAction {
         }
     }
     val pattern = PsiTreeUtil.findElementOfClassAtOffset(
-        file, offset, classOf[ScBindingPattern], false)
+        file,
+        offset,
+        classOf[ScBindingPattern],
+        false)
     typeInfoFromRef.orElse(typeInfoFromPattern(pattern))
   }
 
@@ -124,14 +128,14 @@ object ShowTypeInfoAction {
 
   val NO_TYPE: String = "No type was inferred"
 
-  private[this] def typeTextOf(
-      elem: PsiElement, subst: ScSubstitutor): Option[String] = {
+  private[this] def typeTextOf(elem: PsiElement,
+                               subst: ScSubstitutor): Option[String] = {
     typeText(ScType.ofNamedElement(elem, subst))
   }
 
-  private[this] def typeText(optType: Option[ScType],
-                             s: ScSubstitutor =
-                               ScSubstitutor.empty): Option[String] = {
+  private[this] def typeText(
+      optType: Option[ScType],
+      s: ScSubstitutor = ScSubstitutor.empty): Option[String] = {
     optType.map(ScTypePresentation.withoutAliases)
   }
 }

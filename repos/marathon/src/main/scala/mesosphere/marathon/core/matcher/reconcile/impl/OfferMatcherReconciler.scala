@@ -28,15 +28,16 @@ import scala.concurrent.Future
   * * and creating unreserved/destroy operations for tasks in state "garbage" only
   */
 private[reconcile] class OfferMatcherReconciler(
-    taskTracker: TaskTracker, groupRepository: GroupRepository)
+    taskTracker: TaskTracker,
+    groupRepository: GroupRepository)
     extends OfferMatcher {
 
   private val log = LoggerFactory.getLogger(getClass)
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  override def matchOffer(
-      deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] = {
+  override def matchOffer(deadline: Timestamp,
+                          offer: Offer): Future[MatchedTaskOps] = {
 
     val frameworkId = FrameworkId("").mergeFromProto(offer.getFrameworkId)
 
@@ -53,17 +54,18 @@ private[reconcile] class OfferMatcherReconciler(
   }
 
   private[this] def processResourcesByTaskId(
-      offer: Offer, resourcesByTaskId: Map[Id, Iterable[Resource]])
+      offer: Offer,
+      resourcesByTaskId: Map[Id, Iterable[Resource]])
     : Future[MatchedTaskOps] = {
     // do not query taskTracker in the common case
     if (resourcesByTaskId.isEmpty)
       Future.successful(MatchedTaskOps.noMatch(offer.getId))
     else {
-      def createTaskOps(
-          tasksByApp: TasksByApp, rootGroup: Group): MatchedTaskOps = {
+      def createTaskOps(tasksByApp: TasksByApp,
+                        rootGroup: Group): MatchedTaskOps = {
         def spurious(taskId: Id): Boolean =
           tasksByApp.task(taskId).isEmpty ||
-          rootGroup.app(taskId.appId).isEmpty
+            rootGroup.app(taskId.appId).isEmpty
 
         val taskOps = resourcesByTaskId.iterator.collect {
           case (taskId, spuriousResources) if spurious(taskId) =>

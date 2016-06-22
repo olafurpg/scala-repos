@@ -38,8 +38,8 @@ trait ProducerConsumerTestHarness extends KafkaServerTestHarness {
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName)
-    consumer = new SimpleConsumer(
-        host, servers(0).boundPort(), 1000000, 64 * 1024, "")
+    consumer =
+      new SimpleConsumer(host, servers(0).boundPort(), 1000000, 64 * 1024, "")
   }
 
   @After

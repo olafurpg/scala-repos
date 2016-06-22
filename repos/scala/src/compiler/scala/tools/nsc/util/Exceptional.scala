@@ -7,8 +7,8 @@ import java.lang.reflect.{InvocationTargetException, UndeclaredThrowableExceptio
 object Exceptional {
   def unwrap(x: Throwable): Throwable = x match {
     case _: InvocationTargetException | _: ExceptionInInitializerError |
-        _: UndeclaredThrowableException |
-        _: ExecutionException if x.getCause != null =>
+        _: UndeclaredThrowableException | _: ExecutionException
+        if x.getCause != null =>
       unwrap(x.getCause)
 
     case _ => x

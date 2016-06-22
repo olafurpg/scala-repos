@@ -90,13 +90,13 @@ trait ScModificationTrackerOwner
   }
 
   def createMirror(text: String): PsiElement = {
-    ScalaPsiElementFactory.createExpressionWithContextFromText(
-        text, getContext, this)
+    ScalaPsiElementFactory
+      .createExpressionWithContextFromText(text, getContext, this)
   }
 
   @Cached(synchronized = true, ModCount.getBlockModificationCount, this)
-  def getMirrorPositionForCompletion(
-      dummyIdentifier: String, pos: Int): Option[PsiElement] = {
+  def getMirrorPositionForCompletion(dummyIdentifier: String,
+                                     pos: Int): Option[PsiElement] = {
     val text = new StringBuilder(getText)
     text.insert(pos, dummyIdentifier)
     val newBlock = createMirror(text.toString())

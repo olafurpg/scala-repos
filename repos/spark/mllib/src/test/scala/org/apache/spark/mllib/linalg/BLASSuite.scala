@@ -275,8 +275,11 @@ class BLASSuite extends SparkFunSuite {
         4,
         3,
         Array(0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3.0))
-    val sA = new SparseMatrix(
-        4, 3, Array(0, 1, 3, 4), Array(1, 0, 2, 3), Array(1.0, 2.0, 1.0, 3.0))
+    val sA = new SparseMatrix(4,
+                              3,
+                              Array(0, 1, 3, 4),
+                              Array(1, 0, 2, 3),
+                              Array(1.0, 2.0, 1.0, 3.0))
 
     val B = new DenseMatrix(3, 2, Array(1.0, 0.0, 0.0, 0.0, 2.0, 1.0))
     val expected =
@@ -384,8 +387,11 @@ class BLASSuite extends SparkFunSuite {
         4,
         3,
         Array(0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3.0))
-    val sA = new SparseMatrix(
-        4, 3, Array(0, 1, 3, 4), Array(1, 0, 2, 3), Array(1.0, 2.0, 1.0, 3.0))
+    val sA = new SparseMatrix(4,
+                              3,
+                              Array(0, 1, 3, 4),
+                              Array(1, 0, 2, 3),
+                              Array(1.0, 2.0, 1.0, 3.0))
 
     val dA2 = new DenseMatrix(
         4,

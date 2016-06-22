@@ -30,7 +30,8 @@ sealed abstract class IterateeT[E, F[_], A] {
     * Run this iteratee
     */
   def run(implicit F: Monad[F]): F[A] = {
-    F.bind((this &= enumEofT[E, F]).value)((s: StepT[E, F, A]) =>
+    F.bind((this &= enumEofT[E, F]).value)(
+        (s: StepT[E, F, A]) =>
           s.fold(
               cont = _ => sys.error("diverging iteratee"),
               done = (a, _) => F.point(a)
@@ -41,7 +42,8 @@ sealed abstract class IterateeT[E, F[_], A] {
       implicit F: Monad[F]): IterateeT[E, F, B] = {
     def through(x: IterateeT[E, F, A]): IterateeT[E, F, B] =
       iterateeT(
-          F.bind(x.value)((s: StepT[E, F, A]) =>
+          F.bind(x.value)(
+              (s: StepT[E, F, A]) =>
                 s.fold[F[StepT[E, F, B]]](
                     cont = k => F.point(StepT.scont(u => through(k(u)))),
                     done = (a, i) =>
@@ -120,8 +122,7 @@ sealed abstract class IterateeT[E, F[_], A] {
   }
 
   def up[G[_]](implicit G: Applicative[G], F: Comonad[F]): IterateeT[E, G, A] = {
-    mapI(
-        new (F ~> G) {
+    mapI(new (F ~> G) {
       def apply[A](a: F[A]) = G.point(F.copoint(a))
     })
   }
@@ -150,14 +151,18 @@ sealed abstract class IterateeT[E, F[_], A] {
       def apply[B] = {
         def loop = doneOr(checkEof)
         def checkEof: (Input[A] => IterateeT[A, F, B]) => IterateeT[
-            E, F, StepT[A, F, B]] =
+            E,
+            F,
+            StepT[A, F, B]] =
           k =>
             isEof[E, F] flatMap { eof =>
               if (eof) done(scont(k), eofInput)
               else step(k)
           }
         def step: (Input[A] => IterateeT[A, F, B]) => IterateeT[
-            E, F, StepT[A, F, B]] = k => flatMap(a => k(elInput(a)) >>== loop)
+            E,
+            F,
+            StepT[A, F, B]] = k => flatMap(a => k(elInput(a)) >>== loop)
         loop
       }
     }
@@ -167,7 +172,8 @@ sealed abstract class IterateeT[E, F[_], A] {
     def step[Z](i: IterateeT[E, F, Z], in: Input[E]) =
       IterateeT
         .IterateeTMonadTrans[E]
-        .liftM(i.foldT[(Option[(Z, Input[E])], IterateeT[E, F, Z])](
+        .liftM(
+            i.foldT[(Option[(Z, Input[E])], IterateeT[E, F, Z])](
                 cont = k => F.point((None, k(in))),
                 done = (a, x) => F.point((Some((a, x)), done(a, x)))
             ))
@@ -188,7 +194,7 @@ sealed abstract class IterateeT[E, F[_], A] {
         empty = cont(loop(x, y)),
         eof =
           (x &= enumEofT[E, F]) flatMap
-          (a => (y &= enumEofT[E, F]) map (b => (a, b)))
+            (a => (y &= enumEofT[E, F]) map (b => (a, b)))
     )
     cont(loop(this, other))
   }
@@ -249,8 +255,8 @@ trait IterateeTFunctions {
       c: Input[E] => IterateeT[E, F, A]): IterateeT[E, F, A] =
     StepT.scont(c).pointI
 
-  def done[E, F[_]: Applicative, A](
-      d: => A, r: => Input[E]): IterateeT[E, F, A] =
+  def done[E, F[_]: Applicative, A](d: => A,
+                                    r: => Input[E]): IterateeT[E, F, A] =
     StepT.sdone(d, r).pointI
 
   /**
@@ -299,7 +305,8 @@ trait IterateeTFunctions {
   }
 
   def headDoneOr[E, F[_]: Monad, B](
-      b: => B, f: E => IterateeT[E, F, B]): IterateeT[E, F, B] = {
+      b: => B,
+      f: E => IterateeT[E, F, B]): IterateeT[E, F, B] = {
     head[E, F] flatMap {
       case None => done(b, eofInput)
       case Some(a) => f(a)
@@ -316,7 +323,8 @@ trait IterateeTFunctions {
   }
 
   def peekDoneOr[E, F[_]: Monad, B](
-      b: => B, f: E => IterateeT[E, F, B]): IterateeT[E, F, B] = {
+      b: => B,
+      f: E => IterateeT[E, F, B]): IterateeT[E, F, B] = {
     peek[E, F] flatMap {
       case None => done(b, eofInput)
       case Some(a) => f(a)
@@ -366,7 +374,7 @@ trait IterateeTFunctions {
       s =>
         s(el = e =>
             IterateeT.IterateeTMonadTrans[E].liftM(f(acc, e)) flatMap
-            (a => cont(step(a))),
+              (a => cont(step(a))),
           empty = cont(step(acc)),
           eof = done(acc, eofInput[E]))
     cont(step(init))

@@ -48,14 +48,16 @@ final class RelationApi(coll: Coll,
   def fetchFriends(userId: ID) =
     coll
       .aggregate(
-          Match(BSONDocument(
+          Match(
+              BSONDocument(
                   "$or" -> BSONArray(BSONDocument("u1" -> userId),
                                      BSONDocument("u2" -> userId)),
                   "r" -> Follow
               )),
           List(
               Group(BSONNull)("u1" -> AddToSet("u1"), "u2" -> AddToSet("u2")),
-              Project(BSONDocument(
+              Project(
+                  BSONDocument(
                       "_id" -> BSONDocument(
                           "$setIntersection" -> BSONArray("$u1", "$u2"))
                   ))
@@ -98,25 +100,28 @@ final class RelationApi(coll: Coll,
     coll.count(BSONDocument("u2" -> userId, "r" -> Block).some)
 
   def followingPaginatorAdapter(userId: ID) =
-    new BSONAdapter[Followed](
-        collection = coll,
-        selector = BSONDocument("u1" -> userId, "r" -> Follow),
-        projection = BSONDocument("u2" -> true, "_id" -> false),
-        sort = BSONDocument()).map(_.userId)
+    new BSONAdapter[Followed](collection = coll,
+                              selector =
+                                BSONDocument("u1" -> userId, "r" -> Follow),
+                              projection =
+                                BSONDocument("u2" -> true, "_id" -> false),
+                              sort = BSONDocument()).map(_.userId)
 
   def followersPaginatorAdapter(userId: ID) =
-    new BSONAdapter[Follower](
-        collection = coll,
-        selector = BSONDocument("u2" -> userId, "r" -> Follow),
-        projection = BSONDocument("u1" -> true, "_id" -> false),
-        sort = BSONDocument()).map(_.userId)
+    new BSONAdapter[Follower](collection = coll,
+                              selector =
+                                BSONDocument("u2" -> userId, "r" -> Follow),
+                              projection =
+                                BSONDocument("u1" -> true, "_id" -> false),
+                              sort = BSONDocument()).map(_.userId)
 
   def blockingPaginatorAdapter(userId: ID) =
-    new BSONAdapter[Blocked](
-        collection = coll,
-        selector = BSONDocument("u1" -> userId, "r" -> Block),
-        projection = BSONDocument("u2" -> true, "_id" -> false),
-        sort = BSONDocument()).map(_.userId)
+    new BSONAdapter[Blocked](collection = coll,
+                             selector =
+                               BSONDocument("u1" -> userId, "r" -> Block),
+                             projection =
+                               BSONDocument("u2" -> true, "_id" -> false),
+                             sort = BSONDocument()).map(_.userId)
 
   def follow(u1: ID, u2: ID): Funit =
     if (u1 == u2) funit

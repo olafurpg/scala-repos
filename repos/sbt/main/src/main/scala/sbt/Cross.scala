@@ -54,34 +54,33 @@ object Cross {
         //    to the new global settings.
         // 3. Append these to the session, so that the session is up-to-date and
         //    things like set/session clear, etc. work.
-        val (add, exclude) =
-          if (home.exists) {
-            val instance = ScalaInstance(home)(state.classLoaderCache.apply _)
-            state.log.info("Setting Scala home to " + home +
+        val (add, exclude) = if (home.exists) {
+          val instance = ScalaInstance(home)(state.classLoaderCache.apply _)
+          state.log.info("Setting Scala home to " + home +
                 " with actual version " + instance.actualVersion)
-            val version =
-              if (resolveVersion.isEmpty) instance.actualVersion
-              else resolveVersion
-            state.log.info(
-                "\tand using " + version + " for resolving dependencies.")
-            val settings = Seq(
-                scalaVersion in GlobalScope :== version,
-                scalaHome in GlobalScope :== Some(home),
-                scalaInstance in GlobalScope :== instance
-            )
-            (settings,
-             excludeKeys(
-                 Set(scalaVersion.key, scalaHome.key, scalaInstance.key)))
-          } else if (!resolveVersion.isEmpty) {
-            sys.error("Scala home directory did not exist: " + home)
-          } else {
-            state.log.info("Setting version to " + arg)
-            val settings = Seq(
-                scalaVersion in GlobalScope :== arg,
-                scalaHome in GlobalScope :== None
-            )
-            (settings, excludeKeys(Set(scalaVersion.key, scalaHome.key)))
-          }
+          val version =
+            if (resolveVersion.isEmpty) instance.actualVersion
+            else resolveVersion
+          state.log.info(
+              "\tand using " + version + " for resolving dependencies.")
+          val settings = Seq(
+              scalaVersion in GlobalScope :== version,
+              scalaHome in GlobalScope :== Some(home),
+              scalaInstance in GlobalScope :== instance
+          )
+          (settings,
+           excludeKeys(
+               Set(scalaVersion.key, scalaHome.key, scalaInstance.key)))
+        } else if (!resolveVersion.isEmpty) {
+          sys.error("Scala home directory did not exist: " + home)
+        } else {
+          state.log.info("Setting version to " + arg)
+          val settings = Seq(
+              scalaVersion in GlobalScope :== arg,
+              scalaHome in GlobalScope :== None
+          )
+          (settings, excludeKeys(Set(scalaVersion.key, scalaHome.key)))
+        }
 
         val isForceGc =
           getOpt(Keys.forcegc in Global) getOrElse GCUtil.defaultForceGarbageCollection
@@ -131,7 +130,7 @@ object Cross {
       import x._
       val versions = crossVersions(state)
       val current = scalaVersion in currentRef get structure.data map
-      (SwitchCommand + " " + _) toList;
+        (SwitchCommand + " " + _) toList;
       if (versions.isEmpty) command :: state
       else {
         versions.map(v => s"$SwitchCommand $v $command") ::: current ::: state

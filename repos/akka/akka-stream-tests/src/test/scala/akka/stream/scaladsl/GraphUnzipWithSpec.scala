@@ -17,8 +17,8 @@ class GraphUnzipWithSpec extends AkkaSpec {
 
   import GraphDSL.Implicits._
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -50,8 +50,7 @@ class GraphUnzipWithSpec extends AkkaSpec {
     val rightSubscriber = TestSubscriber.probe[RightOutput]()
 
     RunnableGraph
-      .fromGraph(
-          GraphDSL.create() { implicit b ⇒
+      .fromGraph(GraphDSL.create() { implicit b ⇒
         val f = fixture(b)
 
         Source.fromPublisher(p) ~> f.in
@@ -104,8 +103,7 @@ class GraphUnzipWithSpec extends AkkaSpec {
       val rightProbe = TestSubscriber.manualProbe[RightOutput]()
 
       RunnableGraph
-        .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create() { implicit b ⇒
           val unzip = b.add(UnzipWith(f))
           Source(1 to 4) ~> unzip.in
 
@@ -154,8 +152,8 @@ class GraphUnzipWithSpec extends AkkaSpec {
     }
 
     "work in the sad case" in {
-      val settings = ActorMaterializerSettings(system).withInputBuffer(
-          initialSize = 1, maxSize = 1)
+      val settings = ActorMaterializerSettings(system)
+        .withInputBuffer(initialSize = 1, maxSize = 1)
 
       val leftProbe = TestSubscriber.manualProbe[LeftOutput]()
       val rightProbe = TestSubscriber.manualProbe[RightOutput]()
@@ -250,8 +248,7 @@ class GraphUnzipWithSpec extends AkkaSpec {
       val probe19 = TestSubscriber.manualProbe[String]()
 
       RunnableGraph
-        .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create() { implicit b ⇒
           val split20 = (a: (List[Int])) ⇒
             (a(0),
              a(0).toString,

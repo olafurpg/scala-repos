@@ -58,7 +58,9 @@ class ScalaInplaceVariableIntroducer(project: Project,
   private var mySpecifyTypeChb: JCheckBox = null
   private var myDeclarationStartOffset: Int = 0
   private val newDeclaration = ScalaPsiUtil.getParentOfType(
-      namedElement, classOf[ScEnumerator], classOf[ScDeclaredElementsHolder])
+      namedElement,
+      classOf[ScEnumerator],
+      classOf[ScDeclaredElementsHolder])
   private var myCheckIdentifierListener: DocumentListener = null
   private val myFile: PsiFile = namedElement.getContainingFile
   private val myBalloonPanel: JPanel = new JPanel()
@@ -78,8 +80,8 @@ class ScalaInplaceVariableIntroducer(project: Project,
     new DocumentAdapter() {
       override def documentChanged(e: DocumentEvent): Unit = {
         commitDocument()
-        val range = new TextRange(
-            myCaretRangeMarker.getStartOffset, myCaretRangeMarker.getEndOffset)
+        val range = new TextRange(myCaretRangeMarker.getStartOffset,
+                                  myCaretRangeMarker.getEndOffset)
         if (range.getLength == 0 &&
             UndoManager.getInstance(myProject).isUndoInProgress) {} else {
           val input = myCaretRangeMarker.getDocument.getText(range)
@@ -114,8 +116,9 @@ class ScalaInplaceVariableIntroducer(project: Project,
 
   private def findDeclaration(offset: Int): PsiElement = {
     val elem = myFile.findElementAt(offset)
-    ScalaPsiUtil.getParentOfType(
-        elem, classOf[ScEnumerator], classOf[ScDeclaredElementsHolder])
+    ScalaPsiUtil.getParentOfType(elem,
+                                 classOf[ScEnumerator],
+                                 classOf[ScDeclaredElementsHolder])
   }
 
   private def getDeclaration: PsiElement =
@@ -149,18 +152,19 @@ class ScalaInplaceVariableIntroducer(project: Project,
       myVarCheckbox.setMnemonic('v')
       myVarCheckbox.addActionListener(new ActionListener {
         def actionPerformed(e: ActionEvent): Unit = {
-          val writeAction = new WriteCommandAction[Unit](
-              myProject, getCommandName, getCommandName) {
+          val writeAction = new WriteCommandAction[Unit](myProject,
+                                                         getCommandName,
+                                                         getCommandName) {
 
-            private def changeValOrVar(
-                asVar: Boolean, declaration: PsiElement): Unit = {
+            private def changeValOrVar(asVar: Boolean,
+                                       declaration: PsiElement): Unit = {
               val replacement = declaration match {
                 case value: ScValue if asVar =>
-                  ScalaPsiElementFactory.createVarFromValDeclaration(
-                      value, value.getManager)
+                  ScalaPsiElementFactory
+                    .createVarFromValDeclaration(value, value.getManager)
                 case variable: ScVariableDefinition if !asVar =>
-                  ScalaPsiElementFactory.createValFromVarDefinition(
-                      variable, variable.getManager)
+                  ScalaPsiElementFactory
+                    .createValFromVarDefinition(variable, variable.getManager)
                 case _ => declaration
               }
               if (replacement != declaration)
@@ -193,16 +197,17 @@ class ScalaInplaceVariableIntroducer(project: Project,
               myEditor.getMarkupModel.getAllHighlighters
             for (highlighter <- highlighters;
                  if checkRange(highlighter.getStartOffset,
-                               highlighter.getEndOffset)) greedyToRight +=
-              (highlighter -> highlighter.isGreedyToRight)
+                               highlighter.getEndOffset))
+              greedyToRight +=
+                (highlighter -> highlighter.isGreedyToRight)
           }
           def resetGreedyToRightBack(): Unit = {
             val highlighters: Array[RangeHighlighter] =
               myEditor.getMarkupModel.getAllHighlighters
             for (highlighter <- highlighters;
                  if checkRange(highlighter.getStartOffset,
-                               highlighter.getEndOffset)) highlighter
-              .setGreedyToRight(greedyToRight(highlighter))
+                               highlighter.getEndOffset))
+              highlighter.setGreedyToRight(greedyToRight(highlighter))
           }
           def checkRange(start: Int, end: Int): Boolean = {
             val named: Option[ScNamedElement] = namedElement(getDeclaration)
@@ -213,8 +218,9 @@ class ScalaInplaceVariableIntroducer(project: Project,
             } else false
           }
 
-          val writeAction = new WriteCommandAction[Unit](
-              myProject, getCommandName, getCommandName) {
+          val writeAction = new WriteCommandAction[Unit](myProject,
+                                                         getCommandName,
+                                                         getCommandName) {
             private def addTypeAnnotation(selectedType: ScType): Unit = {
               val declaration = getDeclaration
               declaration match {
@@ -222,13 +228,14 @@ class ScalaInplaceVariableIntroducer(project: Project,
                   val declarationCopy =
                     declaration.copy.asInstanceOf[ScalaPsiElement]
                   val manager = declarationCopy.getManager
-                  val fakeDeclaration = ScalaPsiElementFactory
-                    .createDeclaration(selectedType,
-                                       "x",
-                                       isVariable = false,
-                                       "",
-                                       manager,
-                                       isPresentableText = false)
+                  val fakeDeclaration =
+                    ScalaPsiElementFactory.createDeclaration(
+                        selectedType,
+                        "x",
+                        isVariable = false,
+                        "",
+                        manager,
+                        isPresentableText = false)
                   val first = fakeDeclaration.findFirstChildByType(
                       ScalaTokenTypes.tCOLON)
                   val last = fakeDeclaration.findFirstChildByType(
@@ -255,8 +262,8 @@ class ScalaInplaceVariableIntroducer(project: Project,
                     .createExpressionFromText("1 + 1", myFile.getManager)
                     .findElementAt(1)
                   val newWhiteSpace = holder.addBefore(whiteSpace, assign)
-                  holder.getNode.removeRange(
-                      colon.getNode, newWhiteSpace.getNode)
+                  holder.getNode
+                    .removeRange(colon.getNode, newWhiteSpace.getNode)
                   setDeclaration(holder)
                   commitDocument()
                 case enum: ScEnumerator
@@ -355,8 +362,8 @@ class ScalaInplaceVariableIntroducer(project: Project,
           myEditor.getUserData(ScalaIntroduceVariableHandler.REVERT_INFO)
         if (revertInfo != null) {
           extensions.inWriteAction {
-            myEditor.getDocument.replaceString(
-                0, myFile.getTextLength, revertInfo.fileText)
+            myEditor.getDocument
+              .replaceString(0, myFile.getTextLength, revertInfo.fileText)
           }
           myEditor.getCaretModel.moveToOffset(revertInfo.caretOffset)
           myEditor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
@@ -401,9 +408,8 @@ class ScalaInplaceVariableIntroducer(project: Project,
       val templateState: TemplateState =
         TemplateManagerImpl.getTemplateState(myEditor)
       if (named != null && templateState != null) {
-        val occurrences =
-          (for (i <- 0 to templateState.getSegmentsCount - 1) yield
-            templateState.getSegmentRange(i)).toArray
+        val occurrences = (for (i <- 0 to templateState.getSegmentsCount - 1)
+          yield templateState.getSegmentRange(i)).toArray
         val validator = ScalaVariableValidator(
             new BalloonConflictsReporter(myEditor),
             myProject,

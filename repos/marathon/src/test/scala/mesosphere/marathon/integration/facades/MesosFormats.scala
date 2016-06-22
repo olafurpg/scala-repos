@@ -50,11 +50,12 @@ object MesosFormats {
           .formatNullable[Map[String, ITResources]]
           .withDefault(Map.empty) ~ (__ \ "unreserved_resources")
           .formatNullable[ITResources]
-          .withDefault(ITResources.empty))(
-        ITAgent.apply, unlift(ITAgent.unapply))
+          .withDefault(ITResources.empty))(ITAgent.apply,
+                                           unlift(ITAgent.unapply))
 
   implicit lazy val ITStatusFormat: Format[ITMesosState] =
     ((__ \ "version").format[String] ~ (__ \ "git_tag").format[String] ~
-        (__ \ "slaves").format[Iterable[ITAgent]])(
-        ITMesosState.apply, unlift(ITMesosState.unapply))
+          (__ \ "slaves").format[Iterable[ITAgent]])(
+        ITMesosState.apply,
+        unlift(ITMesosState.unapply))
 }

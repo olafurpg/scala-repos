@@ -159,8 +159,8 @@ class GoToImplicitConversionAction
     if (editor.getSelectionModel.hasSelection) {
       val selectionStart = editor.getSelectionModel.getSelectionStart
       val selectionEnd = editor.getSelectionModel.getSelectionEnd
-      val opt = ScalaRefactoringUtil.getExpression(
-          project, editor, file, selectionStart, selectionEnd)
+      val opt = ScalaRefactoringUtil
+        .getExpression(project, editor, file, selectionStart, selectionEnd)
       opt match {
         case Some((expr, _)) =>
           if (forExpr(expr)) return
@@ -171,7 +171,7 @@ class GoToImplicitConversionAction
       val element: PsiElement = file.findElementAt(offset) match {
         case w: PsiWhiteSpace
             if w.getTextRange.getStartOffset == offset &&
-            w.getText.contains("\n") =>
+              w.getText.contains("\n") =>
           file.findElementAt(offset - 1)
         case p => p
       }
@@ -189,18 +189,21 @@ class GoToImplicitConversionAction
               }
             case expr: ScExpression
                 if guard ||
-                expr.getImplicitConversions(fromUnder = false)._2.isDefined ||
-                (ScUnderScoreSectionUtil.isUnderscoreFunction(expr) && expr
-                      .getImplicitConversions(fromUnder = true)
-                      ._2
-                      .isDefined) || (expr.getAdditionalExpression.isDefined &&
-                    expr.getAdditionalExpression.get._1
-                      .getImplicitConversions(
-                          fromUnder = false,
-                          expectedOption =
-                            Some(expr.getAdditionalExpression.get._2))
-                      ._2
-                      .isDefined) =>
+                  expr
+                    .getImplicitConversions(fromUnder = false)
+                    ._2
+                    .isDefined ||
+                  (ScUnderScoreSectionUtil.isUnderscoreFunction(expr) && expr
+                        .getImplicitConversions(fromUnder = true)
+                        ._2
+                        .isDefined) || (expr.getAdditionalExpression.isDefined &&
+                      expr.getAdditionalExpression.get._1
+                        .getImplicitConversions(
+                            fromUnder = false,
+                            expectedOption =
+                              Some(expr.getAdditionalExpression.get._2))
+                        ._2
+                        .isDefined) =>
               res += expr
             case _ =>
           }
@@ -214,8 +217,8 @@ class GoToImplicitConversionAction
         else getExpressions(guard = true)
       }
       def chooseExpression(expr: ScExpression) {
-        editor.getSelectionModel.setSelection(
-            expr.getTextRange.getStartOffset, expr.getTextRange.getEndOffset)
+        editor.getSelectionModel.setSelection(expr.getTextRange.getStartOffset,
+                                              expr.getTextRange.getEndOffset)
         forExpr(expr)
       }
       if (expressions.length == 0) editor.getSelectionModel.selectLineAtCaret()
@@ -247,8 +250,9 @@ class GoToImplicitConversionAction
 
     hintAlarm.addRequest(new Runnable {
       def run() {
-        hint = new LightBulbHint(
-            element.getEditor, project, element.getOldExpression)
+        hint = new LightBulbHint(element.getEditor,
+                                 project,
+                                 element.getOldExpression)
         hint.createHint(element.getFirstPart, element.getSecondPart)
         GoToImplicitConversionAction.getList.add(hint, 20, 0)
         hint.setBulbLayout()
@@ -266,8 +270,8 @@ class GoToImplicitConversionAction
           BorderFactory.createEmptyBorder(3, 3, 3, 3))
     private final val INDENT = 20
 
-    def createHint(
-        firstPart: Seq[PsiNamedElement], secondPart: Seq[PsiNamedElement]) {
+    def createHint(firstPart: Seq[PsiNamedElement],
+                   secondPart: Seq[PsiNamedElement]) {
       setOpaque(false)
       setBorder(INACTIVE_BORDER)
       setIcon(IconLoader.findIcon("/actions/intentionBulb.png"))

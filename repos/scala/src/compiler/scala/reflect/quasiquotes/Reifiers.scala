@@ -85,62 +85,64 @@ trait Reifiers { self: Quasiquotes =>
           case Bind(name, Ident(nme.WILDCARD)) => true
           case _ => false
         }
-        val cases =
-          if (isVarPattern) {
-            val Ident(name) :: Nil = freevars
-            // cq"$name: $treeType => $SomeModule($name)" :: Nil
-            CaseDef(Bind(name, Typed(Ident(nme.WILDCARD), TypeTree(treeType))),
-                    EmptyTree,
-                    Apply(Ident(SomeModule), List(Ident(name)))) :: Nil
-          } else {
-            val (succ, fail) = freevars match {
-              case Nil =>
-                // (q"true", q"false")
-                (Literal(Constant(true)), Literal(Constant(false)))
-              case head :: Nil =>
-                // (q"$SomeModule($head)", q"$NoneModule")
-                (Apply(Ident(SomeModule), List(head)), Ident(NoneModule))
-              case vars =>
-                // (q"$SomeModule((..$vars))", q"$NoneModule")
-                (Apply(Ident(SomeModule), List(SyntacticTuple(vars))),
-                 Ident(NoneModule))
-            }
-            val guard = nameMap.collect {
-              case (_, nameset) if nameset.size >= 2 =>
-                nameset.toList.sliding(2).map {
-                  case List(n1, n2) =>
-                    // q"$n1 == $n2"
-                    Apply(Select(Ident(n1), nme.EQ), List(Ident(n2)))
-                }
-            }.flatten
-              .reduceOption[Tree] { (l, r) =>
-                // q"$l && $r"
-                Apply(Select(l, nme.ZAND), List(r))
-              }
-              .getOrElse { EmptyTree }
-            // cq"$tree if $guard => $succ" :: cq"_ => $fail" :: Nil
-            CaseDef(tree, guard, succ) :: CaseDef(
-                Ident(nme.WILDCARD), EmptyTree, fail) :: Nil
+        val cases = if (isVarPattern) {
+          val Ident(name) :: Nil = freevars
+          // cq"$name: $treeType => $SomeModule($name)" :: Nil
+          CaseDef(Bind(name, Typed(Ident(nme.WILDCARD), TypeTree(treeType))),
+                  EmptyTree,
+                  Apply(Ident(SomeModule), List(Ident(name)))) :: Nil
+        } else {
+          val (succ, fail) = freevars match {
+            case Nil =>
+              // (q"true", q"false")
+              (Literal(Constant(true)), Literal(Constant(false)))
+            case head :: Nil =>
+              // (q"$SomeModule($head)", q"$NoneModule")
+              (Apply(Ident(SomeModule), List(head)), Ident(NoneModule))
+            case vars =>
+              // (q"$SomeModule((..$vars))", q"$NoneModule")
+              (Apply(Ident(SomeModule), List(SyntacticTuple(vars))),
+               Ident(NoneModule))
           }
+          val guard = nameMap.collect {
+            case (_, nameset) if nameset.size >= 2 =>
+              nameset.toList.sliding(2).map {
+                case List(n1, n2) =>
+                  // q"$n1 == $n2"
+                  Apply(Select(Ident(n1), nme.EQ), List(Ident(n2)))
+              }
+          }.flatten
+            .reduceOption[Tree] { (l, r) =>
+              // q"$l && $r"
+              Apply(Select(l, nme.ZAND), List(r))
+            }
+            .getOrElse { EmptyTree }
+          // cq"$tree if $guard => $succ" :: cq"_ => $fail" :: Nil
+          CaseDef(tree, guard, succ) :: CaseDef(Ident(nme.WILDCARD),
+                                                EmptyTree,
+                                                fail) :: Nil
+        }
         // q"new { def unapply(tree: $AnyClass) = { ..${unlifters.preamble()}; tree match { case ..$cases } } }.unapply(..$args)"
         Apply(
-            Select(SyntacticNew(
-                       Nil,
-                       Nil,
-                       noSelfType,
-                       List(
-                           DefDef(NoMods,
-                                  nme.unapply,
-                                  Nil,
-                                  List(List(ValDef(NoMods,
-                                                   nme.tree,
-                                                   TypeTree(AnyClass.toType),
-                                                   EmptyTree))),
-                                  TypeTree(),
-                                  SyntacticBlock(unlifters.preamble() :+ Match(
-                                          Ident(nme.tree),
-                                          cases))))),
-                   nme.unapply),
+            Select(
+                SyntacticNew(
+                    Nil,
+                    Nil,
+                    noSelfType,
+                    List(
+                        DefDef(
+                            NoMods,
+                            nme.unapply,
+                            Nil,
+                            List(List(ValDef(NoMods,
+                                             nme.tree,
+                                             TypeTree(AnyClass.toType),
+                                             EmptyTree))),
+                            TypeTree(),
+                            SyntacticBlock(
+                                unlifters.preamble() :+ Match(Ident(nme.tree),
+                                                              cases))))),
+                nme.unapply),
             args)
       }
 
@@ -187,8 +189,13 @@ trait Reifiers { self: Quasiquotes =>
         mirrorBuildCall(nme.mkRefTree, reify(qual), tree)
       case This(SymbolPlaceholder(Hole(tree, _))) if isReifyingExpressions =>
         mirrorCall(nme.This, tree)
-      case SyntacticTraitDef(
-          mods, name, tparams, earlyDefs, parents, selfdef, body) =>
+      case SyntacticTraitDef(mods,
+                             name,
+                             tparams,
+                             earlyDefs,
+                             parents,
+                             selfdef,
+                             body) =>
         reifyBuildCall(nme.SyntacticTraitDef,
                        mods,
                        name,
@@ -216,8 +223,11 @@ trait Reifiers { self: Quasiquotes =>
                         reify(parents),
                         reify(selfdef),
                         reify(body))
-      case SyntacticPackageObjectDef(
-          name, earlyDefs, parents, selfdef, body) =>
+      case SyntacticPackageObjectDef(name,
+                                     earlyDefs,
+                                     parents,
+                                     selfdef,
+                                     body) =>
         reifyBuildCall(nme.SyntacticPackageObjectDef,
                        name,
                        earlyDefs,
@@ -445,8 +455,11 @@ trait Reifiers { self: Quasiquotes =>
         reifyBuildCall(nme.SyntacticPatDef, mods, pat, tpt, rhs)
       case SyntacticValDef(mods, p @ Placeholder(h: ApplyHole), tpt, rhs)
           if h.tpe <:< treeType =>
-        mirrorBuildCall(
-            nme.SyntacticPatDef, reify(mods), h.tree, reify(tpt), reify(rhs))
+        mirrorBuildCall(nme.SyntacticPatDef,
+                        reify(mods),
+                        h.tree,
+                        reify(tpt),
+                        reify(rhs))
     }
 
     val fillListOfListsHole: PartialFunction[Any, Tree] = {
@@ -579,8 +592,8 @@ trait Reifiers { self: Quasiquotes =>
     private def cons(lhs: Tree, rhs: Tree) =
       Apply(collectionCons, lhs :: rhs :: Nil)
 
-    def reifyHighRankList(xs: List[Any])(
-        fill: PartialFunction[Any, Tree])(fallback: Any => Tree): Tree = {
+    def reifyHighRankList(xs: List[Any])(fill: PartialFunction[Any, Tree])(
+        fallback: Any => Tree): Tree = {
       val grouped = group(xs) { (a, b) =>
         !fill.isDefinedAt(a) && !fill.isDefinedAt(b)
       }

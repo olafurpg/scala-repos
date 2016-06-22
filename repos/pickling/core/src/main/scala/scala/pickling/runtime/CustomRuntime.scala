@@ -72,7 +72,8 @@ object CustomRuntime {
                                        |collTag: '${collTag.key}'
                                        |elemTag: '${elemTag.key}'
                                        |message:
-                                       |$msg""".stripMargin, cause)
+                                       |$msg""".stripMargin,
+                  cause)
             case e: Exception =>
               e.printStackTrace()
               throw PicklingException(
@@ -92,8 +93,9 @@ object CustomRuntime {
 
 class Tuple2RTKnownTagUnpickler[L, R](lhs: Unpickler[L], rhs: Unpickler[R])
     extends AbstractUnpickler[(L, R)] {
-  def unpickleField[T](
-      name: String, reader: PReader, unpickler: Unpickler[T]): T = {
+  def unpickleField[T](name: String,
+                       reader: PReader,
+                       unpickler: Unpickler[T]): T = {
     val reader1 = reader.readField(name)
     // TODO - Always elide tags?
     if (unpickler.tag.isEffectivelyPrimitive)
@@ -114,20 +116,19 @@ class Tuple2RTPickler() extends AbstractPicklerUnpickler[(Any, Any)] {
   def tag = FastTypeTag[(Any, Any)]
 
   def pickleField(name: String, value: Any, builder: PBuilder): Unit = {
-    val (tag1, pickler1) =
-      if (value == null) {
-        (FastTypeTag.Null.asInstanceOf[FastTypeTag[Any]],
-         Defaults.nullPickler.asInstanceOf[Pickler[Any]])
-      } else {
-        val clazz = value.getClass
-        val tag = FastTypeTag
-          .mkRaw(clazz, reflectRuntime.currentMirror)
-          .asInstanceOf[FastTypeTag[Any]]
-        val pickler = scala.pickling.internal.currentRuntime.picklers
-          .genPickler(clazz.getClassLoader, clazz, tag)
-          .asInstanceOf[Pickler[Any]]
-        (tag, pickler)
-      }
+    val (tag1, pickler1) = if (value == null) {
+      (FastTypeTag.Null.asInstanceOf[FastTypeTag[Any]],
+       Defaults.nullPickler.asInstanceOf[Pickler[Any]])
+    } else {
+      val clazz = value.getClass
+      val tag = FastTypeTag
+        .mkRaw(clazz, reflectRuntime.currentMirror)
+        .asInstanceOf[FastTypeTag[Any]]
+      val pickler = scala.pickling.internal.currentRuntime.picklers
+        .genPickler(clazz.getClassLoader, clazz, tag)
+        .asInstanceOf[Pickler[Any]]
+      (tag, pickler)
+    }
 
     builder.putField(name, b => {
       pickler1.pickle(value, b)
@@ -170,7 +171,8 @@ class Tuple2RTPickler() extends AbstractPicklerUnpickler[(Any, Any)] {
                                        |field name: '$name'
                                        |field tag: '${tag1}'
                                        |message:
-                                       |$msg""".stripMargin, cause)
+                                       |$msg""".stripMargin,
+                cause)
         }
       }
     }

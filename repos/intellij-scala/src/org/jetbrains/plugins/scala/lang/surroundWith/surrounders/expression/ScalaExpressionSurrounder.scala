@@ -29,15 +29,15 @@ abstract class ScalaExpressionSurrounder extends Surrounder {
     element match {
       case _: ScExpression | _: PsiWhiteSpace | _: ScValue | _: ScVariable |
           _: ScFunction | _: ScTypeAlias => {
-          true
-        }
+        true
+      }
       case e => {
-          if (ScalaPsiUtil.isLineTerminator(e)) true
-          else if (e.getNode.getElementType == ScalaTokenTypes.tSEMICOLON) true
-          else if (ScalaTokenTypes.COMMENTS_TOKEN_SET contains e.getNode.getElementType)
-            true
-          else false
-        }
+        if (ScalaPsiUtil.isLineTerminator(e)) true
+        else if (e.getNode.getElementType == ScalaTokenTypes.tSEMICOLON) true
+        else if (ScalaTokenTypes.COMMENTS_TOKEN_SET contains e.getNode.getElementType)
+          true
+        else false
+      }
     }
   }
 

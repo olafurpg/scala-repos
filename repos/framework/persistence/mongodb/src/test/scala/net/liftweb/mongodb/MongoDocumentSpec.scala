@@ -44,8 +44,7 @@ package mongodocumentspecs {
       jlb: java.lang.Byte,
       jlbool: java.lang.Boolean,
       jlsh: java.lang.Short
-  )
-      extends MongoDocument[Primitives] {
+  ) extends MongoDocument[Primitives] {
 
     def meta = Primitives
   }
@@ -62,8 +61,9 @@ package mongodocumentspecs {
     override def formats = super.formats + new ObjectIdSerializer
   }
 
-  case class OptionTestDoc(
-      _id: ObjectId, optNone: Option[String], optSome: Option[String])
+  case class OptionTestDoc(_id: ObjectId,
+                           optNone: Option[String],
+                           optSome: Option[String])
       extends MongoDocument[OptionTestDoc] {
     def meta = OptionTestDoc
   }
@@ -116,8 +116,8 @@ package mongodocumentspecs {
 class MongoDocumentSpec extends Specification with MongoTestKit {
   "MongoDocument Specification".title
 
-  def passSaveAndRetrieveTests(
-      obj: MongoDocument[_], meta: MongoDocumentMeta[_]): Result = {
+  def passSaveAndRetrieveTests(obj: MongoDocument[_],
+                               meta: MongoDocumentMeta[_]): Result = {
     obj.save
     val objFromDb = meta.find(obj._id.asInstanceOf[ObjectId])
     objFromDb.isDefined must_== true

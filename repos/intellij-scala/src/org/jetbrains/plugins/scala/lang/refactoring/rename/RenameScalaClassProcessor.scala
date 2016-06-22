@@ -34,8 +34,8 @@ class RenameScalaClassProcessor
     element.isInstanceOf[PsiClassWrapper] || element.isInstanceOf[ScTypeParam]
   }
 
-  override def substituteElementToRename(
-      element: PsiElement, editor: Editor): PsiElement = {
+  override def substituteElementToRename(element: PsiElement,
+                                         editor: Editor): PsiElement = {
     element match {
       case wrapper: PsiClassWrapper => wrapper.definition
       case _ => element
@@ -135,8 +135,8 @@ class RenameScalaClassProcessor
                              newName: String,
                              usages: Array[UsageInfo],
                              listener: RefactoringElementListener) {
-    ScalaRenameUtil.doRenameGenericNamedElement(
-        element, newName, usages, listener)
+    ScalaRenameUtil
+      .doRenameGenericNamedElement(element, newName, usages, listener)
   }
 }
 

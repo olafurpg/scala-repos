@@ -28,8 +28,8 @@ package com.twitter.scalding {
   import scala.util.Try
 
   trait ScaldingPrepare[C] extends Operation[C] {
-    abstract override def prepare(
-        flowProcess: FlowProcess[_], operationCall: OperationCall[C]) {
+    abstract override def prepare(flowProcess: FlowProcess[_],
+                                  operationCall: OperationCall[C]) {
       RuntimeStats.addFlowProcess(flowProcess)
       super.prepare(flowProcess, operationCall)
     }
@@ -94,8 +94,8 @@ package com.twitter.scalding {
     def operate(flowProcess: FlowProcess[_], functionCall: FunctionCall[Any]) {
       functionCall.getOutputCollector.add(functionCall.getArguments)
     }
-    override def cleanup(
-        flowProcess: FlowProcess[_], operationCall: OperationCall[Any]) {
+    override def cleanup(flowProcess: FlowProcess[_],
+                         operationCall: OperationCall[Any]) {
       Try.apply(lockedEf.get).foreach(_ ())
     }
   }
@@ -155,7 +155,8 @@ package com.twitter.scalding {
                          keyFields: Fields,
                          valueFields: Fields,
                          cacheSize: Option[Int])(
-      implicit conv: TupleConverter[V], set: TupleSetter[V])
+      implicit conv: TupleConverter[V],
+      set: TupleSetter[V])
       extends BaseOperation[MapsideCache[Tuple, V]](
           Fields.join(keyFields, valueFields))
       with Function[MapsideCache[Tuple, V]]
@@ -281,8 +282,7 @@ package com.twitter.scalding {
         Array("org.brianmckenna.wartremover.warts.OptionPartial"))
     private[this] def mergeTraversableOnce[K, V: Semigroup](
         items: TraversableOnce[(K, V)]): Map[K, V] = {
-      val mutable =
-        scala.collection.mutable.OpenHashMap[K, V]() // Scala's OpenHashMap seems faster than Java and Scala's HashMap Impl's
+      val mutable = scala.collection.mutable.OpenHashMap[K, V]() // Scala's OpenHashMap seems faster than Java and Scala's HashMap Impl's
       val innerIter = items.toIterator
       while (innerIter.hasNext) {
         val (k, v) = innerIter.next
@@ -352,15 +352,16 @@ package com.twitter.scalding {
     }
   }
 
-  class SummingMapsideCache[K, V](
-      flowProcess: FlowProcess[_], summingCache: SummingWithHitsCache[K, V])
+  class SummingMapsideCache[K, V](flowProcess: FlowProcess[_],
+                                  summingCache: SummingWithHitsCache[K, V])
       extends MapsideCache[K, V] {
-    private[this] val misses = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "misses"))
-    private[this] val hits = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "hits"))
+    private[this] val misses =
+      CounterImpl(flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "misses"))
+    private[this] val hits =
+      CounterImpl(flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "hits"))
     private[this] val evictions = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "evictions"))
+        flowProcess,
+        StatKey(MapsideReduce.COUNTER_GROUP, "evictions"))
 
     def flush = summingCache.flush
 
@@ -389,19 +390,22 @@ package com.twitter.scalding {
     }
   }
 
-  class AdaptiveMapsideCache[K, V](
-      flowProcess: FlowProcess[_], adaptiveCache: AdaptiveCache[K, V])
+  class AdaptiveMapsideCache[K, V](flowProcess: FlowProcess[_],
+                                   adaptiveCache: AdaptiveCache[K, V])
       extends MapsideCache[K, V] {
-    private[this] val misses = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "misses"))
-    private[this] val hits = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "hits"))
+    private[this] val misses =
+      CounterImpl(flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "misses"))
+    private[this] val hits =
+      CounterImpl(flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "hits"))
     private[this] val capacity = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "capacity"))
+        flowProcess,
+        StatKey(MapsideReduce.COUNTER_GROUP, "capacity"))
     private[this] val sentinel = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "sentinel"))
+        flowProcess,
+        StatKey(MapsideReduce.COUNTER_GROUP, "sentinel"))
     private[this] val evictions = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "evictions"))
+        flowProcess,
+        StatKey(MapsideReduce.COUNTER_GROUP, "evictions"))
 
     def flush = adaptiveCache.flush
 
@@ -447,13 +451,13 @@ package com.twitter.scalding {
       with ScaldingPrepare[C] {
     val lockedBf = Externalizer(() => bf)
     val lockedEf = Externalizer(ef)
-    override def prepare(
-        flowProcess: FlowProcess[_], operationCall: OperationCall[C]) {
+    override def prepare(flowProcess: FlowProcess[_],
+                         operationCall: OperationCall[C]) {
       operationCall.setContext(lockedBf.get.apply)
     }
 
-    override def cleanup(
-        flowProcess: FlowProcess[_], operationCall: OperationCall[C]) {
+    override def cleanup(flowProcess: FlowProcess[_],
+                         operationCall: OperationCall[C]) {
       lockedEf.get(operationCall.getContext)
     }
   }
@@ -473,8 +477,8 @@ package com.twitter.scalding {
       with Function[C] {
     val lockedFn = Externalizer(fn)
 
-    override def operate(
-        flowProcess: FlowProcess[_], functionCall: FunctionCall[C]) {
+    override def operate(flowProcess: FlowProcess[_],
+                         functionCall: FunctionCall[C]) {
       val context = functionCall.getContext
       val s = conv(functionCall.getArguments)
       val res = lockedFn.get(context, s)
@@ -497,8 +501,8 @@ package com.twitter.scalding {
       with Function[C] {
     val lockedFn = Externalizer(fn)
 
-    override def operate(
-        flowProcess: FlowProcess[_], functionCall: FunctionCall[C]) {
+    override def operate(flowProcess: FlowProcess[_],
+                         functionCall: FunctionCall[C]) {
       val context = functionCall.getContext
       val s = conv(functionCall.getArguments)
       lockedFn.get(context, s) foreach { t =>
@@ -624,20 +628,20 @@ package com.twitter.scalding {
      * reuse these objects, so any per instance state might give unexpected
      * results.
      */
-    override final def aggregate(
-        flowProcess: FlowProcess[_], args: TupleEntry, context: Tuple) = {
+    override final def aggregate(flowProcess: FlowProcess[_],
+                                 args: TupleEntry,
+                                 context: Tuple) = {
       var nextContext: Tuple = null
-      val newContextObj =
-        if (null == context) {
-          // First call, make a new mutable tuple to reduce allocations:
-          nextContext = Tuple.size(1)
-          first(args)
-        } else {
-          //We are updating
-          val oldValue = context.getObject(0).asInstanceOf[X]
-          nextContext = context
-          subsequent(oldValue, args)
-        }
+      val newContextObj = if (null == context) {
+        // First call, make a new mutable tuple to reduce allocations:
+        nextContext = Tuple.size(1)
+        first(args)
+      } else {
+        //We are updating
+        val oldValue = context.getObject(0).asInstanceOf[X]
+        nextContext = context
+        subsequent(oldValue, args)
+      }
       nextContext.set(0, newContextObj.asInstanceOf[AnyRef])
       //Return context for reuse next time:
       nextContext
@@ -694,8 +698,8 @@ package com.twitter.scalding {
       extends AggregateBy(
           arguments,
           new MRMFunctor[T, X](mfn, rfn, middleFields, startConv, midSet),
-          new MRMAggregator[X, X, U](
-              args => args, rfn, mfn2, declaredFields, midConv, endSet))
+          new MRMAggregator[X, X, U](args =>
+                args, rfn, mfn2, declaredFields, midConv, endSet))
 
   class BufferOp[I, T, X](
       @transient init: I,
@@ -750,20 +754,20 @@ package com.twitter.scalding {
     }
   }
 
-  class SampleWithReplacement(
-      frac: Double, val seed: Int = new java.util.Random().nextInt)
+  class SampleWithReplacement(frac: Double,
+                              val seed: Int = new java.util.Random().nextInt)
       extends BaseOperation[Poisson]()
       with Function[Poisson]
       with ScaldingPrepare[Poisson] {
-    override def prepare(
-        flowProcess: FlowProcess[_], operationCall: OperationCall[Poisson]) {
+    override def prepare(flowProcess: FlowProcess[_],
+                         operationCall: OperationCall[Poisson]) {
       super.prepare(flowProcess, operationCall)
       val p = new Poisson(frac, seed)
       operationCall.setContext(p);
     }
 
-    def operate(
-        flowProcess: FlowProcess[_], functionCall: FunctionCall[Poisson]) {
+    def operate(flowProcess: FlowProcess[_],
+                functionCall: FunctionCall[Poisson]) {
       val r = functionCall.getContext.nextInt
       for (i <- 0 until r) functionCall.getOutputCollector().add(Tuple.NULL)
     }

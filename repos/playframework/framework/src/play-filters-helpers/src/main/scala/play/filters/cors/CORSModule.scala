@@ -52,8 +52,8 @@ trait CORSComponents {
   implicit def materializer: Materializer
 
   lazy val corsConfig: CORSConfig = CORSConfig.fromConfiguration(configuration)
-  lazy val corsFilter: CORSFilter = new CORSFilter(
-      corsConfig, httpErrorHandler, corsPathPrefixes)
+  lazy val corsFilter: CORSFilter =
+    new CORSFilter(corsConfig, httpErrorHandler, corsPathPrefixes)
   lazy val corsPathPrefixes: Seq[String] = PlayConfig(configuration)
     .get[Seq[String]]("play.filters.cors.pathPrefixes")
 }

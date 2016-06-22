@@ -110,8 +110,8 @@ object Dependencies {
   val jodaConvert = "org.joda" % "joda-convert" % "1.8.1"
 
   def runtime(scalaVersion: String) =
-    slf4j ++ Seq("akka-actor", "akka-slf4j")
-      .map("com.typesafe.akka" %% _ % akkaVersion) ++ jacksons ++ Seq(
+    slf4j ++ Seq("akka-actor", "akka-slf4j").map(
+        "com.typesafe.akka" %% _ % akkaVersion) ++ jacksons ++ Seq(
         "org.scala-stm" %% "scala-stm" % "0.7",
         "commons-codec" % "commons-codec" % "1.10",
         jodatime,
@@ -124,8 +124,8 @@ object Dependencies {
         guava % Test,
         "org.scala-lang" % "scala-reflect" % scalaVersion,
         scalaJava8Compat
-    ) ++ scalaParserCombinators(scalaVersion) ++ specsBuild.map(_ % Test) ++ logback
-      .map(_ % Test) ++ javaTestDeps
+    ) ++ scalaParserCombinators(scalaVersion) ++ specsBuild
+      .map(_ % Test) ++ logback.map(_ % Test) ++ javaTestDeps
 
   val nettyVersion = "4.0.34.Final"
 
@@ -145,11 +145,12 @@ object Dependencies {
     Seq(
         "commons-io" % "commons-io" % "2.4",
         specsMatcherExtra % Test
-    ) ++ specsBuild.map(_ % Test) ++ logback.map(_ % Test) ++ scalaParserCombinators(
-        scalaVersion)
+    ) ++ specsBuild.map(_ % Test) ++ logback
+      .map(_ % Test) ++ scalaParserCombinators(scalaVersion)
 
-  private def sbtPluginDep(
-      sbtVersion: String, scalaVersion: String, moduleId: ModuleID) = {
+  private def sbtPluginDep(sbtVersion: String,
+                           scalaVersion: String,
+                           moduleId: ModuleID) = {
     moduleId.extra(
         "sbtVersion" -> CrossVersion.binarySbtVersion(sbtVersion),
         "scalaVersion" -> CrossVersion.binaryScalaVersion(scalaVersion)
@@ -278,7 +279,7 @@ object Dependencies {
 
   val playCacheDeps =
     "net.sf.ehcache" % "ehcache-core" % "2.6.11" +:
-    (specsBuild.map(_ % Test) ++ logback.map(_ % Test))
+      (specsBuild.map(_ % Test) ++ logback.map(_ % Test))
 
   val playWsDeps =
     Seq(
@@ -286,7 +287,7 @@ object Dependencies {
         "org.asynchttpclient" % "async-http-client" % "2.0.0-RC12"
     ) ++ Seq("signpost-core", "signpost-commonshttp4").map(
         "oauth.signpost" % _ % "1.2.1.2") ++ logback.map(_ % Test) ++
-    (specsBuild :+ specsMatcherExtra).map(_ % Test) :+ mockitoAll % Test
+      (specsBuild :+ specsMatcherExtra).map(_ % Test) :+ mockitoAll % Test
 
   val playDocsSbtPluginDependencies = Seq(
       "com.typesafe.play" %% "play-doc" % "1.3.0"

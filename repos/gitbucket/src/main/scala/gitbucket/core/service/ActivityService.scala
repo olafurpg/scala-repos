@@ -58,8 +58,9 @@ trait ActivityService {
       .list
 
   def recordCreateRepositoryActivity(
-      userName: String, repositoryName: String, activityUserName: String)(
-      implicit s: Session): Unit =
+      userName: String,
+      repositoryName: String,
+      activityUserName: String)(implicit s: Session): Unit =
     Activities insert Activity(
         userName,
         repositoryName,
@@ -97,12 +98,12 @@ trait ActivityService {
         Some(title),
         currentDate)
 
-  def recordClosePullRequestActivity(userName: String,
-                                     repositoryName: String,
-                                     activityUserName: String,
-                                     issueId: Int,
-                                     title: String)(
-      implicit s: Session): Unit =
+  def recordClosePullRequestActivity(
+      userName: String,
+      repositoryName: String,
+      activityUserName: String,
+      issueId: Int,
+      title: String)(implicit s: Session): Unit =
     Activities insert Activity(
         userName,
         repositoryName,
@@ -140,12 +141,12 @@ trait ActivityService {
         Some(cut(comment, 200)),
         currentDate)
 
-  def recordCommentPullRequestActivity(userName: String,
-                                       repositoryName: String,
-                                       activityUserName: String,
-                                       issueId: Int,
-                                       comment: String)(
-      implicit s: Session): Unit =
+  def recordCommentPullRequestActivity(
+      userName: String,
+      repositoryName: String,
+      activityUserName: String,
+      issueId: Int,
+      comment: String)(implicit s: Session): Unit =
     Activities insert Activity(
         userName,
         repositoryName,
@@ -197,12 +198,12 @@ trait ActivityService {
         Some(pageName + ":" + commitId),
         currentDate)
 
-  def recordPushActivity(userName: String,
-                         repositoryName: String,
-                         activityUserName: String,
-                         branchName: String,
-                         commits: List[JGitUtil.CommitInfo])(
-      implicit s: Session): Unit =
+  def recordPushActivity(
+      userName: String,
+      repositoryName: String,
+      activityUserName: String,
+      branchName: String,
+      commits: List[JGitUtil.CommitInfo])(implicit s: Session): Unit =
     Activities insert Activity(
         userName,
         repositoryName,
@@ -244,11 +245,11 @@ trait ActivityService {
         None,
         currentDate)
 
-  def recordCreateBranchActivity(userName: String,
-                                 repositoryName: String,
-                                 activityUserName: String,
-                                 branchName: String)(
-      implicit s: Session): Unit =
+  def recordCreateBranchActivity(
+      userName: String,
+      repositoryName: String,
+      activityUserName: String,
+      branchName: String)(implicit s: Session): Unit =
     Activities insert Activity(
         userName,
         repositoryName,

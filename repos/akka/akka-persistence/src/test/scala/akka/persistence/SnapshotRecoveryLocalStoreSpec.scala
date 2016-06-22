@@ -50,8 +50,10 @@ class SnapshotRecoveryLocalStoreSpec
         Props(classOf[SaveSnapshotTestPersistentActor],
               persistenceId,
               testActor))
-    val persistentActor2 = system.actorOf(Props(
-            classOf[SaveSnapshotTestPersistentActor], extendedName, testActor))
+    val persistentActor2 = system.actorOf(
+        Props(classOf[SaveSnapshotTestPersistentActor],
+              extendedName,
+              testActor))
     persistentActor1 ! TakeSnapshot
     persistentActor2 ! TakeSnapshot
     expectMsgAllOf(0L, 0L)
@@ -60,10 +62,10 @@ class SnapshotRecoveryLocalStoreSpec
   "A persistent actor which is persisted at the same time as another actor whose persistenceId is an extension of the first " must {
     "recover state only from its own correct snapshot file" in {
 
-      val recoveringActor =
-        system.actorOf(Props(classOf[LoadSnapshotTestPersistentActor],
-                             persistenceId,
-                             testActor))
+      val recoveringActor = system.actorOf(
+          Props(classOf[LoadSnapshotTestPersistentActor],
+                persistenceId,
+                testActor))
 
       expectMsgPF() {
         case SnapshotOffer(SnapshotMetadata(`persistenceId`, seqNo, timestamp),

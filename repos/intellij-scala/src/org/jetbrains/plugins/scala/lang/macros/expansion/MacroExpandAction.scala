@@ -68,7 +68,7 @@ class MacroExpandAction extends AnAction {
     resolved
       .find(
           _.expansion.place.line == sourceEditor.getCaretModel.getLogicalPosition.line +
-          1)
+            1)
       .map(expandMacroUnderCursor)
       .getOrElse(expandAllMacroInCurrentFile(resolved))
   }
@@ -147,9 +147,9 @@ class MacroExpandAction extends AnAction {
     res
   }
 
-  def applyExpansions(expansions: Seq[ResolvedMacroExpansion],
-                      triedResolving: Boolean = false)(
-      implicit e: AnActionEvent): Unit = {
+  def applyExpansions(
+      expansions: Seq[ResolvedMacroExpansion],
+      triedResolving: Boolean = false)(implicit e: AnActionEvent): Unit = {
     expansions match {
       case x :: xs =>
         try {
@@ -176,7 +176,8 @@ class MacroExpandAction extends AnAction {
         val body = expansion.body
         val newPsi =
           ScalaPsiElementFactory.createBlockExpressionWithoutBracesFromText(
-              body, PsiManager.getInstance(e.getProject))
+              body,
+              PsiManager.getInstance(e.getProject))
         reformatCode(newPsi)
         newPsi.firstChild match {
           case Some(block: ScBlock) =>
@@ -185,15 +186,16 @@ class MacroExpandAction extends AnAction {
             block.children
               .find(_.isInstanceOf[ScalaPsiElement])
               .foreach(p =>
-                    p.putCopyableUserData(
-                        MacroExpandAction.EXPANDED_KEY, holder.getText))
-            holder.getParent.addRangeAfter(
-                children.tail.head, children.dropRight(1).last, holder)
+                    p.putCopyableUserData(MacroExpandAction.EXPANDED_KEY,
+                                          holder.getText))
+            holder.getParent.addRangeAfter(children.tail.head,
+                                           children.dropRight(1).last,
+                                           holder)
             holder.delete()
           case Some(psi: PsiElement) => // defns/method bodies/etc...
             val result = holder.replace(psi)
-            result.putCopyableUserData(
-                MacroExpandAction.EXPANDED_KEY, holder.getText)
+            result.putCopyableUserData(MacroExpandAction.EXPANDED_KEY,
+                                       holder.getText)
           case None => LOG.warn(s"Failed to parse expansion: $body")
         }
       case other =>
@@ -205,7 +207,8 @@ class MacroExpandAction extends AnAction {
       implicit e: AnActionEvent) = {
     val blockImpl =
       ScalaPsiElementFactory.createBlockExpressionWithoutBracesFromText(
-          expansion.body, PsiManager.getInstance(e.getProject))
+          expansion.body,
+          PsiManager.getInstance(e.getProject))
     val element = call.getParent.addAfter(blockImpl, call)
     element match {
       case ScBlock(x, _ *) =>
@@ -276,8 +279,8 @@ class MacroExpandAction extends AnAction {
   def ensugarExpansion(text: String): String = {
 
     @tailrec
-    def applyRules(
-        rules: Seq[(String, String)], input: String = text): String = {
+    def applyRules(rules: Seq[(String, String)],
+                   input: String = text): String = {
       def pat(p: String) =
         Pattern.compile(p, Pattern.DOTALL | Pattern.MULTILINE)
       rules match {

@@ -78,9 +78,11 @@ class HashedRelationSuite extends SparkFunSuite with SharedSQLContext {
     val hashed = UnsafeHashedRelation(unsafeData.iterator, keyGenerator, 1)
     assert(hashed.isInstanceOf[UnsafeHashedRelation])
 
-    assert(hashed.get(unsafeData(0)) === CompactBuffer[InternalRow](
+    assert(
+        hashed.get(unsafeData(0)) === CompactBuffer[InternalRow](
             unsafeData(0)))
-    assert(hashed.get(unsafeData(1)) === CompactBuffer[InternalRow](
+    assert(
+        hashed.get(unsafeData(1)) === CompactBuffer[InternalRow](
             unsafeData(1)))
     assert(hashed.get(toUnsafe(InternalRow(10))) === null)
 
@@ -95,9 +97,11 @@ class HashedRelationSuite extends SparkFunSuite with SharedSQLContext {
     val in = new ObjectInputStream(new ByteArrayInputStream(os.toByteArray))
     val hashed2 = new UnsafeHashedRelation()
     hashed2.readExternal(in)
-    assert(hashed2.get(unsafeData(0)) === CompactBuffer[InternalRow](
+    assert(
+        hashed2.get(unsafeData(0)) === CompactBuffer[InternalRow](
             unsafeData(0)))
-    assert(hashed2.get(unsafeData(1)) === CompactBuffer[InternalRow](
+    assert(
+        hashed2.get(unsafeData(1)) === CompactBuffer[InternalRow](
             unsafeData(1)))
     assert(hashed2.get(toUnsafe(InternalRow(10))) === null)
     assert(hashed2.get(unsafeData(2)) === data2)
@@ -135,9 +139,9 @@ class HashedRelationSuite extends SparkFunSuite with SharedSQLContext {
   }
 
   test("LongArrayRelation") {
-    val unsafeProj =
-      UnsafeProjection.create(Seq(BoundReference(0, IntegerType, false),
-                                  BoundReference(1, IntegerType, true)))
+    val unsafeProj = UnsafeProjection.create(
+        Seq(BoundReference(0, IntegerType, false),
+            BoundReference(1, IntegerType, true)))
     val rows = (0 until 100).map(i => unsafeProj(InternalRow(i, i + 1)).copy())
     val keyProj =
       UnsafeProjection.create(Seq(BoundReference(0, IntegerType, false)))

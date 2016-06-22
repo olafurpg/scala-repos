@@ -118,8 +118,8 @@ class Netty4ClientChannelInitializerTest
   test("Netty4ClientChannelInitializer pipelines enforce read timeouts") {
     @volatile var observedExn: Throwable = null
     val exnSnooper = new ChannelInboundHandlerAdapter {
-      override def exceptionCaught(
-          ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+      override def exceptionCaught(ctx: ChannelHandlerContext,
+                                   cause: Throwable): Unit = {
         observedExn = cause
         super.exceptionCaught(ctx, cause)
       }
@@ -127,7 +127,7 @@ class Netty4ClientChannelInitializerTest
     new Ctx {
       override def params =
         Params.empty +
-        Transport.Liveness(readTimeout = 1.millisecond, Duration.Top, None)
+          Transport.Liveness(readTimeout = 1.millisecond, Duration.Top, None)
 
       initChannel()
       client.pipeline.addLast(exnSnooper)
@@ -142,8 +142,8 @@ class Netty4ClientChannelInitializerTest
   test("Netty4ClientChannelInitializer pipelines enforce write timeouts") {
     @volatile var observedExn: Throwable = null
     val exnSnooper = new ChannelInboundHandlerAdapter {
-      override def exceptionCaught(
-          ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+      override def exceptionCaught(ctx: ChannelHandlerContext,
+                                   cause: Throwable): Unit = {
         observedExn = cause
         super.exceptionCaught(ctx, cause)
       }
@@ -159,7 +159,7 @@ class Netty4ClientChannelInitializerTest
     new Ctx {
       override def params =
         Params.empty +
-        Transport.Liveness(Duration.Top, writeTimeout = 1.millisecond, None)
+          Transport.Liveness(Duration.Top, writeTimeout = 1.millisecond, None)
 
       initChannel()
       client.pipeline.addLast(exnSnooper)
@@ -224,7 +224,9 @@ class Netty4ClientChannelInitializerTest
       }
     }
     val init = new RawNetty4ClientChannelInitializer[ByteBuf, ByteBuf](
-        p, Params.empty, _.addLast(reverser))
+        p,
+        Params.empty,
+        _.addLast(reverser))
 
     val channel: SocketChannel = new NioSocketChannel()
     val loop = new NioEventLoopGroup()

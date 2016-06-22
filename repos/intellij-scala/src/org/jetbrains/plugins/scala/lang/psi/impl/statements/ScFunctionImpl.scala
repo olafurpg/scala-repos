@@ -22,8 +22,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScFunctionStub
 /**
   * @author ilyas
   */
-abstract class ScFunctionImpl protected (
-    stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
+abstract class ScFunctionImpl protected (stub: StubElement[ScFunction],
+                                         nodeType: IElementType,
+                                         node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScMember
     with ScFunction
@@ -37,8 +38,8 @@ abstract class ScFunctionImpl protected (
     }
     if (n == null) {
       return ScalaPsiElementFactory
-        .createIdentifier(
-            getStub.asInstanceOf[ScFunctionStub].getName, getManager)
+        .createIdentifier(getStub.asInstanceOf[ScFunctionStub].getName,
+                          getManager)
         .getPsi
     }
     n.getPsi
@@ -53,8 +54,9 @@ abstract class ScFunctionImpl protected (
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
     // process function's process type parameters
-    if (!super [ScTypeParametersOwner].processDeclarations(
-            processor, state, lastParent, place)) return false
+    if (!super[ScTypeParametersOwner]
+          .processDeclarations(processor, state, lastParent, place))
+      return false
 
     lazy val parameterIncludingSynthetic: Seq[ScParameter] =
       effectiveParameterClauses.flatMap(_.effectiveParameters)
@@ -62,7 +64,7 @@ abstract class ScFunctionImpl protected (
       returnTypeElement match {
         case Some(x)
             if lastParent != null &&
-            x.startOffsetInParent == lastParent.startOffsetInParent =>
+              x.startOffsetInParent == lastParent.startOffsetInParent =>
           for (p <- parameterIncludingSynthetic) {
             ProgressManager.checkCanceled()
             if (!processor.execute(p, state)) return false

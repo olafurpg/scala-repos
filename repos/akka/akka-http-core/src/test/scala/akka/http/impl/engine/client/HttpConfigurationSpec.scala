@@ -106,7 +106,8 @@ class HttpConfigurationSpec extends AkkaSpec {
     }
 
     "change parser settings for all by setting `akka.http.parsing`, unless client/server override it" in {
-      configuredSystem("""
+      configuredSystem(
+          """
         akka.http {
           parsing.illegal-header-warnings = off
           server.parsing.illegal-header-warnings = on
@@ -125,7 +126,8 @@ class HttpConfigurationSpec extends AkkaSpec {
     }
 
     "change parser settings for all by setting `akka.http.parsing`, unless all override it" in {
-      configuredSystem("""
+      configuredSystem(
+          """
         akka.http {
           parsing.illegal-header-warnings = off
           server.parsing.illegal-header-warnings = on

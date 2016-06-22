@@ -37,7 +37,7 @@ object ClassPath {
     def lsDir(dir: Directory, filt: String => Boolean = _ => true) =
       dir.list filter (x =>
             filt(x.name) && (x.isDirectory || isJarOrZip(x))) map
-      (_.path) toList
+        (_.path) toList
 
     if (pattern == "*") lsDir(Directory("."))
     else if (pattern endsWith wildSuffix) lsDir(Directory(pattern dropRight 2))
@@ -72,7 +72,7 @@ object ClassPath {
       case null => Nil
       case dir =>
         dir filter (_.isClassContainer) map
-        (x => new java.io.File(dir.file, x.name) getPath) toList
+          (x => new java.io.File(dir.file, x.name) getPath) toList
     }
   }
 
@@ -115,8 +115,8 @@ object ClassPath {
 
     def sourcesInPath(path: String): List[ClassPath[T]] =
       for (file <- expandPath(path, expandStar = false);
-           dir <- Option(AbstractFile getDirectory file)) yield
-        new SourcePath[T](dir, this)
+           dir <- Option(AbstractFile getDirectory file))
+        yield new SourcePath[T](dir, this)
   }
 
   def manifests: List[java.net.URL] = {
@@ -276,8 +276,8 @@ class SourcePath[T](dir: AbstractFile, val context: ClassPathContext[T])
 /**
   * A directory (or a .jar file) containing classfiles and packages
   */
-class DirectoryClassPath(
-    val dir: AbstractFile, val context: ClassPathContext[AbstractFile])
+class DirectoryClassPath(val dir: AbstractFile,
+                         val context: ClassPathContext[AbstractFile])
     extends ClassPath[AbstractFile] {
   import FileUtils.AbstractFileOps
 
@@ -317,10 +317,10 @@ class DirectoryClassPath(
   override def toString() = "directory classpath: " + origin.getOrElse("?")
 }
 
-class DeltaClassPath[T](
-    original: MergedClassPath[T], subst: Map[ClassPath[T], ClassPath[T]])
-    extends MergedClassPath[T](
-        original.entries map (e => subst getOrElse (e, e)), original.context) {
+class DeltaClassPath[T](original: MergedClassPath[T],
+                        subst: Map[ClassPath[T], ClassPath[T]])
+    extends MergedClassPath[T](original.entries map (e =>
+              subst getOrElse (e, e)), original.context) {
   // not sure we should require that here. Commented out for now.
   // require(subst.keySet subsetOf original.entries.toSet)
   // We might add specialized operations for computing classes packages here. Not sure it's worth it.
@@ -333,8 +333,8 @@ class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
                          val context: ClassPathContext[T])
     extends ClassPath[T] {
 
-  def this(
-      entries: TraversableOnce[ClassPath[T]], context: ClassPathContext[T]) =
+  def this(entries: TraversableOnce[ClassPath[T]],
+           context: ClassPathContext[T]) =
     this(entries.toIndexedSeq, context)
 
   def name = entries.head.name
@@ -345,7 +345,7 @@ class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
   override def origin =
     Some(
         entries map (x => x.origin getOrElse x.name) mkString
-        ("Merged(", ", ", ")"))
+          ("Merged(", ", ", ")"))
   override def asClassPathString: String =
     join(entries map (_.asClassPathString): _*)
 
@@ -402,8 +402,8 @@ class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
 
   def show() {
     println(
-        "ClassPath %s has %d entries and results in:\n".format(
-            name, entries.size))
+        "ClassPath %s has %d entries and results in:\n".format(name,
+                                                               entries.size))
     asClassPathString split ':' foreach (x => println("  " + x))
   }
 
@@ -415,6 +415,6 @@ class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
   * The classpath when compiling with target:jvm. Binary files (classfiles) are represented
   * as AbstractFile. nsc.io.ZipArchive is used to view zip/jar archives as directories.
   */
-class JavaClassPath(
-    containers: IndexedSeq[ClassPath[AbstractFile]], context: JavaContext)
+class JavaClassPath(containers: IndexedSeq[ClassPath[AbstractFile]],
+                    context: JavaContext)
     extends MergedClassPath[AbstractFile](containers, context) {}

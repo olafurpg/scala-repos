@@ -105,8 +105,8 @@ trait Parsers { self: Quasiquotes =>
         }
 
         // tq"$a => $b"
-        override def makeFunctionTypeTree(
-            argtpes: List[Tree], restpe: Tree): Tree =
+        override def makeFunctionTypeTree(argtpes: List[Tree],
+                                          restpe: Tree): Tree =
           FunctionTypePlaceholder(argtpes, restpe)
 
         // make q"val (x: T) = rhs" be equivalent to q"val x: T = rhs" for sake of bug compatibility (SI-8211)
@@ -120,8 +120,9 @@ trait Parsers { self: Quasiquotes =>
       import treeBuilder.{global => _, unit => _}
 
       // q"def foo($x)"
-      override def param(
-          owner: Name, implicitmod: Int, caseParam: Boolean): ValDef =
+      override def param(owner: Name,
+                         implicitmod: Int,
+                         caseParam: Boolean): ValDef =
         if (isHole &&
             lookingAhead { in.token == COMMA || in.token == RPAREN }) {
           ParamPlaceholder(implicitmod, ident())
@@ -215,8 +216,8 @@ trait Parsers { self: Quasiquotes =>
           stats
       }
 
-      override def enumerator(
-          isFirst: Boolean, allowNestedIf: Boolean = true) =
+      override def enumerator(isFirst: Boolean,
+                              allowNestedIf: Boolean = true) =
         if (isHole && lookingAhead {
               in.token == EOF || in.token == RPAREN || isStatSep
             }) {

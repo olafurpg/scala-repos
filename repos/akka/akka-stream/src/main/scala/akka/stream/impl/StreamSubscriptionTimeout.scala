@@ -64,8 +64,8 @@ private[akka] trait StreamSubscriptionTimeoutSupport {
     * Schedules a Subscription timeout.
     * The actor will receive the message created by the provided block if the timeout triggers.
     */
-  protected def scheduleSubscriptionTimeout(
-      actor: ActorRef, message: Any): Cancellable =
+  protected def scheduleSubscriptionTimeout(actor: ActorRef,
+                                            message: Any): Cancellable =
     subscriptionTimeoutSettings.mode match {
       case NoopTermination ⇒
         NoopSubscriptionTimeout
@@ -96,7 +96,7 @@ private[akka] trait StreamSubscriptionTimeoutSupport {
             target,
             new SubscriptionTimeoutException(
                 s"Publisher ($p) you are trying to subscribe to has been shut-down " +
-                s"because exceeding it's subscription-timeout.")
+                  s"because exceeding it's subscription-timeout.")
             with NoStackTrace)
     }
   }
@@ -123,8 +123,8 @@ private[akka] trait StreamSubscriptionTimeoutSupport {
   /**
     * Callback that should ensure that the target is canceled with the given cause.
     */
-  protected def handleSubscriptionTimeout(
-      target: Publisher[_], cause: Exception): Unit
+  protected def handleSubscriptionTimeout(target: Publisher[_],
+                                          cause: Exception): Unit
 }
 
 /**

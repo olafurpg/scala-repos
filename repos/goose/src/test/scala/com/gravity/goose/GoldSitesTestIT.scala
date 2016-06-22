@@ -23,8 +23,9 @@ class GoldSitesTestIT {
     val title =
       "Giovani, anziani, asili nido e soldi per il Sud ecco il progetto del governo per l'equità "
     val article = TestUtils.getArticle(url)
-    TestUtils.runArticleAssertions(
-        article = article, expectedTitle = title, expectedStart = content)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedTitle = title,
+                                   expectedStart = content)
     TestUtils.printReport()
   }
 
@@ -105,8 +106,9 @@ class GoldSitesTestIT {
     val content =
       "There's discord on Wall Street: Strategists at major American investment banks see a"
     val image = "http://images.businessweek.com/mz/covers/current_120x160.jpg"
-    TestUtils.runArticleAssertions(
-        article = article, expectedStart = content, expectedImage = image)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedStart = content,
+                                   expectedImage = image)
   }
 
   @Test
@@ -120,8 +122,9 @@ class GoldSitesTestIT {
       "Not everyone's a fan of Ben & Jerry's new \"Schweddy Balls\" -- the Saturday Night Live-inspired flavor it rolled out a few weeks ago"
     val image =
       "http://static7.businessinsider.com/image/4e68c8c36bb3f7d80a000016/conservative-moms-are-now-calling-for-a-boycott-of-ben-and-jerrys-schweddy-balls-flavor.jpg"
-    TestUtils.runArticleAssertions(
-        article = article, expectedStart = content, expectedImage = image)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedStart = content,
+                                   expectedImage = image)
   }
 
   @Test
@@ -145,8 +148,9 @@ class GoldSitesTestIT {
       "Russia's announcement that it will help Iran get nuclear fuel is raising questions"
     val image =
       "http://a57.foxnews.com/static/managed/img/Politics/396/223/startsign.jpg"
-    TestUtils.runArticleAssertions(
-        article = article, expectedStart = content, expectedImage = image)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedStart = content,
+                                   expectedImage = image)
   }
 
   @Test
@@ -159,8 +163,9 @@ class GoldSitesTestIT {
       "The director of the controversial loan program that cleared the way for a $535"
     val image =
       "http://a57.foxnews.com/static/managed/img/Politics/396/223/silver_jonathan.jpg"
-    TestUtils.runArticleAssertions(
-        article = article, expectedStart = content, expectedImage = image)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedStart = content,
+                                   expectedImage = image)
   }
 
   @Test
@@ -173,8 +178,9 @@ class GoldSitesTestIT {
       "The death of technology titan Steve Jobs, co-founder and former CEO of Apple"
     val image =
       "http://msnbcmedia.msn.com/j/MSNBC/Components/Photo/_new/tz-biz-11106-applefuture-108p.nv_auth_landscape.jpg"
-    TestUtils.runArticleAssertions(
-        article = article, expectedStart = content, expectedImage = image)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedStart = content,
+                                   expectedImage = image)
   }
 
   @Test
@@ -186,8 +192,9 @@ class GoldSitesTestIT {
     val content =
       "Everyone knows Steve Jobs pulled off one of the outstanding corporate turnarounds in U.S. history"
     val image = "http://www.latimes.com/media/photo/2011-10/65235661.jpg"
-    TestUtils.runArticleAssertions(
-        article = article, expectedStart = content, expectedImage = image)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedStart = content,
+                                   expectedImage = image)
     TestUtils.printReport()
   }
 
@@ -201,8 +208,9 @@ class GoldSitesTestIT {
       "WASHINGTON (Aug. 13) -- Declaring \"the maritime soul of the Marine Corps\" is"
     val image =
       "http://o.aolcdn.com/photo-hub/news_gallery/6/8/680919/1281734929876.JPEG"
-    TestUtils.runArticleAssertions(
-        article = article, expectedStart = content, expectedImage = image)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedStart = content,
+                                   expectedImage = image)
   }
 
   @Test
@@ -215,8 +223,9 @@ class GoldSitesTestIT {
       "The Obama administration has paid out less than a third of the nearly $230 billion"
     val image =
       "http://s.wsj.net/public/resources/images/OB-JO759_0814st_A_20100814143158.jpg"
-    TestUtils.runArticleAssertions(
-        article = article, expectedStart = content, expectedImage = image)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedStart = content,
+                                   expectedImage = image)
   }
 
   @Test
@@ -228,8 +237,9 @@ class GoldSitesTestIT {
     val content = "Brett Favre couldn't get away from the"
     val image =
       "http://i.usatoday.net/communitymanager/_photos/the-huddle/2010/08/18/favrespeaksx-inset-community.jpg"
-    TestUtils.runArticleAssertions(
-        article = article, expectedStart = content, expectedImage = image)
+    TestUtils.runArticleAssertions(article = article,
+                                   expectedStart = content,
+                                   expectedImage = image)
   }
 
   @Test
@@ -663,12 +673,13 @@ class GoldSitesTestIT {
     implicit val config = TestUtils.DEFAULT_CONFIG
     val article = TestUtils.getArticle(url)
 
-    TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart =
-          "From Goldman on the FOMC operation twist announcement",
-        expectedImage =
-          "http://static8.businessinsider.com/image/4e7a0dd26bb3f7da4800003d/goldman-4-key-points-on-the-fomc-announcement.jpg")
+    TestUtils
+      .runArticleAssertions(
+          article = article,
+          expectedStart =
+            "From Goldman on the FOMC operation twist announcement",
+          expectedImage =
+            "http://static8.businessinsider.com/image/4e7a0dd26bb3f7da4800003d/goldman-4-key-points-on-the-fomc-announcement.jpg")
     TestUtils.printReport()
   }
 

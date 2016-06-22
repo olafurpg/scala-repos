@@ -26,8 +26,9 @@ import scala.collection.mutable.ArrayBuffer
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */
-class ScAccessModifierImpl private (
-    stub: StubElement[ScAccessModifier], nodeType: IElementType, node: ASTNode)
+class ScAccessModifierImpl private (stub: StubElement[ScAccessModifier],
+                                    nodeType: IElementType,
+                                    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScAccessModifier {
   def this(node: ASTNode) = { this(null, null, node) }

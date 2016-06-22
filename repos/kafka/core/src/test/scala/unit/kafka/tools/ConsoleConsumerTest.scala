@@ -111,7 +111,7 @@ class ConsoleConsumerTest extends JUnitSuite {
 
     val config = new ConsoleConsumer.ConsumerConfig(args)
 
-    assertEquals(
-        "1000", config.consumerProps.getProperty("consumer.timeout.ms"))
+    assertEquals("1000",
+                 config.consumerProps.getProperty("consumer.timeout.ms"))
   }
 }

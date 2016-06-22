@@ -79,7 +79,8 @@ object Test {
   def ruleMemberDeclaring(c: Class[_]) = {
     if (c.isMemberClass)
       assert(
-          c.getDeclaringClass.getDeclaredClasses.toList.map(_.getName) contains c.getName)
+          c.getDeclaringClass.getDeclaredClasses.toList
+            .map(_.getName) contains c.getName)
   }
 
   def ruleScalaAnonClassIsLocal(c: Class[_]) = {

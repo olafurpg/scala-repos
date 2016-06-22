@@ -27,8 +27,8 @@ object SimpleType {
             isPattern: Boolean,
             multipleSQBrackets: Boolean = true): Boolean = {
     @tailrec
-    def parseTail(
-        curMarker: PsiBuilder.Marker, checkSQBracket: Boolean = true) {
+    def parseTail(curMarker: PsiBuilder.Marker,
+                  checkSQBracket: Boolean = true) {
       builder.getTokenType match {
         case ScalaTokenTypes.tLSQBRACKET if checkSQBracket =>
           val newMarker = curMarker.precede

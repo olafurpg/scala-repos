@@ -65,8 +65,8 @@ class SubscribersKeeperActor(val store: EntityStore[EventSubscribers])
       if (existingSubscribers.urls.contains(callbackUrl))
         EventSubscribers(existingSubscribers.urls - callbackUrl)
       else {
-        log.warning(
-            "Attempted to unsubscribe nonexistent callback {}", callbackUrl)
+        log.warning("Attempted to unsubscribe nonexistent callback {}",
+                    callbackUrl)
         existingSubscribers
       }
     }

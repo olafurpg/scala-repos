@@ -117,7 +117,7 @@ package object scala {
   val Right = scala.util.Right
 
   // Annotations which we might move to annotation.*
-/*
+  /*
   type SerialVersionUID = annotation.SerialVersionUID
   type deprecated = annotation.deprecated
   type deprecatedName = annotation.deprecatedName

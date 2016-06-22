@@ -69,8 +69,9 @@ private object PoolFlow {
     - Simple merge of the Connection Slots' outputs
 
    */
-  def apply(connectionFlow: Flow[
-                HttpRequest, HttpResponse, Future[Http.OutgoingConnection]],
+  def apply(connectionFlow: Flow[HttpRequest,
+                                 HttpResponse,
+                                 Future[Http.OutgoingConnection]],
             remoteAddress: InetSocketAddress,
             settings: ConnectionPoolSettings,
             log: LoggingAdapter)(

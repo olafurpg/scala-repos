@@ -44,14 +44,14 @@ object CanFilterMedian {
 
           overhang match {
             case OptOverhang.PreserveLength => {
-                //calculate beginning and end separately, for partial-windows (no overhang)
-                for (indexFromBeginning <- 0 until halfWindow) tempret(
-                    indexFromBeginning) = median(
+              //calculate beginning and end separately, for partial-windows (no overhang)
+              for (indexFromBeginning <- 0 until halfWindow)
+                tempret(indexFromBeginning) = median(
                     data(0 to indexFromBeginning * 2))
-                for (indexToEnd <- 0 until halfWindow) tempret(
-                    data.length - indexToEnd - 1) = median(
+              for (indexToEnd <- 0 until halfWindow)
+                tempret(data.length - indexToEnd - 1) = median(
                     data(data.length - 2 * indexToEnd - 1 until data.length))
-              }
+            }
             case OptOverhang.None => {}
             case opt: OptOverhang =>
               throw new IllegalArgumentException(
@@ -100,8 +100,10 @@ object CanFilterMedian {
         }
       }
 
-      def findAndReplaceInstanceInPlace(
-          arr: Array[T], fromValue: T, toValue: T, pivotPoint: Int): Unit = {
+      def findAndReplaceInstanceInPlace(arr: Array[T],
+                                        fromValue: T,
+                                        toValue: T,
+                                        pivotPoint: Int): Unit = {
         val pivotValue: T = arr(pivotPoint)
         var found = false
 

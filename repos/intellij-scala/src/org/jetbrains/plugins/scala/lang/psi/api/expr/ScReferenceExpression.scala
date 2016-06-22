@@ -73,7 +73,8 @@ trait ScReferenceExpression
   def shapeType: TypeResult[ScType]
 
   override def createReplacingElementWithClassName(
-      useFullQualifiedName: Boolean, clazz: TypeToImport) = {
+      useFullQualifiedName: Boolean,
+      clazz: TypeToImport) = {
     if (useFullQualifiedName) {
       super.createReplacingElementWithClassName(useFullQualifiedName, clazz)
     } else {
@@ -83,8 +84,8 @@ trait ScReferenceExpression
     }
   }
 
-  def bindToElement(
-      element: PsiElement, containingClass: Option[PsiClass]): PsiElement
+  def bindToElement(element: PsiElement,
+                    containingClass: Option[PsiClass]): PsiElement
 
   def getPrevTypeInfoParams: Seq[TypeParameter]
 

@@ -19,8 +19,8 @@ object Macros {
     import c.universe._
     val tpe = weakTypeOf[T]
     if (tpe.members.exists(_.info =:= typeOf[Int]))
-      c.abort(
-          c.enclosingPosition, "I don't like classes that contain integers")
+      c.abort(c.enclosingPosition,
+              "I don't like classes that contain integers")
     q"new Foo[$tpe]{ override def toString = ${tpe.toString} }"
   }
 }

@@ -45,8 +45,8 @@ trait Encoder[T] {
   /**
     * Decodes a vector back to a Counter[T,Double]
     */
-  def decode(
-      v: Vector[Double], keepZeros: Boolean = false): Counter[T, Double] = {
+  def decode(v: Vector[Double],
+             keepZeros: Boolean = false): Counter[T, Double] = {
     val ctr = Counter[T, Double]()
     for ((i, v) <- v.active.pairs) {
       if (keepZeros || v != 0.0) ctr(index.get(i)) = v

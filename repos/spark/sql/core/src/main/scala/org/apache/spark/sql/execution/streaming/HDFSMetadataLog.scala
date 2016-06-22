@@ -47,13 +47,12 @@ class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String)
 
   private val metadataPath = new Path(path)
 
-  private val fc =
-    if (metadataPath.toUri.getScheme == null) {
-      FileContext.getFileContext(sqlContext.sparkContext.hadoopConfiguration)
-    } else {
-      FileContext.getFileContext(
-          metadataPath.toUri, sqlContext.sparkContext.hadoopConfiguration)
-    }
+  private val fc = if (metadataPath.toUri.getScheme == null) {
+    FileContext.getFileContext(sqlContext.sparkContext.hadoopConfiguration)
+  } else {
+    FileContext.getFileContext(metadataPath.toUri,
+                               sqlContext.sparkContext.hadoopConfiguration)
+  }
 
   if (!fc.util().exists(metadataPath)) {
     fc.mkdir(metadataPath, FsPermission.getDirDefault, true)
@@ -125,13 +124,15 @@ class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String)
             // If "rename" fails, it means some other "HDFSMetadataLog" has committed the batch.
             // So throw an exception to tell the user this is not a valid behavior.
             throw new ConcurrentModificationException(
-                s"Multiple HDFSMetadataLog are using $path", e)
+                s"Multiple HDFSMetadataLog are using $path",
+                e)
           case e: FileNotFoundException =>
             // Sometimes, "create" will succeed when multiple writers are calling it at the same
             // time. However, only one writer can call "rename" successfully, others will get
             // FileNotFoundException because the first writer has removed it.
             throw new ConcurrentModificationException(
-                s"Multiple HDFSMetadataLog are using $path", e)
+                s"Multiple HDFSMetadataLog are using $path",
+                e)
         }
       } catch {
         case e: IOException if isFileAlreadyExistsException(e) =>

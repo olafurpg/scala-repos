@@ -73,8 +73,7 @@ class MultiReaderTest
           val promise = new Promise[Response]()
           executor match {
             case Some(exec) =>
-              exec.submit(
-                  new Runnable {
+              exec.submit(new Runnable {
                 def run() {
                   promise.setValue(interpreter(request))
                 }
@@ -96,8 +95,11 @@ class MultiReaderTest
     }.toMap
 
     lazy val mockClientBuilder = {
-      val result = mock[ClientBuilder[
-              Command, Response, Nothing, ClientConfig.Yes, ClientConfig.Yes]]
+      val result = mock[ClientBuilder[Command,
+                                      Response,
+                                      Nothing,
+                                      ClientConfig.Yes,
+                                      ClientConfig.Yes]]
 
       hosts.foreach { host =>
         val mockHostClientBuilder = mock[ClientBuilder[Command,
@@ -184,8 +186,7 @@ class MultiReaderTest
           val promise = new Promise[Response]()
           executor match {
             case Some(exec) =>
-              exec.submit(
-                  new Runnable {
+              exec.submit(new Runnable {
                 def run() {
                   promise.setValue(interpreter(request))
                 }
@@ -207,8 +208,11 @@ class MultiReaderTest
     }.toMap
 
     lazy val mockClientBuilder = {
-      val result = mock[ClientBuilder[
-              Command, Response, Nothing, ClientConfig.Yes, ClientConfig.Yes]]
+      val result = mock[ClientBuilder[Command,
+                                      Response,
+                                      Nothing,
+                                      ClientConfig.Yes,
+                                      ClientConfig.Yes]]
 
       hosts.foreach { host =>
         val mockHostClientBuilder = mock[ClientBuilder[Command,
@@ -424,7 +428,8 @@ class MultiReaderTest
           // expect fewer to be read on each pass
           val expectFirstN = N - hostIndex - 1
           eventually {
-            assert(messages == sentMessages
+            assert(
+                messages == sentMessages
                   .grouped(N)
                   .map { _.take(expectFirstN) }
                   .flatten
@@ -599,7 +604,8 @@ class MultiReaderTest
           // expect fewer to be read on each pass
           val expectFirstN = N - hostIndex - 1
           eventually {
-            assert(messages == sentMessages
+            assert(
+                messages == sentMessages
                   .grouped(N)
                   .map { _.take(expectFirstN) }
                   .flatten
@@ -609,8 +615,9 @@ class MultiReaderTest
     }
   }
 
-  test("dynamic SocketAddress cluster should wait " +
-      "for cluster to become ready before snapping initial hosts") {
+  test(
+      "dynamic SocketAddress cluster should wait " +
+        "for cluster to become ready before snapping initial hosts") {
     new DynamicClusterHelper {
       val cluster = new DynamicCluster[SocketAddress](Seq())
       val handle = MultiReader(cluster, "the_queue")
@@ -660,8 +667,9 @@ class MultiReaderTest
     }
   }
 
-  test("dynamic SocketAddress cluster should silently" +
-      " handle the removal of a host that was never added") {
+  test(
+      "dynamic SocketAddress cluster should silently" +
+        " handle the removal of a host that was never added") {
     new DynamicClusterHelper {
       val cluster = new DynamicCluster[SocketAddress](hosts)
       val handle = MultiReader(cluster, "the_queue")

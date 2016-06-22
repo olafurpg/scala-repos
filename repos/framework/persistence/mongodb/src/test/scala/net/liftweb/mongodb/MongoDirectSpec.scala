@@ -70,8 +70,7 @@ class MongoDirectSpec extends Specification with MongoTestKit {
       doc.put("count", 2)
       val q = new BasicDBObject("name", "MongoDB") // the query to select the document(s) to update
       val o = doc // the new object to update with, replaces the entire document, except possibly _id
-      val upsert =
-        false // if the database should create the element if it does not exist
+      val upsert = false // if the database should create the element if it does not exist
       val apply = false // if an _id field should be added to the new object
       coll.update(q, o, upsert, apply)
 
@@ -120,7 +119,8 @@ class MongoDirectSpec extends Specification with MongoTestKit {
       coll.getCount must_== 100
 
       // get the count using a query
-      coll.getCount(new BasicDBObject("i", new BasicDBObject("$gt", 50))) must_== 50
+      coll
+        .getCount(new BasicDBObject("i", new BasicDBObject("$gt", 50))) must_== 50
 
       // use a cursor to get all docs
       val cur = coll.find
@@ -143,8 +143,9 @@ class MongoDirectSpec extends Specification with MongoTestKit {
       cur3.count must_== 50
 
       // range - 20 < i <= 30
-      val cur4 = coll.find(new BasicDBObject(
-              "i", new BasicDBObject("$gt", 20).append("$lte", 30)))
+      val cur4 = coll.find(
+          new BasicDBObject("i",
+                            new BasicDBObject("$gt", 20).append("$lte", 30)))
 
       cur4.count must_== 10
 
@@ -255,7 +256,9 @@ class MongoDirectSpec extends Specification with MongoTestKit {
       coll.update(qry, o2, false, false).isUpdateOfExisting must_== true
 
       // this update query won't find any docs to update
-      coll.update(new BasicDBObject("name", "None"), o2, false, false).getN must_== 0
+      coll
+        .update(new BasicDBObject("name", "None"), o2, false, false)
+        .getN must_== 0
 
       // regex query example
       val key = "name"
@@ -265,7 +268,8 @@ class MongoDirectSpec extends Specification with MongoTestKit {
       cur.count must_== 2
 
       // use regex and another dbobject
-      val cur2 = coll.find(BasicDBObjectBuilder.start
+      val cur2 = coll.find(
+          BasicDBObjectBuilder.start
             .add(key, Pattern.compile(regex))
             .add("count", 1)
             .get)

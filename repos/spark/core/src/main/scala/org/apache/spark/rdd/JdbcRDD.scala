@@ -53,14 +53,14 @@ private[spark] class JdbcPartition(idx: Int, val lower: Long, val upper: Long)
   *   This should only call getInt, getString, etc; the RDD takes care of calling next.
   *   The default maps a ResultSet to an array of Object.
   */
-class JdbcRDD[T: ClassTag](
-    sc: SparkContext,
-    getConnection: () => Connection,
-    sql: String,
-    lowerBound: Long,
-    upperBound: Long,
-    numPartitions: Int,
-    mapRow: (ResultSet) => T = JdbcRDD.resultSetToObjectArray _)
+class JdbcRDD[T: ClassTag](sc: SparkContext,
+                           getConnection: () => Connection,
+                           sql: String,
+                           lowerBound: Long,
+                           upperBound: Long,
+                           numPartitions: Int,
+                           mapRow: (ResultSet) => T =
+                             JdbcRDD.resultSetToObjectArray _)
     extends RDD[T](sc, Nil)
     with Logging {
 
@@ -83,16 +83,18 @@ class JdbcRDD[T: ClassTag](
       }
       val part = thePart.asInstanceOf[JdbcPartition]
       val conn = getConnection()
-      val stmt = conn.prepareStatement(
-          sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
+      val stmt = conn.prepareStatement(sql,
+                                       ResultSet.TYPE_FORWARD_ONLY,
+                                       ResultSet.CONCUR_READ_ONLY)
 
       // setFetchSize(Integer.MIN_VALUE) is a mysql driver specific way to force streaming results,
       // rather than pulling entire resultset into memory.
       // see http://dev.mysql.com/doc/refman/5.0/en/connector-j-reference-implementation-notes.html
       if (conn.getMetaData.getURL.matches("jdbc:mysql:.*")) {
         stmt.setFetchSize(Integer.MIN_VALUE)
-        logInfo("statement fetch size set to: " + stmt.getFetchSize +
-            " to force MySQL streaming ")
+        logInfo(
+            "statement fetch size set to: " + stmt.getFetchSize +
+              " to force MySQL streaming ")
       }
 
       stmt.setLong(1, part.lower)

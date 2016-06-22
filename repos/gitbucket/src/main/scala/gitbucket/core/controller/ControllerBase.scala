@@ -89,10 +89,10 @@ abstract class ControllerBase
   implicit def context: Context = {
     contextCache.get match {
       case null => {
-          val context = Context(loadSystemSettings(), LoginAccount, request)
-          contextCache.set(context)
-          context
-        }
+        val context = Context(loadSystemSettings(), LoginAccount, request)
+        contextCache.set(context)
+        context
+      }
       case context => context
     }
   }
@@ -154,7 +154,8 @@ abstract class ControllerBase
           org.scalatra.Unauthorized(
               redirect("/signin?redirect=" + StringUtil.urlEncode(
                       defining(request.getQueryString) { queryString =>
-                request.getRequestURI.substring(request.getContextPath.length) +
+                request.getRequestURI
+                  .substring(request.getContextPath.length) +
                 (if (queryString != null) "?" + queryString else "")
               }
                   )))
@@ -163,14 +164,14 @@ abstract class ControllerBase
     }
 
   // TODO Scala 2.11
-  override def url(
-      path: String,
-      params: Iterable[(String, Any)] = Iterable.empty,
-      includeContextPath: Boolean = true,
-      includeServletPath: Boolean = true,
-      absolutize: Boolean = true,
-      withSessionId: Boolean = true)(implicit request: HttpServletRequest,
-                                     response: HttpServletResponse): String =
+  override def url(path: String,
+                   params: Iterable[(String, Any)] = Iterable.empty,
+                   includeContextPath: Boolean = true,
+                   includeServletPath: Boolean = true,
+                   absolutize: Boolean = true,
+                   withSessionId: Boolean = true)(
+      implicit request: HttpServletRequest,
+      response: HttpServletResponse): String =
     if (path.startsWith("http")) path
     else baseUrl + super.url(path, params, false, false, false)
 
@@ -188,8 +189,8 @@ abstract class ControllerBase
   }
 
   // jenkins send message as 'application/x-www-form-urlencoded' but scalatra already parsed as multi-part-request.
-  def extractFromJsonBody[A](
-      implicit request: HttpServletRequest, mf: Manifest[A]): Option[A] = {
+  def extractFromJsonBody[A](implicit request: HttpServletRequest,
+                             mf: Manifest[A]): Option[A] = {
     (request.contentType.map(_.split(";").head.toLowerCase) match {
       case Some("application/x-www-form-urlencoded") =>
         multiParams.keys.headOption.map(parse(_))
@@ -240,8 +241,9 @@ case class Context(settings: SystemSettingsService.SystemSettings,
 trait AccountManagementControllerBase extends ControllerBase {
   self: AccountService =>
 
-  protected def updateImage(
-      userName: String, fileId: Option[String], clearImage: Boolean): Unit =
+  protected def updateImage(userName: String,
+                            fileId: Option[String],
+                            clearImage: Boolean): Unit =
     if (clearImage) {
       getAccountByUserName(userName).flatMap(_.image).map { image =>
         new java.io.File(getUserUploadDir(userName), image).delete()
@@ -261,8 +263,9 @@ trait AccountManagementControllerBase extends ControllerBase {
     }
 
   protected def uniqueUserName: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] =
+    override def validate(name: String,
+                          value: String,
+                          messages: Messages): Option[String] =
       getAccountByUserName(value, true).map { _ =>
         "User already exists."
       }

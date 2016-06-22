@@ -76,8 +76,8 @@ object BigDecimalRootRefinement {
     val upoly = poly.map { n =>
       new BigDecimal(n.bigDecimal, MathContext.UNLIMITED)
     }
-    BigDecimalRootRefinement(
-        AbsoluteContext(upoly), Unbounded(lowerBound, upperBound))
+    BigDecimalRootRefinement(AbsoluteContext(upoly),
+                             Unbounded(lowerBound, upperBound))
   }
 
   def apply(poly: Polynomial[BigDecimal],
@@ -127,8 +127,8 @@ object BigDecimalRootRefinement {
     def ceil(x: JBigDecimal): JBigDecimal
   }
 
-  case class AbsoluteContext private[poly](
-      poly: Polynomial[BigDecimal], scale: Int = Int.MinValue)
+  case class AbsoluteContext private[poly] (poly: Polynomial[BigDecimal],
+                                            scale: Int = Int.MinValue)
       extends ApproximationContext {
     def getEps(x: JBigDecimal): Int = scale
 
@@ -149,12 +149,13 @@ object BigDecimalRootRefinement {
       x.setScale(scale, RoundingMode.CEILING)
   }
 
-  case class RelativeContext private[poly](
-      poly: Polynomial[BigDecimal], mc: MathContext = new MathContext(0))
+  case class RelativeContext private[poly] (poly: Polynomial[BigDecimal],
+                                            mc: MathContext = new MathContext(
+                                                0))
       extends ApproximationContext {
     def getEps(x: JBigDecimal): Int =
       x.scale - spire.math.ceil(x.unscaledValue.bitLength * bits2dec).toInt +
-      mc.getPrecision + 1
+        mc.getPrecision + 1
 
     def evalExact(x: JBigDecimal): JBigDecimal =
       poly(new BigDecimal(x, MathContext.UNLIMITED)).bigDecimal.round(mc)
@@ -192,8 +193,8 @@ object BigDecimalRootRefinement {
     // If we first scale the polynomial by b^poly.degree, then the roots
     // remain the same, but the first composition will partially cancel with
     // b^poly.degree, leaving an integer.
-    def shift(
-        poly: Polynomial[BigDecimal], h: Rational): Polynomial[BigDecimal] = {
+    def shift(poly: Polynomial[BigDecimal],
+              h: Rational): Polynomial[BigDecimal] = {
       val n = poly.degree
       poly.mapTerms {
         case Term(coeff, k) =>

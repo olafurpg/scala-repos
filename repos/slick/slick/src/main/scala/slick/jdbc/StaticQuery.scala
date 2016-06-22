@@ -65,7 +65,8 @@ object ActionBasedSQLInterpolation {
     val uri = StaticDatabaseConfigMacros.getURI(ctxt)
     //TODO The database configuration and connection should be cached for subsequent macro invocations
     val dc = try DatabaseConfig.forURI[JdbcProfile](
-        new URI(uri), ClassLoaderUtil.defaultClassLoader) catch {
+        new URI(uri),
+        ClassLoaderUtil.defaultClassLoader) catch {
       case ex @ (_: ConfigException | _: SlickException) =>
         ctxt.abort(
             ctxt.enclosingPosition,
@@ -102,8 +103,8 @@ object ActionBasedSQLInterpolation {
   }
 }
 
-case class SQLActionBuilder(
-    queryParts: Seq[Any], unitPConv: SetParameter[Unit]) {
+case class SQLActionBuilder(queryParts: Seq[Any],
+                            unitPConv: SetParameter[Unit]) {
   def as[R](implicit rconv: GetResult[R])
     : SqlStreamingAction[Vector[R], R, Effect] = {
     val query =

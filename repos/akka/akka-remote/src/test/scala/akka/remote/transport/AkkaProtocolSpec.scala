@@ -65,8 +65,8 @@ class AkkaProtocolSpec
   val localAkkaAddress = Address("akka.test", "testsystem", "testhost", 1234)
 
   val remoteAddress = Address("test", "testsystem2", "testhost2", 1234)
-  val remoteAkkaAddress = Address(
-      "akka.test", "testsystem2", "testhost2", 1234)
+  val remoteAkkaAddress =
+    Address("akka.test", "testsystem2", "testhost2", 1234)
 
   val codec = AkkaPduProtobufCodec
 
@@ -92,8 +92,8 @@ class AkkaProtocolSpec
   def collaborators = {
     val registry = new AssociationRegistry
     val transport: TestTransport = new TestTransport(localAddress, registry)
-    val handle: TestAssociationHandle = new TestAssociationHandle(
-        localAddress, remoteAddress, transport, true)
+    val handle: TestAssociationHandle =
+      new TestAssociationHandle(localAddress, remoteAddress, transport, true)
 
     // silently drop writes -- we do not have another endpoint under test, so nobody to forward to
     transport.writeBehavior.pushConstant(true)
@@ -113,8 +113,9 @@ class AkkaProtocolSpec
         case _ ⇒ false
       }
 
-  def lastActivityIsAssociate(
-      registry: AssociationRegistry, uid: Long, cookie: Option[String]) =
+  def lastActivityIsAssociate(registry: AssociationRegistry,
+                              uid: Long,
+                              cookie: Option[String]) =
     if (registry.logSnapshot.isEmpty) false
     else
       registry.logSnapshot.last match {
@@ -123,7 +124,7 @@ class AkkaProtocolSpec
           codec.decodePdu(payload) match {
             case Associate(info) ⇒
               info.cookie == cookie && info.origin == localAddress &&
-              info.uid == uid
+                info.uid == uid
             case _ ⇒ false
           }
         case _ ⇒ false
@@ -261,9 +262,11 @@ class AkkaProtocolSpec
     "ignore incoming associations with wrong cookie" in {
       val (failureDetector, registry, _, handle) = collaborators
 
-      val reader = system.actorOf(ProtocolStateActor.inboundProps(
-              HandshakeInfo(
-                  origin = localAddress, uid = 42, cookie = Some("abcde")),
+      val reader = system.actorOf(
+          ProtocolStateActor.inboundProps(
+              HandshakeInfo(origin = localAddress,
+                            uid = 42,
+                            cookie = Some("abcde")),
               handle,
               ActorAssociationEventListener(testActor),
               new AkkaProtocolSettings(ConfigFactory
@@ -283,9 +286,11 @@ class AkkaProtocolSpec
     "accept incoming associations with correct cookie" in {
       val (failureDetector, registry, _, handle) = collaborators
 
-      val reader = system.actorOf(ProtocolStateActor.inboundProps(
-              HandshakeInfo(
-                  origin = localAddress, uid = 42, cookie = Some("abcde")),
+      val reader = system.actorOf(
+          ProtocolStateActor.inboundProps(
+              HandshakeInfo(origin = localAddress,
+                            uid = 42,
+                            cookie = Some("abcde")),
               handle,
               ActorAssociationEventListener(testActor),
               new AkkaProtocolSettings(ConfigFactory
@@ -321,8 +326,9 @@ class AkkaProtocolSpec
 
       system.actorOf(
           ProtocolStateActor.outboundProps(
-              HandshakeInfo(
-                  origin = localAddress, uid = 42, cookie = Some("abcde")),
+              HandshakeInfo(origin = localAddress,
+                            uid = 42,
+                            cookie = Some("abcde")),
               remoteAddress,
               statusPromise,
               transport,

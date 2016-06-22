@@ -145,8 +145,8 @@ abstract class Graph[VD: ClassTag, ED: ClassTag] protected ()
     * in the graph.
     * @param numPartitions the number of edge partitions in the new graph.
     */
-  def partitionBy(
-      partitionStrategy: PartitionStrategy, numPartitions: Int): Graph[VD, ED]
+  def partitionBy(partitionStrategy: PartitionStrategy,
+                  numPartitions: Int): Graph[VD, ED]
 
   /**
     * Transforms each vertex attribute in the graph using the map function.
@@ -318,8 +318,8 @@ abstract class Graph[VD: ClassTag, ED: ClassTag] protected ()
     * satisfy the predicates
     */
   def subgraph(epred: EdgeTriplet[VD, ED] => Boolean = (x => true),
-               vpred: (VertexId, VD) => Boolean = ((v, d) =>
-                                                     true)): Graph[VD, ED]
+               vpred: (VertexId,
+                       VD) => Boolean = ((v, d) => true)): Graph[VD, ED]
 
   /**
     * Restricts the graph to only the vertices and edges that are also in `other`, but keeps the
@@ -472,11 +472,11 @@ object Graph {
       defaultValue: VD,
       uniqueEdges: Option[PartitionStrategy] = None,
       edgeStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY,
-      vertexStorageLevel: StorageLevel =
-        StorageLevel.MEMORY_ONLY): Graph[VD, Int] = {
+      vertexStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)
+    : Graph[VD, Int] = {
     val edges = rawEdges.map(p => Edge(p._1, p._2, 1))
-    val graph = GraphImpl(
-        edges, defaultValue, edgeStorageLevel, vertexStorageLevel)
+    val graph =
+      GraphImpl(edges, defaultValue, edgeStorageLevel, vertexStorageLevel)
     uniqueEdges match {
       case Some(p) => graph.partitionBy(p).groupEdges((a, b) => a + b)
       case None => graph
@@ -498,8 +498,8 @@ object Graph {
       edges: RDD[Edge[ED]],
       defaultValue: VD,
       edgeStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY,
-      vertexStorageLevel: StorageLevel =
-        StorageLevel.MEMORY_ONLY): Graph[VD, ED] = {
+      vertexStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)
+    : Graph[VD, ED] = {
     GraphImpl(edges, defaultValue, edgeStorageLevel, vertexStorageLevel)
   }
 
@@ -523,8 +523,8 @@ object Graph {
       edges: RDD[Edge[ED]],
       defaultVertexAttr: VD = null.asInstanceOf[VD],
       edgeStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY,
-      vertexStorageLevel: StorageLevel =
-        StorageLevel.MEMORY_ONLY): Graph[VD, ED] = {
+      vertexStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)
+    : Graph[VD, ED] = {
     GraphImpl(vertices,
               edges,
               defaultVertexAttr,

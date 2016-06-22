@@ -17,16 +17,17 @@ class ScalaLocalInplaceRenameHandler
     extends VariableInplaceRenameHandler
     with ScalaInplaceRenameHandler {
 
-  override def isAvailable(
-      element: PsiElement, editor: Editor, file: PsiFile): Boolean = {
+  override def isAvailable(element: PsiElement,
+                           editor: Editor,
+                           file: PsiFile): Boolean = {
     val processor = renameProcessor(element)
     editor.getSettings.isVariableInplaceRenameEnabled && processor != null &&
     processor.canProcessElement(element) &&
     element.getUseScope.isInstanceOf[LocalSearchScope]
   }
 
-  override def createRenamer(
-      elementToRename: PsiElement, editor: Editor): VariableInplaceRenamer = {
+  override def createRenamer(elementToRename: PsiElement,
+                             editor: Editor): VariableInplaceRenamer = {
     elementToRename match {
       case named: PsiNamedElement =>
         new ScalaLocalInplaceRenamer(named, editor)

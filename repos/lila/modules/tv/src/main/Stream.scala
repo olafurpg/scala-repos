@@ -4,8 +4,10 @@ import com.roundeights.hasher.Implicits._
 import play.api.libs.json._
 import StreamerList.Streamer
 
-case class StreamOnAir(
-    streamer: Streamer, name: String, url: String, streamId: String) {
+case class StreamOnAir(streamer: Streamer,
+                       name: String,
+                       url: String,
+                       streamId: String) {
 
   def id = streamer.id
 
@@ -72,8 +74,9 @@ object Hitbox {
 }
 
 object Youtube {
-  case class Snippet(
-      title: String, channelId: String, liveBroadcastContent: String)
+  case class Snippet(title: String,
+                     channelId: String,
+                     liveBroadcastContent: String)
   case class Id(videoId: String)
   case class Item(id: Id, snippet: Snippet)
   case class Result(items: List[Item]) {

@@ -55,9 +55,9 @@ abstract class UnreachableNodeJoinsAgainSpec
 
   muteMarkingAsUnreachable()
 
-  def allBut(role: RoleName,
-             roles: immutable.Seq[RoleName] =
-               roles): immutable.Seq[RoleName] = {
+  def allBut(
+      role: RoleName,
+      roles: immutable.Seq[RoleName] = roles): immutable.Seq[RoleName] = {
     roles.filterNot(_ == role)
   }
 
@@ -186,9 +186,8 @@ abstract class UnreachableNodeJoinsAgainSpec
         try {
           Cluster(freshSystem).join(masterAddress)
           within(15 seconds) {
-            awaitAssert(
-                Cluster(freshSystem).readView.members.map(_.address) should contain(
-                    victimAddress))
+            awaitAssert(Cluster(freshSystem).readView.members
+                  .map(_.address) should contain(victimAddress))
             awaitAssert(Cluster(freshSystem).readView.members.size should ===(
                     expectedNumberOfMembers))
             awaitAssert(
@@ -198,9 +197,10 @@ abstract class UnreachableNodeJoinsAgainSpec
 
           // signal to master node that victim is done
           val endProbe = TestProbe()(freshSystem)
-          val endActor = freshSystem.actorOf(
-              Props(classOf[EndActor], endProbe.ref, Some(masterAddress)),
-              "end")
+          val endActor = freshSystem.actorOf(Props(classOf[EndActor],
+                                                   endProbe.ref,
+                                                   Some(masterAddress)),
+                                             "end")
           endActor ! EndActor.SendEnd
           endProbe.expectMsg(EndActor.EndAck)
         } finally {

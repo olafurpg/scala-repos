@@ -19,7 +19,8 @@ class HoistClientOps extends Phase {
         case Bind(s2, from2, Pure(StructNode(defs2), ts2)) =>
           // Extract client-side operations into ResultSetMapping
           val hoisted = defs2.map { case (ts, n) => (ts, n, unwrap(n, true)) }
-          logger.debug("Hoisting operations from defs: " + hoisted.iterator
+          logger.debug(
+              "Hoisting operations from defs: " + hoisted.iterator
                 .filter(t => t._2 ne t._3._1)
                 .map(_._1)
                 .mkString(", "))
@@ -80,10 +81,10 @@ class HoistClientOps extends Phase {
               }
               logger.debug(
                   "Hoisting operations from defs in left side of Join: " +
-                  hoisted.iterator
-                    .filter(t => t._2 ne t._3._1)
-                    .map(_._1)
-                    .mkString(", "))
+                    hoisted.iterator
+                      .filter(t => t._2 ne t._3._1)
+                      .map(_._1)
+                      .mkString(", "))
               val newDefsM = hoisted.iterator.map {
                 case (ts, n, (n2, wrap)) => (n2, new AnonSymbol)
               }.toMap
@@ -92,8 +93,8 @@ class HoistClientOps extends Phase {
                 .copy(select =
                       Pure(StructNode(ConstArray.from(newDefsM.map(_.swap)))))
                 .infer()
-              logger.debug(
-                  "Translated left join side:", Ellipsis(bl2, List(0)))
+              logger
+                .debug("Translated left join side:", Ellipsis(bl2, List(0)))
               val repl = hoisted.iterator.map {
                 case (s, _, (n2, wrap)) => (s, (wrap, newDefsM(n2)))
               }.toMap
@@ -106,10 +107,10 @@ class HoistClientOps extends Phase {
               }
               logger.debug(
                   "Hoisting operations from defs in right side of Join: " +
-                  hoisted.iterator
-                    .filter(t => t._2 ne t._3._1)
-                    .map(_._1)
-                    .mkString(", "))
+                    hoisted.iterator
+                      .filter(t => t._2 ne t._3._1)
+                      .map(_._1)
+                      .mkString(", "))
               val newDefsM = hoisted.iterator.map {
                 case (ts, n, (n2, wrap)) => (n2, new AnonSymbol)
               }.toMap
@@ -118,8 +119,8 @@ class HoistClientOps extends Phase {
                 .copy(select =
                       Pure(StructNode(ConstArray.from(newDefsM.map(_.swap)))))
                 .infer()
-              logger.debug(
-                  "Translated right join side:", Ellipsis(br2, List(0)))
+              logger
+                .debug("Translated right join side:", Ellipsis(br2, List(0)))
               val repl = hoisted.iterator.map {
                 case (s, _, (n2, wrap)) => (s, (wrap, newDefsM(n2)))
               }.toMap
@@ -167,8 +168,8 @@ class HoistClientOps extends Phase {
           val res = Bind(s1, CollectionCast(bfrom1, cons2), sel1.replace {
             case Ref(s) if s == s1 => Ref(s)
           }).infer()
-          logger.debug(
-              "Pulled Bind out of CollectionCast", Ellipsis(res, List(0, 0)))
+          logger.debug("Pulled Bind out of CollectionCast",
+                       Ellipsis(res, List(0, 0)))
           res
         case from2 =>
           if (from2 eq from1) n else n.copy(child = from2) :@ n.nodeType
@@ -241,7 +242,7 @@ class HoistClientOps extends Phase {
           case NonFatal(ex) =>
             throw new SlickException(
                 "Caught exception while computing default value for Rep[Option[_]].getOrElse -- " +
-                "This cannot be done lazily when the value is needed on the database side",
+                  "This cannot be done lazily when the value is needed on the database side",
                 ex)
         }
         Library.IfNull.typed(tpe, ch, LiteralNode(tpe, d)).infer()

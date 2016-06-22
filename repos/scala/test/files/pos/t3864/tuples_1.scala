@@ -11,29 +11,68 @@ trait Tuples {
       import value._;
       f(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15)
     }
-    def toIndexedSeq[Z](implicit ev: value.type <:< Tuple15[
-            Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z]): IndexedSeq[Z] = {
+    def toIndexedSeq[Z](
+        implicit ev: value.type <:< Tuple15[Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z]): IndexedSeq[Z] = {
       val zs = ev(value); import zs._;
-      IndexedSeq(
-          _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15)
+      IndexedSeq(_1,
+                 _2,
+                 _3,
+                 _4,
+                 _5,
+                 _6,
+                 _7,
+                 _8,
+                 _9,
+                 _10,
+                 _11,
+                 _12,
+                 _13,
+                 _14,
+                 _15)
     }
-    def mapElements[
-        AA, BB, CC, DD, EE, FF, GG, HH, II, JJ, KK, LL, MM, NN, OO](
-        _1: (A => AA) = identity[A] _,
-        _2: (B => BB) = identity[B] _,
-        _3: (C => CC) = identity[C] _,
-        _4: (D => DD) = identity[D] _,
-        _5: (E => EE) = identity[E] _,
-        _6: (F => FF) = identity[F] _,
-        _7: (G => GG) = identity[G] _,
-        _8: (H => HH) = identity[H] _,
-        _9: (I => II) = identity[I] _,
-        _10: (J => JJ) = identity[J] _,
-        _11: (K => KK) = identity[K] _,
-        _12: (L => LL) = identity[L] _,
-        _13: (M => MM) = identity[M] _,
-        _14: (N => NN) = identity[N] _,
-        _15: (O => OO) = identity[O] _)
+    def mapElements[AA,
+                    BB,
+                    CC,
+                    DD,
+                    EE,
+                    FF,
+                    GG,
+                    HH,
+                    II,
+                    JJ,
+                    KK,
+                    LL,
+                    MM,
+                    NN,
+                    OO](_1: (A => AA) = identity[A] _,
+                        _2: (B => BB) = identity[B] _,
+                        _3: (C => CC) = identity[C] _,
+                        _4: (D => DD) = identity[D] _,
+                        _5: (E => EE) = identity[E] _,
+                        _6: (F => FF) = identity[F] _,
+                        _7: (G => GG) = identity[G] _,
+                        _8: (H => HH) = identity[H] _,
+                        _9: (I => II) = identity[I] _,
+                        _10: (J => JJ) = identity[J] _,
+                        _11: (K => KK) = identity[K] _,
+                        _12: (L => LL) = identity[L] _,
+                        _13: (M => MM) = identity[M] _,
+                        _14: (N => NN) = identity[N] _,
+                        _15: (O => OO) = identity[O] _)
       : (AA, BB, CC, DD, EE, FF, GG, HH, II, JJ, KK, LL, MM, NN, OO) =
       (_1(value._1),
        _2(value._2),
@@ -66,8 +105,23 @@ trait Tuples {
       import value._;
       f(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16)
     }
-    def toIndexedSeq[Z](implicit ev: value.type <:< Tuple16[
-            Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z]): IndexedSeq[Z] = {
+    def toIndexedSeq[Z](
+        implicit ev: value.type <:< Tuple16[Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z]): IndexedSeq[Z] = {
       val zs = ev(value); import zs._;
       IndexedSeq(_1,
                  _2,
@@ -86,24 +140,37 @@ trait Tuples {
                  _15,
                  _16)
     }
-    def mapElements[
-        AA, BB, CC, DD, EE, FF, GG, HH, II, JJ, KK, LL, MM, NN, OO, PP](
-        _1: (A => AA) = identity[A] _,
-        _2: (B => BB) = identity[B] _,
-        _3: (C => CC) = identity[C] _,
-        _4: (D => DD) = identity[D] _,
-        _5: (E => EE) = identity[E] _,
-        _6: (F => FF) = identity[F] _,
-        _7: (G => GG) = identity[G] _,
-        _8: (H => HH) = identity[H] _,
-        _9: (I => II) = identity[I] _,
-        _10: (J => JJ) = identity[J] _,
-        _11: (K => KK) = identity[K] _,
-        _12: (L => LL) = identity[L] _,
-        _13: (M => MM) = identity[M] _,
-        _14: (N => NN) = identity[N] _,
-        _15: (O => OO) = identity[O] _,
-        _16: (P => PP) = identity[P] _)
+    def mapElements[AA,
+                    BB,
+                    CC,
+                    DD,
+                    EE,
+                    FF,
+                    GG,
+                    HH,
+                    II,
+                    JJ,
+                    KK,
+                    LL,
+                    MM,
+                    NN,
+                    OO,
+                    PP](_1: (A => AA) = identity[A] _,
+                        _2: (B => BB) = identity[B] _,
+                        _3: (C => CC) = identity[C] _,
+                        _4: (D => DD) = identity[D] _,
+                        _5: (E => EE) = identity[E] _,
+                        _6: (F => FF) = identity[F] _,
+                        _7: (G => GG) = identity[G] _,
+                        _8: (H => HH) = identity[H] _,
+                        _9: (I => II) = identity[I] _,
+                        _10: (J => JJ) = identity[J] _,
+                        _11: (K => KK) = identity[K] _,
+                        _12: (L => LL) = identity[L] _,
+                        _13: (M => MM) = identity[M] _,
+                        _14: (N => NN) = identity[N] _,
+                        _15: (O => OO) = identity[O] _,
+                        _16: (P => PP) = identity[P] _)
       : (AA, BB, CC, DD, EE, FF, GG, HH, II, JJ, KK, LL, MM, NN, OO, PP) =
       (_1(value._1),
        _2(value._2),
@@ -153,9 +220,24 @@ trait Tuples {
         _16,
         _17)
     }
-    def toIndexedSeq[Z](implicit ev: value.type <:< Tuple17[
-            Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z])
-      : IndexedSeq[Z] = {
+    def toIndexedSeq[Z](
+        implicit ev: value.type <:< Tuple17[Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z]): IndexedSeq[Z] = {
       val zs = ev(value); import zs._;
       IndexedSeq(_1,
                  _2,
@@ -175,25 +257,39 @@ trait Tuples {
                  _16,
                  _17)
     }
-    def mapElements[
-        AA, BB, CC, DD, EE, FF, GG, HH, II, JJ, KK, LL, MM, NN, OO, PP, QQ](
-        _1: (A => AA) = identity[A] _,
-        _2: (B => BB) = identity[B] _,
-        _3: (C => CC) = identity[C] _,
-        _4: (D => DD) = identity[D] _,
-        _5: (E => EE) = identity[E] _,
-        _6: (F => FF) = identity[F] _,
-        _7: (G => GG) = identity[G] _,
-        _8: (H => HH) = identity[H] _,
-        _9: (I => II) = identity[I] _,
-        _10: (J => JJ) = identity[J] _,
-        _11: (K => KK) = identity[K] _,
-        _12: (L => LL) = identity[L] _,
-        _13: (M => MM) = identity[M] _,
-        _14: (N => NN) = identity[N] _,
-        _15: (O => OO) = identity[O] _,
-        _16: (P => PP) = identity[P] _,
-        _17: (Q => QQ) = identity[Q] _)
+    def mapElements[AA,
+                    BB,
+                    CC,
+                    DD,
+                    EE,
+                    FF,
+                    GG,
+                    HH,
+                    II,
+                    JJ,
+                    KK,
+                    LL,
+                    MM,
+                    NN,
+                    OO,
+                    PP,
+                    QQ](_1: (A => AA) = identity[A] _,
+                        _2: (B => BB) = identity[B] _,
+                        _3: (C => CC) = identity[C] _,
+                        _4: (D => DD) = identity[D] _,
+                        _5: (E => EE) = identity[E] _,
+                        _6: (F => FF) = identity[F] _,
+                        _7: (G => GG) = identity[G] _,
+                        _8: (H => HH) = identity[H] _,
+                        _9: (I => II) = identity[I] _,
+                        _10: (J => JJ) = identity[J] _,
+                        _11: (K => KK) = identity[K] _,
+                        _12: (L => LL) = identity[L] _,
+                        _13: (M => MM) = identity[M] _,
+                        _14: (N => NN) = identity[N] _,
+                        _15: (O => OO) = identity[O] _,
+                        _16: (P => PP) = identity[P] _,
+                        _17: (Q => QQ) = identity[Q] _)
       : (AA, BB, CC, DD, EE, FF, GG, HH, II, JJ, KK, LL, MM, NN, OO, PP, QQ) =
       (_1(value._1),
        _2(value._2),
@@ -223,8 +319,9 @@ trait Tuples {
   trait Tuple18W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]
       extends EnrichedType[
           Tuple18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]] {
-    def fold[Z](f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q,
-                       R) => Z): Z = {
+    def fold[Z](
+        f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q,
+               R) => Z): Z = {
       import value._;
       f(_1,
         _2,
@@ -245,9 +342,25 @@ trait Tuples {
         _17,
         _18)
     }
-    def toIndexedSeq[Z](implicit ev: value.type <:< Tuple18[
-            Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z])
-      : IndexedSeq[Z] = {
+    def toIndexedSeq[Z](
+        implicit ev: value.type <:< Tuple18[Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z]): IndexedSeq[Z] = {
       val zs = ev(value); import zs._;
       IndexedSeq(_1,
                  _2,
@@ -340,8 +453,24 @@ trait Tuples {
        _18(value._18))
   }
 
-  implicit def ToTuple18W[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
+  implicit def ToTuple18W[A,
+                          B,
+                          C,
+                          D,
+                          E,
+                          F,
+                          G,
+                          H,
+                          I,
+                          J,
+                          K,
+                          L,
+                          M,
+                          N,
+                          O,
+                          P,
+                          Q,
+                          R](
       t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R))
     : Tuple18W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R] =
     new { val value = t }
@@ -350,8 +479,9 @@ trait Tuples {
   trait Tuple19W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
       extends EnrichedType[
           Tuple19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]] {
-    def fold[Z](f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R,
-                       S) => Z): Z = {
+    def fold[Z](
+        f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R,
+               S) => Z): Z = {
       import value._;
       f(_1,
         _2,
@@ -373,9 +503,26 @@ trait Tuples {
         _18,
         _19)
     }
-    def toIndexedSeq[Z](implicit ev: value.type <:< Tuple19[
-            Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z])
-      : IndexedSeq[Z] = {
+    def toIndexedSeq[Z](
+        implicit ev: value.type <:< Tuple19[Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z]): IndexedSeq[Z] = {
       val zs = ev(value); import zs._;
       IndexedSeq(_1,
                  _2,
@@ -473,16 +620,51 @@ trait Tuples {
        _19(value._19))
   }
 
-  implicit def ToTuple19W[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
+  implicit def ToTuple19W[A,
+                          B,
+                          C,
+                          D,
+                          E,
+                          F,
+                          G,
+                          H,
+                          I,
+                          J,
+                          K,
+                          L,
+                          M,
+                          N,
+                          O,
+                          P,
+                          Q,
+                          R,
+                          S](
       t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S))
     : Tuple19W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S] =
     new { val value = t }
     with Tuple19W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
 
   trait Tuple20W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
-      extends EnrichedType[Tuple20[
-              A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]] {
+      extends EnrichedType[Tuple20[A,
+                                   B,
+                                   C,
+                                   D,
+                                   E,
+                                   F,
+                                   G,
+                                   H,
+                                   I,
+                                   J,
+                                   K,
+                                   L,
+                                   M,
+                                   N,
+                                   O,
+                                   P,
+                                   Q,
+                                   R,
+                                   S,
+                                   T]] {
     def fold[Z](
         f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
                T) => Z): Z = {
@@ -508,9 +690,27 @@ trait Tuples {
         _19,
         _20)
     }
-    def toIndexedSeq[Z](implicit ev: value.type <:< Tuple20[
-            Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z])
-      : IndexedSeq[Z] = {
+    def toIndexedSeq[Z](
+        implicit ev: value.type <:< Tuple20[Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z]): IndexedSeq[Z] = {
       val zs = ev(value); import zs._;
       IndexedSeq(_1,
                  _2,
@@ -613,16 +813,54 @@ trait Tuples {
        _20(value._20))
   }
 
-  implicit def ToTuple20W[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
+  implicit def ToTuple20W[A,
+                          B,
+                          C,
+                          D,
+                          E,
+                          F,
+                          G,
+                          H,
+                          I,
+                          J,
+                          K,
+                          L,
+                          M,
+                          N,
+                          O,
+                          P,
+                          Q,
+                          R,
+                          S,
+                          T](
       t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T))
     : Tuple20W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T] =
     new { val value = t }
     with Tuple20W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
 
   trait Tuple21W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
-      extends EnrichedType[Tuple21[
-              A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]] {
+      extends EnrichedType[
+          Tuple21[A,
+                  B,
+                  C,
+                  D,
+                  E,
+                  F,
+                  G,
+                  H,
+                  I,
+                  J,
+                  K,
+                  L,
+                  M,
+                  N,
+                  O,
+                  P,
+                  Q,
+                  R,
+                  S,
+                  T,
+                  U]] {
     def fold[Z](
         f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T,
                U) => Z): Z = {
@@ -649,9 +887,28 @@ trait Tuples {
         _20,
         _21)
     }
-    def toIndexedSeq[Z](implicit ev: value.type <:< Tuple21[
-            Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z])
-      : IndexedSeq[Z] = {
+    def toIndexedSeq[Z](
+        implicit ev: value.type <:< Tuple21[Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z]): IndexedSeq[Z] = {
       val zs = ev(value); import zs._;
       IndexedSeq(_1,
                  _2,
@@ -759,12 +1016,50 @@ trait Tuples {
        _21(value._21))
   }
 
-  implicit def ToTuple21W[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
+  implicit def ToTuple21W[A,
+                          B,
+                          C,
+                          D,
+                          E,
+                          F,
+                          G,
+                          H,
+                          I,
+                          J,
+                          K,
+                          L,
+                          M,
+                          N,
+                          O,
+                          P,
+                          Q,
+                          R,
+                          S,
+                          T,
+                          U](
       t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U))
     : Tuple21W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U] =
-    new { val value = t } with Tuple21W[
-        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
+    new { val value = t } with Tuple21W[A,
+                                        B,
+                                        C,
+                                        D,
+                                        E,
+                                        F,
+                                        G,
+                                        H,
+                                        I,
+                                        J,
+                                        K,
+                                        L,
+                                        M,
+                                        N,
+                                        O,
+                                        P,
+                                        Q,
+                                        R,
+                                        S,
+                                        T,
+                                        U]
 
   trait Tuple22W[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]
@@ -818,9 +1113,29 @@ trait Tuples {
         _21,
         _22)
     }
-    def toIndexedSeq[Z](implicit ev: value.type <:< Tuple22[
-            Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z, Z])
-      : IndexedSeq[Z] = {
+    def toIndexedSeq[Z](
+        implicit ev: value.type <:< Tuple22[Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z,
+                                            Z]): IndexedSeq[Z] = {
       val zs = ev(value); import zs._;
       IndexedSeq(_1,
                  _2,
@@ -933,11 +1248,71 @@ trait Tuples {
        _22(value._22))
   }
 
-  implicit def ToTuple22W[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
+  implicit def ToTuple22W[A,
+                          B,
+                          C,
+                          D,
+                          E,
+                          F,
+                          G,
+                          H,
+                          I,
+                          J,
+                          K,
+                          L,
+                          M,
+                          N,
+                          O,
+                          P,
+                          Q,
+                          R,
+                          S,
+                          T,
+                          U,
+                          V](
       t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V))
-    : Tuple22W[
-        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V] =
-    new { val value = t } with Tuple22W[
-        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]
+    : Tuple22W[A,
+               B,
+               C,
+               D,
+               E,
+               F,
+               G,
+               H,
+               I,
+               J,
+               K,
+               L,
+               M,
+               N,
+               O,
+               P,
+               Q,
+               R,
+               S,
+               T,
+               U,
+               V] =
+    new { val value = t } with Tuple22W[A,
+                                        B,
+                                        C,
+                                        D,
+                                        E,
+                                        F,
+                                        G,
+                                        H,
+                                        I,
+                                        J,
+                                        K,
+                                        L,
+                                        M,
+                                        N,
+                                        O,
+                                        P,
+                                        Q,
+                                        R,
+                                        S,
+                                        T,
+                                        U,
+                                        V]
 }

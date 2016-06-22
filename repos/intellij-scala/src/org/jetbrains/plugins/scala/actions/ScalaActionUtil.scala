@@ -49,16 +49,15 @@ object ScalaActionUtil {
 
     val hintManager: HintManagerImpl = HintManagerImpl.getInstanceImpl
 
-    label.addMouseMotionListener(
-        new MouseMotionAdapter {
+    label.addMouseMotionListener(new MouseMotionAdapter {
       override def mouseMoved(e: MouseEvent) {
         hintManager.hideAllHints()
       }
     })
 
     val position = editor.getCaretModel.getLogicalPosition
-    val p: Point = HintManagerImpl.getHintPosition(
-        hint, editor, position, HintManager.ABOVE)
+    val p: Point = HintManagerImpl
+      .getHintPosition(hint, editor, position, HintManager.ABOVE)
 
     hintManager.showEditorHint(
         hint,

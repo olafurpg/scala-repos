@@ -14,8 +14,7 @@ import scala.collection.mutable.{Buffer => SBuffer}
   * in little endian byte order, which conforms to the mysql spec.
   */
 object Buffer {
-  val NullLength =
-    -1 // denotes a SQL NULL value when reading a length coded binary.
+  val NullLength = -1 // denotes a SQL NULL value when reading a length coded binary.
   val EmptyString = new String
   val EmptyByteArray = new Array[Byte](0)
 
@@ -39,8 +38,8 @@ object Buffer {
 
   def fromChannelBuffer(cb: ChannelBuffer): Buffer = {
     require(cb != null)
-    require(
-        cb.order == ByteOrder.LITTLE_ENDIAN, "Invalid ChannelBuffer ByteOrder")
+    require(cb.order == ByteOrder.LITTLE_ENDIAN,
+            "Invalid ChannelBuffer ByteOrder")
     new Buffer { val underlying = cb }
   }
 }

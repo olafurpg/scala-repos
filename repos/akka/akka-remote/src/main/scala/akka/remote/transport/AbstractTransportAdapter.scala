@@ -21,8 +21,8 @@ trait TransportAdapterProvider {
   /**
     * Create the transport adapter that wraps an underlying transport.
     */
-  def create(
-      wrappedTransport: Transport, system: ExtendedActorSystem): Transport
+  def create(wrappedTransport: Transport,
+             system: ExtendedActorSystem): Transport
 }
 
 class TransportAdapters(system: ExtendedActorSystem) extends Extension {
@@ -35,7 +35,8 @@ class TransportAdapters(system: ExtendedActorSystem) extends Extension {
         .recover({
           case e ⇒
             throw new IllegalArgumentException(
-                s"Cannot instantiate transport adapter [${fqn}]", e)
+                s"Cannot instantiate transport adapter [${fqn}]",
+                e)
         })
         .get
     }
@@ -94,7 +95,8 @@ abstract class AbstractTransportAdapter(
     : Future[AssociationEventListener]
 
   protected def interceptAssociate(
-      remoteAddress: Address, statusPromise: Promise[AssociationHandle]): Unit
+      remoteAddress: Address,
+      statusPromise: Promise[AssociationHandle]): Unit
 
   override def schemeIdentifier: String =
     augmentScheme(wrappedTransport.schemeIdentifier)
@@ -168,7 +170,8 @@ object ActorTransportAdapter {
   final case class ListenerRegistered(listener: AssociationEventListener)
       extends TransportOperation
   final case class AssociateUnderlying(
-      remoteAddress: Address, statusPromise: Promise[AssociationHandle])
+      remoteAddress: Address,
+      statusPromise: Promise[AssociationHandle])
       extends TransportOperation
   final case class ListenUnderlying(
       listenAddress: Address,
@@ -182,8 +185,8 @@ object ActorTransportAdapter {
   implicit val AskTimeout = Timeout(5.seconds)
 }
 
-abstract class ActorTransportAdapter(
-    wrappedTransport: Transport, system: ActorSystem)
+abstract class ActorTransportAdapter(wrappedTransport: Transport,
+                                     system: ActorSystem)
     extends AbstractTransportAdapter(wrappedTransport)(system.dispatcher) {
 
   import ActorTransportAdapter._
@@ -195,7 +198,8 @@ abstract class ActorTransportAdapter(
 
   private def registerManager(): Future[ActorRef] =
     (system.actorSelection("/system/transports") ? RegisterTransportActor(
-            managerProps, managerName)).mapTo[ActorRef]
+            managerProps,
+            managerName)).mapTo[ActorRef]
 
   override def interceptListen(
       listenAddress: Address,
@@ -218,8 +222,8 @@ abstract class ActorTransportAdapter(
 
   override def shutdown(): Future[Boolean] =
     for {
-      stopResult ← gracefulStop(
-                      manager, RARP(system).provider.remoteSettings.FlushWait)
+      stopResult ← gracefulStop(manager,
+                                RARP(system).provider.remoteSettings.FlushWait)
       wrappedStopResult ← wrappedTransport.shutdown()
     } yield stopResult && wrappedStopResult
 }

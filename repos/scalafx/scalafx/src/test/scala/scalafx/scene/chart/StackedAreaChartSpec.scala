@@ -48,6 +48,6 @@ class StackedAreaChartSpec
     with RunOnApplicationThread {
 
   override def getJavaClassInstance =
-    new jfxsc.StackedAreaChart[Number, Number](
-        new jfxsc.NumberAxis, new jfxsc.NumberAxis)
+    new jfxsc.StackedAreaChart[Number, Number](new jfxsc.NumberAxis,
+                                               new jfxsc.NumberAxis)
 }

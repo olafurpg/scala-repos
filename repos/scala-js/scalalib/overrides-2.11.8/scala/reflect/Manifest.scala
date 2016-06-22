@@ -59,7 +59,7 @@ trait Manifest[T] extends ClassManifest[T] with Equals {
   override def equals(that: Any): Boolean = that match {
     case m: Manifest[_] =>
       (m canEqual this) && (this.runtimeClass == m.runtimeClass) &&
-      (this <:< m) && (m <:< this)
+        (this <:< m) && (m <:< this)
     case _ => false
   }
   override def hashCode = this.runtimeClass.##
@@ -214,8 +214,8 @@ object ManifestFactory {
   }
 
   private object ObjectManifest
-      extends PhantomManifest[java.lang.Object](
-          classOf[java.lang.Object], "Object") {
+      extends PhantomManifest[java.lang.Object](classOf[java.lang.Object],
+                                                "Object") {
     override def runtimeClass = classOf[java.lang.Object]
     override def newArray(len: Int) = new Array[java.lang.Object](len)
     override def <:<(that: ClassManifest[_]): Boolean =
@@ -224,8 +224,8 @@ object ManifestFactory {
   }
 
   private object AnyValManifest
-      extends PhantomManifest[scala.AnyVal](
-          classOf[java.lang.Object], "AnyVal") {
+      extends PhantomManifest[scala.AnyVal](classOf[java.lang.Object],
+                                            "AnyVal") {
     override def runtimeClass = classOf[java.lang.Object]
     override def newArray(len: Int) = new Array[scala.AnyVal](len)
     override def <:<(that: ClassManifest[_]): Boolean =
@@ -243,8 +243,8 @@ object ManifestFactory {
   }
 
   private object NothingManifest
-      extends PhantomManifest[scala.Nothing](
-          classOf[scala.runtime.Nothing$], "Nothing") {
+      extends PhantomManifest[scala.Nothing](classOf[scala.runtime.Nothing$],
+                                             "Nothing") {
     override def runtimeClass = classOf[scala.runtime.Nothing$]
     override def newArray(len: Int) = new Array[scala.Nothing](len)
     override def <:<(that: ClassManifest[_]): Boolean = (that ne null)
@@ -303,7 +303,7 @@ object ManifestFactory {
     def runtimeClass: Predef.Class[_] = runtimeClass1
     override def toString =
       (if (prefix.isEmpty) "" else prefix.get.toString + "#") +
-      (if (runtimeClass.isArray) "Array" else runtimeClass.getName) + argString
+        (if (runtimeClass.isArray) "Array" else runtimeClass.getName) + argString
   }
 
   def arrayType[T](arg: Manifest[_]): Manifest[Array[T]] =
@@ -324,13 +324,13 @@ object ManifestFactory {
 
   /** Manifest for the unknown type `_ >: L <: U` in an existential.
     */
-  def wildcardType[T](
-      lowerBound: Manifest[_], upperBound: Manifest[_]): Manifest[T] =
+  def wildcardType[T](lowerBound: Manifest[_],
+                      upperBound: Manifest[_]): Manifest[T] =
     new Manifest[T] {
       def runtimeClass = upperBound.runtimeClass
       override def toString =
         "_" + (if (lowerBound eq Nothing) "" else " >: " + lowerBound) +
-        (if (upperBound eq Nothing) "" else " <: " + upperBound)
+          (if (upperBound eq Nothing) "" else " <: " + upperBound)
     }
 
   /** Manifest for the intersection type `parents_0 with ... with parents_n'. */

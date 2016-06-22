@@ -22,8 +22,9 @@ private[akka] object ActorRefSinkActor {
 /**
   * INTERNAL API
   */
-private[akka] class ActorRefSinkActor(
-    ref: ActorRef, highWatermark: Int, onCompleteMessage: Any)
+private[akka] class ActorRefSinkActor(ref: ActorRef,
+                                      highWatermark: Int,
+                                      onCompleteMessage: Any)
     extends ActorSubscriber {
   import ActorSubscriberMessage._
 

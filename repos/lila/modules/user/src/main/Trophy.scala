@@ -27,12 +27,12 @@ object Trophy {
             none)
 
     object WayOfBerserk
-        extends Kind(
-            key = "wayOfBerserk",
-            name = "The way of Berserk",
-            icon = "`".some,
-            url = "http://lichess.org/qa/340/way-of-berserk-trophy".some,
-            "fire_trophy".some)
+        extends Kind(key = "wayOfBerserk",
+                     name = "The way of Berserk",
+                     icon = "`".some,
+                     url =
+                       "http://lichess.org/qa/340/way-of-berserk-trophy".some,
+                     "fire_trophy".some)
 
     object MarathonWinner
         extends Kind(key = "marathonWinner",

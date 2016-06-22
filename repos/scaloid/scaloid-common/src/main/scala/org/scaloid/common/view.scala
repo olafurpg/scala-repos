@@ -190,8 +190,8 @@ trait TraitView[This <: android.view.View]
 
   // TODO: Make the return type as Option[TraitViewGroup[_]]
   protected def parentViewGroupIfExists[LP <: ViewGroupLayoutParams[_, _]](
-      implicit defaultLayoutParam: This => LP = (v: This) =>
-        null): TraitViewGroup[_] = {
+      implicit defaultLayoutParam: This => LP = (v: This) => null)
+    : TraitViewGroup[_] = {
     val lp = defaultLayoutParam(basis)
     if (lp == null) null else lp.parent
   }
@@ -1154,7 +1154,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setOnLongClickListener(android.view.View.OnLongClickListener) setOnLongClickListener(android.view.View.OnLongClickListener)]]`
     */
-  @inline def onLongClickListener_=(p: android.view.View.OnLongClickListener) = {
+  @inline
+  def onLongClickListener_=(p: android.view.View.OnLongClickListener) = {
     basis.setOnLongClickListener(p); basis
   }
 
@@ -1881,16 +1882,14 @@ trait TraitView[This <: android.view.View]
   @inline def y_=(p: Float) = { basis.setY(p); basis }
 
   @inline def onClick[U](f: android.view.View => U): This = {
-    basis.setOnClickListener(
-        new android.view.View.OnClickListener {
+    basis.setOnClickListener(new android.view.View.OnClickListener {
       def onClick(p: android.view.View): Unit = { f(p) }
     })
     basis
   }
 
   @inline def onClick[U](f: => U): This = {
-    basis.setOnClickListener(
-        new android.view.View.OnClickListener {
+    basis.setOnClickListener(new android.view.View.OnClickListener {
       def onClick(p: android.view.View): Unit = { f }
     })
     basis
@@ -1902,10 +1901,12 @@ trait TraitView[This <: android.view.View]
           android.view.ContextMenu.ContextMenuInfo) => U): This = {
     basis.setOnCreateContextMenuListener(
         new android.view.View.OnCreateContextMenuListener {
-      def onCreateContextMenu(p1: android.view.ContextMenu,
-                              p2: android.view.View,
-                              p3: android.view.ContextMenu.ContextMenuInfo)
-        : Unit = { f(p1, p2, p3) }
+      def onCreateContextMenu(
+          p1: android.view.ContextMenu,
+          p2: android.view.View,
+          p3: android.view.ContextMenu.ContextMenuInfo): Unit = {
+        f(p1, p2, p3)
+      }
     })
     basis
   }
@@ -1923,22 +1924,24 @@ trait TraitView[This <: android.view.View]
 
   @inline
   def onDrag(f: (android.view.View, android.view.DragEvent) => Boolean): This = {
-    basis.setOnDragListener(
-        new android.view.View.OnDragListener {
-      def onDrag(p1: android.view.View, p2: android.view.DragEvent): Boolean = {
-        f(p1, p2)
-      }
-    })
+    basis
+      .setOnDragListener(new android.view.View.OnDragListener {
+        def onDrag(p1: android.view.View,
+                   p2: android.view.DragEvent): Boolean = {
+          f(p1, p2)
+        }
+      })
     basis
   }
 
   @inline def onDrag(f: => Boolean): This = {
-    basis.setOnDragListener(
-        new android.view.View.OnDragListener {
-      def onDrag(p1: android.view.View, p2: android.view.DragEvent): Boolean = {
-        f
-      }
-    })
+    basis
+      .setOnDragListener(new android.view.View.OnDragListener {
+        def onDrag(p1: android.view.View,
+                   p2: android.view.DragEvent): Boolean = {
+          f
+        }
+      })
     basis
   }
 
@@ -1965,9 +1968,10 @@ trait TraitView[This <: android.view.View]
       f: (android.view.View, android.view.MotionEvent) => Boolean): This = {
     basis.setOnGenericMotionListener(
         new android.view.View.OnGenericMotionListener {
-      def onGenericMotion(
-          p1: android.view.View,
-          p2: android.view.MotionEvent): Boolean = { f(p1, p2) }
+      def onGenericMotion(p1: android.view.View,
+                          p2: android.view.MotionEvent): Boolean = {
+        f(p1, p2)
+      }
     })
     basis
   }
@@ -1975,8 +1979,8 @@ trait TraitView[This <: android.view.View]
   @inline def onGenericMotion(f: => Boolean): This = {
     basis.setOnGenericMotionListener(
         new android.view.View.OnGenericMotionListener {
-      def onGenericMotion(
-          p1: android.view.View, p2: android.view.MotionEvent): Boolean = { f }
+      def onGenericMotion(p1: android.view.View,
+                          p2: android.view.MotionEvent): Boolean = { f }
     })
     basis
   }
@@ -1984,8 +1988,7 @@ trait TraitView[This <: android.view.View]
   @inline
   def onHover(
       f: (android.view.View, android.view.MotionEvent) => Boolean): This = {
-    basis.setOnHoverListener(
-        new android.view.View.OnHoverListener {
+    basis.setOnHoverListener(new android.view.View.OnHoverListener {
       def onHover(p1: android.view.View,
                   p2: android.view.MotionEvent): Boolean = { f(p1, p2) }
     })
@@ -1993,10 +1996,9 @@ trait TraitView[This <: android.view.View]
   }
 
   @inline def onHover(f: => Boolean): This = {
-    basis.setOnHoverListener(
-        new android.view.View.OnHoverListener {
-      def onHover(
-          p1: android.view.View, p2: android.view.MotionEvent): Boolean = { f }
+    basis.setOnHoverListener(new android.view.View.OnHoverListener {
+      def onHover(p1: android.view.View,
+                  p2: android.view.MotionEvent): Boolean = { f }
     })
     basis
   }
@@ -2004,8 +2006,7 @@ trait TraitView[This <: android.view.View]
   @inline
   def onKey(
       f: (android.view.View, Int, android.view.KeyEvent) => Boolean): This = {
-    basis.setOnKeyListener(
-        new android.view.View.OnKeyListener {
+    basis.setOnKeyListener(new android.view.View.OnKeyListener {
       def onKey(p1: android.view.View,
                 p2: Int,
                 p3: android.view.KeyEvent): Boolean = { f(p1, p2, p3) }
@@ -2014,8 +2015,7 @@ trait TraitView[This <: android.view.View]
   }
 
   @inline def onKey(f: => Boolean): This = {
-    basis.setOnKeyListener(
-        new android.view.View.OnKeyListener {
+    basis.setOnKeyListener(new android.view.View.OnKeyListener {
       def onKey(p1: android.view.View,
                 p2: Int,
                 p3: android.view.KeyEvent): Boolean = { f }
@@ -2061,16 +2061,14 @@ trait TraitView[This <: android.view.View]
   }
 
   @inline def onLongClick(f: android.view.View => Boolean): This = {
-    basis.setOnLongClickListener(
-        new android.view.View.OnLongClickListener {
+    basis.setOnLongClickListener(new android.view.View.OnLongClickListener {
       def onLongClick(p: android.view.View): Boolean = { f(p) }
     })
     basis
   }
 
   @inline def onLongClick(f: => Boolean): This = {
-    basis.setOnLongClickListener(
-        new android.view.View.OnLongClickListener {
+    basis.setOnLongClickListener(new android.view.View.OnLongClickListener {
       def onLongClick(p: android.view.View): Boolean = { f }
     })
     basis
@@ -2095,8 +2093,7 @@ trait TraitView[This <: android.view.View]
   @inline
   def onTouch(
       f: (android.view.View, android.view.MotionEvent) => Boolean): This = {
-    basis.setOnTouchListener(
-        new android.view.View.OnTouchListener {
+    basis.setOnTouchListener(new android.view.View.OnTouchListener {
       def onTouch(p1: android.view.View,
                   p2: android.view.MotionEvent): Boolean = { f(p1, p2) }
     })
@@ -2104,10 +2101,9 @@ trait TraitView[This <: android.view.View]
   }
 
   @inline def onTouch(f: => Boolean): This = {
-    basis.setOnTouchListener(
-        new android.view.View.OnTouchListener {
-      def onTouch(
-          p1: android.view.View, p2: android.view.MotionEvent): Boolean = { f }
+    basis.setOnTouchListener(new android.view.View.OnTouchListener {
+      def onTouch(p1: android.view.View,
+                  p2: android.view.MotionEvent): Boolean = { f }
     })
     basis
   }
@@ -2524,10 +2520,10 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
       f: (android.view.View, android.view.View) => U): This = {
     basis.setOnHierarchyChangeListener(
         new android.view.ViewGroup.OnHierarchyChangeListener {
-      def onChildViewAdded(
-          p1: android.view.View, p2: android.view.View): Unit = { f(p1, p2) }
-      def onChildViewRemoved(
-          p1: android.view.View, p2: android.view.View): Unit = {}
+      def onChildViewAdded(p1: android.view.View,
+                           p2: android.view.View): Unit = { f(p1, p2) }
+      def onChildViewRemoved(p1: android.view.View,
+                             p2: android.view.View): Unit = {}
     })
     basis
   }
@@ -2535,10 +2531,10 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
   @inline def onChildViewAdded[U](f: => U): This = {
     basis.setOnHierarchyChangeListener(
         new android.view.ViewGroup.OnHierarchyChangeListener {
-      def onChildViewAdded(
-          p1: android.view.View, p2: android.view.View): Unit = { f }
-      def onChildViewRemoved(
-          p1: android.view.View, p2: android.view.View): Unit = {}
+      def onChildViewAdded(p1: android.view.View,
+                           p2: android.view.View): Unit = { f }
+      def onChildViewRemoved(p1: android.view.View,
+                             p2: android.view.View): Unit = {}
     })
     basis
   }
@@ -2548,10 +2544,10 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
       f: (android.view.View, android.view.View) => U): This = {
     basis.setOnHierarchyChangeListener(
         new android.view.ViewGroup.OnHierarchyChangeListener {
-      def onChildViewAdded(
-          p1: android.view.View, p2: android.view.View): Unit = {}
-      def onChildViewRemoved(
-          p1: android.view.View, p2: android.view.View): Unit = { f(p1, p2) }
+      def onChildViewAdded(p1: android.view.View,
+                           p2: android.view.View): Unit = {}
+      def onChildViewRemoved(p1: android.view.View,
+                             p2: android.view.View): Unit = { f(p1, p2) }
     })
     basis
   }
@@ -2559,10 +2555,10 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
   @inline def onChildViewRemoved[U](f: => U): This = {
     basis.setOnHierarchyChangeListener(
         new android.view.ViewGroup.OnHierarchyChangeListener {
-      def onChildViewAdded(
-          p1: android.view.View, p2: android.view.View): Unit = {}
-      def onChildViewRemoved(
-          p1: android.view.View, p2: android.view.View): Unit = { f }
+      def onChildViewAdded(p1: android.view.View,
+                           p2: android.view.View): Unit = {}
+      def onChildViewRemoved(p1: android.view.View,
+                             p2: android.view.View): Unit = { f }
     })
     basis
   }
@@ -2913,14 +2909,14 @@ trait TraitViewStub[This <: android.view.ViewStub] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewStub.html#setOnInflateListener(android.view.ViewStub.OnInflateListener) setOnInflateListener(android.view.ViewStub.OnInflateListener)]]`
     */
-  @inline def onInflateListener_=(p: android.view.ViewStub.OnInflateListener) = {
+  @inline
+  def onInflateListener_=(p: android.view.ViewStub.OnInflateListener) = {
     basis.setOnInflateListener(p); basis
   }
 
   @inline
   def onInflate[U](f: (android.view.ViewStub, android.view.View) => U): This = {
-    basis.setOnInflateListener(
-        new android.view.ViewStub.OnInflateListener {
+    basis.setOnInflateListener(new android.view.ViewStub.OnInflateListener {
       def onInflate(p1: android.view.ViewStub, p2: android.view.View): Unit = {
         f(p1, p2)
       }
@@ -2929,8 +2925,7 @@ trait TraitViewStub[This <: android.view.ViewStub] extends TraitView[This] {
   }
 
   @inline def onInflate[U](f: => U): This = {
-    basis.setOnInflateListener(
-        new android.view.ViewStub.OnInflateListener {
+    basis.setOnInflateListener(new android.view.ViewStub.OnInflateListener {
       def onInflate(p1: android.view.ViewStub, p2: android.view.View): Unit = {
         f
       }

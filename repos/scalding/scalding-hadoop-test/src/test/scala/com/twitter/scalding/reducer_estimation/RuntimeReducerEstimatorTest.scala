@@ -10,8 +10,8 @@ import scala.util.{Success, Try}
 object HistoryService1 extends HistoryServiceWithData {
   import HistoryServiceWithData._
 
-  def fetchHistory(
-      info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
+  def fetchHistory(info: FlowStrategyInfo,
+                   maxHistory: Int): Try[Seq[FlowStepHistory]] =
     Success(
         Seq(makeHistory(inputSize * 2, 0, List(10, 1000, 3000)),
             makeHistory(inputSize / 2, 0, List(10, 200, 400)),

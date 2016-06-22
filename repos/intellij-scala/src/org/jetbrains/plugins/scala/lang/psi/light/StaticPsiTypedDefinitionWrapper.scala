@@ -19,15 +19,16 @@ class StaticPsiTypedDefinitionWrapper(
     extends {
   val elementFactory =
     JavaPsiFacade.getInstance(typedDefinition.getProject).getElementFactory
-  val methodText = StaticPsiTypedDefinitionWrapper.methodText(
-      typedDefinition, role, containingClass)
+  val methodText = StaticPsiTypedDefinitionWrapper
+    .methodText(typedDefinition, role, containingClass)
   val method: PsiMethod = {
     try {
       elementFactory.createMethodFromText(methodText, containingClass)
     } catch {
       case e: Exception =>
         elementFactory.createMethodFromText(
-            "public void FAILED_TO_DECOMPILE_METHOD() {}", containingClass)
+            "public void FAILED_TO_DECOMPILE_METHOD() {}",
+            containingClass)
     }
   }
 } with LightMethodAdapter(typedDefinition.getManager, method, containingClass)

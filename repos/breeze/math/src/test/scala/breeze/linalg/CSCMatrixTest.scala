@@ -35,12 +35,15 @@ class CSCMatrixTest extends FunSuite with Checkers {
     val b = CSCMatrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0), (12.0, 0.0, 5.0))
     val bd = DenseMatrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0), (12.0, 0.0, 5.0))
     val c = DenseVector(6.0, 2.0, 3.0)
-    assert((a * b: CSCMatrix[Double]) === CSCMatrix((37.0, -8.0, 25.0),
-                                                    (85.0, -23.0, 67.0)))
-    assert((a * bd: DenseMatrix[Double]) === DenseMatrix((37.0, -8.0, 25.0),
-                                                         (85.0, -23.0, 67.0)))
-    assert((ad * b: DenseMatrix[Double]) === DenseMatrix((37.0, -8.0, 25.0),
-                                                         (85.0, -23.0, 67.0)))
+    assert(
+        (a * b: CSCMatrix[Double]) === CSCMatrix((37.0, -8.0, 25.0),
+                                                 (85.0, -23.0, 67.0)))
+    assert(
+        (a * bd: DenseMatrix[Double]) === DenseMatrix((37.0, -8.0, 25.0),
+                                                      (85.0, -23.0, 67.0)))
+    assert(
+        (ad * b: DenseMatrix[Double]) === DenseMatrix((37.0, -8.0, 25.0),
+                                                      (85.0, -23.0, 67.0)))
     assert(a * c === DenseVector(19.0, 52.0))
     assert(b * c === DenseVector(62.0, -21.0, 87.0))
 
@@ -101,12 +104,18 @@ class CSCMatrixTest extends FunSuite with Checkers {
         value === CSCMatrix(
             (Complex(0, 74), Complex(0, -16), Complex(0, 50)),
             (Complex(0, 170), Complex(0, -46), Complex(0, 134))))
-    assert(b * c === DenseVector(
-            Complex(62, 62), Complex(-21, -21), Complex(87, 87)))
-    assert(b * cs === DenseVector(
-            Complex(62, 62), Complex(-21, -21), Complex(87, 87)))
-    assert(b.t * c === DenseVector(
-            Complex(72, -72), Complex(-18, 18), Complex(65, -65)))
+    assert(
+        b * c === DenseVector(Complex(62, 62),
+                              Complex(-21, -21),
+                              Complex(87, 87)))
+    assert(
+        b * cs === DenseVector(Complex(62, 62),
+                               Complex(-21, -21),
+                               Complex(87, 87)))
+    assert(
+        b.t * c === DenseVector(Complex(72, -72),
+                                Complex(-18, 18),
+                                Complex(65, -65)))
   }
 
   test("Transpose") {
@@ -234,8 +243,9 @@ class CSCMatrixTest extends FunSuite with Checkers {
 
     a = CSCMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     a :/= b
-    assert(a === CSCMatrix((1.0 / 7.0, -1.0, 3.0 / 8.0),
-                           (4.0 / (-3.0), 5.0 / (-3.0), 6.0)))
+    assert(
+        a === CSCMatrix((1.0 / 7.0, -1.0, 3.0 / 8.0),
+                        (4.0 / (-3.0), 5.0 / (-3.0), 6.0)))
   }
 
   test("csc scalar \"bad\" ops") {
@@ -283,8 +293,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
   }
 
   test("CSCxCSC: OpAddInPlace2:Field") {
-    def testAddInPlace[T: Field: Zero: ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]) = {
+    def testAddInPlace[T: Field: Zero: ClassTag](a: CSCMatrix[T],
+                                                 b: CSCMatrix[T]) = {
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       a += b
@@ -304,8 +314,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
   }
 
   test("CSCxCSC: OpSubInPlace2:Field") {
-    def testSubInPlace[T: Field: Zero: ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]) = {
+    def testSubInPlace[T: Field: Zero: ClassTag](a: CSCMatrix[T],
+                                                 b: CSCMatrix[T]) = {
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       a -= b
@@ -324,8 +334,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     assert(cscA === cscB * -2.0)
   }
   test("CSCxCSC: OpMulScalarInPlace2:Field") {
-    def testMulScalarInPlace[T: Field: Zero: ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]) = {
+    def testMulScalarInPlace[T: Field: Zero: ClassTag](a: CSCMatrix[T],
+                                                       b: CSCMatrix[T]) = {
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       a *= b
@@ -364,8 +374,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     assert(cscA === CSCMatrix.zeros[Double](3, 4))
   }
   test("ZipMapVals Test") {
-    def testZipMap[T: Field: Zero: ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]): CSCMatrix[T] = {
+    def testZipMap[T: Field: Zero: ClassTag](a: CSCMatrix[T],
+                                             b: CSCMatrix[T]): CSCMatrix[T] = {
       val f = implicitly[Field[T]]
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
@@ -430,10 +440,16 @@ class CSCMatrixTest extends FunSuite with Checkers {
   }
 
   test("#479") {
-    val m1: Matrix[Double] = new CSCMatrix[Double](
-        Array(1.0, 1, 1), 3, 3, Array(0, 1, 2, 3), Array(0, 1, 2))
-    val m2: Matrix[Double] = new CSCMatrix[Double](
-        Array(1.0, 2, 2, 4), 3, 3, Array(0, 0, 2, 4), Array(1, 2, 1, 2))
+    val m1: Matrix[Double] = new CSCMatrix[Double](Array(1.0, 1, 1),
+                                                   3,
+                                                   3,
+                                                   Array(0, 1, 2, 3),
+                                                   Array(0, 1, 2))
+    val m2: Matrix[Double] = new CSCMatrix[Double](Array(1.0, 2, 2, 4),
+                                                   3,
+                                                   3,
+                                                   Array(0, 0, 2, 4),
+                                                   Array(1, 2, 1, 2))
 
     val sum = (m1 + m2).asInstanceOf[CSCMatrix[Double]]
     require(sum.colPtrs.last == sum.rowIndices.length,
@@ -445,8 +461,9 @@ class CSCMatrixTest extends FunSuite with Checkers {
       CSCMatrix((1.0, 3.0, 4.0), (2.0, 0.0, 6.0)) \ DenseVector(1.0, 3.0)
     import breeze.numerics.inf
     assert(
-        norm(r2 - DenseVector(
-                 0.1813186813186811, -0.3131868131868131, 0.43956043956043944),
+        norm(r2 - DenseVector(0.1813186813186811,
+                              -0.3131868131868131,
+                              0.43956043956043944),
              inf) < 1E-5)
   }
 }

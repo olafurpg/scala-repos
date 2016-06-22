@@ -60,7 +60,8 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
           case plan: DeploymentPlan =>
             // create a new deployment to return to the previous state
             deploymentResult(
-                result(groupManager.update(
+                result(
+                    groupManager.update(
                         plan.original.id,
                         plan.revert,
                         force = true

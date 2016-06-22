@@ -9,8 +9,9 @@ object DenseMatrixBenchmark extends MyRunner(classOf[DenseMatrixBenchmark])
 
 trait BuildsRandomMatrices {
   private val uniform = Uniform(0, 1)
-  def randomMatrix(
-      m: Int, n: Int, transpose: Boolean = false): DenseMatrix[Double] = {
+  def randomMatrix(m: Int,
+                   n: Int,
+                   transpose: Boolean = false): DenseMatrix[Double] = {
     if (!transpose) {
       DenseMatrix.rand[Double](m, n)
     } else {
@@ -18,8 +19,9 @@ trait BuildsRandomMatrices {
     }
   }
 
-  def randomIntMatrix(
-      m: Int, n: Int, transpose: Boolean = false): DenseMatrix[Int] = {
+  def randomIntMatrix(m: Int,
+                      n: Int,
+                      transpose: Boolean = false): DenseMatrix[Int] = {
     if (!transpose) {
       DenseMatrix.rand[Int](m, n, rand = Rand.randInt(200))
     } else {

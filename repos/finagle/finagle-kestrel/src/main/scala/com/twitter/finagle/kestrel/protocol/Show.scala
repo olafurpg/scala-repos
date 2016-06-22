@@ -27,8 +27,9 @@ object ResponseToEncoding {
 private[kestrel] class ResponseToEncoding extends OneToOneEncoder {
   import ResponseToEncoding._
 
-  def encode(
-      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding = {
+  def encode(ctx: ChannelHandlerContext,
+             ch: Channel,
+             message: AnyRef): Decoding = {
     message match {
       case Stored() => StoredTokens
       case Deleted() => DeletedTokens
@@ -82,12 +83,14 @@ private[kestrel] class CommandToEncoding extends OneToOneEncoder {
     }
   }
 
-  def encode(
-      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding = {
+  def encode(ctx: ChannelHandlerContext,
+             ch: Channel,
+             message: AnyRef): Decoding = {
     message match {
       case Set(key, expiry, value) =>
         TokensWithData(
-            Seq(SET, key, ZERO, Buf.Utf8(expiry.inSeconds.toString)), value)
+            Seq(SET, key, ZERO, Buf.Utf8(expiry.inSeconds.toString)),
+            value)
       case Get(queueName, timeout) =>
         val key = timeout match {
           case Some(t) => queueName.concat(encodeTimeout(t))

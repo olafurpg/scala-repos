@@ -79,8 +79,9 @@ trait MarkupParsers { self: Parsers =>
       val result = ch; input.nextChar(); result
     }
 
-    def mkProcInstr(
-        position: Position, name: String, text: String): ElementType =
+    def mkProcInstr(position: Position,
+                    name: String,
+                    text: String): ElementType =
       parser.symbXMLBuilder.procInstr(position, name, text)
 
     var xEmbeddedBlock = false
@@ -127,8 +128,8 @@ trait MarkupParsers { self: Parsers =>
 
             try handle.parseAttribute(r2p(start, mid, curOffset), tmp) catch {
               case e: RuntimeException =>
-                errorAndResult(
-                    "error parsing attribute value", parser.errorTermTree)
+                errorAndResult("error parsing attribute value",
+                               parser.errorTermTree)
             }
 
           case '{' =>
@@ -347,8 +348,8 @@ trait MarkupParsers { self: Parsers =>
     }
 
     /** Some try/catch/finally logic used by xLiteral and xLiteralPattern.  */
-    private def xLiteralCommon(
-        f: () => Tree, ifTruncated: String => Unit): Tree = {
+    private def xLiteralCommon(f: () => Tree,
+                               ifTruncated: String => Unit): Tree = {
       try return f() catch {
         case c @ TruncatedXMLControl =>
           ifTruncated(c.getMessage)
@@ -382,8 +383,7 @@ trait MarkupParsers { self: Parsers =>
 
           val ts = new ArrayBuffer[Tree]
           val start = curOffset
-          tmppos =
-            o2p(curOffset) // Iuli: added this line, as it seems content_LT uses tmppos when creating trees
+          tmppos = o2p(curOffset) // Iuli: added this line, as it seems content_LT uses tmppos when creating trees
           content_LT(ts)
 
           // parse more XML?

@@ -1,5 +1,5 @@
 trait Base {
-  type Rep [T]
+  type Rep[T]
 }
 
 trait Expressions {

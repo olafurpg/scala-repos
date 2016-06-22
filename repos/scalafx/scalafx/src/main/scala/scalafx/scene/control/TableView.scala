@@ -313,8 +313,8 @@ class TableView[S](
   def columnResizePolicy_=(p: TableView.ResizeFeatures[_] => Boolean) {
     delegate
       .columnResizePolicyProperty()
-      .setValue(new jfxu.Callback[
-              jfxsc.TableView.ResizeFeatures[_], java.lang.Boolean] {
+      .setValue(new jfxu.Callback[jfxsc.TableView.ResizeFeatures[_],
+                                  java.lang.Boolean] {
         def call(v: jfxsc.TableView.ResizeFeatures[_]): java.lang.Boolean = {
           p(v)
         }
@@ -441,7 +441,8 @@ class TableView[S](
   def onScrollTo_=(v: jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]) {
     ObjectProperty
       .fillProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]](
-        onScrollTo, v)
+          onScrollTo,
+          v)
   }
 
   /**
@@ -452,9 +453,8 @@ class TableView[S](
     delegate.onScrollToColumnProperty
   def onScrollToColumn_=(
       v: jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]) {
-    ObjectProperty.fillProperty[
-        jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]](
-        onScrollToColumn, v)
+    ObjectProperty.fillProperty[jfxe.EventHandler[
+            jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]](onScrollToColumn, v)
   }
 
   /** Called when there's a request to sort the control. */
@@ -464,7 +464,8 @@ class TableView[S](
   def onSort_=(v: jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]]) {
     ObjectProperty
       .fillProperty[jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]]](
-        onSort, v)
+          onSort,
+          v)
   }
 
   /** Scrolls the TableView so that the given object is visible within the viewport. */
@@ -479,6 +480,7 @@ class TableView[S](
   def sortPolicy_=(v: jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean]) {
     ObjectProperty
       .fillProperty[jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean]](
-        sortPolicy, v)
+          sortPolicy,
+          v)
   }
 }

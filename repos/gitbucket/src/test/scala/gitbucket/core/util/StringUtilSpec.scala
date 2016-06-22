@@ -31,7 +31,8 @@ class StringUtilSpec extends FunSpec {
   describe("escapeHtml") {
     it("should escape &, <, > and \"") {
       assert(
-          StringUtil.escapeHtml("<a href=\"/test\">a & b</a>") == "&lt;a href=&quot;/test&quot;&gt;a &amp; b&lt;/a&gt;")
+          StringUtil
+            .escapeHtml("<a href=\"/test\">a & b</a>") == "&lt;a href=&quot;/test&quot;&gt;a &amp; b&lt;/a&gt;")
     }
   }
 

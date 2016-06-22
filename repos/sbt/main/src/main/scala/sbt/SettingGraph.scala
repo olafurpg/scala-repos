@@ -13,14 +13,15 @@ import Predef.{any2stringadd => _, _}
 import sbt.io.IO
 
 object SettingGraph {
-  def apply(structure: BuildStructure,
-            basedir: File,
-            scoped: ScopedKey[_],
-            generation: Int)(
-      implicit display: Show[ScopedKey[_]]): SettingGraph = {
+  def apply(
+      structure: BuildStructure,
+      basedir: File,
+      scoped: ScopedKey[_],
+      generation: Int)(implicit display: Show[ScopedKey[_]]): SettingGraph = {
     val cMap = flattenLocals(
-        compiled(structure.settings, false)(
-            structure.delegates, structure.scopeLocal, display))
+        compiled(structure.settings, false)(structure.delegates,
+                                            structure.scopeLocal,
+                                            display))
     def loop(scoped: ScopedKey[_], generation: Int): SettingGraph = {
       val key = scoped.key
       val scope = scoped.scope
@@ -66,7 +67,7 @@ case class SettingGraph(name: String,
                   (x: SettingGraph) => x.depends.toSeq.sortBy(_.name),
                   (x: SettingGraph) =>
                     "%s = %s" format
-                    (x.definedIn getOrElse { "" }, x.dataString))
+                      (x.definedIn getOrElse { "" }, x.dataString))
 }
 
 object Graph {

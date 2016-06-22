@@ -22,8 +22,9 @@ class MergeIfToAndIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = "Merge nested 'if's"
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -37,7 +38,8 @@ class MergeIfToAndIntention extends PsiElementBaseIntentionAction {
     if (condition == null) return false
 
     if (!(ifStmt.getTextRange.getStartOffset <= offset &&
-            offset <= condition.getTextRange.getStartOffset - 1)) return false
+              offset <= condition.getTextRange.getStartOffset - 1))
+      return false
 
     thenBranch match {
       case branch: ScBlockExpr =>
@@ -80,9 +82,8 @@ class MergeIfToAndIntention extends PsiElementBaseIntentionAction {
       .append(") ")
       .append(innerThenBranch.getText)
 
-    val newIfStmt: ScExpression =
-      ScalaPsiElementFactory.createExpressionFromText(
-          expr.toString(), element.getManager)
+    val newIfStmt: ScExpression = ScalaPsiElementFactory
+      .createExpressionFromText(expr.toString(), element.getManager)
 
     inWriteAction {
       ifStmt.replaceExpression(newIfStmt, true)

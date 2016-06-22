@@ -56,8 +56,8 @@ class ConvertToTypedPatternIntention extends PsiElementBaseIntentionAction {
       case _ => "value"
     }
     // TODO replace references to the constructor pattern params with "value.param"
-    val newPattern = ScalaPsiElementFactory.createPatternFromText(
-        "%s: %s".format(name, codeRef.getText), manager)
+    val newPattern = ScalaPsiElementFactory
+      .createPatternFromText("%s: %s".format(name, codeRef.getText), manager)
     constrPattern.replace(newPattern)
   }
 }

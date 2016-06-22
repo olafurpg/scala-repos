@@ -20,7 +20,7 @@ class UnitInMapInspection extends OperationOnCollectionInspection {
       holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case MethodRepr(call, _, Some(ref), Seq(arg @ lambdaWithBody(body)))
         if ref.refName == "map" &&
-        checkResolve(ref, getLikeCollectionClasses) =>
+          checkResolve(ref, getLikeCollectionClasses) =>
       val isInBlock = call.getParent match {
         case _: ScBlock | _: ScTemplateBody | _: ScEarlyDefinitions |
             _: ScalaFile =>

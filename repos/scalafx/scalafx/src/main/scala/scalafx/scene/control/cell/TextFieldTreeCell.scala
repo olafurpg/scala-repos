@@ -86,8 +86,8 @@ object TextFieldTreeCell {
   /**
     * Added to satisfy Spec tests.
     */
-  @deprecated(
-      message = "Use forTreeView[T](StringConverter[T])", since = "1.0")
+  @deprecated(message = "Use forTreeView[T](StringConverter[T])",
+              since = "1.0")
   def forTreeView[T](converter: jfxu.StringConverter[T]) =
     jfxscc.TextFieldTreeCell.forTreeView[T](converter)
 }

@@ -108,8 +108,9 @@ class LeveldbReadJournal(
       fromSequenceNr: Long,
       toSequenceNr: Long): Source[EventEnvelope, NotUsed] =
     scaladslReadJournal
-      .currentEventsByPersistenceId(
-          persistenceId, fromSequenceNr, toSequenceNr)
+      .currentEventsByPersistenceId(persistenceId,
+                                    fromSequenceNr,
+                                    toSequenceNr)
       .asJava
 
   /**
@@ -147,8 +148,8 @@ class LeveldbReadJournal(
     * The stream is completed with failure if there is a failure in executing the query in the
     * backend journal.
     */
-  override def eventsByTag(
-      tag: String, offset: Long): Source[EventEnvelope, NotUsed] =
+  override def eventsByTag(tag: String,
+                           offset: Long): Source[EventEnvelope, NotUsed] =
     scaladslReadJournal.eventsByTag(tag, offset).asJava
 
   /**
@@ -157,7 +158,8 @@ class LeveldbReadJournal(
     * stored after the query is completed are not included in the event stream.
     */
   override def currentEventsByTag(
-      tag: String, offset: Long): Source[EventEnvelope, NotUsed] =
+      tag: String,
+      offset: Long): Source[EventEnvelope, NotUsed] =
     scaladslReadJournal.currentEventsByTag(tag, offset).asJava
 }
 

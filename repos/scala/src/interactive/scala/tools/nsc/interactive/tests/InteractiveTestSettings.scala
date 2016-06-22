@@ -61,8 +61,8 @@ trait InteractiveTestSettings
   /** If there's a file ending in .opts, read it and parse it for cmd line arguments. */
   protected val argsString = {
     val optsFile =
-      outDir / "%s.%s".format(
-          System.getProperty("partest.testname"), TestOptionsFileExtension)
+      outDir / "%s.%s".format(System.getProperty("partest.testname"),
+                              TestOptionsFileExtension)
     val str = try File(optsFile).slurp() catch {
       case e: java.io.IOException => ""
     }

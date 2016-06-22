@@ -30,8 +30,10 @@ class FileStreamSourceTest extends StreamTest with SharedSQLContext {
 
   import testImplicits._
 
-  case class AddTextFileData(
-      source: FileStreamSource, content: String, src: File, tmp: File)
+  case class AddTextFileData(source: FileStreamSource,
+                             content: String,
+                             src: File,
+                             tmp: File)
       extends AddData {
 
     override def addData(): Offset = {
@@ -60,16 +62,15 @@ class FileStreamSourceTest extends StreamTest with SharedSQLContext {
   }
 
   /** Use `format` and `path` to create FileStreamSource via DataFrameReader */
-  def createFileStreamSource(format: String,
-                             path: String,
-                             schema: Option[StructType] =
-                               None): FileStreamSource = {
-    val reader =
-      if (schema.isDefined) {
-        sqlContext.read.format(format).schema(schema.get)
-      } else {
-        sqlContext.read.format(format)
-      }
+  def createFileStreamSource(
+      format: String,
+      path: String,
+      schema: Option[StructType] = None): FileStreamSource = {
+    val reader = if (schema.isDefined) {
+      sqlContext.read.format(format).schema(schema.get)
+    } else {
+      sqlContext.read.format(format)
+    }
     reader
       .stream(path)
       .queryExecution
@@ -94,12 +95,11 @@ class FileStreamSourceSuite
     val reader = sqlContext.read
     format.foreach(reader.format)
     schema.foreach(reader.schema)
-    val df =
-      if (path.isDefined) {
-        reader.stream(path.get)
-      } else {
-        reader.stream()
-      }
+    val df = if (path.isDefined) {
+      reader.stream(path.get)
+    } else {
+      reader.stream()
+    }
     df.queryExecution.analyzed.collect {
       case StreamingRelation(s: FileStreamSource, _) => s
     }.head.schema
@@ -107,16 +107,18 @@ class FileStreamSourceSuite
 
   test("FileStreamSource schema: no path") {
     val e = intercept[IllegalArgumentException] {
-      createFileStreamSourceAndGetSchema(
-          format = None, path = None, schema = None)
+      createFileStreamSourceAndGetSchema(format = None,
+                                         path = None,
+                                         schema = None)
     }
     assert("'path' is not specified" === e.getMessage)
   }
 
   test("FileStreamSource schema: path doesn't exist") {
     intercept[AnalysisException] {
-      createFileStreamSourceAndGetSchema(
-          format = None, path = Some("/a/b/c"), schema = None)
+      createFileStreamSourceAndGetSchema(format = None,
+                                         path = Some("/a/b/c"),
+                                         schema = None)
     }
   }
 
@@ -320,21 +322,28 @@ class FileStreamSourceSuite
     val src = Utils.createTempDir("streaming.src")
     val tmp = Utils.createTempDir("streaming.tmp")
 
-    val fileSource = createFileStreamSource(
-        "parquet", src.getCanonicalPath, Some(valueSchema))
+    val fileSource = createFileStreamSource("parquet",
+                                            src.getCanonicalPath,
+                                            Some(valueSchema))
     val filtered = fileSource.toDF().filter($"value" contains "keep")
 
     testStream(filtered)(
-        AddParquetFileData(
-            fileSource, Seq("drop1", "keep2", "keep3"), src, tmp),
+        AddParquetFileData(fileSource,
+                           Seq("drop1", "keep2", "keep3"),
+                           src,
+                           tmp),
         CheckAnswer("keep2", "keep3"),
         StopStream,
-        AddParquetFileData(
-            fileSource, Seq("drop4", "keep5", "keep6"), src, tmp),
+        AddParquetFileData(fileSource,
+                           Seq("drop4", "keep5", "keep6"),
+                           src,
+                           tmp),
         StartStream,
         CheckAnswer("keep2", "keep3", "keep5", "keep6"),
-        AddParquetFileData(
-            fileSource, Seq("drop7", "keep8", "keep9"), src, tmp),
+        AddParquetFileData(fileSource,
+                           Seq("drop7", "keep8", "keep9"),
+                           src,
+                           tmp),
         CheckAnswer("keep2", "keep3", "keep5", "keep6", "keep8", "keep9")
     )
 

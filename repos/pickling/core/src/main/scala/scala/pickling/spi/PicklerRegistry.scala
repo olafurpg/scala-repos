@@ -30,9 +30,9 @@ trait PicklerRegistry {
     * @param clazz The clazz we need to pickle.
     * @param tag The full tag of the type we're pickling, which may or may not include type parameters.
     */
-  def genPickler(
-      classLoader: ClassLoader, clazz: Class[_], tag: FastTypeTag[_])(
-      implicit share: refs.Share): Pickler[_]
+  def genPickler(classLoader: ClassLoader,
+                 clazz: Class[_],
+                 tag: FastTypeTag[_])(implicit share: refs.Share): Pickler[_]
 
   /** Checks the existince of an unpickler.
     *
@@ -65,8 +65,8 @@ trait PicklerRegistry {
     *             In those situations, the pickler should be able to handle arbitrary (existential) type parameters.
     * @param p  The unpickler to register.
     */
-  def registerPicklerUnpickler[T](
-      key: String, p: (Pickler[T] with Unpickler[T]))
+  def registerPicklerUnpickler[T](key: String,
+                                  p: (Pickler[T] with Unpickler[T]))
     : Unit // TODO - Return old pickler if one existed?
 
   /** Registers a function which can generate picklers for a given type constructor.
@@ -78,8 +78,8 @@ trait PicklerRegistry {
     *                   trying to manually inspect an object at runtime to deterimine its type, and we do not know what
     *                   the arguments are.  You can treat this case as 'existential' arguments.
     */
-  def registerPicklerGenerator[T](
-      typeConstructorKey: String, generator: AppliedType => Pickler[T]): Unit
+  def registerPicklerGenerator[T](typeConstructorKey: String,
+                                  generator: AppliedType => Pickler[T]): Unit
 
   /** Registers a function which can generate picklers for a given type constructor.
     *
@@ -88,7 +88,8 @@ trait PicklerRegistry {
     *                   this type.
     */
   def registerUnpicklerGenerator[T](
-      typeConstructorKey: String, generator: AppliedType => Unpickler[T]): Unit
+      typeConstructorKey: String,
+      generator: AppliedType => Unpickler[T]): Unit
 
   /** Registers a function which can generate picklers for a given type constructor.
     *

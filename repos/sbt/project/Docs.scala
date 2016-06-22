@@ -15,7 +15,8 @@ object Docs {
   def siteInclude(f: File) = !siteExcludes.contains(f.getName)
 
   def settings: Seq[Setting[_]] =
-    site.settings ++ site.includeScaladoc("api") ++ siteIncludeSxr("sxr") ++ ghPagesSettings
+    site.settings ++ site
+      .includeScaladoc("api") ++ siteIncludeSxr("sxr") ++ ghPagesSettings
 
   def ghPagesSettings = ghpages.settings ++ Seq(
       git.remoteRepo := "git@github.com:sbt/sbt.github.com.git",
@@ -43,8 +44,8 @@ object Docs {
         IO.delete(versioned / "sxr")
         IO.delete(versioned / "api")
         val toCopy = for ((file, target) <- mappings
-                          if siteInclude(file)) yield
-          (file, versioned / target)
+                          if siteInclude(file))
+          yield (file, versioned / target)
         IO.copy(toCopy)
         repo
     }

@@ -98,8 +98,9 @@ package object interpreter extends ReplConfig with ReplStrings {
 
       filtered foreach {
         case (source, syms) =>
-          p("/* " + syms.size + " implicit members imported from " +
-              source.fullName + " */")
+          p(
+              "/* " + syms.size + " implicit members imported from " +
+                source.fullName + " */")
 
           // This groups the members by where the symbol is defined
           val byOwner = syms groupBy (_.owner)
@@ -120,7 +121,7 @@ package object interpreter extends ReplConfig with ReplStrings {
                 val (big, small) = groups partition (_._2.size > 3)
                 val xss =
                   ((big sortBy (_._1.toString) map (_._2)) :+
-                      (small flatMap (_._2)))
+                        (small flatMap (_._2)))
 
                 xss map (xs => xs sortBy (_.name.toString))
               }

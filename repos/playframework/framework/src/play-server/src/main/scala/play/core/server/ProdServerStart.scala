@@ -41,8 +41,8 @@ object ProdServerStart {
 
       // Start the application
       val application: Application = {
-        val environment = Environment(
-            config.rootDir, process.classLoader, Mode.Prod)
+        val environment =
+          Environment(config.rootDir, process.classLoader, Mode.Prod)
         val context = ApplicationLoader.createContext(environment)
         val loader = ApplicationLoader(context)
         loader.load(context)
@@ -50,8 +50,8 @@ object ProdServerStart {
       Play.start(application)
 
       // Start the server
-      val serverProvider: ServerProvider = ServerProvider.fromConfiguration(
-          process.classLoader, config.configuration)
+      val serverProvider: ServerProvider = ServerProvider
+        .fromConfiguration(process.classLoader, config.configuration)
       val server = serverProvider.createServer(config, application)
       process.addShutdownHook {
         server.stop()
@@ -76,8 +76,8 @@ object ProdServerStart {
       val rootDirArg: Option[File] = process.args.headOption.map(new File(_))
       val rootDirConfig = rootDirArg.fold(Map.empty[String, String])(dir =>
             ServerConfig.rootDirConfig(dir))
-      Configuration.load(
-          process.classLoader, process.properties, rootDirConfig, true)
+      Configuration
+        .load(process.classLoader, process.properties, rootDirConfig, true)
     }
 
     val rootDir: File = {
@@ -126,8 +126,8 @@ object ProdServerStart {
   /**
     * Create a pid file for the current process.
     */
-  def createPidFile(
-      process: ServerProcess, configuration: Configuration): Option[File] = {
+  def createPidFile(process: ServerProcess,
+                    configuration: Configuration): Option[File] = {
     val pidFilePath = configuration
       .getString("play.server.pidfile.path")
       .getOrElse(throw ServerStartException("Pid file path not configured"))
@@ -142,8 +142,8 @@ object ProdServerStart {
 
       val pid =
         process.pid getOrElse
-        (throw ServerStartException(
-                "Couldn't determine current process's pid"))
+          (throw ServerStartException(
+                  "Couldn't determine current process's pid"))
       val out = new FileOutputStream(pidFile)
       try out.write(pid.getBytes) finally out.close()
 

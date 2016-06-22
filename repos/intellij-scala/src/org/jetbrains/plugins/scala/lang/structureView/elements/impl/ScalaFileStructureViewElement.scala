@@ -21,8 +21,9 @@ import scala.collection.mutable
   * @author Alexander Podkhalyuzin
   * Date: 04.05.2008
   */
-class ScalaFileStructureViewElement(
-    file: ScalaFile, private val console: ScalaLanguageConsole = null)
+class ScalaFileStructureViewElement(file: ScalaFile,
+                                    private val console: ScalaLanguageConsole =
+                                      null)
     extends ScalaStructureViewElement(file, false) {
   def getPresentation: ItemPresentation = {
     new ScalaFileItemPresentation(findRightFile())
@@ -33,36 +34,38 @@ class ScalaFileStructureViewElement(
     for (child <- findRightFile().getChildren) {
       child match {
         case td: ScTypeDefinition => {
-            children += new ScalaTypeDefinitionStructureViewElement(td)
-          }
+          children += new ScalaTypeDefinitionStructureViewElement(td)
+        }
         case packaging: ScPackaging => {
-            def getChildren(
-                pack: ScPackaging): Array[ScalaStructureViewElement] = {
-              val children = new ArrayBuffer[ScalaStructureViewElement]
-              for (td <- pack.immediateTypeDefinitions) {
-                children += new ScalaTypeDefinitionStructureViewElement(td)
-              }
-              for (p <- pack.packagings) {
-                children ++= getChildren(p)
-              }
-              children.toArray
+          def getChildren(
+              pack: ScPackaging): Array[ScalaStructureViewElement] = {
+            val children = new ArrayBuffer[ScalaStructureViewElement]
+            for (td <- pack.immediateTypeDefinitions) {
+              children += new ScalaTypeDefinitionStructureViewElement(td)
             }
-            children ++= getChildren(packaging)
+            for (p <- pack.packagings) {
+              children ++= getChildren(p)
+            }
+            children.toArray
           }
+          children ++= getChildren(packaging)
+        }
         case member: ScVariable => {
-            for (f <- member.declaredElements) children +=
+          for (f <- member.declaredElements)
+            children +=
               new ScalaVariableStructureViewElement(f.nameId, false)
-          }
+        }
         case member: ScValue => {
-            for (f <- member.declaredElements) children +=
+          for (f <- member.declaredElements)
+            children +=
               new ScalaValueStructureViewElement(f.nameId, false)
-          }
+        }
         case member: ScTypeAlias => {
-            children += new ScalaTypeAliasStructureViewElement(member, false)
-          }
+          children += new ScalaTypeAliasStructureViewElement(member, false)
+        }
         case func: ScFunction => {
-            children += new ScalaFunctionStructureViewElement(func, false)
-          }
+          children += new ScalaFunctionStructureViewElement(func, false)
+        }
         case _ =>
       }
     }
@@ -74,8 +77,8 @@ class ScalaFileStructureViewElement(
       val buffer = new mutable.StringBuilder
       buffer.append(console.getHistory)
       buffer.append(file.getText)
-      val newFile = ScalaPsiElementFactory.createScalaFile(
-          buffer.toString(), file.getManager)
+      val newFile = ScalaPsiElementFactory
+        .createScalaFile(buffer.toString(), file.getManager)
       newFile
     } else {
       file

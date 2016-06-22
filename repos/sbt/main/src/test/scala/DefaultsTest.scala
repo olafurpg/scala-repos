@@ -5,8 +5,8 @@ import java.io._
 import org.specs2.mutable.Specification
 
 object DefaultsTest extends Specification {
-  private def assertFiltered(
-      filter: List[String], expected: Map[String, Boolean]) = {
+  private def assertFiltered(filter: List[String],
+                             expected: Map[String, Boolean]) = {
     val actual = expected.map(t =>
           (t._1, Defaults.selectedFilter(filter).exists(fn => fn(t._1))))
 

@@ -31,7 +31,8 @@ trait MetropolisHastings[T] extends Rand[T] {
   def likelihoodRatio(start: T, end: T): Double =
     math.exp(
         logLikelihood(start) - logLikelihood(end) + logTransitionProbability(
-            start, end) - logTransitionProbability(end, start))
+            start,
+            end) - logTransitionProbability(end, start))
   def rand: RandBasis
 
   protected def nextDouble: Double =
@@ -58,11 +59,11 @@ trait TracksStatistics { self: MetropolisHastings[_] =>
   def rejectionFrac: Double = rejectionCount.toDouble / total.toDouble
 }
 
-abstract class BaseMetropolisHastings[T](logLikelihoodFunc: T => Double,
-                                         init: T,
-                                         burnIn: Long = 0,
-                                         dropCount: Int = 0)(
-    implicit val rand: RandBasis = Rand)
+abstract class BaseMetropolisHastings[T](
+    logLikelihoodFunc: T => Double,
+    init: T,
+    burnIn: Long = 0,
+    dropCount: Int = 0)(implicit val rand: RandBasis = Rand)
     extends MetropolisHastings[T]
     with Process[T]
     with TracksStatistics {
@@ -138,7 +139,8 @@ case class AffineStepMetropolisHastings[T](logLikelihood: T => Double,
                                            init: T,
                                            burnIn: Long = 0,
                                            dropCount: Int = 0)(
-    implicit rand: RandBasis = Rand, vectorSpace: VectorSpace[T, _])
+    implicit rand: RandBasis = Rand,
+    vectorSpace: VectorSpace[T, _])
     extends BaseMetropolisHastings[T](logLikelihood, init, burnIn, dropCount)(
         rand)
     with SymmetricMetropolisHastings[T] {
@@ -155,7 +157,8 @@ case class AffineStepMetropolisHastings[T](logLikelihood: T => Double,
 }
 
 case class ThreadedBufferedRand[T](
-    wrapped: Rand[T], bufferSize: Int = 1024 * 8)(implicit m: ClassTag[T])
+    wrapped: Rand[T],
+    bufferSize: Int = 1024 * 8)(implicit m: ClassTag[T])
     extends Rand[T] {
   require(bufferSize > 0)
 

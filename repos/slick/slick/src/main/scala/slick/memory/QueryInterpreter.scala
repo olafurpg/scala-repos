@@ -40,7 +40,8 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
     val res = n match {
       case Ref(sym) =>
         scope.getOrElse(
-            sym, throw new SlickException(s"Symbol $sym not found in scope"))
+            sym,
+            throw new SlickException(s"Symbol $sym not found in scope"))
       case Select(in, field) =>
         val v = run(in)
         field match {
@@ -111,7 +112,8 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
               new ProductValue(Vector(l, r))
             }
           if (inner.headOption.isEmpty)
-            Vector(new ProductValue(
+            Vector(
+                new ProductValue(
                     Vector(l,
                            createNullRow(
                                right.nodeType.asCollectionType.elementType))))
@@ -133,7 +135,8 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
               new ProductValue(Vector(l, r))
             }
           if (inner.headOption.isEmpty)
-            Vector(new ProductValue(
+            Vector(
+                new ProductValue(
                     Vector(createNullRow(
                                left.nodeType.asCollectionType.elementType),
                            r)))
@@ -155,7 +158,8 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
               new ProductValue(Vector(l, r))
             }
           if (inner.headOption.isEmpty)
-            Vector(new ProductValue(
+            Vector(
+                new ProductValue(
                     Vector(l,
                            createNullRow(
                                right.nodeType.asCollectionType.elementType))))
@@ -176,7 +180,8 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
               .isEmpty
           }
           .map { r =>
-            new ProductValue(Vector(
+            new ProductValue(
+                Vector(
                     createNullRow(left.nodeType.asCollectionType.elementType),
                     r))
           }
@@ -330,8 +335,8 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
                 } else whatBase == p(i)
               } contains true
             case ct: CollectionType =>
-              val (els, singleType) = unwrapSingleColumn(
-                  whereV.asInstanceOf[Coll], ct)
+              val (els, singleType) =
+                unwrapSingleColumn(whereV.asInstanceOf[Coll], ct)
               (if (singleType.isInstanceOf[OptionType])
                  els.map(_.asInstanceOf[Option[Any]] match {
                    case Some(v) => whatBase == v
@@ -373,8 +378,8 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
             (t.elementType.asInstanceOf[ScalaBaseType[Any]].ordering, true)
           case t => (t.asInstanceOf[ScalaBaseType[Any]].ordering, false)
         }
-        reduceOptionIt[Any](
-            it, opt, identity, (a, b) => if (ord.lt(b, a)) b else a)
+        reduceOptionIt[Any](it, opt, identity, (a, b) =>
+              if (ord.lt(b, a)) b else a)
       case Library.Max(ch) =>
         val coll = run(ch).asInstanceOf[Coll]
         val (it, itType) = unwrapSingleColumn(coll, ch.nodeType)
@@ -383,8 +388,8 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
             (t.elementType.asInstanceOf[ScalaBaseType[Any]].ordering, true)
           case t => (t.asInstanceOf[ScalaBaseType[Any]].ordering, false)
         }
-        reduceOptionIt[Any](
-            it, opt, identity, (a, b) => if (ord.gt(b, a)) b else a)
+        reduceOptionIt[Any](it, opt, identity, (a, b) =>
+              if (ord.gt(b, a)) b else a)
       case Library.==(ch, LiteralNode(null)) =>
         val chV = run(ch)
         chV == null || chV.asInstanceOf[Option[_]].isEmpty
@@ -402,8 +407,10 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
               case other => other
             }
             logDebug("[chPlainV: " + chPlainV.mkString(", ") + "]")
-            Some(evalFunction(
-                    sym, chPlainV.toSeq, n.nodeType.asOptionType.elementType))
+            Some(
+                evalFunction(sym,
+                             chPlainV.toSeq,
+                             n.nodeType.asOptionType.elementType))
           }
         } else evalFunction(sym, chV.toSeq, n.nodeType)
       //case Library.CountAll(ch) => run(ch).asInstanceOf[Coll].size
@@ -537,13 +544,13 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
       case Library.Substring if args.size == 3 =>
         args(0)._2
           .asInstanceOf[String]
-          .substring(
-              args(1)._2.asInstanceOf[Int], args(2)._2.asInstanceOf[Int])
+          .substring(args(1)._2.asInstanceOf[Int],
+                     args(2)._2.asInstanceOf[Int])
       case Library.Replace =>
         args(0)._2
           .asInstanceOf[String]
-          .replace(
-              args(1)._2.asInstanceOf[String], args(2)._2.asInstanceOf[String])
+          .replace(args(1)._2.asInstanceOf[String],
+                   args(2)._2.asInstanceOf[String])
       case Library.Reverse => args(0)._2.asInstanceOf[String].reverse
       case Library.IndexOf =>
         args(0)._2

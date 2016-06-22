@@ -102,7 +102,8 @@ abstract class FileAndResourceDirectives extends ExecutionDirectives {
     * directoryPath and the unmatched path from the given ClassLoader.
     */
   def getFromResourceDirectory(
-      directoryPath: String, classLoader: ClassLoader): FileAndResourceRoute =
+      directoryPath: String,
+      classLoader: ClassLoader): FileAndResourceRoute =
     FileAndResourceRoute(
         GetFromResourceDirectory(directoryPath, classLoader, _))
 

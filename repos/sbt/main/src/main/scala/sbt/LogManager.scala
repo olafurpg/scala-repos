@@ -24,8 +24,8 @@ object LogManager {
             state.globalLogging.console)
       manager(data, state, task, to)
     }
-  @deprecated(
-      "Use defaultManager to explicitly specify standard out.", "0.13.0")
+  @deprecated("Use defaultManager to explicitly specify standard out.",
+              "0.13.0")
   lazy val default: LogManager = defaultManager(StandardMain.console)
 
   def defaultManager(console: ConsoleOut): LogManager =
@@ -37,31 +37,31 @@ object LogManager {
 
   def defaults(extra: ScopedKey[_] => Seq[AbstractLogger],
                console: ConsoleOut): LogManager =
-    withLoggers(
-        (task,
-         state) => defaultScreen(console, suppressedMessage(task, state)),
-        extra = extra)
+    withLoggers((task, state) =>
+                  defaultScreen(console, suppressedMessage(task, state)),
+                extra = extra)
 
   def withScreenLogger(
       mk: (ScopedKey[_], State) => AbstractLogger): LogManager =
     withLoggers(screen = mk)
 
-  def withLoggers(screen: (ScopedKey[_], State) => AbstractLogger = (sk, s) =>
-                    defaultScreen(s.globalLogging.console),
-                  backed: PrintWriter => AbstractLogger = defaultBacked(),
-                  extra: ScopedKey[_] => Seq[AbstractLogger] = _ =>
-                    Nil): LogManager = new LogManager {
-    def apply(data: Settings[Scope],
-              state: State,
-              task: ScopedKey[_],
-              to: PrintWriter): Logger =
-      defaultLogger(data,
-                    state,
-                    task,
-                    screen(task, state),
-                    backed(to),
-                    extra(task).toList)
-  }
+  def withLoggers(
+      screen: (ScopedKey[_], State) => AbstractLogger = (sk, s) =>
+        defaultScreen(s.globalLogging.console),
+      backed: PrintWriter => AbstractLogger = defaultBacked(),
+      extra: ScopedKey[_] => Seq[AbstractLogger] = _ => Nil): LogManager =
+    new LogManager {
+      def apply(data: Settings[Scope],
+                state: State,
+                task: ScopedKey[_],
+                to: PrintWriter): Logger =
+        defaultLogger(data,
+                      state,
+                      task,
+                      screen(task, state),
+                      backed(to),
+                      extra(task).toList)
+    }
 
   def defaultLogger(data: Settings[Scope],
                     state: State,
@@ -136,8 +136,8 @@ object LogManager {
       .put(Keys.logLevel.key, level)
   }
 
-  private[this] def setExplicitGlobalLogLevels(
-      s: State, flag: Boolean): State =
+  private[this] def setExplicitGlobalLogLevels(s: State,
+                                               flag: Boolean): State =
     s.put(BasicKeys.explicitGlobalLogLevels, flag)
   private[this] def hasExplicitGlobalLogLevels(s: State): Boolean =
     State.getBoolean(s, BasicKeys.explicitGlobalLogLevels, default = false)

@@ -33,8 +33,8 @@ private[akka] object MessageSerializer {
   /**
     * Uses Akka Serialization for the specified ActorSystem to transform the given message to a MessageProtocol
     */
-  def serialize(
-      system: ExtendedActorSystem, message: AnyRef): SerializedMessage = {
+  def serialize(system: ExtendedActorSystem,
+                message: AnyRef): SerializedMessage = {
     val s = SerializationExtension(system)
     val serializer = s.findSerializerFor(message)
     val builder = SerializedMessage.newBuilder

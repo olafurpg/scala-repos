@@ -47,8 +47,8 @@ class ScAccessModifierElementType[Func <: ScAccessModifier]
         psi.idText.map(StringRef.fromString(_)))
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScAccessModifierStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScAccessModifierStub = {
     val isProtected = dataStream.readBoolean
     val isPrivate = dataStream.readBoolean
     val isThis = dataStream.readBoolean

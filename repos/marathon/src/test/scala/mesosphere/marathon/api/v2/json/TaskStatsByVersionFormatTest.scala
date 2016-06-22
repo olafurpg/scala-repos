@@ -93,8 +93,8 @@ class TaskStatsByVersionFormatTest
             fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 200))),
         maybeWithOutdatedConfig = Some(
             fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 300))),
-        maybeTotalSummary =
-          Some(fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 500)))
+        maybeTotalSummary = Some(
+            fullTaskStats.copy(fullTaskStats.counts.copy(tasksRunning = 500)))
     )
 
     When("serializing to JSON")
@@ -103,12 +103,12 @@ class TaskStatsByVersionFormatTest
     withClue(Json.prettyPrint(json)) {
       (json \ "startedAfterLastScaling" \ "stats" \ "counts" \ "running")
         .as[Int] should be(100)
-      (json \ "withLatestConfig" \ "stats" \ "counts" \ "running").as[Int] should be(
-          200)
-      (json \ "withOutdatedConfig" \ "stats" \ "counts" \ "running").as[Int] should be(
-          300)
-      (json \ "totalSummary" \ "stats" \ "counts" \ "running").as[Int] should be(
-          500)
+      (json \ "withLatestConfig" \ "stats" \ "counts" \ "running")
+        .as[Int] should be(200)
+      (json \ "withOutdatedConfig" \ "stats" \ "counts" \ "running")
+        .as[Int] should be(300)
+      (json \ "totalSummary" \ "stats" \ "counts" \ "running")
+        .as[Int] should be(500)
     }
   }
 }

@@ -141,8 +141,8 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
       evalEquals("args", "[]")
       evalEquals("ss", "aa")
       evalEquals("i", ScalaBundle.message("not.used.from.for.statement", "i"))
-      evalEquals(
-          "si", ScalaBundle.message("not.used.from.for.statement", "si"))
+      evalEquals("si",
+                 ScalaBundle.message("not.used.from.for.statement", "si"))
     }
   }
 }

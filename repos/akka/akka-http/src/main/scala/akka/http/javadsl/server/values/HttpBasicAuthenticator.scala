@@ -61,7 +61,7 @@ abstract class HttpBasicAuthenticator[T](val realm: String)
   /**
     * INTERNAL API
     */
-  protected[http] final def createRoute(
-      first: Route, others: Array[Route]): Route =
+  protected[http] final def createRoute(first: Route,
+                                        others: Array[Route]): Route =
     RouteStructure.BasicAuthentication(this)(first, others.toList)
 }

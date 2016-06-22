@@ -7,8 +7,9 @@ import lila.user.User
 
 import akka.actor.ActorSelection
 
-private[qa] final class Notifier(
-    sender: String, messenger: ActorSelection, timeline: ActorSelection) {
+private[qa] final class Notifier(sender: String,
+                                 messenger: ActorSelection,
+                                 timeline: ActorSelection) {
 
   private[qa] def createQuestion(q: Question, u: User) {
     val msg = Propagate(QaQuestion(u.id, q.id, q.title))
@@ -34,8 +35,10 @@ Check it out on ${questionUrl(q)}#answer-${a.id}""")
     timeline ! (msg toFollowersOf u.id toUser q.userId exceptUser u.id)
   }
 
-  private[qa] def createAnswerComment(
-      q: Question, a: Answer, c: Comment, u: User) {
+  private[qa] def createAnswerComment(q: Question,
+                                      a: Answer,
+                                      c: Comment,
+                                      u: User) {
     val msg = Propagate(QaComment(u.id, q.id, q.title, c.id))
     timeline ! (msg toFollowersOf u.id toUser a.userId exceptUser u.id)
   }

@@ -106,14 +106,15 @@ with AbstractTestConfigurationProducer {
     if (element.isInstanceOf[PsiPackage] ||
         element.isInstanceOf[PsiDirectory]) {
       if (!configuration.isInstanceOf[Specs2RunConfiguration]) return false
-      return TestConfigurationUtil.isPackageConfiguration(
-          element, configuration)
+      return TestConfigurationUtil
+        .isPackageConfiguration(element, configuration)
     }
     val parent: ScTypeDefinition =
       PsiTreeUtil.getParentOfType(element, classOf[ScTypeDefinition], false)
     if (parent == null) return false
     val suiteClasses = suitePaths
-      .map(suite =>
+      .map(
+          suite =>
             ScalaPsiManager
               .instance(parent.getProject)
               .getCachedClass(suite,
@@ -136,7 +137,7 @@ with AbstractTestConfigurationProducer {
       case configuration: Specs2RunConfiguration
           if configuration.getTestKind == TestKind.TEST_NAME =>
         testClassPath == configuration.getTestClassPath && testName != null &&
-        testName == configuration.getTestName
+          testName == configuration.getTestName
       case _ => false
     }
   }
@@ -158,7 +159,8 @@ with AbstractTestConfigurationProducer {
 
     val psiManager = ScalaPsiManager.instance(testClassDef.getProject)
     val suiteClasses = suitePaths
-      .map(suite =>
+      .map(
+          suite =>
             psiManager.getCachedClass(suite,
                                       element.getResolveScope,
                                       ScalaPsiManager.ClassCategory.TYPE))

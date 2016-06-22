@@ -28,10 +28,10 @@ class ScAnnotationsElementType[Func <: ScAnnotations]
     new ScAnnotationsStubImpl(parentStub, this)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScAnnotationsStub = {
-    new ScAnnotationsStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this)
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScAnnotationsStub = {
+    new ScAnnotationsStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
+                              this)
   }
 
   def indexStub(stub: ScAnnotationsStub, sink: IndexSink): Unit = {}

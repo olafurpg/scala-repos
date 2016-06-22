@@ -39,8 +39,8 @@ trait FormFieldOrderSpec
             request.body.asFormUrlEncoded map {
               params: Map[String, Seq[String]] =>
                 {
-                  for ((key: String, value: Seq[String]) <- params) yield
-                    key + "=" + value.mkString
+                  for ((key: String, value: Seq[String]) <- params)
+                    yield key + "=" + value.mkString
                 }.toSeq
             }
           }.getOrElse(Seq.empty[String])

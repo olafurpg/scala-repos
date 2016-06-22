@@ -80,8 +80,8 @@ class InterruptibleExecutorServiceFuturePool(executor: ExecutorService)
   * cancellation unless `interruptible` is true. If you want to propagate cancellation,
   * use an [[InterruptibleExecutorServiceFuturePool]].
   */
-class ExecutorServiceFuturePool protected[this](
-    val executor: ExecutorService, val interruptible: Boolean)
+class ExecutorServiceFuturePool protected[this] (val executor: ExecutorService,
+                                                 val interruptible: Boolean)
     extends FuturePool {
   def this(executor: ExecutorService) = this(executor, false)
 

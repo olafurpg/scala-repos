@@ -23,8 +23,9 @@ import org.apache.spark.annotation.{Experimental, Since}
   * Represents singular value decomposition (SVD) factors.
   */
 @Since("1.0.0")
-case class SingularValueDecomposition[UType, VType](
-    U: UType, s: Vector, V: VType)
+case class SingularValueDecomposition[UType, VType](U: UType,
+                                                    s: Vector,
+                                                    V: VType)
 
 /**
   * :: Experimental ::

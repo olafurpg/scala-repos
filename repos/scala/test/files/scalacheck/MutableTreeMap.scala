@@ -105,7 +105,7 @@ package scala.collection.mutable {
       allEntries.forall {
         case (k, v) =>
           map.contains(k) == entries.contains(k) &&
-          map.get(k) == entries.get(k)
+            map.get(k) == entries.get(k)
       }
     }
 
@@ -167,21 +167,18 @@ package scala.collection.mutable {
       val map = mutable.TreeMap[K, V]()
       map ++= entries
 
-      map.keysIteratorFrom(k).toSeq == entries.keysIterator
-        .filter(_ >= k)
-        .toSeq
-        .sorted
+      map
+        .keysIteratorFrom(k)
+        .toSeq == entries.keysIterator.filter(_ >= k).toSeq.sorted
     }
 
     property("valuesIteratorFrom") = forAll { (entries: Map[K, V], k: K) =>
       val map = mutable.TreeMap[K, V]()
       map ++= entries
 
-      map.valuesIteratorFrom(k).toSeq == entries
-        .filterKeys(_ >= k)
-        .toSeq
-        .sorted
-        .map(_._2)
+      map
+        .valuesIteratorFrom(k)
+        .toSeq == entries.filterKeys(_ >= k).toSeq.sorted.map(_._2)
     }
 
     property("headOption") = forAll { (map: mutable.TreeMap[K, V]) =>
@@ -234,8 +231,9 @@ package scala.collection.mutable {
       from.fold(true)(_ <= key) && until.fold(true)(_ > key)
 
     def entriesInView[This <: TraversableOnce[(K, V)], That](
-        entries: This, from: Option[K], until: Option[K])(
-        implicit bf: CanBuildFrom[This, (K, V), That]) = {
+        entries: This,
+        from: Option[K],
+        until: Option[K])(implicit bf: CanBuildFrom[This, (K, V), That]) = {
       (bf.apply(entries) ++= entries.filter {
             case (k, _) => in(k, from, until)
           }).result()
@@ -252,8 +250,8 @@ package scala.collection.mutable {
         allEntries.forall {
           case (k, v) =>
             mapView.contains(k) == (in(k, from, until) &&
-                entries.contains(k)) && mapView.get(k) ==
-            (if (in(k, from, until)) entries.get(k) else None)
+                  entries.contains(k)) && mapView.get(k) ==
+              (if (in(k, from, until)) entries.get(k) else None)
         }
     }
 
@@ -293,7 +291,7 @@ package scala.collection.mutable {
         entries.toMap.forall {
           case (k, v) =>
             map.get(k) == Some(v) && mapView.get(k) ==
-            (if (in(k, from, until)) Some(v) else None)
+              (if (in(k, from, until)) Some(v) else None)
         }
     }
 
@@ -337,8 +335,9 @@ package scala.collection.mutable {
 
         val mapView = map.rangeImpl(from, until)
         val newLower = Some(from.fold(k)(ord.max(_, k)))
-        mapView.iteratorFrom(k).toSeq == entriesInView(
-            entries, newLower, until).toSeq.sorted
+        mapView.iteratorFrom(k).toSeq == entriesInView(entries,
+                                                       newLower,
+                                                       until).toSeq.sorted
     }
 
     property("keysIteratorFrom") = forAll {
@@ -349,7 +348,9 @@ package scala.collection.mutable {
         val mapView = map.rangeImpl(from, until)
         val newLower = Some(from.fold(k)(ord.max(_, k)))
         mapView.keysIteratorFrom(k).toSeq == entriesInView(
-            entries, newLower, until).toSeq.sorted.map(_._1)
+            entries,
+            newLower,
+            until).toSeq.sorted.map(_._1)
     }
 
     property("valuesIteratorFrom") = forAll {
@@ -360,7 +361,9 @@ package scala.collection.mutable {
         val mapView = map.rangeImpl(from, until)
         val newLower = Some(from.fold(k)(ord.max(_, k)))
         mapView.valuesIteratorFrom(k).toSeq == entriesInView(
-            entries, newLower, until).toSeq.sorted.map(_._2)
+            entries,
+            newLower,
+            until).toSeq.sorted.map(_._2)
     }
 
     property("headOption") = forAll {

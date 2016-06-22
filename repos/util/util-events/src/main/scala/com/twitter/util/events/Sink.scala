@@ -119,8 +119,12 @@ object Sink {
   def of(buffer: scala.collection.mutable.Buffer[Event]): Sink =
     new Sink {
       def events = buffer.iterator
-      def event(
-          e: Event.Type, l: Long, o: Object, d: Double, t: Long, s: Long) =
+      def event(e: Event.Type,
+                l: Long,
+                o: Object,
+                d: Double,
+                t: Long,
+                s: Long) =
         buffer += Event(e, com.twitter.util.Time.now, l, o, d, t, s)
     }
 

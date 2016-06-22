@@ -61,8 +61,8 @@ trait MySQLProfile extends JdbcProfile { profile =>
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - JdbcCapabilities.returnInsertOther -
-        SqlCapabilities.sequenceLimited - RelationalCapabilities.joinFull -
-        JdbcCapabilities.nullableNoDefault)
+          SqlCapabilities.sequenceLimited - RelationalCapabilities.joinFull -
+          JdbcCapabilities.nullableNoDefault)
 
   override protected[this] def loadProfileConfig: Config = {
     if (!GlobalConfig.profileConfig("slick.driver.MySQL").entrySet().isEmpty)
@@ -81,8 +81,8 @@ trait MySQLProfile extends JdbcProfile { profile =>
         // TODO: this needs a test
         override def name = super.name.filter(_ != "PRIMARY")
       }
-    override def createColumnBuilder(
-        tableBuilder: TableBuilder, meta: MColumn): ColumnBuilder =
+    override def createColumnBuilder(tableBuilder: TableBuilder,
+                                     meta: MColumn): ColumnBuilder =
       new ColumnBuilder(tableBuilder, meta) {
         override def default =
           meta.columnDef
@@ -106,50 +106,53 @@ trait MySQLProfile extends JdbcProfile { profile =>
       }
   }
 
-  override def createModelBuilder(
-      tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
+  override def createModelBuilder(tables: Seq[MTable],
+                                  ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext): JdbcModelBuilder =
     new ModelBuilder(tables, ignoreInvalidDefaults)
 
   override val columnTypes = new JdbcTypes
   override protected def computeQueryCompiler =
     super.computeQueryCompiler.replace(new MySQLResolveZipJoins) -
-    Phase.fixRowNumberOrdering
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+      Phase.fixRowNumberOrdering
+  override def createQueryBuilder(n: Node,
+                                  state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createUpsertBuilder(node: Insert): InsertBuilder =
     new UpsertBuilder(node)
   override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
-  override def createColumnDDLBuilder(
-      column: FieldSymbol, table: Table[_]): ColumnDDLBuilder =
+  override def createColumnDDLBuilder(column: FieldSymbol,
+                                      table: Table[_]): ColumnDDLBuilder =
     new ColumnDDLBuilder(column)
   override def createSequenceDDLBuilder(
       seq: Sequence[_]): SequenceDDLBuilder[_] = new SequenceDDLBuilder(seq)
 
   override def quoteIdentifier(id: String) = '`' + id + '`'
 
-  override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
-    case java.sql.Types.VARCHAR =>
-      sym.flatMap(_.findColumnOption[RelationalProfile.ColumnOption.Length]) match {
-        case Some(l) =>
-          if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})"
-        case None =>
-          defaultStringType match {
-            case Some(s) => s
-            case None =>
-              if (sym
-                    .flatMap(_.findColumnOption[
-                            RelationalProfile.ColumnOption.Default[_]])
-                    .isDefined || sym
-                    .flatMap(_.findColumnOption[ColumnOption.PrimaryKey.type])
-                    .isDefined) "VARCHAR(254)"
-              else "TEXT"
-          }
-      }
-    case _ => super.defaultSqlTypeName(tmd, sym)
-  }
+  override def defaultSqlTypeName(tmd: JdbcType[_],
+                                  sym: Option[FieldSymbol]): String =
+    tmd.sqlType match {
+      case java.sql.Types.VARCHAR =>
+        sym.flatMap(_.findColumnOption[RelationalProfile.ColumnOption.Length]) match {
+          case Some(l) =>
+            if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})"
+          case None =>
+            defaultStringType match {
+              case Some(s) => s
+              case None =>
+                if (sym
+                      .flatMap(_.findColumnOption[
+                              RelationalProfile.ColumnOption.Default[_]])
+                      .isDefined || sym
+                      .flatMap(
+                          _.findColumnOption[ColumnOption.PrimaryKey.type])
+                      .isDefined) "VARCHAR(254)"
+                else "TEXT"
+            }
+        }
+      case _ => super.defaultSqlTypeName(tmd, sym)
+    }
 
   protected lazy val defaultStringType =
     profileConfig.getStringOpt("defaultStringType")
@@ -166,15 +169,18 @@ trait MySQLProfile extends JdbcProfile { profile =>
                                        offset: Long,
                                        p: Node): Node = {
       val countSym = new AnonSymbol
-      val j = Join(new AnonSymbol,
-                   new AnonSymbol,
-                   Bind(ls, from, Pure(StructNode(defs))),
-                   Bind(new AnonSymbol,
-                        Pure(StructNode(ConstArray.empty)),
-                        Pure(StructNode(ConstArray(new AnonSymbol -> RowNumGen(
-                                        countSym, offset - 1))))),
-                   JoinType.Inner,
-                   LiteralNode(true))
+      val j = Join(
+          new AnonSymbol,
+          new AnonSymbol,
+          Bind(ls, from, Pure(StructNode(defs))),
+          Bind(new AnonSymbol,
+               Pure(StructNode(ConstArray.empty)),
+               Pure(
+                   StructNode(
+                       ConstArray(new AnonSymbol -> RowNumGen(countSym,
+                                                              offset - 1))))),
+          JoinType.Inner,
+          LiteralNode(true))
       var first = true
       Subquery(Bind(s1, j, p.replace {
         case Select(Ref(s), ElementSymbol(2)) if s == s1 =>
@@ -207,13 +213,14 @@ trait MySQLProfile extends JdbcProfile { profile =>
       case _ => super.expr(n, skipParens)
     }
 
-    override protected def buildFetchOffsetClause(
-        fetch: Option[Node], offset: Option[Node]) = (fetch, offset) match {
-      case (Some(t), Some(d)) => b"\nlimit $d,$t"
-      case (Some(t), None) => b"\nlimit $t"
-      case (None, Some(d)) => b"\nlimit $d,18446744073709551615"
-      case _ =>
-    }
+    override protected def buildFetchOffsetClause(fetch: Option[Node],
+                                                  offset: Option[Node]) =
+      (fetch, offset) match {
+        case (Some(t), Some(d)) => b"\nlimit $d,$t"
+        case (Some(t), None) => b"\nlimit $t"
+        case (None, Some(d)) => b"\nlimit $d,18446744073709551615"
+        case _ =>
+      }
 
     override protected def buildOrdering(n: Node, o: Ordering) {
       if (o.nulls.last && !o.direction.desc) b"isnull($n),"
@@ -264,41 +271,40 @@ trait MySQLProfile extends JdbcProfile { profile =>
       val desc = increment < zero
       val minValue =
         seq._minValue getOrElse
-        (if (desc) fromInt(java.lang.Integer.MIN_VALUE) else one)
+          (if (desc) fromInt(java.lang.Integer.MIN_VALUE) else one)
       val maxValue =
         seq._maxValue getOrElse
-        (if (desc) fromInt(-1) else fromInt(java.lang.Integer.MAX_VALUE))
+          (if (desc) fromInt(-1) else fromInt(java.lang.Integer.MAX_VALUE))
       val start = seq._start.getOrElse(if (desc) maxValue else minValue)
       val beforeStart = start - increment
       if (!seq._cycle && (seq._minValue.isDefined && desc ||
               seq._maxValue.isDefined && !desc))
         throw new SlickException(
             "Sequences with limited size and without CYCLE are not supported by MySQLProfile's sequence emulation")
-      val incExpr =
-        if (seq._cycle) {
-          if (desc)
-            "if(id-" + (-increment) + "<" + minValue + "," + maxValue +
-            ",id-" + (-increment) + ")"
-          else
-            "if(id+" + increment + ">" + maxValue + "," + minValue + ",id+" +
-            increment + ")"
-        } else {
-          "id+(" + increment + ")"
-        }
+      val incExpr = if (seq._cycle) {
+        if (desc)
+          "if(id-" + (-increment) + "<" + minValue + "," + maxValue +
+          ",id-" + (-increment) + ")"
+        else
+          "if(id+" + increment + ">" + maxValue + "," + minValue + ",id+" +
+          increment + ")"
+      } else {
+        "id+(" + increment + ")"
+      }
       DDL(
           Iterable(
               "create table " + quoteIdentifier(seq.name + "_seq") + " (id " +
-              t + ")",
+                t + ")",
               "insert into " + quoteIdentifier(seq.name + "_seq") +
-              " values (" + beforeStart + ")",
+                " values (" + beforeStart + ")",
               "create function " + quoteIdentifier(seq.name + "_nextval") +
-              "() returns " + sqlType + " begin update " +
-              quoteIdentifier(seq.name + "_seq") + " set id=last_insert_id(" +
-              incExpr + "); return last_insert_id(); end",
+                "() returns " + sqlType + " begin update " +
+                quoteIdentifier(seq.name + "_seq") + " set id=last_insert_id(" +
+                incExpr + "); return last_insert_id(); end",
               "create function " + quoteIdentifier(seq.name + "_currval") +
-              "() returns " +
-              sqlType + " begin " + "select max(id) into @v from " +
-              quoteIdentifier(seq.name + "_seq") + "; return @v; end"),
+                "() returns " +
+                sqlType + " begin " + "select max(id) into @v from " +
+                quoteIdentifier(seq.name + "_seq") + "; return @v; end"),
           Iterable("drop function " + quoteIdentifier(seq.name + "_currval"),
                    "drop function " + quoteIdentifier(seq.name + "_nextval"),
                    "drop table " + quoteIdentifier(seq.name + "_seq"))

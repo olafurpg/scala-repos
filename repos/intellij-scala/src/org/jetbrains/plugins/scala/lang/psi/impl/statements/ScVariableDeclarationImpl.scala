@@ -19,8 +19,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScVariableDeclarationImpl private (
-    stub: StubElement[ScVariable], nodeType: IElementType, node: ASTNode)
+class ScVariableDeclarationImpl private (stub: StubElement[ScVariable],
+                                         nodeType: IElementType,
+                                         node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScVariableDeclaration {
   def this(node: ASTNode) = { this(null, null, node) }

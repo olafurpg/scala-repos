@@ -86,8 +86,11 @@ object ScalaSdkDescriptor extends SdkDescriptorCompanion {
                                              libraryFiles: Seq[File],
                                              sourceFiles: Seq[File],
                                              docFiles: Seq[File]) = {
-    ScalaSdkDescriptor(
-        version, compilerFiles, libraryFiles, sourceFiles, docFiles)
+    ScalaSdkDescriptor(version,
+                       compilerFiles,
+                       libraryFiles,
+                       sourceFiles,
+                       docFiles)
   }
 }
 
@@ -119,8 +122,8 @@ trait SdkDescriptorCompanion {
 
     val requiredBinaryArtifacts =
       Set(Artifact.ScalaLibrary, Artifact.ScalaCompiler) ++ requiredBinaries ++
-      (if (reflectRequired) Set(Artifact.ScalaReflect)
-       else Set())
+        (if (reflectRequired) Set(Artifact.ScalaReflect)
+         else Set())
 
     val existingBinaryArtifacts = binaryComponents.map(_.artifact).toSet
 

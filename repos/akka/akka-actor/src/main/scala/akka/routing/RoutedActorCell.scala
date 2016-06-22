@@ -40,14 +40,16 @@ private[akka] class RoutedActorCell(_system: ActorSystemImpl,
                                     _routerDispatcher: MessageDispatcher,
                                     val routeeProps: Props,
                                     _supervisor: InternalActorRef)
-    extends ActorCell(
-        _system, _ref, _routerProps, _routerDispatcher, _supervisor) {
+    extends ActorCell(_system,
+                      _ref,
+                      _routerProps,
+                      _routerDispatcher,
+                      _supervisor) {
 
   private[akka] val routerConfig = _routerProps.routerConfig
 
   @volatile
-  private var _router: Router =
-    null // initialized in start, and then only updated from the actor
+  private var _router: Router = null // initialized in start, and then only updated from the actor
   def router: Router = _router
 
   def addRoutee(routee: Routee): Unit = addRoutees(List(routee))
@@ -69,8 +71,8 @@ private[akka] class RoutedActorCell(_system: ActorSystemImpl,
     * Remove routees from the `Router`. Messages in flight may still be routed to
     * the old `Router` instance containing the old routees.
     */
-  def removeRoutees(
-      routees: immutable.Iterable[Routee], stopChild: Boolean): Unit = {
+  def removeRoutees(routees: immutable.Iterable[Routee],
+                    stopChild: Boolean): Unit = {
     val r = _router
     val newRoutees = routees.foldLeft(r.routees) { (xs, x) ⇒
       unwatch(x); xs.filterNot(_ == x)
@@ -161,7 +163,7 @@ private[akka] class RouterActor extends Actor {
     case _ ⇒
       throw ActorInitializationException(
           "Router actor can only be used in RoutedActorRef, not in " +
-          context.getClass)
+            context.getClass)
   }
 
   val routingLogicController: Option[ActorRef] = cell.routerConfig

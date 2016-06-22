@@ -89,8 +89,8 @@ trait RelationProvider {
     * Note: the parameters' keywords are case insensitive and this insensitivity is enforced
     * by the Map that is passed to the function.
     */
-  def createRelation(
-      sqlContext: SQLContext, parameters: Map[String, String]): BaseRelation
+  def createRelation(sqlContext: SQLContext,
+                     parameters: Map[String, String]): BaseRelation
 }
 
 /**
@@ -269,8 +269,8 @@ trait PrunedScan {
   */
 @DeveloperApi
 trait PrunedFilteredScan {
-  def buildScan(
-      requiredColumns: Array[String], filters: Array[Filter]): RDD[Row]
+  def buildScan(requiredColumns: Array[String],
+                filters: Array[Filter]): RDD[Row]
 }
 
 /**
@@ -308,8 +308,8 @@ trait InsertableRelation {
   */
 @Experimental
 trait CatalystScan {
-  def buildScan(
-      requiredColumns: Seq[Attribute], filters: Seq[Expression]): RDD[Row]
+  def buildScan(requiredColumns: Seq[Attribute],
+                filters: Seq[Expression]): RDD[Row]
 }
 
 /**
@@ -580,12 +580,12 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
         .reduceOption(expressions.And)
         .getOrElse(Literal(true))
 
-      val boundPredicate = InterpretedPredicate.create(
-          predicate.transform {
+      val boundPredicate = InterpretedPredicate.create(predicate.transform {
         case a: AttributeReference =>
           val index = partitionColumns.indexWhere(a.name == _.name)
-          BoundReference(
-              index, partitionColumns(index).dataType, nullable = true)
+          BoundReference(index,
+                         partitionColumns(index).dataType,
+                         nullable = true)
       })
 
       val selected = partitions.filter {
@@ -611,8 +611,8 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
   private def listLeafFiles(
       paths: Seq[Path]): mutable.LinkedHashSet[FileStatus] = {
     if (paths.length >= sqlContext.conf.parallelPartitionDiscoveryThreshold) {
-      HadoopFsRelation.listLeafFilesInParallel(
-          paths, hadoopConf, sqlContext.sparkContext)
+      HadoopFsRelation
+        .listLeafFilesInParallel(paths, hadoopConf, sqlContext.sparkContext)
     } else {
       val statuses = paths.flatMap { path =>
         val fs = path.getFileSystem(hadoopConf)
@@ -655,8 +655,7 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
         // Without auto inference, all of value in the `row` should be null or in StringType,
         // we need to cast into the data type that user specified.
         def castPartitionValuesToUserSchema(row: InternalRow) = {
-          InternalRow(
-              (0 until row.numFields).map { i =>
+          InternalRow((0 until row.numFields).map { i =>
             Cast(Literal.create(row.getUTF8String(i), StringType),
                  userProvidedSchema.fields(i).dataType).eval()
           }: _*)
@@ -748,16 +747,15 @@ private[sql] object HadoopFsRelation extends Logging {
       // Dummy jobconf to get to the pathFilter defined in configuration
       val jobConf = new JobConf(fs.getConf, this.getClass())
       val pathFilter = FileInputFormat.getInputPathFilter(jobConf)
-      val statuses =
-        if (pathFilter != null) {
-          val (dirs, files) =
-            fs.listStatus(status.getPath, pathFilter).partition(_.isDirectory)
-          files ++ dirs.flatMap(dir => listLeafFiles(fs, dir))
-        } else {
-          val (dirs, files) =
-            fs.listStatus(status.getPath).partition(_.isDirectory)
-          files ++ dirs.flatMap(dir => listLeafFiles(fs, dir))
-        }
+      val statuses = if (pathFilter != null) {
+        val (dirs, files) =
+          fs.listStatus(status.getPath, pathFilter).partition(_.isDirectory)
+        files ++ dirs.flatMap(dir => listLeafFiles(fs, dir))
+      } else {
+        val (dirs, files) =
+          fs.listStatus(status.getPath).partition(_.isDirectory)
+        files ++ dirs.flatMap(dir => listLeafFiles(fs, dir))
+      }
       statuses.filterNot(status => shouldFilterOut(status.getPath.getName))
     }
   }

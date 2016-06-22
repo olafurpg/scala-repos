@@ -108,8 +108,9 @@ object Trees {
 
   case class Continue(label: Option[Ident] = None) extends Tree
 
-  case class Match(
-      selector: Tree, cases: List[(List[Literal], Tree)], default: Tree)
+  case class Match(selector: Tree,
+                   cases: List[(List[Literal], Tree)],
+                   default: Tree)
       extends Tree
 
   case class Debugger() extends Tree
@@ -126,8 +127,10 @@ object Trees {
   case class Apply(receiver: Tree, method: Ident, args: List[Tree])
       extends Tree
 
-  case class StaticApply(
-      receiver: Tree, cls: ClassType, method: Ident, args: List[Tree])
+  case class StaticApply(receiver: Tree,
+                         cls: ClassType,
+                         method: Ident,
+                         args: List[Tree])
       extends Tree
 
   case class TraitImplApply(impl: ClassType, method: Ident, args: List[Tree])
@@ -168,8 +171,9 @@ object Trees {
   case class JSDotMethodApply(receiver: Tree, method: Ident, args: List[Tree])
       extends Tree
 
-  case class JSBracketMethodApply(
-      receiver: Tree, method: Tree, args: List[Tree])
+  case class JSBracketMethodApply(receiver: Tree,
+                                  method: Tree,
+                                  args: List[Tree])
       extends Tree
 
   case class JSDelete(prop: Tree) extends Tree
@@ -223,8 +227,10 @@ object Trees {
                       defs: List[Tree])
       extends Tree
 
-  case class MethodDef(
-      name: PropertyName, args: List[ParamDef], resultType: Type, body: Tree)
+  case class MethodDef(name: PropertyName,
+                       args: List[ParamDef],
+                       resultType: Type,
+                       body: Tree)
       extends Tree
 
   case class PropertyDef(name: PropertyName,
@@ -233,8 +239,9 @@ object Trees {
                          setterBody: Tree)
       extends Tree
 
-  case class ConstructorExportDef(
-      name: String, args: List[ParamDef], body: Tree)
+  case class ConstructorExportDef(name: String,
+                                  args: List[ParamDef],
+                                  body: Tree)
       extends Tree
 
   case class ModuleExportDef(fullName: String) extends Tree
@@ -258,8 +265,10 @@ object Main {
       case While(cond, body, optLabel) =>
       case DoWhile(body, cond, None) =>
       case Try(block, errVar, EmptyTree, finalizer) =>
-      case Try(
-          block, errVar @ Ident(name, originalName), handler, finalizer) =>
+      case Try(block,
+               errVar @ Ident(name, originalName),
+               handler,
+               finalizer) =>
       case Throw(expr) =>
       case Continue(optLabel) =>
       case Match(selector, cases, default) =>

@@ -79,8 +79,9 @@ class ResizerSpec
           enabled = on
         }
         """)
-      Resizer.fromConfig(cfg).get shouldBe a[
-          DefaultOptimalSizeExploringResizer]
+      Resizer
+        .fromConfig(cfg)
+        .get shouldBe a[DefaultOptimalSizeExploringResizer]
     }
 
     "throws exception when both resizer and optimal-size-exploring-resizer is enabled" in {
@@ -186,14 +187,14 @@ class ResizerSpec
                                    backoffThreshold = 0.0)
 
       val router = system.actorOf(
-          RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer)).props(
-              Props(new Actor {
-        def receive = {
-          case d: FiniteDuration ⇒
-            Thread.sleep(d.dilated.toMillis); sender() ! "done"
-          case "echo" ⇒ sender() ! "reply"
-        }
-      })))
+          RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))
+            .props(Props(new Actor {
+          def receive = {
+            case d: FiniteDuration ⇒
+              Thread.sleep(d.dilated.toMillis); sender() ! "done"
+            case "echo" ⇒ sender() ! "reply"
+          }
+        })))
 
       // first message should create the minimum number of routees
       router ! "echo"
@@ -233,11 +234,11 @@ class ResizerSpec
       val router = system.actorOf(
           RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))
             .props(Props(new Actor {
-        def receive = {
-          case n: Int if n <= 0 ⇒ // done
-          case n: Int ⇒ Thread.sleep((n millis).dilated.toMillis)
-        }
-      })))
+          def receive = {
+            case n: Int if n <= 0 ⇒ // done
+            case n: Int ⇒ Thread.sleep((n millis).dilated.toMillis)
+          }
+        })))
 
       // put some pressure on the router
       for (m ← 0 until 15) {

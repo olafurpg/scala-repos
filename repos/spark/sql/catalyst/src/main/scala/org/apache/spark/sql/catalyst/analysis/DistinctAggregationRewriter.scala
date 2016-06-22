@@ -190,9 +190,9 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
 
         // Select the result of the first aggregate in the last aggregate.
         val result = AggregateExpression(
-            aggregate.First(
-                evalWithinGroup(regularGroupId, operator.toAttribute),
-                Literal(true)),
+            aggregate.First(evalWithinGroup(regularGroupId,
+                                            operator.toAttribute),
+                            Literal(true)),
             mode = Complete,
             isDistinct = false)
 
@@ -211,13 +211,13 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
       }
 
       // Construct the regular aggregate input projection only if we need one.
-      val regularAggProjection =
-        if (regularAggExprs.nonEmpty) {
-          Seq(a.groupingExpressions ++ distinctAggChildren.map(nullify) ++ Seq(
-                  regularGroupId) ++ regularAggChildren)
-        } else {
-          Seq.empty[Seq[Expression]]
-        }
+      val regularAggProjection = if (regularAggExprs.nonEmpty) {
+        Seq(
+            a.groupingExpressions ++ distinctAggChildren.map(nullify) ++ Seq(
+                regularGroupId) ++ regularAggChildren)
+      } else {
+        Seq.empty[Seq[Expression]]
+      }
 
       // Construct the distinct aggregate input projections.
       val regularAggNulls = regularAggChildren.map(nullify)

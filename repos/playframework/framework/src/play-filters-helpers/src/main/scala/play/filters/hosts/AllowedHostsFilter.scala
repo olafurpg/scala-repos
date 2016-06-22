@@ -15,13 +15,13 @@ import play.core.j.JavaHttpErrorHandlerAdapter
 /**
   * A filter that denies requests by hosts that do not match a configured list of allowed hosts.
   */
-case class AllowedHostsFilter @Inject()(
-    config: AllowedHostsConfig, errorHandler: HttpErrorHandler)
+case class AllowedHostsFilter @Inject()(config: AllowedHostsConfig,
+                                        errorHandler: HttpErrorHandler)
     extends EssentialFilter {
 
   // Java API
-  def this(
-      config: AllowedHostsConfig, errorHandler: play.http.HttpErrorHandler) {
+  def this(config: AllowedHostsConfig,
+           errorHandler: play.http.HttpErrorHandler) {
     this(config, new JavaHttpErrorHandlerAdapter(errorHandler))
   }
 
@@ -32,8 +32,10 @@ case class AllowedHostsFilter @Inject()(
     if (hostMatchers.exists(_ (req.host))) {
       next(req)
     } else {
-      Accumulator.done(errorHandler.onClientError(
-              req, Status.BAD_REQUEST, s"Host not allowed: ${req.host}"))
+      Accumulator.done(
+          errorHandler.onClientError(req,
+                                     Status.BAD_REQUEST,
+                                     s"Host not allowed: ${req.host}"))
     }
   }
 }
@@ -108,6 +110,6 @@ trait AllowedHostsComponents {
 
   lazy val allowedHostsConfig: AllowedHostsConfig =
     AllowedHostsConfig.fromConfiguration(configuration)
-  lazy val allowedHostsFilter: AllowedHostsFilter = AllowedHostsFilter(
-      allowedHostsConfig, httpErrorHandler)
+  lazy val allowedHostsFilter: AllowedHostsFilter =
+    AllowedHostsFilter(allowedHostsConfig, httpErrorHandler)
 }

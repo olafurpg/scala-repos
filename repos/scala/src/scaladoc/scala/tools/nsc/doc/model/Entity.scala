@@ -72,7 +72,7 @@ object Entity {
   /** Ordering deprecated things last. */
   implicit lazy val EntityOrdering: Ordering[Entity] =
     Ordering[(Boolean, String, Boolean)] on
-    (x => (isDeprecated(x), x.qualifiedName, isObject(x)))
+      (x => (isDeprecated(x), x.qualifiedName, isObject(x)))
 }
 
 /** A template, which is either a class, trait, object or package. Depending on whether documentation is available
@@ -552,7 +552,7 @@ trait TypeClassConstraint
   /** toString for debugging */
   override def toString =
     typeParamName + " is a class of type " + typeClassEntity.qualifiedName +
-    " (" + typeParamName + ": " + typeClassEntity.name + ")"
+      " (" + typeParamName + ": " + typeClassEntity.name + ")"
 }
 
 trait KnownTypeClassConstraint extends TypeClassConstraint {
@@ -563,7 +563,7 @@ trait KnownTypeClassConstraint extends TypeClassConstraint {
   /** toString for debugging */
   override def toString =
     typeExplanation(typeParamName) + " (" + typeParamName + ": " +
-    typeClassEntity.name + ")"
+      typeClassEntity.name + ")"
 }
 
 /** A constraint involving a type parameter */
@@ -581,7 +581,7 @@ trait EqualTypeParamConstraint extends TypeParamConstraint {
   /** toString for debugging */
   override def toString =
     typeParamName + " is " + rhs.name + " (" + typeParamName + " =:= " +
-    rhs.name + ")"
+      rhs.name + ")"
 }
 
 trait BoundedTypeParamConstraint extends TypeParamConstraint {
@@ -595,8 +595,8 @@ trait BoundedTypeParamConstraint extends TypeParamConstraint {
   /** toString for debugging */
   override def toString =
     typeParamName + " is a superclass of " + lowerBound.name +
-    " and a subclass of " + upperBound.name + " (" + typeParamName + " >: " +
-    lowerBound.name + " <: " + upperBound.name + ")"
+      " and a subclass of " + upperBound.name + " (" + typeParamName + " >: " +
+      lowerBound.name + " <: " + upperBound.name + ")"
 }
 
 trait LowerBoundedTypeParamConstraint extends TypeParamConstraint {
@@ -607,7 +607,7 @@ trait LowerBoundedTypeParamConstraint extends TypeParamConstraint {
   /** toString for debugging */
   override def toString =
     typeParamName + " is a superclass of " + lowerBound.name + " (" +
-    typeParamName + " >: " + lowerBound.name + ")"
+      typeParamName + " >: " + lowerBound.name + ")"
 }
 
 trait UpperBoundedTypeParamConstraint extends TypeParamConstraint {
@@ -618,5 +618,5 @@ trait UpperBoundedTypeParamConstraint extends TypeParamConstraint {
   /** toString for debugging */
   override def toString =
     typeParamName + " is a subclass of " + upperBound.name + " (" +
-    typeParamName + " <: " + upperBound.name + ")"
+      typeParamName + " <: " + upperBound.name + ")"
 }

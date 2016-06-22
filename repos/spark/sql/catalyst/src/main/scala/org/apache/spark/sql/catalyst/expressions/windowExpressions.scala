@@ -47,17 +47,19 @@ case class WindowSpecDefinition(partitionSpec: Seq[Expression],
     case UnspecifiedFrame =>
       Some(
           "Found a UnspecifiedFrame. It should be converted to a SpecifiedWindowFrame " +
-          "during analysis. Please file a bug report.")
+            "during analysis. Please file a bug report.")
     case frame: SpecifiedWindowFrame =>
       frame.validate.orElse {
         def checkValueBasedBoundaryForRangeFrame(): Option[String] = {
           if (orderSpec.length > 1) {
             // It is not allowed to have a value-based PRECEDING and FOLLOWING
             // as the boundary of a Range Window Frame.
-            Some("This Range Window Frame only accepts at most one ORDER BY expression.")
+            Some(
+                "This Range Window Frame only accepts at most one ORDER BY expression.")
           } else if (orderSpec.nonEmpty &&
                      !orderSpec.head.dataType.isInstanceOf[NumericType]) {
-            Some("The data type of the expression in the ORDER BY clause should be a numeric type.")
+            Some(
+                "The data type of the expression in the ORDER BY clause should be a numeric type.")
           } else {
             None
           }
@@ -81,26 +83,24 @@ case class WindowSpecDefinition(partitionSpec: Seq[Expression],
 
   override lazy val resolved: Boolean =
     childrenResolved && checkInputDataTypes().isSuccess &&
-    frameSpecification.isInstanceOf[SpecifiedWindowFrame]
+      frameSpecification.isInstanceOf[SpecifiedWindowFrame]
 
   override def nullable: Boolean = true
   override def foldable: Boolean = false
   override def dataType: DataType = throw new UnsupportedOperationException
 
   override def sql: String = {
-    val partition =
-      if (partitionSpec.isEmpty) {
-        ""
-      } else {
-        "PARTITION BY " + partitionSpec.map(_.sql).mkString(", ")
-      }
+    val partition = if (partitionSpec.isEmpty) {
+      ""
+    } else {
+      "PARTITION BY " + partitionSpec.map(_.sql).mkString(", ")
+    }
 
-    val order =
-      if (orderSpec.isEmpty) {
-        ""
-      } else {
-        "ORDER BY " + orderSpec.map(_.sql).mkString(", ")
-      }
+    val order = if (orderSpec.isEmpty) {
+      ""
+    } else {
+      "ORDER BY " + orderSpec.map(_.sql).mkString(", ")
+    }
 
     s"($partition $order ${frameSpecification.toString})"
   }
@@ -254,7 +254,7 @@ case class SpecifiedWindowFrame(frameType: FrameType,
       } else {
         val reason =
           s"The end of this Window Frame $end is smaller than the start of " +
-          s"this Window Frame $start."
+            s"this Window Frame $start."
         Some(reason)
       }
   }
@@ -287,8 +287,8 @@ object SpecifiedWindowFrame {
   }
 }
 
-case class UnresolvedWindowExpression(
-    child: Expression, windowSpec: WindowSpecReference)
+case class UnresolvedWindowExpression(child: Expression,
+                                      windowSpec: WindowSpecReference)
     extends UnaryExpression
     with Unevaluable {
 
@@ -301,8 +301,8 @@ case class UnresolvedWindowExpression(
   override lazy val resolved = false
 }
 
-case class WindowExpression(
-    windowFunction: Expression, windowSpec: WindowSpecDefinition)
+case class WindowExpression(windowFunction: Expression,
+                            windowSpec: WindowSpecDefinition)
     extends Expression
     with Unevaluable {
 
@@ -408,7 +408,8 @@ abstract class OffsetWindowFunction
   * @param default to use when the input value is null or when the offset is larger than the window.
   */
 @ExpressionDescription(
-    usage = """_FUNC_(input, offset, default) - LEAD returns the value of 'x' at 'offset' rows
+    usage =
+      """_FUNC_(input, offset, default) - LEAD returns the value of 'x' at 'offset' rows
      after the current row in the window""")
 case class Lead(input: Expression, offset: Expression, default: Expression)
     extends OffsetWindowFunction {
@@ -436,7 +437,8 @@ case class Lead(input: Expression, offset: Expression, default: Expression)
   * @param default to use when the input value is null or when the offset is smaller than the window.
   */
 @ExpressionDescription(
-    usage = """_FUNC_(input, offset, default) - LAG returns the value of 'x' at 'offset' rows
+    usage =
+      """_FUNC_(input, offset, default) - LAG returns the value of 'x' at 'offset' rows
      before the current row in the window""")
 case class Lag(input: Expression, offset: Expression, default: Expression)
     extends OffsetWindowFunction {
@@ -455,8 +457,8 @@ abstract class AggregateWindowFunction
     extends DeclarativeAggregate
     with WindowFunction {
   self: Product =>
-  override val frame = SpecifiedWindowFrame(
-      RowFrame, UnboundedPreceding, CurrentRow)
+  override val frame =
+    SpecifiedWindowFrame(RowFrame, UnboundedPreceding, CurrentRow)
   override def dataType: DataType = IntegerType
   override def nullable: Boolean = true
   override def supportsPartial: Boolean = false
@@ -484,8 +486,9 @@ trait SizeBasedWindowFunction extends AggregateWindowFunction {
 }
 
 object SizeBasedWindowFunction {
-  val n = AttributeReference(
-      "window__partition__size", IntegerType, nullable = false)()
+  val n = AttributeReference("window__partition__size",
+                             IntegerType,
+                             nullable = false)()
 }
 
 /**
@@ -495,7 +498,8 @@ object SizeBasedWindowFunction {
   * This documentation has been based upon similar documentation for the Hive and Presto projects.
   */
 @ExpressionDescription(
-    usage = """_FUNC_() - The ROW_NUMBER() function assigns a unique, sequential number to
+    usage =
+      """_FUNC_() - The ROW_NUMBER() function assigns a unique, sequential number to
      each row, starting with one, according to the ordering of rows within
      the window partition.""")
 case class RowNumber() extends RowNumberLike {
@@ -512,16 +516,17 @@ case class RowNumber() extends RowNumberLike {
   * This documentation has been based upon similar documentation for the Hive and Presto projects.
   */
 @ExpressionDescription(
-    usage = """_FUNC_() - The CUME_DIST() function computes the position of a value relative to
+    usage =
+      """_FUNC_() - The CUME_DIST() function computes the position of a value relative to
      a all values in the partition.""")
 case class CumeDist() extends RowNumberLike with SizeBasedWindowFunction {
   override def dataType: DataType = DoubleType
   // The frame for CUME_DIST is Range based instead of Row based, because CUME_DIST must
   // return the same value for equal values in the partition.
-  override val frame = SpecifiedWindowFrame(
-      RangeFrame, UnboundedPreceding, CurrentRow)
-  override val evaluateExpression = Divide(
-      Cast(rowNumber, DoubleType), Cast(n, DoubleType))
+  override val frame =
+    SpecifiedWindowFrame(RangeFrame, UnboundedPreceding, CurrentRow)
+  override val evaluateExpression =
+    Divide(Cast(rowNumber, DoubleType), Cast(n, DoubleType))
   override def sql: String = "CUME_DIST()"
 }
 
@@ -547,7 +552,8 @@ case class CumeDist() extends RowNumberLike with SizeBasedWindowFunction {
   * @param buckets number of buckets to divide the rows in. Default value is 1.
   */
 @ExpressionDescription(
-    usage = """_FUNC_(x) - The NTILE(n) function divides the rows for each window partition
+    usage =
+      """_FUNC_(x) - The NTILE(n) function divides the rows for each window partition
      into 'n' buckets ranging from 1 to at most 'n'.""")
 case class NTile(buckets: Expression)
     extends RowNumberLike
@@ -658,8 +664,8 @@ abstract class RankLike extends AggregateWindowFunction {
   protected def rankSource: Expression = rowNumber
 
   /** Increase the rank when the current rank == 0 or when the one of order attributes changes. */
-  protected val increaseRank = If(
-      And(orderEquals, Not(EqualTo(rank, zero))), rank, rankSource)
+  protected val increaseRank =
+    If(And(orderEquals, Not(EqualTo(rank, zero))), rank, rankSource)
 
   override val aggBufferAttributes: Seq[AttributeReference] =
     rank +: rowNumber +: orderAttrs
@@ -682,7 +688,8 @@ abstract class RankLike extends AggregateWindowFunction {
   *                 change in rank. This is an internal parameter and will be assigned by the
   *                 Analyser.
   */
-@ExpressionDescription(usage =
+@ExpressionDescription(
+    usage =
       """_FUNC_() -  RANK() computes the rank of a value in a group of values. The result
      is one plus the number of rows preceding or equal to the current row in the
      ordering of the partition. Tie values will produce gaps in the sequence.""")
@@ -704,7 +711,8 @@ case class Rank(children: Seq[Expression]) extends RankLike {
   *                 Analyser.
   */
 @ExpressionDescription(
-    usage = """_FUNC_() - The DENSE_RANK() function computes the rank of a value in a group of
+    usage =
+      """_FUNC_() - The DENSE_RANK() function computes the rank of a value in a group of
      values. The result is one plus the previously assigned rank value. Unlike Rank,
      DenseRank will not produce gaps in the ranking sequence.""")
 case class DenseRank(children: Seq[Expression]) extends RankLike {
@@ -732,7 +740,8 @@ case class DenseRank(children: Seq[Expression]) extends RankLike {
   *                 Analyser.
   */
 @ExpressionDescription(
-    usage = """_FUNC_() - PERCENT_RANK() The PercentRank function computes the percentage
+    usage =
+      """_FUNC_() - PERCENT_RANK() The PercentRank function computes the percentage
      ranking of a value in a group of values.""")
 case class PercentRank(children: Seq[Expression])
     extends RankLike

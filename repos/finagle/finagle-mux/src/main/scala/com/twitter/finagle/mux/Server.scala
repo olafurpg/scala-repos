@@ -37,7 +37,7 @@ object gracefulShutdownEnabled
     extends GlobalFlag(
         true,
         "Graceful shutdown enabled. " +
-        "Temporary measure to allow servers to deploy without hurting clients.")
+          "Temporary measure to allow servers to deploy without hurting clients.")
 
 /**
   * A tracker is responsible for tracking pending transactions
@@ -164,8 +164,11 @@ private[twitter] object ServerDispatcher {
       tracer: Tracer,
       statsReceiver: StatsReceiver
   ): ServerDispatcher =
-    new ServerDispatcher(
-        trans, Processor andThen service, lessor, tracer, statsReceiver)
+    new ServerDispatcher(trans,
+                         Processor andThen service,
+                         lessor,
+                         tracer,
+                         statsReceiver)
 
   /**
     * Construct a new request-response dispatcher with a
@@ -175,8 +178,11 @@ private[twitter] object ServerDispatcher {
       trans: Transport[Message, Message],
       service: Service[Request, Response]
   ): ServerDispatcher =
-    newRequestResponse(
-        trans, service, Lessor.nil, NullTracer, NullStatsReceiver)
+    newRequestResponse(trans,
+                       service,
+                       Lessor.nil,
+                       NullTracer,
+                       NullStatsReceiver)
 
   /**
     * Used when comparing the difference between leases.
@@ -198,8 +204,7 @@ private[twitter] class ServerDispatcher(
     lessor: Lessor, // the lessor that the dispatcher should register with in order to get leases
     tracer: Tracer,
     statsReceiver: StatsReceiver
-)
-    extends Closable
+) extends Closable
     with Lessee {
   import ServerDispatcher.State
 
@@ -442,8 +447,8 @@ private[finagle] object Processor
     }
   }
 
-  def apply(
-      req: Message, service: Service[Request, Response]): Future[Message] =
+  def apply(req: Message,
+            service: Service[Request, Response]): Future[Message] =
     req match {
       case d: Message.Tdispatch => dispatch(d, service)
       case r: Message.Treq => dispatch(r, service)

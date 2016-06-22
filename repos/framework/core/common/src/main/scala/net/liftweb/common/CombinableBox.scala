@@ -34,8 +34,7 @@ object CombinableBox {
   }
 
   implicit def boxToCombinableBox[A](in: Box[A]): CombinableBox[A, HNil] =
-    CombinableBox(
-        in match {
+    CombinableBox(in match {
       case Full(a) => Right(a :+: HNil)
       case (f: Failure) => Left(f :: Nil)
       case _ => Left(Failure("Empty") :: Nil)

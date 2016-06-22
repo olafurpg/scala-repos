@@ -27,8 +27,7 @@ import nak.regress.LinearRegression
 case class RegressionStrategyParams(
     indicators: Seq[(String, BaseIndicator)],
     maxTrainingWindowSize: Int
-)
-    extends Params
+) extends Params
 
 class RegressionStrategy(params: RegressionStrategyParams)
     extends StockStrategy[Map[String, DenseVector[Double]]] {
@@ -108,10 +107,10 @@ class RegressionStrategy(params: RegressionStrategyParams)
 
     val vecArray = params.indicators.map {
       case (name, indicator) => {
-          val price = dataView.priceFrame(indicator.getMinWindowSize())
-          val logPrice = price.mapValues(math.log)
-          indicator.getOne(logPrice.firstCol(ticker))
-        }
+        val price = dataView.priceFrame(indicator.getMinWindowSize())
+        val logPrice = price.mapValues(math.log)
+        indicator.getOne(logPrice.firstCol(ticker))
+      }
     }.toArray
 
     val densVecArray = vecArray ++ Array[Double](1)
@@ -122,8 +121,8 @@ class RegressionStrategy(params: RegressionStrategyParams)
   }
 
   // Returns a mapping of tickers to predictions
-  def onClose(
-      model: Map[String, DenseVector[Double]], query: Query): Prediction = {
+  def onClose(model: Map[String, DenseVector[Double]],
+              query: Query): Prediction = {
     val dataView = query.dataView
 
     val prediction =

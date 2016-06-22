@@ -16,8 +16,8 @@ import org.scalajs.core.tools.io.IO
   *  of the Java world. This allows to load another version of Jetty in the same
   *  JVM for the rest of the project.
   */
-final class PhantomJettyClassLoader(
-    jettyLoader: ClassLoader, parent: ClassLoader)
+final class PhantomJettyClassLoader(jettyLoader: ClassLoader,
+                                    parent: ClassLoader)
     extends ClassLoader(parent) {
 
   def this(loader: ClassLoader) =

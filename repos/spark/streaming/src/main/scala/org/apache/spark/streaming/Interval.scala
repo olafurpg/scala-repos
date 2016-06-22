@@ -35,7 +35,7 @@ private[streaming] class Interval(val beginTime: Time, val endTime: Time) {
     if (this.duration != that.duration) {
       throw new Exception(
           "Comparing two intervals with different durations [" + this + ", " +
-          that + "]")
+            that + "]")
     }
     this.endTime < that.endTime
   }

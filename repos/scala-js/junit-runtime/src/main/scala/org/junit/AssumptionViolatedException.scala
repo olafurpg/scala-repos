@@ -10,8 +10,10 @@ class AssumptionViolatedException protected (fAssumption: String,
                                              fValueMatcher: Boolean,
                                              fMatcher: Matcher[_],
                                              fValue: AnyRef)
-    extends org.junit.internal.AssumptionViolatedException(
-        fAssumption, fValueMatcher, fMatcher, fValue) {
+    extends org.junit.internal.AssumptionViolatedException(fAssumption,
+                                                           fValueMatcher,
+                                                           fMatcher,
+                                                           fValue) {
 
   @Deprecated
   def this(actual: Any, matcher: Matcher[_]) =

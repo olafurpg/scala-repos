@@ -106,8 +106,9 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T: ST: ORD]
 
   // driver function
 
-  private def factorizedJoin(
-      left: Index[T], right: Index[T], how: JoinType): ReIndexer[T] = {
+  private def factorizedJoin(left: Index[T],
+                             right: Index[T],
+                             how: JoinType): ReIndexer[T] = {
     // factorize left and right inputs
     val rizer = new Factorizer(left.length + right.length)
     val leftLabels = rizer.factorize(left)
@@ -115,8 +116,8 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T: ST: ORD]
 
     val max_groups = rizer.numUniq
 
-    val JoinResult(lTake, rTake) = JoinHelper(
-        leftLabels, rightLabels, max_groups, how)
+    val JoinResult(lTake, rTake) =
+      JoinHelper(leftLabels, rightLabels, max_groups, how)
 
     // construct new joint index
     val newIdx = array.empty[T](lTake.length)
@@ -673,7 +674,8 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T: ST: ORD]
 }
 
 private[saddle] object JoinerImpl {
-  def join[@spec(Boolean, Int, Long, Double) T: ST: ORD](
-      left: Index[T], right: Index[T], how: JoinType) =
+  def join[@spec(Boolean, Int, Long, Double) T: ST: ORD](left: Index[T],
+                                                         right: Index[T],
+                                                         how: JoinType) =
     (new JoinerImpl[T]).join(left, right, how)
 }

@@ -9,8 +9,8 @@ import GenericRunnerCommand._
 import scala.reflect.internal.util.ScalaClassLoader
 
 /** A command for ScriptRunner */
-class GenericRunnerCommand(
-    args: List[String], override val settings: GenericRunnerSettings)
+class GenericRunnerCommand(args: List[String],
+                           override val settings: GenericRunnerSettings)
     extends CompilerCommand(args, settings) {
 
   def this(args: List[String], error: String => Unit) =

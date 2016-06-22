@@ -96,7 +96,8 @@ trait AssetHelper { self: I18nHelper =>
   }
 
   def jsAt(path: String, static: Boolean = true) = Html {
-    s"""<script src="${static.fold(staticUrl(path), path)}?v=$assetVersion"></script>"""
+    s"""<script src="${static
+      .fold(staticUrl(path), path)}?v=$assetVersion"></script>"""
   }
 
   def embedJs(js: String): Html =

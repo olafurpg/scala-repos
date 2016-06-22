@@ -52,8 +52,8 @@ object BasicIO {
           else Stream.empty
         case Right(s) => Stream.cons(s, next())
       }
-      new Streamed(
-          (s: T) => q put Right(s), code => q put Left(code), () => next())
+      new Streamed((s: T) => q put Right(s), code => q put Left(code), () =>
+            next())
     }
   }
 
@@ -88,8 +88,9 @@ object BasicIO {
     *               sent. If `None`, output will be sent to stderr.
     * @return A `ProcessIO` with the characteristics above.
     */
-  def apply(
-      withIn: Boolean, output: String => Unit, log: Option[ProcessLogger]) =
+  def apply(withIn: Boolean,
+            output: String => Unit,
+            log: Option[ProcessLogger]) =
     new ProcessIO(input(withIn), processFully(output), getErr(log))
 
   /** Creates a `ProcessIO` that appends its output to a `StringBuffer`. It can
@@ -112,8 +113,9 @@ object BasicIO {
     *               sent. If `None`, output will be sent to stderr.
     * @return A `ProcessIO` with the characteristics above.
     */
-  def apply(
-      withIn: Boolean, buffer: StringBuffer, log: Option[ProcessLogger]) =
+  def apply(withIn: Boolean,
+            buffer: StringBuffer,
+            log: Option[ProcessLogger]) =
     new ProcessIO(input(withIn), processFully(buffer), getErr(log))
 
   /** Creates a `ProcessIO` from a `ProcessLogger` . It can attach the
@@ -174,7 +176,8 @@ object BasicIO {
   def processFully(processLine: String => Unit): InputStream => Unit =
     in => {
       val reader = new BufferedReader(new InputStreamReader(in))
-      try processLinesFully(processLine)(reader.readLine) finally reader.close()
+      try processLinesFully(processLine)(reader.readLine) finally reader
+        .close()
     }
 
   /** Calls `processLine` with the result of `readLine` until the latter returns

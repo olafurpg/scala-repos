@@ -67,13 +67,13 @@ class MatCheck extends Specification with ScalaCheck {
         val data = m.contents
         m.map(_ + 1.0) must_== Mat(m.numRows, m.numCols, data.map(_ + 1.0))
         m.map(d => 5.0) must_==
-          Mat(m.numRows,
-              m.numCols,
-              (data.map(d => if (d.isNaN) na.to[Double] else 5.0)))
+        Mat(m.numRows,
+            m.numCols,
+            (data.map(d => if (d.isNaN) na.to[Double] else 5.0)))
         m.map(d => 5) must_==
-          Mat[Int](m.numRows,
-                   m.numCols,
-                   data.map(d => if (d.isNaN) na.to[Int] else 5))
+        Mat[Int](m.numRows,
+                 m.numCols,
+                 data.map(d => if (d.isNaN) na.to[Int] else 5))
       }
     }
 
@@ -84,8 +84,9 @@ class MatCheck extends Specification with ScalaCheck {
         val res = m.T
         res.numCols must_== m.numRows
         res.numRows must_== m.numCols
-        for (i <- Range(0, m.numRows); j <- Range(0, m.numCols)) m.at(i, j) must_==
-          res.at(j, i)
+        for (i <- Range(0, m.numRows); j <- Range(0, m.numCols))
+          m.at(i, j) must_==
+            res.at(j, i)
         res.T must_== m
       }
     }
@@ -121,8 +122,8 @@ class MatCheck extends Specification with ScalaCheck {
           val loc = Set(i: _*)
           val res = m.withoutRows(i: _*)
           res.numRows must_== (m.numRows - loc.size)
-          val exp = for (j <- 0 until m.numRows if !loc.contains(j)) yield
-            m.row(j)
+          val exp = for (j <- 0 until m.numRows if !loc.contains(j))
+            yield m.row(j)
           res must_== Mat(exp: _*).T
         }
       }
@@ -135,8 +136,8 @@ class MatCheck extends Specification with ScalaCheck {
           val loc = Set(i: _*)
           val res = m.withoutCols(i: _*)
           res.numCols must_== (m.numCols - loc.size)
-          val exp = for (j <- 0 until m.numCols if !loc.contains(j)) yield
-            m.col(j)
+          val exp = for (j <- 0 until m.numCols if !loc.contains(j))
+            yield m.col(j)
           res must_== Mat(exp: _*)
         }
       }
@@ -175,8 +176,8 @@ class MatCheck extends Specification with ScalaCheck {
     "cols works" in {
       forAll { (m: Mat[Double]) =>
         val data = m.T.contents
-        val exp = for (i <- IndexedSeq(Range(0, m.numCols): _*)) yield
-          Vec(data).slice(i * m.numRows, (i + 1) * m.numRows)
+        val exp = for (i <- IndexedSeq(Range(0, m.numCols): _*))
+          yield Vec(data).slice(i * m.numRows, (i + 1) * m.numRows)
         m.cols() must_== exp
       }
     }
@@ -184,8 +185,8 @@ class MatCheck extends Specification with ScalaCheck {
     "rows works" in {
       forAll { (m: Mat[Double]) =>
         val data = m.contents
-        val exp = for (i <- IndexedSeq(Range(0, m.numRows): _*)) yield
-          Vec(data).slice(i * m.numCols, (i + 1) * m.numCols)
+        val exp = for (i <- IndexedSeq(Range(0, m.numRows): _*))
+          yield Vec(data).slice(i * m.numCols, (i + 1) * m.numCols)
         m.rows() must_== exp
       }
     }
@@ -241,7 +242,7 @@ class MatCheck extends Specification with ScalaCheck {
     "roundTo works" in {
       forAll { (ma: Mat[Double]) =>
         ma.contents.map((v: Double) => math.round(v * 100) / 100d) must_==
-          ma.roundTo(2).contents
+        ma.roundTo(2).contents
       }
     }
 

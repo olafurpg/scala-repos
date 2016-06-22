@@ -129,8 +129,8 @@ final class GBTClassifier @Since("1.4.0")(
       this,
       "lossType",
       "Loss function which GBT" +
-      " tries to minimize (case-insensitive). Supported options:" +
-      s" ${GBTClassifier.supportedLossTypes.mkString(", ")}",
+        " tries to minimize (case-insensitive). Supported options:" +
+        s" ${GBTClassifier.supportedLossTypes.mkString(", ")}",
       (value: String) =>
         GBTClassifier.supportedLossTypes.contains(value.toLowerCase))
 
@@ -164,8 +164,8 @@ final class GBTClassifier @Since("1.4.0")(
         case None =>
           throw new IllegalArgumentException(
               "GBTClassifier was given input" +
-              s" with invalid label column ${$(labelCol)}, without the number of classes" +
-              " specified. See StringIndexer.")
+                s" with invalid label column ${$(labelCol)}, without the number of classes" +
+                " specified. See StringIndexer.")
         // TODO: Automatically index labels: SPARK-7126
       }
     require(
@@ -205,7 +205,7 @@ object GBTClassifier {
   */
 @Since("1.6.0")
 @Experimental
-final class GBTClassificationModel private[ml](
+final class GBTClassificationModel private[ml] (
     @Since("1.6.0") override val uid: String,
     private val _trees: Array[DecisionTreeRegressionModel],
     private val _treeWeights: Array[Double],
@@ -218,7 +218,7 @@ final class GBTClassificationModel private[ml](
   require(
       _trees.length == _treeWeights.length,
       "GBTClassificationModel given trees, treeWeights" +
-      s" of non-matching lengths (${_trees.length}, ${_treeWeights.length}, respectively).")
+        s" of non-matching lengths (${_trees.length}, ${_treeWeights.length}, respectively).")
 
   /**
     * Construct a GBTClassificationModel
@@ -283,14 +283,16 @@ private[ml] object GBTClassificationModel {
     require(
         oldModel.algo == OldAlgo.Classification,
         "Cannot convert GradientBoostedTreesModel" +
-        s" with algo=${oldModel.algo} (old API) to GBTClassificationModel (new API).")
+          s" with algo=${oldModel.algo} (old API) to GBTClassificationModel (new API).")
     val newTrees = oldModel.trees.map { tree =>
       // parent for each tree is null since there is no good way to set this.
       DecisionTreeRegressionModel.fromOld(tree, null, categoricalFeatures)
     }
     val uid =
       if (parent != null) parent.uid else Identifiable.randomUID("gbtc")
-    new GBTClassificationModel(
-        parent.uid, newTrees, oldModel.treeWeights, numFeatures)
+    new GBTClassificationModel(parent.uid,
+                               newTrees,
+                               oldModel.treeWeights,
+                               numFeatures)
   }
 }

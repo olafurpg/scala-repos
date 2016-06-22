@@ -49,8 +49,12 @@ object AsyncExecutor extends Logging {
             }
         }
         val tf = new DaemonThreadFactory(name + "-")
-        executor = new ThreadPoolExecutor(
-            numThreads, numThreads, 1, TimeUnit.MINUTES, queue, tf)
+        executor = new ThreadPoolExecutor(numThreads,
+                                          numThreads,
+                                          1,
+                                          TimeUnit.MINUTES,
+                                          queue,
+                                          tf)
         if (!state.compareAndSet(1, 2)) {
           executor.shutdownNow()
           throw new IllegalStateException(
@@ -80,8 +84,8 @@ object AsyncExecutor extends Logging {
     private[this] val threadNumber = new AtomicInteger(1)
 
     def newThread(r: Runnable): Thread = {
-      val t = new Thread(
-          group, r, namePrefix + threadNumber.getAndIncrement, 0)
+      val t =
+        new Thread(group, r, namePrefix + threadNumber.getAndIncrement, 0)
       if (!t.isDaemon) t.setDaemon(true)
       if (t.getPriority != Thread.NORM_PRIORITY)
         t.setPriority(Thread.NORM_PRIORITY)

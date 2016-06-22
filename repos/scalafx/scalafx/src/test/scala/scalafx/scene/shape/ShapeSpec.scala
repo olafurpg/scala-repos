@@ -42,8 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class ShapeSpec
-    extends SimpleSFXDelegateSpec[jfxss.Shape, Shape](
-        classOf[jfxss.Shape], classOf[Shape]) {
+    extends SimpleSFXDelegateSpec[jfxss.Shape, Shape](classOf[jfxss.Shape],
+                                                      classOf[Shape]) {
 
   override protected def getScalaClassInstance = new Rectangle
 

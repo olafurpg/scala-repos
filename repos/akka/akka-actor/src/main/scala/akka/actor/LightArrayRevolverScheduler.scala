@@ -51,8 +51,8 @@ class LightArrayRevolverScheduler(config: Config,
     .requiring(
         _ >= 10.millis || !Helpers.isWindows,
         "minimum supported akka.scheduler.tick-duration on Windows is 10ms")
-    .requiring(
-        _ >= 1.millis, "minimum supported akka.scheduler.tick-duration is 1ms")
+    .requiring(_ >= 1.millis,
+               "minimum supported akka.scheduler.tick-duration is 1ms")
   val ShutdownTimeout =
     config.getMillisDuration("akka.scheduler.shutdown-timeout")
 
@@ -92,10 +92,10 @@ class LightArrayRevolverScheduler(config: Config,
     }
   }
 
-  override def schedule(initialDelay: FiniteDuration,
-                        delay: FiniteDuration,
-                        runnable: Runnable)(
-      implicit executor: ExecutionContext): Cancellable = {
+  override def schedule(
+      initialDelay: FiniteDuration,
+      delay: FiniteDuration,
+      runnable: Runnable)(implicit executor: ExecutionContext): Cancellable = {
     checkMaxDelay(roundUp(delay).toNanos)
     val preparedEC = executor.prepare()
     try new AtomicReference[Cancellable](InitialRepeatMarker)
@@ -112,10 +112,11 @@ class LightArrayRevolverScheduler(config: Config,
                     val driftNanos = clock() - getAndAdd(delay.toNanos)
                     if (self.get != null)
                       swap(
-                          schedule(preparedEC,
-                                   this,
-                                   Duration.fromNanos(Math.max(
-                                           delay.toNanos - driftNanos, 1))))
+                          schedule(
+                              preparedEC,
+                              this,
+                              Duration.fromNanos(
+                                  Math.max(delay.toNanos - driftNanos, 1))))
                   } catch {
                     case _: SchedulerException ⇒
                     // ignore failure to enqueue or terminated target actor
@@ -172,8 +173,9 @@ class LightArrayRevolverScheduler(config: Config,
   private val wheelMask = WheelSize - 1
   private val queue = new TaskQueue
 
-  private def schedule(
-      ec: ExecutionContext, r: Runnable, delay: FiniteDuration): TimerTask =
+  private def schedule(ec: ExecutionContext,
+                       r: Runnable,
+                       delay: FiniteDuration): TimerTask =
     if (delay <= Duration.Zero) {
       if (stopped.get != null)
         throw new SchedulerException("cannot enqueue after timer shutdown")
@@ -198,7 +200,7 @@ class LightArrayRevolverScheduler(config: Config,
       // 1 second margin in the error message due to rounding
       throw new IllegalArgumentException(
           s"Task scheduled with [${delayNanos.nanos.toSeconds}] seconds delay, " +
-          s"which is too far in future, maximum delay is [${(tickNanos * Int.MaxValue).nanos.toSeconds - 1}] seconds")
+            s"which is too far in future, maximum delay is [${(tickNanos * Int.MaxValue).nanos.toSeconds - 1}] seconds")
 
   private val stopped = new AtomicReference[Promise[immutable.Seq[TimerTask]]]
   private def stop(): Future[immutable.Seq[TimerTask]] = {
@@ -240,8 +242,8 @@ class LightArrayRevolverScheduler(config: Config,
           case ticks ⇒
             val futureTick =
               ((time - start + // calculate the nanos since timer start
-                      (ticks * tickNanos) + // adding the desired delay
-                      tickNanos - 1 // rounding up
+                        (ticks * tickNanos) + // adding the desired delay
+                        tickNanos - 1 // rounding up
                       ) / tickNanos).toInt // and converting to slot number
             // tick is an Int that will wrap around, but toInt of futureTick gives us modulo operations
             // and the difference (offset) will be correct in any case
@@ -263,8 +265,8 @@ class LightArrayRevolverScheduler(config: Config,
               log.info("starting new LARS thread")
               try thread.start() catch {
                 case e: Throwable ⇒
-                  log.error(
-                      e, "LARS cannot start new thread, ship’s going down!")
+                  log.error(e,
+                            "LARS cannot start new thread, ship’s going down!")
                   stopped.set(Promise successful Nil)
                   clearAll()
               }
@@ -357,8 +359,8 @@ object LightArrayRevolverScheduler {
             true
           } catch {
             case _: InterruptedException ⇒ {
-                Thread.currentThread.interrupt(); false
-              }
+              Thread.currentThread.interrupt(); false
+            }
             case NonFatal(e) ⇒ { executionContext.reportFailure(e); false }
           }
       }

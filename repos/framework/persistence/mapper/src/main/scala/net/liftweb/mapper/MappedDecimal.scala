@@ -49,8 +49,9 @@ import xml.{Text, NodeSeq}
   * @param context The MathContext that controls precision and rounding
   * @param scale Controls the scale of the underlying BigDecimal
   */
-abstract class MappedDecimal[T <: Mapper[T]](
-    val fieldOwner: T, val context: MathContext, val scale: Int)
+abstract class MappedDecimal[T <: Mapper[T]](val fieldOwner: T,
+                                             val context: MathContext,
+                                             val scale: Int)
     extends MappedField[BigDecimal, T] {
 
   /**
@@ -192,12 +193,12 @@ abstract class MappedDecimal[T <: Mapper[T]](
 
   def real_convertToJDBCFriendly(value: BigDecimal): Object = value.bigDecimal
 
-  def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+  def buildSetBooleanValue(accessor: Method,
+                           columnName: String): (T, Boolean, Boolean) => Unit =
     null
 
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedDecimal[T] =>
@@ -205,16 +206,16 @@ abstract class MappedDecimal[T <: Mapper[T]](
               if (v == null) defaultValue else coerce(BigDecimal(v.getTime)))
       })
 
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedDecimal[T] =>
           f.wholeSet(if (v == null) defaultValue else coerce(BigDecimal(v)))
       })
 
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedDecimal[T] =>
@@ -236,12 +237,11 @@ abstract class MappedDecimal[T <: Mapper[T]](
     * top of the page concerning default precision.
     */
   def fieldCreatorString(dbType: DriverType, colName: String): String = {
-    val suffix =
-      if (context.getPrecision == 0) {
-        ""
-      } else {
-        "(" + context.getPrecision + "," + scale + ")"
-      }
+    val suffix = if (context.getPrecision == 0) {
+      ""
+    } else {
+      "(" + context.getPrecision + "," + scale + ")"
+    }
 
     colName + " DECIMAL" + suffix + notNullAppender()
   }

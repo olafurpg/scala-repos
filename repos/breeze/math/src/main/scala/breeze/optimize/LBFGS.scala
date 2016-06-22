@@ -117,17 +117,16 @@ object LBFGS {
     def historyLength = memStep.length
 
     def *(grad: T) = {
-      val diag =
-        if (historyLength > 0) {
-          val prevStep = memStep.head
-          val prevGradStep = memGradDelta.head
-          val sy = prevStep dot prevGradStep
-          val yy = prevGradStep dot prevGradStep
-          if (sy < 0 || sy.isNaN) throw new NaNHistory
-          sy / yy
-        } else {
-          1.0
-        }
+      val diag = if (historyLength > 0) {
+        val prevStep = memStep.head
+        val prevGradStep = memGradDelta.head
+        val sy = prevStep dot prevGradStep
+        val yy = prevGradStep dot prevGradStep
+        if (sy < 0 || sy.isNaN) throw new NaNHistory
+        sy / yy
+      } else {
+        1.0
+      }
 
       val dir = space.copy(grad)
       val as = new Array[Double](m)

@@ -37,8 +37,8 @@ class MesosClusterSchedulerSuite
     with LocalSparkContext
     with MockitoSugar {
 
-  private val command = new Command(
-      "mainClass", Seq("arg"), Map(), Seq(), Seq(), Seq())
+  private val command =
+    new Command("mainClass", Seq("arg"), Map(), Seq(), Seq(), Seq())
   private var scheduler: MesosClusterScheduler = _
 
   override def beforeEach(): Unit = {
@@ -46,7 +46,8 @@ class MesosClusterSchedulerSuite
     conf.setMaster("mesos://localhost:5050")
     conf.setAppName("spark mesos")
     scheduler = new MesosClusterScheduler(
-        new BlackHoleMesosClusterPersistenceEngineFactory, conf) {
+        new BlackHoleMesosClusterPersistenceEngineFactory,
+        conf) {
       override def start(): Unit = { ready = true }
     }
     scheduler.start()
@@ -115,7 +116,8 @@ class MesosClusterSchedulerSuite
     assert(response.success)
     val offer = Offer
       .newBuilder()
-      .addResources(Resource
+      .addResources(
+          Resource
             .newBuilder()
             .setRole("*")
             .setScalar(Scalar.newBuilder().setValue(1).build())

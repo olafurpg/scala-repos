@@ -46,20 +46,23 @@ class GradientBoostedTreesSuite
                                         maxDepth = 2,
                                         categoricalFeaturesInfo = Map.empty,
                                         subsamplingRate = subsamplingRate)
-        val boostingStrategy = new BoostingStrategy(
-            treeStrategy, SquaredError, numIterations, learningRate)
+        val boostingStrategy = new BoostingStrategy(treeStrategy,
+                                                    SquaredError,
+                                                    numIterations,
+                                                    learningRate)
 
         val gbt = GradientBoostedTrees.train(rdd, boostingStrategy)
 
         assert(gbt.trees.size === numIterations)
         try {
-          EnsembleTestHelper.validateRegressor(
-              gbt, GradientBoostedTreesSuite.data, 0.06)
+          EnsembleTestHelper.validateRegressor(gbt,
+                                               GradientBoostedTreesSuite.data,
+                                               0.06)
         } catch {
           case e: java.lang.AssertionError =>
             logError(
                 s"FAILED for numIterations=$numIterations, learningRate=$learningRate," +
-                s" subsamplingRate=$subsamplingRate")
+                  s" subsamplingRate=$subsamplingRate")
             throw e
         }
 
@@ -82,20 +85,24 @@ class GradientBoostedTreesSuite
                                         maxDepth = 2,
                                         categoricalFeaturesInfo = Map.empty,
                                         subsamplingRate = subsamplingRate)
-        val boostingStrategy = new BoostingStrategy(
-            treeStrategy, AbsoluteError, numIterations, learningRate)
+        val boostingStrategy = new BoostingStrategy(treeStrategy,
+                                                    AbsoluteError,
+                                                    numIterations,
+                                                    learningRate)
 
         val gbt = GradientBoostedTrees.train(rdd, boostingStrategy)
 
         assert(gbt.trees.size === numIterations)
         try {
-          EnsembleTestHelper.validateRegressor(
-              gbt, GradientBoostedTreesSuite.data, 0.85, "mae")
+          EnsembleTestHelper.validateRegressor(gbt,
+                                               GradientBoostedTreesSuite.data,
+                                               0.85,
+                                               "mae")
         } catch {
           case e: java.lang.AssertionError =>
             logError(
                 s"FAILED for numIterations=$numIterations, learningRate=$learningRate," +
-                s" subsamplingRate=$subsamplingRate")
+                  s" subsamplingRate=$subsamplingRate")
             throw e
         }
 
@@ -119,20 +126,23 @@ class GradientBoostedTreesSuite
                                         numClasses = 2,
                                         categoricalFeaturesInfo = Map.empty,
                                         subsamplingRate = subsamplingRate)
-        val boostingStrategy = new BoostingStrategy(
-            treeStrategy, LogLoss, numIterations, learningRate)
+        val boostingStrategy = new BoostingStrategy(treeStrategy,
+                                                    LogLoss,
+                                                    numIterations,
+                                                    learningRate)
 
         val gbt = GradientBoostedTrees.train(rdd, boostingStrategy)
 
         assert(gbt.trees.size === numIterations)
         try {
-          EnsembleTestHelper.validateClassifier(
-              gbt, GradientBoostedTreesSuite.data, 0.9)
+          EnsembleTestHelper.validateClassifier(gbt,
+                                                GradientBoostedTreesSuite.data,
+                                                0.9)
         } catch {
           case e: java.lang.AssertionError =>
             logError(
                 s"FAILED for numIterations=$numIterations, learningRate=$learningRate," +
-                s" subsamplingRate=$subsamplingRate")
+                  s" subsamplingRate=$subsamplingRate")
             throw e
         }
 
@@ -200,8 +210,10 @@ class GradientBoostedTreesSuite
                                         impurity = Variance,
                                         maxDepth = 2,
                                         categoricalFeaturesInfo = Map.empty)
-        val boostingStrategy = new BoostingStrategy(
-            treeStrategy, loss, numIterations, validationTol = 0.0)
+        val boostingStrategy = new BoostingStrategy(treeStrategy,
+                                                    loss,
+                                                    numIterations,
+                                                    validationTol = 0.0)
         val gbtValidate = new GradientBoostedTrees(boostingStrategy)
           .runWithValidation(trainRdd, validateRdd)
         val numTrees = gbtValidate.numTrees
@@ -260,8 +272,8 @@ class GradientBoostedTreesSuite
 private object GradientBoostedTreesSuite {
 
   // Combinations for estimators, learning rates and subsamplingRate
-  val testCombinations = Array(
-      (10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
+  val testCombinations =
+    Array((10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
 
   val data =
     EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 10, 100)

@@ -6,10 +6,10 @@ import gitbucket.core.util.RepositoryName
   * https://developer.github.com/v3/repos/#get-branch
   * https://developer.github.com/v3/repos/#enabling-and-disabling-branch-protection
   */
-case class ApiBranch(name: String,
-                     // commit: ApiBranchCommit,
-                     protection: ApiBranchProtection)(
-    repositoryName: RepositoryName)
+case class ApiBranch(
+    name: String,
+    // commit: ApiBranchCommit,
+    protection: ApiBranchProtection)(repositoryName: RepositoryName)
     extends FieldSerializable {
   def _links =
     Map("self" -> ApiPath(

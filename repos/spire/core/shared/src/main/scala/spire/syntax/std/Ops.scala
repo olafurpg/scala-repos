@@ -178,8 +178,8 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     arr2
   }
 
-  def qsortedBy[@sp B](f: A => B)(
-      implicit ev: Order[B], ct: ClassTag[A]): Array[A] = {
+  def qsortedBy[@sp B](f: A => B)(implicit ev: Order[B],
+                                  ct: ClassTag[A]): Array[A] = {
     implicit val ord: Order[A] = ev.on(f)
     val arr2 = arr.clone
     Sorting.sort(arr2)
@@ -324,10 +324,10 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) {
     fromArray(arr)
   }
 
-  def qsortedBy[@sp B](
-      f: A => B)(implicit ev: Order[B],
-                 ct: ClassTag[A],
-                 cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def qsortedBy[@sp B](f: A => B)(
+      implicit ev: Order[B],
+      ct: ClassTag[A],
+      cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     implicit val ord: Order[A] = ev.on(f)
     val arr = as.toArray
     Sorting.sort(arr)
@@ -335,7 +335,8 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) {
   }
 
   def qsortedWith(f: (A, A) => Int)(
-      implicit ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+      implicit ct: ClassTag[A],
+      cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     implicit val ord: Order[A] = Order.from(f)
     val arr = as.toArray
     Sorting.sort(arr)

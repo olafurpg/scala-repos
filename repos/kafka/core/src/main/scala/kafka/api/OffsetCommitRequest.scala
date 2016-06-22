@@ -37,7 +37,7 @@ object OffsetCommitRequest extends Logging {
     assert(
         versionId == 0 || versionId == 1 || versionId == 2,
         "Version " + versionId +
-        " is invalid for OffsetCommitRequest. Valid versions are 0, 1 or 2.")
+          " is invalid for OffsetCommitRequest. Valid versions are 0, 1 or 2.")
 
     val correlationId = buffer.getInt
     val clientId = readShortString(buffer)
@@ -72,7 +72,8 @@ object OffsetCommitRequest extends Logging {
         val timestamp = {
           // version 1 specific field
           if (versionId == 1) buffer.getLong
-          else org.apache.kafka.common.requests.OffsetCommitRequest.DEFAULT_TIMESTAMP
+          else
+            org.apache.kafka.common.requests.OffsetCommitRequest.DEFAULT_TIMESTAMP
         }
         val metadata = readShortString(buffer)
 
@@ -106,9 +107,10 @@ case class OffsetCommitRequest(
       org.apache.kafka.common.requests.OffsetCommitRequest.DEFAULT_RETENTION_TIME)
     extends RequestOrResponse(Some(ApiKeys.OFFSET_COMMIT.id)) {
 
-  assert(versionId == 0 || versionId == 1 || versionId == 2,
-         "Version " + versionId +
-         " is invalid for OffsetCommitRequest. Valid versions are 0, 1 or 2.")
+  assert(
+      versionId == 0 || versionId == 1 || versionId == 2,
+      "Version " + versionId +
+        " is invalid for OffsetCommitRequest. Valid versions are 0, 1 or 2.")
 
   lazy val requestInfoGroupedByTopic = requestInfo.groupBy(_._1.topic)
 
@@ -151,22 +153,22 @@ case class OffsetCommitRequest(
     2 + /* versionId */
     4 + /* correlationId */
     shortStringLength(clientId) + shortStringLength(groupId) +
-    (if (versionId >= 1)
-       4 /* group generation id */ + shortStringLength(memberId)
-     else 0) + (if (versionId >= 2) 8 /* retention time */ else 0) + 4 +
-    /* topic count */
-    requestInfoGroupedByTopic.foldLeft(0)((count, topicAndOffsets) => {
-      val (topic, offsets) = topicAndOffsets
-      count + shortStringLength(topic) + /* topic */
-      4 + /* number of partitions */
-      offsets.foldLeft(0)((innerCount, offsetAndMetadata) => {
-        innerCount + 4 /* partition */ + 8 /* offset */ + (if (versionId == 1)
-                                                             8
-                                                           else
-                                                             0) /* timestamp */ +
-        shortStringLength(offsetAndMetadata._2.metadata)
+      (if (versionId >= 1)
+         4 /* group generation id */ + shortStringLength(memberId)
+       else 0) + (if (versionId >= 2) 8 /* retention time */ else 0) + 4 +
+      /* topic count */
+      requestInfoGroupedByTopic.foldLeft(0)((count, topicAndOffsets) => {
+        val (topic, offsets) = topicAndOffsets
+        count + shortStringLength(topic) + /* topic */
+        4 + /* number of partitions */
+        offsets.foldLeft(0)((innerCount, offsetAndMetadata) => {
+          innerCount + 4 /* partition */ + 8 /* offset */ + (if (versionId == 1)
+                                                               8
+                                                             else
+                                                               0) /* timestamp */ +
+          shortStringLength(offsetAndMetadata._2.metadata)
+        })
       })
-    })
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,

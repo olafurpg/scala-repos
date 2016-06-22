@@ -141,7 +141,8 @@ class LineParsersTest extends FlatSpec with ShouldMatchers with LineParsers {
         new LinkDefinitionStart("foo", "http://example.com/"),
         Some("Optional Title Here"))
     apply(p, "[foo]: http://example.com/") should equal(
-        new LinkDefinitionStart("foo", "http://example.com/"), None)
+        new LinkDefinitionStart("foo", "http://example.com/"),
+        None)
     apply(p, "[Foo]: http://example.com/  'Optional Title Here'") should equal(
         new LinkDefinitionStart("foo", "http://example.com/"),
         Some("Optional Title Here"))

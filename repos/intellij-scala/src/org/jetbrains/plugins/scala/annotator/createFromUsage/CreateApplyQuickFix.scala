@@ -23,8 +23,8 @@ class CreateApplyQuickFix(td: ScTypeDefinition, call: ScMethodCall) extends {
     s"def apply$argsText$dummyTypeText = ???"
   }
 
-  override protected def addElementsToTemplate(
-      method: ScFunction, builder: TemplateBuilder) = {
+  override protected def addElementsToTemplate(method: ScFunction,
+                                               builder: TemplateBuilder) = {
     for (aType <- methodType;
          typeElement <- method.children.findByType(
                            classOf[ScSimpleTypeElement])) {

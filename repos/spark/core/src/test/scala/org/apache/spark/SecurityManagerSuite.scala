@@ -191,9 +191,11 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(securityManager.fileServerSSLOptions.keyStore.isDefined === true)
     assert(
         securityManager.fileServerSSLOptions.keyStore.get.getName === "keystore")
-    assert(securityManager.fileServerSSLOptions.trustStorePassword === Some(
+    assert(
+        securityManager.fileServerSSLOptions.trustStorePassword === Some(
             "password"))
-    assert(securityManager.fileServerSSLOptions.keyStorePassword === Some(
+    assert(
+        securityManager.fileServerSSLOptions.keyStorePassword === Some(
             "password"))
     assert(
         securityManager.fileServerSSLOptions.keyPassword === Some("password"))

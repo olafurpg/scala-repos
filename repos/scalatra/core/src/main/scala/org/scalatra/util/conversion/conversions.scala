@@ -158,9 +158,9 @@ trait DefaultImplicitConversions extends LowPriorityImplicitConversions {
       mf: Manifest[T]): TypeConverter[String, Seq[T]] =
     stringToSeq[T](elementConverter)
 
-  def stringToSeq[T: Manifest](elementConverter: TypeConverter[String, T],
-                               separator: String =
-                                 ","): TypeConverter[String, Seq[T]] =
+  def stringToSeq[T: Manifest](
+      elementConverter: TypeConverter[String, T],
+      separator: String = ","): TypeConverter[String, Seq[T]] =
     safe(s => s.split(separator).toSeq.flatMap(e => elementConverter(e.trim)))
 
   implicit def seqHead[T](implicit elementConverter: TypeConverter[String, T],
@@ -188,9 +188,9 @@ object Conversions extends DefaultImplicitConversions {
 
   class SeqConversion(source: String) {
 
-    def asSeq[T](
-        separator: String)(implicit mf: Manifest[T],
-                           tc: TypeConverter[String, T]): Option[Seq[T]] =
+    def asSeq[T](separator: String)(
+        implicit mf: Manifest[T],
+        tc: TypeConverter[String, T]): Option[Seq[T]] =
       stringToSeq[T](tc, separator).apply(source)
   }
 

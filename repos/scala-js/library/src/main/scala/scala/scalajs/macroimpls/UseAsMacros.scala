@@ -26,8 +26,9 @@ private[scalajs] object UseAsMacros {
   import scala.reflect.macros._
   import blackbox.Context
 
-  def as_impl[A: c.WeakTypeTag, B <: js.Any: c.WeakTypeTag](
-      c: Context { type PrefixType = js.Using[_] }): c.Expr[B] = {
+  def as_impl[A: c.WeakTypeTag, B <: js.Any: c.WeakTypeTag](c: Context {
+    type PrefixType = js.Using[_]
+  }): c.Expr[B] = {
     (new Macros[c.type](c)).as[A, B]
   }
 
@@ -91,19 +92,19 @@ private[scalajs] object UseAsMacros {
             val msg = tpe match {
               case _: PolyType =>
                 "Polymorphic methods are currently " +
-                s"not supported. Offending method: ${sym.fullName}"
+                  s"not supported. Offending method: ${sym.fullName}"
 
               case _: ExistentialType =>
                 "Methods with existential types are " +
-                s"not supported. Offending method: ${sym.fullName}. This is " +
-                "likely caused by an abstract type in the method signature"
+                  s"not supported. Offending method: ${sym.fullName}. This is " +
+                  "likely caused by an abstract type in the method signature"
 
               case _ =>
                 sys.error(
                     "Unknown type in unsupported member. " +
-                    "Report this as a bug.\n" +
-                    s"Offending method: ${sym.fullName}\n" +
-                    s"Offending type: ${showRaw(tpe)}")
+                      "Report this as a bug.\n" +
+                      s"Offending method: ${sym.fullName}\n" +
+                      s"Offending type: ${showRaw(tpe)}")
             }
 
             c.error(c.enclosingPosition, msg)
@@ -131,31 +132,31 @@ private[scalajs] object UseAsMacros {
 
             case JSMemberCall if !isRawJSType =>
               s"$trgTpe defines an apply method. This cannot be implemented " +
-              "by any Scala exported type, since it would need to chain " +
-              "Function's prototype."
+                "by any Scala exported type, since it would need to chain " +
+                "Function's prototype."
 
             case JSMemberBracketAccess if !isRawJSType =>
               s"$trgTpe defines a @JSMemberBracketAccess method. Existence " +
-              "of such a method cannot be statically checked for any " +
-              "Scala exported type."
+                "of such a method cannot be statically checked for any " +
+                "Scala exported type."
 
             case JSMemberBracketCall if !isRawJSType =>
               s"$trgTpe defines a @JSMemberBracketCall method. Existence of " +
-              "such a method cannot be statically checked for any Scala " +
-              "exported type."
+                "such a method cannot be statically checked for any Scala " +
+                "exported type."
 
             case JSMemberCall =>
               noSuchMember("<apply>") + " (type is not callable)"
 
             case JSMemberBracketAccess =>
               noSuchMember("<bracketaccess>") + " (type doesn't support " +
-              "member selection via []). Add @JSBracketAccess to use a " +
-              "method for member selection."
+                "member selection via []). Add @JSBracketAccess to use a " +
+                "method for member selection."
 
             case JSMemberBracketCall =>
               noSuchMember("<bracketcall>") + " (type doesn't support " +
-              "dynamically calling methods). Add @JSBracketCall to use a " +
-              "method for dynamic calls."
+                "dynamically calling methods). Add @JSBracketCall to use a " +
+                "method for dynamic calls."
           }
 
           c.error(c.enclosingPosition, errMsg)
@@ -243,7 +244,7 @@ private[scalajs] object UseAsMacros {
       sym.info.asSeenFrom(origTpe, sym.owner) match {
         case MethodType(List(param), resultType)
             if resultType.typeSymbol == definitions.UnitClass &&
-            sym.name.decodedName.toString.endsWith("_=") =>
+              sym.name.decodedName.toString.endsWith("_=") =>
           JSSetter(param.info)
 
         case NullaryMethodType(returnType) =>
@@ -308,7 +309,7 @@ private[scalajs] object UseAsMacros {
           for (base <- sym.baseClasses if !allowedParent(base)) {
             c.abort(c.enclosingPosition,
                     s"Supertype ${base.fullName} of $sym " +
-                    "is a class. Cannot be used with as.")
+                      "is a class. Cannot be used with as.")
           }
 
           tpe
@@ -319,7 +320,7 @@ private[scalajs] object UseAsMacros {
           for (decl <- decls if !decl.isType) {
             c.abort(c.enclosingPosition,
                     s"Refinement ${decl.name} " +
-                    "is not a type. Only types may be refined with as.")
+                      "is not a type. Only types may be refined with as.")
           }
 
           tpe

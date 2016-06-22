@@ -48,6 +48,6 @@ class StackedBarChartSpec
     with RunOnApplicationThread {
 
   override def getJavaClassInstance =
-    new jfxsc.StackedBarChart[String, Number](
-        new jfxsc.CategoryAxis, new jfxsc.NumberAxis)
+    new jfxsc.StackedBarChart[String, Number](new jfxsc.CategoryAxis,
+                                              new jfxsc.NumberAxis)
 }

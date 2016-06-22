@@ -20,8 +20,9 @@ import scala.util.parsing.json.{JSON, JSONObject}
   * User: jim
   * Date: 9/22/11
   */
-class UpgradedImageIExtractor(
-    httpClient: HttpClient, article: Article, config: Configuration)
+class UpgradedImageIExtractor(httpClient: HttpClient,
+                              article: Article,
+                              config: Configuration)
     extends ImageExtractor {
 
   import UpgradedImageIExtractor._
@@ -58,15 +59,15 @@ class UpgradedImageIExtractor(
     checkForKnownElements() match {
       case Some(image) => return image
       case None => {
-          trace("No known images found")
-        }
+        trace("No known images found")
+      }
     }
 
     checkForLargeImages(topNode, 0, 0) match {
       case Some(image) => return image
       case None => {
-          trace("No big images found")
-        }
+        trace("No big images found")
+      }
     }
 
     checkForMetaTag match {
@@ -133,55 +134,57 @@ class UpgradedImageIExtractor(
   private def checkForLargeImages(node: Element,
                                   parentDepthLevel: Int,
                                   siblingDepthLevel: Int): Option[Image] = {
-    trace("Checking for large images - parent depth " + parentDepthLevel +
-        " sibling depth: " + siblingDepthLevel)
+    trace(
+        "Checking for large images - parent depth " + parentDepthLevel +
+          " sibling depth: " + siblingDepthLevel)
 
     getImageCandidates(node) match {
       case Some(goodImages) => {
-          trace(
-              "checkForLargeImages: After findImagesThatPassByteSizeTest we have: " +
+        trace(
+            "checkForLargeImages: After findImagesThatPassByteSizeTest we have: " +
               goodImages.size + " at parent depth: " + parentDepthLevel)
-          val scoredImages = downloadImagesAndGetResults(
-              goodImages, parentDepthLevel)
-          // get the high score image in a tuple
-          scoredImages.sortBy(-_._2).take(1).headOption match {
-            case Some(highScoreImage) => {
-                val mainImage = new Image
-                // mainImage.topImageNode = highScoreImage
-                mainImage.imageSrc = highScoreImage._1.imgSrc
-                mainImage.imageExtractionType = "bigimage"
-                mainImage.bytes = highScoreImage._1.bytes
-                mainImage.confidenceScore =
-                  if (scoredImages.size > 0)
-                    (100 / scoredImages.size)
-                  else 0
-                trace(
-                    "IMAGE COMPLETE: High Score Image is: " +
-                    mainImage.imageSrc + " Score is: " + highScoreImage._2)
-                return Some(mainImage)
+        val scoredImages =
+          downloadImagesAndGetResults(goodImages, parentDepthLevel)
+        // get the high score image in a tuple
+        scoredImages.sortBy(-_._2).take(1).headOption match {
+          case Some(highScoreImage) => {
+            val mainImage = new Image
+            // mainImage.topImageNode = highScoreImage
+            mainImage.imageSrc = highScoreImage._1.imgSrc
+            mainImage.imageExtractionType = "bigimage"
+            mainImage.bytes = highScoreImage._1.bytes
+            mainImage.confidenceScore =
+              if (scoredImages.size > 0)
+                (100 / scoredImages.size)
+              else 0
+            trace(
+                "IMAGE COMPLETE: High Score Image is: " +
+                  mainImage.imageSrc + " Score is: " + highScoreImage._2)
+            return Some(mainImage)
+          }
+          case None => {
+            trace("No good images found after filtering")
+            getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
+              case Some(depthObj) => {
+                return checkForLargeImages(depthObj.node,
+                                           depthObj.parentDepth,
+                                           depthObj.siblingDepth)
               }
-            case None => {
-                trace("No good images found after filtering")
-                getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
-                  case Some(depthObj) => {
-                      return checkForLargeImages(depthObj.node,
-                                                 depthObj.parentDepth,
-                                                 depthObj.siblingDepth)
-                    }
-                  case None => trace("Image iteration is over!")
-                }
-              }
+              case None => trace("Image iteration is over!")
+            }
           }
         }
+      }
       case None => {
-          getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
-            case Some(depthObj) => {
-                return checkForLargeImages(
-                    depthObj.node, depthObj.parentDepth, depthObj.siblingDepth)
-              }
-            case None => trace("Image iteration is over!")
+        getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
+          case Some(depthObj) => {
+            return checkForLargeImages(depthObj.node,
+                                       depthObj.parentDepth,
+                                       depthObj.siblingDepth)
           }
+          case None => trace("Image iteration is over!")
         }
+      }
     }
 
     None
@@ -194,8 +197,9 @@ class UpgradedImageIExtractor(
 
     val MAX_PARENT_DEPTH = 2
     if (parentDepth > MAX_PARENT_DEPTH) {
-      trace("ParentDepth is greater than " + MAX_PARENT_DEPTH +
-          ", aborting depth traversal")
+      trace(
+          "ParentDepth is greater than " + MAX_PARENT_DEPTH +
+            ", aborting depth traversal")
       None
     } else {
       val siblingNode = node.previousElementSibling()
@@ -238,7 +242,7 @@ class UpgradedImageIExtractor(
           fileExtension = locallyStoredImage.fileExtension
           if (fileExtension != ".gif" && fileExtension != "NA")
           imageSrc = locallyStoredImage.imgSrc if ((depthLevel >= 1 &&
-                  locallyStoredImage.width > 300) || depthLevel < 1)
+                    locallyStoredImage.width > 300) || depthLevel < 1)
           if (!isBannerDimensions(width, height))
         } {
           val sequenceScore: Float = 1.0f / cnt
@@ -254,7 +258,7 @@ class UpgradedImageIExtractor(
           }
           trace(
               "IMG: " + imageSrc + " Area is: " + area + " sequence score: " +
-              sequenceScore + " totalScore: " + totalScore)
+                sequenceScore + " totalScore: " + totalScore)
           cnt += 1
 
           imageResults += locallyStoredImage -> totalScore
@@ -378,17 +382,18 @@ class UpgradedImageIExtractor(
         getLocallyStoredImage(buildImagePath(imageSrc)) match {
           case Some(locallyStoredImage) => {
 
-              val bytes = locallyStoredImage.bytes
-              if ((bytes == 0 || bytes > minBytesForImages) &&
-                  bytes < MAX_BYTES_SIZE) {
-                trace("findImagesThatPassByteSizeTest: Found potential image - size: " +
+            val bytes = locallyStoredImage.bytes
+            if ((bytes == 0 || bytes > minBytesForImages) &&
+                bytes < MAX_BYTES_SIZE) {
+              trace(
+                  "findImagesThatPassByteSizeTest: Found potential image - size: " +
                     bytes + " src: " + image.attr("src"))
-                goodImages.add(image)
-              } else {
-                trace("Removing image: " + image.attr("src"))
-                image.remove()
-              }
+              goodImages.add(image)
+            } else {
+              trace("Removing image: " + image.attr("src"))
+              image.remove()
             }
+          }
           case None => trace(imageSrc + " unable to fetch")
         }
       } catch {
@@ -427,10 +432,10 @@ class UpgradedImageIExtractor(
 
         getLocallyStoredImage(mainImage.imageSrc) match {
           case Some(locallyStoredImage) => {
-              mainImage.bytes = locallyStoredImage.bytes
-              mainImage.height = locallyStoredImage.height
-              mainImage.width = locallyStoredImage.width
-            }
+            mainImage.bytes = locallyStoredImage.bytes
+            mainImage.height = locallyStoredImage.height
+            mainImage.width = locallyStoredImage.width
+          }
           case None =>
         }
         trace("link tag found, using it")
@@ -440,11 +445,11 @@ class UpgradedImageIExtractor(
       None
     } catch {
       case e: Exception => {
-          warn(
-              "Unexpected exception caught in checkForLinkTag. Handled by returning None.",
-              e)
-          None
-        }
+        warn(
+            "Unexpected exception caught in checkForLinkTag. Handled by returning None.",
+            e)
+        None
+      }
     }
   }
 
@@ -468,10 +473,10 @@ class UpgradedImageIExtractor(
         mainImage.confidenceScore = 100
         getLocallyStoredImage(mainImage.imageSrc) match {
           case Some(locallyStoredImage) => {
-              mainImage.bytes = locallyStoredImage.bytes
-              mainImage.height = locallyStoredImage.height
-              mainImage.width = locallyStoredImage.width
-            }
+            mainImage.bytes = locallyStoredImage.bytes
+            mainImage.height = locallyStoredImage.height
+            mainImage.width = locallyStoredImage.width
+          }
           case None =>
         }
         trace("open graph tag found, using it: %s".format(imagePath))
@@ -481,9 +486,9 @@ class UpgradedImageIExtractor(
       None
     } catch {
       case e: Exception => {
-          warn(e, e.toString)
-          None
-        }
+        warn(e, e.toString)
+        None
+      }
     }
   }
 
@@ -542,12 +547,12 @@ class UpgradedImageIExtractor(
         mainImage.imageExtractionType = "known"
         mainImage.confidenceScore = 90
 
-        getLocallyStoredImage(buildImagePath(mainImage.imageSrc)).foreach(
-            locallyStoredImage => {
-          mainImage.bytes = locallyStoredImage.bytes
-          mainImage.height = locallyStoredImage.height
-          mainImage.width = locallyStoredImage.width
-        })
+        getLocallyStoredImage(buildImagePath(mainImage.imageSrc))
+          .foreach(locallyStoredImage => {
+            mainImage.bytes = locallyStoredImage.bytes
+            mainImage.height = locallyStoredImage.height
+            mainImage.width = locallyStoredImage.width
+          })
 
         Some(mainImage)
 
@@ -570,8 +575,8 @@ class UpgradedImageIExtractor(
       return new URL(pageURL, ImageUtils.cleanImageSrcString(imageSrc)).toString
     } catch {
       case e: MalformedURLException => {
-          warn("Unable to get Image Path: " + imageSrc)
-        }
+        warn("Unable to get Image Path: " + imageSrc)
+      }
     }
 
     imageSrc

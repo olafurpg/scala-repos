@@ -35,8 +35,11 @@ private[hive] trait HiveStrategies {
 
   object Scripts extends Strategy {
     def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
-      case logical.ScriptTransformation(
-          input, script, output, child, schema: HiveScriptIOSchema) =>
+      case logical.ScriptTransformation(input,
+                                        script,
+                                        output,
+                                        child,
+                                        schema: HiveScriptIOSchema) =>
         ScriptTransformation(input, script, output, planLater(child), schema)(
             hiveContext) :: Nil
       case _ => Nil
@@ -50,15 +53,21 @@ private[hive] trait HiveStrategies {
                                    child,
                                    overwrite,
                                    ifNotExists) =>
-        execution.InsertIntoHiveTable(
-            table, partition, planLater(child), overwrite, ifNotExists) :: Nil
+        execution.InsertIntoHiveTable(table,
+                                      partition,
+                                      planLater(child),
+                                      overwrite,
+                                      ifNotExists) :: Nil
       case hive.InsertIntoHiveTable(table: MetastoreRelation,
                                     partition,
                                     child,
                                     overwrite,
                                     ifNotExists) =>
-        execution.InsertIntoHiveTable(
-            table, partition, planLater(child), overwrite, ifNotExists) :: Nil
+        execution.InsertIntoHiveTable(table,
+                                      partition,
+                                      planLater(child),
+                                      overwrite,
+                                      ifNotExists) :: Nil
       case _ => Nil
     }
   }
@@ -69,8 +78,9 @@ private[hive] trait HiveStrategies {
     */
   object HiveTableScans extends Strategy {
     def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
-      case PhysicalOperation(
-          projectList, predicates, relation: MetastoreRelation) =>
+      case PhysicalOperation(projectList,
+                             predicates,
+                             relation: MetastoreRelation) =>
         // Filter out all predicates that only deal with partition keys, these are given to the
         // hive table scan operator to be used for partition pruning.
         val partitionKeyIds = AttributeSet(relation.partitionKeys)
@@ -124,8 +134,10 @@ private[hive] trait HiveStrategies {
   case class HiveCommandStrategy(context: HiveContext) extends Strategy {
     def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
       case describe: DescribeCommand =>
-        ExecutedCommand(DescribeHiveTableCommand(
-                describe.table, describe.output, describe.isExtended)) :: Nil
+        ExecutedCommand(
+            DescribeHiveTableCommand(describe.table,
+                                     describe.output,
+                                     describe.isExtended)) :: Nil
       case _ => Nil
     }
   }

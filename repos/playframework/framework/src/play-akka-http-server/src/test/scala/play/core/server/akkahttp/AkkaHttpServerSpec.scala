@@ -20,8 +20,8 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
 
   sequential
 
-  def requestFromServer[T](
-      path: String)(exec: WSRequest => Future[WSResponse])(
+  def requestFromServer[T](path: String)(
+      exec: WSRequest => Future[WSResponse])(
       routes: PartialFunction[(String, String), Handler])(
       check: WSResponse => T)(implicit awaitTimeout: Timeout): T = {
     val app = GuiceApplicationBuilder().routes(routes).build()
@@ -81,8 +81,8 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
       }
     }
 
-    def headerDump(
-        headerNames: String*)(implicit request: Request[_]): String = {
+    def headerDump(headerNames: String*)(
+        implicit request: Request[_]): String = {
       val headerGroups: Seq[String] = for (n <- headerNames) yield {
         val headerGroup = request.headers.getAll(n)
         headerGroup.mkString("<", ", ", ">")

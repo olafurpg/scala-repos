@@ -74,8 +74,8 @@ class ScalaUnreachableCodeInspection
     elements.groupBy(_.getParent).values
   }
 
-  private def registerProblem(
-      fragment: Seq[PsiElement], holder: ProblemsHolder) {
+  private def registerProblem(fragment: Seq[PsiElement],
+                              holder: ProblemsHolder) {
     if (fragment.isEmpty) return
 
     val descriptor = {
@@ -103,8 +103,9 @@ class ScalaUnreachableCodeInspection
 }
 
 class RemoveFragmentQuickFix(fragment: Seq[PsiElement])
-    extends AbstractFixOnPsiElement(
-        "Remove unreachable code", fragment.head, fragment.last) {
+    extends AbstractFixOnPsiElement("Remove unreachable code",
+                                    fragment.head,
+                                    fragment.last) {
   override def doApplyFix(project: Project): Unit = {
     val startElement: PsiElement = getStartElement
     if (startElement == null) return

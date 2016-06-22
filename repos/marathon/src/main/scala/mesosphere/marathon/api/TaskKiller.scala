@@ -34,10 +34,10 @@ class TaskKiller @Inject()(taskTracker: TaskTracker,
     }
   }
 
-  def killAndScale(appId: PathId,
-                   findToKill: (Iterable[Task] => Iterable[Task]),
-                   force: Boolean)(
-      implicit identity: Identity): Future[DeploymentPlan] = {
+  def killAndScale(
+      appId: PathId,
+      findToKill: (Iterable[Task] => Iterable[Task]),
+      force: Boolean)(implicit identity: Identity): Future[DeploymentPlan] = {
     killAndScale(
         Map(appId -> findToKill(taskTracker.appTasksLaunchedSync(appId))),
         force)

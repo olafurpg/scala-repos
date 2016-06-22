@@ -239,8 +239,7 @@ class OpenHashMap[Key, Value](initialSize: Int)
     */
   override def foreach[U](f: ((Key, Value)) => U) {
     val startModCount = modCount
-    foreachUndeletedEntry(
-        entry => {
+    foreachUndeletedEntry(entry => {
       if (modCount != startModCount) sys.error("Concurrent Modification")
       f((entry.key, entry.value.get))
     })
@@ -257,8 +256,7 @@ class OpenHashMap[Key, Value](initialSize: Int)
   }
 
   override def retain(f: (Key, Value) => Boolean) = {
-    foreachUndeletedEntry(
-        entry =>
+    foreachUndeletedEntry(entry =>
           if (!f(entry.key, entry.value.get)) {
         entry.value = None; size -= 1; deleted += 1
     })

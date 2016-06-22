@@ -35,8 +35,11 @@ object FSM {
     def schedule(actor: ActorRef, timeout: Duration) {
       if (repeat) {
         ref = Some(
-            Scheduler.schedule(
-                actor, this, timeout.length, timeout.length, timeout.unit))
+            Scheduler.schedule(actor,
+                               this,
+                               timeout.length,
+                               timeout.length,
+                               timeout.unit))
       } else {
         ref = Some(
             Scheduler.scheduleOnce(actor, this, timeout.length, timeout.unit))
@@ -239,8 +242,10 @@ trait FSM[S, D] extends ListenerManagement {
     * @param repeat send once if false, scheduleAtFixedRate if true
     * @return current state descriptor
     */
-  protected final def setTimer(
-      name: String, msg: AnyRef, timeout: Duration, repeat: Boolean): State = {
+  protected final def setTimer(name: String,
+                               msg: AnyRef,
+                               timeout: Duration,
+                               repeat: Boolean): State = {
     if (timers contains name) {
       timers(name).cancel
     }
@@ -430,25 +435,24 @@ trait FSM[S, D] extends ListenerManagement {
     case UnsubscribeTransitionCallBack(actorRef) =>
       removeListener(actorRef)
     case value => {
-        if (timeoutFuture.isDefined) {
-          timeoutFuture.get.cancel(true)
-          timeoutFuture = None
-        }
-        generation += 1
-        processEvent(value)
+      if (timeoutFuture.isDefined) {
+        timeoutFuture.get.cancel(true)
+        timeoutFuture = None
       }
+      generation += 1
+      processEvent(value)
+    }
   }
 
   private def processEvent(value: Any) = {
     val event = Event(value, currentState.stateData)
     val stateFunc = stateFunctions(currentState.stateName)
-    val nextState =
-      if (stateFunc isDefinedAt event) {
-        stateFunc(event)
-      } else {
-        // handleEventDefault ensures that this is always defined
-        handleEvent(event)
-      }
+    val nextState = if (stateFunc isDefinedAt event) {
+      stateFunc(event)
+    } else {
+      // handleEventDefault ensures that this is always defined
+      handleEvent(event)
+    }
     nextState.stopReason match {
       case Some(reason) => terminate(reason)
       case None => makeTransition(nextState)
@@ -478,8 +482,8 @@ trait FSM[S, D] extends ListenerManagement {
       val t = timeout.get
       if (t.finite_? && t.length >= 0) {
         timeoutFuture = Some(
-            Scheduler.scheduleOnce(
-                self, TimeoutMarker(generation), t.length, t.unit))
+            Scheduler
+              .scheduleOnce(self, TimeoutMarker(generation), t.length, t.unit))
       }
     }
   }

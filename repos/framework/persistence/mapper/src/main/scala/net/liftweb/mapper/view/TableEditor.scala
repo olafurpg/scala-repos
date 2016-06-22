@@ -197,8 +197,9 @@ object TableEditor {
 
   private[view] val map =
     new scala.collection.mutable.HashMap[String, TableEditorImpl[_]]
-  def registerTable[T <: Mapper[T]](
-      name: String, meta: T with MetaMapper[T], title: String) =
+  def registerTable[T <: Mapper[T]](name: String,
+                                    meta: T with MetaMapper[T],
+                                    title: String) =
     map(name) = new TableEditorImpl(title, meta)
 }
 
@@ -235,8 +236,8 @@ package snippet {
   * The implementation is in the base trait ItemsListEditor
   * @author nafg
   */
-protected class TableEditorImpl[T <: Mapper[T]](
-    val title: String, meta: T with MetaMapper[T])
+protected class TableEditorImpl[T <: Mapper[T]](val title: String,
+                                                meta: T with MetaMapper[T])
     extends ItemsListEditor[T] {
   var items = new ItemsList[T] {
     def metaMapper = meta
@@ -329,8 +330,8 @@ trait ItemsListEditor[T <: Mapper[T]] {
       ".title *" #> title & ".insertBtn" #> SHtml.submit(?("Insert"),
                                                          onInsert _,
                                                          noPrompt) & ".item" #>
-      (bindRegularItems ++ bindRemovedItems) & ".saveBtn" #> SHtml.submit(
-          ?("Save"), onSubmit _, noPrompt)
+      (bindRegularItems ++ bindRemovedItems) & ".saveBtn" #> SHtml
+        .submit(?("Save"), onSubmit _, noPrompt)
     }
   }
 }

@@ -319,11 +319,11 @@ object Spool {
     * @deprecated Both forms of cons are deprecated in favor of {{*::}}. They will eventually
     * be changed in an ABI-breaking fashion in order to act lazily on the tail.
     */
-  @deprecated(
-      "Use *:: instead: the ABI for this method will be changing.", "6.14.1")
+  @deprecated("Use *:: instead: the ABI for this method will be changing.",
+              "6.14.1")
   def cons[A](value: A, next: Future[Spool[A]]): Spool[A] = Cons(value, next)
-  @deprecated(
-      "Use *:: instead: the ABI for this method will be changing.", "6.14.1")
+  @deprecated("Use *:: instead: the ABI for this method will be changing.",
+              "6.14.1")
   def cons[A](value: A, nextSpool: Spool[A]): Spool[A] =
     Cons(value, Future.value(nextSpool))
 

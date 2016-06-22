@@ -24,25 +24,25 @@ import org.jetbrains.plugins.scala.overrideImplement._
   * or after override element definition (override def <caret>)
   */
 class ScalaOverrideContributor extends ScalaCompletionContributor {
-  private def registerOverrideCompletion(
-      filter: ElementFilter, keyword: String) {
-    extend(CompletionType.BASIC,
-           PlatformPatterns.psiElement
-             .and(
-               new FilterPattern(
-                   new AndFilter(
-                       new NotFilter(new LeftNeighbour(
-                               new TextContainFilter("override"))),
-                       new AndFilter(new NotFilter(new LeftNeighbour(
-                                             new TextFilter("."))),
-                                     filter)))),
-           new CompletionProvider[CompletionParameters] {
-             def addCompletions(parameters: CompletionParameters,
-                                context: ProcessingContext,
-                                resultSet: CompletionResultSet) {
-               addCompletionsOnOverrideKeyWord(resultSet, parameters)
-             }
-           })
+  private def registerOverrideCompletion(filter: ElementFilter,
+                                         keyword: String) {
+    extend(
+        CompletionType.BASIC,
+        PlatformPatterns.psiElement.and(
+            new FilterPattern(
+                new AndFilter(
+                    new NotFilter(
+                        new LeftNeighbour(new TextContainFilter("override"))),
+                    new AndFilter(
+                        new NotFilter(new LeftNeighbour(new TextFilter("."))),
+                        filter)))),
+        new CompletionProvider[CompletionParameters] {
+          def addCompletions(parameters: CompletionParameters,
+                             context: ProcessingContext,
+                             resultSet: CompletionResultSet) {
+            addCompletionsOnOverrideKeyWord(resultSet, parameters)
+          }
+        })
   }
 
   extend(CompletionType.BASIC,
@@ -87,8 +87,8 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
       parameters: CompletionParameters): Unit = {
     val position = positionFromParameters(parameters)
 
-    val clazz = PsiTreeUtil.getParentOfType(
-        position, classOf[ScTemplateDefinition], false)
+    val clazz = PsiTreeUtil
+      .getParentOfType(position, classOf[ScTemplateDefinition], false)
     if (clazz == null) return
 
     val classMembers =
@@ -110,7 +110,8 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
     val position = positionFromParameters(parameters)
 
     val clazz = PsiTreeUtil.getParentOfType(
-        position, classOf[ScTemplateDefinition], /*strict = */ false)
+        position,
+        classOf[ScTemplateDefinition], /*strict = */ false)
     if (clazz == null) return
 
     val mlo = Option(
@@ -152,8 +153,8 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
 
         elementOption.foreach { element =>
           TypeAdjuster.markToAdjust(element)
-          ScalaGenerationInfo.positionCaret(
-              context.getEditor, element.asInstanceOf[PsiMember])
+          ScalaGenerationInfo.positionCaret(context.getEditor,
+                                            element.asInstanceOf[PsiMember])
           context.commitDocument()
         }
       }
@@ -186,8 +187,11 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
                 mBody)
         fun.getText
       case tm: ScAliasMember =>
-        ScalaPsiElementFactory.getOverrideImplementTypeSign(
-            tm.getElement, tm.substitutor, "this.type", needsOverride = false)
+        ScalaPsiElementFactory.getOverrideImplementTypeSign(tm.getElement,
+                                                            tm.substitutor,
+                                                            "this.type",
+                                                            needsOverride =
+                                                              false)
       case value: ScValueMember =>
         ScalaPsiElementFactory.getOverrideImplementVariableSign(
             value.element,
@@ -229,8 +233,8 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
                   ICON_FLAG_VISIBILITY | ICON_FLAG_READ_STATUS))
           .withInsertHandler(insertionHandler(mm))
 
-        val renderingDecorator = LookupElementDecorator.withRenderer(
-            lookupItem, new MyElementRenderer(mm))
+        val renderingDecorator = LookupElementDecorator
+          .withRenderer(lookupItem, new MyElementRenderer(mm))
         resultSet.consume(renderingDecorator)
       case _ =>
     }

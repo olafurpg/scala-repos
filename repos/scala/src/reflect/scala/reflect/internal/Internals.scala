@@ -32,8 +32,9 @@ trait Internals extends api.Internals { self: SymbolTable =>
 
     def freeTerms(tree: Tree): List[FreeTermSymbol] = tree.freeTerms
     def freeTypes(tree: Tree): List[FreeTypeSymbol] = tree.freeTypes
-    def substituteSymbols(
-        tree: Tree, from: List[Symbol], to: List[Symbol]): Tree =
+    def substituteSymbols(tree: Tree,
+                          from: List[Symbol],
+                          to: List[Symbol]): Tree =
       tree.substituteSymbols(from, to)
     def substituteTypes(tree: Tree, from: List[Symbol], to: List[Type]): Tree =
       tree.substituteTypes(from, to)
@@ -137,8 +138,8 @@ trait Internals extends api.Internals { self: SymbolTable =>
     def flags(symbol: Symbol): FlagSet = symbol.flags
     def attachments(symbol: Symbol): Attachments { type Pos = Position } =
       symbol.attachments
-    def updateAttachment[T: ClassTag](
-        symbol: Symbol, attachment: T): symbol.type =
+    def updateAttachment[T: ClassTag](symbol: Symbol,
+                                      attachment: T): symbol.type =
       symbol.updateAttachment(attachment)
     def removeAttachment[T: ClassTag](symbol: Symbol): symbol.type =
       symbol.removeAttachment[T]
@@ -165,8 +166,9 @@ trait Internals extends api.Internals { self: SymbolTable =>
       self.TypeRef(pre, sym, args)
     def refinedType(parents: List[Type], decls: Scope): RefinedType =
       self.RefinedType(parents, decls)
-    def refinedType(
-        parents: List[Type], decls: Scope, clazz: Symbol): RefinedType =
+    def refinedType(parents: List[Type],
+                    decls: Scope,
+                    clazz: Symbol): RefinedType =
       self.RefinedType(parents, decls, clazz)
     def refinedType(parents: List[Type], owner: Symbol): Type =
       self.refinedType(parents, owner)
@@ -180,8 +182,9 @@ trait Internals extends api.Internals { self: SymbolTable =>
     def intersectionType(tps: List[Type]): Type = self.intersectionType(tps)
     def intersectionType(tps: List[Type], owner: Symbol): Type =
       self.intersectionType(tps, owner)
-    def classInfoType(
-        parents: List[Type], decls: Scope, typeSymbol: Symbol): ClassInfoType =
+    def classInfoType(parents: List[Type],
+                      decls: Scope,
+                      typeSymbol: Symbol): ClassInfoType =
       self.ClassInfoType(parents, decls, typeSymbol)
     def methodType(params: List[Symbol], resultType: Type): MethodType =
       self.MethodType(params, resultType)
@@ -189,13 +192,13 @@ trait Internals extends api.Internals { self: SymbolTable =>
       self.NullaryMethodType(resultType)
     def polyType(typeParams: List[Symbol], resultType: Type): PolyType =
       self.PolyType(typeParams, resultType)
-    def existentialType(
-        quantified: List[Symbol], underlying: Type): ExistentialType =
+    def existentialType(quantified: List[Symbol],
+                        underlying: Type): ExistentialType =
       self.ExistentialType(quantified, underlying)
     def existentialAbstraction(tparams: List[Symbol], tpe0: Type): Type =
       self.existentialAbstraction(tparams, tpe0)
-    def annotatedType(
-        annotations: List[Annotation], underlying: Type): AnnotatedType =
+    def annotatedType(annotations: List[Annotation],
+                      underlying: Type): AnnotatedType =
       self.AnnotatedType(annotations, underlying)
     def typeBounds(lo: Type, hi: Type): TypeBounds = self.TypeBounds(lo, hi)
     def boundedWildcardType(bounds: TypeBounds): BoundedWildcardType =
@@ -255,15 +258,17 @@ trait Internals extends api.Internals { self: SymbolTable =>
                      targs: List[Type],
                      args: List[Tree]): Tree =
       self.gen.mkMethodCall(receiver, methodName, targs, args)
-    def mkMethodCall(
-        method: Symbol, targs: List[Type], args: List[Tree]): Tree =
+    def mkMethodCall(method: Symbol,
+                     targs: List[Type],
+                     args: List[Tree]): Tree =
       self.gen.mkMethodCall(method, targs, args)
     def mkMethodCall(method: Symbol, args: List[Tree]): Tree =
       self.gen.mkMethodCall(method, args)
     def mkMethodCall(target: Tree, args: List[Tree]): Tree =
       self.gen.mkMethodCall(target, args)
-    def mkMethodCall(
-        receiver: Symbol, methodName: Name, args: List[Tree]): Tree =
+    def mkMethodCall(receiver: Symbol,
+                     methodName: Name,
+                     args: List[Tree]): Tree =
       self.gen.mkMethodCall(receiver, methodName, args)
     def mkMethodCall(receiver: Tree,
                      method: Symbol,

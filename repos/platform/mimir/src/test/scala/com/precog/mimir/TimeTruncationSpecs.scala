@@ -68,8 +68,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2010-04-29", "2011-02-21", "2011-09-06", "2012-02-11", "2012-12-28")
+      result2 must contain("2010-04-29",
+                           "2011-02-21",
+                           "2011-09-06",
+                           "2012-02-11",
+                           "2012-12-28")
     }
     "determine year and month" in {
       val input = dag.Operate(
@@ -85,8 +88,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2010-04", "2011-02", "2011-09", "2012-02", "2012-12")
+      result2 must contain("2010-04",
+                           "2011-02",
+                           "2011-09",
+                           "2012-02",
+                           "2012-12")
     }
     "determine year and day of year" in {
       val input = dag.Operate(
@@ -102,8 +108,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2012-363", "2011-249", "2012-042", "2010-119", "2011-052")
+      result2 must contain("2012-363",
+                           "2011-249",
+                           "2012-042",
+                           "2010-119",
+                           "2011-052")
     }
     "determine month and day" in {
       val input = dag.Operate(
@@ -271,8 +280,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "09:37:52", "20:09:59", "06:44:52", "09:11:33", "22:38:19")
+      result2 must contain("09:37:52",
+                           "20:09:59",
+                           "06:44:52",
+                           "09:11:33",
+                           "22:38:19")
     }
   }
 
@@ -291,8 +303,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2010-04-29", "2011-02-21", "2011-09-06", "2012-02-11", "2012-12-28")
+      result2 must contain("2010-04-29",
+                           "2011-02-21",
+                           "2011-09-06",
+                           "2012-02-11",
+                           "2012-12-28")
     }
     "determine year and month" in {
       val input = dag.Operate(
@@ -308,8 +323,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2010-04", "2011-02", "2011-09", "2012-02", "2012-12")
+      result2 must contain("2010-04",
+                           "2011-02",
+                           "2011-09",
+                           "2012-02",
+                           "2012-12")
     }
     "determine year and day of year" in {
       val input = dag.Operate(
@@ -325,8 +343,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "2012-363", "2011-249", "2012-042", "2010-119", "2011-052")
+      result2 must contain("2012-363",
+                           "2011-249",
+                           "2012-042",
+                           "2010-119",
+                           "2011-052")
     }
     "determine month and day" in {
       val input = dag.Operate(
@@ -494,8 +515,11 @@ trait TimeTruncationSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain(
-          "09:37:52", "20:09:59", "06:44:52", "09:11:33", "22:38:19")
+      result2 must contain("09:37:52",
+                           "20:09:59",
+                           "06:44:52",
+                           "09:11:33",
+                           "22:38:19")
     }
   }
 

@@ -22,7 +22,8 @@ class MockClientTest extends FunSuite {
     val memcache = new MockClient(Map("key" -> "value")).withStrings
 
     assert(
-        Await.result(memcache.set("key", "new value").liftToTry) == Return.Unit)
+        Await
+          .result(memcache.set("key", "new value").liftToTry) == Return.Unit)
     assert(Await.result(memcache.get("key")) == Some("new value"))
 
     assert(

@@ -156,11 +156,11 @@ sealed abstract case class Uri(scheme: String,
     * Converts this URI to an "effective HTTP request URI" as defined by
     * http://tools.ietf.org/html/rfc7230#section-5.5
     */
-  def toEffectiveHttpRequestUri(hostHeaderHost: Host,
-                                hostHeaderPort: Int,
-                                securedConnection: Boolean = false,
-                                defaultAuthority: Authority =
-                                  Authority.Empty): Uri =
+  def toEffectiveHttpRequestUri(
+      hostHeaderHost: Host,
+      hostHeaderPort: Int,
+      securedConnection: Boolean = false,
+      defaultAuthority: Authority = Authority.Empty): Uri =
     effectiveHttpRequestUri(scheme,
                             authority.host,
                             authority.port,
@@ -285,8 +285,9 @@ object Uri {
            fragment: Option[String] = None,
            mode: Uri.ParsingMode = Uri.ParsingMode.Relaxed): Uri =
     apply(scheme,
-          Authority(
-              Host(host, UTF8, mode), normalizePort(port, scheme), userinfo),
+          Authority(Host(host, UTF8, mode),
+                    normalizePort(port, scheme),
+                    userinfo),
           Path(path),
           queryString,
           fragment)
@@ -349,17 +350,17 @@ object Uri {
     * Converts a set of URI components to an "effective HTTP request URI" as defined by
     * http://tools.ietf.org/html/rfc7230#section-5.5.
     */
-  def effectiveHttpRequestUri(scheme: String,
-                              host: Host,
-                              port: Int,
-                              path: Path,
-                              query: Option[String],
-                              fragment: Option[String],
-                              securedConnection: Boolean,
-                              hostHeaderHost: Host,
-                              hostHeaderPort: Int,
-                              defaultAuthority: Authority =
-                                Authority.Empty): Uri = {
+  def effectiveHttpRequestUri(
+      scheme: String,
+      host: Host,
+      port: Int,
+      path: Path,
+      query: Option[String],
+      fragment: Option[String],
+      securedConnection: Boolean,
+      hostHeaderHost: Host,
+      hostHeaderPort: Int,
+      defaultAuthority: Authority = Authority.Empty): Uri = {
     var _scheme = scheme
     var _host = host
     var _port = port
@@ -375,8 +376,13 @@ object Uri {
         }
       }
     }
-    create(
-        _scheme, "", _host, _port, collapseDotSegments(path), query, fragment)
+    create(_scheme,
+           "",
+           _host,
+           _port,
+           collapseDotSegments(path),
+           query,
+           fragment)
   }
 
   def httpScheme(securedConnection: Boolean = false) =
@@ -451,8 +457,8 @@ object Uri {
     def isEmpty = false
     def toOption = Some(this)
   }
-  final case class IPv4Host private[http](
-      bytes: immutable.Seq[Byte], address: String)
+  final case class IPv4Host private[http] (bytes: immutable.Seq[Byte],
+                                           address: String)
       extends NonEmptyHost {
     require(bytes.length == 4, "bytes array must have length 4")
     require(!address.isEmpty, "address must not be empty")
@@ -475,8 +481,8 @@ object Uri {
     private[http] def apply(bytes: Array[Byte], address: String): IPv4Host =
       IPv4Host(immutable.Seq(bytes: _*), address)
   }
-  final case class IPv6Host private (
-      bytes: immutable.Seq[Byte], address: String)
+  final case class IPv6Host private (bytes: immutable.Seq[Byte],
+                                     address: String)
       extends NonEmptyHost {
     require(bytes.length == 16, "bytes array must have length 16")
     require(!address.isEmpty, "address must not be empty")
@@ -671,8 +677,8 @@ object Uri {
                  q: Query): Map[String, List[String]] =
         if (q.isEmpty) map
         else
-          append(
-              map.updated(q.key, q.value :: map.getOrElse(q.key, Nil)), q.tail)
+          append(map.updated(q.key, q.value :: map.getOrElse(q.key, Nil)),
+                 q.tail)
       append(Map.empty, this)
     }
     override def newBuilder: mutable.Builder[(String, String), Query] =
@@ -1015,8 +1021,9 @@ object UriRendering {
     * produce percent-encoded representations of potentially existing non-ASCII characters in the
     * different components.
     */
-  def renderUriWithoutFragment[R <: Rendering](
-      r: R, value: Uri, charset: Charset): r.type = {
+  def renderUriWithoutFragment[R <: Rendering](r: R,
+                                               value: Uri,
+                                               charset: Charset): r.type = {
     import value._
     if (isAbsolute) r ~~ scheme ~~ ':'
     renderAuthority(r, authority, path, scheme, charset)
@@ -1025,8 +1032,10 @@ object UriRendering {
     r
   }
 
-  def renderAuthority[R <: Rendering](
-      r: R, authority: Authority, scheme: String, charset: Charset): r.type =
+  def renderAuthority[R <: Rendering](r: R,
+                                      authority: Authority,
+                                      scheme: String,
+                                      charset: Charset): r.type =
     renderAuthority(r, authority, Path.Empty, scheme, charset)
 
   def renderAuthority[R <: Rendering](r: R,
@@ -1048,11 +1057,11 @@ object UriRendering {
           if (path.isEmpty || path.startsWithSlash) r ~~ '/' ~~ '/' else r
       }
 
-  def renderPath[R <: Rendering](r: R,
-                                 path: Path,
-                                 charset: Charset,
-                                 encodeFirstSegmentColons: Boolean =
-                                   false): r.type =
+  def renderPath[R <: Rendering](
+      r: R,
+      path: Path,
+      charset: Charset,
+      encodeFirstSegmentColons: Boolean = false): r.type =
     path match {
       case Path.Empty ⇒ r
       case Path.Slash(tail) ⇒ renderPath(r ~~ '/', tail, charset)
@@ -1062,11 +1071,11 @@ object UriRendering {
         renderPath(encode(r, head, charset, keep), tail, charset)
     }
 
-  def renderQuery[R <: Rendering](r: R,
-                                  query: Query,
-                                  charset: Charset,
-                                  keep: CharPredicate =
-                                    `strict-query-char-np`): r.type = {
+  def renderQuery[R <: Rendering](
+      r: R,
+      query: Query,
+      charset: Charset,
+      keep: CharPredicate = `strict-query-char-np`): r.type = {
     def enc(s: String): Unit =
       encode(r, s, charset, keep, replaceSpaces = true)
     @tailrec def append(q: Query): r.type =
@@ -1097,8 +1106,8 @@ object UriRendering {
           case c if keep(c) ⇒ { r ~~ c; 1 }
           case ' ' if replaceSpaces ⇒ { r ~~ '+'; 1 }
           case c if c <= 127 && asciiCompatible ⇒ {
-              appendEncoded(c.toByte); 1
-            }
+            appendEncoded(c.toByte); 1
+          }
           case c ⇒
             def append(s: String) = s.getBytes(charset).foreach(appendEncoded)
             if (Character.isHighSurrogate(c)) {

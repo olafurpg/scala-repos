@@ -86,8 +86,7 @@ trait LatticeLaws[A] extends Laws {
       val name: String,
       val parents: Seq[LatticeProperties],
       val props: (String, Prop)*
-  )
-      extends RuleSet {
+  ) extends RuleSet {
     val bases = Seq.empty
   }
 }

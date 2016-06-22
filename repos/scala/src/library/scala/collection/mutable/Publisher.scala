@@ -47,7 +47,8 @@ trait Publisher[Evt] {
   def removeSubscriptions() { filters.clear() }
 
   protected def publish(event: Evt) {
-    filters.keys.foreach(sub =>
+    filters.keys.foreach(
+        sub =>
           if (!suspended.contains(sub) &&
               filters.entryExists(sub, p => p(event))) sub.notify(self, event))
   }

@@ -19,21 +19,22 @@ trait Notifier
     with AccountService
     with IssuesService {
   def toNotify(
-      r: RepositoryService.RepositoryInfo, issue: Issue, content: String)(
-      msg: String => String)(implicit context: Context): Unit
+      r: RepositoryService.RepositoryInfo,
+      issue: Issue,
+      content: String)(msg: String => String)(implicit context: Context): Unit
 
-  protected def recipients(issue: Issue)(notify: String => Unit)(
-      implicit session: Session, context: Context) =
+  protected def recipients(issue: Issue)(
+      notify: String => Unit)(implicit session: Session, context: Context) =
     (// individual repository's owner
         issue.userName :: // collaborators
-        getCollaborators(issue.userName, issue.repositoryName) ::: // participants
-        issue.openedUserName :: getComments(
-            issue.userName,
-            issue.repositoryName,
-            issue.issueId).map(_.commentedUserName)).distinct
+          getCollaborators(issue.userName, issue.repositoryName) ::: // participants
+            issue.openedUserName :: getComments(
+                issue.userName,
+                issue.repositoryName,
+                issue.issueId).map(_.commentedUserName)).distinct
       .withFilter(_ != context.loginAccount.get.userName) // the operation in person is excluded
       .foreach(getAccountByUserName(_) filterNot (_.isGroupAccount) filterNot
-          (LDAPUtil.isDummyMailAddress(_)) foreach (x =>
+            (LDAPUtil.isDummyMailAddress(_)) foreach (x =>
                 notify(x.mailAddress)))
 }
 
@@ -73,8 +74,9 @@ class Mailer(private val smtp: Smtp) extends Notifier {
   private val logger = LoggerFactory.getLogger(classOf[Mailer])
 
   def toNotify(
-      r: RepositoryService.RepositoryInfo, issue: Issue, content: String)(
-      msg: String => String)(implicit context: Context) = {
+      r: RepositoryService.RepositoryInfo,
+      issue: Issue,
+      content: String)(msg: String => String)(implicit context: Context) = {
     val database = Database()
 
     val f = Future {
@@ -95,8 +97,9 @@ class Mailer(private val smtp: Smtp) extends Notifier {
               email.setHostName(smtp.host)
               email.setSmtpPort(smtp.port.get)
               smtp.user.foreach { user =>
-                email.setAuthenticator(new DefaultAuthenticator(
-                        user, smtp.password.getOrElse("")))
+                email.setAuthenticator(
+                    new DefaultAuthenticator(user,
+                                             smtp.password.getOrElse("")))
               }
               smtp.ssl.foreach { ssl =>
                 email.setSSLOnConnect(ssl)
@@ -129,7 +132,8 @@ class Mailer(private val smtp: Smtp) extends Notifier {
   }
 }
 class MockMailer extends Notifier {
-  def toNotify(
-      r: RepositoryService.RepositoryInfo, issue: Issue, content: String)(
-      msg: String => String)(implicit context: Context): Unit = {}
+  def toNotify(r: RepositoryService.RepositoryInfo,
+               issue: Issue,
+               content: String)(msg: String => String)(
+      implicit context: Context): Unit = {}
 }

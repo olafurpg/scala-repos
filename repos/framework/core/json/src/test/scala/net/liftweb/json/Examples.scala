@@ -87,9 +87,20 @@ trait AbstractExamples extends Specification {
   "Unbox values using XPath-like type expression" in {
     (parse(objArray) \ "children" \\ classOf[JInt] mustEqual List(5, 3)) and
     (parse(lotto) \ "lotto" \ "winning-numbers" \ classOf[JInt] mustEqual List(
-            2, 45, 34, 23, 7, 5, 3)) and
-    (parse(lotto) \\ "winning-numbers" \ classOf[JInt] mustEqual List(
-            2, 45, 34, 23, 7, 5, 3))
+            2,
+            45,
+            34,
+            23,
+            7,
+            5,
+            3)) and
+    (parse(lotto) \\ "winning-numbers" \ classOf[JInt] mustEqual List(2,
+                                                                      45,
+                                                                      34,
+                                                                      23,
+                                                                      7,
+                                                                      5,
+                                                                      3))
   }
 
   "Quoted example" in {
@@ -128,7 +139,8 @@ trait AbstractExamples extends Specification {
   "JSON building example" in {
     val json =
       JObject(JField("name", JString("joe")), JField("age", JInt(34))) ++ JObject(
-          JField("name", ("mazy")), JField("age", JInt(31)))
+          JField("name", ("mazy")),
+          JField("age", JInt(31)))
     print(json) mustEqual """[{"name":"joe","age":34},{"name":"mazy","age":31}]"""
   }
 
@@ -136,7 +148,8 @@ trait AbstractExamples extends Specification {
     import Implicits._
     val json =
       JObject(JField("name", "joe"), JField("age", 34)) ++ JObject(
-          JField("name", "mazy"), JField("age", 31))
+          JField("name", "mazy"),
+          JField("age", 31))
     print(json) mustEqual """[{"name":"joe","age":34},{"name":"mazy","age":31}]"""
   }
 
@@ -198,7 +211,7 @@ object Examples {
 
   val personDSL =
     ("person" -> ("name" -> "Joe") ~ ("age" -> 35) ~
-        ("spouse" -> ("person" -> ("name" -> "Marilyn") ~ ("age" -> 33))))
+          ("spouse" -> ("person" -> ("name" -> "Marilyn") ~ ("age" -> 33))))
 
   val objArray = """
 { "name": "joe",

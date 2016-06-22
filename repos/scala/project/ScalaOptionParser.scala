@@ -29,10 +29,11 @@ object ScalaOptionParser {
               IntBasic.map(_.toString),
               TokenCompletions.displayOnly("<integer>")))
     def ChoiceSetting(name: String, choices: List[String]): Parser[String] =
-      concat(token(concat(name ~ ":")) ~ token(
-              StringBasic.examples(choices: _*)).map(_.mkString))
-    def MultiChoiceSetting(
-        name: String, choices: List[String]): Parser[String] =
+      concat(
+          token(concat(name ~ ":")) ~ token(StringBasic.examples(choices: _*))
+            .map(_.mkString))
+    def MultiChoiceSetting(name: String,
+                           choices: List[String]): Parser[String] =
       concat(
           token(concat(name ~ ":")) ~ rep1sep(
               token(StringBasic.examples(choices: _*)),
@@ -54,8 +55,10 @@ object ScalaOptionParser {
       MultiChoiceSetting(name, phases)
     }
     def ScalaVersionSetting(name: String): Parser[String] = {
-      concat(concat(token(name ~ Space.string)) ~ token(
-              StringBasic, TokenCompletions.displayOnly("<scala version>")))
+      concat(
+          concat(token(name ~ Space.string)) ~ token(
+              StringBasic,
+              TokenCompletions.displayOnly("<scala version>")))
     }
     val Property: Parser[String] = {
       val PropName = concat(
@@ -73,8 +76,10 @@ object ScalaOptionParser {
     val UniversalOpt =
       Property | oneOf(
           pathSettingNames.map(PathSetting) ++ phaseSettings.map(
-              PhaseSettingParser) ++ booleanSettingNames.map(BooleanSetting) ++ stringSettingNames
-            .map(StringSetting) ++ multiStringSettingNames.map(MultiStringSetting) ++ intSettingNames
+              PhaseSettingParser) ++ booleanSettingNames
+            .map(BooleanSetting) ++ stringSettingNames
+            .map(StringSetting) ++ multiStringSettingNames.map(
+              MultiStringSetting) ++ intSettingNames
             .map(IntSetting) ++ choiceSettingNames.map {
         case (k, v) => ChoiceSetting(k, v)
       } ++ multiChoiceSettingNames.map {
@@ -85,15 +90,17 @@ object ScalaOptionParser {
     val ScalaExtraSettings = oneOf(
         scalaChoiceSettingNames.map {
       case (k, v) => ChoiceSetting(k, v)
-    }.toList ++ scalaStringSettingNames.map(StringSetting) ++ scalaBooleanSettingNames
-          .map(BooleanSetting))
+    }.toList ++ scalaStringSettingNames
+          .map(StringSetting) ++ scalaBooleanSettingNames.map(BooleanSetting))
     val ScalaOpt = UniversalOpt | ScalaExtraSettings
 
     val ScalaDocExtraSettings = oneOf(
-        scalaDocBooleanSettingNames.map(BooleanSetting) ++ scalaDocIntSettingNames
+        scalaDocBooleanSettingNames
+          .map(BooleanSetting) ++ scalaDocIntSettingNames
           .map(IntSetting) ++ scalaDocChoiceSettingNames.map {
           case (k, v) => ChoiceSetting(k, v)
-        } ++ scaladocStringSettingNames.map(StringSetting) ++ scaladocPathSettingNames
+        } ++ scaladocStringSettingNames
+          .map(StringSetting) ++ scaladocPathSettingNames
           .map(PathSetting) ++ scaladocMultiStringSettingNames.map(
             MultiStringSetting)
     )
@@ -106,13 +113,16 @@ object ScalaOptionParser {
                 TokenCompletions.displayOnly("<script|class|object|jar>"))
             .filter(!_.startsWith("-"), x => x)
         val runnableAndArgs = concat(
-            runnable ~ Opt(concat(Space.string ~ repsep(
+            runnable ~ Opt(
+                concat(Space.string ~ repsep(
                         token(StringBasic,
                               TokenCompletions.displayOnly("<arg>")),
                         Space).map(_.mkString(" ")))))
         val options = rep1sep(ScalaOpt, Space).map(_.mkString(" "))
-        Opt(Space ~>
-            (options | concat(concat(options ~ Space.string) ~ runnableAndArgs) | runnableAndArgs))
+        Opt(
+            Space ~>
+              (options | concat(
+                      concat(options ~ Space.string) ~ runnableAndArgs) | runnableAndArgs))
       case "scaladoc" =>
         Opt(Space ~> Opt(repsep(ScalaDocOpt, Space).map(_.mkString(" "))))
       case "scalac" =>
@@ -273,8 +283,10 @@ object ScalaOptionParser {
                                    "-Ycheck",
                                    "-Xprint")
   private def multiStringSettingNames =
-    List(
-        "-Xmacro-settings", "-Xplugin", "-Xplugin-disable", "-Xplugin-require")
+    List("-Xmacro-settings",
+         "-Xplugin",
+         "-Xplugin-disable",
+         "-Xplugin-require")
   private def intSettingNames =
     List("-Xmax-classfile-name",
          "-Xelide-below",
@@ -329,8 +341,12 @@ object ScalaOptionParser {
                       "closure-elimination",
                       "inline-project",
                       "inline-global"),
-      "-Ystatistics" -> List(
-          "parser", "typer", "patmat", "erasure", "cleanup", "jvm")
+      "-Ystatistics" -> List("parser",
+                             "typer",
+                             "patmat",
+                             "erasure",
+                             "cleanup",
+                             "jvm")
   )
   private def scalaVersionSettings = List("-Xmigration", "-Xsource")
 

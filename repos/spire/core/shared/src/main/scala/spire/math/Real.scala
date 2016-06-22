@@ -276,12 +276,11 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
       case 1 => ("", m.toString)
     }
     val i = str.length - d
-    val s =
-      if (i > 0) {
-        sign + str.substring(0, i) + "." + str.substring(i)
-      } else {
-        sign + "0." + ("0" * -i) + str
-      }
+    val s = if (i > 0) {
+      sign + str.substring(0, i) + "." + str.substring(i)
+    } else {
+      sign + "0." + ("0" * -i) + str
+    }
     s.replaceAll("0+$", "").replaceAll("\\.$", "")
   }
 }
@@ -458,7 +457,8 @@ object Real extends RealInstances {
   def roundUp(r: Rational): SafeLong = SafeLong(r.round.toBigInt)
 
   def div2n(x: Real, n: Int): Real =
-    Real(p =>
+    Real(
+        p =>
           if (p >= n) x(p - n)
           else roundUp(Rational(x(p), SafeLong.two.pow(n))))
 
@@ -485,8 +485,9 @@ object Real extends RealInstances {
     }
   }
 
-  private[spire] def powerSeries(
-      ps: Stream[Rational], terms: Int => Int, x: Real): Real = {
+  private[spire] def powerSeries(ps: Stream[Rational],
+                                 terms: Int => Int,
+                                 x: Real): Real = {
     Real({ p =>
       val t = terms(p)
       val l2t = 2 * sizeInBase(SafeLong(t) + 1, 2) + 6
@@ -521,12 +522,13 @@ object Real extends RealInstances {
   }
 
   def sinDr(x: Real): Real =
-    x * powerSeries(
-        accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n + 1))), n => n, x * x)
+    x * powerSeries(accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n + 1))),
+                    n => n,
+                    x * x)
 
   def cosDr(x: Real): Real =
-    powerSeries(
-        accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n - 1))), n => n, x * x)
+    powerSeries(accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n - 1))), n =>
+          n, x * x)
 
   def atanDr(x: Real): Real = {
     val y = x * x + Real(1)

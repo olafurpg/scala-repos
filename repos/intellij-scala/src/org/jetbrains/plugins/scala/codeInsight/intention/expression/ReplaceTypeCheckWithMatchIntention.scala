@@ -27,8 +27,9 @@ class ReplaceTypeCheckWithMatchIntention
 
   override def getText: String = getFamilyName
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     for {
       IsInstanceOfCall(iioCall) <- Option(
                                       PsiTreeUtil.getParentOfType(
@@ -57,8 +58,8 @@ class ReplaceTypeCheckWithMatchIntention
       condition <- ifStmt.condition
       if findIsInstanceOfCalls(condition, onlyFirst = false) contains iioCall
     } {
-      val (matchStmtOption, renameData) = buildMatchStmt(
-          ifStmt, iioCall, onlyFirst = false)
+      val (matchStmtOption, renameData) =
+        buildMatchStmt(ifStmt, iioCall, onlyFirst = false)
       for (matchStmt <- matchStmtOption) {
         val newMatch = inWriteAction {
           ifStmt

@@ -17,7 +17,8 @@ object fsc extends Command {
   val name = Section(
       "NAME",
       MBold(command) & " " & NDash & " Fast offline compiler for the " & Link(
-          "Scala 2", "http://scala-lang.org/") & " language")
+          "Scala 2",
+          "http://scala-lang.org/") & " language")
 
   val synopsis = Section(
       "SYNOPSIS",
@@ -108,9 +109,11 @@ object fsc extends Command {
   val seeAlso = Section(
       "SEE ALSO",
       Link(Bold("scala") & "(1)", "scala.html") & ", " & Link(
-          Bold("scalac") & "(1)", "scalac.html") & ", " & Link(
-          Bold("scaladoc") & "(1)", "scaladoc.html") & ", " & Link(
-          Bold("scalap") & "(1)", "scalap.html"))
+          Bold("scalac") & "(1)",
+          "scalac.html") & ", " & Link(Bold("scaladoc") & "(1)",
+                                       "scaladoc.html") & ", " & Link(
+          Bold("scalap") & "(1)",
+          "scalap.html"))
 
   def manpage = new Document {
     title = command

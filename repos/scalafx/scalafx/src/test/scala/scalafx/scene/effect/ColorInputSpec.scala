@@ -41,7 +41,8 @@ import scalafx.testutil.{DimensionDelegateSpec, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ColorInputSpec
     extends SimpleSFXDelegateSpec[jfxse.ColorInput, ColorInput](
-        classOf[jfxse.ColorInput], classOf[ColorInput])
+        classOf[jfxse.ColorInput],
+        classOf[ColorInput])
     with DimensionDelegateSpec[ColorInput] {
 
   val dimensionDelegate = getScalaClassInstance

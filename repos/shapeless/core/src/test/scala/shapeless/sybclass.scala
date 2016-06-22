@@ -387,10 +387,13 @@ class SybClassTests {
 
   @Test
   def testGeneric6 {
-    val input = Person(
-        "Joe Grey", 37, Address("Southover Street", "Brighton", "BN2 9UA"))
+    val input = Person("Joe Grey",
+                       37,
+                       Address("Southover Street", "Brighton", "BN2 9UA"))
     val expected = Person(
-        "Joe Grey*", 38, Address("Southover Street*", "Brighton*", "BN2 9UA*"))
+        "Joe Grey*",
+        38,
+        Address("Southover Street*", "Brighton*", "BN2 9UA*"))
 
     val result = everywhere(inc)(input)
     assertEquals(expected, result)

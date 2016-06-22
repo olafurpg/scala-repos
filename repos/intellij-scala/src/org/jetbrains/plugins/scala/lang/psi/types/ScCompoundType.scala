@@ -26,7 +26,7 @@ case class ScCompoundType(components: Seq[ScType],
     if (hash == -1) {
       hash =
         components.hashCode() +
-        (signatureMap.hashCode() * 31 + typesMap.hashCode()) * 31
+          (signatureMap.hashCode() * 31 + typesMap.hashCode()) * 31
     }
     hash
   }
@@ -49,7 +49,7 @@ case class ScCompoundType(components: Seq[ScType],
             sign.lowerBound.typeDepth.max(sign.upperBound.typeDepth)
           if (sign.typeParams.nonEmpty) {
             (ScType.typeParamsDepth(sign.typeParams.toArray) +
-                1).max(boundsDepth)
+                  1).max(boundsDepth)
           } else boundsDepth
       }
     val ints = components.map(_.typeDepth)
@@ -186,8 +186,10 @@ case class ScCompoundType(components: Seq[ScType],
           }, tp.ptp)
         }
         new ScCompoundType(
-            components.map(_.recursiveVarianceUpdateModifiable(
-                    newData, update, variance)),
+            components.map(
+                _.recursiveVarianceUpdateModifiable(newData,
+                                                    update,
+                                                    variance)),
             signatureMap.map {
               case (s: Signature, tp) =>
                 val tParams =
@@ -195,10 +197,12 @@ case class ScCompoundType(components: Seq[ScType],
                   else s.typeParams.map(updateTypeParam)
                 (new Signature(
                      s.name,
-                     s.substitutedTypes.map(_.map(f =>
+                     s.substitutedTypes.map(
+                         _.map(f =>
                                () =>
-                                 f().recursiveVarianceUpdateModifiable(
-                                     newData, update, 1))),
+                                 f().recursiveVarianceUpdateModifiable(newData,
+                                                                       update,
+                                                                       1))),
                      s.paramLength,
                      tParams,
                      ScSubstitutor.empty,
@@ -334,9 +338,12 @@ object ScCompoundType {
             signatureMapVal += ((new Signature(e.name, Seq.empty, 0, subst, e),
                                  varType.getOrAny))
             signatureMapVal +=
-              ((new Signature(
-                    e.name + "_=", Seq(() => varType.getOrAny), 1, subst, e),
-                psi.types.Unit)) //setter
+            ((new Signature(e.name + "_=",
+                            Seq(() => varType.getOrAny),
+                            1,
+                            subst,
+                            e),
+              psi.types.Unit)) //setter
           }
         case valDecl: ScValue =>
           for (e <- valDecl.declaredElements) {

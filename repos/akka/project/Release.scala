@@ -47,11 +47,11 @@ object Release {
 
     // copy all distributions from dist dir to downloads dir
     // may contain distributions from cross-builds
-    for (f <- (dist * "akka_*.zip").get) IO.copyFile(
-        f, release / "downloads" / f.name)
+    for (f <- (dist * "akka_*.zip").get)
+      IO.copyFile(f, release / "downloads" / f.name)
 
-    for (f <- (activatorDist * "*.zip").get) IO.copyFile(
-        f, release / "downloads" / f.name)
+    for (f <- (activatorDist * "*.zip").get)
+      IO.copyFile(f, release / "downloads" / f.name)
 
     state5
   }

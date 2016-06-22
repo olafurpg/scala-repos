@@ -247,18 +247,18 @@ trait HtmlHelpers extends CssBindImplicits {
       case element: Elem =>
         element.attribute("id") match {
           case Some(id) => {
-              if (ids.contains(id.text)) {
-                processElement(
-                    element.copy(attributes =
-                          removeAttribute("id", element.attributes)),
-                    stripDuplicateId _
-                )
-              } else {
-                ids += id.text
+            if (ids.contains(id.text)) {
+              processElement(
+                  element.copy(
+                      attributes = removeAttribute("id", element.attributes)),
+                  stripDuplicateId _
+              )
+            } else {
+              ids += id.text
 
-                processElement(element, stripDuplicateId _)
-              }
+              processElement(element, stripDuplicateId _)
             }
+          }
 
           case _ => element
         }
@@ -298,12 +298,12 @@ trait HtmlHelpers extends CssBindImplicits {
     ns.map {
       case x if found => x
       case element: Elem => {
-          val meta = removeAttribute("id", element.attributes)
+        val meta = removeAttribute("id", element.attributes)
 
-          found = true
+        found = true
 
-          element.copy(attributes = new UnprefixedAttribute("id", id, meta))
-        }
+        element.copy(attributes = new UnprefixedAttribute("id", id, meta))
+      }
 
       case x => x
     }
@@ -314,7 +314,8 @@ trait HtmlHelpers extends CssBindImplicits {
   def errorDiv(body: NodeSeq): Box[NodeSeq] = {
     Props.mode match {
       case Props.RunModes.Development | Props.RunModes.Test =>
-        Full(<div class="snippeterror" style="display: block; padding: 4px; margin: 8px; border: 2px solid red">
+        Full(
+            <div class="snippeterror" style="display: block; padding: 4px; margin: 8px; border: 2px solid red">
              {body}
           <i>note: this error is displayed in the browser because
           your application is running in "development" or "test" mode.If you
@@ -335,8 +336,10 @@ trait HtmlHelpers extends CssBindImplicits {
   def makeMetaData(key: String, value: String, rest: MetaData): MetaData =
     key.indexOf(":") match {
       case x if x > 0 =>
-        new PrefixedAttribute(
-            key.substring(0, x), key.substring(x + 1), value, rest)
+        new PrefixedAttribute(key.substring(0, x),
+                              key.substring(x + 1),
+                              value,
+                              rest)
 
       case _ => new UnprefixedAttribute(key, value, rest)
     }
@@ -349,12 +352,12 @@ trait HtmlHelpers extends CssBindImplicits {
   def pairsToMetaData(in: List[String]): MetaData = in match {
     case Nil => Null
     case x :: xs => {
-        val rest = pairsToMetaData(xs)
-        x.charSplit('=').map(Helpers.urlDecode) match {
-          case Nil => rest
-          case x :: Nil => makeMetaData(x, "", rest)
-          case x :: y :: _ => makeMetaData(x, y, rest)
-        }
+      val rest = pairsToMetaData(xs)
+      x.charSplit('=').map(Helpers.urlDecode) match {
+        case Nil => rest
+        case x :: Nil => makeMetaData(x, "", rest)
+        case x :: y :: _ => makeMetaData(x, y, rest)
       }
+    }
   }
 }

@@ -76,8 +76,9 @@ private[streaming] class ReliableKafkaReceiver[K: ClassTag,
     null
 
   /** A concurrent HashMap to store the stream block id and related offset snapshot. */
-  private var blockOffsetMap: ConcurrentHashMap[
-      StreamBlockId, Map[TopicAndPartition, Long]] = null
+  private var blockOffsetMap: ConcurrentHashMap[StreamBlockId,
+                                                Map[TopicAndPartition, Long]] =
+    null
 
   /**
     * Manage the BlockGenerator in receiver itself for better managing block store and offset
@@ -105,7 +106,7 @@ private[streaming] class ReliableKafkaReceiver[K: ClassTag,
         kafkaParams(AUTO_OFFSET_COMMIT) == "true") {
       logWarning(
           s"$AUTO_OFFSET_COMMIT should be set to false in ReliableKafkaReceiver, " +
-          "otherwise we will manually set it to false to turn off auto offset commit in Kafka")
+            "otherwise we will manually set it to false to turn off auto offset commit in Kafka")
     }
 
     val props = new Properties()
@@ -128,8 +129,8 @@ private[streaming] class ReliableKafkaReceiver[K: ClassTag,
                             consumerConfig.zkConnectionTimeoutMs,
                             ZKStringSerializer)
 
-    messageHandlerThreadPool = ThreadUtils.newDaemonFixedThreadPool(
-        topics.values.sum, "KafkaMessageHandler")
+    messageHandlerThreadPool = ThreadUtils
+      .newDaemonFixedThreadPool(topics.values.sum, "KafkaMessageHandler")
 
     blockGenerator.start()
 
@@ -188,16 +189,16 @@ private[streaming] class ReliableKafkaReceiver[K: ClassTag,
   /** Store a Kafka message and the associated metadata as a tuple. */
   private def storeMessageAndMetadata(
       msgAndMetadata: MessageAndMetadata[K, V]): Unit = {
-    val topicAndPartition = TopicAndPartition(
-        msgAndMetadata.topic, msgAndMetadata.partition)
+    val topicAndPartition =
+      TopicAndPartition(msgAndMetadata.topic, msgAndMetadata.partition)
     val data = (msgAndMetadata.key, msgAndMetadata.message)
     val metadata = (topicAndPartition, msgAndMetadata.offset)
     blockGenerator.addDataWithCallback(data, metadata)
   }
 
   /** Update stored offset */
-  private def updateOffset(
-      topicAndPartition: TopicAndPartition, offset: Long): Unit = {
+  private def updateOffset(topicAndPartition: TopicAndPartition,
+                           offset: Long): Unit = {
     topicPartitionOffsetMap.put(topicAndPartition, offset)
   }
 
@@ -217,7 +218,8 @@ private[streaming] class ReliableKafkaReceiver[K: ClassTag,
     * will try a fixed number of times to push the block. If the push fails, the receiver is stopped.
     */
   private def storeBlockAndCommitOffset(
-      blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
+      blockId: StreamBlockId,
+      arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
     var count = 0
     var pushed = false
     var exception: Exception = null
@@ -263,13 +265,13 @@ private[streaming] class ReliableKafkaReceiver[K: ClassTag,
         case e: Exception =>
           logWarning(
               s"Exception during commit offset $offset for topic" +
-              s"${topicAndPart.topic}, partition ${topicAndPart.partition}",
+                s"${topicAndPart.topic}, partition ${topicAndPart.partition}",
               e)
       }
 
       logInfo(
           s"Committed offset $offset for topic ${topicAndPart.topic}, " +
-          s"partition ${topicAndPart.partition}")
+            s"partition ${topicAndPart.partition}")
     }
   }
 
@@ -308,8 +310,8 @@ private[streaming] class ReliableKafkaReceiver[K: ClassTag,
       rememberBlockOffsets(blockId)
     }
 
-    def onPushBlock(
-        blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
+    def onPushBlock(blockId: StreamBlockId,
+                    arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
       // Store block and commit the blocks offset
       storeBlockAndCommitOffset(blockId, arrayBuffer)
     }

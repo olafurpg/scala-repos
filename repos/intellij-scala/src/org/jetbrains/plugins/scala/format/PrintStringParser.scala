@@ -29,11 +29,11 @@ object PrintStringParser extends StringParser {
 
       // System.out.printf("%d", 1)
       case MethodInvocation(
-          PsiReferenceEx
-            .resolve((f: PsiMethod) && ContainingClass(owner: PsiClass)),
+          PsiReferenceEx.resolve(
+          (f: PsiMethod) && ContainingClass(owner: PsiClass)),
           Seq(literal: ScLiteral, args @ _ *))
           if literal.isString &&
-          isPrintStreamPrintfMethod(owner.qualifiedName, f.getName) =>
+            isPrintStreamPrintfMethod(owner.qualifiedName, f.getName) =>
         (literal, args)
     }
 

@@ -38,8 +38,9 @@ import org.streum.configrity.Configuration
 
 import scalaz._
 
-private[jobs] case class JobData(
-    job: Job, channels: Map[String, List[Message]], status: Option[Status])
+private[jobs] case class JobData(job: Job,
+                                 channels: Map[String, List[Message]],
+                                 status: Option[Status])
 
 final class InMemoryJobManager[M[+ _]](implicit val M: Monad[M])
     extends BaseInMemoryJobManager[M] {
@@ -48,8 +49,8 @@ final class InMemoryJobManager[M[+ _]](implicit val M: Monad[M])
     with mutable.SynchronizedMap[JobId, JobData]
 }
 
-final class ExpiringJobManager[M[+ _]](
-    timeout: Duration)(implicit val M: Monad[M])
+final class ExpiringJobManager[M[+ _]](timeout: Duration)(
+    implicit val M: Monad[M])
     extends BaseInMemoryJobManager[M] {
   private[jobs] val jobs: mutable.Map[JobId, JobData] =
     Cache.simple(Cache.ExpireAfterAccess(timeout))
@@ -107,18 +108,20 @@ trait BaseInMemoryJobManager[M[+ _]]
 
     val jval = JObject(
         JField("message", JString(msg)) :: JField("progress", JNum(progress)) :: JField(
-            "unit", JString(unit)) ::
-        (extra map (JField("info", _) :: Nil) getOrElse Nil)
+            "unit",
+            JString(unit)) ::
+          (extra map (JField("info", _) :: Nil) getOrElse Nil)
     )
 
     synchronized {
       jobs get jobId map {
         case JobData(_, _, Some(cur)) if cur.id == prev.getOrElse(cur.id) =>
-          for (m <- addMessage(jobId, JobManager.channels.Status, jval)) yield {
-            val Some(s) = Status.fromMessage(m)
-            jobs(jobId) = jobs(jobId).copy(status = Some(s))
-            Right(s)
-          }
+          for (m <- addMessage(jobId, JobManager.channels.Status, jval))
+            yield {
+              val Some(s) = Status.fromMessage(m)
+              jobs(jobId) = jobs(jobId).copy(status = Some(s))
+              Right(s)
+            }
 
         case JobData(_, _, Some(_)) =>
           M.point(Left("Current status did not match expected status."))
@@ -127,11 +130,12 @@ trait BaseInMemoryJobManager[M[+ _]]
           M.point(Left("Job has not yet started, yet a status was expected."))
 
         case JobData(_, _, None) =>
-          for (m <- addMessage(jobId, JobManager.channels.Status, jval)) yield {
-            val Some(s) = Status.fromMessage(m)
-            jobs(jobId) = jobs(jobId).copy(status = Some(s))
-            Right(s)
-          }
+          for (m <- addMessage(jobId, JobManager.channels.Status, jval))
+            yield {
+              val Some(s) = Status.fromMessage(m)
+              jobs(jobId) = jobs(jobId).copy(status = Some(s))
+              Right(s)
+            }
       } getOrElse {
         M.point(Left("No job with ID " + jobId))
       }

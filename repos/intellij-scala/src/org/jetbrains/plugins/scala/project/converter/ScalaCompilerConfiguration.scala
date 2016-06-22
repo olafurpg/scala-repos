@@ -26,10 +26,10 @@ class ScalaCompilerConfiguration(defaultSettings: ScalaCompilerSettings,
     }
   }
 
-  private def addDirectoryBasedOptions(
-      options: Elem, context: ConversionContext): File = {
-    val base = Option(context.getSettingsBaseDir)
-      .getOrElse(throw new CannotConvertException(
+  private def addDirectoryBasedOptions(options: Elem,
+                                       context: ConversionContext): File = {
+    val base = Option(context.getSettingsBaseDir).getOrElse(
+        throw new CannotConvertException(
             "Only directory-based IDEA projects are supported"))
 
     val file = new File(base, "scala_compiler.xml")
@@ -38,8 +38,8 @@ class ScalaCompilerConfiguration(defaultSettings: ScalaCompilerSettings,
     file
   }
 
-  private def addProjectBasedOptions(
-      options: Elem, context: ConversionContext) {
+  private def addProjectBasedOptions(options: Elem,
+                                     context: ConversionContext) {
     val rootElement = context.getProjectSettings.getRootElement
     rootElement.addContent(asJava(options))
   }

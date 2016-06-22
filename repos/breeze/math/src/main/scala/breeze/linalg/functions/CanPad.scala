@@ -48,8 +48,8 @@ object CanPadRight {
         }
       }
 
-      def padRight1ImplZero[T](
-          v: DenseVector[T], optDim: Dimensions1): DenseVector[T] = {
+      def padRight1ImplZero[T](v: DenseVector[T],
+                               optDim: Dimensions1): DenseVector[T] = {
         padRight1ImplFixed(v, optDim, implicitly[Semiring[T]].zero)
       }
 
@@ -98,8 +98,8 @@ object CanPadRight {
   // <editor-fold defaultstate="collapsed" desc=" DenseVector 2D padding ">
 
   @expand
-  implicit def implDM_OptPadDim_OptPadMode[@expand.args(
-          Int, Long, Float, Double) T: ClassTag: Semiring]
+  implicit def implDM_OptPadDim_OptPadMode[
+      @expand.args(Int, Long, Float, Double) T: ClassTag: Semiring]
     : CanPadRight[DenseMatrix[T], Dimensions2, DenseMatrix[T]] =
     new CanPadRight[DenseMatrix[T], Dimensions2, DenseMatrix[T]] {
       def apply(m: DenseMatrix[T],
@@ -111,7 +111,9 @@ object CanPadRight {
           case Min => padRight2ImplFixed(m, optDim, min(m))
           case Mean =>
             padRight2ImplFixed(
-                m, optDim, convert(mean(convert(m.toDenseVector, Double)), T))
+                m,
+                optDim,
+                convert(mean(convert(m.toDenseVector, Double)), T))
           case Median =>
             padRight2ImplFixed(
                 m,
@@ -132,8 +134,8 @@ object CanPadRight {
         }
       }
 
-      def padRight2ImplZero[T](
-          v: DenseMatrix[T], optDim: Dimensions2): DenseMatrix[T] = {
+      def padRight2ImplZero[T](v: DenseMatrix[T],
+                               optDim: Dimensions2): DenseMatrix[T] = {
         padRight2ImplFixed(v, optDim, implicitly[Semiring[T]].zero)
       }
 
@@ -144,10 +146,9 @@ object CanPadRight {
                 "Cannot pad to zero or negative length!")
 
         val tempret = DenseMatrix.zeros[T](optDim.n1, optDim.n2)
-        cforRange2(
-            0 until min(optDim.n2, m.cols), 0 until min(optDim.n1, m.rows)) {
-          (c, r) =>
-            tempret(r, c) = m(r, c)
+        cforRange2(0 until min(optDim.n2, m.cols),
+                   0 until min(optDim.n1, m.rows)) { (c, r) =>
+          tempret(r, c) = m(r, c)
         }
         tempret
       }
@@ -190,8 +191,8 @@ object CanPadLeft {
         }
       }
 
-      def padLeft1ImplZero(
-          v: DenseVector[T], optDim: Dimensions1): DenseVector[T] = {
+      def padLeft1ImplZero(v: DenseVector[T],
+                           optDim: Dimensions1): DenseVector[T] = {
         padLeft1ImplFixed(v, optDim, implicitly[Semiring[T]].zero)
       }
 
@@ -240,8 +241,8 @@ object CanPadLeft {
   // <editor-fold defaultstate="collapsed" desc=" DenseVector 2D padding ">
 
   @expand
-  implicit def implDM_OptPadDim_OptPadMode[@expand.args(
-          Int, Long, Float, Double) T: ClassTag: Semiring]
+  implicit def implDM_OptPadDim_OptPadMode[
+      @expand.args(Int, Long, Float, Double) T: ClassTag: Semiring]
     : CanPadLeft[DenseMatrix[T], Dimensions2, DenseMatrix[T]] =
     new CanPadLeft[DenseMatrix[T], Dimensions2, DenseMatrix[T]] {
       def apply(m: DenseMatrix[T],
@@ -253,7 +254,9 @@ object CanPadLeft {
           case Min => padLeft2ImplFixed(m, optDim, min(m))
           case Mean =>
             padLeft2ImplFixed(
-                m, optDim, convert(mean(convert(m.toDenseVector, Double)), T))
+                m,
+                optDim,
+                convert(mean(convert(m.toDenseVector, Double)), T))
           case Median =>
             padLeft2ImplFixed(
                 m,
@@ -274,8 +277,8 @@ object CanPadLeft {
         }
       }
 
-      def padLeft2ImplZero[T](
-          v: DenseMatrix[T], optDim: Dimensions2): DenseMatrix[T] = {
+      def padLeft2ImplZero[T](v: DenseMatrix[T],
+                              optDim: Dimensions2): DenseMatrix[T] = {
         padLeft2ImplFixed(v, optDim, implicitly[Semiring[T]].zero)
       }
 

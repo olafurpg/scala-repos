@@ -72,8 +72,8 @@ object Beam {
     new Beam[T](maxSize, xs: _*)
 
   @deprecated("Use Beam(maxSize)(xs) instead", "0.12")
-  def apply[T](maxSize: Int, xs: T*)(
-      implicit ordering: Ordering[T], dummyImplicit: DummyImplicit): Beam[T] =
+  def apply[T](maxSize: Int, xs: T*)(implicit ordering: Ordering[T],
+                                     dummyImplicit: DummyImplicit): Beam[T] =
     new Beam[T](maxSize, xs: _*)
 
   implicit def canBuildFrom[T: Ordering]: CanBuildFrom[Beam[T], T, Beam[T]] =

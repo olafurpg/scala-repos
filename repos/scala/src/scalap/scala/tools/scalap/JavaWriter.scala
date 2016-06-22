@@ -111,8 +111,10 @@ class JavaWriter(classfile: Classfile, writer: Writer)
 
   def isConstr(name: String) = (name == "<init>")
 
-  def printField(
-      flags: Int, name: Int, tpe: Int, attribs: List[cf.Attribute]) {
+  def printField(flags: Int,
+                 name: Int,
+                 tpe: Int,
+                 attribs: List[cf.Attribute]) {
     print(flagsToStr(false, flags))
     if ((flags & 0x0010) != 0)
       print("val " + NameTransformer.decode(getName(name)))
@@ -120,8 +122,10 @@ class JavaWriter(classfile: Classfile, writer: Writer)
     print(": " + getType(tpe) + ";").newline
   }
 
-  def printMethod(
-      flags: Int, name: Int, tpe: Int, attribs: List[cf.Attribute]) {
+  def printMethod(flags: Int,
+                  name: Int,
+                  tpe: Int,
+                  attribs: List[cf.Attribute]) {
     if (getName(name) == "<init>") print(flagsToStr(false, flags))
     if (getName(name) == "<init>") {
       print("def this" + getType(tpe) + ";").newline

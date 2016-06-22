@@ -56,8 +56,8 @@ class AppInfoBaseData(clock: Clock,
     taskTracker.tasksByApp()
   }
 
-  def appInfoFuture(
-      app: AppDefinition, embed: Set[AppInfo.Embed]): Future[AppInfo] = {
+  def appInfoFuture(app: AppDefinition,
+                    embed: Set[AppInfo.Embed]): Future[AppInfo] = {
     val appData = new AppData(app)
     embed.foldLeft(Future.successful(AppInfo(app))) { (infoFuture, embed) =>
       infoFuture.flatMap { info =>
@@ -101,7 +101,8 @@ class AppInfoBaseData(clock: Clock,
     }.recover {
       case NonFatal(e) =>
         throw new RuntimeException(
-            s"while retrieving health counts for app [${app.id}]", e)
+            s"while retrieving health counts for app [${app.id}]",
+            e)
     }
 
     lazy val tasksForStats: Future[Iterable[TaskForStatistics]] = {
@@ -112,7 +113,8 @@ class AppInfoBaseData(clock: Clock,
     }.recover {
       case NonFatal(e) =>
         throw new RuntimeException(
-            s"while calculating tasksForStats for app [${app.id}]", e)
+            s"while calculating tasksForStats for app [${app.id}]",
+            e)
     }
 
     lazy val taskCountsFuture: Future[TaskCounts] = {
@@ -123,7 +125,8 @@ class AppInfoBaseData(clock: Clock,
     }.recover {
       case NonFatal(e) =>
         throw new RuntimeException(
-            s"while calculating task counts for app [${app.id}]", e)
+            s"while calculating task counts for app [${app.id}]",
+            e)
     }
 
     lazy val taskStatsFuture: Future[TaskStatsByVersion] = {
@@ -156,7 +159,8 @@ class AppInfoBaseData(clock: Clock,
     }.recover {
       case NonFatal(e) =>
         throw new RuntimeException(
-            s"while assembling rich tasks for app [${app.id}]", e)
+            s"while assembling rich tasks for app [${app.id}]",
+            e)
     }
 
     lazy val maybeLastTaskFailureFuture: Future[Option[TaskFailure]] = {
@@ -165,7 +169,8 @@ class AppInfoBaseData(clock: Clock,
     }.recover {
       case NonFatal(e) =>
         throw new RuntimeException(
-            s"while retrieving last task failure for app [${app.id}]", e)
+            s"while retrieving last task failure for app [${app.id}]",
+            e)
     }
   }
 }

@@ -170,46 +170,47 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       import trans._
 
       //@deprecated, see the DEPRECATED comment in StringLib
-      val tpe = BinaryOperationType(
-          StrAndDateT, StrAndDateT, JArrayHomogeneousT(JTextT))
+      val tpe = BinaryOperationType(StrAndDateT,
+                                    StrAndDateT,
+                                    JArrayHomogeneousT(JTextT))
 
       lazy val prepare = UnifyStrDate
 
       val mapper = CF2Array[String, M]("std::string::regexMatch") {
         case (target: StrColumn, regex: StrColumn, range) => {
-            val table = new Array[Array[String]](range.length)
-            val defined = new BitSet(range.length)
+          val table = new Array[Array[String]](range.length)
+          val defined = new BitSet(range.length)
 
-            RangeUtil.loop(range) { i =>
-              if (target.isDefinedAt(i) && regex.isDefinedAt(i)) {
-                val str = target(i)
+          RangeUtil.loop(range) { i =>
+            if (target.isDefinedAt(i) && regex.isDefinedAt(i)) {
+              val str = target(i)
 
-                try {
-                  val reg = regex(i).r
+              try {
+                val reg = regex(i).r
 
-                  str match {
-                    case reg(capture @ _ *) => {
-                        val capture2 =
-                          capture map { str =>
-                            if (str == null) ""
-                            else str
-                          }
-
-                        table(i) = capture2.toArray
-                        defined.set(i)
+                str match {
+                  case reg(capture @ _ *) => {
+                    val capture2 =
+                      capture map { str =>
+                        if (str == null) ""
+                        else str
                       }
 
-                    case _ =>
+                    table(i) = capture2.toArray
+                    defined.set(i)
                   }
-                } catch {
-                  case _: java.util.regex.PatternSyntaxException =>
-                  // yay, scala 
+
+                  case _ =>
                 }
+              } catch {
+                case _: java.util.regex.PatternSyntaxException =>
+                // yay, scala 
               }
             }
-
-            (CString, table, defined)
           }
+
+          (CString, table, defined)
+        }
       }
     }
 
@@ -224,8 +225,10 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
         case (c1: StrColumn, c2: DateColumn) =>
           new StrFrom.SS(c1, dateToStrCol(c2), neitherNull, _ concat _)
         case (c1: DateColumn, c2: DateColumn) =>
-          new StrFrom.SS(
-              dateToStrCol(c1), dateToStrCol(c2), neitherNull, _ concat _)
+          new StrFrom.SS(dateToStrCol(c1),
+                         dateToStrCol(c2),
+                         neitherNull,
+                         _ concat _)
       }
     }
 
@@ -304,16 +307,14 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
               f(s, n.toInt)
             })
           case (c1: DateColumn, c2: DoubleColumn) =>
-            new StrFrom.SD(
-                dateToStrCol(c1), c2, (s, n) => n >= 0 && (n % 1 == 0), {
-              (s, n) =>
-                f(s, n.toInt)
+            new StrFrom.SD(dateToStrCol(c1), c2, (s, n) =>
+                  n >= 0 && (n % 1 == 0), { (s, n) =>
+              f(s, n.toInt)
             })
           case (c1: DateColumn, c2: NumColumn) =>
-            new StrFrom.SN(
-                dateToStrCol(c1), c2, (s, n) => n >= 0 && (n % 1 == 0), {
-              (s, n) =>
-                f(s, n.toInt)
+            new StrFrom.SN(dateToStrCol(c1), c2, (s, n) =>
+                  n >= 0 && (n % 1 == 0), { (s, n) =>
+              f(s, n.toInt)
             })
         }
     }
@@ -401,20 +402,21 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       def f1(ctx: MorphContext): F1 = CF1P("builtin::str::numToString") {
         case c: LongColumn => new StrFrom.L(c, _ => true, _.toString)
         case c: DoubleColumn => {
-            new StrFrom.D(c, _ => true, { d =>
-              val back = d.toString
-              if (back.endsWith(".0")) back.substring(0, back.length - 2)
-              else back
-            })
-          }
+          new StrFrom.D(c, _ => true, { d =>
+            val back = d.toString
+            if (back.endsWith(".0")) back.substring(0, back.length - 2)
+            else back
+          })
+        }
         case c: NumColumn => new StrFrom.N(c, _ => true, _.toString)
       }
     }
 
     object split extends Op2(StringNamespace, "split") with Op2Array {
       //@deprecated, see the DEPRECATED comment in StringLib
-      val tpe = BinaryOperationType(
-          StrAndDateT, StrAndDateT, JArrayHomogeneousT(JTextT))
+      val tpe = BinaryOperationType(StrAndDateT,
+                                    StrAndDateT,
+                                    JArrayHomogeneousT(JTextT))
 
       lazy val prepare = UnifyStrDate
 
@@ -443,8 +445,9 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
         extends Op2(StringNamespace, "splitRegex")
         with Op2Array {
       //@deprecated, see the DEPRECATED comment in StringLib
-      val tpe = BinaryOperationType(
-          StrAndDateT, StrAndDateT, JArrayHomogeneousT(JTextT))
+      val tpe = BinaryOperationType(StrAndDateT,
+                                    StrAndDateT,
+                                    JArrayHomogeneousT(JTextT))
 
       lazy val prepare = UnifyStrDate
 
@@ -454,27 +457,27 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     def splitMapper(quote: Boolean) =
       CF2Array[String, M]("std::string::split(%s)".format(quote)) {
         case (left: StrColumn, right: StrColumn, range) => {
-            val result = new Array[Array[String]](range.length)
-            val defined = new BitSet(range.length)
+          val result = new Array[Array[String]](range.length)
+          val defined = new BitSet(range.length)
 
-            RangeUtil.loop(range) { row =>
-              if (left.isDefinedAt(row) && right.isDefinedAt(row)) {
-                try {
-                  val pattern =
-                    if (quote) Pattern.quote(right(row)) else right(row)
+          RangeUtil.loop(range) { row =>
+            if (left.isDefinedAt(row) && right.isDefinedAt(row)) {
+              try {
+                val pattern =
+                  if (quote) Pattern.quote(right(row)) else right(row)
 
-                  // TOOD cache compiled patterns for awesome sauce
-                  result(row) = Pattern.compile(pattern).split(left(row), -1)
+                // TOOD cache compiled patterns for awesome sauce
+                result(row) = Pattern.compile(pattern).split(left(row), -1)
 
-                  defined.flip(row)
-                } catch {
-                  case _: PatternSyntaxException =>
-                }
+                defined.flip(row)
+              } catch {
+                case _: PatternSyntaxException =>
               }
             }
-
-            (CString, result, defined)
           }
+
+          (CString, result, defined)
+        }
       }
 
     val UnifyStrDate = CF1P("builtin::str::unifyStrDate")({

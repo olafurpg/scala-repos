@@ -23,8 +23,8 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
                },
                "name" -> simul.name,
                "fullName" -> simul.fullName,
-               "variants" -> simul.variants
-                 .map(variantJson(chess.Speed(simul.clock.chessClock.some))),
+               "variants" -> simul.variants.map(
+                   variantJson(chess.Speed(simul.clock.chessClock.some))),
                "applicants" -> simul.applicants
                  .sortBy(-_.player.rating)
                  .map(applicantJson),

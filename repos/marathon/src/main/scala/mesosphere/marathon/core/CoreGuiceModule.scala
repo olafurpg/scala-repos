@@ -182,7 +182,8 @@ class CoreGuiceModule extends AbstractModule {
       config: MarathonConf,
       actorRefFactory: ActorRefFactory): CapConcurrentExecutions = {
     val capMetrics = new CapConcurrentExecutionsMetrics(
-        metrics, classOf[ThrottlingTaskStatusUpdateProcessor])
+        metrics,
+        classOf[ThrottlingTaskStatusUpdateProcessor])
 
     CapConcurrentExecutions(
         capMetrics,

@@ -41,8 +41,8 @@ abstract class LazyVals
             d.symbol.resetFlag(symtab.Flags.LAZY)
             result = true
 
-          case ClassDef(_, _, _, _) | DefDef(_, _, _, _, _, _) | ModuleDef(
-              _, _, _) =>
+          case ClassDef(_, _, _, _) | DefDef(_, _, _, _, _, _) |
+              ModuleDef(_, _, _) =>
           // Avoid adding bitmaps when they are fully overshadowed by those that are added inside loops
           case LabelDef(name, _, _) if nme.isLoopHeaderLabel(name) =>
           case _ =>
@@ -105,55 +105,56 @@ abstract class LazyVals
 
         case DefDef(_, _, _, _, _, rhs) =>
           atOwner(tree.symbol) {
-            val (res, slowPathDef) =
-              if (!sym.owner.isClass && sym.isLazy) {
-                val enclosingClassOrDummyOrMethod = {
-                  val enclMethod = sym.enclMethod
+            val (res, slowPathDef) = if (!sym.owner.isClass && sym.isLazy) {
+              val enclosingClassOrDummyOrMethod = {
+                val enclMethod = sym.enclMethod
 
-                  if (enclMethod != NoSymbol) {
-                    val enclClass = sym.enclClass
-                    if (enclClass != NoSymbol &&
-                        enclMethod == enclClass.enclMethod) enclClass
-                    else enclMethod
-                  } else sym.owner
-                }
-                debuglog(
-                    s"determined enclosing class/dummy/method for lazy val as $enclosingClassOrDummyOrMethod given symbol $sym")
-                val idx = lazyVals(enclosingClassOrDummyOrMethod)
-                lazyVals(enclosingClassOrDummyOrMethod) = idx + 1
-                val (rhs1, sDef) = mkLazyDef(
-                    enclosingClassOrDummyOrMethod, transform(rhs), idx, sym)
-                sym.resetFlag((if (lazyUnit(sym)) 0 else LAZY) | ACCESSOR)
-                (rhs1, sDef)
-              } else if (sym.hasAllFlags(MODULE | METHOD) &&
-                         !sym.owner.isTrait) {
-                rhs match {
-                  case b @ Block(
-                      (assign @ Assign(moduleRef, _)) :: Nil, expr) =>
-                    def cond =
-                      Apply(Select(moduleRef, Object_eq),
-                            List(Literal(Constant(null))))
-                    val (fastPath, slowPath) =
-                      mkFastPathBody(sym.owner.enclClass,
-                                     moduleRef.symbol,
-                                     cond,
-                                     transform(assign) :: Nil,
-                                     Nil,
-                                     transform(expr))
-                    (localTyper.typedPos(tree.pos)(fastPath),
-                     localTyper.typedPos(tree.pos)(slowPath))
-                  case rhs =>
-                    global.reporter.error(
-                        tree.pos,
-                        "Unexpected tree on the RHS of a module accessor: " +
-                        rhs)
-                    (rhs, EmptyTree)
-                }
-              } else {
-                (transform(rhs), EmptyTree)
+                if (enclMethod != NoSymbol) {
+                  val enclClass = sym.enclClass
+                  if (enclClass != NoSymbol &&
+                      enclMethod == enclClass.enclMethod) enclClass
+                  else enclMethod
+                } else sym.owner
               }
+              debuglog(
+                  s"determined enclosing class/dummy/method for lazy val as $enclosingClassOrDummyOrMethod given symbol $sym")
+              val idx = lazyVals(enclosingClassOrDummyOrMethod)
+              lazyVals(enclosingClassOrDummyOrMethod) = idx + 1
+              val (rhs1, sDef) = mkLazyDef(enclosingClassOrDummyOrMethod,
+                                           transform(rhs),
+                                           idx,
+                                           sym)
+              sym.resetFlag((if (lazyUnit(sym)) 0 else LAZY) | ACCESSOR)
+              (rhs1, sDef)
+            } else if (sym.hasAllFlags(MODULE | METHOD) &&
+                       !sym.owner.isTrait) {
+              rhs match {
+                case b @ Block((assign @ Assign(moduleRef, _)) :: Nil, expr) =>
+                  def cond =
+                    Apply(Select(moduleRef, Object_eq),
+                          List(Literal(Constant(null))))
+                  val (fastPath, slowPath) =
+                    mkFastPathBody(sym.owner.enclClass,
+                                   moduleRef.symbol,
+                                   cond,
+                                   transform(assign) :: Nil,
+                                   Nil,
+                                   transform(expr))
+                  (localTyper.typedPos(tree.pos)(fastPath),
+                   localTyper.typedPos(tree.pos)(slowPath))
+                case rhs =>
+                  global.reporter.error(
+                      tree.pos,
+                      "Unexpected tree on the RHS of a module accessor: " +
+                        rhs)
+                  (rhs, EmptyTree)
+              }
+            } else {
+              (transform(rhs), EmptyTree)
+            }
 
-            val ddef1 = deriveDefDef(tree)(_ =>
+            val ddef1 = deriveDefDef(tree)(
+                _ =>
                   if (LocalLazyValFinder.find(res))
                     typed(addBitmapDefs(sym, res))
                   else res)
@@ -185,8 +186,7 @@ abstract class LazyVals
                 // add bitmap to inner class if necessary
                 val toAdd0 =
                   bitmaps(currentOwner).map(s => typed(ValDef(s, ZERO)))
-                toAdd0.foreach(
-                    t => {
+                toAdd0.foreach(t => {
                   if (currentOwner.info.decl(t.symbol.name) == NoSymbol) {
                     t.symbol.setFlag(PROTECTED)
                     currentOwner.info.decls.enter(t.symbol)
@@ -221,7 +221,7 @@ abstract class LazyVals
 
         case l @ LabelDef(name0, params0, block @ Block(stats0, expr))
             if name0.startsWith(nme.WHILE_PREFIX) ||
-            name0.startsWith(nme.DO_WHILE_PREFIX) =>
+              name0.startsWith(nme.DO_WHILE_PREFIX) =>
           val stats1 = super.transformTrees(stats0)
           if (LocalLazyValFinder.find(stats1))
             deriveLabelDef(l)(
@@ -258,8 +258,8 @@ abstract class LazyVals
         rhs match {
           case Block(assign, l @ LabelDef(name, params, _))
               if (name string_== "_" + methSym.name) && isMatch(params) =>
-            Block(assign,
-                  deriveLabelDef(l)(rhs => typed(prependStats(bmps, rhs))))
+            Block(assign, deriveLabelDef(l)(rhs =>
+                      typed(prependStats(bmps, rhs))))
 
           case _ => prependStats(bmps, rhs)
         }
@@ -295,8 +295,8 @@ abstract class LazyVals
                        syncBody: List[Tree],
                        stats: List[Tree],
                        retVal: Tree): (Tree, Tree) = {
-      val slowPathDef: Tree = mkSlowPathDef(
-          clazz, lzyVal, cond, syncBody, stats, retVal)
+      val slowPathDef: Tree =
+        mkSlowPathDef(clazz, lzyVal, cond, syncBody, stats, retVal)
       (If(cond, Apply(Ident(slowPathDef.symbol), Nil), retVal), slowPathDef)
     }
 
@@ -356,8 +356,12 @@ abstract class LazyVals
       }
 
       def cond = (bitmapRef GEN_& (mask, bitmapKind)) GEN_== (ZERO, bitmapKind)
-      val lazyDefs = mkFastPathBody(
-          methOrClass.enclClass, lazyVal, cond, List(block), Nil, res)
+      val lazyDefs = mkFastPathBody(methOrClass.enclClass,
+                                    lazyVal,
+                                    cond,
+                                    List(block),
+                                    Nil,
+                                    res)
       (atPos(tree.pos)(localTyper.typed { lazyDefs._1 }),
        atPos(tree.pos)(localTyper.typed { lazyDefs._2 }))
     }

@@ -31,8 +31,7 @@ import org.apache.spark.util.Utils
 private[spark] class PartitionerAwareUnionRDDPartition(
     @transient val rdds: Seq[RDD[_]],
     val idx: Int
-)
-    extends Partition {
+) extends Partition {
   var parents = rdds.map(_.partitions(idx)).toArray
 
   override val index = idx
@@ -58,13 +57,12 @@ private[spark] class PartitionerAwareUnionRDDPartition(
 private[spark] class PartitionerAwareUnionRDD[T: ClassTag](
     sc: SparkContext,
     var rdds: Seq[RDD[T]]
-)
-    extends RDD[T](sc, rdds.map(x => new OneToOneDependency(x))) {
+) extends RDD[T](sc, rdds.map(x => new OneToOneDependency(x))) {
   require(rdds.length > 0)
   require(rdds.forall(_.partitioner.isDefined))
   require(rdds.flatMap(_.partitioner).toSet.size == 1,
           "Parent RDDs have different partitioners: " +
-          rdds.flatMap(_.partitioner))
+            rdds.flatMap(_.partitioner))
 
   override val partitioner = rdds.head.partitioner
 
@@ -85,22 +83,21 @@ private[spark] class PartitionerAwareUnionRDD[T: ClassTag](
       s.asInstanceOf[PartitionerAwareUnionRDDPartition].parents
     val locations = rdds.zip(parentPartitions).flatMap {
       case (rdd, part) => {
-          val parentLocations = currPrefLocs(rdd, part)
-          logDebug("Location of " + rdd + " partition " +
+        val parentLocations = currPrefLocs(rdd, part)
+        logDebug("Location of " + rdd + " partition " +
               part.index + " = " + parentLocations)
-          parentLocations
-        }
-    }
-    val location =
-      if (locations.isEmpty) {
-        None
-      } else {
-        // Find the location that maximum number of parent partitions prefer
-        Some(locations.groupBy(x => x).maxBy(_._2.length)._1)
+        parentLocations
       }
+    }
+    val location = if (locations.isEmpty) {
+      None
+    } else {
+      // Find the location that maximum number of parent partitions prefer
+      Some(locations.groupBy(x => x).maxBy(_._2.length)._1)
+    }
     logDebug(
         "Selected location for " + this + ", partition " + s.index + " = " +
-        location)
+          location)
     location.toSeq
   }
 

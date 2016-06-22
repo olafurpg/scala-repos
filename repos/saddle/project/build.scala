@@ -29,8 +29,8 @@ object SaddleBuild extends sbt.Build {
                 assembleArtifact in packageScala := false,
                 publishArtifact := false,
                 mergeStrategy in assembly := {
-                  case "META-INF/MANIFEST.MF" |
-                      "META-INF/LICENSE" | "META-INF/BCKEY.DSA" =>
+                  case "META-INF/MANIFEST.MF" | "META-INF/LICENSE" |
+                      "META-INF/BCKEY.DSA" =>
                     MergeStrategy.discard
                   case _ => MergeStrategy.first
                 }
@@ -71,7 +71,8 @@ object SaddleBuild extends sbt.Build {
                 |import org.saddle._
                 |import org.saddle.time._
                 |import org.saddle.io._""".stripMargin('|'),
-                libraryDependencies <++= scalaVersion(v =>
+                libraryDependencies <++= scalaVersion(
+                    v =>
                       Seq(
                           "org.scala-saddle" % "jhdf5" % "2.9"
                       ) ++ Shared.testDeps(v)),
@@ -88,8 +89,9 @@ object SaddleBuild extends sbt.Build {
         )
     ) dependsOn (core)
 
-  def project(
-      id: String, base: File, settings: Seq[Project.Setting[_]] = Nil) =
+  def project(id: String,
+              base: File,
+              settings: Seq[Project.Setting[_]] = Nil) =
     Project(
         id = id,
         base = base,

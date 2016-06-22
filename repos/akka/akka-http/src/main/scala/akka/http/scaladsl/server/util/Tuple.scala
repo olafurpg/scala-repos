@@ -48,19 +48,93 @@ object Tuple {
     : Tuple[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] = null
   implicit def forTuple18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]
     : Tuple[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] = null
-  implicit def forTuple19[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
+  implicit def forTuple19[A,
+                          B,
+                          C,
+                          D,
+                          E,
+                          F,
+                          G,
+                          H,
+                          I,
+                          J,
+                          K,
+                          L,
+                          M,
+                          N,
+                          O,
+                          P,
+                          Q,
+                          R,
+                          S]
     : Tuple[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] = null
-  implicit def forTuple20[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
+  implicit def forTuple20[A,
+                          B,
+                          C,
+                          D,
+                          E,
+                          F,
+                          G,
+                          H,
+                          I,
+                          J,
+                          K,
+                          L,
+                          M,
+                          N,
+                          O,
+                          P,
+                          Q,
+                          R,
+                          S,
+                          T]
     : Tuple[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
     null
-  implicit def forTuple21[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
+  implicit def forTuple21[A,
+                          B,
+                          C,
+                          D,
+                          E,
+                          F,
+                          G,
+                          H,
+                          I,
+                          J,
+                          K,
+                          L,
+                          M,
+                          N,
+                          O,
+                          P,
+                          Q,
+                          R,
+                          S,
+                          T,
+                          U]
     : Tuple[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
     null
-  implicit def forTuple22[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]: Tuple[
+  implicit def forTuple22[A,
+                          B,
+                          C,
+                          D,
+                          E,
+                          F,
+                          G,
+                          H,
+                          I,
+                          J,
+                          K,
+                          L,
+                          M,
+                          N,
+                          O,
+                          P,
+                          Q,
+                          R,
+                          S,
+                          T,
+                          U,
+                          V]: Tuple[
       (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
     null
 }

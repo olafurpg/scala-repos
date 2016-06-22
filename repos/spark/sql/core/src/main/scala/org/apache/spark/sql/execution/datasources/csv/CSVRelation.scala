@@ -59,14 +59,13 @@ object CSVRelation extends Logging {
 
     val schemaFields = schema.fields
     val requiredFields = StructType(requiredColumns.map(schema(_))).fields
-    val safeRequiredFields =
-      if (params.dropMalformed) {
-        // If `dropMalformed` is enabled, then it needs to parse all the values
-        // so that we can decide which row is malformed.
-        requiredFields ++ schemaFields.filterNot(requiredFields.contains(_))
-      } else {
-        requiredFields
-      }
+    val safeRequiredFields = if (params.dropMalformed) {
+      // If `dropMalformed` is enabled, then it needs to parse all the values
+      // so that we can decide which row is malformed.
+      requiredFields ++ schemaFields.filterNot(requiredFields.contains(_))
+    } else {
+      requiredFields
+    }
     val safeRequiredIndices = new Array[Int](safeRequiredFields.length)
     schemaFields.zipWithIndex.filter {
       case (field, _) => safeRequiredFields.contains(field)
@@ -82,8 +81,9 @@ object CSVRelation extends Logging {
             s"Dropping malformed line: ${tokens.mkString(params.delimiter.toString)}")
         None
       } else if (params.failFast && schemaFields.length != tokens.length) {
-        throw new RuntimeException(s"Malformed line in FAILFAST mode: " +
-            s"${tokens.mkString(params.delimiter.toString)}")
+        throw new RuntimeException(
+            s"Malformed line in FAILFAST mode: " +
+              s"${tokens.mkString(params.delimiter.toString)}")
       } else {
         val indexSafeTokens =
           if (params.permissive && schemaFields.length > tokens.length) {
@@ -115,8 +115,9 @@ object CSVRelation extends Logging {
           Some(row)
         } catch {
           case NonFatal(e) if params.dropMalformed =>
-            logWarning("Parse exception. " +
-                s"Dropping malformed line: ${tokens.mkString(params.delimiter.toString)}")
+            logWarning(
+                "Parse exception. " +
+                  s"Dropping malformed line: ${tokens.mkString(params.delimiter.toString)}")
             None
         }
       }
@@ -147,8 +148,8 @@ private[sql] class CsvOutputWriter(path: String,
 
   private val recordWriter: RecordWriter[NullWritable, Text] = {
     new TextOutputFormat[NullWritable, Text]() {
-      override def getDefaultWorkFile(
-          context: TaskAttemptContext, extension: String): Path = {
+      override def getDefaultWorkFile(context: TaskAttemptContext,
+                                      extension: String): Path = {
         val configuration = context.getConfiguration
         val uniqueWriteJobId =
           configuration.get("spark.sql.sources.writeJobUUID")
@@ -161,8 +162,8 @@ private[sql] class CsvOutputWriter(path: String,
 
   private var firstRow: Boolean = params.headerFlag
 
-  private val csvWriter = new LineCsvWriter(
-      params, dataSchema.fieldNames.toSeq)
+  private val csvWriter =
+    new LineCsvWriter(params, dataSchema.fieldNames.toSeq)
 
   private def rowToString(row: Seq[Any]): Seq[String] = row.map { field =>
     if (field != null) {

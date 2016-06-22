@@ -28,7 +28,8 @@ private[spark] class BlockRDDPartition(val blockId: BlockId, idx: Int)
 }
 
 private[spark] class BlockRDD[T: ClassTag](
-    sc: SparkContext, @transient val blockIds: Array[BlockId])
+    sc: SparkContext,
+    @transient val blockIds: Array[BlockId])
     extends RDD[T](sc, Nil) {
 
   @transient lazy val _locations =

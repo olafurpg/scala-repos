@@ -59,10 +59,10 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
                        jobManager: JobManager[Response],
                        val clock: Clock,
                        eventStore: EventStore[Future],
-                       ingestTimeout: Timeout)(
-    implicit val M: Monad[Future], executor: ExecutionContext)
-    extends CustomHttpService[
-        ByteChunk, (APIKey, Path) => Future[HttpResponse[JValue]]]
+                       ingestTimeout: Timeout)(implicit val M: Monad[Future],
+                                               executor: ExecutionContext)
+    extends CustomHttpService[ByteChunk,
+                              (APIKey, Path) => Future[HttpResponse[JValue]]]
     with IngestSupport
     with Logging {
 
@@ -77,8 +77,8 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
       case (_, HttpMethods.PUT) => Success(AccessMode.Replace)
       case (otherType, otherMethod) =>
         Failure(
-            "Content-Type %s is not supported for use with method %s.".format(
-                otherType, otherMethod))
+            "Content-Type %s is not supported for use with method %s."
+              .format(otherType, otherMethod))
     }
   }
 
@@ -92,10 +92,10 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
           // if the filename after URL encoding is the same as before, accept it.
           _ <- (URLEncoder.encode(fn0, "UTF-8") == fn0)
                 .unlessM[({ type λ[α] = Validation[String, α] })#λ, Unit] {
-                Failure(
-                    "\"%s\" is not a valid file name; please do not use characters which require URL encoding."
-                      .format(fn0))
-              }
+                  Failure(
+                      "\"%s\" is not a valid file name; please do not use characters which require URL encoding."
+                        .format(fn0))
+                }
         } yield { (dir: Path) =>
           dir / Path(fn0)
         }
@@ -112,7 +112,8 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
   }
 
   val service: HttpRequest[ByteChunk] => Validation[
-      NotServed, (APIKey, Path) => Future[HttpResponse[JValue]]] =
+      NotServed,
+      (APIKey, Path) => Future[HttpResponse[JValue]]] =
     (request: HttpRequest[ByteChunk]) => {
       val contentType0 = request.headers
         .header[`Content-Type`]
@@ -133,8 +134,10 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
             val timestamp = clock.now()
             val fullPath = pathf(path)
 
-            findRequestWriteAuthorities(
-                request, apiKey, fullPath, Some(timestamp.toInstant)) {
+            findRequestWriteAuthorities(request,
+                                        apiKey,
+                                        fullPath,
+                                        Some(timestamp.toInstant)) {
               authorities =>
                 request.content map { content =>
                   (for {
@@ -148,7 +151,7 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
                               .leftMap { errors =>
                                 logger.error(
                                     "File creation failed due to errors in job service: " +
-                                    errors)
+                                      errors)
                                 serverError(errors)
                               }
                     bytes <- EitherT {
@@ -178,7 +181,7 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
                     _ <- right(eventStore.save(storeFile, ingestTimeout))
                   } yield {
                     val resultsPath = (baseURI.path |+| Some("/data/fs/" +
-                            fullPath.path)).map(_.replaceAll("//", "/"))
+                              fullPath.path)).map(_.replaceAll("//", "/"))
                     val locationHeader =
                       Location(baseURI.copy(path = resultsPath))
                     HttpResponse[JValue](Accepted,

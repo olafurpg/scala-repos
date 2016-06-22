@@ -241,8 +241,7 @@ private[akka] class SimpleOutputs(val actor: ActorRef, val pump: Pump)
       } else {
         downstreamDemand += elements
         if (downstreamDemand < 1)
-          downstreamDemand =
-            Long.MaxValue // Long overflow, Reactive Streams Spec 3:17: effectively unbounded
+          downstreamDemand = Long.MaxValue // Long overflow, Reactive Streams Spec 3:17: effectively unbounded
         pump.pump()
       }
     case Cancel(subscription) ⇒
@@ -262,11 +261,11 @@ private[akka] abstract class ActorProcessorImpl(
     with ActorLogging
     with Pump {
 
-  protected val primaryInputs: Inputs = new BatchingInputBuffer(
-      settings.initialInputBufferSize, this) {
-    override def inputOnError(e: Throwable): Unit =
-      ActorProcessorImpl.this.onError(e)
-  }
+  protected val primaryInputs: Inputs =
+    new BatchingInputBuffer(settings.initialInputBufferSize, this) {
+      override def inputOnError(e: Throwable): Unit =
+        ActorProcessorImpl.this.onError(e)
+    }
 
   protected val primaryOutputs: Outputs = new SimpleOutputs(self, this)
 

@@ -32,8 +32,8 @@ import org.apache.spark.util.{ThreadUtils, Utils}
 /**
   * Runs a thread pool that deserializes and remotely fetches (if necessary) task results.
   */
-private[spark] class TaskResultGetter(
-    sparkEnv: SparkEnv, scheduler: TaskSchedulerImpl)
+private[spark] class TaskResultGetter(sparkEnv: SparkEnv,
+                                      scheduler: TaskSchedulerImpl)
     extends Logging {
 
   private val THREADS = sparkEnv.conf.getInt("spark.resultGetter.threads", 4)
@@ -82,8 +82,10 @@ private[spark] class TaskResultGetter(
                   /* We won't be able to get the task result if the machine that ran the task failed
                    * between when the task ended and when we tried to fetch the result, or if the
                    * block manager had to flush the result. */
-                  scheduler.handleFailedTask(
-                      taskSetManager, tid, TaskState.FINISHED, TaskResultLost)
+                  scheduler.handleFailedTask(taskSetManager,
+                                             tid,
+                                             TaskState.FINISHED,
+                                             TaskResultLost)
                   return
                 }
                 val deserializedResult = serializer
@@ -100,8 +102,9 @@ private[spark] class TaskResultGetter(
           result.accumUpdates = result.accumUpdates.map {
             a =>
               if (a.name == Some(InternalAccumulator.RESULT_SIZE)) {
-                assert(a.update == Some(0L),
-                       "task result size should not have been set on the executors")
+                assert(
+                    a.update == Some(0L),
+                    "task result size should not have been set on the executors")
                 a.copy(update = Some(size.toLong))
               } else {
                 a
@@ -144,7 +147,7 @@ private[spark] class TaskResultGetter(
               // if we can't deserialize the reason.
               logError(
                   "Could not deserialize TaskEndReason: ClassNotFound with classloader " +
-                  loader)
+                    loader)
             case ex: Exception => {}
           }
           scheduler.handleFailedTask(taskSetManager, tid, taskState, reason)

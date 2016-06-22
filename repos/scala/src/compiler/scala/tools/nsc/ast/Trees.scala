@@ -120,8 +120,10 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
   class StrictTreeCopier extends super.StrictTreeCopier with TreeCopier {
     def DocDef(tree: Tree, comment: DocComment, definition: Tree) =
       new DocDef(comment, definition).copyAttrs(tree)
-    def SelectFromArray(
-        tree: Tree, qualifier: Tree, selector: Name, erasure: Type) =
+    def SelectFromArray(tree: Tree,
+                        qualifier: Tree,
+                        selector: Name,
+                        erasure: Type) =
       new SelectFromArray(qualifier, selector, erasure).copyAttrs(tree)
     def InjectDerivedValue(tree: Tree, arg: Tree) =
       new InjectDerivedValue(arg).copyAttrs(tree)
@@ -139,8 +141,10 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
           t
         case _ => this.treeCopy.DocDef(tree, comment, definition)
       }
-    def SelectFromArray(
-        tree: Tree, qualifier: Tree, selector: Name, erasure: Type) =
+    def SelectFromArray(tree: Tree,
+                        qualifier: Tree,
+                        selector: Name,
+                        erasure: Type) =
       tree match {
         case t @ SelectFromArray(qualifier0, selector0, _)
             if (qualifier0 == qualifier) && (selector0 == selector) =>
@@ -175,14 +179,16 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
     override def transformUnit(unit: CompilationUnit): Unit = {}
   }
 
-  override protected def xtransform(
-      transformer: super.Transformer, tree: Tree): Tree = tree match {
+  override protected def xtransform(transformer: super.Transformer,
+                                    tree: Tree): Tree = tree match {
     case DocDef(comment, definition) =>
-      transformer.treeCopy.DocDef(
-          tree, comment, transformer.transform(definition))
+      transformer.treeCopy
+        .DocDef(tree, comment, transformer.transform(definition))
     case SelectFromArray(qualifier, selector, erasure) =>
-      transformer.treeCopy.SelectFromArray(
-          tree, transformer.transform(qualifier), selector, erasure)
+      transformer.treeCopy.SelectFromArray(tree,
+                                           transformer.transform(qualifier),
+                                           selector,
+                                           erasure)
     case InjectDerivedValue(arg) =>
       transformer.treeCopy.InjectDerivedValue(tree, transformer.transform(arg))
     case TypeTreeWithDeferredRefCheck() =>
@@ -293,7 +299,7 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
                 else {
                   val refersToLocalSymbols =
                     tpt.tpe != null &&
-                    (tpt.tpe exists (tp => locals contains tp.typeSymbol))
+                      (tpt.tpe exists (tp => locals contains tp.typeSymbol))
                   val isInferred = tpt.wasEmpty
                   if (refersToLocalSymbols || isInferred) {
                     tpt.duplicate.clearType()
@@ -333,7 +339,7 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
                   val sym = dupl.symbol
                   val vetoScope =
                     !brutally && !(locals contains sym) &&
-                    !(locals contains sym.deSkolemize)
+                      !(locals contains sym.deSkolemize)
                   val vetoThis = dupl.isInstanceOf[This] && sym.isPackageClass
                   if (!(vetoScope || vetoThis)) dupl.symbol = NoSymbol
                 }

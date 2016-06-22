@@ -180,10 +180,10 @@ object Memcached
       */
     val defaultParams: Stack.Params =
       StackClient.defaultParams +
-      FailureAccrualFactory.Param(defaultFailureAccrualPolicy) +
-      FailFastFactory.FailFast(false) +
-      LoadBalancerFactory.Param(Balancers.p2cPeakEwma()) +
-      finagle.param.ProtocolLibrary(ProtocolLibraryName)
+        FailureAccrualFactory.Param(defaultFailureAccrualPolicy) +
+        FailFastFactory.FailFast(false) +
+        LoadBalancerFactory.Param(Balancers.p2cPeakEwma()) +
+        finagle.param.ProtocolLibrary(ProtocolLibraryName)
 
     /**
       * A default client stack which supports the pipelined memcached client.
@@ -228,9 +228,9 @@ object Memcached
     * A memcached client with support for pipelined requests, consistent hashing,
     * and per-node load-balancing.
     */
-  case class Client(
-      stack: Stack[ServiceFactory[Command, Response]] = Client.newStack,
-      params: Stack.Params = Client.defaultParams)
+  case class Client(stack: Stack[ServiceFactory[Command, Response]] =
+                      Client.newStack,
+                    params: Stack.Params = Client.defaultParams)
       extends StdStackClient[Command, Response, Client]
       with WithConcurrentLoadBalancer[Client]
       with MemcachedRichClient {
@@ -257,10 +257,9 @@ object Memcached
       )
 
     def newTwemcacheClient(dest: Name, label: String): TwemcacheClient = {
-      val _dest =
-        if (LocalMemcached.enabled) {
-          Resolver.eval(mkDestination("localhost", LocalMemcached.port))
-        } else dest
+      val _dest = if (LocalMemcached.enabled) {
+        Resolver.eval(mkDestination("localhost", LocalMemcached.port))
+      } else dest
 
       // Memcache only support Name.Bound names (TRFC-162).
       // See KetamaPartitionedClient for more details.
@@ -283,16 +282,19 @@ object Memcached
         val key = KetamaClientKey.fromCacheNode(node)
         val stk = stack.replace(
             FailureAccrualFactory.role,
-            KetamaFailureAccrualFactory.module[Command, Response](
-                key, healthBroker))
+            KetamaFailureAccrualFactory
+              .module[Command, Response](key, healthBroker))
         withStack(stk).newService(mkDestination(node.host, node.port), label)
       }
 
       val group = CacheNodeGroup.fromVarAddr(va)
       val scopedSr = sr.scope(label)
-      new KetamaPartitionedClient(
-          group, newService, healthBroker, scopedSr, hasher, numReps)
-      with TwemcachePartitionedClient
+      new KetamaPartitionedClient(group,
+                                  newService,
+                                  healthBroker,
+                                  scopedSr,
+                                  hasher,
+                                  numReps) with TwemcachePartitionedClient
     }
 
     /**
@@ -377,9 +379,9 @@ object Memcached
       StackServer.defaultParams + finagle.param.ProtocolLibrary("memcached")
   }
 
-  case class Server(
-      stack: Stack[ServiceFactory[Command, Response]] = StackServer.newStack,
-      params: Stack.Params = Server.defaultParams)
+  case class Server(stack: Stack[ServiceFactory[Command, Response]] =
+                      StackServer.newStack,
+                    params: Stack.Params = Server.defaultParams)
       extends StdStackServer[Command, Response, Server] {
 
     protected def copy1(

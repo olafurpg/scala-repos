@@ -67,8 +67,8 @@ object RandomForestClassificationExample {
 
     // Save and load model
     model.save(sc, "target/tmp/myRandomForestClassificationModel")
-    val sameModel = RandomForestModel.load(
-        sc, "target/tmp/myRandomForestClassificationModel")
+    val sameModel = RandomForestModel
+      .load(sc, "target/tmp/myRandomForestClassificationModel")
     // $example off$
   }
 }

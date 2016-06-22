@@ -68,17 +68,20 @@ object MongoScheduleStorage {
 
     val storage = new MongoScheduleStorage(mongo, database, settings)
 
-    val dbStop = Stoppable.fromFuture(
-        database.disconnect.fallbackTo(Future(())) flatMap { _ =>
-      mongo.close
-    })
+    val dbStop =
+      Stoppable.fromFuture(database.disconnect.fallbackTo(Future(())) flatMap {
+        _ =>
+          mongo.close
+      })
 
     (storage, dbStop)
   }
 }
 
-class MongoScheduleStorage private[MongoScheduleStorage](
-    mongo: Mongo, database: Database, settings: MongoScheduleStorageSettings)(
+class MongoScheduleStorage private[MongoScheduleStorage] (
+    mongo: Mongo,
+    database: Database,
+    settings: MongoScheduleStorageSettings)(
     implicit executor: ExecutionContext)
     extends ScheduleStorage[Future]
     with Logging {
@@ -108,7 +111,9 @@ class MongoScheduleStorage private[MongoScheduleStorage](
           _ <- database(
                   remove.from(settings.tasks) where (".id" === id.toString))
         } yield {
-          taskjv.validated[ScheduledTask].disjunction leftMap { _.message } map {
+          taskjv
+            .validated[ScheduledTask]
+            .disjunction leftMap { _.message } map {
             Some(_)
           }
         }
@@ -120,7 +125,8 @@ class MongoScheduleStorage private[MongoScheduleStorage](
   }
 
   def reportRun(report: ScheduledRunReport) =
-    database(insert(report.serialize.asInstanceOf[JObject])
+    database(
+        insert(report.serialize.asInstanceOf[JObject])
           .into(settings.reports)) map { _ =>
       PrecogUnit
     }
@@ -129,7 +135,9 @@ class MongoScheduleStorage private[MongoScheduleStorage](
     database(selectOne().from(settings.tasks).where(".id" === id.toString)) flatMap {
       taskOpt =>
         database(
-            selectAll.from(settings.reports).where(".id" === id.toString) /* TODO: limit */ ) map {
+            selectAll
+              .from(settings.reports)
+              .where(".id" === id.toString) /* TODO: limit */ ) map {
           history =>
             taskOpt map { task =>
               (task.deserialize[ScheduledTask], history.toSeq map {

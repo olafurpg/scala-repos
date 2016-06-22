@@ -10,8 +10,8 @@ object Test extends Properties("Array") {
 
   /** At this moment the authentic scalacheck Array Builder/Arb bits are commented out.
     */
-  implicit def arbArray[T](
-      implicit a: Arbitrary[T], m: Manifest[T]): Arbitrary[Array[T]] =
+  implicit def arbArray[T](implicit a: Arbitrary[T],
+                           m: Manifest[T]): Arbitrary[Array[T]] =
     Arbitrary(containerOf[List, T](arbitrary[T]) map (_.toArray))
 
   val arrGen: Gen[Array[_]] = oneOf(

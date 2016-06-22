@@ -59,8 +59,8 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
              Literal(384)),
         DigestUtils.sha384Hex(Array[Byte](1, 2, 3, 4, 5, 6)))
     // unsupported bit length
-    checkEvaluation(
-        Sha2(Literal.create(null, BinaryType), Literal(1024)), null)
+    checkEvaluation(Sha2(Literal.create(null, BinaryType), Literal(1024)),
+                    null)
     checkEvaluation(Sha2(Literal.create(null, BinaryType), Literal(512)), null)
     checkEvaluation(Sha2(Literal("ABC".getBytes(StandardCharsets.UTF_8)),
                          Literal.create(null, IntegerType)),
@@ -71,8 +71,8 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test("crc32") {
-    checkEvaluation(
-        Crc32(Literal("ABC".getBytes(StandardCharsets.UTF_8))), 2743272264L)
+    checkEvaluation(Crc32(Literal("ABC".getBytes(StandardCharsets.UTF_8))),
+                    2743272264L)
     checkEvaluation(
         Crc32(Literal.create(Array[Byte](1, 2, 3, 4, 5, 6), BinaryType)),
         2180413220L)
@@ -154,8 +154,8 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
             case (value, dt) => Literal.create(value, dt)
           }
         // Only test the interpreted version has same result with codegen version.
-        checkEvaluation(
-            Murmur3Hash(literals, seed), Murmur3Hash(literals, seed).eval())
+        checkEvaluation(Murmur3Hash(literals, seed),
+                        Murmur3Hash(literals, seed).eval())
       }
     }
   }

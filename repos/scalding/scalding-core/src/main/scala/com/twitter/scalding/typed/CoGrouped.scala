@@ -150,8 +150,7 @@ trait CoGrouped[K, +R]
     with WithDescription[CoGrouped[K, R]] {
   override def withReducers(reds: Int) = {
     val self = this // the usual self => trick leads to serialization errors
-    val joinF =
-      joinFunction // can't access this on self, since it is protected
+    val joinF = joinFunction // can't access this on self, since it is protected
     new CoGrouped[K, R] {
       def inputs = self.inputs
       def reducers = Some(reds)
@@ -163,8 +162,7 @@ trait CoGrouped[K, +R]
 
   override def withDescription(description: String) = {
     val self = this // the usual self => trick leads to serialization errors
-    val joinF =
-      joinFunction // can't access this on self, since it is protected
+    val joinF = joinFunction // can't access this on self, since it is protected
     new CoGrouped[K, R] {
       def inputs = self.inputs
       def reducers = self.reducers
@@ -186,8 +184,7 @@ trait CoGrouped[K, +R]
   // Filter the keys before doing the join
   override def filterKeys(fn: K => Boolean): CoGrouped[K, R] = {
     val self = this // the usual self => trick leads to serialization errors
-    val joinF =
-      joinFunction // can't access this on self, since it is protected
+    val joinF = joinFunction // can't access this on self, since it is protected
     new CoGrouped[K, R] {
       val inputs = self.inputs.map(_.filterKeys(fn))
       def reducers = self.reducers
@@ -200,8 +197,7 @@ trait CoGrouped[K, +R]
   override def mapGroup[R1](
       fn: (K, Iterator[R]) => Iterator[R1]): CoGrouped[K, R1] = {
     val self = this // the usual self => trick leads to serialization errors
-    val joinF =
-      joinFunction // can't access this on self, since it is protected
+    val joinF = joinFunction // can't access this on self, since it is protected
     new CoGrouped[K, R1] {
       def inputs = self.inputs
       def reducers = self.reducers
@@ -254,14 +250,15 @@ trait CoGrouped[K, +R]
               * not repeated. That case is below
               */
             val NUM_OF_SELF_JOINS = firstCount - 1
-            new CoGroup(
-                assignName(inputs.head.toPipe[(K, Any)](("key", "value"))(
-                        flowDef, mode, tupset)),
-                ordKeyField,
-                NUM_OF_SELF_JOINS,
-                outFields(firstCount),
-                WrappedJoiner(new DistinctCoGroupJoiner(
-                        firstCount, Grouped.keyGetter(ord), joinFunction)))
+            new CoGroup(assignName(inputs.head.toPipe[(K, Any)](
+                                ("key", "value"))(flowDef, mode, tupset)),
+                        ordKeyField,
+                        NUM_OF_SELF_JOINS,
+                        outFields(firstCount),
+                        WrappedJoiner(
+                            new DistinctCoGroupJoiner(firstCount,
+                                                      Grouped.keyGetter(ord),
+                                                      joinFunction)))
           } else if (firstCount == 1) {
 
             def keyId(idx: Int): String = "key%d".format(idx)
@@ -273,7 +270,9 @@ trait CoGrouped[K, +R]
               */
             def renamePipe(idx: Int, p: TypedPipe[(K, Any)]): Pipe =
               p.toPipe[(K, Any)](List(keyId(idx), "value%d".format(idx)))(
-                  flowDef, mode, tupset)
+                  flowDef,
+                  mode,
+                  tupset)
 
             // This is tested for the properties we need (non-reordering)
             val distincts = CoGrouped.distinctBy(inputs)(identity)
@@ -303,18 +302,22 @@ trait CoGrouped[K, +R]
                     idx -> distincts.indexWhere(_ == item)
                 }.toMap
 
-                new CoGroupedJoiner(
-                    isize, Grouped.keyGetter(ord), joinFunction) {
+                new CoGroupedJoiner(isize,
+                                    Grouped.keyGetter(ord),
+                                    joinFunction) {
                   val distinctSize = dsize
                   def distinctIndexOf(orig: Int) = mapping(orig)
                 }
               } else {
-                new DistinctCoGroupJoiner(
-                    isize, Grouped.keyGetter(ord), joinFunction)
+                new DistinctCoGroupJoiner(isize,
+                                          Grouped.keyGetter(ord),
+                                          joinFunction)
               }
 
-            new CoGroup(
-                pipes, groupFields, outFields(dsize), WrappedJoiner(cjoiner))
+            new CoGroup(pipes,
+                        groupFields,
+                        outFields(dsize),
+                        WrappedJoiner(cjoiner))
           } else {
 
             /**
@@ -323,8 +326,8 @@ trait CoGrouped[K, +R]
               */
             sys.error(
                 "Except for self joins, where you are joining something with only itself,\n" +
-                "left-most pipe can only appear once. Firsts: " +
-                inputs.collect { case x if x == inputs.head => x }.toString)
+                  "left-most pipe can only appear once. Firsts: " +
+                  inputs.collect { case x if x == inputs.head => x }.toString)
           }
       }
       /*
@@ -338,7 +341,9 @@ trait CoGrouped[K, +R]
       }
       //Construct the new TypedPipe
       TypedPipe.from[(K, R)](pipeWithRedAndDescriptions, ('key, 'value))(
-          flowDef, mode, tuple2Converter)
+          flowDef,
+          mode,
+          tuple2Converter)
     })
   }
 }

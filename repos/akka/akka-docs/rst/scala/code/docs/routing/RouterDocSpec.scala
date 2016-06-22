@@ -305,8 +305,8 @@ router-dispatcher {}
   class Parent extends Actor {
 
     //#paths
-    val paths = List(
-        "/user/workers/w1", "/user/workers/w2", "/user/workers/w3")
+    val paths =
+      List("/user/workers/w1", "/user/workers/w2", "/user/workers/w3")
     //#paths
 
     //#round-robin-pool-1
@@ -452,8 +452,8 @@ router-dispatcher {}
     //#consistent-hashing-pool-1
 
     //#consistent-hashing-pool-2
-    val router26: ActorRef = context.actorOf(
-        ConsistentHashingPool(5).props(Props[Worker]), "router26")
+    val router26: ActorRef = context
+      .actorOf(ConsistentHashingPool(5).props(Props[Worker]), "router26")
     //#consistent-hashing-pool-2
 
     //#consistent-hashing-group-1
@@ -473,7 +473,8 @@ router-dispatcher {}
     //#resize-pool-2
     val resizer = DefaultResizer(lowerBound = 2, upperBound = 15)
     val router30: ActorRef = context.actorOf(
-        RoundRobinPool(5, Some(resizer)).props(Props[Worker]), "router30")
+        RoundRobinPool(5, Some(resizer)).props(Props[Worker]),
+        "router30")
     //#resize-pool-2  
 
     //#optimal-size-exploring-resize-pool

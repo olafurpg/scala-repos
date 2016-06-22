@@ -46,7 +46,8 @@ import org.apache.spark.util.{ShutdownHookManager, Utils}
  * stopped by sbin/start-mesos-dispatcher and sbin/stop-mesos-dispatcher respectively.
  */
 private[mesos] class MesosClusterDispatcher(
-    args: MesosClusterDispatcherArguments, conf: SparkConf)
+    args: MesosClusterDispatcherArguments,
+    conf: SparkConf)
     extends Logging {
 
   private val publicAddress =
@@ -65,8 +66,8 @@ private[mesos] class MesosClusterDispatcher(
 
   private val scheduler = new MesosClusterScheduler(engineFactory, conf)
 
-  private val server = new MesosRestServer(
-      args.host, args.port, conf, scheduler)
+  private val server =
+    new MesosRestServer(args.host, args.port, conf, scheduler)
   private val webUi = new MesosClusterUI(new SecurityManager(conf),
                                          args.webUiPort,
                                          conf,

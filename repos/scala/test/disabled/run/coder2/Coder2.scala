@@ -14,8 +14,8 @@ class SeqCoder(words: List[String]) {
 
   /** Invert the mnemonics map to give a map from chars 'A' ... 'Z' to '2' ... '9' */
   private val charCode: Map[Char, Char] = for ((digit, letters) <- m;
-                                               letter <- letters) yield
-    letter -> digit
+                                               letter <- letters)
+    yield letter -> digit
 
   /** Maps a word to the digit string it represents, 
     * e.g. `Java` -> `5282`  */
@@ -25,7 +25,8 @@ class SeqCoder(words: List[String]) {
     *  them e.g. `5282` -> List(`Java`, `Kata`, `Lava`, ...)
     */
   val wordsForNum: Map[String, Seq[String]] =
-    (words groupBy wordCode).map(t => (t._1, t._2.toSeq)) withDefaultValue Seq()
+    (words groupBy wordCode)
+      .map(t => (t._1, t._2.toSeq)) withDefaultValue Seq()
 
   val memo = collection.mutable.Map[String, Set[Seq[String]]]("" -> Set(Seq()))
   val wfnmemo = collection.mutable.Map[(String, String), Set[Seq[String]]]()
@@ -77,8 +78,8 @@ class ParCoder(words: List[String]) {
 
   /** Invert the mnemnonics map to give a map from chars 'A' ... 'Z' to '2' ... '9' */
   private val charCode: Map[Char, Char] = for ((digit, letters) <- m;
-                                               letter <- letters) yield
-    letter -> digit
+                                               letter <- letters)
+    yield letter -> digit
 
   /** Maps a word to the digit string it represents, 
     * e.g. `Java` -> `5282`  */
@@ -88,7 +89,8 @@ class ParCoder(words: List[String]) {
     *  them e.g. `5282` -> List(`Java`, `Kata`, `Lava`, ...)
     */
   val wordsForNum: Map[String, ParSeq[String]] =
-    (words groupBy wordCode).map(t => (t._1, t._2.toSeq.par)) withDefaultValue ParSeq()
+    (words groupBy wordCode)
+      .map(t => (t._1, t._2.toSeq.par)) withDefaultValue ParSeq()
 
   val comparison = new SeqCoder(words)
 
@@ -117,20 +119,25 @@ class ParCoder(words: List[String]) {
       r
     }
 
-  def assertSubs(
-      num: String, subsfrom: String, word: String, r: ParSet[ParSeq[String]]) {
+  def assertSubs(num: String,
+                 subsfrom: String,
+                 word: String,
+                 r: ParSet[ParSeq[String]]) {
     val m = comparison.subsmemo((num, subsfrom, word))
     if (r != m) {
-      println("map for number from subs and word: " + num + ", " + subsfrom +
-          ", " + word)
+      println(
+          "map for number from subs and word: " + num + ", " + subsfrom +
+            ", " + word)
       println("parset: " + r.size)
       println("memoed: " + m.size)
       error("r != m")
     }
   }
 
-  def assertWfn(
-      num: String, split: String, dropped: String, r: ParSeq[ParSeq[String]]) {
+  def assertWfn(num: String,
+                split: String,
+                dropped: String,
+                r: ParSeq[ParSeq[String]]) {
     val m = comparison.wfnmemo((num, split))
     val rs = r.toSet.par
     val words: ParSeq[String] = wordsForNum(split)
@@ -144,8 +151,8 @@ class ParCoder(words: List[String]) {
         val r2: ParSeq[ParSeq[String]] = words.flatMap(word => {
           val subs: ParSet[ParSeq[String]] = encode(dropped)
           println("subs size for '" + dropped + "': " + subs.size)
-          val subsmapped: ParSet[ParSeq[String]] = subs.map(rest =>
-                word +: rest)
+          val subsmapped: ParSet[ParSeq[String]] =
+            subs.map(rest => word +: rest)
           println("map size: " + subsmapped.size)
           subsmapped.toList
         })

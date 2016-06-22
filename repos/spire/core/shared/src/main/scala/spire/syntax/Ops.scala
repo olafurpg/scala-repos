@@ -337,8 +337,8 @@ final class LiteralLongEuclideanRingOps(val lhs: Long) extends AnyVal {
     ev.quot(c.fromLong(lhs), rhs)
   def %[A](rhs: A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A =
     ev.mod(c.fromLong(lhs), rhs)
-  def /%[A](rhs: A)(
-      implicit ev: EuclideanRing[A], c: ConvertableTo[A]): (A, A) =
+  def /%[A](rhs: A)(implicit ev: EuclideanRing[A],
+                    c: ConvertableTo[A]): (A, A) =
     ev.quotmod(c.fromLong(lhs), rhs)
 }
 
@@ -612,8 +612,8 @@ final class TorsorPointOps[P](lhs: P) {
     .binopWithEv[P, MultiplicativeTorsor[P, G], G]
 }
 
-final class IntervalPointOps[A](lhs: A)(
-    implicit o: Order[A], ev: AdditiveGroup[A]) {
+final class IntervalPointOps[A](lhs: A)(implicit o: Order[A],
+                                        ev: AdditiveGroup[A]) {
   def ±(rhs: A): Interval[A] =
     Interval(ev.minus(lhs, rhs), ev.plus(lhs, rhs))
   def +/-(rhs: A): Interval[A] =

@@ -17,14 +17,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
   * @since 2/3/13
   */
 class ScLiteralExpressionTokenizer extends Tokenizer[ScLiteral] {
-  def processTextWithEscapeSequences(
-      element: ScLiteral, text: String, consumer: TokenConsumer) {
+  def processTextWithEscapeSequences(element: ScLiteral,
+                                     text: String,
+                                     consumer: TokenConsumer) {
     val unEscapedText: StringBuilder = new StringBuilder
     val offsets: Array[Int] = new Array[Int](text.length + 1)
-    PsiLiteralExpressionImpl.parseStringCharacters(
-        text, unEscapedText, offsets)
-    EscapeSequenceTokenizer.processTextWithOffsets(
-        element, consumer, unEscapedText, offsets, 1)
+    PsiLiteralExpressionImpl
+      .parseStringCharacters(text, unEscapedText, offsets)
+    EscapeSequenceTokenizer
+      .processTextWithOffsets(element, consumer, unEscapedText, offsets, 1)
   }
 
   def tokenize(element: ScLiteral, consumer: TokenConsumer) {

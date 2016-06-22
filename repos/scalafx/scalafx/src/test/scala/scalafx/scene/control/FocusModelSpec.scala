@@ -40,7 +40,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class FocusModelSpec[T]
     extends SimpleSFXDelegateSpec[jfxsc.FocusModel[T], FocusModel[T]](
-        classOf[jfxsc.FocusModel[T]], classOf[FocusModel[T]]) {
+        classOf[jfxsc.FocusModel[T]],
+        classOf[FocusModel[T]]) {
 
   override def getScalaClassInstance =
     new FocusModel[T](this.getJavaClassInstance) {}

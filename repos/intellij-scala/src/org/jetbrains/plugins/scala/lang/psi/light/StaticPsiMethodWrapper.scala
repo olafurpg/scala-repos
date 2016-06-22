@@ -12,8 +12,8 @@ import _root_.scala.collection.immutable.HashMap
   * @author Alefas
   * @since 27.02.12
   */
-class StaticPsiMethodWrapper private (
-    val method: PsiMethod, containingClass: PsiClass)
+class StaticPsiMethodWrapper private (val method: PsiMethod,
+                                      containingClass: PsiClass)
     extends LightMethodAdapter(method.getManager, method, containingClass)
     with LightScalaMethod {
   setNavigationElement(method)
@@ -49,8 +49,8 @@ object StaticPsiMethodWrapper {
   private val KEY: Key[HashMap[PsiClass, (StaticPsiMethodWrapper, Long)]] =
     Key.create("static.psi.method.wrapper.key")
 
-  def getWrapper(
-      method: PsiMethod, containingClass: PsiClass): StaticPsiMethodWrapper = {
+  def getWrapper(method: PsiMethod,
+                 containingClass: PsiClass): StaticPsiMethodWrapper = {
     var data = method.getUserData(KEY)
     if (data == null) {
       data = new HashMap()

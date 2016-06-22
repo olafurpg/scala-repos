@@ -115,8 +115,9 @@ object JSSE {
     new Engine(sslEngine)
   }
 
-  private[this] def client(
-      trustManagers: Array[TrustManager], host: String, port: Int): Engine = {
+  private[this] def client(trustManagers: Array[TrustManager],
+                           host: String,
+                           port: Int): Engine = {
     val ctx = SSLContext.getInstance(protocol)
     ctx.init(null, trustManagers, null)
     val sslEngine = ctx.createSSLEngine(host, port)

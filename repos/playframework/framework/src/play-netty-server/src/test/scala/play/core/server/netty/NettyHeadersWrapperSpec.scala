@@ -82,7 +82,7 @@ object NettyHeadersWrapperSpec extends Specification {
 
     "add headers" in {
       headers.add("a" -> "a3", "a" -> "a4").getAll("a") must_==
-        Seq("a1", "a2", "a3", "a4")
+      Seq("a1", "a2", "a3", "a4")
     }
 
     "remove headers by case insensitive" in {
@@ -92,7 +92,7 @@ object NettyHeadersWrapperSpec extends Specification {
 
     "replace headers by case insensitive" in {
       headers.replace("a" -> "a3", "A" -> "a4").getAll("a") must_==
-        Seq("a3", "a4")
+      Seq("a3", "a4")
     }
 
     "equal other Headers by case insensitive" in {

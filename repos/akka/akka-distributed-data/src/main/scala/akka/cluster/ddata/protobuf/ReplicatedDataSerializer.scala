@@ -71,15 +71,15 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
         ORSetKeyManifest -> (bytes ⇒ ORSetKey(keyIdFromBinary(bytes))),
         FlagKeyManifest -> (bytes ⇒ FlagKey(keyIdFromBinary(bytes))),
         LWWRegisterKeyManifest ->
-        (bytes ⇒ LWWRegisterKey(keyIdFromBinary(bytes))),
+          (bytes ⇒ LWWRegisterKey(keyIdFromBinary(bytes))),
         GCounterKeyManifest -> (bytes ⇒ GCounterKey(keyIdFromBinary(bytes))),
         PNCounterKeyManifest -> (bytes ⇒ PNCounterKey(keyIdFromBinary(bytes))),
         ORMapKeyManifest -> (bytes ⇒ ORMapKey(keyIdFromBinary(bytes))),
         LWWMapKeyManifest -> (bytes ⇒ LWWMapKey(keyIdFromBinary(bytes))),
         PNCounterMapKeyManifest ->
-        (bytes ⇒ PNCounterMapKey(keyIdFromBinary(bytes))),
+          (bytes ⇒ PNCounterMapKey(keyIdFromBinary(bytes))),
         ORMultiMapKeyManifest ->
-        (bytes ⇒ ORMultiMapKey(keyIdFromBinary(bytes))))
+          (bytes ⇒ ORMultiMapKey(keyIdFromBinary(bytes))))
 
   override def manifest(obj: AnyRef): String = obj match {
     case _: ORSet[_] ⇒ ORSetManifest
@@ -280,7 +280,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
     val b = rd.GCounter.newBuilder()
     gcounter.state.toVector.sortBy { case (address, _) ⇒ address }.foreach {
       case (address, value) ⇒
-        b.addEntries(rd.GCounter.Entry
+        b.addEntries(
+            rd.GCounter.Entry
               .newBuilder()
               .setNode(uniqueAddressToProto(address))
               .setValue(ByteString.copyFrom(value.toByteArray)))
@@ -292,7 +293,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
     gcounterFromProto(rd.GCounter.parseFrom(bytes))
 
   def gcounterFromProto(gcounter: rd.GCounter): GCounter = {
-    new GCounter(state = gcounter.getEntriesList.asScala.map(entry ⇒
+    new GCounter(
+        state = gcounter.getEntriesList.asScala.map(entry ⇒
               uniqueAddressFromProto(entry.getNode) -> BigInt(
                   entry.getValue.toByteArray))(breakOut))
   }
@@ -316,7 +318,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
     val b = rd.VersionVector.newBuilder()
     versionVector.versionsIterator.foreach {
       case (node, value) ⇒
-        b.addEntries(rd.VersionVector.Entry
+        b.addEntries(
+            rd.VersionVector.Entry
               .newBuilder()
               .setNode(uniqueAddressToProto(node))
               .setVersion(value))
@@ -346,7 +349,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
     val b = rd.ORMap.newBuilder().setKeys(orsetToProto(ormap.keys))
     ormap.entries.toVector.sortBy { case (key, _) ⇒ key }.foreach {
       case (key, value) ⇒
-        b.addEntries(rd.ORMap.Entry
+        b.addEntries(
+            rd.ORMap.Entry
               .newBuilder()
               .setKey(key)
               .setValue(otherMessageToProto(value)))
@@ -372,7 +376,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       rd.LWWMap.newBuilder().setKeys(orsetToProto(lwwmap.underlying.keys))
     lwwmap.underlying.entries.toVector.sortBy { case (key, _) ⇒ key }.foreach {
       case (key, value) ⇒
-        b.addEntries(rd.LWWMap.Entry
+        b.addEntries(
+            rd.LWWMap.Entry
               .newBuilder()
               .setKey(key)
               .setValue(lwwRegisterToProto(value)))
@@ -399,7 +404,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       .setKeys(orsetToProto(pncountermap.underlying.keys))
     pncountermap.underlying.entries.toVector.sortBy { case (key, _) ⇒ key }.foreach {
       case (key, value: PNCounter) ⇒
-        b.addEntries(rd.PNCounterMap.Entry
+        b.addEntries(
+            rd.PNCounterMap.Entry
               .newBuilder()
               .setKey(key)
               .setValue(pncounterToProto(value)))
@@ -426,7 +432,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       .setKeys(orsetToProto(multimap.underlying.keys))
     multimap.underlying.entries.toVector.sortBy { case (key, _) ⇒ key }.foreach {
       case (key, value) ⇒
-        b.addEntries(rd.ORMultiMap.Entry
+        b.addEntries(
+            rd.ORMultiMap.Entry
               .newBuilder()
               .setKey(key)
               .setValue(orsetToProto(value)))

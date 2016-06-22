@@ -244,14 +244,14 @@ private[kinesis] object KinesisTestUtils {
 private[kinesis] trait KinesisDataGenerator {
 
   /** Sends the data to Kinesis and returns the metadata for everything that has been sent. */
-  def sendData(
-      streamName: String, data: Seq[Int]): Map[String, Seq[(Int, String)]]
+  def sendData(streamName: String,
+               data: Seq[Int]): Map[String, Seq[(Int, String)]]
 }
 
 private[kinesis] class SimpleDataGenerator(client: AmazonKinesisClient)
     extends KinesisDataGenerator {
-  override def sendData(
-      streamName: String, data: Seq[Int]): Map[String, Seq[(Int, String)]] = {
+  override def sendData(streamName: String,
+                        data: Seq[Int]): Map[String, Seq[(Int, String)]] = {
     val shardIdToSeqNumbers =
       new mutable.HashMap[String, ArrayBuffer[(Int, String)]]()
     data.foreach { num =>
@@ -265,8 +265,8 @@ private[kinesis] class SimpleDataGenerator(client: AmazonKinesisClient)
       val putRecordResult = client.putRecord(putRecordRequest)
       val shardId = putRecordResult.getShardId
       val seqNumber = putRecordResult.getSequenceNumber()
-      val sentSeqNumbers = shardIdToSeqNumbers.getOrElseUpdate(
-          shardId, new ArrayBuffer[(Int, String)]())
+      val sentSeqNumbers = shardIdToSeqNumbers
+        .getOrElseUpdate(shardId, new ArrayBuffer[(Int, String)]())
       sentSeqNumbers += ((num, seqNumber))
     }
 

@@ -65,8 +65,10 @@ class TopicCommandTest
     // modify the topic to add new partitions
     val numPartitionsModified = 3
     val alterOpts = new TopicCommandOptions(
-        Array(
-            "--partitions", numPartitionsModified.toString, "--topic", topic))
+        Array("--partitions",
+              numPartitionsModified.toString,
+              "--topic",
+              topic))
     TopicCommand.alterTopic(zkUtils, alterOpts)
     val newProps =
       AdminUtils.fetchEntityConfig(zkUtils, ConfigType.Topic, topic)
@@ -227,8 +229,11 @@ class TopicCommandTest
       case (tp, replicas) =>
         tp.partition -> replicas
     }
-    checkReplicaDistribution(
-        assignment, rackInfo, rackInfo.size, numPartitions, replicationFactor)
+    checkReplicaDistribution(assignment,
+                             rackInfo,
+                             rackInfo.size,
+                             numPartitions,
+                             replicationFactor)
 
     val alteredNumPartitions = 36
     // verify that adding partitions will also be rack aware

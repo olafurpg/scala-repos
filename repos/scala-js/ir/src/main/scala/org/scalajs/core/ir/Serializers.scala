@@ -648,9 +648,10 @@ object Serializers {
         case TagApply =>
           Apply(readTree(), readIdent(), readTrees())(readType())
         case TagApplyStatically =>
-          val result1 = ApplyStatically(
-              readTree(), readClassType(), readIdent(), readTrees())(
-              readType())
+          val result1 = ApplyStatically(readTree(),
+                                        readClassType(),
+                                        readIdent(),
+                                        readTrees())(readType())
           if (useHacks065 && result1.tpe != NoType &&
               isConstructorName(result1.method.name)) result1.copy()(NoType)
           else result1
@@ -681,8 +682,10 @@ object Serializers {
         case TagJSSuperBracketSelect =>
           JSSuperBracketSelect(readClassType(), readTree(), readTree())
         case TagJSSuperBracketCall =>
-          JSSuperBracketCall(
-              readClassType(), readTree(), readTree(), readTrees())
+          JSSuperBracketCall(readClassType(),
+                             readTree(),
+                             readTree(),
+                             readTrees())
         case TagJSSuperConstructorCall => JSSuperConstructorCall(readTrees())
         case TagLoadJSConstructor => LoadJSConstructor(readClassType())
         case TagLoadJSModule => LoadJSModule(readClassType())
@@ -730,17 +733,16 @@ object Serializers {
           val parents = readIdents()
           val jsName = Some(readString()).filter(_ != "")
           val defs0 = readTrees()
-          val defs =
-            if (useHacks065) {
-              defs0.filter {
-                case MethodDef(_, Ident(name, _), _, _, _) =>
-                  !Definitions.isReflProxyName(name)
-                case _ =>
-                  true
-              }
-            } else {
-              defs0
+          val defs = if (useHacks065) {
+            defs0.filter {
+              case MethodDef(_, Ident(name, _), _, _, _) =>
+                !Definitions.isReflProxyName(name)
+              case _ =>
+                true
             }
+          } else {
+            defs0
+          }
           val optimizerHints = new OptimizerHints(readInt())
           ClassDef(name, kind, superClass, parents, jsName, defs)(
               optimizerHints)
@@ -766,17 +768,17 @@ object Serializers {
                       readParamDefs(),
                       readType(),
                       readTree())(new OptimizerHints(readInt()), optHash)
-          val result2 =
-            if (foundArguments) {
-              foundArguments = false
-              new RewriteArgumentsTransformer().transformMethodDef(result1)
-            } else {
-              result1
-            }
+          val result2 = if (foundArguments) {
+            foundArguments = false
+            new RewriteArgumentsTransformer().transformMethodDef(result1)
+          } else {
+            result1
+          }
           if (useHacks065 && result2.resultType != NoType &&
               isConstructorName(result2.name.name)) {
             result2.copy(resultType = NoType, body = result2.body)(
-                result2.optimizerHints, result2.hash)(result2.pos)
+                result2.optimizerHints,
+                result2.hash)(result2.pos)
           } else {
             result2
           }
@@ -786,8 +788,8 @@ object Serializers {
                       readTree().asInstanceOf[ParamDef],
                       readTree())
         case TagConstructorExportDef =>
-          val result = ConstructorExportDef(
-              readString(), readParamDefs(), readTree())
+          val result =
+            ConstructorExportDef(readString(), readParamDefs(), readTree())
           if (foundArguments) {
             foundArguments = false
             new RewriteArgumentsTransformer()
@@ -882,42 +884,38 @@ object Serializers {
 
       val first = readByte()
 
-      val result =
-        if (first == FormatNoPositionValue) {
-          Position.NoPosition
+      val result = if (first == FormatNoPositionValue) {
+        Position.NoPosition
+      } else {
+        val result = if ((first & FormatFullMask) == FormatFullMaskValue) {
+          val file = files(readInt())
+          val line = readInt()
+          val column = readInt()
+          Position(file, line, column)
         } else {
-          val result =
-            if ((first & FormatFullMask) == FormatFullMaskValue) {
-              val file = files(readInt())
-              val line = readInt()
-              val column = readInt()
-              Position(file, line, column)
-            } else {
-              assert(lastPosition != NoPosition,
-                     "Position format error: first position must be full")
-              if ((first & Format1Mask) == Format1MaskValue) {
-                val columnDiff = first >> Format1Shift
-                Position(lastPosition.source,
-                         lastPosition.line,
-                         lastPosition.column + columnDiff)
-              } else if ((first & Format2Mask) == Format2MaskValue) {
-                val lineDiff = first >> Format2Shift
-                val column = readByte() & 0xff // unsigned
-                Position(
-                    lastPosition.source, lastPosition.line + lineDiff, column)
-              } else {
-                assert(
-                    (first & Format3Mask) == Format3MaskValue,
-                    s"Position format error: first byte $first does not match any format")
-                val lineDiff = readShort()
-                val column = readByte() & 0xff // unsigned
-                Position(
-                    lastPosition.source, lastPosition.line + lineDiff, column)
-              }
-            }
-          lastPosition = result
-          result
+          assert(lastPosition != NoPosition,
+                 "Position format error: first position must be full")
+          if ((first & Format1Mask) == Format1MaskValue) {
+            val columnDiff = first >> Format1Shift
+            Position(lastPosition.source,
+                     lastPosition.line,
+                     lastPosition.column + columnDiff)
+          } else if ((first & Format2Mask) == Format2MaskValue) {
+            val lineDiff = first >> Format2Shift
+            val column = readByte() & 0xff // unsigned
+            Position(lastPosition.source, lastPosition.line + lineDiff, column)
+          } else {
+            assert(
+                (first & Format3Mask) == Format3MaskValue,
+                s"Position format error: first byte $first does not match any format")
+            val lineDiff = readShort()
+            val column = readByte() & 0xff // unsigned
+            Position(lastPosition.source, lastPosition.line + lineDiff, column)
+          }
         }
+        lastPosition = result
+        result
+      }
 
       if (UseDebugMagic) {
         val magic = readInt()
@@ -961,7 +959,8 @@ object Serializers {
                 List(argumentsParamDef(tree.pos)),
                 resultType,
                 transform(body, isStat = resultType == NoType))(
-          tree.optimizerHints, None)(tree.pos)
+          tree.optimizerHints,
+          None)(tree.pos)
     }
 
     def transformConstructorExportDef(

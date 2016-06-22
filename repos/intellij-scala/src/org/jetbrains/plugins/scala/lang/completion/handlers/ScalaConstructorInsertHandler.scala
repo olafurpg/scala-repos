@@ -66,7 +66,8 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
             c.secondaryConstructors.foreach(fun =>
                   if (fun.parameters.nonEmpty) hasNonEmptyParams = true)
           case _ =>
-            clazz.getConstructors.foreach(meth =>
+            clazz.getConstructors.foreach(
+                meth =>
                   if (meth.getParameterList.getParametersCount > 0)
                     hasNonEmptyParams = true)
         }
@@ -102,8 +103,8 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
           .commitDocument(document)
         val file = context.getFile
         val element = file.findElementAt(endOffset - 1)
-        val newT = PsiTreeUtil.getParentOfType(
-            element, classOf[ScNewTemplateDefinition])
+        val newT = PsiTreeUtil
+          .getParentOfType(element, classOf[ScNewTemplateDefinition])
         if (newT != null) {
           newT.extendsBlock.templateParents match {
             case Some(tp: ScTemplateParents) =>
@@ -124,9 +125,8 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
                   if (item.prefixCompletion) {
                     val newRefText =
                       clazz.qualifiedName.split('.').takeRight(2).mkString(".")
-                    val newRef =
-                      ScalaPsiElementFactory.createReferenceFromText(
-                          newRefText, clazz.getManager)
+                    val newRef = ScalaPsiElementFactory
+                      .createReferenceFromText(newRefText, clazz.getManager)
                     val replaced = ref
                       .replace(newRef)
                       .asInstanceOf[ScStableCodeReferenceElement]

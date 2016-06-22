@@ -49,8 +49,8 @@ object LineChart {
     new LineChart[X, Y](new jfxsc.LineChart[X, Y](xAxis, yAxis, data))
 
   object SortingPolicy
-      extends SFXEnumDelegateCompanion[
-          jfxsc.LineChart.SortingPolicy, SortingPolicy] {
+      extends SFXEnumDelegateCompanion[jfxsc.LineChart.SortingPolicy,
+                                       SortingPolicy] {
 
     /**
       * The data should be left in the order defined by the list in [[scalafx.scene.chart.LineChart.data]] property.

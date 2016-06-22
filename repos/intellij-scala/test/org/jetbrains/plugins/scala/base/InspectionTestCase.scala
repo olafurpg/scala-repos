@@ -13,12 +13,12 @@ import scala.reflect.ClassTag
   */
 abstract class InspectionTestCase[T <: LocalInspectionTool: ClassTag]
     extends SimpleTestCase {
-  protected def assertHighlights(
-      @Language("Scala") code: String, highlights: Highlight*) {
+  protected def assertHighlights(@Language("Scala") code: String,
+                                 highlights: Highlight*) {
     Assert.assertEquals(
         highlights,
-        highlight(
-            code, implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]]))
+        highlight(code,
+                  implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]]))
   }
 
   protected def highlight(
@@ -36,7 +36,8 @@ abstract class InspectionTestCase[T <: LocalInspectionTool: ClassTag]
       }
       if (severity == Information) Seq.empty
       else
-        Seq(Highlight(it.getStartOffset,
+        Seq(
+            Highlight(it.getStartOffset,
                       it.getEndOffset,
                       it.getDescription,
                       severity))
@@ -53,6 +54,8 @@ abstract class InspectionTestCase[T <: LocalInspectionTool: ClassTag]
 
   protected case object Information extends Severity
 
-  protected case class Highlight(
-      begin: Int, end: Int, description: String, severity: Severity = Warning)
+  protected case class Highlight(begin: Int,
+                                 end: Int,
+                                 description: String,
+                                 severity: Severity = Warning)
 }

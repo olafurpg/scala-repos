@@ -171,41 +171,40 @@ package object runtime {
       val isNegative = v < 0
       val av = if (isNegative) -v else v
 
-      val absResult =
-        if (av >= SubnormalThreshold) {
-          val e0 = floor(log(av) / LN2)
-          // 1-bias <= e0 <= 1024
-          if (e0 > bias) {
-            // Overflow
-            Double.PositiveInfinity
-          } else {
-            val twoPowE0 = pow(2, e0)
-            val f0 = Bits.roundToEven(av / twoPowE0 * twoPowFbits)
-            if (f0 / twoPowFbits >= 2) {
-              //val e = e0 + 1.0 // not used
-              val f = 1.0
-              if (e0 > bias - 1) {
-                // === (e > bias) because e0 is whole
-                // Overflow
-                Double.PositiveInfinity
-              } else {
-                // Normalized case 1
-                val twoPowE = 2 * twoPowE0
-                twoPowE * (1.0 + (f - twoPowFbits) / twoPowFbits)
-              }
+      val absResult = if (av >= SubnormalThreshold) {
+        val e0 = floor(log(av) / LN2)
+        // 1-bias <= e0 <= 1024
+        if (e0 > bias) {
+          // Overflow
+          Double.PositiveInfinity
+        } else {
+          val twoPowE0 = pow(2, e0)
+          val f0 = Bits.roundToEven(av / twoPowE0 * twoPowFbits)
+          if (f0 / twoPowFbits >= 2) {
+            //val e = e0 + 1.0 // not used
+            val f = 1.0
+            if (e0 > bias - 1) {
+              // === (e > bias) because e0 is whole
+              // Overflow
+              Double.PositiveInfinity
             } else {
-              // Normalized case 2
-              // val e = e0 // not used
-              val f = f0
-              val twoPowE = twoPowE0
+              // Normalized case 1
+              val twoPowE = 2 * twoPowE0
               twoPowE * (1.0 + (f - twoPowFbits) / twoPowFbits)
             }
+          } else {
+            // Normalized case 2
+            // val e = e0 // not used
+            val f = f0
+            val twoPowE = twoPowE0
+            twoPowE * (1.0 + (f - twoPowFbits) / twoPowFbits)
           }
-        } else {
-          // Subnormal
-          val rounder = Float.MinPositiveValue.toDouble
-          Bits.roundToEven(av / rounder) * rounder
         }
+      } else {
+        // Subnormal
+        val rounder = Float.MinPositiveValue.toDouble
+        Bits.roundToEven(av / rounder) * rounder
+      }
 
       if (isNegative) -absResult else absResult
     }

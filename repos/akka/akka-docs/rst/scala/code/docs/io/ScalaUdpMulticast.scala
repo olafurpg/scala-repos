@@ -58,9 +58,9 @@ class Sender(iface: String, group: String, port: Int, msg: String)
 
   def receive = {
     case Udp.SimpleSenderReady => {
-        val remote = new InetSocketAddress(s"$group%$iface", port)
-        log.info("Sending message to {}", remote)
-        sender() ! Udp.Send(ByteString(msg), remote)
-      }
+      val remote = new InetSocketAddress(s"$group%$iface", port)
+      log.info("Sending message to {}", remote)
+      sender() ! Udp.Send(ByteString(msg), remote)
+    }
   }
 }

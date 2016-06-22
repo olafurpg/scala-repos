@@ -44,8 +44,11 @@ class ScalaRearranger
                                     groupingRules))
 
     val newInfo = new ScalaArrangementParseInfo
-    element.accept(new ScalaArrangementVisitor(
-            newInfo, document, Iterable(element.getTextRange), groupingRules))
+    element.accept(
+        new ScalaArrangementVisitor(newInfo,
+                                    document,
+                                    Iterable(element.getTextRange),
+                                    groupingRules))
     if (newInfo.entries.size != 1) {
       null
     } else {
@@ -59,8 +62,11 @@ class ScalaRearranger
                      settings: ArrangementSettings) = {
     UsageTrigger.trigger(ScalaRearranger.featureId)
     val info = new ScalaArrangementParseInfo
-    root.accept(new ScalaArrangementVisitor(
-            info, document, ranges, getGroupingRules(settings)))
+    root.accept(
+        new ScalaArrangementVisitor(info,
+                                    document,
+                                    ranges,
+                                    getGroupingRules(settings)))
     if (settings != null) {
       for (rule <- settings.getGroupings) {
         if (DEPENDENT_METHODS == rule.getGroupingType) {
@@ -114,8 +120,9 @@ class ScalaRearranger
   override def getSupportedGroupingTokens =
     seqAsJavaList(
         immutable.List(
-            new CompositeArrangementSettingsToken(
-                DEPENDENT_METHODS, BREADTH_FIRST, DEPTH_FIRST),
+            new CompositeArrangementSettingsToken(DEPENDENT_METHODS,
+                                                  BREADTH_FIRST,
+                                                  DEPTH_FIRST),
             new CompositeArrangementSettingsToken(JAVA_GETTERS_AND_SETTERS),
             new CompositeArrangementSettingsToken(SCALA_GETTERS_AND_SETTERS),
             new CompositeArrangementSettingsToken(
@@ -123,26 +130,28 @@ class ScalaRearranger
 
   override def getSupportedMatchingTokens =
     seqAsJavaList(
-        immutable.List(new CompositeArrangementSettingsToken(
-                           General.TYPE, scalaTypesValues.toList),
-                       new CompositeArrangementSettingsToken(
-                           General.MODIFIER, scalaModifiers.toList),
-                       new CompositeArrangementSettingsToken(
-                           General.ORDER, Order.KEEP, Order.BY_NAME)))
+        immutable.List(
+            new CompositeArrangementSettingsToken(General.TYPE,
+                                                  scalaTypesValues.toList),
+            new CompositeArrangementSettingsToken(General.MODIFIER,
+                                                  scalaModifiers.toList),
+            new CompositeArrangementSettingsToken(General.ORDER,
+                                                  Order.KEEP,
+                                                  Order.BY_NAME)))
 
-  override def isEnabled(
-      token: ArrangementSettingsToken, current: ArrangementMatchCondition) =
+  override def isEnabled(token: ArrangementSettingsToken,
+                         current: ArrangementMatchCondition) =
     (scalaTypesValues.contains(token) || supportedOrders.contains(token)) ||
-    (if (current != null) {
-       val tokenType = ArrangementUtil.parseType(current)
-       if (tokenType != null) {
-         tokensForType(tokenType).contains(token)
+      (if (current != null) {
+         val tokenType = ArrangementUtil.parseType(current)
+         if (tokenType != null) {
+           tokensForType(tokenType).contains(token)
+         } else {
+           commonModifiers.contains(token)
+         }
        } else {
          commonModifiers.contains(token)
-       }
-     } else {
-       commonModifiers.contains(token)
-     })
+       })
 
   override def buildMatcher(condition: ArrangementMatchCondition) =
     throw new IllegalArgumentException(
@@ -151,8 +160,8 @@ class ScalaRearranger
   override def getMutexes =
     seqAsJavaList(immutable.List(scalaAccessModifiersValues, scalaTypesValues))
 
-  private def setupUtilityMethods(
-      info: ScalaArrangementParseInfo, orderType: ArrangementSettingsToken) {
+  private def setupUtilityMethods(info: ScalaArrangementParseInfo,
+                                  orderType: ArrangementSettingsToken) {
     if (DEPTH_FIRST == orderType) {
       for (root <- info.getMethodDependencyRoots) {
         setupDepthFirstDependency(root)
@@ -216,8 +225,9 @@ object ScalaRearranger {
     if (conditions.length == 1) {
       ArrangementSectionRule.create(
           new StdArrangementMatchRule(
-              new StdArrangementEntryMatcher(new ArrangementAtomMatchCondition(
-                      conditions(0), conditions(0)))
+              new StdArrangementEntryMatcher(
+                  new ArrangementAtomMatchCondition(conditions(0),
+                                                    conditions(0)))
           )
       ) :: matchRules
     } else {
@@ -226,7 +236,8 @@ object ScalaRearranger {
         composite.addOperand(
             new ArrangementAtomMatchCondition(condition, condition))
       }
-      ArrangementSectionRule.create(new StdArrangementMatchRule(
+      ArrangementSectionRule.create(
+          new StdArrangementMatchRule(
               new StdArrangementEntryMatcher(composite))) :: matchRules
     }
   }
@@ -270,10 +281,10 @@ object ScalaRearranger {
       matchRules = addCondition(matchRules, CONSTRUCTOR, access)
     }
     matchRules = addCondition(matchRules, CONSTRUCTOR)
-    matchRules = addCondition(
-        matchRules, FUNCTION, PUBLIC, FINAL, OVERRIDE, IMPLICIT)
-    matchRules = addCondition(
-        matchRules, FUNCTION, PROTECTED, FINAL, OVERRIDE, IMPLICIT)
+    matchRules =
+      addCondition(matchRules, FUNCTION, PUBLIC, FINAL, OVERRIDE, IMPLICIT)
+    matchRules =
+      addCondition(matchRules, FUNCTION, PROTECTED, FINAL, OVERRIDE, IMPLICIT)
     for (access <- scalaAccessModifiersValues) {
       matchRules = addCondition(matchRules, FUNCTION, PUBLIC, FINAL, IMPLICIT)
     }
@@ -323,5 +334,6 @@ object ScalaRearranger {
   private val defaultSettings = getDefaultSettings
 
   private val SETTINGS_SERIALIZER = new DefaultArrangementSettingsSerializer(
-      new ScalaSettingsSerializerMixin(), defaultSettings)
+      new ScalaSettingsSerializerMixin(),
+      defaultSettings)
 }

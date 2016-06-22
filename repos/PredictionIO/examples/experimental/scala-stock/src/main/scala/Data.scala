@@ -95,9 +95,9 @@ object SaddleWrapper {
     val index = IndexTime(timeIndex: _*)
     val seriesList = tickerPriceSeq.map {
       case (ticker, price) => {
-          val series = Series(Vec(price), index)
-          (ticker, series)
-        }
+        val series = Series(Vec(price), index)
+        (ticker, series)
+      }
     }
     Frame(seriesList: _*)
   }

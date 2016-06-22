@@ -9,8 +9,10 @@ import org.apache.spark.rdd.RDD
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[TrainingData,
+                        EmptyEvaluationInfo,
+                        Query,
+                        EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -29,10 +31,10 @@ class DataSource(val dsp: DataSourceParams)
             User()
           } catch {
             case e: Exception => {
-                logger.error(s"Failed to get properties $properties of" +
+              logger.error(s"Failed to get properties $properties of" +
                     s" user $entityId. Exception: $e.")
-                throw e
-              }
+              throw e
+            }
           }
           (entityId, user)
       }
@@ -57,10 +59,10 @@ class DataSource(val dsp: DataSourceParams)
           }
         } catch {
           case e: Exception => {
-              logger.error(s"Cannot convert $event to FollowEvent." +
+            logger.error(s"Cannot convert $event to FollowEvent." +
                   s" Exception: $e.")
-              throw e
-            }
+            throw e
+          }
         }
         followEvent
       }
@@ -80,8 +82,7 @@ case class FollowEvent(user: String, followedUser: String, t: Long)
 class TrainingData(
     val users: RDD[(String, User)],
     val followEvents: RDD[FollowEvent]
-)
-    extends Serializable {
+) extends Serializable {
   override def toString = {
     s"users: [${users.count()} (${users.take(2).toList}...)]" +
     s"followEvents: [${followEvents.count()}] (${followEvents.take(2).toList}...)"

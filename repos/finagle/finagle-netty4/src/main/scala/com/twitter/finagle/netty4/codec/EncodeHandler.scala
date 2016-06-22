@@ -20,8 +20,9 @@ import io.netty.channel.ChannelHandler.Sharable
 private[netty4] class EncodeHandler[Out](frameEncoder: FrameEncoder[Out])
     extends ChannelOutboundHandlerAdapter {
 
-  override def write(
-      ctx: ChannelHandlerContext, msg: Any, promise: ChannelPromise): Unit = {
+  override def write(ctx: ChannelHandlerContext,
+                     msg: Any,
+                     promise: ChannelPromise): Unit = {
     val encoded = try { frameEncoder(msg.asInstanceOf[Out]) } catch {
       case NonFatal(e) =>
         ctx.pipeline.fireExceptionCaught(Failure("encoding failure", e))

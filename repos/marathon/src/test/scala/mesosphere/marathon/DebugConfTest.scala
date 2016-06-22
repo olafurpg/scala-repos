@@ -25,8 +25,8 @@ class DebugConfTest extends MarathonSpec {
   }
 
   test("tracing can be disabled") {
-    val conf = MarathonTestHelper.makeConfig(
-        "" + "--master", "127.0.0.1:5050", "--disable_tracing")
+    val conf = MarathonTestHelper
+      .makeConfig("" + "--master", "127.0.0.1:5050", "--disable_tracing")
     assert(!conf.enableDebugTracing)
   }
 

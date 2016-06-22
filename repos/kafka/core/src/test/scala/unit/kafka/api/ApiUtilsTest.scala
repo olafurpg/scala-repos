@@ -70,16 +70,16 @@ class ApiUtilsTest extends JUnitSuite {
       fail
     } catch {
       case e: KafkaException => {
-          // ok
-        }
+        // ok
+      }
     }
     try {
       ApiUtils.writeShortString(bb, s2)
       fail
     } catch {
       case e: KafkaException => {
-          // ok
-        }
+        // ok
+      }
     }
   }
 }

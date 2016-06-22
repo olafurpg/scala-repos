@@ -96,8 +96,9 @@ sealed trait Schedule extends Loggable {
     * @return a <code>ScheduledFuture</code> which sends the <code>msg</code> to
     * the <code>to<code> Actor after the specified TimeSpan <code>delay</code>.
     */
-  def schedule[T](
-      to: SimpleActor[T], msg: T, delay: TimeSpan): ScheduledFuture[Unit] =
+  def schedule[T](to: SimpleActor[T],
+                  msg: T,
+                  delay: TimeSpan): ScheduledFuture[Unit] =
     this.schedule(() => Helpers.tryo(to ! msg), delay)
 
   /**
@@ -106,8 +107,9 @@ sealed trait Schedule extends Loggable {
     * @return a <code>ScheduledFuture</code> which sends the <code>msg</code> to
     * the <code>to<code> Actor after the specified TimeSpan <code>delay</code>.
     */
-  def perform[T](
-      to: SimpleActor[T], msg: T, delay: Long): ScheduledFuture[Unit] =
+  def perform[T](to: SimpleActor[T],
+                 msg: T,
+                 delay: Long): ScheduledFuture[Unit] =
     this.schedule(() => Helpers.tryo(to ! msg), TimeSpan(delay))
 
   /**

@@ -267,18 +267,18 @@ private[akka] object FanOut {
 /**
   * INTERNAL API
   */
-private[akka] abstract class FanOut(
-    val settings: ActorMaterializerSettings, val outputCount: Int)
+private[akka] abstract class FanOut(val settings: ActorMaterializerSettings,
+                                    val outputCount: Int)
     extends Actor
     with ActorLogging
     with Pump {
   import FanOut._
 
   protected val outputBunch = new OutputBunch(outputCount, self, this)
-  protected val primaryInputs: Inputs = new BatchingInputBuffer(
-      settings.maxInputBufferSize, this) {
-    override def onError(e: Throwable): Unit = fail(e)
-  }
+  protected val primaryInputs: Inputs =
+    new BatchingInputBuffer(settings.maxInputBufferSize, this) {
+      override def onError(e: Throwable): Unit = fail(e)
+    }
 
   override def pumpFinished(): Unit = {
     primaryInputs.cancel()
@@ -340,7 +340,7 @@ private[akka] class Unzip(_settings: ActorMaterializerSettings)
             case t ⇒
               throw new IllegalArgumentException(
                   s"Unable to unzip elements of type ${t.getClass.getName}, " +
-                  s"can only handle Tuple2 and akka.japi.Pair!")
+                    s"can only handle Tuple2 and akka.japi.Pair!")
           }
       })
 }

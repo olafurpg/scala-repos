@@ -47,18 +47,21 @@ class InMemoryAccountManager[M[+ _]](resetExpiration: Int = 1)(
     }
   }
 
-  def createAccount(email: String,
-                    password: String,
-                    creationDate: DateTime,
-                    plan: AccountPlan,
-                    parentId: Option[AccountId],
-                    profile: Option[JValue])(
-      f: AccountId => M[APIKey]): M[Account] = {
-    TestAccounts.createAccount(
-        email, password, creationDate, plan, parentId, profile)(f) map {
-      account =>
-        accounts.put(account.accountId, account)
-        account
+  def createAccount(
+      email: String,
+      password: String,
+      creationDate: DateTime,
+      plan: AccountPlan,
+      parentId: Option[AccountId],
+      profile: Option[JValue])(f: AccountId => M[APIKey]): M[Account] = {
+    TestAccounts.createAccount(email,
+                               password,
+                               creationDate,
+                               plan,
+                               parentId,
+                               profile)(f) map { account =>
+      accounts.put(account.accountId, account)
+      account
     }
   }
 
@@ -88,17 +91,17 @@ class InMemoryAccountManager[M[+ _]](resetExpiration: Int = 1)(
   def findAccountByEmail(email: String): M[Option[Account]] =
     accounts.values.find(_.email == email).point[M]
 
-  def findResetToken(
-      accountId: AccountId, tokenId: ResetTokenId): M[Option[ResetToken]] = {
+  def findResetToken(accountId: AccountId,
+                     tokenId: ResetTokenId): M[Option[ResetToken]] = {
     M.point(resetTokens.get(tokenId))
   }
 
-  def generateResetToken(
-      account: Account, expiration: DateTime): M[ResetTokenId] = {
+  def generateResetToken(account: Account,
+                         expiration: DateTime): M[ResetTokenId] = {
     val tokenId = java.util.UUID.randomUUID.toString.replace("-", "")
 
-    val token = ResetToken(
-        tokenId, account.accountId, account.email, expiration)
+    val token =
+      ResetToken(tokenId, account.accountId, account.email, expiration)
 
     resetTokens += (tokenId -> token)
 

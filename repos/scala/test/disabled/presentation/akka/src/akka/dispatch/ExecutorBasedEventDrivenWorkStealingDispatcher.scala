@@ -33,8 +33,11 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
     throughputDeadlineTime: Int = Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS,
     mailboxType: MailboxType = Dispatchers.MAILBOX_TYPE,
     config: ThreadPoolConfig = ThreadPoolConfig())
-    extends ExecutorBasedEventDrivenDispatcher(
-        _name, throughput, throughputDeadlineTime, mailboxType, config) {
+    extends ExecutorBasedEventDrivenDispatcher(_name,
+                                               throughput,
+                                               throughputDeadlineTime,
+                                               mailboxType,
+                                               config) {
 
   def this(_name: String,
            throughput: Int,
@@ -133,8 +136,7 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
     */
   protected def donateFrom(
       donorMbox: MessageQueue with ExecutableMailbox): Boolean = {
-    val actors =
-      members // copy to prevent concurrent modifications having any impact
+    val actors = members // copy to prevent concurrent modifications having any impact
 
     // we risk to pick a thief which is unregistered from the dispatcher in the meantime, but that typically means
     // the dispatcher is being shut down...
@@ -156,8 +158,7 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
       donorMbox: MessageQueue with ExecutableMailbox): Boolean =
     try {
       donationInProgress.value = true
-      val actors =
-        members // copy to prevent concurrent modifications having any impact
+      val actors = members // copy to prevent concurrent modifications having any impact
       doFindDonorRecipient(
           donorMbox,
           actors,
@@ -171,12 +172,15 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
     * Rewrites the message and adds that message to the recipients mailbox
     * returns true if the message is non-null
     */
-  protected def donate(
-      organ: MessageInvocation, recipient: ActorRef): Boolean = {
+  protected def donate(organ: MessageInvocation,
+                       recipient: ActorRef): Boolean = {
     if (organ ne null) {
       if (organ.senderFuture.isDefined)
         recipient.postMessageToMailboxAndCreateFutureResultWithTimeout[Any](
-            organ.message, recipient.timeout, organ.sender, organ.senderFuture)
+            organ.message,
+            recipient.timeout,
+            organ.sender,
+            organ.senderFuture)
       else if (organ.sender.isDefined)
         recipient.postMessageToMailbox(organ.message, organ.sender)
       else recipient.postMessageToMailbox(organ.message, None)
@@ -196,8 +200,7 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
     var recipient: ActorRef = null
 
     while ((i < prSz) && (recipient eq null)) {
-      val actor =
-        potentialRecipients((i + startIndex) % prSz) //Wrap-around, one full lap
+      val actor = potentialRecipients((i + startIndex) % prSz) //Wrap-around, one full lap
       val mbox = getMailbox(actor)
 
       if ((mbox ne donorMbox) && mbox.isEmpty) {

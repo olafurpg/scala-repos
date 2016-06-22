@@ -44,9 +44,9 @@ object ActivatorDist {
                 .foldLeft[FileFilter](NothingFilter)((acc, x) => acc || x)
             val filteredPathFinder =
               PathFinder(dir) descendantsExcept ("*", gitignoreFileFilter) filter
-              (_.isFile)
-            filteredPathFinder pair Path.rebase(
-                dir, activatorDistDirectory / dir.name) map {
+                (_.isFile)
+            filteredPathFinder pair Path
+              .rebase(dir, activatorDistDirectory / dir.name) map {
               case (source, target) =>
                 s.log.info(s"copying: $source -> $target")
                 IO.copyFile(source, target, preserveLastModified = true)

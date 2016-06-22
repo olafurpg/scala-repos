@@ -12,8 +12,8 @@ object MonadCatchIO extends MonadCatchIOFunctions {
 }
 
 sealed abstract class MonadCatchIOFunctions {
-  def except[M[_], A](ma: M[A])(
-      handler: Throwable => M[A])(implicit M: MonadCatchIO[M]): M[A] =
+  def except[M[_], A](ma: M[A])(handler: Throwable => M[A])(
+      implicit M: MonadCatchIO[M]): M[A] =
     M.except(ma)(handler)
 
   import scalaz.syntax.monad._
@@ -22,10 +22,9 @@ sealed abstract class MonadCatchIOFunctions {
     * Executes the handler for exceptions that are raised and match the given predicate.
     * Other exceptions are rethrown.
     */
-  def catchSome[M[_]: MonadCatchIO, A, B](
-      ma: M[A])(p: Throwable => Option[B], handler: B => M[A]): M[A] =
-    except(ma)(
-        e =>
+  def catchSome[M[_]: MonadCatchIO, A, B](ma: M[A])(p: Throwable => Option[B],
+                                                    handler: B => M[A]): M[A] =
+    except(ma)(e =>
           p(e) match {
         case Some(z) => handler(z)
         case None => throw e
@@ -46,8 +45,7 @@ sealed abstract class MonadCatchIOFunctions {
 
   /**Like "finally", but only performs the final action if there was an exception. */
   def onException[M[_]: MonadCatchIO, A, B](ma: M[A], action: M[B]): M[A] =
-    except(ma)(
-        e =>
+    except(ma)(e =>
           for {
         _ <- action
         a <- (throw e): M[A]
@@ -82,8 +80,8 @@ sealed abstract class MonadCatchIOFunctions {
     } yield r
 
   /** An automatic resource management. */
-  def using[M[_], A, B](ma: M[A])(
-      f: A => M[B])(implicit M: MonadCatchIO[M], resource: Resource[A]) =
+  def using[M[_], A, B](ma: M[A])(f: A => M[B])(implicit M: MonadCatchIO[M],
+                                                resource: Resource[A]) =
     bracket(ma)(resource.close(_).liftIO[M])(f)
 
   implicit def KleisliMonadCatchIO[F[_], R](

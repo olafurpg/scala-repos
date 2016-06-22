@@ -63,7 +63,7 @@ private object ClassPath {
 
   private def isClass(name: String) =
     (name endsWith ".class") &&
-    ((name endsWith "$.class") || !(name contains "$"))
+      ((name endsWith "$.class") || !(name contains "$"))
 
   private def getEntries(loader: ClassLoader): Seq[(URI, ClassLoader)] = {
     val ents = mutable.Buffer[(URI, ClassLoader)]()
@@ -106,9 +106,10 @@ private object ClassPath {
       return
     }
 
-    for (f <- dir.listFiles) if (f.isDirectory())
-      browseDir(f, loader, prefix + f.getName + "/", buf)
-    else if (isClass(f.getName)) buf += Info(prefix + f.getName, loader)
+    for (f <- dir.listFiles)
+      if (f.isDirectory())
+        browseDir(f, loader, prefix + f.getName + "/", buf)
+      else if (isClass(f.getName)) buf += Info(prefix + f.getName, loader)
   }
 
   private def browseJar(
@@ -141,8 +142,8 @@ private object ClassPath {
     }
   }
 
-  private def jarClasspath(
-      jarFile: File, manifest: java.util.jar.Manifest): Seq[URI] =
+  private def jarClasspath(jarFile: File,
+                           manifest: java.util.jar.Manifest): Seq[URI] =
     for {
       m <- Option(manifest).toSeq
       attr <- Option(m.getMainAttributes().getValue("Class-Path")).toSeq

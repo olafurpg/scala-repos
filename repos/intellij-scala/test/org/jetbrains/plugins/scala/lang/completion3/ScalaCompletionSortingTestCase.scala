@@ -49,7 +49,8 @@ abstract class ScalaCompletionSortingTestCase(completionType: CompletionType,
   }
 
   def configureNoCompletion(path: String) {
-    myFixture.configureFromExistingVirtualFile(myFixture.copyFileToProject(
+    myFixture.configureFromExistingVirtualFile(
+        myFixture.copyFileToProject(
             path,
             com.intellij.openapi.util.text.StringUtil.getShortName(path, '/')))
   }

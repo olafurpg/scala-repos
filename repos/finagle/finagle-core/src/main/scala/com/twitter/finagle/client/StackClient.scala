@@ -358,7 +358,7 @@ object StackClient {
     */
   val defaultParams: Stack.Params =
     Stack.Params.empty + Stats(ClientStatsReceiver) +
-    LoadBalancerFactory.HostStats(LoadedHostStatsReceiver)
+      LoadBalancerFactory.HostStats(LoadedHostStatsReceiver)
 }
 
 /**
@@ -496,10 +496,9 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
     * A copy constructor in lieu of defining StackClient as a
     * case class.
     */
-  protected def copy1(
-      stack: Stack[ServiceFactory[Req, Rep]] = this.stack,
-      params: Stack.Params =
-        this.params): This { type In = self.In; type Out = self.Out }
+  protected def copy1(stack: Stack[ServiceFactory[Req, Rep]] = this.stack,
+                      params: Stack.Params = this.params)
+    : This { type In = self.In; type Out = self.Out }
 
   /**
     * A stackable module that creates new `Transports` (via transporter)
@@ -549,7 +548,7 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
     val clientStack = stack ++ (endpointer +: nilStack)
     val clientParams =
       params + Label(clientLabel) + Stats(stats.scope(clientLabel)) +
-      BindingFactory.Dest(dest)
+        BindingFactory.Dest(dest)
 
     clientStack.make(clientParams)
   }

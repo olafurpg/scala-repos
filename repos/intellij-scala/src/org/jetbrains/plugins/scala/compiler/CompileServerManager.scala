@@ -83,7 +83,7 @@ class CompileServerManager(project: Project) extends ProjectComponent {
 
   private def applicable =
     running || ScalaCompileServerSettings.getInstance.COMPILE_SERVER_ENABLED &&
-    project.hasScala
+      project.hasScala
 
   private def running = launcher.running
 
@@ -134,8 +134,8 @@ class CompileServerManager(project: Project) extends ProjectComponent {
     val group = new DefaultActionGroup(actions: _*)
 
     val context = DataManager.getInstance.getDataContext(e.getComponent)
-    val popup = JBPopupFactory.getInstance.createActionGroupPopup(
-        title, group, context, mnemonics, true)
+    val popup = JBPopupFactory.getInstance
+      .createActionGroupPopup(title, group, context, mnemonics, true)
     val dimension = popup.getContent.getPreferredSize
     val at = new Point(0, -dimension.height)
 
@@ -143,8 +143,9 @@ class CompileServerManager(project: Project) extends ProjectComponent {
   }
 
   private object Start
-      extends AnAction(
-          "&Run", "Start compile server", AllIcons.Actions.Execute)
+      extends AnAction("&Run",
+                       "Start compile server",
+                       AllIcons.Actions.Execute)
       with DumbAware {
     override def update(e: AnActionEvent) {
       e.getPresentation.setEnabled(!launcher.running)
@@ -156,8 +157,9 @@ class CompileServerManager(project: Project) extends ProjectComponent {
   }
 
   private object Stop
-      extends AnAction(
-          "&Stop", "Shutdown compile server", AllIcons.Actions.Suspend)
+      extends AnAction("&Stop",
+                       "Shutdown compile server",
+                       AllIcons.Actions.Suspend)
       with DumbAware {
     override def update(e: AnActionEvent) {
       e.getPresentation.setEnabled(launcher.running)
@@ -206,10 +208,11 @@ class CompileServerManager(project: Project) extends ProjectComponent {
       val errors = launcher.errors()
 
       if (errors.nonEmpty) {
-        Notifications.Bus.notify(
-            new Notification(
-                "scala", title, errors.mkString, NotificationType.ERROR),
-            project)
+        Notifications.Bus.notify(new Notification("scala",
+                                                  title,
+                                                  errors.mkString,
+                                                  NotificationType.ERROR),
+                                 project)
       }
     }
   }

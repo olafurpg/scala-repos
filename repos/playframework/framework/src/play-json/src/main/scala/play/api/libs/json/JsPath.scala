@@ -31,8 +31,7 @@ case class RecursiveSearch(key: String) extends PathNode {
   def set(json: JsValue, transform: JsValue => JsValue): JsValue = json match {
     case obj: JsObject =>
       var found = false
-      val o = JsObject(
-          obj.fields.map {
+      val o = JsObject(obj.fields.map {
         case (k, v) =>
           if (k == this.key) {
             found = true
@@ -73,8 +72,7 @@ case class KeyPathNode(key: String) extends PathNode {
   def set(json: JsValue, transform: JsValue => JsValue): JsValue = json match {
     case obj: JsObject =>
       var found = false
-      val o = JsObject(
-          obj.fields.map {
+      val o = JsObject(obj.fields.map {
         case (k, v) =>
           if (k == this.key) {
             found = true
@@ -111,8 +109,7 @@ case class IdxPathNode(idx: Int) extends PathNode {
 
   def set(json: JsValue, transform: JsValue => JsValue): JsValue = json match {
     case arr: JsArray =>
-      JsArray(
-          arr.value.zipWithIndex.map {
+      JsArray(arr.value.zipWithIndex.map {
         case (js, j) => if (j == idx) transform(js) else js
       })
     case _ => transform(json)
@@ -205,21 +202,25 @@ case class JsPath(path: List[PathNode] = List()) {
       case List(node) =>
         node(json) match {
           case Nil =>
-            Right(JsError(
+            Right(
+                JsError(
                     Seq(this -> Seq(ValidationError("error.path.missing")))))
           case List(js) => Right(JsSuccess(js))
           case _ :: _ =>
-            Right(JsError(Seq(this -> Seq(
+            Right(
+                JsError(Seq(this -> Seq(
                             ValidationError("error.path.result.multiple")))))
         }
       case head :: tail =>
         head(json) match {
           case Nil =>
-            Left(JsError(
+            Left(
+                JsError(
                     Seq(this -> Seq(ValidationError("error.path.missing")))))
           case List(js) => step(tail, js)
           case _ :: _ =>
-            Left(JsError(Seq(this -> Seq(
+            Left(
+                JsError(Seq(this -> Seq(
                             ValidationError("error.path.result.multiple")))))
         }
     }
@@ -245,8 +246,9 @@ case class JsPath(path: List[PathNode] = List()) {
       }
     }
 
-    def filterPathNode(
-        json: JsObject, node: PathNode, value: JsValue): JsResult[JsObject] = {
+    def filterPathNode(json: JsObject,
+                       node: PathNode,
+                       value: JsValue): JsResult[JsObject] = {
       node match {
         case KeyPathNode(key) =>
           JsSuccess(
@@ -460,8 +462,8 @@ case class JsPath(path: List[PathNode] = List()) {
     * @see JsPath.lazyReadNullable to see behavior in reads
     * @see JsPath.lazyWriteNullable to see behavior in writes
     */
-  def lazyFormatNullable[T](
-      r: => Reads[T], w: => Writes[T]): OFormat[Option[T]] =
+  def lazyFormatNullable[T](r: => Reads[T],
+                            w: => Writes[T]): OFormat[Option[T]] =
     OFormat[Option[T]](lazyReadNullable(r), lazyWriteNullable(w))
 
   private val self = this

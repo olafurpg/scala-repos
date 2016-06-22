@@ -44,7 +44,8 @@ trait PathServiceCombinators
     // FIXME: We need documentation *right here* about what this regex
     // is trying to do, because it's unclear that this is 100%
     // correct.
-    path("""%s/(?:(?<prefixPath>(?:[^\n.](?:[^\n/]|/[^\n])*)/?)?)""".format(
+    path(
+        """%s/(?:(?<prefixPath>(?:[^\n.](?:[^\n/]|/[^\n])*)/?)?)""".format(
             prefix)) {
       new DelegatingService[A, B => Future[C], A, (B, Path) => Future[C]] {
         val delegate = next

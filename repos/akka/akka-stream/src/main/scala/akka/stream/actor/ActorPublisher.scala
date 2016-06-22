@@ -275,8 +275,8 @@ trait ActorPublisher[T] extends Actor {
   /**
     * INTERNAL API
     */
-  protected[akka] override def aroundReceive(
-      receive: Receive, msg: Any): Unit = msg match {
+  protected[akka] override def aroundReceive(receive: Receive,
+                                             msg: Any): Unit = msg match {
     case Request(n) ⇒
       if (n < 1) {
         if (lifecycleState == Active)
@@ -284,8 +284,7 @@ trait ActorPublisher[T] extends Actor {
       } else {
         demand += n
         if (demand < 0)
-          demand =
-            Long.MaxValue // Long overflow, Reactive Streams Spec 3:17: effectively unbounded
+          demand = Long.MaxValue // Long overflow, Reactive Streams Spec 3:17: effectively unbounded
         super.aroundReceive(receive, msg)
       }
 
@@ -356,8 +355,8 @@ trait ActorPublisher[T] extends Actor {
   /**
     * INTERNAL API
     */
-  protected[akka] override def aroundPreRestart(
-      reason: Throwable, message: Option[Any]): Unit = {
+  protected[akka] override def aroundPreRestart(reason: Throwable,
+                                                message: Option[Any]): Unit = {
     // some state must survive restart
     state.set(
         self,

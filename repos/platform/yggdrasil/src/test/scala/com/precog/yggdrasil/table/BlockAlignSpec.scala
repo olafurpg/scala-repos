@@ -99,8 +99,8 @@ trait BlockAlignSpec[M[+ _]]
   }
 
   def alignSimple = {
-    val JArray(elements) =
-      JParser.parseUnsafe("""[
+    val JArray(elements) = JParser.parseUnsafe(
+        """[
         {
           "value":{ "fr8y":-2.761198250953116839E+14037, "hw":[], "q":2.429467767811669098E+50018 },
           "key":[1.0,2.0]
@@ -395,8 +395,8 @@ trait BlockAlignSpec[M[+ _]]
     }
 
     def test1 = {
-      val JArray(ljson) =
-        JParser.parseUnsafe("""[
+      val JArray(ljson) = JParser.parseUnsafe(
+          """[
         [[10],{ "000001":-2, "000000":42 },{ "a":42, "b":-2 }],
         [[7],{ "000001":6, "000000":17 },{ "a":17, "b":6 }],
         [[0],{ "000001":12, "000000":42 },{ "a":42, "b":12 }],
@@ -444,15 +444,15 @@ trait BlockAlignSpec[M[+ _]]
     }
 
     def test2 = {
-      val JArray(ljson) =
-        JParser.parseUnsafe("""[
+      val JArray(ljson) = JParser.parseUnsafe(
+          """[
         [[6],{ "000001":42, "000000":7 },{ "a":7, "b":42 }],
         [[12],{ "000001":42, "000000":7 },{ "a":7, "b":42 }],
         [[7],{ "000001":6, "000000":17 },{ "a":17, "b":6 }],
         [[9],{ "000001":12, "000000":21 },{ "a":21, "b":12 }]
       ]""")
-      val JArray(ljson2) =
-        JParser.parseUnsafe("""[
+      val JArray(ljson2) = JParser.parseUnsafe(
+          """[
         [[0],{ "000001":12, "000000":42 },{ "a":42, "b":12 }],
         [[5],{ "000001":12, "000000":42 },{ "a":42, "b":12 }],
         [[10],{ "000001":-2, "000000":42 },{ "a":42, "b":-2 }],

@@ -40,7 +40,8 @@ abstract class ParquetSourcesTestsBase extends WordSpec {
   }
 
   def testReturnProvidedColumns[S <: Source with HasColumnProjection](
-      src: S, expected: ColumnProjectionString) = {
+      src: S,
+      expected: ColumnProjectionString) = {
     "return the provided columns " + expected in {
       assert(src.columnProjectionString.get === expected)
     }
@@ -73,13 +74,15 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedColumns(
         new DailySuffixParquetThrift[MockTBase](path, dateRange) {
-      override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+          override def withColumns: Set[String] = columnStrings
+        },
+        DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
         new DailySuffixParquetThrift[MockTBase](path, dateRange) {
-      override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
+          override def withColumnProjections: Set[String] = columnStrings
+        },
+        StrictColumnProjectionString(columnStrings))
   }
 
   "HourlySuffixParquetThrift" should {
@@ -96,13 +99,15 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedColumns(
         new HourlySuffixParquetThrift[MockTBase](path, dateRange) {
-      override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+          override def withColumns: Set[String] = columnStrings
+        },
+        DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
         new HourlySuffixParquetThrift[MockTBase](path, dateRange) {
-      override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
+          override def withColumnProjections: Set[String] = columnStrings
+        },
+        StrictColumnProjectionString(columnStrings))
   }
 
   "FixedPathParquetThrift" should {
@@ -119,13 +124,15 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedColumns(
         new FixedPathParquetThrift[MockTBase](path, path, path) {
-      override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+          override def withColumns: Set[String] = columnStrings
+        },
+        DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
         new FixedPathParquetThrift[MockTBase](path, path, path) {
-      override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
+          override def withColumnProjections: Set[String] = columnStrings
+        },
+        StrictColumnProjectionString(columnStrings))
   }
 
   "DailySuffixParquetTuple" should {

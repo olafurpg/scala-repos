@@ -7,8 +7,7 @@ import scala.collection.JavaConverters._
 
 object HipJob {
   val InSrcFileSize = 2496L
-  val inSrc =
-    TextLine(getClass.getResource("/hipster.txt").toString) // file size is 2496 bytes
+  val inSrc = TextLine(getClass.getResource("/hipster.txt").toString) // file size is 2496 bytes
   val InScoresFileSize = 174L
   val inScores = TypedTsv[(String, Double)](
       getClass.getResource("/scores.tsv").toString) // file size is 174 bytes
@@ -97,7 +96,7 @@ class ReducerEstimatorTest
     "run with correct number of reducers" in {
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InputSizeReducerEstimator]) +
-        (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
+          (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
 
       HadoopPlatformJobTest(new SimpleJob(_, customConfig), cluster).inspectCompletedFlow {
         flow =>
@@ -112,8 +111,8 @@ class ReducerEstimatorTest
     "run with correct number of reducers when overriding set values" in {
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InputSizeReducerEstimator]) +
-        (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString) +
-        (Config.ReducerEstimatorOverride -> "true")
+          (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString) +
+          (Config.ReducerEstimatorOverride -> "true")
 
       HadoopPlatformJobTest(new SimpleJob(_, customConfig), cluster).inspectCompletedFlow {
         flow =>
@@ -130,7 +129,7 @@ class ReducerEstimatorTest
     "run with correct number of reducers (i.e. 1)" in {
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InputSizeReducerEstimator]) +
-        (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
+          (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
 
       HadoopPlatformJobTest(new GroupAllJob(_, customConfig), cluster).inspectCompletedFlow {
         flow =>
@@ -147,7 +146,7 @@ class ReducerEstimatorTest
     "run with correct number of reducers in each step" in {
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InputSizeReducerEstimator]) +
-        (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
+          (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
 
       HadoopPlatformJobTest(new HipJob(_, customConfig), cluster)
         .sink[Double](out)(_.head shouldBe 2.86 +- 0.0001)
@@ -165,7 +164,7 @@ class ReducerEstimatorTest
     "not set num reducers" in {
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InputSizeReducerEstimator]) +
-        (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
+          (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
 
       HadoopPlatformJobTest(new SimpleMapOnlyJob(_, customConfig), cluster).inspectCompletedFlow {
         flow =>

@@ -15,8 +15,7 @@ private[emitter] class InternalOptions private (
       optimizeBracketSelects: Boolean): InternalOptions =
     copy(optimizeBracketSelects = optimizeBracketSelects)
 
-  private def copy(
-      optimizeBracketSelects: Boolean =
+  private def copy(optimizeBracketSelects: Boolean =
         this.optimizeBracketSelects): InternalOptions = {
     new InternalOptions(optimizeBracketSelects)
   }

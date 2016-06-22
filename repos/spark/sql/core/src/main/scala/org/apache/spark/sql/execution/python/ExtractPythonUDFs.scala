@@ -35,8 +35,9 @@ private[spark] object ExtractPythonUDFs extends Rule[LogicalPlan] {
 
     case plan: LogicalPlan if plan.resolved =>
       // Extract any PythonUDFs from the current operator.
-      val udfs =
-        plan.expressions.flatMap(_.collect { case udf: PythonUDF => udf })
+      val udfs = plan.expressions.flatMap(_.collect {
+        case udf: PythonUDF => udf
+      })
       if (udfs.isEmpty) {
         // If there aren't any, we are done.
         plan

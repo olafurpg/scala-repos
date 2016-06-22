@@ -44,7 +44,7 @@ private[streaming] class UnionDStream[T: ClassTag](parents: Array[DStream[T]])
       case None =>
         throw new SparkException(
             "Could not generate RDD from a parent for unifying at" +
-            s" time $validTime")
+              s" time $validTime")
     }
     if (rdds.nonEmpty) {
       Some(new UnionRDD(ssc.sc, rdds))

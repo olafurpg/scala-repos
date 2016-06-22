@@ -12,8 +12,8 @@ import slick.relational.{RelationalProfile, RelationalTypesComponent}
 trait JdbcTypesComponent extends RelationalTypesComponent {
   self: JdbcProfile =>
 
-  abstract class MappedJdbcType[T, U](
-      implicit val tmd: JdbcType[U], val classTag: ClassTag[T])
+  abstract class MappedJdbcType[T, U](implicit val tmd: JdbcType[U],
+                                      val classTag: ClassTag[T])
       extends JdbcType[T] {
     def map(t: T): U
     def comap(u: U): T
@@ -53,7 +53,8 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
 
   object MappedJdbcType extends MappedColumnTypeFactory {
     def base[T: ClassTag, U: BaseColumnType](
-        tmap: T => U, tcomap: U => T): BaseColumnType[T] = {
+        tmap: T => U,
+        tcomap: U => T): BaseColumnType[T] = {
       assertNonNullType(implicitly[BaseColumnType[U]])
       new MappedJdbcType[T, U] with BaseTypedType[T] {
         def map(t: T) = tmap(t)
@@ -369,6 +370,6 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
 object JdbcTypesComponent {
   private[slick] lazy val typeNames =
     Map() ++
-    (for (f <- classOf[java.sql.Types].getFields) yield
-          f.get(null).asInstanceOf[Int] -> f.getName)
+      (for (f <- classOf[java.sql.Types].getFields)
+            yield f.get(null).asInstanceOf[Int] -> f.getName)
 }

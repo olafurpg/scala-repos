@@ -89,9 +89,9 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
       (r.end.toLong - r.start.toLong < 0, r.step < 0) match {
         case (true, true) | (false, false) =>
           ((r.end.toLong - r.start.toLong).abs / r.step.abs.toLong +
-              (if ((r.end.toLong -
-                       r.start.toLong).abs % r.step.abs.toLong > 0L) 1L
-               else 0L))
+                (if ((r.end.toLong -
+                           r.start.toLong).abs % r.step.abs.toLong > 0L) 1L
+                 else 0L))
         case _ => 0L
       }
     }
@@ -226,7 +226,7 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
   }
 
   property("take") = forAll(myGen suchThat
-                            (r => expectedSize(r).toInt == expectedSize(r)),
+                              (r => expectedSize(r).toInt == expectedSize(r)),
                             arbInt.arbitrary) { (r, x) =>
 //    println("take "+str(r))
     val t = r take x

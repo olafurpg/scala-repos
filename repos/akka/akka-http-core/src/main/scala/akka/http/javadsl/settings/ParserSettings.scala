@@ -18,8 +18,8 @@ import com.typesafe.config.Config
 /**
   * Public API but not intended for subclassing
   */
-abstract class ParserSettings private[akka]() extends BodyPartParser.Settings {
-  self: ParserSettingsImpl ⇒
+abstract class ParserSettings private[akka] ()
+    extends BodyPartParser.Settings { self: ParserSettingsImpl ⇒
   def getMaxUriLength: Int
   def getMaxMethodLength: Int
   def getMaxResponseReasonLength: Int
@@ -36,10 +36,10 @@ abstract class ParserSettings private[akka]() extends BodyPartParser.Settings {
   def getHeaderValueCacheLimits: ju.Map[String, Int]
   def getIncludeTlsSessionInfoHeader: Boolean
   def headerValueCacheLimits: Map[String, Int]
-  def getCustomMethods: java.util.function.Function[
-      String, Optional[HttpMethod]]
-  def getCustomStatusCodes: java.util.function.Function[
-      Int, Optional[StatusCode]]
+  def getCustomMethods: java.util.function.Function[String,
+                                                    Optional[HttpMethod]]
+  def getCustomStatusCodes: java.util.function.Function[Int,
+                                                        Optional[StatusCode]]
 
   // ---
 

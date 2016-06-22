@@ -23,8 +23,7 @@ object StablePriorityDispatcherSpec {
     """
 
   class Unbounded(settings: ActorSystem.Settings, config: Config)
-      extends UnboundedStablePriorityMailbox(
-          PriorityGenerator({
+      extends UnboundedStablePriorityMailbox(PriorityGenerator({
         case i: Int if i <= 100 ⇒ i // Small integers have high priority
         case i: Int ⇒ 101 // Don't care for other integers
         case 'Result ⇒ Int.MaxValue

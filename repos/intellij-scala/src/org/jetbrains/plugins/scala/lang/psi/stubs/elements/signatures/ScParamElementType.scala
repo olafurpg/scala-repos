@@ -68,8 +68,8 @@ abstract class ScParamElementType[Param <: ScParameter](debugName: String)
     }
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScParameterStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScParameterStub = {
     val name = dataStream.readName
     val parent = parentStub.asInstanceOf[StubElement[PsiElement]]
     val typeText = dataStream.readName

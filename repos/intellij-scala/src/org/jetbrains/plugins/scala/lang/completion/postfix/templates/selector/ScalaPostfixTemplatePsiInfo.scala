@@ -49,11 +49,12 @@ class ScalaPostfixTemplatePsiInfo extends PostfixTemplatePsiInfo {
       case _ =>
         throw new IllegalArgumentException(
             "Attempted adding negation through template for element " +
-            element.getText + " which is not a valid boolean expression.")
+              element.getText + " which is not a valid boolean expression.")
     }
 
-  override def createExpression(
-      context: PsiElement, prefix: String, suffix: String): PsiElement =
-    ScalaPsiElementFactory.createExpressionFromText(
-        prefix + context.getText + suffix, context)
+  override def createExpression(context: PsiElement,
+                                prefix: String,
+                                suffix: String): PsiElement =
+    ScalaPsiElementFactory
+      .createExpressionFromText(prefix + context.getText + suffix, context)
 }

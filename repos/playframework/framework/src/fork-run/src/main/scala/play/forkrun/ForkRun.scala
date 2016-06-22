@@ -35,8 +35,8 @@ object ForkRun {
 
     val log = Logger(logLevel)
     val system = ActorSystem("play-fork-run", akkaNoLogging)
-    val sbt = system.actorOf(
-        SbtClient.props(new File(baseDirectory), log, logEvents), "sbt")
+    val sbt = system
+      .actorOf(SbtClient.props(new File(baseDirectory), log, logEvents), "sbt")
     val forkRun =
       system.actorOf(props(sbt, configKey, runArgs, log), "fork-run")
 
@@ -59,8 +59,9 @@ object ForkRun {
     }
   }
 
-  def registerShutdownHook(
-      log: Logger, system: ActorSystem, forkRun: ActorRef): Unit = {
+  def registerShutdownHook(log: Logger,
+                           system: ActorSystem,
+                           forkRun: ActorRef): Unit = {
     Runtime
       .getRuntime()
       .addShutdownHook(new Thread {
@@ -83,8 +84,9 @@ object ForkRun {
 
     val watchService = config.watchService match {
       case ForkConfig.DefaultWatchService =>
-        FileWatchService.defaultWatchService(
-            config.targetDirectory, config.pollInterval, log)
+        FileWatchService.defaultWatchService(config.targetDirectory,
+                                             config.pollInterval,
+                                             log)
       case ForkConfig.JDK7WatchService => FileWatchService.jdk7(log)
       case ForkConfig.JNotifyWatchService =>
         FileWatchService.jnotify(config.targetDirectory)
@@ -120,7 +122,8 @@ object ForkRun {
     )
 
     println()
-    println(Colors.green(
+    println(
+        Colors.green(
             "(Server started, use Ctrl+D to stop and go back to the console...)"))
     println()
 
@@ -130,8 +133,10 @@ object ForkRun {
   def sendStart(sbt: ActorRef,
                 config: ForkConfig,
                 args: Seq[String]): InetSocketAddress => Unit = { address =>
-    val url = serverUrl(
-        args, config.defaultHttpPort, config.defaultHttpAddress, address)
+    val url = serverUrl(args,
+                        config.defaultHttpPort,
+                        config.defaultHttpAddress,
+                        address)
     sbt ! SbtClient.Execute(s"${config.notifyKey} $url")
   }
 
@@ -141,8 +146,8 @@ object ForkRun {
                 defaultHttpAddress: String,
                 address: InetSocketAddress): String = {
     val devSettings: Seq[(String, String)] = Seq.empty
-    val (properties, httpPort, httpsPort, httpAddress) = Reloader.filterArgs(
-        args, defaultHttpPort, defaultHttpAddress, devSettings)
+    val (properties, httpPort, httpsPort, httpAddress) = Reloader
+      .filterArgs(args, defaultHttpPort, defaultHttpAddress, devSettings)
     val host = if (httpAddress == "0.0.0.0") "localhost" else httpAddress
     if (httpPort.isDefined) s"http://$host:${httpPort.get}"
     else if (httpsPort.isDefined) s"https://$host:${httpsPort.get}"
@@ -227,8 +232,9 @@ class ForkRun(sbt: ActorRef, configKey: String, args: Seq[String], log: Logger)
     context become reloading(server, reloadKey, replyTo)
   }
 
-  def reloading(
-      server: PlayDevServer, reloadKey: String, replyTo: ActorRef): Receive = {
+  def reloading(server: PlayDevServer,
+                reloadKey: String,
+                replyTo: ActorRef): Receive = {
     case Response(`reloadKey`, result) =>
       result.result[CompileResult] match {
         case Success(result) =>

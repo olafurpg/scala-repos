@@ -44,16 +44,15 @@ object GenerateOrdering
   protected def canonicalize(in: Seq[SortOrder]): Seq[SortOrder] =
     in.map(ExpressionCanonicalizer.execute(_).asInstanceOf[SortOrder])
 
-  protected def bind(
-      in: Seq[SortOrder], inputSchema: Seq[Attribute]): Seq[SortOrder] =
+  protected def bind(in: Seq[SortOrder],
+                     inputSchema: Seq[Attribute]): Seq[SortOrder] =
     in.map(BindReferences.bindReference(_, inputSchema))
 
   /**
     * Creates a code gen ordering for sorting this schema, in ascending order.
     */
   def create(schema: StructType): BaseOrdering = {
-    create(
-        schema.zipWithIndex.map {
+    create(schema.zipWithIndex.map {
       case (field, ordinal) =>
         SortOrder(BoundReference(ordinal, field.dataType, nullable = true),
                   Ascending)
@@ -107,8 +106,9 @@ object GenerateOrdering
           } else if ($isNullB) {
             return ${if (order.direction == Ascending) "1" else "-1"};
           } else {
-            int comp = ${ctx.genComp(
-          order.child.dataType, primitiveA, primitiveB)};
+            int comp = ${ctx.genComp(order.child.dataType,
+                                     primitiveA,
+                                     primitiveB)};
             if (comp != 0) {
               return ${if (asc) "comp" else "-comp"};
             }
@@ -182,8 +182,7 @@ object LazilyGeneratedOrdering {
     * Creates a [[LazilyGeneratedOrdering]] for the given schema, in natural ascending order.
     */
   def forSchema(schema: StructType): LazilyGeneratedOrdering = {
-    new LazilyGeneratedOrdering(
-        schema.zipWithIndex.map {
+    new LazilyGeneratedOrdering(schema.zipWithIndex.map {
       case (field, ordinal) =>
         SortOrder(BoundReference(ordinal, field.dataType, nullable = true),
                   Ascending)

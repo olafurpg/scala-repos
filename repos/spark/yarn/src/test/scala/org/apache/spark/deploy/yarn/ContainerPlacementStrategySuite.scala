@@ -46,7 +46,7 @@ class ContainerPlacementStrategySuite
 
   test(
       "allocate locality preferred containers with enough resource and no matched existed " +
-      "containers") {
+        "containers") {
     // 1. All the locations of current containers cannot satisfy the new requirements
     // 2. Current requested container number can fully satisfy the pending tasks.
 
@@ -71,7 +71,7 @@ class ContainerPlacementStrategySuite
 
   test(
       "allocate locality preferred containers with enough resource and partially matched " +
-      "containers") {
+        "containers") {
     // 1. Parts of current containers' locations can satisfy the new requirements
     // 2. Current requested container number can fully satisfy the pending tasks.
 
@@ -92,13 +92,15 @@ class ContainerPlacementStrategySuite
           handler.allocatedHostToContainersMap,
           Seq.empty)
 
-    assert(localities.map(_.nodes) === Array(
-            null, Array("host2", "host3"), Array("host2", "host3")))
+    assert(
+        localities.map(_.nodes) === Array(null,
+                                          Array("host2", "host3"),
+                                          Array("host2", "host3")))
   }
 
   test(
       "allocate locality preferred containers with limited resource and partially matched " +
-      "containers") {
+        "containers") {
     // 1. Parts of current containers' locations can satisfy the new requirements
     // 2. Current requested container number cannot fully satisfy the pending tasks.
 
@@ -157,7 +159,11 @@ class ContainerPlacementStrategySuite
 
     val localities =
       handler.containerPlacementStrategy.localityOfRequestedContainers(
-          1, 0, Map.empty, handler.allocatedHostToContainersMap, Seq.empty)
+          1,
+          0,
+          Map.empty,
+          handler.allocatedHostToContainersMap,
+          Seq.empty)
 
     assert(localities.map(_.nodes) === Array(null))
   }

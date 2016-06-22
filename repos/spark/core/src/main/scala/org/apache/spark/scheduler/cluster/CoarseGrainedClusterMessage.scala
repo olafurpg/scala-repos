@@ -87,8 +87,9 @@ private[spark] object CoarseGrainedClusterMessages {
       extends CoarseGrainedClusterMessage
 
   // Exchanged between the driver and the AM in Yarn client mode
-  case class AddWebUIFilter(
-      filterName: String, filterParams: Map[String, String], proxyBase: String)
+  case class AddWebUIFilter(filterName: String,
+                            filterParams: Map[String, String],
+                            proxyBase: String)
       extends CoarseGrainedClusterMessage
 
   // Messages exchanged between the driver and the cluster manager for executor allocation

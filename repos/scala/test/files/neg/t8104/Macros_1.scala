@@ -7,8 +7,8 @@ object Macros {
     val fields = T.tpe.decls.toList.collect {
       case x: TermSymbol if x.isVal && x.isCaseAccessor => x
     }
-    val Repr = appliedType(
-        TupleClass(fields.length).asType.toType, fields.map(_.info))
+    val Repr =
+      appliedType(TupleClass(fields.length).asType.toType, fields.map(_.info))
     q"new Generic[$T]{ type Repr = $Repr }"
   }
 }

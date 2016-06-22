@@ -83,7 +83,8 @@ class SorterSuite extends SparkFunSuite with Logging {
 
   /** Runs an experiment several times. */
   def runExperiment(name: String, skip: Boolean = false)(
-      f: => Unit, prepare: () => Unit): Unit = {
+      f: => Unit,
+      prepare: () => Unit): Unit = {
     if (skip) {
       logInfo(s"Skipped experiment $name.")
       return
@@ -210,14 +211,14 @@ class SorterSuite extends SparkFunSuite with Logging {
 
     val sorterWithoutKeyReuse = new Sorter(new IntArraySortDataFormat)
     runExperiment("Sorter without key reuse on primitive int array")({
-      sorterWithoutKeyReuse.sort(
-          intPrimitiveArray, 0, numElements, Ordering[Int])
+      sorterWithoutKeyReuse
+        .sort(intPrimitiveArray, 0, numElements, Ordering[Int])
     }, prepareIntPrimitiveArray)
 
     val sorterWithKeyReuse = new Sorter(new KeyReuseIntArraySortDataFormat)
     runExperiment("Sorter with key reuse on primitive int array")({
-      sorterWithKeyReuse.sort(
-          intPrimitiveArray, 0, numElements, Ordering[IntWrapper])
+      sorterWithKeyReuse
+        .sort(intPrimitiveArray, 0, numElements, Ordering[IntWrapper])
     }, prepareIntPrimitiveArray)
   }
 }
@@ -231,8 +232,10 @@ abstract class AbstractIntArraySortDataFormat[K]
     data(pos1) = tmp
   }
 
-  override def copyElement(
-      src: Array[Int], srcPos: Int, dst: Array[Int], dstPos: Int) {
+  override def copyElement(src: Array[Int],
+                           srcPos: Int,
+                           dst: Array[Int],
+                           dstPos: Int) {
     dst(dstPos) = src(srcPos)
   }
 
@@ -275,8 +278,9 @@ class KeyReuseIntArraySortDataFormat
     new IntWrapper()
   }
 
-  override def getKey(
-      data: Array[Int], pos: Int, reuse: IntWrapper): IntWrapper = {
+  override def getKey(data: Array[Int],
+                      pos: Int,
+                      reuse: IntWrapper): IntWrapper = {
     if (reuse == null) {
       new IntWrapper(data(pos))
     } else {

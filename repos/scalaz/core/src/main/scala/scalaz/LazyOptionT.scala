@@ -50,8 +50,7 @@ final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
 
   def orElse(a: => LazyOptionT[F, A])(
       implicit F: Monad[F]): LazyOptionT[F, A] =
-    LazyOptionT(
-        F.bind(run) {
+    LazyOptionT(F.bind(run) {
       case LazyNone => a.run
       case x @ LazySome(_) => F.point(x)
     })
@@ -100,7 +99,8 @@ sealed abstract class LazyOptionTInstances extends LazyOptionTInstances0 {
     new LazyOptionTHoist {}
 
   implicit def lazyOptionTBindRec[F[_]](
-      implicit F0: Monad[F], B0: BindRec[F]): BindRec[LazyOptionT[F, ?]] =
+      implicit F0: Monad[F],
+      B0: BindRec[F]): BindRec[LazyOptionT[F, ?]] =
     new LazyOptionTBindRec[F] {
       implicit def F: Monad[F] = F0
       implicit def B: BindRec[F] = B0
@@ -143,8 +143,10 @@ private trait LazyOptionTMonad[F[_]]
 
   override def ap[A, B](fa: => LazyOptionT[F, A])(
       f: => LazyOptionT[F, A => B]): LazyOptionT[F, B] =
-    LazyOptionT(F.bind(f.run)(_ fold
-            (ff => F.map(fa.run)(_ map ((ff: A => B)(_))), F.point(LazyOption.lazyNone))))
+    LazyOptionT(
+        F.bind(f.run)(_ fold
+              (ff => F.map(fa.run)(_ map ((ff: A => B)(_))), F.point(
+                      LazyOption.lazyNone))))
 
   def point[A](a: => A): LazyOptionT[F, A] =
     LazyOptionT[F, A](F.point(LazyOption.lazySome(a)))

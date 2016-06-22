@@ -36,8 +36,8 @@ object DateProperties extends Properties("Date Properties") {
   }
   implicit val dateRangeArb: Arbitrary[DateRange] = Arbitrary {
     for (v1 <- choose(0L, 1L << 33);
-         v2 <- choose(v1, 1L << 33)) yield
-      DateRange(RichDate(v1), RichDate(v2))
+         v2 <- choose(v1, 1L << 33))
+      yield DateRange(RichDate(v1), RichDate(v2))
   }
   implicit val absdur: Arbitrary[AbsoluteDuration] = Arbitrary {
     implicitly[Arbitrary[Long]].arbitrary

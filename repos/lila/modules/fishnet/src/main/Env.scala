@@ -21,16 +21,16 @@ final class Env(config: Config,
   private val analysisColl = db(config getString "collection.analysis")
   private val clientColl = db(config getString "collection.client")
 
-  private val repo = new FishnetRepo(
-      analysisColl = analysisColl, clientColl = clientColl)
+  private val repo =
+    new FishnetRepo(analysisColl = analysisColl, clientColl = clientColl)
 
   private val moveDb = new MoveDB
 
-  private val sequencer = new lila.hub.FutureSequencer(
-      system = system,
-      receiveTimeout = None,
-      executionTimeout = Some(1 second),
-      logger = logger)
+  private val sequencer = new lila.hub.FutureSequencer(system = system,
+                                                       receiveTimeout = None,
+                                                       executionTimeout =
+                                                         Some(1 second),
+                                                       logger = logger)
 
   private val monitor = new Monitor(moveDb, repo, sequencer, scheduler)
 

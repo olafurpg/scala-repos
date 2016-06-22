@@ -87,12 +87,12 @@ object WebAPIKeyFinder {
   }
 }
 
-class RealWebAPIKeyFinder(protocol: String,
-                          host: String,
-                          port: Int,
-                          path: String,
-                          val rootAPIKey: APIKey)(
-    implicit val executor: ExecutionContext)
+class RealWebAPIKeyFinder(
+    protocol: String,
+    host: String,
+    port: Int,
+    path: String,
+    val rootAPIKey: APIKey)(implicit val executor: ExecutionContext)
     extends WebClient(protocol, host, port, path)
     with WebAPIKeyFinder {
   implicit val M = new FutureMonad(executor)
@@ -127,10 +127,10 @@ trait WebAPIKeyFinder extends BaseClient with APIKeyFinder[Response] {
 
         case res =>
           logger.error("Unexpected response from auth service for apiKey " +
-              apiKey + ":\n" + res)
+                apiKey + ":\n" + res)
           left(
               "Unexpected response from security service; unable to proceed." +
-              res)
+                res)
       })
     }
   }
@@ -143,10 +143,10 @@ trait WebAPIKeyFinder extends BaseClient with APIKeyFinder[Response] {
                 .validated[Set[v1.APIKeyDetails]]).disjunction
         case res =>
           logger.error("Unexpected response from auth service for apiKey " +
-              fromRoot + ":\n" + res)
+                fromRoot + ":\n" + res)
           left(
               "Unexpected response from security service; unable to proceed." +
-              res)
+                res)
       })
     }
   }
@@ -169,10 +169,10 @@ trait WebAPIKeyFinder extends BaseClient with APIKeyFinder[Response] {
                 .validated[Set[Permission]]).disjunction
         case res =>
           logger.error("Unexpected response from auth service for apiKey " +
-              apiKey + ":\n" + res)
+                apiKey + ":\n" + res)
           left(
               "Unexpected response from security service; unable to proceed." +
-              res)
+                res)
       })
     }
   }
@@ -215,8 +215,9 @@ trait WebAPIKeyFinder extends BaseClient with APIKeyFinder[Response] {
         case res =>
           logger.error(
               "Unexpected response from api provisioning service: " + res)
-          left("Unexpected response from api key provisioning service; unable to proceed." +
-              res)
+          left(
+              "Unexpected response from api key provisioning service; unable to proceed." +
+                res)
       })
     }
   }

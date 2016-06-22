@@ -23,15 +23,17 @@ object IfElseToHeadOption extends SimplificationType {
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
     expr match {
-      case IfStmt(
-          CheckIsEmpty(coll, _, _), scalaNone(), scalaSome(coll2 `.head` ()))
+      case IfStmt(CheckIsEmpty(coll, _, _),
+                  scalaNone(),
+                  scalaSome(coll2 `.head` ()))
           if PsiEquivalenceUtil.areElementsEquivalent(coll, coll2) =>
         Some(
             replace(expr)
               .withText(invocationText(coll, "headOption"))
               .highlightAll)
-      case IfStmt(
-          CheckNonEmpty(coll, _, _), scalaSome(coll2 `.head` ()), scalaNone())
+      case IfStmt(CheckNonEmpty(coll, _, _),
+                  scalaSome(coll2 `.head` ()),
+                  scalaNone())
           if PsiEquivalenceUtil.areElementsEquivalent(coll, coll2) =>
         Some(
             replace(expr)
@@ -49,15 +51,17 @@ object IfElseToLastOption extends SimplificationType {
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
     expr match {
-      case IfStmt(
-          CheckIsEmpty(coll, _, _), scalaNone(), scalaSome(coll2 `.last` ()))
+      case IfStmt(CheckIsEmpty(coll, _, _),
+                  scalaNone(),
+                  scalaSome(coll2 `.last` ()))
           if PsiEquivalenceUtil.areElementsEquivalent(coll, coll2) =>
         Some(
             replace(expr)
               .withText(invocationText(coll, "lastOption"))
               .highlightAll)
-      case IfStmt(
-          CheckNonEmpty(coll, _, _), scalaSome(coll2 `.last` ()), scalaNone())
+      case IfStmt(CheckNonEmpty(coll, _, _),
+                  scalaSome(coll2 `.last` ()),
+                  scalaNone())
           if PsiEquivalenceUtil.areElementsEquivalent(coll, coll2) =>
         Some(
             replace(expr)

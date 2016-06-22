@@ -94,7 +94,7 @@ object OpenSSL {
         // This is a warning rather than a Throwable because we fall back to JSSE
         log.log(Level.FINEST,
                 "APR/OpenSSL could not be loaded: " + e.getClass().getName() +
-                ": " + e.getMessage())
+                  ": " + e.getMessage())
         return None
     }
 
@@ -113,7 +113,8 @@ object OpenSSL {
       val config = linker.configurationCtor.newInstance(
           configMap.asInstanceOf[MapOfStrings])
 
-      log.finest("OpenSSL context instantiated for certificate '%s'".format(
+      log.finest(
+          "OpenSSL context instantiated for certificate '%s'".format(
               certificatePath))
 
       linker.contextHolderCtor

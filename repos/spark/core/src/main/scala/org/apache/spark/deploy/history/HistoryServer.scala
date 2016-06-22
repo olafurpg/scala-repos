@@ -61,15 +61,15 @@ class HistoryServer(conf: SparkConf,
     conf.getInt("spark.history.retainedApplications", 50)
 
   // application
-  private val appCache = new ApplicationCache(
-      this, retainedApplications, new SystemClock())
+  private val appCache =
+    new ApplicationCache(this, retainedApplications, new SystemClock())
 
   // and its metrics, for testing as well as monitoring
   val cacheMetrics = appCache.metrics
 
   private val loaderServlet = new HttpServlet {
-    protected override def doGet(
-        req: HttpServletRequest, res: HttpServletResponse): Unit = {
+    protected override def doGet(req: HttpServletRequest,
+                                 res: HttpServletResponse): Unit = {
       // Parse the URI created by getAttemptURI(). It contains an app ID and an optional
       // attempt ID (separated by a slash).
       val parts = Option(req.getPathInfo()).getOrElse("").split("/")
@@ -102,13 +102,13 @@ class HistoryServer(conf: SparkConf,
       // Also, make sure that the redirect url contains the query string present in the request.
       val requestURI =
         req.getRequestURI +
-        Option(req.getQueryString).map("?" + _).getOrElse("")
+          Option(req.getQueryString).map("?" + _).getOrElse("")
       res.sendRedirect(res.encodeRedirectURL(requestURI))
     }
 
     // SPARK-5983 ensure TRACE is not supported
-    protected override def doTrace(
-        req: HttpServletRequest, res: HttpServletResponse): Unit = {
+    protected override def doTrace(req: HttpServletRequest,
+                                   res: HttpServletResponse): Unit = {
       res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
     }
   }
@@ -162,8 +162,9 @@ class HistoryServer(conf: SparkConf,
   }
 
   /** Detach a reconstructed UI from this server. Only valid after bind(). */
-  override def detachSparkUI(
-      appId: String, attemptId: Option[String], ui: SparkUI): Unit = {
+  override def detachSparkUI(appId: String,
+                             attemptId: Option[String],
+                             ui: SparkUI): Unit = {
     assert(serverInfo.isDefined,
            "HistoryServer must be bound before detaching SparkUIs")
     ui.getHandlers.foreach(detachHandler)
@@ -175,8 +176,8 @@ class HistoryServer(conf: SparkConf,
     * @param attemptId attempt ID
     * @return If found, the Spark UI and any history information to be used in the cache
     */
-  override def getAppUI(
-      appId: String, attemptId: Option[String]): Option[LoadedAppUI] = {
+  override def getAppUI(appId: String,
+                        attemptId: Option[String]): Option[LoadedAppUI] = {
     provider.getAppUI(appId, attemptId)
   }
 
@@ -298,8 +299,8 @@ object HistoryServer extends Logging {
     }
   }
 
-  private[history] def getAttemptURI(
-      appId: String, attemptId: Option[String]): String = {
+  private[history] def getAttemptURI(appId: String,
+                                     attemptId: Option[String]): String = {
     val attemptSuffix = attemptId.map { id =>
       s"/$id"
     }.getOrElse("")

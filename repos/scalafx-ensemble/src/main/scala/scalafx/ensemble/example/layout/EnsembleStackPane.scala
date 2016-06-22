@@ -57,7 +57,8 @@ class EnsembleStackPane extends EnsembleExample {
             text = "I am in a stack pane"
             contentDisplay = ContentDisplay.Left
             graphic = new ImageView {
-              image = new Image(this.getClass.getResourceAsStream(
+              image = new Image(
+                  this.getClass.getResourceAsStream(
                       "/scalafx/ensemble/images/icon-48x48.png"))
             }
           }

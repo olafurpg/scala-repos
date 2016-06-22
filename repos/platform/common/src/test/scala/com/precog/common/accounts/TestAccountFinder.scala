@@ -29,8 +29,8 @@ import scalaz._
 import scalaz.syntax.monad._
 
 class TestAccountFinder[M[+ _]](
-    accountIds: Map[APIKey, AccountId], accounts: Map[AccountId, Account])(
-    implicit val M: Monad[M])
+    accountIds: Map[APIKey, AccountId],
+    accounts: Map[AccountId, Account])(implicit val M: Monad[M])
     extends AccountFinder[M] {
   def findAccountByAPIKey(apiKey: APIKey): M[Option[AccountId]] =
     M.point(accountIds.get(apiKey))
@@ -45,13 +45,13 @@ class TestAccountFinder[M[+ _]](
 object TestAccounts {
   def newAccountId() = java.util.UUID.randomUUID.toString.toUpperCase
 
-  def createAccount[M[+ _]: Monad](email: String,
-                                   password: String,
-                                   creationDate: DateTime,
-                                   plan: AccountPlan,
-                                   parentId: Option[AccountId],
-                                   profile: Option[JValue])(
-      f: AccountId => M[APIKey]): M[Account] = {
+  def createAccount[M[+ _]: Monad](
+      email: String,
+      password: String,
+      creationDate: DateTime,
+      plan: AccountPlan,
+      parentId: Option[AccountId],
+      profile: Option[JValue])(f: AccountId => M[APIKey]): M[Account] = {
     for {
       accountId <- newAccountId().point[M]
       path = Path(accountId)

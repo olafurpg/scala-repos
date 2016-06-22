@@ -14,8 +14,10 @@ private[flow] object OfferMatcherLaunchTokensActor {
   def props(conf: LaunchTokenConfig,
             taskStatusObservables: TaskStatusObservables,
             offerMatcherManager: OfferMatcherManager): Props = {
-    Props(new OfferMatcherLaunchTokensActor(
-            conf, taskStatusObservables, offerMatcherManager))
+    Props(
+        new OfferMatcherLaunchTokensActor(conf,
+                                          taskStatusObservables,
+                                          offerMatcherManager))
   }
 }
 
@@ -43,8 +45,8 @@ private class OfferMatcherLaunchTokensActor(
     import context.dispatcher
     periodicSetToken = context.system.scheduler
       .schedule(0.seconds, conf.launchTokenRefreshInterval().millis)(
-        offerMatcherManager.setLaunchTokens(conf.launchTokens())
-    )
+          offerMatcherManager.setLaunchTokens(conf.launchTokens())
+      )
   }
 
   override def postStop(): Unit = {

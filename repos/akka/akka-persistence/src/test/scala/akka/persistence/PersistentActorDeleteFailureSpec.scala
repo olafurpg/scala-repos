@@ -24,8 +24,8 @@ object PersistentActorDeleteFailureSpec {
       with NoStackTrace
 
   class DeleteFailingInmemJournal extends InmemJournal {
-    override def asyncDeleteMessagesTo(
-        persistenceId: String, toSequenceNr: Long): Future[Unit] =
+    override def asyncDeleteMessagesTo(persistenceId: String,
+                                       toSequenceNr: Long): Future[Unit] =
       Future.failed(new SimulatedException("Boom! Unable to delete events!"))
   }
 
@@ -54,8 +54,8 @@ class PersistentActorDeleteFailureSpec
         PersistenceSpec.config(
             "inmem",
             "SnapshotFailureRobustnessSpec",
-            extraConfig =
-              Some("""
+            extraConfig = Some(
+                """
   akka.persistence.journal.inmem.class = "akka.persistence.PersistentActorDeleteFailureSpec$DeleteFailingInmemJournal"
   """)))
     with ImplicitSender {

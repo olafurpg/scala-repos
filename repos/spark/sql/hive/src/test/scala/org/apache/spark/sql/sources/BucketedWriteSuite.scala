@@ -134,10 +134,11 @@ class BucketedWriteSuite
       // values, and make sure it equals to the expected bucket id that inferred from file name.
       val qe = readBack.select(bucketCols.map(col): _*).queryExecution
       val rows = qe.toRdd.map(_.copy()).collect()
-      val getBucketId = UnsafeProjection.create(
-          HashPartitioning(qe.analyzed.output,
-                           numBuckets).partitionIdExpression :: Nil,
-          qe.analyzed.output)
+      val getBucketId =
+        UnsafeProjection.create(HashPartitioning(
+                                    qe.analyzed.output,
+                                    numBuckets).partitionIdExpression :: Nil,
+                                qe.analyzed.output)
 
       for (row <- rows) {
         val actualBucketId = getBucketId(row).getInt(0)
@@ -173,8 +174,11 @@ class BucketedWriteSuite
           .saveAsTable("bucketed_table")
 
         for (i <- 0 until 5) {
-          testBucketing(
-              new File(tableDir, s"i=$i"), source, 8, Seq("j"), Seq("k"))
+          testBucketing(new File(tableDir, s"i=$i"),
+                        source,
+                        8,
+                        Seq("j"),
+                        Seq("k"))
         }
       }
     }
@@ -192,7 +196,8 @@ class BucketedWriteSuite
 
   test(
       "write bucketed data with the identical bucketBy and partitionBy columns") {
-    intercept[AnalysisException](df.write
+    intercept[AnalysisException](
+        df.write
           .partitionBy("i")
           .bucketBy(8, "i")
           .saveAsTable("bucketed_table"))
@@ -237,8 +242,10 @@ class BucketedWriteSuite
             .saveAsTable("bucketed_table")
 
           for (i <- 0 until 5) {
-            testBucketing(
-                new File(tableDir, s"i=$i"), source, 8, Seq("j", "k"))
+            testBucketing(new File(tableDir, s"i=$i"),
+                          source,
+                          8,
+                          Seq("j", "k"))
           }
         }
       }

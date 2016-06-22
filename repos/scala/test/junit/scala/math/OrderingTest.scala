@@ -25,8 +25,8 @@ class OrderingTest {
 
       assertEquals(O.equiv(t1, t2), R.equiv(t1, t2))
 
-      assertEquals(
-          O.on((x: T) => x).min(t1, t2), R.on((x: T) => x).max(t1, t2))
+      assertEquals(O.on((x: T) => x).min(t1, t2),
+                   R.on((x: T) => x).max(t1, t2))
 
       assertEquals(O.tryCompare(t1, t2), R.tryCompare(t2, t1))
 

@@ -14,7 +14,7 @@ object IterateeTTest extends SpecLite {
 
   "consume" in {
     (consume[Int, Id, List] &= enumStream(Stream(1, 2, 3))).run must_===
-      (List(1, 2, 3))
+    (List(1, 2, 3))
   }
 
   "fold in constant stack space" in {

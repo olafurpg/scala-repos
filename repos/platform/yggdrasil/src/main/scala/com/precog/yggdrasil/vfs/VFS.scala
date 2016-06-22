@@ -218,8 +218,8 @@ trait VFSModule[M[+ _], Block] extends Logging {
     def writeAllSync(
         data: Seq[(Long, EventMessage)]): EitherT[M, ResourceError, PrecogUnit]
 
-    def readResource(
-        path: Path, version: Version): EitherT[M, ResourceError, Resource]
+    def readResource(path: Path,
+                     version: Version): EitherT[M, ResourceError, Resource]
 
     /**
       * Returns the direct children of path.

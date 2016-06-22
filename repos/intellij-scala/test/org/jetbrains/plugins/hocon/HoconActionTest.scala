@@ -32,7 +32,8 @@ abstract class HoconActionTest(actionId: String, subpath: String)
 
     val editorManager = FileEditorManager.getInstance(getProject)
     val editor = editorManager.openTextEditor(
-        new OpenFileDescriptor(getProject, psiFile.getVirtualFile, 0), false)
+        new OpenFileDescriptor(getProject, psiFile.getVirtualFile, 0),
+        false)
     assert(editor != null)
     editor.getCaretModel.moveToOffset(offset)
 

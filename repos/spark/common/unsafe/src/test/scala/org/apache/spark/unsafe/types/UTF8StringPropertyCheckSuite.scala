@@ -80,7 +80,8 @@ class UTF8StringPropertyCheckSuite
 
   test("compare") {
     forAll { (s1: String, s2: String) =>
-      assert(Math.signum(toUTF8(s1).compareTo(toUTF8(s2))) === Math.signum(
+      assert(
+          Math.signum(toUTF8(s1).compareTo(toUTF8(s2))) === Math.signum(
               s1.compareTo(s2)))
     }
   }
@@ -88,8 +89,9 @@ class UTF8StringPropertyCheckSuite
   test("substring") {
     forAll { (s: String) =>
       for (start <- 0 to s.length; end <- 0 to s.length; if start <= end) {
-        assert(toUTF8(s).substring(start, end).toString === s.substring(start,
-                                                                        end))
+        assert(
+            toUTF8(s).substring(start, end).toString === s.substring(start,
+                                                                     end))
       }
     }
   }
@@ -168,8 +170,10 @@ class UTF8StringPropertyCheckSuite
   }
 
   test("lpad, rpad") {
-    def padding(
-        origin: String, pad: String, length: Int, isLPad: Boolean): String = {
+    def padding(origin: String,
+                pad: String,
+                length: Int,
+                isLPad: Boolean): String = {
       if (length <= 0) return ""
       if (length <= origin.length) {
         if (length <= 0) "" else origin.substring(0, length)
@@ -192,9 +196,11 @@ class UTF8StringPropertyCheckSuite
         randomString,
         randomInt
     ) { (s: String, pad: String, length: Int) =>
-      assert(toUTF8(s).lpad(length, toUTF8(pad)) === toUTF8(
+      assert(
+          toUTF8(s).lpad(length, toUTF8(pad)) === toUTF8(
               padding(s, pad, length, true)))
-      assert(toUTF8(s).rpad(length, toUTF8(pad)) === toUTF8(
+      assert(
+          toUTF8(s).rpad(length, toUTF8(pad)) === toUTF8(
               padding(s, pad, length, false)))
     }
   }
@@ -206,7 +212,8 @@ class UTF8StringPropertyCheckSuite
       if (orgin.contains(null)) null else orgin.mkString
 
     forAll { (inputs: Seq[String]) =>
-      assert(UTF8String.concat(inputs.map(toUTF8): _*) === toUTF8(
+      assert(
+          UTF8String.concat(inputs.map(toUTF8): _*) === toUTF8(
               inputs.mkString))
     }
     forAll(nullalbeSeq) { (inputs: Seq[String]) =>
@@ -236,7 +243,8 @@ class UTF8StringPropertyCheckSuite
   // TODO: enable this when we find a proper way to generate valid patterns
   ignore("split") {
     forAll { (s: String, pattern: String, limit: Int) =>
-      assert(toUTF8(s).split(toUTF8(pattern), limit) === s
+      assert(
+          toUTF8(s).split(toUTF8(pattern), limit) === s
             .split(pattern, limit)
             .map(toUTF8(_)))
     }
@@ -244,7 +252,8 @@ class UTF8StringPropertyCheckSuite
 
   test("levenshteinDistance") {
     forAll { (one: String, another: String) =>
-      assert(toUTF8(one).levenshteinDistance(toUTF8(another)) === StringUtils
+      assert(
+          toUTF8(one).levenshteinDistance(toUTF8(another)) === StringUtils
             .getLevenshteinDistance(one, another))
     }
   }

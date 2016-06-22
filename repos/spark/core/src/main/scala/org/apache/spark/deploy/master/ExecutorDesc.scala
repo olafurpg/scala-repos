@@ -38,7 +38,7 @@ private[master] class ExecutorDesc(val id: Int,
     other match {
       case info: ExecutorDesc =>
         fullId == info.fullId && worker.id == info.worker.id &&
-        cores == info.cores && memory == info.memory
+          cores == info.cores && memory == info.memory
       case _ => false
     }
   }

@@ -69,24 +69,24 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
     // Internal node with 2 leaf children
     val feature0importance =
       parentImp.calculate() * parentImp.count -
-      (leftImp.calculate() * leftImp.count +
-          rightImp.calculate() * rightImp.count)
+        (leftImp.calculate() * leftImp.count +
+              rightImp.calculate() * rightImp.count)
     testNode(parent, Map(0 -> feature0importance))
 
     // Full tree
     val feature1importance =
       grandImp.calculate() * grandImp.count -
-      (left2Imp.calculate() * left2Imp.count +
-          parentImp.calculate() * parentImp.count)
-    testNode(
-        grandParent, Map(0 -> feature0importance, 1 -> feature1importance))
+        (left2Imp.calculate() * left2Imp.count +
+              parentImp.calculate() * parentImp.count)
+    testNode(grandParent,
+             Map(0 -> feature0importance, 1 -> feature1importance))
 
     // Forest consisting of (full tree) + (internal node with 2 leafs)
     val trees = Array(parent, grandParent).map { root =>
-      new DecisionTreeClassificationModel(root,
-                                          numFeatures = 2,
-                                          numClasses =
-                                            3).asInstanceOf[DecisionTreeModel]
+      new DecisionTreeClassificationModel(
+          root,
+          numFeatures = 2,
+          numClasses = 3).asInstanceOf[DecisionTreeModel]
     }
     val importances: Vector = RandomForest.featureImportances(trees, 2)
     val tree2norm = feature0importance + feature1importance

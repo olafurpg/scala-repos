@@ -74,8 +74,8 @@ scalaVersion := "2.10.4"""")
     }
 
     "parse a setting and val without intervening blank line" in {
-      val (imports, settings) =
-        split("""version := "1.0"
+      val (imports, settings) = split(
+          """version := "1.0"
 lazy val root = (project in file(".")).enablePlugins­(PlayScala)""")
 
       imports.isEmpty should beTrue

@@ -24,8 +24,8 @@ import cascading.pipe.Pipe
   */
 object TypedJson {
   private implicit val formats = native.Serialization.formats(NoTypeHints)
-  private def caseClass2Json[A <: AnyRef](
-      implicit tt: Manifest[A], fmt: Formats): Injection[A, String] =
+  private def caseClass2Json[A <: AnyRef](implicit tt: Manifest[A],
+                                          fmt: Formats): Injection[A, String] =
     new AbstractInjection[A, String] {
       override def apply(a: A): String = write(a)
 

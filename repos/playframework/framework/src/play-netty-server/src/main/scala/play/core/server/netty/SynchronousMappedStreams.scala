@@ -8,7 +8,8 @@ import org.reactivestreams.{Processor, Publisher, Subscription, Subscriber}
 object SynchronousMappedStreams {
 
   private class SynchronousContramappedSubscriber[A, B](
-      subscriber: Subscriber[_ >: B], f: A => B)
+      subscriber: Subscriber[_ >: B],
+      f: A => B)
       extends Subscriber[A] {
     override def onError(t: Throwable): Unit = subscriber.onError(t)
     override def onSubscribe(s: Subscription): Unit = subscriber.onSubscribe(s)
@@ -17,16 +18,16 @@ object SynchronousMappedStreams {
     override def toString = s"SynchronousContramappedSubscriber($subscriber)"
   }
 
-  private class SynchronousMappedPublisher[A, B](
-      publisher: Publisher[A], f: A => B)
+  private class SynchronousMappedPublisher[A, B](publisher: Publisher[A],
+                                                 f: A => B)
       extends Publisher[B] {
     override def subscribe(s: Subscriber[_ >: B]): Unit =
       publisher.subscribe(new SynchronousContramappedSubscriber[A, B](s, f))
     override def toString = s"SynchronousMappedPublisher($publisher)"
   }
 
-  private class JoinedProcessor[A, B](
-      subscriber: Subscriber[A], publisher: Publisher[B])
+  private class JoinedProcessor[A, B](subscriber: Subscriber[A],
+                                      publisher: Publisher[B])
       extends Processor[A, B] {
     override def onError(t: Throwable): Unit = subscriber.onError(t)
     override def onSubscribe(s: Subscription): Unit = subscriber.onSubscribe(s)

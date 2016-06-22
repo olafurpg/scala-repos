@@ -19,8 +19,8 @@ object AutoDownSpec {
   val memberB = TestMember(Address("akka.tcp", "sys", "b", 2552), Up)
   val memberC = TestMember(Address("akka.tcp", "sys", "c", 2552), Up)
 
-  class AutoDownTestActor(
-      autoDownUnreachableAfter: FiniteDuration, probe: ActorRef)
+  class AutoDownTestActor(autoDownUnreachableAfter: FiniteDuration,
+                          probe: ActorRef)
       extends AutoDownBase(autoDownUnreachableAfter) {
 
     override def selfAddress = memberA.address

@@ -99,8 +99,7 @@ object ClassName {
 case class MemberName(
     owner: ClassName,
     name: String
-)
-    extends FullyQualifiedName {
+) extends FullyQualifiedName {
   def contains(o: FullyQualifiedName) = this == o
   def fqnString = ClassName.cleanupPackage(owner.fqnString + "." + name)
 }

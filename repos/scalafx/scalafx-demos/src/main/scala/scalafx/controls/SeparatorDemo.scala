@@ -59,8 +59,8 @@ object SeparatorDemo extends JFXApp {
     alignment = Pos.Center
     alignmentInParent = Pos.TopCenter
     hgrow = Priority.Always
-    children = List(
-        new SeparatorControls(separator), new ControlControls(separator))
+    children =
+      List(new SeparatorControls(separator), new ControlControls(separator))
   }
 
   val mainPane = new BorderPane {

@@ -39,12 +39,16 @@ private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] wit
 
   override def bind[A, B](fa: ($tparams, A))(f: A => ($tparams, B)) = {
     val t = f(fa._$n)
-    (${(1 until n).map(i => s"_$i.append(fa._$i, t._$i)").mkString(", ")}, t._$n)
+    (${(1 until n)
+      .map(i => s"_$i.append(fa._$i, t._$i)")
+      .mkString(", ")}, t._$n)
   }
 
   override def tailrecM[A, B](f: A => ($tparams, A \\/ B))(a: A): ($tparams, B) = {
     @annotation.tailrec
-    def go(${(1 until n).map(i => s"s$i: A$i").mkString(", ")})(z: A): ($tparams, B) =
+    def go(${(1 until n)
+      .map(i => s"s$i: A$i")
+      .mkString(", ")})(z: A): ($tparams, B) =
       f(z) match {
         case (${(1 until n).map("a" + _).mkString(", ")}, b0) =>
           ${(1 until n)
@@ -71,7 +75,9 @@ private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] wit
     s"""
 private[std] abstract class Tuple${n}Monad[$tparams] extends Monad[($tparams, ?)] with Tuple${n}BindRec[$tparams] {
   ${(1 until n).map(i => s"override def _$i : Monoid[A$i]").mkString("; ")}
-  def point[A](a: => A) = (${(1 until n).map(i => s"_$i.zero").mkString(", ")}, a)
+  def point[A](a: => A) = (${(1 until n)
+      .map(i => s"_$i.zero")
+      .mkString(", ")}, a)
 }
 """
   }

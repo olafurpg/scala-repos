@@ -22,8 +22,11 @@ import java.util.concurrent.CompletionStage
   * SubFlows cannot contribute to the super-flow’s materialized value since they
   * are materialized later, during the runtime of the flow graph processing.
   */
-class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
-        Out, Mat, scaladsl.Flow[In, Out, Mat]#Repr, scaladsl.Sink[In, Mat]]) {
+class SubFlow[-In, +Out, +Mat](
+    delegate: scaladsl.SubFlow[Out,
+                               Mat,
+                               scaladsl.Flow[In, Out, Mat]#Repr,
+                               scaladsl.Sink[In, Mat]]) {
 
   /** Converts this Flow to its Scala DSL counterpart */
   def asScala: scaladsl.SubFlow[Out,
@@ -175,8 +178,7 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
   def statefulMapConcat[T](
       f: function.Creator[function.Function[Out, java.lang.Iterable[T]]])
     : SubFlow[In, T, Mat] =
-    new SubFlow(
-        delegate.statefulMapConcat { () ⇒
+    new SubFlow(delegate.statefulMapConcat { () ⇒
       val fun = f.create()
       elem ⇒
         Util.immutableSeq(fun(elem))
@@ -380,9 +382,8 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
     *
     * '''Cancels when''' downstream cancels
     */
-  def sliding(n: Int,
-              step: Int =
-                1): SubFlow[In, java.util.List[Out @uncheckedVariance], Mat] =
+  def sliding(n: Int, step: Int = 1)
+    : SubFlow[In, java.util.List[Out @uncheckedVariance], Mat] =
     new SubFlow(delegate.sliding(n, step).map(_.asJava)) // TODO optimize to one step
 
   /**
@@ -866,8 +867,8 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
     * @param size The size of the buffer in element count
     * @param overflowStrategy Strategy that is used when incoming elements cannot fit inside the buffer
     */
-  def buffer(
-      size: Int, overflowStrategy: OverflowStrategy): SubFlow[In, Out, Mat] =
+  def buffer(size: Int,
+             overflowStrategy: OverflowStrategy): SubFlow[In, Out, Mat] =
     new SubFlow(delegate.buffer(size, overflowStrategy))
 
   /**
@@ -906,12 +907,9 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
               akka.japi.Pair[java.util.List[Out @uncheckedVariance],
                              javadsl.Source[Out @uncheckedVariance, NotUsed]],
               Mat] =
-    new SubFlow(
-        delegate
-          .prefixAndTail(n)
-          .map {
-        case (taken, tail) ⇒ akka.japi.Pair(taken.asJava, tail.asJava)
-      })
+    new SubFlow(delegate.prefixAndTail(n).map {
+      case (taken, tail) ⇒ akka.japi.Pair(taken.asJava, tail.asJava)
+    })
 
   /**
     * Transform each input element into a `Source` of output elements that is
@@ -946,7 +944,8 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
     * '''Cancels when''' downstream cancels
     */
   def flatMapMerge[T, M](
-      breadth: Int, f: function.Function[Out, _ <: Graph[SourceShape[T], M]])
+      breadth: Int,
+      f: function.Function[Out, _ <: Graph[SourceShape[T], M]])
     : SubFlow[In, T, Mat] =
     new SubFlow(delegate.flatMapMerge(breadth, o ⇒ f(o)))
 
@@ -1047,8 +1046,8 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
     *
     * '''Cancels when''' downstream cancels
     */
-  def interleave[T >: Out](
-      that: Graph[SourceShape[T], _], segmentSize: Int): SubFlow[In, T, Mat] =
+  def interleave[T >: Out](that: Graph[SourceShape[T], _],
+                           segmentSize: Int): SubFlow[In, T, Mat] =
     new SubFlow(delegate.interleave(that, segmentSize))
 
   /**
@@ -1231,8 +1230,8 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
                costCalculation: function.Function[Out, Integer],
                mode: ThrottleMode): javadsl.SubFlow[In, Out, Mat] =
     new SubFlow(
-        delegate.throttle(
-            cost, per, maximumBurst, costCalculation.apply, mode))
+        delegate
+          .throttle(cost, per, maximumBurst, costCalculation.apply, mode))
 
   /**
     * Detaches upstream demand from downstream demand without detaching the

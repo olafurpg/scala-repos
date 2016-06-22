@@ -84,8 +84,9 @@ trait ScParameter
   }
 
   def getDeclarationScope =
-    PsiTreeUtil.getParentOfType(
-        this, classOf[ScParameterOwner], classOf[ScFunctionExpr])
+    PsiTreeUtil.getParentOfType(this,
+                                classOf[ScParameterOwner],
+                                classOf[ScFunctionExpr])
 
   def deprecatedName: Option[String]
 
@@ -150,8 +151,7 @@ trait ScParameter
         // an. fun's type
         case f: ScFunctionExpr =>
           var flag = false
-          var result: Option[ScType] =
-            None //strange logic to handle problems with detecting type
+          var result: Option[ScType] = None //strange logic to handle problems with detecting type
           for (tp <- f.expectedTypes(fromUnderscore = false) if !flag) {
             @tailrec
             def applyForFunction(tp: ScType, checkDeep: Boolean) {
@@ -176,8 +176,8 @@ trait ScParameter
                 case _ =>
               }
             }
-            applyForFunction(
-                tp, ScUnderScoreSectionUtil.underscores(f).nonEmpty)
+            applyForFunction(tp,
+                             ScUnderScoreSectionUtil.underscores(f).nonEmpty)
           }
           result
         case _ => None
@@ -190,8 +190,8 @@ trait ScParameter
   def isDefaultParam: Boolean = calcIsDefaultParam(this, HashSet.empty)
 
   @tailrec
-  private def calcIsDefaultParam(
-      param: ScParameter, visited: HashSet[ScParameter]): Boolean = {
+  private def calcIsDefaultParam(param: ScParameter,
+                                 visited: HashSet[ScParameter]): Boolean = {
     if (param.baseDefaultParam) return true
     if (visited.contains(param)) return false
     getSuperParameter match {

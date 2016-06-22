@@ -47,8 +47,9 @@ trait JavaTestBase extends TestSuiteBase {
     * Attach a provided stream to it's associated StreamingContext as a
     * [[org.apache.spark.streaming.TestOutputStream]].
     **/
-  def attachTestOutputStream[
-      T, This <: JavaDStreamLike[T, This, R], R <: JavaRDDLike[T, R]](
+  def attachTestOutputStream[T,
+                             This <: JavaDStreamLike[T, This, R],
+                             R <: JavaRDDLike[T, R]](
       dstream: JavaDStreamLike[T, This, R]) = {
     implicit val cm: ClassTag[T] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[T]]

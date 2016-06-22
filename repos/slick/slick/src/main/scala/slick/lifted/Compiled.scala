@@ -42,8 +42,8 @@ object Compiled {
 
   /** Create a new `Compiled` value for a raw value that is `Compilable`. */
   @inline
-  def apply[V, C <: Compiled[V]](raw: V)(
-      implicit compilable: Compilable[V, C], profile: BasicProfile): C =
+  def apply[V, C <: Compiled[V]](raw: V)(implicit compilable: Compilable[V, C],
+                                         profile: BasicProfile): C =
     compilable.compiled(raw, profile)
 }
 
@@ -101,16 +101,16 @@ class AppliedCompiledFunction[PU, R <: Rep[_], RU](
   def compiledInsert = function.compiledInsert
 }
 
-abstract class CompiledExecutable[R, RU](
-    val extract: R, val profile: BasicProfile)
+abstract class CompiledExecutable[R, RU](val extract: R,
+                                         val profile: BasicProfile)
     extends RunnableCompiled[R, RU]
     with CompilersMixin {
   def param = ()
   def toNode: Node
 }
 
-abstract class CompiledStreamingExecutable[R, RU, EU](
-    extract: R, profile: BasicProfile)
+abstract class CompiledStreamingExecutable[R, RU, EU](extract: R,
+                                                      profile: BasicProfile)
     extends CompiledExecutable[R, RU](extract, profile)
     with StreamableCompiled[R, RU, EU]
 
@@ -127,8 +127,13 @@ object Executable {
     StreamingExecutable[Query[B, BU, C], C[BU], BU]
   @inline implicit def tableQueryIsExecutable[B <: AbstractTable[_], BU, C[_]] =
     StreamingExecutable[Query[B, BU, C] with TableQuery[B], C[BU], BU]
-  @inline implicit def baseJoinQueryIsExecutable[
-      B1, B2, BU1, BU2, C[_], Ba1, Ba2] =
+  @inline implicit def baseJoinQueryIsExecutable[B1,
+                                                 B2,
+                                                 BU1,
+                                                 BU2,
+                                                 C[_],
+                                                 Ba1,
+                                                 Ba2] =
     StreamingExecutable[BaseJoinQuery[B1, B2, BU1, BU2, C, Ba1, Ba2],
                         C[(BU1, BU2)],
                         (BU1, BU2)]

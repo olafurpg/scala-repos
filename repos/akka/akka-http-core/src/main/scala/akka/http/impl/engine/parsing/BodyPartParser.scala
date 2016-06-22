@@ -58,19 +58,20 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
   // TODO: prevent re-priming header parser from scratch
   private[this] val headerParser = HttpHeaderParser(settings) { errorInfo ⇒
     if (illegalHeaderWarnings)
-      log.warning(errorInfo
+      log.warning(
+          errorInfo
             .withSummaryPrepended("Illegal multipart header")
             .formatPretty)
   }
 
-  private[this] var output =
-    collection.immutable.Queue.empty[Output] // FIXME this probably is too wasteful
+  private[this] var output = collection.immutable.Queue.empty[Output] // FIXME this probably is too wasteful
   private[this] var state: ByteString ⇒ StateResult = tryParseInitialBoundary
   private[this] var terminated = false
 
   def warnOnIllegalHeader(errorInfo: ErrorInfo): Unit =
     if (illegalHeaderWarnings)
-      log.warning(errorInfo
+      log.warning(
+          errorInfo
             .withSummaryPrepended("Illegal multipart header")
             .formatPretty)
 
@@ -80,8 +81,8 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
         case e: ParsingException ⇒ fail(e.info)
         case NotEnoughDataException ⇒
           // we are missing a try/catch{continue} wrapper somewhere
-          throw new IllegalStateException(
-              "unexpected NotEnoughDataException", NotEnoughDataException)
+          throw new IllegalStateException("unexpected NotEnoughDataException",
+                                          NotEnoughDataException)
       }
       if (output.nonEmpty) ctx.push(dequeue())
       else if (!terminated) ctx.pull()
@@ -189,7 +190,8 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
   def parseHeaderLinesAux(headers: ListBuffer[HttpHeader],
                           headerCount: Int,
                           cth: Option[`Content-Type`])(
-      input: ByteString, lineStart: Int): StateResult =
+      input: ByteString,
+      lineStart: Int): StateResult =
     parseHeaderLines(input, lineStart, headers, headerCount, cth)
 
   def parseEntity(headers: List[HttpHeader],
@@ -200,16 +202,16 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
                         BodyPartStart(headers,
                                       entityParts ⇒
                                         HttpEntity.IndefiniteLength(
-                                            ct, entityParts.collect {
-                                      case EntityPart(data) ⇒ data
-                                    })))
+                                            ct,
+                                            entityParts.collect {
+                                          case EntityPart(data) ⇒ data
+                                        })))
                     emit(bytes)
                   },
                   emitFinalPartChunk: (List[HttpHeader], ContentType,
                                        ByteString) ⇒ Unit = {
                     (headers, ct, bytes) ⇒
-                      emit(
-                          BodyPartStart(headers, { rest ⇒
+                      emit(BodyPartStart(headers, { rest ⇒
                         SubSource.kill(rest)
                         HttpEntity.Strict(ct, bytes)
                       }))
@@ -218,8 +220,9 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
       @tailrec def rec(index: Int): StateResult = {
         val currentPartEnd = boyerMoore.nextIndex(input, index)
         def emitFinalChunk() =
-          emitFinalPartChunk(
-              headers, contentType, input.slice(offset, currentPartEnd))
+          emitFinalPartChunk(headers,
+                             contentType,
+                             input.slice(offset, currentPartEnd))
         val needleEnd = currentPartEnd + needle.length
         if (crlf(input, needleEnd)) {
           emitFinalChunk()
@@ -241,8 +244,11 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
           continue(input drop emitEnd, 0)(
               parseEntity(null, null, simpleEmit, simpleEmit))
         } else
-          continue(input, offset)(parseEntity(
-                  headers, contentType, emitPartChunk, emitFinalPartChunk))
+          continue(input, offset)(
+              parseEntity(headers,
+                          contentType,
+                          emitPartChunk,
+                          emitFinalPartChunk))
     }
 
   def emit(bytes: ByteString): Unit =
@@ -291,7 +297,7 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
 
   @tailrec def boundary(input: ByteString, offset: Int, ix: Int = 2): Boolean =
     (ix == needle.length) || (byteAt(input, offset + ix - 2) == needle(ix)) &&
-    boundary(input, offset, ix + 1)
+      boundary(input, offset, ix + 1)
 
   def crlf(input: ByteString, offset: Int): Boolean =
     byteChar(input, offset) == '\r' && byteChar(input, offset + 1) == '\n'

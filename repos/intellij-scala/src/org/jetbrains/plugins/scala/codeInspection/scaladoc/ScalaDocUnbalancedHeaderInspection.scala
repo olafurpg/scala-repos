@@ -15,8 +15,8 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocSyntaxElement
   * Date: 11/21/11
   */
 class ScalaDocUnbalancedHeaderInspection extends LocalInspectionTool {
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType._
       override def visitWikiSyntax(s: ScDocSyntaxElement) {
@@ -66,8 +66,9 @@ class ScalaDocUnbalancedHeaderInspection extends LocalInspectionTool {
 }
 
 class ScalaDocHeaderBalanceQuickFix(opening: PsiElement, closing: PsiElement)
-    extends AbstractFixOnTwoPsiElements(
-        ScalaBundle.message("balance.header"), opening, closing) {
+    extends AbstractFixOnTwoPsiElements(ScalaBundle.message("balance.header"),
+                                        opening,
+                                        closing) {
 
   override def getFamilyName: String = InspectionsUtil.SCALADOC
 
@@ -81,14 +82,16 @@ class ScalaDocHeaderBalanceQuickFix(opening: PsiElement, closing: PsiElement)
       return
     }
 
-    cl.replace(ScalaPsiElementFactory.createDocHeaderElement(
-            op.getText.length(), op.getManager))
+    cl.replace(
+        ScalaPsiElementFactory.createDocHeaderElement(op.getText.length(),
+                                                      op.getManager))
   }
 }
 
 class ScalaDocMoveTextToNewLineQuickFix(textData: PsiElement)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("move.text.after.header.to.new.line"), textData) {
+        ScalaBundle.message("move.text.after.header.to.new.line"),
+        textData) {
   override def getFamilyName: String = InspectionsUtil.SCALADOC
 
   def doApplyFix(project: Project) {
@@ -96,8 +99,10 @@ class ScalaDocMoveTextToNewLineQuickFix(textData: PsiElement)
     if (!data.isValid) return
 
     data.getParent.addBefore(
-        ScalaPsiElementFactory.createDocWhiteSpace(data.getManager), data)
+        ScalaPsiElementFactory.createDocWhiteSpace(data.getManager),
+        data)
     data.getParent.addBefore(
-        ScalaPsiElementFactory.createLeadingAsterisk(data.getManager), data)
+        ScalaPsiElementFactory.createLeadingAsterisk(data.getManager),
+        data)
   }
 }

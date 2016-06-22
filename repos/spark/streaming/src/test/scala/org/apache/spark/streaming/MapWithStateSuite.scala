@@ -177,8 +177,10 @@ class MapWithStateSuite
       sum
     }
 
-    testOperation[String, Int, Int](
-        inputData, StateSpec.function(mappingFunc), outputData, stateData)
+    testOperation[String, Int, Int](inputData,
+                                    StateSpec.function(mappingFunc),
+                                    outputData,
+                                    stateData)
   }
 
   test("mapWithState - basic operations with advanced API") {
@@ -220,8 +222,10 @@ class MapWithStateSuite
       Some(key * 2)
     }
 
-    testOperation(
-        inputData, StateSpec.function(mappingFunc), outputData, stateData)
+    testOperation(inputData,
+                  StateSpec.function(mappingFunc),
+                  outputData,
+                  stateData)
   }
 
   test("mapWithState - type inferencing and class tags") {
@@ -319,8 +323,10 @@ class MapWithStateSuite
       Some(output)
     }
 
-    testOperation(
-        inputData, StateSpec.function(mappingFunc), outputData, stateData)
+    testOperation(inputData,
+                  StateSpec.function(mappingFunc),
+                  outputData,
+                  stateData)
   }
 
   test(
@@ -438,8 +444,10 @@ class MapWithStateSuite
       }
     }
 
-    val (collectedOutputs, collectedStateSnapshots) = getOperationOutput(
-        inputData, StateSpec.function(mappingFunc).timeout(Seconds(3)), 20)
+    val (collectedOutputs, collectedStateSnapshots) =
+      getOperationOutput(inputData,
+                         StateSpec.function(mappingFunc).timeout(Seconds(3)),
+                         20)
 
     // b and c should be returned once each, when they were marked as expired
     assert(collectedOutputs.flatten.sorted === Seq("b", "c"))
@@ -550,8 +558,8 @@ class MapWithStateSuite
   ): Unit = {
     require(expectedOutputs.size == expectedStateSnapshots.size)
 
-    val (collectedOutputs, collectedStateSnapshots) = getOperationOutput(
-        input, mapWithStateSpec, expectedOutputs.size)
+    val (collectedOutputs, collectedStateSnapshots) =
+      getOperationOutput(input, mapWithStateSpec, expectedOutputs.size)
     assert(expectedOutputs, collectedOutputs, "outputs")
     assert(expectedStateSnapshots, collectedStateSnapshots, "state snapshots")
   }
@@ -568,11 +576,12 @@ class MapWithStateSuite
     val trackeStateStream =
       inputStream.map(x => (x, 1)).mapWithState(mapWithStateSpec)
     val collectedOutputs = new ConcurrentLinkedQueue[Seq[T]]
-    val outputStream = new TestOutputStream(
-        trackeStateStream, collectedOutputs)
+    val outputStream =
+      new TestOutputStream(trackeStateStream, collectedOutputs)
     val collectedStateSnapshots = new ConcurrentLinkedQueue[Seq[(K, S)]]
     val stateSnapshotStream = new TestOutputStream(
-        trackeStateStream.stateSnapshots(), collectedStateSnapshots)
+        trackeStateStream.stateSnapshots(),
+        collectedStateSnapshots)
     outputStream.register()
     stateSnapshotStream.register()
 
@@ -588,15 +597,16 @@ class MapWithStateSuite
     (collectedOutputs.asScala.toSeq, collectedStateSnapshots.asScala.toSeq)
   }
 
-  private def assert[U](
-      expected: Seq[Seq[U]], collected: Seq[Seq[U]], typ: String) {
+  private def assert[U](expected: Seq[Seq[U]],
+                        collected: Seq[Seq[U]],
+                        typ: String) {
     val debugString =
       "\nExpected:\n" + expected.mkString("\n") + "\nCollected:\n" +
-      collected.mkString("\n")
+        collected.mkString("\n")
     assert(
         expected.size === collected.size,
         s"number of collected $typ (${collected.size}) different from expected (${expected.size})" +
-        debugString)
+          debugString)
     expected.zip(collected).foreach {
       case (c, e) =>
         assert(c.toSet === e.toSet,

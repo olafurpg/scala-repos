@@ -46,9 +46,9 @@ class ESAccessKeys(client: Client, config: StorageClientConfig, index: String)
   if (!typeExistResponse.isExists) {
     val json =
       (estype ->
-          ("properties" ->
-              ("key" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-              ("events" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
+            ("properties" ->
+                  ("key" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+                    ("events" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
     indices
       .preparePutMapping(index)
       .setType(estype)

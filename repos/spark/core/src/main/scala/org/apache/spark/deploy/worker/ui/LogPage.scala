@@ -56,8 +56,8 @@ private[ui] class LogPage(parent: WorkerWebUI)
             "Request must specify either application or driver identifiers")
     }
 
-    val (logText, startByte, endByte, logLength) = getLog(
-        logDir, logType, offset, byteLength)
+    val (logText, startByte, endByte, logLength) =
+      getLog(logDir, logType, offset, byteLength)
     val pre =
       s"==== Bytes $startByte-$endByte of $logLength of $logDir$logType ====\n"
     pre + logText
@@ -84,40 +84,38 @@ private[ui] class LogPage(parent: WorkerWebUI)
             "Request must specify either application or driver identifiers")
     }
 
-    val (logText, startByte, endByte, logLength) = getLog(
-        logDir, logType, offset, byteLength)
+    val (logText, startByte, endByte, logLength) =
+      getLog(logDir, logType, offset, byteLength)
     val linkToMaster =
       <p><a href={worker.activeMasterWebUiUrl}>Back to Master</a></p>
     val range =
       <span>Bytes {startByte.toString} - {endByte.toString} of {logLength}</span>
 
-    val backButton =
-      if (startByte > 0) {
-        <a href={"?%s&logType=%s&offset=%s&byteLength=%s"
+    val backButton = if (startByte > 0) {
+      <a href={"?%s&logType=%s&offset=%s&byteLength=%s"
           .format(params, logType, math.max(startByte - byteLength, 0), byteLength)}>
           <button type="button" class="btn btn-default">
             Previous {Utils.bytesToString(math.min(byteLength, startByte))}
           </button>
         </a>
-      } else {
-        <button type="button" class="btn btn-default" disabled="disabled">
+    } else {
+      <button type="button" class="btn btn-default" disabled="disabled">
           Previous 0 B
         </button>
-      }
+    }
 
-    val nextButton =
-      if (endByte < logLength) {
-        <a href={"?%s&logType=%s&offset=%s&byteLength=%s".
+    val nextButton = if (endByte < logLength) {
+      <a href={"?%s&logType=%s&offset=%s&byteLength=%s".
           format(params, logType, endByte, byteLength)}>
           <button type="button" class="btn btn-default">
             Next {Utils.bytesToString(math.min(byteLength, logLength - endByte))}
           </button>
         </a>
-      } else {
-        <button type="button" class="btn btn-default" disabled="disabled">
+    } else {
+      <button type="button" class="btn btn-default" disabled="disabled">
           Next 0 B
         </button>
-      }
+    }
 
     val content = <html>
         <body>
@@ -183,8 +181,8 @@ private[ui] class LogPage(parent: WorkerWebUI)
       (logText, startIndex, endIndex, totalLength)
     } catch {
       case e: Exception =>
-        logError(
-            s"Error getting $logType logs from directory $logDirectory", e)
+        logError(s"Error getting $logType logs from directory $logDirectory",
+                 e)
         ("Error getting logs due to exception: " + e.getMessage, 0, 0, 0)
     }
   }

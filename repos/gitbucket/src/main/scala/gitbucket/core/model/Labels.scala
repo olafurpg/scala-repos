@@ -13,7 +13,7 @@ trait LabelComponent extends TemplateComponent { self: Profile =>
     val color = column[String]("COLOR")
     def * =
       (userName, repositoryName, labelId, labelName, color) <>
-      (Label.tupled, Label.unapply)
+        (Label.tupled, Label.unapply)
 
     def byPrimaryKey(owner: String, repository: String, labelId: Int) =
       byLabel(owner, repository, labelId)

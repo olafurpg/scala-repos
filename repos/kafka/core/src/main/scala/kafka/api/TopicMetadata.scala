@@ -26,13 +26,13 @@ object TopicMetadata {
 
   val NoLeaderNodeId = -1
 
-  def readFrom(
-      buffer: ByteBuffer, brokers: Map[Int, BrokerEndPoint]): TopicMetadata = {
-    val errorCode = readShortInRange(
-        buffer, "error code", (-1, Short.MaxValue))
+  def readFrom(buffer: ByteBuffer,
+               brokers: Map[Int, BrokerEndPoint]): TopicMetadata = {
+    val errorCode =
+      readShortInRange(buffer, "error code", (-1, Short.MaxValue))
     val topic = readShortString(buffer)
-    val numPartitions = readIntInRange(
-        buffer, "number of partitions", (0, Int.MaxValue))
+    val numPartitions =
+      readIntInRange(buffer, "number of partitions", (0, Int.MaxValue))
     val partitionsMetadata: Array[PartitionMetadata] =
       new Array[PartitionMetadata](numPartitions)
     for (i <- 0 until numPartitions) {
@@ -94,8 +94,8 @@ case class TopicMetadata(topic: String,
         }
       case error: Errors =>
         topicMetadataInfo.append(
-            "\nNo partition metadata for topic %s due to %s".format(
-                topic, error.exceptionName))
+            "\nNo partition metadata for topic %s due to %s"
+              .format(topic, error.exceptionName))
     }
     topicMetadataInfo.append("}")
     topicMetadataInfo.toString()
@@ -106,22 +106,21 @@ object PartitionMetadata {
 
   def readFrom(buffer: ByteBuffer,
                brokers: Map[Int, BrokerEndPoint]): PartitionMetadata = {
-    val errorCode = readShortInRange(
-        buffer, "error code", (-1, Short.MaxValue))
-    val partitionId =
-      readIntInRange(buffer, "partition id", (0, Int.MaxValue)) /* partition id */
+    val errorCode =
+      readShortInRange(buffer, "error code", (-1, Short.MaxValue))
+    val partitionId = readIntInRange(buffer, "partition id", (0, Int.MaxValue)) /* partition id */
     val leaderId = buffer.getInt
     val leader = brokers.get(leaderId)
 
     /* list of all replicas */
-    val numReplicas = readIntInRange(
-        buffer, "number of all replicas", (0, Int.MaxValue))
+    val numReplicas =
+      readIntInRange(buffer, "number of all replicas", (0, Int.MaxValue))
     val replicaIds = (0 until numReplicas).map(_ => buffer.getInt)
     val replicas = replicaIds.map(brokers)
 
     /* list of in-sync replicas */
-    val numIsr = readIntInRange(
-        buffer, "number of in-sync replicas", (0, Int.MaxValue))
+    val numIsr =
+      readIntInRange(buffer, "number of in-sync replicas", (0, Int.MaxValue))
     val isrIds = (0 until numIsr).map(_ => buffer.getInt)
     val isr = isrIds.map(brokers)
 
@@ -165,7 +164,8 @@ case class PartitionMetadata(partitionId: Int,
         "\tleader: " + (if (leader.isDefined) leader.get.toString else "none"))
     partitionMetadataString.append("\treplicas: " + replicas.mkString(","))
     partitionMetadataString.append("\tisr: " + isr.mkString(","))
-    partitionMetadataString.append("\tisUnderReplicated: %s".format(
+    partitionMetadataString.append(
+        "\tisUnderReplicated: %s".format(
             if (isr.size < replicas.size) "true" else "false"))
     partitionMetadataString.toString()
   }

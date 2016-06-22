@@ -51,7 +51,8 @@ trait Set[A]
 
   override def seq: Set[A] = this
   protected override def parCombiner =
-    ParSet.newCombiner[A] // if `immutable.SetLike` gets introduced, please move this there!
+    ParSet
+      .newCombiner[A] // if `immutable.SetLike` gets introduced, please move this there!
 }
 
 /** $factoryInfo
@@ -81,7 +82,7 @@ object Set extends ImmutableSetFactory[Set] {
 
   /** An optimized representation for immutable sets of size 1 */
   @SerialVersionUID(1233385750652442003L)
-  class Set1[A] private[collection](elem1: A)
+  class Set1[A] private[collection] (elem1: A)
       extends AbstractSet[A]
       with Set[A]
       with Serializable {
@@ -120,7 +121,7 @@ object Set extends ImmutableSetFactory[Set] {
 
   /** An optimized representation for immutable sets of size 2 */
   @SerialVersionUID(-6443011234944830092L)
-  class Set2[A] private[collection](elem1: A, elem2: A)
+  class Set2[A] private[collection] (elem1: A, elem2: A)
       extends AbstractSet[A]
       with Set[A]
       with Serializable {
@@ -161,7 +162,7 @@ object Set extends ImmutableSetFactory[Set] {
 
   /** An optimized representation for immutable sets of size 3 */
   @SerialVersionUID(-3590273538119220064L)
-  class Set3[A] private[collection](elem1: A, elem2: A, elem3: A)
+  class Set3[A] private[collection] (elem1: A, elem2: A, elem3: A)
       extends AbstractSet[A]
       with Set[A]
       with Serializable {
@@ -204,7 +205,7 @@ object Set extends ImmutableSetFactory[Set] {
 
   /** An optimized representation for immutable sets of size 4 */
   @SerialVersionUID(-3622399588156184395L)
-  class Set4[A] private[collection](elem1: A, elem2: A, elem3: A, elem4: A)
+  class Set4[A] private[collection] (elem1: A, elem2: A, elem3: A, elem4: A)
       extends AbstractSet[A]
       with Set[A]
       with Serializable {

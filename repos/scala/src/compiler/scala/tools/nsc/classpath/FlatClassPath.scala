@@ -87,8 +87,8 @@ private[nsc] case class SourceFileEntryImpl(file: AbstractFile)
   override def source: Option[AbstractFile] = Some(file)
 }
 
-private[nsc] case class ClassAndSourceFilesEntry(
-    classFile: AbstractFile, srcFile: AbstractFile)
+private[nsc] case class ClassAndSourceFilesEntry(classFile: AbstractFile,
+                                                 srcFile: AbstractFile)
     extends ClassRepClassPathEntry {
   override def name = FileUtils.stripClassExtension(classFile.name)
 

@@ -163,7 +163,8 @@ class DynamicTest {
   }
 
   @Test
-  def should_provide_object_literal_construction_with_dynamic_naming(): Unit = {
+  def should_provide_object_literal_construction_with_dynamic_naming()
+    : Unit = {
     import js.Dynamic.{literal => obj}
     val x = obj("foo" -> 3, "bar" -> "foobar")
     val x_foo = x.foo
@@ -190,7 +191,8 @@ class DynamicTest {
   }
 
   @Test
-  def should_allow_to_create_an_empty_object_with_the_literal_syntax(): Unit = {
+  def should_allow_to_create_an_empty_object_with_the_literal_syntax()
+    : Unit = {
     import js.Dynamic.{literal => obj}
     val x = obj()
     assertTrue(x.isInstanceOf[js.Object])
@@ -269,7 +271,8 @@ class DynamicTest {
   }
 
   @Test
-  def should_allow_object_literals_to_have_duplicate_keys_issue_1595(): Unit = {
+  def should_allow_object_literals_to_have_duplicate_keys_issue_1595()
+    : Unit = {
     import js.Dynamic.{literal => obj}
 
     // Basic functionality

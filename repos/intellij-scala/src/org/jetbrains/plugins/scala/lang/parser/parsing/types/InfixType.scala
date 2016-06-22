@@ -20,11 +20,11 @@ object InfixType {
   def parse(builder: ScalaPsiBuilder): Boolean = parse(builder, star = false)
   def parse(builder: ScalaPsiBuilder, star: Boolean): Boolean =
     parse(builder, star, isPattern = false)
-  def parse(
-      builder: ScalaPsiBuilder, star: Boolean, isPattern: Boolean): Boolean = {
+  def parse(builder: ScalaPsiBuilder,
+            star: Boolean,
+            isPattern: Boolean): Boolean = {
     var infixTypeMarker = builder.mark
-    var markerList =
-      List[PsiBuilder.Marker]() //This list consist of markers for right-associated op
+    var markerList = List[PsiBuilder.Marker]() //This list consist of markers for right-associated op
     var count = 0
     markerList = infixTypeMarker :: markerList
     builder.getTokenType match {
@@ -101,8 +101,8 @@ object InfixType {
         infixTypeMarker.drop()
       } else {
         markerList.head.drop()
-        for (x: PsiBuilder.Marker <- markerList.tail) x.done(
-            ScalaElementTypes.INFIX_TYPE)
+        for (x: PsiBuilder.Marker <- markerList.tail)
+          x.done(ScalaElementTypes.INFIX_TYPE)
       }
     } else {
       if (assoc == 1) {

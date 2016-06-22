@@ -50,8 +50,9 @@ private[kafka] object TopicCount extends Logging {
     for ((topic, nConsumers) <- topicCountMap) {
       val consumerSet = new mutable.HashSet[ConsumerThreadId]
       assert(nConsumers >= 1)
-      for (i <- 0 until nConsumers) consumerSet +=
-        ConsumerThreadId(consumerIdString, i)
+      for (i <- 0 until nConsumers)
+        consumerSet +=
+          ConsumerThreadId(consumerIdString, i)
       consumerThreadIdsPerTopicMap.put(topic, consumerSet)
     }
     consumerThreadIdsPerTopicMap
@@ -104,13 +105,16 @@ private[kafka] object TopicCount extends Logging {
       val filter =
         if (hasWhiteList) new Whitelist(regex)
         else new Blacklist(regex)
-      new WildcardTopicCount(
-          zkUtils, consumerId, filter, numStreams, excludeInternalTopics)
+      new WildcardTopicCount(zkUtils,
+                             consumerId,
+                             filter,
+                             numStreams,
+                             excludeInternalTopics)
     }
   }
 
-  def constructTopicCount(
-      consumerIdString: String, topicCount: Map[String, Int]) =
+  def constructTopicCount(consumerIdString: String,
+                          topicCount: Map[String, Int]) =
     new StaticTopicCount(consumerIdString, topicCount)
 
   def constructTopicCount(consumerIdString: String,
@@ -118,8 +122,11 @@ private[kafka] object TopicCount extends Logging {
                           numStreams: Int,
                           zkUtils: ZkUtils,
                           excludeInternalTopics: Boolean) =
-    new WildcardTopicCount(
-        zkUtils, consumerIdString, filter, numStreams, excludeInternalTopics)
+    new WildcardTopicCount(zkUtils,
+                           consumerIdString,
+                           filter,
+                           numStreams,
+                           excludeInternalTopics)
 }
 
 private[kafka] class StaticTopicCount(val consumerIdString: String,
@@ -134,7 +141,7 @@ private[kafka] class StaticTopicCount(val consumerIdString: String,
       case null => false
       case n: StaticTopicCount =>
         consumerIdString == n.consumerIdString &&
-        topicCountMap == n.topicCountMap
+          topicCountMap == n.topicCountMap
       case _ => false
     }
   }
@@ -156,7 +163,8 @@ private[kafka] class WildcardTopicCount(zkUtils: ZkUtils,
       .filter(topic =>
             topicFilter.isTopicAllowed(topic, excludeInternalTopics))
     TopicCount.makeConsumerThreadIdsPerTopic(
-        consumerIdString, Map(wildcardTopics.map((_, numStreams)): _*))
+        consumerIdString,
+        Map(wildcardTopics.map((_, numStreams)): _*))
   }
 
   def getTopicCountMap =

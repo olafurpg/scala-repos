@@ -41,8 +41,9 @@ abstract class IntroduceParameterTestBase
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+        FileUtil.loadFile(new File(file.getCanonicalPath),
+                          CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val startOffset = fileText.indexOf(startMarker) + startMarker.length
@@ -56,7 +57,8 @@ abstract class IntroduceParameterTestBase
 
     val fileEditorManager = FileEditorManager.getInstance(project)
     val editor = fileEditorManager.openTextEditor(
-        new OpenFileDescriptor(project, file, startOffset), false)
+        new OpenFileDescriptor(project, file, startOffset),
+        false)
 
     var res: String = null
 
@@ -81,8 +83,11 @@ abstract class IntroduceParameterTestBase
       ScalaUtils.runWriteActionDoNotRequestConfirmation(new Runnable {
         def run() {
           editor.getSelectionModel.setSelection(startOffset, endOffset)
-          ScalaRefactoringUtil.afterExpressionChoosing(
-              project, editor, scalaFile, null, "Introduce Variable") {
+          ScalaRefactoringUtil.afterExpressionChoosing(project,
+                                                       editor,
+                                                       scalaFile,
+                                                       null,
+                                                       "Introduce Variable") {
             ScalaRefactoringUtil.trimSpacesAndComments(editor, scalaFile)
             PsiDocumentManager.getInstance(project).commitAllDocuments()
             val handler = new ScalaIntroduceParameterHandler()
@@ -100,26 +105,28 @@ abstract class IntroduceParameterTestBase
                    .get,
                  StdType.ANY)
               else {
-                val fun = PsiTreeUtil.getContextOfType(
-                    elems.head, true, classOf[ScFunctionDefinition])
+                val fun =
+                  PsiTreeUtil.getContextOfType(elems.head,
+                                               true,
+                                               classOf[ScFunctionDefinition])
                 (fun, fun.returnType.getOrAny)
               }
             val collectedData =
               handler.collectData(exprWithTypes, elems, methodLike, editor)
             assert(collectedData.isDefined,
                    "Could not collect data for introduce parameter")
-            val data = collectedData.get.copy(
-                paramName = paramName, replaceAll = replaceAllOccurrences)
+            val data = collectedData.get
+              .copy(paramName = paramName, replaceAll = replaceAllOccurrences)
 
-            val paramInfo = new ScalaParameterInfo(data.paramName,
-                                                   -1,
-                                                   data.tp,
-                                                   project,
-                                                   false,
-                                                   false,
-                                                   data.defaultArg,
-                                                   isIntroducedParameter =
-                                                     true)
+            val paramInfo =
+              new ScalaParameterInfo(data.paramName,
+                                     -1,
+                                     data.tp,
+                                     project,
+                                     false,
+                                     false,
+                                     data.defaultArg,
+                                     isIntroducedParameter = true)
             val descriptor: ScalaMethodDescriptor =
               handler.createMethodDescriptor(data.methodToSearchFor, paramInfo)
             val changeInfo = new ScalaChangeInfo(descriptor.getVisibility,
@@ -137,8 +144,8 @@ abstract class IntroduceParameterTestBase
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
     } catch {
       case e: Exception =>
-        assert(
-            assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
+        assert(assertion = false,
+               message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

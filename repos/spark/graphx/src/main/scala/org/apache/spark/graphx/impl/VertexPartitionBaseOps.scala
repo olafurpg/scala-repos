@@ -165,8 +165,8 @@ private[graphx] abstract class VertexPartitionBaseOps[VD: ClassTag,
       val newValues = new Array[VD2](self.capacity)
       var i = newMask.nextSetBit(0)
       while (i >= 0) {
-        newValues(i) = f(
-            self.index.getValue(i), self.values(i), other.values(i))
+        newValues(i) =
+          f(self.index.getValue(i), self.values(i), other.values(i))
         i = newMask.nextSetBit(i + 1)
       }
       this.withValues(newValues).withMask(newMask)
@@ -177,8 +177,8 @@ private[graphx] abstract class VertexPartitionBaseOps[VD: ClassTag,
     * Inner join an iterator of messages.
     */
   def innerJoin[U: ClassTag, VD2: ClassTag](
-      iter: Iterator[Product2[VertexId, U]])(
-      f: (VertexId, VD, U) => VD2): Self[VD2] = {
+      iter: Iterator[Product2[VertexId, U]])(f: (VertexId, VD,
+                                                 U) => VD2): Self[VD2] = {
     innerJoin(createUsingIndex(iter))(f)
   }
 

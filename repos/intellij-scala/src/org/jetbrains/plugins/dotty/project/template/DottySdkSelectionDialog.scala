@@ -11,8 +11,8 @@ import scala.runtime.BoxedUnit
 /**
   * @author adkozlov
   */
-class DottySdkSelectionDialog(
-    parent: JComponent, provider: () => java.util.List[SdkChoice])
+class DottySdkSelectionDialog(parent: JComponent,
+                              provider: () => java.util.List[SdkChoice])
     extends SdkSelectionDialog(parent, provider, false) {
 
   setDownloadButtonText("Download latest snapshot")

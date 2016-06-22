@@ -17,8 +17,8 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocTag
 class ScalaDocUnknownTagInspection extends LocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
-  override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(holder: ProblemsHolder,
+                            isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitTag(s: ScDocTag) {
         val tagNameElement = s.getFirstChild
@@ -55,8 +55,8 @@ class ScalaDocUnknownTagInspection extends LocalInspectionTool {
 }
 
 class ScalaDocDeleteUnknownTagInspection(unknownTag: ScDocTag)
-    extends AbstractFixOnPsiElement(
-        ScalaBundle.message("delete.unknown.tag"), unknownTag) {
+    extends AbstractFixOnPsiElement(ScalaBundle.message("delete.unknown.tag"),
+                                    unknownTag) {
   override def getFamilyName: String = InspectionsUtil.SCALADOC
 
   def doApplyFix(project: Project) {

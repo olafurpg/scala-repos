@@ -142,8 +142,8 @@ trait FlashMapSupport extends Handler {
 
   import org.scalatra.FlashMapSupport._
 
-  abstract override def handle(
-      req: HttpServletRequest, res: HttpServletResponse): Unit = {
+  abstract override def handle(req: HttpServletRequest,
+                               res: HttpServletResponse): Unit = {
     withRequest(req) {
       val f = flash
       val isOutermost = !request.contains(LockKey)

@@ -68,7 +68,7 @@ class YarnSparkHadoopUtilSuite
       val argLine =
         args.map(a => YarnSparkHadoopUtil.escapeForShell(a)).mkString(" ")
       Files.write(("bash -c \"echo " + argLine +
-                      "\"").getBytes(StandardCharsets.UTF_8),
+                        "\"").getBytes(StandardCharsets.UTF_8),
                   scriptFile)
       scriptFile.setExecutable(true)
 
@@ -109,21 +109,21 @@ class YarnSparkHadoopUtilSuite
 
     viewAcls match {
       case Some(vacls) => {
-          val aclSet = vacls.split(',').map(_.trim).toSet
-          assert(aclSet.contains(System.getProperty("user.name", "invalid")))
-        }
+        val aclSet = vacls.split(',').map(_.trim).toSet
+        assert(aclSet.contains(System.getProperty("user.name", "invalid")))
+      }
       case None => {
-          fail()
-        }
+        fail()
+      }
     }
     modifyAcls match {
       case Some(macls) => {
-          val aclSet = macls.split(',').map(_.trim).toSet
-          assert(aclSet.contains(System.getProperty("user.name", "invalid")))
-        }
+        val aclSet = macls.split(',').map(_.trim).toSet
+        assert(aclSet.contains(System.getProperty("user.name", "invalid")))
+      }
       case None => {
-          fail()
-        }
+        fail()
+      }
     }
   }
 
@@ -143,25 +143,25 @@ class YarnSparkHadoopUtilSuite
 
     viewAcls match {
       case Some(vacls) => {
-          val aclSet = vacls.split(',').map(_.trim).toSet
-          assert(aclSet.contains("user1"))
-          assert(aclSet.contains("user2"))
-          assert(aclSet.contains(System.getProperty("user.name", "invalid")))
-        }
+        val aclSet = vacls.split(',').map(_.trim).toSet
+        assert(aclSet.contains("user1"))
+        assert(aclSet.contains("user2"))
+        assert(aclSet.contains(System.getProperty("user.name", "invalid")))
+      }
       case None => {
-          fail()
-        }
+        fail()
+      }
     }
     modifyAcls match {
       case Some(macls) => {
-          val aclSet = macls.split(',').map(_.trim).toSet
-          assert(aclSet.contains("user3"))
-          assert(aclSet.contains("user4"))
-          assert(aclSet.contains(System.getProperty("user.name", "invalid")))
-        }
+        val aclSet = macls.split(',').map(_.trim).toSet
+        assert(aclSet.contains("user3"))
+        assert(aclSet.contains("user4"))
+        assert(aclSet.contains(System.getProperty("user.name", "invalid")))
+      }
       case None => {
-          fail()
-        }
+        fail()
+      }
     }
   }
 
@@ -223,8 +223,8 @@ class YarnSparkHadoopUtilSuite
 
   test("check access two nns") {
     val sparkConf = new SparkConf()
-    sparkConf.set(
-        "spark.yarn.access.namenodes", "hdfs://nn1:8032,hdfs://nn2:8032")
+    sparkConf.set("spark.yarn.access.namenodes",
+                  "hdfs://nn1:8032,hdfs://nn2:8032")
     val util = new YarnSparkHadoopUtil
     val nns = util.getNameNodesToAccess(sparkConf)
     nns should be(
@@ -234,8 +234,8 @@ class YarnSparkHadoopUtilSuite
   test("check token renewer") {
     val hadoopConf = new Configuration()
     hadoopConf.set("yarn.resourcemanager.address", "myrm:8033")
-    hadoopConf.set(
-        "yarn.resourcemanager.principal", "yarn/myrm:8032@SPARKTEST.COM")
+    hadoopConf.set("yarn.resourcemanager.principal",
+                   "yarn/myrm:8032@SPARKTEST.COM")
     val util = new YarnSparkHadoopUtil
     val renewer = util.getTokenRenewer(hadoopConf)
     renewer should be("yarn/myrm:8032@SPARKTEST.COM")
@@ -321,8 +321,8 @@ class YarnSparkHadoopUtilSuite
     } finally {
       // removeSecretKey() was only added in Hadoop 2.6, so instead we just set the secret
       // to an empty string.
-      SparkHadoopUtil.get.addSecretKeyToUserCredentials(
-          SecurityManager.SECRET_LOOKUP_KEY, "")
+      SparkHadoopUtil.get
+        .addSecretKeyToUserCredentials(SecurityManager.SECRET_LOOKUP_KEY, "")
       System.clearProperty("SPARK_YARN_MODE")
     }
   }

@@ -34,8 +34,9 @@ abstract class ScalaSigSymbol extends Symbol {
     applyScalaSigRule(ScalaSigParsers.attributes) filter (_.symbol == this)
 }
 
-case class ExternalSymbol(
-    name: String, parent: Option[Symbol], entry: ScalaSig#Entry)
+case class ExternalSymbol(name: String,
+                          parent: Option[Symbol],
+                          entry: ScalaSig#Entry)
     extends ScalaSigSymbol {
   override def toString = path
   def hasFlag(flag: Long) = false
@@ -54,7 +55,7 @@ case class SymbolInfo(name: String,
 
   override def toString =
     name + ", owner=" + symbolString(owner) + ", flags=" + flags.toHexString +
-    ", info=" + info + (privateWithin match {
+      ", info=" + info + (privateWithin match {
           case Some(any) => ", privateWithin=" + symbolString(any)
           case None => " "
         })

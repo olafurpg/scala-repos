@@ -13,8 +13,7 @@ import org.jetbrains.jps.model.module.JpsModule
   * 11/19/13
   */
 class ScalaBuilderService extends BuilderService {
-  ResourcesBuilder.registerEnabler(
-      new StandardResourceBuilderEnabler {
+  ResourcesBuilder.registerEnabler(new StandardResourceBuilderEnabler {
     def isResourceProcessingEnabled(module: JpsModule): Boolean = {
       val moduleType = module.getModuleType
       moduleType != SbtModuleType.INSTANCE &&

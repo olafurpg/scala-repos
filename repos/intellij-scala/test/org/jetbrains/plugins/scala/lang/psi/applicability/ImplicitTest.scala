@@ -47,8 +47,9 @@ class ImplicitTest extends ApplicabilityTestBase {
       case MissedValueParameter(Parameter("a")) :: MissedValueParameter(
           Parameter("b")) :: Nil =>
     }
-    assertProblemsFunction(
-        "implicit val v = B", "(implicit a: A, b: B)", "(A)") {
+    assertProblemsFunction("implicit val v = B",
+                           "(implicit a: A, b: B)",
+                           "(A)") {
       case MissedValueParameter(Parameter("b")) :: Nil =>
     }
   }

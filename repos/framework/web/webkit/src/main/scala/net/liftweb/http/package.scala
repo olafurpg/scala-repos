@@ -34,8 +34,8 @@ package object http {
     * implicit for it.
     */
   implicit def asyncResolvableTransform[ResolvableType, ResolvedType](
-      implicit asyncResolveProvider: CanResolveAsync[
-          ResolvableType, ResolvedType],
+      implicit asyncResolveProvider: CanResolveAsync[ResolvableType,
+                                                     ResolvedType],
       innerTransform: CanBind[ResolvedType]
   ) = {
     new CanBind[ResolvableType] {
@@ -47,12 +47,12 @@ package object http {
 
         S.session.map { session =>
           // Capture context now.
-          val deferredRender = session.buildDeferredFunction(
-              (resolved: ResolvedType) => {
-            AsyncRenderComet.completeAsyncRender(
-                Replace(placeholderId, innerTransform(resolved)(ns).flatten)
-            )
-          })
+          val deferredRender =
+            session.buildDeferredFunction((resolved: ResolvedType) => {
+              AsyncRenderComet.completeAsyncRender(
+                  Replace(placeholderId, innerTransform(resolved)(ns).flatten)
+              )
+            })
 
           // Actually complete the render once the future is fulfilled.
           asyncResolveProvider.resolveAsync(

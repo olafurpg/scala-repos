@@ -154,11 +154,13 @@ trait CValueGenerators extends ArbitraryBigDecimal {
       idCount <- choose(1, 3)
       dataSize <- choose(0, 20)
       ids <- containerOfN[Set, List[Long]](
-                dataSize, containerOfN[List, Long](idCount, posNum[Long]))
+                dataSize,
+                containerOfN[List, Long](idCount, posNum[Long]))
       values <- containerOfN[List, Seq[(JPath, JValue)]](
-                   dataSize, Gen.sequence[List, (JPath, JValue)](jschema map {
-                 case (jpath, ctype) => jvalue(ctype).map(jpath ->)
-               }))
+                   dataSize,
+                   Gen.sequence[List, (JPath, JValue)](jschema map {
+                     case (jpath, ctype) => jvalue(ctype).map(jpath ->)
+                   }))
 
       falseDepth <- choose(1, 3)
       falseSchema <- schema(falseDepth)
@@ -176,7 +178,7 @@ trait CValueGenerators extends ArbitraryBigDecimal {
     } yield {
       (idCount,
        (ids.map(_.toArray) zip values).toStream ++
-       (falseIds2.map(_.toArray) zip falseValues).toStream)
+         (falseIds2.map(_.toArray) zip falseValues).toStream)
     }
 
   def assemble(parts: Seq[(JPath, JValue)]): JValue = {

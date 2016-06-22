@@ -27,8 +27,8 @@ abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData]
                                              startOffsets: Array[Int],
                                              endOffsets: Array[Int]) = {
 
-    val result = collectTransferableData0(
-        file, editor, startOffsets, endOffsets)
+    val result =
+      collectTransferableData0(file, editor, startOffsets, endOffsets)
 
     if (result == null) emptyList() else singletonList(result)
   }
@@ -57,8 +57,12 @@ abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData]
                                              values: util.List[T]) {
 
     values.asScala.foreach { value =>
-      processTransferableData0(
-          project, editor, bounds, caretOffset, ref, value)
+      processTransferableData0(project,
+                               editor,
+                               bounds,
+                               caretOffset,
+                               ref,
+                               value)
     }
   }
 

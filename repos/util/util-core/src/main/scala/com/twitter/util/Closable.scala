@@ -86,8 +86,8 @@ object Closable {
     * resource ''n+1'' is not closed until resource ''n'' is.
     */
   def sequence(closables: Closable*): Closable = new Closable {
-    private final def closeSeq(
-        deadline: Time, closables: Seq[Closable]): Future[Unit] =
+    private final def closeSeq(deadline: Time,
+                               closables: Seq[Closable]): Future[Unit] =
       closables match {
         case Seq() => Future.Done
         case Seq(hd, tl @ _ *) =>

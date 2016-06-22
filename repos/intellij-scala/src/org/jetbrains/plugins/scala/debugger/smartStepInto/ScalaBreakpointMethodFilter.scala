@@ -33,8 +33,8 @@ class ScalaBreakpointMethodFilter(
     case m => JVMNameUtil.getJVMSignature(m)
   }
 
-  override def locationMatches(
-      process: DebugProcessImpl, location: Location): Boolean = {
+  override def locationMatches(process: DebugProcessImpl,
+                               location: Location): Boolean = {
     def signatureMatches(method: Method): Boolean = {
       val expSign = expectedSignature match {
         case None => return true
@@ -53,7 +53,7 @@ class ScalaBreakpointMethodFilter(
     psiMethod match {
       case None => //is created for fun expression
         method.name == "apply" || method.name.startsWith("apply$") ||
-        ScalaPositionManager.isIndyLambda(method)
+          ScalaPositionManager.isIndyLambda(method)
       case Some(m) =>
         val javaName = inReadAction(
             if (m.isConstructor) "<init>"
@@ -107,8 +107,11 @@ object ScalaBreakpointMethodFilter {
            exprLines: Range[Integer]): Option[ScalaBreakpointMethodFilter] = {
     val firstPos = first.map(createSourcePosition)
     val lastPos = last.map(createSourcePosition)
-    Some(new ScalaBreakpointMethodFilter(
-            psiMethod, firstPos, lastPos, exprLines))
+    Some(
+        new ScalaBreakpointMethodFilter(psiMethod,
+                                        firstPos,
+                                        lastPos,
+                                        exprLines))
   }
 
   @Nullable

@@ -11,8 +11,9 @@ import org.jetbrains.sbt.project.settings.SbtLocalSettings
 // TODO Rely on the immediate UI interaction API when IDEA-123007 will be implemented
 class SbtNotificationListener
     extends ExternalSystemTaskNotificationListenerAdapter {
-  override def onTaskOutput(
-      id: ExternalSystemTaskId, text: String, stdOut: Boolean) {
+  override def onTaskOutput(id: ExternalSystemTaskId,
+                            text: String,
+                            stdOut: Boolean) {
     // TODO this check must be performed in the External System itself (see SCL-7405)
     if (id.getProjectSystemId == SbtProjectSystem.Id) {
       processOutput(text)

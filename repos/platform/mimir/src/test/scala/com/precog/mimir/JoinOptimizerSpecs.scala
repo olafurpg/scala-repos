@@ -70,8 +70,10 @@ trait JoinOptimizerSpecs[M[+ _]]
       val numbers =
         dag.AbsoluteLoad(Const(CString("/het/numbers"))(line))(line)
 
-      def makeFilter(
-          lhs1: DepGraph, rhs1: DepGraph, lhs2: DepGraph, rhs2: DepGraph) =
+      def makeFilter(lhs1: DepGraph,
+                     rhs1: DepGraph,
+                     lhs2: DepGraph,
+                     rhs2: DepGraph) =
         Filter(IdentitySort,
                Join(Eq, Cross(None), lhs1, rhs1)(line),
                Join(Eq, Cross(None), lhs2, rhs2)(line))(line)
@@ -589,8 +591,8 @@ trait JoinOptimizerSpecs[M[+ _]]
       val line = Line(1, 1, "")
       val clicksData =
         dag.AbsoluteLoad(Const(CString("/clicks"))(line), JUniverseT)(line)
-      val conversionsData = dag.AbsoluteLoad(
-          Const(CString("/conversions"))(line), JUniverseT)(line)
+      val conversionsData = dag
+        .AbsoluteLoad(Const(CString("/conversions"))(line), JUniverseT)(line)
       val clicks = Const(CString("clicks"))(line)
       val price = Const(CString("price"))(line)
       val id = Const(CString("ID"))(line)
@@ -638,32 +640,39 @@ trait JoinOptimizerSpecs[M[+ _]]
                                  "value",
                                  0)
 
-      val input = Filter(
-          IdentitySort,
-          Join(JoinObject,
-               Cross(None),
-               Join(WrapObject, Cross(None), clicks, clicksData)(line),
-               Join(WrapObject,
-                    Cross(None),
-                    price,
-                    Join(DerefObject,
-                         Cross(None),
-                         Join(DerefObject,
+      val input = Filter(IdentitySort,
+                         Join(JoinObject,
                               Cross(None),
-                              conversionsData,
-                              product)(line),
-                         id)(line))(line))(line),
-          Join(Eq,
-               Cross(None),
-               Join(DerefObject,
-                    Cross(None),
-                    Join(DerefObject, Cross(None), conversionsData, product)(
-                        line),
-                    price)(line),
-               Join(DerefObject,
-                    Cross(None),
-                    Join(DerefObject, Cross(None), clicksData, product)(line),
-                    price)(line))(line))(line)
+                              Join(WrapObject,
+                                   Cross(None),
+                                   clicks,
+                                   clicksData)(line),
+                              Join(WrapObject,
+                                   Cross(None),
+                                   price,
+                                   Join(DerefObject,
+                                        Cross(None),
+                                        Join(DerefObject,
+                                             Cross(None),
+                                             conversionsData,
+                                             product)(line),
+                                        id)(line))(line))(line),
+                         Join(Eq,
+                              Cross(None),
+                              Join(DerefObject,
+                                   Cross(None),
+                                   Join(DerefObject,
+                                        Cross(None),
+                                        conversionsData,
+                                        product)(line),
+                                   price)(line),
+                              Join(DerefObject,
+                                   Cross(None),
+                                   Join(DerefObject,
+                                        Cross(None),
+                                        clicksData,
+                                        product)(line),
+                                   price)(line))(line))(line)
 
       val opt = optimizeJoins(input, ctx, new IdGen)
 

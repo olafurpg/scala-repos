@@ -79,7 +79,7 @@ abstract class MultiNodeConfig {
 
   def deployOn(role: RoleName, deployment: String): Unit =
     _deployments += role ->
-    ((_deployments get role getOrElse Vector()) :+ deployment)
+      ((_deployments get role getOrElse Vector()) :+ deployment)
 
   def deployOnAll(deployment: String): Unit = _allDeploy :+= deployment
 
@@ -99,7 +99,8 @@ abstract class MultiNodeConfig {
   private[testkit] def config: Config = {
     val transportConfig =
       if (_testTransport)
-        ConfigFactory.parseString("""
+        ConfigFactory.parseString(
+            """
            akka.remote.netty.tcp.applied-adapters = [trttl, gremlin]
         """)
       else ConfigFactory.empty
@@ -126,8 +127,8 @@ object MultiNodeSpec {
     */
   val maxNodes: Int =
     Option(Integer.getInteger("multinode.max-nodes")) getOrElse
-    (throw new IllegalStateException(
-            "need system property multinode.max-nodes to be set"))
+      (throw new IllegalStateException(
+              "need system property multinode.max-nodes to be set"))
 
   require(maxNodes > 0, "multinode.max-nodes must be greater than 0")
 
@@ -174,8 +175,8 @@ object MultiNodeSpec {
     */
   val serverName: String =
     Option(System.getProperty("multinode.server-host")) getOrElse
-    (throw new IllegalStateException(
-            "need system property multinode.server-host to be set"))
+      (throw new IllegalStateException(
+              "need system property multinode.server-host to be set"))
 
   require(serverName != "", "multinode.server-host must not be empty")
 
@@ -202,8 +203,8 @@ object MultiNodeSpec {
     */
   val selfIndex =
     Option(Integer.getInteger("multinode.index")) getOrElse
-    (throw new IllegalStateException(
-            "need system property multinode.index to be set"))
+      (throw new IllegalStateException(
+              "need system property multinode.index to be set"))
 
   require(selfIndex >= 0 && selfIndex < maxNodes,
           "multinode.index is out of bounds: " + selfIndex)
@@ -240,7 +241,7 @@ object MultiNodeSpec {
   private def getCallerName(clazz: Class[_]): String = {
     val s =
       Thread.currentThread.getStackTrace map (_.getClassName) drop 1 dropWhile
-      (_ matches ".*MultiNodeSpec.?$")
+        (_ matches ".*MultiNodeSpec.?$")
     val reduced = s.lastIndexWhere(_ == clazz.getName) match {
       case -1 ⇒ s
       case z ⇒ s drop (z + 1)
@@ -282,8 +283,8 @@ abstract class MultiNodeSpec(val myself: RoleName,
   implicit def awaitHelper[T](w: Awaitable[T]) = new AwaitHelper(w)
   class AwaitHelper[T](w: Awaitable[T]) {
     def await: T =
-      Await.result(
-          w, remainingOr(testConductor.Settings.QueryTimeout.duration))
+      Await
+        .result(w, remainingOr(testConductor.Settings.QueryTimeout.duration))
   }
 
   final override def multiNodeSpecBeforeAll {
@@ -390,8 +391,8 @@ abstract class MultiNodeSpec(val myself: RoleName,
   def node(role: RoleName): ActorPath =
     RootActorPath(testConductor.getAddressFor(role).await)
 
-  def muteDeadLetters(
-      messageClasses: Class[_]*)(sys: ActorSystem = system): Unit =
+  def muteDeadLetters(messageClasses: Class[_]*)(
+      sys: ActorSystem = system): Unit =
     if (!sys.log.isDebugEnabled) {
       def mute(clazz: Class[_]): Unit =
         sys.eventStream.publish(

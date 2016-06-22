@@ -32,7 +32,7 @@ case class ChiSquared(k: Double)(implicit rand: RandBasis = Rand)
     } else {
       throw new IllegalArgumentException(
           "Domain of ChiSquared.pdf is [0,Infinity), you tried to apply to " +
-          x)
+            x)
     }
 
   def unnormalizedLogPdf(x: Double): Double = innerGamma.unnormalizedLogPdf(x)

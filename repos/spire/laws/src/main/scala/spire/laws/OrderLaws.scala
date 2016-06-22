@@ -44,8 +44,7 @@ trait OrderLaws[A] extends Laws {
       name: String,
       parent: Option[OrderProperties],
       props: (String, Prop)*
-  )
-      extends DefaultRuleSet(name, parent, props: _*)
+  ) extends DefaultRuleSet(name, parent, props: _*)
 }
 
 // vim: expandtab:ts=2:sw=2

@@ -38,8 +38,9 @@ package object optimize {
   def iterations[Objective, Vector, State](fn: Objective,
                                            init: Vector,
                                            options: OptimizationOption*)(
-      implicit optimization: IterableOptimizationPackage[
-          Objective, Vector, State]) = {
+      implicit optimization: IterableOptimizationPackage[Objective,
+                                                         Vector,
+                                                         State]) = {
     optimization.iterations(fn, init, options: _*)
   }
 }

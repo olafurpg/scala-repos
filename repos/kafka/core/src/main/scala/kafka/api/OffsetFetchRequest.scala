@@ -46,8 +46,11 @@ object OffsetFetchRequest extends Logging {
         TopicAndPartition(topic, partitionId)
       })
     })
-    OffsetFetchRequest(
-        consumerGroupId, pairs, versionId, correlationId, clientId)
+    OffsetFetchRequest(consumerGroupId,
+                       pairs,
+                       versionId,
+                       correlationId,
+                       clientId)
   }
 }
 
@@ -84,12 +87,12 @@ case class OffsetFetchRequest(
     2 + /* versionId */
     4 + /* correlationId */
     shortStringLength(clientId) + shortStringLength(groupId) + 4 +
-    /* topic count */
-    requestInfoGroupedByTopic.foldLeft(0)((count, t) => {
-      count + shortStringLength(t._1) + /* topic */
-      4 + /* number of partitions */
-      t._2.size * 4 /* partition */
-    })
+      /* topic count */
+      requestInfoGroupedByTopic.foldLeft(0)((count, t) => {
+        count + shortStringLength(t._1) + /* topic */
+        4 + /* number of partitions */
+        t._2.size * 4 /* partition */
+      })
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,
@@ -101,8 +104,8 @@ case class OffsetFetchRequest(
              Errors.forException(e).code
          ))
     }.toMap
-    val errorResponse = OffsetFetchResponse(
-        requestInfo = responseMap, correlationId = correlationId)
+    val errorResponse = OffsetFetchResponse(requestInfo = responseMap,
+                                            correlationId = correlationId)
     requestChannel.sendResponse(
         new Response(
             request,

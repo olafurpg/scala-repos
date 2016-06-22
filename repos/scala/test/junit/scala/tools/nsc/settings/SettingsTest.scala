@@ -131,9 +131,11 @@ class SettingsTest {
         check("-Xlint", "adapted-args", "-deprecation")(
             _.warnMissingInterpolator))
     assertTrue(
-        check(
-            "-Xlint", "adapted-args", "missing-interpolator", "-deprecation")(
-            s => s.warnMissingInterpolator && s.warnAdaptedArgs))
+        check("-Xlint",
+              "adapted-args",
+              "missing-interpolator",
+              "-deprecation")(s =>
+              s.warnMissingInterpolator && s.warnAdaptedArgs))
     assertThrows[IllegalArgumentException](
         check("-Xlint", "adapted-args", "-missing-interpolator")(
             _.warnAdaptedArgs)) // non-colonated: cannot provide negative args
@@ -193,8 +195,11 @@ class SettingsTest {
       val ac = Choice("ac", expandsTo = List(a, c))
       val uber = Choice("uber", expandsTo = List(ab, d))
     }
-    val m = s.MultiChoiceSetting(
-        "-m", "args", "magic sauce", mChoices, Some(List("ac")))
+    val m = s.MultiChoiceSetting("-m",
+                                 "args",
+                                 "magic sauce",
+                                 mChoices,
+                                 Some(List("ac")))
 
     def check(args: String*)(
         t: s.MultiChoiceSetting[mChoices.type] => Boolean): Boolean = {
@@ -225,9 +230,10 @@ class SettingsTest {
     assertFalse(check("-m:uber")(_.contains("i-m-not-an-option")))
 
     assertThrows[IllegalArgumentException](
-        check("-m:-_")(_ => true), _ contains "'-_' is not a valid choice")
-    assertThrows[IllegalArgumentException](
-        check("-m:a,b,-ab")(_ => true), _ contains "'ab' cannot be negated")
+        check("-m:-_")(_ => true),
+        _ contains "'-_' is not a valid choice")
+    assertThrows[IllegalArgumentException](check("-m:a,b,-ab")(_ => true),
+                                           _ contains "'ab' cannot be negated")
     assertThrows[IllegalArgumentException](
         check("-m:a,ac,-uber,uber")(_ => true),
         _ contains "'uber' cannot be negated")

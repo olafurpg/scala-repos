@@ -17,8 +17,8 @@ object ForkTest extends Properties("Fork") {
     */
   final val MaximumClasspathLength = 100000
 
-  lazy val genOptionName = frequency(
-      (9, Some("-cp")), (9, Some("-classpath")), (1, None))
+  lazy val genOptionName =
+    frequency((9, Some("-cp")), (9, Some("-classpath")), (1, None))
   lazy val pathElement = nonEmptyListOf(alphaNumChar).map(_.mkString)
   lazy val path = nonEmptyListOf(pathElement).map(_.mkString(File.separator))
   lazy val genRelClasspath = nonEmptyListOf(path)
@@ -37,7 +37,10 @@ object ForkTest extends Properties("Fork") {
               requiredEntries ::: relCP.map(rel => new File(dir, rel))
             val absClasspath = trimClasspath(Path.makeString(withScala))
             val args =
-              optionName.map(_ :: absClasspath :: Nil).toList.flatten ++ mainAndArgs
+              optionName
+                .map(_ :: absClasspath :: Nil)
+                .toList
+                .flatten ++ mainAndArgs
             val config = ForkOptions(outputStrategy = Some(LoggedOutput(log)))
             val exitCode = try Fork.java(config, args) catch {
               case e: Exception => e.printStackTrace; 1

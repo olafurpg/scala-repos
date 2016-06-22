@@ -336,12 +336,13 @@ object KafkaTools extends Command {
 
       trackedAccounts =
         trackedAccounts ++
-        (byAccount.keySet -- trackedAccounts)
+          (byAccount.keySet -- trackedAccounts)
       slices += (timestamp -> byAccount)
     }
 
-    def processIngest(
-        trackInterval: Int, state: ReportState, msg: IngestMessage) = {
+    def processIngest(trackInterval: Int,
+                      state: ReportState,
+                      msg: IngestMessage) = {
       // Track timestamps
       (if (msg.timestamp != EventMessage.defaultTimestamp) {
          //println("Exact timestamp found: " + msg.timestamp)
@@ -386,7 +387,7 @@ object KafkaTools extends Command {
             interpolationMap ++= pendingTimes.map { interp =>
               val interpFraction =
                 (interp.index - lastTimestamp.index).toDouble /
-                (newTimestamp.index - lastTimestamp.index)
+                  (newTimestamp.index - lastTimestamp.index)
               val timeSpanSize = newTimestamp.time - lastTimestamp.time
               val interpTS =
                 (interpFraction * timeSpanSize + lastTimestamp.time).toLong
@@ -410,7 +411,7 @@ object KafkaTools extends Command {
 
         ReportState(state.index + 1,
                     state.pathSize +
-                    (path -> (state.pathSize.getOrElse(path, 0L) + size)))
+                      (path -> (state.pathSize.getOrElse(path, 0L) + size)))
       } else {
         state.inc
       }
@@ -490,9 +491,10 @@ object KafkaTools extends Command {
               case i: Interpolated => interpolationMap.get(i)
             }).foreach { timestamp =>
               //println(index + " => " + timestamp)
-              println("%d,%d,%s".format(timestamp,
-                                        accountTotals.sum,
-                                        accountTotals.mkString(",")))
+              println(
+                  "%d,%d,%s".format(timestamp,
+                                    accountTotals.sum,
+                                    accountTotals.mkString(",")))
             }
         }
       } else {
@@ -503,17 +505,19 @@ object KafkaTools extends Command {
               case i: Interpolated => interpolationMap.get(i)
             }).foreach { timestamp =>
               //println(index + " => " + timestamp)
-              println(JObject(
+              println(
+                  JObject(
                       "index" -> JNum(timestamp),
                       "account" -> JString("total"),
                       "size" -> JNum(byAccount.map(_._2).sum)).renderCompact)
               trackedAccounts.foreach { account =>
                 if (byAccount.contains(account)) {
                   println(JObject("index" -> JNum(timestamp),
-                                  "account" -> JString(accountLookup.getOrElse(
-                                          account, account)),
+                                  "account" -> JString(accountLookup
+                                        .getOrElse(account, account)),
                                   "size" -> JNum(byAccount.getOrElse(
-                                          account, 0L))).renderCompact)
+                                          account,
+                                          0L))).renderCompact)
                 }
               }
             }
@@ -561,8 +565,7 @@ object KafkaTools extends Command {
 
     def parseOffset(s: String): Either[Unit, Option[Int]] = {
       try {
-        Right(
-            if (s.trim.length == 0) {
+        Right(if (s.trim.length == 0) {
           None
         } else {
           Some(s.toInt)
@@ -607,8 +610,8 @@ object KafkaTools extends Command {
       message.get(bytes)
 
       println(
-          "Type: %d, offset: %d, payload: %s".format(
-              tpe, msg.offset, new String(bytes, "UTF-8")))
+          "Type: %d, offset: %d, payload: %s"
+            .format(tpe, msg.offset, new String(bytes, "UTF-8")))
     }
   }
 
@@ -617,14 +620,14 @@ object KafkaTools extends Command {
       EventEncoding.read(msg.message.payload) match {
         case Success(Ingest(apiKey, path, ownerAccountId, data, _, _, _)) =>
           println(
-              "Ingest-%06d Offset: %d Path: %s APIKey: %s Owner: %s --".format(
-                  i + 1, msg.offset, path, apiKey, ownerAccountId))
+              "Ingest-%06d Offset: %d Path: %s APIKey: %s Owner: %s --"
+                .format(i + 1, msg.offset, path, apiKey, ownerAccountId))
           data.foreach(v => println(v.renderPretty))
 
         case other =>
           println(
-              "Message %d: %s was not an ingest request.".format(
-                  i + 1, other.toString))
+              "Message %d: %s was not an ingest request."
+                .format(i + 1, other.toString))
       }
     }
   }
@@ -643,8 +646,9 @@ object KafkaTools extends Command {
 
       parsed.valueOr {
         case other =>
-          println("Message %d: %s was not an ingest request.".format(
-                  i + 1, other.toString))
+          println(
+              "Message %d: %s was not an ingest request."
+                .format(i + 1, other.toString))
       }
     }
   }
@@ -746,13 +750,14 @@ object ZookeeperTools extends Command {
 
     config.relayAgentUpdate.foreach {
       case (path, data) =>
-        setRelayState(
-            path, parseRelayState(data).valueOr(err => sys.error(err.message)))
+        setRelayState(path, parseRelayState(data).valueOr(err =>
+                  sys.error(err.message)))
     }
   }
 
-  def showChildren(
-      name: String, path: String, children: Buffer[(String, String)]) {
+  def showChildren(name: String,
+                   path: String,
+                   children: Buffer[(String, String)]) {
     children match {
       case l if l.size == 0 =>
         println("no %s at: %s".format(name, path))
@@ -862,16 +867,16 @@ object IngestTools extends Command {
 
     println("Messaging State")
     println(
-        "PID: %d Shard SID: %s Ingest (relay) SID: %s".format(
-            pid, shardSID, relaySID))
+        "PID: %d Shard SID: %s Ingest (relay) SID: %s"
+          .format(pid, shardSID, relaySID))
 
     val syncDelta =
       relayState.nextSequenceId - 1 - shardValues.get(pid).getOrElse(0)
 
     if (syncDelta > config.limit) {
       println(
-          "Message sync limit exceeded: %d > %d".format(
-              syncDelta, config.limit))
+          "Message sync limit exceeded: %d > %d".format(syncDelta,
+                                                        config.limit))
       sys.exit(1)
     }
 
@@ -884,12 +889,14 @@ object IngestTools extends Command {
     val shardModified = new DateTime(shardStat.getMtime, DateTimeZone.UTC)
 
     if (isOlderThan(config.lag, relayModified)) {
-      println("Relay state exceeds acceptable lag. (Last Updated: %s)".format(
+      println(
+          "Relay state exceeds acceptable lag. (Last Updated: %s)".format(
               relayModified))
       sys.exit(2)
     }
     if (isOlderThan(config.lag, shardModified)) {
-      println("Shard state exceeds acceptable lag. (Last updated: %s)".format(
+      println(
+          "Shard state exceeds acceptable lag. (Last updated: %s)".format(
               shardModified))
       sys.exit(3)
     }
@@ -1004,8 +1011,9 @@ object ImportTools extends Command with Logging {
     val masterChef =
       actorSystem.actorOf(Props[Chef].withRouter(RoundRobinRouter(chefs)))
 
-    val accountFinder = new StaticAccountFinder[Future](
-        config.accountId, config.apiKey, Some("/"))
+    val accountFinder = new StaticAccountFinder[Future](config.accountId,
+                                                        config.apiKey,
+                                                        Some("/"))
 
     logger.info("Starting APIKeyFinder")
     //// ****** WARNING ****** ////
@@ -1021,8 +1029,8 @@ object ImportTools extends Command with Logging {
     object vfsModule extends ActorVFSModule { self =>
       logger.info("Starting ResourceBuilder")
       val jobManager = new InMemoryJobManager[Future]
-      val permissionsFinder = new PermissionsFinder(
-          apiKeyFinder, accountFinder, new Instant(0L))
+      val permissionsFinder =
+        new PermissionsFinder(apiKeyFinder, accountFinder, new Instant(0L))
       val resourceBuilder = new ResourceBuilder(actorSystem,
                                                 yggConfig.clock,
                                                 masterChef,
@@ -1031,11 +1039,12 @@ object ImportTools extends Command with Logging {
 
       logger.info("Starting Projections Actor")
       val projectionsActor = actorSystem.actorOf(
-          Props(new PathRoutingActor(yggConfig.dataDir,
-                                     yggConfig.storageTimeout.duration,
-                                     yggConfig.quiescenceTimeout,
-                                     100,
-                                     yggConfig.clock)))
+          Props(
+              new PathRoutingActor(yggConfig.dataDir,
+                                   yggConfig.storageTimeout.duration,
+                                   yggConfig.quiescenceTimeout,
+                                   100,
+                                   yggConfig.clock)))
 
       logger.info("Shard module complete")
     }
@@ -1050,8 +1059,11 @@ object ImportTools extends Command with Logging {
       for {
         rootKey <- apiKeyManager.rootAPIKey
         rootGrantId <- apiKeyManager.rootGrantId
-        _ <- apiKeyManager.populateAPIKey(
-                None, None, rootKey, key, Set(rootGrantId)) onComplete {
+        _ <- apiKeyManager.populateAPIKey(None,
+                                          None,
+                                          rootKey,
+                                          key,
+                                          Set(rootGrantId)) onComplete {
               case Left(error) =>
                 logger.error(
                     "Could not add grant " + rootGrantId + " to apiKey " + key,
@@ -1087,8 +1099,9 @@ object ImportTools extends Command with Logging {
           val (AsyncParse(errors, results), parser) = p(input)
 
           if (!errors.isEmpty) {
-            sys.error("found %d parse errors.\nfirst 5 were: %s" format
-                (errors.length, errors.take(5)))
+            sys.error(
+                "found %d parse errors.\nfirst 5 were: %s" format
+                  (errors.length, errors.take(5)))
           } else if (results.size > 0) {
             val eventidobj = EventId(pid, sid.getAndIncrement)
             logger.info("Sending %d events".format(results.size))
@@ -1122,13 +1135,14 @@ object ImportTools extends Command with Logging {
 
     val complete =
       grantWrite(config.apiKey) >> logGrants(config.apiKey) >> runIngest(
-          config.apiKey) >> Future(
-          logger.info("Finalizing chef work-in-progress")) >> chefs.toList
-        .traverse(gracefulStop(_, stopTimeout)) >> gracefulStop(
-          masterChef, stopTimeout) >> Future(
+          config.apiKey) >> Future(logger.info(
+              "Finalizing chef work-in-progress")) >> chefs.toList.traverse(
+          gracefulStop(_, stopTimeout)) >> gracefulStop(masterChef,
+                                                        stopTimeout) >> Future(
           logger.info("Completed chef shutdown")) >> Future(
           logger.info("Waiting for bifrost shutdown")) >> gracefulStop(
-          vfsModule.projectionsActor, stopTimeout)
+          vfsModule.projectionsActor,
+          stopTimeout)
 
     Await.result(complete, stopTimeout)
     actorSystem.shutdown()
@@ -1236,7 +1250,8 @@ object APIKeyTools extends Command with AkkaDefaults with Logging {
       actions = (config.list).option(list(apiKeys)).toSeq ++ (config.showRoot)
         .option(showRoot(apiKeys))
         .toSeq ++ //              config.listChildren.map(listChildren(_, apiKeys)) ++
-      config.accountId.map(p => create(p, config.newAPIKeyName, apiKeys)) ++ config.delete
+        config.accountId
+          .map(p => create(p, config.newAPIKeyName, apiKeys)) ++ config.delete
         .map(delete(_, apiKeys))
       _ <- Future.sequence(actions)
       _ <- Stoppable.stop(stoppable)
@@ -1253,28 +1268,29 @@ object APIKeyTools extends Command with AkkaDefaults with Logging {
     implicit val timeout = config.mongoSettings.timeout
     val database = mongo.database(config.database)
 
-    val dbStop = Stoppable.fromFuture(
-        database.disconnect.fallbackTo(Future(())) flatMap { _ =>
-      mongo.close
-    })
+    val dbStop =
+      Stoppable.fromFuture(database.disconnect.fallbackTo(Future(())) flatMap {
+        _ =>
+          mongo.close
+      })
 
-    val rootKey: Future[APIKeyRecord] =
-      if (config.createRoot) {
-        MongoAPIKeyManager.createRootAPIKey(
-            database,
-            config.mongoSettings.apiKeys,
-            config.mongoSettings.grants
-        )
-      } else {
-        MongoAPIKeyManager.findRootAPIKey(
-            database,
-            config.mongoSettings.apiKeys
-        )
-      }
+    val rootKey: Future[APIKeyRecord] = if (config.createRoot) {
+      MongoAPIKeyManager.createRootAPIKey(
+          database,
+          config.mongoSettings.apiKeys,
+          config.mongoSettings.grants
+      )
+    } else {
+      MongoAPIKeyManager.findRootAPIKey(
+          database,
+          config.mongoSettings.apiKeys
+      )
+    }
 
     rootKey map { k =>
-      (new MongoAPIKeyManager(
-           mongo, database, config.mongoSettings.copy(rootKeyId = k.apiKey)),
+      (new MongoAPIKeyManager(mongo,
+                              database,
+                              config.mongoSettings.copy(rootKeyId = k.apiKey)),
        dbStop)
     }
   }
@@ -1367,27 +1383,27 @@ object CSVToJSONConverter {
   def convert(file: String,
               delimeter: Char = ',',
               timestampConversion: Boolean = false,
-              verbose: Boolean =
-                false): Iterator[JValue] = new Iterator[JValue] {
+              verbose: Boolean = false): Iterator[JValue] =
+    new Iterator[JValue] {
 
-    private val reader = new CSVReader(new FileReader(file), delimeter)
-    private val header = reader.readNext
-    private var line = reader.readNext
+      private val reader = new CSVReader(new FileReader(file), delimeter)
+      private val header = reader.readNext
+      private var line = reader.readNext
 
-    def hasNext(): Boolean = line != null
+      def hasNext(): Boolean = line != null
 
-    def next(): JValue = {
-      val result = JObject(
-          header
-            .zip(line)
-            .map {
-          case (k, v) => JField(k, parse(v, timestampConversion, verbose))
-        }
-            .toList)
-      line = reader.readNext
-      result
+      def next(): JValue = {
+        val result = JObject(
+            header
+              .zip(line)
+              .map {
+            case (k, v) => JField(k, parse(v, timestampConversion, verbose))
+          }
+              .toList)
+        line = reader.readNext
+        result
+      }
     }
-  }
 
   private val Timestamp =
     """^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}\.\d{3})\d{0,3}$""".r

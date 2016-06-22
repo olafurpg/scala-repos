@@ -13,8 +13,9 @@ trait Specs2_2_11_2_4_15_Base extends Specs2TestCase {
     * Intended for loading libraries different from scala-compiler.
     */
   override protected def addOtherLibraries(): Unit = {
-    addIvyCacheLibrary(
-        "specs2", "org.specs2/specs2_2.11/jars", "specs2_2.11-2.4.15.jar")
+    addIvyCacheLibrary("specs2",
+                       "org.specs2/specs2_2.11/jars",
+                       "specs2_2.11-2.4.15.jar")
     addIvyCacheLibrary("scalaz-core",
                        "org.scalaz/scalaz-core_2.11/bundles",
                        "scalaz-core_2.11-7.1.0.jar")

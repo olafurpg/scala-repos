@@ -27,9 +27,12 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
 
     "Accept" in {
       "Accept: audio/midi;q=0.2, audio/basic" =!= Accept(
-          `audio/midi` withQValue 0.2, `audio/basic`)
+          `audio/midi` withQValue 0.2,
+          `audio/basic`)
       "Accept: text/plain;q=0.5, text/html,\r\n text/css;q=0.8" =!= Accept(
-          `text/plain` withQValue 0.5, `text/html`, `text/css` withQValue 0.8)
+          `text/plain` withQValue 0.5,
+          `text/html`,
+          `text/css` withQValue 0.8)
         .renderedTo("text/plain;q=0.5, text/html, text/css;q=0.8")
       "Accept: text/html, image/gif, image/jpeg, *;q=.2, */*;q=.2" =!= Accept(
           `text/html`,
@@ -68,7 +71,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
         .renderedTo("ISO-8859-1, UTF-16;q=0.0, *;q=0.8")
       `Accept-Charset`(`UTF-16` withQValue 0.234567).toString shouldEqual "Accept-Charset: UTF-16;q=0.235"
       "Accept-Charset: UTF-16, unsupported42" =!= `Accept-Charset`(
-          `UTF-16`, HttpCharset.custom("unsupported42"))
+          `UTF-16`,
+          HttpCharset.custom("unsupported42"))
     }
 
     "Access-Control-Allow-Credentials" in {
@@ -78,14 +82,18 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
 
     "Access-Control-Allow-Headers" in {
       "Access-Control-Allow-Headers: Accept, X-My-Header" =!= `Access-Control-Allow-Headers`(
-          "Accept", "X-My-Header")
+          "Accept",
+          "X-My-Header")
     }
 
     "Access-Control-Allow-Methods" in {
       "Access-Control-Allow-Methods: GET, POST" =!= `Access-Control-Allow-Methods`(
-          GET, POST)
+          GET,
+          POST)
       "Access-Control-Allow-Methods: GET, PROPFIND, POST" =!= `Access-Control-Allow-Methods`(
-          GET, PROPFIND, POST)
+          GET,
+          PROPFIND,
+          POST)
     }
 
     "Access-Control-Allow-Origin" in {
@@ -99,7 +107,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
 
     "Access-Control-Expose-Headers" in {
       "Access-Control-Expose-Headers: Accept, X-My-Header" =!= `Access-Control-Expose-Headers`(
-          "Accept", "X-My-Header")
+          "Accept",
+          "X-My-Header")
     }
 
     "Access-Control-Max-Age" in {
@@ -108,7 +117,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
 
     "Access-Control-Request-Headers" in {
       "Access-Control-Request-Headers: Accept, X-My-Header" =!= `Access-Control-Request-Headers`(
-          "Accept", "X-My-Header")
+          "Accept",
+          "X-My-Header")
     }
 
     "Access-Control-Request-Method" in {
@@ -121,15 +131,20 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     "Accept-Ranges" in {
       "Accept-Ranges: bytes" =!= `Accept-Ranges`(RangeUnits.Bytes)
       "Accept-Ranges: bytes, sausages" =!= `Accept-Ranges`(
-          RangeUnits.Bytes, RangeUnits.Other("sausages"))
+          RangeUnits.Bytes,
+          RangeUnits.Other("sausages"))
       "Accept-Ranges: none" =!= `Accept-Ranges`()
     }
 
     "Accept-Encoding" in {
       "Accept-Encoding: compress, gzip, fancy" =!= `Accept-Encoding`(
-          compress, gzip, HttpEncoding.custom("fancy"))
+          compress,
+          gzip,
+          HttpEncoding.custom("fancy"))
       "Accept-Encoding: gzip, identity;q=0.5, *;q=0.0" =!= `Accept-Encoding`(
-          gzip, identity withQValue 0.5, HttpEncodingRange.`*` withQValue 0)
+          gzip,
+          identity withQValue 0.5,
+          HttpEncodingRange.`*` withQValue 0)
         .renderedTo("gzip, identity;q=0.5, *;q=0.0")
       "Accept-Encoding: " =!= `Accept-Encoding`()
     }
@@ -140,9 +155,11 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
           Language("en", "gb") withQValue 0.8f,
           Language("en") withQValue 0.7f)
       "Accept-Language: de-CH-1901, *;q=0.0" =!= `Accept-Language`(
-          Language("de", "CH", "1901"), LanguageRange.`*` withQValue 0f)
-      "Accept-Language: es-419, es" =!= `Accept-Language`(
-          Language("es", "419"), Language("es"))
+          Language("de", "CH", "1901"),
+          LanguageRange.`*` withQValue 0f)
+      "Accept-Language: es-419, es" =!= `Accept-Language`(Language("es",
+                                                                   "419"),
+                                                          Language("es"))
     }
 
     "Age" in {
@@ -189,7 +206,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Cache-Control: private=\"Some-Field\"" =!= `Cache-Control`(
           `private`("Some-Field"))
       "Cache-Control: private, community=\"<UCI>\"" =!= `Cache-Control`(
-          `private`(), CacheDirective.custom("community", Some("<UCI>")))
+          `private`(),
+          CacheDirective.custom("community", Some("<UCI>")))
       "Cache-Control: max-age=1234567890123456789" =!= `Cache-Control`(
           `max-age`(Int.MaxValue)).renderedTo("max-age=2147483647")
       "Cache-Control: private, no-cache, no-cache=Set-Cookie, proxy-revalidate" =!= `Cache-Control`(
@@ -201,7 +219,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Cache-Control: no-cache=Set-Cookie" =!= `Cache-Control`(
           `no-cache`("Set-Cookie")).renderedTo("no-cache=\"Set-Cookie\"")
       "Cache-Control: private=\"a,b\", no-cache" =!= `Cache-Control`(
-          `private`("a", "b"), `no-cache`)
+          `private`("a", "b"),
+          `no-cache`)
     }
 
     "Connection" in {
@@ -220,7 +239,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     "Content-Encoding" in {
       "Content-Encoding: gzip" =!= `Content-Encoding`(gzip)
       "Content-Encoding: compress, pipapo" =!= `Content-Encoding`(
-          compress, HttpEncoding.custom("pipapo"))
+          compress,
+          HttpEncoding.custom("pipapo"))
     }
 
     "Content-Length" in {
@@ -272,7 +292,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     "Cookie (RFC 6265)" in {
       "Cookie: SID=31d4d96e407aad42" =!= Cookie("SID" -> "31d4d96e407aad42")
       "Cookie: SID=31d4d96e407aad42; lang=en>US" =!= Cookie(
-          "SID" -> "31d4d96e407aad42", "lang" -> "en>US")
+          "SID" -> "31d4d96e407aad42",
+          "lang" -> "en>US")
       "Cookie: a=1; b=2" =!= Cookie("a" -> "1", "b" -> "2")
       "Cookie: a=1;b=2" =!= Cookie("a" -> "1", "b" -> "2")
         .renderedTo("a=1; b=2")
@@ -322,9 +343,10 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                HttpCookiePair.raw("b" -> "f\"d\"c\""),
                HttpCookiePair("c" -> "xyz")))
         .withCookieParsingMode(CookieParsingMode.Raw)
-      "Cookie: a=1; b=ä; c=d" =!= Cookie(List(HttpCookiePair("a" -> "1"),
-                                              HttpCookiePair.raw("b" -> "ä"),
-                                              HttpCookiePair("c" -> "d")))
+      "Cookie: a=1; b=ä; c=d" =!= Cookie(
+          List(HttpCookiePair("a" -> "1"),
+               HttpCookiePair.raw("b" -> "ä"),
+               HttpCookiePair("c" -> "d")))
         .withCookieParsingMode(CookieParsingMode.Raw)
     }
 
@@ -377,7 +399,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       """If-Match: "938fz3f83z3z38z"""" =!= `If-Match`(
           EntityTag("938fz3f83z3z38z"))
       """If-Match: "938fz3f83z3z38z", "0293f34hhv0nc"""" =!= `If-Match`(
-          EntityTag("938fz3f83z3z38z"), EntityTag("0293f34hhv0nc"))
+          EntityTag("938fz3f83z3z38z"),
+          EntityTag("0293f34hhv0nc"))
     }
 
     "If-Modified-Since" in {
@@ -392,7 +415,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       """If-None-Match: "938fz3f83z3z38z"""" =!= `If-None-Match`(
           EntityTag("938fz3f83z3z38z"))
       """If-None-Match: "938fz3f83z3z38z", "0293f34hhv0nc"""" =!= `If-None-Match`(
-          EntityTag("938fz3f83z3z38z"), EntityTag("0293f34hhv0nc"))
+          EntityTag("938fz3f83z3z38z"),
+          EntityTag("0293f34hhv0nc"))
       """If-None-Match: W/"938fz3f83z3z38z"""" =!= `If-None-Match`(
           EntityTag("938fz3f83z3z38z", weak = true))
     }
@@ -422,7 +446,7 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
         .renderedTo("https://spray.io/%7Bsec%7D")
       "Location: https://spray.io/ sec" =!= ErrorInfo(
           "Illegal HTTP header 'Location': Invalid input ' ', " +
-          "expected '/', 'EOI', '#', segment or '?' (line 1, column 18)",
+            "expected '/', 'EOI', '#', segment or '?' (line 1, column 18)",
           "https://spray.io/ sec\n                 ^")
     }
 
@@ -436,13 +460,17 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
         .renderedTo("</>; rel=prev, </page/2>; rel=next")
 
       """Link: </>; rel="x.y-z http://spray.io"""" =!= Link(
-          Uri("/"), LinkParams.rel("x.y-z http://spray.io"))
+          Uri("/"),
+          LinkParams.rel("x.y-z http://spray.io"))
       """Link: </>; title="My Title"""" =!= Link(Uri("/"),
                                                  LinkParams.title("My Title"))
       """Link: </>; rel=next; title="My Title"""" =!= Link(
-          Uri("/"), LinkParams.next, LinkParams.title("My Title"))
+          Uri("/"),
+          LinkParams.next,
+          LinkParams.title("My Title"))
       """Link: </>; anchor="http://example.com"""" =!= Link(
-          Uri("/"), LinkParams.anchor(Uri("http://example.com")))
+          Uri("/"),
+          LinkParams.anchor(Uri("http://example.com")))
       """Link: </>; rev=foo; hreflang=de-de; media=print; type=application/json""" =!= Link(
           Uri("/"),
           LinkParams.rev("foo"),
@@ -458,7 +486,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
           """<http://example.com/TheBook/chapter2>; rel=previous; title="previous chapter"""")
 
       """Link: </>; rel="http://example.net/foo"""" =!= Link(
-          Uri("/"), LinkParams.rel("http://example.net/foo"))
+          Uri("/"),
+          LinkParams.rel("http://example.net/foo"))
         .renderedTo("</>; rel=http://example.net/foo")
 
       """Link: <http://example.org/>; rel="start http://example.net/relation/other"""" =!= Link(
@@ -505,9 +534,11 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Strict-Transport-Security: max-age=31536000" =!= `Strict-Transport-Security`(
           maxAge = 31536000)
       "Strict-Transport-Security: max-age=31536000" =!= `Strict-Transport-Security`(
-          maxAge = 31536000, includeSubDomains = false)
+          maxAge = 31536000,
+          includeSubDomains = false)
       "Strict-Transport-Security: max-age=31536000; includeSubDomains" =!= `Strict-Transport-Security`(
-          maxAge = 31536000, includeSubDomains = true)
+          maxAge = 31536000,
+          includeSubDomains = true)
     }
 
     "Transfer-Encoding" in {
@@ -590,8 +621,11 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                      path = Some("/hello")))
       "Set-Cookie: name=123; Max-Age=12345; Secure" =!= `Set-Cookie`(
           HttpCookie("name", "123", maxAge = Some(12345), secure = true))
-      "Set-Cookie: name=123; HttpOnly; fancyPants" =!= `Set-Cookie`(HttpCookie(
-              "name", "123", httpOnly = true, extension = Some("fancyPants")))
+      "Set-Cookie: name=123; HttpOnly; fancyPants" =!= `Set-Cookie`(
+          HttpCookie("name",
+                     "123",
+                     httpOnly = true,
+                     extension = Some("fancyPants")))
       "Set-Cookie: foo=bar; domain=example.com; Path=/this is a path with blanks; extension with blanks" =!= `Set-Cookie`(
           HttpCookie("foo",
                      "bar",
@@ -747,7 +781,7 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                             "nonce" -> "dcd98b7102dd2f0e8b11d0f600bfb0c093",
                             "opaque" -> "5ccc069c403ebaf9f0171e9517f40e41")))
         .renderedTo(
-          "Digest realm=\"testrealm@host.com\",qop=\"auth,auth-int\",nonce=dcd98b7102dd2f0e8b11d0f600bfb0c093,opaque=5ccc069c403ebaf9f0171e9517f40e41")
+            "Digest realm=\"testrealm@host.com\",qop=\"auth,auth-int\",nonce=dcd98b7102dd2f0e8b11d0f600bfb0c093,opaque=5ccc069c403ebaf9f0171e9517f40e41")
       "WWW-Authenticate: Basic realm=\"WallyWorld\",attr=\"val>ue\", Fancy realm=\"yeah\"" =!= `WWW-Authenticate`(
           HttpChallenge("Basic", "WallyWorld", Map("attr" -> "val>ue")),
           HttpChallenge("Fancy", "yeah"))
@@ -759,11 +793,14 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "X-Forwarded-For: 1.2.3.4" =!= `X-Forwarded-For`(
           remoteAddress("1.2.3.4"))
       "X-Forwarded-For: 234.123.5.6, 8.8.8.8" =!= `X-Forwarded-For`(
-          remoteAddress("234.123.5.6"), remoteAddress("8.8.8.8"))
+          remoteAddress("234.123.5.6"),
+          remoteAddress("8.8.8.8"))
       "X-Forwarded-For: 1.2.3.4, unknown" =!= `X-Forwarded-For`(
-          remoteAddress("1.2.3.4"), RemoteAddress.Unknown)
+          remoteAddress("1.2.3.4"),
+          RemoteAddress.Unknown)
       "X-Forwarded-For: 192.0.2.43, 2001:db8:cafe:0:0:0:0:17" =!= `X-Forwarded-For`(
-          remoteAddress("192.0.2.43"), remoteAddress("2001:db8:cafe::17"))
+          remoteAddress("192.0.2.43"),
+          remoteAddress("2001:db8:cafe::17"))
       "X-Forwarded-For: 1234:5678:9abc:def1:2345:6789:abcd:ef00" =!= `X-Forwarded-For`(
           remoteAddress("1234:5678:9abc:def1:2345:6789:abcd:ef00"))
       "X-Forwarded-For: 1234:567:9a:d:2:67:abc:ef00" =!= `X-Forwarded-For`(
@@ -849,7 +886,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
           ErrorInfo("Illegal HTTP header name", " X"))
     }
     "not accept illegal header values" in {
-      parse("Foo", "ba\u0000r") shouldEqual ParsingResult.Error(ErrorInfo(
+      parse("Foo", "ba\u0000r") shouldEqual ParsingResult.Error(
+          ErrorInfo(
               "Illegal HTTP header value: Invalid input '\\u0000', expected field-value-char, FWS or 'EOI' (line 1, column 3)",
               "ba\u0000r\n  ^"))
     }
@@ -859,12 +897,12 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
             Nil)
     }
     "compress value whitespace into single spaces and trim" in {
-      parse("Foo", " b  a \tr\t") shouldEqual ParsingResult.Ok(
-          RawHeader("Foo", "b a r"), Nil)
+      parse("Foo", " b  a \tr\t") shouldEqual ParsingResult
+        .Ok(RawHeader("Foo", "b a r"), Nil)
     }
     "resolve obs-fold occurrences" in {
-      parse("Foo", "b\r\n\ta \r\n r") shouldEqual ParsingResult.Ok(
-          RawHeader("Foo", "b a r"), Nil)
+      parse("Foo", "b\r\n\ta \r\n r") shouldEqual ParsingResult
+        .Ok(RawHeader("Foo", "b a r"), Nil)
     }
 
     "parse with custom uri parsing mode" in {
@@ -896,7 +934,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       val Array(name, value) = line.split(": ", 2)
       HttpHeader.parse(name, value, settings) should
       (equal(HttpHeader.ParsingResult.Ok(header, Nil)) and renderFromHeaderTo(
-              this, line))
+              this,
+              line))
     }
     def rendering(line: String): String = line
     def settings: HeaderParser.Settings = HeaderParser.DefaultSettings
@@ -928,8 +967,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     }
   }
 
-  def renderFromHeaderTo(
-      header: TestHeader, line: String): Matcher[HttpHeader.ParsingResult] =
+  def renderFromHeaderTo(header: TestHeader,
+                         line: String): Matcher[HttpHeader.ParsingResult] =
     Matcher {
       case HttpHeader.ParsingResult.Ok(h, Nil) ⇒
         MatchResult(

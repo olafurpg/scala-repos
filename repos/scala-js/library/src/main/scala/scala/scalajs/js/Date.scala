@@ -166,11 +166,13 @@ class Date extends Object {
   def setUTCMilliseconds(ms: Int): Unit = native
   def setSeconds(sec: Int, ms: Int = getMilliseconds()): Unit = native
   def setUTCSeconds(sec: Int, ms: Int = getMilliseconds()): Unit = native
-  def setMinutes(
-      min: Int, sec: Int = getSeconds(), ms: Int = getMilliseconds()): Unit =
+  def setMinutes(min: Int,
+                 sec: Int = getSeconds(),
+                 ms: Int = getMilliseconds()): Unit =
     native
-  def setUTCMinutes(
-      min: Int, sec: Int = getSeconds(), ms: Int = getMilliseconds()): Unit =
+  def setUTCMinutes(min: Int,
+                    sec: Int = getSeconds(),
+                    ms: Int = getMilliseconds()): Unit =
     native
   def setHours(hours: Int,
                min: Int = getMinutes(),
@@ -185,10 +187,12 @@ class Date extends Object {
   def setUTCDate(date: Int): Unit = native
   def setMonth(month: Int, date: Int = getDate()): Unit = native
   def setUTCMonth(month: Int, date: Int = getDate()): Unit = native
-  def setFullYear(
-      year: Int, month: Int = getMonth(), date: Int = getDate()): Unit = native
-  def setUTCFullYear(
-      year: Int, month: Int = getMonth(), date: Int = getDate()): Unit = native
+  def setFullYear(year: Int,
+                  month: Int = getMonth(),
+                  date: Int = getDate()): Unit = native
+  def setUTCFullYear(year: Int,
+                     month: Int = getMonth(),
+                     date: Int = getDate()): Unit = native
 
   def toUTCString(): String = native
   def toISOString(): String = native

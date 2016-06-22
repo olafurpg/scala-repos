@@ -98,7 +98,8 @@ private[spark] object RDDOperationScope extends Logging {
     * Note: Return statements are NOT allowed in body.
     */
   private[spark] def withScope[T](
-      sc: SparkContext, allowNesting: Boolean = false)(body: => T): T = {
+      sc: SparkContext,
+      allowNesting: Boolean = false)(body: => T): T = {
     val ourMethodName = "withScope"
     val callerMethodName = Thread.currentThread
       .getStackTrace()
@@ -143,8 +144,8 @@ private[spark] object RDDOperationScope extends Logging {
         sc.setLocalProperty(scopeKey, new RDDOperationScope(name).toJson)
       } else if (sc.getLocalProperty(noOverrideKey) == null) {
         // Otherwise, set the scope only if the higher level caller allows us to do so
-        sc.setLocalProperty(
-            scopeKey, new RDDOperationScope(name, oldScope).toJson)
+        sc.setLocalProperty(scopeKey,
+                            new RDDOperationScope(name, oldScope).toJson)
       }
       // Optionally disallow the child body to override our scope
       if (!allowNesting) {

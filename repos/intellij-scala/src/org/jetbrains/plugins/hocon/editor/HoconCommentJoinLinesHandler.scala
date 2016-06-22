@@ -15,8 +15,10 @@ import org.jetbrains.plugins.hocon.psi.HoconPsiFile
   * [[HoconCommenter]] and so I need this custom join lines handler to properly handle both.
   */
 class HoconCommentJoinLinesHandler extends JoinLinesHandlerDelegate {
-  def tryJoinLines(
-      document: Document, file: PsiFile, start: Int, end: Int): Int =
+  def tryJoinLines(document: Document,
+                   file: PsiFile,
+                   start: Int,
+                   end: Int): Int =
     file match {
       case hoconFile: HoconPsiFile =>
         import CommonUtil._

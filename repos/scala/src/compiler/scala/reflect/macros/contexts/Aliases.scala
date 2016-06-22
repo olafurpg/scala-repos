@@ -23,8 +23,8 @@ trait Aliases { self: Context =>
   override val WeakTypeTag = universe.WeakTypeTag
   override val TypeTag = universe.TypeTag
   def WeakTypeTag[T](tpe: Type): WeakTypeTag[T] =
-    universe.WeakTypeTag[T](
-        mirror, universe.FixedMirrorTypeCreator(mirror, tpe))
+    universe
+      .WeakTypeTag[T](mirror, universe.FixedMirrorTypeCreator(mirror, tpe))
   def TypeTag[T](tpe: Type): TypeTag[T] =
     universe.TypeTag[T](mirror, universe.FixedMirrorTypeCreator(mirror, tpe))
   override def weakTypeTag[T](implicit attag: WeakTypeTag[T]) = attag

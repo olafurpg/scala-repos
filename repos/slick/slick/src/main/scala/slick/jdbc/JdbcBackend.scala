@@ -54,19 +54,22 @@ trait JdbcBackend extends RelationalBackend {
       * `request()` more data. This allows you to process LOBs asynchronously by requesting only
       * one single element at a time after processing the current one, so that the proper
       * sequencing is preserved even though processing may happen on a different thread. */
-    final def stream[T](
-        a: StreamingDBIO[_, T], bufferNext: Boolean): DatabasePublisher[T] =
+    final def stream[T](a: StreamingDBIO[_, T],
+                        bufferNext: Boolean): DatabasePublisher[T] =
       createPublisher(a,
                       s =>
-                        new JdbcStreamingActionContext(
-                            s, false, DatabaseDef.this, bufferNext))
+                        new JdbcStreamingActionContext(s,
+                                                       false,
+                                                       DatabaseDef.this,
+                                                       bufferNext))
 
     override protected[this] def createDatabaseActionContext[T](
         _useSameThread: Boolean): Context =
       new JdbcActionContext { val useSameThread = _useSameThread }
 
     override protected[this] def createStreamingDatabaseActionContext[T](
-        s: Subscriber[_ >: T], useSameThread: Boolean): StreamingContext =
+        s: Subscriber[_ >: T],
+        useSameThread: Boolean): StreamingContext =
       new JdbcStreamingActionContext(s, useSameThread, DatabaseDef.this, true)
 
     protected[this] def synchronousExecutionContext = executor.executionContext
@@ -98,8 +101,8 @@ trait JdbcBackend extends RelationalBackend {
     def forDataSource(ds: DataSource,
                       executor: AsyncExecutor = AsyncExecutor.default(),
                       keepAliveConnection: Boolean = false): DatabaseDef =
-      forSource(
-          new DataSourceJdbcDataSource(ds, keepAliveConnection), executor)
+      forSource(new DataSourceJdbcDataSource(ds, keepAliveConnection),
+                executor)
 
     /** Create a Database based on the JNDI name of a DataSource. */
     def forName(name: String, executor: AsyncExecutor = null) =
@@ -122,13 +125,16 @@ trait JdbcBackend extends RelationalBackend {
                driver: String = null,
                executor: AsyncExecutor = AsyncExecutor.default(),
                keepAliveConnection: Boolean = false,
-               classLoader: ClassLoader =
-                 ClassLoaderUtil.defaultClassLoader): DatabaseDef =
-      forDataSource(
-          new DriverDataSource(
-              url, user, password, prop, driver, classLoader = classLoader),
-          executor,
-          keepAliveConnection)
+               classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader)
+      : DatabaseDef =
+      forDataSource(new DriverDataSource(url,
+                                         user,
+                                         password,
+                                         prop,
+                                         driver,
+                                         classLoader = classLoader),
+                    executor,
+                    keepAliveConnection)
 
     /** Create a Database that uses the DriverManager to open new connections. */
     def forURL(url: String, prop: Map[String, String]): Database = {
@@ -140,15 +146,18 @@ trait JdbcBackend extends RelationalBackend {
 
     /** Create a Database that directly uses a Driver to open new connections.
       * This is needed to open a JDBC URL with a driver that was not loaded by the system ClassLoader. */
-    def forDriver(driver: Driver,
-                  url: String,
-                  user: String = null,
-                  password: String = null,
-                  prop: Properties = null,
-                  executor: AsyncExecutor =
-                    AsyncExecutor.default()): DatabaseDef =
-      forDataSource(new DriverDataSource(
-                        url, user, password, prop, driverObject = driver),
+    def forDriver(
+        driver: Driver,
+        url: String,
+        user: String = null,
+        password: String = null,
+        prop: Properties = null,
+        executor: AsyncExecutor = AsyncExecutor.default()): DatabaseDef =
+      forDataSource(new DriverDataSource(url,
+                                         user,
+                                         password,
+                                         prop,
+                                         driverObject = driver),
                     executor)
 
     /** Load a database configuration through [[https://github.com/typesafehub/config Typesafe Config]].
@@ -300,11 +309,12 @@ trait JdbcBackend extends RelationalBackend {
       * @param classLoader The ClassLoader to use to load any custom classes from. The default is to
       *                    try the context ClassLoader first and fall back to Slick's ClassLoader.
       */
-    def forConfig(path: String,
-                  config: Config = ConfigFactory.load(),
-                  driver: Driver = null,
-                  classLoader: ClassLoader =
-                    ClassLoaderUtil.defaultClassLoader): Database = {
+    def forConfig(
+        path: String,
+        config: Config = ConfigFactory.load(),
+        driver: Driver = null,
+        classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader)
+      : Database = {
       val usedConfig = if (path.isEmpty) config else config.getConfig(path)
       val source =
         JdbcDataSource.forConfig(usedConfig, driver, path, classLoader)
@@ -328,13 +338,14 @@ trait JdbcBackend extends RelationalBackend {
     def decorateStatement[S <: Statement](statement: S): S = statement
     def fetchSize: Int = 0
 
-    final def prepareStatement(
-        sql: String,
-        defaultType: ResultSetType = ResultSetType.ForwardOnly,
-        defaultConcurrency: ResultSetConcurrency =
-          ResultSetConcurrency.ReadOnly,
-        defaultHoldability: ResultSetHoldability =
-          ResultSetHoldability.Default): PreparedStatement = {
+    final def prepareStatement(sql: String,
+                               defaultType: ResultSetType =
+                                 ResultSetType.ForwardOnly,
+                               defaultConcurrency: ResultSetConcurrency =
+                                 ResultSetConcurrency.ReadOnly,
+                               defaultHoldability: ResultSetHoldability =
+                                 ResultSetHoldability.Default)
+      : PreparedStatement = {
       JdbcBackend.logStatement("Preparing statement", sql)
       val s = loggingPreparedStatement(
           decorateStatement(
@@ -357,13 +368,13 @@ trait JdbcBackend extends RelationalBackend {
       s
     }
 
-    final def prepareInsertStatement(
-        sql: String,
-        columnNames: Array[String] =
-          new Array[String](0)): PreparedStatement = {
+    final def prepareInsertStatement(sql: String,
+                                     columnNames: Array[String] =
+                                       new Array[String](0))
+      : PreparedStatement = {
       if (JdbcBackend.statementLogger.isDebugEnabled)
         JdbcBackend.logStatement("Preparing insert statement (returning: " +
-                                 columnNames.mkString(",") + ")",
+                                   columnNames.mkString(",") + ")",
                                  sql)
       val s = loggingPreparedStatement(
           decorateStatement(conn.prepareStatement(sql, columnNames)))
@@ -372,11 +383,12 @@ trait JdbcBackend extends RelationalBackend {
     }
 
     final def prepareInsertStatement(
-        sql: String, columnIndexes: Array[Int]): PreparedStatement = {
+        sql: String,
+        columnIndexes: Array[Int]): PreparedStatement = {
       if (JdbcBackend.statementLogger.isDebugEnabled)
         JdbcBackend.logStatement(
             "Preparing insert statement (returning indexes: " +
-            columnIndexes.mkString(",") + ")",
+              columnIndexes.mkString(",") + ")",
             sql)
       val s = loggingPreparedStatement(
           decorateStatement(conn.prepareStatement(sql, columnIndexes)))
@@ -384,12 +396,12 @@ trait JdbcBackend extends RelationalBackend {
       s
     }
 
-    final def createStatement(
-        defaultType: ResultSetType = ResultSetType.ForwardOnly,
-        defaultConcurrency: ResultSetConcurrency =
-          ResultSetConcurrency.ReadOnly,
-        defaultHoldability: ResultSetHoldability =
-          ResultSetHoldability.Default): Statement = {
+    final def createStatement(defaultType: ResultSetType =
+                                ResultSetType.ForwardOnly,
+                              defaultConcurrency: ResultSetConcurrency =
+                                ResultSetConcurrency.ReadOnly,
+                              defaultHoldability: ResultSetHoldability =
+                                ResultSetHoldability.Default): Statement = {
       val s = loggingStatement(
           decorateStatement(
               resultSetHoldability.withDefault(defaultHoldability) match {
@@ -413,38 +425,42 @@ trait JdbcBackend extends RelationalBackend {
         defaultType: ResultSetType = ResultSetType.ForwardOnly,
         defaultConcurrency: ResultSetConcurrency =
           ResultSetConcurrency.ReadOnly,
-        defaultHoldability: ResultSetHoldability =
-          ResultSetHoldability.Default)(f: (PreparedStatement => T)): T = {
-      val st = prepareStatement(
-          sql, defaultType, defaultConcurrency, defaultHoldability)
+        defaultHoldability: ResultSetHoldability = ResultSetHoldability.Default)(
+        f: (PreparedStatement => T)): T = {
+      val st = prepareStatement(sql,
+                                defaultType,
+                                defaultConcurrency,
+                                defaultHoldability)
       try f(st) finally st.close()
     }
 
     /** A wrapper around the JDBC Connection's prepareInsertStatement method, that automatically closes the statement. */
-    final def withPreparedInsertStatement[T](
-        sql: String, columnNames: Array[String] = new Array[String](0))(
+    final def withPreparedInsertStatement[T](sql: String,
+                                             columnNames: Array[String] =
+                                               new Array[String](0))(
         f: (PreparedStatement => T)): T = {
       val st = prepareInsertStatement(sql, columnNames)
       try f(st) finally st.close()
     }
 
     /** A wrapper around the JDBC Connection's prepareInsertStatement method, that automatically closes the statement. */
-    final def withPreparedInsertStatement[T](sql: String,
-                                             columnIndexes: Array[Int])(
-        f: (PreparedStatement => T)): T = {
+    final def withPreparedInsertStatement[T](
+        sql: String,
+        columnIndexes: Array[Int])(f: (PreparedStatement => T)): T = {
       val st = prepareInsertStatement(sql, columnIndexes)
       try f(st) finally st.close()
     }
 
     /** A wrapper around the JDBC Connection's createStatement method, that automatically closes the statement. */
-    final def withStatement[T](
-        defaultType: ResultSetType = ResultSetType.ForwardOnly,
-        defaultConcurrency: ResultSetConcurrency =
-          ResultSetConcurrency.ReadOnly,
-        defaultHoldability: ResultSetHoldability =
-          ResultSetHoldability.Default)(f: (Statement => T)): T = {
-      val st = createStatement(
-          defaultType, defaultConcurrency, defaultHoldability)
+    final def withStatement[T](defaultType: ResultSetType =
+                                 ResultSetType.ForwardOnly,
+                               defaultConcurrency: ResultSetConcurrency =
+                                 ResultSetConcurrency.ReadOnly,
+                               defaultHoldability: ResultSetHoldability =
+                                 ResultSetHoldability.Default)(
+        f: (Statement => T)): T = {
+      val st =
+        createStatement(defaultType, defaultConcurrency, defaultHoldability)
       try f(st) finally st.close()
     }
 
@@ -574,7 +590,7 @@ trait JdbcBackend extends RelationalBackend {
         } else p
       statementParameters =
         p2 ::
-        (if (statementParameters eq null) Nil else statementParameters)
+          (if (statementParameters eq null) Nil else statementParameters)
     }
 
     def popStatementParameters: Unit = {

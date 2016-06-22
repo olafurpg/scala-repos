@@ -22,8 +22,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScTypeAliasStub
   * Date: 22.02.2008
   * Time: 9:55:13
   */
-class ScTypeAliasDefinitionImpl private (
-    stub: StubElement[ScTypeAlias], nodeType: IElementType, node: ASTNode)
+class ScTypeAliasDefinitionImpl private (stub: StubElement[ScTypeAlias],
+                                         nodeType: IElementType,
+                                         node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScTypeAliasDefinition {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -59,14 +60,14 @@ class ScTypeAliasDefinitionImpl private (
       def getTextAttributesKey: TextAttributesKey = null
       def getLocationString: String =
         "(" + ScTypeAliasDefinitionImpl.this.containingClass.qualifiedName +
-        ")"
+          ")"
       override def getIcon(open: Boolean) =
         ScTypeAliasDefinitionImpl.this.getIcon(0)
     }
   }
 
   override def getOriginalElement: PsiElement =
-    super [ScTypeAliasDefinition].getOriginalElement
+    super[ScTypeAliasDefinition].getOriginalElement
 
   override def accept(visitor: ScalaElementVisitor) {
     visitor.visitTypeAliasDefinition(this)

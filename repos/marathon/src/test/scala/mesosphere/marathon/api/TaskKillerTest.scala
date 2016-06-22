@@ -39,8 +39,12 @@ class TaskKillerTest
     auth = new TestAuthFixture
     identity = auth.identity
 
-    taskKiller = new TaskKiller(
-        tracker, groupManager, service, config, auth.auth, auth.auth)
+    taskKiller = new TaskKiller(tracker,
+                                groupManager,
+                                service,
+                                config,
+                                auth.auth,
+                                auth.auth)
 
     when(config.zkTimeoutDuration).thenReturn(1.second)
   }

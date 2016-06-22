@@ -301,8 +301,8 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     * Common supertype of [[Write]] and [[WriteFile]].
     */
   sealed abstract class SimpleWriteCommand extends WriteCommand {
-    require(
-        ack != null, "ack must be non-null. Use NoAck if you don't want acks.")
+    require(ack != null,
+            "ack must be non-null. Use NoAck if you don't want acks.")
 
     /**
       * The acknowledgment token associated with this write command.
@@ -360,8 +360,10 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     * or have been sent!</b> Unfortunately there is no way to determine whether
     * a particular write has been sent by the O/S.
     */
-  final case class WriteFile(
-      filePath: String, position: Long, count: Long, ack: Event)
+  final case class WriteFile(filePath: String,
+                             position: Long,
+                             count: Long,
+                             ack: Event)
       extends SimpleWriteCommand {
     require(position >= 0, "WriteFile.position must be >= 0")
     require(count > 0, "WriteFile.count must be > 0")
@@ -375,8 +377,8 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     * If the sub commands contain `ack` requests they will be honored as soon as the
     * respective write has been written completely.
     */
-  final case class CompoundWrite(
-      override val head: SimpleWriteCommand, tailCommand: WriteCommand)
+  final case class CompoundWrite(override val head: SimpleWriteCommand,
+                                 tailCommand: WriteCommand)
       extends WriteCommand
       with immutable.Iterable[SimpleWriteCommand] {
 
@@ -440,8 +442,8 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     * in the [[Bind]] message. The connection is characterized by the `remoteAddress`
     * and `localAddress` TCP endpoints.
     */
-  final case class Connected(
-      remoteAddress: InetSocketAddress, localAddress: InetSocketAddress)
+  final case class Connected(remoteAddress: InetSocketAddress,
+                             localAddress: InetSocketAddress)
       extends Event
 
   /**
@@ -549,18 +551,18 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
 class TcpExt(system: ExtendedActorSystem) extends IO.Extension {
 
   val Settings = new Settings(system.settings.config.getConfig("akka.io.tcp"))
-  class Settings private[TcpExt](_config: Config)
+  class Settings private[TcpExt] (_config: Config)
       extends SelectionHandlerSettings(_config) {
     import akka.util.Helpers.ConfigOps
     import _config._
 
     val NrOfSelectors: Int =
       getInt("nr-of-selectors") requiring
-      (_ > 0, "nr-of-selectors must be > 0")
+        (_ > 0, "nr-of-selectors must be > 0")
 
     val BatchAcceptLimit: Int =
       getInt("batch-accept-limit") requiring
-      (_ > 0, "batch-accept-limit must be > 0")
+        (_ > 0, "batch-accept-limit must be > 0")
     val DirectBufferSize: Int = getIntBytes("direct-buffer-size")
     val MaxDirectBufferPoolSize: Int = getInt("direct-buffer-pool-limit")
     val RegisterTimeout: Duration = getString("register-timeout") match {
@@ -583,7 +585,7 @@ class TcpExt(system: ExtendedActorSystem) extends IO.Extension {
       if (MaxChannels == -1) -1 else math.max(MaxChannels / NrOfSelectors, 1)
     val FinishConnectRetries: Int =
       getInt("finish-connect-retries") requiring
-      (_ > 0, "finish-connect-retries must be > 0")
+        (_ > 0, "finish-connect-retries must be > 0")
 
     val WindowsConnectionAbortWorkaroundEnabled: Boolean = getString(
         "windows-connection-abort-workaround-enabled") match {
@@ -615,7 +617,8 @@ class TcpExt(system: ExtendedActorSystem) extends IO.Extension {
   def getManager: ActorRef = manager
 
   val bufferPool: BufferPool = new DirectByteBufferPool(
-      Settings.DirectBufferSize, Settings.MaxDirectBufferPoolSize)
+      Settings.DirectBufferSize,
+      Settings.MaxDirectBufferPoolSize)
   val fileIoDispatcher = system.dispatchers.lookup(Settings.FileIODispatcher)
 }
 
@@ -718,8 +721,9 @@ object TcpMessage {
   /**
     * Open a listening socket without specifying options.
     */
-  def bind(
-      handler: ActorRef, endpoint: InetSocketAddress, backlog: Int): Command =
+  def bind(handler: ActorRef,
+           endpoint: InetSocketAddress,
+           backlog: Int): Command =
     Bind(handler, endpoint, backlog, Nil)
 
   /**
@@ -823,8 +827,10 @@ object TcpMessage {
     * or have been sent!</b> Unfortunately there is no way to determine whether
     * a particular write has been sent by the O/S.
     */
-  def writeFile(
-      filePath: String, position: Long, count: Long, ack: Event): Command =
+  def writeFile(filePath: String,
+                position: Long,
+                count: Long,
+                ack: Event): Command =
     WriteFile(filePath, position, count, ack)
 
   /**

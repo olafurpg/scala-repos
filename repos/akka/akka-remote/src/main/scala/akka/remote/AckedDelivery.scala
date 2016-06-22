@@ -79,7 +79,7 @@ class ResendBufferCapacityReachedException(c: Int)
 class ResendUnfulfillableException
     extends AkkaException(
         "Unable to fulfill resend request since negatively acknowledged payload is no longer in buffer. " +
-        "The resend states between two systems are compromised and cannot be recovered.")
+          "The resend states between two systems are compromised and cannot be recovered.")
 
 /**
   * Implements an immutable resend buffer that buffers messages until they have been acknowledged. Properly removes messages
@@ -130,7 +130,7 @@ final case class AckedSendBuffer[T <: HasSequenceNumber](
     if (msg.seq <= maxSeq)
       throw new IllegalArgumentException(
           s"Sequence number must be monotonic. Received [${msg.seq}] " +
-          s"which is smaller than [$maxSeq]")
+            s"which is smaller than [$maxSeq]")
 
     if (nonAcked.size == capacity)
       throw new ResendBufferCapacityReachedException(capacity)

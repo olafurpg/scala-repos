@@ -32,12 +32,14 @@ class MarshalledContextTest extends FunSuite with AssertionsForJUnit {
     assert(ctx.marshal(env).toMap == Map(Buf.Utf8("a.key") -> Buf.Utf8("ok")))
 
     env = env.bound(b, 123)
-    assert(ctx.marshal(env).toMap == Map(Buf.Utf8("a.key") -> Buf.Utf8("ok"),
-                                         Buf.Utf8("b.key") -> Buf.U32BE(123)))
+    assert(
+        ctx.marshal(env).toMap == Map(Buf.Utf8("a.key") -> Buf.Utf8("ok"),
+                                      Buf.Utf8("b.key") -> Buf.U32BE(123)))
 
     env = env.bound(b, 321)
-    assert(ctx.marshal(env).toMap == Map(Buf.Utf8("a.key") -> Buf.Utf8("ok"),
-                                         Buf.Utf8("b.key") -> Buf.U32BE(321)))
+    assert(
+        ctx.marshal(env).toMap == Map(Buf.Utf8("a.key") -> Buf.Utf8("ok"),
+                                      Buf.Utf8("b.key") -> Buf.U32BE(321)))
 
     assert(
         ctx.marshal(ctx.OrElse(env, ctx.Empty)).toMap == Map(
@@ -47,11 +49,13 @@ class MarshalledContextTest extends FunSuite with AssertionsForJUnit {
 
   test("Only marshal the most recent binding for a given key (OrElse)") {
     val env1 = ctx.Empty.bound(a, "ok").bound(b, 123)
-    assert(ctx.marshal(env1).toMap == Map(Buf.Utf8("a.key") -> Buf.Utf8("ok"),
-                                          Buf.Utf8("b.key") -> Buf.U32BE(123)))
+    assert(
+        ctx.marshal(env1).toMap == Map(Buf.Utf8("a.key") -> Buf.Utf8("ok"),
+                                       Buf.Utf8("b.key") -> Buf.U32BE(123)))
 
     val env2 = ctx.Empty.bound(b, 321)
-    assert(ctx.marshal(ctx.OrElse(env2, env1)).toMap == Map(
+    assert(
+        ctx.marshal(ctx.OrElse(env2, env1)).toMap == Map(
             Buf.Utf8("a.key") -> Buf.Utf8("ok"),
             Buf.Utf8("b.key") -> Buf.U32BE(321)))
   }
@@ -78,7 +82,8 @@ class MarshalledContextTest extends FunSuite with AssertionsForJUnit {
     env = ctx.Translucent(env, Buf.Utf8("b.key"), Buf.U32BE(30301952))
     assert(env.contains(b))
     assert(env(b) == 30301952)
-    assert(ctx.marshal(env).toMap == Map(
+    assert(
+        ctx.marshal(env).toMap == Map(
             Buf.Utf8("b.key") -> Buf.U32BE(30301952)))
   }
 
@@ -89,7 +94,8 @@ class MarshalledContextTest extends FunSuite with AssertionsForJUnit {
     assert(!env.contains(b))
     // We still pass the context through unmolested; I'm not sure this
     // is the right thing to do.
-    assert(ctx.marshal(env).toMap == Map(
+    assert(
+        ctx.marshal(env).toMap == Map(
             Buf.Utf8("b.key") -> Buf.U64BE(30301952)))
   }
 

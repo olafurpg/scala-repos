@@ -27,9 +27,9 @@ object Resolve {
   def resolveExtra(mask: ScopeMask)(scope: Scope): Scope =
     if (mask.extra) scope else scope.copy(extra = Global)
 
-  def resolveConfig[P](
-      index: BuildUtil[P], key: AttributeKey[_], mask: ScopeMask)(
-      scope: Scope): Scope =
+  def resolveConfig[P](index: BuildUtil[P],
+                       key: AttributeKey[_],
+                       mask: ScopeMask)(scope: Scope): Scope =
     if (mask.config) scope
     else {
       val (resolvedRef, proj) = scope.project match {
@@ -42,7 +42,8 @@ object Resolve {
       val task = scope.task.toOption
       val keyIndex = index.keyIndex
       val definesKey = (c: ScopeAxis[ConfigKey]) =>
-        keyIndex.keys(resolvedRef, c.toOption.map(_.name), task) contains key.label
+        keyIndex
+          .keys(resolvedRef, c.toOption.map(_.name), task) contains key.label
       val projectConfigs = index.configurations(proj).map(ck => Select(ck))
       val config: ScopeAxis[ConfigKey] =
         (Global +: projectConfigs) find definesKey getOrElse Global

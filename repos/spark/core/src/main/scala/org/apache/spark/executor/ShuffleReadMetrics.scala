@@ -36,17 +36,23 @@ class ShuffleReadMetrics private (_remoteBlocksFetched: Accumulator[Int],
 
   private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
     this(TaskMetrics.getAccum[Int](
-             accumMap, InternalAccumulator.shuffleRead.REMOTE_BLOCKS_FETCHED),
+             accumMap,
+             InternalAccumulator.shuffleRead.REMOTE_BLOCKS_FETCHED),
          TaskMetrics.getAccum[Int](
-             accumMap, InternalAccumulator.shuffleRead.LOCAL_BLOCKS_FETCHED),
+             accumMap,
+             InternalAccumulator.shuffleRead.LOCAL_BLOCKS_FETCHED),
          TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleRead.REMOTE_BYTES_READ),
+             accumMap,
+             InternalAccumulator.shuffleRead.REMOTE_BYTES_READ),
          TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleRead.LOCAL_BYTES_READ),
+             accumMap,
+             InternalAccumulator.shuffleRead.LOCAL_BYTES_READ),
          TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleRead.FETCH_WAIT_TIME),
+             accumMap,
+             InternalAccumulator.shuffleRead.FETCH_WAIT_TIME),
          TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleRead.RECORDS_READ))
+             accumMap,
+             InternalAccumulator.shuffleRead.RECORDS_READ))
   }
 
   /**

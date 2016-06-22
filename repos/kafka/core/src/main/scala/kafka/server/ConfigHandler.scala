@@ -38,8 +38,8 @@ trait ConfigHandler {
   * The TopicConfigHandler will process topic config changes in ZK.
   * The callback provides the topic name and the full properties set read from ZK
   */
-class TopicConfigHandler(
-    private val logManager: LogManager, kafkaConfig: KafkaConfig)
+class TopicConfigHandler(private val logManager: LogManager,
+                         kafkaConfig: KafkaConfig)
     extends ConfigHandler
     with Logging {
 
@@ -51,7 +51,7 @@ class TopicConfigHandler(
         if (kafkaConfig.interBrokerProtocolVersion < ApiVersion(versionString)) {
           warn(
               s"Log configuration ${LogConfig.MessageFormatVersionProp} is ignored for `$topic` because `$versionString` " +
-              s"is not compatible with Kafka inter-broker protocol version `${kafkaConfig.interBrokerProtocolVersionString}`")
+                s"is not compatible with Kafka inter-broker protocol version `${kafkaConfig.interBrokerProtocolVersionString}`")
           Some(LogConfig.MessageFormatVersionProp)
         } else None
     }

@@ -34,19 +34,21 @@ class NamingParamsSearcher
             val references = inReadAction(element.getReferences)
             for (ref <- references
                  if ref.getRangeInElement.contains(offsetInElement) &&
-                 !collectedReferences.contains(ref)) {
+                   !collectedReferences.contains(ref)) {
               ref match {
                 case refElement: ScReferenceElement =>
                   inReadAction {
                     refElement.getParent match {
                       case assign: ScAssignStmt
                           if assign.getLExpression == refElement &&
-                          assign.getParent.isInstanceOf[ScArgumentExprList] =>
+                            assign.getParent
+                              .isInstanceOf[ScArgumentExprList] =>
                         Option(refElement.resolve()) match {
                           case Some(`parameter`) =>
                             if (!consumer.process(ref)) return false
                           case Some(x: ScParameter) =>
-                            ScalaPsiUtil.parameterForSyntheticParameter(x) match {
+                            ScalaPsiUtil
+                              .parameterForSyntheticParameter(x) match {
                               case Some(realParam) =>
                                 if (realParam == parameter &&
                                     !consumer.process(ref)) return false
@@ -65,8 +67,11 @@ class NamingParamsSearcher
         }
         val helper: PsiSearchHelper =
           PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
-        helper.processElementsWithWord(
-            processor, scope, name, UsageSearchContext.IN_CODE, true)
+        helper.processElementsWithWord(processor,
+                                       scope,
+                                       name,
+                                       UsageSearchContext.IN_CODE,
+                                       true)
       case _ => true
     }
   }

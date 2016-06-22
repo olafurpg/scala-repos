@@ -60,8 +60,8 @@ trait TableModuleTestSupport[M[+ _]] extends TableModule[M] with TestLib[M] {
   def toJson(dataset: Table): M[Stream[JValue]] =
     dataset.toJson.map(_.toStream)
 
-  def fromSample(
-      sampleData: SampleData, maxBlockSize: Option[Int] = None): Table =
+  def fromSample(sampleData: SampleData,
+                 maxBlockSize: Option[Int] = None): Table =
     fromJson(sampleData.data, maxBlockSize)
 }
 
@@ -75,7 +75,9 @@ trait TableModuleSpec[M[+ _]] extends Specification with ScalaCheck {
     implicit val gen = sample(schema)
     check { (sample: SampleData) =>
       val dataset = testSupport.fromSample(sample)
-      testSupport.toJson(dataset).copoint must containAllOf(sample.data.toList).only
+      testSupport
+        .toJson(dataset)
+        .copoint must containAllOf(sample.data.toList).only
     }
   }
 }

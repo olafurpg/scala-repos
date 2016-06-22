@@ -42,4 +42,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ImageViewSpec
     extends SimpleSFXDelegateSpec[jfxsi.ImageView, ImageView](
-        classOf[jfxsi.ImageView], classOf[ImageView])
+        classOf[jfxsi.ImageView],
+        classOf[ImageView])

@@ -62,9 +62,9 @@ object Templates {
           val syncTemplateDirValue: File = syncTemplateDir.value
           val mappings: Seq[(File, File)] = preparedTemplates.flatMap {
             template =>
-              (template.***.filter(!_.isDirectory) x relativeTo(template)).map {
-                f =>
-                  (f._1, syncTemplateDirValue / template.getName / f._2)
+              (template.***
+                    .filter(!_.isDirectory) x relativeTo(template)).map { f =>
+                (f._1, syncTemplateDirValue / template.getName / f._2)
               }
           }
 
@@ -329,7 +329,7 @@ object Templates {
                     false
                   case (name, key, Right(uuid)) =>
                     logger.info("Template " + name +
-                        " published successfully with uuid: " + uuid)
+                          " published successfully with uuid: " + uuid)
                     overall
                 }
             }
@@ -367,8 +367,9 @@ object Templates {
       def createSetCommand(dirs: Seq[TemplateSources]): String = {
         dirs
           .map("file(\"" + _.mainDir.getAbsolutePath + "\")")
-          .mkString(
-              "set play.sbt.activator.Templates.templates := Seq(", ",", ")")
+          .mkString("set play.sbt.activator.Templates.templates := Seq(",
+                    ",",
+                    ")")
       }
 
       val setCommand = createSetCommand(templateDirs)

@@ -105,8 +105,8 @@ class PEventsSpec extends Specification with TestEvents {
   /* setup */
 
   // events from TestEvents trait
-  val listOfEvents = List(
-      u1e5, u2e2, u1e3, u1e1, u2e3, u2e1, u1e4, u1e2, r1, r2)
+  val listOfEvents =
+    List(u1e5, u2e2, u1e3, u1e1, u2e3, u2e1, u1e4, u1e2, r1, r2)
   val listOfEventsChannel = List(u3e1, u3e2, u3e3, r3, r4)
 
   def initTest(localEventClient: LEvents) = {

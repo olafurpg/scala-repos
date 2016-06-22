@@ -27,12 +27,13 @@ import org.apache.spark.rpc.{RpcAddress, RpcEndpoint, ThreadSafeRpcEndpoint}
 
 private[netty] sealed trait InboxMessage
 
-private[netty] case class OneWayMessage(
-    senderAddress: RpcAddress, content: Any)
+private[netty] case class OneWayMessage(senderAddress: RpcAddress,
+                                        content: Any)
     extends InboxMessage
 
-private[netty] case class RpcMessage(
-    senderAddress: RpcAddress, content: Any, context: NettyRpcCallContext)
+private[netty] case class RpcMessage(senderAddress: RpcAddress,
+                                     content: Any,
+                                     context: NettyRpcCallContext)
     extends InboxMessage
 
 private[netty] case object OnStart extends InboxMessage
@@ -49,14 +50,15 @@ private[netty] case class RemoteProcessDisconnected(remoteAddress: RpcAddress)
 
 /** A message to tell all endpoints that a network error has happened. */
 private[netty] case class RemoteProcessConnectionError(
-    cause: Throwable, remoteAddress: RpcAddress)
+    cause: Throwable,
+    remoteAddress: RpcAddress)
     extends InboxMessage
 
 /**
   * A inbox that stores messages for an [[RpcEndpoint]] and posts messages to it thread-safely.
   */
-private[netty] class Inbox(
-    val endpointRef: NettyRpcEndpointRef, val endpoint: RpcEndpoint)
+private[netty] class Inbox(val endpointRef: NettyRpcEndpointRef,
+                           val endpoint: RpcEndpoint)
     extends Logging { inbox => // Give this an alias so we can use it more clearly in closures.
 
   @GuardedBy("this")

@@ -36,8 +36,8 @@ object ConnectHttp {
   def toHost(uriHost: Uri): ConnectHttp = {
     val s = uriHost.scheme.toLowerCase(Locale.ROOT)
     if (s == "https")
-      new ConnectHttpsImpl(
-          uriHost.host.address, effectivePort(s, uriHost.port))
+      new ConnectHttpsImpl(uriHost.host.address,
+                           effectivePort(s, uriHost.port))
     else
       new ConnectHttpImpl(uriHost.host.address, effectivePort(s, uriHost.port))
   }

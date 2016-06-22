@@ -128,8 +128,10 @@ class KillOverdueTasksActorTest
         stagedAt = now - 10.seconds
     )
 
-    val runningTask = MarathonTestHelper.runningTaskProto(
-        "running", stagedAt = now - 5.seconds, startedAt = now - 2.seconds)
+    val runningTask =
+      MarathonTestHelper.runningTaskProto("running",
+                                          stagedAt = now - 5.seconds,
+                                          startedAt = now - 2.seconds)
 
     Given("Several somehow overdue tasks plus some not overdue tasks")
     val appId = PathId("/ignored")
@@ -146,7 +148,8 @@ class KillOverdueTasksActorTest
     )
     taskTracker.tasksByAppSync returns TasksByApp.of(app)
 
-    When("We check which tasks should be killed because they're not yet staged or unconfirmed")
+    When(
+        "We check which tasks should be killed because they're not yet staged or unconfirmed")
     val testProbe = TestProbe()
     testProbe.send(checkActor,
                    KillOverdueTasksActor.Check(maybeAck = Some(testProbe.ref)))
@@ -156,15 +159,18 @@ class KillOverdueTasksActorTest
     verify(taskTracker).tasksByAppSync
 
     And("All somehow overdue tasks are killed")
-    verify(driver).killTask(MesosProtos.TaskID
+    verify(driver).killTask(
+        MesosProtos.TaskID
           .newBuilder()
           .setValue(unconfirmedOverdueTask.getId)
           .build())
-    verify(driver).killTask(MesosProtos.TaskID
+    verify(driver).killTask(
+        MesosProtos.TaskID
           .newBuilder()
           .setValue(overdueUnstagedTask.getId)
           .build())
-    verify(driver).killTask(MesosProtos.TaskID
+    verify(driver).killTask(
+        MesosProtos.TaskID
           .newBuilder()
           .setValue(overdueStagedTask.getId)
           .build())

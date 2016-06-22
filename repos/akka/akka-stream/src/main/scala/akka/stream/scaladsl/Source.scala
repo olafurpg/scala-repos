@@ -173,12 +173,12 @@ final class Source[+Out, +Mat](private[stream] override val module: Module)
   /**
     * Combines several sources with fun-in strategy like `Merge` or `Concat` and returns `Source`.
     */
-  def combine[T, U](
-      first: Source[T, _], second: Source[T, _], rest: Source[T, _]*)(
+  def combine[T, U](first: Source[T, _],
+                    second: Source[T, _],
+                    rest: Source[T, _]*)(
       strategy: Int ⇒ Graph[UniformFanInShape[T, U], NotUsed])
     : Source[U, NotUsed] =
-    Source.fromGraph(
-        GraphDSL.create() { implicit b ⇒
+    Source.fromGraph(GraphDSL.create() { implicit b ⇒
       import GraphDSL.Implicits._
       val c = b.add(strategy(rest.size + 2))
       first ~> c.in(0)
@@ -226,8 +226,7 @@ object Source {
     * from the downstream transformation steps.
     */
   def fromIterator[T](f: () ⇒ Iterator[T]): Source[T, NotUsed] =
-    apply(
-        new immutable.Iterable[T] {
+    apply(new immutable.Iterable[T] {
       override def iterator: Iterator[T] = f()
       override def toString: String = "() => Iterator"
     })
@@ -358,8 +357,8 @@ object Source {
     */
   def maybe[T]: Source[T, Promise[Option[T]]] =
     new Source(
-        new MaybeSource[T](
-            DefaultAttributes.maybeSource, shape("MaybeSource")))
+        new MaybeSource[T](DefaultAttributes.maybeSource,
+                           shape("MaybeSource")))
 
   /**
     * Create a `Source` that immediately ends the stream with the `cause` error to every connected `Sink`.
@@ -374,8 +373,9 @@ object Source {
     * Creates a `Source` that is materialized as a [[org.reactivestreams.Subscriber]]
     */
   def asSubscriber[T]: Source[T, Subscriber[T]] =
-    new Source(new SubscriberSource[T](
-            DefaultAttributes.subscriberSource, shape("SubscriberSource")))
+    new Source(
+        new SubscriberSource[T](DefaultAttributes.subscriberSource,
+                                shape("SubscriberSource")))
 
   /**
     * Creates a `Source` that is materialized to an [[akka.actor.ActorRef]] which points to an Actor
@@ -436,12 +436,12 @@ object Source {
   /**
     * Combines several sources with fun-in strategy like `Merge` or `Concat` and returns `Source`.
     */
-  def combine[T, U](
-      first: Source[T, _], second: Source[T, _], rest: Source[T, _]*)(
+  def combine[T, U](first: Source[T, _],
+                    second: Source[T, _],
+                    rest: Source[T, _]*)(
       strategy: Int ⇒ Graph[UniformFanInShape[T, U], NotUsed])
     : Source[U, NotUsed] =
-    Source.fromGraph(
-        GraphDSL.create() { implicit b ⇒
+    Source.fromGraph(GraphDSL.create() { implicit b ⇒
       import GraphDSL.Implicits._
       val c = b.add(strategy(rest.size + 2))
       first ~> c.in(0)
@@ -488,6 +488,7 @@ object Source {
     */
   def queue[T](bufferSize: Int, overflowStrategy: OverflowStrategy)
     : Source[T, SourceQueueWithComplete[T]] =
-    Source.fromGraph(new QueueSource(bufferSize, overflowStrategy)
+    Source.fromGraph(
+        new QueueSource(bufferSize, overflowStrategy)
           .withAttributes(DefaultAttributes.queueSource))
 }

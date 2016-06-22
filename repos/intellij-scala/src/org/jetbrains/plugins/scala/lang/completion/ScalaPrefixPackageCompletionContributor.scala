@@ -69,7 +69,8 @@ object ScalaPrefixPackageCompletionContributor {
 
       if (parameters.getInvocationCount == 0) return
 
-      if (PsiTreeUtil.getContextOfType(position, classOf[ScImportStmt]) != null)
+      if (PsiTreeUtil
+            .getContextOfType(position, classOf[ScImportStmt]) != null)
         return
 
       if (result.getPrefixMatcher.getPrefix == "") return
@@ -79,7 +80,9 @@ object ScalaPrefixPackageCompletionContributor {
       if (pckg == null) return
 
       ScalaPsiElementFactory.createExpressionWithContextFromText(
-          pckg.name, position.getContext, position) match {
+          pckg.name,
+          position.getContext,
+          position) match {
         case ResolvesTo(pack: PsiPackage)
             if pack.getQualifiedName == pckg.getQualifiedName =>
           return
@@ -88,7 +91,9 @@ object ScalaPrefixPackageCompletionContributor {
 
       val resolveResult = new ScalaResolveResult(pckg, prefixCompletion = true)
       val lookupElems = LookupElementManager.getLookupElement(
-          resolveResult, isInImport = false, shouldImport = true)
+          resolveResult,
+          isInImport = false,
+          shouldImport = true)
       lookupElems.foreach { le =>
         le.elementToImport = pckg
       }

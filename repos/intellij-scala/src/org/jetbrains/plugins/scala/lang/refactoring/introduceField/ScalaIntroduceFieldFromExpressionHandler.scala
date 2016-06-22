@@ -42,16 +42,16 @@ class ScalaIntroduceFieldFromExpressionHandler
       PsiDocumentManager.getInstance(project).commitAllDocuments()
       ScalaRefactoringUtil.checkFile(file, project, editor, REFACTORING_NAME)
 
-      val (expr: ScExpression, types: Array[ScType]) = getExpression(
-          project, editor, file, startOffset, endOffset) match {
-        case Some((e, tps)) => (e, tps)
-        case None =>
-          showErrorMessage(
-              ScalaBundle.message("cannot.refactor.not.expression"),
-              project,
-              editor)
-          return
-      }
+      val (expr: ScExpression, types: Array[ScType]) =
+        getExpression(project, editor, file, startOffset, endOffset) match {
+          case Some((e, tps)) => (e, tps)
+          case None =>
+            showErrorMessage(
+                ScalaBundle.message("cannot.refactor.not.expression"),
+                project,
+                editor)
+            return
+        }
 
       afterClassChoosing[ScExpression](expr,
                                        types,
@@ -96,7 +96,8 @@ class ScalaIntroduceFieldFromExpressionHandler
   def convertExpressionToField(ifc: IntroduceFieldContext[ScExpression]) {
 
     val possiblePlace = ScalaRefactoringUtil.checkCanBeIntroduced(
-        ifc.element, showErrorMessage(_, ifc.project, ifc.editor))
+        ifc.element,
+        showErrorMessage(_, ifc.project, ifc.editor))
     if (!possiblePlace) return
 
     def runWithDialog() {
@@ -125,37 +126,47 @@ class ScalaIntroduceFieldFromExpressionHandler
     val occurrencesToReplace =
       if (settings.replaceAll) ifc.occurrences else mainOcc
     val aClass = ifc.aClass
-    val checkAnchor: PsiElement = anchorForNewDeclaration(
-        expression, occurrencesToReplace, aClass)
+    val checkAnchor: PsiElement =
+      anchorForNewDeclaration(expression, occurrencesToReplace, aClass)
     if (checkAnchor == null) {
-      showErrorMessage(
-          "Cannot find place for the new field", ifc.project, ifc.editor)
+      showErrorMessage("Cannot find place for the new field",
+                       ifc.project,
+                       ifc.editor)
       return
     }
     val manager = aClass.getManager
     val name = settings.name
     val typeName = Option(settings.scType).map(_.canonicalText).getOrElse("")
-    val replacedOccurences = ScalaRefactoringUtil.replaceOccurences(
-        occurrencesToReplace, name, ifc.file)
+    val replacedOccurences = ScalaRefactoringUtil
+      .replaceOccurences(occurrencesToReplace, name, ifc.file)
 
-    val anchor = anchorForNewDeclaration(
-        expression, replacedOccurences, aClass)
+    val anchor =
+      anchorForNewDeclaration(expression, replacedOccurences, aClass)
     val initInDecl = settings.initInDeclaration
     var createdDeclaration: PsiElement = null
     if (initInDecl) {
       createdDeclaration = ScalaPsiElementFactory.createDeclaration(
-          name, typeName, settings.defineVar, expression, manager)
+          name,
+          typeName,
+          settings.defineVar,
+          expression,
+          manager)
     } else {
       val underscore =
         ScalaPsiElementFactory.createExpressionFromText("_", manager)
       createdDeclaration = ScalaPsiElementFactory.createDeclaration(
-          name, typeName, settings.defineVar, underscore, manager)
+          name,
+          typeName,
+          settings.defineVar,
+          underscore,
+          manager)
 
       anchorForInitializer(replacedOccurences, ifc.file) match {
         case Some(anchorForInit) =>
           val parent = anchorForInit.getParent
           val assignStmt = ScalaPsiElementFactory.createExpressionFromText(
-              s"$name = ${expression.getText}", manager)
+              s"$name = ${expression.getText}",
+              manager)
           parent.addBefore(assignStmt, anchorForInit)
           parent.addBefore(
               ScalaPsiElementFactory.createNewLineNode(manager, "\n").getPsi,
@@ -188,7 +199,8 @@ class ScalaIntroduceFieldFromExpressionHandler
           if onOneLine(document, ed.getTextRange) =>
         def isBlockStmtOrMember(elem: PsiElement) =
           elem != null &&
-          (elem.isInstanceOf[ScBlockStatement] || elem.isInstanceOf[ScMember])
+            (elem.isInstanceOf[ScBlockStatement] || elem
+                  .isInstanceOf[ScMember])
         var declaration = createdDeclaration.getText
         if (isBlockStmtOrMember(anchor)) declaration += "; "
         if (isBlockStmtOrMember(anchor.getPrevSibling))
@@ -220,8 +232,8 @@ class ScalaIntroduceFieldFromExpressionHandler
     val occCount = ifc.occurrences.length
     // Add occurrences highlighting
     if (occCount > 1)
-      occurrenceHighlighters = ScalaRefactoringUtil.highlightOccurrences(
-          ifc.project, ifc.occurrences, ifc.editor)
+      occurrenceHighlighters = ScalaRefactoringUtil
+        .highlightOccurrences(ifc.project, ifc.occurrences, ifc.editor)
 
     val dialog = new ScalaIntroduceFieldDialog(ifc, settings)
     dialog.show()
@@ -235,16 +247,21 @@ class ScalaIntroduceFieldFromExpressionHandler
   }
 
   protected override def isSuitableClass(
-      elem: PsiElement, clazz: ScTemplateDefinition): Boolean = true
+      elem: PsiElement,
+      clazz: ScTemplateDefinition): Boolean = true
 
   private def onOneLine(document: Document, range: TextRange): Boolean = {
     document.getLineNumber(range.getStartOffset) == document.getLineNumber(
         range.getEndOffset)
   }
 
-  private def showErrorMessage(
-      text: String, project: Project, editor: Editor) = {
-    CommonRefactoringUtil.showErrorHint(
-        project, editor, text, REFACTORING_NAME, HelpID.INTRODUCE_FIELD)
+  private def showErrorMessage(text: String,
+                               project: Project,
+                               editor: Editor) = {
+    CommonRefactoringUtil.showErrorHint(project,
+                                        editor,
+                                        text,
+                                        REFACTORING_NAME,
+                                        HelpID.INTRODUCE_FIELD)
   }
 }

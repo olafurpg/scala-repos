@@ -26,8 +26,8 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK
 
 /** Holds a cached logical plan and its data */
-private[sql] case class CachedData(
-    plan: LogicalPlan, cachedRepresentation: InMemoryRelation)
+private[sql] case class CachedData(plan: LogicalPlan,
+                                   cachedRepresentation: InMemoryRelation)
 
 /**
   * Provides support in a SQLContext for caching query results and automatically using these cached
@@ -99,8 +99,8 @@ private[sql] class CacheManager extends Logging {
   }
 
   /** Removes the data for the given [[Queryable]] from the cache */
-  private[sql] def uncacheQuery(
-      query: Queryable, blocking: Boolean = true): Unit = writeLock {
+  private[sql] def uncacheQuery(query: Queryable,
+                                blocking: Boolean = true): Unit = writeLock {
     val planToCache = query.queryExecution.analyzed
     val dataIndex =
       cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))
@@ -112,19 +112,20 @@ private[sql] class CacheManager extends Logging {
   /** Tries to remove the data for the given [[Queryable]] from the cache
     * if it's cached
     */
-  private[sql] def tryUncacheQuery(
-      query: Queryable, blocking: Boolean = true): Boolean = writeLock {
-    val planToCache = query.queryExecution.analyzed
-    val dataIndex =
-      cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))
-    val found = dataIndex >= 0
-    if (found) {
-      cachedData(dataIndex).cachedRepresentation.cachedColumnBuffers
-        .unpersist(blocking)
-      cachedData.remove(dataIndex)
+  private[sql] def tryUncacheQuery(query: Queryable,
+                                   blocking: Boolean = true): Boolean =
+    writeLock {
+      val planToCache = query.queryExecution.analyzed
+      val dataIndex =
+        cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))
+      val found = dataIndex >= 0
+      if (found) {
+        cachedData(dataIndex).cachedRepresentation.cachedColumnBuffers
+          .unpersist(blocking)
+        cachedData.remove(dataIndex)
+      }
+      found
     }
-    found
-  }
 
   /** Optionally returns cached data for the given [[Queryable]] */
   private[sql] def lookupCachedData(query: Queryable): Option[CachedData] =

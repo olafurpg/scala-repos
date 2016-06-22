@@ -41,7 +41,7 @@ import org.apache.spark.sql.types.StructType
   * @since 1.4.0
   */
 @Experimental
-class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
+class DataFrameReader private[sql] (sqlContext: SQLContext) extends Logging {
 
   /**
     * Specifies the input data source format.
@@ -130,8 +130,8 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
                                 userSpecifiedSchema = userSpecifiedSchema,
                                 className = source,
                                 options = extraOptions.toMap)
-    Dataset.newDataFrame(
-        sqlContext, LogicalRelation(dataSource.resolveRelation()))
+    Dataset
+      .newDataFrame(sqlContext, LogicalRelation(dataSource.resolveRelation()))
   }
 
   /**
@@ -177,8 +177,8 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
                                 userSpecifiedSchema = userSpecifiedSchema,
                                 className = source,
                                 options = extraOptions.toMap)
-    Dataset.newDataFrame(
-        sqlContext, StreamingRelation(dataSource.createSource()))
+    Dataset
+      .newDataFrame(sqlContext, StreamingRelation(dataSource.createSource()))
   }
 
   /**
@@ -228,8 +228,8 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
            upperBound: Long,
            numPartitions: Int,
            connectionProperties: Properties): DataFrame = {
-    val partitioning = JDBCPartitioningInfo(
-        columnName, lowerBound, upperBound, numPartitions)
+    val partitioning =
+      JDBCPartitioningInfo(columnName, lowerBound, upperBound, numPartitions)
     val parts = JDBCRelation.columnPartition(partitioning)
     jdbc(url, table, parts, connectionProperties)
   }
@@ -363,8 +363,9 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
   def json(jsonRDD: RDD[String]): DataFrame = {
     val parsedOptions: JSONOptions = new JSONOptions(extraOptions.toMap)
     val schema = userSpecifiedSchema.getOrElse {
-      InferSchema.infer(
-          jsonRDD, sqlContext.conf.columnNameOfCorruptRecord, parsedOptions)
+      InferSchema.infer(jsonRDD,
+                        sqlContext.conf.columnNameOfCorruptRecord,
+                        parsedOptions)
     }
 
     Dataset.newDataFrame(

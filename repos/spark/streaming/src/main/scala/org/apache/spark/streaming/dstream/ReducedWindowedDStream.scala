@@ -33,18 +33,19 @@ private[streaming] class ReducedWindowedDStream[K: ClassTag, V: ClassTag](
     _windowDuration: Duration,
     _slideDuration: Duration,
     partitioner: Partitioner
-)
-    extends DStream[(K, V)](parent.ssc) {
+) extends DStream[(K, V)](parent.ssc) {
 
-  require(_windowDuration.isMultipleOf(parent.slideDuration),
-          "The window duration of ReducedWindowedDStream (" + _windowDuration +
-          ") " + "must be multiple of the slide duration of parent DStream (" +
-          parent.slideDuration + ")")
+  require(
+      _windowDuration.isMultipleOf(parent.slideDuration),
+      "The window duration of ReducedWindowedDStream (" + _windowDuration +
+        ") " + "must be multiple of the slide duration of parent DStream (" +
+        parent.slideDuration + ")")
 
-  require(_slideDuration.isMultipleOf(parent.slideDuration),
-          "The slide duration of ReducedWindowedDStream (" + _slideDuration +
-          ") " + "must be multiple of the slide duration of parent DStream (" +
-          parent.slideDuration + ")")
+  require(
+      _slideDuration.isMultipleOf(parent.slideDuration),
+      "The slide duration of ReducedWindowedDStream (" + _slideDuration +
+        ") " + "must be multiple of the slide duration of parent DStream (" +
+        parent.slideDuration + ")")
 
   // Reduce each batch of data using reduceByKey which will be further reduced by window
   // by ReducedWindowedDStream
@@ -83,7 +84,8 @@ private[streaming] class ReducedWindowedDStream[K: ClassTag, V: ClassTag](
 
     val currentTime = validTime
     val currentWindow = new Interval(
-        currentTime - windowDuration + parent.slideDuration, currentTime)
+        currentTime - windowDuration + parent.slideDuration,
+        currentTime)
     val previousWindow = currentWindow - slideDuration
 
     logDebug("Window time = " + windowDuration)
@@ -111,7 +113,8 @@ private[streaming] class ReducedWindowedDStream[K: ClassTag, V: ClassTag](
 
     // Get the RDDs of the reduced values in "new time steps"
     val newRDDs = reducedStream.slice(
-        previousWindow.endTime + parent.slideDuration, currentWindow.endTime)
+        previousWindow.endTime + parent.slideDuration,
+        currentWindow.endTime)
     logDebug("# new RDDs = " + newRDDs.size)
 
     // Get the RDD of the reduced value of the previous window
@@ -124,7 +127,8 @@ private[streaming] class ReducedWindowedDStream[K: ClassTag, V: ClassTag](
 
     // Cogroup the reduced RDDs and merge the reduced values
     val cogroupedRDD = new CoGroupedRDD[K](
-        allRDDs.toSeq.asInstanceOf[Seq[RDD[(K, _)]]], partitioner)
+        allRDDs.toSeq.asInstanceOf[Seq[RDD[(K, _)]]],
+        partitioner)
     // val mergeValuesFunc = mergeValues(oldRDDs.size, newRDDs.size) _
 
     val numOldValues = oldRDDs.size
@@ -150,7 +154,7 @@ private[streaming] class ReducedWindowedDStream[K: ClassTag, V: ClassTag](
         if (newValues.isEmpty) {
           throw new Exception(
               "Neither previous window has value for key, nor new values found. " +
-              "Are you sure your key class hashes consistently?")
+                "Are you sure your key class hashes consistently?")
         }
         // Reduce the new values
         newValues.reduce(reduceF) // return

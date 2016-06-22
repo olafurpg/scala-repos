@@ -53,11 +53,12 @@ object Dispatchers {
   val MAILBOX_CAPACITY =
     config.getInt("akka.actor.default-dispatcher.mailbox-capacity", -1)
   val MAILBOX_PUSH_TIME_OUT = Duration(
-      config.getInt(
-          "akka.actor.default-dispatcher.mailbox-push-timeout-time", 10),
+      config.getInt("akka.actor.default-dispatcher.mailbox-push-timeout-time",
+                    10),
       TIME_UNIT)
   val THROUGHPUT_DEADLINE_TIME = Duration(
-      config.getInt("akka.actor.throughput-deadline-time", -1), TIME_UNIT)
+      config.getInt("akka.actor.throughput-deadline-time", -1),
+      TIME_UNIT)
   val THROUGHPUT_DEADLINE_TIME_MILLIS = THROUGHPUT_DEADLINE_TIME.toMillis.toInt
   val MAILBOX_TYPE: MailboxType =
     if (MAILBOX_CAPACITY < 1) UnboundedMailbox() else BoundedMailbox()
@@ -71,7 +72,10 @@ object Dispatchers {
 
   object globalExecutorBasedEventDrivenDispatcher
       extends ExecutorBasedEventDrivenDispatcher(
-          "global", THROUGHPUT, THROUGHPUT_DEADLINE_TIME_MILLIS, MAILBOX_TYPE)
+          "global",
+          THROUGHPUT,
+          THROUGHPUT_DEADLINE_TIME_MILLIS,
+          MAILBOX_TYPE)
 
   /**
     * Creates an thread based dispatcher serving a single actor through the same single thread.
@@ -98,8 +102,9 @@ object Dispatchers {
     * <p/>
     * E.g. each actor consumes its own thread.
     */
-  def newThreadBasedDispatcher(
-      actor: ActorRef, mailboxCapacity: Int, pushTimeOut: Duration) =
+  def newThreadBasedDispatcher(actor: ActorRef,
+                               mailboxCapacity: Int,
+                               pushTimeOut: Duration) =
     new ThreadBasedDispatcher(actor, mailboxCapacity, pushTimeOut)
 
   /**
@@ -117,8 +122,9 @@ object Dispatchers {
     * <p/>
     * Has a fluent builder interface for configuring its semantics.
     */
-  def newExecutorBasedEventDrivenDispatcher(
-      name: String, throughput: Int, mailboxType: MailboxType) =
+  def newExecutorBasedEventDrivenDispatcher(name: String,
+                                            throughput: Int,
+                                            mailboxType: MailboxType) =
     ThreadPoolConfigDispatcherBuilder(config =>
                                         new ExecutorBasedEventDrivenDispatcher(
                                             name,
@@ -139,8 +145,11 @@ object Dispatchers {
                                             mailboxType: MailboxType) =
     ThreadPoolConfigDispatcherBuilder(
         config =>
-          new ExecutorBasedEventDrivenDispatcher(
-              name, throughput, throughputDeadlineMs, mailboxType, config),
+          new ExecutorBasedEventDrivenDispatcher(name,
+                                                 throughput,
+                                                 throughputDeadlineMs,
+                                                 mailboxType,
+                                                 config),
         ThreadPoolConfig())
 
   /**
@@ -159,8 +168,8 @@ object Dispatchers {
     * <p/>
     * Has a fluent builder interface for configuring its semantics.
     */
-  def newExecutorBasedEventDrivenWorkStealingDispatcher(
-      name: String, throughput: Int) =
+  def newExecutorBasedEventDrivenWorkStealingDispatcher(name: String,
+                                                        throughput: Int) =
     ThreadPoolConfigDispatcherBuilder(
         config =>
           new ExecutorBasedEventDrivenWorkStealingDispatcher(
@@ -177,7 +186,9 @@ object Dispatchers {
     * Has a fluent builder interface for configuring its semantics.
     */
   def newExecutorBasedEventDrivenWorkStealingDispatcher(
-      name: String, throughput: Int, mailboxType: MailboxType) =
+      name: String,
+      throughput: Int,
+      mailboxType: MailboxType) =
     ThreadPoolConfigDispatcherBuilder(
         config =>
           new ExecutorBasedEventDrivenWorkStealingDispatcher(
@@ -201,7 +212,11 @@ object Dispatchers {
     ThreadPoolConfigDispatcherBuilder(
         config =>
           new ExecutorBasedEventDrivenWorkStealingDispatcher(
-              name, throughput, throughputDeadlineMs, mailboxType, config),
+              name,
+              throughput,
+              throughputDeadlineMs,
+              mailboxType,
+              config),
         ThreadPoolConfig())
 
   /**
@@ -209,8 +224,8 @@ object Dispatchers {
     * or else use the supplied default dispatcher
     */
   def fromConfig(key: String,
-                 default: => MessageDispatcher =
-                   defaultGlobalDispatcher): MessageDispatcher =
+                 default: => MessageDispatcher = defaultGlobalDispatcher)
+    : MessageDispatcher =
     config getSection key flatMap from getOrElse default
 
   /*
@@ -245,10 +260,13 @@ object Dispatchers {
       case "GlobalExecutorBasedEventDriven" =>
         GlobalExecutorBasedEventDrivenDispatcherConfigurator
       case fqn =>
-        ReflectiveAccess.getClassFor[MessageDispatcherConfigurator](fqn) match {
+        ReflectiveAccess
+          .getClassFor[MessageDispatcherConfigurator](fqn) match {
           case r: Right[_, Class[MessageDispatcherConfigurator]] =>
             ReflectiveAccess.createInstance[MessageDispatcherConfigurator](
-                r.b, Array[Class[_]](), Array[AnyRef]()) match {
+                r.b,
+                Array[Class[_]](),
+                Array[AnyRef]()) match {
               case r: Right[Exception, MessageDispatcherConfigurator] => r.b
               case l: Left[Exception, MessageDispatcherConfigurator] =>
                 throw new IllegalArgumentException(

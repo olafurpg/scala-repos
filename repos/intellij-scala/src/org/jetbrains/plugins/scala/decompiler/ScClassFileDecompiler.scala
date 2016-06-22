@@ -12,8 +12,11 @@ class ScClassFileDecompiler extends ClassFileDecompilers.Full {
 
   override val getStubBuilder: ClsStubBuilder = new ScClsStubBuilder
 
-  override def createFileViewProvider(
-      file: VirtualFile, manager: PsiManager, physical: Boolean) =
-    new ScClassFileViewProvider(
-        manager, file, physical, DecompilerUtil.isScalaFile(file))
+  override def createFileViewProvider(file: VirtualFile,
+                                      manager: PsiManager,
+                                      physical: Boolean) =
+    new ScClassFileViewProvider(manager,
+                                file,
+                                physical,
+                                DecompilerUtil.isScalaFile(file))
 }

@@ -40,13 +40,18 @@ trait TypedSeperatedFile extends Serializable {
   }
 
   def apply[T: Manifest: TupleConverter: TupleSetter](
-      path: String, f: Fields): FixedPathTypedDelimited[T] =
+      path: String,
+      f: Fields): FixedPathTypedDelimited[T] =
     apply(Seq(path), f)
 
   def apply[T: Manifest: TupleConverter: TupleSetter](
-      paths: Seq[String], f: Fields): FixedPathTypedDelimited[T] =
-    new FixedPathTypedDelimited[T](
-        paths, f, skipHeader, writeHeader, separator)
+      paths: Seq[String],
+      f: Fields): FixedPathTypedDelimited[T] =
+    new FixedPathTypedDelimited[T](paths,
+                                   f,
+                                   skipHeader,
+                                   writeHeader,
+                                   separator)
 }
 
 /**
@@ -79,17 +84,21 @@ object TypedOsv extends TypedSeperatedFile {
 
 object FixedPathTypedDelimited {
   def apply[T: Manifest: TupleConverter: TupleSetter](
-      path: String, separator: String): FixedPathTypedDelimited[T] =
+      path: String,
+      separator: String): FixedPathTypedDelimited[T] =
     apply(Seq(path), separator)
 
   def apply[T: Manifest: TupleConverter: TupleSetter](
-      paths: Seq[String], separator: String): FixedPathTypedDelimited[T] = {
+      paths: Seq[String],
+      separator: String): FixedPathTypedDelimited[T] = {
     val f = Dsl.intFields(0 until implicitly[TupleConverter[T]].arity)
     apply(paths, f, separator)
   }
 
   def apply[T: Manifest: TupleConverter: TupleSetter](
-      path: String, f: Fields, separator: String): FixedPathTypedDelimited[T] =
+      path: String,
+      f: Fields,
+      separator: String): FixedPathTypedDelimited[T] =
     apply(Seq(path), f, separator)
 
   def apply[T: Manifest: TupleConverter: TupleSetter](
@@ -154,7 +163,7 @@ class FixedPathTypedDelimited[T](p: Seq[String],
 
   override lazy val toString: String =
     "FixedPathTypedDelimited" +
-    ((p, fields, skipHeader, writeHeader, separator, mf).toString)
+      ((p, fields, skipHeader, writeHeader, separator, mf).toString)
 
   override def equals(that: Any): Boolean =
     Option(that).map { _.toString == this.toString }.getOrElse(false)

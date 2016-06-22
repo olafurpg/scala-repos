@@ -38,8 +38,8 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   def composeK[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] =
     this <==< k
 
-  def traverse[F[_]](f: F[A])(
-      implicit M: Applicative[M], F: Traverse[F]): M[F[B]] =
+  def traverse[F[_]](f: F[A])(implicit M: Applicative[M],
+                              F: Traverse[F]): M[F[B]] =
     F.traverse(f)(run)
 
   def =<<(a: M[A])(implicit m: Bind[M]): M[B] = m.bind(a)(run)
@@ -90,15 +90,15 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   def state(implicit M: Monad[M]): StateT[M, A, B] =
     StateT(a => M.map(run(a))((a, _)))
 
-  def liftMK[T[_ [_], _]](
-      implicit T: MonadTrans[T], M: Monad[M]): Kleisli[T[M, ?], A, B] =
+  def liftMK[T[_ [_], _]](implicit T: MonadTrans[T],
+                          M: Monad[M]): Kleisli[T[M, ?], A, B] =
     mapK[T[M, ?], B](ma => T.liftM(ma))
 
   def local[AA](f: AA => A): Kleisli[M, AA, B] =
     kleisli(f andThen run)
 
-  def endo(
-      implicit M: Functor[M], ev: A >~> B): Endomorphic[Kleisli[M, ?, ?], A] =
+  def endo(implicit M: Functor[M],
+           ev: A >~> B): Endomorphic[Kleisli[M, ?, ?], A] =
     Endomorphic[Kleisli[M, ?, ?], A](map(ev.apply))
 
   def liftF(implicit F: Functor[Kleisli[M, A, ?]]) =
@@ -471,8 +471,8 @@ private trait KleisliCompose[F[_]] extends Compose[Kleisli[F, ?, ?]] {
 
   implicit def F: Bind[F]
 
-  def compose[A, B, C](
-      bc: Kleisli[F, B, C], ab: Kleisli[F, A, B]): Kleisli[F, A, C] = ab >=> bc
+  def compose[A, B, C](bc: Kleisli[F, B, C],
+                       ab: Kleisli[F, A, B]): Kleisli[F, A, C] = ab >=> bc
 }
 
 private trait KleisliArrow[F[_]]
@@ -485,7 +485,7 @@ private trait KleisliArrow[F[_]]
 
   override def second[A, B, C](
       f: Kleisli[F, A, B]): Kleisli[F, (C, A), (C, B)] =
-    super [KleisliProChoice].second(f)
+    super[KleisliProChoice].second(f)
 
   def id[A]: Kleisli[F, A, A] =
     kleisli(a => F.point(a))
@@ -493,15 +493,16 @@ private trait KleisliArrow[F[_]]
   def arr[A, B](f: A => B): Kleisli[F, A, B] =
     kleisli(a => F.point(f(a)))
 
-  def choice[A, B, C](
-      f: => Kleisli[F, A, C], g: => Kleisli[F, B, C]): Kleisli[F, A \/ B, C] =
+  def choice[A, B, C](f: => Kleisli[F, A, C],
+                      g: => Kleisli[F, B, C]): Kleisli[F, A \/ B, C] =
     Kleisli {
       case -\/(a) => f run a
       case \/-(b) => g run b
     }
 
   override def split[A, B, C, D](
-      f: Kleisli[F, A, B], g: Kleisli[F, C, D]): Kleisli[F, (A, C), (B, D)] =
+      f: Kleisli[F, A, B],
+      g: Kleisli[F, C, D]): Kleisli[F, (A, C), (B, D)] =
     Kleisli {
       case (a, c) =>
         F.bind(f run a)(b => F.map(g run c)(d => (b, d)))

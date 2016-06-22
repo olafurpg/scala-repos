@@ -148,7 +148,8 @@ trait Action[A] extends EssentialAction {
   * @tparam A the body content type
   */
 trait BodyParser[+A]
-    extends (RequestHeader => Accumulator[ByteString, Either[Result, A]]) { self =>
+    extends (RequestHeader => Accumulator[ByteString, Either[Result, A]]) {
+  self =>
 
   /**
     * Uses the provided function to transform the BodyParser's computed result
@@ -328,8 +329,8 @@ trait ActionFunction[-R[_], +P[_]] { self =>
     * @param block The block of code to invoke
     * @return A future of the result
     */
-  def invokeBlock[A](
-      request: R[A], block: P[A] => Future[Result]): Future[Result]
+  def invokeBlock[A](request: R[A],
+                     block: P[A] => Future[Result]): Future[Result]
 
   /**
     * Get the execution context to run the request in.  Override this if you want a custom execution context
@@ -523,8 +524,8 @@ trait ActionBuilder[+R[_]] extends ActionFunction[Request, R] { self =>
 object Action extends ActionBuilder[Request] {
   private val logger = Logger(Action.getClass)
 
-  def invokeBlock[A](
-      request: Request[A], block: (Request[A]) => Future[Result]) =
+  def invokeBlock[A](request: Request[A],
+                     block: (Request[A]) => Future[Result]) =
     block(request)
 }
 

@@ -127,8 +127,9 @@ object Persistence extends ExtensionId[Persistence] with ExtensionIdProvider {
   def lookup() = Persistence
 
   /** INTERNAL API. */
-  private[persistence] case class PluginHolder(
-      actor: ActorRef, adapters: EventAdapters, config: Config)
+  private[persistence] case class PluginHolder(actor: ActorRef,
+                                               adapters: EventAdapters,
+                                               config: Config)
       extends Extension
 }
 
@@ -157,9 +158,10 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
     val configPath = config.getString("snapshot-store.plugin")
 
     if (isEmpty(configPath)) {
-      log.warning("No default snapshot store configured! " +
-          "To configure a default snapshot-store plugin set the `akka.persistence.snapshot-store.plugin` key. " +
-          "For details see 'reference.conf'")
+      log.warning(
+          "No default snapshot store configured! " +
+            "To configure a default snapshot-store plugin set the `akka.persistence.snapshot-store.plugin` key. " +
+            "For details see 'reference.conf'")
       NoSnapshotStorePluginId
     } else configPath
   }
@@ -285,8 +287,8 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
     pluginHolderFor(configPath, snapshotStoreFallbackConfigPath).actor
   }
 
-  @tailrec private def pluginHolderFor(
-      configPath: String, fallbackPath: String): PluginHolder = {
+  @tailrec private def pluginHolderFor(configPath: String,
+                                       fallbackPath: String): PluginHolder = {
     val extensionIdMap = pluginExtensionId.get
     extensionIdMap.get(configPath) match {
       case Some(extensionId) ⇒
@@ -294,19 +296,20 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
       case None ⇒
         val extensionId = new PluginHolderExtensionId(configPath, fallbackPath)
         pluginExtensionId.compareAndSet(
-            extensionIdMap, extensionIdMap.updated(configPath, extensionId))
+            extensionIdMap,
+            extensionIdMap.updated(configPath, extensionId))
         pluginHolderFor(configPath, fallbackPath) // Recursive invocation.
     }
   }
 
-  private def createPlugin(
-      configPath: String, pluginConfig: Config): ActorRef = {
+  private def createPlugin(configPath: String,
+                           pluginConfig: Config): ActorRef = {
     val pluginActorName = configPath
     val pluginClassName = pluginConfig.getString("class") match {
       case "" ⇒
         throw new IllegalArgumentException(
             "Plugin class name must be defined in config property " +
-            s"[$configPath.class]")
+              s"[$configPath.class]")
       case className ⇒ className
     }
     log.debug(s"Create plugin: $pluginActorName $pluginClassName")
@@ -314,11 +317,13 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
       system.dynamicAccess.getClassFor[Any](pluginClassName).get
     val pluginDispatcherId = pluginConfig.getString("plugin-dispatcher")
     val pluginActorArgs = try {
-      Reflect.findConstructor(pluginClass, List(pluginConfig)) // will throw if not found
+      Reflect
+        .findConstructor(pluginClass, List(pluginConfig)) // will throw if not found
       List(pluginConfig)
     } catch { case NonFatal(_) ⇒ Nil } // otherwise use empty constructor
-    val pluginActorProps = Props(
-        Deploy(dispatcher = pluginDispatcherId), pluginClass, pluginActorArgs)
+    val pluginActorProps = Props(Deploy(dispatcher = pluginDispatcherId),
+                                 pluginClass,
+                                 pluginActorArgs)
     system.systemActorOf(pluginActorProps, pluginActorName)
   }
 
@@ -332,8 +337,8 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
 
   private def id(ref: ActorRef) = ref.path.toStringWithoutAddress
 
-  private class PluginHolderExtensionId(
-      configPath: String, fallbackPath: String)
+  private class PluginHolderExtensionId(configPath: String,
+                                        fallbackPath: String)
       extends ExtensionId[PluginHolder] {
     override def createExtension(system: ExtendedActorSystem): PluginHolder = {
       require(

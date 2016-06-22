@@ -89,21 +89,23 @@ object ScriptSourceFile {
   def apply(file: AbstractFile, content: Array[Char]) = {
     val underlying = new BatchSourceFile(file, content)
     val headerLen = headerLength(content)
-    val stripped = new ScriptSourceFile(
-        underlying, content drop headerLen, headerLen)
+    val stripped =
+      new ScriptSourceFile(underlying, content drop headerLen, headerLen)
 
     stripped
   }
 
   def apply(underlying: BatchSourceFile) = {
     val headerLen = headerLength(underlying.content)
-    new ScriptSourceFile(
-        underlying, underlying.content drop headerLen, headerLen)
+    new ScriptSourceFile(underlying,
+                         underlying.content drop headerLen,
+                         headerLen)
   }
 }
 
-class ScriptSourceFile(
-    underlying: BatchSourceFile, content: Array[Char], override val start: Int)
+class ScriptSourceFile(underlying: BatchSourceFile,
+                       content: Array[Char],
+                       override val start: Int)
     extends BatchSourceFile(underlying.file, content) {
   override def isSelfContained = false
 
@@ -144,7 +146,7 @@ class BatchSourceFile(val file: AbstractFile, content0: Array[Char])
     // don't identify the CR in CR LF as a line break, since LF will do.
     def notCRLF0 =
       content(idx) != CR || !content.isDefinedAt(idx + 1) ||
-      content(idx + 1) != LF
+        content(idx + 1) != LF
 
     idx < length && notCRLF0 && p(content(idx))
   }

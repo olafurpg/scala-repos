@@ -2,8 +2,8 @@ import scala.reflect.runtime.universe._
 import scala.reflect.macros.blackbox.Context
 
 object Macros {
-  def cons_impl[A: c.WeakTypeTag](c: Context)(
-      x: c.Expr[A], xs: c.Expr[List[A]]): c.Expr[List[A]] = {
+  def cons_impl[A: c.WeakTypeTag](
+      c: Context)(x: c.Expr[A], xs: c.Expr[List[A]]): c.Expr[List[A]] = {
     import c.universe._
     reify {
       println(

@@ -58,8 +58,8 @@ class BlockingChannel(val host: String,
         channel.socket.setSoTimeout(readTimeoutMs)
         channel.socket.setKeepAlive(true)
         channel.socket.setTcpNoDelay(true)
-        channel.socket.connect(
-            new InetSocketAddress(host, port), connectTimeoutMs)
+        channel.socket
+          .connect(new InetSocketAddress(host, port), connectTimeoutMs)
 
         writeChannel = channel
         // Need to create a new ReadableByteChannel from input stream because SocketChannel doesn't implement read with timeout

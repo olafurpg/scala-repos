@@ -67,8 +67,7 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
     })) // result = 6
     assert(result == 6)
 
-    result =
-      1 // reset the value, but this time the ordering will go v0, v4 because of depth
+    result = 1 // reset the value, but this time the ordering will go v0, v4 because of depth
     v0() = 4 // trigger recomputation, supplied value is unused
     // v0 observation: result = result*2 = 2
     // v4 observation: result = result+2 = 4
@@ -346,8 +345,7 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
       }
 
     x() = 42
-    x() =
-      0 // this should not throw an exception because there are no observers
+    x() = 0 // this should not throw an exception because there are no observers
     x() = 1
 
     assert(Var.sample(result) == 1) // invertX is observed briefly

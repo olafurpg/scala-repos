@@ -91,8 +91,8 @@ object DocStrings {
     *  usecase or the end of the string, as they might include other sections
     *  of their own
     */
-  def tagIndex(
-      str: String, p: Int => Boolean = (idx => true)): List[(Int, Int)] = {
+  def tagIndex(str: String,
+               p: Int => Boolean = (idx => true)): List[(Int, Int)] = {
     var indices = findAll(str, 0)(idx => str(idx) == '@' && p(idx))
     indices = mergeUsecaseSections(str, indices)
     indices = mergeInheritdocSections(str, indices)
@@ -132,7 +132,7 @@ object DocStrings {
 
   def startsWithTag(str: String, start: Int, tag: String): Boolean =
     str.startsWith(tag, start) &&
-    !isIdentifierPart(str charAt (start + tag.length))
+      !isIdentifierPart(str charAt (start + tag.length))
 
   /** The first start tag of a list of tag intervals,
     *  or the end of the whole comment string - 2 if list is empty
@@ -186,11 +186,11 @@ object DocStrings {
   }
 
   /** A map from the section tag to section parameters */
-  def sectionTagMap(
-      str: String, sections: List[(Int, Int)]): Map[String, (Int, Int)] =
+  def sectionTagMap(str: String,
+                    sections: List[(Int, Int)]): Map[String, (Int, Int)] =
     Map() ++ {
-      for (section <- sections) yield
-        extractSectionTag(str, section) -> section
+      for (section <- sections)
+        yield extractSectionTag(str, section) -> section
     }
 
   /** Extract the section tag, treating the section tag as an identifier */
@@ -200,8 +200,9 @@ object DocStrings {
   /** Extract the section parameter */
   def extractSectionParam(str: String, section: (Int, Int)): String = {
     val (beg, _) = section
-    assert(str.startsWith("@param", beg) || str.startsWith("@tparam", beg) ||
-        str.startsWith("@throws", beg))
+    assert(
+        str.startsWith("@param", beg) || str.startsWith("@tparam", beg) ||
+          str.startsWith("@throws", beg))
 
     val start = skipWhitespace(str, skipTag(str, beg))
     val finish = skipIdent(str, start)
@@ -214,8 +215,8 @@ object DocStrings {
     val (beg, end) = section
     if (str.startsWith("@param", beg) || str.startsWith("@tparam", beg) ||
         str.startsWith("@throws", beg))
-      (skipWhitespace(
-           str, skipIdent(str, skipWhitespace(str, skipTag(str, beg)))),
+      (skipWhitespace(str,
+                      skipIdent(str, skipWhitespace(str, skipTag(str, beg)))),
        end)
     else (skipWhitespace(str, skipTag(str, beg)), end)
   }

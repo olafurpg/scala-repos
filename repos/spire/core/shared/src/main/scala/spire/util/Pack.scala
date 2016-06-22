@@ -124,7 +124,7 @@ object Pack {
                     b7: Byte,
                     b8: Byte): Long =
     (b1 & 0xffL) << 56 | (b2 & 0xffL) << 48 | (b3 & 0xffL) << 40 | (b4 & 0xffL) << 32 |
-    (b5 & 0xffL) << 24 | (b6 & 0xffL) << 16 | (b7 & 0xffL) << 8 | (b8 & 0xffL)
+      (b5 & 0xffL) << 24 | (b6 & 0xffL) << 16 | (b7 & 0xffL) << 8 | (b8 & 0xffL)
 
   def longFromByteBuffer(bb: ByteBuffer): Long =
     if (bb.remaining >= 8) {

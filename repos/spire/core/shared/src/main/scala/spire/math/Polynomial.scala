@@ -47,8 +47,8 @@ object Polynomial extends PolynomialInstances {
       terms: Iterable[Term[C]]): PolySparse[C] =
     sparse(terms.map(_.toTuple)(collection.breakOut))
 
-  def apply[@sp(Double) C: Semiring: Eq: ClassTag](
-      c: C, e: Int): PolySparse[C] =
+  def apply[@sp(Double) C: Semiring: Eq: ClassTag](c: C,
+                                                   e: Int): PolySparse[C] =
     PolySparse.safe(Array(e), Array(c))
 
   import scala.util.{Try, Success, Failure}
@@ -61,21 +61,24 @@ object Polynomial extends PolynomialInstances {
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map((0, c)))
   def linear[@sp(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map((1, c)))
-  def linear[@sp(Double) C: Eq: Semiring: ClassTag](
-      c1: C, c0: C): Polynomial[C] =
+  def linear[@sp(Double) C: Eq: Semiring: ClassTag](c1: C,
+                                                    c0: C): Polynomial[C] =
     Polynomial(Map((1, c1), (0, c0)))
-  def quadratic[@sp(Double) C: Eq: Semiring: ClassTag](
-      c1: C, c0: C): Polynomial[C] =
+  def quadratic[@sp(Double) C: Eq: Semiring: ClassTag](c1: C,
+                                                       c0: C): Polynomial[C] =
     Polynomial(Map((1, c1), (0, c0)))
   def quadratic[@sp(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map((2, c)))
-  def quadratic[@sp(Double) C: Eq: Semiring: ClassTag](
-      c2: C, c1: C, c0: C): Polynomial[C] =
+  def quadratic[@sp(Double) C: Eq: Semiring: ClassTag](c2: C,
+                                                       c1: C,
+                                                       c0: C): Polynomial[C] =
     Polynomial(Map((2, c2), (1, c1), (0, c0)))
   def cubic[@sp(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map((3, c)))
-  def cubic[@sp(Double) C: Eq: Semiring: ClassTag](
-      c3: C, c2: C, c1: C, c0: C): Polynomial[C] =
+  def cubic[@sp(Double) C: Eq: Semiring: ClassTag](c3: C,
+                                                   c2: C,
+                                                   c1: C,
+                                                   c0: C): Polynomial[C] =
     Polynomial(Map((3, c3), (2, c2), (1, c1), (0, c0)))
   def one[@sp(Double) C: Eq: Rig: ClassTag]: Polynomial[C] =
     constant(Rig[C].one)
@@ -191,8 +194,8 @@ trait Polynomial[@sp(Double) C] { lhs =>
     * to highest (eg. constant term would be first) and calls `f` with the degree
     * of term and its coefficient.
     */
-  def foreachNonZero[U](f: (Int, C) => U)(
-      implicit ring: Semiring[C], eq: Eq[C]): Unit =
+  def foreachNonZero[U](f: (Int, C) => U)(implicit ring: Semiring[C],
+                                          eq: Eq[C]): Unit =
     foreach { (e, c) =>
       if (c =!= ring.zero) f(e, c)
     }
@@ -285,8 +288,9 @@ trait Polynomial[@sp(Double) C] { lhs =>
   def maxOrderTermCoeff(implicit ring: Semiring[C]): C
 
   /** Returns a polynomial with the max term removed. */
-  def reductum(
-      implicit e: Eq[C], ring: Semiring[C], ct: ClassTag[C]): Polynomial[C]
+  def reductum(implicit e: Eq[C],
+               ring: Semiring[C],
+               ct: ClassTag[C]): Polynomial[C]
 
   /** Returns `true` if this polynomial is `ring.zero`. */
   def isZero: Boolean
@@ -294,13 +298,13 @@ trait Polynomial[@sp(Double) C] { lhs =>
   /** Evaluate the polynomial at `x`. */
   def apply(x: C)(implicit r: Semiring[C]): C
 
-  def evalWith[A: Semiring: Eq: ClassTag](x: A)(f: C => A)(
-      implicit ring: Semiring[C], eq: Eq[C]): A =
+  def evalWith[A: Semiring: Eq: ClassTag](x: A)(
+      f: C => A)(implicit ring: Semiring[C], eq: Eq[C]): A =
     this.map(f).apply(x)
 
   /** Compose this polynomial with another. */
-  def compose(y: Polynomial[C])(
-      implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = {
+  def compose(y: Polynomial[C])(implicit ring: Rig[C],
+                                eq: Eq[C]): Polynomial[C] = {
     var polynomial: Polynomial[C] = Polynomial.zero[C]
     foreachNonZero { (e, c) =>
       val z: Polynomial[C] = y.pow(e) :* c
@@ -324,8 +328,9 @@ trait Polynomial[@sp(Double) C] { lhs =>
     * polynomial. Given 2 consecutive terms (ignoring 0 terms), a sign variation
     * is indicated when the terms have differing signs.
     */
-  def signVariations(
-      implicit ring: Semiring[C], eq: Eq[C], signed: Signed[C]): Int = {
+  def signVariations(implicit ring: Semiring[C],
+                     eq: Eq[C],
+                     signed: Signed[C]): Int = {
     var prevSign: Sign = Sign.Zero
     var variations = 0
     foreachNonZero { (_, c) =>
@@ -346,12 +351,13 @@ trait Polynomial[@sp(Double) C] { lhs =>
     mapTerms { case Term(c, n) => Term(c, n - k) }
   }
 
-  def map[D: Semiring: Eq: ClassTag](f: C => D)(
-      implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
+  def map[D: Semiring: Eq: ClassTag](f: C => D)(implicit ring: Semiring[C],
+                                                eq: Eq[C]): Polynomial[D] =
     mapTerms { case Term(c, n) => Term(f(c), n) }
 
   def mapTerms[D: Semiring: Eq: ClassTag](f: Term[C] => Term[D])(
-      implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
+      implicit ring: Semiring[C],
+      eq: Eq[C]): Polynomial[D] =
     Polynomial(terms map f)
 
   /**
@@ -394,18 +400,18 @@ trait Polynomial[@sp(Double) C] { lhs =>
   // EuclideanRing ops.
 
   def unary_-()(implicit ring: Rng[C]): Polynomial[C]
-  def +(rhs: Polynomial[C])(
-      implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
+  def +(rhs: Polynomial[C])(implicit ring: Semiring[C],
+                            eq: Eq[C]): Polynomial[C]
   def -(rhs: Polynomial[C])(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] =
     lhs + (-rhs)
-  def *(rhs: Polynomial[C])(
-      implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
-  def /~(rhs: Polynomial[C])(
-      implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._1
-  def /%(rhs: Polynomial[C])(
-      implicit field: Field[C], eq: Eq[C]): (Polynomial[C], Polynomial[C])
-  def %(rhs: Polynomial[C])(
-      implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._2
+  def *(rhs: Polynomial[C])(implicit ring: Semiring[C],
+                            eq: Eq[C]): Polynomial[C]
+  def /~(rhs: Polynomial[C])(implicit field: Field[C],
+                             eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._1
+  def /%(rhs: Polynomial[C])(implicit field: Field[C],
+                             eq: Eq[C]): (Polynomial[C], Polynomial[C])
+  def %(rhs: Polynomial[C])(implicit field: Field[C],
+                            eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._2
 
   def **(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = pow(k)
 
@@ -529,8 +535,8 @@ trait PolynomialEuclideanRing[@sp(Double) C]
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
   def quot(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x /~ y
   def mod(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x % y
-  override def quotmod(
-      x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) =
+  override def quotmod(x: Polynomial[C],
+                       y: Polynomial[C]): (Polynomial[C], Polynomial[C]) =
     x /% y
 
   final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = {

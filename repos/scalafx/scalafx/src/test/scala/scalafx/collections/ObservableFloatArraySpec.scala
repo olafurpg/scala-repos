@@ -42,9 +42,10 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class ObservableFloatArraySpec
-    extends SimpleSFXDelegateSpec[
-        jfxc.ObservableFloatArray, ObservableFloatArray](
-        classOf[jfxc.ObservableFloatArray], classOf[ObservableFloatArray]) {
+    extends SimpleSFXDelegateSpec[jfxc.ObservableFloatArray,
+                                  ObservableFloatArray](
+        classOf[jfxc.ObservableFloatArray],
+        classOf[ObservableFloatArray]) {
 
   /**
     * Test trait for instance testing.

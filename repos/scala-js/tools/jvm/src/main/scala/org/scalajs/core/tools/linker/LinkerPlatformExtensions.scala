@@ -46,8 +46,10 @@ trait LinkerPlatformExtensions {
             s"Cannot use output mode $outputMode with the Closure Compiler")
         new ClosureLinkerBackend(semantics, withSourceMap, backendConfig)
       } else {
-        new BasicLinkerBackend(
-            semantics, outputMode, withSourceMap, backendConfig)
+        new BasicLinkerBackend(semantics,
+                               outputMode,
+                               withSourceMap,
+                               backendConfig)
       }
     }
 

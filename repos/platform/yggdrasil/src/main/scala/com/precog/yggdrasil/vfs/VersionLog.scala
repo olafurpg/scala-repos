@@ -74,7 +74,8 @@ object VersionLog {
             version <- jv match {
                         case JString(`unsetSentinel`) =>
                           \/.left(
-                              NotFound("No current data for the path %s exists; it has been archived."
+                              NotFound(
+                                  "No current data for the path %s exists; it has been archived."
                                     .format(dir)))
                         case other =>
                           other.validated[VersionEntry].disjunction leftMap {
@@ -181,7 +182,8 @@ class VersionLog(logFiles: VersionLog.LogFiles,
       IO(PrecogUnit)
     } getOrElse {
       logger.debug("Adding version entry: " + entry)
-      IOUtils.writeToFile(entry.serialize.renderCompact + "\n", logFile, true) map {
+      IOUtils
+        .writeToFile(entry.serialize.renderCompact + "\n", logFile, true) map {
         _ =>
           allVersions = allVersions :+ entry
           PrecogUnit
@@ -198,7 +200,8 @@ class VersionLog(logFiles: VersionLog.LogFiles,
         PrecogUnit
       }
     } else {
-      IO.throwIO(new IllegalStateException(
+      IO.throwIO(
+          new IllegalStateException(
               "Cannot make nonexistent version %s current" format version))
     }
   }
@@ -207,7 +210,8 @@ class VersionLog(logFiles: VersionLog.LogFiles,
     currentVersion.exists(_.id == newHead) unlessM {
       allVersions.find(_.id == newHead) traverse { entry =>
         logger.debug("Setting HEAD to " + newHead)
-        IOUtils.writeToFile(entry.serialize.renderCompact + "\n", headFile) map {
+        IOUtils
+          .writeToFile(entry.serialize.renderCompact + "\n", headFile) map {
           _ =>
             currentVersion = Some(entry);
         }
@@ -225,8 +229,9 @@ class VersionLog(logFiles: VersionLog.LogFiles,
   }
 }
 
-case class VersionEntry(
-    id: UUID, typeName: PathData.DataType, timestamp: Instant)
+case class VersionEntry(id: UUID,
+                        typeName: PathData.DataType,
+                        timestamp: Instant)
 
 object VersionEntry {
   implicit val versionEntryIso =
@@ -234,8 +239,8 @@ object VersionEntry {
 
   val schemaV1 = "id" :: "typeName" :: "timestamp" :: HNil
 
-  implicit val Decomposer: Decomposer[VersionEntry] = decomposerV(
-      schemaV1, Some("1.0".v))
-  implicit val Extractor: Extractor[VersionEntry] = extractorV(
-      schemaV1, Some("1.0".v))
+  implicit val Decomposer: Decomposer[VersionEntry] =
+    decomposerV(schemaV1, Some("1.0".v))
+  implicit val Extractor: Extractor[VersionEntry] =
+    extractorV(schemaV1, Some("1.0".v))
 }

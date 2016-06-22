@@ -125,8 +125,8 @@ object Bifoldable {
     * Template trait to define `Bifoldable` in terms of `bifoldMap`.
     */
   trait FromBifoldMap[F[_, _]] extends Bifoldable[F] {
-    override def bifoldRight[A, B, C](fa: F[A, B], z: => C)(
-        f: (A, => C) => C)(g: (B, => C) => C) =
+    override def bifoldRight[A, B, C](fa: F[A, B], z: => C)(f: (A, => C) => C)(
+        g: (B, => C) => C) =
       bifoldMap(fa)((a: A) => (Endo.endo(f(a, _: C))))((b: B) =>
             (Endo.endo(g(b, _: C)))) apply z
   }
@@ -135,8 +135,8 @@ object Bifoldable {
     * Template trait to define `Bifoldable` in terms of `bifoldR`
     */
   trait FromBifoldr[F[_, _]] extends Bifoldable[F] {
-    override def bifoldMap[A, B, M](fa: F[A, B])(
-        f: A => M)(g: B => M)(implicit F: Monoid[M]) =
+    override def bifoldMap[A, B, M](fa: F[A, B])(f: A => M)(g: B => M)(
+        implicit F: Monoid[M]) =
       bifoldR(fa, F.zero)(x => y => F.append(f(x), y))(x =>
             y => F.append(g(x), y))
   }

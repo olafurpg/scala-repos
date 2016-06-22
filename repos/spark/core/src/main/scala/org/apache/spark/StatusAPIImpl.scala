@@ -17,8 +17,9 @@
 
 package org.apache.spark
 
-private class SparkJobInfoImpl(
-    val jobId: Int, val stageIds: Array[Int], val status: JobExecutionStatus)
+private class SparkJobInfoImpl(val jobId: Int,
+                               val stageIds: Array[Int],
+                               val status: JobExecutionStatus)
     extends SparkJobInfo
 
 private class SparkStageInfoImpl(val stageId: Int,

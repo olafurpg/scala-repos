@@ -37,8 +37,8 @@ class DontLeakActorsOnFailingConnectionSpecs
       stdout-loglevel = OFF
     }""")
     .withFallback(ConfigFactory.load())
-  implicit val system = ActorSystem(
-      "DontLeakActorsOnFailingConnectionSpecs", config)
+  implicit val system =
+    ActorSystem("DontLeakActorsOnFailingConnectionSpecs", config)
   import system.dispatcher
   implicit val materializer = ActorMaterializer()
 

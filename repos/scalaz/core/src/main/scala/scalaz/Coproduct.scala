@@ -6,12 +6,12 @@ package scalaz
 final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
   import Coproduct._
 
-  def map[B](f: A => B)(
-      implicit F: Functor[F], G: Functor[G]): Coproduct[F, G, B] =
+  def map[B](f: A => B)(implicit F: Functor[F],
+                        G: Functor[G]): Coproduct[F, G, B] =
     Coproduct(run.bimap(F.lift(f), G.lift(f)))
 
-  def cobind[B](f: Coproduct[F, G, A] => B)(
-      implicit F: Cobind[F], G: Cobind[G]): Coproduct[F, G, B] =
+  def cobind[B](f: Coproduct[F, G, A] => B)(implicit F: Cobind[F],
+                                            G: Cobind[G]): Coproduct[F, G, B] =
     Coproduct(
         run.bimap(a => F.cobind(a)(x => f(leftc(x))),
                   a => G.cobind(a)(x => f(rightc(x))))
@@ -19,31 +19,31 @@ final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
 
   def duplicate(implicit F: Cobind[F],
                 G: Cobind[G]): Coproduct[F, G, Coproduct[F, G, A]] =
-    Coproduct(
-        run.bimap(
-            x => F.extend(x)(a => leftc(a)), x => G.extend(x)(a => rightc(a))))
+    Coproduct(run.bimap(x => F.extend(x)(a => leftc(a)), x =>
+              G.extend(x)(a => rightc(a))))
 
   def copoint(implicit F: Comonad[F], G: Comonad[G]): A =
     run.fold(F.copoint(_), G.copoint(_))
 
-  def contramap[B](f: B => A)(
-      implicit F: Contravariant[F], G: Contravariant[G]): Coproduct[F, G, B] =
+  def contramap[B](f: B => A)(implicit F: Contravariant[F],
+                              G: Contravariant[G]): Coproduct[F, G, B] =
     Coproduct(run.bimap(F.contramap(_)(f), G.contramap(_)(f)))
 
-  def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(
-      implicit F: Foldable[F], G: Foldable[G]): Z =
+  def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F],
+                                               G: Foldable[G]): Z =
     run.fold(a => F.foldRight(a, z)(f), a => G.foldRight(a, z)(f))
 
-  def foldMap[B](f: A => B)(
-      implicit F: Foldable[F], G: Foldable[G], M: Monoid[B]): B =
+  def foldMap[B](
+      f: A => B)(implicit F: Foldable[F], G: Foldable[G], M: Monoid[B]): B =
     run.fold(F.foldMap(_)(f), G.foldMap(_)(f))
 
-  def foldMap1[B](f: A => B)(
-      implicit F: Foldable1[F], G: Foldable1[G], M: Semigroup[B]): B =
+  def foldMap1[B](f: A => B)(implicit F: Foldable1[F],
+                             G: Foldable1[G],
+                             M: Semigroup[B]): B =
     run.fold(F.foldMap1(_)(f), G.foldMap1(_)(f))
 
-  def foldMapRight1[B](z: A => B)(
-      f: (A, => B) => B)(implicit F: Foldable1[F], G: Foldable1[G]): B =
+  def foldMapRight1[B](z: A => B)(f: (A, => B) => B)(implicit F: Foldable1[F],
+                                                     G: Foldable1[G]): B =
     run.fold(F.foldMapRight1(_)(z)(f), G.foldMapRight1(_)(z)(f))
 
   def traverse[X[_], B](g: A => X[B])(
@@ -126,7 +126,8 @@ sealed abstract class CoproductInstances3 {
     Equal.equalBy(_.run)
 
   implicit def coproductFunctor[F[_], G[_]](
-      implicit F0: Functor[F], G0: Functor[G]): Functor[Coproduct[F, G, ?]] =
+      implicit F0: Functor[F],
+      G0: Functor[G]): Functor[Coproduct[F, G, ?]] =
     new CoproductFunctor[F, G] {
       implicit def F: Functor[F] = F0
       implicit def G: Functor[G] = G0
@@ -161,7 +162,8 @@ sealed abstract class CoproductInstances2 extends CoproductInstances3 {
 
 sealed abstract class CoproductInstances1 extends CoproductInstances2 {
   implicit def coproductCobind[F[_], G[_]](
-      implicit F0: Cobind[F], G0: Cobind[G]): Cobind[Coproduct[F, G, ?]] =
+      implicit F0: Cobind[F],
+      G0: Cobind[G]): Cobind[Coproduct[F, G, ?]] =
     new CoproductCobind[F, G] {
       implicit def F: Cobind[F] = F0
       implicit def G: Cobind[G] = G0
@@ -180,7 +182,8 @@ sealed abstract class CoproductInstances0 extends CoproductInstances1 {
 
 sealed abstract class CoproductInstances extends CoproductInstances0 {
   implicit def coproductComonad[F[_], G[_]](
-      implicit F0: Comonad[F], G0: Comonad[G]): Comonad[Coproduct[F, G, ?]] =
+      implicit F0: Comonad[F],
+      G0: Comonad[G]): Comonad[Coproduct[F, G, ?]] =
     new CoproductComonad[F, G] {
       implicit def F: Comonad[F] = F0
       implicit def G: Comonad[G] = G0

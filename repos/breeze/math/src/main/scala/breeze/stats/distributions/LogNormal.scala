@@ -15,8 +15,8 @@ import scala.math.sqrt
   *
   * @author dlwh
   **/
-case class LogNormal(
-    mu: Double, sigma: Double)(implicit rand: RandBasis = Rand)
+case class LogNormal(mu: Double, sigma: Double)(
+    implicit rand: RandBasis = Rand)
     extends ContinuousDistr[Double]
     with Moments[Double, Double]
     with HasCdf

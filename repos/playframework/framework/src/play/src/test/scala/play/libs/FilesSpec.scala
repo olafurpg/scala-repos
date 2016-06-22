@@ -91,7 +91,8 @@ object FilesSpec extends Specification with After {
       val file = new File(parentDirectory, "file.txt")
       writeFile(file, "file content")
 
-      retry(new String(PlayIO.readFile(file), utf8) must beEqualTo(
+      retry(
+          new String(PlayIO.readFile(file), utf8) must beEqualTo(
               "file content"))
     }
 

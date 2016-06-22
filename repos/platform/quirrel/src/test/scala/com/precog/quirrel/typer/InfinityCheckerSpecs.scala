@@ -130,8 +130,8 @@ object InfinityCheckerSpecs
     }
 
     "reject unobserved distribution in summand" in {
-      val expr @ Let(_, _, _, _, _) =
-        parseSingle("""
+      val expr @ Let(_, _, _, _, _) = parseSingle(
+          """
           f(x) := x
           f(observe(5, std::random::foobar(12))) + f(std::random::foobar(12))
         """)
@@ -182,16 +182,16 @@ object InfinityCheckerSpecs
     }
 
     "reject union" in {
-      val expr @ Observe(_, _, _) =
-        parseSingle("""
+      val expr @ Observe(_, _, _) = parseSingle(
+          """
           observe(5, std::random::foobar(12) union std::math::floor(5))
         """)
       expr.errors mustEqual Set(CannotUseDistributionWithoutSampling)
     }
 
     "reject intersect" in {
-      val expr @ Observe(_, _, _) =
-        parseSingle("""
+      val expr @ Observe(_, _, _) = parseSingle(
+          """
           observe(5, count(std::random::foobar(12)) intersect std::math::floor(5))
         """)
       expr.errors mustEqual Set(CannotUseDistributionWithoutSampling)
@@ -206,8 +206,8 @@ object InfinityCheckerSpecs
     }
 
     "reject object concat" in {
-      val expr @ Observe(_, _, _) =
-        parseSingle("""
+      val expr @ Observe(_, _, _) = parseSingle(
+          """
           observe(5, {a: std::random::foobar(12)} with {b: std::math::floor(5)})
         """)
       expr.errors mustEqual Set(CannotUseDistributionWithoutSampling)

@@ -24,7 +24,7 @@ trait HttpEventConfiguration extends ScallopConf {
       "http_endpoints",
       descr =
         "The URLs of the event endpoints added to the current list of subscribers on startup. " +
-        "You can manage this list during runtime by using the /v2/eventSubscriptions API endpoint.",
+          "You can manage this list during runtime by using the /v2/eventSubscriptions API endpoint.",
       required = false,
       noshort = true).map(parseHttpEventEndpoints)
 
@@ -62,8 +62,12 @@ class HttpEventModule(httpEventConfiguration: HttpEventConfiguration)
       @Named(HttpEventModule.SubscribersKeeperActor) subscribersKeeper: ActorRef,
       metrics: HttpEventActor.HttpEventActorMetrics,
       clock: Clock): ActorRef = {
-    system.actorOf(Props(new HttpEventActor(
-                httpEventConfiguration, subscribersKeeper, metrics, clock)))
+    system.actorOf(
+        Props(
+            new HttpEventActor(httpEventConfiguration,
+                               subscribersKeeper,
+                               metrics,
+                               clock)))
   }
 
   @Provides

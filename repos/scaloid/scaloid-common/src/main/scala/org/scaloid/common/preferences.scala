@@ -538,8 +538,8 @@ trait TraitPreference[This <: android.preference.Preference] {
       f: (android.preference.Preference, Any) => Boolean): This = {
     basis.setOnPreferenceChangeListener(
         new android.preference.Preference.OnPreferenceChangeListener {
-      def onPreferenceChange(
-          p1: android.preference.Preference, p2: Any): Boolean = { f(p1, p2) }
+      def onPreferenceChange(p1: android.preference.Preference,
+                             p2: Any): Boolean = { f(p1, p2) }
     })
     basis
   }
@@ -547,8 +547,8 @@ trait TraitPreference[This <: android.preference.Preference] {
   @inline def onPreferenceChange(f: => Boolean): This = {
     basis.setOnPreferenceChangeListener(
         new android.preference.Preference.OnPreferenceChangeListener {
-      def onPreferenceChange(
-          p1: android.preference.Preference, p2: Any): Boolean = { f }
+      def onPreferenceChange(p1: android.preference.Preference,
+                             p2: Any): Boolean = { f }
     })
     basis
   }

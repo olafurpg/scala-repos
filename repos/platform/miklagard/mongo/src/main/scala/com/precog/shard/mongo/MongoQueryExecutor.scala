@@ -85,15 +85,17 @@ object MongoQueryExecutor {
             jobActorSystem: ActorSystem)(
       implicit ec: ExecutionContext,
       M: Monad[Future]): Platform[Future, StreamT[Future, Slice]] = {
-    new MongoQueryExecutor(
-        new MongoQueryExecutorConfig(config), jobManager, jobActorSystem)
+    new MongoQueryExecutor(new MongoQueryExecutorConfig(config),
+                           jobManager,
+                           jobActorSystem)
   }
 }
 
 class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
                          val jobManager: JobManager[Future],
                          val jobActorSystem: ActorSystem)(
-    implicit val executionContext: ExecutionContext, val M: Monad[Future])
+    implicit val executionContext: ExecutionContext,
+    val M: Monad[Future])
     extends StandaloneQueryExecutor
     with MongoColumnarTableModule
     with Logging {
@@ -125,8 +127,9 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
         path.elements.toList match {
           case dbName :: collectionName :: Nil =>
             val db = Table.mongo.getDB(dbName)
-            success(JNum(db
-                      .getCollection(collectionName)
+            success(
+                JNum(
+                    db.getCollection(collectionName)
                       .getStats
                       .getLong("count")))
 
@@ -137,8 +140,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
         case t => logger.error("Failure during size", t)
       }
 
-    def browse(
-        userUID: String, path: Path): Future[Validation[String, JArray]] =
+    def browse(userUID: String,
+               path: Path): Future[Validation[String, JArray]] =
       Future {
         path.elements.toList match {
           case Nil =>
@@ -161,7 +164,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
 
           case dbName :: Nil =>
             val db = Table.mongo.getDB(dbName)
-            Success(if (db == null) JArray(Nil)
+            Success(
+                if (db == null) JArray(Nil)
                 else
                   db.getCollectionNames.asScala.map { d =>
                 d + "/"
@@ -180,8 +184,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
 
     def structure(userUID: String, path: Path, cpath: CPath)
       : Future[Validation[String, JObject]] = Promise.successful(
-        Success(JObject(
-                Map("children" -> JArray.empty,
+        Success(JObject(Map(
+                    "children" -> JArray.empty,
                     "types" -> JObject.empty))) // TODO: How to implement this?
     )
 

@@ -9,8 +9,8 @@ private[pickling] object AdtPickling extends PicklingAlgorithm {
   /**
     * Attempts to construct pickling logic for a given type.
     */
-  override def generate(
-      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult = {
+  override def generate(tpe: IrClass,
+                        logger: AlgorithmLogger): AlgorithmResult = {
     if (!tpe.isAbstract) {
       AlgorithmFailure(
           s"Cannot use ADT algorithm because $tpe is not abstract")

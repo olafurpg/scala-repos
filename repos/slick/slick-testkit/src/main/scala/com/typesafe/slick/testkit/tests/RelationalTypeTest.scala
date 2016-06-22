@@ -70,7 +70,8 @@ class RelationalTypeTest extends AsyncTest[RelationalTestDB] {
 
   def testBoolean = {
     roundtrip[Boolean]("boolean_true", true) >> roundtrip[Boolean](
-        "boolean_false", false)
+        "boolean_false",
+        false)
   }
 
   def testUnit = {

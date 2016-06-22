@@ -260,17 +260,19 @@ object TestUtils extends Logging {
     * Wait until the leader is elected and the metadata is propagated to all brokers.
     * Return the leader for each partition.
     */
-  def createTopic(
-      zkUtils: ZkUtils,
-      topic: String,
-      numPartitions: Int = 1,
-      replicationFactor: Int = 1,
-      servers: Seq[KafkaServer],
-      topicConfig: Properties =
-        new Properties): scala.collection.immutable.Map[Int, Option[Int]] = {
+  def createTopic(zkUtils: ZkUtils,
+                  topic: String,
+                  numPartitions: Int = 1,
+                  replicationFactor: Int = 1,
+                  servers: Seq[KafkaServer],
+                  topicConfig: Properties = new Properties)
+    : scala.collection.immutable.Map[Int, Option[Int]] = {
     // create topic
-    AdminUtils.createTopic(
-        zkUtils, topic, numPartitions, replicationFactor, topicConfig)
+    AdminUtils.createTopic(zkUtils,
+                           topic,
+                           numPartitions,
+                           replicationFactor,
+                           topicConfig)
     // wait until the update metadata request for new topic reaches all servers
     (0 until numPartitions).map {
       case i =>
@@ -291,7 +293,9 @@ object TestUtils extends Logging {
     : scala.collection.immutable.Map[Int, Option[Int]] = {
     // create topic
     AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
-        zkUtils, topic, partitionReplicaAssignment)
+        zkUtils,
+        topic,
+        partitionReplicaAssignment)
     // wait until the update metadata request for new topic reaches all servers
     partitionReplicaAssignment.keySet.map {
       case i =>
@@ -354,8 +358,10 @@ object TestUtils extends Logging {
     */
   def randomString(len: Int): String = {
     val b = new StringBuilder()
-    for (i <- 0 until len) b.append(
-        LettersAndDigits.charAt(seededRandom.nextInt(LettersAndDigits.length)))
+    for (i <- 0 until len)
+      b.append(
+          LettersAndDigits.charAt(
+              seededRandom.nextInt(LettersAndDigits.length)))
     b.toString
   }
 
@@ -366,10 +372,10 @@ object TestUtils extends Logging {
     assertEquals("Buffers should have equal length",
                  b1.limit - b1.position,
                  b2.limit - b2.position)
-    for (i <- 0 until b1.limit - b1.position) assertEquals(
-        "byte " + i + " byte not equal.",
-        b1.get(b1.position + i),
-        b2.get(b1.position + i))
+    for (i <- 0 until b1.limit - b1.position)
+      assertEquals("byte " + i + " byte not equal.",
+                   b1.get(b1.position + i),
+                   b2.get(b1.position + i))
   }
 
   /**
@@ -391,7 +397,7 @@ object TestUtils extends Logging {
         length1 += 1
       }
       assertFalse("Iterators have uneven length-- first has more: " + length1 +
-                  " > " + length,
+                    " > " + length,
                   true);
     }
 
@@ -403,7 +409,7 @@ object TestUtils extends Logging {
         length2 += 1
       }
       assertFalse("Iterators have uneven length-- second has more: " +
-                  length2 + " > " + length,
+                    length2 + " > " + length,
                   true);
     }
   }
@@ -463,8 +469,10 @@ object TestUtils extends Logging {
     */
   def hexString(buffer: ByteBuffer): String = {
     val builder = new StringBuilder("0x")
-    for (i <- 0 until buffer.limit) builder.append(
-        String.format("%x", Integer.valueOf(buffer.get(buffer.position + i))))
+    for (i <- 0 until buffer.limit)
+      builder.append(
+          String.format("%x",
+                        Integer.valueOf(buffer.get(buffer.position + i))))
     builder.toString
   }
 
@@ -503,8 +511,8 @@ object TestUtils extends Logging {
                      securityProtocol == SecurityProtocol.SSL,
                      trustStoreFile,
                      certAlias))
-    props.put(
-        CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol.name)
+    props
+      .put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol.name)
     props
   }
 
@@ -535,8 +543,8 @@ object TestUtils extends Logging {
     producerProps.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, maxBlockMs.toString)
     producerProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, bufferSize.toString)
     producerProps.put(ProducerConfig.RETRIES_CONFIG, retries.toString)
-    producerProps.put(
-        ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeoutMs.toString)
+    producerProps
+      .put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeoutMs.toString)
 
     /* Only use these if not already set */
     val defaultProps = Map(
@@ -577,17 +585,17 @@ object TestUtils extends Logging {
   /**
     * Create a new consumer with a few pre-configured properties.
     */
-  def createNewConsumer(
-      brokerList: String,
-      groupId: String = "group",
-      autoOffsetReset: String = "earliest",
-      partitionFetchSize: Long = 4096L,
-      partitionAssignmentStrategy: String = classOf[RangeAssignor].getName,
-      sessionTimeout: Int = 30000,
-      securityProtocol: SecurityProtocol,
-      trustStoreFile: Option[File] = None,
-      props: Option[Properties] =
-        None): KafkaConsumer[Array[Byte], Array[Byte]] = {
+  def createNewConsumer(brokerList: String,
+                        groupId: String = "group",
+                        autoOffsetReset: String = "earliest",
+                        partitionFetchSize: Long = 4096L,
+                        partitionAssignmentStrategy: String =
+                          classOf[RangeAssignor].getName,
+                        sessionTimeout: Int = 30000,
+                        securityProtocol: SecurityProtocol,
+                        trustStoreFile: Option[File] = None,
+                        props: Option[Properties] = None)
+    : KafkaConsumer[Array[Byte], Array[Byte]] = {
     import org.apache.kafka.clients.consumer.ConsumerConfig
 
     val consumerProps = props.getOrElse(new Properties())
@@ -649,8 +657,9 @@ object TestUtils extends Logging {
     props
   }
 
-  def updateConsumerOffset(
-      config: ConsumerConfig, path: String, offset: Long) = {
+  def updateConsumerOffset(config: ConsumerConfig,
+                           path: String,
+                           offset: Long) = {
     val zkUtils = ZkUtils(config.zkConnect,
                           config.zkSessionTimeoutMs,
                           config.zkConnectionTimeoutMs,
@@ -771,8 +780,8 @@ object TestUtils extends Logging {
               zkUtils.leaderAndIsrZkData(newLeaderAndIsr, controllerEpoch))
         } catch {
           case oe: Throwable =>
-            error("Error while electing leader for partition [%s,%d]".format(
-                      topic, partition),
+            error("Error while electing leader for partition [%s,%d]"
+                    .format(topic, partition),
                   oe)
         }
       }
@@ -816,23 +825,23 @@ object TestUtils extends Logging {
             isLeaderElectedOrChanged = true
           } else if (oldLeaderOpt.isDefined && oldLeaderOpt.get != l) {
             trace(
-                "Leader for partition [%s,%d] is changed from %d to %d".format(
-                    topic, partition, oldLeaderOpt.get, l))
+                "Leader for partition [%s,%d] is changed from %d to %d"
+                  .format(topic, partition, oldLeaderOpt.get, l))
             isLeaderElectedOrChanged = true
           } else if (!oldLeaderOpt.isDefined) {
             trace(
-                "Leader %d is elected for partition [%s,%d]".format(
-                    l, topic, partition))
+                "Leader %d is elected for partition [%s,%d]"
+                  .format(l, topic, partition))
             isLeaderElectedOrChanged = true
           } else {
             trace(
-                "Current leader for partition [%s,%d] is %d".format(
-                    topic, partition, l))
+                "Current leader for partition [%s,%d] is %d"
+                  .format(topic, partition, l))
           }
         case None =>
           trace(
-              "Leader for partition [%s,%d] is not elected yet".format(
-                  topic, partition))
+              "Leader for partition [%s,%d] is not elected yet"
+                .format(topic, partition))
       }
       Thread.sleep(timeoutMs.min(100L))
     }
@@ -861,8 +870,9 @@ object TestUtils extends Logging {
           if (ellapsed > maxWaitMs) {
             throw e
           } else {
-            info("Attempt failed, sleeping for " + wait +
-                ", and then retrying.")
+            info(
+                "Attempt failed, sleeping for " + wait +
+                  ", and then retrying.")
             Thread.sleep(wait)
             wait += math.min(wait, 1000)
           }
@@ -886,8 +896,9 @@ object TestUtils extends Logging {
     throw new RuntimeException("unexpected error")
   }
 
-  def isLeaderLocalOnBroker(
-      topic: String, partitionId: Int, server: KafkaServer): Boolean = {
+  def isLeaderLocalOnBroker(topic: String,
+                            partitionId: Int,
+                            server: KafkaServer): Boolean = {
     val partitionOpt = server.replicaManager.getPartition(topic, partitionId)
     partitionOpt match {
       case None => false
@@ -925,19 +936,20 @@ object TestUtils extends Logging {
     var leader: Int = -1
     TestUtils.waitUntilTrue(
         () =>
-          servers.foldLeft(true) { (result, server) =>
-            val partitionStateOpt =
-              server.apis.metadataCache.getPartitionInfo(topic, partition)
-            partitionStateOpt match {
-              case None => false
-              case Some(partitionState) =>
-                leader =
-                  partitionState.leaderIsrAndControllerEpoch.leaderAndIsr.leader
-                result && Request.isValidBrokerId(leader)
-            }
+          servers.foldLeft(true) {
+            (result, server) =>
+              val partitionStateOpt =
+                server.apis.metadataCache.getPartitionInfo(topic, partition)
+              partitionStateOpt match {
+                case None => false
+                case Some(partitionState) =>
+                  leader =
+                    partitionState.leaderIsrAndControllerEpoch.leaderAndIsr.leader
+                  result && Request.isValidBrokerId(leader)
+              }
         },
-        "Partition [%s,%d] metadata not propagated after %d ms".format(
-            topic, partition, timeout),
+        "Partition [%s,%d] metadata not propagated after %d ms"
+          .format(topic, partition, timeout),
         waitTime = timeout)
 
     leader
@@ -954,8 +966,8 @@ object TestUtils extends Logging {
               .getPartition(topic, partition)
               .exists(_.leaderReplicaIfLocal().isDefined)
         },
-        "Partition [%s,%d] leaders not made yet after %d ms".format(
-            topic, partition, timeout),
+        "Partition [%s,%d] leaders not made yet after %d ms"
+          .format(topic, partition, timeout),
         waitTime = timeout)
   }
 
@@ -993,12 +1005,12 @@ object TestUtils extends Logging {
                                         servers: Seq[KafkaServer]) {
     TestUtils.waitUntilTrue(
         () => {
-          val inSyncReplicas = zkUtils.getInSyncReplicasForPartition(
-              topic, partitionToBeReassigned)
+          val inSyncReplicas = zkUtils
+            .getInSyncReplicasForPartition(topic, partitionToBeReassigned)
           inSyncReplicas.size == assignedReplicas.size
         },
-        "Reassigned partition [%s,%d] is under replicated".format(
-            topic, partitionToBeReassigned))
+        "Reassigned partition [%s,%d] is under replicated"
+          .format(topic, partitionToBeReassigned))
     var leader: Option[Int] = None
     TestUtils.waitUntilTrue(
         () => {
@@ -1006,8 +1018,8 @@ object TestUtils extends Logging {
             zkUtils.getLeaderForPartition(topic, partitionToBeReassigned)
           leader.isDefined
         },
-        "Reassigned partition [%s,%d] is unavailable".format(
-            topic, partitionToBeReassigned))
+        "Reassigned partition [%s,%d] is unavailable"
+          .format(topic, partitionToBeReassigned))
     TestUtils.waitUntilTrue(
         () => {
           val leaderBroker =
@@ -1030,7 +1042,7 @@ object TestUtils extends Logging {
                    .map(_.asInstanceOf[Thread])
                    .count(t =>
                          !t.isDaemon && t.isAlive &&
-                         t.getName.startsWith(threadNamePrefix)))
+                           t.getName.startsWith(threadNamePrefix)))
   }
 
   /**
@@ -1080,8 +1092,8 @@ object TestUtils extends Logging {
       producer.send(
           ms.map(m => new KeyedMessage[Int, String](topic, partition, m)): _*)
       debug(
-          "Sent %d messages for partition [%s,%d]".format(
-              ms.size, topic, partition))
+          "Sent %d messages for partition [%s,%d]"
+            .format(ms.size, topic, partition))
       producer.close()
       ms.toList
     } else {
@@ -1123,8 +1135,9 @@ object TestUtils extends Logging {
     values
   }
 
-  def produceMessage(
-      servers: Seq[KafkaServer], topic: String, message: String) {
+  def produceMessage(servers: Seq[KafkaServer],
+                     topic: String,
+                     message: String) {
     val producer = createNewProducer(
         TestUtils.getBrokerListStrFromServers(servers),
         retries = 5,
@@ -1159,8 +1172,7 @@ object TestUtils extends Logging {
           while ((shouldGetAllMessages && iterator.hasNext()) ||
                  (i < nMessagesPerThread)) {
             assertTrue(iterator.hasNext)
-            val message =
-              iterator.next.message // will throw a timeout exception if the message isn't there
+            val message = iterator.next.message // will throw a timeout exception if the message isn't there
             messages ::= message
             debug("received message: " + message)
             i += 1
@@ -1169,8 +1181,9 @@ object TestUtils extends Logging {
           case e: ConsumerTimeoutException =>
             if (shouldGetAllMessages) {
               // swallow the exception
-              debug("consumer timed out after receiving " + messages.length +
-                  " message(s).")
+              debug(
+                  "consumer timed out after receiving " + messages.length +
+                    " message(s).")
             } else {
               throw e
             }
@@ -1199,10 +1212,11 @@ object TestUtils extends Logging {
     // ensure that the topic-partition has been deleted from all brokers' replica managers
     TestUtils.waitUntilTrue(
         () =>
-          servers.forall(server =>
+          servers.forall(
+              server =>
                 topicAndPartitions.forall(tp =>
-                      server.replicaManager.getPartition(
-                          tp.topic, tp.partition) == None)),
+                      server.replicaManager
+                        .getPartition(tp.topic, tp.partition) == None)),
         "Replica manager's should have deleted all of this topic's partitions")
     // ensure that logs from all replicas are deleted if delete topic is marked successful in zookeeper
     assertTrue("Replica logs not deleted after delete topic is complete",
@@ -1210,18 +1224,16 @@ object TestUtils extends Logging {
                      topicAndPartitions.forall(tp =>
                            server.getLogManager().getLog(tp).isEmpty)))
     // ensure that topic is removed from all cleaner offsets
-    TestUtils.waitUntilTrue(
-        () =>
+    TestUtils.waitUntilTrue(() =>
           servers.forall(server =>
                 topicAndPartitions.forall { tp =>
-              val checkpoints = server.getLogManager().logDirs.map { logDir =>
-                new OffsetCheckpoint(
-                    new File(logDir, "cleaner-offset-checkpoint")).read()
-              }
-              checkpoints.forall(checkpointsPerLogDir =>
-                    !checkpointsPerLogDir.contains(tp))
-          }),
-        "Cleaner offset for deleted partition should have been removed")
+          val checkpoints = server.getLogManager().logDirs.map { logDir =>
+            new OffsetCheckpoint(new File(logDir, "cleaner-offset-checkpoint"))
+              .read()
+          }
+          checkpoints.forall(checkpointsPerLogDir =>
+                !checkpointsPerLogDir.contains(tp))
+      }), "Cleaner offset for deleted partition should have been removed")
   }
 
   /**
@@ -1230,9 +1242,9 @@ object TestUtils extends Logging {
     * @param buffer The buffer to translate
     * @param encoding The encoding to use in translating bytes to characters
     */
-  def readString(buffer: ByteBuffer,
-                 encoding: String =
-                   Charset.defaultCharset.toString): String = {
+  def readString(
+      buffer: ByteBuffer,
+      encoding: String = Charset.defaultCharset.toString): String = {
     val bytes = new Array[Byte](buffer.remaining)
     buffer.get(bytes)
     new String(bytes, encoding)
@@ -1247,8 +1259,8 @@ object TestUtils extends Logging {
       throw new Exception("SSL enabled but no trustStoreFile provided")
     }
 
-    val sslConfigs = TestSslUtils.createSslConfig(
-        clientCert, true, mode, trustStore, certAlias)
+    val sslConfigs = TestSslUtils
+      .createSslConfig(clientCert, true, mode, trustStore, certAlias)
 
     val sslProps = new Properties()
     sslConfigs.foreach { case (k, v) => sslProps.put(k, v) }
@@ -1261,16 +1273,17 @@ object TestUtils extends Logging {
       override def getAcceptedIssuers: Array[X509Certificate] = {
         null
       }
-      override def checkClientTrusted(
-          certs: Array[X509Certificate], authType: String) {}
-      override def checkServerTrusted(
-          certs: Array[X509Certificate], authType: String) {}
+      override def checkClientTrusted(certs: Array[X509Certificate],
+                                      authType: String) {}
+      override def checkServerTrusted(certs: Array[X509Certificate],
+                                      authType: String) {}
     }
     trustManager
   }
 
-  def waitAndVerifyAcls(
-      expected: Set[Acl], authorizer: Authorizer, resource: Resource) = {
+  def waitAndVerifyAcls(expected: Set[Acl],
+                        authorizer: Authorizer,
+                        resource: Resource) = {
     TestUtils.waitUntilTrue(
         () => authorizer.getAcls(resource) == expected,
         s"expected acls $expected but got ${authorizer.getAcls(resource)}",
@@ -1282,8 +1295,9 @@ object TestUtils extends Logging {
     * They all run at the same time in the assertConcurrent method; the chances of triggering a multithreading code error,
     * and thereby failing some assertion are greatly increased.
     */
-  def assertConcurrent(
-      message: String, functions: Seq[() => Any], timeoutMs: Int) {
+  def assertConcurrent(message: String,
+                       functions: Seq[() => Any],
+                       timeoutMs: Int) {
 
     def failWithTimeout() {
       fail(
@@ -1316,8 +1330,8 @@ object TestUtils extends Logging {
     } finally {
       threadPool.shutdownNow()
     }
-    assertTrue(
-        s"$message failed with exception(s) $exceptions", exceptions.isEmpty)
+    assertTrue(s"$message failed with exception(s) $exceptions",
+               exceptions.isEmpty)
   }
 }
 

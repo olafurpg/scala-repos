@@ -58,8 +58,8 @@ class AppClientSuite
     masterRpcEnv =
       RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
     workerRpcEnvs = (0 until numWorkers).map { i =>
-      RpcEnv.create(
-          Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)
+      RpcEnv
+        .create(Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)
     }
     master = makeMaster()
     workers = makeWorkers(10, 2048)
@@ -147,8 +147,8 @@ class AppClientSuite
 
   /** Make a master to which our application will send executor requests. */
   private def makeMaster(): Master = {
-    val master = new Master(
-        masterRpcEnv, masterRpcEnv.address, 0, securityManager, conf)
+    val master =
+      new Master(masterRpcEnv, masterRpcEnv.address, 0, securityManager, conf)
     masterRpcEnv.setupEndpoint(Master.ENDPOINT_NAME, master)
     master
   }
@@ -211,8 +211,9 @@ class AppClientSuite
       execAddedList.add(id)
     }
 
-    def executorRemoved(
-        id: String, message: String, exitStatus: Option[Int]): Unit = {
+    def executorRemoved(id: String,
+                        message: String,
+                        exitStatus: Option[Int]): Unit = {
       execRemovedList.add(id)
     }
   }
@@ -228,10 +229,13 @@ class AppClientSuite
         Seq(),
         Seq(),
         Seq())
-    private val desc = new ApplicationDescription(
-        "AppClientSuite", Some(1), 512, cmd, "ignored")
+    private val desc = new ApplicationDescription("AppClientSuite",
+                                                  Some(1),
+                                                  512,
+                                                  cmd,
+                                                  "ignored")
     val listener = new AppClientCollector
-    val client = new AppClient(
-        rpcEnv, Array(masterUrl), desc, listener, new SparkConf)
+    val client =
+      new AppClient(rpcEnv, Array(masterUrl), desc, listener, new SparkConf)
   }
 }

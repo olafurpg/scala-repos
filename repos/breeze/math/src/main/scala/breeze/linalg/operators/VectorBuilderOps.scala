@@ -57,8 +57,8 @@ trait VectorBuilderOps {
 
   @expand
   @expand.valify
-  implicit def canOpInto_V_V[
-      @expand.args(OpAdd, OpSub) Op, @expand.args(Double, Long, Float, Int) T](
+  implicit def canOpInto_V_V[@expand.args(OpAdd, OpSub) Op,
+                             @expand.args(Double, Long, Float, Int) T](
       implicit @expand.sequence[Op]((x => x), (-_)) op: Q)
     : Op.InPlaceImpl2[VectorBuilder[T], VectorBuilder[T]] = {
     new Op.InPlaceImpl2[VectorBuilder[T], VectorBuilder[T]] {
@@ -155,8 +155,8 @@ trait VectorBuilderOps {
       dev: Zero[V],
       classTag: ClassTag[V])
     : UImpl2[Op, VectorBuilder[V], Other, VectorBuilder[V]] = {
-    BinaryOp.fromCopyAndUpdate[VectorBuilder[V], Other, Op](
-        op, canCopyBuilder[V])
+    BinaryOp
+      .fromCopyAndUpdate[VectorBuilder[V], Other, Op](op, canCopyBuilder[V])
   }
 
   @expand

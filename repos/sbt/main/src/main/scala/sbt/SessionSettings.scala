@@ -40,7 +40,7 @@ final case class SessionSettings(currentBuild: URI,
                                  currentEval: () => Eval) {
   assert(currentProject contains currentBuild,
          "Current build (" + currentBuild +
-         ") not associated with a current project.")
+           ") not associated with a current project.")
 
   /**
     * Modifiy the current state.
@@ -50,8 +50,9 @@ final case class SessionSettings(currentBuild: URI,
     * @param eval  The mechanism to compile new settings.
     * @return  A new SessionSettings object
     */
-  def setCurrent(
-      build: URI, project: String, eval: () => Eval): SessionSettings =
+  def setCurrent(build: URI,
+                 project: String,
+                 eval: () => Eval): SessionSettings =
     copy(currentBuild = build,
          currentProject = currentProject.updated(build, project),
          currentEval = eval)
@@ -92,8 +93,8 @@ final case class SessionSettings(currentBuild: URI,
   private[this] def merge(map: SessionMap): Seq[Setting[_]] =
     map.values.toSeq.flatten[SessionSetting].map(_._1)
 
-  private[this] def modify(
-      map: SessionMap, onSeq: Endo[Seq[SessionSetting]]): SessionMap = {
+  private[this] def modify(map: SessionMap,
+                           onSeq: Endo[Seq[SessionSetting]]): SessionMap = {
     val cur = current
     map.updated(cur, onSeq(map.getOrElse(cur, Nil)))
   }
@@ -154,7 +155,7 @@ object SessionSettings {
     if (newSession.append.isEmpty && oldSettings.nonEmpty)
       oldState.log.warn(
           "Discarding " + pluralize(oldSettings.size, " session setting") +
-          ".  Use 'session save' to persist session settings.")
+            ".  Use 'session save' to persist session settings.")
   }
 
   @deprecated("This method will no longer be public", "0.13.7")
@@ -201,13 +202,15 @@ object SessionSettings {
     withSettings(s) { session =>
       val newSettings = for ((ref, settings) <- session.append
                              if settings.nonEmpty && include(ref)) yield {
-        val (news, olds) = writeSettings(
-            ref, settings.toList, session.original, Project.structure(s))
+        val (news, olds) = writeSettings(ref,
+                                         settings.toList,
+                                         session.original,
+                                         Project.structure(s))
         (ref -> news, olds)
       }
       val (newAppend, newOriginal) = newSettings.unzip
-      val newSession = session.copy(
-          append = newAppend.toMap, original = newOriginal.flatten.toSeq)
+      val newSession = session.copy(append = newAppend.toMap,
+                                    original = newOriginal.flatten.toSeq)
       reapply(newSession.copy(original = newSession.mergeSettings,
                               append = Map.empty),
               s)
@@ -299,8 +302,8 @@ object SessionSettings {
 
   /** Prints all the passed in session settings */
   def printSettings(settings: Seq[SessionSetting]): Unit =
-    for (((_, stringRep), index) <- settings.zipWithIndex) println(
-        "  " + (index + 1) + ". " + stringRep.mkString("\n"))
+    for (((_, stringRep), index) <- settings.zipWithIndex)
+      println("  " + (index + 1) + ". " + stringRep.mkString("\n"))
 
   def Help =
     """session <command>
@@ -353,10 +356,12 @@ save, save-all
   /** Parser for the session command. */
   lazy val parser =
     token(Space) ~>
-    (token("list-all" ^^^ new Print(true)) | token("list" ^^^ new Print(false)) | token(
-            "clear" ^^^ new Clear(false)) | token("save-all" ^^^ new Save(
-                true)) | token("save" ^^^ new Save(false)) | token(
-            "clear-all" ^^^ new Clear(true)) | remove)
+      (token("list-all" ^^^ new Print(true)) | token(
+              "list" ^^^ new Print(false)) | token(
+              "clear" ^^^ new Clear(false)) | token(
+              "save-all" ^^^ new Save(true)) | token(
+              "save" ^^^ new Save(false)) | token(
+              "clear-all" ^^^ new Clear(true)) | remove)
 
   lazy val remove =
     token("remove") ~> token(Space) ~> natSelect.map(ranges =>

@@ -46,7 +46,7 @@ trait ScModifierListOwner extends ScalaPsiElement with PsiModifierListOwner {
   def hasModifierPropertyScala(name: String): Boolean = {
     if (name == PsiModifier.PUBLIC) {
       return !hasModifierPropertyScala("private") &&
-      !hasModifierPropertyScala("protected")
+        !hasModifierPropertyScala("protected")
     }
     hasModifierPropertyInner(name)
   }

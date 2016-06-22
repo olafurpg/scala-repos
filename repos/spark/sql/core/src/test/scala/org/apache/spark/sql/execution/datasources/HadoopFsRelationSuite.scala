@@ -36,7 +36,8 @@ class HadoopFsRelationSuite extends QueryTest with SharedSQLContext {
       })
       val totalSize = allFiles.map(_.length()).sum
       val df = sqlContext.read.parquet(dir.toString)
-      assert(df.queryExecution.logical.statistics.sizeInBytes === BigInt(
+      assert(
+          df.queryExecution.logical.statistics.sizeInBytes === BigInt(
               totalSize))
     }
   }

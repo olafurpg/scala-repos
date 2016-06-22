@@ -66,7 +66,7 @@ object debugLoggedStatNames
     extends GlobalFlag[Set[String]](
         Set.empty,
         "Comma separated stat names for logging observed values" +
-        " (set via a -D system property to avoid load ordering issues)"
+          " (set via a -D system property to avoid load ordering issues)"
     )
 
 // It's possible to override the scope separator (the default value for `MetricsStatsReceiver` is
@@ -107,8 +107,11 @@ object MetricsStatsReceiver {
         case Event(etype, when, value, name: String, _, tid, sid)
             if etype eq this =>
           val (t, s) = serializeTrace(tid, sid)
-          val env = Json.Envelope(
-              id, when.inMilliseconds, t, s, CounterIncrData(name, value))
+          val env = Json.Envelope(id,
+                                  when.inMilliseconds,
+                                  t,
+                                  s,
+                                  CounterIncrData(name, value))
           Try(Buf.Utf8(Json.serialize(env)))
 
         case _ =>
@@ -149,8 +152,8 @@ object MetricsStatsReceiver {
         case Event(etype, when, delta, name: String, _, tid, sid)
             if etype eq this =>
           val (t, s) = serializeTrace(tid, sid)
-          val env = Json.Envelope(
-              id, when.inMilliseconds, t, s, StatAddData(name, delta))
+          val env = Json
+            .Envelope(id, when.inMilliseconds, t, s, StatAddData(name, delta))
           Try(Buf.Utf8(Json.serialize(env)))
 
         case _ =>
@@ -194,8 +197,7 @@ class MetricsStatsReceiver(
     val registry: Metrics,
     sink: Sink,
     histogramFactory: String => HistogramInterface
-)
-    extends StatsReceiverWithCumulativeGauges {
+) extends StatsReceiverWithCumulativeGauges {
   import MetricsStatsReceiver._
 
   def this(registry: Metrics, sink: Sink) =
@@ -217,8 +219,8 @@ class MetricsStatsReceiver(
   private[this] val statRequests = new LongAdder()
   private[this] val gaugeRequests = new LongAdder()
 
-  private[this] def checkRequestsLimit(
-      which: String, adder: LongAdder): Option[Issue] = {
+  private[this] def checkRequestsLimit(which: String,
+                                       adder: LongAdder): Option[Issue] = {
     // todo: ideally these would be computed as rates over time, but this is a
     // relatively simple proxy for bad behavior.
     val count = adder.sum()
@@ -232,9 +234,9 @@ class MetricsStatsReceiver(
           Category.Performance,
           "Elevated metric creation requests",
           "For best performance, metrics should be created and stored in member variables " +
-          "and not requested via `StatsReceiver.{counter,stat,addGauge}` at runtime. " +
-          "Large numbers are an indication that these metrics are being requested " +
-          "frequently at runtime."
+            "and not requested via `StatsReceiver.{counter,stat,addGauge}` at runtime. " +
+            "Large numbers are an indication that these metrics are being requested " +
+            "frequently at runtime."
       ) {
         Seq(
             checkRequestsLimit("counter", counterRequests),

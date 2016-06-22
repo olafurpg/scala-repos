@@ -135,16 +135,16 @@ class MigrationTest
     val groupRepo = mock[GroupRepository]
     val config = mock[MarathonConf]
     val taskRepo = new TaskRepository(
-        new MarathonStore[MarathonTaskState](store = store,
-                                             metrics = metrics,
-                                             newState = () =>
-                                               MarathonTaskState(MarathonTask
-                                                     .newBuilder()
-                                                     .setId(UUID
-                                                           .randomUUID()
-                                                           .toString)
-                                                     .build()),
-                                             prefix = "task:"),
+        new MarathonStore[MarathonTaskState](
+            store = store,
+            metrics = metrics,
+            newState = () =>
+              MarathonTaskState(
+                  MarathonTask
+                    .newBuilder()
+                    .setId(UUID.randomUUID().toString)
+                    .build()),
+            prefix = "task:"),
         metrics
     )
     val migration = new Migration(store,

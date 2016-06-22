@@ -67,7 +67,8 @@ object IntroduceImplicitParameterIntention {
       }
     }
 
-    val result = expr.result.getOrElse(return Right(
+    val result = expr.result.getOrElse(
+        return Right(
             InspectionBundle.message("introduce.implicit.not.allowed.here")))
 
     val buf = new StringBuilder
@@ -106,8 +107,8 @@ object IntroduceImplicitParameterIntention {
       buf.replace(offset, offset + p.name.length, newParam)
     }
 
-    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-        buf.toString(), expr.getManager)
+    val newExpr = ScalaPsiElementFactory
+      .createExpressionFromText(buf.toString(), expr.getManager)
 
     if (!isValidExpr(newExpr, expr.parameters.length))
       return Right(
@@ -123,8 +124,9 @@ class IntroduceImplicitParameterIntention
 
   override def getText: String = getFamilyName
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     val expr: ScFunctionExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScFunctionExpr], false)
     if (expr == null) return false

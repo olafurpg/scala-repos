@@ -92,7 +92,7 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
         new ChildAttributes(Indent.getNormalIndent, null)
       case l: ScLiteral
           if l.isMultiLineString &&
-          scalaSettings.MULTILINE_STRING_SUPORT != ScalaCodeStyleSettings.MULTILINE_STRING_NONE =>
+            scalaSettings.MULTILINE_STRING_SUPORT != ScalaCodeStyleSettings.MULTILINE_STRING_NONE =>
         new ChildAttributes(Indent.getSpaceIndent(3, true), null)
       case b: ScBlockExpr
           if b.lastExpr.exists(_.isInstanceOf[ScFunctionExpr]) =>
@@ -150,8 +150,8 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
       case _: ScalaFile => new ChildAttributes(Indent.getNoneIndent, null)
       case _: ScCaseClause => new ChildAttributes(Indent.getNormalIndent, null)
       case _: ScExpression | _: ScPattern | _: ScParameters =>
-        new ChildAttributes(
-            Indent.getContinuationWithoutFirstIndent, this.getAlignment)
+        new ChildAttributes(Indent.getContinuationWithoutFirstIndent,
+                            this.getAlignment)
       case _: ScDocComment =>
         new ChildAttributes(
             Indent.getSpaceIndent(
@@ -161,10 +161,11 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
         new ChildAttributes(Indent.getNormalIndent, null)
       case p: ScParameterClause
           if scalaSettings.USE_ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS &&
-          isConstructorArgOrMemberFunctionParameter(p) =>
+            isConstructorArgOrMemberFunctionParameter(p) =>
         new ChildAttributes(
             Indent.getSpaceIndent(
-                scalaSettings.ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS, false),
+                scalaSettings.ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS,
+                false),
             null)
       case p: ScParameterClause =>
         new ChildAttributes(
@@ -188,8 +189,8 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
   }
 
   def getSpacing(child1: Block, child2: Block) = {
-    ScalaSpacingProcessor.getSpacing(
-        child1.asInstanceOf[ScalaBlock], child2.asInstanceOf[ScalaBlock])
+    ScalaSpacingProcessor.getSpacing(child1.asInstanceOf[ScalaBlock],
+                                     child2.asInstanceOf[ScalaBlock])
   }
 
   def getSubBlocks: util.List[Block] = {

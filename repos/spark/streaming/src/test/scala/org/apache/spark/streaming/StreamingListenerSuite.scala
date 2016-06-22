@@ -65,8 +65,7 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
     val batchInfosSubmitted = collector.batchInfosSubmitted
     batchInfosSubmitted should have size 4
 
-    batchInfosSubmitted.asScala.foreach(
-        info => {
+    batchInfosSubmitted.asScala.foreach(info => {
       info.schedulingDelay should be(None)
       info.processingDelay should be(None)
       info.totalDelay should be(None)
@@ -84,8 +83,7 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
     val batchInfosStarted = collector.batchInfosStarted
     batchInfosStarted should have size 4
 
-    batchInfosStarted.asScala.foreach(
-        info => {
+    batchInfosStarted.asScala.foreach(info => {
       info.schedulingDelay should not be None
       info.schedulingDelay.get should be >= 0L
       info.processingDelay should be(None)
@@ -264,7 +262,8 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
     _ssc.start()
     // Make sure running at least one batch
     if (!batchCounter.waitUntilBatchesCompleted(
-            expectedNumCompletedBatches = 1, timeout = 10000)) {
+            expectedNumCompletedBatches = 1,
+            timeout = 10000)) {
       fail("The first batch cannot complete in 10 seconds")
     }
     // When reaching here, we can make sure `StreamingContextStoppingCollector` won't call
@@ -274,14 +273,15 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
   }
 
   private def startStreamingContextAndCollectFailureReasons(
-      _ssc: StreamingContext, isFailed: Boolean = false): Map[Int, String] = {
+      _ssc: StreamingContext,
+      isFailed: Boolean = false): Map[Int, String] = {
     val failureReasonsCollector = new FailureReasonsCollector()
     _ssc.addStreamingListener(failureReasonsCollector)
     val batchCounter = new BatchCounter(_ssc)
     _ssc.start()
     // Make sure running at least one batch
-    batchCounter.waitUntilBatchesCompleted(
-        expectedNumCompletedBatches = 1, timeout = 10000)
+    batchCounter.waitUntilBatchesCompleted(expectedNumCompletedBatches = 1,
+                                           timeout = 10000)
     if (isFailed) {
       intercept[RuntimeException] {
         _ssc.awaitTerminationOrTimeout(10000)

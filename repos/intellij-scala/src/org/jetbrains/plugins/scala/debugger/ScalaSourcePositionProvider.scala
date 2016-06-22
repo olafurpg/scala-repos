@@ -42,8 +42,8 @@ class ScalaSourcePositionProvider extends SourcePositionProvider {
   }
 
   @tailrec
-  private def resolveReferenceWithName(
-      name: String, context: PsiElement): PsiElement = {
+  private def resolveReferenceWithName(name: String,
+                                       context: PsiElement): PsiElement = {
     if (!ScalaNamesUtil.isIdentifier(name)) return null
     if (name == "$outer" || name.startsWith("x$")) return null
 

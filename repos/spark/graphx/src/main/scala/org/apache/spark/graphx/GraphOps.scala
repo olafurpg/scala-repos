@@ -89,27 +89,26 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
     */
   def collectNeighborIds(
       edgeDirection: EdgeDirection): VertexRDD[Array[VertexId]] = {
-    val nbrs =
-      if (edgeDirection == EdgeDirection.Either) {
-        graph.aggregateMessages[Array[VertexId]](ctx => {
-          ctx.sendToSrc(Array(ctx.dstId));
-          ctx.sendToDst(Array(ctx.srcId))
-        }, _ ++ _, TripletFields.None)
-      } else if (edgeDirection == EdgeDirection.Out) {
-        graph.aggregateMessages[Array[VertexId]](
-            ctx => ctx.sendToSrc(Array(ctx.dstId)),
-            _ ++ _,
-            TripletFields.None)
-      } else if (edgeDirection == EdgeDirection.In) {
-        graph.aggregateMessages[Array[VertexId]](
-            ctx => ctx.sendToDst(Array(ctx.srcId)),
-            _ ++ _,
-            TripletFields.None)
-      } else {
-        throw new SparkException(
-            "It doesn't make sense to collect neighbor ids without a " +
+    val nbrs = if (edgeDirection == EdgeDirection.Either) {
+      graph.aggregateMessages[Array[VertexId]](ctx => {
+        ctx.sendToSrc(Array(ctx.dstId));
+        ctx.sendToDst(Array(ctx.srcId))
+      }, _ ++ _, TripletFields.None)
+    } else if (edgeDirection == EdgeDirection.Out) {
+      graph.aggregateMessages[Array[VertexId]](
+          ctx => ctx.sendToSrc(Array(ctx.dstId)),
+          _ ++ _,
+          TripletFields.None)
+    } else if (edgeDirection == EdgeDirection.In) {
+      graph.aggregateMessages[Array[VertexId]](
+          ctx => ctx.sendToDst(Array(ctx.srcId)),
+          _ ++ _,
+          TripletFields.None)
+    } else {
+      throw new SparkException(
+          "It doesn't make sense to collect neighbor ids without a " +
             "direction. (EdgeDirection.Both is not supported; use EdgeDirection.Either instead.)")
-      }
+    }
     graph.vertices.leftZipJoin(nbrs) { (vid, vdata, nbrsOpt) =>
       nbrsOpt.getOrElse(Array.empty[VertexId])
     }
@@ -148,7 +147,7 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
       case EdgeDirection.Both =>
         throw new SparkException(
             "collectEdges does not support EdgeDirection.Both. Use" +
-            "EdgeDirection.Either instead.")
+              "EdgeDirection.Either instead.")
     }
     graph.vertices.leftJoin(nbrs) { (vid, vdata, nbrsOpt) =>
       nbrsOpt.getOrElse(Array.empty[(VertexId, VD)])
@@ -192,7 +191,7 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
       case EdgeDirection.Both =>
         throw new SparkException(
             "collectEdges does not support EdgeDirection.Both. Use" +
-            "EdgeDirection.Either instead.")
+              "EdgeDirection.Either instead.")
     }
   }
 
@@ -274,8 +273,8 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
       preprocess: Graph[VD, ED] => Graph[VD2, ED2],
       epred: (EdgeTriplet[VD2, ED2]) => Boolean = (x: EdgeTriplet[VD2, ED2]) =>
         true,
-      vpred: (VertexId, VD2) => Boolean =
-        (v: VertexId, d: VD2) => true): Graph[VD, ED] = {
+      vpred: (VertexId, VD2) => Boolean = (v: VertexId, d: VD2) => true)
+    : Graph[VD, ED] = {
     graph.mask(preprocess(graph).subgraph(epred, vpred))
   }
 
@@ -314,8 +313,8 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
     *
     * @return the resulting graph with canonical edges
     */
-  def convertToCanonicalEdges(mergeFunc: (ED, ED) => ED = (e1, e2) =>
-        e1): Graph[VD, ED] = {
+  def convertToCanonicalEdges(
+      mergeFunc: (ED, ED) => ED = (e1, e2) => e1): Graph[VD, ED] = {
     val newEdges = graph.edges.map {
       case e if e.srcId < e.dstId => ((e.srcId, e.dstId), e.attr)
       case e => ((e.dstId, e.srcId), e.attr)
@@ -370,15 +369,16 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
     * @return the resulting graph at the end of the computation
     *
     */
-  def pregel[A: ClassTag](initialMsg: A,
-                          maxIterations: Int = Int.MaxValue,
-                          activeDirection: EdgeDirection =
-                            EdgeDirection.Either)(
+  def pregel[A: ClassTag](
+      initialMsg: A,
+      maxIterations: Int = Int.MaxValue,
+      activeDirection: EdgeDirection = EdgeDirection.Either)(
       vprog: (VertexId, VD, A) => VD,
       sendMsg: EdgeTriplet[VD, ED] => Iterator[(VertexId, A)],
       mergeMsg: (A, A) => A): Graph[VD, ED] = {
-    Pregel(graph, initialMsg, maxIterations, activeDirection)(
-        vprog, sendMsg, mergeMsg)
+    Pregel(graph, initialMsg, maxIterations, activeDirection)(vprog,
+                                                              sendMsg,
+                                                              mergeMsg)
   }
 
   /**
@@ -411,10 +411,10 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
     *
     * @see [[org.apache.spark.graphx.lib.PageRank$#runWithOptions]]
     */
-  def staticPersonalizedPageRank(src: VertexId,
-                                 numIter: Int,
-                                 resetProb: Double =
-                                   0.15): Graph[Double, Double] = {
+  def staticPersonalizedPageRank(
+      src: VertexId,
+      numIter: Int,
+      resetProb: Double = 0.15): Graph[Double, Double] = {
     PageRank.runWithOptions(graph, numIter, resetProb, Some(src))
   }
 
@@ -424,8 +424,8 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
     *
     * @see [[org.apache.spark.graphx.lib.PageRank$#run]]
     */
-  def staticPageRank(
-      numIter: Int, resetProb: Double = 0.15): Graph[Double, Double] = {
+  def staticPageRank(numIter: Int,
+                     resetProb: Double = 0.15): Graph[Double, Double] = {
     PageRank.run(graph, numIter, resetProb)
   }
 

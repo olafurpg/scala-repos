@@ -46,9 +46,14 @@ object User extends LilaController {
       (ctx.isAuth ?? { Env.pref.api.followable(user.id) }) zip
       (ctx.userId ?? { relationApi.fetchRelation(_, user.id) }) map {
         case (((((pov, donor), blocked), crosstable), followable), relation) =>
-          Ok(html.user.mini(
-                  user, pov, blocked, followable, relation, crosstable, donor))
-            .withHeaders(CACHE_CONTROL -> "max-age=5")
+          Ok(
+              html.user.mini(user,
+                             pov,
+                             blocked,
+                             followable,
+                             relation,
+                             crosstable,
+                             donor)).withHeaders(CACHE_CONTROL -> "max-age=5")
       }
     }
   }
@@ -65,7 +70,8 @@ object User extends LilaController {
         html = notFound,
         api = _ =>
           env.cached top50Online true map { list =>
-            Ok(Json.toJson(list
+            Ok(
+                Json.toJson(list
                       .take(getInt("nb").fold(10)(_ min max))
                       .map(env.jsonView(_))))
         }
@@ -167,11 +173,12 @@ object User extends LilaController {
       online ← env.cached top50Online true
       res <- negotiate(
                 html = fuccess(
-                    Ok(html.user.list(tourneyWinners = tourneyWinners,
-                                      online = online,
-                                      leaderboards = leaderboards,
-                                      nbDay = nbDay,
-                                      nbAllTime = nbAllTime))),
+                    Ok(
+                        html.user.list(tourneyWinners = tourneyWinners,
+                                       online = online,
+                                       leaderboards = leaderboards,
+                                       nbDay = nbDay,
+                                       nbAllTime = nbAllTime))),
                 api = _ =>
                   fuccess {
                     implicit val lpWrites = OWrites[UserModel.LightPerf](
@@ -201,25 +208,23 @@ object User extends LilaController {
   }
 
   def topWeek = Open { implicit ctx =>
-    negotiate(html = notFound,
-              api = _ =>
-                env.cached
-                  .topWeek(true)
-                  .map { users =>
-                    Ok(Json toJson users.map(env.jsonView.lightPerfIsOnline))
-                })
+    negotiate(html = notFound, api = _ =>
+          env.cached.topWeek(true).map { users =>
+        Ok(Json toJson users.map(env.jsonView.lightPerfIsOnline))
+    })
   }
 
   def mod(username: String) = Secure(_.UserSpy) { implicit ctx => me =>
     OptionFuOk(UserRepo named username) { user =>
       (!isGranted(_.SetEmail, user) ?? UserRepo.email(user.id)) zip
       (Env.security userSpy user.id) zip
-      (Env.mod.assessApi.getPlayerAggregateAssessmentWithGames(user.id)) zip Env.mod.logApi
+      (Env.mod.assessApi
+            .getPlayerAggregateAssessmentWithGames(user.id)) zip Env.mod.logApi
         .userHistory(user.id) flatMap {
         case ((((email, spy), playerAggregateAssessment), history)) =>
           (Env.playban.api bans spy.usersSharingIp.map(_.id)) map { bans =>
-            html.user.mod(
-                user, email, spy, playerAggregateAssessment, bans, history)
+            html.user
+              .mod(user, email, spy, playerAggregateAssessment, bans, history)
           }
       }
     }
@@ -267,13 +272,15 @@ object User extends LilaController {
             perfStat <- Env.perfStat.get(u, perfType)
             ranks <- Env.user.cached.ranking.getAll(u.id)
             distribution <- u.perfs(perfType).established ?? {
-                             Env.user.cached.ratingDistribution(perfType) map some
+                             Env.user.cached
+                               .ratingDistribution(perfType) map some
                            }
-            data = Env.perfStat.jsonView(
-                u, perfStat, ranks get perfType.key, distribution)
-            response <- negotiate(html = Ok(html.user.perfStat(
-                                          u, ranks, perfType, data)).fuccess,
-                                  api = _ => Ok(data).fuccess)
+            data = Env.perfStat
+              .jsonView(u, perfStat, ranks get perfType.key, distribution)
+            response <- negotiate(
+                           html = Ok(html.user
+                                 .perfStat(u, ranks, perfType, data)).fuccess,
+                           api = _ => Ok(data).fuccess)
           } yield response
         }
     }

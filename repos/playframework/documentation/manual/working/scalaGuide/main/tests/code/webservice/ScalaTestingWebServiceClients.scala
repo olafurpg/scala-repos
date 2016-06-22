@@ -115,7 +115,7 @@ object ScalaTestingWebServiceClients
         //#send-resource
         WsTestClient.withClient { client =>
           Await.result(new GitHubClient(client, "").repositories(), 10.seconds) must_==
-            Seq("octocat/Hello-World")
+          Seq("octocat/Hello-World")
         }
       }
     }

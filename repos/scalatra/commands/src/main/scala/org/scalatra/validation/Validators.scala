@@ -20,8 +20,9 @@ object Validators {
         subject: TResult): FieldValidation[TResult]
   }
 
-  class PredicateValidator[TValue](
-      fieldName: String, isValid: TValue ⇒ Boolean, messageFormat: String)
+  class PredicateValidator[TValue](fieldName: String,
+                                   isValid: TValue ⇒ Boolean,
+                                   messageFormat: String)
       extends Validator[TValue] {
     def validate[TResult >: TValue <: TValue](
         value: TResult): FieldValidation[TResult] = {
@@ -41,17 +42,17 @@ object Validators {
   /**
     * Must be a non-empty [String]. null, " ", and "" are not allowed.
     */
-  def nonEmptyString(fieldName: String,
-                     messageFormat: String =
-                       "%s must be present."): Validator[String] =
+  def nonEmptyString(
+      fieldName: String,
+      messageFormat: String = "%s must be present."): Validator[String] =
     new PredicateValidator[String](fieldName, _.nonBlank, messageFormat)
 
   /**
     * Must be non-null.
     */
-  def notNull(fieldName: String,
-              messageFormat: String =
-                "%s must be present."): Validator[AnyRef] =
+  def notNull(
+      fieldName: String,
+      messageFormat: String = "%s must be present."): Validator[AnyRef] =
     new PredicateValidator[AnyRef](fieldName, _ != null, messageFormat)
 
   /**
@@ -68,8 +69,9 @@ object Validators {
   def validEmail(
       fieldName: String,
       messageFormat: String = "%s must be a valid email."): Validator[String] =
-    new PredicateValidator[String](
-        fieldName, EmailValidator.getInstance.isValid(_), messageFormat)
+    new PredicateValidator[String](fieldName,
+                                   EmailValidator.getInstance.isValid(_),
+                                   messageFormat)
 
   /**
     * Must be a valid absolute URL, parseable by the Apache Commons URI class.
@@ -105,17 +107,18 @@ object Validators {
       fieldName: String,
       regex: Regex,
       messageFormat: String = "%s is invalid."): Validator[String] =
-    new PredicateValidator[String](
-        fieldName, regex.findFirstIn(_).isDefined, messageFormat)
+    new PredicateValidator[String](fieldName,
+                                   regex.findFirstIn(_).isDefined,
+                                   messageFormat)
 
   /**
     * The confirmation fieldName must have a true value.
     */
-  def validConfirmation(fieldName: String,
-                        confirmationFieldName: String,
-                        confirmationValue: => String,
-                        messageFormat: String =
-                          "%%s must match %s."): Validator[String] =
+  def validConfirmation(
+      fieldName: String,
+      confirmationFieldName: String,
+      confirmationValue: => String,
+      messageFormat: String = "%%s must match %s."): Validator[String] =
     new PredicateValidator[String](
         fieldName,
         _ == confirmationValue,
@@ -129,18 +132,20 @@ object Validators {
       fieldName: String,
       min: T,
       messageFormat: String = "%%s must be greater than %s."): Validator[T] =
-    new PredicateValidator[T](
-        fieldName, _ > min, messageFormat format min.toString)
+    new PredicateValidator[T](fieldName,
+                              _ > min,
+                              messageFormat format min.toString)
 
   /**
     * Must be less than the max param.
     */
-  def lessThan[T <% Ordered[T]](
-      fieldName: String,
-      max: T,
-      messageFormat: String = "%%s must be less than %s."): Validator[T] =
-    new PredicateValidator[T](
-        fieldName, _ < max, messageFormat format max.toString)
+  def lessThan[T <% Ordered[T]](fieldName: String,
+                                max: T,
+                                messageFormat: String =
+                                  "%%s must be less than %s."): Validator[T] =
+    new PredicateValidator[T](fieldName,
+                              _ < max,
+                              messageFormat format max.toString)
 
   /**
     * Must be greater than or equal to the min param.
@@ -148,8 +153,8 @@ object Validators {
   def greaterThanOrEqualTo[T <% Ordered[T]](
       fieldName: String,
       min: T,
-      messageFormat: String =
-        "%%s must be greater than or equal to %s."): Validator[T] =
+      messageFormat: String = "%%s must be greater than or equal to %s.")
+    : Validator[T] =
     new PredicateValidator[T](fieldName, _ >= min, messageFormat format min)
 
   /**
@@ -158,20 +163,21 @@ object Validators {
   def lessThanOrEqualTo[T <% Ordered[T]](
       fieldName: String,
       max: T,
-      messageFormat: String =
-        "%%s must be less than or equal to %s."): Validator[T] =
+      messageFormat: String = "%%s must be less than or equal to %s.")
+    : Validator[T] =
     new PredicateValidator[T](fieldName, _ <= max, messageFormat.format(max))
 
   /**
     * Must have a minimum length of min.
     */
-  def minLength(
-      fieldName: String,
-      min: Int,
-      messageFormat: String =
-        "%%s must be at least %s characters long."): Validator[String] =
-    new PredicateValidator[String](
-        fieldName, _.size >= min, messageFormat.format(min))
+  def minLength(fieldName: String,
+                min: Int,
+                messageFormat: String =
+                  "%%s must be at least %s characters long.")
+    : Validator[String] =
+    new PredicateValidator[String](fieldName,
+                                   _.size >= min,
+                                   messageFormat.format(min))
 
   /**
     * Must be included in the expected collection.
@@ -187,10 +193,10 @@ object Validators {
   /**
     * Checks if the value of the data is a value of the specified enum.
     */
-  def enumValue(fieldName: String,
-                enum: Enumeration,
-                messageFormat: String =
-                  "%%s must be one of %s."): Validator[String] =
+  def enumValue(
+      fieldName: String,
+      enum: Enumeration,
+      messageFormat: String = "%%s must be one of %s."): Validator[String] =
     oneOf(fieldName, messageFormat, enum.values.map(_.toString).toSeq)
 
   private def buildUrlValidator(fieldName: String,

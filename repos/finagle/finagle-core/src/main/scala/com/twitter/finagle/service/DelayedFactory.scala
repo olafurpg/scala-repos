@@ -19,8 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
   */
 class DelayedFactory[Req, Rep](
     underlyingF: Future[ServiceFactory[Req, Rep]]
-)
-    extends ServiceFactory[Req, Rep] {
+) extends ServiceFactory[Req, Rep] {
   private[this] def wrapped(): Future[ServiceFactory[Req, Rep]] =
     safelyInterruptible(underlyingF)
 

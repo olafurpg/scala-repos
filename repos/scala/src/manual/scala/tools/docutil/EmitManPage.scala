@@ -133,8 +133,9 @@ object EmitManPage {
     }
 
     out println ".\\\""
-    out.println(".\\\" ############################## " + section.title +
-        " ###############################")
+    out.println(
+        ".\\\" ############################## " + section.title +
+          " ###############################")
     out println ".\\\""
     val tag = if (depth > 1) ".SS" else ".SH"
     val title =
@@ -159,7 +160,7 @@ object EmitManPage {
     out println ".\\\""
     out.println(
         ".TH " + doc.title + " " + doc.category.id + "  \"" + doc.date +
-        "\" \"version " + doc.version + "\" \"" + doc.category + "\"")
+          "\" \"version " + doc.version + "\" \"" + doc.category + "\"")
 
     doc.sections foreach (s => emitSection(s, 1))
   }
@@ -171,8 +172,8 @@ object EmitManPage {
     case _ => sys.exit(1)
   }
 
-  def emitManPage(
-      classname: String, outStream: java.io.OutputStream = out.out) {
+  def emitManPage(classname: String,
+                  outStream: java.io.OutputStream = out.out) {
     if (outStream != out.out) out setOut outStream
     try {
       val cl = this.getClass.getClassLoader()

@@ -45,8 +45,7 @@ class MigrationClient(
     protected val zkPath: String,
     protected val zkClient: ZooKeeperClient,
     protected val statsReceiver: StatsReceiver = NullStatsReceiver
-)
-    extends ProxyClient
+) extends ProxyClient
     with ZookeeperStateMonitor {
 
   import MigrationConstants._
@@ -66,18 +65,18 @@ class MigrationClient(
       case MigrationState.Pending =>
         proxyClient = new FrontendClient(oldClient)
       case MigrationState.Warming if (config.readRepairBack) =>
-        proxyClient = new FrontendClient(oldClient)
-        with DarkRead with ReadWarmup with DarkWrite {
+        proxyClient = new FrontendClient(oldClient) with DarkRead
+        with ReadWarmup with DarkWrite {
           val backendClient = newClient
         }
       case MigrationState.Warming =>
-        proxyClient = new FrontendClient(oldClient)
-        with DarkRead with DarkWrite {
+        proxyClient = new FrontendClient(oldClient) with DarkRead
+        with DarkWrite {
           val backendClient = newClient
         }
       case MigrationState.Verifying if (config.readRepairFront) =>
-        proxyClient = new FrontendClient(newClient)
-        with FallbackRead with ReadRepair {
+        proxyClient = new FrontendClient(newClient) with FallbackRead
+        with ReadRepair {
           val backendClient = oldClient
         }
       case MigrationState.Verifying =>
@@ -181,36 +180,46 @@ trait ReadWarmup { self: DarkRead =>
 trait DarkWrite extends Client {
   protected val backendClient: Client
 
-  abstract override def set(
-      key: String, flags: Int, expiry: Time, value: Buf) = {
+  abstract override def set(key: String,
+                            flags: Int,
+                            expiry: Time,
+                            value: Buf) = {
     val result = super.set(key, flags, expiry, value)
     backendClient.set(key, flags, expiry, value)
     result
   }
 
-  abstract override def add(
-      key: String, flags: Int, expiry: Time, value: Buf) = {
+  abstract override def add(key: String,
+                            flags: Int,
+                            expiry: Time,
+                            value: Buf) = {
     val result = super.add(key, flags, expiry, value)
     backendClient.add(key, flags, expiry, value)
     result
   }
 
-  abstract override def append(
-      key: String, flags: Int, expiry: Time, value: Buf) = {
+  abstract override def append(key: String,
+                               flags: Int,
+                               expiry: Time,
+                               value: Buf) = {
     val result = super.append(key, flags, expiry, value)
     backendClient.append(key, flags, expiry, value)
     result
   }
 
-  abstract override def prepend(
-      key: String, flags: Int, expiry: Time, value: Buf) = {
+  abstract override def prepend(key: String,
+                                flags: Int,
+                                expiry: Time,
+                                value: Buf) = {
     val result = super.prepend(key, flags, expiry, value)
     backendClient.prepend(key, flags, expiry, value)
     result
   }
 
-  abstract override def replace(
-      key: String, flags: Int, expiry: Time, value: Buf) = {
+  abstract override def replace(key: String,
+                                flags: Int,
+                                expiry: Time,
+                                value: Buf) = {
     val result = super.replace(key, flags, expiry, value)
     backendClient.replace(key, flags, expiry, value)
     result
@@ -229,8 +238,11 @@ trait DarkWrite extends Client {
   }
 
   // cas operation does not migrate
-  abstract override def checkAndSet(
-      key: String, flags: Int, expiry: Time, value: Buf, casUnique: Buf) =
+  abstract override def checkAndSet(key: String,
+                                    flags: Int,
+                                    expiry: Time,
+                                    value: Buf,
+                                    casUnique: Buf) =
     super.checkAndSet(key, flags, expiry, value, casUnique)
 
   abstract override def delete(key: String) = {
@@ -267,8 +279,8 @@ trait FallbackRead extends Client {
     }
   }
 
-  protected def combineGetResult(
-      frontR: GetResult, backR: GetResult): GetResult = {
+  protected def combineGetResult(frontR: GetResult,
+                                 backR: GetResult): GetResult = {
     // when fallback, merge the front hits with back result
     GetResult.merged(Seq(GetResult(frontR.hits), backR))
   }
@@ -291,8 +303,8 @@ trait FallbackRead extends Client {
   * frontend repairing is not not blocking or exposed.
   */
 trait ReadRepair { self: FallbackRead =>
-  override def combineGetResult(
-      frontR: GetResult, backR: GetResult): GetResult = {
+  override def combineGetResult(frontR: GetResult,
+                                backR: GetResult): GetResult = {
     // when readrepair, use back hit to repair front miss
     backR.hits foreach {
       case (k, v) => set(k, v.value)
@@ -327,7 +339,10 @@ object MigrationClient {
     val migrationStatsReceiver = ClientStatsReceiver.scope("migrationclient")
 
     // create MigrationClient, by oldClient newClient, (zkPath, zkClient)
-    new MigrationClient(
-        oldClient, newClient, zkPath, zkClient, migrationStatsReceiver)
+    new MigrationClient(oldClient,
+                        newClient,
+                        zkPath,
+                        zkClient,
+                        migrationStatsReceiver)
   }
 }

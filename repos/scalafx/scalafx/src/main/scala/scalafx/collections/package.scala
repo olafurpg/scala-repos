@@ -37,8 +37,9 @@ import scalafx.delegate.SFXDelegate
   */
 package object collections {
 
-  private def internalFiller[A, B](
-      originalList: jfxc.ObservableList[A], filler: Iterable[B], f: B => A) {
+  private def internalFiller[A, B](originalList: jfxc.ObservableList[A],
+                                   filler: Iterable[B],
+                                   f: B => A) {
     if (null == filler) {
       originalList.clear()
     } else {
@@ -46,8 +47,9 @@ package object collections {
     }
   }
 
-  private def internalFillerWithOne[A, B](
-      originalList: jfxc.ObservableList[A], element: B, f: B => A) {
+  private def internalFillerWithOne[A, B](originalList: jfxc.ObservableList[A],
+                                          element: B,
+                                          f: B => A) {
     if (null == element) {
       originalList.clear()
     } else {
@@ -63,8 +65,8 @@ package object collections {
     * @param originalList List to be filled
     * @param filler Iterable which will fill originalList
     */
-  def fillCollection[T](
-      originalList: jfxc.ObservableList[T], filler: Iterable[T]) {
+  def fillCollection[T](originalList: jfxc.ObservableList[T],
+                        filler: Iterable[T]) {
     this.internalFiller(originalList, filler, (t: T) => t)
   }
 
@@ -76,8 +78,8 @@ package object collections {
     * @param originalList List to be filled
     * @param element Element which will replace originalList content.
     */
-  def fillCollectionWithOne[T](
-      originalList: jfxc.ObservableList[T], element: T) {
+  def fillCollectionWithOne[T](originalList: jfxc.ObservableList[T],
+                               element: T) {
     internalFillerWithOne(originalList, element, (t: T) => t)
   }
 
@@ -89,10 +91,10 @@ package object collections {
     * @param originalList List to be filled
     * @param filler Iterable which will fill originalList
     */
-  def fillSFXCollection[J <: Object](
-      originalList: jfxc.ObservableList[J], filler: Iterable[SFXDelegate[J]]) {
-    this.internalFiller(
-        originalList, filler, (s: SFXDelegate[J]) => s.delegate)
+  def fillSFXCollection[J <: Object](originalList: jfxc.ObservableList[J],
+                                     filler: Iterable[SFXDelegate[J]]) {
+    this.internalFiller(originalList, filler, (s: SFXDelegate[J]) =>
+          s.delegate)
   }
 
   /**
@@ -104,8 +106,9 @@ package object collections {
     * @param element Element which will replace originalList content. Actually, it will used its delegate.
     */
   def fillSFXCollectionWithOne[J <: Object](
-      originalList: jfxc.ObservableList[J], element: SFXDelegate[J]) {
-    this.internalFillerWithOne(
-        originalList, element, (s: SFXDelegate[J]) => s.delegate)
+      originalList: jfxc.ObservableList[J],
+      element: SFXDelegate[J]) {
+    this.internalFillerWithOne(originalList, element, (s: SFXDelegate[J]) =>
+          s.delegate)
   }
 }

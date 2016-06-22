@@ -82,8 +82,8 @@ object ScheduledTask {
   val schemaV1 =
     "id" :: "repeat" :: "apiKey" :: "authorities" :: "prefix" :: "source" :: "sink" :: "timeout" :: HNil
 
-  implicit val decomposer: Decomposer[ScheduledTask] = decomposerV(
-      schemaV1, Some("1.0".v))
-  implicit val extractor: Extractor[ScheduledTask] = extractorV(
-      schemaV1, Some("1.0".v))
+  implicit val decomposer: Decomposer[ScheduledTask] =
+    decomposerV(schemaV1, Some("1.0".v))
+  implicit val extractor: Extractor[ScheduledTask] =
+    extractorV(schemaV1, Some("1.0".v))
 }

@@ -81,8 +81,8 @@ trait FlashCookieSpec
       ws =>
         val response = await(ws.url("/flash").withFollowRedirects(false).get())
         val Some(flashCookie) = readFlashCookie(response)
-        val response2 = await(ws
-              .url("/set-cookie")
+        val response2 = await(
+            ws.url("/set-cookie")
               .withHeaders(
                   "Cookie" -> s"${flashCookie.name.get}=${flashCookie.value.get}")
               .get())

@@ -53,8 +53,9 @@ final class Emitter private (semantics: Semantics,
         internalOptions.withOptimizeBracketSelects(optimizeBracketSelects))
   }
 
-  def emitAll(
-      unit: LinkingUnit, builder: JSFileBuilder, logger: Logger): Unit = {
+  def emitAll(unit: LinkingUnit,
+              builder: JSFileBuilder,
+              logger: Logger): Unit = {
     emitPrelude(builder, logger)
     emit(unit, builder, logger)
     emitPostlude(builder, logger)
@@ -115,15 +116,15 @@ final class Emitter private (semantics: Semantics,
   private def endRun(logger: Logger): Unit = {
     logger.debug(
         s"Emitter: Class tree cache stats: reused: $statsClassesReused -- " +
-        s"invalidated: $statsClassesInvalidated")
+          s"invalidated: $statsClassesInvalidated")
     logger.debug(
         s"Emitter: Method tree cache stats: resued: $statsMethodsReused -- " +
-        s"invalidated: $statsMethodsInvalidated")
+          s"invalidated: $statsMethodsInvalidated")
     classCaches.retain((_, c) => c.cleanAfterRun())
   }
 
-  private def emitLinkedClass(
-      linkedClass: LinkedClass, builder: JSTreeBuilder): Unit = {
+  private def emitLinkedClass(linkedClass: LinkedClass,
+                              builder: JSTreeBuilder): Unit = {
 
     def addTree(tree: js.Tree): Unit = builder.addJSTree(tree)
 
@@ -138,7 +139,8 @@ final class Emitter private (semantics: Semantics,
 
       addTree(
           methodCache.getOrElseUpdate(
-              m.version, classEmitter.genMethod(className, m.tree)))
+              m.version,
+              classEmitter.genMethod(className, m.tree)))
     }
 
     if (linkedClass.hasInstances && kind.isAnyScalaJSDefinedClass) {
@@ -149,8 +151,8 @@ final class Emitter private (semantics: Semantics,
       val memberMethods = for (m <- linkedClass.memberMethods) yield {
         val methodCache = classCache.getMethodCache(m.info.encodedName)
 
-        methodCache.getOrElseUpdate(
-            m.version, classEmitter.genMethod(className, m.tree))
+        methodCache.getOrElseUpdate(m.version,
+                                    classEmitter.genMethod(className, m.tree))
       }
 
       // Exported Members
@@ -180,13 +182,15 @@ final class Emitter private (semantics: Semantics,
         val methodCache = classCache.getMethodCache(m.info.encodedName)
         addTree(
             methodCache.getOrElseUpdate(
-                m.version, classEmitter.genDefaultMethod(className, m.tree)))
+                m.version,
+                classEmitter.genDefaultMethod(className, m.tree)))
       }
     }
 
     if (classEmitter.needInstanceTests(linkedClass)) {
       addTree(
-          classTreeCache.instanceTests.getOrElseUpdate(js.Block(
+          classTreeCache.instanceTests.getOrElseUpdate(
+              js.Block(
                   classEmitter.genInstanceTests(linkedClass),
                   classEmitter.genArrayInstanceTests(linkedClass)
               )(linkedClass.pos)))
@@ -325,7 +329,8 @@ private[scalajs] object Emitter {
 
   // The only reason this is not private is that Rhino needs it
   private[scalajs] def symbolRequirements(
-      semantics: Semantics, esLevel: ESLevel): SymbolRequirement = {
+      semantics: Semantics,
+      esLevel: ESLevel): SymbolRequirement = {
     import semantics._
     import CheckedBehavior._
 
@@ -343,8 +348,8 @@ private[scalajs] object Emitter {
           instantiateClass("jl_ClassCastException", "init___T")
         },
         cond(asInstanceOfs == Fatal) {
-          instantiateClass(
-              "sjsr_UndefinedBehaviorError", "init___jl_Throwable")
+          instantiateClass("sjsr_UndefinedBehaviorError",
+                           "init___jl_Throwable")
         },
         cond(moduleInit == Fatal) {
           instantiateClass("sjsr_UndefinedBehaviorError", "init___T")
@@ -355,8 +360,8 @@ private[scalajs] object Emitter {
         instanceTests(LongImpl.RuntimeLongClass),
         instantiateClass(LongImpl.RuntimeLongClass, LongImpl.AllConstructors),
         callMethods(LongImpl.RuntimeLongClass, LongImpl.AllMethods),
-        callOnModule(
-            LongImpl.RuntimeLongModuleClass, LongImpl.AllModuleMethods),
+        callOnModule(LongImpl.RuntimeLongModuleClass,
+                     LongImpl.AllModuleMethods),
         cond(semantics.strictFloats && esLevel == ESLevel.ES5) {
           callOnModule("sjsr_package$", "froundPolyfill__D__D")
         },

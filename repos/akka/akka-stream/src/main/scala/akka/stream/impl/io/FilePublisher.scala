@@ -26,8 +26,8 @@ private[akka] object FilePublisher {
             initialBuffer: Int,
             maxBuffer: Int) = {
     require(chunkSize > 0, s"chunkSize must be > 0 (was $chunkSize)")
-    require(
-        initialBuffer > 0, s"initialBuffer must be > 0 (was $initialBuffer)")
+    require(initialBuffer > 0,
+            s"initialBuffer must be > 0 (was $initialBuffer)")
     require(maxBuffer >= initialBuffer,
             s"maxBuffer must be >= initialBuffer (was $maxBuffer)")
 
@@ -59,8 +59,7 @@ private[akka] final class FilePublisher(f: File,
 
   val buf = ByteBuffer.allocate(chunkSize)
   var readBytesTotal = 0L
-  var availableChunks: Vector[ByteString] =
-    Vector.empty // TODO possibly resign read-ahead-ing and make fusable as Stage
+  var availableChunks: Vector[ByteString] = Vector.empty // TODO possibly resign read-ahead-ing and make fusable as Stage
 
   private var chan: FileChannel = _
 
@@ -100,8 +99,8 @@ private[akka] final class FilePublisher(f: File,
 
   /** BLOCKING I/O READ */
   @tailrec
-  def readAhead(
-      maxChunks: Int, chunks: Vector[ByteString]): Vector[ByteString] =
+  def readAhead(maxChunks: Int,
+                chunks: Vector[ByteString]): Vector[ByteString] =
     if (chunks.size <= maxChunks && isActive && !eofEncountered) {
       (try chan.read(buf) catch {
         case NonFatal(ex) ⇒ onErrorThenStop(ex); Int.MinValue
@@ -110,7 +109,7 @@ private[akka] final class FilePublisher(f: File,
           eofReachedAtOffset = chan.position
           log.debug(
               "No more bytes available to read (got `-1` from `read`), marking final bytes of file @ " +
-              eofReachedAtOffset)
+                eofReachedAtOffset)
           chunks
         case 0 ⇒
           readAhead(maxChunks, chunks) // had nothing to read into this chunk

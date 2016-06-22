@@ -97,8 +97,9 @@ object ByteString {
   /** Java API */
   def createBuilder: ByteStringBuilder = new ByteStringBuilder
 
-  implicit val canBuildFrom: CanBuildFrom[
-      TraversableOnce[Byte], Byte, ByteString] =
+  implicit val canBuildFrom: CanBuildFrom[TraversableOnce[Byte],
+                                          Byte,
+                                          ByteString] =
     new CanBuildFrom[TraversableOnce[Byte], Byte, ByteString] {
       def apply(ignore: TraversableOnce[Byte]): ByteStringBuilder = newBuilder
       def apply(): ByteStringBuilder = newBuilder
@@ -263,8 +264,8 @@ object ByteString {
     def apply(bs1: ByteStrings, bs2: ByteStrings): ByteString =
       compare(bs1, bs2) match {
         case 3 ⇒
-          new ByteStrings(
-              bs1.bytestrings ++ bs2.bytestrings, bs1.length + bs2.length)
+          new ByteStrings(bs1.bytestrings ++ bs2.bytestrings,
+                          bs1.length + bs2.length)
         case 2 ⇒ bs2
         case 1 ⇒ bs1
         case 0 ⇒ ByteString.empty
@@ -300,7 +301,8 @@ object ByteString {
     * A ByteString with 2 or more fragments.
     */
   final class ByteStrings private (
-      private[akka] val bytestrings: Vector[ByteString1], val length: Int)
+      private[akka] val bytestrings: Vector[ByteString1],
+      val length: Int)
       extends ByteString
       with Serializable {
     if (bytestrings.isEmpty)
@@ -318,8 +320,9 @@ object ByteString {
       } else throw new IndexOutOfBoundsException(idx.toString)
 
     override def iterator: ByteIterator.MultiByteArrayIterator =
-      ByteIterator.MultiByteArrayIterator(
-          bytestrings.toStream map { _.iterator })
+      ByteIterator.MultiByteArrayIterator(bytestrings.toStream map {
+        _.iterator
+      })
 
     def ++(that: ByteString): ByteString = {
       if (that.isEmpty) this
@@ -467,8 +470,9 @@ sealed abstract class ByteString
 
   override def toArray[B >: Byte](implicit arg0: ClassTag[B]): Array[B] =
     iterator.toArray
-  override def copyToArray[B >: Byte](
-      xs: Array[B], start: Int, len: Int): Unit =
+  override def copyToArray[B >: Byte](xs: Array[B],
+                                      start: Int,
+                                      len: Int): Unit =
     iterator.copyToArray(xs, start, len)
 
   override def foreach[@specialized U](f: Byte ⇒ U): Unit = iterator foreach f
@@ -612,8 +616,9 @@ object CompactByteString {
     * Creates a new CompactByteString by copying length bytes starting at offset from
     * an Array.
     */
-  def fromArray(
-      array: Array[Byte], offset: Int, length: Int): CompactByteString = {
+  def fromArray(array: Array[Byte],
+                offset: Int,
+                length: Int): CompactByteString = {
     val copyOffset = math.max(offset, 0)
     val copyLength = math.max(math.min(array.length - copyOffset, length), 0)
     if (copyLength == 0) empty
@@ -653,8 +658,8 @@ final class ByteStringBuilder extends Builder[Byte, ByteString] { builder ⇒
   private var _tempLength: Int = 0
   private var _tempCapacity: Int = 0
 
-  protected def fillArray(len: Int)(
-      fill: (Array[Byte], Int) ⇒ Unit): this.type = {
+  protected def fillArray(len: Int)(fill: (Array[Byte],
+                                           Int) ⇒ Unit): this.type = {
     ensureTempSize(_tempLength + len)
     fill(_temp, _tempLength)
     _tempLength += len

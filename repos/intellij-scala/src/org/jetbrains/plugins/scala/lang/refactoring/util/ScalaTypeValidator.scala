@@ -47,7 +47,8 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
                            enclosingOne) {
 
   override def findConflicts(
-      name: String, allOcc: Boolean): Array[(PsiNamedElement, String)] = {
+      name: String,
+      allOcc: Boolean): Array[(PsiNamedElement, String)] = {
     //returns declaration and message
     val container = enclosingContainer(allOcc)
     if (container == null) return Array()
@@ -103,7 +104,8 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
         true
       case typeDefinition: ScTypeDefinition =>
         if ((typeDefinition.getName == name) && (PsiTreeUtil.getParentOfType(
-                    typeDefinition, classOf[ScFunctionDefinition]) == null)) {
+                    typeDefinition,
+                    classOf[ScFunctionDefinition]) == null)) {
           buf += ((typeDefinition, messageForClassMember(name)))
         }
         true
@@ -118,10 +120,10 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
   }
 
   private def messageForTypeAliasMember(name: String) =
-    ScalaBundle.message(
-        "introduced.typealias.will.conflict.with.type.name", name)
+    ScalaBundle
+      .message("introduced.typealias.will.conflict.with.type.name", name)
 
   private def messageForClassMember(name: String) =
-    ScalaBundle.message(
-        "introduced.typealias.will.conflict.with.class.name", name)
+    ScalaBundle
+      .message("introduced.typealias.will.conflict.with.class.name", name)
 }

@@ -24,8 +24,7 @@ class ScalaPackageUsagesSearcher
     }
     val name = scPack.name
     if (name == null || StringUtil.isEmptyOrSpaces(name)) return
-    val scope: SearchScope =
-      inReadAction(parameters.getEffectiveSearchScope) // TODO PsiUtil.restrictScopeToGroovyFiles(parameters.getEffectiveSearchScope)
+    val scope: SearchScope = inReadAction(parameters.getEffectiveSearchScope) // TODO PsiUtil.restrictScopeToGroovyFiles(parameters.getEffectiveSearchScope)
     val collector: SearchRequestCollector = parameters.getOptimizer
     val session: SearchSession = collector.getSearchSession
     collector.searchWord(name,
@@ -35,17 +34,18 @@ class ScalaPackageUsagesSearcher
                          new MyProcessor(scPack, null, session))
   }
 
-  private class MyProcessor(
-      myTarget: PsiElement, @Nullable prefix: String, mySession: SearchSession)
+  private class MyProcessor(myTarget: PsiElement,
+                            @Nullable prefix: String,
+                            mySession: SearchSession)
       extends RequestResultProcessor(myTarget, prefix) {
-    def processTextOccurrence(
-        element: PsiElement,
-        offsetInElement: Int,
-        consumer: Processor[PsiReference]): Boolean = inReadAction {
-      val reference: PsiReference = element.getReference
-      if (reference == null || !reference.isReferenceTo(myTarget)) {
-        true
-      } else consumer.process(reference)
-    }
+    def processTextOccurrence(element: PsiElement,
+                              offsetInElement: Int,
+                              consumer: Processor[PsiReference]): Boolean =
+      inReadAction {
+        val reference: PsiReference = element.getReference
+        if (reference == null || !reference.isReferenceTo(myTarget)) {
+          true
+        } else consumer.process(reference)
+      }
   }
 }

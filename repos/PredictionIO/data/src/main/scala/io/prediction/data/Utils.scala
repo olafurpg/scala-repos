@@ -37,9 +37,9 @@ private[prediction] object Utils {
       dateTimeFormatter.parseDateTime(dt)
     } catch {
       case e: IllegalArgumentException => {
-          // handle when the datetime string doesn't specify milliseconds.
-          dateTimeNoMillisFormatter.parseDateTime(dt)
-        }
+        // handle when the datetime string doesn't specify milliseconds.
+        dateTimeNoMillisFormatter.parseDateTime(dt)
+      }
     }
   }
 

@@ -200,11 +200,11 @@ class DataFrameFunctionsSuite extends QueryTest with SharedSQLContext {
 
   test("misc crc32 function") {
     val df = Seq(("ABC", Array[Byte](1, 2, 3, 4, 5, 6))).toDF("a", "b")
-    checkAnswer(
-        df.select(crc32($"a"), crc32($"b")), Row(2743272264L, 2180413220L))
+    checkAnswer(df.select(crc32($"a"), crc32($"b")),
+                Row(2743272264L, 2180413220L))
 
-    checkAnswer(
-        df.selectExpr("crc32(a)", "crc32(b)"), Row(2743272264L, 2180413220L))
+    checkAnswer(df.selectExpr("crc32(a)", "crc32(b)"),
+                Row(2743272264L, 2180413220L))
   }
 
   test("string function find_in_set") {
@@ -311,7 +311,8 @@ class DataFrameFunctionsSuite extends QueryTest with SharedSQLContext {
         .toDF("a", "b")
     checkAnswer(
         df2.selectExpr("sort_array(a, true)", "sort_array(a, false)"),
-        Seq(Row(Seq[Seq[Int]](null, Seq(1), Seq(2), Seq(2, 4)),
+        Seq(
+            Row(Seq[Seq[Int]](null, Seq(1), Seq(2), Seq(2, 4)),
                 Seq[Seq[Int]](Seq(2, 4), Seq(2), Seq(1), null)))
     )
 

@@ -38,8 +38,8 @@ private[spark] object RpcEnv {
              conf: SparkConf,
              securityManager: SecurityManager,
              clientMode: Boolean = false): RpcEnv = {
-    val config = RpcEnvConfig(
-        conf, name, host, port, securityManager, clientMode)
+    val config =
+      RpcEnvConfig(conf, name, host, port, securityManager, clientMode)
     new NettyRpcEnvFactory().create(config)
   }
 }
@@ -90,8 +90,8 @@ private[spark] abstract class RpcEnv(conf: SparkConf) {
     * Retrieve the [[RpcEndpointRef]] represented by `address` and `endpointName`.
     * This is a blocking action.
     */
-  def setupEndpointRef(
-      address: RpcAddress, endpointName: String): RpcEndpointRef = {
+  def setupEndpointRef(address: RpcAddress,
+                       endpointName: String): RpcEndpointRef = {
     setupEndpointRefByURI(RpcEndpointAddress(address, endpointName).toString)
   }
 

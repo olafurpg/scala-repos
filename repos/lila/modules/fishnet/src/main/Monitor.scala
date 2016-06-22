@@ -14,8 +14,11 @@ private final class Monitor(moveDb: MoveDB,
   private[fishnet] def acquire(client: Client) =
     lila.mon.fishnet.acquire.count(client.userId.value)()
 
-  private case class AnalysisMeta(
-      time: Int, nodes: Int, nps: Int, depth: Int, pvSize: Int)
+  private case class AnalysisMeta(time: Int,
+                                  nodes: Int,
+                                  nps: Int,
+                                  depth: Int,
+                                  pvSize: Int)
 
   private def sumOf[A](ints: List[A])(f: A => Option[Int]) = ints.foldLeft(0) {
     case (acc, a) => acc + f(a).getOrElse(0)
@@ -37,8 +40,8 @@ private final class Monitor(moveDb: MoveDB,
     } / 1000000)
     monitor.totalPosition(result.analysis.size)
 
-    val metaMovesSample = sample(
-        result.analysis.drop(6).filterNot(_.mateFound), 100)
+    val metaMovesSample =
+      sample(result.analysis.drop(6).filterNot(_.mateFound), 100)
     def avgOf(f: JsonApi.Request.Evaluation => Option[Int]): Option[Int] = {
       val (sum, nb) = metaMovesSample.foldLeft(0 -> 0) {
         case ((sum, nb), move) =>

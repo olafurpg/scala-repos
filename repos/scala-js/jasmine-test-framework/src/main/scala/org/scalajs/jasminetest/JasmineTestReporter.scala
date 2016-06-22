@@ -44,8 +44,8 @@ class JasmineTestReporter(taskDef: TaskDef,
     val results = spec.results()
     val description = spec.description
 
-    val selector = new NestedTestSelector(
-        spec.suite.getFullName(), description)
+    val selector =
+      new NestedTestSelector(spec.suite.getFullName(), description)
 
     if (results.passed) {
       eventHandler.handle(new JasmineEvent(taskDef, Status.Success, selector))

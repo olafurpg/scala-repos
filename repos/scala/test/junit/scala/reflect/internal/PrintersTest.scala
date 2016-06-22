@@ -196,13 +196,13 @@ trait BasePrintTests {
 
   //val x = true && true && false.!
   @Test def testBooleanExpr1 =
-    assertPrintedCode(
-        "val x = true.&&(true).&&(false.`unary_!`)", checkTypedTree = false)
+    assertPrintedCode("val x = true.&&(true).&&(false.`unary_!`)",
+                      checkTypedTree = false)
 
   //val x = true && !(true && false)
   @Test def testBooleanExpr2 =
-    assertPrintedCode(
-        "val x = true.&&(true.&&(false).`unary_!`)", checkTypedTree = false)
+    assertPrintedCode("val x = true.&&(true.&&(false).`unary_!`)",
+                      checkTypedTree = false)
 
   @Test def testNewExpr1 =
     assertResultCode(code = sm"""
@@ -399,12 +399,12 @@ trait ClassPrintTests {
     assertPrintedCode("class X(x: scala.Int, s: scala.Predef.String)")
 
   @Test def testClassWithParams2 =
-    assertPrintedCode(
-        "class X(@test x: Int, s: String)", checkTypedTree = false)
+    assertPrintedCode("class X(@test x: Int, s: String)",
+                      checkTypedTree = false)
 
   @Test def testClassWithParams3 =
-    assertPrintedCode(
-        "class X(implicit x: Int, s: String)", checkTypedTree = false)
+    assertPrintedCode("class X(implicit x: Int, s: String)",
+                      checkTypedTree = false)
 
   @Test def testClassWithParams4 =
     assertPrintedCode("class X(implicit @unchecked x: Int, s: String)",
@@ -444,8 +444,8 @@ trait ClassPrintTests {
     |}""")
 
   @Test def testClassWithParams10 =
-    assertPrintedCode(
-        "class X(protected[zzz] var x: Int)", checkTypedTree = false)
+    assertPrintedCode("class X(protected[zzz] var x: Int)",
+                      checkTypedTree = false)
 
   @Test def testClassWithParams11 = assertPrintedCode(sm"""
     |{
@@ -1042,12 +1042,11 @@ trait ValAndDefPrintTests {
     |}""")
 
   @Test def testDef8 = {
-    val arg = ValDef(
-        Modifiers(Flag.IMPLICIT),
-        newTermName("a"),
-        AppliedTypeTree(
-            Ident(newTypeName("R")), List(Ident(newTypeName("X")))),
-        EmptyTree)
+    val arg = ValDef(Modifiers(Flag.IMPLICIT),
+                     newTermName("a"),
+                     AppliedTypeTree(Ident(newTypeName("R")),
+                                     List(Ident(newTypeName("X")))),
+                     EmptyTree)
 
     //def m[X](implicit a: R[X]) = ()
     val tree = DefDef(NoMods,
@@ -1115,16 +1114,16 @@ trait ValAndDefPrintTests {
     assertPrintedCode("@Foo[A, B] def foo = null", checkTypedTree = false)
 
   @Test def testDefWithAnn4 =
-    assertPrintedCode(
-        "@Foo(a)(b)(x, y) def foo = null", checkTypedTree = false)
+    assertPrintedCode("@Foo(a)(b)(x, y) def foo = null",
+                      checkTypedTree = false)
 
   @Test def testDefWithAnn5 =
-    assertPrintedCode(
-        "@Foo[A, B](a)(b) @Bar def foo(x: Int) = null", checkTypedTree = false)
+    assertPrintedCode("@Foo[A, B](a)(b) @Bar def foo(x: Int) = null",
+                      checkTypedTree = false)
 
   @Test def testDefWithAnn6 =
-    assertPrintedCode(
-        "@test1(new test2()) def foo = 42", checkTypedTree = false)
+    assertPrintedCode("@test1(new test2()) def foo = 42",
+                      checkTypedTree = false)
 
   @Test def testDefWithAnn7 =
     assertPrintedCode("@`t*` def foo = 42", checkTypedTree = false)
@@ -1156,8 +1155,7 @@ trait ValAndDefPrintTests {
   @Test def testAnnotated4 =
     assertResultCode(
         code = "def foo = 42: @foo3[A1, B1](4)(2.0F, new foo1[A1, B1]())")(
-        parsedCode =
-          "def foo = 42: @foo3[A1, B1](4)(2.0F, new foo1[A1, B1]())",
+        parsedCode = "def foo = 42: @foo3[A1, B1](4)(2.0F, new foo1[A1, B1]())",
         typedCode =
           "def foo = (42: @foo3[A1, B1](4)(2.0F, new foo1[A1, B1]()))",
         wrap = true)

@@ -221,12 +221,14 @@ class Matrix2PropJob(args: Args) extends Job(args) {
   val mat = MatrixLiteral(tp1, NoClue)
 
   val tsv2 = TypedText.tsv[(Int, Double)]("col")
-  val col = MatrixLiteral(
-      TypedPipe.from(tsv2).map { case (idx, v) => (idx, (), v) }, NoClue)
+  val col = MatrixLiteral(TypedPipe.from(tsv2).map {
+    case (idx, v) => (idx, (), v)
+  }, NoClue)
 
   val tsv3 = TypedText.tsv[(Int, Double)]("row")
-  val row = MatrixLiteral(
-      TypedPipe.from(tsv3).map { case (idx, v) => ((), idx, v) }, NoClue)
+  val row = MatrixLiteral(TypedPipe.from(tsv3).map {
+    case (idx, v) => ((), idx, v)
+  }, NoClue)
 
   mat
     .binarizeAs[Boolean]
@@ -461,8 +463,10 @@ class Matrix2Test extends WordSpec with Matchers {
                 List((1, 1, 1.0), (2, 2, 3.0), (1, 2, 4.0)))
         .typedSink(TypedText.tsv[(Int, Int, Double)]("product")) { ob =>
           "correctly compute products" in {
-            toSparseMat(ob) shouldBe Map(
-                (1, 1) -> 17.0, (1, 2) -> 12.0, (2, 1) -> 12.0, (2, 2) -> 9.0)
+            toSparseMat(ob) shouldBe Map((1, 1) -> 17.0,
+                                         (1, 2) -> 12.0,
+                                         (2, 1) -> 12.0,
+                                         (2, 2) -> 9.0)
           }
         }
         .runHadoop
@@ -477,8 +481,10 @@ class Matrix2Test extends WordSpec with Matchers {
                 List((1, 1, 1.0), (2, 2, 3.0), (1, 2, 4.0)))
         .typedSink(TypedText.tsv[(Int, Int, Double)]("product")) { ob =>
           "correctly compute products with infinite matrices" in {
-            toSparseMat(ob) shouldBe Map(
-                (1, 1) -> 5.0, (1, 2) -> 35.0, (2, 1) -> 3.0, (2, 2) -> 21.0)
+            toSparseMat(ob) shouldBe Map((1, 1) -> 5.0,
+                                         (1, 2) -> 35.0,
+                                         (2, 1) -> 3.0,
+                                         (2, 2) -> 21.0)
           }
         }
         .runHadoop
@@ -495,8 +501,10 @@ class Matrix2Test extends WordSpec with Matchers {
                 List((1, 1, 1.0), (1, 2, 1.0), (2, 1, 1.0), (2, 2, 1.0)))
         .typedSink(TypedText.tsv[(Int, Int, Double)]("product-sum")) { ob =>
           "correctly compute products" in {
-            toSparseMat(ob) shouldBe Map(
-                (1, 1) -> 18.0, (1, 2) -> 13.0, (2, 1) -> 13.0, (2, 2) -> 10.0)
+            toSparseMat(ob) shouldBe Map((1, 1) -> 18.0,
+                                         (1, 2) -> 13.0,
+                                         (2, 1) -> 13.0,
+                                         (2, 2) -> 10.0)
           }
         }
         .runHadoop

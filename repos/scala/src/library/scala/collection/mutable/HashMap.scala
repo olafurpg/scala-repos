@@ -37,7 +37,7 @@ import scala.collection.parallel.mutable.ParHashMap
   *  @define willNotTerminateInf
   */
 @SerialVersionUID(1L)
-class HashMap[A, B] private[collection](
+class HashMap[A, B] private[collection] (
     contents: HashTable.Contents[A, DefaultEntry[A, B]])
     extends AbstractMap[A, B]
     with Map[A, B]

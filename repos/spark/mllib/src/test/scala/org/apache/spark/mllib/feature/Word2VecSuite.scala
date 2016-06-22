@@ -39,7 +39,8 @@ class Word2VecSuite extends SparkFunSuite with MLlibTestSparkContext {
     // and a Word2VecMap give the same values.
     val word2VecMap = model.getVectors
     val newModel = new Word2VecModel(word2VecMap)
-    assert(newModel.getVectors.mapValues(_.toSeq) === word2VecMap.mapValues(
+    assert(
+        newModel.getVectors.mapValues(_.toSeq) === word2VecMap.mapValues(
             _.toSeq))
   }
 
@@ -83,7 +84,8 @@ class Word2VecSuite extends SparkFunSuite with MLlibTestSparkContext {
     try {
       model.save(sc, path)
       val sameModel = Word2VecModel.load(sc, path)
-      assert(sameModel.getVectors.mapValues(_.toSeq) === model.getVectors
+      assert(
+          sameModel.getVectors.mapValues(_.toSeq) === model.getVectors
             .mapValues(_.toSeq))
     } finally {
       Utils.deleteRecursively(tempDir)
@@ -102,7 +104,8 @@ class Word2VecSuite extends SparkFunSuite with MLlibTestSparkContext {
     try {
       model.save(sc, path)
       val sameModel = Word2VecModel.load(sc, path)
-      assert(sameModel.getVectors.mapValues(_.toSeq) === model.getVectors
+      assert(
+          sameModel.getVectors.mapValues(_.toSeq) === model.getVectors
             .mapValues(_.toSeq))
     } finally {
       Utils.deleteRecursively(tempDir)

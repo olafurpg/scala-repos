@@ -47,7 +47,9 @@ object AndersonDarlingTest {
 
   // Anderson-Darling test.
   def isGaussian[A: Field: Trig: NRoot: IsReal: ClassTag](
-      xs: Array[A], mean: A, stdDev: A): Boolean = {
+      xs: Array[A],
+      mean: A,
+      stdDev: A): Boolean = {
     @tailrec def loop(sum: A, i: Int, a: A, b: A): A =
       if (i < xs.length) {
         // val y = cdf((xs(i) - mean) / stdDev, mean, stdDev)
@@ -75,9 +77,9 @@ object AndersonDarlingTest {
       val t = 1 / (1 + 0.3275911 * x)
       val y =
         t *
-        (0.254829592 + t *
-            (-0.284496736 + t *
-                (1.421413741 + t * (-1.453152027 + t * 1.061405429))))
+          (0.254829592 + t *
+                (-0.284496736 + t *
+                      (1.421413741 + t * (-1.453152027 + t * 1.061405429))))
       (-x * x).exp() * y
     }
 }

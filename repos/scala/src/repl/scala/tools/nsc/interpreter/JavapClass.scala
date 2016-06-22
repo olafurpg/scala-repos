@@ -29,8 +29,7 @@ class JavapClass(
     val loader: ScalaClassLoader,
     val printWriter: PrintWriter,
     intp: IMain
-)
-    extends Javap {
+) extends Javap {
   import JavapClass._
 
   lazy val tool = JavapTool()
@@ -120,13 +119,13 @@ class JavapClass(
       (// only simple names get the scope treatment
           Some(p) filter (_ contains '.')
           // take path as a Name in scope
-          orElse (intp translatePath p filter loadable)
+            orElse (intp translatePath p filter loadable)
           // take path as a Name in scope and find its enclosing class
-          orElse (intp translateEnclosingClass p filter loadable)
+            orElse (intp translateEnclosingClass p filter loadable)
           // take path as a synthetic derived from some Name in scope
-          orElse desynthesize(p)
+            orElse desynthesize(p)
           // just try it plain
-          getOrElse p)
+            getOrElse p)
     load(q)
   }
 
@@ -178,14 +177,13 @@ class JavapClass(
                 isAnonymized(method))
           }
         }
-        filtering =
-          if (filtering) {
-            // next blank line terminates section
-            // in non-verbose mode, next line is next method, more or less
-            line.trim.nonEmpty && (!isAnyMethod || isOurMethod)
-          } else {
-            isAnyMethod && isOurMethod
-          }
+        filtering = if (filtering) {
+          // next blank line terminates section
+          // in non-verbose mode, next line is next method, more or less
+          line.trim.nonEmpty && (!isAnyMethod || isOurMethod)
+        } else {
+          isAnyMethod && isOurMethod
+        }
         filtering
       }
       // do we output this line?
@@ -252,14 +250,14 @@ class JavapClass(
             .tryToLoadClass[JavaFileManager](
                 "com.sun.tools.javap.JavapFileManager")
             .get getMethod
-          ("create", classOf[DiagnosticListener[_]],
-              classOf[PrintWriter]) invoke
-          (null, reporter, new PrintWriter(System.err, true)))
+            ("create", classOf[DiagnosticListener[_]],
+                classOf[PrintWriter]) invoke
+            (null, reporter, new PrintWriter(System.err, true)))
         .asInstanceOf[JavaFileManager] orFailed null
 
     // manages named arrays of bytes, which might have failed to load
-    class JavapFileManager(val managed: Seq[Input])(
-        delegate: JavaFileManager = defaultFileManager)
+    class JavapFileManager(val managed: Seq[Input])(delegate: JavaFileManager =
+                                                      defaultFileManager)
         extends ForwardingJavaFileManager[JavaFileManager](delegate) {
       import JavaFileObject.Kind
       import Kind._
@@ -279,8 +277,9 @@ class JavapClass(
         case _ => null
       }
       // todo: just wrap it as scala abstractfile and adapt it uniformly
-      def fileObjectForInput(
-          name: String, bytes: Try[ByteAry], kind: Kind): JavaFileObject =
+      def fileObjectForInput(name: String,
+                             bytes: Try[ByteAry],
+                             kind: Kind): JavaFileObject =
         new SimpleJavaFileObject(uri(name), kind) {
           override def openInputStream(): InputStream =
             new ByteArrayInputStream(bytes.get)
@@ -290,8 +289,9 @@ class JavapClass(
           // suppress
           override def getLastModified: Long = -1L
         }
-      override def getJavaFileForInput(
-          location: Location, className: String, kind: Kind): JavaFileObject =
+      override def getJavaFileForInput(location: Location,
+                                       className: String,
+                                       kind: Kind): JavaFileObject =
         location match {
           case CLASS_PATH => managedFile(className, kind)
           case _ => null

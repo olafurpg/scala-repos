@@ -46,8 +46,10 @@ private[akka] trait MemoryUsageSnapshotting extends MetricsPrefix {
   private def key(k: String) = prefix + "." + k
 }
 
-private[akka] case class TotalMemoryUsage(
-    init: Long, used: Long, max: Long, comitted: Long) {
+private[akka] case class TotalMemoryUsage(init: Long,
+                                          used: Long,
+                                          max: Long,
+                                          comitted: Long) {
 
   def diff(other: TotalMemoryUsage): TotalMemoryUsage =
     TotalMemoryUsage(this.init - other.init,
@@ -56,8 +58,11 @@ private[akka] case class TotalMemoryUsage(
                      this.comitted - other.comitted)
 }
 
-private[akka] case class HeapMemoryUsage(
-    init: Long, used: Long, max: Long, comitted: Long, usage: Double) {
+private[akka] case class HeapMemoryUsage(init: Long,
+                                         used: Long,
+                                         max: Long,
+                                         comitted: Long,
+                                         usage: Double) {
 
   def diff(other: HeapMemoryUsage): HeapMemoryUsage =
     HeapMemoryUsage(this.init - other.init,
@@ -67,8 +72,11 @@ private[akka] case class HeapMemoryUsage(
                     this.usage - other.usage)
 }
 
-private[akka] case class NonHeapMemoryUsage(
-    init: Long, used: Long, max: Long, comitted: Long, usage: Double) {
+private[akka] case class NonHeapMemoryUsage(init: Long,
+                                            used: Long,
+                                            max: Long,
+                                            comitted: Long,
+                                            usage: Double) {
 
   def diff(other: NonHeapMemoryUsage): NonHeapMemoryUsage =
     NonHeapMemoryUsage(this.init - other.init,

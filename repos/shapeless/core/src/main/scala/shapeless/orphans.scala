@@ -128,7 +128,7 @@ class OrphanMacros(val c: whitebox.Context) extends CaseClassMacros {
         val useDerived = resTpeD.typeArgs.zip(resTpeI.typeArgs).forall {
           case (ad, ai) =>
             ai.typeSymbol.isParameter ||
-            (!ad.typeSymbol.isParameter && !(ad <:< ai))
+              (!ad.typeSymbol.isParameter && !(ad <:< ai))
         }
 
         if (useDerived) derived else inst

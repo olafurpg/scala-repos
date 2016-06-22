@@ -20,8 +20,9 @@ import org.saddle._
 /**
   * Helper class to do combine or transform after a groupBy
   */
-class SeriesGrouper[Y: ST: ORD, X: ST: ORD, T: ST](
-    ix: Index[Y], series: Series[X, T], sorted: Boolean = true)
+class SeriesGrouper[Y: ST: ORD, X: ST: ORD, T: ST](ix: Index[Y],
+                                                   series: Series[X, T],
+                                                   sorted: Boolean = true)
     extends IndexGrouper[Y](ix, sorted) {
 
   def combine[U: ST: ORD](fn: (Y, Vec[T]) => U): Series[Y, U] =

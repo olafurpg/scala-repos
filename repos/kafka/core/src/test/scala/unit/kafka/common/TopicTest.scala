@@ -91,8 +91,8 @@ class TopicTest {
   @Test
   def testTopicHasCollision() = {
     val periodFirstMiddleLastNone = List(".topic", "to.pic", "topic.", "topic")
-    val underscoreFirstMiddleLastNone = List(
-        "_topic", "to_pic", "topic_", "topic")
+    val underscoreFirstMiddleLastNone =
+      List("_topic", "to_pic", "topic_", "topic")
 
     // Self
     periodFirstMiddleLastNone.foreach { t =>

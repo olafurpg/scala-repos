@@ -106,12 +106,13 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
   implicit def sourceToRichPipe(src: Source): RichPipe = new RichPipe(src.read)
 
   // This converts an Iterable into a Pipe or RichPipe with index (int-based) fields
-  implicit def toPipe[T](iter: Iterable[T])(
-      implicit set: TupleSetter[T], conv: TupleConverter[T]): Pipe =
+  implicit def toPipe[T](iter: Iterable[T])(implicit set: TupleSetter[T],
+                                            conv: TupleConverter[T]): Pipe =
     IterableSource[T](iter)(set, conv).read
 
   implicit def iterableToRichPipe[T](iter: Iterable[T])(
-      implicit set: TupleSetter[T], conv: TupleConverter[T]): RichPipe =
+      implicit set: TupleSetter[T],
+      conv: TupleConverter[T]): RichPipe =
     RichPipe(toPipe(iter)(set, conv))
 
   // Provide args as an implicit val for extensions such as the Checkpoint extension.
@@ -186,7 +187,8 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
 
     // This is setting a property for cascading/driven
     AppProps.addApplicationFramework(
-        null, String.format("scalding:%s", scaldingVersion))
+        null,
+        String.format("scalding:%s", scaldingVersion))
 
     val modeConf = mode match {
       case h: HadoopMode => Config.fromHadoop(h.jobConf)
@@ -385,8 +387,8 @@ class NamedPoolThreadFactory(name: String, makeDaemons: Boolean)
   val threadNumber = new AtomicInteger(1)
 
   def newThread(r: Runnable) = {
-    val thread = new Thread(
-        group, r, name + "-" + threadNumber.getAndIncrement())
+    val thread =
+      new Thread(group, r, name + "-" + threadNumber.getAndIncrement())
     thread.setDaemon(makeDaemons)
     if (thread.getPriority != Thread.NORM_PRIORITY) {
       thread.setPriority(Thread.NORM_PRIORITY)
@@ -471,8 +473,9 @@ abstract class ExecutionJob[+T](args: Args) extends Job(args) {
   def result: Future[T] = resultPromise.future
 
   override def buildFlow: Flow[_] =
-    sys.error("ExecutionJobs do not have a single accessible flow. " +
-        "You cannot print the graph as it may be dynamically built or recurrent")
+    sys.error(
+        "ExecutionJobs do not have a single accessible flow. " +
+          "You cannot print the graph as it may be dynamically built or recurrent")
 
   final override def run = {
     val r = Config.tryFrom(config).map { conf =>
@@ -500,7 +503,9 @@ class ScriptJob(cmds: Iterable[String]) extends Job(Args("")) {
     try {
       cmds.dropWhile { cmd: String =>
         {
-          new java.lang.ProcessBuilder("bash", "-c", cmd).start().waitFor() match {
+          new java.lang.ProcessBuilder("bash", "-c", cmd)
+            .start()
+            .waitFor() match {
             case x if x != 0 =>
               println(cmd + " failed, exitStatus: " + x)
               false
@@ -510,9 +515,9 @@ class ScriptJob(cmds: Iterable[String]) extends Job(Args("")) {
       }.isEmpty
     } catch {
       case e: Exception => {
-          e.printStackTrace
-          false
-        }
+        e.printStackTrace
+        false
+      }
     }
   }
 }
@@ -547,8 +552,8 @@ private[scalding] case class FlowStepStrategies[A]()
   /**
     * Returns a new FlowStepStrategy that runs both strategies in sequence.
     */
-  def plus(
-      l: FlowStepStrategy[A], r: FlowStepStrategy[A]): FlowStepStrategy[A] =
+  def plus(l: FlowStepStrategy[A],
+           r: FlowStepStrategy[A]): FlowStepStrategy[A] =
     new FlowStepStrategy[A] {
       override def apply(flow: Flow[A],
                          predecessorSteps: JList[FlowStep[A]],

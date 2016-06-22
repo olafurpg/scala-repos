@@ -42,8 +42,8 @@ final case class ChildRestartStats(child: ActorRef,
     retriesWindow match {
       case (Some(retries), _) if retries < 1 ⇒ false
       case (Some(retries), None) ⇒ {
-          maxNrOfRetriesCount += 1; maxNrOfRetriesCount <= retries
-        }
+        maxNrOfRetriesCount += 1; maxNrOfRetriesCount <= retries
+      }
       case (x, Some(window)) ⇒
         retriesInWindowOkay(if (x.isDefined) x.get else 1, window)
       case (None, _) ⇒ true
@@ -57,11 +57,10 @@ final case class ChildRestartStats(child: ActorRef,
      */
     val retriesDone = maxNrOfRetriesCount + 1
     val now = System.nanoTime
-    val windowStart =
-      if (restartTimeWindowStartNanos == 0) {
-        restartTimeWindowStartNanos = now
-        now
-      } else restartTimeWindowStartNanos
+    val windowStart = if (restartTimeWindowStartNanos == 0) {
+      restartTimeWindowStartNanos = now
+      now
+    } else restartTimeWindowStartNanos
     val insideWindow =
       (now - windowStart) <= TimeUnit.MILLISECONDS.toNanos(window)
     if (insideWindow) {
@@ -372,8 +371,8 @@ abstract class SupervisorStrategy {
           publish(context, Warning(child.path.toString, getClass, logMessage))
         case Escalate ⇒ // don't log here
         case _ ⇒
-          publish(
-              context, Error(cause, child.path.toString, getClass, logMessage))
+          publish(context,
+                  Error(cause, child.path.toString, getClass, logMessage))
       }
     }
 
@@ -401,8 +400,9 @@ abstract class SupervisorStrategy {
     * currently failing one, then it did not request this treatment and is
     * therefore not prepared to be resumed without prior suspend.
     */
-  final def restartChild(
-      child: ActorRef, cause: Throwable, suspendFirst: Boolean): Unit = {
+  final def restartChild(child: ActorRef,
+                         cause: Throwable,
+                         suspendFirst: Boolean): Unit = {
     val c = child.asInstanceOf[InternalActorRef]
     if (suspendFirst) c.suspend()
     c.restart(cause)
@@ -505,8 +505,9 @@ case class AllForOneStrategy(maxNrOfRetries: Int = -1,
           children.forall(_.requestRestartPermission(retriesWindow)))
         children foreach
         (crs ⇒
-              restartChild(
-                  crs.child, cause, suspendFirst = (crs.child != child)))
+              restartChild(crs.child,
+                           cause,
+                           suspendFirst = (crs.child != child)))
       else for (c ← children) context.stop(c.child)
     }
   }

@@ -27,14 +27,18 @@ class SerializabilitySpec extends WordSpec with Matchers {
                                  ByteString.empty)) should beSerializable
       }
       "with accepted media types" in {
-        HttpRequest().withHeaders(Accept(MediaTypes.`application/json`)) should beSerializable
+        HttpRequest()
+          .withHeaders(Accept(MediaTypes.`application/json`)) should beSerializable
       }
       "with accept-charset" in {
-        HttpRequest().withHeaders(`Accept-Charset`(HttpCharsets.`UTF-16`)) should beSerializable
-        HttpRequest().withHeaders(`Accept-Charset`(HttpCharset.custom("utf8"))) should beSerializable
+        HttpRequest()
+          .withHeaders(`Accept-Charset`(HttpCharsets.`UTF-16`)) should beSerializable
+        HttpRequest()
+          .withHeaders(`Accept-Charset`(HttpCharset.custom("utf8"))) should beSerializable
       }
       "with accepted encodings" in {
-        HttpRequest().withHeaders(`Accept-Encoding`(HttpEncodings.chunked)) should beSerializable
+        HttpRequest()
+          .withHeaders(`Accept-Encoding`(HttpEncodings.chunked)) should beSerializable
         HttpRequest().withHeaders(`Accept-Encoding`(
                 HttpEncoding.custom("test"))) should beSerializable
       }

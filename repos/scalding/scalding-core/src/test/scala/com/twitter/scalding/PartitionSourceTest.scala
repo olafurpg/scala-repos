@@ -39,7 +39,7 @@ object PartitionSourceTestHelpers {
 
     def toPartition(tupleEntry: TupleEntry): String =
       "{" + Util.join(tupleEntry.asIterableOf(classOf[String]), "}->{", true) +
-      "}"
+        "}"
 
     def toTuple(partition: String, tupleEntry: TupleEntry): Unit =
       throw new RuntimeException("toTuple for reading not implemented")
@@ -53,8 +53,8 @@ object PartitionSourceTestHelpers {
       false,
       Fields.ALL,
       SinkMode.REPLACE)
-  val PartialPartitionedTsv = StandardPartitionedTsv(
-      "base", "/", ('col1, 'col2), false, ('col1, 'col3))
+  val PartialPartitionedTsv =
+    StandardPartitionedTsv("base", "/", ('col1, 'col2), false, ('col1, 'col3))
 }
 
 class DelimitedPartitionTestJob(args: Args) extends Job(args) {

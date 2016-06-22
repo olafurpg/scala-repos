@@ -73,8 +73,8 @@ trait MinimalScalaTest extends Output with Features {
     }
   }
 
-  def checkType[T: Manifest, S](
-      in: Future[T], refmanifest: Manifest[S]): Boolean =
+  def checkType[T: Manifest, S](in: Future[T],
+                                refmanifest: Manifest[S]): Boolean =
     manifest[T] == refmanifest
 }
 

@@ -91,7 +91,8 @@ trait TypeKinds extends SubComponent {
   }
 
   /** Integer number (Byte, Short, Char or Int). */
-  case class INT private[TypeKinds](typeSymbol: Symbol) extends ValueTypeKind {
+  case class INT private[TypeKinds] (typeSymbol: Symbol)
+      extends ValueTypeKind {
     def toIRType: Types.IntType.type = Types.IntType
   }
 
@@ -102,7 +103,7 @@ trait TypeKinds extends SubComponent {
   }
 
   /** Floating-point number (Float or Double). */
-  case class FLOAT private[TypeKinds](typeSymbol: Symbol)
+  case class FLOAT private[TypeKinds] (typeSymbol: Symbol)
       extends ValueTypeKind {
     def toIRType: Types.Type =
       if (typeSymbol == FloatClass) Types.FloatType
@@ -132,7 +133,7 @@ trait TypeKinds extends SubComponent {
   }
 
   /** An object */
-  case class REFERENCE private[TypeKinds](typeSymbol: Symbol)
+  case class REFERENCE private[TypeKinds] (typeSymbol: Symbol)
       extends TypeKindButArray {
     override def toString(): String = "REFERENCE(" + typeSymbol.fullName + ")"
     override def isReferenceType: Boolean = true
@@ -141,7 +142,7 @@ trait TypeKinds extends SubComponent {
   }
 
   /** An array */
-  case class ARRAY private[TypeKinds](elem: TypeKind) extends TypeKind {
+  case class ARRAY private[TypeKinds] (elem: TypeKind) extends TypeKind {
     override def toString(): String = "ARRAY[" + elem + "]"
     override def isArrayType: Boolean = true
 

@@ -11,7 +11,7 @@ import org.apache.thrift.protocol.TProtocolFactory
   * instance of ThriftMuxClientLike, see [[com.twitter.finagle.ThriftMuxClient]].
   */
 @deprecated("Use object ThriftMux", "7.0.0")
-class ThriftMuxClientLike private[finagle](client: ThriftMux.Client)
+class ThriftMuxClientLike private[finagle] (client: ThriftMux.Client)
     extends StackBasedClient[ThriftClientRequest, Array[Byte]]
     with Stack.Parameterized[ThriftMuxClientLike]
     with Stack.Transformable[ThriftMuxClientLike]
@@ -80,8 +80,8 @@ class ThriftMuxClientLike private[finagle](client: ThriftMux.Client)
   def withProtocolFactory(pf: TProtocolFactory): ThriftMuxClientLike =
     new ThriftMuxClientLike(client.withProtocolFactory(pf))
 
-  def newService(
-      dest: Name, label: String): Service[ThriftClientRequest, Array[Byte]] =
+  def newService(dest: Name,
+                 label: String): Service[ThriftClientRequest, Array[Byte]] =
     client.newService(dest, label)
 
   def newClient(

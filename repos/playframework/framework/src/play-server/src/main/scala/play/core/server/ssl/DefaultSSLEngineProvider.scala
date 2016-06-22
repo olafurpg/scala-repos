@@ -17,8 +17,8 @@ import play.utils.PlayIO
 /**
   * This class calls sslContext.createSSLEngine() with no parameters and returns the result.
   */
-class DefaultSSLEngineProvider(
-    serverConfig: ServerConfig, appProvider: ApplicationProvider)
+class DefaultSSLEngineProvider(serverConfig: ServerConfig,
+                               appProvider: ApplicationProvider)
     extends SSLEngineProvider {
 
   import DefaultSSLEngineProvider._
@@ -54,17 +54,17 @@ class DefaultSSLEngineProvider(
             kmf
           } catch {
             case NonFatal(e) => {
-                throw new Exception("Error loading HTTPS keystore from " +
+              throw new Exception("Error loading HTTPS keystore from " +
                                     file.getAbsolutePath,
-                                    e)
-              }
+                                  e)
+            }
           } finally {
             PlayIO.closeQuietly(in)
           }
         } else {
           throw new Exception(
               "Unable to find HTTPS keystore at \"" + file.getAbsolutePath +
-              "\"")
+                "\"")
         }
       } else {
         // Load a generated key store
@@ -75,16 +75,15 @@ class DefaultSSLEngineProvider(
 
     // Load the configured trust manager
     val trustStoreConfig = httpsConfig.getConfig("trustStore")
-    val tm =
-      if (trustStoreConfig.getBoolean("noCaVerification")) {
-        logger.warn("HTTPS configured with no client " +
+    val tm = if (trustStoreConfig.getBoolean("noCaVerification")) {
+      logger.warn(
+          "HTTPS configured with no client " +
             "side CA verification. Requires http://webid.info/ for client certificate verification.")
-        Array[TrustManager](noCATrustManager)
-      } else {
-        logger.debug(
-            "Using default trust store for client side CA verification")
-        null
-      }
+      Array[TrustManager](noCATrustManager)
+    } else {
+      logger.debug("Using default trust store for client side CA verification")
+      null
+    }
 
     // Configure the SSL context
     val sslContext = SSLContext.getInstance("TLS")

@@ -26,8 +26,9 @@ import kafka.common.TopicAndPartition
 import com.yammer.metrics.core.Gauge
 import org.apache.kafka.common.utils.Utils
 
-abstract class AbstractFetcherManager(
-    protected val name: String, clientId: String, numFetchers: Int = 1)
+abstract class AbstractFetcherManager(protected val name: String,
+                                      clientId: String,
+                                      numFetchers: Int = 1)
     extends Logging
     with KafkaMetricsGroup {
   // map of (source broker_id, fetcher_id per source broker) => fetcher
@@ -77,8 +78,8 @@ abstract class AbstractFetcherManager(
   }
 
   // to be defined in subclass to create a specific fetcher
-  def createFetcherThread(
-      fetcherId: Int, sourceBroker: BrokerEndPoint): AbstractFetcherThread
+  def createFetcherThread(fetcherId: Int,
+                          sourceBroker: BrokerEndPoint): AbstractFetcherThread
 
   def addFetcherForPartitions(
       partitionAndOffsets: Map[TopicAndPartition, BrokerAndInitialOffset]) {
@@ -94,8 +95,8 @@ abstract class AbstractFetcherManager(
         fetcherThreadMap.get(brokerAndFetcherId) match {
           case Some(f) => fetcherThread = f
           case None =>
-            fetcherThread = createFetcherThread(
-                brokerAndFetcherId.fetcherId, brokerAndFetcherId.broker)
+            fetcherThread = createFetcherThread(brokerAndFetcherId.fetcherId,
+                                                brokerAndFetcherId.broker)
             fetcherThreadMap.put(brokerAndFetcherId, fetcherThread)
             fetcherThread.start
         }
@@ -108,12 +109,11 @@ abstract class AbstractFetcherManager(
       }
     }
 
-    info(
-        "Added fetcher for partitions %s".format(partitionAndOffsets.map {
+    info("Added fetcher for partitions %s".format(partitionAndOffsets.map {
       case (topicAndPartition, brokerAndInitialOffset) =>
         "[" + topicAndPartition +
-        ", initOffset " + brokerAndInitialOffset.initOffset + " to broker " +
-        brokerAndInitialOffset.broker + "] "
+          ", initOffset " + brokerAndInitialOffset.initOffset + " to broker " +
+          brokerAndInitialOffset.broker + "] "
     }))
   }
 

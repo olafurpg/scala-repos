@@ -33,8 +33,8 @@ import org.apache.hadoop.mapreduce.lib.input.{CombineFileInputFormat, CombineFil
   */
 private[spark] abstract class StreamFileInputFormat[T]
     extends CombineFileInputFormat[String, T] {
-  override protected def isSplitable(
-      context: JobContext, file: Path): Boolean = false
+  override protected def isSplitable(context: JobContext,
+                                     file: Path): Boolean = false
 
   /**
     * Allow minPartitions set by end-user in order to keep compatibility with old Hadoop API
@@ -58,7 +58,9 @@ private[spark] abstract class StreamFileInputFormat[T]
   * to reading files out as streams
   */
 private[spark] abstract class StreamBasedRecordReader[T](
-    split: CombineFileSplit, context: TaskAttemptContext, index: Integer)
+    split: CombineFileSplit,
+    context: TaskAttemptContext,
+    index: Integer)
     extends RecordReader[String, T] {
 
   // True means the current file has been processed, then skip it.
@@ -67,8 +69,8 @@ private[spark] abstract class StreamBasedRecordReader[T](
   private var key = ""
   private var value: T = null.asInstanceOf[T]
 
-  override def initialize(
-      split: InputSplit, context: TaskAttemptContext): Unit = {}
+  override def initialize(split: InputSplit,
+                          context: TaskAttemptContext): Unit = {}
   override def close(): Unit = {}
 
   override def getProgress: Float = if (processed) 1.0f else 0.0f
@@ -100,8 +102,9 @@ private[spark] abstract class StreamBasedRecordReader[T](
 /**
   * Reads the record in directly as a stream for other objects to manipulate and handle
   */
-private[spark] class StreamRecordReader(
-    split: CombineFileSplit, context: TaskAttemptContext, index: Integer)
+private[spark] class StreamRecordReader(split: CombineFileSplit,
+                                        context: TaskAttemptContext,
+                                        index: Integer)
     extends StreamBasedRecordReader[PortableDataStream](split, context, index) {
 
   def parseStream(inStream: PortableDataStream): PortableDataStream = inStream
@@ -112,8 +115,8 @@ private[spark] class StreamRecordReader(
   */
 private[spark] class StreamInputFormat
     extends StreamFileInputFormat[PortableDataStream] {
-  override def createRecordReader(
-      split: InputSplit, taContext: TaskAttemptContext)
+  override def createRecordReader(split: InputSplit,
+                                  taContext: TaskAttemptContext)
     : CombineFileRecordReader[String, PortableDataStream] = {
     new CombineFileRecordReader[String, PortableDataStream](
         split.asInstanceOf[CombineFileSplit],
@@ -128,8 +131,9 @@ private[spark] class StreamInputFormat
   * @note TaskAttemptContext is not serializable resulting in the confBytes construct
   * @note CombineFileSplit is not serializable resulting in the splitBytes construct
   */
-class PortableDataStream(
-    isplit: CombineFileSplit, context: TaskAttemptContext, index: Integer)
+class PortableDataStream(isplit: CombineFileSplit,
+                         context: TaskAttemptContext,
+                         index: Integer)
     extends Serializable {
 
   private val confBytes = {

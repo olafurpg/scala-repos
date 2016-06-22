@@ -17,10 +17,18 @@ class VectorTest extends FunSuite {
   //val dmTest = DenseMatrix((1,2,3,4), (5,6,7,8))
 
   test("scan") {
-    assert(dvTest.scanLeft(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(
-            0, 1, 3, 6, 10))
-    assert(dvTest.scanRight(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(
-            10, 9, 7, 4, 0))
+    assert(
+        dvTest.scanLeft(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(0,
+                                                                         1,
+                                                                         3,
+                                                                         6,
+                                                                         10))
+    assert(
+        dvTest.scanRight(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(10,
+                                                                          9,
+                                                                          7,
+                                                                          4,
+                                                                          0))
   }
 
   test("fold") {
@@ -214,7 +222,7 @@ class VectorOps_ComplexTest
   }
 
   implicit def genScalar: Arbitrary[Complex] = Arbitrary {
-    for (r <- Arbitrary.arbitrary[Double]; i <- Arbitrary.arbitrary[Double]) yield
-      Complex(r % 100, i % 100)
+    for (r <- Arbitrary.arbitrary[Double]; i <- Arbitrary.arbitrary[Double])
+      yield Complex(r % 100, i % 100)
   }
 }

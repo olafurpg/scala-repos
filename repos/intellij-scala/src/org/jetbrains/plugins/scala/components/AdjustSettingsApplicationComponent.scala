@@ -111,8 +111,7 @@ class AdjustSettingsApplicationComponent extends ApplicationComponent {
       } catch {
         case n: NumberFormatException => //do nothing
       } finally {
-        SwingUtilities.invokeLater(
-            new Runnable {
+        SwingUtilities.invokeLater(new Runnable {
           override def run(): Unit = {
             ApplicationManager.getApplication.restart()
           }

@@ -74,8 +74,8 @@ package javaguide.testhelpers {
         requestBuilder: play.mvc.Http.RequestBuilder,
         body: String)(implicit mat: Materializer): Result = {
       Helpers
-        .await(Helpers.call(
-                action, requestBuilder.build()._underlyingRequest, body))
+        .await(Helpers
+              .call(action, requestBuilder.build()._underlyingRequest, body))
         .asJava
     }
 

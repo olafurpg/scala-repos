@@ -20,7 +20,8 @@ object InsertionSort extends Sort {
     sort(data, 0, data.length)
 
   final def sort[@sp A](data: Array[A], start: Int, end: Int)(
-      implicit o: Order[A], ct: ClassTag[A]): Unit = {
+      implicit o: Order[A],
+      ct: ClassTag[A]): Unit = {
 
     var i = start + 1
     while (i < end) {
@@ -89,9 +90,11 @@ object MergeSort extends Sort {
     * left and right ranges of the input to merge, as well as the area of the
     * ouput to write to.
     */
-  @inline final def merge[@sp A](
-      in: Array[A], out: Array[A], start: Int, mid: Int, end: Int)(
-      implicit o: Order[A]): Unit = {
+  @inline final def merge[@sp A](in: Array[A],
+                                 out: Array[A],
+                                 start: Int,
+                                 mid: Int,
+                                 end: Int)(implicit o: Order[A]): Unit = {
 
     var ii = start
     var jj = mid
@@ -119,7 +122,8 @@ object QuickSort {
     qsort(data, 0, data.length - 1)
 
   final def qsort[@sp A](data: Array[A], left: Int, right: Int)(
-      implicit o: Order[A], ct: ClassTag[A]): Unit = {
+      implicit o: Order[A],
+      ct: ClassTag[A]): Unit = {
 
     if (right - left < limit) return InsertionSort.sort(data, left, right + 1)
 
@@ -130,8 +134,10 @@ object QuickSort {
   }
 
   final def partition[@sp A](
-      data: Array[A], left: Int, right: Int, pivot: Int)(
-      implicit o: Order[A], ct: ClassTag[A]): Int = {
+      data: Array[A],
+      left: Int,
+      right: Int,
+      pivot: Int)(implicit o: Order[A], ct: ClassTag[A]): Int = {
 
     val value = data(pivot)
 

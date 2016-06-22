@@ -61,14 +61,15 @@ object ConfigurationSpec extends Specification {
     "make all sub keys accessible" in {
       exampleConfig.subKeys must contain(allOf("foo", "blah", "blah2"))
       exampleConfig.subKeys must not(
-          contain(anyOf("foo.bar1",
-                        "foo.bar2",
-                        "blah.0",
-                        "blah.1",
-                        "blah.2",
-                        "blah.3",
-                        "blah.4",
-                        "blah2.blah3.blah4")))
+          contain(
+              anyOf("foo.bar1",
+                    "foo.bar2",
+                    "blah.0",
+                    "blah.1",
+                    "blah.2",
+                    "blah.3",
+                    "blah.4",
+                    "blah2.blah3.blah4")))
     }
 
     "make all get accessible using scala" in {
@@ -144,8 +145,8 @@ object PlayConfigSpec extends Specification {
             "bar")
       }
       "when undefined" in {
-        config().get[Option[String]]("foo.bar") must throwA[
-            ConfigException.Missing]
+        config()
+          .get[Option[String]]("foo.bar") must throwA[ConfigException.Missing]
       }
     }
     "support getting prototyped seqs" in {

@@ -49,7 +49,8 @@ class MetricsTest extends MarathonSpec with MockitoSugar {
     assert(instance.getClass.getName.contains("EnhancerByGuice"))
 
     assert(
-        metrics.className(instance.getClass) == "mesosphere.marathon.metrics.FooBar")
+        metrics
+          .className(instance.getClass) == "mesosphere.marathon.metrics.FooBar")
   }
 
   test("Metrics caches the class names") {

@@ -58,11 +58,13 @@ object Watched {
   def isEnter(key: Int): Boolean = key == 10 || key == 13
   def printIfDefined(msg: String) = if (!msg.isEmpty) System.out.println(msg)
 
-  def executeContinuously(
-      watched: Watched, s: State, next: String, repeat: String): State = {
+  def executeContinuously(watched: Watched,
+                          s: State,
+                          next: String,
+                          repeat: String): State = {
     @tailrec def shouldTerminate: Boolean =
       (System.in.available > 0) &&
-      (watched.terminateWatch(System.in.read()) || shouldTerminate)
+        (watched.terminateWatch(System.in.read()) || shouldTerminate)
     val sourcesFinder = PathFinder { watched watchPaths s }
     val watchState = s get ContinuousState getOrElse WatchState.empty
 
@@ -70,8 +72,10 @@ object Watched {
       printIfDefined(watched watchingMessage watchState)
 
     val (triggered, newWatchState, newState) = try {
-      val (triggered, newWatchState) = SourceModificationWatch.watch(
-          sourcesFinder, watched.pollInterval, watchState)(shouldTerminate)
+      val (triggered, newWatchState) =
+        SourceModificationWatch.watch(sourcesFinder,
+                                      watched.pollInterval,
+                                      watchState)(shouldTerminate)
       (triggered, newWatchState, s)
     } catch {
       case e: Exception =>
@@ -92,7 +96,8 @@ object Watched {
     }
   }
   val ContinuousState = AttributeKey[WatchState](
-      "watch state", "Internal: tracks state for continuous execution.")
-  val Configuration = AttributeKey[Watched](
-      "watched-configuration", "Configures continuous execution.")
+      "watch state",
+      "Internal: tracks state for continuous execution.")
+  val Configuration = AttributeKey[Watched]("watched-configuration",
+                                            "Configures continuous execution.")
 }

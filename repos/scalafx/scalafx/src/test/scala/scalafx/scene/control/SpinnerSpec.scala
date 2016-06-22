@@ -39,5 +39,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class SpinnerSpec[T]
     extends SimpleSFXDelegateSpec[jfxsc.Spinner[T], Spinner[T]](
-        classOf[jfxsc.Spinner[T]], classOf[Spinner[T]])
+        classOf[jfxsc.Spinner[T]],
+        classOf[Spinner[T]])
     with RunOnApplicationThread

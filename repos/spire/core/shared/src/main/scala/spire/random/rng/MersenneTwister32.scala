@@ -35,8 +35,8 @@ import java.util.Arrays
   * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
   * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
   */
-final class MersenneTwister32 protected[random](
-    mt: Array[Int], mti0: Int = 625)
+final class MersenneTwister32 protected[random] (mt: Array[Int],
+                                                 mti0: Int = 625)
     extends IntBasedGenerator {
   // N + 1 == 625
 
@@ -107,10 +107,8 @@ final class MersenneTwister32 protected[random](
 object MersenneTwister32
     extends GeneratorCompanion[MersenneTwister32, (Array[Int], Int)] {
 
-  @inline private val UpperMask =
-    0x80000000 // = Int.MinValue = 0xFFFFFFFF ^ Int.MaxValue
-  @inline private val LowerMask =
-    0x7FFFFFFF // = Int.MaxValue = 0xFFFFFFFF ^ Int.MinValue
+  @inline private val UpperMask = 0x80000000 // = Int.MinValue = 0xFFFFFFFF ^ Int.MaxValue
+  @inline private val LowerMask = 0x7FFFFFFF // = Int.MaxValue = 0xFFFFFFFF ^ Int.MinValue
 
   @inline private val N = 624
   @inline private val M = 397

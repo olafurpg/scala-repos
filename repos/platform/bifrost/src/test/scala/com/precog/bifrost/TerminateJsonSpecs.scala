@@ -38,8 +38,7 @@ class TerminateJsonSpecs extends Specification {
   }
 
   def chunkAndParse(partialJson: String) = {
-    val stream = StreamT.fromStream(
-        Need {
+    val stream = StreamT.fromStream(Need {
       partialJson.toStream.map { c =>
         CharBuffer.wrap(c.toString)
       }

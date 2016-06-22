@@ -191,8 +191,9 @@ private[parser] trait CommonRules {
     `challenge-or-credentials` ~> { (scheme, params) ⇒
       val (realms, otherParams) =
         params.partition(_._1 equalsIgnoreCase "realm")
-      HttpChallenge(
-          scheme, realms.headOption.map(_._2).getOrElse(""), otherParams.toMap)
+      HttpChallenge(scheme,
+                    realms.headOption.map(_._2).getOrElse(""),
+                    otherParams.toMap)
     }
   }
 
@@ -350,7 +351,8 @@ private[parser] trait CommonRules {
   }
 
   def `origin-list` = rule {
-    oneOrMore(capture(oneOrMore(VCHAR)) ~> (HttpOrigin(_))).separatedBy(SP) ~ OWS // offload to URL parser
+    oneOrMore(capture(oneOrMore(VCHAR)) ~> (HttpOrigin(_)))
+      .separatedBy(SP) ~ OWS // offload to URL parser
   }
 
   // ******************************************************************************************
@@ -430,7 +432,7 @@ private[parser] trait CommonRules {
   def `product-or-comment` =
     rule(
         product ~ comment ~> (ProductVersion(_, _, sb.toString)) | product ~>
-        (ProductVersion(_, _)) | comment ~ push(
+          (ProductVersion(_, _)) | comment ~ push(
             ProductVersion("", "", sb.toString)))
 
   def products = rule {
@@ -471,7 +473,7 @@ private[parser] trait CommonRules {
   def digit4 = rule {
     DIGIT ~ DIGIT ~ DIGIT ~ DIGIT ~ push(
         digitInt(charAt(-4)) * 1000 + digitInt(charAt(-3)) * 100 +
-        digitInt(charAt(-2)) * 10 + digitInt(lastChar))
+          digitInt(charAt(-2)) * 10 + digitInt(lastChar))
   }
 
   def ws(c: Char) = rule { c ~ OWS }
@@ -485,7 +487,8 @@ private[parser] trait CommonRules {
 
   // parses a potentially long series of digits and extracts its Long value capping at 999,999,999,999,999,999 in case of overflows
   def longNumberCapped =
-    rule((capture((1 to 18).times(DIGIT)) ~ !DIGIT ~> (_.toLong) | oneOrMore(
+    rule(
+        (capture((1 to 18).times(DIGIT)) ~ !DIGIT ~> (_.toLong) | oneOrMore(
                 DIGIT) ~ push(999999999999999999L)) ~ OWS)
 
   private def digitInt(c: Char): Int = c - '0'
@@ -501,7 +504,7 @@ private[parser] trait CommonRules {
     if (dt.weekday != wkday)
       throw ParsingException(
           s"Illegal weekday in date $dt: is '${DateTime.weekday(wkday)}' but " +
-          s"should be '${DateTime.weekday(dt.weekday)}'")
+            s"should be '${DateTime.weekday(dt.weekday)}'")
     dt
   }
 

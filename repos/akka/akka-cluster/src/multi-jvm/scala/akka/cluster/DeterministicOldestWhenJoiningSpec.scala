@@ -21,7 +21,8 @@ object DeterministicOldestWhenJoiningMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(ConfigFactory.parseString(
+                """
     # not too quick to trigger problematic scenario more often
     akka.cluster.leader-actions-interval = 2000 ms
     akka.cluster.gossip-interval = 500 ms

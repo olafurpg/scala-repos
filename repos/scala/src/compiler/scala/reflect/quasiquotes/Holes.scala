@@ -4,7 +4,7 @@ package quasiquotes
 import scala.reflect.internal.Flags._
 import scala.reflect.macros.TypecheckException
 
-class Rank private[Rank](val value: Int) extends AnyVal {
+class Rank private[Rank] (val value: Int) extends AnyVal {
   def pred = { assert(value - 1 >= 0); new Rank(value - 1) }
   def succ = new Rank(value + 1)
   override def toString = if (value == 0) "no dots" else "." * (value + 1)
@@ -40,7 +40,7 @@ trait Holes { self: Quasiquotes =>
   private def isLiftableType(tpe: Type) = inferLiftable(tpe) != EmptyTree
   private def isNativeType(tpe: Type) =
     (tpe <:< treeType) || (tpe <:< nameType) || (tpe <:< modsType) ||
-    (tpe <:< flagsType) || (tpe <:< symbolType)
+      (tpe <:< flagsType) || (tpe <:< symbolType)
   private def isBottomType(tpe: Type) =
     tpe <:< NothingClass.tpe || tpe <:< NullClass.tpe
   private def extractIterableTParam(tpe: Type) =
@@ -57,8 +57,8 @@ trait Holes { self: Quasiquotes =>
   private def iterableTypeFromRank(n: Rank, tpe: Type): Type = {
     if (n == NoDot) tpe
     else
-      appliedType(
-          IterableClass.toType, List(iterableTypeFromRank(n.pred, tpe)))
+      appliedType(IterableClass.toType,
+                  List(iterableTypeFromRank(n.pred, tpe)))
   }
 
   /** Hole encapsulates information about unquotees in quasiquotes.
@@ -80,8 +80,8 @@ trait Holes { self: Quasiquotes =>
 
   class ApplyHole(annotatedRank: Rank, unquotee: Tree) extends Hole {
     val (strippedTpe, tpe): (Type, Type) = {
-      val (strippedRank, strippedTpe) = stripIterable(
-          unquotee.tpe, limit = annotatedRank)
+      val (strippedRank, strippedTpe) =
+        stripIterable(unquotee.tpe, limit = annotatedRank)
       if (isBottomType(strippedTpe)) cantSplice()
       else if (isNativeType(strippedTpe)) {
         if (strippedRank != NoDot && !(strippedTpe <:< treeType) &&
@@ -118,7 +118,7 @@ trait Holes { self: Quasiquotes =>
       val rankSuggestion = if (suggestRank) unquoteeRankMsg else ""
       val suggestLifting =
         (annotatedRank == NoDot || iterableRank != NoDot) &&
-        !(iterableType <:< treeType) && !isLiftableType(iterableType)
+          !(iterableType <:< treeType) && !isLiftableType(iterableType)
       val liftedTpe =
         if (annotatedRank != NoDot) iterableType else unquotee.tpe
       val liftSuggestion =

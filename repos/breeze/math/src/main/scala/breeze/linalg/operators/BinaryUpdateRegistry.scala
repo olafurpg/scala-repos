@@ -75,7 +75,8 @@ trait BinaryUpdateRegistry[A <: AnyRef, B, Op <: OpType]
   }
 
   def register[AA <: A, BB <: B](op: InPlaceImpl2[Op, AA, BB])(
-      implicit cA: ClassTag[AA], cB: ClassTag[BB]) {
+      implicit cA: ClassTag[AA],
+      cB: ClassTag[BB]) {
     super.register(cA.runtimeClass, cB.runtimeClass, op)
   }
 }

@@ -189,15 +189,15 @@ private[simul] final class SimulApi(system: ActorSystem,
         .withId(pairing.gameId)
         .start
       _ ← (GameRepo insertDenormalized game2) >>- onGameStart(game2.id) >>- sendTo(
-             simul.id, actorApi.StartGame(game2, simul.hostId))
+             simul.id,
+             actorApi.StartGame(game2, simul.hostId))
     } yield game2 -> hostColor
 
   private def update(simul: Simul) =
     repo.update(simul) >>- socketReload(simul.id) >>- publish()
 
-  private def WithSimul(
-      finding: Simul.ID => Fu[Option[Simul]], simulId: Simul.ID)(
-      updating: Simul => Simul) {
+  private def WithSimul(finding: Simul.ID => Fu[Option[Simul]],
+                        simulId: Simul.ID)(updating: Simul => Simul) {
     Sequence(simulId) {
       finding(simulId) flatMap {
         _ ?? { simul =>
@@ -213,14 +213,14 @@ private[simul] final class SimulApi(system: ActorSystem,
 
   private object publish {
     private val siteMessage = SendToFlag("simul", Json.obj("t" -> "reload"))
-    private val debouncer = system.actorOf(
-        Props(new Debouncer(2 seconds, { (_: Debouncer.Nothing) =>
-      site ! siteMessage
-      repo.allCreated foreach { simuls =>
-        renderer ? actorApi.SimulTable(simuls) map {
-          case view: play.twirl.api.Html => ReloadSimuls(view.body)
-        } pipeToSelection lobby
-      }
+    private val debouncer = system.actorOf(Props(new Debouncer(2 seconds, {
+      (_: Debouncer.Nothing) =>
+        site ! siteMessage
+        repo.allCreated foreach { simuls =>
+          renderer ? actorApi.SimulTable(simuls) map {
+            case view: play.twirl.api.Html => ReloadSimuls(view.body)
+          } pipeToSelection lobby
+        }
     })))
     def apply() { debouncer ! Debouncer.Nothing }
   }

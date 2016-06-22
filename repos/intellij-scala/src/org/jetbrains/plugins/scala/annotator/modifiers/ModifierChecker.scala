@@ -32,8 +32,9 @@ private[annotator] object ModifierChecker {
     val modifiersSet = new mutable.HashSet[String]
     def checkDublicates(element: PsiElement, text: String): Boolean =
       checkDublicate(element, text, withPrivate = false)
-    def checkDublicate(
-        element: PsiElement, text: String, withPrivate: Boolean): Boolean = {
+    def checkDublicate(element: PsiElement,
+                       text: String,
+                       withPrivate: Boolean): Boolean = {
       val illegalCombinations = Array[(String, String)](
           ("final", "sealed"),
           if (withPrivate) ("final", "private") else ("", ""),
@@ -41,8 +42,8 @@ private[annotator] object ModifierChecker {
           if (withPrivate) ("private", "override") else ("", "")
       )
       for ((bad1, bad2) <- illegalCombinations if (bad1 == text &&
-               owner.hasModifierPropertyScala(bad2)) ||
-           (bad2 == text && owner.hasModifierPropertyScala(bad1))) {
+                 owner.hasModifierPropertyScala(bad2)) ||
+             (bad2 == text && owner.hasModifierPropertyScala(bad1))) {
         proccessError(
             ScalaBundle.message("illegal.modifiers.combination", bad1, bad2),
             element,
@@ -123,11 +124,11 @@ private[annotator] object ModifierChecker {
                   }
                 case e: ScMember
                     if e.getParent.isInstanceOf[ScTemplateBody] ||
-                    e.getParent.isInstanceOf[ScEarlyDefinitions] =>
+                      e.getParent.isInstanceOf[ScEarlyDefinitions] =>
                   val redundant = (e.containingClass, e) match {
                     case (obj: ScObject, valMember: ScPatternDefinition)
                         if valMember.typeElement.isEmpty &&
-                        valMember.pList.allPatternsSimple =>
+                          valMember.pList.allPatternsSimple =>
                       false // SCL-899
                     case (cls, _) if cls.hasFinalModifier => true
                     case _ => false
@@ -193,7 +194,7 @@ private[annotator] object ModifierChecker {
                   }
                 case member: ScMember
                     if !member.isInstanceOf[ScTemplateBody] &&
-                    member.getParent.isInstanceOf[ScTemplateBody] =>
+                      member.getParent.isInstanceOf[ScTemplateBody] =>
                   // 'abstract override' modifier only allowed for members of traits
                   if (!member.containingClass.isInstanceOf[ScTrait] &&
                       owner.hasModifierProperty("override")) {
@@ -224,7 +225,7 @@ private[annotator] object ModifierChecker {
                       new RemoveModifierQuickFix(owner, "override"))
                 case member: ScMember
                     if member.getParent.isInstanceOf[ScTemplateBody] ||
-                    member.getParent.isInstanceOf[ScEarlyDefinitions] =>
+                      member.getParent.isInstanceOf[ScEarlyDefinitions] =>
                   checkDublicates(modifierPsi, "override")
                 case param: ScClassParameter =>
                   checkDublicates(modifierPsi, "override")
@@ -257,7 +258,7 @@ private[annotator] object ModifierChecker {
                         def errorResult() {
                           proccessError(
                               "implicit class must have a primary constructor with exactly one " +
-                              "argument in first parameter list",
+                                "argument in first parameter list",
                               modifierPsi,
                               holder,
                               new RemoveModifierQuickFix(owner, "implicit"))

@@ -197,13 +197,14 @@ trait Instructions {
     }
 
     trait EqualityOperation extends BinaryOperation {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JType.JUniverseT, JBooleanT)
+      val tpe =
+        BinaryOperationType(JType.JUniverseT, JType.JUniverseT, JBooleanT)
     }
 
     trait UnfixedBinaryOperation extends BinaryOperation {
-      val tpe = BinaryOperationType(
-          JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
+      val tpe = BinaryOperationType(JType.JUniverseT,
+                                    JType.JUniverseT,
+                                    JType.JUniverseT)
     }
 
     case class BuiltInFunction1Op(op: Op1) extends UnaryOperation {
@@ -256,12 +257,12 @@ trait Instructions {
     }
 
     case object JoinObject extends BinaryOperation {
-      val tpe = BinaryOperationType(
-          JObjectUnfixedT, JObjectUnfixedT, JObjectUnfixedT)
+      val tpe =
+        BinaryOperationType(JObjectUnfixedT, JObjectUnfixedT, JObjectUnfixedT)
     }
     case object JoinArray extends BinaryOperation {
-      val tpe = BinaryOperationType(
-          JArrayUnfixedT, JArrayUnfixedT, JArrayUnfixedT)
+      val tpe =
+        BinaryOperationType(JArrayUnfixedT, JArrayUnfixedT, JArrayUnfixedT)
     }
 
     case object ArraySwap extends BinaryOperation {

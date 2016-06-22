@@ -103,7 +103,7 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
 
   require(values.length == index.length,
           "Values length %d != index length %d" format
-          (values.length, index.length))
+            (values.length, index.length))
 
   /**
     * The length shared by both the index and the values array
@@ -290,8 +290,8 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
     * @tparam U type of other Series Values
     * @tparam V type of resulting Series values
     */
-  def concat[U, V](other: Series[X, U])(
-      implicit pro: Promoter[T, U, V], md: ST[V]): Series[X, V] =
+  def concat[U, V](other: Series[X, U])(implicit pro: Promoter[T, U, V],
+                                        md: ST[V]): Series[X, V] =
     Series(values concat other.values, index concat other.index)
 
   /**
@@ -713,23 +713,19 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
     val cix = rgt.uniques
 
     val grpr = IndexGrouper(rgt, sorted = false)
-    val grps =
-      grpr.groups // Group by pivot label. Each unique label will get its
+    val grps = grpr.groups // Group by pivot label. Each unique label will get its
     //  own column
     if (length == 0) Frame.empty[O1, O2, T]
     else {
       var loc = 0
-      val result =
-        Array.ofDim[Vec[T]](cix.length) // accumulates result columns
+      val result = Array.ofDim[Vec[T]](cix.length) // accumulates result columns
 
       for ((k, taker) <- grps) {
         // For each pivot label grouping,
         val gIdx = lft.take(taker) //   use group's (lft) row index labels
         val ixer = rix.join(gIdx) //   to compute map to final (rix) locations;
-        val vals =
-          values.take(taker) // Take values corresponding to current pivot label
-        val v =
-          ixer.rTake.map(vals.take(_)).getOrElse(vals) //   map values to be in correspondence to rix
+        val vals = values.take(taker) // Take values corresponding to current pivot label
+        val v = ixer.rTake.map(vals.take(_)).getOrElse(vals) //   map values to be in correspondence to rix
         result(loc) = v //   and save resulting col vec in array.
         loc += 1 // Increment offset into result array
       }
@@ -772,8 +768,8 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
     * @param other Series to join with
     * @param how How to perform the join
     */
-  def hjoin(
-      other: Series[X, _], how: JoinType = LeftJoin): Frame[X, Int, Any] = {
+  def hjoin(other: Series[X, _],
+            how: JoinType = LeftJoin): Frame[X, Int, Any] = {
     val indexer = this.index.join(other.index, how)
     val lft = indexer.lTake.map(this.values.take(_)) getOrElse this.values
     val rgt = indexer.rTake.map(other.values.take(_)) getOrElse other.values
@@ -790,11 +786,11 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
     * @param other Frame[X, Any, T]
     * @param how How to perform the join
     */
-  def joinF(
-      other: Frame[X, _, T], how: JoinType = LeftJoin): Frame[X, Int, T] = {
+  def joinF(other: Frame[X, _, T],
+            how: JoinType = LeftJoin): Frame[X, Int, T] = {
     val tmpFrame = other.joinS(this, how)
-    Frame(tmpFrame.values.last +: tmpFrame.values.slice(
-              0, tmpFrame.values.length - 1),
+    Frame(tmpFrame.values.last +: tmpFrame.values
+            .slice(0, tmpFrame.values.length - 1),
           tmpFrame.rowIx,
           IndexIntRange(other.colIx.length + 1))
   }
@@ -809,11 +805,11 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
     * @param other Frame[X, Any, Any]
     * @param how How to perform the join
     */
-  def hjoinF(
-      other: Frame[X, _, _], how: JoinType = LeftJoin): Frame[X, Int, Any] = {
+  def hjoinF(other: Frame[X, _, _],
+             how: JoinType = LeftJoin): Frame[X, Int, Any] = {
     val tmpFrame = other.joinAnyS(this, how)
-    Panel(tmpFrame.values.last +: tmpFrame.values.slice(
-              0, tmpFrame.values.length - 1),
+    Panel(tmpFrame.values.last +: tmpFrame.values
+            .slice(0, tmpFrame.values.length - 1),
           tmpFrame.rowIx,
           IndexIntRange(other.colIx.length + 1))
   }
@@ -903,11 +899,10 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
         val vls = isca.strList(index.raw(r))
         val lst = for ((i, l, v) <- enumZip(ilens, vls)) yield {
           val fmt = "%" + l + "s"
-          val res =
-            if (i == vls.length - 1 || prevRowLabels(i) != v) {
-              resetRowLabels(i + 1)
-              v.formatted(fmt)
-            } else "".formatted(fmt)
+          val res = if (i == vls.length - 1 || prevRowLabels(i) != v) {
+            resetRowLabels(i + 1)
+            v.formatted(fmt)
+          } else "".formatted(fmt)
           prevRowLabels(i) = v
           res
         }
@@ -917,9 +912,8 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
       def createVal(r: Int) =
         ("%" + vlen + "s\n").format(vsca.show(values.raw(r)))
 
-      buf.append(
-          util.buildStr(
-              len, length, (i: Int) => createIx(i) + " -> " + createVal(i), {
+      buf.append(util.buildStr(len, length, (i: Int) =>
+                createIx(i) + " -> " + createVal(i), {
         resetRowLabels(0); " ... \n"
       }))
     }
@@ -941,7 +935,7 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
   override def equals(other: Any): Boolean = other match {
     case s: Series[_, _] =>
       (this eq s) || (length == s.length) && index == s.index &&
-      values == s.values
+        values == s.values
     case _ => false
   }
 
@@ -1044,6 +1038,6 @@ object Series extends BinOpSeries {
     * @tparam X Type of key
     */
   def apply[X: ST: ORD, T: ST](values: (X, T)*): Series[X, T] =
-    new Series[X, T](
-        Vec(values.map(_._2).toArray), Index(values.map(_._1).toArray))
+    new Series[X, T](Vec(values.map(_._2).toArray),
+                     Index(values.map(_._1).toArray))
 }

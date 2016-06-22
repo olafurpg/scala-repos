@@ -17,8 +17,9 @@ import scala.collection.mutable
 /**
   * @author Alexander Podkhalyuzin
   */
-final class ScalaCallerMethodsTreeStructure(
-    project: Project, method: PsiMethod, scopeType: String)
+final class ScalaCallerMethodsTreeStructure(project: Project,
+                                            method: PsiMethod,
+                                            scopeType: String)
     extends HierarchyTreeStructure(
         project,
         new CallHierarchyNodeDescriptor(project, null, method, true, false)) {
@@ -58,8 +59,10 @@ final class ScalaCallerMethodsTreeStructure(
         .forEach(new Processor[PsiReference] {
           def process(reference: PsiReference): Boolean = {
             val element: PsiElement = reference.getElement
-            val key: PsiMember = PsiTreeUtil.getNonStrictParentOfType(
-                element, classOf[PsiMethod], classOf[PsiClass])
+            val key: PsiMember =
+              PsiTreeUtil.getNonStrictParentOfType(element,
+                                                   classOf[PsiMethod],
+                                                   classOf[PsiClass])
             methodToDescriptorMap synchronized {
               var d: CallHierarchyNodeDescriptor =
                 methodToDescriptorMap.get(key) match {
@@ -69,8 +72,11 @@ final class ScalaCallerMethodsTreeStructure(
                     }
                     call
                   case _ =>
-                    val newD = new CallHierarchyNodeDescriptor(
-                        myProject, descriptor, element, false, true)
+                    val newD = new CallHierarchyNodeDescriptor(myProject,
+                                                               descriptor,
+                                                               element,
+                                                               false,
+                                                               true)
                     methodToDescriptorMap.put(key, newD)
                     newD
                 }

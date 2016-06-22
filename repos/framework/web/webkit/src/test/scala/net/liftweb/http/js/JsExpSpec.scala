@@ -36,7 +36,7 @@ object JsExpSpec extends Specification {
       val json = ("a" -> 4) ~ ("b" -> 44)
 
       JE.JsArray(json, "dog").toJsCmd must_==
-        ("""[{"a":4,"b":44}, "dog"]""" + "\n")
+      ("""[{"a":4,"b":44}, "dog"]""" + "\n")
     }
 
     "Implicitly convert from Numeric types" in {

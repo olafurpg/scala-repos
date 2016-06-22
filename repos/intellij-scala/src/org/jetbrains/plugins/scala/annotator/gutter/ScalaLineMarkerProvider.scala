@@ -82,8 +82,8 @@ class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
       def getParent: PsiElement = {
         var e = element
         def test(x: PsiElement) = x match {
-          case _: ScFunction | _: ScValue |
-              _: ScVariable | _: ScTypeDefinition | _: ScTypeAlias =>
+          case _: ScFunction | _: ScValue | _: ScVariable |
+              _: ScTypeDefinition | _: ScTypeAlias =>
             true
           case _ => false
         }
@@ -130,8 +130,9 @@ class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
             case v: ScDeclaredElementsHolder => v.declaredElements
             case _ => return null
           }
-          for (z <- bindings) signatures ++=
-            ScalaPsiUtil.superValsSignatures(z, withSelfType = true)
+          for (z <- bindings)
+            signatures ++=
+              ScalaPsiUtil.superValsSignatures(z, withSelfType = true)
           val icon =
             if (GutterUtil.isOverrides(x, signatures)) OVERRIDING_METHOD_ICON
             else IMPLEMENTING_METHOD_ICON
@@ -263,7 +264,7 @@ private object GutterUtil {
       members: ArrayBuffer[PsiElement],
       result: util.Collection[LineMarkerInfo[_ <: PsiElement]]) {
     for (member <- members if !member.isInstanceOf[PsiMethod] ||
-         !member.asInstanceOf[PsiMethod].isConstructor) {
+           !member.asInstanceOf[PsiMethod].isConstructor) {
       ProgressManager.checkCanceled()
       val offset = member.getTextOffset
       val members = member match {
@@ -273,9 +274,10 @@ private object GutterUtil {
         case _ => Array[PsiNamedElement]()
       }
       val overrides = new ArrayBuffer[PsiNamedElement]
-      for (member <- members) overrides ++=
-        ScalaOverridingMemberSearcher.search(
-          member, deep = false, withSelfType = true)
+      for (member <- members)
+        overrides ++=
+          ScalaOverridingMemberSearcher
+            .search(member, deep = false, withSelfType = true)
       if (overrides.nonEmpty) {
         val icon =
           if (!GutterUtil.isAbstract(member)) OVERRIDEN_METHOD_MARKER_RENDERER

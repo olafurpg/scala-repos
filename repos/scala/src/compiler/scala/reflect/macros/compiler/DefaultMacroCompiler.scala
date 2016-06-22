@@ -20,8 +20,8 @@ abstract class DefaultMacroCompiler
   val macroDdef: DefDef
   lazy val macroDef = macroDdef.symbol
 
-  case class MacroImplRefCompiler(
-      untypedMacroImplRef: Tree, isImplBundle: Boolean)
+  case class MacroImplRefCompiler(untypedMacroImplRef: Tree,
+                                  isImplBundle: Boolean)
       extends Resolver
       with Validator
       with Error
@@ -53,8 +53,8 @@ abstract class DefaultMacroCompiler
         case ex: MacroImplResolutionException => scala.util.Failure(ex)
       }
     }
-    val vanillaImplRef = MacroImplRefCompiler(
-        macroDdef.rhs.duplicate, isImplBundle = false)
+    val vanillaImplRef =
+      MacroImplRefCompiler(macroDdef.rhs.duplicate, isImplBundle = false)
     val (maybeBundleRef, methName, targs) = macroDdef.rhs.duplicate match {
       case Applied(
           Select(Applied(RefTree(qual, bundleName), _, Nil), methName),

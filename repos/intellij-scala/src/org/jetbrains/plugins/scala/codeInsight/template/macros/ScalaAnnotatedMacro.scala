@@ -36,8 +36,8 @@ class ScalaAnnotatedMacro extends Macro {
     }
   }
 
-  override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(params: Array[Expression],
+                               context: ExpressionContext): Result = {
     Option(getAnnotatedMembers(params, context).findFirst())
       .map(member =>
             new TextResult(member match {
@@ -52,8 +52,8 @@ class ScalaAnnotatedMacro extends Macro {
   override def getPresentableName: String =
     MacroUtil.scalaPresentablePrefix + "annotated(\"annotation qname\")"
 
-  override def calculateQuickResult(
-      params: Array[Expression], context: ExpressionContext): Result =
+  override def calculateQuickResult(params: Array[Expression],
+                                    context: ExpressionContext): Result =
     calculateResult(params, context)
 
   override def calculateLookupItems(

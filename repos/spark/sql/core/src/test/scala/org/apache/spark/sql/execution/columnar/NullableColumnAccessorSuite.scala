@@ -24,8 +24,8 @@ import org.apache.spark.sql.catalyst.CatalystTypeConverters
 import org.apache.spark.sql.catalyst.expressions.{GenericMutableRow, UnsafeProjection}
 import org.apache.spark.sql.types._
 
-class TestNullableColumnAccessor[JvmType](
-    buffer: ByteBuffer, columnType: ColumnType[JvmType])
+class TestNullableColumnAccessor[JvmType](buffer: ByteBuffer,
+                                          columnType: ColumnType[JvmType])
     extends BasicColumnAccessor(buffer, columnType)
     with NullableColumnAccessor
 
@@ -88,7 +88,8 @@ class NullableColumnAccessorSuite extends SparkFunSuite {
       (0 until 4).foreach { _ =>
         assert(accessor.hasNext)
         accessor.extractTo(row, 0)
-        assert(converter(row.get(0, columnType.dataType)) === converter(
+        assert(
+            converter(row.get(0, columnType.dataType)) === converter(
                 randomRow.get(0, columnType.dataType)))
 
         assert(accessor.hasNext)

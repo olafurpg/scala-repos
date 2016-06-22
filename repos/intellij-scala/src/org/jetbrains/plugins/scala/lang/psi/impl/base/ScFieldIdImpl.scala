@@ -19,8 +19,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 /**
   * @author ilyas
   */
-class ScFieldIdImpl private (
-    stub: StubElement[ScFieldId], nodeType: IElementType, node: ASTNode)
+class ScFieldIdImpl private (stub: StubElement[ScFieldId],
+                             nodeType: IElementType,
+                             node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScFieldId
     with ScImportableDeclarationsOwner {

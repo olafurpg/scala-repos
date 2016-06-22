@@ -371,8 +371,9 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
                 // If there's a content length, send that, otherwise return the body chunked
                 response.headers.get("Content-Length") match {
                   case Some(Seq(length)) =>
-                    Ok.sendEntity(HttpEntity.Streamed(
-                            body, Some(length.toLong), Some(contentType)))
+                    Ok.sendEntity(HttpEntity.Streamed(body,
+                                                      Some(length.toLong),
+                                                      Some(contentType)))
                   case _ =>
                     Ok.chunked(body).as(contentType)
                 }
@@ -517,7 +518,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
       import play.api.libs.ws._
 
       val configuration =
-        Configuration.reference ++ Configuration(ConfigFactory.parseString("""
+        Configuration.reference ++ Configuration(
+            ConfigFactory.parseString("""
           |ws.followRedirects = true
         """.stripMargin))
 
@@ -527,7 +529,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
       val logging = new AsyncHttpClientConfig.AdditionalChannelInitializer() {
         override def initChannel(channel: io.netty.channel.Channel): Unit = {
           channel.pipeline.addFirst(
-              "log", new io.netty.handler.logging.LoggingHandler("debug"))
+              "log",
+              new io.netty.handler.logging.LoggingHandler("debug"))
         }
       }
       val ahcBuilder = builder.configure()

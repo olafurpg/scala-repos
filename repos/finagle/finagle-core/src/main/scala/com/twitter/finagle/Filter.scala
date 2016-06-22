@@ -154,8 +154,8 @@ object Filter {
         override def toString() = factory.toString()
       }
 
-    def apply(
-        request: ReqIn, service: Service[ReqOut, RepIn]): Future[RepOut] =
+    def apply(request: ReqIn,
+              service: Service[ReqOut, RepIn]): Future[RepOut] =
       build(service)(request)
   }
 

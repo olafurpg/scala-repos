@@ -16,10 +16,12 @@ class HoconLanguageCodeStyleSettingsProvider
   private val ObjectFieldsWithColonWrap = "Object fields with ':'"
   private val ObjectFieldsWithAssignmentWrap = "Object fields with '=' or '+='"
 
-  override def customizeSettings(
-      consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType) {
-    def showCustomOption(
-        name: String, title: String, group: String, options: AnyRef*) =
+  override def customizeSettings(consumer: CodeStyleSettingsCustomizable,
+                                 settingsType: SettingsType) {
+    def showCustomOption(name: String,
+                         title: String,
+                         group: String,
+                         options: AnyRef*) =
       consumer.showCustomOption(classOf[HoconCustomCodeStyleSettings],
                                 name,
                                 title,
@@ -42,16 +44,18 @@ class HoconLanguageCodeStyleSettingsProvider
                 SPACE_AFTER_COMMA
             ).map(_.name): _*)
 
-        consumer.renameStandardOption(
-            SPACE_WITHIN_BRACES.name, "Object braces")
+        consumer
+          .renameStandardOption(SPACE_WITHIN_BRACES.name, "Object braces")
         consumer.renameStandardOption(
             SPACE_WITHIN_METHOD_CALL_PARENTHESES.name,
             "Include qualifier parentheses")
 
-        showCustomOption(
-            "SPACE_BEFORE_COLON", "Before colon", SPACES_AROUND_OPERATORS)
-        showCustomOption(
-            "SPACE_AFTER_COLON", "After colon", SPACES_AROUND_OPERATORS)
+        showCustomOption("SPACE_BEFORE_COLON",
+                         "Before colon",
+                         SPACES_AROUND_OPERATORS)
+        showCustomOption("SPACE_AFTER_COLON",
+                         "After colon",
+                         SPACES_AROUND_OPERATORS)
         showCustomOption("SPACE_BEFORE_ASSIGNMENT",
                          "Before assignment ('=' and '+=')",
                          SPACES_AROUND_OPERATORS)
@@ -78,25 +82,35 @@ class HoconLanguageCodeStyleSettingsProvider
                          "Double slash comments at first column",
                          WRAPPING_KEEP)
 
-        showCustomOption(
-            "OBJECTS_WRAP", ObjectsWrap, null, WRAP_OPTIONS, WRAP_VALUES)
+        showCustomOption("OBJECTS_WRAP",
+                         ObjectsWrap,
+                         null,
+                         WRAP_OPTIONS,
+                         WRAP_VALUES)
         showCustomOption("OBJECTS_ALIGN_WHEN_MULTILINE",
                          "Align when multiline",
                          ObjectsWrap)
-        showCustomOption(
-            "OBJECTS_NEW_LINE_AFTER_LBRACE", "New line after '{'", ObjectsWrap)
+        showCustomOption("OBJECTS_NEW_LINE_AFTER_LBRACE",
+                         "New line after '{'",
+                         ObjectsWrap)
         showCustomOption("OBJECTS_RBRACE_ON_NEXT_LINE",
                          "Place '}' on new line",
                          ObjectsWrap)
 
-        showCustomOption(
-            "LISTS_WRAP", ListsWrap, null, WRAP_OPTIONS, WRAP_VALUES)
-        showCustomOption(
-            "LISTS_ALIGN_WHEN_MULTILINE", "Align when multiline", ListsWrap)
-        showCustomOption(
-            "LISTS_NEW_LINE_AFTER_LBRACKET", "New line after '['", ListsWrap)
-        showCustomOption(
-            "LISTS_RBRACKET_ON_NEXT_LINE", "Place ']' on new line", ListsWrap)
+        showCustomOption("LISTS_WRAP",
+                         ListsWrap,
+                         null,
+                         WRAP_OPTIONS,
+                         WRAP_VALUES)
+        showCustomOption("LISTS_ALIGN_WHEN_MULTILINE",
+                         "Align when multiline",
+                         ListsWrap)
+        showCustomOption("LISTS_NEW_LINE_AFTER_LBRACKET",
+                         "New line after '['",
+                         ListsWrap)
+        showCustomOption("LISTS_RBRACKET_ON_NEXT_LINE",
+                         "Place ']' on new line",
+                         ListsWrap)
 
         showCustomOption("OBJECT_FIELDS_WITH_COLON_WRAP",
                          ObjectFieldsWithColonWrap,
@@ -123,14 +137,18 @@ class HoconLanguageCodeStyleSettingsProvider
                          WRAP_VALUES_FOR_SINGLETON)
 
       case BLANK_LINES_SETTINGS =>
-        showCustomOption(
-            "KEEP_BLANK_LINES_IN_OBJECTS", "In objects", BLANK_LINES_KEEP)
-        showCustomOption(
-            "KEEP_BLANK_LINES_BEFORE_RBRACE", "Before '}'", BLANK_LINES_KEEP)
-        showCustomOption(
-            "KEEP_BLANK_LINES_IN_LISTS", "In lists", BLANK_LINES_KEEP)
-        showCustomOption(
-            "KEEP_BLANK_LINES_BEFORE_RBRACKET", "Before ']'", BLANK_LINES_KEEP)
+        showCustomOption("KEEP_BLANK_LINES_IN_OBJECTS",
+                         "In objects",
+                         BLANK_LINES_KEEP)
+        showCustomOption("KEEP_BLANK_LINES_BEFORE_RBRACE",
+                         "Before '}'",
+                         BLANK_LINES_KEEP)
+        showCustomOption("KEEP_BLANK_LINES_IN_LISTS",
+                         "In lists",
+                         BLANK_LINES_KEEP)
+        showCustomOption("KEEP_BLANK_LINES_BEFORE_RBRACKET",
+                         "Before ']'",
+                         BLANK_LINES_KEEP)
 
       case _ =>
     }

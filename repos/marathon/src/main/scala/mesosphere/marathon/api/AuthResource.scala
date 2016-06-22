@@ -31,10 +31,10 @@ trait AuthResource extends RestResource {
     }
   }
 
-  def checkAuthorization[T](action: AuthorizedAction[T],
-                            maybeResource: Option[T],
-                            ifNotExists: Exception)(
-      implicit identity: Identity): Unit = {
+  def checkAuthorization[T](
+      action: AuthorizedAction[T],
+      maybeResource: Option[T],
+      ifNotExists: Exception)(implicit identity: Identity): Unit = {
     maybeResource match {
       case Some(resource) => checkAuthorization(action, resource)
       case None => throw ifNotExists
@@ -43,8 +43,8 @@ trait AuthResource extends RestResource {
 
   def withAuthorization[A, B >: A](action: AuthorizedAction[B],
                                    maybeResource: Option[A],
-                                   ifNotExists: Response)(
-      fn: A => Response)(implicit identity: Identity): Response = {
+                                   ifNotExists: Response)(fn: A => Response)(
+      implicit identity: Identity): Response = {
     maybeResource match {
       case Some(resource) =>
         checkAuthorization(action, resource)

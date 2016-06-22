@@ -136,8 +136,8 @@ class SubexpressionEliminationSuite extends SparkFunSuite {
     val tax = Literal(0.1)
     equivalence.addExprTree(quantity, false)
     equivalence.addExprTree(price, false)
-    equivalence.addExprTree(
-        Multiply(price, Subtract(Literal(1), discount)), false)
+    equivalence.addExprTree(Multiply(price, Subtract(Literal(1), discount)),
+                            false)
     equivalence.addExprTree(
         Multiply(Multiply(price, Subtract(Literal(1), discount)),
                  Add(Literal(1), tax)),

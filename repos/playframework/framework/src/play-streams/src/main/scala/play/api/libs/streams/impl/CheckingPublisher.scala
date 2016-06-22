@@ -24,14 +24,15 @@ private[streams] abstract class CheckingPublisher[T] extends Publisher[T] {
 
   // Streams method
   final override def subscribe(subr: Subscriber[_ >: T]): Unit = {
-    val handle: SubscriptionHandle[_] = createSubscription(
-        subr, removeSubscription)
+    val handle: SubscriptionHandle[_] =
+      createSubscription(subr, removeSubscription)
 
     @tailrec
     def addSubscription(): Unit = {
       val oldSubscriptions = subscriptions.get
       if (oldSubscriptions.exists(s => (s.subscriber eq subr) && s.isActive)) {
-        subr.onError(new IllegalStateException(
+        subr.onError(
+            new IllegalStateException(
                 "Subscriber is already subscribed to this Publisher"))
       } else {
         val newSubscriptions: List[SubscriptionHandle[_]] =

@@ -117,10 +117,8 @@ abstract class SymbolPairs {
     */
   abstract class Cursor(val base: Symbol) { cursor =>
 
-    final val self =
-      base.thisType // The type relative to which symbols are seen.
-    private val decls =
-      newScope // all the symbols which can take part in a pair.
+    final val self = base.thisType // The type relative to which symbols are seen.
+    private val decls = newScope // all the symbols which can take part in a pair.
     private val size = bases.length
 
     /** A symbol for which exclude returns true will not appear as
@@ -228,8 +226,9 @@ abstract class SymbolPairs {
 
     /** Implements `bs1 * bs2 * {0..n} != 0`.
       *  Used in hasCommonParentAsSubclass */
-    private def intersectionContainsElementLeq(
-        bs1: BitSet, bs2: BitSet, n: Int): Boolean = {
+    private def intersectionContainsElementLeq(bs1: BitSet,
+                                               bs2: BitSet,
+                                               n: Int): Boolean = {
       val nshifted = n >> 5
       val nmask = 1 << (n & 31)
       var i = 0
@@ -248,8 +247,9 @@ abstract class SymbolPairs {
       (index1 >= 0) && {
         val index2 = index(sym2.owner)
         (index2 >= 0) && {
-          intersectionContainsElementLeq(
-              subParents(index1), subParents(index2), index1 min index2)
+          intersectionContainsElementLeq(subParents(index1),
+                                         subParents(index2),
+                                         index1 min index2)
         }
       }
     }

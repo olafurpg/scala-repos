@@ -63,8 +63,8 @@ class LookupJoinedTest extends WordSpec with Matchers {
   import Dsl._
   import LookupJoinedTest.genList
 
-  def lookupJoin[T: Ordering, K, V, W](
-      in0: Iterable[(T, K, V)], in1: Iterable[(T, K, W)]) = {
+  def lookupJoin[T: Ordering, K, V, W](in0: Iterable[(T, K, V)],
+                                       in1: Iterable[(T, K, W)]) = {
     val serv = in1.groupBy(_._2)
     def lookup(t: T, k: K): Option[W] = {
       val ord = Ordering.by { tkw: (T, K, W) =>
@@ -85,7 +85,8 @@ class LookupJoinedTest extends WordSpec with Matchers {
   }
 
   def lookupSumJoin[T: Ordering, K, V, W: Semigroup](
-      in0: Iterable[(T, K, V)], in1: Iterable[(T, K, W)]) = {
+      in0: Iterable[(T, K, V)],
+      in1: Iterable[(T, K, W)]) = {
     implicit val ord: Ordering[(T, K, W)] = Ordering.by {
       _._1
     }
@@ -179,8 +180,9 @@ class WindowLookupJoinedTest extends WordSpec with Matchers {
   import Dsl._
   import LookupJoinedTest.genList
 
-  def windowLookupJoin[K, V, W](
-      in0: Iterable[(Int, K, V)], in1: Iterable[(Int, K, W)], win: Int) = {
+  def windowLookupJoin[K, V, W](in0: Iterable[(Int, K, V)],
+                                in1: Iterable[(Int, K, W)],
+                                win: Int) = {
     val serv = in1.groupBy(_._2)
     // super inefficient, but easy to verify:
     def lookup(t: Int, k: K): Option[W] = {

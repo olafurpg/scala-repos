@@ -176,36 +176,35 @@ class AnnotationMacros(val c: whitebox.Context) extends CaseClassMacros {
 
     val tpe = weakTypeOf[T]
 
-    val annTreeOpts =
-      if (isProduct(tpe)) {
-        val constructorSyms = tpe
-          .member(termNames.CONSTRUCTOR)
-          .asMethod
-          .paramLists
-          .flatten
-          .map { sym =>
-            sym.name.decodedName.toString -> sym
-          }
-          .toMap
-
-        fieldsOf(tpe).map {
-          case (name, _) =>
-            val paramConstrSym = constructorSyms(name.decodedName.toString)
-
-            paramConstrSym.annotations.collectFirst {
-              case ann if ann.tree.tpe =:= annTpe =>
-                construct0(ann.tree.children.tail)
-            }
+    val annTreeOpts = if (isProduct(tpe)) {
+      val constructorSyms = tpe
+        .member(termNames.CONSTRUCTOR)
+        .asMethod
+        .paramLists
+        .flatten
+        .map { sym =>
+          sym.name.decodedName.toString -> sym
         }
-      } else if (isCoproduct(tpe))
-        ctorsOf(tpe).map { cTpe =>
-          cTpe.typeSymbol.annotations.collectFirst {
+        .toMap
+
+      fieldsOf(tpe).map {
+        case (name, _) =>
+          val paramConstrSym = constructorSyms(name.decodedName.toString)
+
+          paramConstrSym.annotations.collectFirst {
             case ann if ann.tree.tpe =:= annTpe =>
               construct0(ann.tree.children.tail)
           }
-        } else
-        abort(
-            s"$tpe is not case class like or the root of a sealed family of types")
+      }
+    } else if (isCoproduct(tpe))
+      ctorsOf(tpe).map { cTpe =>
+        cTpe.typeSymbol.annotations.collectFirst {
+          case ann if ann.tree.tpe =:= annTpe =>
+            construct0(ann.tree.children.tail)
+        }
+      } else
+      abort(
+          s"$tpe is not case class like or the root of a sealed family of types")
 
     val wrapTpeTrees = annTreeOpts.map {
       case Some(annTree) =>

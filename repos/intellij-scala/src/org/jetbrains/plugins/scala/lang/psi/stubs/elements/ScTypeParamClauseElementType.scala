@@ -31,13 +31,17 @@ class ScTypeParamClauseElementType[Func <: ScTypeParamClause]
       psi: ScTypeParamClause,
       parentStub: StubElement[ParentPsi]): ScTypeParamClauseStub = {
     new ScTypeParamClauseStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this, psi.getText)
+        parentStub.asInstanceOf[StubElement[PsiElement]],
+        this,
+        psi.getText)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTypeParamClauseStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScTypeParamClauseStub = {
     val text = dataStream.readName().toString
     new ScTypeParamClauseStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this, text)
+        parentStub.asInstanceOf[StubElement[PsiElement]],
+        this,
+        text)
   }
 }

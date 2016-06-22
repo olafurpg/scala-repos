@@ -482,8 +482,9 @@ trait TraversableLike[+A, +Repr]
     sliceWithKnownBound(scala.math.max(from, 0), until)
 
   // Precondition: from >= 0, until > 0, builder already configured for building.
-  private[this] def sliceInternal(
-      from: Int, until: Int, b: Builder[A, Repr]): Repr = {
+  private[this] def sliceInternal(from: Int,
+                                  until: Int,
+                                  b: Builder[A, Repr]): Repr = {
     var i = 0
     breakable {
       for (x <- this) {
@@ -495,8 +496,9 @@ trait TraversableLike[+A, +Repr]
     b.result
   }
   // Precondition: from >= 0
-  private[scala] def sliceWithKnownDelta(
-      from: Int, until: Int, delta: Int): Repr = {
+  private[scala] def sliceWithKnownDelta(from: Int,
+                                         until: Int,
+                                         delta: Int): Repr = {
     val b = newBuilder
     if (until <= from) b.result
     else {

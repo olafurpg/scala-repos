@@ -15,7 +15,7 @@ import Opcodes._
 object Test extends DirectTest {
   override def extraSettings: String =
     "-Yopt:l:classpath -usejavacp -d " + testOutput.path + " -cp " +
-    testOutput.path
+      testOutput.path
 
   def generateInterface() {
     val interfaceName = "HasDefaultMethod"

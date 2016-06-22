@@ -27,7 +27,8 @@ object PerformanceTester {
     implicit val config = TestUtils.NO_IMAGE_CONFIG
     val goose = new Goose(config)
     val html = FileHelper.loadResourceFile(
-        TestUtils.staticHtmlDir + "scribd1.txt", Goose.getClass)
+        TestUtils.staticHtmlDir + "scribd1.txt",
+        Goose.getClass)
     val url =
       "http://www.scribd.com/doc/52584146/Microfinance-and-Poverty-Reduction?in_collection=2987942"
 

@@ -52,7 +52,7 @@ object Kafka extends Logging {
         CommandLineUtils.printUsageAndDie(
             optionParser,
             "Found non argument parameters: " +
-            options.nonOptionArguments().toArray.mkString(","))
+              options.nonOptionArguments().toArray.mkString(","))
       }
 
       props.putAll(

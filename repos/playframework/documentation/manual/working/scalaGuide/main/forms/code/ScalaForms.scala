@@ -28,9 +28,10 @@ package scalaguide.forms.scalaforms {
   class ScalaFormsSpec extends Specification with Controller {
 
     val conf = Configuration.reference
-    implicit val messages: Messages = new DefaultMessagesApi(
-        Environment.simple(), conf, new DefaultLangs(conf))
-      .preferred(Seq.empty)
+    implicit val messages: Messages =
+      new DefaultMessagesApi(Environment.simple(),
+                             conf,
+                             new DefaultLangs(conf)).preferred(Seq.empty)
 
     "A scala forms" should {
 
@@ -75,7 +76,8 @@ package scalaguide.forms.scalaforms {
         controllers.Application.userFormNestedCity === "Shanghai"
 
         controllers.Application.userFormRepeatedEmails === List(
-            "benewu@gmail.com", "bob@gmail.com")
+            "benewu@gmail.com",
+            "bob@gmail.com")
 
         controllers.Application.userFormOptionalEmail === None
 
@@ -110,8 +112,8 @@ package scalaguide.forms.scalaforms {
       "display global errors user template" in {
         val userForm = controllers.Application.userFormConstraintsAdHoc
 
-        implicit val request = FakeRequest().withFormUrlEncodedBody(
-            "name" -> "Johnny Utah", "age" -> "25")
+        implicit val request = FakeRequest()
+          .withFormUrlEncodedBody("name" -> "Johnny Utah", "age" -> "25")
 
         val boundForm = userForm.bindFromRequest
         boundForm.hasGlobalErrors must beTrue
@@ -335,11 +337,11 @@ package scalaguide.forms.scalaforms {
               "name" -> text,
               "age" -> number
           )(UserData.apply)(UserData.unapply) verifying
-          ("Failed form constraints!", fields =>
-                fields match {
-                  case userData =>
-                    validate(userData.name, userData.age).isDefined
-              })
+            ("Failed form constraints!", fields =>
+                  fields match {
+                    case userData =>
+                      validate(userData.name, userData.age).isDefined
+                })
       )
       //#userForm-constraints-ad-hoc
 

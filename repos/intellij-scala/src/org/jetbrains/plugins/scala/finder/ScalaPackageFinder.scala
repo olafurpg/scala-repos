@@ -13,8 +13,8 @@ class ScalaPackageFinder(project: Project) extends PsiElementFinder {
   def findClass(qualifiedName: String, scope: GlobalSearchScope): PsiClass =
     null
 
-  def findClasses(
-      qualifiedName: String, scope: GlobalSearchScope): Array[PsiClass] =
+  def findClasses(qualifiedName: String,
+                  scope: GlobalSearchScope): Array[PsiClass] =
     PsiClass.EMPTY_ARRAY
 
   override def findPackage(qName: String): PsiPackage = {

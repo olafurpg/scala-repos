@@ -9,8 +9,8 @@ import java.util.{Comparator, PriorityQueue}
 import java.util.concurrent._
 import akka.util._
 
-class MessageQueueAppendFailedException(
-    message: String, cause: Throwable = null)
+class MessageQueueAppendFailedException(message: String,
+                                        cause: Throwable = null)
     extends AkkaException(message, cause)
 
 /**
@@ -85,5 +85,6 @@ class BoundedPriorityMessageQueue(capacity: Int,
                                   val pushTimeOut: Duration,
                                   cmp: Comparator[MessageInvocation])
     extends BoundedBlockingQueue[MessageInvocation](
-        capacity, new PriorityQueue[MessageInvocation](11, cmp))
+        capacity,
+        new PriorityQueue[MessageInvocation](11, cmp))
     with BoundedMessageQueueSemantics

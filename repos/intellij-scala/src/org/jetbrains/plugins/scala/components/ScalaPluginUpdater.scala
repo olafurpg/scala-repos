@@ -73,8 +73,9 @@ object ScalaPluginUpdater {
   def currentRepo = knownVersions(currentVersion)
 
   val updGroupId = "ScalaPluginUpdate"
-  val GROUP = new NotificationGroup(
-      updGroupId, NotificationDisplayType.STICKY_BALLOON, true)
+  val GROUP = new NotificationGroup(updGroupId,
+                                    NotificationDisplayType.STICKY_BALLOON,
+                                    true)
 
   // save plugin version before patching to restore it when switching back
   var savedPluginVersion = ""
@@ -225,7 +226,8 @@ object ScalaPluginUpdater {
         .connect(new HttpRequests.RequestProcessor[Option[UpdatesInfo]] {
           def process(request: HttpRequests.Request) = {
             try {
-              Some(new UpdatesInfo(JDOMUtil
+              Some(
+                  new UpdatesInfo(JDOMUtil
                         .loadDocument(request.getInputStream)
                         .detachRootElement))
             } catch { case e: JDOMException => LOG.info(e); None }
@@ -248,21 +250,21 @@ object ScalaPluginUpdater {
     val notification = getPlatformUpdateResult match {
       case Some(result)
           if isUpToDatePlatform(result) && !isBetaOrEAPPlatform &&
-          appSettings.ASK_PLATFORM_UPDATE =>
+            appSettings.ASK_PLATFORM_UPDATE =>
         // platform is up to date - suggest eap
         val message =
           s"Your IDEA is outdated to use with $branch branch.<br/>Would you like to switch IDEA channel to EAP?" +
-          s"""<p/><a href="Yes">Yes</a>\n""" +
-          s"""<p/><a href="No">Not now</a>""" +
-          s"""<p/><a href="Ignore">Ignore this update</a>"""
+            s"""<p/><a href="Yes">Yes</a>\n""" +
+            s"""<p/><a href="No">Not now</a>""" +
+            s"""<p/><a href="Ignore">Ignore this update</a>"""
         Some(
             GROUP.createNotification(
                 "Scala Plugin Update Failed",
                 message,
                 NotificationType.WARNING,
                 new NotificationListener {
-              override def hyperlinkUpdate(
-                  notification: Notification, event: HyperlinkEvent): Unit = {
+              override def hyperlinkUpdate(notification: Notification,
+                                           event: HyperlinkEvent): Unit = {
                 notification.expire()
                 event.getDescription match {
                   case "No" => // do nothing, will ask next time
@@ -277,7 +279,7 @@ object ScalaPluginUpdater {
         Some(
             GROUP.createNotification(
                 s"Your IDEA is outdated to use with Scala plugin $branch branch.<br/>" +
-                s"Please update IDEA to at least $suggestedVersion to use latest Scala plugin.",
+                  s"Please update IDEA to at least $suggestedVersion to use latest Scala plugin.",
                 NotificationType.WARNING))
       case None => None
     }
@@ -384,16 +386,16 @@ object ScalaPluginUpdater {
         ScalaPluginUpdater.pluginIsRelease) {
       val message =
         "Please select Scala plugin update channel:" +
-        s"""<p/><a href="EAP">EAP</a>\n""" +
-        s"""<p/><a href="Release">Release</a>"""
+          s"""<p/><a href="EAP">EAP</a>\n""" +
+          s"""<p/><a href="Release">Release</a>"""
       val notification = new Notification(
           updGroupId,
           "Scala Plugin Update",
           message,
           NotificationType.INFORMATION,
           new NotificationListener {
-            def hyperlinkUpdate(
-                notification: Notification, event: HyperlinkEvent) {
+            def hyperlinkUpdate(notification: Notification,
+                                event: HyperlinkEvent) {
               notification.expire()
               applicationSettings.ASK_USE_LATEST_PLUGIN_BUILDS = false
               event.getDescription match {

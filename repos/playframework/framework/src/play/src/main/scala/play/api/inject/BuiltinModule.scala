@@ -26,8 +26,8 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
   * application.
   */
 class BuiltinModule extends Module {
-  def bindings(
-      env: Environment, configuration: Configuration): Seq[Binding[_]] = {
+  def bindings(env: Environment,
+               configuration: Configuration): Seq[Binding[_]] = {
     def dynamicBindings(
         factories: ((Environment, Configuration) => Seq[Binding[_]])*) = {
       factories.flatMap(_ (env, configuration))

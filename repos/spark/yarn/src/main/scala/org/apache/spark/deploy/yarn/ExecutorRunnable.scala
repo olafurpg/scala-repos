@@ -115,14 +115,13 @@ private[yarn] class ExecutorRunnable(container: Container,
     // key for fetching shuffle files later
     if (sparkConf.get(SHUFFLE_SERVICE_ENABLED)) {
       val secretString = securityMgr.getSecretKey()
-      val secretBytes =
-        if (secretString != null) {
-          // This conversion must match how the YarnShuffleService decodes our secret
-          JavaUtils.stringToBytes(secretString)
-        } else {
-          // Authentication is not enabled, so just provide dummy metadata
-          ByteBuffer.allocate(0)
-        }
+      val secretBytes = if (secretString != null) {
+        // This conversion must match how the YarnShuffleService decodes our secret
+        JavaUtils.stringToBytes(secretString)
+      } else {
+        // Authentication is not enabled, so just provide dummy metadata
+        ByteBuffer.allocate(0)
+      }
       ctx.setServiceData(
           Collections.singletonMap("spark_shuffle", secretBytes))
     }
@@ -134,7 +133,7 @@ private[yarn] class ExecutorRunnable(container: Container,
       case ex: Exception =>
         throw new SparkException(
             s"Exception while starting container ${container.getId}" +
-            s" on host $hostname",
+              s" on host $hostname",
             ex)
     }
   }
@@ -162,11 +161,11 @@ private[yarn] class ExecutorRunnable(container: Container,
     // Set extra Java options for the executor, if defined
     sparkConf.get(EXECUTOR_JAVA_OPTIONS).foreach { opts =>
       javaOpts ++=
-        Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
+      Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
     }
     sys.env.get("SPARK_JAVA_OPTS").foreach { opts =>
       javaOpts ++=
-        Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
+      Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
     }
     sparkConf.get(EXECUTOR_LIBRARY_PATH).foreach { p =>
       prefixEnv = Some(
@@ -222,12 +221,11 @@ private[yarn] class ExecutorRunnable(container: Container,
     val userClassPath = Client
       .getUserClasspath(sparkConf)
       .flatMap { uri =>
-        val absPath =
-          if (new File(uri.getPath()).isAbsolute()) {
-            Client.getClusterPath(sparkConf, uri.getPath())
-          } else {
-            Client.buildPath(Environment.PWD.$(), uri.getPath())
-          }
+        val absPath = if (new File(uri.getPath()).isAbsolute()) {
+          Client.getClusterPath(sparkConf, uri.getPath())
+        } else {
+          Client.buildPath(Environment.PWD.$(), uri.getPath())
+        }
         Seq("--user-class-path", "file:" + absPath)
       }
       .toSeq
@@ -235,7 +233,7 @@ private[yarn] class ExecutorRunnable(container: Container,
     val commands =
       prefixEnv ++ Seq(
           YarnSparkHadoopUtil.expandEnvironment(Environment.JAVA_HOME) +
-          "/bin/java",
+            "/bin/java",
           "-server",
           // Kill if OOM is raised - leverage yarn's failure handling to cause rescheduling.
           // Not killing the task leaves various aspects of the executor and (to some extent) the jvm in

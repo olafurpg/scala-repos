@@ -71,7 +71,8 @@ case class BoundReference(ordinal: Int, dataType: DataType, nullable: Boolean)
     } else if (nullable) {
       s"""
         boolean ${ev.isNull} = ${ctx.INPUT_ROW}.isNullAt($ordinal);
-        $javaType ${ev.value} = ${ev.isNull} ? ${ctx.defaultValue(dataType)} : ($value);
+        $javaType ${ev.value} = ${ev.isNull} ? ${ctx
+        .defaultValue(dataType)} : ($value);
       """
     } else {
       ev.isNull = "false"

@@ -1,5 +1,5 @@
 trait A {
-  type T <: { type S [-U] }
+  type T <: { type S[-U] }
   val x: T
   def y: x.S[AnyRef]
   def z: x.S[String] = y

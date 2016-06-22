@@ -60,7 +60,7 @@ object ScalaCompletionUtil {
     val prefix = prefixMatcher.getPrefix
     val capitalized =
       prefix.length() > 0 &&
-      prefix.substring(0, 1).capitalize == prefix.substring(0, 1)
+        prefix.substring(0, 1).capitalize == prefix.substring(0, 1)
     capitalized || lookingForAnnotations
   }
 
@@ -289,8 +289,9 @@ object ScalaCompletionUtil {
     !checkErrors(dummyFile)
   }
 
-  def checkReplace(
-      elem: PsiElement, additionText: String, manager: PsiManager): Boolean = {
+  def checkReplace(elem: PsiElement,
+                   additionText: String,
+                   manager: PsiManager): Boolean = {
     val typeText = elem.getText
     var text = "class a { " + typeText + "}"
     if (text.indexOf(DUMMY_IDENTIFIER) == -1) return false
@@ -346,24 +347,23 @@ object ScalaCompletionUtil {
         case ref: PsiReference =>
           ref.getElement.getText //this case for anonymous method in ScAccessModifierImpl
       }
-      val id =
-        if (isOpChar(text(text.length - 1))) {
-          "+++++++++++++++++++++++"
-        } else {
-          val rest = ref match {
-            case ref: PsiElement =>
-              text.substring(offset - ref.getTextRange.getStartOffset + 1)
-            case ref: PsiReference =>
-              val from =
-                offset - ref.getElement.getTextRange.getStartOffset + 1
-              if (from < text.length && from >= 0) text.substring(from) else ""
-          }
-          if (ScalaNamesUtil.isKeyword(rest)) {
-            CompletionUtil.DUMMY_IDENTIFIER
-          } else {
-            CompletionUtil.DUMMY_IDENTIFIER_TRIMMED
-          }
+      val id = if (isOpChar(text(text.length - 1))) {
+        "+++++++++++++++++++++++"
+      } else {
+        val rest = ref match {
+          case ref: PsiElement =>
+            text.substring(offset - ref.getTextRange.getStartOffset + 1)
+          case ref: PsiReference =>
+            val from =
+              offset - ref.getElement.getTextRange.getStartOffset + 1
+            if (from < text.length && from >= 0) text.substring(from) else ""
         }
+        if (ScalaNamesUtil.isKeyword(rest)) {
+          CompletionUtil.DUMMY_IDENTIFIER
+        } else {
+          CompletionUtil.DUMMY_IDENTIFIER_TRIMMED
+        }
+      }
 
       if (ref.getElement != null && ref.getElement.getPrevSibling != null &&
           ref.getElement.getPrevSibling.getNode.getElementType == ScalaTokenTypes.tSTUB)
@@ -396,8 +396,8 @@ object ScalaCompletionUtil {
         if (owner.containingFile.contains(parameters.getOriginalFile)) {
           owner
             .getMirrorPositionForCompletion(
-                getDummyIdentifier(
-                    parameters.getOffset, parameters.getOriginalFile),
+                getDummyIdentifier(parameters.getOffset,
+                                   parameters.getOriginalFile),
                 parameters.getOffset - owner.getTextRange.getStartOffset)
             .getOrElse(parameters.getPosition)
         } else parameters.getPosition

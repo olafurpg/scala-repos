@@ -12,9 +12,9 @@ trait StdAttachments { self: SymbolTable =>
       type Pos = Position
     } = NoPosition
     def attachments = rawatt
-    def setAttachments(
-        attachments: scala.reflect.macros.Attachments { type Pos = Position })
-      : this.type = { rawatt = attachments; this }
+    def setAttachments(attachments: scala.reflect.macros.Attachments {
+      type Pos = Position
+    }): this.type = { rawatt = attachments; this }
     def updateAttachment[T: ClassTag](attachment: T): this.type = {
       rawatt = rawatt.update(attachment); this
     }
@@ -43,8 +43,8 @@ trait StdAttachments { self: SymbolTable =>
     *  Unfortunately typed `CompoundTypeTree` is lacking essential info, and the reifier cannot use `CompoundTypeTree.tpe`.
     *  Therefore we need this hack (see `Reshape.toPreTyperTypeTree` for a detailed explanation).
     */
-  case class CompoundTypeTreeOriginalAttachment(
-      parents: List[Tree], stats: List[Tree])
+  case class CompoundTypeTreeOriginalAttachment(parents: List[Tree],
+                                                stats: List[Tree])
 
   /** When present, indicates that the host `Ident` has been created from a backquoted identifier.
     */

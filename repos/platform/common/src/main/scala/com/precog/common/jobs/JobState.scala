@@ -78,8 +78,9 @@ trait JobStateSerialization {
                      reason: Option[String] = None): JObject = {
       JObject(
           jfield("state", state) :: jfield("timestamp", timestamp) :: jfield(
-              "previous", decompose(previous)) ::
-          (reason map { jfield("reason", _) :: Nil } getOrElse Nil)
+              "previous",
+              decompose(previous)) ::
+            (reason map { jfield("reason", _) :: Nil } getOrElse Nil)
       )
     }
 

@@ -79,7 +79,8 @@ object MovieLensALS {
         .required()
         .text("input paths to a MovieLens dataset of ratings")
         .action((x, c) => c.copy(input = x))
-      note("""
+      note(
+          """
           |For example, the following command runs this app on a synthetic dataset:
           |
           | bin/spark-submit --class org.apache.spark.examples.mllib.MovieLensALS \
@@ -144,20 +145,19 @@ object MovieLensALS {
 
     val splits = ratings.randomSplit(Array(0.8, 0.2))
     val training = splits(0).cache()
-    val test =
-      if (params.implicitPrefs) {
-        /*
-         * 0 means "don't know" and positive values mean "confident that the prediction should be 1".
-         * Negative values means "confident that the prediction should be 0".
-         * We have in this case used some kind of weighted RMSE. The weight is the absolute value of
-         * the confidence. The error is the difference between prediction and either 1 or 0,
-         * depending on whether r is positive or negative.
-         */
-        splits(1).map(x =>
-              Rating(x.user, x.product, if (x.rating > 0) 1.0 else 0.0))
-      } else {
-        splits(1)
-      }.cache()
+    val test = if (params.implicitPrefs) {
+      /*
+       * 0 means "don't know" and positive values mean "confident that the prediction should be 1".
+       * Negative values means "confident that the prediction should be 0".
+       * We have in this case used some kind of weighted RMSE. The weight is the absolute value of
+       * the confidence. The error is the difference between prediction and either 1 or 0,
+       * depending on whether r is positive or negative.
+       */
+      splits(1).map(x =>
+            Rating(x.user, x.product, if (x.rating > 0) 1.0 else 0.0))
+    } else {
+      splits(1)
+    }.cache()
 
     val numTraining = training.count()
     val numTest = test.count()

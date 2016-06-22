@@ -18,8 +18,8 @@ object Decompiler {
   private val SCALA_LONG_SIG_ANNOTATION = "Lscala/reflect/ScalaLongSignature;"
   private val BYTES_VALUE = "bytes"
 
-  def decompile(
-      fileName: String, bytes: Array[Byte]): Option[(String, String)] = {
+  def decompile(fileName: String,
+                bytes: Array[Byte]): Option[(String, String)] = {
     val byteCode = ByteCode(bytes)
     val isPackageObject = fileName == "package.class"
     val classFile = ClassFileParser.parse(byteCode)

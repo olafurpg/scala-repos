@@ -13,29 +13,29 @@ import lila.db.ByteArray
 import lila.rating.PerfType
 import lila.user.User
 
-case class Game(id: String,
-                whitePlayer: Player,
-                blackPlayer: Player,
-                binaryPieces: ByteArray,
-                binaryPgn: ByteArray,
-                status: Status,
-                turns: Int, // = ply
-                startedAtTurn: Int,
-                clock: Option[Clock],
-                castleLastMoveTime: CastleLastMoveTime,
-                daysPerTurn: Option[Int],
-                positionHashes: PositionHash = Array(),
-                checkCount: CheckCount = CheckCount(0, 0),
-                binaryMoveTimes: ByteArray =
-                  ByteArray.empty, // tenths of seconds
-                mode: Mode = Mode.default,
-                variant: Variant = Variant.default,
-                crazyData: Option[Crazyhouse.Data] = None,
-                next: Option[String] = None,
-                bookmarks: Int = 0,
-                createdAt: DateTime = DateTime.now,
-                updatedAt: Option[DateTime] = None,
-                metadata: Metadata) {
+case class Game(
+    id: String,
+    whitePlayer: Player,
+    blackPlayer: Player,
+    binaryPieces: ByteArray,
+    binaryPgn: ByteArray,
+    status: Status,
+    turns: Int, // = ply
+    startedAtTurn: Int,
+    clock: Option[Clock],
+    castleLastMoveTime: CastleLastMoveTime,
+    daysPerTurn: Option[Int],
+    positionHashes: PositionHash = Array(),
+    checkCount: CheckCount = CheckCount(0, 0),
+    binaryMoveTimes: ByteArray = ByteArray.empty, // tenths of seconds
+    mode: Mode = Mode.default,
+    variant: Variant = Variant.default,
+    crazyData: Option[Crazyhouse.Data] = None,
+    next: Option[String] = None,
+    bookmarks: Int = 0,
+    createdAt: DateTime = DateTime.now,
+    updatedAt: Option[DateTime] = None,
+    metadata: Metadata) {
 
   val players = List(whitePlayer, blackPlayer)
 
@@ -162,21 +162,20 @@ case class Game(id: String,
     val (history, situation) = (game.board.history, game.situation)
 
     def copyPlayer(player: Player) = player.copy(
-        blurs = math.min(
-            playerMoves(player.color),
-            player.blurs + (blur &&
-                moveOrDrop.fold(_.color, _.color) == player.color).fold(1, 0))
+        blurs =
+          math.min(playerMoves(player.color),
+                   player.blurs + (blur &&
+                         moveOrDrop.fold(_.color, _.color) == player.color)
+                     .fold(1, 0))
     )
 
     val updated = copy(
-        whitePlayer =
-          copyPlayer(whitePlayer),
+        whitePlayer = copyPlayer(whitePlayer),
         blackPlayer = copyPlayer(blackPlayer),
         binaryPieces = BinaryFormat.piece write game.board.pieces,
         binaryPgn =
           BinaryFormat.pgn write game.pgnMoves,
-        turns =
-          game.turns,
+        turns = game.turns,
         positionHashes = history.positionHashes,
         checkCount = history.checkCount,
         crazyData = situation.board.crazyData,
@@ -229,8 +228,8 @@ case class Game(id: String,
   def check = castleLastMoveTime.check
 
   def updatePlayer(color: Color, f: Player => Player) =
-    color.fold(
-        copy(whitePlayer = f(whitePlayer)), copy(blackPlayer = f(blackPlayer)))
+    color.fold(copy(whitePlayer = f(whitePlayer)),
+               copy(blackPlayer = f(blackPlayer)))
 
   def updatePlayers(f: Player => Player) =
     copy(whitePlayer = f(whitePlayer), blackPlayer = f(blackPlayer))
@@ -294,18 +293,18 @@ case class Game(id: String,
 
   def playerCanOfferDraw(color: Color) =
     started && playable && turns >= 2 && !player(color).isOfferingDraw &&
-    !(opponent(color).isAi) && !(playerHasOfferedDraw(color))
+      !(opponent(color).isAi) && !(playerHasOfferedDraw(color))
 
   def playerHasOfferedDraw(color: Color) =
     player(color).lastDrawOffer ?? (_ >= turns - 1)
 
   def playerCanRematch(color: Color) =
     !player(color).isOfferingRematch && finishedOrAborted && nonMandatory &&
-    !boosted
+      !boosted
 
   def playerCanProposeTakeback(color: Color) =
     started && playable && !isTournament && !isSimul && bothPlayersHaveMoved &&
-    !player(color).isProposingTakeback && !opponent(color).isProposingTakeback
+      !player(color).isProposingTakeback && !opponent(color).isProposingTakeback
 
   def boosted = rated && finished && bothPlayersHaveMoved && playedTurns < 10
 
@@ -413,7 +412,8 @@ case class Game(id: String,
   def estimateClockTotalTime = clock.map(_.estimateTotalTime)
 
   def estimateTotalTime =
-    estimateClockTotalTime orElse correspondenceClock.map(_.estimateTotalTime) getOrElse 1200
+    estimateClockTotalTime orElse correspondenceClock
+      .map(_.estimateTotalTime) getOrElse 1200
 
   def playerWhoDidNotMove: Option[Player] = playedTurns match {
     case 0 => player(White).some
@@ -447,8 +447,8 @@ case class Game(id: String,
 
   def abandoned =
     (status <= Status.Started) &&
-    ((updatedAt | createdAt) isBefore hasAi.fold(Game.aiAbandonedDate,
-                                                 Game.abandonedDate))
+      ((updatedAt | createdAt) isBefore hasAi.fold(Game.aiAbandonedDate,
+                                                   Game.abandonedDate))
 
   def forecastable = started && playable && isCorrespondence && !hasAi
 

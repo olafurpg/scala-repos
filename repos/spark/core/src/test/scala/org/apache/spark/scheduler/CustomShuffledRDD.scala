@@ -31,8 +31,8 @@ import org.apache.spark.rdd.RDD
   *   parent with 5 partitions, and partitionStartIndices is [0, 2, 4], we get three output
   *   partitions, corresponding to partition ranges [0, 1], [2, 3] and [4] of the parent partitioner.
   */
-class CoalescedPartitioner(
-    val parent: Partitioner, val partitionStartIndices: Array[Int])
+class CoalescedPartitioner(val parent: Partitioner,
+                           val partitionStartIndices: Array[Int])
     extends Partitioner {
 
   @transient private lazy val parentPartitionMapping: Array[Int] = {
@@ -59,14 +59,15 @@ class CoalescedPartitioner(
   override def equals(other: Any): Boolean = other match {
     case c: CoalescedPartitioner =>
       c.parent == parent &&
-      Arrays.equals(c.partitionStartIndices, partitionStartIndices)
+        Arrays.equals(c.partitionStartIndices, partitionStartIndices)
     case _ =>
       false
   }
 }
 
-private[spark] class CustomShuffledRDDPartition(
-    val index: Int, val startIndexInParent: Int, val endIndexInParent: Int)
+private[spark] class CustomShuffledRDDPartition(val index: Int,
+                                                val startIndexInParent: Int,
+                                                val endIndexInParent: Int)
     extends Partition {
 
   override def hashCode(): Int = index
@@ -87,8 +88,9 @@ class CustomShuffledRDD[K, V, C](var dependency: ShuffleDependency[K, V, C],
   override def getDependencies: Seq[Dependency[_]] = List(dependency)
 
   override val partitioner = {
-    Some(new CoalescedPartitioner(
-            dependency.partitioner, partitionStartIndices))
+    Some(
+        new CoalescedPartitioner(dependency.partitioner,
+                                 partitionStartIndices))
   }
 
   override def getPartitions: Array[Partition] = {

@@ -65,15 +65,14 @@ class InMemoryStatsReceiver extends StatsReceiver {
 
       override def toString: String = {
         val vals = apply()
-        val valStr =
-          if (vals.length <= 3) {
-            vals.mkString("[", ",", "]")
-          } else {
-            val numOmitted = vals.length - 3
-            vals
-              .take(3)
-              .mkString("[", ",", s"... (omitted $numOmitted value(s))]")
-          }
+        val valStr = if (vals.length <= 3) {
+          vals.mkString("[", ",", "]")
+        } else {
+          val numOmitted = vals.length - 3
+          vals
+            .take(3)
+            .mkString("[", ",", s"... (omitted $numOmitted value(s))]")
+        }
         s"Stat(${name.mkString("/")}=$valStr)"
       }
     }
@@ -106,12 +105,12 @@ class InMemoryStatsReceiver extends StatsReceiver {
     * Dumps this in-memory stats receiver to the given [[PrintStream]].
     */
   def print(p: PrintStream): Unit = {
-    for ((k, v) <- counters) p.printf(
-        "%s %d\n", k.mkString("/"), v: java.lang.Integer)
-    for ((k, g) <- gauges) p.printf(
-        "%s %f\n", k.mkString("/"), g(): java.lang.Float)
-    for ((k, s) <- stats if s.size > 0) p.printf(
-        "%s %f\n", k.mkString("/"), (s.sum / s.size): java.lang.Float)
+    for ((k, v) <- counters)
+      p.printf("%s %d\n", k.mkString("/"), v: java.lang.Integer)
+    for ((k, g) <- gauges)
+      p.printf("%s %f\n", k.mkString("/"), g(): java.lang.Float)
+    for ((k, s) <- stats if s.size > 0)
+      p.printf("%s %f\n", k.mkString("/"), (s.sum / s.size): java.lang.Float)
   }
 
   /**

@@ -112,8 +112,8 @@ class MockServletContext(var target: String) extends ServletContext {
   def addFilter(
       x$1: String,
       x$2: Class[_ <: javax.servlet.Filter]): FilterRegistration.Dynamic = null
-  def addFilter(
-      x$1: String, x$2: javax.servlet.Filter): FilterRegistration.Dynamic =
+  def addFilter(x$1: String,
+                x$2: javax.servlet.Filter): FilterRegistration.Dynamic =
     null
   def addFilter(x$1: String, x$2: String): FilterRegistration.Dynamic = null
 
@@ -122,14 +122,14 @@ class MockServletContext(var target: String) extends ServletContext {
   def addListener[T <: java.util.EventListener](listener: T): Unit = ()
   def addListener(listenerClass: String): Unit = ()
 
-  def addServlet(
-      servletNAme: String, servletClass: Class[_ <: javax.servlet.Servlet])
+  def addServlet(servletNAme: String,
+                 servletClass: Class[_ <: javax.servlet.Servlet])
     : ServletRegistration.Dynamic = null
   def addServlet(servletName: String,
                  servlet: javax.servlet.Servlet): ServletRegistration.Dynamic =
     null
-  def addServlet(
-      servletName: String, servletClass: String): ServletRegistration.Dynamic =
+  def addServlet(servletName: String,
+                 servletClass: String): ServletRegistration.Dynamic =
     null
 
   // This remain unimplemented since we can't provide a Null here due toe type restrictions.

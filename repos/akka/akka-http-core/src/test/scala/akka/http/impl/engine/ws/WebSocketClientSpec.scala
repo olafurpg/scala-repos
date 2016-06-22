@@ -45,8 +45,9 @@ class WebSocketClientSpec
                      |""")
 
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
-      expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
+      expectMaskedFrameOnNetwork(Protocol.Opcode.Text,
+                                 ByteString("Message 1"),
+                                 fin = true)
     }
     "reject invalid handshakes" - {
       "other status code" in new TestSetup with ClientEchoes {
@@ -129,14 +130,16 @@ class WebSocketClientSpec
     "don't send out frames before handshake was finished successfully" in new TestSetup {
       def clientImplementation: Flow[Message, Message, NotUsed] =
         Flow.fromSinkAndSourceMat(
-            Sink.ignore, Source.single(TextMessage("fast message")))(Keep.none)
+            Sink.ignore,
+            Source.single(TextMessage("fast message")))(Keep.none)
 
       expectWireData(UpgradeRequestBytes)
       expectNoWireData()
 
       sendWireData(UpgradeResponseBytes)
-      expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("fast message"), fin = true)
+      expectMaskedFrameOnNetwork(Protocol.Opcode.Text,
+                                 ByteString("fast message"),
+                                 fin = true)
 
       expectMaskedCloseFrame(Protocol.CloseCodes.Regular)
       sendWSCloseFrame(Protocol.CloseCodes.Regular)
@@ -148,8 +151,10 @@ class WebSocketClientSpec
     with ClientProbes {
       expectWireData(UpgradeRequestBytes)
 
-      val firstFrame = WSTestUtils.frame(
-          Protocol.Opcode.Text, ByteString("fast"), fin = true, mask = false)
+      val firstFrame = WSTestUtils.frame(Protocol.Opcode.Text,
+                                         ByteString("fast"),
+                                         fin = true,
+                                         mask = false)
       sendWireData(UpgradeResponseBytes ++ firstFrame)
 
       messagesIn.requestNext(TextMessage("fast"))
@@ -159,8 +164,9 @@ class WebSocketClientSpec
     with ClientProbes {
       messagesOut.sendNext(TextMessage("Message 1"))
 
-      expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
+      expectMaskedFrameOnNetwork(Protocol.Opcode.Text,
+                                 ByteString("Message 1"),
+                                 fin = true)
 
       sendWSFrame(Protocol.Opcode.Binary,
                   ByteString("Response"),
@@ -172,20 +178,25 @@ class WebSocketClientSpec
     "client echoes scenario" in new EstablishedConnectionSetup
     with ClientEchoes {
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
-      expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
+      expectMaskedFrameOnNetwork(Protocol.Opcode.Text,
+                                 ByteString("Message 1"),
+                                 fin = true)
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 2"), fin = true)
-      expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 2"), fin = true)
+      expectMaskedFrameOnNetwork(Protocol.Opcode.Text,
+                                 ByteString("Message 2"),
+                                 fin = true)
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 3"), fin = true)
-      expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 3"), fin = true)
+      expectMaskedFrameOnNetwork(Protocol.Opcode.Text,
+                                 ByteString("Message 3"),
+                                 fin = true)
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 4"), fin = true)
-      expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 4"), fin = true)
+      expectMaskedFrameOnNetwork(Protocol.Opcode.Text,
+                                 ByteString("Message 4"),
+                                 fin = true)
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 5"), fin = true)
-      expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 5"), fin = true)
+      expectMaskedFrameOnNetwork(Protocol.Opcode.Text,
+                                 ByteString("Message 5"),
+                                 fin = true)
 
       sendWSCloseFrame(Protocol.CloseCodes.Regular)
       expectMaskedCloseFrame(Protocol.CloseCodes.Regular)
@@ -336,16 +347,16 @@ class WebSocketClientSpec
       val netOut = ByteStringSinkProbe()
       val netIn = TestPublisher.probe[ByteString]()
 
-      val graph = RunnableGraph.fromGraph(
-          GraphDSL.create(clientLayer) { implicit b ⇒ client ⇒
-        import GraphDSL.Implicits._
-        Source.fromPublisher(netIn) ~> Flow[ByteString].map(
-            SessionBytes(null, _)) ~> client.in2
-        client.out1 ~> Flow[SslTlsOutbound].collect {
-          case SendBytes(x) ⇒ x
-        } ~> netOut.sink
-        client.out2 ~> clientImplementation ~> client.in1
-        ClosedShape
+      val graph = RunnableGraph.fromGraph(GraphDSL.create(clientLayer) {
+        implicit b ⇒ client ⇒
+          import GraphDSL.Implicits._
+          Source.fromPublisher(netIn) ~> Flow[ByteString].map(
+              SessionBytes(null, _)) ~> client.in2
+          client.out1 ~> Flow[SslTlsOutbound].collect {
+            case SendBytes(x) ⇒ x
+          } ~> netOut.sink
+          client.out2 ~> clientImplementation ~> client.in1
+          ClosedShape
       })
 
       val response = graph.run()

@@ -46,9 +46,8 @@ class ScInfixExprImpl(node: ASTNode)
         val lText = lOp.getText
         val rText = rOp.getText
         val exprText = s"$lText = $lText ${r.element.name} $rText"
-        val newExpr =
-          ScalaPsiElementFactory.createExpressionWithContextFromText(
-              exprText, getContext, this)
+        val newExpr = ScalaPsiElementFactory
+          .createExpressionWithContextFromText(exprText, getContext, this)
         newExpr.getType(TypingContext.empty)
       case _ => super.innerType(ctx)
     }

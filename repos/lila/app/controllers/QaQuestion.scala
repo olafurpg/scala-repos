@@ -40,8 +40,8 @@ object QaQuestion extends QaController {
     }
   }
 
-  private def renderAsk(
-      form: Form[_], status: Results.Status)(implicit ctx: Context) =
+  private def renderAsk(form: Form[_], status: Results.Status)(
+      implicit ctx: Context) =
     fetchPopular zip api.tag.all zip forms.anyCaptcha map {
       case ((popular, tags), captcha) =>
         status(html.qa.ask(form, tags, popular, captcha))

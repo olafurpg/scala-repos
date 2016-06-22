@@ -18,7 +18,8 @@ class DeclarationHasNoExplicitTypeInspection
   def actionFor(holder: ProblemsHolder) = {
     case f: ScFunctionDeclaration
         if f.hasUnitResultType && !f.hasExplicitType =>
-      holder.registerProblem(
-          f.nameId, getDisplayName, new AddUnitTypeToDeclaration(f))
+      holder.registerProblem(f.nameId,
+                             getDisplayName,
+                             new AddUnitTypeToDeclaration(f))
   }
 }

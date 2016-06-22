@@ -23,8 +23,8 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
       new ChannelStatsHandler(new InMemoryStatsReceiver),
       new SimpleChannelSnooper("test"),
       new ByteBufSnooper("test"),
-      new WriteCompletionTimeoutHandler(
-          DefaultTimer.twitter, Duration.fromSeconds(10))
+      new WriteCompletionTimeoutHandler(DefaultTimer.twitter,
+                                        Duration.fromSeconds(10))
   )
   val loop = new NioEventLoopGroup()
 
@@ -60,8 +60,8 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
 
     test(s"$name doesn't suppress ChannelRegistered event") {
       pipeline.fireChannelRegistered()
-      assert(
-          handler.channelRegisteredFired, "suppressed ChannelRegistered event")
+      assert(handler.channelRegisteredFired,
+             "suppressed ChannelRegistered event")
     }
 
     test(s"$name doesn't suppress ChannelUnregistered event") {
@@ -150,15 +150,15 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
     }
 
     var closeFired = false
-    override def close(
-        ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
+    override def close(ctx: ChannelHandlerContext,
+                       future: ChannelPromise): Unit = {
       closeFired = true
       super.close(ctx, future)
     }
 
     var deregisterFired = false
-    override def deregister(
-        ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
+    override def deregister(ctx: ChannelHandlerContext,
+                            future: ChannelPromise): Unit = {
       deregisterFired = true
       super.deregister(ctx, future)
     }
@@ -188,8 +188,8 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
 
     // inbound events
     var exceptionCaughtFired = false
-    override def exceptionCaught(
-        ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+    override def exceptionCaught(ctx: ChannelHandlerContext,
+                                 cause: Throwable): Unit = {
       exceptionCaughtFired = true
       super.exceptionCaught(ctx, cause)
     }
@@ -201,8 +201,8 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
     }
 
     var channelReadFired = false
-    override def channelRead(
-        ctx: ChannelHandlerContext, msg: scala.Any): Unit = {
+    override def channelRead(ctx: ChannelHandlerContext,
+                             msg: scala.Any): Unit = {
       channelReadFired = true
       super.channelRead(ctx, msg)
     }
@@ -226,8 +226,8 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
     }
 
     var userEventTriggeredFired = false
-    override def userEventTriggered(
-        ctx: ChannelHandlerContext, evt: scala.Any): Unit = {
+    override def userEventTriggered(ctx: ChannelHandlerContext,
+                                    evt: scala.Any): Unit = {
       userEventTriggeredFired = true
       super.userEventTriggered(ctx, evt)
     }

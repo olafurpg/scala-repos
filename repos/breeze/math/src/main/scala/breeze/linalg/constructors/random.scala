@@ -18,10 +18,10 @@ import breeze.storage.Zero
 object randomDouble extends RandomGeneratorUFunc[Double] {
   protected def gen(implicit basis: RandBasis = Rand): Rand[Double] =
     basis.uniform
-  protected def genRange(low: Double, high: Double)(
-      implicit basis: RandBasis = Rand): Rand[Double] = {
-    require(
-        high >= low, s"High term must be greater than low term. ($low, $high)")
+  protected def genRange(low: Double, high: Double)(implicit basis: RandBasis =
+                                                      Rand): Rand[Double] = {
+    require(high >= low,
+            s"High term must be greater than low term. ($low, $high)")
     val range = (high - low)
     basis.uniform.map(_ * range + low)
   }
@@ -46,8 +46,8 @@ object randomInt extends RandomGeneratorUFunc[Int] {
     genRange(0, 1)
   protected def genRange(low: Int, high: Int)(
       implicit basis: RandBasis = Rand): Rand[Int] = {
-    require(
-        high >= low, s"High term must be greater than low term. ($low, $high)")
+    require(high >= low,
+            s"High term must be greater than low term. ($low, $high)")
     basis.randInt(high - low + 1).map(_ + low)
   }
 
@@ -67,8 +67,8 @@ object randn extends RandomGeneratorUFunc[Double] {
 
   protected def gen(implicit basis: RandBasis = Rand): Rand[Double] =
     basis.gaussian
-  protected def genRange(low: Double, high: Double)(
-      implicit basis: RandBasis = Rand): Rand[Double] =
+  protected def genRange(low: Double, high: Double)(implicit basis: RandBasis =
+                                                      Rand): Rand[Double] =
     basis.gaussian(low, high)
 
   protected val _classTag: ClassTag[Double] = scala.reflect.classTag[Double]
@@ -107,13 +107,12 @@ trait RandomGeneratorUFunc[T] extends UFunc {
       }
     }
 
-  implicit def implRandomT_2DRange(
-      implicit basis: RandBasis =
-        Rand): Impl2[(Int, Int), (T, T), DenseMatrix[T]] =
+  implicit def implRandomT_2DRange(implicit basis: RandBasis = Rand)
+    : Impl2[(Int, Int), (T, T), DenseMatrix[T]] =
     new Impl2[(Int, Int), (T, T), DenseMatrix[T]] {
       def apply(dimensions2: (Int, Int), range: (T, T)): DenseMatrix[T] = {
-        DenseMatrix.rand(
-            dimensions2._1, dimensions2._2, genRange(range._1, range._2))
+        DenseMatrix
+          .rand(dimensions2._1, dimensions2._2, genRange(range._1, range._2))
       }
     }
 }

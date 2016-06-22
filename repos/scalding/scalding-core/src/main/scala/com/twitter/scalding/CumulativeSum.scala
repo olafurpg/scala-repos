@@ -71,8 +71,8 @@ object CumulativeSum {
           case (acc, (s, v)) =>
             acc match {
               case Some((previousPreviousSum, previousSum, previousS)) => {
-                  Some((Some(previousSum), sg.plus(v, previousSum), s))
-                }
+                Some((Some(previousSum), sg.plus(v, previousSum), s))
+              }
               case _ => Some((None, v, s))
             }
         }

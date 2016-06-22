@@ -39,8 +39,8 @@ class ProducerRequestMetrics(metricId: ClientIdBroker)
                TimeUnit.MILLISECONDS,
                TimeUnit.SECONDS,
                tags))
-  val requestSizeHist = newHistogram(
-      "ProducerRequestSize", biased = true, tags)
+  val requestSizeHist =
+    newHistogram("ProducerRequestSize", biased = true, tags)
   val throttleTimeStats = newTimer("ProducerRequestThrottleRateAndTimeMs",
                                    TimeUnit.MILLISECONDS,
                                    TimeUnit.SECONDS,
@@ -65,8 +65,8 @@ class ProducerRequestStats(clientId: String) {
   def getProducerRequestAllBrokersStats(): ProducerRequestMetrics =
     allBrokersStats
 
-  def getProducerRequestStats(
-      brokerHost: String, brokerPort: Int): ProducerRequestMetrics = {
+  def getProducerRequestStats(brokerHost: String,
+                              brokerPort: Int): ProducerRequestMetrics = {
     stats.getAndMaybePut(
         new ClientIdAndBroker(clientId, brokerHost, brokerPort))
   }

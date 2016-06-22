@@ -43,8 +43,9 @@ class PrepareRequestsSpec extends AkkaSpec {
       Uri("http://example.com/"),
       HttpProtocols.`HTTP/1.1`,
       List(),
-      StrictEntityCreator(HttpEntity.Strict(
-              ContentTypes.`application/octet-stream`, ByteString("body"))),
+      StrictEntityCreator(
+          HttpEntity.Strict(ContentTypes.`application/octet-stream`,
+                            ByteString("body"))),
       true,
       false)
 

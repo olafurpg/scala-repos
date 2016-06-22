@@ -56,7 +56,7 @@ object AFTSurvivalRegressionExample {
     // Print the coefficients, intercept and scale parameter for AFT survival regression
     println(
         s"Coefficients: ${model.coefficients} Intercept: " +
-        s"${model.intercept} Scale: ${model.scale}")
+          s"${model.intercept} Scale: ${model.scale}")
     model.transform(training).show(false)
     // $example off$
 

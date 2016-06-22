@@ -68,7 +68,8 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Binary functor traverse on this disjunction. */
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(
-      implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, C, D]] =
+      implicit F: Traverse[F],
+      G: Applicative[G]): G[EitherT[F, C, D]] =
     Applicative[G].map(F.traverse(run)(Bitraverse[\/].bitraverseF(f, g)))(
         EitherT(_: F[C \/ D]))
 
@@ -77,8 +78,8 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     EitherT(F.map(run)(_.map(f)))
 
   /** Traverse on the right of this disjunction. */
-  def traverse[G[_], C](f: B => G[C])(
-      implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
+  def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F],
+                                      G: Applicative[G]): G[EitherT[F, A, C]] =
     G.map(F.traverse(run)(o => Traverse[A \/ ?].traverse(o)(f)))(EitherT(_))
 
   /** Apply a function in the environment of the right of this
@@ -103,14 +104,14 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     F.foldRight[A \/ B, Z](run, z)((a, b) => a.foldRight(b)(f))
 
   /** Filter on the right of this disjunction. */
-  def filter(p: B => Boolean)(
-      implicit M: Monoid[A], F: Monad[F]): EitherT[F, A, B] =
+  def filter(p: B => Boolean)(implicit M: Monoid[A],
+                              F: Monad[F]): EitherT[F, A, B] =
     MonadPlus[EitherT[F, A, ?]].filter(this)(p)
 
   /** Alias for `filter`.
     */
-  def withFilter(p: B => Boolean)(
-      implicit M: Monoid[A], F: Monad[F]): EitherT[F, A, B] =
+  def withFilter(p: B => Boolean)(implicit M: Monoid[A],
+                                  F: Monad[F]): EitherT[F, A, B] =
     filter(p)(M, F)
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
@@ -156,8 +157,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
   def orElse(x: => EitherT[F, A, B])(implicit F: Monad[F]): EitherT[F, A, B] = {
     val g = run
-    EitherT(
-        F.bind(g) {
+    EitherT(F.bind(g) {
       case -\/(_) => x.run
       case r @ (\/-(_)) => F.point(r)
     })
@@ -187,13 +187,15 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     EitherT(F.map(run)(_.ensure(onLeft)(f)))
 
   /** Compare two disjunction values for equality. */
-  def ===(x: EitherT[F, A, B])(
-      implicit EA: Equal[A], EB: Equal[B], F: Apply[F]): F[Boolean] =
+  def ===(x: EitherT[F, A, B])(implicit EA: Equal[A],
+                               EB: Equal[B],
+                               F: Apply[F]): F[Boolean] =
     F.apply2(run, x.run)(_ === _)
 
   /** Compare two disjunction values for ordering. */
-  def compare(x: EitherT[F, A, B])(
-      implicit EA: Order[A], EB: Order[B], F: Apply[F]): F[Ordering] =
+  def compare(x: EitherT[F, A, B])(implicit EA: Order[A],
+                                   EB: Order[B],
+                                   F: Apply[F]): F[Ordering] =
     F.apply2(run, x.run)(_ compare _)
 
   /** Show for a disjunction value. */
@@ -313,7 +315,8 @@ object EitherT extends EitherTInstances {
 
 sealed abstract class EitherTInstances4 {
   implicit def eitherTBindRec[F[_], E](
-      implicit F0: Monad[F], B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
+      implicit F0: Monad[F],
+      B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
     new EitherTBindRec[F, E] {
       implicit def F = F0
       implicit def B = B0
@@ -342,8 +345,8 @@ sealed abstract class EitherTInstances1 extends EitherTInstances2 {
     new EitherTMonad[F, L] {
       implicit def F = F0
     }
-  implicit def eitherTPlus[F[_], L](
-      implicit F0: Monad[F], L0: Semigroup[L]): Plus[EitherT[F, L, ?]] =
+  implicit def eitherTPlus[F[_], L](implicit F0: Monad[F],
+                                    L0: Semigroup[L]): Plus[EitherT[F, L, ?]] =
     new EitherTPlus[F, L] {
       implicit def F = F0
       implicit def G = L0
@@ -362,7 +365,8 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
       implicit def F = F0
     }
   implicit def eitherTMonadPlus[F[_], L](
-      implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[EitherT[F, L, ?]] =
+      implicit F0: Monad[F],
+      L0: Monoid[L]): MonadPlus[EitherT[F, L, ?]] =
     new EitherTMonadPlus[F, L] {
       implicit def F = F0
       implicit def G = L0
@@ -421,8 +425,8 @@ private trait EitherTBindRec[F[_], E]
   implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
-  final def tailrecM[A, B](
-      f: A => EitherT[F, E, A \/ B])(a: A): EitherT[F, E, B] =
+  final def tailrecM[A, B](f: A => EitherT[F, E, A \/ B])(
+      a: A): EitherT[F, E, B] =
     EitherT(
         B.tailrecM[A, E \/ B](a =>
               F.map(f(a).run) {
@@ -446,8 +450,7 @@ private trait EitherTPlus[F[_], E] extends Plus[EitherT[F, E, ?]] {
   def G: Semigroup[E]
 
   def plus[A](a: EitherT[F, E, A], b: => EitherT[F, E, A]): EitherT[F, E, A] =
-    EitherT(
-        F.bind(a.run) {
+    EitherT(F.bind(a.run) {
       case -\/(l) =>
         F.map(b.run) {
           case -\/(ll) => -\/(G.append(l, ll))
@@ -487,8 +490,9 @@ private trait EitherTTraverse[F[_], E]
 private trait EitherTBifunctor[F[_]] extends Bifunctor[EitherT[F, ?, ?]] {
   implicit def F: Functor[F]
 
-  override def bimap[A, B, C, D](fab: EitherT[F, A, B])(
-      f: A => C, g: B => D): EitherT[F, C, D] = fab.bimap(f, g)
+  override def bimap[A, B, C, D](
+      fab: EitherT[F, A, B])(f: A => C, g: B => D): EitherT[F, C, D] =
+    fab.bimap(f, g)
 }
 
 private trait EitherTBifoldable[F[_]]
@@ -506,8 +510,8 @@ private trait EitherTBitraverse[F[_]]
     with EitherTBifoldable[F] {
   implicit def F: Traverse[F]
 
-  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: EitherT[F, A, B])(
-      f: A => G[C], g: B => G[D]): G[EitherT[F, C, D]] =
+  def bitraverseImpl[G[_]: Applicative, A, B, C, D](
+      fab: EitherT[F, A, B])(f: A => G[C], g: B => G[D]): G[EitherT[F, C, D]] =
     fab.bitraverse(f, g)
 }
 
@@ -565,8 +569,7 @@ private trait EitherTMonadError[F[_], E]
   def raiseError[A](e: E): EitherT[F, E, A] = EitherT(F.point(-\/(e)))
   def handleError[A](fa: EitherT[F, E, A])(
       f: E => EitherT[F, E, A]): EitherT[F, E, A] =
-    EitherT(
-        F.bind(fa.run) {
+    EitherT(F.bind(fa.run) {
       case -\/(e) => f(e).run
       case r => F.point(r)
     })

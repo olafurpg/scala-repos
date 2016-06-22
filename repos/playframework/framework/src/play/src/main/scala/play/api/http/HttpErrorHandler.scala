@@ -44,8 +44,8 @@ trait HttpErrorHandler {
     * @param request The request that triggered the server error.
     * @param exception The server error.
     */
-  def onServerError(
-      request: RequestHeader, exception: Throwable): Future[Result]
+  def onServerError(request: RequestHeader,
+                    exception: Throwable): Future[Result]
 }
 
 object HttpErrorHandler {
@@ -97,7 +97,8 @@ private[play] class GlobalSettingsHttpErrorHandler @Inject()(
         Future.successful(Forbidden(views.html.defaultpages.unauthorized()))
       case NOT_FOUND => global.get.onHandlerNotFound(request)
       case clientError if statusCode >= 400 && statusCode < 500 =>
-        Future.successful(Results.Status(clientError)(views.html.defaultpages
+        Future.successful(
+            Results.Status(clientError)(views.html.defaultpages
                   .badRequest(request.method, request.uri, message)))
       case nonClientError =>
         throw new IllegalArgumentException(
@@ -171,12 +172,13 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param request The request that was bad.
     * @param message The error message.
     */
-  protected def onBadRequest(
-      request: RequestHeader, message: String): Future[Result] =
+  protected def onBadRequest(request: RequestHeader,
+                             message: String): Future[Result] =
     Future.successful(
-        BadRequest(views.html.defaultpages.badRequest(request.method,
-                                                      request.uri,
-                                                      message)))
+        BadRequest(
+            views.html.defaultpages.badRequest(request.method,
+                                               request.uri,
+                                               message)))
 
   /**
     * Invoked when a client makes a request that was forbidden.
@@ -184,8 +186,8 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param request The forbidden request.
     * @param message The error message.
     */
-  protected def onForbidden(
-      request: RequestHeader, message: String): Future[Result] =
+  protected def onForbidden(request: RequestHeader,
+                            message: String): Future[Result] =
     Future.successful(Forbidden(views.html.defaultpages.unauthorized()))
 
   /**
@@ -194,10 +196,9 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param request The request that no handler was found to handle.
     * @param message A message.
     */
-  protected def onNotFound(
-      request: RequestHeader, message: String): Future[Result] = {
-    Future.successful(
-        NotFound(environment.mode match {
+  protected def onNotFound(request: RequestHeader,
+                           message: String): Future[Result] = {
+    Future.successful(NotFound(environment.mode match {
       case Mode.Prod =>
         views.html.defaultpages.notFound(request.method, request.uri)
       case _ =>
@@ -217,7 +218,8 @@ class DefaultHttpErrorHandler(environment: Environment,
   protected def onOtherClientError(request: RequestHeader,
                                    statusCode: Int,
                                    message: String): Future[Result] = {
-    Future.successful(Results.Status(statusCode)(views.html.defaultpages
+    Future.successful(
+        Results.Status(statusCode)(views.html.defaultpages
               .badRequest(request.method, request.uri, message)))
   }
 
@@ -231,12 +233,14 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param request The request that triggered the server error.
     * @param exception The server error.
     */
-  def onServerError(
-      request: RequestHeader, exception: Throwable): Future[Result] = {
+  def onServerError(request: RequestHeader,
+                    exception: Throwable): Future[Result] = {
     try {
       val usefulException =
         HttpErrorHandlerExceptions.throwableToUsefulException(
-            sourceMapper, environment.mode == Mode.Prod, exception)
+            sourceMapper,
+            environment.mode == Mode.Prod,
+            exception)
 
       logServerError(request, usefulException)
 
@@ -259,13 +263,13 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param request The request that triggered the server error.
     * @param usefulException The server error.
     */
-  protected def logServerError(
-      request: RequestHeader, usefulException: UsefulException) {
+  protected def logServerError(request: RequestHeader,
+                               usefulException: UsefulException) {
     Logger.error("""
                     |
                     |! @%s - Internal server error, for (%s) [%s] ->
-                    | """.stripMargin.format(
-                     usefulException.id, request.method, request.uri),
+                    | """.stripMargin
+                   .format(usefulException.id, request.method, request.uri),
                  usefulException)
   }
 
@@ -275,9 +279,10 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param request The request that triggered the error.
     * @param exception The exception.
     */
-  protected def onDevServerError(
-      request: RequestHeader, exception: UsefulException): Future[Result] =
-    Future.successful(InternalServerError(
+  protected def onDevServerError(request: RequestHeader,
+                                 exception: UsefulException): Future[Result] =
+    Future.successful(
+        InternalServerError(
             views.html.defaultpages.devError(playEditor, exception)))
 
   /**
@@ -289,8 +294,8 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param request The request that triggered the error.
     * @param exception The exception.
     */
-  protected def onProdServerError(
-      request: RequestHeader, exception: UsefulException): Future[Result] =
+  protected def onProdServerError(request: RequestHeader,
+                                  exception: UsefulException): Future[Result] =
     Future.successful(
         InternalServerError(views.html.defaultpages.error(exception)))
 }
@@ -306,37 +311,39 @@ object HttpErrorHandlerExceptions {
     * This will generate an id for the exception, and in dev mode, will load the source code for the code that threw the
     * exception, making it possible to report on the location that the exception was thrown from.
     */
-  def throwableToUsefulException(
-      sourceMapper: Option[SourceMapper],
-      isProd: Boolean,
-      throwable: Throwable): UsefulException = throwable match {
-    case useful: UsefulException => useful
-    case e: ExecutionException =>
-      throwableToUsefulException(sourceMapper, isProd, e.getCause)
-    case prodException if isProd =>
-      UnexpectedException(unexpected = Some(prodException))
-    case other =>
-      val source = sourceMapper.flatMap(_.sourceFor(other))
+  def throwableToUsefulException(sourceMapper: Option[SourceMapper],
+                                 isProd: Boolean,
+                                 throwable: Throwable): UsefulException =
+    throwable match {
+      case useful: UsefulException => useful
+      case e: ExecutionException =>
+        throwableToUsefulException(sourceMapper, isProd, e.getCause)
+      case prodException if isProd =>
+        UnexpectedException(unexpected = Some(prodException))
+      case other =>
+        val source = sourceMapper.flatMap(_.sourceFor(other))
 
-      new PlayException.ExceptionSource(
-          "Execution exception",
-          "[%s: %s]".format(other.getClass.getSimpleName, other.getMessage),
-          other) {
-        def line =
-          source.flatMap(_._2).map(_.asInstanceOf[java.lang.Integer]).orNull
-        def position = null
-        def input = source.map(_._1).map(PlayIO.readFileAsString).orNull
-        def sourceName = source.map(_._1.getAbsolutePath).orNull
-      }
-  }
+        new PlayException.ExceptionSource(
+            "Execution exception",
+            "[%s: %s]".format(other.getClass.getSimpleName, other.getMessage),
+            other) {
+          def line =
+            source.flatMap(_._2).map(_.asInstanceOf[java.lang.Integer]).orNull
+          def position = null
+          def input = source.map(_._1).map(PlayIO.readFileAsString).orNull
+          def sourceName = source.map(_._1.getAbsolutePath).orNull
+        }
+    }
 }
 
 /**
   * A default HTTP error handler that can be used when there's no application available
   */
 object DefaultHttpErrorHandler
-    extends DefaultHttpErrorHandler(
-        Environment.simple(), Configuration.empty, None, None)
+    extends DefaultHttpErrorHandler(Environment.simple(),
+                                    Configuration.empty,
+                                    None,
+                                    None)
 
 /**
   * A lazy HTTP error handler, that looks up the error handler from the current application
@@ -363,15 +370,17 @@ private[play] class JavaHttpErrorHandlerDelegate @Inject()(
     extends play.http.HttpErrorHandler {
   import play.api.libs.iteratee.Execution.Implicits.trampoline
 
-  def onClientError(
-      request: Http.RequestHeader, statusCode: Int, message: String) =
+  def onClientError(request: Http.RequestHeader,
+                    statusCode: Int,
+                    message: String) =
     FutureConverters.toJava(
         delegate
           .onClientError(request._underlyingHeader(), statusCode, message)
           .map(_.asJava))
 
   def onServerError(request: Http.RequestHeader, exception: Throwable) =
-    FutureConverters.toJava(delegate
+    FutureConverters.toJava(
+        delegate
           .onServerError(request._underlyingHeader(), exception)
           .map(_.asJava))
 }

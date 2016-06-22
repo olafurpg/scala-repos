@@ -152,7 +152,7 @@ class TrainValidationSplit @Since("1.5.0")(
   */
 @Since("1.5.0")
 @Experimental
-class TrainValidationSplitModel private[ml](
+class TrainValidationSplitModel private[ml] (
     @Since("1.5.0") override val uid: String,
     @Since("1.5.0") val bestModel: Model[_],
     @Since("1.5.0") val validationMetrics: Array[Double])

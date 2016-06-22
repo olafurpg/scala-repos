@@ -102,7 +102,8 @@ class StreamExecution(val sqlContext: SQLContext,
   private[sql] def start(): Unit = {
     microBatchThread.setDaemon(true)
     microBatchThread.start()
-    startLatch.await() // Wait until thread started and QueryStart event has been posted
+    startLatch
+      .await() // Wait until thread started and QueryStart event has been posted
   }
 
   /**
@@ -309,10 +310,9 @@ class StreamExecution(val sqlContext: SQLContext,
   }
 
   def toDebugString: String = {
-    val deathCauseStr =
-      if (streamDeathCause != null) {
-        "Error:\n" + stackTraceToString(streamDeathCause.cause)
-      } else ""
+    val deathCauseStr = if (streamDeathCause != null) {
+      "Error:\n" + stackTraceToString(streamDeathCause.cause)
+    } else ""
     s"""
        |=== Continuous Query ===
        |Name: $name

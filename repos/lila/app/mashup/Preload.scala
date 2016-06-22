@@ -44,9 +44,9 @@ final class Preload(tv: Tv,
             tours: Fu[List[Tournament]],
             simuls: Fu[List[Simul]])(implicit ctx: Context): Fu[Response] =
     lobbyApi(ctx) zip posts zip tours zip simuls zip tv.getBest zip
-    (ctx.userId ?? timelineEntries) zip leaderboard(true) zip tourneyWinners(
+      (ctx.userId ?? timelineEntries) zip leaderboard(true) zip tourneyWinners(
         10) zip dailyPuzzle() zip streamsOnAir() zip (ctx.userId ?? getPlayban) zip
-    (ctx.me ?? Preload.currentGame(lightUser)) map {
+      (ctx.me ?? Preload.currentGame(lightUser)) map {
       case (((((((((((data, posts), tours), simuls), feat), entries), lead),
                 tWinners),
                puzzle),

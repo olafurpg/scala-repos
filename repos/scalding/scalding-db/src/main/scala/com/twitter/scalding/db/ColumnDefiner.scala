@@ -55,29 +55,41 @@ trait ColumnDefiner {
                          nullable: IsNullable = NotNullable,
                          sizeOpt: Option[Int] = None,
                          defaultValue: Option[String] = None) =
-    ColumnDefinition(
-        SMALLINT, ColumnName(name), nullable, sizeOpt, defaultValue)
+    ColumnDefinition(SMALLINT,
+                     ColumnName(name),
+                     nullable,
+                     sizeOpt,
+                     defaultValue)
 
   protected def tinyint(name: String,
                         nullable: IsNullable = NotNullable,
                         sizeOpt: Option[Int] = None,
                         defaultValue: Option[String] = None) =
-    ColumnDefinition(
-        TINYINT, ColumnName(name), nullable, sizeOpt, defaultValue)
+    ColumnDefinition(TINYINT,
+                     ColumnName(name),
+                     nullable,
+                     sizeOpt,
+                     defaultValue)
 
   protected def boolean(name: String,
                         nullable: IsNullable = NotNullable,
                         sizeOpt: Option[Int] = None,
                         defaultValue: Option[String] = None) =
-    ColumnDefinition(
-        BOOLEAN, ColumnName(name), nullable, sizeOpt, defaultValue)
+    ColumnDefinition(BOOLEAN,
+                     ColumnName(name),
+                     nullable,
+                     sizeOpt,
+                     defaultValue)
 
   protected def varchar(name: String,
                         nullable: IsNullable = NotNullable,
                         sizeOpt: Option[Int] = None,
                         defaultValue: Option[String] = None) =
-    ColumnDefinition(
-        VARCHAR, ColumnName(name), nullable, sizeOpt, defaultValue)
+    ColumnDefinition(VARCHAR,
+                     ColumnName(name),
+                     nullable,
+                     sizeOpt,
+                     defaultValue)
 
   protected def date(name: String,
                      nullable: IsNullable = NotNullable,
@@ -89,8 +101,11 @@ trait ColumnDefiner {
                          nullable: IsNullable = NotNullable,
                          sizeOpt: Option[Int] = None,
                          defaultValue: Option[String] = None) =
-    ColumnDefinition(
-        DATETIME, ColumnName(name), nullable, sizeOpt, defaultValue)
+    ColumnDefinition(DATETIME,
+                     ColumnName(name),
+                     nullable,
+                     sizeOpt,
+                     defaultValue)
 
   protected def text(name: String,
                      nullable: IsNullable = NotNullable,

@@ -44,8 +44,9 @@ object OffsetResponse {
 
 case class PartitionOffsetsResponse(error: Short, offsets: Seq[Long]) {
   override def toString(): String = {
-    new String("error: " + Errors.forCode(error).exceptionName + " offsets: " +
-        offsets.mkString)
+    new String(
+        "error: " + Errors.forCode(error).exceptionName + " offsets: " +
+          offsets.mkString)
   }
 }
 

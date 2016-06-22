@@ -31,7 +31,10 @@ class DDLSourceLoadSuite extends DataSourceTest with SharedSQLContext {
   }
 
   test("load data source from format alias") {
-    caseInsensitiveContext.read.format("gathering quorum").load().schema == StructType(
+    caseInsensitiveContext.read
+      .format("gathering quorum")
+      .load()
+      .schema == StructType(
         Seq(StructField("stringType", StringType, nullable = false)))
   }
 
@@ -54,8 +57,8 @@ class FakeSourceOne extends RelationProvider with DataSourceRegister {
 
   def shortName(): String = "Fluet da Bomb"
 
-  override def createRelation(
-      cont: SQLContext, param: Map[String, String]): BaseRelation =
+  override def createRelation(cont: SQLContext,
+                              param: Map[String, String]): BaseRelation =
     new BaseRelation {
       override def sqlContext: SQLContext = cont
 
@@ -69,8 +72,8 @@ class FakeSourceTwo extends RelationProvider with DataSourceRegister {
 
   def shortName(): String = "Fluet da Bomb"
 
-  override def createRelation(
-      cont: SQLContext, param: Map[String, String]): BaseRelation =
+  override def createRelation(cont: SQLContext,
+                              param: Map[String, String]): BaseRelation =
     new BaseRelation {
       override def sqlContext: SQLContext = cont
 
@@ -84,8 +87,8 @@ class FakeSourceThree extends RelationProvider with DataSourceRegister {
 
   def shortName(): String = "gathering quorum"
 
-  override def createRelation(
-      cont: SQLContext, param: Map[String, String]): BaseRelation =
+  override def createRelation(cont: SQLContext,
+                              param: Map[String, String]): BaseRelation =
     new BaseRelation {
       override def sqlContext: SQLContext = cont
 

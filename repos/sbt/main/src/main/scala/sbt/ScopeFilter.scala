@@ -49,7 +49,7 @@ object ScopeFilter {
       }
     }
 
-  final class SettingKeyAll[T] private[sbt](i: Initialize[T]) {
+  final class SettingKeyAll[T] private[sbt] (i: Initialize[T]) {
 
     /**
       * Evaluates the initialization in all scopes selected by the filter.  These are dynamic dependencies, so
@@ -63,7 +63,7 @@ object ScopeFilter {
           .join
     }
   }
-  final class TaskKeyAll[T] private[sbt](i: Initialize[Task[T]]) {
+  final class TaskKeyAll[T] private[sbt] (i: Initialize[Task[T]]) {
 
     /**
       * Evaluates the task in all scopes selected by the filter.  These are dynamic dependencies, so
@@ -195,8 +195,9 @@ object ScopeFilter {
                            classpath: Boolean): ProjectFilter =
     inResolvedProjects { data =>
       val resolvedRef = data.resolve(ref)
-      val direct = getDependencies(
-          data.units, classpath = classpath, aggregate = aggregate)
+      val direct = getDependencies(data.units,
+                                   classpath = classpath,
+                                   aggregate = aggregate)
       if (transitive) {
         val full = Dag.topologicalSort(resolvedRef)(direct)
         if (includeRoot) full else full dropRight 1

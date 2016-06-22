@@ -27,10 +27,12 @@ object EchoServer extends App {
 
     // create two EchoManager and stop the application once one dies
     val watcher = inbox()
-    watcher.watch(system.actorOf(
-            Props(classOf[EchoManager], classOf[EchoHandler]), "echo"))
-    watcher.watch(system.actorOf(
-            Props(classOf[EchoManager], classOf[SimpleEchoHandler]), "simple"))
+    watcher.watch(
+        system.actorOf(Props(classOf[EchoManager], classOf[EchoHandler]),
+                       "echo"))
+    watcher.watch(
+        system.actorOf(Props(classOf[EchoManager], classOf[SimpleEchoHandler]),
+                       "simple"))
     watcher.receive(10.minutes)
   }
 }

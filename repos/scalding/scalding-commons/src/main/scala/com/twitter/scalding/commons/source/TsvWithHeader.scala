@@ -42,37 +42,36 @@ class TsvWithHeader(p: String, f: Fields = Fields.UNKNOWN)(implicit mode: Mode)
     new Fields(names: _*)
   }
 
-  override val fields =
-    if (f == Fields.UNKNOWN) {
-      fieldsFromHeaderFile
-    } else {
-      f
-    }
+  override val fields = if (f == Fields.UNKNOWN) {
+    fieldsFromHeaderFile
+  } else {
+    f
+  }
 
   // TODO: move this method to make it a util function.
   def readFromFile(filename: String)(implicit mode: Mode) = {
     mode match {
       case Hdfs(_, conf) => {
-          try {
-            val pt = new Path(filename)
-            val fs = pt.getFileSystem(conf)
-            fs.open(pt).readUTF
-          } catch {
-            case e: IOException => {
-                throw new RuntimeException(e)
-              }
+        try {
+          val pt = new Path(filename)
+          val fs = pt.getFileSystem(conf)
+          fs.open(pt).readUTF
+        } catch {
+          case e: IOException => {
+            throw new RuntimeException(e)
           }
         }
+      }
       // Local mode
       case _ => {
-          try {
-            Files.toString(new File(filename), Charsets.UTF_8)
-          } catch {
-            case e: IOException => {
-                throw new RuntimeException(e)
-              }
+        try {
+          Files.toString(new File(filename), Charsets.UTF_8)
+        } catch {
+          case e: IOException => {
+            throw new RuntimeException(e)
           }
         }
+      }
     }
   }
 
@@ -80,42 +79,41 @@ class TsvWithHeader(p: String, f: Fields = Fields.UNKNOWN)(implicit mode: Mode)
   def writeToFile(filename: String, text: String)(implicit mode: Mode) {
     mode match {
       case Hdfs(_, conf) => {
-          try {
-            val pt = new Path(filename)
-            val fs = pt.getFileSystem(conf)
-            val br = new BufferedWriter(
-                new OutputStreamWriter(fs.create(pt, true)))
+        try {
+          val pt = new Path(filename)
+          val fs = pt.getFileSystem(conf)
+          val br = new BufferedWriter(
+              new OutputStreamWriter(fs.create(pt, true)))
 
-            br.write(text)
-            br.close()
-          } catch {
-            case e: IOException => {
-                throw new RuntimeException(e)
-              }
+          br.write(text)
+          br.close()
+        } catch {
+          case e: IOException => {
+            throw new RuntimeException(e)
           }
         }
+      }
       // Local mode
       case _ => {
-          try {
-            val br = new BufferedWriter(
-                new OutputStreamWriter(
-                    new FileOutputStream(filename), "utf-8"))
+        try {
+          val br = new BufferedWriter(
+              new OutputStreamWriter(new FileOutputStream(filename), "utf-8"))
 
-            br.write(text)
-            br.close()
-          } catch {
-            case e: IOException => {
-                throw new RuntimeException(e)
-              }
+          br.write(text)
+          br.close()
+        } catch {
+          case e: IOException => {
+            throw new RuntimeException(e)
           }
         }
+      }
     }
   }
 
   override def writeFrom(pipe: Pipe)(implicit flowDef: FlowDef, mode: Mode) = {
     val ret = super.writeFrom(pipe)(flowDef, mode)
-    val fieldNames = for (i <- (0 until fields.size)) yield
-      fields.get(i).asInstanceOf[String]
+    val fieldNames = for (i <- (0 until fields.size))
+      yield fields.get(i).asInstanceOf[String]
     val headerFileText = fieldNames.mkString("\t")
     writeToFile(headerPath, headerFileText)
     ret

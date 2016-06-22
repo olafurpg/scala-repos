@@ -52,12 +52,14 @@ private class LeadershipCoordinatorActor(var whenLeaderActors: Set[ActorRef])
     } else {
       LoggingReceive.withLabel("preparingForStart") {
         case PreparationMessages.PrepareForStart =>
-          context.become(preparingForStart(ackStartRefs + sender(),
-                                           whenLeaderActorsWithoutAck))
+          context.become(
+              preparingForStart(ackStartRefs + sender(),
+                                whenLeaderActorsWithoutAck))
 
         case PreparationMessages.Prepared(whenLeaderRef) =>
-          context.become(preparingForStart(
-                  ackStartRefs, whenLeaderActorsWithoutAck - whenLeaderRef))
+          context.become(
+              preparingForStart(ackStartRefs,
+                                whenLeaderActorsWithoutAck - whenLeaderRef))
 
         case Terminated(actorRef) =>
           log.error("unexpected death of {}", actorRef)

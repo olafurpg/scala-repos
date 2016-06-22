@@ -24,8 +24,10 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
                                             _settings: ActorSystem.Settings,
                                             _eventStream: EventStream,
                                             _dynamicAccess: DynamicAccess)
-    extends RemoteActorRefProvider(
-        _systemName, _settings, _eventStream, _dynamicAccess) {
+    extends RemoteActorRefProvider(_systemName,
+                                   _settings,
+                                   _eventStream,
+                                   _dynamicAccess) {
 
   override def init(system: ActorSystemImpl): Unit = {
     super.init(system)
@@ -64,8 +66,8 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
   *
   * Deployer of cluster aware routers.
   */
-private[akka] class ClusterDeployer(
-    _settings: ActorSystem.Settings, _pm: DynamicAccess)
+private[akka] class ClusterDeployer(_settings: ActorSystem.Settings,
+                                    _pm: DynamicAccess)
     extends RemoteDeployer(_settings, _pm) {
 
   override def parseConfig(path: String, config: Config): Option[Deploy] = {

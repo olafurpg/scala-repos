@@ -2,8 +2,9 @@ package org.scalajs.core.ir
 
 import java.io.IOException
 
-class IRVersionNotSupportedException(
-    val version: String, val supported: Set[String], message: String)
+class IRVersionNotSupportedException(val version: String,
+                                     val supported: Set[String],
+                                     message: String)
     extends IOException(message) {
 
   def this(version: String,

@@ -154,11 +154,11 @@ abstract class ClusterConsistentHashingRouterSpec
           case s: String ⇒ s
         }
 
-        val router3 = system.actorOf(
-            ConsistentHashingPool(nrOfInstances = 0,
-                                  hashMapping =
-                                    hashMapping).props(Props[Echo]),
-            "router3")
+        val router3 =
+          system.actorOf(ConsistentHashingPool(
+                             nrOfInstances = 0,
+                             hashMapping = hashMapping).props(Props[Echo]),
+                         "router3")
 
         assertHashMapping(router3)
       }
@@ -173,15 +173,14 @@ abstract class ClusterConsistentHashingRouterSpec
         }
 
         val router4 = system.actorOf(
-            ClusterRouterPool(
-                local = ConsistentHashingPool(nrOfInstances = 0,
-                                              hashMapping = hashMapping),
-                settings =
-                  ClusterRouterPoolSettings(totalInstances = 10,
-                                            maxInstancesPerNode = 1,
-                                            allowLocalRoutees = true,
-                                            useRole =
-                                              None)).props(Props[Echo]),
+            ClusterRouterPool(local = ConsistentHashingPool(nrOfInstances = 0,
+                                                            hashMapping =
+                                                              hashMapping),
+                              settings = ClusterRouterPoolSettings(
+                                  totalInstances = 10,
+                                  maxInstancesPerNode = 1,
+                                  allowLocalRoutees = true,
+                                  useRole = None)).props(Props[Echo]),
             "router4")
 
         assertHashMapping(router4)

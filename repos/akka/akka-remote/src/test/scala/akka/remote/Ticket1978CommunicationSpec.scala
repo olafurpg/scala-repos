@@ -62,13 +62,18 @@ object Configuration {
 
   def getCipherConfig(cipher: String, enabled: String*): CipherConfig = {
     val localPort, remotePort = {
-      val s = new java.net.ServerSocket(0); try s.getLocalPort finally s.close()
+      val s = new java.net.ServerSocket(0);
+      try s.getLocalPort finally s.close()
     }
     try {
       //if (true) throw new IllegalArgumentException("Ticket1978*Spec isn't enabled")
 
-      val config = ConfigFactory.parseString(conf.format(
-              localPort, trustStore, keyStore, cipher, enabled.mkString(", ")))
+      val config = ConfigFactory.parseString(
+          conf.format(localPort,
+                      trustStore,
+                      keyStore,
+                      cipher,
+                      enabled.mkString(", ")))
       val fullConfig = config
         .withFallback(AkkaSpec.testConf)
         .withFallback(ConfigFactory.load)
@@ -76,7 +81,8 @@ object Configuration {
       val settings = new SSLSettings(fullConfig)
 
       val rng = NettySSLSupport.initializeCustomSecureRandom(
-          settings.SSLRandomNumberGenerator, NoLogging)
+          settings.SSLRandomNumberGenerator,
+          NoLogging)
 
       rng.nextInt() // Has to work
       settings.SSLRandomNumberGenerator foreach { sRng ⇒
@@ -129,8 +135,9 @@ class Ticket1978AES256CounterSecureRNGSpec
   */
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class Ticket1978AES128CounterInetRNGSpec
-    extends Ticket1978CommunicationSpec(getCipherConfig(
-            "AES128CounterInetRNG", "TLS_RSA_WITH_AES_128_CBC_SHA"))
+    extends Ticket1978CommunicationSpec(
+        getCipherConfig("AES128CounterInetRNG",
+                        "TLS_RSA_WITH_AES_128_CBC_SHA"))
     with InetRNGSpec
 
 /**
@@ -138,8 +145,9 @@ class Ticket1978AES128CounterInetRNGSpec
   */
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class Ticket1978AES256CounterInetRNGSpec
-    extends Ticket1978CommunicationSpec(getCipherConfig(
-            "AES256CounterInetRNG", "TLS_RSA_WITH_AES_256_CBC_SHA"))
+    extends Ticket1978CommunicationSpec(
+        getCipherConfig("AES256CounterInetRNG",
+                        "TLS_RSA_WITH_AES_256_CBC_SHA"))
     with InetRNGSpec
 
 trait InetRNGSpec {
@@ -208,7 +216,8 @@ abstract class Ticket1978CommunicationSpec(val cipherConfig: CipherConfig)
 
       "support tell" in within(timeout.duration) {
         val here = {
-          system.actorSelection(otherAddress.toString + "/user/echo") ! Identify(
+          system
+            .actorSelection(otherAddress.toString + "/user/echo") ! Identify(
               None)
           expectMsgType[ActorIdentity].ref.get
         }
@@ -222,15 +231,18 @@ abstract class Ticket1978CommunicationSpec(val cipherConfig: CipherConfig)
       "support ask" in within(timeout.duration) {
         import system.dispatcher
         val here = {
-          system.actorSelection(otherAddress.toString + "/user/echo") ! Identify(
+          system
+            .actorSelection(otherAddress.toString + "/user/echo") ! Identify(
               None)
           expectMsgType[ActorIdentity].ref.get
         }
 
-        val f = for (i ← 1 to 1000) yield
-          here ? (("ping", i)) mapTo classTag[((String, Int), ActorRef)]
-        Await.result(Future.sequence(f), remaining).map(_._1._1).toSet should ===(
-            Set("pong"))
+        val f = for (i ← 1 to 1000)
+          yield here ? (("ping", i)) mapTo classTag[((String, Int), ActorRef)]
+        Await
+          .result(Future.sequence(f), remaining)
+          .map(_._1._1)
+          .toSet should ===(Set("pong"))
       }
     } else {
       "not be run when the cipher is not supported by the platform this test is currently being executed on" in {

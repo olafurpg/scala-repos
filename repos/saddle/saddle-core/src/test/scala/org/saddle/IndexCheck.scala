@@ -91,7 +91,11 @@ class IndexCheck extends Specification with ScalaCheck {
     "index union works" in {
       implicit val arbIndex = Arbitrary(IndexArbitraries.indexIntNoDups)
       forAll { (ix1: Index[Int], ix2: Index[Int]) =>
-        ix1.union(ix2).index.toSeq.toSet must_== { ix1.toSeq ++ ix2.toSeq }.toSet
+        ix1
+          .union(ix2)
+          .index
+          .toSeq
+          .toSet must_== { ix1.toSeq ++ ix2.toSeq }.toSet
       }
     }
 
@@ -110,7 +114,7 @@ class IndexCheck extends Specification with ScalaCheck {
 
       forAll { (ix1: Index[Int], ix2: Index[Int]) =>
         ix1.intersect(ix2).index.toSeq.toSet must_==
-          ix1.toSeq.toSet[Int].intersect(ix2.toSeq.toSet[Int])
+        ix1.toSeq.toSet[Int].intersect(ix2.toSeq.toSet[Int])
       }
     }
 
@@ -225,7 +229,11 @@ class IndexCheck extends Specification with ScalaCheck {
       implicit val arbIndex = Arbitrary(IndexArbitraries.indexTimeNoDups)
 
       forAll { (ix1: Index[DateTime], ix2: Index[DateTime]) =>
-        ix1.union(ix2).index.toSeq.toSet must_== { ix1.toSeq ++ ix2.toSeq }.toSet
+        ix1
+          .union(ix2)
+          .index
+          .toSeq
+          .toSet must_== { ix1.toSeq ++ ix2.toSeq }.toSet
       }
     }
 
@@ -244,7 +252,7 @@ class IndexCheck extends Specification with ScalaCheck {
 
       forAll { (ix1: Index[DateTime], ix2: Index[DateTime]) =>
         ix1.intersect(ix2).index.toSeq.toSet must_==
-          ix1.toSeq.toSet[DateTime].intersect(ix2.toSeq.toSet[DateTime])
+        ix1.toSeq.toSet[DateTime].intersect(ix2.toSeq.toSet[DateTime])
       }
     }
 

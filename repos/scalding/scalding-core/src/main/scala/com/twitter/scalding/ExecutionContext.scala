@@ -49,8 +49,8 @@ trait ExecutionContext {
     val conf = step.getConfig
     getIdentifierOpt(ExecutionContext.getDesc(step))
       .foreach(descriptionString => {
-      conf.set(Config.StepDescriptions, descriptionString)
-    })
+        conf.set(Config.StepDescriptions, descriptionString)
+      })
   }
 
   final def buildFlow: Try[Flow[_]] =
@@ -126,7 +126,8 @@ trait ExecutionContext {
             case Success(fn) => flow.addStepListener(fn(mode, configWithId))
             case Failure(e) =>
               new Exception(
-                  "Failed to decode flow step listener when submitting job", e)
+                  "Failed to decode flow step listener when submitting job",
+                  e)
           }
 
         case _ => ()
@@ -176,8 +177,8 @@ object ExecutionContext {
    * can be used inside of a Job to get an ExecutionContext if you want
    * to call a function that requires an implicit ExecutionContext
    */
-  def newContext(
-      conf: Config)(implicit fd: FlowDef, m: Mode): ExecutionContext =
+  def newContext(conf: Config)(implicit fd: FlowDef,
+                               m: Mode): ExecutionContext =
     new ExecutionContext {
       def config = conf
       def flowDef = fd

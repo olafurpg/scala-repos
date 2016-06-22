@@ -66,75 +66,73 @@ object DesktopIngestShardServer
   implicit val M: Monad[Future] = new FutureMonad(executionContext)
 
   def runGUI(config: Configuration): Option[Future[PrecogUnit]] = {
-    val guiNotifier =
-      if (config[Boolean]("appwindow.enabled", false)) {
-        logger.info("Starting gui window")
-        // Add a window with a menu for shutdown
-        val notifyArea = new JTextArea(25, 80)
+    val guiNotifier = if (config[Boolean]("appwindow.enabled", false)) {
+      logger.info("Starting gui window")
+      // Add a window with a menu for shutdown
+      val notifyArea = new JTextArea(25, 80)
 
-        EventQueue.invokeLater(new Runnable {
-          def run() {
-            val precogMenu = new JMenu("Precog for Desktop")
-            val quitItem = new JMenuItem("Quit", KeyEvent.VK_Q)
-            quitItem.addActionListener(new ActionListener {
-              def actionPerformed(ev: ActionEvent) = {
-                System.exit(0)
-              }
-            })
-
-            precogMenu.add(quitItem)
-
-            val labcoatMenu = new JMenu("Labcoat")
-            val launchItem = new JMenuItem("Launch", KeyEvent.VK_L)
-            launchItem.addActionListener(new ActionListener {
-              def actionPerformed(ev: ActionEvent) = {
-                LaunchLabcoat.launchBrowser(config)
-              }
-            })
-
-            labcoatMenu.add(launchItem)
-
-            val menubar = new JMenuBar
-            menubar.add(precogMenu)
-            menubar.add(labcoatMenu)
-
-            val appFrame = new JFrame("Precog for Desktop")
-            appFrame.setJMenuBar(menubar)
-
-            appFrame.addWindowListener(new WindowAdapter {
-              override def windowClosed(ev: WindowEvent) = {
-                System.exit(0)
-              }
-            })
-
-            notifyArea.setEditable(false)
-            appFrame.add(notifyArea)
-
-            appFrame.pack()
-
-            val iconUrl =
-              ClassLoader.getSystemClassLoader.getResource("LargeIcon.png")
-            logger.debug("Loaded icon: " + iconUrl)
-            appFrame.setIconImage(Toolkit.getDefaultToolkit.getImage(iconUrl))
-
-            appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-
-            appFrame.setVisible(true)
-          }
-        })
-
-        Some({ (msg: String) =>
-          EventQueue.invokeLater(
-              new Runnable {
-            def run() {
-              notifyArea.append(msg + "\n")
+      EventQueue.invokeLater(new Runnable {
+        def run() {
+          val precogMenu = new JMenu("Precog for Desktop")
+          val quitItem = new JMenuItem("Quit", KeyEvent.VK_Q)
+          quitItem.addActionListener(new ActionListener {
+            def actionPerformed(ev: ActionEvent) = {
+              System.exit(0)
             }
           })
+
+          precogMenu.add(quitItem)
+
+          val labcoatMenu = new JMenu("Labcoat")
+          val launchItem = new JMenuItem("Launch", KeyEvent.VK_L)
+          launchItem.addActionListener(new ActionListener {
+            def actionPerformed(ev: ActionEvent) = {
+              LaunchLabcoat.launchBrowser(config)
+            }
+          })
+
+          labcoatMenu.add(launchItem)
+
+          val menubar = new JMenuBar
+          menubar.add(precogMenu)
+          menubar.add(labcoatMenu)
+
+          val appFrame = new JFrame("Precog for Desktop")
+          appFrame.setJMenuBar(menubar)
+
+          appFrame.addWindowListener(new WindowAdapter {
+            override def windowClosed(ev: WindowEvent) = {
+              System.exit(0)
+            }
+          })
+
+          notifyArea.setEditable(false)
+          appFrame.add(notifyArea)
+
+          appFrame.pack()
+
+          val iconUrl =
+            ClassLoader.getSystemClassLoader.getResource("LargeIcon.png")
+          logger.debug("Loaded icon: " + iconUrl)
+          appFrame.setIconImage(Toolkit.getDefaultToolkit.getImage(iconUrl))
+
+          appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+
+          appFrame.setVisible(true)
+        }
+      })
+
+      Some({ (msg: String) =>
+        EventQueue.invokeLater(new Runnable {
+          def run() {
+            notifyArea.append(msg + "\n")
+          }
         })
-      } else {
-        logger.info("Skipping gui window")
-        None
-      }
+      })
+    } else {
+      logger.info("Skipping gui window")
+      None
+    }
 
     guiNotifier.foreach(_ ("Starting internal services"))
     val zookeeper = startZookeeperStandalone(config.detach("zookeeper"))
@@ -182,8 +180,8 @@ object DesktopIngestShardServer
       apiKeyFinder: APIKeyFinder[Future],
       jobManager: JobManager[Future]): (ManagedPlatform, Stoppable) = {
     val rootAPIKey = config[String]("security.masterAccount.apiKey")
-    val accountFinder = new StaticAccountFinder(
-        "desktop", rootAPIKey, Some("/"))
+    val accountFinder =
+      new StaticAccountFinder("desktop", rootAPIKey, Some("/"))
     val platform = platformFactory(config.detach("queryExecutor"),
                                    apiKeyFinder,
                                    accountFinder,
@@ -235,8 +233,8 @@ object DesktopIngestShardServer
     defaultProps.setProperty("log.cleanup.interval.mins", "1")
     defaultProps.setProperty("zk.connectiontimeout.ms", "1000000")
 
-    defaultProps.setProperty(
-        "zk.connect", "localhost:" + config[String]("zookeeper.port"))
+    defaultProps.setProperty("zk.connect",
+                             "localhost:" + config[String]("zookeeper.port"))
 
     val centralProps = defaultProps.clone.asInstanceOf[Properties]
     centralProps.putAll(config.detach("kafka").data.asJava)
@@ -323,13 +321,15 @@ object LaunchLabcoat {
     launchBrowser(jettyPort, shardPort, zkPort, kafkaPort)
   }
 
-  def launchBrowser(
-      jettyPort: Int, shardPort: Int, zkPort: Int, kafkaPort: Int): Unit = {
+  def launchBrowser(jettyPort: Int,
+                    shardPort: Int,
+                    zkPort: Int,
+                    kafkaPort: Int): Unit = {
     def waitForPorts =
       DesktopIngestShardServer.waitForPortOpen(jettyPort, 15) &&
-      DesktopIngestShardServer.waitForPortOpen(shardPort, 15) &&
-      DesktopIngestShardServer.waitForPortOpen(zkPort, 15) &&
-      DesktopIngestShardServer.waitForPortOpen(kafkaPort, 15)
+        DesktopIngestShardServer.waitForPortOpen(shardPort, 15) &&
+        DesktopIngestShardServer.waitForPortOpen(zkPort, 15) &&
+        DesktopIngestShardServer.waitForPortOpen(kafkaPort, 15)
 
     @tailrec
     def doLaunch() {

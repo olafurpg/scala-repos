@@ -71,15 +71,18 @@ class FormatterTest extends WordSpec {
 
   "Formatter" should {
     "create a prefix" in {
-      assert(basicFormatter.formatPrefix(
+      assert(
+          basicFormatter.formatPrefix(
               Level.ERROR,
               "20080329-05:53:16.722",
               "(root)") == "ERR [20080329-05:53:16.722] (root): ")
-      assert(basicFormatter.formatPrefix(
+      assert(
+          basicFormatter.formatPrefix(
               Level.DEBUG,
               "20080329-05:53:16.722",
               "(root)") == "DEB [20080329-05:53:16.722] (root): ")
-      assert(basicFormatter.formatPrefix(
+      assert(
+          basicFormatter.formatPrefix(
               Level.WARNING,
               "20080329-05:53:16.722",
               "(root)") == "WAR [20080329-05:53:16.722] (root): ")
@@ -100,7 +103,8 @@ class FormatterTest extends WordSpec {
 
     "format a timestamp" in {
       assert(
-          utcFormatter.format(record1) == "ERR [20080329-05:53:16.722] jobs: boo.\n")
+          utcFormatter
+            .format(record1) == "ERR [20080329-05:53:16.722] jobs: boo.\n")
     }
 
     "do lazy message evaluation" in {
@@ -121,9 +125,11 @@ class FormatterTest extends WordSpec {
 
     "format package names" in {
       assert(
-          utcFormatter.format(record1) == "ERR [20080329-05:53:16.722] jobs: boo.\n")
+          utcFormatter
+            .format(record1) == "ERR [20080329-05:53:16.722] jobs: boo.\n")
       assert(
-          fullPackageFormatter.format(record1) == "ERR [20080329-05:53:16.722] com.example.jobs: boo.\n")
+          fullPackageFormatter
+            .format(record1) == "ERR [20080329-05:53:16.722] com.example.jobs: boo.\n")
     }
 
     "handle other prefixes" in {
@@ -133,7 +139,8 @@ class FormatterTest extends WordSpec {
 
     "truncate line" in {
       assert(
-          truncateFormatter.format(record3) == "CRI [20080329-05:53:16.722] whiskey: Something terrible happened th...\n")
+          truncateFormatter
+            .format(record3) == "CRI [20080329-05:53:16.722] whiskey: Something terrible happened th...\n")
     }
 
     "write stack traces" should {
@@ -204,8 +211,9 @@ class FormatterTest extends WordSpec {
 
       "log even blank exceptions" in {
         assert(
-            utcFormatter.format(record4) == "ERR [20080329-05:53:16.722] jobs: with minimal exception\n" +
-            "ERR [20080329-05:53:16.722] jobs: java.lang.Exception: fast exception no stacktrace\n")
+            utcFormatter
+              .format(record4) == "ERR [20080329-05:53:16.722] jobs: with minimal exception\n" +
+              "ERR [20080329-05:53:16.722] jobs: java.lang.Exception: fast exception no stacktrace\n")
       }
     }
   }

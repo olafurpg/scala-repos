@@ -61,8 +61,9 @@ object TimeoutFilter {
     * for use in servers.
     */
   def serverModule[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module2[
-        TimeoutFilter.Param, param.Timer, ServiceFactory[Req, Rep]] {
+    new Stack.Module2[TimeoutFilter.Param,
+                      param.Timer,
+                      ServiceFactory[Req, Rep]] {
       val role = TimeoutFilter.role
       val description =
         "Apply a timeout-derived deadline to requests; adjust existing deadlines."
@@ -104,8 +105,9 @@ object TimeoutFilter {
   *      and [[https://twitter.github.io/finagle/guide/Servers.html#request-timeout servers]]
   *      in the user guide for more details.
   */
-class TimeoutFilter[Req, Rep](
-    timeout: Duration, exception: RequestTimeoutException, timer: Timer)
+class TimeoutFilter[Req, Rep](timeout: Duration,
+                              exception: RequestTimeoutException,
+                              timer: Timer)
     extends SimpleFilter[Req, Rep] {
   def this(timeout: Duration, timer: Timer) =
     this(timeout, new IndividualRequestTimeoutException(timeout), timer)

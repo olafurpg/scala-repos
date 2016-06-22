@@ -34,7 +34,8 @@ class OneHotEncoderSuite
 
   def stringIndexed(): DataFrame = {
     val data = sc.parallelize(
-        Seq((0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c")), 2)
+        Seq((0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c")),
+        2)
     val df = sqlContext.createDataFrame(data).toDF("id", "label")
     val indexer = new StringIndexer()
       .setInputCol("label")
@@ -111,10 +112,12 @@ class OneHotEncoderSuite
     val output = encoder.transform(df)
     val group = AttributeGroup.fromStructField(output.schema("encoded"))
     assert(group.size === 2)
-    assert(group.getAttr(0) === BinaryAttribute.defaultAttr
+    assert(
+        group.getAttr(0) === BinaryAttribute.defaultAttr
           .withName("small")
           .withIndex(0))
-    assert(group.getAttr(1) === BinaryAttribute.defaultAttr
+    assert(
+        group.getAttr(1) === BinaryAttribute.defaultAttr
           .withName("medium")
           .withIndex(1))
   }
@@ -128,10 +131,12 @@ class OneHotEncoderSuite
     val output = encoder.transform(df)
     val group = AttributeGroup.fromStructField(output.schema("encoded"))
     assert(group.size === 2)
-    assert(group.getAttr(0) === BinaryAttribute.defaultAttr
+    assert(
+        group.getAttr(0) === BinaryAttribute.defaultAttr
           .withName("0")
           .withIndex(0))
-    assert(group.getAttr(1) === BinaryAttribute.defaultAttr
+    assert(
+        group.getAttr(1) === BinaryAttribute.defaultAttr
           .withName("1")
           .withIndex(1))
   }

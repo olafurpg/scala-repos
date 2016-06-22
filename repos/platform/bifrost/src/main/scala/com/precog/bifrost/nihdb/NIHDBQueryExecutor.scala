@@ -154,7 +154,8 @@ trait NIHDBQueryExecutorComponent {
       val jobActorSystem = ActorSystem("jobPollingActorSystem")
 
       val chefs = (1 to yggConfig.howManyChefsInTheKitchen).map { _ =>
-        actorSystem.actorOf(Props(
+        actorSystem.actorOf(
+            Props(
                 Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
                      VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
       }
@@ -166,7 +167,9 @@ trait NIHDBQueryExecutorComponent {
 
       val jobManager = extJobManager
       val permissionsFinder = new PermissionsFinder(
-          extApiKeyFinder, extAccountFinder, yggConfig.timestampRequiredAfter)
+          extApiKeyFinder,
+          extAccountFinder,
+          yggConfig.timestampRequiredAfter)
       val resourceBuilder = new ResourceBuilder(actorSystem,
                                                 clock,
                                                 masterChef,
@@ -174,35 +177,38 @@ trait NIHDBQueryExecutorComponent {
                                                 storageTimeout)
 
       private val projectionsActor = actorSystem.actorOf(
-          Props(new PathRoutingActor(yggConfig.dataDir,
-                                     storageTimeout.duration,
-                                     yggConfig.quiescenceTimeout,
-                                     yggConfig.maxOpenPaths,
-                                     clock)))
+          Props(
+              new PathRoutingActor(yggConfig.dataDir,
+                                   storageTimeout.duration,
+                                   yggConfig.quiescenceTimeout,
+                                   yggConfig.maxOpenPaths,
+                                   clock)))
       val ingestSystem = initShardActors(permissionsFinder, projectionsActor)
 
-      private val actorVFS = new ActorVFS(
-          projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
+      private val actorVFS = new ActorVFS(projectionsActor,
+                                          yggConfig.storageTimeout,
+                                          yggConfig.storageTimeout)
       val vfs = new SecureVFS(actorVFS, permissionsFinder, jobManager, clock)
 
       private val (scheduleStorage, scheduleStorageStoppable) =
         MongoScheduleStorage(config0.detach("scheduling"))
 
       private val scheduleActor = actorSystem.actorOf(
-          Props(new SchedulingActor(jobManager,
-                                    permissionsFinder,
-                                    scheduleStorage,
-                                    platform,
-                                    clock)))
+          Props(
+              new SchedulingActor(jobManager,
+                                  permissionsFinder,
+                                  scheduleStorage,
+                                  platform,
+                                  clock)))
 
-      val scheduler = new ActorScheduler(
-          scheduleActor, yggConfig.schedulingTimeout)
+      val scheduler =
+        new ActorScheduler(scheduleActor, yggConfig.schedulingTimeout)
 
       trait TableCompanion extends VFSColumnarTableCompanion
       object Table extends TableCompanion
 
-      def ingestFailureLog(
-          checkpoint: YggCheckpoint, logRoot: File): IngestFailureLog =
+      def ingestFailureLog(checkpoint: YggCheckpoint,
+                           logRoot: File): IngestFailureLog =
         FilesystemIngestFailureLog(logRoot, checkpoint)
 
       def asyncExecutorFor(apiKey: APIKey) = {
@@ -247,14 +253,16 @@ trait NIHDBQueryExecutorComponent {
 
       def shutdown() =
         for {
-          _ <- Stoppable.stop(Stoppable.fromFuture(gracefulStop(
+          _ <- Stoppable.stop(
+                  Stoppable.fromFuture(gracefulStop(
                           scheduleActor,
                           yggConfig.schedulingTimeout.duration)(actorSystem)))
-          _ <- Stoppable.stop(ingestSystem
+          _ <- Stoppable.stop(
+                  ingestSystem
                     .map(_.stoppable)
                     .getOrElse(Stoppable.fromFuture(Future(()))))
-          _ <- IngestSystem.actorStop(
-                  yggConfig, projectionsActor, "projections")
+          _ <- IngestSystem
+                .actorStop(yggConfig, projectionsActor, "projections")
           _ <- IngestSystem.actorStop(yggConfig, masterChef, "masterChef")
           _ <- Stoppable.stop(scheduleStorageStoppable)
           _ <- chefs

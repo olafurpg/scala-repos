@@ -37,7 +37,7 @@ abstract class Specs2ObjectSpecTest extends Specs2TestCase {
                                            "SpecObject",
                                            "single test in SpecObject should",
                                            "run alone") &&
-          checkResultTreeDoesNotHaveNodes(root, "ignore other test"),
+            checkResultTreeDoesNotHaveNodes(root, "ignore other test"),
         debug = true)
   }
 }

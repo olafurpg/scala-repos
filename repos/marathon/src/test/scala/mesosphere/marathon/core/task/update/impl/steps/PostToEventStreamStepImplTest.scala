@@ -57,7 +57,8 @@ class PostToEventStreamStepImplTest
         ))
     And("only sending event info gets logged")
     logs should have size 1
-    logs.map(_.toString) should be(Seq(
+    logs.map(_.toString) should be(
+        Seq(
             s"[INFO] Sending event notification for $taskId of app [$appId]: ${status.getState}"
         ))
   }
@@ -140,7 +141,8 @@ class PostToEventStreamStepImplTest
         ))
     And("only sending event info gets logged")
     logs should have size 1
-    logs.map(_.toString) should be(Seq(
+    logs.map(_.toString) should be(
+        Seq(
             s"[INFO] Sending event notification for $taskId of app [$appId]: ${status.getState}"
         ))
   }

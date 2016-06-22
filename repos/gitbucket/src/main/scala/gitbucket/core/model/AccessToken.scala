@@ -12,7 +12,7 @@ trait AccessTokenComponent { self: Profile =>
     val note = column[String]("NOTE")
     def * =
       (accessTokenId, userName, tokenHash, note) <>
-      (AccessToken.tupled, AccessToken.unapply)
+        (AccessToken.tupled, AccessToken.unapply)
   }
 }
 case class AccessToken(

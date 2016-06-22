@@ -101,7 +101,7 @@ abstract class CharArrayReader extends CharArrayReaderData { self =>
     if (charOffset < buf.length && buf(charOffset) == 'u' && decodeUni &&
         evenSlashPrefix) {
       do charOffset += 1 while (charOffset < buf.length &&
-      buf(charOffset) == 'u')
+        buf(charOffset) == 'u')
       val code = udigit << 12 | udigit << 8 | udigit << 4 | udigit
       lastUnicodeOffset = charOffset
       ch = code.toChar

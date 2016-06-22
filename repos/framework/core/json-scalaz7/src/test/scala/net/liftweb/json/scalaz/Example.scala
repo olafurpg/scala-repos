@@ -19,7 +19,7 @@ object Example extends Specification {
     val json = parse(""" {"street": "Manhattan 2", "zip": "00223" } """)
     val a1 =
       field[String]("zip")(json) <*>
-      (field[String]("street")(json) map Address.curried)
+        (field[String]("street")(json) map Address.curried)
     val a2 = (field[String]("street")(json) |@| field[String]("zip")(json)) {
       Address
     }
@@ -46,8 +46,9 @@ object Example extends Specification {
 
     val p = parse(
         """ {"name":"joe","age":34,"address":{"street": "Manhattan 2", "zip": "00223" }} """)
-    val person = Person.applyJSON(
-        field[String]("name"), field[Int]("age"), field[Address]("address"))(p)
+    val person = Person.applyJSON(field[String]("name"),
+                                  field[Int]("age"),
+                                  field[Address]("address"))(p)
     person mustEqual Success(
         Person("joe", 34, Address("Manhattan 2", "00223")))
   }
@@ -62,7 +63,7 @@ object Example extends Specification {
     val p = Person("joe", 34, Address("Manhattan 2", "00223"))
     val json = makeObj(
         ("name" -> toJSON(p.name)) :: ("age" -> toJSON(p.age)) ::
-        ("address" -> toJSON(p.address)) :: Nil)
+          ("address" -> toJSON(p.address)) :: Nil)
     json.shows mustEqual """{"name":"joe","age":34,"address":{"street":"Manhattan 2","zip":"00223"}}"""
   }
 

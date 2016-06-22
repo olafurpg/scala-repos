@@ -64,7 +64,8 @@ object SourceBuilder {
     "%s_%d".format(manifest[T], nextId.getAndIncrement)
 
   def apply[T](eventSource: EventSource[T], timeOf: T => Date)(
-      implicit mf: Manifest[T], eventCodec: Codec[T]) = {
+      implicit mf: Manifest[T],
+      eventCodec: Codec[T]) = {
     implicit val te = TimeExtractor[T](timeOf(_).getTime)
     val newID = nextName[T]
     val scaldingSource =
@@ -108,7 +109,8 @@ case class SourceBuilder[T: Manifest] private (
     flatMap(newFlatMapper(_))
 
   def write[U](sink: CompoundSink[U])(conversion: T => TraversableOnce[U])(
-      implicit batcher: Batcher, mf: Manifest[U]): SourceBuilder[T] = {
+      implicit batcher: Batcher,
+      mf: Manifest[U]): SourceBuilder[T] = {
     val newNode = node
       .flatMap(conversion)
       .write(

@@ -70,7 +70,8 @@ class DescriptorParserSpec extends EnsimeSpec {
     parseType("LMyAnnotation;") should ===(ClassName(root, "MyAnnotation"))
 
     // of course, SUN break their own rules for package names (capitals)
-    Try(parseType(
+    Try(
+        parseType(
             "Lcom/sun/tools/corba/se/idl/toJavaPortable/NameModifierImpl;")).success
 
     // hmmm, apache, what???? dashes in package names????

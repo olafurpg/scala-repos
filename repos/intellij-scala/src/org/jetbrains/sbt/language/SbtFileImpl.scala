@@ -29,11 +29,11 @@ class SbtFileImpl(provider: FileViewProvider)
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean =
-    super [ScalaFileImpl]
+    super[ScalaFileImpl]
       .processDeclarations(processor, state, lastParent, place) &&
-    super [ScDeclarationSequenceHolder].processDeclarations(
-        processor, state, lastParent, place) &&
-    processImplicitImports(processor, state, lastParent, place)
+      super[ScDeclarationSequenceHolder]
+        .processDeclarations(processor, state, lastParent, place) &&
+      processImplicitImports(processor, state, lastParent, place)
 
   private def processImplicitImports(processor: PsiScopeProcessor,
                                      state: ResolveState,
@@ -86,7 +86,8 @@ class SbtFileImpl(provider: FileViewProvider)
 
   private def projectDefinitionModule: Option[Module] = fileModule.flatMap {
     module =>
-      Option(ModuleManager
+      Option(
+          ModuleManager
             .getInstance(getProject)
             .findModuleByName(module.getName + Sbt.BuildModuleSuffix))
   }

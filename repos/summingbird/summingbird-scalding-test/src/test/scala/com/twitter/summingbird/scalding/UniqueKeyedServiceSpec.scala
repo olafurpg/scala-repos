@@ -13,11 +13,9 @@ import org.scalatest.WordSpec
 class UniqueKeyJoinJob(args: Args) extends Job(args) {
 
   // K: Int, W: Long, V: String
-  val input =
-    TypedTsv[(Timestamp, (Int, Long))]("input0") // left side of the join
+  val input = TypedTsv[(Timestamp, (Int, Long))]("input0") // left side of the join
   val serv = TypedTsv[(Int, String)]("input1") // service to be looked up
-  val versionedSource =
-    VersionedKeyValSource[Int, String]("input2") // source to be looked up
+  val versionedSource = VersionedKeyValSource[Int, String]("input2") // source to be looked up
 
   val uniqueKeyJoiner =
     UniqueKeyedService.fromAndThen[(Int, String), Int, String](

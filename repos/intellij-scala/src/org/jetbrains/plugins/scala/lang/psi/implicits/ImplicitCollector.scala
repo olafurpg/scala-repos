@@ -89,9 +89,9 @@ class ImplicitCollector(
     isImplicitConversion: Boolean,
     isExtensionConversion: Boolean,
     searchImplicitsRecursively: Int = 0,
-    predicate: Option[(ScalaResolveResult,
-                       ScSubstitutor) => Option[(ScalaResolveResult,
-                                                 ScSubstitutor)]] = None,
+    predicate: Option[
+        (ScalaResolveResult,
+         ScSubstitutor) => Option[(ScalaResolveResult, ScSubstitutor)]] = None,
     previousRecursionState: Option[RecursionMap] = None) {
   def this(state: ImplicitState) {
     this(state.place,
@@ -135,8 +135,10 @@ class ImplicitCollector(
       var stop = false
       while (!stop) {
         if (placeForTreeWalkUp == null ||
-            !placeForTreeWalkUp.processDeclarations(
-                processor, ResolveState.initial(), lastParent, place))
+            !placeForTreeWalkUp.processDeclarations(processor,
+                                                    ResolveState.initial(),
+                                                    lastParent,
+                                                    place))
           stop = true
         placeForTreeWalkUp match {
           case (_: ScTemplateBody | _: ScExtendsBlock) =>
@@ -150,8 +152,7 @@ class ImplicitCollector(
               case e: ScTemplateParents => placeCalculated = true
               case m: ScModifierListOwner
                   if m.hasModifierProperty("implicit") =>
-                placeCalculated =
-                  true //we need to check that, otherwise we will be outside
+                placeCalculated = true //we need to check that, otherwise we will be outside
               case _ =>
             }
             if (predicate.isEmpty)
@@ -171,8 +172,9 @@ class ImplicitCollector(
 
       if (!fullInfo) processor = new ImplicitParametersProcessor(true)
 
-      for (obj <- ScalaPsiUtil.collectImplicitObjects(
-                     expandedTp, place.getProject, place.getResolveScope)) {
+      for (obj <- ScalaPsiUtil.collectImplicitObjects(expandedTp,
+                                                      place.getProject,
+                                                      place.getResolveScope)) {
         processor.processType(obj, place, ResolveState.initial())
       }
 
@@ -211,11 +213,11 @@ class ImplicitCollector(
           if (!isPredefPriority && !ResolveUtils.isAccessible(o, getPlace))
             return true
           addResult(
-              new ScalaResolveResult(o,
-                                     subst,
-                                     getImports(state),
-                                     implicitSearchState =
-                                       Some(collectorState)))
+              new ScalaResolveResult(
+                  o,
+                  subst,
+                  getImports(state),
+                  implicitSearchState = Some(collectorState)))
         case param: ScParameter if param.isImplicitParameter =>
           placeCalculated = true
           param match {
@@ -225,14 +227,14 @@ class ImplicitCollector(
             case _ =>
           }
           addResult(
-              new ScalaResolveResult(param,
-                                     subst,
-                                     getImports(state),
-                                     implicitSearchState =
-                                       Some(collectorState)))
+              new ScalaResolveResult(
+                  param,
+                  subst,
+                  getImports(state),
+                  implicitSearchState = Some(collectorState)))
         case f: ScFieldId =>
-          val memb = ScalaPsiUtil.getContextOfType(
-              f, true, classOf[ScValue], classOf[ScVariable])
+          val memb = ScalaPsiUtil
+            .getContextOfType(f, true, classOf[ScValue], classOf[ScVariable])
           memb match {
             case memb: ScMember if memb.hasModifierProperty("implicit") =>
               placeCalculated = true
@@ -247,8 +249,10 @@ class ImplicitCollector(
             case _ =>
           }
         case patt: ScBindingPattern =>
-          val memb = ScalaPsiUtil.getContextOfType(
-              patt, true, classOf[ScValue], classOf[ScVariable])
+          val memb = ScalaPsiUtil.getContextOfType(patt,
+                                                   true,
+                                                   classOf[ScValue],
+                                                   classOf[ScVariable])
           memb match {
             case memb: ScMember if memb.hasModifierProperty("implicit") =>
               placeCalculated = true
@@ -294,7 +298,7 @@ class ImplicitCollector(
         (c.element match {
           case o: ScObject
               if !withLocalTypeInference &&
-              !PsiTreeUtil.isContextAncestor(o, place, false) =>
+                !PsiTreeUtil.isContextAncestor(o, place, false) =>
             o.getType(TypingContext.empty) match {
               case Success(objType: ScType, _) =>
                 if (!subst.subst(objType).conforms(tp))
@@ -310,7 +314,7 @@ class ImplicitCollector(
             }
           case param: ScParameter
               if !withLocalTypeInference &&
-              !PsiTreeUtil.isContextAncestor(param, place, false) =>
+                !PsiTreeUtil.isContextAncestor(param, place, false) =>
             param.getType(TypingContext.empty) match {
               case Success(paramType: ScType, _) =>
                 if (!subst.subst(paramType).conforms(tp))
@@ -326,7 +330,9 @@ class ImplicitCollector(
             }
           case patt: ScBindingPattern
               if !withLocalTypeInference && !PsiTreeUtil.isContextAncestor(
-                  ScalaPsiUtil.nameContext(patt), place, false) =>
+                  ScalaPsiUtil.nameContext(patt),
+                  place,
+                  false) =>
             patt.getType(TypingContext.empty) match {
               case Success(pattType: ScType, _) if !withLocalTypeInference =>
                 if (!subst.subst(pattType).conforms(tp))
@@ -342,7 +348,9 @@ class ImplicitCollector(
             }
           case f: ScFieldId
               if !withLocalTypeInference && !PsiTreeUtil.isContextAncestor(
-                  ScalaPsiUtil.nameContext(f), place, false) =>
+                  ScalaPsiUtil.nameContext(f),
+                  place,
+                  false) =>
             f.getType(TypingContext.empty) match {
               case Success(fType: ScType, _) =>
                 if (!subst.subst(fType).conforms(tp))
@@ -367,7 +375,7 @@ class ImplicitCollector(
 
             val oneImplicit =
               fun.effectiveParameterClauses.length == 1 &&
-              fun.effectiveParameterClauses.head.isImplicit
+                fun.effectiveParameterClauses.head.isImplicit
             //to avoid checking implicit functions in case of simple implicit parameter search
             if (!oneImplicit && fun.effectiveParameterClauses.nonEmpty) {
               clazz match {
@@ -414,10 +422,12 @@ class ImplicitCollector(
                         Some(c.copy(implicitReason = OkResult), subst)
                       else {
                         val methodType = lastImplicit
-                          .map(li =>
-                                subst.subst(ScMethodType(ret,
-                                                         li.getSmartParameters,
-                                                         isImplicit = true)(
+                          .map(
+                              li =>
+                                subst.subst(
+                                    ScMethodType(ret,
+                                                 li.getSmartParameters,
+                                                 isImplicit = true)(
                                         place.getProject,
                                         place.getResolveScope)))
                           .getOrElse(ret)
@@ -427,14 +437,15 @@ class ImplicitCollector(
                             tp: ScType): (ScType, Seq[TypeParameter]) = {
                           if (isExtensionConversion) {
                             tp match {
-                              case ScTypePolymorphicType(
-                                  internalType, typeParams) =>
+                              case ScTypePolymorphicType(internalType,
+                                                         typeParams) =>
                                 val filteredTypeParams = typeParams.filter(
                                     tp =>
                                       !tp.lowerType().equiv(types.Nothing) ||
-                                      !tp.upperType().equiv(types.Any))
+                                        !tp.upperType().equiv(types.Any))
                                 val newPolymorphicType = ScTypePolymorphicType(
-                                    internalType, filteredTypeParams)
+                                    internalType,
+                                    filteredTypeParams)
                                 (newPolymorphicType.inferValueType.recursiveUpdate {
                                   case u: ScUndefinedType => (true, u.tpt)
                                   case tp: ScType => (false, tp)
@@ -443,8 +454,8 @@ class ImplicitCollector(
                             }
                           } else
                             tp match {
-                              case ScTypePolymorphicType(
-                                  internalType, typeParams) =>
+                              case ScTypePolymorphicType(internalType,
+                                                         typeParams) =>
                                 (tp.inferValueType, typeParams)
                               case _ => (tp.inferValueType, Seq.empty)
                             }
@@ -452,8 +463,8 @@ class ImplicitCollector(
                         var nonValueType: TypeResult[ScType] = Success(
                             if (polymorphicTypeParameters.isEmpty) methodType
                             else
-                              ScTypePolymorphicType(
-                                  methodType, polymorphicTypeParameters),
+                              ScTypePolymorphicType(methodType,
+                                                    polymorphicTypeParameters),
                             Some(place))
                         try {
                           def reportWrong(result: ImplicitResult)
@@ -492,7 +503,7 @@ class ImplicitCollector(
                                   inferValueType(
                                       nonValueType
                                         .getOrElse(return reportWrong(
-                                              BadTypeResult))) match {
+                                                BadTypeResult))) match {
                                     case (ScFunctionType(rt, _), _) =>
                                       if (predicateFunction(
                                               c.copy(implicitParameterType =
@@ -537,7 +548,8 @@ class ImplicitCollector(
                                 results.foldLeft(result) {
                                   case (r1: ScalaResolveResult,
                                         r2: ScalaResolveResult) =>
-                                    r1.copy(importsUsed =
+                                    r1.copy(
+                                        importsUsed =
                                           r1.importsUsed ++ r2.importsUsed)
                                 }
                               }
@@ -608,13 +620,12 @@ class ImplicitCollector(
                     }
                   }
 
-                  val funType =
-                    if (MacroInferUtil.isMacro(fun).isDefined) {
-                      MacroInferUtil.checkMacro(fun, Some(tp), place) match {
-                        case Some(newTp) => newTp
-                        case _ => _funType
-                      }
-                    } else _funType
+                  val funType = if (MacroInferUtil.isMacro(fun).isDefined) {
+                    MacroInferUtil.checkMacro(fun, Some(tp), place) match {
+                      case Some(newTp) => newTp
+                      case _ => _funType
+                    }
+                  } else _funType
                   var substedFunType: ScType = funType
 
                   if (fun.hasTypeParameters && noReturnType) {
@@ -703,9 +714,8 @@ class ImplicitCollector(
           new ArrayBuffer[(ScalaResolveResult, ScSubstitutor)]()
         var lastResult: Option[ScalaResolveResult] = None
         while (candidatesSeq.nonEmpty) {
-          val (next, rest) =
-            mostSpecific.nextLayerSpecificForImplicitParameters(
-                lastResult, candidatesSeq)
+          val (next, rest) = mostSpecific
+            .nextLayerSpecificForImplicitParameters(lastResult, candidatesSeq)
           next match {
             case Some(c) =>
               candidatesSeq = rest
@@ -732,9 +742,11 @@ class ImplicitCollector(
       }
 
       if (fullInfo)
-        return (candidates.toSeq.map(c =>
-                  forMap(c, withLocalTypeInference = false, checkFast = false)) ++ candidates.toSeq
+        return (candidates.toSeq
               .map(c =>
+                    forMap(c,
+                           withLocalTypeInference = false,
+                           checkFast = false)) ++ candidates.toSeq.map(c =>
                   forMap(c, withLocalTypeInference = true, checkFast = false)))
           .flatMap(_.toSeq)
           .map(_._1)

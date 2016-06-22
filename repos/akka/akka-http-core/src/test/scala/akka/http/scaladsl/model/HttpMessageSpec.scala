@@ -13,7 +13,10 @@ class HttpMessageSpec extends WordSpec with Matchers {
 
   def fail(uri: String, hostHeader: Host) =
     an[IllegalUriException] should be thrownBy HttpRequest.effectiveUri(
-        Uri(uri), List(hostHeader), securedConnection = false, null)
+        Uri(uri),
+        List(hostHeader),
+        securedConnection = false,
+        null)
 
   "HttpRequest" should {
     "provide an effective URI for relative URIs or matching Host-headers" in {

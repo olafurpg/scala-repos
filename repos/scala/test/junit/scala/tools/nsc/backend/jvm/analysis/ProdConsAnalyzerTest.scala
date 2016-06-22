@@ -100,8 +100,8 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testSingleInsn(a.producersForValueAt(ifne, 1), "ParameterProducer")
 
     val ret = findInstr(m, "IRETURN").head
-    testMultiInsns(
-        a.producersForValueAt(ret, 1), List("ParameterProducer", "ISTORE 1"))
+    testMultiInsns(a.producersForValueAt(ret, 1),
+                   List("ParameterProducer", "ISTORE 1"))
   }
 
   @Test
@@ -152,8 +152,8 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     val List(call) = findInstr(m, "INVOKEVIRTUAL")
     val List(ret) = findInstr(m, "IRETURN")
 
-    testSingleInsn(
-        a.producersForValueAt(store, 2), "UninitializedLocalProducer(2)")
+    testSingleInsn(a.producersForValueAt(store, 2),
+                   "UninitializedLocalProducer(2)")
     testSingleInsn(a.producersForValueAt(call, 2), "ISTORE")
     testMultiInsns(a.producersForValueAt(ret, 2),
                    List("UninitializedLocalProducer", "ISTORE"))
@@ -210,8 +210,8 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testMultiInsns(a.producersForInputsOf(swap), List("IADD", "DUP2"))
     testSingleInsn(a.consumersOfValueAt(swap.getNext, 4), "ISTORE")
     testSingleInsn(a.consumersOfValueAt(swap.getNext, 3), "IRETURN")
-    testSingleInsn(
-        a.initialProducersForInputsOf(store), "ParameterProducer(1)")
+    testSingleInsn(a.initialProducersForInputsOf(store),
+                   "ParameterProducer(1)")
     testSingleInsn(a.initialProducersForInputsOf(ret), "IADD")
   }
 
@@ -290,10 +290,10 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     assert(secondLoad.getOpcode == ILOAD)
 
     testSingleInsn(a.producersForValueAt(iadd, 2), "ILOAD")
-    testSingleInsn(
-        a.initialProducersForValueAt(iadd, 2), "ParameterProducer(1)")
-    testMultiInsns(
-        a.producersForInputsOf(firstLoad), List("ParameterProducer", "ISTORE"))
+    testSingleInsn(a.initialProducersForValueAt(iadd, 2),
+                   "ParameterProducer(1)")
+    testMultiInsns(a.producersForInputsOf(firstLoad),
+                   List("ParameterProducer", "ISTORE"))
     testMultiInsns(a.producersForInputsOf(secondLoad),
                    List("ParameterProducer", "ISTORE"))
 

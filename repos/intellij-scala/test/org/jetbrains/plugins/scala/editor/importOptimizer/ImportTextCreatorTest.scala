@@ -114,11 +114,11 @@ class ImportTextCreatorTest extends TestCase {
                           Set.empty,
                           hasWildcard = false,
                           rootUsed = false)
-    Assert.assertEquals("import java.lang.{Long, Integer, Float, Short}",
-                        textCreator.getImportText(info,
-                                                  isUnicodeArrow = false,
-                                                  spacesInImports = false,
-                                                  sortLexicografically =
-                                                    false))
+    Assert.assertEquals(
+        "import java.lang.{Long, Integer, Float, Short}",
+        textCreator.getImportText(info,
+                                  isUnicodeArrow = false,
+                                  spacesInImports = false,
+                                  sortLexicografically = false))
   }
 }

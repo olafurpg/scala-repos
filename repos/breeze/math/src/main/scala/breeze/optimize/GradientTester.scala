@@ -42,8 +42,8 @@ object GradientTester extends SerializableLogging {
       canNorm: norm.Impl[T, Double],
       opSub: OpSub.Impl2[T, T, T]) = {
     val indices = Rand
-      .subsetsOfSize(
-          x.keysIterator.toIndexedSeq, (x.size * randFraction + 1).toInt)
+      .subsetsOfSize(x.keysIterator.toIndexedSeq,
+                     (x.size * randFraction + 1).toInt)
       .get()
     testIndices(f, x, indices, skipZeros, toString, epsilon, tolerance)
   }
@@ -54,12 +54,12 @@ object GradientTester extends SerializableLogging {
                         skipZeros: Boolean = false,
                         toString: (K) => String = { (_: K).toString },
                         epsilon: Double = 1e-8,
-                        tolerance: Double =
-                          1E-3)(implicit view2: T <:< NumericOps[T],
-                                view: T <:< Tensor[K, Double],
-                                copy: CanCopy[T],
-                                canNorm: norm.Impl[T, Double],
-                                opSub: OpSub.Impl2[T, T, T]): T = {
+                        tolerance: Double = 1E-3)(
+      implicit view2: T <:< NumericOps[T],
+      view: T <:< Tensor[K, Double],
+      copy: CanCopy[T],
+      canNorm: norm.Impl[T, Double],
+      opSub: OpSub.Impl2[T, T, T]): T = {
     val (fx, trueGrad) = f.calculate(x)
     val xx = copy(x)
     val differences = opSub(x, x)
@@ -75,14 +75,17 @@ object GradientTester extends SerializableLogging {
         xx(k) -= epsilon
         val relDif =
           (grad -
-              trueGrad(k)).abs / math.max(trueGrad(k).abs, grad.abs).max(1E-4)
+                trueGrad(k)).abs / math
+            .max(trueGrad(k).abs, grad.abs)
+            .max(1E-4)
         if (relDif < tolerance) {
           ok += 1
           logger.debug(s"OK: ${toString(k)} $relDif")
         } else {
-          logger.warn(toString(k) +
-              " relDif: %.3e [eps : %e, calculated: %4.3e empirical: %4.3e]"
-                .format(relDif, epsilon, trueGrad(k), grad))
+          logger.warn(
+              toString(k) +
+                " relDif: %.3e [eps : %e, calculated: %4.3e empirical: %4.3e]"
+                  .format(relDif, epsilon, trueGrad(k), grad))
         }
         differences(k) = relDif
         tried += 1

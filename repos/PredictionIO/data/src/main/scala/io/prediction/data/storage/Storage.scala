@@ -72,10 +72,10 @@ trait BaseStorageClient {
   * @group Storage System
   */
 @DeveloperApi
-case class StorageClientConfig(parallel: Boolean =
-                                 false, // parallelized access (RDD)?
-                               test: Boolean = false, // test mode config
-                               properties: Map[String, String] = Map())
+case class StorageClientConfig(
+    parallel: Boolean = false, // parallelized access (RDD)?
+    test: Boolean = false, // test mode config
+    properties: Map[String, String] = Map())
 
 /** :: DeveloperApi ::
   * Thrown when a StorageClient runs into an exceptional condition
@@ -200,14 +200,15 @@ object Storage extends Logging {
   private def repositoriesPrefixPath(body: String) =
     prefixPath(repositoriesPrefix, body)
 
-  private def sourcesToClientMeta(
-      source: String, parallel: Boolean, test: Boolean): Option[ClientMeta] = {
+  private def sourcesToClientMeta(source: String,
+                                  parallel: Boolean,
+                                  test: Boolean): Option[ClientMeta] = {
     val sourceName = if (parallel) s"parallel-$source" else source
     s2cm.getOrElseUpdate(sourceName, updateS2CM(source, parallel, test))
   }
 
-  private def getClient(
-      clientConfig: StorageClientConfig, pkg: String): BaseStorageClient = {
+  private def getClient(clientConfig: StorageClientConfig,
+                        pkg: String): BaseStorageClient = {
     val className = "io.prediction.data.storage." + pkg + ".StorageClient"
     try {
       Class
@@ -236,16 +237,18 @@ object Storage extends Logging {
     } else None
   }
 
-  private def updateS2CM(
-      k: String, parallel: Boolean, test: Boolean): Option[ClientMeta] = {
+  private def updateS2CM(k: String,
+                         parallel: Boolean,
+                         test: Boolean): Option[ClientMeta] = {
     try {
       val keyedPath = sourcesPrefixPath(k)
       val sourceType = sys.env(prefixPath(keyedPath, "TYPE"))
       val props = sys.env
         .filter(t => t._1.startsWith(keyedPath))
         .map(t => t._1.replace(s"${keyedPath}_", "") -> t._2)
-      val clientConfig = StorageClientConfig(
-          properties = props, parallel = parallel, test = test)
+      val clientConfig = StorageClientConfig(properties = props,
+                                             parallel = parallel,
+                                             test = test)
       val client = getClient(clientConfig, sourceType)
       Some(ClientMeta(sourceType, client, clientConfig))
     } catch {
@@ -257,7 +260,8 @@ object Storage extends Logging {
   }
 
   private[prediction] def getDataObjectFromRepo[T](
-      repo: String, test: Boolean = false)(implicit tag: TypeTag[T]): T = {
+      repo: String,
+      test: Boolean = false)(implicit tag: TypeTag[T]): T = {
     val repoDOMeta = repositoriesToDataObjectMeta(repo)
     val repoDOSourceName = repoDOMeta.sourceName
     getDataObject[T](repoDOSourceName, repoDOMeta.namespace, test = test)
@@ -270,15 +274,16 @@ object Storage extends Logging {
     getPDataObject[T](repoDOSourceName, repoDOMeta.namespace)
   }
 
-  private[prediction] def getDataObject[T](sourceName: String,
-                                           namespace: String,
-                                           parallel: Boolean = false,
-                                           test: Boolean = false)(
-      implicit tag: TypeTag[T]): T = {
+  private[prediction] def getDataObject[T](
+      sourceName: String,
+      namespace: String,
+      parallel: Boolean = false,
+      test: Boolean = false)(implicit tag: TypeTag[T]): T = {
     val clientMeta =
       sourcesToClientMeta(sourceName, parallel, test) getOrElse {
         throw new StorageClientException(
-            s"Data source $sourceName was not properly initialized.", null)
+            s"Data source $sourceName was not properly initialized.",
+            null)
       }
     val sourceType = clientMeta.sourceType
     val ctorArgs = dataObjectCtorArgs(clientMeta.client, namespace)
@@ -296,8 +301,8 @@ object Storage extends Logging {
           case e: ClassNotFoundException =>
             throw new StorageClientException(
                 "No storage backend " +
-                "implementation can be found (tried both " +
-                s"$className and $rawClassName)",
+                  "implementation can be found (tried both " +
+                  s"$className and $rawClassName)",
                 e)
         }
     }
@@ -307,14 +312,14 @@ object Storage extends Logging {
     } catch {
       case e: IllegalArgumentException =>
         error("Unable to instantiate data object with class '" +
-              constructor.getDeclaringClass.getName +
-              " because its constructor" +
-              " does not have the right number of arguments." +
-              " Number of required constructor arguments: " + ctorArgs.size +
-              "." + " Number of existing constructor arguments: " +
-              constructor.getParameterTypes.size + "." +
-              s" Storage source name: ${sourceName}." +
-              s" Exception message: ${e.getMessage}).",
+                constructor.getDeclaringClass.getName +
+                " because its constructor" +
+                " does not have the right number of arguments." +
+                " Number of required constructor arguments: " + ctorArgs.size +
+                "." + " Number of existing constructor arguments: " +
+                constructor.getParameterTypes.size + "." +
+                s" Storage source name: ${sourceName}." +
+                s" Exception message: ${e.getMessage}).",
               e)
         errors += 1
         throw e
@@ -327,15 +332,15 @@ object Storage extends Logging {
       implicit tag: TypeTag[T]): T =
     getDataObject[T](sourceName, databaseName, true)
 
-  private def dataObjectCtorArgs(
-      client: BaseStorageClient, namespace: String): Seq[AnyRef] = {
+  private def dataObjectCtorArgs(client: BaseStorageClient,
+                                 namespace: String): Seq[AnyRef] = {
     Seq(client.client, client.config, namespace)
   }
 
   private[prediction] def verifyAllDataObjects(): Unit = {
     info(
         "Verifying Meta Data Backend (Source: " +
-        s"${repositoriesToDataObjectMeta(MetaDataRepository).sourceName})...")
+          s"${repositoriesToDataObjectMeta(MetaDataRepository).sourceName})...")
     getMetaDataEngineManifests()
     getMetaDataEngineInstances()
     getMetaDataEvaluationInstances()
@@ -343,17 +348,17 @@ object Storage extends Logging {
     getMetaDataAccessKeys()
     info(
         "Verifying Model Data Backend (Source: " +
-        s"${repositoriesToDataObjectMeta(ModelDataRepository).sourceName})...")
+          s"${repositoriesToDataObjectMeta(ModelDataRepository).sourceName})...")
     getModelDataModels()
     info(
         "Verifying Event Data Backend (Source: " +
-        s"${repositoriesToDataObjectMeta(EventDataRepository).sourceName})...")
+          s"${repositoriesToDataObjectMeta(EventDataRepository).sourceName})...")
     val eventsDb = getLEvents(test = true)
     info("Test writing to Event Store (App Id 0)...")
     // use appId=0 for testing purpose
     eventsDb.init(0)
-    eventsDb.insert(
-        Event(event = "test", entityType = "test", entityId = "test"), 0)
+    eventsDb
+      .insert(Event(event = "test", entityType = "test", entityId = "test"), 0)
     eventsDb.remove(0)
     eventsDb.close()
   }

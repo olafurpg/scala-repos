@@ -500,9 +500,9 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
     */
   protected def appendFieldId(in: Elem): Elem = fieldId match {
     case Some(i) => {
-        import util.Helpers._
-        in % ("id" -> i)
-      }
+      import util.Helpers._
+      in % ("id" -> i)
+    }
     case _ => in
   }
 
@@ -525,8 +525,8 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
     real_i_set_!(runFilters(value, setFilter))
   }
 
-  def runFilters(
-      in: FieldType, filter: List[FieldType => FieldType]): FieldType =
+  def runFilters(in: FieldType,
+                 filter: List[FieldType => FieldType]): FieldType =
     filter match {
       case Nil => in
       case x :: xs => runFilters(x(in), xs)
@@ -540,12 +540,12 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
   def buildSetActualValue(accessor: Method,
                           inst: AnyRef,
                           columnName: String): (OwnerType, AnyRef) => Unit
-  def buildSetLongValue(
-      accessor: Method, columnName: String): (OwnerType, Long, Boolean) => Unit
-  def buildSetStringValue(
-      accessor: Method, columnName: String): (OwnerType, String) => Unit
-  def buildSetDateValue(
-      accessor: Method, columnName: String): (OwnerType, Date) => Unit
+  def buildSetLongValue(accessor: Method,
+                        columnName: String): (OwnerType, Long, Boolean) => Unit
+  def buildSetStringValue(accessor: Method,
+                          columnName: String): (OwnerType, String) => Unit
+  def buildSetDateValue(accessor: Method,
+                        columnName: String): (OwnerType, Date) => Unit
   def buildSetBooleanValue(
       accessor: Method,
       columnName: String): (OwnerType, Boolean, Boolean) => Unit

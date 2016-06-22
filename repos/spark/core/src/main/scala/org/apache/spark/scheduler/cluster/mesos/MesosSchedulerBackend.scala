@@ -38,8 +38,9 @@ import org.apache.spark.util.Utils
   * separate Mesos task, allowing multiple applications to share cluster nodes both in space (tasks
   * from multiple apps can run on different cores) and in time (a core can switch ownership).
   */
-private[spark] class MesosSchedulerBackend(
-    scheduler: TaskSchedulerImpl, sc: SparkContext, master: String)
+private[spark] class MesosSchedulerBackend(scheduler: TaskSchedulerImpl,
+                                           sc: SparkContext,
+                                           master: String)
     extends SchedulerBackend
     with MScheduler
     with MesosSchedulerUtils {
@@ -102,7 +103,8 @@ private[spark] class MesosSchedulerBackend(
       }
     val environment = Environment.newBuilder()
     sc.conf.getOption("spark.executor.extraClassPath").foreach { cp =>
-      environment.addVariables(Environment.Variable
+      environment.addVariables(
+          Environment.Variable
             .newBuilder()
             .setName("SPARK_CLASSPATH")
             .setValue(cp)
@@ -152,10 +154,10 @@ private[spark] class MesosSchedulerBackend(
       command.addUris(CommandInfo.URI.newBuilder().setValue(uri.get))
     }
     val builder = MesosExecutorInfo.newBuilder()
-    val (resourcesAfterCpu, usedCpuResources) = partitionResources(
-        availableResources, "cpus", mesosExecutorCores)
-    val (resourcesAfterMem, usedMemResources) = partitionResources(
-        resourcesAfterCpu.asJava, "mem", executorMemory(sc))
+    val (resourcesAfterCpu, usedCpuResources) =
+      partitionResources(availableResources, "cpus", mesosExecutorCores)
+    val (resourcesAfterMem, usedMemResources) =
+      partitionResources(resourcesAfterCpu.asJava, "mem", executorMemory(sc))
 
     builder.addAllResources(usedCpuResources.asJava)
     builder.addAllResources(usedMemResources.asJava)
@@ -169,7 +171,9 @@ private[spark] class MesosSchedulerBackend(
 
     sc.conf.getOption("spark.mesos.executor.docker.image").foreach { image =>
       MesosSchedulerBackendUtil.setupContainerBuilderDockerInfo(
-          image, sc.conf, executorInfo.getContainerBuilder())
+          image,
+          sc.conf,
+          executorInfo.getContainerBuilder())
     }
 
     (executorInfo.build(), resourcesAfterMem.asJava)
@@ -193,8 +197,9 @@ private[spark] class MesosSchedulerBackend(
 
   override def offerRescinded(d: SchedulerDriver, o: OfferID) {}
 
-  override def registered(
-      d: SchedulerDriver, frameworkId: FrameworkID, masterInfo: MasterInfo) {
+  override def registered(d: SchedulerDriver,
+                          frameworkId: FrameworkID,
+                          masterInfo: MasterInfo) {
     inClassLoader() {
       appId = frameworkId.getValue
       logInfo("Registered as framework ID " + appId)
@@ -247,8 +252,9 @@ private[spark] class MesosSchedulerBackend(
       val (offersMatchingConstraints, offersNotMatchingConstraints) =
         offers.asScala.partition { o =>
           val offerAttributes = toAttributeMap(o.getAttributesList)
-          val meetsConstraints = matchesAttributeRequirements(
-              slaveOfferConstraints, offerAttributes)
+          val meetsConstraints =
+            matchesAttributeRequirements(slaveOfferConstraints,
+                                         offerAttributes)
 
           // add some debug messaging
           if (!meetsConstraints) {
@@ -286,11 +292,12 @@ private[spark] class MesosSchedulerBackend(
             cpus >= (mesosExecutorCores + scheduler.CPUS_PER_TASK)
           val meetsRequirements =
             (meetsMemoryRequirements && meetsCPURequirements) ||
-            (slaveIdToExecutorInfo.contains(slaveId) &&
-                cpus >= scheduler.CPUS_PER_TASK)
+              (slaveIdToExecutorInfo.contains(slaveId) &&
+                    cpus >= scheduler.CPUS_PER_TASK)
           val debugstr = if (meetsRequirements) "Accepting" else "Declining"
-          logDebug(s"$debugstr offer: ${o.getId.getValue} with attributes: " +
-              s"$offerAttributes mem: $mem cpu: $cpus")
+          logDebug(
+              s"$debugstr offer: ${o.getId.getValue} with attributes: " +
+                s"$offerAttributes mem: $mem cpu: $cpus")
 
           meetsRequirements
         }
@@ -299,15 +306,14 @@ private[spark] class MesosSchedulerBackend(
       unUsableOffers.foreach(o => d.declineOffer(o.getId))
 
       val workerOffers = usableOffers.map { o =>
-        val cpus =
-          if (slaveIdToExecutorInfo.contains(o.getSlaveId.getValue)) {
-            getResource(o.getResourcesList, "cpus").toInt
-          } else {
-            // If the Mesos executor has not been started on this slave yet, set aside a few
-            // cores for the Mesos executor by offering fewer cores to the Spark executor
-            (getResource(o.getResourcesList, "cpus") -
+        val cpus = if (slaveIdToExecutorInfo.contains(o.getSlaveId.getValue)) {
+          getResource(o.getResourcesList, "cpus").toInt
+        } else {
+          // If the Mesos executor has not been started on this slave yet, set aside a few
+          // cores for the Mesos executor by offering fewer cores to the Spark executor
+          (getResource(o.getResourcesList, "cpus") -
                 mesosExecutorCores).toInt
-          }
+        }
         new WorkerOffer(o.getSlaveId.getValue, o.getHostname, cpus)
       }
 
@@ -343,15 +349,16 @@ private[spark] class MesosSchedulerBackend(
       }
 
       // Reply to the offers
-      val filters =
-        Filters.newBuilder().setRefuseSeconds(1).build() // TODO: lower timeout?
+      val filters = Filters.newBuilder().setRefuseSeconds(1).build() // TODO: lower timeout?
 
       mesosTasks.foreach {
         case (slaveId, tasks) =>
           slaveIdToWorkerOffer
             .get(slaveId)
-            .foreach(o =>
-                  listenerBus.post(SparkListenerExecutorAdded(
+            .foreach(
+                o =>
+                  listenerBus.post(
+                      SparkListenerExecutorAdded(
                           System.currentTimeMillis(),
                           slaveId,
                           // TODO: Add support for log urls for Mesos
@@ -384,8 +391,8 @@ private[spark] class MesosSchedulerBackend(
         createExecutorInfo(resources, slaveId)
       }
     slaveIdToExecutorInfo(slaveId) = executorInfo
-    val (finalResources, cpuResources) = partitionResources(
-        remainingResources, "cpus", scheduler.CPUS_PER_TASK)
+    val (finalResources, cpuResources) =
+      partitionResources(remainingResources, "cpus", scheduler.CPUS_PER_TASK)
     val taskInfo = MesosTaskInfo
       .newBuilder()
       .setTaskId(taskId)
@@ -434,22 +441,27 @@ private[spark] class MesosSchedulerBackend(
     mesosDriver.reviveOffers()
   }
 
-  override def frameworkMessage(
-      d: SchedulerDriver, e: ExecutorID, s: SlaveID, b: Array[Byte]) {}
+  override def frameworkMessage(d: SchedulerDriver,
+                                e: ExecutorID,
+                                s: SlaveID,
+                                b: Array[Byte]) {}
 
   /**
     * Remove executor associated with slaveId in a thread safe manner.
     */
   private def removeExecutor(slaveId: String, reason: String) = {
     synchronized {
-      listenerBus.post(SparkListenerExecutorRemoved(
-              System.currentTimeMillis(), slaveId, reason))
+      listenerBus.post(
+          SparkListenerExecutorRemoved(System.currentTimeMillis(),
+                                       slaveId,
+                                       reason))
       slaveIdToExecutorInfo -= slaveId
     }
   }
 
-  private def recordSlaveLost(
-      d: SchedulerDriver, slaveId: SlaveID, reason: ExecutorLossReason) {
+  private def recordSlaveLost(d: SchedulerDriver,
+                              slaveId: SlaveID,
+                              reason: ExecutorLossReason) {
     inClassLoader() {
       logInfo("Mesos slave lost: " + slaveId.getValue)
       removeExecutor(slaveId.getValue, reason.toString)
@@ -466,13 +478,14 @@ private[spark] class MesosSchedulerBackend(
                             slaveId: SlaveID,
                             status: Int) {
     logInfo(
-        "Executor lost: %s, marking slave %s as lost".format(
-            executorId.getValue, slaveId.getValue))
+        "Executor lost: %s, marking slave %s as lost"
+          .format(executorId.getValue, slaveId.getValue))
     recordSlaveLost(d, slaveId, ExecutorExited(status, exitCausedByApp = true))
   }
 
-  override def killTask(
-      taskId: Long, executorId: String, interruptThread: Boolean): Unit = {
+  override def killTask(taskId: Long,
+                        executorId: String,
+                        interruptThread: Boolean): Unit = {
     mesosDriver.killTask(
         TaskID.newBuilder().setValue(taskId.toString).build()
     )

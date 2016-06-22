@@ -125,7 +125,8 @@ trait BinaryRegistry[A, B, Op, +R]
 
   def register[AA <: A, BB <: B](
       op: UImpl2[Op, AA, BB, _ <: R @uncheckedVariance])(
-      implicit cA: ClassTag[AA], cB: ClassTag[BB]) = {
+      implicit cA: ClassTag[AA],
+      cB: ClassTag[BB]) = {
     super.register(cA.runtimeClass, cB.runtimeClass, op)
     op
   }

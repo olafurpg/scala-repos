@@ -8,8 +8,9 @@ import com.twitter.util.{Closable, CloseAwaitably, Future, FuturePool, Time}
 /**
   * Provides the Reader API for an InputStream
   */
-class InputStreamReader private[io](
-    inputStream: InputStream, maxBufferSize: Int, pool: FuturePool)
+class InputStreamReader private[io] (inputStream: InputStream,
+                                     maxBufferSize: Int,
+                                     pool: FuturePool)
     extends Reader
     with Closable
     with CloseAwaitably {
@@ -65,7 +66,7 @@ class InputStreamReader private[io](
 
 object InputStreamReader {
   val DefaultMaxBufferSize = 4096
-  def apply(
-      inputStream: InputStream, maxBufferSize: Int = DefaultMaxBufferSize) =
+  def apply(inputStream: InputStream,
+            maxBufferSize: Int = DefaultMaxBufferSize) =
     new InputStreamReader(inputStream, maxBufferSize)
 }

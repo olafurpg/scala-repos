@@ -58,8 +58,8 @@ object StringConverter {
     * @param fromStringFunction Function that converts a String to a new T instance
     * @param toStringFunction Function that converts a T instance to a new String
     */
-  def apply[T](
-      fromStringFunction: String => T, toStringFunction: T => String) =
+  def apply[T](fromStringFunction: String => T,
+               toStringFunction: T => String) =
     new StringConverter[T] {
 
       def fromString(string: String): T = fromStringFunction(string)

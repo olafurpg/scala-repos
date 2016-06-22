@@ -67,8 +67,9 @@ object Entropy extends Impurity {
     */
   @Since("1.0.0")
   @DeveloperApi
-  override def calculate(
-      count: Double, sum: Double, sumSquares: Double): Double =
+  override def calculate(count: Double,
+                         sum: Double,
+                         sumSquares: Double): Double =
     throw new UnsupportedOperationException("Entropy.calculate")
 
   /**
@@ -101,12 +102,12 @@ private[tree] class EntropyAggregator(numClasses: Int)
     if (label >= statsSize) {
       throw new IllegalArgumentException(
           s"EntropyAggregator given label $label" +
-          s" but requires label < numClasses (= $statsSize).")
+            s" but requires label < numClasses (= $statsSize).")
     }
     if (label < 0) {
       throw new IllegalArgumentException(
           s"EntropyAggregator given label $label" +
-          s"but requires label is non-negative.")
+            s"but requires label is non-negative.")
     }
     allStats(offset + label.toInt) += instanceWeight
   }

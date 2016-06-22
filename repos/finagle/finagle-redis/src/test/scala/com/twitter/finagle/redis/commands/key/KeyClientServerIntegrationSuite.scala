@@ -257,7 +257,8 @@ final class KeyClientServerIntegrationSuite
       val originalKeyName = string2ChanBuf("rename1")
       assert(Await.result(client(Set(originalKeyName, bar))) == OKStatusReply)
 
-      assert(Await
+      assert(
+          Await
             .result(client(Rename(originalKeyName, originalKeyName)))
             .isInstanceOf[ErrorReply])
     }
@@ -269,7 +270,8 @@ final class KeyClientServerIntegrationSuite
       RedisTest) {
     withRedisClient { client =>
       val noSuchKey = string2ChanBuf("noSuchKey")
-      assert(Await
+      assert(
+          Await
             .result(
                 client(Rename(noSuchKey, string2ChanBuf("DOES NOT MATTER"))))
             .isInstanceOf[ErrorReply])
@@ -295,7 +297,8 @@ final class KeyClientServerIntegrationSuite
     withRedisClient { client =>
       val originalKeyName = string2ChanBuf("rename1")
       assert(Await.result(client(Set(originalKeyName, bar))) == OKStatusReply)
-      assert(Await
+      assert(
+          Await
             .result(client(RenameNx(originalKeyName, originalKeyName)))
             .isInstanceOf[ErrorReply])
     }
@@ -308,7 +311,8 @@ final class KeyClientServerIntegrationSuite
     withRedisClient { client =>
       val noSuchKey = string2ChanBuf("noSuchKey")
 
-      assert(Await
+      assert(
+          Await
             .result(
                 client(RenameNx(noSuchKey, string2ChanBuf("DOES NOT MATTER"))))
             .isInstanceOf[ErrorReply])
@@ -329,7 +333,7 @@ final class KeyClientServerIntegrationSuite
 
   test(
       "RENAMENX should return an IntegerReply of 0 to verify a key rename did not occur when the" +
-      " the new key name already exists",
+        " the new key name already exists",
       ClientServerTest,
       RedisTest) {
     withRedisClient { client =>

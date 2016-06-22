@@ -47,8 +47,8 @@ trait VectorInstances {
       Eval.defer(loop(0))
     }
 
-    def traverse[G[_], A, B](fa: Vector[A])(
-        f: A => G[B])(implicit G: Applicative[G]): G[Vector[B]] =
+    def traverse[G[_], A, B](fa: Vector[A])(f: A => G[B])(
+        implicit G: Applicative[G]): G[Vector[B]] =
       fa.foldLeft(G.pure(Vector.empty[B]))((buf, a) =>
             G.map2(buf, f(a))(_ :+ _))
 

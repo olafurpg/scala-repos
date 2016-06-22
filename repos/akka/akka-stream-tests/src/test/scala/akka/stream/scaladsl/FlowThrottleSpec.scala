@@ -124,7 +124,8 @@ class FlowThrottleSpec extends AkkaSpec {
       upstream.sendNext(1)
       downstream.expectNoMsg(100.millis)
       downstream.expectNext(1)
-      downstream.expectNoMsg(500.millis) //wait to receive 2 in burst afterwards
+      downstream
+        .expectNoMsg(500.millis) //wait to receive 2 in burst afterwards
       downstream.request(5)
       for (i ← 2 to 4) upstream.sendNext(i)
       downstream.receiveWithin(100.millis, 2) should be(Seq(2, 3))
@@ -247,7 +248,8 @@ class FlowThrottleSpec extends AkkaSpec {
       upstream.sendNext(1)
       downstream.expectNoMsg(100.millis)
       downstream.expectNext(1)
-      downstream.expectNoMsg(500.millis) //wait to receive 2 in burst afterwards
+      downstream
+        .expectNoMsg(500.millis) //wait to receive 2 in burst afterwards
       downstream.request(5)
       for (i ← 2 to 4) upstream.sendNext(i)
       downstream.receiveWithin(200.millis, 2) should be(Seq(2, 3))

@@ -30,11 +30,12 @@ trait ScTypeAlias
     with ScCommentOwner {
   override def getIcon(flags: Int): Icon = Icons.TYPE_ALIAS
 
-  override protected def isSimilarMemberForNavigation(
-      m: ScMember, isStrict: Boolean) = m match {
-    case t: ScTypeAlias => t.name == name
-    case _ => false
-  }
+  override protected def isSimilarMemberForNavigation(m: ScMember,
+                                                      isStrict: Boolean) =
+    m match {
+      case t: ScTypeAlias => t.name == name
+      case _ => false
+    }
 
   def isExistentialTypeAlias: Boolean = {
     getContext match {
@@ -45,7 +46,7 @@ trait ScTypeAlias
 
   override def isDeprecated =
     hasAnnotation("scala.deprecated") != None ||
-    hasAnnotation("java.lang.Deprecated") != None
+      hasAnnotation("java.lang.Deprecated") != None
 
   def getTypeToken: PsiElement = findFirstChildByType(ScalaTokenTypes.kTYPE)
 

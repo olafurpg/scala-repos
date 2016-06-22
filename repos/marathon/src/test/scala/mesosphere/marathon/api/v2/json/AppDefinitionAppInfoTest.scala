@@ -54,8 +54,9 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
 
   test("app with taskCounts + deployments (show that combinations work)") {
     Given("an app with counts")
-    val extended = AppInfo(
-        app, maybeCounts = Some(counts), maybeDeployments = Some(deployments))
+    val extended = AppInfo(app,
+                           maybeCounts = Some(counts),
+                           maybeDeployments = Some(deployments))
 
     Then("the result contains all fields of the app plus the counts")
     val expectedJson =

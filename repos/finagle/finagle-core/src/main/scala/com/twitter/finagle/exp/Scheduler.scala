@@ -12,7 +12,7 @@ object scheduler
     extends GlobalFlag(
         "local",
         "Which scheduler to use for futures " +
-        "<local> | <lifo> | <bridged>[:<num workers>] | <forkjoin>[:<num workers>]"
+          "<local> | <lifo> | <bridged>[:<num workers>] | <forkjoin>[:<num workers>]"
     )
 
 private[finagle] object FinagleScheduler {
@@ -36,10 +36,10 @@ private[finagle] object FinagleScheduler {
       .newInstance
       .asInstanceOf[BlockingQueue[Runnable]] catch {
       case _: ClassNotFoundException => {
-          log.info(
-              "bridged scheduler is not available on pre java 7, using local instead")
-          return
-        }
+        log.info(
+            "bridged scheduler is not available on pre java 7, using local instead")
+        return
+      }
     }
 
     Scheduler.setUnsafe(
@@ -58,8 +58,9 @@ private[finagle] object FinagleScheduler {
 
   private def switchToForkJoin(numWorkers: Int) {
     log.info("Using forkjoin scheduler with %d workers".format(numWorkers))
-    Scheduler.setUnsafe(new ForkJoinScheduler(
-            numWorkers, DefaultStatsReceiver.scope("forkjoin")))
+    Scheduler.setUnsafe(
+        new ForkJoinScheduler(numWorkers,
+                              DefaultStatsReceiver.scope("forkjoin")))
   }
 
   def init() {

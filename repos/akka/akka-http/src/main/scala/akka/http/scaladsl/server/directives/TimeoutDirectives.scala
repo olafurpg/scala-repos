@@ -32,8 +32,8 @@ trait TimeoutDirectives {
     *
     * @param handler optional custom "timeout response" function. If left None, the default timeout HttpResponse will be used.
     */
-  def withRequestTimeout(
-      timeout: Duration, handler: HttpRequest ⇒ HttpResponse): Directive0 =
+  def withRequestTimeout(timeout: Duration,
+                         handler: HttpRequest ⇒ HttpResponse): Directive0 =
     withRequestTimeout(timeout, Some(handler))
 
   /**

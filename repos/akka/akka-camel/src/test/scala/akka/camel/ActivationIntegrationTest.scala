@@ -27,8 +27,9 @@ class ActivationIntegrationTest
 
   "ActivationAware should be notified when endpoint is activated" in {
     val latch = new TestLatch(0)
-    val actor = system.actorOf(
-        Props(new TestConsumer("direct:actor-1", latch)), "act-direct-actor-1")
+    val actor =
+      system.actorOf(Props(new TestConsumer("direct:actor-1", latch)),
+                     "act-direct-actor-1")
     Await.result(camel.activationFutureFor(actor), 10 seconds) should ===(
         actor)
 
@@ -64,8 +65,9 @@ class ActivationIntegrationTest
 
   "activationFutureFor must fail if notification timeout is too short and activation is not complete yet" in {
     val latch = new TestLatch(1)
-    val actor = system.actorOf(
-        Props(new TestConsumer("direct:actor-4", latch)), "direct-actor-4")
+    val actor =
+      system.actorOf(Props(new TestConsumer("direct:actor-4", latch)),
+                     "direct-actor-4")
     intercept[TimeoutException] {
       Await.result(camel.activationFutureFor(actor), 1 millis)
     }

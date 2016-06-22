@@ -151,8 +151,10 @@ object ThriftMux
       params[Thrift.param.ClientId]
 
     private[this] object ThriftMuxToMux
-        extends Filter[
-            ThriftClientRequest, Array[Byte], mux.Request, mux.Response] {
+        extends Filter[ThriftClientRequest,
+                       Array[Byte],
+                       mux.Request,
+                       mux.Response] {
       def apply(
           req: ThriftClientRequest,
           service: Service[mux.Request, mux.Response]): Future[Array[Byte]] = {
@@ -172,8 +174,8 @@ object ThriftMux
       }
     }
 
-    private[this] def deserializingClassifier: StackClient[
-        mux.Request, mux.Response] = {
+    private[this] def deserializingClassifier: StackClient[mux.Request,
+                                                           mux.Response] = {
       // Note: what type of deserializer used is important if none is specified
       // so that we keep the prior behavior of Thrift exceptions
       // being counted as a success. Otherwise, even using the default
@@ -181,19 +183,18 @@ object ThriftMux
       // a failure. So, when none is specified, a "deserializing-only"
       // classifier is used to make when deserialization happens in the stack
       // uniform whether or not a `ResponseClassifier` is wired up.
-      val classifier =
-        if (params.contains[param.ResponseClassifier]) {
-          ThriftMuxResponseClassifier.usingDeserializeCtx(
-              params[param.ResponseClassifier].responseClassifier
-          )
-        } else {
-          ThriftMuxResponseClassifier.DeserializeCtxOnly
-        }
+      val classifier = if (params.contains[param.ResponseClassifier]) {
+        ThriftMuxResponseClassifier.usingDeserializeCtx(
+            params[param.ResponseClassifier].responseClassifier
+        )
+      } else {
+        ThriftMuxResponseClassifier.DeserializeCtxOnly
+      }
       muxer.configured(param.ResponseClassifier(classifier))
     }
 
-    def newService(
-        dest: Name, label: String): Service[ThriftClientRequest, Array[Byte]] =
+    def newService(dest: Name,
+                   label: String): Service[ThriftClientRequest, Array[Byte]] =
       ThriftMuxToMux andThen deserializingClassifier.newService(dest, label)
 
     def newClient(
@@ -293,8 +294,7 @@ object ThriftMux
     * tracing support).
     */
   case class ServerMuxer(
-      stack: Stack[ServiceFactory[mux.Request, mux.Response]] =
-        BaseServerStack,
+      stack: Stack[ServiceFactory[mux.Request, mux.Response]] = BaseServerStack,
       params: Stack.Params = Mux.server.params + ProtocolLibrary("thriftmux"))
       extends StdStackServer[mux.Request, mux.Response, ServerMuxer] {
 
@@ -378,8 +378,8 @@ object ThriftMux
           case e @ RetryPolicy.RetryableWriteException(_) =>
             Future.exception(e)
           case e if !e.isInstanceOf[TException] =>
-            val msg = UncaughtAppExceptionFilter.writeExceptionMessage(
-                request.body, e, protocolFactory)
+            val msg = UncaughtAppExceptionFilter
+              .writeExceptionMessage(request.body, e, protocolFactory)
             Future.value(mux.Response(msg))
         }
     }
@@ -461,8 +461,8 @@ object ThriftMux
         addr: SocketAddress,
         factory: ServiceFactory[Array[Byte], Array[Byte]]
     ): ListeningServer = {
-      muxer.serve(
-          addr, MuxToArrayFilter.andThen(tracingFilter).andThen(factory))
+      muxer
+        .serve(addr, MuxToArrayFilter.andThen(tracingFilter).andThen(factory))
     }
 
     // Java-friendly forwarders

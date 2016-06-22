@@ -81,11 +81,11 @@ class StreamingKMeansModel @Since("1.2.0")(
     val closest = data.map(point => (this.predict(point), (point, 1L)))
 
     // get sums and counts for updating each cluster
-    val mergeContribs: ((Vector, Long),
-                        (Vector, Long)) => (Vector, Long) = (p1, p2) => {
-      BLAS.axpy(1.0, p2._1, p1._1)
-      (p1._1, p1._2 + p2._2)
-    }
+    val mergeContribs: ((Vector, Long), (Vector, Long)) => (Vector, Long) =
+      (p1, p2) => {
+        BLAS.axpy(1.0, p2._1, p1._1)
+        (p1._1, p1._2 + p2._2)
+      }
     val dim = clusterCenters(0).size
 
     val pointStats: Array[(Int, (Vector, Long))] = closest
@@ -181,8 +181,8 @@ class StreamingKMeans @Since("1.2.0")(@Since("1.2.0") var k: Int,
   @Since("1.2.0")
   def this() = this(2, 1.0, StreamingKMeans.BATCHES)
 
-  protected var model: StreamingKMeansModel = new StreamingKMeansModel(
-      null, null)
+  protected var model: StreamingKMeansModel =
+    new StreamingKMeansModel(null, null)
 
   /**
     * Set the number of clusters.
@@ -224,8 +224,8 @@ class StreamingKMeans @Since("1.2.0")(@Since("1.2.0") var k: Int,
     * Specify initial centers directly.
     */
   @Since("1.2.0")
-  def setInitialCenters(
-      centers: Array[Vector], weights: Array[Double]): this.type = {
+  def setInitialCenters(centers: Array[Vector],
+                        weights: Array[Double]): this.type = {
     model = new StreamingKMeansModel(centers, weights)
     this
   }
@@ -321,7 +321,8 @@ class StreamingKMeans @Since("1.2.0")(@Since("1.2.0") var k: Int,
   def predictOnValues[K](data: JavaPairDStream[K, Vector])
     : JavaPairDStream[K, java.lang.Integer] = {
     implicit val tag = fakeClassTag[K]
-    JavaPairDStream.fromPairDStream(predictOnValues(data.dstream)
+    JavaPairDStream.fromPairDStream(
+        predictOnValues(data.dstream)
           .asInstanceOf[DStream[(K, java.lang.Integer)]])
   }
 

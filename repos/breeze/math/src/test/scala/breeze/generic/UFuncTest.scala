@@ -19,7 +19,8 @@ class UFuncTest extends FunSuite {
     val f = UFunc(math.pow _)
     assert(f(3.0, 4.0) == math.pow(3.0, 4.0))
     assert(f(DenseVector(3.0), 4.0) == DenseVector(math.pow(3.0, 4.0)))
-    assert(f(DenseMatrix(3.0), DenseMatrix(4.0)) == DenseMatrix(
+    assert(
+        f(DenseMatrix(3.0), DenseMatrix(4.0)) == DenseMatrix(
             math.pow(3.0, 4.0)))
   }
 }

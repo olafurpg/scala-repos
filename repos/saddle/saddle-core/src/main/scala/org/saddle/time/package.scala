@@ -79,8 +79,9 @@ package object time {
   /**
     * Class providing time accessor methods for Vec and Index containing DateTimes
     */
-  protected[saddle] class TimeAccessors[T](
-      times: Vec[Long], chrono: Chronology, cast: Vec[Int] => T) {
+  protected[saddle] class TimeAccessors[T](times: Vec[Long],
+                                           chrono: Chronology,
+                                           cast: Vec[Int] => T) {
     def millisOfSecond = cast(extractor(1L, 1000L))
     def secondOfMinute = cast(extractor(1000L, 60L))
     def minuteOfHour = cast(extractor(60000L, 60L))
@@ -93,25 +94,29 @@ package object time {
     def millisOfDay = cast(_millisOfDay)
     def secondOfDay = cast(_secondOfDay)
     def minuteOfDay =
-      cast(getField(
-              DateTimeFieldType.minuteOfDay.getField(chrono), isTime = true))
+      cast(
+          getField(DateTimeFieldType.minuteOfDay.getField(chrono),
+                   isTime = true))
     def clockhourOfDay =
       cast(
           getField(DateTimeFieldType.clockhourOfDay.getField(chrono),
                    isTime = true))
     def hourOfHalfday =
-      cast(getField(
-              DateTimeFieldType.hourOfHalfday.getField(chrono), isTime = true))
+      cast(
+          getField(DateTimeFieldType.hourOfHalfday.getField(chrono),
+                   isTime = true))
     def clockhourOfHalfday =
       cast(
           getField(DateTimeFieldType.clockhourOfHalfday.getField(chrono),
                    isTime = true))
     def halfdayOfDay =
-      cast(getField(
-              DateTimeFieldType.halfdayOfDay.getField(chrono), isTime = true))
+      cast(
+          getField(DateTimeFieldType.halfdayOfDay.getField(chrono),
+                   isTime = true))
     def hourOfDay =
-      cast(getField(
-              DateTimeFieldType.hourOfDay.getField(chrono), isTime = true))
+      cast(
+          getField(DateTimeFieldType.hourOfDay.getField(chrono),
+                   isTime = true))
 
     def dayOfWeek =
       cast(getField(DateTimeFieldType.dayOfWeek.getField(chrono)))
@@ -135,8 +140,8 @@ package object time {
       cast(getField(DateTimeFieldType.centuryOfEra.getField(chrono)))
     def era = cast(getField(DateTimeFieldType.era.getField(chrono)))
 
-    protected def getField(
-        field: DateTimeField, isTime: Boolean = false): Vec[Int] =
+    protected def getField(field: DateTimeField,
+                           isTime: Boolean = false): Vec[Int] =
       if (chrono != ISO_CHRONO_UTC || !isTime)
         times.map { (ms: Long) =>
           field.get(ms)
@@ -172,8 +177,8 @@ package object time {
     val (times, chrono: Chronology) = vec match {
       case tv: VecTime => (tv.times, tv.chrono)
       case _ => {
-          val tmp = new VecTime(vec.map(_.getMillis)); (tmp.times, tmp.chrono)
-        }
+        val tmp = new VecTime(vec.map(_.getMillis)); (tmp.times, tmp.chrono)
+      }
     }
     new TimeAccessors(times, chrono, identity)
   }
@@ -186,9 +191,9 @@ package object time {
     val (times, chrono: Chronology) = ix match {
       case tv: IndexTime => (tv.times.toVec, tv.chrono)
       case _ => {
-          val tmp = new IndexTime(ix.map(_.getMillis));
-          (tmp.times.toVec, tmp.chrono)
-        }
+        val tmp = new IndexTime(ix.map(_.getMillis));
+        (tmp.times.toVec, tmp.chrono)
+      }
     }
 
     new TimeAccessors(times, chrono, Index(_))

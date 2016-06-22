@@ -58,13 +58,14 @@ final class DataForm(keys: I18nKeys,
                 msgs.headOption map { key.drop(4) -> _ }
             }).flatten.toMap
       case body => {
-          logger.warn("Can't parse translation request body: " + body)
-          Map.empty
-        }
+        logger.warn("Can't parse translation request body: " + body)
+        Map.empty
+      }
     }
 
   private def sanitize(message: String) = message.replace("""\n""", " ").trim
 }
 
-private[i18n] case class TransMetadata(
-    comment: Option[String], gameId: String, move: String)
+private[i18n] case class TransMetadata(comment: Option[String],
+                                       gameId: String,
+                                       move: String)

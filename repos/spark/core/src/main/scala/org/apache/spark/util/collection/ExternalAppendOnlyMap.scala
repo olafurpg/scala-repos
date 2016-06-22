@@ -190,8 +190,8 @@ class ExternalAppendOnlyMap[K, V, C](
   override protected[this] def spill(collection: SizeTracker): Unit = {
     val (blockId, file) = diskBlockManager.createTempLocalBlock()
     curWriteMetrics = new ShuffleWriteMetrics()
-    var writer = blockManager.getDiskWriter(
-        blockId, file, ser, fileBufferSize, curWriteMetrics)
+    var writer = blockManager
+      .getDiskWriter(blockId, file, ser, fileBufferSize, curWriteMetrics)
     var objectsWritten = 0
 
     // List of batch sizes (bytes) in the order they are written to disk
@@ -218,8 +218,8 @@ class ExternalAppendOnlyMap[K, V, C](
         if (objectsWritten == serializerBatchSize) {
           flush()
           curWriteMetrics = new ShuffleWriteMetrics()
-          writer = blockManager.getDiskWriter(
-              blockId, file, ser, fileBufferSize, curWriteMetrics)
+          writer = blockManager
+            .getDiskWriter(blockId, file, ser, fileBufferSize, curWriteMetrics)
         }
       }
       if (objectsWritten > 0) {
@@ -258,8 +258,8 @@ class ExternalAppendOnlyMap[K, V, C](
           "ExternalAppendOnlyMap.iterator is destructive and should only be called once.")
     }
     if (spilledMaps.isEmpty) {
-      CompletionIterator[(K, C), Iterator[(K, C)]](
-          currentMap.iterator, freeCurrentMap())
+      CompletionIterator[(K, C), Iterator[(K, C)]](currentMap.iterator,
+                                                   freeCurrentMap())
     } else {
       new ExternalIterator()
     }
@@ -282,7 +282,8 @@ class ExternalAppendOnlyMap[K, V, C](
     // Input streams are derived both from the in-memory map and spilled maps on disk
     // The in-memory map is sorted in place, while the spilled maps are already in sorted order
     private val sortedMap = CompletionIterator[(K, C), Iterator[(K, C)]](
-        currentMap.destructiveSortedIterator(keyComparator), freeCurrentMap())
+        currentMap.destructiveSortedIterator(keyComparator),
+        freeCurrentMap())
     private val inputStreams =
       (Seq(sortedMap) ++ spilledMaps).map(it => it.buffered)
 
@@ -303,8 +304,8 @@ class ExternalAppendOnlyMap[K, V, C](
       * @param it iterator to read from
       * @param buf buffer to write the results into
       */
-    private def readNextHashCode(
-        it: BufferedIterator[(K, C)], buf: ArrayBuffer[(K, C)]): Unit = {
+    private def readNextHashCode(it: BufferedIterator[(K, C)],
+                                 buf: ArrayBuffer[(K, C)]): Unit = {
       if (it.hasNext) {
         var kc = it.next()
         buf += kc
@@ -320,8 +321,9 @@ class ExternalAppendOnlyMap[K, V, C](
       * If the given buffer contains a value for the given key, merge that value into
       * baseCombiner and remove the corresponding (K, C) pair from the buffer.
       */
-    private def mergeIfKeyExists(
-        key: K, baseCombiner: C, buffer: StreamBuffer): C = {
+    private def mergeIfKeyExists(key: K,
+                                 baseCombiner: C,
+                                 buffer: StreamBuffer): C = {
       var i = 0
       while (i < buffer.pairs.length) {
         val pair = buffer.pairs(i)
@@ -344,8 +346,7 @@ class ExternalAppendOnlyMap[K, V, C](
       */
     private def removeFromBuffer[T](buffer: ArrayBuffer[T], index: Int): T = {
       val elem = buffer(index)
-      buffer(index) =
-        buffer(buffer.size - 1) // This also works if index == buffer.size - 1
+      buffer(index) = buffer(buffer.size - 1) // This also works if index == buffer.size - 1
       buffer.reduceToSize(buffer.size - 1)
       elem
     }
@@ -428,16 +429,16 @@ class ExternalAppendOnlyMap[K, V, C](
   /**
     * An iterator that returns (K, C) pairs in sorted order from an on-disk map
     */
-  private class DiskMapIterator(
-      file: File, blockId: BlockId, batchSizes: ArrayBuffer[Long])
+  private class DiskMapIterator(file: File,
+                                blockId: BlockId,
+                                batchSizes: ArrayBuffer[Long])
       extends Iterator[(K, C)] {
-    private val batchOffsets =
-      batchSizes.scanLeft(0L)(_ + _) // Size will be batchSize.length + 1
+    private val batchOffsets = batchSizes.scanLeft(0L)(_ + _) // Size will be batchSize.length + 1
     assert(file.length() == batchOffsets.last,
            "File length is not equal to the last batch offset:\n" +
-           s"    file length = ${file.length}\n" +
-           s"    last batch offset = ${batchOffsets.last}\n" +
-           s"    all batch offsets = ${batchOffsets.mkString(",")}")
+             s"    file length = ${file.length}\n" +
+             s"    last batch offset = ${batchOffsets.last}\n" +
+             s"    all batch offsets = ${batchOffsets.mkString(",")}")
 
     private var batchIndex = 0 // Which batch we're in
     private var fileStream: FileInputStream = null
@@ -471,7 +472,7 @@ class ExternalAppendOnlyMap[K, V, C](
 
         assert(end >= start,
                "start = " + start + ", end = " + end + ", batchOffsets = " +
-               batchOffsets.mkString("[", ", ", "]"))
+                 batchOffsets.mkString("[", ", ", "]"))
 
         val bufferedStream = new BufferedInputStream(
             ByteStreams.limit(fileStream, end - start))

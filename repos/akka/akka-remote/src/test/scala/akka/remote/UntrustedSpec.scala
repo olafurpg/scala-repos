@@ -59,7 +59,8 @@ object UntrustedSpec {
 }
 
 class UntrustedSpec
-    extends AkkaSpec("""
+    extends AkkaSpec(
+        """
 akka.actor.provider = akka.remote.RemoteActorRefProvider
 akka.remote.untrusted-mode = on
 akka.remote.trusted-selection-paths = ["/user/receptionist", ]    
@@ -72,7 +73,8 @@ akka.loglevel = DEBUG
 
   val client = ActorSystem(
       "UntrustedSpec-client",
-      ConfigFactory.parseString("""
+      ConfigFactory.parseString(
+          """
       akka.actor.provider = akka.remote.RemoteActorRefProvider
       akka.remote.netty.tcp.port = 0
   """))
@@ -142,8 +144,7 @@ akka.loglevel = DEBUG
     }
 
     "discard watch messages" in {
-      client.actorOf(
-          Props(new Actor {
+      client.actorOf(Props(new Actor {
         context.watch(target2)
         def receive = {
           case x ⇒ testActor forward x

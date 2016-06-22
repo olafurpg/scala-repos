@@ -231,8 +231,11 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
       // Only create new instance if anything changed
       if (newPath == origPath) this
       else
-        new URI(
-            getScheme(), getRawAuthority(), newPath, getQuery(), getFragment())
+        new URI(getScheme(),
+                getRawAuthority(),
+                newPath,
+                getQuery(),
+                getFragment())
     }
 
   def parseServerAuthority(): URI = {
@@ -533,7 +536,7 @@ object URI {
     val relativeURI =
       /*3CAPT*/
       "((?:" + net_path + "|(" + abs_path + ")|(" + rel_path + "))(?:\\?" +
-      query + ")?)"
+        query + ")?)"
 
     // URI-reference = [ absoluteURI | relativeURI ] [ "#" fragment ]
     val uriRef =
@@ -699,8 +702,8 @@ object URI {
       // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
       // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=%]
       "[\u0000- \"#/<>?@\\[-\\^`{-}" +
-      "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
-      "%(?![0-9a-f]{2})",
+        "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
+        "%(?![0-9a-f]{2})",
       "ig")
 
   /** Quote any character not in unreserved, punct, escaped or other */
@@ -716,8 +719,8 @@ object URI {
       // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
       // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=%@/]
       "[\u0000- \"#<>?\\[-\\^`{-}" +
-      "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
-      "%(?![0-9a-f]{2})",
+        "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
+        "%(?![0-9a-f]{2})",
       "ig")
 
   /** Quote any character not in unreserved, punct, escaped, other or equal
@@ -739,8 +742,8 @@ object URI {
       // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
       // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=%@\[\]]
       "[\u0000- \"#/<>?\\^`{-}" +
-      "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
-      "%(?![0-9a-f]{2})",
+        "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
+        "%(?![0-9a-f]{2})",
       "ig")
 
   /** Quote any character not in unreserved, punct, escaped, other or equal
@@ -756,8 +759,8 @@ object URI {
       // !other = [\u0000-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]
       // Char class is: [:!other:^a-z0-9-_.!~*'(),;:$&+=?/\\[\\]%]
       "[\u0000- \"#<>@\\^`{-}" +
-      "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
-      "%(?![0-9a-f]{2})",
+        "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
+        "%(?![0-9a-f]{2})",
       "ig")
 
   /** Quote any character not in unreserved, reserved, escaped or other */

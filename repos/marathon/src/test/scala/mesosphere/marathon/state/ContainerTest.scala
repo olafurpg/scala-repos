@@ -26,35 +26,31 @@ class ContainerTest extends MarathonSpec with Matchers {
         docker = Some(Container.Docker(image = "group/image"))
     )
 
-    lazy val container2 =
-      Container(
-          `type` = mesos.ContainerInfo.Type.DOCKER,
-          volumes =
-            Nil,
-          docker = Some(
-              Container
-                .Docker(
-                  image = "group/image",
-                  network = Some(
-                      mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
-                  portMappings =
-                    Some(Seq(
-                            Container.Docker.PortMapping(
-                                containerPort = 8080,
-                                hostPort = 32001,
-                                servicePort = 9000,
-                                protocol = Container.Docker.PortMapping.TCP,
-                                name = Some("http"),
-                                labels = Map("foo" -> "bar")),
-                            Container.Docker.PortMapping(
-                                containerPort = 8081,
-                                hostPort = 32002,
-                                servicePort = 9001,
-                                protocol = Container.Docker.PortMapping.UDP)
-                        ))
-              )
-          )
-      )
+    lazy val container2 = Container(
+        `type` = mesos.ContainerInfo.Type.DOCKER,
+        volumes = Nil,
+        docker = Some(
+            Container.Docker(
+                image = "group/image",
+                network = Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
+                portMappings = Some(
+                    Seq(
+                        Container.Docker.PortMapping(
+                            containerPort = 8080,
+                            hostPort = 32001,
+                            servicePort = 9000,
+                            protocol = Container.Docker.PortMapping.TCP,
+                            name = Some("http"),
+                            labels = Map("foo" -> "bar")),
+                        Container.Docker.PortMapping(
+                            containerPort = 8081,
+                            hostPort = 32002,
+                            servicePort = 9001,
+                            protocol = Container.Docker.PortMapping.UDP)
+                    ))
+            )
+        )
+    )
 
     lazy val container3 = Container(
         `type` = mesos.ContainerInfo.Type.DOCKER,
@@ -138,7 +134,8 @@ class ContainerTest extends MarathonSpec with Matchers {
     assert(
         f.container2.docker.get.network == Some(proto2.getDocker.getNetwork))
     val portMappings = proto2.getDocker.getPortMappingsList.asScala
-    assert(f.container2.docker.get.portMappings == Some(
+    assert(
+        f.container2.docker.get.portMappings == Some(
             portMappings.map(PortMappingSerializer.fromProto)))
     assert(proto2.getDocker.hasForcePullImage)
     assert(
@@ -152,10 +149,12 @@ class ContainerTest extends MarathonSpec with Matchers {
     assert(
         f.container3.docker.get.privileged == proto3.getDocker.getPrivileged)
     assert(
-        f.container3.docker.get.parameters.map(_.key) == proto3.getDocker.getParametersList.asScala
+        f.container3.docker.get.parameters
+          .map(_.key) == proto3.getDocker.getParametersList.asScala
           .map(_.getKey))
     assert(
-        f.container3.docker.get.parameters.map(_.value) == proto3.getDocker.getParametersList.asScala
+        f.container3.docker.get.parameters
+          .map(_.value) == proto3.getDocker.getParametersList.asScala
           .map(_.getValue)
     )
     assert(proto3.getDocker.hasForcePullImage)
@@ -206,10 +205,12 @@ class ContainerTest extends MarathonSpec with Matchers {
     assert(
         f.container3.docker.get.privileged == proto3.getDocker.getPrivileged)
     assert(
-        f.container3.docker.get.parameters.map(_.key) == proto3.getDocker.getParametersList.asScala
+        f.container3.docker.get.parameters
+          .map(_.key) == proto3.getDocker.getParametersList.asScala
           .map(_.getKey))
     assert(
-        f.container3.docker.get.parameters.map(_.value) == proto3.getDocker.getParametersList.asScala
+        f.container3.docker.get.parameters
+          .map(_.value) == proto3.getDocker.getParametersList.asScala
           .map(_.getValue)
     )
     assert(proto3.getDocker.hasForcePullImage)

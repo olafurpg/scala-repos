@@ -32,8 +32,9 @@ private[opening] final class Selector(openingColl: Coll,
         }
     }).mon(_.opening.selector.time) >>- lila.mon.opening.selector.count()
 
-  private def tryRange(
-      user: User, tolerance: Int, ids: BSONArray): Fu[Opening] =
+  private def tryRange(user: User,
+                       tolerance: Int,
+                       ids: BSONArray): Fu[Opening] =
     openingColl
       .find(
           BSONDocument(

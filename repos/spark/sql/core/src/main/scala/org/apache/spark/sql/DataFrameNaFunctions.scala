@@ -33,7 +33,7 @@ import org.apache.spark.sql.types._
   * @since 1.3.1
   */
 @Experimental
-final class DataFrameNaFunctions private[sql](df: DataFrame) {
+final class DataFrameNaFunctions private[sql] (df: DataFrame) {
 
   /**
     * Returns a new [[DataFrame]] that drops rows containing any null or NaN values.
@@ -124,8 +124,8 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
   def drop(minNonNulls: Int, cols: Seq[String]): DataFrame = {
     // Filtering condition:
     // only keep the row if it has at least `minNonNulls` non-null and non-NaN values.
-    val predicate = AtLeastNNonNulls(
-        minNonNulls, cols.map(name => df.resolve(name)))
+    val predicate =
+      AtLeastNNonNulls(minNonNulls, cols.map(name => df.resolve(name)))
     df.filter(Column(predicate))
   }
 
@@ -287,8 +287,8 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
     *
     * @since 1.3.1
     */
-  def replace[T](
-      cols: Array[String], replacement: java.util.Map[T, T]): DataFrame = {
+  def replace[T](cols: Array[String],
+                 replacement: java.util.Map[T, T]): DataFrame = {
     replace(cols.toSeq, replacement.asScala.toMap)
   }
 
@@ -344,8 +344,8 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
   def replace[T](cols: Seq[String], replacement: Map[T, T]): DataFrame =
     replace0(cols, replacement)
 
-  private def replace0[T](
-      cols: Seq[String], replacement: Map[T, T]): DataFrame = {
+  private def replace0[T](cols: Seq[String],
+                          replacement: Map[T, T]): DataFrame = {
     if (replacement.isEmpty || cols.isEmpty) {
       return df
     }

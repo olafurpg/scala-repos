@@ -18,8 +18,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   */
 class ScTypeParamStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
-    elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                               _ <: PsiElement])
     extends StubBaseWrapper[ScTypeParam](parent, elemType)
     with ScTypeParamStub {
   private var name: StringRef = _
@@ -40,8 +40,8 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](
   def getName: String = StringRef.toString(name)
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement],
+                                      _ <: PsiElement],
            name: StringRef,
            upperText: StringRef,
            lowerText: StringRef,
@@ -89,8 +89,8 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](
     val res: Option[ScTypeElement] =
       if (getLowerText != "")
         Some(
-            ScalaPsiElementFactory.createTypeElementFromText(
-                getLowerText, getPsi, null))
+            ScalaPsiElementFactory
+              .createTypeElementFromText(getLowerText, getPsi, null))
       else None
     lowerElement = new SofterReference[Option[ScTypeElement]](res)
     res
@@ -107,8 +107,8 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](
     val res: Option[ScTypeElement] =
       if (getUpperText != "")
         Some(
-            ScalaPsiElementFactory.createTypeElementFromText(
-                getUpperText, getPsi, null))
+            ScalaPsiElementFactory
+              .createTypeElementFromText(getUpperText, getPsi, null))
       else None
     upperElement = new SofterReference[Option[ScTypeElement]](res)
     res

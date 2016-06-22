@@ -22,18 +22,18 @@ private[controllers] trait ForumController extends forum.Granter {
   protected def userOwnsTeam(teamId: String, userId: String): Fu[Boolean] =
     Env.team.api.owns(teamId, userId)
 
-  protected def CategGrantRead[A <: Result](categSlug: String)(
-      a: => Fu[A])(implicit ctx: Context): Fu[Result] =
-    isGrantedRead(categSlug).fold(
-        a, fuccess(Forbidden("You cannot access to this category")))
+  protected def CategGrantRead[A <: Result](categSlug: String)(a: => Fu[A])(
+      implicit ctx: Context): Fu[Result] =
+    isGrantedRead(categSlug)
+      .fold(a, fuccess(Forbidden("You cannot access to this category")))
 
   protected def CategGrantWrite[A <: Result](categSlug: String)(a: => Fu[A])(
       implicit ctx: Context): Fu[Result] =
     if (isGrantedWrite(categSlug)) a
     else fuccess(Forbidden("You cannot post to this category"))
 
-  protected def CategGrantMod[A <: Result](categSlug: String)(
-      a: => Fu[A])(implicit ctx: Context): Fu[Result] =
+  protected def CategGrantMod[A <: Result](categSlug: String)(a: => Fu[A])(
+      implicit ctx: Context): Fu[Result] =
     isGrantedMod(categSlug) flatMap { granted =>
       (granted | isGranted(_.ModerateForum)) fold
       (a, fuccess(Forbidden("You cannot post to this category")))

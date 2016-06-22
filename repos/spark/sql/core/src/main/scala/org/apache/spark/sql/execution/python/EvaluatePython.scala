@@ -51,19 +51,17 @@ case class EvaluatePython(udf: PythonUDF,
 
 object EvaluatePython {
   def apply(udf: PythonUDF, child: LogicalPlan): EvaluatePython =
-    new EvaluatePython(
-        udf, child, AttributeReference("pythonUDF", udf.dataType)())
+    new EvaluatePython(udf,
+                       child,
+                       AttributeReference("pythonUDF", udf.dataType)())
 
   def takeAndServe(df: DataFrame, n: Int): Int = {
     registerPicklers()
     df.withNewExecutionId {
       val iter = new SerDeUtil.AutoBatchedPickler(
-          df.queryExecution.executedPlan
-            .executeTake(n)
-            .iterator
-            .map { row =>
-          EvaluatePython.toJava(row, df.schema)
-        })
+          df.queryExecution.executedPlan.executeTake(n).iterator.map { row =>
+        EvaluatePython.toJava(row, df.schema)
+      })
       PythonRDD.serveIterator(iter, s"serve-DataFrame")
     }
   }
@@ -78,8 +76,8 @@ object EvaluatePython {
       val values = new Array[Any](row.numFields)
       var i = 0
       while (i < row.numFields) {
-        values(i) = toJava(
-            row.get(i, struct.fields(i).dataType), struct.fields(i).dataType)
+        values(i) = toJava(row.get(i, struct.fields(i).dataType),
+                           struct.fields(i).dataType)
         i += 1
       }
       new GenericRowWithSchema(values, struct)
@@ -144,7 +142,7 @@ object EvaluatePython {
     case (c: String, BinaryType) => c.getBytes(StandardCharsets.UTF_8)
     case (c, BinaryType)
         if c.getClass.isArray &&
-        c.getClass.getComponentType.getName == "byte" =>
+          c.getClass.getComponentType.getName == "byte" =>
       c
 
     case (c: java.util.List[_], ArrayType(elementType, _)) =>
@@ -167,15 +165,12 @@ object EvaluatePython {
       if (array.length != fields.length) {
         throw new IllegalStateException(
             s"Input row doesn't have expected number of values required by the schema. " +
-            s"${fields.length} fields are required while ${array.length} values are provided."
+              s"${fields.length} fields are required while ${array.length} values are provided."
         )
       }
-      new GenericInternalRow(
-          array
-            .zip(fields)
-            .map {
-          case (e, f) => fromJava(e, f.dataType)
-        })
+      new GenericInternalRow(array.zip(fields).map {
+        case (e, f) => fromJava(e, f.dataType)
+      })
 
     case (_, udt: UserDefinedType[_]) => fromJava(obj, udt.sqlType)
 
@@ -199,7 +194,8 @@ object EvaluatePython {
 
     def pickle(obj: Object, out: OutputStream, pickler: Pickler): Unit = {
       out.write(Opcodes.GLOBAL)
-      out.write((module + "\n" + "_parse_datatype_json_string" + "\n")
+      out.write(
+          (module + "\n" + "_parse_datatype_json_string" + "\n")
             .getBytes(StandardCharsets.UTF_8))
       val schema = obj.asInstanceOf[StructType]
       pickler.save(schema.json)
@@ -224,7 +220,8 @@ object EvaluatePython {
     def pickle(obj: Object, out: OutputStream, pickler: Pickler): Unit = {
       if (obj == this) {
         out.write(Opcodes.GLOBAL)
-        out.write((module + "\n" + "_create_row_inbound_converter" + "\n")
+        out.write(
+            (module + "\n" + "_create_row_inbound_converter" + "\n")
               .getBytes(StandardCharsets.UTF_8))
       } else {
         // it will be memorized by Pickler to save some bytes

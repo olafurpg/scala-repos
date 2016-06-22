@@ -33,11 +33,11 @@ object GettingStartedOverview extends App {
     .run(
 //#quick-query
         coffees.schema.create andThen //#quick-query
-        (for (c <- coffees; if c.price < 10.0) yield c.name).result
+          (for (c <- coffees; if c.price < 10.0) yield c.name).result
 //#quick-query
-        andThen //#quick-query
-        // or
-        coffees.filter(_.price < 10.0).map(_.name).result
+          andThen //#quick-query
+            // or
+            coffees.filter(_.price < 10.0).map(_.name).result
     )
 //#quick-query
   Await.result(f1, Duration.Inf)
@@ -86,7 +86,7 @@ object GettingStartedOverview extends App {
       val coffeeNames: Future[Seq[Double]] = db.run(
           //#features-type-safe
           coffees.schema.create andThen //#features-type-safe
-          coffees.map(_.price).result
+            coffees.map(_.price).result
       )
 
       // Query builders are type safe:

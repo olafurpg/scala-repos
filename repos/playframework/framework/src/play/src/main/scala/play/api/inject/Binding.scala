@@ -77,8 +77,8 @@ object BindingKey {
   * @param qualifier An optional qualifier.
   * @see The [[Module]] class for information on how to provide bindings.
   */
-final case class BindingKey[T](
-    clazz: Class[T], qualifier: Option[QualifierAnnotation]) {
+final case class BindingKey[T](clazz: Class[T],
+                               qualifier: Option[QualifierAnnotation]) {
 
   def this(clazz: Class[T]) = this(clazz, None)
 
@@ -212,8 +212,11 @@ final case class BindingKey[T](
     * Bind this binding key to another binding key.
     */
   def to(key: BindingKey[_ <: T]): Binding[T] =
-    Binding(
-        this, Some(BindingKeyTarget(key)), None, false, SourceLocator.source)
+    Binding(this,
+            Some(BindingKeyTarget(key)),
+            None,
+            false,
+            SourceLocator.source)
 
   /**
     * Bind this binding key to the given provider class.
@@ -321,7 +324,9 @@ final case class QualifierClass[T <: Annotation](clazz: Class[T])
 
 private object SourceLocator {
   val provider = SourceProvider.DEFAULT_INSTANCE.plusSkippedClasses(
-      this.getClass, classOf[BindingKey[_]], classOf[Binding[_]])
+      this.getClass,
+      classOf[BindingKey[_]],
+      classOf[Binding[_]])
 
   def source = provider.get()
 }

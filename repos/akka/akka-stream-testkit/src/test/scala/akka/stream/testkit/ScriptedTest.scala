@@ -125,7 +125,7 @@ trait ScriptedTest extends Matchers {
     var currentScript = script
     var remainingDemand =
       script.expectedOutputs.size +
-      ThreadLocalRandom.current().nextInt(1, maximumOverrun)
+        ThreadLocalRandom.current().nextInt(1, maximumOverrun)
     debugLog(s"starting with remainingDemand=$remainingDemand")
     var pendingRequests = 0L
     var outstandingDemand = 0L
@@ -153,7 +153,7 @@ trait ScriptedTest extends Matchers {
 
     def mayProvideInput: Boolean =
       currentScript.someInsPending && (pendingRequests > 0) &&
-      (currentScript.pendingOuts <= maximumBuffer)
+        (currentScript.pendingOuts <= maximumBuffer)
     def mayRequestMore: Boolean = remainingDemand > 0
 
     def shakeIt(): Boolean = {
@@ -227,15 +227,18 @@ trait ScriptedTest extends Matchers {
     }
   }
 
-  def runScript[In, Out, M](script: Script[In, Out],
-                            settings: ActorMaterializerSettings,
-                            maximumOverrun: Int = 3,
-                            maximumRequest: Int = 3,
-                            maximumBuffer: Int = 3)(
-      op: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M])(
+  def runScript[In, Out, M](
+      script: Script[In, Out],
+      settings: ActorMaterializerSettings,
+      maximumOverrun: Int = 3,
+      maximumRequest: Int = 3,
+      maximumBuffer: Int = 3)(op: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M])(
       implicit system: ActorSystem): Unit = {
-    new ScriptRunner(
-        op, settings, script, maximumOverrun, maximumRequest, maximumBuffer)
-      .run()
+    new ScriptRunner(op,
+                     settings,
+                     script,
+                     maximumOverrun,
+                     maximumRequest,
+                     maximumBuffer).run()
   }
 }

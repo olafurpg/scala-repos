@@ -104,8 +104,9 @@ class RoutingSpec
     }
 
     "use configured nr-of-instances when FromConfig" in {
-      val router = system.actorOf(
-          FromConfig.props(routeeProps = Props[TestActor]), "router1")
+      val router =
+        system.actorOf(FromConfig.props(routeeProps = Props[TestActor]),
+                       "router1")
       router ! GetRoutees
       expectMsgType[Routees].routees.size should ===(3)
       watch(router)
@@ -132,10 +133,10 @@ class RoutingSpec
           3
         }
       }
-      val router = system.actorOf(
-          RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))
-            .props(routeeProps = Props[TestActor]),
-          "router3")
+      val router = system.actorOf(RoundRobinPool(nrOfInstances = 0,
+                                                 resizer = Some(resizer))
+                                    .props(routeeProps = Props[TestActor]),
+                                  "router3")
       Await.ready(latch, remainingOrDefault)
       router ! GetRoutees
       expectMsgType[Routees].routees.size should ===(3)
@@ -149,9 +150,9 @@ class RoutingSpec
         case e ⇒ testActor ! e; SupervisorStrategy.Escalate
         //#custom-strategy
       }
-      val router =
-        system.actorOf(RoundRobinPool(1, supervisorStrategy = escalator)
-              .props(routeeProps = Props[TestActor]))
+      val router = system.actorOf(
+          RoundRobinPool(1, supervisorStrategy = escalator)
+            .props(routeeProps = Props[TestActor]))
       //#supervision
       router ! GetRoutees
       EventFilter[ActorKilledException](occurrences = 1) intercept {
@@ -159,7 +160,8 @@ class RoutingSpec
       }
       expectMsgType[ActorKilledException]
 
-      val router2 = system.actorOf(RoundRobinPool(1)
+      val router2 = system.actorOf(
+          RoundRobinPool(1)
             .withSupervisorStrategy(escalator)
             .props(routeeProps = Props[TestActor]))
       router2 ! GetRoutees
@@ -189,8 +191,7 @@ class RoutingSpec
         case e ⇒ testActor ! e; SupervisorStrategy.Restart
       }
       val supervisor = system.actorOf(Props(new Supervisor(restarter)))
-      supervisor ! RoundRobinPool(3).props(
-          routeeProps = Props(new Actor {
+      supervisor ! RoundRobinPool(3).props(routeeProps = Props(new Actor {
         def receive = {
           case x: String ⇒ throw new Exception(x)
         }

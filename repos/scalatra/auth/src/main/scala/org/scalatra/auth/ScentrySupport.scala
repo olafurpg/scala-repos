@@ -86,11 +86,11 @@ trait ScentrySupport[UserType <: AnyRef] extends Initializable {
   protected def isAnonymous(implicit request: HttpServletRequest): Boolean =
     !isAuthenticated
 
-  protected def authenticate()(
-      implicit request: HttpServletRequest, response: HttpServletResponse) =
+  protected def authenticate()(implicit request: HttpServletRequest,
+                               response: HttpServletResponse) =
     scentry.authenticate()
 
-  protected def logOut()(
-      implicit request: HttpServletRequest, response: HttpServletResponse) =
+  protected def logOut()(implicit request: HttpServletRequest,
+                         response: HttpServletResponse) =
     scentry.logout()
 }

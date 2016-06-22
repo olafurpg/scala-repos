@@ -61,8 +61,7 @@ class TraversableOnceTest {
   def testOnlyEvaluateOnce() = {
     var evaluatedCountOfMaxBy = 0
 
-    val max = list.maxBy(
-        x => {
+    val max = list.maxBy(x => {
       evaluatedCountOfMaxBy += 1
       x * 10
     })
@@ -72,8 +71,7 @@ class TraversableOnceTest {
 
     var evaluatedCountOfMinBy = 0
 
-    val min = list.minBy(
-        x => {
+    val min = list.minBy(x => {
       evaluatedCountOfMinBy += 1
       x * 10
     })

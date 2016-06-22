@@ -48,8 +48,8 @@ object FileUtils {
       case e: IOException => Left(e)
     }
 
-  def writeChanges(
-      changes: List[FileEdit], cs: Charset): Either[Exception, List[File]] = {
+  def writeChanges(changes: List[FileEdit],
+                   cs: Charset): Either[Exception, List[File]] = {
     val editsByFile = changes.collect { case ed: TextEdit => ed }
       .groupBy(_.file)
     val newFiles = changes.collect { case ed: NewFile => ed }
@@ -86,8 +86,8 @@ object FileUtils {
     }
   }
 
-  def writeDiffChanges(
-      changes: List[FileEdit], cs: Charset): Either[Exception, File] = {
+  def writeDiffChanges(changes: List[FileEdit],
+                       cs: Charset): Either[Exception, File] = {
     //TODO: add support for NewFile and DeleteFile
     val editsByFile = changes.collect { case ed: TextEdit => ed }
       .groupBy(_.file)
@@ -96,8 +96,10 @@ object FileUtils {
         case (file, fileChanges) =>
           readFile(file, cs) match {
             case Right(contents) =>
-              FileEditHelper.diffFromTextEdits(
-                  fileChanges, contents, file, file)
+              FileEditHelper.diffFromTextEdits(fileChanges,
+                                               contents,
+                                               file,
+                                               file)
             case Left(e) => throw e
           }
       }.mkString("\n")

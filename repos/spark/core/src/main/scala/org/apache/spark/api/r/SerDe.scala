@@ -252,8 +252,9 @@ private[spark] object SerDe {
     }
   }
 
-  private def writeKeyValue(
-      dos: DataOutputStream, key: Object, value: Object): Unit = {
+  private def writeKeyValue(dos: DataOutputStream,
+                            key: Object,
+                            value: Object): Unit = {
     if (key == null) {
       throw new IllegalArgumentException("Key in map can't be null.")
     } else if (!key.isInstanceOf[String]) {
@@ -272,12 +273,11 @@ private[spark] object SerDe {
       // Convert ArrayType collected from DataFrame to Java array
       // Collected data of ArrayType from a DataFrame is observed to be of
       // type "scala.collection.mutable.WrappedArray"
-      val value =
-        if (obj.isInstanceOf[WrappedArray[_]]) {
-          obj.asInstanceOf[WrappedArray[_]].toArray
-        } else {
-          obj
-        }
+      val value = if (obj.isInstanceOf[WrappedArray[_]]) {
+        obj.asInstanceOf[WrappedArray[_]].toArray
+      } else {
+        obj
+      }
 
       value match {
         case v: java.lang.Character =>
@@ -367,16 +367,18 @@ private[spark] object SerDe {
             val key = entry.getKey
             val value = entry.getValue
 
-            writeKeyValue(
-                dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
+            writeKeyValue(dos,
+                          key.asInstanceOf[Object],
+                          value.asInstanceOf[Object])
           }
         case v: scala.collection.Map[_, _] =>
           writeType(dos, "map")
           writeInt(dos, v.size)
           v.foreach {
             case (key, value) =>
-              writeKeyValue(
-                  dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
+              writeKeyValue(dos,
+                            key.asInstanceOf[Object],
+                            value.asInstanceOf[Object])
           }
 
         case _ =>

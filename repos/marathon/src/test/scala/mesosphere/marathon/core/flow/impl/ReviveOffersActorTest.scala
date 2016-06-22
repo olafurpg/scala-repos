@@ -259,7 +259,8 @@ class ReviveOffersActorTest
     Mockito.reset(f.driver)
 
     for (i <- 2L to f.repetitions.toLong - 1) {
-      When("the min_revive_offers_interval has passed and we receive a TimedCheck")
+      When(
+          "the min_revive_offers_interval has passed and we receive a TimedCheck")
       f.clock += f.conf.minReviveOffersInterval().millis
       f.actorRef ! ReviveOffersActor.TimedCheck
 
@@ -278,7 +279,8 @@ class ReviveOffersActorTest
       f.actorRef.underlyingActor.revivesNeeded should be(f.repetitions - i)
     }
 
-    When("the min_revive_offers_interval has passed and we receive our last TimedCheck")
+    When(
+        "the min_revive_offers_interval has passed and we receive our last TimedCheck")
     f.clock += f.conf.minReviveOffersInterval().millis
     f.actorRef ! ReviveOffersActor.TimedCheck
 

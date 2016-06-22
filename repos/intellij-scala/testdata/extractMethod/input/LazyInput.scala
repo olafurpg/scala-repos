@@ -3,7 +3,7 @@ class LazyInput {
     lazy val x = 44
     /*start*/
     x + 77
-/*end*/
+    /*end*/
   }
 }
 /*

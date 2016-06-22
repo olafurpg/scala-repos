@@ -41,8 +41,11 @@ class JobQueryLoggerSpec extends Specification {
       val clock = Clock.System
       val jobManager = new InMemoryJobManager[Need]
       val jobId = jobManager
-        .createJob(
-            "password", "error-report-spec", "hard", None, Some(clock.now()))
+        .createJob("password",
+                   "error-report-spec",
+                   "hard",
+                   None,
+                   Some(clock.now()))
         .copoint
         .id
       val decomposer = new Decomposer[Unit] {
@@ -51,8 +54,8 @@ class JobQueryLoggerSpec extends Specification {
     })
   }
 
-  def testChannel(channel: String)(
-      f: (QueryLogger[Need, Unit], String) => Need[Unit]) = {
+  def testChannel(channel: String)(f: (QueryLogger[Need, Unit],
+                                       String) => Need[Unit]) = {
     withReport { report =>
       val messages = (for {
         _ <- f(report, "Hi there!")

@@ -76,8 +76,8 @@ sealed abstract class Xor[+A, +B] extends Product with Serializable {
       f: Validated[A, B] => Validated[AA, BB]): AA Xor BB =
     f(toValidated).toXor
 
-  def to[F[_], BB >: B](
-      implicit monoidKF: MonoidK[F], applicativeF: Applicative[F]): F[BB] =
+  def to[F[_], BB >: B](implicit monoidKF: MonoidK[F],
+                        applicativeF: Applicative[F]): F[BB] =
     fold(_ => monoidKF.empty, applicativeF.pure)
 
   def bimap[C, D](fa: A => C, fb: B => D): C Xor D = this match {
@@ -100,20 +100,21 @@ sealed abstract class Xor[+A, +B] extends Product with Serializable {
     case Xor.Right(b) => f(b)
   }
 
-  def compare[AA >: A, BB >: B](that: AA Xor BB)(
-      implicit AA: Order[AA], BB: Order[BB]): Int = fold(
+  def compare[AA >: A, BB >: B](that: AA Xor BB)(implicit AA: Order[AA],
+                                                 BB: Order[BB]): Int = fold(
       a => that.fold(AA.compare(a, _), _ => -1),
       b => that.fold(_ => 1, BB.compare(b, _))
   )
 
   def partialCompare[AA >: A, BB >: B](that: AA Xor BB)(
-      implicit AA: PartialOrder[AA], BB: PartialOrder[BB]): Double = fold(
+      implicit AA: PartialOrder[AA],
+      BB: PartialOrder[BB]): Double = fold(
       a => that.fold(AA.partialCompare(a, _), _ => -1),
       b => that.fold(_ => 1, BB.partialCompare(b, _))
   )
 
-  def ===[AA >: A, BB >: B](that: AA Xor BB)(
-      implicit AA: Eq[AA], BB: Eq[BB]): Boolean = fold(
+  def ===[AA >: A, BB >: B](that: AA Xor BB)(implicit AA: Eq[AA],
+                                             BB: Eq[BB]): Boolean = fold(
       a => that.fold(AA.eqv(a, _), _ => false),
       b => that.fold(_ => false, BB.eqv(b, _))
   )
@@ -132,7 +133,8 @@ sealed abstract class Xor[+A, +B] extends Product with Serializable {
   def merge[AA >: A](implicit ev: B <:< AA): AA = fold(identity, ev.apply)
 
   final def combine[AA >: A, BB >: B](that: AA Xor BB)(
-      implicit AA: Semigroup[AA], BB: Semigroup[BB]): AA Xor BB = this match {
+      implicit AA: Semigroup[AA],
+      BB: Semigroup[BB]): AA Xor BB = this match {
     case Xor.Left(a1) =>
       that match {
         case Xor.Left(a2) => Xor.Left(AA.combine(a1, a2))
@@ -171,8 +173,8 @@ private[data] sealed abstract class XorInstances extends XorInstances1 {
       def show(f: A Xor B): String = f.show
     }
 
-  implicit def xorMonoid[A, B](
-      implicit A: Semigroup[A], B: Monoid[B]): Monoid[A Xor B] =
+  implicit def xorMonoid[A, B](implicit A: Semigroup[A],
+                               B: Monoid[B]): Monoid[A Xor B] =
     new Monoid[A Xor B] {
       def empty: A Xor B = Xor.Right(B.empty)
       def combine(x: A Xor B, y: A Xor B): A Xor B = x combine y
@@ -180,23 +182,24 @@ private[data] sealed abstract class XorInstances extends XorInstances1 {
 
   implicit def xorBifunctor: Bitraverse[Xor] =
     new Bitraverse[Xor] {
-      def bitraverse[G[_], A, B, C, D](
-          fab: Xor[A, B])(f: A => G[C], g: B => G[D])(
-          implicit G: Applicative[G]): G[Xor[C, D]] =
+      def bitraverse[G[_], A, B, C, D](fab: Xor[A, B])(
+          f: A => G[C],
+          g: B => G[D])(implicit G: Applicative[G]): G[Xor[C, D]] =
         fab match {
           case Xor.Left(a) => G.map(f(a))(Xor.left)
           case Xor.Right(b) => G.map(g(b))(Xor.right)
         }
 
-      def bifoldLeft[A, B, C](fab: Xor[A, B], c: C)(
-          f: (C, A) => C, g: (C, B) => C): C =
+      def bifoldLeft[A, B, C](fab: Xor[A, B], c: C)(f: (C, A) => C,
+                                                    g: (C, B) => C): C =
         fab match {
           case Xor.Left(a) => f(c, a)
           case Xor.Right(b) => g(c, b)
         }
 
       def bifoldRight[A, B, C](fab: Xor[A, B], c: Eval[C])(
-          f: (A, Eval[C]) => Eval[C], g: (B, Eval[C]) => Eval[C]): Eval[C] =
+          f: (A, Eval[C]) => Eval[C],
+          g: (B, Eval[C]) => Eval[C]): Eval[C] =
         fab match {
           case Xor.Left(a) => f(a, c)
           case Xor.Right(b) => g(b, c)
@@ -233,8 +236,8 @@ private[data] sealed abstract class XorInstances extends XorInstances1 {
 
 private[data] sealed abstract class XorInstances1 extends XorInstances2 {
 
-  implicit def xorSemigroup[A, B](
-      implicit A: Semigroup[A], B: Semigroup[B]): Semigroup[A Xor B] =
+  implicit def xorSemigroup[A, B](implicit A: Semigroup[A],
+                                  B: Semigroup[B]): Semigroup[A Xor B] =
     new Semigroup[A Xor B] {
       def combine(x: A Xor B, y: A Xor B): A Xor B = x combine y
     }

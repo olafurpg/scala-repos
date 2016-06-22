@@ -194,8 +194,8 @@ class HttpClientDispatcherTest extends FunSuite {
     import OpTransport._
 
     val writep = new Promise[Unit]
-    val transport = OpTransport[Any, Any](
-        Write(Function.const(true), writep), Close(Future.Done))
+    val transport = OpTransport[Any, Any](Write(Function.const(true), writep),
+                                          Close(Future.Done))
 
     val disp = new HttpClientDispatcher(transport)
     val req = Request()

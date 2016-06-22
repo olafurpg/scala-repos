@@ -53,14 +53,14 @@ class ScCaseClauseImpl(node: ASTNode)
         expr match {
           case Some(e)
               if lastParent != null &&
-              e.startOffsetInParent == lastParent.startOffsetInParent =>
+                e.startOffsetInParent == lastParent.startOffsetInParent =>
             if (!process) return false
           case Some(e: ScInterpolationPattern) => if (!process) return false
           case _ =>
             guard match {
               case Some(g)
                   if lastParent != null &&
-                  g.startOffsetInParent == lastParent.startOffsetInParent =>
+                    g.startOffsetInParent == lastParent.startOffsetInParent =>
                 if (!process) return false
               case _ =>
                 //todo: is this good? Maybe parser => always expression.

@@ -81,8 +81,8 @@ class NettyBlockTransferServiceSuite
       .set("spark.blockManager.port", port.toString)
     val securityManager = new SecurityManager(conf)
     val blockDataManager = mock(classOf[BlockDataManager])
-    val service = new NettyBlockTransferService(
-        conf, securityManager, numCores = 1)
+    val service =
+      new NettyBlockTransferService(conf, securityManager, numCores = 1)
     service.init(blockDataManager)
     service
   }

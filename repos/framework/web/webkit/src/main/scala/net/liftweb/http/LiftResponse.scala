@@ -161,15 +161,18 @@ object UnauthorizedDigestResponse {
 /**
   * 401 Unauthorized Response.
   */
-class UnauthorizedDigestResponse(
-    override val realm: String, qop: Qop.Value, nonce: String, opaque: String)
+class UnauthorizedDigestResponse(override val realm: String,
+                                 qop: Qop.Value,
+                                 nonce: String,
+                                 opaque: String)
     extends UnauthorizedResponse(realm) {
   override def toResponse =
     InMemoryResponse(
         Array(),
-        List("WWW-Authenticate" ->
-            ("Digest realm=\"" + realm + "\", " + "qop=\"" + qop + "\", " +
-                "nonce=\"" + nonce + "\", " + "opaque=\"" + opaque + "\"")),
+        List(
+            "WWW-Authenticate" ->
+              ("Digest realm=\"" + realm + "\", " + "qop=\"" + qop + "\", " +
+                    "nonce=\"" + nonce + "\", " + "opaque=\"" + opaque + "\"")),
         Nil,
         401)
 }
@@ -306,8 +309,10 @@ case class BadGatewayResponse() extends LiftResponse with HeaderDefaults {
   */
 case class ServiceUnavailableResponse(retryAfter: Long) extends LiftResponse {
   def toResponse =
-    InMemoryResponse(
-        Array(), List("Retry-After" -> retryAfter.toString), Nil, 503)
+    InMemoryResponse(Array(),
+                     List("Retry-After" -> retryAfter.toString),
+                     Nil,
+                     503)
 }
 
 object JavaScriptResponse {
@@ -427,17 +432,16 @@ final case class InMemoryResponse(data: Array[Byte],
 
   override def toString =
     "InMemoryResponse(" + (new String(data, "UTF-8")) + ", " + headers + ", " +
-    cookies + ", " + code + ")"
+      cookies + ", " + code + ")"
 }
 
-final case class StreamingResponse(
-    data: { def read(buf: Array[Byte]): Int }, onEnd: () => Unit, size: Long, headers: List[(String, String)], cookies: List[HTTPCookie], code: Int)
+final case class StreamingResponse(data: { def read(buf: Array[Byte]): Int }, onEnd: () => Unit, size: Long, headers: List[(String, String)], cookies: List[HTTPCookie], code: Int)
     extends BasicResponse {
   def toResponse = this
 
   override def toString =
     "StreamingResponse( steaming_data , " + headers + ", " + cookies + ", " +
-    code + ")"
+      code + ")"
 }
 
 object OutputStreamResponse {
@@ -474,8 +478,9 @@ case class OutputStreamResponse(out: (OutputStream) => Unit,
 /**
   * 301 Redirect.
   */
-case class PermRedirectResponse(
-    uri: String, request: Req, cookies: HTTPCookie*)
+case class PermRedirectResponse(uri: String,
+                                request: Req,
+                                cookies: HTTPCookie*)
     extends LiftResponse {
   def toResponse =
     InMemoryResponse(Array(), List("Location" -> uri), cookies.toList, 301)
@@ -484,8 +489,9 @@ case class PermRedirectResponse(
 /**
   * 307 Redirect.
   */
-case class TemporaryRedirectResponse(
-    uri: String, request: Req, cookies: HTTPCookie*)
+case class TemporaryRedirectResponse(uri: String,
+                                     request: Req,
+                                     cookies: HTTPCookie*)
     extends LiftResponse {
   def toResponse =
     InMemoryResponse(Array(), List("Location" -> uri), cookies.toList, 307)
@@ -554,8 +560,10 @@ object RedirectWithState {
   def apply(uri: String,
             state: RedirectState,
             cookies: HTTPCookie*): RedirectWithState =
-    this.apply(
-        uri, S.request or CurrentReq.box openOr Req.nil, state, cookies: _*)
+    this.apply(uri,
+               S.request or CurrentReq.box openOr Req.nil,
+               state,
+               cookies: _*)
 
   def apply(uri: String,
             req: Req,
@@ -581,8 +589,8 @@ object RedirectState {
   def apply(f: () => Unit, msgs: (String, NoticeType.Value)*): RedirectState =
     new RedirectState(Full(f), msgs: _*)
 }
-case class RedirectState(
-    func: Box[() => Unit], msgs: (String, NoticeType.Value)*)
+case class RedirectState(func: Box[() => Unit],
+                         msgs: (String, NoticeType.Value)*)
 
 object MessageState {
   implicit def tuple2MessageState(msg: (String, NoticeType.Value)) =
@@ -625,8 +633,9 @@ object PlainTextResponse {
     PlainTextResponse(text, Nil, code)
 }
 
-case class PlainTextResponse(
-    text: String, headers: List[(String, String)], code: Int)
+case class PlainTextResponse(text: String,
+                             headers: List[(String, String)],
+                             code: Int)
     extends LiftResponse {
   def toResponse = {
     val bytes = text.getBytes("UTF-8")
@@ -646,8 +655,9 @@ object CSSResponse {
     CSSResponse(text, Nil, code)
 }
 
-case class CSSResponse(
-    text: String, headers: List[(String, String)], code: Int)
+case class CSSResponse(text: String,
+                       headers: List[(String, String)],
+                       code: Int)
     extends LiftResponse {
   def toResponse = {
     val bytes = text.getBytes("UTF-8")
@@ -915,8 +925,9 @@ object AppXmlResponse {
 /**
   * Returning an Atom document.
   */
-case class AtomResponse(
-    xml: Node, addlHeaders: List[(String, String)] = XmlResponse.addlHeaders)
+case class AtomResponse(xml: Node,
+                        addlHeaders: List[(String, String)] =
+                          XmlResponse.addlHeaders)
     extends XmlNodeResponse {
   def docType = Empty
 
@@ -933,8 +944,9 @@ case class AtomResponse(
 /**
   * Returning an OpenSearch Description Document.
   */
-case class OpenSearchResponse(
-    xml: Node, addlHeaders: List[(String, String)] = XmlResponse.addlHeaders)
+case class OpenSearchResponse(xml: Node,
+                              addlHeaders: List[(String, String)] =
+                                XmlResponse.addlHeaders)
     extends XmlNodeResponse {
   def docType = Empty
 

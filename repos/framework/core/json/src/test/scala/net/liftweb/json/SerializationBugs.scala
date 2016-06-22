@@ -157,11 +157,12 @@ object SerializationBugs extends Specification {
         case SingleValue(x: Double) => JObject(List(JField("val", JDouble(x))))
         case VectorValue(x: Vector[_]) =>
           JObject(
-              List(JField("val",
-                          JArray(x
-                                .asInstanceOf[Vector[Double]]
-                                .toList
-                                .map(JDouble(_))))))
+              List(
+                  JField("val",
+                         JArray(x
+                               .asInstanceOf[Vector[Double]]
+                               .toList
+                               .map(JDouble(_))))))
       }
     }
 

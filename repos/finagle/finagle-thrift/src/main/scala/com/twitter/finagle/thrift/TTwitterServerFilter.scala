@@ -11,8 +11,7 @@ import org.apache.thrift.protocol.{TMessage, TMessageType, TProtocolFactory}
 private[finagle] class TTwitterServerFilter(
     serviceName: String,
     protocolFactory: TProtocolFactory
-)
-    extends SimpleFilter[Array[Byte], Array[Byte]] {
+) extends SimpleFilter[Array[Byte], Array[Byte]] {
   // Concurrency is not an issue here since we have an instance per
   // channel, and receive only one request at a time (thrift does no
   // pipelining).  Furthermore, finagle will guarantee this by

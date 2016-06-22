@@ -52,8 +52,8 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
   def resolveOperators(
       rule: PartialFunction[LogicalPlan, LogicalPlan]): LogicalPlan = {
     if (!analyzed) {
-      val afterRuleOnChildren = transformChildren(
-          rule, (t, r) => t.resolveOperators(r))
+      val afterRuleOnChildren =
+        transformChildren(rule, (t, r) => t.resolveOperators(r))
       if (this fastEquals afterRuleOnChildren) {
         CurrentOrigin.withOrigin(origin) {
           rule.applyOrElse(this, identity[LogicalPlan])
@@ -145,8 +145,8 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     * nodes of this LogicalPlan. The attribute is expressed as
     * as string in the following form: `[scope].AttributeName.[nested].[fields]...`.
     */
-  def resolveChildren(
-      nameParts: Seq[String], resolver: Resolver): Option[NamedExpression] =
+  def resolveChildren(nameParts: Seq[String],
+                      resolver: Resolver): Option[NamedExpression] =
     resolve(nameParts, children.flatMap(_.output), resolver)
 
   /**
@@ -154,8 +154,8 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     * LogicalPlan. The attribute is expressed as string in the following form:
     * `[scope].AttributeName.[nested].[fields]...`.
     */
-  def resolve(
-      nameParts: Seq[String], resolver: Resolver): Option[NamedExpression] =
+  def resolve(nameParts: Seq[String],
+              resolver: Resolver): Option[NamedExpression] =
     resolve(nameParts, output, resolver)
 
   /**
@@ -163,8 +163,8 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     * don't split the name parts quoted by backticks, for example,
     * `ab.cd`.`efg` should be split into two parts "ab.cd" and "efg".
     */
-  def resolveQuoted(
-      name: String, resolver: Resolver): Option[NamedExpression] = {
+  def resolveQuoted(name: String,
+                    resolver: Resolver): Option[NamedExpression] = {
     resolve(UnresolvedAttribute.parseAttributeName(name), output, resolver)
   }
 

@@ -94,8 +94,9 @@ class SSLOptionsSuite extends SparkFunSuite with BeforeAndAfterAll {
     assert(opts.keyStorePassword === Some("password"))
     assert(opts.keyPassword === Some("password"))
     assert(opts.protocol === Some("SSLv3"))
-    assert(opts.enabledAlgorithms === Set("TLS_RSA_WITH_AES_128_CBC_SHA",
-                                          "TLS_RSA_WITH_AES_256_CBC_SHA"))
+    assert(
+        opts.enabledAlgorithms === Set("TLS_RSA_WITH_AES_128_CBC_SHA",
+                                       "TLS_RSA_WITH_AES_256_CBC_SHA"))
   }
 
   test("test whether defaults can be overridden ") {

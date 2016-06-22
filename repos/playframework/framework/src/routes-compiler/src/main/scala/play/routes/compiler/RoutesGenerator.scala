@@ -60,33 +60,38 @@ object StaticRoutesGenerator extends RoutesGenerator {
         new java.util.Date().toString)
     val routes = rules.collect { case r: Route => r }
 
-    val forwardsRoutesFiles =
-      if (task.forwardsRouter) {
-        Seq(
-            folder + ForwardsRoutesFile -> generateRouter(
-                sourceInfo, namespace, task.additionalImports, rules))
-      } else {
-        Nil
-      }
+    val forwardsRoutesFiles = if (task.forwardsRouter) {
+      Seq(
+          folder + ForwardsRoutesFile -> generateRouter(sourceInfo,
+                                                        namespace,
+                                                        task.additionalImports,
+                                                        rules))
+    } else {
+      Nil
+    }
 
-    val reverseRoutesFiles =
-      if (task.reverseRouter) {
-        Seq(folder + RoutesPrefixFile -> generateRoutesPrefix(
-                sourceInfo, namespace)) ++ generateReverseRouters(
-            sourceInfo,
-            namespace,
-            task.additionalImports,
-            routes,
-            task.namespaceReverseRouter) ++ generateJavaScriptReverseRouters(
-            sourceInfo,
-            namespace,
-            task.additionalImports,
-            routes,
-            task.namespaceReverseRouter) ++ generateJavaWrappers(
-            sourceInfo, namespace, rules, task.namespaceReverseRouter)
-      } else {
-        Nil
-      }
+    val reverseRoutesFiles = if (task.reverseRouter) {
+      Seq(
+          folder + RoutesPrefixFile -> generateRoutesPrefix(
+              sourceInfo,
+              namespace)) ++ generateReverseRouters(
+          sourceInfo,
+          namespace,
+          task.additionalImports,
+          routes,
+          task.namespaceReverseRouter) ++ generateJavaScriptReverseRouters(
+          sourceInfo,
+          namespace,
+          task.additionalImports,
+          routes,
+          task.namespaceReverseRouter) ++ generateJavaWrappers(
+          sourceInfo,
+          namespace,
+          rules,
+          task.namespaceReverseRouter)
+    } else {
+      Nil
+    }
 
     forwardsRoutesFiles ++ reverseRoutesFiles
   }
@@ -104,8 +109,8 @@ object StaticRoutesGenerator extends RoutesGenerator {
       )
       .body
 
-  private def generateRoutesPrefix(
-      sourceInfo: RoutesSourceInfo, namespace: Option[String]) =
+  private def generateRoutesPrefix(sourceInfo: RoutesSourceInfo,
+                                   namespace: Option[String]) =
     static.twirl
       .routesPrefix(
           sourceInfo,
@@ -208,33 +213,38 @@ object InjectedRoutesGenerator extends RoutesGenerator {
         new java.util.Date().toString)
     val routes = rules.collect { case r: Route => r }
 
-    val forwardsRoutesFiles =
-      if (task.forwardsRouter) {
-        Seq(
-            folder + ForwardsRoutesFile -> generateRouter(
-                sourceInfo, namespace, task.additionalImports, rules))
-      } else {
-        Nil
-      }
+    val forwardsRoutesFiles = if (task.forwardsRouter) {
+      Seq(
+          folder + ForwardsRoutesFile -> generateRouter(sourceInfo,
+                                                        namespace,
+                                                        task.additionalImports,
+                                                        rules))
+    } else {
+      Nil
+    }
 
-    val reverseRoutesFiles =
-      if (task.reverseRouter) {
-        Seq(folder + RoutesPrefixFile -> generateRoutesPrefix(
-                sourceInfo, namespace)) ++ generateReverseRouters(
-            sourceInfo,
-            namespace,
-            task.additionalImports,
-            routes,
-            task.namespaceReverseRouter) ++ generateJavaScriptReverseRouters(
-            sourceInfo,
-            namespace,
-            task.additionalImports,
-            routes,
-            task.namespaceReverseRouter) ++ generateJavaWrappers(
-            sourceInfo, namespace, rules, task.namespaceReverseRouter)
-      } else {
-        Nil
-      }
+    val reverseRoutesFiles = if (task.reverseRouter) {
+      Seq(
+          folder + RoutesPrefixFile -> generateRoutesPrefix(
+              sourceInfo,
+              namespace)) ++ generateReverseRouters(
+          sourceInfo,
+          namespace,
+          task.additionalImports,
+          routes,
+          task.namespaceReverseRouter) ++ generateJavaScriptReverseRouters(
+          sourceInfo,
+          namespace,
+          task.additionalImports,
+          routes,
+          task.namespaceReverseRouter) ++ generateJavaWrappers(
+          sourceInfo,
+          namespace,
+          rules,
+          task.namespaceReverseRouter)
+    } else {
+      Nil
+    }
 
     forwardsRoutesFiles ++ reverseRoutesFiles
   }
@@ -251,8 +261,9 @@ object InjectedRoutesGenerator extends RoutesGenerator {
       .zipWithIndex
       .map {
         case ((router, includes), index) =>
-          router -> Dependency(
-              router.replace('.', '_') + "_" + index, router, includes.head)
+          router -> Dependency(router.replace('.', '_') + "_" + index,
+                               router,
+                               includes.head)
       }
       .toMap
 
@@ -288,9 +299,10 @@ object InjectedRoutesGenerator extends RoutesGenerator {
       case include: Include =>
         includesDeps(include.router).copy(rule = include)
       case route: Route =>
-        routesDeps((route.call.packageName,
-                    route.call.controller,
-                    route.call.instantiate)).copy(rule = route)
+        routesDeps(
+            (route.call.packageName,
+             route.call.controller,
+             route.call.instantiate)).copy(rule = route)
     }
 
     inject.twirl
@@ -305,8 +317,8 @@ object InjectedRoutesGenerator extends RoutesGenerator {
       .body
   }
 
-  private def generateRoutesPrefix(
-      sourceInfo: RoutesSourceInfo, namespace: Option[String]) =
+  private def generateRoutesPrefix(sourceInfo: RoutesSourceInfo,
+                                   namespace: Option[String]) =
     static.twirl
       .routesPrefix(
           sourceInfo,

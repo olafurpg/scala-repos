@@ -15,8 +15,8 @@ abstract class Driver {
 
   /** Forward errors to the (current) reporter. */
   protected def scalacError(msg: String): Unit = {
-    reporter.error(
-        FakePos("scalac"), msg + "\n  scalac -help  gives more information")
+    reporter.error(FakePos("scalac"),
+                   msg + "\n  scalac -help  gives more information")
   }
 
   /** True to continue compilation. */
@@ -40,8 +40,7 @@ abstract class Driver {
 
   def process(args: Array[String]): Boolean = {
     val ss = new Settings(scalacError)
-    reporter =
-      new ConsoleReporter(ss) // for reporting early config errors, before compiler is constructed
+    reporter = new ConsoleReporter(ss) // for reporting early config errors, before compiler is constructed
     command = new CompilerCommand(args.toList, ss)
     settings = command.settings
 

@@ -63,9 +63,9 @@ object Iteratee {
       case Input.EOF => Done(s, Input.EOF)
       case Input.Empty => Cont[E, A](step(s))
       case Input.El(e) => {
-          val newS = executeFuture(f(s, e))(pec);
-          flatten(newS.map(s1 => Cont[E, A](step(s1)))(dec))
-        }
+        val newS = executeFuture(f(s, e))(pec);
+        flatten(newS.map(s1 => Cont[E, A](step(s1)))(dec))
+      }
     }
     (Cont[E, A](step(state)))
   }
@@ -86,13 +86,12 @@ object Iteratee {
       case Input.EOF => Done(s, Input.EOF)
       case Input.Empty => Cont[E, A](step(s))
       case Input.El(e) => {
-          val newS = executeFuture(f(s, e))(pec);
-          flatten(
-              newS.map[Iteratee[E, A]] {
-            case (s1, done) =>
-              if (!done) Cont[E, A](step(s1)) else Done(s1, Input.Empty)
-          }(dec))
-        }
+        val newS = executeFuture(f(s, e))(pec);
+        flatten(newS.map[Iteratee[E, A]] {
+          case (s1, done) =>
+            if (!done) Cont[E, A](step(s1)) else Done(s1, Input.Empty)
+        }(dec))
+      }
     }
     (Cont[E, A](step(state)))
   }
@@ -240,8 +239,7 @@ object Iteratee {
   def eofOrElse[E] = new EofOrElse[E] {
     def apply[A, B](otherwise: => B)(eofValue: A): Iteratee[E, Either[B, A]] = {
       def cont: Iteratee[E, Either[B, A]] =
-        Cont(
-            (in: Input[E]) => {
+        Cont((in: Input[E]) => {
           in match {
             case Input.El(e) => Done(Left(otherwise), in)
             case Input.EOF => Done(Right(eofValue), in)
@@ -593,9 +591,9 @@ trait Iteratee[E, +A] { self =>
           case Step.Error(msg, e) => Error(msg, e)
         }(dec)
       case Step.Cont(k) => {
-          implicit val pec = ec.prepare()
-          Cont((in: Input[E]) => executeIteratee(k(in))(dec).flatMap(f)(pec))
-        }
+        implicit val pec = ec.prepare()
+        Cont((in: Input[E]) => executeIteratee(k(in))(dec).flatMap(f)(pec))
+      }
       case Step.Error(msg, e) => Error(msg, e)
     }
   }
@@ -633,17 +631,17 @@ trait Iteratee[E, +A] { self =>
       case Step.Done(a, e) =>
         executeIteratee(f(a))(pec).pureFlatFold {
           case Step.Done(a, eIn) => {
-              val fullIn = (e, eIn) match {
-                case (Input.Empty, in) => in
-                case (in, Input.Empty) => in
-                case (Input.EOF, _) => Input.EOF
-                case (in, Input.EOF) => in
-                case (Input.El(e1), Input.El(e2)) =>
-                  Input.El[E](p(e1) ++ p(e2))
-              }
-
-              Done(a, fullIn)
+            val fullIn = (e, eIn) match {
+              case (Input.Empty, in) => in
+              case (in, Input.Empty) => in
+              case (Input.EOF, _) => Input.EOF
+              case (in, Input.EOF) => in
+              case (Input.El(e1), Input.El(e2)) =>
+                Input.El[E](p(e1) ++ p(e2))
             }
+
+            Done(a, fullIn)
+          }
           case Step.Cont(k) => k(e)
           case Step.Error(msg, e) => Error(msg, e)
         }(dec)
@@ -829,8 +827,7 @@ private final class DoneIteratee[E, A](a: A, e: Input[E])
     */
   override def mapM[B](f: A => Future[B])(
       implicit ec: ExecutionContext): Iteratee[E, B] = {
-    Iteratee.flatten(
-        executeFuture {
+    Iteratee.flatten(executeFuture {
       f(a).map[Iteratee[E, B]](Done(_, e))(dec)
     }(ec /* delegate preparation */ ))
   }

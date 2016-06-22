@@ -20,21 +20,28 @@ class StateTrackerTest extends FlatSpec {
       timer.tick() // StateTracker.timerTask should fire, increment
       tc.advance(250.milliseconds)
       timer.tick() // StateTracker.timerTask should NOT fire
-      assert(statsReceiver.counter(
+      assert(
+          statsReceiver.counter(
               s"${SessionState.SyncConnected.name}_duration_ms")() == 2000)
-      stateTracker.transition(SessionState.Disconnected) // StateTracker.update should run
-      assert(statsReceiver.counter(
+      stateTracker
+        .transition(SessionState.Disconnected) // StateTracker.update should run
+      assert(
+          statsReceiver.counter(
               s"${SessionState.SyncConnected.name}_duration_ms")() == 2250)
       tc.advance(500.milliseconds)
       timer.tick() // StateTracker.timerTask should NOT fire
-      assert(statsReceiver.counter(
+      assert(
+          statsReceiver.counter(
               s"${SessionState.Disconnected.name}_duration_ms")() == 0)
-      stateTracker.transition(SessionState.SyncConnected) // StateTracker.update should run
-      assert(statsReceiver.counter(
+      stateTracker
+        .transition(SessionState.SyncConnected) // StateTracker.update should run
+      assert(
+          statsReceiver.counter(
               s"${SessionState.Disconnected.name}_duration_ms")() == 500)
       tc.advance(5000.milliseconds)
       timer.tick() // StateTracker.timerTask should fire, increment
-      assert(statsReceiver.counter(
+      assert(
+          statsReceiver.counter(
               s"${SessionState.SyncConnected.name}_duration_ms")() == 7250)
     }
   }

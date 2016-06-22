@@ -15,5 +15,7 @@ private[sbtplugin] object Version {
           s"$version is not a valid version string")
   }
 }
-private[sbtplugin] case class Version(
-    era: Int, major: Int, minor: Int, qualifier: Option[String])
+private[sbtplugin] case class Version(era: Int,
+                                      major: Int,
+                                      minor: Int,
+                                      qualifier: Option[String])

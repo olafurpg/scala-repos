@@ -33,6 +33,6 @@ trait AppInfoService {
     *
     * @param embed specifies which fields in the resulting AppInfo s are filled.
     */
-  def selectAppsBy(
-      selector: AppSelector, embed: Set[AppInfo.Embed]): Future[Seq[AppInfo]]
+  def selectAppsBy(selector: AppSelector,
+                   embed: Set[AppInfo.Embed]): Future[Seq[AppInfo]]
 }

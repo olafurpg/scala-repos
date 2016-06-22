@@ -90,8 +90,9 @@ class Run(instance: ScalaInstance, trapExit: Boolean, nativeTmp: File)
     val main = getMainMethod(mainClassName, loader)
     invokeMain(loader, main, options)
   }
-  private def invokeMain(
-      loader: ClassLoader, main: Method, options: Seq[String]): Unit = {
+  private def invokeMain(loader: ClassLoader,
+                         main: Method,
+                         options: Seq[String]): Unit = {
     val currentThread = Thread.currentThread
     val oldLoader = Thread.currentThread.getContextClassLoader
     currentThread.setContextClassLoader(loader)

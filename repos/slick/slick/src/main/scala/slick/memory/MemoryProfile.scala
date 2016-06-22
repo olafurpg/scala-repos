@@ -49,10 +49,12 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
   type InsertActionExtensionMethods[T] = InsertActionExtensionMethodsImpl[T]
 
   def createQueryActionExtensionMethods[R, S <: NoStream](
-      tree: Node, param: Any): QueryActionExtensionMethods[R, S] =
+      tree: Node,
+      param: Any): QueryActionExtensionMethods[R, S] =
     new QueryActionExtensionMethods[R, S](tree, param)
   def createStreamingQueryActionExtensionMethods[R, T](
-      tree: Node, param: Any): StreamingQueryActionExtensionMethods[R, T] =
+      tree: Node,
+      param: Any): StreamingQueryActionExtensionMethods[R, T] =
     new StreamingQueryActionExtensionMethods[R, T](tree, param)
   def createSchemaActionExtensionMethods(
       schema: SchemaDescription): SchemaActionExtensionMethods =
@@ -65,15 +67,17 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
 
   class MappedColumnTypeFactory extends super.MappedColumnTypeFactory {
     def base[T: ClassTag, U: BaseColumnType](
-        tmap: T => U, tcomap: U => T): BaseColumnType[T] = {
+        tmap: T => U,
+        tcomap: U => T): BaseColumnType[T] = {
       assertNonNullType(implicitly[BaseColumnType[U]])
       new MappedColumnType(implicitly[BaseColumnType[U]], tmap, tcomap)
     }
   }
 
   class MappedColumnType[T, U](
-      val baseType: ColumnType[U], toBase: T => U, toMapped: U => T)(
-      implicit val classTag: ClassTag[T])
+      val baseType: ColumnType[U],
+      toBase: T => U,
+      toMapped: U => T)(implicit val classTag: ClassTag[T])
       extends ScalaType[T]
       with BaseTypedType[T] {
     def nullable: Boolean = baseType.nullable
@@ -86,18 +90,19 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
   }
 
   trait API
-      extends super [RelationalProfile].API
-      with super [MemoryQueryingProfile].API {
+      extends super[RelationalProfile].API
+      with super[MemoryQueryingProfile].API {
     type SimpleDBIO[+R] = SimpleMemoryAction[R]
     val SimpleDBIO = SimpleMemoryAction
   }
 
-  protected def createInterpreter(
-      db: Backend#Database, param: Any): QueryInterpreter =
+  protected def createInterpreter(db: Backend#Database,
+                                  param: Any): QueryInterpreter =
     new QueryInterpreter(db, param) {
       override def run(n: Node) = n match {
         case ResultSetMapping(_, from, CompiledMapping(converter, _)) :@ CollectionType(
-            cons, el) =>
+            cons,
+            el) =>
           val fromV = run(from).asInstanceOf[TraversableOnce[Any]]
           val b =
             cons.createBuilder(el.classTag).asInstanceOf[Builder[Any, Any]]
@@ -117,8 +122,9 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
     createInterpreter(session.database, param).run(tree).asInstanceOf[R]
 
   class InsertInvokerDef[T](tree: Node) {
-    protected[this] val ResultSetMapping(
-    _, Insert(_, table: TableNode, _, _), CompiledMapping(converter, _)) = tree
+    protected[this] val ResultSetMapping(_,
+                                         Insert(_, table: TableNode, _, _),
+                                         CompiledMapping(converter, _)) = tree
 
     type SingleInsertResult = Unit
     type MultiInsertResult = Unit
@@ -156,8 +162,10 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
 
   class StreamingQueryAction[R, T](tree: Node, param: Any)
       extends StreamingProfileAction[R, T, Effect.Read]
-      with SynchronousDatabaseAction[
-          R, Streaming[T], Backend#This, Effect.Read] {
+      with SynchronousDatabaseAction[R,
+                                     Streaming[T],
+                                     Backend#This,
+                                     Effect.Read] {
     type StreamState = Iterator[T]
     protected[this] def getIterator(ctx: Backend#Context): Iterator[T] = {
       val inter = createInterpreter(ctx.session.database, param)
@@ -192,8 +200,10 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
       }
     def headOption: ProfileAction[Option[T], NoStream, Effect.Read] =
       new ProfileAction[Option[T], NoStream, Effect.Read]
-      with SynchronousDatabaseAction[
-          Option[T], NoStream, Backend#This, Effect.Read] {
+      with SynchronousDatabaseAction[Option[T],
+                                     NoStream,
+                                     Backend#This,
+                                     Effect.Read] {
         def run(ctx: Backend#Context): Option[T] = {
           val it = getIterator(ctx)
           if (it.hasNext) Some(it.next) else None
@@ -204,8 +214,8 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
     def getDumpInfo = DumpInfo("MemoryProfile.StreamingQueryAction")
   }
 
-  class QueryActionExtensionMethodsImpl[R, S <: NoStream](
-      tree: Node, param: Any)
+  class QueryActionExtensionMethodsImpl[R, S <: NoStream](tree: Node,
+                                                          param: Any)
       extends super.QueryActionExtensionMethodsImpl[R, S] {
     def result: ProfileAction[R, S, Effect.Read] =
       new StreamingQueryAction[R, Nothing](tree, param)
@@ -275,8 +285,9 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
   }
 
   class MemoryInsertCodeGen extends CodeGen {
-    def compileServerSideAndMapping(
-        serverSide: Node, mapping: Option[Node], state: CompilerState) =
+    def compileServerSideAndMapping(serverSide: Node,
+                                    mapping: Option[Node],
+                                    state: CompilerState) =
       (serverSide,
        mapping.map(
            new InsertMappingCompiler(serverSide.asInstanceOf[Insert]).compileMapping))

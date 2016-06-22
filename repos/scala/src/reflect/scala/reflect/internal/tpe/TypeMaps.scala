@@ -206,8 +206,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       if (trackVariance) variance = variance.flip
       try body finally if (trackVariance) variance = variance.flip
     }
-    protected def mapOverArgs(
-        args: List[Type], tparams: List[Symbol]): List[Type] =
+    protected def mapOverArgs(args: List[Type],
+                              tparams: List[Symbol]): List[Type] =
       (if (trackVariance)
          map2Conserve(args, tparams)((arg, tparam) =>
                withVariance(variance * tparam.variance)(this(arg)))
@@ -336,7 +336,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
             expanded += sym
             val eparams = mapOver(typeParamsToExistentials(sym))
             existentialAbstraction(
-                eparams, typeRef(apply(pre), sym, eparams map (_.tpe)))
+                eparams,
+                typeRef(apply(pre), sym, eparams map (_.tpe)))
           } finally {
             expanded -= sym
           }
@@ -513,7 +514,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     private def isBaseClassOfEnclosingClass(base: Symbol) = {
       def loop(encl: Symbol): Boolean =
         (isPossiblePrefix(encl) &&
-            ((encl isSubClass base) || loop(encl.owner.enclClass)))
+              ((encl isSubClass base) || loop(encl.owner.enclClass)))
       // The hasCompleteInfo guard is necessary to avoid cycles during the typing
       // of certain classes, notably ones defined inside package objects.
       !base.hasCompleteInfo || loop(seenFromClass)
@@ -524,7 +525,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       */
     private def isTypeParamOfEnclosingClass(sym: Symbol): Boolean =
       (sym.isTypeParameter && sym.owner.isClass &&
-          isBaseClassOfEnclosingClass(sym.owner))
+            isBaseClassOfEnclosingClass(sym.owner))
 
     /** Creates an existential representing a type parameter which appears
       *  in the prefix of a ThisType.
@@ -584,7 +585,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         if (!rhsArgs.isDefinedAt(argIndex))
           abort(
               s"Something is wrong: cannot find $lhs in applied type $rhs\n" +
-              explain)
+                explain)
         else {
           val targ = rhsArgs(argIndex)
           // @M! don't just replace the whole thing, might be followed by type application
@@ -654,7 +655,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         wroteAnnotation = true
         val presym = seenFromPrefix.widen.typeSymbol
         val thisSym =
-          presym.owner.newValue(presym.name.toTermName, presym.pos) setInfo seenFromPrefix
+          presym.owner
+            .newValue(presym.name.toTermName, presym.pos) setInfo seenFromPrefix
         gen.mkAttributedQualifier(seenFromPrefix, thisSym)
       }
 
@@ -706,7 +708,9 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       if (pre1 eq pre) tp
       else if (pre1.isStable) singleType(pre1, sym)
       else
-        pre1.memberType(sym).resultType //todo: this should be rolled into existential abstraction
+        pre1
+          .memberType(sym)
+          .resultType //todo: this should be rolled into existential abstraction
     }
 
     override def toString = s"AsSeenFromMap($seenFromPrefix, $seenFromClass)"
@@ -738,8 +742,10 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         tp
     }
 
-    @tailrec private def subst(
-        tp: Type, sym: Symbol, from: List[Symbol], to: List[T]): Type =
+    @tailrec private def subst(tp: Type,
+                               sym: Symbol,
+                               from: List[Symbol],
+                               to: List[T]): Type =
       (if (from.isEmpty) tp
        // else if (to.isEmpty) error("Unexpected substitution on '%s': from = %s but to == Nil".format(tp, from))
        else if (matches(from.head, sym)) toType(tp, to.head)
@@ -796,8 +802,9 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       case TypeRef(pre, _, args) => copyTypeRef(fromtp, pre, sym, args)
       case SingleType(pre, _) => singleType(pre, sym)
     }
-    @tailrec private def subst(
-        sym: Symbol, from: List[Symbol], to: List[Symbol]): Symbol =
+    @tailrec private def subst(sym: Symbol,
+                               from: List[Symbol],
+                               to: List[Symbol]): Symbol =
       (if (from.isEmpty) sym
        // else if (to.isEmpty) error("Unexpected substitution on '%s': from = %s but to == Nil".format(sym, from))
        else if (matches(from.head, sym)) to.head
@@ -811,7 +818,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
            case TypeRef(pre, sym, args) if pre ne NoPrefix =>
              val newSym = substFor(sym)
              // mapOver takes care of subst'ing in args
-             mapOver(if (sym eq newSym) tp
+             mapOver(
+                 if (sym eq newSym) tp
                  else
                    copyTypeRef(tp,
                                pre,
@@ -1161,11 +1169,11 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         /* The two symbols have the same fully qualified name */
         def corresponds(sym1: Symbol, sym2: Symbol): Boolean =
           sym1.name == sym2.name &&
-          (sym1.isPackageClass || corresponds(sym1.owner, sym2.owner))
+            (sym1.isPackageClass || corresponds(sym1.owner, sym2.owner))
         if (!corresponds(sym.owner, rebind0.owner)) {
           debuglog(
               "ADAPT1 pre = " + pre + ", sym = " + sym.fullLocationString +
-              ", rebind = " + rebind0.fullLocationString)
+                ", rebind = " + rebind0.fullLocationString)
           val bcs =
             pre.baseClasses.dropWhile(bc => !corresponds(bc, sym.owner))
           if (bcs.isEmpty)
@@ -1173,13 +1181,14 @@ private[internal] trait TypeMaps { self: SymbolTable =>
           else rebind0 = pre.baseType(bcs.head).member(sym.name)
           debuglog(
               "ADAPT2 pre = " + pre + ", bcs.head = " + bcs.head +
-              ", sym = " + sym.fullLocationString + ", rebind = " +
-              rebind0.fullLocationString
+                ", sym = " + sym.fullLocationString + ", rebind = " +
+                rebind0.fullLocationString
           )
         }
         rebind0.suchThat(sym => sym.isType || sym.isStable) orElse {
-          debuglog("" + phase + " " + phase.flatClasses + sym.owner +
-              sym.name + " " + sym.isType)
+          debuglog(
+              "" + phase + " " + phase.flatClasses + sym.owner +
+                sym.name + " " + sym.isType)
           throw new MalformedType(pre, sym.nameString)
         }
       }
@@ -1257,8 +1266,10 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         val parents1 = parents mapConserve (this)
         if (parents1 eq parents) tp
         else
-          refinedType(
-              parents1, tp.typeSymbol.owner, decls, tp.typeSymbol.owner.pos)
+          refinedType(parents1,
+                      tp.typeSymbol.owner,
+                      decls,
+                      tp.typeSymbol.owner.pos)
       case SuperType(_, _) => mapOver(tp)
       case TypeBounds(_, _) => mapOver(tp)
       case TypeVar(_, _) => mapOver(tp)

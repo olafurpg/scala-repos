@@ -25,8 +25,8 @@ private[persistence] sealed trait PersistentEnvelope {
   * INTERNAL API
   * Message which can be resequenced by the Journal, but will not be persisted.
   */
-private[persistence] final case class NonPersistentRepr(
-    payload: Any, sender: ActorRef)
+private[persistence] final case class NonPersistentRepr(payload: Any,
+                                                        sender: ActorRef)
     extends PersistentEnvelope {
   override def size: Int = 1
 }
@@ -49,7 +49,7 @@ final case class AtomicWrite(payload: immutable.Seq[PersistentRepr])
     require(
         payload.forall(_.persistenceId == payload.head.persistenceId),
         "AtomicWrite must contain messages for the same persistenceId, " +
-        s"yet different persistenceIds found: ${payload.map(_.persistenceId).toSet}")
+          s"yet different persistenceIds found: ${payload.map(_.persistenceId).toSet}")
 
   def persistenceId = payload.head.persistenceId
   def lowestSequenceNr =

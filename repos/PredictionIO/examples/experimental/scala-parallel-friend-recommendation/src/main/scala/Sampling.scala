@@ -27,16 +27,14 @@ object Sampling {
     } else {
       val pivot = a(a.length / 2).srcId
       // 'L'ess, 'E'qual, 'G'reater
-      val partitions = a.groupBy(
-          (e: Edge[Int]) => {
+      val partitions = a.groupBy((e: Edge[Int]) => {
         if (e.srcId < pivot) 'L'
         else if (e.srcId > pivot) 'G'
         else 'E'
       })
 
       var sortedAccumulator: Array[Edge[Int]] = Array()
-      List('L', 'E', 'G').foreach(
-          (c: Char) => {
+      List('L', 'E', 'G').foreach((c: Char) => {
         if (partitions.contains(c)) {
           sortedAccumulator = sortedAccumulator ++ partitions(c)
         }
@@ -89,15 +87,17 @@ object Sampling {
       }
     }
     val vertex: Seq[(VertexId, Int)] = sampledVertices.map(v => (v, 1)).toSeq
-    val edges = graph.edges.filter(e =>
+    val edges = graph.edges.filter(
+        e =>
           sampledVertices.contains(e.srcId) &&
-          sampledVertices.contains(e.dstId))
+            sampledVertices.contains(e.dstId))
     Graph(sc.parallelize(vertex), edges)
   }
 
   // Samples vertices uniformly and induces edges.
-  def nodeSampling(
-      sc: SparkContext, graph: Graph[Int, Int], fraction: Double) = {
+  def nodeSampling(sc: SparkContext,
+                   graph: Graph[Int, Int],
+                   fraction: Double) = {
     val vertices = graph.vertices.sample(false, fraction, Random.nextLong)
     val vertexMap = vertices.collectAsMap()
     val edges = graph.edges.filter(e =>
@@ -107,8 +107,8 @@ object Sampling {
   }
 
   // Get all edges with source vertexId of target
-  def accumulateEdges(
-      e: Array[Edge[Int]], target: VertexId): ListBuffer[Edge[Int]] = {
+  def accumulateEdges(e: Array[Edge[Int]],
+                      target: VertexId): ListBuffer[Edge[Int]] = {
     val idx = binarySearchE(e, target)(0, e.size - 1)
     var outEdges: ListBuffer[Edge[Int]] = ListBuffer()
     if (idx == -1) return outEdges
@@ -141,7 +141,8 @@ object Sampling {
 
   // Binary search to find an edge with target vertexId
   def binarySearchE(list: Array[Edge[Int]], target: VertexId)(
-      start: Int = 0, end: Int = list.length - 1): Int = {
+      start: Int = 0,
+      end: Int = list.length - 1): Int = {
     if (start > end) return -1
     val mid = start + (end - start + 1) / 2
     if (list(mid).srcId == target) return mid

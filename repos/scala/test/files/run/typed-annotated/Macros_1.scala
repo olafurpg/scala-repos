@@ -12,10 +12,11 @@ object Macros {
               List()),
         TypeTree(weakTypeOf[Int]))
     c.Expr[Unit](
-        Block(List(ValDef(Modifiers(),
-                          newTermName("x"),
-                          tpt,
-                          Literal(Constant(42)))),
+        Block(List(
+                  ValDef(Modifiers(),
+                         newTermName("x"),
+                         tpt,
+                         Literal(Constant(42)))),
               Apply(Ident(newTermName("println")),
                     List(Ident(newTermName("x"))))))
   }

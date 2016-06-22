@@ -1,6 +1,6 @@
 // t1231: reported by Vladimir Reshetnikov on 19 July 2007
 trait A {
-  type T [_]
+  type T[_]
 }
 
 trait B // First-order type

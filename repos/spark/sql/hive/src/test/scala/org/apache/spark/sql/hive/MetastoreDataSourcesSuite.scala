@@ -99,13 +99,15 @@ class MetastoreDataSourcesSuite
          """.stripMargin)
 
       val innerStruct = StructType(
-          Seq(StructField("=",
-                          ArrayType(StructType(StructField(
-                                      "Dd2", BooleanType, true) :: Nil)))))
+          Seq(
+              StructField(
+                  "=",
+                  ArrayType(StructType(
+                          StructField("Dd2", BooleanType, true) :: Nil)))))
 
-      val expectedSchema =
-        StructType(Seq(StructField("<d>", innerStruct, true),
-                       StructField("b", StringType, true)))
+      val expectedSchema = StructType(
+          Seq(StructField("<d>", innerStruct, true),
+              StructField("b", StringType, true)))
 
       assert(expectedSchema === table("jsonTable").schema)
 
@@ -153,7 +155,7 @@ class MetastoreDataSourcesSuite
       assert(
           new File(jsonFilePath).exists(),
           "The table with specified path is considered as an external table, " +
-          "its data should not deleted after DROP TABLE.")
+            "its data should not deleted after DROP TABLE.")
     }
   }
 
@@ -712,9 +714,8 @@ class MetastoreDataSourcesSuite
               inputFormat = None,
               outputFormat = None,
               serde = None,
-              serdeProperties =
-                Map("path" -> sessionState.catalog.hiveDefaultTableFilePath(
-                        TableIdentifier(tableName)))
+              serdeProperties = Map("path" -> sessionState.catalog
+                    .hiveDefaultTableFilePath(TableIdentifier(tableName)))
           ),
           properties = Map("spark.sql.sources.provider" -> "json",
                            "spark.sql.sources.schema" -> schema.json,
@@ -747,16 +748,16 @@ class MetastoreDataSourcesSuite
         metastoreTable.properties("spark.sql.sources.schema.numPartCols").toInt
       assert(numPartCols == 2)
 
-      val actualPartitionColumns = StructType(
-          (0 until numPartCols).map { index =>
-        df.schema(metastoreTable.properties(
-                s"spark.sql.sources.schema.partCol.$index"))
+      val actualPartitionColumns = StructType((0 until numPartCols).map {
+        index =>
+          df.schema(metastoreTable.properties(
+                  s"spark.sql.sources.schema.partCol.$index"))
       })
       // Make sure partition columns are correctly stored in metastore.
       assert(
           expectedPartitionColumns.sameType(actualPartitionColumns),
           s"Partitions columns stored in metastore $actualPartitionColumns is not the " +
-          s"partition columns defined by the saveAsTable operation $expectedPartitionColumns.")
+            s"partition columns defined by the saveAsTable operation $expectedPartitionColumns.")
 
       // Check the content of the saved table.
       checkAnswer(table(tableName).select("c", "b", "d", "a"),
@@ -796,16 +797,16 @@ class MetastoreDataSourcesSuite
         metastoreTable.properties("spark.sql.sources.schema.numSortCols").toInt
       assert(numSortCols == 1)
 
-      val actualBucketByColumns = StructType(
-          (0 until numBucketCols).map { index =>
-        df.schema(metastoreTable.properties(
-                s"spark.sql.sources.schema.bucketCol.$index"))
+      val actualBucketByColumns = StructType((0 until numBucketCols).map {
+        index =>
+          df.schema(metastoreTable.properties(
+                  s"spark.sql.sources.schema.bucketCol.$index"))
       })
       // Make sure bucketBy columns are correctly stored in metastore.
       assert(
           expectedBucketByColumns.sameType(actualBucketByColumns),
           s"Partitions columns stored in metastore $actualBucketByColumns is not the " +
-          s"partition columns defined by the saveAsTable operation $expectedBucketByColumns.")
+            s"partition columns defined by the saveAsTable operation $expectedBucketByColumns.")
 
       val actualSortByColumns = StructType((0 until numSortCols).map { index =>
         df.schema(metastoreTable.properties(
@@ -815,7 +816,7 @@ class MetastoreDataSourcesSuite
       assert(
           expectedSortByColumns.sameType(actualSortByColumns),
           s"Partitions columns stored in metastore $actualSortByColumns is not the " +
-          s"partition columns defined by the saveAsTable operation $expectedSortByColumns.")
+            s"partition columns defined by the saveAsTable operation $expectedSortByColumns.")
 
       // Check the content of the saved table.
       checkAnswer(table(tableName).select("c", "b", "d", "a"),

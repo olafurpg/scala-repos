@@ -165,7 +165,8 @@ trait Crudify {
                 listPath,
                 showAllMenuName,
                 addlMenuLocParams :::
-                (locSnippets :: Loc.Template(showAllTemplate) :: showAllMenuLocParams))))
+                  (locSnippets :: Loc
+                        .Template(showAllTemplate) :: showAllMenuLocParams))))
 
   /**
     * Override to include new Params for the show all menu
@@ -182,7 +183,8 @@ trait Crudify {
                 createPath,
                 createMenuName,
                 (addlMenuLocParams :::
-                    (locSnippets :: Loc.Template(createTemplate) :: createMenuLocParams)))))
+                      (locSnippets :: Loc
+                            .Template(createTemplate) :: createMenuLocParams)))))
 
   /**
     * Override to include new Params for the create menu
@@ -600,9 +602,11 @@ trait Crudify {
   private def mp(in: List[String]) = in.mkString("/", "/", "")
 
   def menus: List[Menu] =
-    List(
-        showAllMenuLoc, createMenuLoc, viewMenuLoc, editMenuLoc, deleteMenuLoc)
-      .flatMap(x => x)
+    List(showAllMenuLoc,
+         createMenuLoc,
+         viewMenuLoc,
+         editMenuLoc,
+         deleteMenuLoc).flatMap(x => x)
 
   /**
     * Given a range, find the records.  Your implementation of this
@@ -621,7 +625,8 @@ trait Crudify {
     * that to an actual instance of a BaseField on the instance of TheCrudType
     */
   protected def computeFieldFromPointer(
-      instance: TheCrudType, pointer: FieldPointerType): Box[BaseField]
+      instance: TheCrudType,
+      pointer: FieldPointerType): Box[BaseField]
 
   /**
     * This method defines how many rows are displayed per page.  By
@@ -681,8 +686,8 @@ trait Crudify {
   /**
     * Override this method to change how the next link is generated
     */
-  protected def crudAllNext(
-      first: Long, list: List[TheCrudType]): (NodeSeq) => NodeSeq = {
+  protected def crudAllNext(first: Long,
+                            list: List[TheCrudType]): (NodeSeq) => NodeSeq = {
     if (first < rowsPerPage) {
       ClearNodes
     } else {

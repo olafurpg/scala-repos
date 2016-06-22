@@ -36,7 +36,7 @@ class AddrMetadataExtractionTest extends FunSuite with AssertionsForJUnit {
         .push(verifyModule(expected))
         .push(AddrMetadataExtraction.module)
         .make(Stack.Params.empty + LoadBalancerFactory.Dest(addr) +
-            BindingFactory.Dest(name))
+              BindingFactory.Dest(name))
 
       factory()
     }
@@ -46,15 +46,13 @@ class AddrMetadataExtractionTest extends FunSuite with AssertionsForJUnit {
     Await.result(verify(Var(addrBound), unbound, metadata))
   })
 
-  test("add bound name id")(
-      new Ctx {
+  test("add bound name id")(new Ctx {
     val vaddr = Var(addrBound)
     val name = Name.Bound(vaddr, "baz")
     Await.result(verify(vaddr, name, metadata ++ Addr.Metadata("id" -> "baz")))
   })
 
-  test("add bound name path id")(
-      new Ctx {
+  test("add bound name path id")(new Ctx {
     Await.result(
         verify(vaddrBound, bound, metadata ++ Addr.Metadata("id" -> "/baz")))
   })
@@ -63,8 +61,7 @@ class AddrMetadataExtractionTest extends FunSuite with AssertionsForJUnit {
     Await.result(verify(Var(Addr.Neg), unbound, Addr.Metadata.empty))
   })
 
-  test("undefined for Addr.Pending until Addr.Bound")(
-      new Ctx {
+  test("undefined for Addr.Pending until Addr.Bound")(new Ctx {
     val addr = Var[Addr](Addr.Pending)
     val result = verify(addr, unbound, metadata)
     assert(!result.isDefined)
@@ -72,10 +69,10 @@ class AddrMetadataExtractionTest extends FunSuite with AssertionsForJUnit {
     Await.result(result)
   })
 
-  test("just id for Addr.Failed")(
-      new Ctx {
-    Await.result(verify(Var(Addr.Failed(new RuntimeException)),
-                        bound,
-                        Addr.Metadata("id" -> "/baz")))
+  test("just id for Addr.Failed")(new Ctx {
+    Await.result(
+        verify(Var(Addr.Failed(new RuntimeException)),
+               bound,
+               Addr.Metadata("id" -> "/baz")))
   })
 }

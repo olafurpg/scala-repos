@@ -56,7 +56,8 @@ import org.apache.spark.storage.StorageLevel
   * @tparam T  Dataset type, such as RDD[Double]
   */
 private[mllib] abstract class PeriodicCheckpointer[T](
-    val checkpointInterval: Int, val sc: SparkContext)
+    val checkpointInterval: Int,
+    val sc: SparkContext)
     extends Logging {
 
   /** FIFO queue of past checkpointed Datasets */
@@ -148,7 +149,7 @@ private[mllib] abstract class PeriodicCheckpointer[T](
         case e: Exception =>
           logWarning(
               "PeriodicCheckpointer could not remove old checkpoint file: " +
-              checkpointFile)
+                checkpointFile)
       }
     }
   }

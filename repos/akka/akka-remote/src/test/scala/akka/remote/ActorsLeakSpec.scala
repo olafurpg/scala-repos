@@ -18,8 +18,8 @@ import scala.concurrent.duration._
 
 object ActorsLeakSpec {
 
-  val config =
-    ConfigFactory.parseString("""
+  val config = ConfigFactory.parseString(
+      """
       | akka.actor.provider = "akka.remote.RemoteActorRefProvider"
       | #akka.loglevel = DEBUG
       | akka.remote.netty.tcp.applied-adapters = ["trttl"]
@@ -39,8 +39,8 @@ object ActorsLeakSpec {
           val cell = wc.underlying
 
           cell.childrenRefs match {
-            case ChildrenContainer.TerminatingChildrenContainer(
-                _, toDie, reason) ⇒
+            case ChildrenContainer
+                  .TerminatingChildrenContainer(_, toDie, reason) ⇒
               Nil
             case x @ (ChildrenContainer.TerminatedChildrenContainer |
                 ChildrenContainer.EmptyChildrenContainer) ⇒

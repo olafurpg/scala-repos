@@ -42,11 +42,11 @@ import scala.collection.mutable.ArrayBuffer
   * @param isSlice Should the start and end parameters be used for slicing?
   */
 @nonthreadsafe
-class FileMessageSet private[kafka](@volatile var file: File,
-                                    private[log] val channel: FileChannel,
-                                    private[log] val start: Int,
-                                    private[log] val end: Int,
-                                    isSlice: Boolean)
+class FileMessageSet private[kafka] (@volatile var file: File,
+                                     private[log] val channel: FileChannel,
+                                     private[log] val start: Int,
+                                     private[log] val end: Int,
+                                     isSlice: Boolean)
     extends MessageSet
     with Logging {
 
@@ -181,8 +181,8 @@ class FileMessageSet private[kafka](@volatile var file: File,
     }).toInt
     trace(
         "FileMessageSet " + file.getAbsolutePath + " : bytes transferred : " +
-        bytesTransferred + " bytes requested for transfer : " +
-        math.min(size, sizeInBytes))
+          bytesTransferred + " bytes requested for transfer : " +
+          math.min(size, sizeInBytes))
     bytesTransferred
   }
 
@@ -233,7 +233,7 @@ class FileMessageSet private[kafka](@volatile var file: File,
         val deepIter = ByteBufferMessageSet.deepIterator(messageAndOffset)
         for (innerMessageAndOffset <- deepIter) {
           newMessages +=
-            innerMessageAndOffset.message.toFormatVersion(toMagicValue)
+          innerMessageAndOffset.message.toFormatVersion(toMagicValue)
           offsets += innerMessageAndOffset.offset
         }
       }
@@ -349,8 +349,8 @@ class FileMessageSet private[kafka](@volatile var file: File,
     if (targetSize > originalSize || targetSize < 0)
       throw new KafkaException(
           "Attempt to truncate log segment to " + targetSize +
-          " bytes failed, " + " size of this log segment is " + originalSize +
-          " bytes.")
+            " bytes failed, " + " size of this log segment is " + originalSize +
+            " bytes.")
     channel.truncate(targetSize)
     channel.position(targetSize)
     _size.set(targetSize)
@@ -408,6 +408,7 @@ object FileMessageSet {
 
 object LogFlushStats extends KafkaMetricsGroup {
   val logFlushTimer = new KafkaTimer(
-      newTimer(
-          "LogFlushRateAndTimeMs", TimeUnit.MILLISECONDS, TimeUnit.SECONDS))
+      newTimer("LogFlushRateAndTimeMs",
+               TimeUnit.MILLISECONDS,
+               TimeUnit.SECONDS))
 }

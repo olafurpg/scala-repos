@@ -98,15 +98,15 @@ object PhysicalNode {
     * This is the PhysicalNode that implements flatMap and sends it on to the next
     * Node.
     */
-  case class FlatMap[I, O](
-      fn: I => TraversableOnce[O], target: PhysicalNode[O])
+  case class FlatMap[I, O](fn: I => TraversableOnce[O],
+                           target: PhysicalNode[O])
       extends PhysicalNode[I] {
 
     def push(item: I)(implicit ec: ExecutionContext) =
       Future.sequence(fn(item).map(target.push(_))).map(_ => ())
   }
-  case class Join[K, V, W](
-      service: K => Option[W], target: PhysicalNode[(K, (V, Option[W]))])
+  case class Join[K, V, W](service: K => Option[W],
+                           target: PhysicalNode[(K, (V, Option[W]))])
       extends PhysicalNode[(K, V)] {
     def push(item: (K, V))(implicit ec: ExecutionContext) = {
       val (k, v) = item
@@ -191,8 +191,9 @@ class ConcurrentMemory(
                     val (post, phys) = toPhys[U](deps, hm._1, p)
                     (post, Some(phys))
                 }
-              (res.last._1,
-               FanOut[U](res.collect { case (_, Some(phys)) => phys }))
+              (res.last._1, FanOut[U](res.collect {
+                case (_, Some(phys)) => phys
+              }))
           }
 
         def cast[A](out: (HMap[ProdCons, PhysicalNode], PhysicalNode[A]))
@@ -235,14 +236,15 @@ class ConcurrentMemory(
             cast(go(prod, service))
 
           case Summer(producer, store, sg) => {
-              def go[K, V](
-                  in: Prod[(K, V)], str: Store[K, V], semi: Semigroup[V]) = {
-                val (planned, targets) = maybeFanout[(K, (Option[V], V))]
-                val phys = Sum(str, semi, targets)
-                (planned + (that -> phys), phys)
-              }
-              cast(go(producer, store, sg))
+            def go[K, V](in: Prod[(K, V)],
+                         str: Store[K, V],
+                         semi: Semigroup[V]) = {
+              val (planned, targets) = maybeFanout[(K, (Option[V], V))]
+              val phys = Sum(str, semi, targets)
+              (planned + (that -> phys), phys)
             }
+            cast(go(producer, store, sg))
+          }
 
           case other =>
             sys.error(

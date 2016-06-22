@@ -20,11 +20,14 @@ object Docs {
       "apiDocsIncludeManaged",
       "Whether managed sources from this project should be included in the API docs")
   val apiDocsScalaSources = TaskKey[Seq[File]](
-      "apiDocsScalaSources", "All the scala sources for all projects")
+      "apiDocsScalaSources",
+      "All the scala sources for all projects")
   val apiDocsJavaSources = TaskKey[Seq[File]](
-      "apiDocsJavaSources", "All the Java sources for all projects")
+      "apiDocsJavaSources",
+      "All the Java sources for all projects")
   val apiDocsClasspath = TaskKey[Seq[File]](
-      "apiDocsClasspath", "The classpath for API docs generation")
+      "apiDocsClasspath",
+      "The classpath for API docs generation")
   val apiDocsUseCache = SettingKey[Boolean](
       "apiDocsUseCache",
       "Whether to cache the doc inputs (can hit cache limit with dbuild)")
@@ -51,30 +54,32 @@ object Docs {
         (thisProjectRef, buildStructure) flatMap allConfsTask,
       mappings in (Compile, packageBin) <++=
         (baseDirectory, apiDocs, extractWebjars, version, allConfs) map {
-        (base, apiBase, webjars, playVersion, confs) =>
-          // Include documentation and API docs in main binary JAR
-          val docBase = base / "../../../documentation"
-          val raw = (docBase \ "manual" ** "*") +++ (docBase \ "style" ** "*")
-          val filtered = raw.filter(_.getName != ".DS_Store")
-          val docMappings =
-            filtered.get pair rebase(docBase, "play/docs/content/")
+          (base, apiBase, webjars, playVersion, confs) =>
+            // Include documentation and API docs in main binary JAR
+            val docBase = base / "../../../documentation"
+            val raw = (docBase \ "manual" ** "*") +++ (docBase \ "style" ** "*")
+            val filtered = raw.filter(_.getName != ".DS_Store")
+            val docMappings =
+              filtered.get pair rebase(docBase, "play/docs/content/")
 
-          val apiDocMappings =
-            (apiBase ** "*").get pair rebase(apiBase, "play/docs/content/api")
+            val apiDocMappings =
+              (apiBase ** "*").get pair rebase(apiBase,
+                                               "play/docs/content/api")
 
-          // The play version is added so that resource paths are versioned
-          val webjarMappings =
-            webjars.*** pair rebase(webjars,
-                                    "play/docs/content/webjars/" + playVersion)
+            // The play version is added so that resource paths are versioned
+            val webjarMappings =
+              webjars.*** pair rebase(
+                  webjars,
+                  "play/docs/content/webjars/" + playVersion)
 
-          // Gather all the conf files into the project
-          val referenceConfMappings = confs.map {
-            case (projectName, conf) =>
-              conf -> s"play/docs/content/confs/$projectName/${conf.getName}"
-          }
+            // Gather all the conf files into the project
+            val referenceConfMappings = confs.map {
+              case (projectName, conf) =>
+                conf -> s"play/docs/content/confs/$projectName/${conf.getName}"
+            }
 
-          docMappings ++ apiDocMappings ++ webjarMappings ++ referenceConfMappings
-      }
+            docMappings ++ apiDocMappings ++ webjarMappings ++ referenceConfMappings
+        }
   )
 
   def playdocSettings: Seq[Setting[_]] = Playdoc.projectSettings ++ Seq(
@@ -114,12 +119,11 @@ object Docs {
     if ((publishArtifact in packageDoc).value) {
 
       val version = Keys.version.value
-      val sourceTree =
-        if (version.endsWith("-SNAPSHOT")) {
-          BuildSettings.snapshotBranch
-        } else {
-          version
-        }
+      val sourceTree = if (version.endsWith("-SNAPSHOT")) {
+        BuildSettings.snapshotBranch
+      } else {
+        version
+      }
 
       val scalaCache = new File(targetDir, "scalaapidocs.cache")
       val javaCache = new File(targetDir, "javaapidocs.cache")
@@ -141,7 +145,7 @@ object Docs {
             (baseDirectory in ThisBuild).value.getAbsolutePath,
             "-doc-source-url",
             "https://github.com/playframework/playframework/tree/" +
-            sourceTree + "/framework€{FILE_PATH}.scala",
+              sourceTree + "/framework€{FILE_PATH}.scala",
             "-doc-external-doc",
             externalDocsScalacOption)
 
@@ -202,14 +206,14 @@ object Docs {
         val projectId = moduleName in ref get structure.data
 
         val confs =
-          (unmanagedResources in Compile in ref get structure.data).map(
-              _.map { resources =>
-            (for {
-              conf <- resources.filter(resource =>
-                           resource.name == "reference.conf" ||
-                           resource.name.endsWith(".xml"))
-              id <- projectId.toSeq
-            } yield id -> conf).distinct
+          (unmanagedResources in Compile in ref get structure.data).map(_.map {
+            resources =>
+              (for {
+                conf <- resources.filter(resource =>
+                             resource.name == "reference.conf" ||
+                               resource.name.endsWith(".xml"))
+                id <- projectId.toSeq
+              } yield id -> conf).distinct
           })
 
         // Join them
@@ -220,7 +224,8 @@ object Docs {
   }
 
   def allSources(conf: Configuration, extension: String)(
-      projectRef: ProjectRef, structure: BuildStructure): Task[Seq[File]] = {
+      projectRef: ProjectRef,
+      structure: BuildStructure): Task[Seq[File]] = {
     val projects = allApiProjects(projectRef.build, structure)
     val sourceTasks =
       projects map { ref =>
@@ -258,8 +263,8 @@ object Docs {
     aggregated(rootProjectRef)
   }
 
-  def allClasspaths(
-      projectRef: ProjectRef, structure: BuildStructure): Task[Seq[File]] = {
+  def allClasspaths(projectRef: ProjectRef,
+                    structure: BuildStructure): Task[Seq[File]] = {
     val projects = allApiProjects(projectRef.build, structure)
     // Full classpath is necessary to ensure that scaladoc and javadoc can see the compiled classes of the other language.
     val tasks =
@@ -285,13 +290,13 @@ object Docs {
     type GenerateDoc = (Seq[File], Seq[File], File, Seq[String], Int,
                         Logger) => Unit
 
-    def scaladoc(
-        label: String, compile: compiler.AnalyzingCompiler): GenerateDoc =
+    def scaladoc(label: String,
+                 compile: compiler.AnalyzingCompiler): GenerateDoc =
       RawCompileLike.prepare(label + " Scala API documentation", compile.doc)
 
     def javadoc(label: String, compilers: Compiler.Compilers): GenerateDoc =
       RawCompileLike.prepare(label + " Java API documentation",
-                             RawCompileLike.filterSources(
-                                 Doc.javaSourcesOnly, compilers.javac.doc))
+                             RawCompileLike.filterSources(Doc.javaSourcesOnly,
+                                                          compilers.javac.doc))
   }
 }

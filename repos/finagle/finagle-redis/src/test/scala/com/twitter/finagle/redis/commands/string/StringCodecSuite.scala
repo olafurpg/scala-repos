@@ -33,7 +33,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode BITCOUNT") {
-    assert(codec(wrap("BITCOUNT foo\r\n")) == List(
+    assert(
+        codec(wrap("BITCOUNT foo\r\n")) == List(
             BitCount(StringToChannelBuffer("foo"))))
   }
 
@@ -45,7 +46,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode BITCOUNT with start and end") {
-    assert(codec(wrap("BITCOUNT foo 0 1\r\n")) == List(
+    assert(
+        codec(wrap("BITCOUNT foo 0 1\r\n")) == List(
             BitCount(StringToChannelBuffer("foo"), Some(0), Some(1))))
   }
 
@@ -84,7 +86,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode DECR with a string key") {
-    assert(codec(wrap("DECR foo\r\n")) == List(
+    assert(
+        codec(wrap("DECR foo\r\n")) == List(
             Decr(StringToChannelBuffer("foo"))))
   }
 
@@ -95,9 +98,11 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode DECRBY") {
-    assert(codec(wrap("DECRBY foo 1\r\n")) == List(
+    assert(
+        codec(wrap("DECRBY foo 1\r\n")) == List(
             DecrBy(StringToChannelBuffer("foo"), 1)))
-    assert(codec(wrap("DECRBY foo 4096\r\n")) == List(
+    assert(
+        codec(wrap("DECRBY foo 4096\r\n")) == List(
             DecrBy(StringToChannelBuffer("foo"), 4096)))
   }
 
@@ -125,7 +130,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode GETBIT") {
-    assert(codec(wrap("GETBIT foo 0\r\n")) == List(
+    assert(
+        codec(wrap("GETBIT foo 0\r\n")) == List(
             GetBit(StringToChannelBuffer("foo"), 0)))
   }
 
@@ -148,7 +154,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode GETRANGE") {
-    assert(codec(wrap("GETRANGE key 0 5\r\n")) == List(
+    assert(
+        codec(wrap("GETRANGE key 0 5\r\n")) == List(
             GetRange(StringToChannelBuffer("key"), 0, 5)))
   }
 
@@ -178,7 +185,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode INCR with a string argument") {
-    assert(codec(wrap("INCR foo\r\n")) == List(
+    assert(
+        codec(wrap("INCR foo\r\n")) == List(
             Incr(StringToChannelBuffer("foo"))))
   }
 
@@ -189,9 +197,11 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode INCRBY") {
-    assert(codec(wrap("INCRBY foo 1\r\n")) == List(
+    assert(
+        codec(wrap("INCRBY foo 1\r\n")) == List(
             IncrBy(StringToChannelBuffer("foo"), 1)))
-    assert(codec(wrap("INCRBY foo 4096\r\n")) == List(
+    assert(
+        codec(wrap("INCRBY foo 4096\r\n")) == List(
             IncrBy(StringToChannelBuffer("foo"), 4096)))
   }
 
@@ -202,7 +212,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode MGET") {
-    assert(codec(wrap("MGET foo bar\r\n")) == List(
+    assert(
+        codec(wrap("MGET foo bar\r\n")) == List(
             MGet(List(StringToChannelBuffer("foo"),
                       StringToChannelBuffer("bar")))))
   }
@@ -267,7 +278,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode SETBIT") {
-    assert(codec(wrap("SETBIT foo 7 1\r\n")) == List(
+    assert(
+        codec(wrap("SETBIT foo 7 1\r\n")) == List(
             SetBit(StringToChannelBuffer("foo"), 7, 1)))
   }
 
@@ -396,7 +408,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode STRLEN") {
-    assert(codec(wrap("STRLEN foo\r\n")) == List(
+    assert(
+        codec(wrap("STRLEN foo\r\n")) == List(
             Strlen(StringToChannelBuffer("foo"))))
   }
 
@@ -449,7 +462,8 @@ final class StringCodecSuite extends RedisRequestTest {
   }
 
   test("Correctly encode unified MGET requests", CodecTest) {
-    assert(codec(wrap("bar\r\n")) == List(
+    assert(
+        codec(wrap("bar\r\n")) == List(
             MGet(List(StringToChannelBuffer("foo"),
                       StringToChannelBuffer("bar")))))
   }

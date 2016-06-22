@@ -6,8 +6,9 @@ import lila.hub.actorApi.map.Ask
 import makeTimeout.short
 import org.joda.time.DateTime
 
-private[simul] final class SimulCleaner(
-    repo: SimulRepo, api: SimulApi, socketHub: ActorRef) {
+private[simul] final class SimulCleaner(repo: SimulRepo,
+                                        api: SimulApi,
+                                        socketHub: ActorRef) {
 
   def apply {
     repo.allCreated foreach { simuls =>

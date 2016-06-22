@@ -12,8 +12,9 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
   import IntervalSeqArbitrary._
 
   // a test that works by sampling the result at all relevant places and checks consistency with the boolean operation
-  def unarySampleTest(
-      a: IntervalSeq[Int], r: IntervalSeq[Int], op: Boolean => Boolean) = {
+  def unarySampleTest(a: IntervalSeq[Int],
+                      r: IntervalSeq[Int],
+                      op: Boolean => Boolean) = {
     val support = a.edges.toArray.sorted.distinct
     support.forall { value =>
       val sameBefore = r.below(value) === op(a.below(value))

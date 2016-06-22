@@ -20,8 +20,8 @@ class GraphiteClient(address: InetSocketAddress) extends Closeable {
   private final val charset: Charset = Charset.forName("UTF-8")
 
   private lazy val socket = {
-    val s = SocketFactory.getDefault.createSocket(
-        address.getAddress, address.getPort)
+    val s = SocketFactory.getDefault
+      .createSocket(address.getAddress, address.getPort)
     s.setKeepAlive(true)
     s
   }

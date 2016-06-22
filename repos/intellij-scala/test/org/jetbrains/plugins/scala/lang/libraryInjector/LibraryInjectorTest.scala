@@ -78,7 +78,8 @@ class LibraryInjectorTest extends ModuleTestCase with ScalaVersion {
                                                   Some(getTestProjectJdk))
 
     scalaLibraryLoader.loadScala(scalaSdkVersion)
-    addLibrary(testData(getTestName(false))
+    addLibrary(
+        testData(getTestName(false))
           .zip(ScalaUtil.createTmpDir("injectorTestLib", "")))
   }
 

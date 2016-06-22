@@ -125,8 +125,7 @@ class WebSocketIntegrationSpec
     "send back 100 elements and then terminate without error even when not ordinarily closed" in Utils.assertAllStagesStopped {
       val N = 100
 
-      val handler = Flow.fromGraph(
-          GraphDSL.create() { implicit b ⇒
+      val handler = Flow.fromGraph(GraphDSL.create() { implicit b ⇒
         val merge = b.add(Merge[Int](2))
 
         // convert to int so we can connect to merge

@@ -25,7 +25,8 @@ final case class SplitBrainMultiNodeConfig(failureDetectorPuppet: Boolean)
 
   commonConfig(
       debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+        .withFallback(
+            ConfigFactory.parseString("""
         akka.remote.retry-gate-closed-for = 3 s
         akka.cluster {
           auto-down-unreachable-after = 1s

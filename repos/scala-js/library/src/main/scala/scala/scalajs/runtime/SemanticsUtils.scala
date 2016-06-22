@@ -17,8 +17,8 @@ object SemanticsUtils {
     *  semantics.
     */
   @inline
-  def asInstanceOfCheck(
-      shouldThrow: => Boolean, exception: => Throwable): Unit = {
+  def asInstanceOfCheck(shouldThrow: => Boolean,
+                        exception: => Throwable): Unit = {
     genericCheck(asInstanceOfs, shouldThrow, exception)
   }
 

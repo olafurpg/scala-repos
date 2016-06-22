@@ -33,7 +33,7 @@ object RatingFest {
 
     def unrate(game: Game) =
       (game.whitePlayer.ratingDiff.isDefined ||
-          game.blackPlayer.ratingDiff.isDefined) ?? GameRepo
+            game.blackPlayer.ratingDiff.isDefined) ?? GameRepo
         .unrate(game.id)
         .void
 

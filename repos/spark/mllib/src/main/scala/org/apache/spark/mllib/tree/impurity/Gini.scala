@@ -63,8 +63,9 @@ object Gini extends Impurity {
     */
   @Since("1.0.0")
   @DeveloperApi
-  override def calculate(
-      count: Double, sum: Double, sumSquares: Double): Double =
+  override def calculate(count: Double,
+                         sum: Double,
+                         sumSquares: Double): Double =
     throw new UnsupportedOperationException("Gini.calculate")
 
   /**
@@ -97,12 +98,12 @@ private[tree] class GiniAggregator(numClasses: Int)
     if (label >= statsSize) {
       throw new IllegalArgumentException(
           s"GiniAggregator given label $label" +
-          s" but requires label < numClasses (= $statsSize).")
+            s" but requires label < numClasses (= $statsSize).")
     }
     if (label < 0) {
       throw new IllegalArgumentException(
           s"GiniAggregator given label $label" +
-          s"but requires label is non-negative.")
+            s"but requires label is non-negative.")
     }
     allStats(offset + label.toInt) += instanceWeight
   }

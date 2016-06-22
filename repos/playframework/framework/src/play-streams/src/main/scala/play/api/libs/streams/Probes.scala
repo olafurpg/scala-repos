@@ -39,16 +39,17 @@ object Probes {
   def publisherProbe[T](
       name: String,
       publisher: Publisher[T],
-      messageLogger: T => String = (t: T) =>
-        t.toString): Publisher[T] = new Publisher[T] with Probe {
-    val probeName = name
-    val startTime = System.nanoTime()
+      messageLogger: T => String = (t: T) => t.toString): Publisher[T] =
+    new Publisher[T] with Probe {
+      val probeName = name
+      val startTime = System.nanoTime()
 
-    def subscribe(subscriber: Subscriber[_ >: T]) = {
-      log("subscribe", subscriber.toString)(publisher.subscribe(
-              subscriberProbe(name, subscriber, messageLogger, startTime)))
+      def subscribe(subscriber: Subscriber[_ >: T]) = {
+        log("subscribe", subscriber.toString)(
+            publisher.subscribe(
+                subscriberProbe(name, subscriber, messageLogger, startTime)))
+      }
     }
-  }
 
   def subscriberProbe[T](name: String,
                          subscriber: Subscriber[_ >: T],
@@ -63,7 +64,8 @@ object Probes {
             subscriber.onError(t))
       }
       def onSubscribe(subscription: Subscription) =
-        log("onSubscribe", subscription.toString)(subscriber.onSubscribe(
+        log("onSubscribe", subscription.toString)(
+            subscriber.onSubscribe(
                 subscriptionProbe(name, subscription, start)))
       def onComplete() = log("onComplete")(subscriber.onComplete())
       def onNext(t: T) = log("onNext", messageLogger(t))(subscriber.onNext(t))
@@ -99,9 +101,9 @@ object Probes {
     }
   }
 
-  def flowProbe[T](name: String,
-                   messageLogger: T => String = (t: T) =>
-                     t.toString): Flow[T, T, _] = {
+  def flowProbe[T](
+      name: String,
+      messageLogger: T => String = (t: T) => t.toString): Flow[T, T, _] = {
     Flow[T].transform(() =>
           new PushPullStage[T, T] with Probe {
         override def startTime: Long = System.nanoTime()

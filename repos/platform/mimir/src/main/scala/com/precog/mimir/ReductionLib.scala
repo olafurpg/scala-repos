@@ -464,8 +464,8 @@ trait ReductionLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       implicit val monoid = new Monoid[Result] {
         def zero = None
         def append(left: Result, right: => Result) = {
-          val both = for ((l1, l2) <- left; (r1, r2) <- right) yield
-            (l1 * r1, l2 + r2)
+          val both = for ((l1, l2) <- left; (r1, r2) <- right)
+            yield (l1 * r1, l2 + r2)
           both orElse left orElse right
         }
       }
@@ -659,8 +659,7 @@ trait ReductionLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     val StdDevMonoid = implicitly[Monoid[StdDev.Result]]
     object StdDev extends Reduction(ReductionNamespace, "stdDev") {
       type Result = Option[InitialResult]
-      type InitialResult =
-        (Long, BigDecimal, BigDecimal) // (count, sum, sumsq)
+      type InitialResult = (Long, BigDecimal, BigDecimal) // (count, sum, sumsq)
 
       implicit val monoid = StdDevMonoid
 

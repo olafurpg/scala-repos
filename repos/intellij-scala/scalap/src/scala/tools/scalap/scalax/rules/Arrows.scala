@@ -5,7 +5,7 @@ package rules
 import scala.language.higherKinds
 
 trait Arrows extends UnitFunctors {
-  type Arr [-A, +B] <: Arrow[A, B]
+  type Arr[-A, +B] <: Arrow[A, B]
   type M[+B] = Arr[Nothing, B]
 
   def arrow[A, B](f: A => B): Arr[A, B]
@@ -27,7 +27,7 @@ trait Arrows extends UnitFunctors {
 }
 
 trait ApplicativeArrows extends Arrows {
-  type Arr [-A, +B] <: ApplicativeArrow[A, B]
+  type Arr[-A, +B] <: ApplicativeArrow[A, B]
 
   def app[A, B]: Arr[(Arr[A, B], A), B]
 
@@ -38,7 +38,7 @@ trait ApplicativeArrows extends Arrows {
 }
 
 trait ArrowMonads extends ApplicativeArrows with Monads {
-  type Arr [-A, +B] <: ApplicativeArrow[A, B] with Monad[B]
+  type Arr[-A, +B] <: ApplicativeArrow[A, B] with Monad[B]
 
   override def unit[A](a: => A): M[A] = arrow[Unit, A](Unit => a)
 }

@@ -234,8 +234,8 @@ private[spark] object ClosureCleaner extends Logging {
       // all of its inner closures. If transitive cleaning is enabled, this may recursively
       // visits methods that belong to other classes in search of transitively referenced fields.
       for (cls <- func.getClass :: innerClasses) {
-        getClassReader(cls).accept(
-            new FieldAccessFinder(accessedFields, cleanTransitively), 0)
+        getClassReader(cls)
+          .accept(new FieldAccessFinder(accessedFields, cleanTransitively), 0)
       }
     }
 
@@ -331,8 +331,8 @@ private[spark] object ClosureCleaner extends Logging {
     }
   }
 
-  private def instantiateClass(
-      cls: Class[_], enclosingObject: AnyRef): AnyRef = {
+  private def instantiateClass(cls: Class[_],
+                               enclosingObject: AnyRef): AnyRef = {
     // Use reflection to instantiate object without calling constructor
     val rf = sun.reflect.ReflectionFactory.getReflectionFactory()
     val parentCtor = classOf[java.lang.Object].getDeclaredConstructor()
@@ -373,8 +373,9 @@ private class ReturnStatementFinder extends ClassVisitor(ASM5) {
 }
 
 /** Helper class to identify a method. */
-private case class MethodIdentifier[T](
-    cls: Class[T], name: String, desc: String)
+private case class MethodIdentifier[T](cls: Class[T],
+                                       name: String,
+                                       desc: String)
 
 /**
   * Find the fields accessed by a given class.
@@ -407,8 +408,10 @@ private[util] class FieldAccessFinder(
     }
 
     new MethodVisitor(ASM5) {
-      override def visitFieldInsn(
-          op: Int, owner: String, name: String, desc: String) {
+      override def visitFieldInsn(op: Int,
+                                  owner: String,
+                                  name: String,
+                                  desc: String) {
         if (op == GETFIELD) {
           for (cl <- fields.keys if cl.getName == owner.replace('/', '.')) {
             fields(cl) += name
@@ -416,8 +419,11 @@ private[util] class FieldAccessFinder(
         }
       }
 
-      override def visitMethodInsn(
-          op: Int, owner: String, name: String, desc: String, itf: Boolean) {
+      override def visitMethodInsn(op: Int,
+                                   owner: String,
+                                   name: String,
+                                   desc: String,
+                                   itf: Boolean) {
         for (cl <- fields.keys if cl.getName == owner.replace('/', '.')) {
           // Check for calls a getter method for a variable in an interpreter wrapper object.
           // This means that the corresponding field will be accessed, so we should save it.
@@ -433,8 +439,10 @@ private[util] class FieldAccessFinder(
               visitedMethods += m
               ClosureCleaner
                 .getClassReader(cl)
-                .accept(new FieldAccessFinder(
-                            fields, findTransitively, Some(m), visitedMethods),
+                .accept(new FieldAccessFinder(fields,
+                                              findTransitively,
+                                              Some(m),
+                                              visitedMethods),
                         0)
             }
           }
@@ -468,8 +476,11 @@ private class InnerClosureFinder(output: Set[Class[_]])
                            sig: String,
                            exceptions: Array[String]): MethodVisitor = {
     new MethodVisitor(ASM5) {
-      override def visitMethodInsn(
-          op: Int, owner: String, name: String, desc: String, itf: Boolean) {
+      override def visitMethodInsn(op: Int,
+                                   owner: String,
+                                   name: String,
+                                   desc: String,
+                                   itf: Boolean) {
         val argTypes = Type.getArgumentTypes(desc)
         if (op == INVOKESPECIAL && name == "<init>" && argTypes.length > 0 &&
             argTypes(0).toString.startsWith("L") // is it an object?

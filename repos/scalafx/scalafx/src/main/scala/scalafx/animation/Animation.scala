@@ -77,24 +77,24 @@ object Animation extends AnimationStatics {
       * The paused state.
       */
     val Paused = new Status(jfxa.Animation.Status.PAUSED)
-    @deprecated(
-        "Use Paused; PAUSED will be removed in a future release", "2.2.60")
+    @deprecated("Use Paused; PAUSED will be removed in a future release",
+                "2.2.60")
     val PAUSED = Paused
 
     /**
       * The running state.
       */
     val Running = new Status(jfxa.Animation.Status.RUNNING)
-    @deprecated(
-        "Use Running; RUNNING will be removed in a future release", "2.2.60")
+    @deprecated("Use Running; RUNNING will be removed in a future release",
+                "2.2.60")
     val RUNNING = Running
 
     /**
       * The stopped state.
       */
     val Stopped = new Status(jfxa.Animation.Status.STOPPED)
-    @deprecated(
-        "Use Stopped; STOPPED will be removed in a future release", "2.2.60")
+    @deprecated("Use Stopped; STOPPED will be removed in a future release",
+                "2.2.60")
     val STOPPED = Stopped
 
     protected override def unsortedValues: Array[Status] =

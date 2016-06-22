@@ -42,8 +42,7 @@ trait TypedSource[+T] extends java.io.Serializable {
     * We don't call this map because of conflicts with Mappable, unfortunately
     */
   def andThen[U](fn: T => U): TypedSource[U] = {
-    val self =
-      this // compiler generated self can cause problems with serialization
+    val self = this // compiler generated self can cause problems with serialization
     new TypedSource[U] {
       override def sourceFields = self.sourceFields
       def converter[V >: U]: TupleConverter[V] = self.converter.andThen(fn)

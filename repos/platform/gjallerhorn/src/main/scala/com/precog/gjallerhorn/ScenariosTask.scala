@@ -47,7 +47,8 @@ class ScenariosTask(settings: Settings)
       EventuallyResults.eventually(10, 1.second) {
         val res =
           (analytics / "fs" / account.bareRootPath) <<? List(
-              "apiKey" -> account.apiKey, "q" -> "count(//foo)")
+              "apiKey" -> account.apiKey,
+              "q" -> "count(//foo)")
         val str = Http(res OK as.String)()
         val json =
           JParser.parseFromString(Http(res OK as.String)()).valueOr(throw _)
@@ -76,8 +77,10 @@ class ScenariosTask(settings: Settings)
       val account2 = createAccount
 
       val res = ingestString(
-          account1.apiKey, account2, dummyEvents, "application/json")(
-          _ / account1.bareRootPath / "foo") match {
+          account1.apiKey,
+          account2,
+          dummyEvents,
+          "application/json")(_ / account1.bareRootPath / "foo") match {
         case Left(thr) => Failure(thr)
         case Right(s) => JParser.parseFromString(s)
       }
@@ -124,8 +127,10 @@ class ScenariosTask(settings: Settings)
       val account2 = createAccount
 
       val res = ingestString(
-          account1.apiKey, account2, dummyEvents, "application/json")(
-          _ / account1.bareRootPath / "foo") match {
+          account1.apiKey,
+          account2,
+          dummyEvents,
+          "application/json")(_ / account1.bareRootPath / "foo") match {
         case Left(thr) => Failure(thr)
         case Right(s) => JParser.parseFromString(s)
       }
@@ -142,8 +147,10 @@ class ScenariosTask(settings: Settings)
       val account2 = createAccount
 
       val res = ingestString(
-          account1.apiKey, account2, dummyEvents, "application/json")(
-          _ / account1.bareRootPath / "foo") match {
+          account1.apiKey,
+          account2,
+          dummyEvents,
+          "application/json")(_ / account1.bareRootPath / "foo") match {
         case Left(thr) => Failure(thr)
         case Right(s) => JParser.parseFromString(s)
       }
@@ -161,8 +168,8 @@ class ScenariosTask(settings: Settings)
 
       val req =
         (security / "").addQueryParameter("apiKey", account1.apiKey) <<
-        ("""{"grants":[{"permissions":[{"accessType":"write", "path":"%s", "ownerAccountIds":["%s"]}]}]}""" format
-            (account1.rootPath + "/foo", account1.accountId))
+          ("""{"grants":[{"permissions":[{"accessType":"write", "path":"%s", "ownerAccountIds":["%s"]}]}]}""" format
+                (account1.rootPath + "/foo", account1.accountId))
 
       val result = Http(req OK as.String)
       val json = JParser.parseFromString(result()).valueOr(throw _)
@@ -171,8 +178,10 @@ class ScenariosTask(settings: Settings)
       delegateAPIKey must_!= account1.apiKey
       delegateAPIKey must_!= account2.apiKey
 
-      val res = ingestString(
-          delegateAPIKey, account1, dummyEvents, "application/json")(
+      val res = ingestString(delegateAPIKey,
+                             account1,
+                             dummyEvents,
+                             "application/json")(
           _ / account1.bareRootPath / "foo") match {
         case Left(thr) => Failure(thr)
         case Right(s) => JParser.parseFromString(s)

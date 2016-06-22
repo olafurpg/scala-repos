@@ -67,14 +67,14 @@ object AtLeastOnceDeliverySpec {
       case AcceptedReq(payload, destination) if actorSelectionDelivery ⇒
         log.debug(
             s"deliver(destination, deliveryId ⇒ Action(deliveryId, $payload)), recovery: " +
-            recoveryRunning)
+              recoveryRunning)
         deliver(context.actorSelection(destination))(deliveryId ⇒
               Action(deliveryId, payload))
 
       case AcceptedReq(payload, destination) ⇒
         log.debug(
             s"deliver(destination, deliveryId ⇒ Action(deliveryId, $payload)), recovery: " +
-            recoveryRunning)
+              recoveryRunning)
         deliver(destination)(deliveryId ⇒ Action(deliveryId, payload))
 
       case ReqDone(id) ⇒
@@ -147,8 +147,8 @@ object AtLeastOnceDeliverySpec {
       case a @ Action(id, payload) ⇒
         // discard duplicates (naive impl)
         if (!allReceived.contains(id)) {
-          log.debug(
-              "Destination got {}, all count {}", a, allReceived.size + 1)
+          log
+            .debug("Destination got {}, all count {}", a, allReceived.size + 1)
           testActor ! a
           allReceived += id
         }
@@ -477,10 +477,14 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       val destinations =
         Map("A" -> system.actorOf(unreliableProps(2, dst)).path)
 
-      val snd = system.actorOf(
-          senderProps(
-              probe.ref, name, 1000.millis, 5, 2, destinations, async = true),
-          name)
+      val snd = system.actorOf(senderProps(probe.ref,
+                                           name,
+                                           1000.millis,
+                                           5,
+                                           2,
+                                           destinations,
+                                           async = true),
+                               name)
 
       val N = 10
       for (n ← 1 to N) {

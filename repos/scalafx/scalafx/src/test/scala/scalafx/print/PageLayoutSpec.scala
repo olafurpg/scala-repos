@@ -47,7 +47,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PageLayoutSpec
     extends SimpleSFXDelegateSpec[jfxp.PageLayout, PageLayout](
-        classOf[jfxp.PageLayout], classOf[PageLayout]) {
+        classOf[jfxp.PageLayout],
+        classOf[PageLayout]) {
 
   val skipingMessage: String =
     if (jfxp.Printer.getDefaultPrinter == null ||

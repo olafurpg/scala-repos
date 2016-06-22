@@ -16,8 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
   */
 class ScalaByTypeWeigher extends CompletionWeigher {
 
-  override def weigh(
-      element: LookupElement, location: CompletionLocation): Comparable[_] = {
+  override def weigh(element: LookupElement,
+                     location: CompletionLocation): Comparable[_] = {
     import KindWeights._
 
     val position = ScalaCompletionUtil.positionFromParameters(

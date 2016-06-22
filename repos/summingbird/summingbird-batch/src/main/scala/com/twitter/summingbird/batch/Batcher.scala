@@ -207,8 +207,8 @@ trait Batcher extends Serializable {
     )
   }
 
-  def enclosedBy(
-      extremities: (BatchID, BatchID), other: Batcher): Iterable[BatchID] = {
+  def enclosedBy(extremities: (BatchID, BatchID),
+                 other: Batcher): Iterable[BatchID] = {
     val (bottom, top) = extremities
     SortedSet(
         BatchID.range(bottom, top).toSeq.flatMap(enclosedBy(_, other)): _*

@@ -194,7 +194,7 @@ object ALaCacheDemo extends App {
     val ops = Ops
     object Foo extends CaseClassCompanion
     // keep the constructor private so everybody has to go through .apply
-    class Foo private[FooDefns](val i: Int, val s: String) extends CaseClass {
+    class Foo private[FooDefns] (val i: Int, val s: String) extends CaseClass {
       def stuff = log.info("hello")
     }
   }

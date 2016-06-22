@@ -44,9 +44,10 @@ object ResourceType {
   def fromString(resourceType: String): ResourceType = {
     val rType = values.find(rType => rType.name.equalsIgnoreCase(resourceType))
     rType.getOrElse(
-        throw new KafkaException(resourceType +
-            " not a valid resourceType name. The valid names are " +
-            values.mkString(",")))
+        throw new KafkaException(
+            resourceType +
+              " not a valid resourceType name. The valid names are " +
+              values.mkString(",")))
   }
 
   def values: Seq[ResourceType] = List(Cluster, Topic, Group)

@@ -527,8 +527,9 @@ object Column {
   object unionRightSemigroup extends Semigroup[Column] {
     def append(c1: Column, c2: => Column): Column = {
       cf.util.UnionRight(c1, c2) getOrElse {
-        sys.error("Illgal attempt to merge columns of dissimilar type: " +
-            c1.tpe + "," + c2.tpe)
+        sys.error(
+            "Illgal attempt to merge columns of dissimilar type: " +
+              c1.tpe + "," + c2.tpe)
       }
     }
   }

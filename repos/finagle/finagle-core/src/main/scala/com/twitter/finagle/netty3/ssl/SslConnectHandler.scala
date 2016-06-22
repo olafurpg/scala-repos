@@ -18,13 +18,14 @@ import sun.security.util.HostnameChecker
   *    we may later deem invalid), and
   * 2. invoking a shutdown callback on disconnect
   */
-private[netty3] class SslListenerConnectionHandler(
-    sslHandler: SslHandler, onShutdown: () => Unit = () => Unit)
+private[netty3] class SslListenerConnectionHandler(sslHandler: SslHandler,
+                                                   onShutdown: () => Unit =
+                                                     () => Unit)
     extends SimpleChannelUpstreamHandler {
 
   // delay propagating connection upstream until we've completed the handshake
-  override def channelConnected(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+  override def channelConnected(ctx: ChannelHandlerContext,
+                                e: ChannelStateEvent): Unit = {
     sslHandler
       .handshake()
       .addListener(new ChannelFutureListener {
@@ -37,15 +38,15 @@ private[netty3] class SslListenerConnectionHandler(
       })
   }
 
-  override def exceptionCaught(
-      ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
+  override def exceptionCaught(ctx: ChannelHandlerContext,
+                               e: ExceptionEvent): Unit = {
     // remove the ssl handler so that it doesn't trap the disconnect
     if (e.getCause.isInstanceOf[SSLException]) ctx.getPipeline.remove("ssl")
     super.exceptionCaught(ctx, e)
   }
 
-  override def channelClosed(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+  override def channelClosed(ctx: ChannelHandlerContext,
+                             e: ChannelStateEvent): Unit = {
     onShutdown()
     super.channelClosed(ctx, e)
   }
@@ -62,8 +63,7 @@ private[netty3] class SslListenerConnectionHandler(
 class SslConnectHandler(
     sslHandler: SslHandler,
     sessionError: SSLSession => Option[Throwable] = Function.const(None)
-)
-    extends SimpleChannelHandler {
+) extends SimpleChannelHandler {
   private[this] val connectFuture = new AtomicReference[ChannelFuture](null)
 
   private[this] def fail(c: Channel, t: Throwable) {
@@ -76,8 +76,8 @@ class SslConnectHandler(
     fail(c, t)
   }
 
-  override def connectRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+  override def connectRequested(ctx: ChannelHandlerContext,
+                                e: ChannelStateEvent): Unit = {
     e match {
       case de: DownstreamChannelStateEvent =>
         if (!connectFuture.compareAndSet(null, e.getFuture)) {
@@ -87,8 +87,7 @@ class SslConnectHandler(
 
         // proxy cancellation
         val wrappedConnectFuture = Channels.future(de.getChannel, true)
-        de.getFuture.addListener(
-            new ChannelFutureListener {
+        de.getFuture.addListener(new ChannelFutureListener {
           override def operationComplete(f: ChannelFuture): Unit =
             if (f.isCancelled) {
               wrappedConnectFuture.cancel()
@@ -97,8 +96,7 @@ class SslConnectHandler(
 
         // Proxy failures here so that if the connect fails, it is
         // propagated to the listener, not just on the channel.
-        wrappedConnectFuture.addListener(
-            new ChannelFutureListener {
+        wrappedConnectFuture.addListener(new ChannelFutureListener {
           def operationComplete(f: ChannelFuture) {
             if (f.isSuccess || f.isCancelled) return
 
@@ -107,7 +105,10 @@ class SslConnectHandler(
         })
 
         val wrappedEvent = new DownstreamChannelStateEvent(
-            de.getChannel, wrappedConnectFuture, de.getState, de.getValue)
+            de.getChannel,
+            wrappedConnectFuture,
+            de.getState,
+            de.getValue)
 
         super.connectRequested(ctx, wrappedEvent)
 
@@ -117,16 +118,15 @@ class SslConnectHandler(
   }
 
   // delay propagating connection upstream until we've completed the handshake
-  override def channelConnected(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+  override def channelConnected(ctx: ChannelHandlerContext,
+                                e: ChannelStateEvent): Unit = {
     if (connectFuture.get eq null) {
       fail(ctx.getChannel, new InconsistentStateException(_))
       return
     }
 
     // proxy cancellations again.
-    connectFuture.get.addListener(
-        new ChannelFutureListener {
+    connectFuture.get.addListener(new ChannelFutureListener {
       override def operationComplete(f: ChannelFuture): Unit =
         if (f.isCancelled) {
           fail(ctx.getChannel, new ChannelClosedException(_))

@@ -79,27 +79,27 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
   /**
     * Approximate operation to return the mean within a timeout.
     */
-  def meanApprox(
-      timeout: Long, confidence: Double = 0.95): PartialResult[BoundedDouble] =
+  def meanApprox(timeout: Long,
+                 confidence: Double = 0.95): PartialResult[BoundedDouble] =
     self.withScope {
       val processPartition = (ctx: TaskContext,
                               ns: Iterator[Double]) => StatCounter(ns)
       val evaluator = new MeanEvaluator(self.partitions.length, confidence)
-      self.context.runApproximateJob(
-          self, processPartition, evaluator, timeout)
+      self.context
+        .runApproximateJob(self, processPartition, evaluator, timeout)
     }
 
   /**
     * Approximate operation to return the sum within a timeout.
     */
-  def sumApprox(
-      timeout: Long, confidence: Double = 0.95): PartialResult[BoundedDouble] =
+  def sumApprox(timeout: Long,
+                confidence: Double = 0.95): PartialResult[BoundedDouble] =
     self.withScope {
       val processPartition = (ctx: TaskContext,
                               ns: Iterator[Double]) => StatCounter(ns)
       val evaluator = new SumEvaluator(self.partitions.length, confidence)
-      self.context.runApproximateJob(
-          self, processPartition, evaluator, timeout)
+      self.context
+        .runApproximateJob(self, processPartition, evaluator, timeout)
     }
 
   /**
@@ -113,8 +113,9 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
   def histogram(bucketCount: Int): (Array[Double], Array[Long]) =
     self.withScope {
       // Scala's built-in range has issues. See #SI-8782
-      def customRange(
-          min: Double, max: Double, steps: Int): IndexedSeq[Double] = {
+      def customRange(min: Double,
+                      max: Double,
+                      steps: Int): IndexedSeq[Double] = {
         val span = max - min
         Range.Int(0, steps, 1).map(s => min + (s * span) / steps) :+ max
       }
@@ -131,15 +132,14 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
         throw new UnsupportedOperationException(
             "Histogram on either an empty RDD or RDD containing +/-infinity or NaN")
       }
-      val range =
-        if (min != max) {
-          // Range.Double.inclusive(min, max, increment)
-          // The above code doesn't always work. See Scala bug #SI-8782.
-          // https://issues.scala-lang.org/browse/SI-8782
-          customRange(min, max, bucketCount)
-        } else {
-          List(min, min)
-        }
+      val range = if (min != max) {
+        // Range.Double.inclusive(min, max, increment)
+        // The above code doesn't always work. See Scala bug #SI-8782.
+        // https://issues.scala-lang.org/browse/SI-8782
+        customRange(min, max, bucketCount)
+      } else {
+        List(min, min)
+      }
       val buckets = range.toArray
       (buckets, histogram(buckets, true))
     }
@@ -161,8 +161,8 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
     * the maximum value of the last position and all NaN entries will be counted
     * in that bucket.
     */
-  def histogram(
-      buckets: Array[Double], evenBuckets: Boolean = false): Array[Long] =
+  def histogram(buckets: Array[Double],
+                evenBuckets: Boolean = false): Array[Long] =
     self.withScope {
       if (buckets.length < 2) {
         throw new IllegalArgumentException(
@@ -231,12 +231,11 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
       // Decide which bucket function to pass to histogramPartition. We decide here
       // rather than having a general function so that the decision need only be made
       // once rather than once per shard
-      val bucketFunction =
-        if (evenBuckets) {
-          fastBucketFunction(buckets.head, buckets.last, buckets.length - 1) _
-        } else {
-          basicBucketFunction _
-        }
+      val bucketFunction = if (evenBuckets) {
+        fastBucketFunction(buckets.head, buckets.last, buckets.length - 1) _
+      } else {
+        basicBucketFunction _
+      }
       if (self.partitions.length == 0) {
         new Array[Long](buckets.length - 1)
       } else {

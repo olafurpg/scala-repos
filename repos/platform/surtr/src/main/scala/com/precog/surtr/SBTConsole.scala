@@ -139,8 +139,9 @@ object SBTConsole {
     val accountFinder = new StaticAccountFinder[Future]("", "")
     val rawAPIKeyFinder = new InMemoryAPIKeyManager[Future](Clock.System)
     val accessControl = new DirectAPIKeyFinder(rawAPIKeyFinder)
-    val permissionsFinder = new PermissionsFinder(
-        accessControl, accountFinder, new org.joda.time.Instant())
+    val permissionsFinder = new PermissionsFinder(accessControl,
+                                                  accountFinder,
+                                                  new org.joda.time.Instant())
 
     val rootAPIKey = rawAPIKeyFinder.rootAPIKey.copoint
     val rootAccount = AccountDetails("root",
@@ -150,8 +151,11 @@ object SBTConsole {
                                      Path.Root,
                                      AccountPlan.Root)
     def evaluationContext =
-      EvaluationContext(
-          rootAPIKey, rootAccount, Path.Root, Path.Root, new DateTime)
+      EvaluationContext(rootAPIKey,
+                        rootAccount,
+                        Path.Root,
+                        Path.Root,
+                        new DateTime)
 
     val storageTimeout = yggConfig.storageTimeout
 
@@ -165,20 +169,22 @@ object SBTConsole {
                                               yggConfig.cookThreshold,
                                               yggConfig.storageTimeout)
     val projectionsActor = actorSystem.actorOf(
-        Props(new PathRoutingActor(yggConfig.dataDir,
-                                   yggConfig.storageTimeout.duration,
-                                   yggConfig.quiescenceTimeout,
-                                   100,
-                                   yggConfig.clock)))
+        Props(
+            new PathRoutingActor(yggConfig.dataDir,
+                                 yggConfig.storageTimeout.duration,
+                                 yggConfig.quiescenceTimeout,
+                                 100,
+                                 yggConfig.clock)))
 
     val jobManager = new InMemoryJobManager[Future]
-    val actorVFS = new ActorVFS(
-        projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
-    val vfs = new SecureVFS(
-        actorVFS, permissionsFinder, jobManager, Clock.System)
+    val actorVFS = new ActorVFS(projectionsActor,
+                                yggConfig.storageTimeout,
+                                yggConfig.storageTimeout)
+    val vfs =
+      new SecureVFS(actorVFS, permissionsFinder, jobManager, Clock.System)
 
-    def Evaluator[N[+ _]](N0: Monad[N])(
-        implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] =
+    def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: Future ~> N,
+                                        nm: N ~> Future): EvaluatorLike[N] =
       new Evaluator[N](N0) {
         type YggConfig = PlatformConfig
         val yggConfig = console.yggConfig

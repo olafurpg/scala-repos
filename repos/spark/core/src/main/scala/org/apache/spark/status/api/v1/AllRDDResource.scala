@@ -31,8 +31,10 @@ private[v1] class AllRDDResource(ui: SparkUI) {
     val storageStatusList = ui.storageListener.activeStorageStatusList
     val rddInfos = ui.storageListener.rddInfoList
     rddInfos.map { rddInfo =>
-      AllRDDResource.getRDDStorageInfo(
-          rddInfo.id, rddInfo, storageStatusList, includeDetails = false)
+      AllRDDResource.getRDDStorageInfo(rddInfo.id,
+                                       rddInfo,
+                                       storageStatusList,
+                                       includeDetails = false)
     }
   }
 }
@@ -64,35 +66,32 @@ private[spark] object AllRDDResource {
          blockLocations.getOrElse(blockId, Seq[String]("Unknown")))
     }
 
-    val dataDistribution =
-      if (includeDetails) {
-        Some(
-            storageStatusList.map { status =>
-          new RDDDataDistribution(
-              address = status.blockManagerId.hostPort,
-              memoryUsed = status.memUsedByRdd(rddId),
-              memoryRemaining = status.memRemaining,
-              diskUsed = status.diskUsedByRdd(rddId)
+    val dataDistribution = if (includeDetails) {
+      Some(storageStatusList.map { status =>
+        new RDDDataDistribution(
+            address = status.blockManagerId.hostPort,
+            memoryUsed = status.memUsedByRdd(rddId),
+            memoryRemaining = status.memRemaining,
+            diskUsed = status.diskUsedByRdd(rddId)
+        )
+      })
+    } else {
+      None
+    }
+    val partitions = if (includeDetails) {
+      Some(blocks.map {
+        case (id, block, locations) =>
+          new RDDPartitionInfo(
+              blockName = id.name,
+              storageLevel = block.storageLevel.description,
+              memoryUsed = block.memSize,
+              diskUsed = block.diskSize,
+              executors = locations
           )
-        })
-      } else {
-        None
-      }
-    val partitions =
-      if (includeDetails) {
-        Some(blocks.map {
-          case (id, block, locations) =>
-            new RDDPartitionInfo(
-                blockName = id.name,
-                storageLevel = block.storageLevel.description,
-                memoryUsed = block.memSize,
-                diskUsed = block.diskSize,
-                executors = locations
-            )
-        })
-      } else {
-        None
-      }
+      })
+    } else {
+      None
+    }
 
     new RDDStorageInfo(
         id = rddId,

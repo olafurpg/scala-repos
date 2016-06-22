@@ -31,7 +31,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     assert(proto1.getCmd.getShell)
     assert("bash foo-*/start -Dhttp.port=$PORT" == proto1.getCmd.getValue)
     assert(5 == proto1.getInstances)
-    assert(Seq(8080, 8081) == proto1.getPortDefinitionsList.asScala
+    assert(
+        Seq(8080, 8081) == proto1.getPortDefinitionsList.asScala
           .map(_.getNumber))
     assert("//cmd" == proto1.getExecutor)
     assert(4 == getScalarResourceValue(proto1, "cpus"), 1e-6)
@@ -69,7 +70,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     assert(!proto2.getCmd.getShell)
     assert(Seq("a", "b", "c") == proto2.getCmd.getArgumentsList.asScala)
     assert(5 == proto2.getInstances)
-    assert(Seq(8080, 8081) == proto2.getPortDefinitionsList.asScala
+    assert(
+        Seq(8080, 8081) == proto2.getPortDefinitionsList.asScala
           .map(_.getNumber))
     assert("//cmd" == proto2.getExecutor)
     assert(4 == getScalarResourceValue(proto2, "cpus"), 1e-6)
@@ -153,9 +155,10 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
                     "baz" -> "buzz"
                 ),
                 discoveryInfo = DiscoveryInfo(
-                    ports = Vector(DiscoveryInfo.Port(name = "http",
-                                                      number = 80,
-                                                      protocol = "tcp"))
+                    ports = Vector(
+                        DiscoveryInfo.Port(name = "http",
+                                           number = 80,
+                                           protocol = "tcp"))
                 )
             )
         )

@@ -56,7 +56,7 @@ class AdminClient(val time: Time,
 
       now = time.milliseconds()
     } while (now < deadline &&
-    future.exception().isInstanceOf[SendFailedException])
+      future.exception().isInstanceOf[SendFailedException])
 
     throw future.exception()
   }
@@ -261,8 +261,10 @@ object AdminClient {
         DefaultRequestTimeoutMs,
         time)
 
-    val highLevelClient = new ConsumerNetworkClient(
-        networkClient, metadata, time, DefaultRetryBackoffMs)
+    val highLevelClient = new ConsumerNetworkClient(networkClient,
+                                                    metadata,
+                                                    time,
+                                                    DefaultRetryBackoffMs)
 
     new AdminClient(time,
                     DefaultRequestTimeoutMs,

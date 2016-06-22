@@ -19,8 +19,9 @@ trait ScCaseClause extends ScalaPsiElement {
   def expr: Option[ScExpression] = findChild(classOf[ScExpression])
   def guard: Option[ScGuard] = findChild(classOf[ScGuard])
   def funType: Option[PsiElement] = {
-    val result = getNode.getChildren(TokenSet.create(
-            ScalaTokenTypes.tFUNTYPE, ScalaTokenTypes.tFUNTYPE_ASCII))
+    val result = getNode.getChildren(
+        TokenSet.create(ScalaTokenTypes.tFUNTYPE,
+                        ScalaTokenTypes.tFUNTYPE_ASCII))
     if (result.length != 1) None
     else Some(result(0).getPsi)
   }

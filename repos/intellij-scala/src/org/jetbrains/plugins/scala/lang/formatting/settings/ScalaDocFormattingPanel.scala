@@ -28,8 +28,7 @@ class ScalaDocFormattingPanel(val settings: CodeStyleSettings)
     super.init()
 
     myEnableCheckBox = new JCheckBox("Enable scaladoc formatting")
-    myEnableCheckBox.addActionListener(
-        new ActionListener() {
+    myEnableCheckBox.addActionListener(new ActionListener() {
       override def actionPerformed(e: ActionEvent): Unit = update()
     })
 

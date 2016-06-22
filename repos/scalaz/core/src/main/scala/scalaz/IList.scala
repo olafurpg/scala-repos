@@ -249,8 +249,8 @@ sealed abstract class IList[A] extends Product with Serializable {
     foldRight(IList.empty[B])(f(_) :: _)
 
   // private helper for mapAccumLeft/Right below
-  private[this] def mapAccum[B, C](as: IList[A])(
-      c: C, f: (C, A) => (C, B)): (C, IList[B]) =
+  private[this] def mapAccum[B, C](
+      as: IList[A])(c: C, f: (C, A) => (C, B)): (C, IList[B]) =
     as.foldLeft((c, IList.empty[B])) {
       case ((c, bs), a) => BFT.rightMap(f(c, a))(_ :: bs)
     }
@@ -593,8 +593,8 @@ sealed abstract class IListInstances extends IListInstance0 {
     override def cojoin[A](a: IList[A]) =
       a.uncons(empty, (_, t) => a :: cojoin(t))
 
-    def traverseImpl[F[_], A, B](
-        fa: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] =
+    def traverseImpl[F[_], A, B](fa: IList[A])(f: A => F[B])(
+        implicit F: Applicative[F]): F[IList[B]] =
       fa.foldRight(F.point(IList.empty[B]))((a, fbs) =>
             F.apply2(f(a), fbs)(_ :: _))
 
@@ -637,8 +637,8 @@ sealed abstract class IListInstances extends IListInstance0 {
         case INil() => None
       }
 
-    override def foldMapLeft1Opt[A, B](fa: IList[A])(z: A => B)(
-        f: (B, A) => B) =
+    override def foldMapLeft1Opt[A, B](fa: IList[A])(z: A => B)(f: (B,
+                                                                    A) => B) =
       fa match {
         case ICons(h, t) => Some(t.foldLeft(z(h))(f))
         case INil() => None

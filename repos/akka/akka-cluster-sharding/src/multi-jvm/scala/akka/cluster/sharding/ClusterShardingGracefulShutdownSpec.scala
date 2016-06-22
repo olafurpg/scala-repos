@@ -151,7 +151,8 @@ abstract class ClusterShardingGracefulShutdownSpec(
 
   def startSharding(): Unit = {
     val allocationStrategy = new ShardCoordinator.LeastShardAllocationStrategy(
-        rebalanceThreshold = 2, maxSimultaneousRebalance = 1)
+        rebalanceThreshold = 2,
+        maxSimultaneousRebalance = 1)
     ClusterSharding(system).start(typeName = "Entity",
                                   entityProps = Props[Entity],
                                   settings = ClusterShardingSettings(system),
@@ -227,7 +228,8 @@ abstract class ClusterShardingGracefulShutdownSpec(
       runOn(first) {
         val allocationStrategy =
           new ShardCoordinator.LeastShardAllocationStrategy(
-              rebalanceThreshold = 2, maxSimultaneousRebalance = 1)
+              rebalanceThreshold = 2,
+              maxSimultaneousRebalance = 1)
         val regionEmpty =
           ClusterSharding(system).start(typeName = "EntityEmpty",
                                         entityProps = Props[Entity],

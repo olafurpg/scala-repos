@@ -46,7 +46,8 @@ class PagingTest extends AsyncTest[RelationalTestDB] {
         ids.schema.create,
         ids ++= (1 to 10),
         q(0, 5).result.map(_ shouldBe (1 to 5).toList),
-        ifCap(rcap.pagingDrop)(seq(
+        ifCap(rcap.pagingDrop)(
+            seq(
                 q(5, 1000).result.map(_ shouldBe (6 to 10).toList),
                 q(5, 3).result.map(_ shouldBe (6 to 8).toList)
             )),

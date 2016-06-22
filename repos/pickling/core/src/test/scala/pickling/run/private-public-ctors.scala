@@ -11,7 +11,7 @@ class C private (private var x: Int, private var y: String) {
 
   override def equals(other: Any): Boolean =
     other.isInstanceOf[C] && other.asInstanceOf[C].x == x &&
-    other.asInstanceOf[C].y == y
+      other.asInstanceOf[C].y == y
 }
 
 class PrivatePublicCtorsTest extends FunSuite {

@@ -24,8 +24,8 @@ import org.scalatra.test.specs2.MutableScalatraSpec
 //
 //
 //class JacksonCommandSpec extends JsonCommandSpec("Jackson", new JacksonCommandSpecServlet)
-abstract class JsonCommandSpec(
-    jsonTestTitle: String, servletUnderTest: => ScalatraServlet)
+abstract class JsonCommandSpec(jsonTestTitle: String,
+                               servletUnderTest: => ScalatraServlet)
     extends MutableScalatraSpec {
 
   val validJson = """{"name":"ihavemorethan5chars","quantity":5}"""

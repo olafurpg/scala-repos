@@ -220,8 +220,8 @@ trait ScanningClassification { self: EventBus ⇒
   protected final val subscribers =
     new ConcurrentSkipListSet[(Classifier, Subscriber)](
         new Comparator[(Classifier, Subscriber)] {
-      def compare(
-          a: (Classifier, Subscriber), b: (Classifier, Subscriber)): Int =
+      def compare(a: (Classifier, Subscriber),
+                  b: (Classifier, Subscriber)): Int =
         compareClassifiers(a._1, b._1) match {
           case 0 ⇒ compareSubscribers(a._2, b._2)
           case other ⇒ other
@@ -293,13 +293,15 @@ trait ManagedActorClassification {
     def add(monitored: ActorRef, monitor: ActorRef) = {
       val watchers = backing.get(monitored).getOrElse(empty) + monitor
       new ManagedActorClassificationMappings(
-          seqNr + 1, backing.updated(monitored, watchers))
+          seqNr + 1,
+          backing.updated(monitored, watchers))
     }
 
     def remove(monitored: ActorRef, monitor: ActorRef) = {
       val monitors = backing.get(monitored).getOrElse(empty) - monitor
       new ManagedActorClassificationMappings(
-          seqNr + 1, backing.updated(monitored, monitors))
+          seqNr + 1,
+          backing.updated(monitored, monitors))
     }
 
     def remove(monitored: ActorRef) = {
@@ -311,7 +313,8 @@ trait ManagedActorClassification {
   private val mappings =
     new AtomicReference[ManagedActorClassificationMappings](
         new ManagedActorClassificationMappings(
-            0, Map.empty[ActorRef, immutable.TreeSet[ActorRef]]))
+            0,
+            Map.empty[ActorRef, immutable.TreeSet[ActorRef]]))
 
   private val empty = immutable.TreeSet.empty[ActorRef]
 
@@ -320,8 +323,8 @@ trait ManagedActorClassification {
     ActorClassificationUnsubscriber.start(system, this)
 
   @tailrec
-  protected final def associate(
-      monitored: ActorRef, monitor: ActorRef): Boolean = {
+  protected final def associate(monitored: ActorRef,
+                                monitor: ActorRef): Boolean = {
     val current = mappings.get
 
     current.backing.get(monitored) match {
@@ -376,8 +379,8 @@ trait ManagedActorClassification {
   }
 
   @tailrec
-  protected final def dissociate(
-      monitored: ActorRef, monitor: ActorRef): Boolean = {
+  protected final def dissociate(monitored: ActorRef,
+                                 monitor: ActorRef): Boolean = {
     val current = mappings.get
 
     current.backing.get(monitored) match {
@@ -435,8 +438,8 @@ trait ManagedActorClassification {
   /**
     * INTERNAL API
     */
-  private[akka] def registerWithUnsubscriber(
-      subscriber: ActorRef, seqNr: Int): Boolean = {
+  private[akka] def registerWithUnsubscriber(subscriber: ActorRef,
+                                             seqNr: Int): Boolean = {
     unsubscriber ! ActorClassificationUnsubscriber.Register(subscriber, seqNr)
     true
   }
@@ -444,10 +447,10 @@ trait ManagedActorClassification {
   /**
     * INTERNAL API
     */
-  private[akka] def unregisterFromUnsubscriber(
-      subscriber: ActorRef, seqNr: Int): Boolean = {
-    unsubscriber ! ActorClassificationUnsubscriber.Unregister(
-        subscriber, seqNr)
+  private[akka] def unregisterFromUnsubscriber(subscriber: ActorRef,
+                                               seqNr: Int): Boolean = {
+    unsubscriber ! ActorClassificationUnsubscriber.Unregister(subscriber,
+                                                              seqNr)
     true
   }
 }
@@ -465,8 +468,8 @@ trait ActorClassification {
     new ConcurrentHashMap[ActorRef, immutable.TreeSet[ActorRef]](mapSize)
 
   @tailrec
-  protected final def associate(
-      monitored: ActorRef, monitor: ActorRef): Boolean = {
+  protected final def associate(monitored: ActorRef,
+                                monitor: ActorRef): Boolean = {
     val current = mappings get monitored
     current match {
       case null ⇒
@@ -526,8 +529,8 @@ trait ActorClassification {
   }
 
   @tailrec
-  protected final def dissociate(
-      monitored: ActorRef, monitor: ActorRef): Boolean = {
+  protected final def dissociate(monitored: ActorRef,
+                                 monitor: ActorRef): Boolean = {
     val current = mappings get monitored
     current match {
       case null ⇒ false

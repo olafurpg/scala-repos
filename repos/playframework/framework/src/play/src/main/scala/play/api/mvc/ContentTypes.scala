@@ -154,8 +154,10 @@ object MultipartFormData {
   /**
     * A file part.
     */
-  case class FilePart[A](
-      key: String, filename: String, contentType: Option[String], ref: A)
+  case class FilePart[A](key: String,
+                         filename: String,
+                         contentType: Option[String],
+                         ref: A)
       extends Part[A]
 
   /**
@@ -184,8 +186,8 @@ object MultipartFormData {
   *
   * @param memoryThreshold If the content size is bigger than this limit, the content is stored as file.
   */
-case class RawBuffer(
-    memoryThreshold: Int, initialData: ByteString = ByteString.empty) {
+case class RawBuffer(memoryThreshold: Int,
+                     initialData: ByteString = ByteString.empty) {
 
   import play.api.libs.Files._
 
@@ -239,8 +241,7 @@ case class RawBuffer(
     */
   def asBytes(maxLength: Long = memoryThreshold): Option[ByteString] = {
     if (size <= maxLength) {
-      Some(
-          if (inMemory != null) {
+      Some(if (inMemory != null) {
         inMemory
       } else {
         ByteString(PlayIO.readFile(backedByTemporaryFile.file))
@@ -405,7 +406,7 @@ trait BodyParsers {
     def json(maxLength: Int): BodyParser[JsValue] = when(
         _.contentType.exists(m =>
               m.equalsIgnoreCase("text/json") ||
-              m.equalsIgnoreCase("application/json")),
+                m.equalsIgnoreCase("application/json")),
         tolerantJson(maxLength),
         createBadResult("Expecting text/json or application/json body",
                         UNSUPPORTED_MEDIA_TYPE)
@@ -699,10 +700,9 @@ trait BodyParsers {
       *
       * @param filePartHandler Handles file parts.
       */
-    def multipartFormData[A](
-        filePartHandler: Multipart.FilePartHandler[A],
-        maxLength: Long =
-          DefaultMaxDiskLength): BodyParser[MultipartFormData[A]] = {
+    def multipartFormData[A](filePartHandler: Multipart.FilePartHandler[A],
+                             maxLength: Long = DefaultMaxDiskLength)
+      : BodyParser[MultipartFormData[A]] = {
       BodyParser("multipartFormData") { request =>
         val app = Play.privateMaybeApplication.get // throw exception
         implicit val mat = app.materializer
@@ -822,8 +822,9 @@ trait BodyParsers {
       * @param errorMessage The error message to prepend to the exception message if an error was encountered.
       * @param parser The parser.
       */
-    private def tolerantBodyParser[A](
-        name: String, maxLength: Long, errorMessage: String)(
+    private def tolerantBodyParser[A](name: String,
+                                      maxLength: Long,
+                                      errorMessage: String)(
         parser: (RequestHeader, ByteString) => A): BodyParser[A] =
       BodyParser(name + ", maxLength=" + maxLength) { request =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
@@ -862,7 +863,8 @@ object BodyParsers extends BodyParsers {
 
   private[play] class TakeUpTo(maxLength: Long)
       extends GraphStageWithMaterializedValue[
-          FlowShape[ByteString, ByteString], Future[MaxSizeStatus]] {
+          FlowShape[ByteString, ByteString],
+          Future[MaxSizeStatus]] {
 
     private val in = Inlet[ByteString]("TakeUpTo.in")
     private val out = Outlet[ByteString]("TakeUpTo.out")

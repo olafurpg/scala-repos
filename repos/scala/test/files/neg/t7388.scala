@@ -1,1 +1,1 @@
-class Test private[doesnotexist]()
+class Test private[doesnotexist] ()

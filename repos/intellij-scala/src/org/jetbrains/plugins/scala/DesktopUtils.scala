@@ -30,7 +30,7 @@ object DesktopUtils {
   def browse(url: String) {
     val supported =
       Desktop.isDesktopSupported &&
-      Desktop.getDesktop.isSupported(Desktop.Action.BROWSE)
+        Desktop.getDesktop.isSupported(Desktop.Action.BROWSE)
 
     if (supported) Desktop.getDesktop.browse(new URI(url))
     else

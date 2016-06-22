@@ -86,14 +86,13 @@ class WeightedLeastSquaresSuite
     var idx = 0
     for (fitIntercept <- Seq(false, true)) {
       for (standardization <- Seq(false, true)) {
-        val wls =
-          new WeightedLeastSquares(fitIntercept,
-                                   regParam = 0.0,
-                                   standardizeFeatures = standardization,
-                                   standardizeLabel =
-                                     standardization).fit(instances)
-        val actual = Vectors.dense(
-            wls.intercept, wls.coefficients(0), wls.coefficients(1))
+        val wls = new WeightedLeastSquares(
+            fitIntercept,
+            regParam = 0.0,
+            standardizeFeatures = standardization,
+            standardizeLabel = standardization).fit(instances)
+        val actual = Vectors
+          .dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
         assert(actual ~== expected(idx) absTol 1e-4)
       }
       idx += 1
@@ -120,14 +119,13 @@ class WeightedLeastSquaresSuite
     var idx = 0
     for (fitIntercept <- Seq(false, true)) {
       for (standardization <- Seq(false, true)) {
-        val wls =
-          new WeightedLeastSquares(fitIntercept,
-                                   regParam = 0.0,
-                                   standardizeFeatures = standardization,
-                                   standardizeLabel =
-                                     standardization).fit(instancesConstLabel)
-        val actual = Vectors.dense(
-            wls.intercept, wls.coefficients(0), wls.coefficients(1))
+        val wls = new WeightedLeastSquares(
+            fitIntercept,
+            regParam = 0.0,
+            standardizeFeatures = standardization,
+            standardizeLabel = standardization).fit(instancesConstLabel)
+        val actual = Vectors
+          .dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
         assert(actual ~== expected(idx) absTol 1e-4)
       }
       idx += 1
@@ -193,11 +191,11 @@ class WeightedLeastSquaresSuite
     for (fitIntercept <- Seq(false, true);
          regParam <- Seq(0.0, 0.1, 1.0);
          standardizeFeatures <- Seq(false, true)) {
-      val wls = new WeightedLeastSquares(fitIntercept,
-                                         regParam,
-                                         standardizeFeatures,
-                                         standardizeLabel =
-                                           true).fit(instances)
+      val wls =
+        new WeightedLeastSquares(fitIntercept,
+                                 regParam,
+                                 standardizeFeatures,
+                                 standardizeLabel = true).fit(instances)
       val actual =
         Vectors.dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)

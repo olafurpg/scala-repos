@@ -117,23 +117,26 @@ class DescriptiveStatsTest extends WordSpec with Matchers {
 
     "bincountSparse should compute bins for DenseVector" in {
       val x = DenseVector[Int](0, 10, 20, 300, 10)
-      val result = new SparseVector[Int](
-          Array[Int](0, 10, 20, 300), Array[Int](1, 2, 1, 1), 301)
+      val result = new SparseVector[Int](Array[Int](0, 10, 20, 300),
+                                         Array[Int](1, 2, 1, 1),
+                                         301)
       assert(result == bincount.sparse(x))
     }
 
     "bincountSparse should compute bins for other container with CanTraverseValues" in {
       val x = List[Int](0, 10, 20, 300, 10)
-      val result = new SparseVector[Int](
-          Array[Int](0, 10, 20, 300), Array[Int](1, 2, 1, 1), 301)
+      val result = new SparseVector[Int](Array[Int](0, 10, 20, 300),
+                                         Array[Int](1, 2, 1, 1),
+                                         301)
       assert(result == bincount.sparse(x))
     }
 
     "bincountSparse should compute weighted bins for DenseVector" in {
       val x = DenseVector[Int](0, 10, 20, 300, 10)
       val weights = DenseVector[Double](1.0, 3.0, 1.0, 7.0, 1.0)
-      val result = new SparseVector[Double](
-          Array[Int](0, 10, 20, 300), Array[Double](1.0, 4.0, 1.0, 7.0), 301)
+      val result = new SparseVector[Double](Array[Int](0, 10, 20, 300),
+                                            Array[Double](1.0, 4.0, 1.0, 7.0),
+                                            301)
       assert(result == bincount.sparse(x, weights))
     }
   }
@@ -145,8 +148,9 @@ class DescriptiveStatsTest2 extends FunSuite {
   test("complex mean") {
     import breeze.{math => bmath}
     import breeze.math.Complex
-    val data = DenseVector[Complex](
-        (0.0 + 1.0 * bmath.i), (1.0 + 0.0 * bmath.i), (2.0 + 2.0 * bmath.i))
+    val data = DenseVector[Complex]((0.0 + 1.0 * bmath.i),
+                                    (1.0 + 0.0 * bmath.i),
+                                    (2.0 + 2.0 * bmath.i))
     assert(mean(data) === (1.0 + 1.0 * bmath.i))
   }
 
@@ -194,30 +198,30 @@ class DescriptiveStatsTest2 extends FunSuite {
            "median (odd length) should be 2 instead of " + median(dataOdd))
     assert(median(dataOddDuplicate) == 2,
            "median (odd length with duplicate) should be 2 instead of " +
-           median(dataOddDuplicate))
+             median(dataOddDuplicate))
     assert(
         median(dataEven) == 1.5f,
         "median (even length) should be 1.5f instead of " + median(dataEven))
     assert(median(dataEvenDuplicate) == 250,
            "median (even length with duplicate) should be 250 instead of " +
-           median(dataEvenDuplicate))
+             median(dataEvenDuplicate))
     assert(median(dataEvenDuplicate2) == 450,
            "median (even length with duplicate) should be 450 instead of " +
-           median(dataEvenDuplicate2))
+             median(dataEvenDuplicate2))
 
     assert(median(dataOddSeq) == 2,
            "median (odd length) should be 2 instead of " + median(dataOddSeq))
     assert(median(dataOddDuplicateSeq) == 2,
            "median (odd length with duplicate) should be 2 instead of " +
-           median(dataOddDuplicateSeq))
+             median(dataOddDuplicateSeq))
     assert(median(dataEvenSeq) == 1.5f,
            "median (even length) should be 1.5f instead of " +
-           median(dataEvenSeq))
+             median(dataEvenSeq))
     assert(median(dataEvenDuplicateSeq) == 250,
            "median (even length with duplicate) should be 250 instead of " +
-           median(dataEvenDuplicate))
+             median(dataEvenDuplicate))
     assert(median(dataEvenDuplicate2Seq) == 450,
            "median (even length with duplicate) should be 450 instead of " +
-           median(dataEvenDuplicate2))
+             median(dataEvenDuplicate2))
   }
 }

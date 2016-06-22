@@ -45,10 +45,14 @@ class LeaderElectionTest extends ZooKeeperTestHarness {
   override def setUp() {
     super.setUp()
 
-    val configProps1 = TestUtils.createBrokerConfig(
-        brokerId1, zkConnect, enableControlledShutdown = false)
-    val configProps2 = TestUtils.createBrokerConfig(
-        brokerId2, zkConnect, enableControlledShutdown = false)
+    val configProps1 = TestUtils.createBrokerConfig(brokerId1,
+                                                    zkConnect,
+                                                    enableControlledShutdown =
+                                                      false)
+    val configProps2 = TestUtils.createBrokerConfig(brokerId2,
+                                                    zkConnect,
+                                                    enableControlledShutdown =
+                                                      false)
 
     // start both servers
     val server1 = TestUtils.createServer(KafkaConfig.fromProps(configProps1))
@@ -157,15 +161,19 @@ class LeaderElectionTest extends ZooKeeperTestHarness {
           new Broker(s.config.brokerId, "localhost", s.boundPort()))
     val brokerEndPoints = brokers.map { b =>
       val brokerEndPoint = b.getBrokerEndPoint(SecurityProtocol.PLAINTEXT)
-      new BrokerEndPoint(
-          brokerEndPoint.id, brokerEndPoint.host, brokerEndPoint.port)
+      new BrokerEndPoint(brokerEndPoint.id,
+                         brokerEndPoint.host,
+                         brokerEndPoint.port)
     }
 
     val controllerContext = new ControllerContext(zkUtils, 6000)
     controllerContext.liveBrokers = brokers.toSet
     val metrics = new Metrics
     val controllerChannelManager = new ControllerChannelManager(
-        controllerContext, controllerConfig, new SystemTime, metrics)
+        controllerContext,
+        controllerConfig,
+        new SystemTime,
+        metrics)
     controllerChannelManager.startup()
     try {
       val staleControllerEpoch = 0

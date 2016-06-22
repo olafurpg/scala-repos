@@ -10,8 +10,8 @@ object MapPicklerHelper {
     tpe.typeargs match {
       case List(one, two) =>
         FastTypeTag
-          .apply(
-              currentMirror, s"scala.Tuple2[${one.toString},${two.toString}]")
+          .apply(currentMirror,
+                 s"scala.Tuple2[${one.toString},${two.toString}]")
           .asInstanceOf[FastTypeTag[(T, U)]]
       // Note: This is what we do to handle
       case List() =>
@@ -42,17 +42,23 @@ trait MapPicklers {
       MapPicklerHelper.tupleTagExtractor(tpe)
     } _
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.immutable.Map", generator)
+        "scala.collection.immutable.Map",
+        generator)
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.immutable.Map.Map1", generator)
+        "scala.collection.immutable.Map.Map1",
+        generator)
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.immutable.Map.Map2", generator)
+        "scala.collection.immutable.Map.Map2",
+        generator)
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.immutable.Map.Map3", generator)
+        "scala.collection.immutable.Map.Map3",
+        generator)
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.immutable.Map.Map4", generator)
+        "scala.collection.immutable.Map.Map4",
+        generator)
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.immutable.HashMap.HashTrieMap", generator)
+        "scala.collection.immutable.HashMap.HashTrieMap",
+        generator)
   }
 }
 
@@ -62,10 +68,10 @@ trait ImmutableSortedMapPicklers {
       elemUnpickler: Unpickler[(K, V)],
       pairTag: FastTypeTag[(K, V)],
       collTag: FastTypeTag[immutable.SortedMap[K, V]],
-      cbf: CanBuildFrom[
-          immutable.SortedMap[K, V], (K, V), immutable.SortedMap[K, V]])
-    : Pickler[immutable.SortedMap[K, V]] with Unpickler[
-        immutable.SortedMap[K, V]] =
+      cbf: CanBuildFrom[immutable.SortedMap[K, V],
+                        (K, V),
+                        immutable.SortedMap[K, V]]): Pickler[
+      immutable.SortedMap[K, V]] with Unpickler[immutable.SortedMap[K, V]] =
     MapPickler[K, V, immutable.SortedMap]
 
   // TODO - SortedMap runtime generation involves using a specialized pickler that can remember the ordering of elements.  Currently our pickler does not do that.
@@ -90,6 +96,7 @@ trait MutableMapPicklers {
       MapPicklerHelper.tupleTagExtractor(tpe)
     } _
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
-        "scala.collection.mutable.Map", generator)
+        "scala.collection.mutable.Map",
+        generator)
   }
 }

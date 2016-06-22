@@ -45,8 +45,8 @@ class PrefixComparatorsSuite extends SparkFunSuite with PropertyChecks {
 
       assert(
           (prefixComparisonResult == 0 && cmp == 0) ||
-          (prefixComparisonResult < 0 && s1.compareTo(s2) < 0) ||
-          (prefixComparisonResult > 0 && s1.compareTo(s2) > 0))
+            (prefixComparisonResult < 0 && s1.compareTo(s2) < 0) ||
+            (prefixComparisonResult > 0 && s1.compareTo(s2) > 0))
     }
 
     // scalastyle:off
@@ -81,9 +81,10 @@ class PrefixComparatorsSuite extends SparkFunSuite with PropertyChecks {
       val s2Prefix = PrefixComparators.BinaryPrefixComparator.computePrefix(y)
       val prefixComparisonResult =
         PrefixComparators.BINARY.compare(s1Prefix, s2Prefix)
-      assert((prefixComparisonResult == 0) ||
-          (prefixComparisonResult < 0 && compareBinary(x, y) < 0) ||
-          (prefixComparisonResult > 0 && compareBinary(x, y) > 0))
+      assert(
+          (prefixComparisonResult == 0) ||
+            (prefixComparisonResult < 0 && compareBinary(x, y) < 0) ||
+            (prefixComparisonResult > 0 && compareBinary(x, y) > 0))
     }
 
     // scalastyle:off

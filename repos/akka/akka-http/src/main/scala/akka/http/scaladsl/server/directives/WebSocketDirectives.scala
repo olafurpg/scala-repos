@@ -42,8 +42,8 @@ trait WebSocketDirectives {
     * Handles WebSocket requests with the given handler if the given subprotocol is offered in the request and
     * rejects other requests with an [[ExpectedWebSocketRequestRejection]] or an [[UnsupportedWebSocketSubprotocolRejection]].
     */
-  def handleWebSocketMessagesForProtocol(
-      handler: Flow[Message, Message, Any], subprotocol: String): Route =
+  def handleWebSocketMessagesForProtocol(handler: Flow[Message, Message, Any],
+                                         subprotocol: String): Route =
     handleWebSocketMessagesForOptionalProtocol(handler, Some(subprotocol))
 
   /**

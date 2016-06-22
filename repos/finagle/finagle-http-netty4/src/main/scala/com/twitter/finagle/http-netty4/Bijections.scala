@@ -36,8 +36,8 @@ private[http4] object Bijections {
       result
     }
 
-    private[this] def writeNettyHeadersToFinagle(
-        head: NettyHttp.HttpHeaders, out: HeaderMap): Unit = {
+    private[this] def writeNettyHeadersToFinagle(head: NettyHttp.HttpHeaders,
+                                                 out: HeaderMap): Unit = {
       val itr = head.iteratorAsString()
       while (itr.hasNext) {
         val entry = itr.next()

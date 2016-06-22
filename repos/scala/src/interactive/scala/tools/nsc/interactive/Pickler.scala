@@ -127,7 +127,8 @@ object Pickler {
       case s @ UnpickleSuccess(x) => s
       case f: UnpickleFailure =>
         throw new MalformedInput(
-            f.rd, "Unrecoverable unpickle failure:\n" + f.errMsg)
+            f.rd,
+            "Unrecoverable unpickle failure:\n" + f.errMsg)
     }
   }
 
@@ -149,8 +150,8 @@ object Pickler {
   }
 
   private def errorExpected(rd: Lexer, msg: => String) =
-    new UnpickleFailure(
-        "expected: " + msg + "\n" + "found   : " + rd.token, rd)
+    new UnpickleFailure("expected: " + msg + "\n" + "found   : " + rd.token,
+                        rd)
 
   private def nextSuccess[T](rd: Lexer, result: T) = {
     rd.nextToken()
@@ -226,8 +227,8 @@ object Pickler {
 
   /** Same as `p | q`
     */
-  def eitherPickler[T, U <: T, V <: T](
-      p: CondPickler[U], q: => CondPickler[V]) =
+  def eitherPickler[T, U <: T, V <: T](p: CondPickler[U],
+                                       q: => CondPickler[V]) =
     new CondPickler[T](x => p.canPickle(x) || q.canPickle(x)) {
       lazy val qq = q
       override def tryPickle(wr: Writer, x: Any): Boolean =

@@ -247,8 +247,10 @@ object Array extends FallbackArrayBuilding {
     tabulate(n1)(_ => ofDim[T](n2, n3))
 
   /** Creates a 4-dimensional array */
-  def ofDim[T: ClassTag](
-      n1: Int, n2: Int, n3: Int, n4: Int): Array[Array[Array[Array[T]]]] =
+  def ofDim[T: ClassTag](n1: Int,
+                         n2: Int,
+                         n3: Int,
+                         n4: Int): Array[Array[Array[Array[T]]]] =
     tabulate(n1)(_ => ofDim[T](n2, n3, n4))
 
   /** Creates a 5-dimensional array */
@@ -370,8 +372,8 @@ object Array extends FallbackArrayBuilding {
     *  @param   n2  the number of elements in the 2nd dimension
     *  @param   f   The function computing element values
     */
-  def tabulate[T: ClassTag](n1: Int, n2: Int)(
-      f: (Int, Int) => T): Array[Array[T]] =
+  def tabulate[T: ClassTag](n1: Int, n2: Int)(f: (Int,
+                                                  Int) => T): Array[Array[T]] =
     tabulate(n1)(i1 => tabulate(n2)(f(i1, _)))
 
   /** Returns a three-dimensional array containing values of a given function

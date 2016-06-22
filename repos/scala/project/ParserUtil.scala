@@ -46,14 +46,15 @@ object ParserUtil {
         }
         val childFilter =
           GlobFilter(preFile.name + "*") &&
-          ((IsDirectoryFilter && dirFilter) || fileFilter)
+            ((IsDirectoryFilter && dirFilter) || fileFilter)
         val children = parent.*(childFilter).get
         children.map(pathOf).toList
       } else Nil
     }
     def displayPath = Completions.single(Completion.displayOnly("<path>"))
     token(StringBasic,
-          TokenCompletions.fixed((seen, level) =>
+          TokenCompletions.fixed(
+              (seen, level) =>
                 if (seen.isEmpty) displayPath
                 else
                   matching(seen) match {
@@ -66,8 +67,8 @@ object ParserUtil {
                     Completions.strict(
                         Set(Completion.suggestion(x.stripPrefix(seen))))
                 case xs =>
-                  Completions.strict(xs
-                        .map(x =>
+                  Completions.strict(
+                      xs.map(x =>
                               Completion.tokenDisplay(x.stripPrefix(seen), x))
                         .toSet)
             })).filter(!_.startsWith("-"), x => x)

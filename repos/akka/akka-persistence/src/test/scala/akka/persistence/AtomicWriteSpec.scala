@@ -17,20 +17,26 @@ class AtomicWriteSpec extends WordSpec with Matchers {
       intercept[IllegalArgumentException] {
         AtomicWrite(
             PersistentRepr("", 1, "p1") :: PersistentRepr("", 2, "p1") :: PersistentRepr(
-                "", 3, "p2") :: Nil)
+                "",
+                3,
+                "p2") :: Nil)
       }
     }
 
     "have highestSequenceNr" in {
       AtomicWrite(
           PersistentRepr("", 1, "p1") :: PersistentRepr("", 2, "p1") :: PersistentRepr(
-              "", 3, "p1") :: Nil).highestSequenceNr should ===(3)
+              "",
+              3,
+              "p1") :: Nil).highestSequenceNr should ===(3)
     }
 
     "have lowestSequenceNr" in {
       AtomicWrite(
           PersistentRepr("", 2, "p1") :: PersistentRepr("", 3, "p1") :: PersistentRepr(
-              "", 4, "p1") :: Nil).lowestSequenceNr should ===(2)
+              "",
+              4,
+              "p1") :: Nil).lowestSequenceNr should ===(2)
     }
   }
 }

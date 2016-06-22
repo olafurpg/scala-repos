@@ -157,8 +157,8 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
     val recordedBlocks = blockGeneratorListener.arrayBuffers
     val recordedData = recordedBlocks.flatten
     assert(blockGeneratorListener.arrayBuffers.size > 0, "No blocks received")
-    assert(
-        recordedData.toSet === generatedData.toSet, "Received data not same")
+    assert(recordedData.toSet === generatedData.toSet,
+           "Received data not same")
 
     // recordedData size should be close to the expected rate; use an error margin proportional to
     // the value, so that rate changes don't cause a brittle test
@@ -167,7 +167,7 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
     val numMessages = recordedData.size
     assert(
         numMessages >= minExpectedMessages &&
-        numMessages <= maxExpectedMessages,
+          numMessages <= maxExpectedMessages,
         s"#records received = $numMessages, not between $minExpectedMessages and $maxExpectedMessages"
     )
 
@@ -186,9 +186,9 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
 
     assert(
         averageBlockSize >= minExpectedMessagesPerBlock &&
-        averageBlockSize <= maxExpectedMessagesPerBlock,
+          averageBlockSize <= maxExpectedMessagesPerBlock,
         s"# records in received blocks = [$receivedBlockSizes], not between " +
-        s"$minExpectedMessagesPerBlock and $maxExpectedMessagesPerBlock, on average"
+          s"$minExpectedMessagesPerBlock and $maxExpectedMessagesPerBlock, on average"
     )
   }
 

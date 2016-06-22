@@ -9,10 +9,11 @@ import play.api._
 import play.api.libs.crypto._
 
 @javax.inject.Singleton
-@deprecated(
-    "This class is deprecated and will be removed in future versions", "2.5.0")
-class Crypto @Inject()(
-    signer: CookieSigner, tokenSigner: CSRFTokenSigner, aesCrypter: AESCrypter)
+@deprecated("This class is deprecated and will be removed in future versions",
+            "2.5.0")
+class Crypto @Inject()(signer: CookieSigner,
+                       tokenSigner: CSRFTokenSigner,
+                       aesCrypter: AESCrypter)
     extends CookieSigner
     with CSRFTokenSigner
     with AESCrypter {
@@ -55,8 +56,8 @@ class Crypto @Inject()(
   *
   * @deprecated The singleton crypto object is deprecated as of 2.5.0
   */
-@deprecated(
-    "This class is deprecated and will be removed in future versions", "2.5.0")
+@deprecated("This class is deprecated and will be removed in future versions",
+            "2.5.0")
 object Crypto {
 
   type CryptoException = play.api.libs.crypto.CryptoException

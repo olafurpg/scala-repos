@@ -52,15 +52,16 @@ case class TungstenAggregate(
       .flatMap(_.aggregateFunction.inputAggBufferAttributes)
 
   override private[sql] lazy val metrics = Map(
-      "numOutputRows" -> SQLMetrics.createLongMetric(
-          sparkContext, "number of output rows"),
+      "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
+                                                     "number of output rows"),
       "dataSize" -> SQLMetrics.createSizeMetric(sparkContext, "data size"),
       "spillSize" -> SQLMetrics.createSizeMetric(sparkContext, "spill size"))
 
   override def output: Seq[Attribute] = resultExpressions.map(_.toAttribute)
 
   override def producedAttributes: AttributeSet =
-    AttributeSet(aggregateAttributes) ++ AttributeSet(resultExpressions
+    AttributeSet(aggregateAttributes) ++ AttributeSet(
+        resultExpressions
           .diff(groupingExpressions)
           .map(_.toAttribute)) ++ AttributeSet(aggregateBufferAttributes)
 
@@ -76,8 +77,8 @@ case class TungstenAggregate(
   // This is for testing. We force TungstenAggregationIterator to fall back to sort-based
   // aggregation once it has processed a given number of input rows.
   private val testFallbackStartsAt: Option[Int] = {
-    sqlContext.getConf(
-        "spark.sql.TungstenAggregate.testFallbackStartsAt", null) match {
+    sqlContext.getConf("spark.sql.TungstenAggregate.testFallbackStartsAt",
+                       null) match {
       case null | "" => None
       case fallbackStartsAt => Some(fallbackStartsAt.toInt)
     }
@@ -103,8 +104,9 @@ case class TungstenAggregate(
               initialInputBufferOffset,
               resultExpressions,
               (expressions, inputSchema) =>
-                newMutableProjection(
-                    expressions, inputSchema, subexpressionEliminationEnabled),
+                newMutableProjection(expressions,
+                                     inputSchema,
+                                     subexpressionEliminationEnabled),
               child.output,
               iter,
               testFallbackStartsAt,
@@ -145,8 +147,9 @@ case class TungstenAggregate(
     }
   }
 
-  override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  override def doConsume(ctx: CodegenContext,
+                         input: Seq[ExprCode],
+                         row: String): String = {
     if (groupingExpressions.isEmpty) {
       doConsumeWithoutKeys(ctx, input)
     } else {
@@ -232,8 +235,8 @@ case class TungstenAggregate(
      """.stripMargin
   }
 
-  private def doConsumeWithoutKeys(
-      ctx: CodegenContext, input: Seq[ExprCode]): String = {
+  private def doConsumeWithoutKeys(ctx: CodegenContext,
+                                   input: Seq[ExprCode]): String = {
     // only have DeclarativeAggregate
     val functions = aggregateExpressions.map(
         _.aggregateFunction.asInstanceOf[DeclarativeAggregate])
@@ -350,12 +353,11 @@ case class TungstenAggregate(
 
       var currentKey: UnsafeRow = null
       var currentRow: UnsafeRow = null
-      var nextKey: UnsafeRow =
-        if (sortedIter.next()) {
-          sortedIter.getKey
-        } else {
-          null
-        }
+      var nextKey: UnsafeRow = if (sortedIter.next()) {
+        sortedIter.getKey
+      } else {
+        null
+      }
 
       override def next(): Boolean = {
         if (nextKey != null) {
@@ -466,13 +468,14 @@ case class TungstenAggregate(
                         hashMapTerm,
                         s"$hashMapTerm = $thisPlan.createHashMap();")
     sorterTerm = ctx.freshName("sorter")
-    ctx.addMutableState(
-        classOf[UnsafeKVExternalSorter].getName, sorterTerm, "")
+    ctx
+      .addMutableState(classOf[UnsafeKVExternalSorter].getName, sorterTerm, "")
 
     // Create a name for iterator from HashMap
     val iterTerm = ctx.freshName("mapIter")
-    ctx.addMutableState(
-        classOf[KVIterator[UnsafeRow, UnsafeRow]].getName, iterTerm, "")
+    ctx.addMutableState(classOf[KVIterator[UnsafeRow, UnsafeRow]].getName,
+                        iterTerm,
+                        "")
 
     val doAgg = ctx.freshName("doAggregateWithKeys")
     ctx.addNewFunction(doAgg, s"""
@@ -516,8 +519,8 @@ case class TungstenAggregate(
      """
   }
 
-  private def doConsumeWithKeys(
-      ctx: CodegenContext, input: Seq[ExprCode]): String = {
+  private def doConsumeWithKeys(ctx: CodegenContext,
+                                input: Seq[ExprCode]): String = {
 
     // create grouping key
     ctx.currentVars = input
@@ -620,7 +623,7 @@ case class TungstenAggregate(
         s"TungstenAggregate(key=$keyString, functions=$functionString, output=$outputString)"
       case Some(fallbackStartsAt) =>
         s"TungstenAggregateWithControlledFallback $groupingExpressions " +
-        s"$allAggregateExpressions $resultExpressions fallbackStartsAt=$fallbackStartsAt"
+          s"$allAggregateExpressions $resultExpressions fallbackStartsAt=$fallbackStartsAt"
     }
   }
 }

@@ -127,8 +127,7 @@ class JobCancellationSuite
 
     // Add a listener to release the semaphore once any tasks are launched.
     val sem = new Semaphore(0)
-    sc.addSparkListener(
-        new SparkListener {
+    sc.addSparkListener(new SparkListener {
       override def onTaskStart(taskStart: SparkListenerTaskStart) {
         sem.release()
       }
@@ -162,8 +161,7 @@ class JobCancellationSuite
 
     // Add a listener to release the semaphore once any tasks are launched.
     val sem = new Semaphore(0)
-    sc.addSparkListener(
-        new SparkListener {
+    sc.addSparkListener(new SparkListener {
       override def onTaskStart(taskStart: SparkListenerTaskStart) {
         sem.release()
       }
@@ -202,8 +200,7 @@ class JobCancellationSuite
 
     // Add a listener to release the semaphore once any tasks are launched.
     val sem = new Semaphore(0)
-    sc.addSparkListener(
-        new SparkListener {
+    sc.addSparkListener(new SparkListener {
       override def onTaskStart(taskStart: SparkListenerTaskStart) {
         sem.release()
       }
@@ -211,8 +208,9 @@ class JobCancellationSuite
 
     // jobA is the one to be cancelled.
     val jobA = Future {
-      sc.setJobGroup(
-          "jobA", "this is a job to be cancelled", interruptOnCancel = true)
+      sc.setJobGroup("jobA",
+                     "this is a job to be cancelled",
+                     interruptOnCancel = true)
       sc.parallelize(1 to 10000, 2)
         .map { i =>
           Thread.sleep(100000); i
@@ -240,8 +238,7 @@ class JobCancellationSuite
     val sem1 = new Semaphore(0)
 
     sc = new SparkContext("local[2]", "test")
-    sc.addSparkListener(
-        new SparkListener {
+    sc.addSparkListener(new SparkListener {
       override def onTaskStart(taskStart: SparkListenerTaskStart) {
         sem1.release()
       }
@@ -282,16 +279,16 @@ class JobCancellationSuite
         .countAsync()
       Future { f.cancel() }
       val e = intercept[SparkException] { f.get() }
-      assert(e.getMessage.contains("cancelled") ||
-          e.getMessage.contains("killed"))
+      assert(
+          e.getMessage.contains("cancelled") ||
+            e.getMessage.contains("killed"))
     }
 
     // Cancel after some tasks have been launched
     {
       // Add a listener to release the semaphore once any tasks are launched.
       val sem = new Semaphore(0)
-      sc.addSparkListener(
-          new SparkListener {
+      sc.addSparkListener(new SparkListener {
         override def onTaskStart(taskStart: SparkListenerTaskStart) {
           sem.release()
         }
@@ -309,8 +306,9 @@ class JobCancellationSuite
         f.cancel()
       }
       val e = intercept[SparkException] { f.get() }
-      assert(e.getMessage.contains("cancelled") ||
-          e.getMessage.contains("killed"))
+      assert(
+          e.getMessage.contains("cancelled") ||
+            e.getMessage.contains("killed"))
     }
   }
 
@@ -325,16 +323,16 @@ class JobCancellationSuite
         .takeAsync(5000)
       Future { f.cancel() }
       val e = intercept[SparkException] { f.get() }
-      assert(e.getMessage.contains("cancelled") ||
-          e.getMessage.contains("killed"))
+      assert(
+          e.getMessage.contains("cancelled") ||
+            e.getMessage.contains("killed"))
     }
 
     // Cancel after some tasks have been launched
     {
       // Add a listener to release the semaphore once any tasks are launched.
       val sem = new Semaphore(0)
-      sc.addSparkListener(
-          new SparkListener {
+      sc.addSparkListener(new SparkListener {
         override def onTaskStart(taskStart: SparkListenerTaskStart) {
           sem.release()
         }
@@ -350,8 +348,9 @@ class JobCancellationSuite
         f.cancel()
       }
       val e = intercept[SparkException] { f.get() }
-      assert(e.getMessage.contains("cancelled") ||
-          e.getMessage.contains("killed"))
+      assert(
+          e.getMessage.contains("cancelled") ||
+            e.getMessage.contains("killed"))
     }
   }
 }

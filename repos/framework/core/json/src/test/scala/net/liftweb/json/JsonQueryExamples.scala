@@ -105,8 +105,8 @@ object JsonQueryExamples extends Specification {
     clusters mustEqual List("cluster2")
   }
 
-  val json =
-    parse("""
+  val json = parse(
+      """
     { "data_center": [
       {
         "name": "cluster1",

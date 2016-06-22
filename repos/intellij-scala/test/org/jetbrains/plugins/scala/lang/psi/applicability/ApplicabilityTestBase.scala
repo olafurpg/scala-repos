@@ -77,15 +77,17 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
     assertProblems("", definition, application)(pattern)
   }
 
-  def assertProblems(
-      auxiliary: String, definition: String, application: String)(
+  def assertProblems(auxiliary: String,
+                     definition: String,
+                     application: String)(
       pattern: PartialFunction[List[ApplicabilityProblem], Unit]) {
     assertProblemsFunction(auxiliary, definition, application)(pattern)
     assertProblemsConstructor(auxiliary, definition, application)(pattern)
   }
 
-  def assertProblemsFunction(
-      auxiliary: String, definition: String, application: String)(
+  def assertProblemsFunction(auxiliary: String,
+                             definition: String,
+                             application: String)(
       pattern: PartialFunction[scala.List[ApplicabilityProblem], Unit]) {
     val typified = typify(definition, application)
 
@@ -95,8 +97,9 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
         pattern)
   }
 
-  def assertProblemsConstructor(
-      auxiliary: String, definition: String, application: String)(
+  def assertProblemsConstructor(auxiliary: String,
+                                definition: String,
+                                application: String)(
       pattern: PartialFunction[scala.List[ApplicabilityProblem], Unit]) {
     val typified = typify(definition, application)
     assertProblemsAre(auxiliary, formatConstructor(definition, application))(
@@ -113,7 +116,7 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
     try {
       val message =
         "\n\n             code: " + line + "\n  actual problems: " +
-        problemsIn(file).toString + "\n"
+          problemsIn(file).toString + "\n"
       Assert.assertTrue(message, pattern.isDefinedAt(problemsIn(file)))
     } finally {
       Compatibility.seqClass = None
@@ -125,8 +128,8 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
                  .filterByType(classOf[ScReferenceElement])
                  .toList;
          result <- ref.advancedResolve.toList;
-         problem <- result.problems.filter(_ != ExpectedTypeMismatch)) yield
-      problem
+         problem <- result.problems.filter(_ != ExpectedTypeMismatch))
+      yield problem
   }
 
   private def formatFunction(definition: String, application: String) =
@@ -138,8 +141,8 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   private def typify(definition: String, application: String) = {
     val Parameter = """(\w+):\s*([A-Za-z\[\]]+)""".r
 
-    val types =
-      for (Parameter(_, t) <- Parameter.findAllIn(definition).toList) yield t
+    val types = for (Parameter(_, t) <- Parameter.findAllIn(definition).toList)
+      yield t
     val ids = (1 to types.size).map("T" + _)
 
     val id = ids.toIterator

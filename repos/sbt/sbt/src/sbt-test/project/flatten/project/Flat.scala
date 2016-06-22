@@ -9,7 +9,8 @@ object Flat extends Build {
       file("."),
       settings =
         Defaults.defaultSettings ++ forConfig(Compile, "src") ++ forConfig(
-            Test, "test-src") ++ baseSettings)
+            Test,
+            "test-src") ++ baseSettings)
 
   def baseSettings = Seq(
       scalaVersion := "2.8.1",

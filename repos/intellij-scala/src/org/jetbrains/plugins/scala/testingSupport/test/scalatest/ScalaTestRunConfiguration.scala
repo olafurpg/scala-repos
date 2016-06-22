@@ -47,7 +47,9 @@ object ScalaTestRunConfiguration extends SuiteValidityChecker {
     val project = clazz.getProject
     val constructors = clazz match {
       case c: ScClass =>
-        c.secondaryConstructors.filter(_.isConstructor).toList ::: c.constructor.toList
+        c.secondaryConstructors
+          .filter(_.isConstructor)
+          .toList ::: c.constructor.toList
       case _ => clazz.getConstructors.toList
     }
     for (con <- constructors) {

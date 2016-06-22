@@ -38,7 +38,7 @@ class InputSizeReducerEstimator extends ReducerEstimator {
       case Nil =>
         LOG.warn(
             "InputSizeReducerEstimator unable to estimate reducers; " +
-            "cannot compute size of:\n - " + Common
+              "cannot compute size of:\n - " + Common
               .unrollTaps(info.step)
               .filterNot(_.isInstanceOf[Hfs])
               .mkString("\n - "))
@@ -57,8 +57,8 @@ class InputSizeReducerEstimator extends ReducerEstimator {
 
         LOG.info(
             "\nInputSizeReducerEstimator" + "\n - input size (bytes): " +
-            totalBytes + "\n - reducer estimate:   " + nReducers +
-            "\n - Breakdown:\n" + logStr)
+              totalBytes + "\n - reducer estimate:   " + nReducers +
+              "\n - Breakdown:\n" + logStr)
 
         Some(nReducers)
     }

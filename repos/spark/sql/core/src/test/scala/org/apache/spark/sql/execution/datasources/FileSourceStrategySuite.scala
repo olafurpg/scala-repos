@@ -181,16 +181,17 @@ class FileSourceStrategySuite
 
   // Helpers for checking the arguments passed to the FileFormat.
 
-  protected val checkPartitionSchema = checkArgument(
-      "partition schema", _.partitionSchema, _: StructType)
-  protected val checkDataSchema = checkArgument(
-      "data schema", _.dataSchema, _: StructType)
-  protected val checkDataFilters = checkArgument(
-      "data filters", _.filters.toSet, _: Set[Filter])
+  protected val checkPartitionSchema =
+    checkArgument("partition schema", _.partitionSchema, _: StructType)
+  protected val checkDataSchema =
+    checkArgument("data schema", _.dataSchema, _: StructType)
+  protected val checkDataFilters =
+    checkArgument("data filters", _.filters.toSet, _: Set[Filter])
 
   /** Helper for building checks on the arguments passed to the reader. */
-  protected def checkArgument[T](
-      name: String, arg: LastArguments.type => T, expected: T): Unit = {
+  protected def checkArgument[T](name: String,
+                                 arg: LastArguments.type => T,
+                                 expected: T): Unit = {
     if (arg(LastArguments) != expected) {
       fail(s"""
            |Wrong $name
@@ -207,8 +208,7 @@ class FileSourceStrategySuite
 
   /** Returns a set with all the filters present in the physical plan. */
   def getPhysicalFilters(df: DataFrame): ExpressionSet = {
-    ExpressionSet(
-        df.queryExecution.executedPlan.collect {
+    ExpressionSet(df.queryExecution.executedPlan.collect {
       case execution.Filter(f, _) => splitConjunctivePredicates(f)
     }.flatten)
   }
@@ -250,10 +250,11 @@ class FileSourceStrategySuite
       val bucketed =
         df.queryExecution.analyzed transform {
           case l @ LogicalRelation(r: HadoopFsRelation, _, _) =>
-            l.copy(relation =
-                  r.copy(bucketSpec = Some(BucketSpec(numBuckets = buckets,
-                                                      "c1" :: Nil,
-                                                      Nil))))
+            l.copy(
+                relation = r.copy(
+                    bucketSpec = Some(BucketSpec(numBuckets = buckets,
+                                                 "c1" :: Nil,
+                                                 Nil))))
         }
       Dataset.newDataFrame(sqlContext, bucketed)
     } else {

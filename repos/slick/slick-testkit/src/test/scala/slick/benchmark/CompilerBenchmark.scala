@@ -87,7 +87,8 @@ object CompilerBenchmark {
   def queriesFromNewComposition: Vector[Rep[_]] = {
     class SuppliersStd(tag: Tag)
         extends Table[(Int, String, String, String, String, String)](
-            tag, "SUPPLIERS") {
+            tag,
+            "SUPPLIERS") {
       def id =
         column[Int]("SUP_ID", O.PrimaryKey) // This is the primary key column
       def name = column[String]("SUP_NAME")

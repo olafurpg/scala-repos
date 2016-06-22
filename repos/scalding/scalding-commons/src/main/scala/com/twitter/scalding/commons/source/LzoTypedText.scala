@@ -29,53 +29,67 @@ object LzoTypedText {
     new FixedLzoTypedText[T](COMMA, path: _*)
 
   def hourlyLzoTsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange,
+      td: TypeDescriptor[T]): TypedTextDelimited[T] = {
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathLzoTypedText[T](
-        TAB, prefix + TimePathedSource.YEAR_MONTH_DAY_HOUR + "/*")
+        TAB,
+        prefix + TimePathedSource.YEAR_MONTH_DAY_HOUR + "/*")
   }
 
   def hourlyLzoOsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange,
+      td: TypeDescriptor[T]): TypedTextDelimited[T] = {
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathLzoTypedText[T](
-        ONE, prefix + TimePathedSource.YEAR_MONTH_DAY_HOUR + "/*")
+        ONE,
+        prefix + TimePathedSource.YEAR_MONTH_DAY_HOUR + "/*")
   }
 
   def hourlyLzoCsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange,
+      td: TypeDescriptor[T]): TypedTextDelimited[T] = {
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathLzoTypedText[T](
-        COMMA, prefix + TimePathedSource.YEAR_MONTH_DAY_HOUR + "/*")
+        COMMA,
+        prefix + TimePathedSource.YEAR_MONTH_DAY_HOUR + "/*")
   }
 
   def dailyLzoTsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange,
+      td: TypeDescriptor[T]): TypedTextDelimited[T] = {
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathLzoTypedText[T](
-        TAB, prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
+        TAB,
+        prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
   }
 
   def dailyLzoOsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange,
+      td: TypeDescriptor[T]): TypedTextDelimited[T] = {
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathLzoTypedText[T](
-        ONE, prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
+        ONE,
+        prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
   }
 
   def dailyLzoCsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange,
+      td: TypeDescriptor[T]): TypedTextDelimited[T] = {
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathLzoTypedText[T](
-        COMMA, prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
+        COMMA,
+        prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
   }
 
   def dailyPrefixSuffixLzoOsv[T](prefix: String, suffix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange,
+      td: TypeDescriptor[T]): TypedTextDelimited[T] = {
     require(prefix.last != '/', "prefix should not include trailing /")
     require(suffix.head == '/', "suffix should include a preceding /")
     new TimePathLzoTypedText[T](
-        ONE, prefix + TimePathedSource.YEAR_MONTH_DAY + suffix + "/*")
+        ONE,
+        prefix + TimePathedSource.YEAR_MONTH_DAY + suffix + "/*")
   }
 }
 
@@ -95,7 +109,8 @@ trait LzoTypedTextDelimited[T]
 }
 
 class TimePathLzoTypedText[T](sep: TypedSep, path: String)(
-    implicit dr: DateRange, td: TypeDescriptor[T])
+    implicit dr: DateRange,
+    td: TypeDescriptor[T])
     extends TimePathedSource(path, dr, DateOps.UTC)
     with LzoTypedTextDelimited[T] {
   override def typeDescriptor = td
@@ -103,15 +118,16 @@ class TimePathLzoTypedText[T](sep: TypedSep, path: String)(
 }
 
 class MostRecentLzoTypedText[T](sep: TypedSep, path: String)(
-    implicit dr: DateRange, td: TypeDescriptor[T])
+    implicit dr: DateRange,
+    td: TypeDescriptor[T])
     extends MostRecentGoodSource(path, dr, DateOps.UTC)
     with LzoTypedTextDelimited[T] {
   override def typeDescriptor = td
   protected override def separator = sep
 }
 
-class FixedLzoTypedText[T](
-    sep: TypedSep, path: String*)(implicit td: TypeDescriptor[T])
+class FixedLzoTypedText[T](sep: TypedSep, path: String*)(
+    implicit td: TypeDescriptor[T])
     extends FixedPathSource(path: _*)
     with LzoTypedTextDelimited[T] {
   override def typeDescriptor = td

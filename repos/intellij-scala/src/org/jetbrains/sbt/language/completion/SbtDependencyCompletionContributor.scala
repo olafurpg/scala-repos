@@ -76,7 +76,7 @@ class SbtDependencyCompletionContributor extends ScalaCompletionContributor {
               completeArtifact(group)
             case (ScInfixExpr(llop, loper, lrop), oper, rop)
                 if rop == place.getContext && oper.getText == "%" &&
-                isValidOperation(loper.getText) =>
+                  isValidOperation(loper.getText) =>
               for {
                 ScLiteralImpl.string(group) <- Option(llop)
                 ScLiteralImpl.string(artifact) <- Option(lrop)

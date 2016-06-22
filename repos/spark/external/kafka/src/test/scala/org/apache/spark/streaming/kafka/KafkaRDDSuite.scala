@@ -67,7 +67,9 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
 
     val rdd =
       KafkaUtils.createRDD[String, String, StringDecoder, StringDecoder](
-          sc, kafkaParams, offsetRanges)
+          sc,
+          kafkaParams,
+          offsetRanges)
 
     val received = rdd.map(_._2).collect.toSet
     assert(received === messages.toSet)
@@ -82,7 +84,9 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
 
     val emptyRdd =
       KafkaUtils.createRDD[String, String, StringDecoder, StringDecoder](
-          sc, kafkaParams, Array(OffsetRange(topic, 0, 0, 0)))
+          sc,
+          kafkaParams,
+          Array(OffsetRange(topic, 0, 0, 0)))
 
     assert(emptyRdd.isEmpty)
 
@@ -90,7 +94,9 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
     val badRanges = Array(OffsetRange(topic, 0, 0, messages.size + 1))
     intercept[SparkException] {
       KafkaUtils.createRDD[String, String, StringDecoder, StringDecoder](
-          sc, kafkaParams, badRanges)
+          sc,
+          kafkaParams,
+          badRanges)
     }
   }
 
@@ -173,8 +179,10 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
           until =>
             val offsetRanges = from.map {
               case (tp: TopicAndPartition, fromOffset: Long) =>
-                OffsetRange(
-                    tp.topic, tp.partition, fromOffset, until(tp).offset)
+                OffsetRange(tp.topic,
+                            tp.partition,
+                            fromOffset,
+                            until(tp).offset)
             }.toArray
 
             val leaders = until.map {
@@ -184,12 +192,12 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
 
             KafkaUtils
               .createRDD[String, String, StringDecoder, StringDecoder, String](
-                sc,
-                kc.kafkaParams,
-                offsetRanges,
-                leaders,
-                (mmd: MessageAndMetadata[String, String]) =>
-                  s"${mmd.offset} ${mmd.message}")
+                  sc,
+                  kc.kafkaParams,
+                  offsetRanges,
+                  leaders,
+                  (mmd: MessageAndMetadata[String, String]) =>
+                    s"${mmd.offset} ${mmd.message}")
         }
       }
     }

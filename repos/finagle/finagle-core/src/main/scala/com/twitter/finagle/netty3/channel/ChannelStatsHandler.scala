@@ -37,8 +37,8 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
     connectionCount.get()
   }
 
-  override def channelOpen(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+  override def channelOpen(ctx: ChannelHandlerContext,
+                           e: ChannelStateEvent): Unit = {
     elapsed = Stopwatch.start()
     ctx.setAttachment(new AtomicLong(0), new AtomicLong(0))
     connects.incr()
@@ -47,8 +47,8 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
     super.channelOpen(ctx, e)
   }
 
-  override def writeComplete(
-      ctx: ChannelHandlerContext, e: WriteCompletionEvent) {
+  override def writeComplete(ctx: ChannelHandlerContext,
+                             e: WriteCompletionEvent) {
     val (_, channelWriteCount) =
       ctx.getAttachment().asInstanceOf[(AtomicLong, AtomicLong)]
 
@@ -77,14 +77,14 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
   private[this] val closesCount = statsReceiver.counter("closes")
   private[this] val closedCount = statsReceiver.counter("closed")
 
-  override def closeRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+  override def closeRequested(ctx: ChannelHandlerContext,
+                              e: ChannelStateEvent) {
     closesCount.incr()
     super.closeRequested(ctx, e)
   }
 
-  override def channelClosed(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+  override def channelClosed(ctx: ChannelHandlerContext,
+                             e: ChannelStateEvent) {
     closedCount.incr()
     closeChans.incr()
 
@@ -103,8 +103,8 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
     super.channelClosed(ctx, e)
   }
 
-  override def exceptionCaught(
-      ctx: ChannelHandlerContext, evt: ExceptionEvent) {
+  override def exceptionCaught(ctx: ChannelHandlerContext,
+                               evt: ExceptionEvent) {
     val m =
       if (evt.getCause != null) evt.getCause.getClass.getName else "unknown"
     exceptions.counter(m).incr()
@@ -119,14 +119,13 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
     super.exceptionCaught(ctx, evt)
   }
 
-  private[this] var hasBeenWritable =
-    true //netty channels start in writable state
+  private[this] var hasBeenWritable = true //netty channels start in writable state
   private[this] var since = Time.now
 
   private[this] def socketDuration(now: Time): Duration = now - since
 
-  override def channelInterestChanged(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+  override def channelInterestChanged(ctx: ChannelHandlerContext,
+                                      e: ChannelStateEvent): Unit = {
     val now = Time.now
     super.channelInterestChanged(ctx, e)
     val isWritable = ctx.getChannel.isWritable()

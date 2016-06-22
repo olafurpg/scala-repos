@@ -39,8 +39,9 @@ private[finagle] object TrafficDistributor {
     * size of the balancers backing collection. The [[Distributor]]
     * operates over these.
     */
-  case class WeightClass[Req, Rep](
-      balancer: ServiceFactory[Req, Rep], weight: Double, size: Int)
+  case class WeightClass[Req, Rep](balancer: ServiceFactory[Req, Rep],
+                                   weight: Double,
+                                   size: Int)
 
   /**
     * Folds and accumulates over an [[Activity]] based event `stream` while biasing
@@ -74,8 +75,8 @@ private[finagle] object TrafficDistributor {
   /**
     * Distributes requests to `classes` according to their weight and size.
     */
-  private class Distributor[Req, Rep](
-      classes: Iterable[WeightClass[Req, Rep]], rng: Rng = Rng.threadLocal)
+  private class Distributor[Req, Rep](classes: Iterable[WeightClass[Req, Rep]],
+                                      rng: Rng = Rng.threadLocal)
       extends ServiceFactory[Req, Rep] {
 
     private[this] val (balancers, drv): (IndexedSeq[ServiceFactory[Req, Rep]],
@@ -126,7 +127,8 @@ private[finagle] class TrafficDistributor[Req, Rep](
     dest: Activity[Set[Address]],
     newEndpoint: Address => ServiceFactory[Req, Rep],
     newBalancer: Activity[Set[ServiceFactory[Req, Rep]]] => ServiceFactory[
-        Req, Rep],
+        Req,
+        Rep],
     eagerEviction: Boolean,
     rng: Rng = Rng.threadLocal,
     statsReceiver: StatsReceiver = NullStatsReceiver)
@@ -220,19 +222,18 @@ private[finagle] class TrafficDistributor[Req, Rep](
             val unweighted = factories.map {
               case WeightedFactory(f, _, _) => f
             }
-            val newCacheEntry =
-              if (cache.contains(weight)) {
-                // an update that contains an existing weight class updates
-                // the balancers backing collection.
-                val cached = cache(weight)
-                cached.endpoints.update(Activity.Ok(unweighted))
-                cached.copy(size = unweighted.size)
-              } else {
-                val endpoints: BalancerEndpoints[Req, Rep] =
-                  Var(Activity.Ok(unweighted))
-                val lb = newBalancer(Activity(endpoints))
-                CachedBalancer(lb, endpoints, unweighted.size)
-              }
+            val newCacheEntry = if (cache.contains(weight)) {
+              // an update that contains an existing weight class updates
+              // the balancers backing collection.
+              val cached = cache(weight)
+              cached.endpoints.update(Activity.Ok(unweighted))
+              cached.copy(size = unweighted.size)
+            } else {
+              val endpoints: BalancerEndpoints[Req, Rep] =
+                Var(Activity.Ok(unweighted))
+              val lb = newBalancer(Activity(endpoints))
+              CachedBalancer(lb, endpoints, unweighted.size)
+            }
             cache + (weight -> newCacheEntry)
         }
 

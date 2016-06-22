@@ -86,7 +86,8 @@ class LinkedHashMap[A, B]
   }
 
   @deprecatedOverriding(
-      "+= should not be overridden so it stays consistent with put.", "2.11.0")
+      "+= should not be overridden so it stays consistent with put.",
+      "2.11.0")
   def +=(kv: (A, B)): this.type = { put(kv._1, kv._2); this }
 
   @deprecatedOverriding(

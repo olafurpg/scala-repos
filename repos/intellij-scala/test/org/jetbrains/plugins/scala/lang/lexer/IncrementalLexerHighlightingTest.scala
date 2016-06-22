@@ -23,12 +23,12 @@ class IncrementalLexerHighlightingTest
 
     typed foreach {
       case '\r' =>
-        CommandProcessor.getInstance.executeCommand(
-            myFixture.getProject, new Runnable {
-          def run() {
-            myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
-          }
-        }, "", null)
+        CommandProcessor.getInstance
+          .executeCommand(myFixture.getProject, new Runnable {
+            def run() {
+              myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
+            }
+          }, "", null)
       case '\n' =>
         CommandProcessor
           .getInstance()
@@ -94,7 +94,7 @@ class IncrementalLexerHighlightingTest
   def testScl7330() {
     val text =
       "object ololo {\n" + s"(escritorTexto$CARET_MARKER)\n" +
-      "iniBloque(s\"\"\"filename=\"$fich\"\"\"\")\n" + "}"
+        "iniBloque(s\"\"\"filename=\"$fich\"\"\"\")\n" + "}"
 
     genericTestHighlighting(text, ',', ' ', '\r', '\r')
   }
@@ -256,7 +256,7 @@ class Sincronizador(servidor: String, ruta: String, soporte: String, tblsProcesa
         |
         |    if (true) {
         |      """ + CARET_MARKER +
-      """"Unsupported payment type: [$paymentType]" ; val a = 1
+        """"Unsupported payment type: [$paymentType]" ; val a = 1
         |    }
         |  }
         |}

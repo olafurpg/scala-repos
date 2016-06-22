@@ -49,12 +49,12 @@ object VersionedStore {
     * See summingbird-client's ClientStore for more information on the
     * merge between offline and online data.
     */
-  def apply[K, V](
-      rootPath: String,
-      versionsToKeep: Int = VersionedKeyValSource.defaultVersionsToKeep,
-      prunedSpace: PrunedSpace[(K, V)] = PrunedSpace.neverPruned)(
-      implicit injection: Injection[
-          (K, (BatchID, V)), (Array[Byte], Array[Byte])],
+  def apply[K, V](rootPath: String,
+                  versionsToKeep: Int =
+                    VersionedKeyValSource.defaultVersionsToKeep,
+                  prunedSpace: PrunedSpace[(K, V)] = PrunedSpace.neverPruned)(
+      implicit injection: Injection[(K, (BatchID, V)),
+                                    (Array[Byte], Array[Byte])],
       batcher: Batcher,
       ord: Ordering[K]): VersionedBatchStore[K, V, K, (BatchID, V)] =
     new VersionedBatchStore[K, V, K, (BatchID, V)](

@@ -47,8 +47,8 @@ class InputMetrics private (_bytesRead: Accumulator[Long],
            .getAccum[Long](accumMap, InternalAccumulator.input.BYTES_READ),
          TaskMetrics
            .getAccum[Long](accumMap, InternalAccumulator.input.RECORDS_READ),
-         TaskMetrics.getAccum[String](
-             accumMap, InternalAccumulator.input.READ_METHOD))
+         TaskMetrics
+           .getAccum[String](accumMap, InternalAccumulator.input.READ_METHOD))
   }
 
   /**
@@ -106,16 +106,16 @@ class InputMetrics private (_bytesRead: Accumulator[Long],
   */
 object InputMetrics {
 
-  @deprecated(
-      "matching on InputMetrics will not be supported in the future", "2.0.0")
+  @deprecated("matching on InputMetrics will not be supported in the future",
+              "2.0.0")
   def apply(readMethod: DataReadMethod.Value): InputMetrics = {
     val im = new InputMetrics
     im.setReadMethod(readMethod)
     im
   }
 
-  @deprecated(
-      "matching on InputMetrics will not be supported in the future", "2.0.0")
+  @deprecated("matching on InputMetrics will not be supported in the future",
+              "2.0.0")
   def unapply(input: InputMetrics): Option[DataReadMethod.Value] = {
     Some(input.readMethod)
   }

@@ -43,8 +43,9 @@ object Reporter {
     * Default in this case means that the instance of ServiceException it constructs when its
     * receive method is called does not report any endpoints.
     */
-  def defaultReporter(
-      scribeHost: String, scribePort: Int, serviceName: String): Reporter = {
+  def defaultReporter(scribeHost: String,
+                      scribePort: Int,
+                      serviceName: String): Reporter = {
     new Reporter(makeClient(scribeHost, scribePort), serviceName)
   }
 
@@ -86,8 +87,8 @@ object Reporter {
 
       def clientMonitor(serviceName: String): Reporter =
         new Reporter(scribeClient, serviceName).withClient()
-      def serverMonitor(
-          serviceName: String, address: SocketAddress): Reporter =
+      def serverMonitor(serviceName: String,
+                        address: SocketAddress): Reporter =
         new Reporter(scribeClient, serviceName).withSource(address)
     }
 
@@ -161,8 +162,8 @@ sealed case class Reporter(client: Scribe[Future],
     * endpoint).
     */
   def createEntry(e: Throwable): LogEntry = {
-    var se = new ServiceException(
-        serviceName, e, Time.now, Trace.id.traceId.toLong)
+    var se =
+      new ServiceException(serviceName, e, Time.now, Trace.id.traceId.toLong)
 
     sourceAddress foreach { sa =>
       se = se withSource sa
@@ -171,8 +172,8 @@ sealed case class Reporter(client: Scribe[Future],
       se = se withClient ca
     }
 
-    LogEntry(
-        Reporter.scribeCategory, GZIPStringEncoder.encodeString(se.toJson))
+    LogEntry(Reporter.scribeCategory,
+             GZIPStringEncoder.encodeString(se.toJson))
   }
 
   /**

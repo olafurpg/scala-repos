@@ -113,8 +113,8 @@ trait Base {
         case JObject(fs) =>
           val r = fs
             .map(f => fromJSON[A](f.value).map(v => (f.name, v)))
-            .sequence[
-                PartialApply1Of2[ValidationNEL, Error]#Apply, (String, A)]
+            .sequence[PartialApply1Of2[ValidationNEL, Error]#Apply,
+                      (String, A)]
           r.map(_.toMap)
         case x => UnexpectedJSONError(x, classOf[JObject]).fail.liftFailNel
       }

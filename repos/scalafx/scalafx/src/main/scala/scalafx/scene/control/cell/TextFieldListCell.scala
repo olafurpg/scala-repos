@@ -79,8 +79,8 @@ object TextFieldListCell {
   /**
     * Added to satisfy Spec Texts.
     */
-  @deprecated(
-      message = "Use forListView[T](StringConverter[T])", since = "1.0")
+  @deprecated(message = "Use forListView[T](StringConverter[T])",
+              since = "1.0")
   def forListView[T](converter: jfxu.StringConverter[T]) =
     jfxscc.TextFieldListCell.forListView[T](converter)
 }

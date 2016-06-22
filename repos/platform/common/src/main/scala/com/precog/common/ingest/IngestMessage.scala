@@ -133,8 +133,8 @@ case class IngestMessage(apiKey: APIKey,
   }
 
   override def toString =
-    "IngestMessage(%s, %s, %s, (%d records), %s, %s, %s)".format(
-        apiKey, path, writeAs, data.size, jobId, timestamp, streamRef)
+    "IngestMessage(%s, %s, %s, (%d records), %s, %s, %s)"
+      .format(apiKey, path, writeAs, data.size, jobId, timestamp, streamRef)
 }
 
 object IngestMessage {
@@ -145,7 +145,7 @@ object IngestMessage {
 
   val schemaV1 =
     "apiKey" :: "path" :: "writeAs" :: "data" :: "jobId" :: "timestamp" ::
-    ("streamRef" ||| StreamRef.Append.asInstanceOf[StreamRef]) :: HNil
+      ("streamRef" ||| StreamRef.Append.asInstanceOf[StreamRef]) :: HNil
   implicit def seqExtractor[A: Extractor]: Extractor[Seq[A]] =
     implicitly[Extractor[List[A]]].map(_.toSeq)
 
@@ -164,35 +164,36 @@ object IngestMessage {
       override def validated(
           obj: JValue): Validation[Error, EventMessageExtraction] =
         obj.validated[Ingest]("event").flatMap { ingest =>
-          (obj.validated[Int]("producerId") |@| obj.validated[Int]("eventId")) {
-            (producerId, sequenceId) =>
-              val eventRecords =
-                ingest.data map { jv =>
-                  IngestRecord(EventId(producerId, sequenceId), jv)
-                }
-              ingest.writeAs map { authorities =>
-                assert(ingest.data.size == 1)
-                \/.right(IngestMessage(ingest.apiKey,
-                                       ingest.path,
-                                       authorities,
-                                       eventRecords,
-                                       ingest.jobId,
-                                       defaultTimestamp,
-                                       StreamRef.Append))
-              } getOrElse {
-                \/.left(
-                    (ingest.apiKey,
-                     ingest.path,
-                     (authorities: Authorities) =>
-                       IngestMessage(ingest.apiKey,
-                                     ingest.path,
-                                     authorities,
-                                     eventRecords,
-                                     ingest.jobId,
-                                     defaultTimestamp,
-                                     StreamRef.Append))
-                )
+          (obj.validated[Int]("producerId") |@| obj
+                .validated[Int]("eventId")) { (producerId, sequenceId) =>
+            val eventRecords =
+              ingest.data map { jv =>
+                IngestRecord(EventId(producerId, sequenceId), jv)
               }
+            ingest.writeAs map { authorities =>
+              assert(ingest.data.size == 1)
+              \/.right(
+                  IngestMessage(ingest.apiKey,
+                                ingest.path,
+                                authorities,
+                                eventRecords,
+                                ingest.jobId,
+                                defaultTimestamp,
+                                StreamRef.Append))
+            } getOrElse {
+              \/.left(
+                  (ingest.apiKey,
+                   ingest.path,
+                   (authorities: Authorities) =>
+                     IngestMessage(ingest.apiKey,
+                                   ingest.path,
+                                   authorities,
+                                   eventRecords,
+                                   ingest.jobId,
+                                   defaultTimestamp,
+                                   StreamRef.Append))
+              )
+            }
           }
         }
     }
@@ -227,14 +228,14 @@ object ArchiveMessage {
     extractorV[ArchiveMessage](schemaV1, Some("1.0".v))
   val extractorV0: Extractor[ArchiveMessage] = new Extractor[ArchiveMessage] {
     override def validated(obj: JValue): Validation[Error, ArchiveMessage] = {
-      (obj.validated[Int]("producerId") |@| obj.validated[Int]("deletionId") |@| obj
-            .validated[Archive]("deletion")) {
-        (producerId, sequenceId, archive) =>
-          ArchiveMessage(archive.apiKey,
-                         archive.path,
-                         archive.jobId,
-                         EventId(producerId, sequenceId),
-                         defaultTimestamp)
+      (obj.validated[Int]("producerId") |@| obj
+            .validated[Int]("deletionId") |@| obj.validated[Archive](
+              "deletion")) { (producerId, sequenceId, archive) =>
+        ArchiveMessage(archive.apiKey,
+                       archive.path,
+                       archive.jobId,
+                       EventId(producerId, sequenceId),
+                       defaultTimestamp)
       }
     }
   }

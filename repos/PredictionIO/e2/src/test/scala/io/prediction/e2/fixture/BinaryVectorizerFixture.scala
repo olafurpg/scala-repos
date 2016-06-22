@@ -37,8 +37,8 @@ trait BinaryVectorizerFixture {
     new {
       // Test case for checking food value not listed in base.maps, and
       // property not in properties.
-      val one = Array(
-          ("food", "burger"), ("music", "rock"), ("hobby", "scala"))
+      val one =
+        Array(("food", "burger"), ("music", "rock"), ("hobby", "scala"))
 
       // Test case for making sure indices are preserved.
       val twoA = Array(("food", "orange"), ("hobby", "scala"))

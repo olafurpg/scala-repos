@@ -44,22 +44,24 @@ import akka.actor.{ActorLogging, Props}
   *
   */
 private[io] class TcpManager(tcp: TcpExt)
-    extends SelectionHandler.SelectorBasedManager(
-        tcp.Settings, tcp.Settings.NrOfSelectors)
+    extends SelectionHandler.SelectorBasedManager(tcp.Settings,
+                                                  tcp.Settings.NrOfSelectors)
     with ActorLogging {
 
   def receive = workerForCommandHandler {
     case c: Connect ⇒
-      val commander =
-        sender() // cache because we create a function that will run asynchly
+      val commander = sender() // cache because we create a function that will run asynchly
       (registry ⇒
          Props(classOf[TcpOutgoingConnection], tcp, registry, commander, c))
 
     case b: Bind ⇒
-      val commander =
-        sender() // cache because we create a function that will run asynchly
+      val commander = sender() // cache because we create a function that will run asynchly
       (registry ⇒
-         Props(
-             classOf[TcpListener], selectorPool, tcp, registry, commander, b))
+         Props(classOf[TcpListener],
+               selectorPool,
+               tcp,
+               registry,
+               commander,
+               b))
   }
 }

@@ -50,8 +50,9 @@ object ProducerResponse {
   }
 }
 
-case class ProducerResponseStatus(
-    var error: Short, offset: Long, timestamp: Long = Message.NoTimestamp)
+case class ProducerResponseStatus(var error: Short,
+                                  offset: Long,
+                                  timestamp: Long = Message.NoTimestamp)
 
 case class ProducerResponse(
     correlationId: Int,

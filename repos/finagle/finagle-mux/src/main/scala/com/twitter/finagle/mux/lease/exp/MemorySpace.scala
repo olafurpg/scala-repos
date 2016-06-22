@@ -79,5 +79,5 @@ private[lease] class MemorySpace(
 
   override def toString(): String =
     "MemorySpace(left=" + left + ", discount=" + discount() + ", info=" +
-    info + ")"
+      info + ")"
 }

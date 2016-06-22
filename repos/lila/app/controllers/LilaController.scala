@@ -73,7 +73,8 @@ private[controllers] trait LilaController
     }
 
   protected def SocketOptionLimited[A: FrameFormatter](
-      consumer: TokenBucket.Consumer, name: String)(
+      consumer: TokenBucket.Consumer,
+      name: String)(
       f: Context => Fu[Option[(Iteratee[A, _], Enumerator[A])]]) =
     rateLimitedSocket[A](consumer, name) { ctx =>
       f(ctx) map {
@@ -85,8 +86,8 @@ private[controllers] trait LilaController
   protected def Open(f: Context => Fu[Result]): Action[Unit] =
     Open(BodyParsers.parse.empty)(f)
 
-  protected def Open[A](
-      p: BodyParser[A])(f: Context => Fu[Result]): Action[A] =
+  protected def Open[A](p: BodyParser[A])(
+      f: Context => Fu[Result]): Action[A] =
     Action.async(p) { req =>
       reqToCtx(req) flatMap { ctx =>
         Env.i18n.requestHandler.forUser(req, ctx.me).fold(f(ctx))(fuccess)
@@ -106,8 +107,8 @@ private[controllers] trait LilaController
   protected def Auth(f: Context => UserModel => Fu[Result]): Action[Unit] =
     Auth(BodyParsers.parse.empty)(f)
 
-  protected def Auth[A](
-      p: BodyParser[A])(f: Context => UserModel => Fu[Result]): Action[A] =
+  protected def Auth[A](p: BodyParser[A])(
+      f: Context => UserModel => Fu[Result]): Action[A] =
     Action.async(p) { req =>
       reqToCtx(req) flatMap { implicit ctx =>
         ctx.me.fold(authenticationFailed) { me =>
@@ -138,8 +139,8 @@ private[controllers] trait LilaController
       f: Context => UserModel => Fu[Result]): Action[AnyContent] =
     Secure(BodyParsers.parse.anyContent)(perm)(f)
 
-  protected def Secure[A](p: BodyParser[A])(
-      perm: Permission)(f: Context => UserModel => Fu[Result]): Action[A] =
+  protected def Secure[A](p: BodyParser[A])(perm: Permission)(
+      f: Context => UserModel => Fu[Result]): Action[A] =
     Auth(p) { implicit ctx => me =>
       isGranted(perm).fold(f(ctx)(me), fuccess(authorizationFailed(ctx.req)))
     }
@@ -154,8 +155,8 @@ private[controllers] trait LilaController
       f: BodyContext[_] => UserModel => Fu[Result]): Action[AnyContent] =
     SecureBody(BodyParsers.parse.anyContent)(perm(Permission))(f)
 
-  protected def Firewall[A <: Result](
-      a: => Fu[A])(implicit ctx: Context): Fu[Result] =
+  protected def Firewall[A <: Result](a: => Fu[A])(
+      implicit ctx: Context): Fu[Result] =
     Env.security.firewall.accepts(ctx.req) flatMap {
       _ fold
       (a, {
@@ -167,8 +168,8 @@ private[controllers] trait LilaController
       implicit ctx: Context): Fu[Result] =
     ctx.me.??(_.engine).fold(Forbidden(views.html.site.noEngine()).fuccess, a)
 
-  protected def NoBooster[A <: Result](
-      a: => Fu[A])(implicit ctx: Context): Fu[Result] =
+  protected def NoBooster[A <: Result](a: => Fu[A])(
+      implicit ctx: Context): Fu[Result] =
     ctx.me
       .??(_.booster)
       .fold(Forbidden(views.html.site.noBooster()).fuccess, a)
@@ -185,7 +186,8 @@ private[controllers] trait LilaController
             html = Lobby.renderHome(Results.Forbidden),
             api = _ =>
               fuccess {
-                Forbidden(jsonError(
+                Forbidden(
+                    jsonError(
                         s"Banned from playing for ${ban.remainingMinutes} minutes. Reason: Too many aborts or unplayed games"
                     )) as JSON
             }
@@ -193,15 +195,16 @@ private[controllers] trait LilaController
       }
     }
 
-  protected def NoCurrentGame(
-      a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
+  protected def NoCurrentGame(a: => Fu[Result])(
+      implicit ctx: Context): Fu[Result] =
     ctx.me.??(mashup.Preload.currentGame(Env.user.lightUser)) flatMap {
       _.fold(a) { current =>
         negotiate(
             html = Lobby.renderHome(Results.Forbidden),
             api = _ =>
               fuccess {
-                Forbidden(jsonError(
+                Forbidden(
+                    jsonError(
                         s"You are already playing ${current.opponent}"
                     )) as JSON
             }
@@ -236,10 +239,10 @@ private[controllers] trait LilaController
       Ok(a) as JAVASCRIPT withHeaders (headers: _*)
     }
 
-  protected def FormResult[A](form: Form[A])(
-      op: A => Fu[Result])(implicit req: Request[_]): Fu[Result] =
-    form.bindFromRequest.fold(
-        form => fuccess(BadRequest(form.errors mkString "\n")), op)
+  protected def FormResult[A](form: Form[A])(op: A => Fu[Result])(
+      implicit req: Request[_]): Fu[Result] =
+    form.bindFromRequest.fold(form =>
+          fuccess(BadRequest(form.errors mkString "\n")), op)
 
   protected def FormFuResult[A, B: Writeable: ContentTypeOf](form: Form[A])(
       err: Form[A] => Fu[B])(op: A => Fu[Result])(implicit req: Request[_]) =
@@ -250,8 +253,8 @@ private[controllers] trait LilaController
 
   protected def FuRedirect(fua: Fu[Call]) = fua map { Redirect(_) }
 
-  protected def OptionOk[A, B: Writeable: ContentTypeOf](
-      fua: Fu[Option[A]])(op: A => B)(implicit ctx: Context): Fu[Result] =
+  protected def OptionOk[A, B: Writeable: ContentTypeOf](fua: Fu[Option[A]])(
+      op: A => B)(implicit ctx: Context): Fu[Result] =
     OptionFuOk(fua) { a =>
       fuccess(op(a))
     }
@@ -260,8 +263,8 @@ private[controllers] trait LilaController
       op: A => Fu[B])(implicit ctx: Context) =
     fua flatMap { _.fold(notFound(ctx))(a => op(a) map { Ok(_) }) }
 
-  protected def OptionFuRedirect[A](fua: Fu[Option[A]])(
-      op: A => Fu[Call])(implicit ctx: Context) =
+  protected def OptionFuRedirect[A](fua: Fu[Option[A]])(op: A => Fu[Call])(
+      implicit ctx: Context) =
     fua flatMap {
       _.fold(notFound(ctx))(a =>
             op(a) map { b =>
@@ -304,8 +307,8 @@ private[controllers] trait LilaController
   protected def notFoundReq(req: RequestHeader): Fu[Result] =
     reqToCtx(req) flatMap (x => notFound(x))
 
-  protected def isGranted(
-      permission: Permission.type => Permission, user: UserModel): Boolean =
+  protected def isGranted(permission: Permission.type => Permission,
+                          user: UserModel): Boolean =
     Granter(permission(Permission))(user)
 
   protected def isGranted(permission: Permission.type => Permission)(
@@ -320,8 +323,8 @@ private[controllers] trait LilaController
     negotiate(
         html = fuccess {
           implicit val req = ctx.req
-          Redirect(routes.Auth.signup) withCookies LilaCookie.session(
-              Env.security.api.AccessUri, req.uri)
+          Redirect(routes.Auth.signup) withCookies LilaCookie
+            .session(Env.security.api.AccessUri, req.uri)
         },
         api = _ => unauthorizedApiResult.fuccess
     )
@@ -356,8 +359,8 @@ private[controllers] trait LilaController
       pageDataBuilder(ctx, d.??(_.hasFingerprint)) map { Context(ctx, _) }
     }
 
-  private def pageDataBuilder(
-      ctx: UserContext, hasFingerprint: Boolean): Fu[PageData] =
+  private def pageDataBuilder(ctx: UserContext,
+                              hasFingerprint: Boolean): Fu[PageData] =
     ctx.me.fold(fuccess(PageData anon blindMode(ctx))) { me =>
       val isPage = HTTPRequest.isSynchronousHttp(ctx.req)
       (Env.pref.api getPref me) zip {
@@ -367,7 +370,8 @@ private[controllers] trait LilaController
           import makeTimeout.short
           (Env.hub.actor.relation ? GetOnlineFriends(me.id) map {
                 case OnlineFriends(users) => users
-              } recover { case _ => Nil }) zip Env.team.api.nbRequests(me.id) zip Env.message.api
+              } recover { case _ => Nil }) zip Env.team.api
+            .nbRequests(me.id) zip Env.message.api
             .unreadIds(me.id) zip Env.challenge.api.countInFor(me.id)
         }
       } map {

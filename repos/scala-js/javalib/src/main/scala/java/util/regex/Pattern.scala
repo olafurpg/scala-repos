@@ -4,8 +4,9 @@ import scala.annotation.switch
 
 import scala.scalajs.js
 
-final class Pattern private (
-    jsRegExp: js.RegExp, _pattern: String, _flags: Int)
+final class Pattern private (jsRegExp: js.RegExp,
+                             _pattern: String,
+                             _flags: Int)
     extends Serializable {
 
   import Pattern._
@@ -141,8 +142,7 @@ object Pattern {
   private def tryFlagHack(pat: String, flags0: Int) = {
     val m = flagHackPat.exec(pat)
     if (m != null) {
-      val newPat =
-        pat.substring(m(0).get.length) // cut off the flag specifiers
+      val newPat = pat.substring(m(0).get.length) // cut off the flag specifiers
       val flags1 = m(1).fold(flags0) { chars =>
         chars.foldLeft(flags0) { (f, c) =>
           f | charToFlag(c)

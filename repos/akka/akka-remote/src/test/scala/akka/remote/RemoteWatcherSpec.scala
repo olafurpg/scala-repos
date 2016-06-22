@@ -85,7 +85,8 @@ class RemoteWatcherSpec
     remoteSystem.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
   def remoteAddressUid = AddressUidExtension(remoteSystem).addressUid
 
-  Seq(system, remoteSystem).foreach(muteDeadLetters(
+  Seq(system, remoteSystem).foreach(
+      muteDeadLetters(
           akka.remote.transport.AssociationHandle.Disassociated.getClass,
           akka.remote.transport.ActorTransportAdapter.DisassociateUnderlying.getClass)(
           _))
@@ -98,7 +99,8 @@ class RemoteWatcherSpec
 
   def createRemoteActor(props: Props, name: String): InternalActorRef = {
     remoteSystem.actorOf(props, name)
-    system.actorSelection(RootActorPath(remoteAddress) / "user" / name) ! Identify(
+    system
+      .actorSelection(RootActorPath(remoteAddress) / "user" / name) ! Identify(
         name)
     expectMsgType[ActorIdentity].ref.get.asInstanceOf[InternalActorRef]
   }
@@ -109,8 +111,9 @@ class RemoteWatcherSpec
 
       val fd = createFailureDetector()
       val monitorA = system.actorOf(Props[TestRemoteWatcher], "monitor1")
-      val monitorB = createRemoteActor(
-          Props(classOf[TestActorProxy], testActor), "monitor1")
+      val monitorB =
+        createRemoteActor(Props(classOf[TestActorProxy], testActor),
+                          "monitor1")
 
       val a1 =
         system.actorOf(Props[MyActor], "a1").asInstanceOf[InternalActorRef]
@@ -178,8 +181,9 @@ class RemoteWatcherSpec
                                    classOf[TestRemoteWatcher.Quarantined])
 
       val monitorA = system.actorOf(Props[TestRemoteWatcher], "monitor4")
-      val monitorB = createRemoteActor(
-          Props(classOf[TestActorProxy], testActor), "monitor4")
+      val monitorB =
+        createRemoteActor(Props(classOf[TestActorProxy], testActor),
+                          "monitor4")
 
       val a =
         system.actorOf(Props[MyActor], "a4").asInstanceOf[InternalActorRef]
@@ -222,11 +226,12 @@ class RemoteWatcherSpec
 
       val fd = createFailureDetector()
       val heartbeatExpectedResponseAfter = 2.seconds
-      val monitorA = system.actorOf(
-          Props(classOf[TestRemoteWatcher], heartbeatExpectedResponseAfter),
-          "monitor5")
-      val monitorB = createRemoteActor(
-          Props(classOf[TestActorProxy], testActor), "monitor5")
+      val monitorA = system.actorOf(Props(classOf[TestRemoteWatcher],
+                                          heartbeatExpectedResponseAfter),
+                                    "monitor5")
+      val monitorB =
+        createRemoteActor(Props(classOf[TestActorProxy], testActor),
+                          "monitor5")
 
       val a =
         system.actorOf(Props[MyActor], "a5").asInstanceOf[InternalActorRef]
@@ -264,8 +269,9 @@ class RemoteWatcherSpec
                                    classOf[TestRemoteWatcher.Quarantined])
 
       val monitorA = system.actorOf(Props[TestRemoteWatcher], "monitor6")
-      val monitorB = createRemoteActor(
-          Props(classOf[TestActorProxy], testActor), "monitor6")
+      val monitorB =
+        createRemoteActor(Props(classOf[TestActorProxy], testActor),
+                          "monitor6")
 
       val a =
         system.actorOf(Props[MyActor], "a6").asInstanceOf[InternalActorRef]

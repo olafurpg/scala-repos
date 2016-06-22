@@ -30,12 +30,13 @@ class FlattenProjections extends Phase {
         res
       case p: PathElement =>
         logger.debug("Analyzing " + p.pathString +
-                     " with symbols " + translations.keySet.mkString(", "),
+                       " with symbols " + translations.keySet.mkString(", "),
                      p)
         val p2 = splitPath(p, translations.keySet) match {
           case Some((base, rest, tsym)) =>
-            logger.debug("Found " + p.pathString + " with local part " +
-                Path.toString(rest) + " over " + tsym)
+            logger.debug(
+                "Found " + p.pathString + " with local part " +
+                  Path.toString(rest) + " over " + tsym)
             val paths = translations(tsym)
             logger.debug(s"  Translation for $tsym: $paths")
             Select(base.untypedPath, paths(rest))

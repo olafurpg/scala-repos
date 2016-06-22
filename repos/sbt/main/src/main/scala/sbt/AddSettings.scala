@@ -23,8 +23,7 @@ object AddSettings {
   private[sbt] final object BuildScalaFiles extends AddSettings
 
   /** Adds all settings from autoplugins. */
-  val autoPlugins: AddSettings =
-    new AutoPlugins(const(true)) // Note: We do not expose fine-grained autoplugins because
+  val autoPlugins: AddSettings = new AutoPlugins(const(true)) // Note: We do not expose fine-grained autoplugins because
   // it's dangerous to control at that level right now.
   // Leaving the hook in place in case we need to expose
   // it, but most likely it will remain locked out

@@ -86,8 +86,9 @@ object CanZipMapKeyValues {
       arr
     }
 
-    override def mapActive(
-        from: Array[V], from2: Array[V], fn: (Int, V, V) => RV): Array[RV] = {
+    override def mapActive(from: Array[V],
+                           from2: Array[V],
+                           fn: (Int, V, V) => RV): Array[RV] = {
       map(from, from2, fn)
     }
   }

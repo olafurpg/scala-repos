@@ -393,7 +393,8 @@ abstract class UnixTime extends BinaryExpression with ExpectsInputTypes {
           t.asInstanceOf[Long] / 1000000L
         case StringType if right.foldable =>
           if (constFormat != null) {
-            Try(new SimpleDateFormat(constFormat.toString)
+            Try(
+                new SimpleDateFormat(constFormat.toString)
                   .parse(t.asInstanceOf[UTF8String].toString)
                   .getTime / 1000L).getOrElse(null)
           } else {
@@ -405,7 +406,8 @@ abstract class UnixTime extends BinaryExpression with ExpectsInputTypes {
             null
           } else {
             val formatString = f.asInstanceOf[UTF8String].toString
-            Try(new SimpleDateFormat(formatString)
+            Try(
+                new SimpleDateFormat(formatString)
                   .parse(t.asInstanceOf[UTF8String].toString)
                   .getTime / 1000L).getOrElse(null)
           }
@@ -460,7 +462,8 @@ abstract class UnixTime extends BinaryExpression with ExpectsInputTypes {
         s"""
           ${eval1.code}
           boolean ${ev.isNull} = ${eval1.isNull};
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
           if (!${ev.isNull}) {
             ${ev.value} = ${eval1.value} / 1000000L;
           }
@@ -471,7 +474,8 @@ abstract class UnixTime extends BinaryExpression with ExpectsInputTypes {
         s"""
           ${eval1.code}
           boolean ${ev.isNull} = ${eval1.isNull};
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
           if (!${ev.isNull}) {
             ${ev.value} = $dtu.daysToMillis(${eval1.value}) / 1000L;
           }
@@ -529,7 +533,8 @@ case class FromUnixTime(sec: Expression, format: Expression)
         if (f == null) {
           null
         } else {
-          Try(UTF8String.fromString(new SimpleDateFormat(
+          Try(
+              UTF8String.fromString(new SimpleDateFormat(
                       f.asInstanceOf[UTF8String].toString).format(
                       new java.util.Date(time.asInstanceOf[Long] * 1000L))))
             .getOrElse(null)
@@ -544,14 +549,16 @@ case class FromUnixTime(sec: Expression, format: Expression)
       if (constFormat == null) {
         s"""
           boolean ${ev.isNull} = true;
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
         """
       } else {
         val t = left.gen(ctx)
         s"""
           ${t.code}
           boolean ${ev.isNull} = ${t.isNull};
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
           if (!${ev.isNull}) {
             try {
               ${ev.value} = UTF8String.fromString(new $sdf("${constFormat.toString}").format(
@@ -681,8 +688,9 @@ case class TimeAdd(start: Expression, interval: Expression)
 
   override def nullSafeEval(start: Any, interval: Any): Any = {
     val itvl = interval.asInstanceOf[CalendarInterval]
-    DateTimeUtils.timestampAddInterval(
-        start.asInstanceOf[Long], itvl.months, itvl.microseconds)
+    DateTimeUtils.timestampAddInterval(start.asInstanceOf[Long],
+                                       itvl.months,
+                                       itvl.microseconds)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -706,8 +714,8 @@ case class FromUTCTimestamp(left: Expression, right: Expression)
   override def prettyName: String = "from_utc_timestamp"
 
   override def nullSafeEval(time: Any, timezone: Any): Any = {
-    DateTimeUtils.fromUTCTime(
-        time.asInstanceOf[Long], timezone.asInstanceOf[UTF8String].toString)
+    DateTimeUtils.fromUTCTime(time.asInstanceOf[Long],
+                              timezone.asInstanceOf[UTF8String].toString)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -722,8 +730,9 @@ case class FromUTCTimestamp(left: Expression, right: Expression)
       } else {
         val tzTerm = ctx.freshName("tz")
         val tzClass = classOf[TimeZone].getName
-        ctx.addMutableState(
-            tzClass, tzTerm, s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
+        ctx.addMutableState(tzClass,
+                            tzTerm,
+                            s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
         val eval = left.gen(ctx)
         s"""
            |${eval.code}
@@ -761,8 +770,9 @@ case class TimeSub(start: Expression, interval: Expression)
 
   override def nullSafeEval(start: Any, interval: Any): Any = {
     val itvl = interval.asInstanceOf[CalendarInterval]
-    DateTimeUtils.timestampAddInterval(
-        start.asInstanceOf[Long], 0 - itvl.months, 0 - itvl.microseconds)
+    DateTimeUtils.timestampAddInterval(start.asInstanceOf[Long],
+                                       0 - itvl.months,
+                                       0 - itvl.microseconds)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -788,8 +798,8 @@ case class AddMonths(startDate: Expression, numMonths: Expression)
   override def dataType: DataType = DateType
 
   override def nullSafeEval(start: Any, months: Any): Any = {
-    DateTimeUtils.dateAddMonths(
-        start.asInstanceOf[Int], months.asInstanceOf[Int])
+    DateTimeUtils
+      .dateAddMonths(start.asInstanceOf[Int], months.asInstanceOf[Int])
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -844,8 +854,8 @@ case class ToUTCTimestamp(left: Expression, right: Expression)
   override def prettyName: String = "to_utc_timestamp"
 
   override def nullSafeEval(time: Any, timezone: Any): Any = {
-    DateTimeUtils.toUTCTime(
-        time.asInstanceOf[Long], timezone.asInstanceOf[UTF8String].toString)
+    DateTimeUtils.toUTCTime(time.asInstanceOf[Long],
+                            timezone.asInstanceOf[UTF8String].toString)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -860,8 +870,9 @@ case class ToUTCTimestamp(left: Expression, right: Expression)
       } else {
         val tzTerm = ctx.freshName("tz")
         val tzClass = classOf[TimeZone].getName
-        ctx.addMutableState(
-            tzClass, tzTerm, s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
+        ctx.addMutableState(tzClass,
+                            tzTerm,
+                            s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
         val eval = left.gen(ctx)
         s"""
            |${eval.code}
@@ -921,12 +932,11 @@ case class TruncDate(date: Expression, format: Expression)
     DateTimeUtils.parseTruncLevel(format.eval().asInstanceOf[UTF8String])
 
   override def eval(input: InternalRow): Any = {
-    val level =
-      if (format.foldable) {
-        truncLevel
-      } else {
-        DateTimeUtils.parseTruncLevel(format.eval().asInstanceOf[UTF8String])
-      }
+    val level = if (format.foldable) {
+      truncLevel
+    } else {
+      DateTimeUtils.parseTruncLevel(format.eval().asInstanceOf[UTF8String])
+    }
     if (level == -1) {
       // unknown format
       null
@@ -947,14 +957,16 @@ case class TruncDate(date: Expression, format: Expression)
       if (truncLevel == -1) {
         s"""
           boolean ${ev.isNull} = true;
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
         """
       } else {
         val d = date.gen(ctx)
         s"""
           ${d.code}
           boolean ${ev.isNull} = ${d.isNull};
-          ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
+          ${ctx.javaType(dataType)} ${ev.value} = ${ctx
+          .defaultValue(dataType)};
           if (!${ev.isNull}) {
             ${ev.value} = $dtu.truncDate(${d.value}, $truncLevel);
           }

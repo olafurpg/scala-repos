@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Equal` */
-final class EqualOps[F] private[syntax](val self: F)(implicit val F: Equal[F])
+final class EqualOps[F] private[syntax] (val self: F)(implicit val F: Equal[F])
     extends Ops[F] {
   ////
 

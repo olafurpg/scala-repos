@@ -109,8 +109,10 @@ class CircuitBreaker(
     */
   @inline
   private[this] def swapState(oldState: State, newState: State): Boolean =
-    Unsafe.instance.compareAndSwapObject(
-        this, AbstractCircuitBreaker.stateOffset, oldState, newState)
+    Unsafe.instance.compareAndSwapObject(this,
+                                         AbstractCircuitBreaker.stateOffset,
+                                         oldState,
+                                         newState)
 
   /**
     * Helper method for accessing underlying state via Unsafe

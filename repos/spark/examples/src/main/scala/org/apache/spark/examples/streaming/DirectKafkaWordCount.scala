@@ -59,7 +59,9 @@ object DirectKafkaWordCount {
     val kafkaParams = Map[String, String]("metadata.broker.list" -> brokers)
     val messages = KafkaUtils
       .createDirectStream[String, String, StringDecoder, StringDecoder](
-        ssc, kafkaParams, topicsSet)
+          ssc,
+          kafkaParams,
+          topicsSet)
 
     // Get the lines, split them into words, count the words and print
     val lines = messages.map(_._2)

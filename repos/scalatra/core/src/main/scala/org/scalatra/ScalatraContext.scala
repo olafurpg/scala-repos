@@ -68,7 +68,8 @@ trait ScalatraContext
   }
 
   protected[this] implicit def scalatraContext: ScalatraContext = {
-    new StableValuesContext()(
-        HttpServletRequestReadOnly(request), response, servletContext)
+    new StableValuesContext()(HttpServletRequestReadOnly(request),
+                              response,
+                              servletContext)
   }
 }

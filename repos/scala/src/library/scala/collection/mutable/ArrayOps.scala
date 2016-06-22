@@ -80,8 +80,7 @@ trait ArrayOps[T]
   def flatten[U](implicit asTrav: T => scala.collection.Traversable[U],
                  m: ClassTag[U]): Array[U] = {
     val b = Array.newBuilder[U]
-    b.sizeHint(
-        map {
+    b.sizeHint(map {
       case is: scala.collection.IndexedSeq[_] => is.size
       case _ => 0
     }.sum)

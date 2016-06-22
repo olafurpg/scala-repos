@@ -92,15 +92,15 @@ object FutureCache {
     * A [[com.twitter.cache.FutureCache]] backed by a
     * [[java.util.concurrent.ConcurrentMap]].
     */
-  def fromMap[K, V](
-      fn: K => Future[V], map: ConcurrentMap[K, Future[V]]): K => Future[V] =
+  def fromMap[K, V](fn: K => Future[V],
+                    map: ConcurrentMap[K, Future[V]]): K => Future[V] =
     default(fn, new ConcurrentMapCache(map))
 
   /**
     * Encodes keys, producing a Cache that takes keys of a different type.
     */
-  def keyEncoded[K, V, U](
-      encode: K => V, cache: FutureCache[V, U]): FutureCache[K, U] =
+  def keyEncoded[K, V, U](encode: K => V,
+                          cache: FutureCache[V, U]): FutureCache[K, U] =
     new KeyEncodingCache(encode, cache)
 
   /**
@@ -110,8 +110,8 @@ object FutureCache {
     *
     * @see [[standard]] for the equivalent Java API.
     */
-  def default[K, V](
-      fn: K => Future[V], cache: FutureCache[K, V]): K => Future[V] =
+  def default[K, V](fn: K => Future[V],
+                    cache: FutureCache[K, V]): K => Future[V] =
     AsyncMemoize(fn, new EvictingCache(cache)) andThen { f: Future[V] =>
       f.interruptible()
     }
@@ -119,7 +119,7 @@ object FutureCache {
   /**
     * Alias for [[default]] which can be called from Java.
     */
-  def standard[K, V](
-      fn: K => Future[V], cache: FutureCache[K, V]): K => Future[V] =
+  def standard[K, V](fn: K => Future[V],
+                     cache: FutureCache[K, V]): K => Future[V] =
     default(fn, cache)
 }

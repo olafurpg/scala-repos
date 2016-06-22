@@ -83,12 +83,14 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
     private[SchedulingActor] case class RemoveTaskFromQueue(id: UUID)
         extends SchedulingMessage
 
-    private[SchedulingActor] case class TaskComplete(
-        id: UUID, endedAt: DateTime, total: Long, error: Option[String])
+    private[SchedulingActor] case class TaskComplete(id: UUID,
+                                                     endedAt: DateTime,
+                                                     total: Long,
+                                                     error: Option[String])
         extends SchedulingMessage
 
-    private[SchedulingActor] case class TaskInProgress(
-        task: ScheduledTask, startedAt: DateTime)
+    private[SchedulingActor] case class TaskInProgress(task: ScheduledTask,
+                                                       startedAt: DateTime)
   }
 
   class SchedulingActor(
@@ -197,8 +199,8 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
         // We don't allow for more than one concurrent instance of a given task
         Promise successful PrecogUnit
       } else {
-        def consumeStream(
-            totalSize: Long, stream: StreamT[Future, Slice]): Future[Long] = {
+        def consumeStream(totalSize: Long,
+                          stream: StreamT[Future, Slice]): Future[Long] = {
           stream.uncons flatMap {
             case Some((x, xs)) => consumeStream(totalSize + x.size, xs)
             case None => M.point(totalSize)
@@ -211,11 +213,11 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
         implicit val readTimeout = resourceTimeout
 
         // This cannot occur inside a Future, or we would be exposing Actor state outside of this thread
-        running += ((task.source, task.sink) -> TaskInProgress(task, startedAt))
+        running += ((task.source, task.sink) -> TaskInProgress(task,
+                                                               startedAt))
 
         val execution = for {
-          basePath <- EitherT(
-                         M point {
+          basePath <- EitherT(M point {
                        task.source.prefix \/> invalidState(
                            "Path %s cannot be relativized.".format(
                                task.source.path))
@@ -234,7 +236,7 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
               M point {
                 logger.error(
                     "An error was encountered processing a scheduled query execution: " +
-                    failure)
+                      failure)
                 ourself ! TaskComplete(task.id,
                                        clock.now(),
                                        0,
@@ -268,8 +270,8 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
           identity[Future[PrecogUnit]]
         } onFailure {
           case t: Throwable =>
-            logger.error(
-                "Scheduled query execution failed by thrown error.", t)
+            logger.error("Scheduled query execution failed by thrown error.",
+                         t)
             ourself ! TaskComplete(task.id,
                                    clock.now(),
                                    0,
@@ -280,8 +282,13 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
     }
 
     def receive = {
-      case AddTask(
-          repeat, apiKey, authorities, context, source, sink, timeout) =>
+      case AddTask(repeat,
+                   apiKey,
+                   authorities,
+                   context,
+                   source,
+                   sink,
+                   timeout) =>
         val ourself = self
         val taskId = UUID.randomUUID()
         val newTask = ScheduledTask(taskId,

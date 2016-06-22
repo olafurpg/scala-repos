@@ -146,7 +146,8 @@ object union {
     }
 
     implicit def cconsFields[K, V, T <: Coproduct](
-        implicit key: Witness.Aux[K], tailFields: Fields[T])
+        implicit key: Witness.Aux[K],
+        tailFields: Fields[T])
       : Aux[FieldType[K, V] :+: T, (K, V) :+: tailFields.Out] =
       new Fields[FieldType[K, V] :+: T] {
         type Out = (K, V) :+: tailFields.Out
@@ -241,7 +242,8 @@ object union {
       }
 
     implicit def cconsMapValues[HF, K, V, T <: Coproduct](
-        implicit hc: Case1[HF, V], tailMapValues: MapValues[HF, T])
+        implicit hc: Case1[HF, V],
+        tailMapValues: MapValues[HF, T])
       : Aux[HF,
             FieldType[K, V] :+: T,
             FieldType[K, hc.Result] :+: tailMapValues.Out] =

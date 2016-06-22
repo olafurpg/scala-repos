@@ -242,7 +242,9 @@ class PartitioningSuite
     assert(grouped2.map(_ => 1).partitioner === None)
     assert(grouped2.mapValues(_ => 1).partitioner === grouped2.partitioner)
     assert(
-        grouped2.flatMapValues(_ => Seq(1)).partitioner === grouped2.partitioner)
+        grouped2
+          .flatMapValues(_ => Seq(1))
+          .partitioner === grouped2.partitioner)
     assert(grouped2.filter(_._1 > 4).partitioner === grouped2.partitioner)
   }
 

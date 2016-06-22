@@ -21,7 +21,7 @@ private[round] final class Rematcher(messenger: Messenger,
   def yes(pov: Pov): Fu[Events] = pov match {
     case Pov(game, color) if (game playerCanRematch color) =>
       (game.opponent(color).isOfferingRematch ||
-          game.opponent(color).isAi).fold(
+            game.opponent(color).isAi).fold(
           game.next.fold(rematchJoin(pov))(rematchExists(pov)),
           rematchCreate(pov)
       )
@@ -54,9 +54,9 @@ private[round] final class Rematcher(messenger: Messenger,
   private def rematchJoin(pov: Pov): Fu[Events] =
     for {
       nextGame ← returnGame(pov) map (_.start)
-      _ ← (GameRepo insertDenormalized nextGame) >> GameRepo.saveNext(
-             pov.game, nextGame.id) >>- messenger.system(
-             pov.game, _.rematchOfferAccepted) >>- {
+      _ ← (GameRepo insertDenormalized nextGame) >> GameRepo
+           .saveNext(pov.game, nextGame.id) >>- messenger
+           .system(pov.game, _.rematchOfferAccepted) >>- {
            isRematchCache.put(nextGame.id)
            if (pov.game.variant == Chess960 &&
                !rematch960Cache.get(pov.game.id))
@@ -107,8 +107,9 @@ private[round] final class Rematcher(messenger: Messenger,
           daysPerTurn = pov.game.daysPerTurn,
           pgnImport = None)
 
-  private def returnPlayer(
-      game: Game, color: ChessColor, users: List[User]): lila.game.Player = {
+  private def returnPlayer(game: Game,
+                           color: ChessColor,
+                           users: List[User]): lila.game.Player = {
     val player = lila.game.Player
       .make(color = color, aiLevel = game.opponent(color).aiLevel)
     game

@@ -91,7 +91,10 @@ object ScalaTestingWithDatabases extends Specification {
       //#in-memory
 
       try {
-        database.getConnection().getMetaData.getDatabaseProductName must_== "H2"
+        database
+          .getConnection()
+          .getMetaData
+          .getDatabaseProductName must_== "H2"
       } finally {
         database.shutdown()
       }
@@ -113,7 +116,10 @@ object ScalaTestingWithDatabases extends Specification {
       //#in-memory-full-config
 
       try {
-        database.getConnection().getMetaData.getDatabaseProductName must_== "H2"
+        database
+          .getConnection()
+          .getMetaData
+          .getDatabaseProductName must_== "H2"
       } finally {
         //#in-memory-shutdown
         database.shutdown()
@@ -194,34 +200,36 @@ object ScalaTestingWithDatabases extends Specification {
         Evolutions.cleanupEvolutions(database)
         //#cleanup-evolutions-simple
 
-        connection.prepareStatement("select * from test").executeQuery() must throwAn[
-            SQLException]
+        connection
+          .prepareStatement("select * from test")
+          .executeQuery() must throwAn[SQLException]
     }
 
     "allow running evolutions from a custom path" in play.api.db.Databases
       .withInMemory() { database =>
-      //#apply-evolutions-custom-path
-      import play.api.db.evolutions._
+        //#apply-evolutions-custom-path
+        import play.api.db.evolutions._
 
-      Evolutions.applyEvolutions(
-          database, ClassLoaderEvolutionsReader.forPrefix("testdatabase/"))
-      //#apply-evolutions-custom-path
-      ok
-    }
+        Evolutions.applyEvolutions(
+            database,
+            ClassLoaderEvolutionsReader.forPrefix("testdatabase/"))
+        //#apply-evolutions-custom-path
+        ok
+      }
 
     "allow play to manage evolutions for you" in play.api.db.Databases
       .withInMemory() { database =>
-      //#with-evolutions
-      import play.api.db.evolutions._
+        //#with-evolutions
+        import play.api.db.evolutions._
 
-      Evolutions.withEvolutions(database) {
-        val connection = database.getConnection()
+        Evolutions.withEvolutions(database) {
+          val connection = database.getConnection()
 
-        // ...
+          // ...
+        }
+        //#with-evolutions
+        ok
       }
-      //#with-evolutions
-      ok
-    }
 
     "allow simple composition of with database and with evolutions" in {
       //#with-evolutions-custom

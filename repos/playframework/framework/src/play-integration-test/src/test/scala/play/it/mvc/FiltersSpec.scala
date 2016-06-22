@@ -56,8 +56,10 @@ trait DefaultFiltersSpec extends FiltersSpec {
       override lazy val httpFilters: Seq[EssentialFilter] = makeFilters(
           materializer)
       override lazy val httpErrorHandler = errorHandler.getOrElse(
-          new DefaultHttpErrorHandler(
-              environment, configuration, sourceMapper, Some(router))
+          new DefaultHttpErrorHandler(environment,
+                                      configuration,
+                                      sourceMapper,
+                                      Some(router))
       )
     }.application
 
@@ -245,7 +247,8 @@ trait FiltersSpec extends Specification with ServerIntegrationSpecification {
     }
 
     "Filters work even if one of them does not call next" in withServer()(
-        ErrorHandlingFilter, SkipNextFilter) { ws =>
+        ErrorHandlingFilter,
+        SkipNextFilter) { ws =>
       val response = Await.result(ws.url("/ok").get(), Duration.Inf)
       response.status must_== 200
       response.body must_== SkipNextFilter.expectedText
@@ -273,15 +276,18 @@ trait FiltersSpec extends Specification with ServerIntegrationSpecification {
         next(request.copy(headers = addCustomHeader(request.headers)))
       }
       def addCustomHeader(originalHeaders: Headers): Headers = {
-        FakeHeaders(originalHeaders.headers :+
-            (filterAddedHeaderKey -> filterAddedHeaderVal))
+        FakeHeaders(
+            originalHeaders.headers :+
+              (filterAddedHeaderKey -> filterAddedHeaderVal))
       }
     }
 
     object CustomErrorHandler extends HttpErrorHandler {
-      def onClientError(
-          request: RequestHeader, statusCode: Int, message: String) = {
-        Future.successful(Results.NotFound(request.headers
+      def onClientError(request: RequestHeader,
+                        statusCode: Int,
+                        message: String) = {
+        Future.successful(
+            Results.NotFound(request.headers
                   .get(filterAddedHeaderKey)
                   .getOrElse("undefined header")))
       }

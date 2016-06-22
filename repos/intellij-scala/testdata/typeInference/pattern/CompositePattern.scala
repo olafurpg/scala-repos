@@ -6,9 +6,9 @@ object CompositePattern {
     val x: C = new C
     x match {
       case t @ (_: A | _: B) => {
-          /*start*/
-          t /*end*/
-        }
+        /*start*/
+        t /*end*/
+      }
       case _ =>
     }
   }

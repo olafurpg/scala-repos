@@ -282,8 +282,8 @@ object Test {
                          rows: (A, B, C, D, E)*): Tuple5[A, B, C, D, E] = null
   def foo[A, B, C, D](heading: (String, String, String, String),
                       rows: (A, B, C, D)*): Tuple4[A, B, C, D] = null
-  def foo[A, B, C](
-      heading: (String, String, String), rows: (A, B, C)*): Tuple3[A, B, C] =
+  def foo[A, B, C](heading: (String, String, String),
+                   rows: (A, B, C)*): Tuple3[A, B, C] =
     null
   def foo[A, B](heading: (String, String), rows: (A, B)*): Tuple2[A, B] = null
   def foo[A](heading: String, rows: A*): Tuple1[A] = null

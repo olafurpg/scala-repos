@@ -145,8 +145,7 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
     abstract class Op2(namespace: Vector[String], name: String)
         extends Morphism2(namespace, name)
         with Op2Like {
-      val alignment = MorphismAlignment.Match(
-          M.point {
+      val alignment = MorphismAlignment.Match(M.point {
         new Morph1Apply {
           def apply(input: Table, ctx: MorphContext) =
             sys.error("morphism application of an op2 is wrong")
@@ -154,14 +153,16 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
       })
 
       def spec[A <: SourceType](ctx: MorphContext)(
-          left: TransSpec[A], right: TransSpec[A]): TransSpec[A]
+          left: TransSpec[A],
+          right: TransSpec[A]): TransSpec[A]
 
       def fold[A](op2: Op2 => A, op2F2: Op2F2 => A): A = op2(this)
     }
 
     trait Op2Array extends Op2 {
       def spec[A <: SourceType](ctx: MorphContext)(
-          left: TransSpec[A], right: TransSpec[A]): TransSpec[A] = {
+          left: TransSpec[A],
+          right: TransSpec[A]): TransSpec[A] = {
         trans.MapWith(trans.InnerArrayConcat(
                           trans.WrapArray(trans.Map1(left, prepare)),
                           trans.WrapArray(trans.Map1(right, prepare))),
@@ -176,7 +177,8 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
     abstract class Op2F2(namespace: Vector[String], name: String)
         extends Op2(namespace, name) {
       def spec[A <: SourceType](ctx: MorphContext)(
-          left: TransSpec[A], right: TransSpec[A]): TransSpec[A] =
+          left: TransSpec[A],
+          right: TransSpec[A]): TransSpec[A] =
         trans.Map2(left, right, f2(ctx))
 
       def f2(ctx: MorphContext): F2
@@ -186,8 +188,8 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
       override def fold[A](op2: Op2 => A, op2F2: Op2F2 => A): A = op2F2(this)
     }
 
-    abstract class Reduction(
-        val namespace: Vector[String], val name: String)(implicit M: Monad[M])
+    abstract class Reduction(val namespace: Vector[String], val name: String)(
+        implicit M: Monad[M])
         extends ReductionLike
         with Morph1Apply {
       val opcode: Int = defaultReductionOpcode.getAndIncrement
@@ -213,8 +215,8 @@ trait ColumnarTableLibModule[M[+ _]]
     extends TableLibModule[M]
     with ColumnarTableModule[M] {
   trait ColumnarTableLib extends TableLib {
-    class WrapArrayTableReduction(
-        val r: Reduction, val jtypef: Option[JType => JType])
+    class WrapArrayTableReduction(val r: Reduction,
+                                  val jtypef: Option[JType => JType])
         extends Reduction(r.namespace, r.name) {
       type Result = r.Result
       val tpe = r.tpe
@@ -247,54 +249,55 @@ trait ColumnarTableLibModule[M[+ _]]
               acc: Reduction): Reduction = {
         reductions match {
           case (x, jtypef) :: xs => {
-              val impl = new Reduction(Vector(), "") {
-                type Result = (x.Result, acc.Result)
+            val impl = new Reduction(Vector(), "") {
+              type Result = (x.Result, acc.Result)
 
-                def reducer(ctx: MorphContext) = new CReducer[Result] {
-                  def reduce(schema: CSchema, range: Range): Result = {
-                    jtypef match {
-                      case Some(f) =>
-                        val cols0 = new CSchema {
-                          def columnRefs = schema.columnRefs
-                          def columns(tpe: JType) = schema.columns(f(tpe))
-                        }
-                        (x.reducer(ctx).reduce(cols0, range),
-                         acc.reducer(ctx).reduce(schema, range))
-                      case None =>
-                        (x.reducer(ctx).reduce(schema, range),
-                         acc.reducer(ctx).reduce(schema, range))
-                    }
+              def reducer(ctx: MorphContext) = new CReducer[Result] {
+                def reduce(schema: CSchema, range: Range): Result = {
+                  jtypef match {
+                    case Some(f) =>
+                      val cols0 = new CSchema {
+                        def columnRefs = schema.columnRefs
+                        def columns(tpe: JType) = schema.columns(f(tpe))
+                      }
+                      (x.reducer(ctx).reduce(cols0, range),
+                       acc.reducer(ctx).reduce(schema, range))
+                    case None =>
+                      (x.reducer(ctx).reduce(schema, range),
+                       acc.reducer(ctx).reduce(schema, range))
                   }
                 }
-
-                implicit val monoid: Monoid[Result] = new Monoid[Result] {
-                  def zero = (x.monoid.zero, acc.monoid.zero)
-                  def append(r1: Result, r2: => Result): Result = {
-                    (x.monoid.append(r1._1, r2._1),
-                     acc.monoid.append(r1._2, r2._2))
-                  }
-                }
-
-                def extract(r: Result): Table = {
-                  import trans._
-
-                  val left = x.extract(r._1)
-                  val right = acc.extract(r._2)
-
-                  left.cross(right)(OuterArrayConcat(
-                          WrapArray(Leaf(SourceLeft)), Leaf(SourceRight)))
-                }
-
-                // TODO: Can't translate this into a CValue. Evaluator
-                // won't inline the results. See call to inlineNodeValue
-                def extractValue(res: Result) = None
-
-                val tpe = UnaryOperationType(
-                    JUnionT(x.tpe.arg, acc.tpe.arg), JArrayUnfixedT)
               }
 
-              rec(xs, impl)
+              implicit val monoid: Monoid[Result] = new Monoid[Result] {
+                def zero = (x.monoid.zero, acc.monoid.zero)
+                def append(r1: Result, r2: => Result): Result = {
+                  (x.monoid.append(r1._1, r2._1),
+                   acc.monoid.append(r1._2, r2._2))
+                }
+              }
+
+              def extract(r: Result): Table = {
+                import trans._
+
+                val left = x.extract(r._1)
+                val right = acc.extract(r._2)
+
+                left.cross(right)(
+                    OuterArrayConcat(WrapArray(Leaf(SourceLeft)),
+                                     Leaf(SourceRight)))
+              }
+
+              // TODO: Can't translate this into a CValue. Evaluator
+              // won't inline the results. See call to inlineNodeValue
+              def extractValue(res: Result) = None
+
+              val tpe = UnaryOperationType(JUnionT(x.tpe.arg, acc.tpe.arg),
+                                           JArrayUnfixedT)
             }
+
+            rec(xs, impl)
+          }
 
           case Nil => acc
         }
@@ -372,8 +375,9 @@ object StdLib {
       def apply(row: Int) = f(c(row))
     }
 
-    class N(
-        c: NumColumn, defined: BigDecimal => Boolean, f: BigDecimal => String)
+    class N(c: NumColumn,
+            defined: BigDecimal => Boolean,
+            f: BigDecimal => String)
         extends Map1Column(c)
         with StrColumn {
 
@@ -393,8 +397,9 @@ object StdLib {
       def apply(row: Int) = f(c(row))
     }
 
-    class Dt(
-        c: DateColumn, defined: DateTime => Boolean, f: DateTime => String)
+    class Dt(c: DateColumn,
+             defined: DateTime => Boolean,
+             f: DateTime => String)
         extends Map1Column(c)
         with StrColumn {
 
@@ -426,7 +431,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && c1(row) != null &&
-        doubleIsDefined(c2(row)) && defined(c1(row), c2(row))
+          doubleIsDefined(c2(row)) && defined(c1(row), c2(row))
 
       def apply(row: Int) = f(c1(row), c2(row))
     }
@@ -562,7 +567,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row)) &&
-        doubleIsDefined(apply(row))
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c(row))
     }
@@ -573,7 +578,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row).toDouble) &&
-        doubleIsDefined(apply(row))
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c(row))
     }
@@ -584,7 +589,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row).toDouble) &&
-        doubleIsDefined(apply(row))
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c(row).toDouble)
     }
@@ -598,7 +603,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row)) &&
-        doubleIsDefined(apply(row))
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c1(row), c2(row))
     }
@@ -612,7 +617,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row).toDouble) &&
-        doubleIsDefined(apply(row))
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c1(row), c2(row).toDouble)
     }
@@ -626,7 +631,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row).toDouble) &&
-        doubleIsDefined(apply(row))
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c1(row), c2(row).toDouble)
     }
@@ -640,7 +645,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row).toDouble, c2(row)) &&
-        doubleIsDefined(apply(row))
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c1(row).toDouble, c2(row))
     }
@@ -654,8 +659,8 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
-        defined(c1(row).toDouble, c2(row).toDouble) &&
-        doubleIsDefined(apply(row))
+          defined(c1(row).toDouble, c2(row).toDouble) &&
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c1(row).toDouble, c2(row).toDouble)
     }
@@ -669,8 +674,8 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
-        defined(c1(row).toDouble, c2(row).toDouble) &&
-        doubleIsDefined(apply(row))
+          defined(c1(row).toDouble, c2(row).toDouble) &&
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c1(row).toDouble, c2(row).toDouble)
     }
@@ -684,7 +689,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row).toDouble, c2(row)) &&
-        doubleIsDefined(apply(row))
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c1(row).toDouble, c2(row))
     }
@@ -698,8 +703,8 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
-        defined(c1(row).toDouble, c2(row).toDouble) &&
-        doubleIsDefined(apply(row))
+          defined(c1(row).toDouble, c2(row).toDouble) &&
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c1(row).toDouble, c2(row).toDouble)
     }
@@ -713,8 +718,8 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
-        defined(c1(row).toDouble, c2(row).toDouble) &&
-        doubleIsDefined(apply(row))
+          defined(c1(row).toDouble, c2(row).toDouble) &&
+          doubleIsDefined(apply(row))
 
       def apply(row: Int) = f(c1(row).toDouble, c2(row).toDouble)
     }
@@ -742,7 +747,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
-        defined(BigDecimal(c1(row)), BigDecimal(c2(row)))
+          defined(BigDecimal(c1(row)), BigDecimal(c2(row)))
 
       def apply(row: Int) = f(BigDecimal(c1(row)), BigDecimal(c2(row)))
     }
@@ -756,7 +761,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
-        defined(BigDecimal(c1(row)), BigDecimal(c2(row)))
+          defined(BigDecimal(c1(row)), BigDecimal(c2(row)))
 
       def apply(row: Int) = f(BigDecimal(c1(row)), BigDecimal(c2(row)))
     }
@@ -783,7 +788,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
-        defined(BigDecimal(c1(row)), BigDecimal(c2(row)))
+          defined(BigDecimal(c1(row)), BigDecimal(c2(row)))
 
       def apply(row: Int) = f(BigDecimal(c1(row)), BigDecimal(c2(row)))
     }
@@ -797,7 +802,7 @@ object StdLib {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
-        defined(BigDecimal(c1(row)), BigDecimal(c2(row)))
+          defined(BigDecimal(c1(row)), BigDecimal(c2(row)))
 
       def apply(row: Int) =
         f(BigDecimal(c1(row)), BigDecimal(c2(row).toDouble))
@@ -1011,8 +1016,9 @@ object StdLib {
       def apply(row: Int) = f(c1(row), c2(row))
     }
 
-    class Dt(
-        c: DateColumn, defined: DateTime => Boolean, f: DateTime => Boolean)
+    class Dt(c: DateColumn,
+             defined: DateTime => Boolean,
+             f: DateTime => Boolean)
         extends Map1Column(c)
         with BoolColumn {
 

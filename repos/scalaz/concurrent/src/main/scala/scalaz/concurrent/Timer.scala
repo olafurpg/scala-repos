@@ -11,8 +11,8 @@ import scalaz.syntax.either._
 trait Timeout
 object Timeout extends Timeout
 
-case class Timer(
-    timeoutTickMs: Int = 100, workerName: String = "TimeoutContextWorker") {
+case class Timer(timeoutTickMs: Int = 100,
+                 workerName: String = "TimeoutContextWorker") {
   val safeTickMs = if (timeoutTickMs > 5) timeoutTickMs else 5
   private[this] val futureNondeterminism = Nondeterminism[Future]
   private[this] val taskNondeterminism = Nondeterminism[Task]
@@ -29,14 +29,13 @@ case class Timer(
         // Deal with stuff to expire.
         futures.headOption match {
           case Some((time, _)) if (time <= lastNow) => {
-              val expiredFutures: SortedMap[Long, List[() => Unit]] =
-                withWrite {
-                  val (past, future) = futures.span(pair => pair._1 < lastNow)
-                  futures = future
-                  past
-                }
-              expireFutures(expiredFutures)
+            val expiredFutures: SortedMap[Long, List[() => Unit]] = withWrite {
+              val (past, future) = futures.span(pair => pair._1 < lastNow)
+              futures = future
+              past
             }
+            expireFutures(expiredFutures)
+          }
           case _ => ()
         }
         // Should we keep running?

@@ -33,8 +33,8 @@ private[serverset2] object Node {
                       stat: com.twitter.finagle.serverset2.client.Data.Stat)
       extends Node
 
-  case class Data(
-      data: Option[Buf], stat: com.twitter.finagle.serverset2.client.Data.Stat)
+  case class Data(data: Option[Buf],
+                  stat: com.twitter.finagle.serverset2.client.Data.Stat)
       extends Node
 }
 

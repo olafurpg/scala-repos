@@ -38,7 +38,7 @@ trait ParSeq[+T]
 
   def apply(i: Int): T
 
-  override def toString = super [ParIterable].toString
+  override def toString = super[ParIterable].toString
 
   override def stringPrefix = getClass.getSimpleName
 }

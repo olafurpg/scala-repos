@@ -200,7 +200,8 @@ object Engine0 {
       PAlgo0.Model(id, pd)
 
     override def batchPredict(
-        m: PAlgo0.Model, qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
+        m: PAlgo0.Model,
+        qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
       qs.mapValues(q => Prediction(id, q, Some(m)))
     }
 
@@ -219,7 +220,8 @@ object Engine0 {
       PAlgo1.Model(id, pd)
 
     override def batchPredict(
-        m: PAlgo1.Model, qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
+        m: PAlgo1.Model,
+        qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
       qs.mapValues(q => Prediction(id, q, Some(m)))
     }
 
@@ -241,7 +243,8 @@ object Engine0 {
       PAlgo2.Model(id, pd)
 
     override def batchPredict(
-        m: PAlgo2.Model, qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
+        m: PAlgo2.Model,
+        qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
       qs.mapValues(q => Prediction(id, q, Some(m)))
     }
 
@@ -267,7 +270,8 @@ object Engine0 {
       PAlgo3.Model(id, pd)
 
     override def batchPredict(
-        m: PAlgo3.Model, qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
+        m: PAlgo3.Model,
+        qs: RDD[(Long, Query)]): RDD[(Long, Prediction)] = {
       qs.mapValues(q => Prediction(id, q, Some(m)))
     }
 
@@ -436,8 +440,10 @@ object Engine1 {
 }
 
 class Engine1
-    extends BaseEngine[
-        Engine1.EvalInfo, Engine1.Query, Engine1.Prediction, Engine1.Actual] {
+    extends BaseEngine[Engine1.EvalInfo,
+                       Engine1.Query,
+                       Engine1.Prediction,
+                       Engine1.Actual] {
 
   def train(sc: SparkContext,
             engineParams: EngineParams,
@@ -450,7 +456,8 @@ class Engine1
     : Seq[(Engine1.EvalInfo,
            RDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)])] = {
     val dsp = engineParams.dataSourceParams._2.asInstanceOf[Engine1.DSP]
-    Seq((Engine1.EvalInfo(dsp.v),
+    Seq(
+        (Engine1.EvalInfo(dsp.v),
          sc.emptyRDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)]))
   }
 }

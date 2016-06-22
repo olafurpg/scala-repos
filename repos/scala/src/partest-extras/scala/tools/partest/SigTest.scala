@@ -30,7 +30,7 @@ trait SigTest {
     val cl = classTag[T].runtimeClass
     val ms =
       (cl.getMethods ++ cl.getDeclaredMethods).distinct sortBy
-      (x => (x.getName, x.isBridge))
+        (x => (x.getName, x.isBridge))
 
     ms filter p
   }

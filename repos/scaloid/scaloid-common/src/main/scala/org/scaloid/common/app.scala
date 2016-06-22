@@ -69,8 +69,7 @@ trait TraitActivity[+This <: Activity] {
     if (uiThread == Thread.currentThread) {
       f
     } else {
-      handler.post(
-          new Runnable() {
+      handler.post(new Runnable() {
         def run() {
           f
         }
@@ -281,8 +280,8 @@ trait LocalService extends SService {
   * See also: `alert()`
   */
 class AlertDialogBuilder(
-    _title: CharSequence = null, _message: CharSequence = null)(
-    implicit context: Context)
+    _title: CharSequence = null,
+    _message: CharSequence = null)(implicit context: Context)
     extends AlertDialog.Builder(context) {
   if (_title != null) setTitle(_title)
   if (_message != null) setMessage(_message)
@@ -316,8 +315,8 @@ class AlertDialogBuilder(
   }
 
   @inline
-  def negativeButton(
-      name: CharSequence, onClick: => Unit): AlertDialogBuilder =
+  def negativeButton(name: CharSequence,
+                     onClick: => Unit): AlertDialogBuilder =
     negativeButton(name, (_, _) => {
       onClick
     })

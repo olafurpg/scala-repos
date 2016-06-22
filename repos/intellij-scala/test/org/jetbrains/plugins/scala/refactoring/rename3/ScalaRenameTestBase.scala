@@ -43,7 +43,10 @@ abstract class ScalaRenameTestBase
 
   protected def doTest(newName: String = "NameAfterRename") {
     myDirectory = PsiTestUtil.createTestProjectStructure(
-        projectAdapter, moduleAdapter, rootBefore, new util.HashSet[File]())
+        projectAdapter,
+        moduleAdapter,
+        rootBefore,
+        new util.HashSet[File]())
     VirtualFilePointerManager.getInstance
       .asInstanceOf[VirtualFilePointerManagerImpl]
       .storePointers()
@@ -125,11 +128,12 @@ abstract class ScalaRenameTestBase
   private def projectAdapter = getProjectAdapter
   private def moduleAdapter = getModuleAdapter
 
-  private def doRename(
-      editor: Editor, file: PsiFile, newName: String): String = {
+  private def doRename(editor: Editor,
+                       file: PsiFile,
+                       newName: String): String = {
     val element = TargetElementUtil.findTargetElement(
-        InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(
-            editor, file),
+        InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(editor,
+                                                                  file),
         TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED)
     assert(element != null, "Reference is not specified.")
     val searchInComments =
@@ -141,8 +145,11 @@ abstract class ScalaRenameTestBase
         .substituteElementToRename(element, getEditorAdapter)
       if (subst != null) {
         oldName = ScalaNamesUtil.scalaName(subst)
-        new RenameProcessor(
-            projectAdapter, subst, newName, searchInComments, false).run()
+        new RenameProcessor(projectAdapter,
+                            subst,
+                            newName,
+                            searchInComments,
+                            false).run()
       }
     }
     PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()

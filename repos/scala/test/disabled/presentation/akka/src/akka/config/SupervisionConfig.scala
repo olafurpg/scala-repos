@@ -38,7 +38,8 @@ object Supervision {
     def this(restartStrategy: FaultHandlingStrategy,
              worker: Array[Server],
              restartHandler: Procedure2[
-                 ActorRef, MaximumNumberOfRestartsWithinTimeRangeReached]) =
+                 ActorRef,
+                 MaximumNumberOfRestartsWithinTimeRangeReached]) =
       this(restartStrategy, worker.toList, { (aRef, max) =>
         restartHandler.apply(aRef, max)
       })
@@ -162,8 +163,7 @@ object Supervision {
                                  val timeout: Long,
                                  _dispatcher: MessageDispatcher, // optional
                                  _remoteAddress: RemoteAddress // optional
-  )
-      extends Server {
+  ) extends Server {
     val intf: Option[Class[_]] = Option(_intf)
     val dispatcher: Option[MessageDispatcher] = Option(_dispatcher)
     val remoteAddress: Option[RemoteAddress] = Option(_remoteAddress)

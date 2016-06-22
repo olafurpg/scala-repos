@@ -21,5 +21,4 @@ class PreparedData(
     val items: RDD[(String, Item)],
     val viewEvents: RDD[ViewEvent],
     val likeEvents: RDD[LikeEvent] // ADDED
-)
-    extends Serializable
+) extends Serializable

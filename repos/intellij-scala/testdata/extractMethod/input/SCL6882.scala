@@ -5,7 +5,7 @@ class test {
   def f(a: Int, b: Int) = {
     /*start*/
     A(a, b)
-/*end*/
+    /*end*/
   }
 }
 /*

@@ -54,7 +54,7 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
     val originalQuery = x
       .join(y,
             condition = Some(("x.a".attr === "y.a".attr) &&
-                ("x.a".attr === 1) && ("y.c".attr > 5)))
+                  ("x.a".attr === 1) && ("y.c".attr > 5)))
       .analyze
     val left = x.where(IsNotNull('a) && "x.a".attr === 1)
     val right = y.where(
@@ -71,7 +71,7 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
     val originalQuery = x
       .join(y,
             condition = Some(("x.a".attr =!= "y.a".attr) &&
-                ("x.b".attr === 1) && ("y.c".attr > 5)))
+                  ("x.b".attr === 1) && ("y.c".attr > 5)))
       .analyze
     val left = x.where(IsNotNull('a) && IsNotNull('b) && "x.b".attr === 1)
     val right = y.where(IsNotNull('a) && IsNotNull('c) && "y.c".attr > 5)

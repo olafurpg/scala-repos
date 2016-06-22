@@ -222,8 +222,9 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
   protected def innerPush(elem: E): Unit =
     inner.push(elem)
 
-  protected def innerSplice(
-      index: Int, deleteCount: Int, items: E*): js.Array[E] =
+  protected def innerSplice(index: Int,
+                            deleteCount: Int,
+                            items: E*): js.Array[E] =
     inner.splice(index, deleteCount, items: _*)
 
   protected def copyIfNeeded(): Unit = {
@@ -238,8 +239,8 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
     inner
   }
 
-  private class CopyOnWriteArrayListView(
-      fromIndex: Int, private var toIndex: Int)
+  private class CopyOnWriteArrayListView(fromIndex: Int,
+                                         private var toIndex: Int)
       extends CopyOnWriteArrayList[E](null: js.Array[E]) { viewSelf =>
 
     override def size(): Int =
@@ -253,8 +254,10 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
 
     override def listIterator(index: Int): ListIterator[E] = {
       checkIndexOnBounds(index)
-      new CopyOnWriteArrayListIterator[E](
-          innerSnapshot(), fromIndex + index, fromIndex, toIndex) {
+      new CopyOnWriteArrayListIterator[E](innerSnapshot(),
+                                          fromIndex + index,
+                                          fromIndex,
+                                          toIndex) {
         override protected def onSizeChanged(delta: Int): Unit =
           changeSize(delta)
       }
@@ -264,8 +267,8 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
       if (fromIndex < 0 || fromIndex > toIndex || toIndex > size)
         throw new IndexOutOfBoundsException
 
-      new CopyOnWriteArrayListView(
-          viewSelf.fromIndex + fromIndex, viewSelf.fromIndex + toIndex) {
+      new CopyOnWriteArrayListView(viewSelf.fromIndex + fromIndex,
+                                   viewSelf.fromIndex + toIndex) {
         override protected def changeSize(delta: Int): Unit = {
           super.changeSize(delta)
           viewSelf.changeSize(delta)
@@ -282,8 +285,9 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
     override protected def innerSet(index: Int, elem: E): Unit =
       self.innerSet(fromIndex + index, elem)
 
-    override protected def innerSplice(
-        index: Int, deleteCount: Int, items: E*): js.Array[E] = {
+    override protected def innerSplice(index: Int,
+                                       deleteCount: Int,
+                                       items: E*): js.Array[E] = {
       changeSize(items.size - deleteCount)
       self.innerSplice(fromIndex + index, deleteCount, items: _*)
     }
@@ -318,8 +322,10 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
   }
 }
 
-private class CopyOnWriteArrayListIterator[E](
-    arraySnapshot: js.Array[E], i: Int, start: Int, end: Int)
+private class CopyOnWriteArrayListIterator[E](arraySnapshot: js.Array[E],
+                                              i: Int,
+                                              start: Int,
+                                              end: Int)
     extends AbstractRandomAccessListIterator[E](i, start, end) {
   override def remove(): Unit =
     throw new UnsupportedOperationException

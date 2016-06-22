@@ -8,8 +8,9 @@ import lila.game.{GameRepo, Game, Event, Progress, Pov, PlayerRef, Namer, Source
 import lila.pref.{Pref, PrefApi}
 import makeTimeout.short
 
-private[round] final class Drawer(
-    messenger: Messenger, finisher: Finisher, prefApi: PrefApi) {
+private[round] final class Drawer(messenger: Messenger,
+                                  finisher: Finisher,
+                                  prefApi: PrefApi) {
 
   def autoThreefold(game: Game): Fu[Option[Pov]] =
     Pov(game).map { pov =>
@@ -59,8 +60,8 @@ private[round] final class Drawer(
 
   def claim(pov: Pov): Fu[Events] =
     (pov.game.playable &&
-        pov.game.toChessHistory.threefoldRepetition) ?? finisher.other(
-        pov.game, _.Draw)
+          pov.game.toChessHistory.threefoldRepetition) ?? finisher
+      .other(pov.game, _.Draw)
 
   def force(game: Game): Fu[Events] = finisher.other(game, _.Draw, None, None)
 }

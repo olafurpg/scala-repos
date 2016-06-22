@@ -61,9 +61,10 @@ case class VersionedSegmentFormat(formats: Map[Int, SegmentFormat])
         formats get version map { format =>
           format.reader.readSegmentId(channel)
         } getOrElse {
-          Failure(new IOException(
+          Failure(
+              new IOException(
                   "Invalid version found. Expected one of %s, found %d." format
-                  (formats.keys mkString ",", version)))
+                    (formats.keys mkString ",", version)))
         }
       }
     }
@@ -74,9 +75,10 @@ case class VersionedSegmentFormat(formats: Map[Int, SegmentFormat])
         formats get version map { format =>
           format.reader.readSegment(channel)
         } getOrElse {
-          Failure(new IOException(
+          Failure(
+              new IOException(
                   "Invalid version found. Expected one of %s, found %d." format
-                  (formats.keys mkString ",", version)))
+                    (formats.keys mkString ",", version)))
         }
       }
     }

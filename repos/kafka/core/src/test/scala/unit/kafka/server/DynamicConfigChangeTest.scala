@@ -117,15 +117,15 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     val propertiesArgument = EasyMock.newCapture[Properties]
     val handler = EasyMock.createNiceMock(classOf[ConfigHandler])
     handler.processConfigChanges(
-        EasyMock.and(
-            EasyMock.capture(entityArgument), EasyMock.isA(classOf[String])),
+        EasyMock.and(EasyMock.capture(entityArgument),
+                     EasyMock.isA(classOf[String])),
         EasyMock.and(EasyMock.capture(propertiesArgument),
                      EasyMock.isA(classOf[Properties])))
     EasyMock.expectLastCall().once()
     EasyMock.replay(handler)
 
-    val configManager = new DynamicConfigManager(
-        zkUtils, Map(ConfigType.Topic -> handler))
+    val configManager =
+      new DynamicConfigManager(zkUtils, Map(ConfigType.Topic -> handler))
     // Notifications created using the old TopicConfigManager are ignored.
     configManager.ConfigChangedNotificationHandler.processNotification(
         "not json")
@@ -137,19 +137,19 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
           Json.encode(jsonMap))
       fail(
           "Should have thrown an Exception while parsing incorrect notification " +
-          jsonMap)
+            jsonMap)
     } catch {
       case t: Throwable =>
     }
     // Version is provided. EntityType is incorrect
     try {
-      val jsonMap = Map(
-          "version" -> 1, "entity_type" -> "garbage", "entity_name" -> "x")
+      val jsonMap =
+        Map("version" -> 1, "entity_type" -> "garbage", "entity_name" -> "x")
       configManager.ConfigChangedNotificationHandler.processNotification(
           Json.encode(jsonMap))
       fail(
           "Should have thrown an Exception while parsing incorrect notification " +
-          jsonMap)
+            jsonMap)
     } catch {
       case t: Throwable =>
     }
@@ -161,7 +161,7 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
           Json.encode(jsonMap))
       fail(
           "Should have thrown an Exception while parsing incorrect notification " +
-          jsonMap)
+            jsonMap)
     } catch {
       case t: Throwable =>
     }

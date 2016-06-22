@@ -323,8 +323,8 @@ object Request {
   }
 
   /** Create Request from HttpRequest and Channel.  Used by Codec. */
-  private[finagle] def apply(
-      httpRequestArg: HttpRequest, channel: Channel): Request =
+  private[finagle] def apply(httpRequestArg: HttpRequest,
+                             channel: Channel): Request =
     new Request {
       val httpRequest = httpRequestArg
       lazy val remoteSocketAddress =

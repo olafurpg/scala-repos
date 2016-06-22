@@ -45,8 +45,7 @@ abstract class SocketServer(fixPort: Int = 0) extends CompileOutputCommon {
   // Default to 30 minute idle timeout, settable with -max-idle
   protected var idleMinutes = 30
   private var savedTimeout = 0
-  private val acceptBox = new Socket.Box(
-      () => {
+  private val acceptBox = new Socket.Box(() => {
     // update the timeout if it has changed
     if (savedTimeout != idleMinutes) {
       savedTimeout = idleMinutes

@@ -22,8 +22,8 @@ class OfferMatcherReconciliationModule(
     leadershipModule: LeadershipModule) {
 
   /** An offer matcher that performs reconciliation on the expected reservations. */
-  lazy val offerMatcherReconciler: OfferMatcher = new OfferMatcherReconciler(
-      taskTracker, groupRepository)
+  lazy val offerMatcherReconciler: OfferMatcher =
+    new OfferMatcherReconciler(taskTracker, groupRepository)
 
   /** Emits true when offers are wanted for reconciliation. */
   def offersWantedObservable: Observable[Boolean] = offersWantedSubject

@@ -200,16 +200,18 @@ class DefaultInfoServiceTest
     result.futureValue.get.maybeGroups.get should have size 1
 
     When("querying extending group information without apps")
-    val result2 = f.infoService.selectGroup(
-        group.id, GroupSelector.all, Set.empty, Set(GroupInfo.Embed.Groups))
+    val result2 = f.infoService.selectGroup(group.id,
+                                            GroupSelector.all,
+                                            Set.empty,
+                                            Set(GroupInfo.Embed.Groups))
 
     Then("The group info contains no apps but groups")
     result2.futureValue.get.maybeGroups should be(defined)
     result2.futureValue.get.maybeApps should be(empty)
 
     When("querying extending group information without apps and groups")
-    val result3 = f.infoService.selectGroup(
-        group.id, GroupSelector.all, Set.empty, Set.empty)
+    val result3 = f.infoService
+      .selectGroup(group.id, GroupSelector.all, Set.empty, Set.empty)
 
     Then("The group info contains no apps nor groups")
     result3.futureValue.get.maybeGroups should be(empty)
@@ -250,8 +252,8 @@ class DefaultInfoServiceTest
     lazy val appRepo = mock[AppRepository]
     lazy val baseData = mock[AppInfoBaseData]
     def newBaseData(): AppInfoBaseData = baseData
-    lazy val infoService = new DefaultInfoService(
-        groupManager, appRepo, newBaseData)
+    lazy val infoService =
+      new DefaultInfoService(groupManager, appRepo, newBaseData)
 
     def verifyNoMoreInteractions(): Unit = {
       noMoreInteractions(groupManager)

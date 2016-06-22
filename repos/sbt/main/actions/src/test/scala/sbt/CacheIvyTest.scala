@@ -11,8 +11,9 @@ class CacheIvyTest extends Properties("CacheIvy") {
   import sbinary._
   import sbinary.DefaultProtocol._
 
-  private def cachePreservesEquality[T: Format](
-      m: T, eq: (T, T) => Prop, str: T => String): Prop = {
+  private def cachePreservesEquality[T: Format](m: T,
+                                                eq: (T, T) => Prop,
+                                                str: T => String): Prop = {
     val out = fromByteArray[T](toByteArray(m))
     eq(out, m) :| s"Expected: ${str(m)}" :| s"Got: ${str(out)}"
   }

@@ -19,8 +19,7 @@ class StopActorTest
     val promise = Promise[Boolean]()
     val probe = TestProbe()
 
-    probe.setAutoPilot(
-        new AutoPilot {
+    probe.setAutoPilot(new AutoPilot {
       def run(sender: ActorRef, msg: Any): AutoPilot = msg match {
         case Cancel(reason) =>
           system.stop(probe.ref)

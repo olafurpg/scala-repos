@@ -171,8 +171,8 @@ object JDBCPlatformSpecEngine extends Logging {
                     val columns = properties.map(_._1).mkString(", ")
                     val values = properties.map(_._2._2).mkString(", ")
 
-                    val insert = "INSERT INTO %s (%s) VALUES (%s);".format(
-                        tableName, columns, values)
+                    val insert = "INSERT INTO %s (%s) VALUES (%s);"
+                      .format(tableName, columns, values)
 
                     logger.debug("Inserting with " + insert)
 
@@ -236,8 +236,8 @@ trait JDBCPlatformSpecs
     Duration(10, "minutes") // it's just unreasonable to run tests longer than this
 
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(
-        asyncContext, yggConfig.maxEvalDuration)
+    new blueeyes.bkka.UnsafeFutureComonad(asyncContext,
+                                          yggConfig.maxEvalDuration)
 
   val unescapeColumnNames = true
 
@@ -255,8 +255,9 @@ trait JDBCPlatformSpecs
 
     val databaseMap = Map("test" -> JDBCPlatformSpecEngine.dbURL)
 
-    override def load(
-        table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
+    override def load(table: Table,
+                      apiKey: APIKey,
+                      tpe: JType): Future[Table] = {
       // Rewrite paths of the form /foo/bar/baz to /test/foo_bar_baz
       val pathFixTS = Map1(Leaf(Source), CF1P("fix_paths") {
         case orig: StrColumn =>
@@ -288,8 +289,8 @@ trait JDBCPlatformSpecs
   override def map(fs: => Fragments): Fragments =
     Step { startup() } ^ fs ^ Step { shutdown() }
 
-  def Evaluator[N[+ _]](
-      N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future) =
+  def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: Future ~> N,
+                                      nm: N ~> Future) =
     new Evaluator[N](N0)(mn, nm) {
       val report = new LoggingQueryLogger[N, instructions.Line]
       with ExceptionQueryLogger[N, instructions.Line]

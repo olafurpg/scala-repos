@@ -30,8 +30,8 @@ class MesosStateStore(state: State, timeout: Duration)
       .recover(mapException(s"Can not load entity with key $key"))
   }
 
-  override def create(
-      key: ID, content: IndexedSeq[Byte]): Future[PersistentEntity] = {
+  override def create(key: ID,
+                      content: IndexedSeq[Byte]): Future[PersistentEntity] = {
     futureToFuture(state.fetch(key))
       .map(throwOnNull)
       .flatMap { variable =>
@@ -83,8 +83,8 @@ class MesosStateStore(state: State, timeout: Duration)
         // and we have to log them all.
         log.warn(
             s"Exception while calling $getClass.allIds(). " +
-            s"This problem should occur only with an empty zookeeper state. " +
-            s"In that case, you can ignore this message",
+              s"This problem should occur only with an empty zookeeper state. " +
+              s"In that case, you can ignore this message",
             ex)
         Seq.empty[ID]
     }

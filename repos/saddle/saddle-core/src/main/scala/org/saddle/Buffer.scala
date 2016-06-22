@@ -47,8 +47,8 @@ trait Buffer[@spec(Boolean, Int, Long, Double) T] {
   def toArray: Array[T]
 
   override def toString =
-    "Buffer [" + util.buildStr(
-        8, count(), (i: Int) => " " + apply(i).toString, " ... ") + " ]"
+    "Buffer [" + util.buildStr(8, count(), (i: Int) =>
+          " " + apply(i).toString, " ... ") + " ]"
 }
 
 object Buffer {

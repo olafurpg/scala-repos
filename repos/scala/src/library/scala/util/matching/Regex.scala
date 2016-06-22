@@ -167,7 +167,7 @@ import java.util.regex.{Pattern, Matcher}
   *  dollar sign. Use `Regex.quoteReplacement` to escape these characters.
   */
 @SerialVersionUID(-2094783597747625537L)
-class Regex private[matching](val pattern: Pattern, groupNames: String*)
+class Regex private[matching] (val pattern: Pattern, groupNames: String*)
     extends Serializable { outer =>
 
   import Regex._
@@ -502,10 +502,11 @@ class Regex private[matching](val pattern: Pattern, groupNames: String*)
     * @param replacer    The function which optionally maps a match to another string.
     * @return            The target string after replacements.
     */
-  def replaceSomeIn(
-      target: CharSequence, replacer: Match => Option[String]): String = {
+  def replaceSomeIn(target: CharSequence,
+                    replacer: Match => Option[String]): String = {
     val it = new Regex.MatchIterator(target, this, groupNames).replacementData
-    for (matchdata <- it; replacement <- replacer(matchdata)) it replace replacement
+    for (matchdata <- it; replacement <- replacer(matchdata))
+      it replace replacement
 
     it.replaced
   }
@@ -750,8 +751,9 @@ object Regex {
     *
     *  @see [[java.util.regex.Matcher]]
     */
-  class MatchIterator(
-      val source: CharSequence, val regex: Regex, val groupNames: Seq[String])
+  class MatchIterator(val source: CharSequence,
+                      val regex: Regex,
+                      val groupNames: Seq[String])
       extends AbstractIterator[String]
       with Iterator[String]
       with MatchData {
@@ -773,7 +775,7 @@ object Regex {
       matcher.group
     }
 
-    override def toString = super [AbstractIterator].toString
+    override def toString = super[AbstractIterator].toString
 
     /** The index of the first matched character. */
     def start: Int = matcher.start

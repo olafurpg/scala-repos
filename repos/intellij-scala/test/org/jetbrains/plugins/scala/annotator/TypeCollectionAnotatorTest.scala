@@ -37,25 +37,24 @@ class TypeCollectionAnotatorTest
     }
   }
 
-  private def testCanAnnotate(
-      text: String, highlightedText: String, highlightingMessage: String) {
+  private def testCanAnnotate(text: String,
+                              highlightedText: String,
+                              highlightingMessage: String) {
     val holder = new AnnotatorHolderMock
     annotate(text, holder)
 
-    assert(
-        holder.annotations.exists {
+    assert(holder.annotations.exists {
       case Info(`highlightedText`, `highlightingMessage`) => true
       case _ => false
     })
   }
 
-  private def testCannotAnnotate(
-      text: String, textCantHighlight: (String, String)) {
+  private def testCannotAnnotate(text: String,
+                                 textCantHighlight: (String, String)) {
     val holder = new AnnotatorHolderMock
     annotate(text, holder)
 
-    assert(
-        !holder.annotations.exists {
+    assert(!holder.annotations.exists {
       case Info(`textCantHighlight`._1, `textCantHighlight`._2) => true
       case _ => false
     })

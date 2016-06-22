@@ -29,6 +29,6 @@ class AppInfoModule @Inject()(
   def appInfoService: AppInfoService = infoService
   def groupInfoService: GroupInfoService = infoService
 
-  private[this] lazy val infoService = new DefaultInfoService(
-      groupManager, appRepository, appInfoBaseData)
+  private[this] lazy val infoService =
+    new DefaultInfoService(groupManager, appRepository, appInfoBaseData)
 }

@@ -39,8 +39,8 @@ object Halton {
   lazy val EA_PERMS = readClasspathFileToIntArray(
       "quasimontecarlo_halton_ea_perms.txt")
 
-  def integrate(func: Array[Double] => Double)(
-      dimension: Int, numSamples: Long): Double = {
+  def integrate(func: Array[Double] => Double)(dimension: Int,
+                                               numSamples: Long): Double = {
     val gen = new BaseUniformHaltonGenerator(dimension)
     var result: Double = 0
     cfor(0)(i => i < numSamples, i => i + 1)(i => {
@@ -70,8 +70,7 @@ class BaseUniformHaltonGenerator(val dimension: Int)
   private val counters: Array[UnboxedIntVector] =
     List.fill(dimension)({ new UnboxedIntVector(16) }).toArray
   val permutations: Array[Array[Long]] = (0 to dimension)
-    .map(
-        i => {
+    .map(i => {
       val vv = new Array[Long](Halton.PRIMES(i))
       cfor(0)(j => j < Halton.PRIMES(i), j => j + 1)(j => {
         vv(j) = j

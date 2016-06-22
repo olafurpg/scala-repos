@@ -56,8 +56,8 @@ object Reflector {
 
   private[this] val stringTypes = new Memo[String, Option[ScalaType]]
   def scalaTypeOf(name: String): Option[ScalaType] =
-    stringTypes(
-        name, resolveClass[AnyRef](_, ClassLoaders) map (c => scalaTypeOf(c)))
+    stringTypes(name, resolveClass[AnyRef](_, ClassLoaders) map (c =>
+              scalaTypeOf(c)))
 
   def describe[T](implicit mf: Manifest[T]): ObjectDescriptor =
     describe(scalaTypeOf[T])
@@ -65,42 +65,43 @@ object Reflector {
     describe(scalaTypeOf(clazz))
   def describe(fqn: String): Option[ObjectDescriptor] =
     scalaTypeOf(fqn) map (describe(_))
-  def describe(st: ScalaType,
-               paranamer: ParameterNameReader =
-                 ParanamerReader): ObjectDescriptor =
+  def describe(
+      st: ScalaType,
+      paranamer: ParameterNameReader = ParanamerReader): ObjectDescriptor =
     descriptors(st, createDescriptor(_, paranamer))
 
   def resolveClass[X <: AnyRef](
-      c: String, classLoaders: Iterable[ClassLoader]): Option[Class[X]] =
+      c: String,
+      classLoaders: Iterable[ClassLoader]): Option[Class[X]] =
     classLoaders match {
       case Nil =>
         sys.error(
             "resolveClass: expected 1+ classloaders but received empty list")
       case List(cl) => Some(Class.forName(c, true, cl).asInstanceOf[Class[X]])
       case many => {
-          try {
-            var clazz: Class[_] = null
-            val iter = many.iterator
-            while (clazz == null && iter.hasNext) {
-              try {
-                clazz = Class.forName(c, true, iter.next())
-              } catch {
-                case e: ClassNotFoundException =>
-                // keep going, maybe it's in the next one
-              }
+        try {
+          var clazz: Class[_] = null
+          val iter = many.iterator
+          while (clazz == null && iter.hasNext) {
+            try {
+              clazz = Class.forName(c, true, iter.next())
+            } catch {
+              case e: ClassNotFoundException =>
+              // keep going, maybe it's in the next one
             }
-
-            if (clazz != null) Some(clazz.asInstanceOf[Class[X]]) else None
-          } catch {
-            case _: Throwable => None
           }
+
+          if (clazz != null) Some(clazz.asInstanceOf[Class[X]]) else None
+        } catch {
+          case _: Throwable => None
         }
+      }
     }
 
-  private[reflect] def createDescriptor(
-      tpe: ScalaType,
-      paramNameReader: ParameterNameReader =
-        ParanamerReader): ObjectDescriptor = {
+  private[reflect] def createDescriptor(tpe: ScalaType,
+                                        paramNameReader: ParameterNameReader =
+                                          ParanamerReader)
+    : ObjectDescriptor = {
     if (tpe.isPrimitive) {
       PrimitiveDescriptor(tpe.simpleName, tpe.fullName, tpe)
     } else {
@@ -128,7 +129,7 @@ object Reflector {
             val f = ls.next()
             val mod = f.getModifiers
             if (!(Modifier.isStatic(mod) || Modifier.isTransient(mod) ||
-                    Modifier.isVolatile(mod) || f.isSynthetic)) {
+                      Modifier.isVolatile(mod) || f.isSynthetic)) {
               val st = ManifestScalaType(f.getType, f.getGenericType match {
                 case p: ParameterizedType =>
                   p.getActualTypeArguments.toSeq.zipWithIndex map {
@@ -151,20 +152,20 @@ object Reflector {
         fields(tpe.erasure)
       }
 
-      def ctorParamType(name: String,
-                        index: Int,
-                        owner: ScalaType,
-                        ctorParameterNames: List[String],
-                        t: Type,
-                        container: Option[(ScalaType, List[Int])] =
-                          None): ScalaType = {
+      def ctorParamType(
+          name: String,
+          index: Int,
+          owner: ScalaType,
+          ctorParameterNames: List[String],
+          t: Type,
+          container: Option[(ScalaType, List[Int])] = None): ScalaType = {
         val idxes = container.map(_._2.reverse)
         t match {
           case v: TypeVariable[_] =>
             val a = owner.typeVars.getOrElse(v, scalaTypeOf(v))
             if (a.erasure == classOf[java.lang.Object]) {
-              val r = ScalaSigReader.readConstructor(
-                  name, owner, index, ctorParameterNames)
+              val r = ScalaSigReader
+                .readConstructor(name, owner, index, ctorParameterNames)
               scalaTypeOf(r)
             } else a
           case v: ParameterizedType =>
@@ -218,8 +219,11 @@ object Reflector {
                                             tpe,
                                             ctorParameterNames.toList,
                                             genParams(index))
-                ConstructorParamDescriptor(
-                    decoded, paramName, index, theType, default)
+                ConstructorParamDescriptor(decoded,
+                                           paramName,
+                                           index,
+                                           theType,
+                                           default)
             }
           ConstructorDescriptor(ctorParams.toSeq, ctor, isPrimary = false)
         }
@@ -236,7 +240,8 @@ object Reflector {
 
   def defaultValue(compClass: Class[_], compObj: AnyRef, argIndex: Int) = {
     allCatch.withApply(_ => None) {
-      Option(compClass.getMethod(
+      Option(
+          compClass.getMethod(
               "%s$%d".format(ConstructorDefault, argIndex + 1))) map {
         meth => () =>
           meth.invoke(compObj)

@@ -86,8 +86,7 @@ class DispatcherActorSpec
         def receive = { case "sabotage" ⇒ works.set(false) }
       }).withDispatcher(throughputDispatcher))
 
-      val slowOne = system.actorOf(
-          Props(new Actor {
+      val slowOne = system.actorOf(Props(new Actor {
         def receive = {
           case "hogexecutor" ⇒ { sender() ! "OK"; start.await }
           case "ping" ⇒ if (works.get) latch.countDown()
@@ -115,15 +114,13 @@ class DispatcherActorSpec
       val start = new CountDownLatch(1)
       val ready = new CountDownLatch(1)
 
-      val fastOne = system.actorOf(
-          Props(new Actor {
+      val fastOne = system.actorOf(Props(new Actor {
         def receive = {
           case "ping" ⇒ if (works.get) latch.countDown(); context.stop(self)
         }
       }).withDispatcher(throughputDispatcher))
 
-      val slowOne = system.actorOf(
-          Props(new Actor {
+      val slowOne = system.actorOf(Props(new Actor {
         def receive = {
           case "hogexecutor" ⇒ { ready.countDown(); start.await }
           case "ping" ⇒ { works.set(false); context.stop(self) }

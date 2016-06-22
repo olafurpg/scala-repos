@@ -19,8 +19,8 @@ import scala.collection.mutable.ListBuffer
   * 8/19/13
   */
 object GenerationUtil {
-  def classOrTraitAtCaret(
-      editor: Editor, file: PsiFile): Option[ScTemplateDefinition] =
+  def classOrTraitAtCaret(editor: Editor,
+                          file: PsiFile): Option[ScTemplateDefinition] =
     elementOfTypeAtCaret(editor, file, classOf[ScClass], classOf[ScTrait])
 
   def classAtCaret(editor: Editor, file: PsiFile): Option[ScClass] =
@@ -100,7 +100,9 @@ object GenerationUtil {
   }
 
   def elementOfTypeAtCaret[T <: PsiElement](
-      editor: Editor, file: PsiFile, types: Class[_ <: T]*): Option[T] = {
+      editor: Editor,
+      file: PsiFile,
+      types: Class[_ <: T]*): Option[T] = {
     val elem = file.findElementAt(editor.getCaretModel.getOffset)
     Option(PsiTreeUtil.getParentOfType(elem, types: _*))
   }

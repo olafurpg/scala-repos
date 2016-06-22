@@ -48,8 +48,9 @@ trait SSetup extends Around {
 
 class WithRules(val rules: LiftRules) extends BaseAround with LiftRulesSetup
 
-class WithLiftContext(
-    val rules: LiftRules, val session: LiftSession, val req: Box[Req] = Empty)
+class WithLiftContext(val rules: LiftRules,
+                      val session: LiftSession,
+                      val req: Box[Req] = Empty)
     extends BaseAround
     with LiftRulesSetup
     with SSetup
@@ -174,7 +175,8 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
     }
 
     "normalize absolute link hrefs everywhere" in new WithLiftContext(
-        testRules, testSession) {
+        testRules,
+        testSession) {
       val result = testSession.merge(
           <html>
             <head>
@@ -206,7 +208,8 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
     }
 
     "normalize absolute script srcs everywhere" in new WithLiftContext(
-        testRules, testSession) {
+        testRules,
+        testSession) {
       val result = testSession.merge(
           <html>
             <head>
@@ -238,7 +241,8 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
     }
 
     "normalize absolute a hrefs everywhere" in new WithLiftContext(
-        testRules, testSession) {
+        testRules,
+        testSession) {
       val result = testSession.merge(
           <html>
             <head>
@@ -270,7 +274,8 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
     }
 
     "normalize absolute form actions everywhere" in new WithLiftContext(
-        testRules, testSession) {
+        testRules,
+        testSession) {
       val result = testSession.merge(
           <html>
             <head>

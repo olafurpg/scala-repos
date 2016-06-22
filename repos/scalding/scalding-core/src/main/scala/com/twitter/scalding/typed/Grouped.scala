@@ -229,7 +229,8 @@ sealed trait ReduceStep[K, V1] extends KeyedPipe[K] {
                     Grouped.getBoxFnAndOrder[V1](ordser, fd)
                   val valueF = new Fields("value")
                   valueF.setComparator(
-                      "value", new CascadingBinaryComparator(boxordSer))
+                      "value",
+                      new CascadingBinaryComparator(boxordSer))
                   val ts2 = tupleSetter
                     .asInstanceOf[TupleSetter[(K, Boxed[V1])]]
                     .contraMap { kv1: (K, V1) =>
@@ -248,7 +249,9 @@ sealed trait ReduceStep[K, V1] extends KeyedPipe[K] {
           }
       }
       TypedPipe.from(pipe, Grouped.kvFields)(
-          fd, mode, Grouped.tuple2Conv[K, V2](keyOrdering))
+          fd,
+          mode,
+          Grouped.tuple2Conv[K, V2](keyOrdering))
     })
 }
 
@@ -277,8 +280,11 @@ case class IdentityReduce[K, V1](override val keyOrdering: Ordering[K],
 
   override def withSortOrdering[U >: V1](
       so: Ordering[U]): IdentityValueSortedReduce[K, V1] =
-    IdentityValueSortedReduce[K, V1](
-        keyOrdering, mapped, so, reducers, descriptions)
+    IdentityValueSortedReduce[K, V1](keyOrdering,
+                                     mapped,
+                                     so,
+                                     reducers,
+                                     descriptions)
 
   override def withReducers(red: Int): IdentityReduce[K, V1] =
     copy(reducers = Some(red))
@@ -291,8 +297,11 @@ case class IdentityReduce[K, V1](override val keyOrdering: Ordering[K],
 
   override def mapGroup[V3](fn: (K, Iterator[V1]) => Iterator[V3]) = {
     // Only pass non-Empty iterators to subsequent functions
-    IteratorMappedReduce(
-        keyOrdering, mapped, Grouped.addEmptyGuard(fn), reducers, descriptions)
+    IteratorMappedReduce(keyOrdering,
+                         mapped,
+                         Grouped.addEmptyGuard(fn),
+                         reducers,
+                         descriptions)
   }
 
   // It would be nice to return IdentityReduce here, but
@@ -306,8 +315,10 @@ case class IdentityReduce[K, V1](override val keyOrdering: Ordering[K],
   override def sum[U >: V1](implicit sg: Semigroup[U]) = {
     // there is no sort, mapValueStream or force to reducers:
     val upipe: TypedPipe[(K, U)] = mapped // use covariance to set the type
-    UnsortedIdentityReduce(
-        keyOrdering, upipe.sumByLocalKeys, reducers, descriptions).sumLeft
+    UnsortedIdentityReduce(keyOrdering,
+                           upipe.sumByLocalKeys,
+                           reducers,
+                           descriptions).sumLeft
   }
 
   override lazy val toTypedPipe = reducers match {
@@ -374,26 +385,35 @@ case class UnsortedIdentityReduce[K, V1](
     copy(descriptions = descriptions :+ description)
 
   override def filterKeys(fn: K => Boolean) =
-    UnsortedIdentityReduce(
-        keyOrdering, mapped.filterKeys(fn), reducers, descriptions)
+    UnsortedIdentityReduce(keyOrdering,
+                           mapped.filterKeys(fn),
+                           reducers,
+                           descriptions)
 
   override def mapGroup[V3](fn: (K, Iterator[V1]) => Iterator[V3]) = {
     // Only pass non-Empty iterators to subsequent functions
-    IteratorMappedReduce(
-        keyOrdering, mapped, Grouped.addEmptyGuard(fn), reducers, descriptions)
+    IteratorMappedReduce(keyOrdering,
+                         mapped,
+                         Grouped.addEmptyGuard(fn),
+                         reducers,
+                         descriptions)
   }
 
   // It would be nice to return IdentityReduce here, but
   // the type constraints prevent it currently
   override def mapValues[V2](fn: V1 => V2) =
-    UnsortedIdentityReduce(
-        keyOrdering, mapped.mapValues(fn), reducers, descriptions)
+    UnsortedIdentityReduce(keyOrdering,
+                           mapped.mapValues(fn),
+                           reducers,
+                           descriptions)
 
   override def sum[U >: V1](implicit sg: Semigroup[U]) = {
     // there is no sort, mapValueStream or force to reducers:
     val upipe: TypedPipe[(K, U)] = mapped // use covariance to set the type
-    UnsortedIdentityReduce(
-        keyOrdering, upipe.sumByLocalKeys, reducers, descriptions).sumLeft
+    UnsortedIdentityReduce(keyOrdering,
+                           upipe.sumByLocalKeys,
+                           reducers,
+                           descriptions).sumLeft
   }
 
   override lazy val toTypedPipe = reducers match {
@@ -418,13 +438,19 @@ case class IdentityValueSortedReduce[K, V1](
     with Reversable[IdentityValueSortedReduce[K, V1]] {
 
   override def reverse: IdentityValueSortedReduce[K, V1] =
-    IdentityValueSortedReduce[K, V1](
-        keyOrdering, mapped, valueSort.reverse, reducers, descriptions)
+    IdentityValueSortedReduce[K, V1](keyOrdering,
+                                     mapped,
+                                     valueSort.reverse,
+                                     reducers,
+                                     descriptions)
 
   override def withReducers(red: Int): IdentityValueSortedReduce[K, V1] =
     // copy fails to get the types right, :/
-    IdentityValueSortedReduce[K, V1](
-        keyOrdering, mapped, valueSort, reducers = Some(red), descriptions)
+    IdentityValueSortedReduce[K, V1](keyOrdering,
+                                     mapped,
+                                     valueSort,
+                                     reducers = Some(red),
+                                     descriptions)
 
   override def withDescription(
       description: String): IdentityValueSortedReduce[K, V1] =
@@ -437,8 +463,11 @@ case class IdentityValueSortedReduce[K, V1](
 
   override def filterKeys(fn: K => Boolean) =
     // copy fails to get the types right, :/
-    IdentityValueSortedReduce[K, V1](
-        keyOrdering, mapped.filterKeys(fn), valueSort, reducers, descriptions)
+    IdentityValueSortedReduce[K, V1](keyOrdering,
+                                     mapped.filterKeys(fn),
+                                     valueSort,
+                                     reducers,
+                                     descriptions)
 
   override def mapGroup[V3](fn: (K, Iterator[V1]) => Iterator[V3]) = {
     // Only pass non-Empty iterators to subsequent functions
@@ -491,12 +520,11 @@ case class IdentityValueSortedReduce[K, V1](
   override lazy val toTypedPipe =
     groupOpWithValueSort[V1](valueSort = Some(valueSort)) { gb =>
       // If its an ordered serialization we need to unbox
-      val mappedGB =
-        if (valueSort.isInstanceOf[OrderedSerialization[_]])
-          gb.mapStream[Boxed[V1], V1](Grouped.valueField -> Grouped.valueField) {
-            it: Iterator[Boxed[V1]] =>
-              it.map(_.get)
-          } else gb
+      val mappedGB = if (valueSort.isInstanceOf[OrderedSerialization[_]])
+        gb.mapStream[Boxed[V1], V1](Grouped.valueField -> Grouped.valueField) {
+          it: Iterator[Boxed[V1]] =>
+            it.map(_.get)
+        } else gb
 
       mappedGB.reducers(reducers.getOrElse(-1)).setDescriptions(descriptions)
     }
@@ -520,8 +548,12 @@ case class ValueSortedReduce[K, V1, V2](
 
   override def withReducers(red: Int) =
     // copy infers loose types. :(
-    ValueSortedReduce[K, V1, V2](
-        keyOrdering, mapped, valueSort, reduceFn, Some(red), descriptions)
+    ValueSortedReduce[K, V1, V2](keyOrdering,
+                                 mapped,
+                                 valueSort,
+                                 reduceFn,
+                                 Some(red),
+                                 descriptions)
 
   override def withDescription(description: String) =
     ValueSortedReduce[K, V1, V2](keyOrdering,
@@ -548,8 +580,12 @@ case class ValueSortedReduce[K, V1, V2](
       // Only pass non-Empty iterators to subsequent functions
       Grouped.addEmptyGuard(fn)(k, step1)
     }
-    ValueSortedReduce[K, V1, V3](
-        keyOrdering, mapped, valueSort, newReduce, reducers, descriptions)
+    ValueSortedReduce[K, V1, V3](keyOrdering,
+                                 mapped,
+                                 valueSort,
+                                 newReduce,
+                                 reducers,
+                                 descriptions)
   }
 
   override lazy val toTypedPipe = {
@@ -629,8 +665,8 @@ case class IteratorMappedReduce[K, V1, V2](
       assert(
           empties.isEmpty,
           "this join function should never be called with non-empty right-most")
-      localRed(
-          k, iter.map(_.getObject(Grouped.ValuePosition).asInstanceOf[V1]))
+      localRed(k,
+               iter.map(_.getObject(Grouped.ValuePosition).asInstanceOf[V1]))
     }
   }
 }

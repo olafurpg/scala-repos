@@ -62,8 +62,9 @@ trait TransformSpec[M[+ _]]
   def testMap1IntLeaf = {
     val sample = (-10 to 10).map(JNum(_)).toStream
     val table = fromSample(SampleData(sample))
-    val results = toJson(
-        table.transform { Map1(Leaf(Source), lookupF1(Nil, "negate")) })
+    val results = toJson(table.transform {
+      Map1(Leaf(Source), lookupF1(Nil, "negate"))
+    })
 
     results.copoint must_== (-10 to 10).map(x => JNum(-x))
   }
@@ -72,17 +73,20 @@ trait TransformSpec[M[+ _]]
     val data: Stream[JValue] = Stream(
         JObject(
             JField("value", JObject(JField("foo", JNum(12)) :: Nil)) :: JField(
-                "key", JArray(JNum(1) :: Nil)) :: Nil),
-        JObject(JField("value", JArray(JNum(30) :: Nil)) :: JField(
-                "key", JArray(JNum(1) :: Nil)) :: Nil),
+                "key",
+                JArray(JNum(1) :: Nil)) :: Nil),
+        JObject(
+            JField("value", JArray(JNum(30) :: Nil)) :: JField(
+                "key",
+                JArray(JNum(1) :: Nil)) :: Nil),
         JObject(JField("value", JNum(20)) :: JField(
-                "key", JArray(JNum(1) :: Nil)) :: Nil))
+                "key",
+                JArray(JNum(1) :: Nil)) :: Nil))
 
     val sample = SampleData(data)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Map1(DerefObjectStatic(Leaf(Source), CPathField("value")),
            lookupF1(Nil, "negate"))
     })
@@ -92,31 +96,34 @@ trait TransformSpec[M[+ _]]
   }
 
   def testDeepMap1CoerceToDouble = {
-    val data: Stream[JValue] =
-      Stream(
-          JObject(
-              JField("value", JNum(12)) :: JField(
-                  "key",
-                  JArray(JNum(1) :: Nil)) :: Nil),
-          JObject(
-              JField("value", JNum(34.5)) :: JField(
-                  "key",
-                  JArray(JNum(2) :: Nil)) :: Nil),
-          JObject(JField("value", JNum(31.9)) :: JField(
-                  "key", JArray(JNum(3) :: Nil)) :: Nil),
-          JObject(
-              JField("value", JObject(JField("baz", JNum(31)) :: Nil)) :: JField(
-                  "key", JArray(JNum(3) :: Nil)) :: Nil),
-          JObject(JField("value", JString("foo")) :: JField(
-                  "key", JArray(JNum(3) :: Nil)) :: Nil),
-          JObject(JField("value", JNum(20)) :: JField(
-                  "key", JArray(JNum(4) :: Nil)) :: Nil))
+    val data: Stream[JValue] = Stream(
+        JObject(JField("value", JNum(12)) :: JField(
+                "key",
+                JArray(JNum(1) :: Nil)) :: Nil),
+        JObject(
+            JField("value", JNum(34.5)) :: JField(
+                "key",
+                JArray(JNum(2) :: Nil)) :: Nil),
+        JObject(
+            JField("value", JNum(31.9)) :: JField(
+                "key",
+                JArray(JNum(3) :: Nil)) :: Nil),
+        JObject(
+            JField("value", JObject(JField("baz", JNum(31)) :: Nil)) :: JField(
+                "key",
+                JArray(JNum(3) :: Nil)) :: Nil),
+        JObject(
+            JField("value", JString("foo")) :: JField(
+                "key",
+                JArray(JNum(3) :: Nil)) :: Nil),
+        JObject(JField("value", JNum(20)) :: JField(
+                "key",
+                JArray(JNum(4) :: Nil)) :: Nil))
 
     val sample = SampleData(data)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       DeepMap1(DerefObjectStatic(Leaf(Source), CPathField("value")),
                lookupF1(Nil, "coerceToDouble"))
     })
@@ -132,31 +139,34 @@ trait TransformSpec[M[+ _]]
   }
 
   def testMap1CoerceToDouble = {
-    val data: Stream[JValue] =
-      Stream(
-          JObject(
-              JField("value", JNum(12)) :: JField(
-                  "key",
-                  JArray(JNum(1) :: Nil)) :: Nil),
-          JObject(
-              JField("value", JNum(34.5)) :: JField(
-                  "key",
-                  JArray(JNum(2) :: Nil)) :: Nil),
-          JObject(JField("value", JNum(31.9)) :: JField(
-                  "key", JArray(JNum(3) :: Nil)) :: Nil),
-          JObject(
-              JField("value", JObject(JField("baz", JNum(31)) :: Nil)) :: JField(
-                  "key", JArray(JNum(3) :: Nil)) :: Nil),
-          JObject(JField("value", JString("foo")) :: JField(
-                  "key", JArray(JNum(3) :: Nil)) :: Nil),
-          JObject(JField("value", JNum(20)) :: JField(
-                  "key", JArray(JNum(4) :: Nil)) :: Nil))
+    val data: Stream[JValue] = Stream(
+        JObject(JField("value", JNum(12)) :: JField(
+                "key",
+                JArray(JNum(1) :: Nil)) :: Nil),
+        JObject(
+            JField("value", JNum(34.5)) :: JField(
+                "key",
+                JArray(JNum(2) :: Nil)) :: Nil),
+        JObject(
+            JField("value", JNum(31.9)) :: JField(
+                "key",
+                JArray(JNum(3) :: Nil)) :: Nil),
+        JObject(
+            JField("value", JObject(JField("baz", JNum(31)) :: Nil)) :: JField(
+                "key",
+                JArray(JNum(3) :: Nil)) :: Nil),
+        JObject(
+            JField("value", JString("foo")) :: JField(
+                "key",
+                JArray(JNum(3) :: Nil)) :: Nil),
+        JObject(JField("value", JNum(20)) :: JField(
+                "key",
+                JArray(JNum(4) :: Nil)) :: Nil))
 
     val sample = SampleData(data)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Map1(DerefObjectStatic(Leaf(Source), CPathField("value")),
            lookupF1(Nil, "coerceToDouble"))
     })
@@ -172,8 +182,7 @@ trait TransformSpec[M[+ _]]
     check { (sample: SampleData) =>
       val table = fromSample(sample)
 
-      val results = toJson(
-          table.transform {
+      val results = toJson(table.transform {
         Map1(DerefObjectStatic(Leaf(Source), CPathField("value")),
              lookupF2(Nil, "mod").applyr(CLong(2)) andThen lookupF2(Nil, "eq")
                .applyr(CLong(0)))
@@ -213,8 +222,7 @@ trait TransformSpec[M[+ _]]
     implicit val gen = sample(schema)
     check { (sample: SampleData) =>
       val table = fromSample(sample)
-      val results = toJson(
-          table.transform {
+      val results = toJson(table.transform {
         Filter(
             Leaf(Source),
             Equal(Leaf(Source), Leaf(Source)) //Map1 now makes undefined all columns not a the root-identity level
@@ -235,7 +243,8 @@ trait TransformSpec[M[+ _]]
             Map1(
                 DerefObjectStatic(Leaf(Source), CPathField("value")),
                 lookupF2(Nil, "mod").applyr(CLong(2)) andThen lookupF2(
-                    Nil, "eq").applyr(CLong(0))
+                    Nil,
+                    "eq").applyr(CLong(0))
             )
         )
       })
@@ -271,12 +280,12 @@ trait TransformSpec[M[+ _]]
     val sample = SampleData(data)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Filter(Leaf(Source),
              Map1(DerefObjectStatic(Leaf(Source), CPathField("value")),
                   lookupF2(Nil, "mod").applyr(CLong(2)) andThen lookupF2(
-                      Nil, "eq").applyr(CLong(0))))
+                      Nil,
+                      "eq").applyr(CLong(0))))
     })
 
     val expected =
@@ -294,8 +303,7 @@ trait TransformSpec[M[+ _]]
     implicit val gen = sample(objectSchema(_, 3))
     check { (sample: SampleData) =>
       val table = fromSample(sample)
-      val results = toJson(
-          table.transform {
+      val results = toJson(table.transform {
         DerefMetadataStatic(Leaf(Source), CPathMeta("foo"))
       })
 
@@ -309,8 +317,7 @@ trait TransformSpec[M[+ _]]
       val (field, _) = sample.schema.get._2.head
       val fieldHead = field.head.get
       val table = fromSample(sample)
-      val results = toJson(
-          table.transform {
+      val results = toJson(table.transform {
         DerefObjectStatic(Leaf(Source), fieldHead match {
           case JPathField(s) => CPathField(s)
           case _ => sys.error("non-field reached")
@@ -335,8 +342,7 @@ trait TransformSpec[M[+ _]]
       val (field, _) = sample.schema.get._2.head
       val fieldHead = field.head.get
       val table = fromSample(sample)
-      val results = toJson(
-          table.transform {
+      val results = toJson(table.transform {
         DerefArrayStatic(Leaf(Source), fieldHead match {
           case JPathIndex(s) => CPathIndex(s)
           case _ => sys.error("non-index reached")
@@ -418,22 +424,27 @@ trait TransformSpec[M[+ _]]
     val data: Stream[JValue] = Stream(
         JObject(
             JField("value1", JObject(JField("foo", JNum(12)) :: Nil)) :: JField(
-                "value2", JArray(JNum(1) :: Nil)) :: Nil),
-        JObject(JField("value1", JArray(JNum(30) :: Nil)) :: JField(
-                "value2", JArray(JNum(1) :: Nil)) :: Nil),
-        JObject(JField("value1", JNum(20)) :: JField(
-                "value2", JArray(JNum(1) :: Nil)) :: Nil),
+                "value2",
+                JArray(JNum(1) :: Nil)) :: Nil),
+        JObject(
+            JField("value1", JArray(JNum(30) :: Nil)) :: JField(
+                "value2",
+                JArray(JNum(1) :: Nil)) :: Nil),
+        JObject(
+            JField("value1", JNum(20)) :: JField(
+                "value2",
+                JArray(JNum(1) :: Nil)) :: Nil),
         JObject(
             JField("value1", JObject(JField("foo", JNum(-188)) :: Nil)) :: JField(
-                "value2", JNum(77)) :: Nil),
+                "value2",
+                JNum(77)) :: Nil),
         JObject(
             JField("value1", JNum(3)) :: JField("value2", JNum(77)) :: Nil))
 
     val sample = SampleData(data)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Map2(DerefObjectStatic(Leaf(Source), CPathField("value1")),
            DerefObjectStatic(Leaf(Source), CPathField("value2")),
            lookupF2(Nil, "add"))
@@ -447,8 +458,7 @@ trait TransformSpec[M[+ _]]
     implicit val gen = sample(schema)
     check { (sample: SampleData) =>
       val table = fromSample(sample)
-      val results = toJson(
-          table.transform {
+      val results = toJson(table.transform {
         Equal(Leaf(Source), Leaf(Source))
       })
 
@@ -482,19 +492,19 @@ trait TransformSpec[M[+ _]]
     val sample2 = SampleData(data2)
     val table2 = fromSample(sample2)
 
-    val leftIdentitySpec = DerefObjectStatic(
-        Leaf(SourceLeft), CPathField("key"))
-    val rightIdentitySpec = DerefObjectStatic(
-        Leaf(SourceRight), CPathField("key"))
+    val leftIdentitySpec =
+      DerefObjectStatic(Leaf(SourceLeft), CPathField("key"))
+    val rightIdentitySpec =
+      DerefObjectStatic(Leaf(SourceRight), CPathField("key"))
 
     val newIdentitySpec = OuterArrayConcat(leftIdentitySpec, rightIdentitySpec)
 
     val wrappedIdentitySpec = trans.WrapObject(newIdentitySpec, "key")
 
-    val leftValueSpec = DerefObjectStatic(
-        Leaf(SourceLeft), CPathField("value"))
-    val rightValueSpec = DerefObjectStatic(
-        Leaf(SourceRight), CPathField("value"))
+    val leftValueSpec =
+      DerefObjectStatic(Leaf(SourceLeft), CPathField("value"))
+    val rightValueSpec =
+      DerefObjectStatic(Leaf(SourceRight), CPathField("value"))
 
     val wrappedValueSpec =
       trans.WrapObject(Equal(leftValueSpec, rightValueSpec), "value")
@@ -504,10 +514,10 @@ trait TransformSpec[M[+ _]]
             InnerObjectConcat(wrappedIdentitySpec, wrappedValueSpec)))
     val expected = (data map {
           case jo @ JObject(fields) if fields.contains("value") => {
-              if (fields("value") == JArray(List(JNum(9), JNum(10), JNum(11))))
-                JObject(fields - "value" + JField("value", JBool(true)))
-              else JObject(fields - "value" + JField("value", JBool(false)))
-            }
+            if (fields("value") == JArray(List(JNum(9), JNum(10), JNum(11))))
+              JObject(fields - "value" + JField("value", JBool(true)))
+            else JObject(fields - "value" + JField("value", JBool(false)))
+          }
           case _ => sys.error("unreachable case")
         }).toStream
 
@@ -893,8 +903,7 @@ trait TransformSpec[M[+ _]]
     implicit val gen = sample(schema)
     check { (sample: SampleData) =>
       val table = fromSample(sample)
-      val results = toJson(
-          table.transform {
+      val results = toJson(table.transform {
         WrapObject(Leaf(Source), "foo")
       })
 
@@ -911,13 +920,11 @@ trait TransformSpec[M[+ _]]
     implicit val gen = sample(schema)
     check { (sample: SampleData) =>
       val table = fromSample(sample)
-      val resultsInner = toJson(
-          table.transform {
+      val resultsInner = toJson(table.transform {
         InnerObjectConcat(Leaf(Source), Leaf(Source))
       })
 
-      val resultsOuter = toJson(
-          table.transform {
+      val resultsOuter = toJson(table.transform {
         OuterObjectConcat(Leaf(Source), Leaf(Source))
       })
 
@@ -931,13 +938,11 @@ trait TransformSpec[M[+ _]]
     val sample = SampleData(data)
     val table = fromSample(sample)
 
-    val resultsInner = toJson(
-        table.transform {
+    val resultsInner = toJson(table.transform {
       InnerObjectConcat(Leaf(Source))
     })
 
-    val resultsOuter = toJson(
-        table.transform {
+    val resultsOuter = toJson(table.transform {
       OuterObjectConcat(Leaf(Source))
     })
 
@@ -950,13 +955,11 @@ trait TransformSpec[M[+ _]]
     val sample = SampleData(data)
     val table = fromSample(sample)
 
-    val resultsInner = toJson(
-        table.transform {
+    val resultsInner = toJson(table.transform {
       InnerObjectConcat(Leaf(Source))
     })
 
-    val resultsOuter = toJson(
-        table.transform {
+    val resultsOuter = toJson(table.transform {
       OuterObjectConcat(Leaf(Source))
     })
 
@@ -965,8 +968,8 @@ trait TransformSpec[M[+ _]]
   }
 
   def testInnerObjectConcatEmptyObject = {
-    val JArray(elements) =
-      JParser.parseUnsafe("""[
+    val JArray(elements) = JParser.parseUnsafe(
+        """[
       {"foo": {}, "bar": {"ack": 12}},
       {"foo": {}, "bar": {"ack": 12, "bak": 13}},
       {"foo": {"ook": 99}, "bar": {}},
@@ -996,11 +999,15 @@ trait TransformSpec[M[+ _]]
         JObject(JField("ack", JNum(12)) :: Nil),
         JObject(JField("ack", JNum(12)) :: JField("bak", JNum(13)) :: Nil),
         JObject(JField("ook", JNum(99)) :: Nil),
-        JObject(JField("ook", JNum(99)) :: JField("ack", JNum(100)) :: JField(
-                "bak", JNum(101)) :: Nil),
+        JObject(
+            JField("ook", JNum(99)) :: JField("ack", JNum(100)) :: JField(
+                "bak",
+                JNum(101)) :: Nil),
         JObject(JField("ook", JNum(99)) :: JField("ick", JNum(100)) :: Nil),
-        JObject(JField("ook", JNum(99)) :: JField("ick", JNum(100)) :: JField(
-                "ack", JNum(102)) :: Nil),
+        JObject(
+            JField("ook", JNum(99)) :: JField("ick", JNum(100)) :: JField(
+                "ack",
+                JNum(102)) :: Nil),
         JObject(Nil),
         JObject(JField("ook", JNum(7)) :: Nil),
         JObject(JField("ook", JNum(3)) :: JField("ack", JNum(9)) :: Nil),
@@ -1010,8 +1017,8 @@ trait TransformSpec[M[+ _]]
   }
 
   def testOuterObjectConcatEmptyObject = {
-    val JArray(elements) =
-      JParser.parseUnsafe("""[
+    val JArray(elements) = JParser.parseUnsafe(
+        """[
       {"foo": {}, "bar": {"ack": 12}},
       {"foo": {}, "bar": {"ack": 12, "bak": 13}},
       {"foo": {"ook": 99}, "bar": {}},
@@ -1041,11 +1048,15 @@ trait TransformSpec[M[+ _]]
         JObject(JField("ack", JNum(12)) :: Nil),
         JObject(JField("ack", JNum(12)) :: JField("bak", JNum(13)) :: Nil),
         JObject(JField("ook", JNum(99)) :: Nil),
-        JObject(JField("ook", JNum(99)) :: JField("ack", JNum(100)) :: JField(
-                "bak", JNum(101)) :: Nil),
+        JObject(
+            JField("ook", JNum(99)) :: JField("ack", JNum(100)) :: JField(
+                "bak",
+                JNum(101)) :: Nil),
         JObject(JField("ook", JNum(99)) :: JField("ick", JNum(100)) :: Nil),
-        JObject(JField("ook", JNum(99)) :: JField("ick", JNum(100)) :: JField(
-                "ack", JNum(102)) :: Nil),
+        JObject(
+            JField("ook", JNum(99)) :: JField("ick", JNum(100)) :: JField(
+                "ack",
+                JNum(102)) :: Nil),
         JObject(Nil),
         JObject(JField("ook", JNum(88)) :: Nil),
         JObject(Nil),
@@ -1059,8 +1070,8 @@ trait TransformSpec[M[+ _]]
   }
 
   def testInnerObjectConcatUndefined = {
-    val JArray(elements) =
-      JParser.parseUnsafe("""[
+    val JArray(elements) = JParser.parseUnsafe(
+        """[
       {"foo": {"baz": 4}, "bar": {"ack": 12}},
       {"foo": {"baz": 5}},
       {"bar": {"ack": 45}},
@@ -1084,8 +1095,8 @@ trait TransformSpec[M[+ _]]
   }
 
   def testOuterObjectConcatUndefined = {
-    val JArray(elements) =
-      JParser.parseUnsafe("""[
+    val JArray(elements) = JParser.parseUnsafe(
+        """[
       {"foo": {"baz": 4}, "bar": {"ack": 12}},
       {"foo": {"baz": 5}},
       {"bar": {"ack": 45}},
@@ -1179,19 +1190,18 @@ trait TransformSpec[M[+ _]]
         )
       })
 
-      val resultsOuter = toJson(
-          table.transform {
+      val resultsOuter = toJson(table.transform {
         OuterObjectConcat(
-            WrapObject(
-                WrapObject(DerefObjectStatic(
-                               DerefObjectStatic(
-                                   Leaf(Source),
-                                   CPathField("value")),
-                               CPathField("value1")),
-                           "value1"),
-                "value"),
-            WrapObject(WrapObject(DerefObjectStatic(DerefObjectStatic(Leaf(Source), CPathField("value")),
-                                                    CPathField("value2")),
+            WrapObject(WrapObject(DerefObjectStatic(
+                                      DerefObjectStatic(Leaf(Source),
+                                                        CPathField("value")),
+                                      CPathField("value1")),
+                                  "value1"),
+                       "value"),
+            WrapObject(WrapObject(DerefObjectStatic(
+                                      DerefObjectStatic(Leaf(Source),
+                                                        CPathField("value")),
+                                      CPathField("value2")),
                                   "value2"),
                        "value")
         )
@@ -1200,14 +1210,14 @@ trait TransformSpec[M[+ _]]
       def isOk(results: M[Stream[JValue]]) =
         results.copoint must_== (sample.data flatMap {
               case JObject(fields) => {
-                  val back = JObject(fields filter {
-                    case (name, value) =>
-                      name == "value" && value.isInstanceOf[JObject]
-                  })
-                  if (back \ "value" \ "value1" == JUndefined ||
-                      back \ "value" \ "value2" == JUndefined) None
-                  else Some(back)
-                }
+                val back = JObject(fields filter {
+                  case (name, value) =>
+                    name == "value" && value.isInstanceOf[JObject]
+                })
+                if (back \ "value" \ "value1" == JUndefined ||
+                    back \ "value" \ "value2" == JUndefined) None
+                else Some(back)
+              }
 
               case _ => None
             })
@@ -1256,7 +1266,7 @@ trait TransformSpec[M[+ _]]
         results.copoint must_== (sample.data map { _ \ "value" } collect {
               case v
                   if (v \ "value1") != JUndefined &&
-                  (v \ "value2") != JUndefined =>
+                    (v \ "value2") != JUndefined =>
                 JObject(JField("value1", v \ "value2") :: Nil)
             })
 
@@ -1293,8 +1303,7 @@ trait TransformSpec[M[+ _]]
       array.concat(undefined) = array
       which is incorrect but is what the code currently does
         */
-      val sample = SampleData(
-          sample0.data flatMap { jv =>
+      val sample = SampleData(sample0.data flatMap { jv =>
         (jv \ "value") match {
           case JArray(x :: Nil) => None
           case z => Some(z)
@@ -1305,12 +1314,14 @@ trait TransformSpec[M[+ _]]
       val resultsInner = toJson(table.transform {
         WrapObject(
             InnerArrayConcat(
-                WrapArray(DerefArrayStatic(
-                        DerefObjectStatic(Leaf(Source), CPathField("value")),
-                        CPathIndex(0))),
-                WrapArray(DerefArrayStatic(
-                        DerefObjectStatic(Leaf(Source), CPathField("value")),
-                        CPathIndex(1)))
+                WrapArray(
+                    DerefArrayStatic(DerefObjectStatic(Leaf(Source),
+                                                       CPathField("value")),
+                                     CPathIndex(0))),
+                WrapArray(
+                    DerefArrayStatic(DerefObjectStatic(Leaf(Source),
+                                                       CPathField("value")),
+                                     CPathIndex(1)))
             ),
             "value"
         )
@@ -1319,12 +1330,14 @@ trait TransformSpec[M[+ _]]
       val resultsOuter = toJson(table.transform {
         WrapObject(
             OuterArrayConcat(
-                WrapArray(DerefArrayStatic(
-                        DerefObjectStatic(Leaf(Source), CPathField("value")),
-                        CPathIndex(0))),
-                WrapArray(DerefArrayStatic(
-                        DerefObjectStatic(Leaf(Source), CPathField("value")),
-                        CPathIndex(1)))
+                WrapArray(
+                    DerefArrayStatic(DerefObjectStatic(Leaf(Source),
+                                                       CPathField("value")),
+                                     CPathIndex(0))),
+                WrapArray(
+                    DerefArrayStatic(DerefObjectStatic(Leaf(Source),
+                                                       CPathField("value")),
+                                     CPathIndex(1)))
             ),
             "value"
         )
@@ -1333,14 +1346,13 @@ trait TransformSpec[M[+ _]]
       def isOk(results: M[Stream[JValue]]) =
         results.copoint must_== (sample.data flatMap {
               case obj @ JObject(fields) => {
-                  (obj \ "value") match {
-                    case JArray(inner) if inner.length >= 2 =>
-                      Some(JObject(
-                              JField("value", JArray(inner take 2)) :: Nil))
+                (obj \ "value") match {
+                  case JArray(inner) if inner.length >= 2 =>
+                    Some(JObject(JField("value", JArray(inner take 2)) :: Nil))
 
-                    case _ => None
-                  }
+                  case _ => None
                 }
+              }
 
               case _ => None
             })
@@ -1561,8 +1573,7 @@ trait TransformSpec[M[+ _]]
 
         val Some(field) = toDelete
 
-        val result = toJson(
-            table.transform {
+        val result = toJson(table.transform {
           ObjectDelete(DerefObjectStatic(Leaf(Source), CPathField("value")),
                        Set(CPathField(field.name)))
         })
@@ -1736,8 +1747,7 @@ trait TransformSpec[M[+ _]]
     val table = fromSample(sample)
 
     val jtpe = JNumberT
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       IsType(Leaf(Source), jtpe)
     })
 
@@ -1775,8 +1785,7 @@ trait TransformSpec[M[+ _]]
     val table = fromSample(sample)
 
     val jtpe = JUnionT(JNumberT, JNullT)
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       IsType(Leaf(Source), jtpe)
     })
 
@@ -1796,8 +1805,8 @@ trait TransformSpec[M[+ _]]
   }
 
   def testIsTypeUnion = {
-    val JArray(elements) =
-      JParser.parseUnsafe("""[
+    val JArray(elements) = JParser.parseUnsafe(
+        """[
       {"key":[1], "value": 23},
       {"key":[1, "bax"], "value": {"foo":4, "bar":{}}},
       {"key":[null, "bax", 4], "value": {"foo":4.4, "bar":{"a": false}}},
@@ -1818,8 +1827,7 @@ trait TransformSpec[M[+ _]]
         Map("value" -> JObjectFixedT(Map("foo" -> JUnionT(JNumberT, JTextT),
                                          "bar" -> JObjectUnfixedT)),
             "key" -> JArrayUnfixedT))
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       IsType(Leaf(Source), jtpe)
     })
 
@@ -1839,8 +1847,8 @@ trait TransformSpec[M[+ _]]
   }
 
   def testIsTypeUnfixed = {
-    val JArray(elements) =
-      JParser.parseUnsafe("""[
+    val JArray(elements) = JParser.parseUnsafe(
+        """[
       {"key":[1], "value": 23},
       {"key":[1, "bax"], "value": {"foo":4, "bar":{}}},
       {"key":[null, "bax", 4], "value": {"foo":4.4, "bar":{"a": false}}},
@@ -1861,8 +1869,7 @@ trait TransformSpec[M[+ _]]
         Map("value" -> JObjectFixedT(
                 Map("foo" -> JNumberT, "bar" -> JObjectUnfixedT)),
             "key" -> JArrayUnfixedT))
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       IsType(Leaf(Source), jtpe)
     })
 
@@ -1900,8 +1907,7 @@ trait TransformSpec[M[+ _]]
     val table = fromSample(sample)
 
     val jtpe = JObjectFixedT(Map("value" -> JNumberT, "key" -> JArrayUnfixedT))
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       IsType(Leaf(Source), jtpe)
     })
 
@@ -1934,13 +1940,12 @@ trait TransformSpec[M[+ _]]
     val table = fromSample(sample)
 
     val jtpe = JObjectFixedT(Map())
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       IsType(Leaf(Source), jtpe)
     })
 
-    val expected = Stream(
-        JFalse, JFalse, JTrue, JFalse, JFalse, JFalse, JFalse)
+    val expected =
+      Stream(JFalse, JFalse, JTrue, JFalse, JFalse, JFalse, JFalse)
 
     results.copoint must_== expected
   }
@@ -1960,13 +1965,12 @@ trait TransformSpec[M[+ _]]
     val table = fromSample(sample)
 
     val jtpe = JArrayFixedT(Map())
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       IsType(Leaf(Source), jtpe)
     })
 
-    val expected = Stream(
-        JTrue, JFalse, JFalse, JFalse, JFalse, JFalse, JFalse)
+    val expected =
+      Stream(JTrue, JFalse, JFalse, JFalse, JFalse, JFalse, JFalse)
 
     results.copoint must_== expected
   }
@@ -1986,8 +1990,7 @@ trait TransformSpec[M[+ _]]
     val table = fromSample(sample)
 
     val jtpe = JObjectUnfixedT
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       IsType(Leaf(Source), jtpe)
     })
 
@@ -2011,8 +2014,7 @@ trait TransformSpec[M[+ _]]
     val table = fromSample(sample)
 
     val jtpe = JArrayUnfixedT
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       IsType(Leaf(Source), jtpe)
     })
 
@@ -2022,14 +2024,14 @@ trait TransformSpec[M[+ _]]
   }
 
   def testIsTypeTrivial = {
-    val JArray(elements) =
-      JParser.parseUnsafe("""[
+    val JArray(elements) = JParser.parseUnsafe(
+        """[
       {"key":[2,1,1],"value":[]},
       {"key":[2,2,2],"value":{"dx":[8.342062585288287E+307]}}]
     """)
 
-    val sample = SampleData(
-        elements.toStream, Some((3, Seq((JPath.Identity, CEmptyArray)))))
+    val sample = SampleData(elements.toStream,
+                            Some((3, Seq((JPath.Identity, CEmptyArray)))))
 
     testIsType(sample)
   }
@@ -2086,8 +2088,7 @@ trait TransformSpec[M[+ _]]
     check { (sample: SampleData) =>
       val table = fromSample(sample)
 
-      val results = toJson(
-          table.transform {
+      val results = toJson(table.transform {
         Typed(Leaf(Source),
               JObjectFixedT(Map("value" -> JObjectFixedT(
                           Map("value1" -> JNumberT, "value3" -> JNumberT)))))
@@ -2100,7 +2101,8 @@ trait TransformSpec[M[+ _]]
 
           if (value1.isInstanceOf[JNum] && value3.isInstanceOf[JNum]) {
             Some(
-                JObject(JField(
+                JObject(
+                    JField(
                         "value",
                         JObject(
                             JField("value1", jv \ "value" \ "value1") :: JField(
@@ -2152,8 +2154,8 @@ trait TransformSpec[M[+ _]]
   }
 
   def testTypedAtSliceBoundary = {
-    val JArray(data) =
-      JParser.parseUnsafe("""[
+    val JArray(data) = JParser.parseUnsafe(
+        """[
         { "value":{ "n":{ } }, "key":[1,1,1] },
         { "value":{ "lvf":2123699568254154891, "vbeu":false, "dAc":4611686018427387903 }, "key":[1,1,3] },
         { "value":{ "lvf":1, "vbeu":true, "dAc":0 }, "key":[2,1,1] },
@@ -2167,8 +2169,8 @@ trait TransformSpec[M[+ _]]
         { "value":{ "lvf":-1, "vbeu":true, "dAc":0 }, "key":[4,3,4] }
       ]""")
 
-    val sample = SampleData(
-        data.toStream, Some((3, List((JPath(".n"), CEmptyObject)))))
+    val sample =
+      SampleData(data.toStream, Some((3, List((JPath(".n"), CEmptyObject)))))
 
     testTyped(sample)
   }
@@ -2183,8 +2185,7 @@ trait TransformSpec[M[+ _]]
     val table = fromSample(sample)
 
     val jtpe = JObjectFixedT(Map("value" -> JTextT, "key" -> JArrayUnfixedT))
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(Leaf(Source), jtpe)
     })
 
@@ -2206,8 +2207,7 @@ trait TransformSpec[M[+ _]]
     val sample = SampleData(elements.toStream)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(Leaf(Source),
             JObjectFixedT(Map("value" -> JObjectFixedT(Map("foo" -> JNumberT)),
                               "key" -> JArrayUnfixedT)))
@@ -2224,15 +2224,15 @@ trait TransformSpec[M[+ _]]
 
   def testTypedObject2 = {
     val data: Stream[JValue] = Stream(
-        JObject(List(JField("value",
-                            JObject(List(JField("foo", JBool(true)),
-                                         JField("bar", JNum(77))))),
-                     JField("key", JArray(List(JNum(1)))))))
+        JObject(
+            List(JField("value",
+                        JObject(List(JField("foo", JBool(true)),
+                                     JField("bar", JNum(77))))),
+                 JField("key", JArray(List(JNum(1)))))))
     val sample = SampleData(data)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(Leaf(Source),
             JObjectFixedT(Map("value" -> JObjectFixedT(Map("bar" -> JNumberT)),
                               "key" -> JArrayUnfixedT)))
@@ -2251,8 +2251,7 @@ trait TransformSpec[M[+ _]]
     val sample = SampleData(data)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(Leaf(Source), JObjectUnfixedT)
     })
 
@@ -2269,8 +2268,7 @@ trait TransformSpec[M[+ _]]
     val sample = SampleData(data.toStream)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(
           Leaf(Source),
           JObjectFixedT(
@@ -2298,14 +2296,15 @@ trait TransformSpec[M[+ _]]
         Map("value" -> JArrayFixedT(Map(1 -> JBooleanT)),
             "key" -> JArrayUnfixedT))
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(Leaf(Source), jtpe)
     })
 
     val expected = Stream(
-        JObject(JField("key", JArray(JNum(1) :: Nil)) :: JField(
-                "value", JArray(JUndefined :: JBool(true) :: Nil)) :: Nil))
+        JObject(
+            JField("key", JArray(JNum(1) :: Nil)) :: JField(
+                "value",
+                JArray(JUndefined :: JBool(true) :: Nil)) :: Nil))
 
     results.copoint must_== expected
   }
@@ -2329,8 +2328,7 @@ trait TransformSpec[M[+ _]]
                                         2 -> JNullT)),
             "key" -> JArrayUnfixedT))
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(Leaf(Source), jtpe)
     })
 
@@ -2349,29 +2347,29 @@ trait TransformSpec[M[+ _]]
   }
 
   def testTypedArray4 = {
-    val data: Stream[JValue] =
-      Stream(JObject(List(
-                     JField("value",
-                            JArray(
-                                List(
-                                    JNum(2.4),
-                                    JNum(12), JBool(true), JArray(List())))),
-                      JField("key", JArray(List(JNum(1)))))),
-             JObject(
-                 List(JField("value",
-                             JArray(List(JNum(3.5), JNull, JBool(false)))),
-                      JField("key", JArray(List(JNum(2)))))))
+    val data: Stream[JValue] = Stream(
+        JObject(
+            List(JField("value",
+                        JArray(
+                            List(JNum(2.4),
+                                 JNum(12),
+                                 JBool(true),
+                                 JArray(List())))),
+                 JField("key", JArray(List(JNum(1)))))),
+        JObject(
+            List(JField("value", JArray(List(JNum(3.5), JNull, JBool(false)))),
+                 JField("key", JArray(List(JNum(2)))))))
     val sample = SampleData(data)
     val table = fromSample(sample)
 
     val jtpe = JObjectFixedT(
-        Map("value" -> JArrayFixedT(Map(0 -> JNumberT,
-                                        1 -> JNumberT,
-                                        2 -> JBooleanT,
-                                        3 -> JArrayFixedT(Map()))),
+        Map("value" -> JArrayFixedT(
+                Map(0 -> JNumberT,
+                    1 -> JNumberT,
+                    2 -> JBooleanT,
+                    3 -> JArrayFixedT(Map()))),
             "key" -> JArrayUnfixedT))
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(Leaf(Source), jtpe)
     })
 
@@ -2399,8 +2397,7 @@ trait TransformSpec[M[+ _]]
     val sample = SampleData(data.toStream)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(Leaf(Source),
             JObjectFixedT(Map("value" -> JNumberT, "key" -> JArrayUnfixedT)))
     })
@@ -2415,15 +2412,16 @@ trait TransformSpec[M[+ _]]
 
   def testTypedNumber2 = {
     val data: Stream[JValue] = Stream(
-        JObject(List(JField("value", JNum(23)),
-                     JField("key", JArray(List(JNum(1), JNum(3)))))),
-        JObject(List(JField("value", JNum(12.5)),
-                     JField("key", JArray(List(JNum(2), JNum(4)))))))
+        JObject(
+            List(JField("value", JNum(23)),
+                 JField("key", JArray(List(JNum(1), JNum(3)))))),
+        JObject(
+            List(JField("value", JNum(12.5)),
+                 JField("key", JArray(List(JNum(2), JNum(4)))))))
     val sample = SampleData(data)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(Leaf(Source),
             JObjectFixedT(Map("value" -> JNumberT, "key" -> JArrayUnfixedT)))
     })
@@ -2440,8 +2438,7 @@ trait TransformSpec[M[+ _]]
     val sample = SampleData(data.toStream)
     val table = fromSample(sample)
 
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Typed(Leaf(Source),
             JObjectFixedT(
                 Map("value" -> JArrayFixedT(Map()), "key" -> JArrayUnfixedT)))
@@ -2459,14 +2456,14 @@ trait TransformSpec[M[+ _]]
       JObject(
           JField("value", JNum(BigDecimal("2705009941739170689"))) :: JField(
               "key",
-              JArray(JNum(1) :: Nil)) :: Nil) #:: JObject(JField("value",
-                                                                 JString("")) :: JField(
-              "key", JArray(JNum(2) :: Nil)) :: Nil) #:: Stream.empty
+              JArray(JNum(1) :: Nil)) :: Nil) #:: JObject(
+          JField(
+              "value",
+              JString("")) :: JField("key", JArray(JNum(2) :: Nil)) :: Nil) #:: Stream.empty
 
     val sample = SampleData(data)
     val table = fromSample(sample)
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Scan(DerefObjectStatic(Leaf(Source), CPathField("value")),
            lookupScanner(Nil, "sum"))
     })
@@ -2474,11 +2471,11 @@ trait TransformSpec[M[+ _]]
     val (_, expected) =
       sample.data.foldLeft((BigDecimal(0), Vector.empty[JValue])) {
         case ((a, s), jv) => {
-            (jv \ "value") match {
-              case JNum(i) => (a + i, s :+ JNum(a + i))
-              case _ => (a, s)
-            }
+          (jv \ "value") match {
+            case JNum(i) => (a + i, s :+ JNum(a + i))
+            case _ => (a, s)
           }
+        }
       }
 
     results.copoint must_== expected.toStream
@@ -2487,16 +2484,17 @@ trait TransformSpec[M[+ _]]
   def testHetScan = {
     val data =
       JObject(JField("value", JNum(12)) :: JField(
-              "key", JArray(JNum(1) :: Nil)) :: Nil) #:: JObject(JField(
+              "key",
+              JArray(JNum(1) :: Nil)) :: Nil) #:: JObject(JField(
               "value",
               JNum(10)) :: JField("key", JArray(JNum(2) :: Nil)) :: Nil) #:: JObject(
           JField("value", JArray(JNum(13) :: Nil)) :: JField(
-              "key", JArray(JNum(3) :: Nil)) :: Nil) #:: Stream.empty
+              "key",
+              JArray(JNum(3) :: Nil)) :: Nil) #:: Stream.empty
 
     val sample = SampleData(data)
     val table = fromSample(sample)
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       Scan(DerefObjectStatic(Leaf(Source), CPathField("value")),
            lookupScanner(Nil, "sum"))
     })
@@ -2504,11 +2502,11 @@ trait TransformSpec[M[+ _]]
     val (_, expected) =
       sample.data.foldLeft((BigDecimal(0), Vector.empty[JValue])) {
         case ((a, s), jv) => {
-            (jv \ "value") match {
-              case JNum(i) => (a + i, s :+ JNum(a + i))
-              case _ => (a, s)
-            }
+          (jv \ "value") match {
+            case JNum(i) => (a + i, s :+ JNum(a + i))
+            case _ => (a, s)
           }
+        }
       }
 
     results.copoint must_== expected.toStream
@@ -2518,8 +2516,7 @@ trait TransformSpec[M[+ _]]
     implicit val gen = sample(_ => Seq(JPath.Identity -> CLong))
     check { (sample: SampleData) =>
       val table = fromSample(sample)
-      val results = toJson(
-          table.transform {
+      val results = toJson(table.transform {
         Scan(DerefObjectStatic(Leaf(Source), CPathField("value")),
              lookupScanner(Nil, "sum"))
       })
@@ -2527,11 +2524,11 @@ trait TransformSpec[M[+ _]]
       val (_, expected) =
         sample.data.foldLeft((BigDecimal(0), Vector.empty[JValue])) {
           case ((a, s), jv) => {
-              (jv \ "value") match {
-                case JNum(i) => (a + i, s :+ JNum(a + i))
-                case _ => (a, s)
-              }
+            (jv \ "value") match {
+              case JNum(i) => (a + i, s :+ JNum(a + i))
+              case _ => (a, s)
             }
+          }
         }
 
       results.copoint must_== expected.toStream
@@ -2546,8 +2543,7 @@ trait TransformSpec[M[+ _]]
         .empty[JValue]
 
     val table = fromSample(SampleData(data))
-    val results = toJson(
-        table.transform {
+    val results = toJson(table.transform {
       DerefObjectDynamic(
           Leaf(Source),
           DerefObjectStatic(Leaf(Source), CPathField("ref"))
@@ -2570,8 +2566,7 @@ trait TransformSpec[M[+ _]]
       this will never happen in the real system
       so the test ignores this case
         */
-      val sample = SampleData(
-          sample0.data flatMap { jv =>
+      val sample = SampleData(sample0.data flatMap { jv =>
         (jv \ "value") match {
           case JArray(x :: Nil) => None
           case JArray(x :: y :: Nil) => None
@@ -2579,8 +2574,7 @@ trait TransformSpec[M[+ _]]
         }
       })
       val table = fromSample(sample)
-      val results = toJson(
-          table.transform {
+      val results = toJson(table.transform {
         ArraySwap(DerefObjectStatic(Leaf(Source), CPathField("value")), 2)
       })
 
@@ -2605,7 +2599,8 @@ trait TransformSpec[M[+ _]]
     check { (sample: SampleData) =>
       val table = fromSample(sample)
       val results = toJson(
-          table.transform(ConstLiteral(
+          table.transform(
+              ConstLiteral(
                   CString("foo"),
                   DerefObjectStatic(DerefObjectStatic(Leaf(Source),
                                                       CPathField("value")),
@@ -2628,7 +2623,8 @@ trait TransformSpec[M[+ _]]
       val results = toJson(table transform {
         Cond(Map1(DerefObjectStatic(Leaf(Source), CPathField("value")),
                   lookupF2(Nil, "mod").applyr(CLong(2)) andThen lookupF2(
-                      Nil, "eq").applyr(CLong(0))),
+                      Nil,
+                      "eq").applyr(CLong(0))),
              DerefObjectStatic(Leaf(Source), CPathField("value")),
              ConstLiteral(CBoolean(false), Leaf(Source)))
       })
@@ -2660,7 +2656,7 @@ trait TransformSpec[M[+ _]]
                 case JString(_) => ctpes.contains(CString)
                 case JNum(_) =>
                   ctpes.contains(CLong) || ctpes.contains(CDouble) ||
-                  ctpes.contains(CNum)
+                    ctpes.contains(CNum)
                 case JNull => ctpes.contains(CNull)
                 case JObject(elements) =>
                   // if elements is nonempty, then leaf is a nonempty object and consequently can't conform

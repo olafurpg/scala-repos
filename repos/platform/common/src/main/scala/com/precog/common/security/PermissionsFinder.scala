@@ -41,8 +41,8 @@ import scalaz.syntax.std.option._
 
 object PermissionsFinder {
   import Permission._
-  def canWriteAs(
-      permissions: Set[WritePermission], authorities: Authorities): Boolean = {
+  def canWriteAs(permissions: Set[WritePermission],
+                 authorities: Authorities): Boolean = {
     val permWriteAs = permissions.map(_.writeAs)
     permWriteAs.exists(_ == WriteAsAny) || {
       val writeAsAlls = permWriteAs.collect({
@@ -95,7 +95,9 @@ class PermissionsFinder[M[+ _]: Monad](val apiKeyFinder: APIKeyFinder[M],
           case WritePermission(_, WriteAsAny) =>
             left(accountWriter)
           case WritePermission(_, WriteAsAll(accountIds)) =>
-            (Authorities.ifPresent(accountIds).map(a => Some(a).point[M]) \/> accountWriter)
+            (Authorities
+                  .ifPresent(accountIds)
+                  .map(a => Some(a).point[M]) \/> accountWriter)
         })(collection.breakOut)
 
       // if it is possible to write as the account holder for the api key, then do so, otherwise,
@@ -121,17 +123,20 @@ class PermissionsFinder[M[+ _]: Monad](val apiKeyFinder: APIKeyFinder[M],
     }
   }
 
-  def writePermissions(
-      apiKey: APIKey, path: Path, at: Instant): M[Set[WritePermission]] = {
+  def writePermissions(apiKey: APIKey,
+                       path: Path,
+                       at: Instant): M[Set[WritePermission]] = {
     apiKeyFinder.findAPIKey(apiKey, None) map {
       case Some(details) =>
-        logger.debug("Filtering write grants from " + details + " for " +
-            path + " at " + at)
+        logger.debug(
+            "Filtering write grants from " + details + " for " +
+              path + " at " + at)
         filterWritePermissions(details, path, Some(at))
 
       case None =>
-        logger.warn("No API key details found for %s %s at %s".format(
-                apiKey, path.path, at.toString))
+        logger.warn(
+            "No API key details found for %s %s at %s"
+              .format(apiKey, path.path, at.toString))
         Set()
     }
   }

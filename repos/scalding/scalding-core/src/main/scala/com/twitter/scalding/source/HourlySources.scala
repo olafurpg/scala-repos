@@ -23,8 +23,8 @@ abstract class HourlySuffixSource(prefixTemplate: String, dateRange: DateRange)
         dateRange,
         DateOps.UTC)
 
-abstract class HourlySuffixMostRecentSource(
-    prefixTemplate: String, dateRange: DateRange)
+abstract class HourlySuffixMostRecentSource(prefixTemplate: String,
+                                            dateRange: DateRange)
     extends MostRecentGoodSource(
         prefixTemplate + TimePathedSource.YEAR_MONTH_DAY_HOUR + "/*",
         dateRange,
@@ -35,8 +35,8 @@ object HourlySuffixTsv {
     new HourlySuffixTsv(prefix)
 }
 
-class HourlySuffixTsv(
-    prefix: String)(override implicit val dateRange: DateRange)
+class HourlySuffixTsv(prefix: String)(
+    override implicit val dateRange: DateRange)
     extends HourlySuffixSource(prefix, dateRange)
     with DelimitedScheme
 

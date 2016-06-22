@@ -136,10 +136,11 @@ abstract class JavaPartialFunction[A, B]
   final override def apply(x: A): B = try apply(x, false) catch {
     case NoMatch ⇒ throw new MatchError(x)
   }
-  final override def applyOrElse[A1 <: A, B1 >: B](
-      x: A1, default: A1 ⇒ B1): B1 = try apply(x, false) catch {
-    case NoMatch ⇒ default(x)
-  }
+  final override def applyOrElse[A1 <: A, B1 >: B](x: A1,
+                                                   default: A1 ⇒ B1): B1 =
+    try apply(x, false) catch {
+      case NoMatch ⇒ default(x)
+    }
 }
 
 /**

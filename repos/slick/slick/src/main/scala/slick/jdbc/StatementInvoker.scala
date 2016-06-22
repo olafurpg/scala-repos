@@ -9,7 +9,8 @@ import scala.collection.mutable.ArrayBuffer
 private[jdbc] object StatementInvoker {
   val maxLogResults = 5
   lazy val tableDump = new TableDump(20)
-  lazy val resultLogger = new SlickLogger(LoggerFactory.getLogger(
+  lazy val resultLogger = new SlickLogger(
+      LoggerFactory.getLogger(
           classOf[StatementInvoker[_]].getName + ".result"))
 }
 
@@ -21,8 +22,8 @@ abstract class StatementInvoker[+R] extends Invoker[R] { self =>
 
   def iteratorTo(maxRows: Int)(
       implicit session: JdbcBackend#Session): CloseableIterator[R] =
-    results(maxRows).fold(
-        r => new CloseableIterator.Single[R](r.asInstanceOf[R]), identity)
+    results(maxRows).fold(r =>
+          new CloseableIterator.Single[R](r.asInstanceOf[R]), identity)
 
   /** Invoke the statement and return the raw results. */
   def results(
@@ -34,8 +35,10 @@ abstract class StatementInvoker[+R] extends Invoker[R] { self =>
     : Either[Int, PositionedResultIterator[R]] = {
     //TODO Support multiple results
     val statement = getStatement
-    val st = session.prepareStatement(
-        statement, defaultType, defaultConcurrency, defaultHoldability)
+    val st = session.prepareStatement(statement,
+                                      defaultType,
+                                      defaultConcurrency,
+                                      defaultHoldability)
     setParam(st)
     var doClose = true
     try {
@@ -43,16 +46,15 @@ abstract class StatementInvoker[+R] extends Invoker[R] { self =>
       val doLogResult = StatementInvoker.resultLogger.isDebugEnabled
       if (st.execute) {
         val rs = st.getResultSet
-        val logHeader =
-          if (doLogResult) {
-            val meta = rs.getMetaData
-            Vector(
-                1.to(meta.getColumnCount).map(_.toString),
-                1.to(meta.getColumnCount)
-                  .map(idx => meta.getColumnLabel(idx))
-                  .to[ArrayBuffer]
-            )
-          } else null
+        val logHeader = if (doLogResult) {
+          val meta = rs.getMetaData
+          Vector(
+              1.to(meta.getColumnCount).map(_.toString),
+              1.to(meta.getColumnCount)
+                .map(idx => meta.getColumnLabel(idx))
+                .to[ArrayBuffer]
+          )
+        } else null
         val logBuffer =
           if (doLogResult) new ArrayBuffer[ArrayBuffer[Any]] else null
         var rowCount = 0

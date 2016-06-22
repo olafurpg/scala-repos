@@ -47,8 +47,8 @@ abstract class ScTemplateParentsElementType[Func <: ScTemplateParents](
                                         StringRef.fromString(te.getText)))
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTemplateParentsStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScTemplateParentsStub = {
     val length = dataStream.readInt
     if (length >= 0) {
       val res = new ArrayBuffer[StringRef]
@@ -58,7 +58,10 @@ abstract class ScTemplateParentsElementType[Func <: ScTemplateParents](
         case false => None
       }
       new ScTemplateParentsStubImpl(
-          parentStub.asInstanceOf[StubElement[PsiElement]], this, constr, res)
+          parentStub.asInstanceOf[StubElement[PsiElement]],
+          this,
+          constr,
+          res)
     } else {
       ScTemplateParentsElementType.LOG.error(
           "Negative byte deserialized for array")

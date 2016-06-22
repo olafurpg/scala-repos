@@ -68,12 +68,13 @@ private[spark] class CoarseGrainedExecutorBackend(override val rpcEnv: RpcEnv,
         // This is a very fast action so we can use "ThreadUtils.sameThread"
         case Success(msg) =>
           Utils.tryLogNonFatalError {
-            Option(self).foreach(_.send(msg)) // msg must be RegisterExecutorResponse
+            Option(self)
+              .foreach(_.send(msg)) // msg must be RegisterExecutorResponse
           }
         case Failure(e) => {
-            logError(s"Cannot register with driver: $driverUrl", e)
-            System.exit(1)
-          }
+          logError(s"Cannot register with driver: $driverUrl", e)
+          System.exit(1)
+        }
       }(ThreadUtils.sameThread)
   }
 
@@ -87,8 +88,8 @@ private[spark] class CoarseGrainedExecutorBackend(override val rpcEnv: RpcEnv,
   override def receive: PartialFunction[Any, Unit] = {
     case RegisteredExecutor(hostname) =>
       logInfo("Successfully registered with driver")
-      executor = new Executor(
-          executorId, hostname, env, userClassPath, isLocal = false)
+      executor =
+        new Executor(executorId, hostname, env, userClassPath, isLocal = false)
 
     case RegisterExecutorFailed(message) =>
       logError("Slave registration failed: " + message)
@@ -193,18 +194,26 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
         }
       }
       if (driverConf.contains("spark.yarn.credentials.file")) {
-        logInfo("Will periodically update credentials from: " +
-            driverConf.get("spark.yarn.credentials.file"))
+        logInfo(
+            "Will periodically update credentials from: " +
+              driverConf.get("spark.yarn.credentials.file"))
         SparkHadoopUtil.get.startExecutorDelegationTokenRenewer(driverConf)
       }
 
-      val env = SparkEnv.createExecutorEnv(
-          driverConf, executorId, hostname, port, cores, isLocal = false)
+      val env = SparkEnv.createExecutorEnv(driverConf,
+                                           executorId,
+                                           hostname,
+                                           port,
+                                           cores,
+                                           isLocal = false)
 
-      env.rpcEnv.setupEndpoint(
-          "Executor",
-          new CoarseGrainedExecutorBackend(
-              env.rpcEnv, driverUrl, executorId, cores, userClassPath, env))
+      env.rpcEnv.setupEndpoint("Executor",
+                               new CoarseGrainedExecutorBackend(env.rpcEnv,
+                                                                driverUrl,
+                                                                executorId,
+                                                                cores,
+                                                                userClassPath,
+                                                                env))
       workerUrl.foreach { url =>
         env.rpcEnv.setupEndpoint("WorkerWatcher",
                                  new WorkerWatcher(env.rpcEnv, url))

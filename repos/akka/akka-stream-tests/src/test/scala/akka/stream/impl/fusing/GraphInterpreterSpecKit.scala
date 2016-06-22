@@ -101,7 +101,8 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
 
         for ((downstream, i) ← downstreams.zipWithIndex) {
           _interpreter.attachDownstreamBoundary(
-              i + upstreams.size + connections.size, downstream._2)
+              i + upstreams.size + connections.size,
+              downstream._2)
         }
 
         _interpreter.init(null)
@@ -344,8 +345,8 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
   implicit class ToGraphStage[I, O](stage: Stage[I, O]) {
     def toGS: PushPullGraphStage[Any, Any, Any] = {
       val s = stage
-      new PushPullGraphStage[Any, Any, Any](
-          (_) ⇒ s.asInstanceOf[Stage[Any, Any]], Attributes.none)
+      new PushPullGraphStage[Any, Any, Any]((_) ⇒
+            s.asInstanceOf[Stage[Any, Any]], Attributes.none)
     }
   }
 

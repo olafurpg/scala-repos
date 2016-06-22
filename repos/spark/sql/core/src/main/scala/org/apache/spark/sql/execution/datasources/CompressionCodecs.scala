@@ -50,8 +50,8 @@ private[datasources] object CompressionCodecs {
       case e: ClassNotFoundException =>
         throw new IllegalArgumentException(
             s"Codec [$codecName] " +
-            s"is not available. Known codecs are ${shortCompressionCodecNames.keys
-          .mkString(", ")}.")
+              s"is not available. Known codecs are ${shortCompressionCodecNames.keys
+            .mkString(", ")}.")
     }
   }
 

@@ -46,19 +46,18 @@ class InsertCompiler(val mode: InsertCompiler.Mode) extends Phase {
         tr(expansion)
       case sel @ Select(Ref(s), fs: FieldSymbol) if s == expansionRef =>
         allFields += fs
-        val ch =
-          if (mode(fs)) {
-            cols += Select(tref, fs) :@ sel.nodeType
-            ConstArray(
-                Select(rref, ElementSymbol(cols.length)) :@ sel.nodeType)
-          } else ConstArray.empty
+        val ch = if (mode(fs)) {
+          cols += Select(tref, fs) :@ sel.nodeType
+          ConstArray(Select(rref, ElementSymbol(cols.length)) :@ sel.nodeType)
+        } else ConstArray.empty
         InsertColumn(ch, fs, sel.nodeType).infer()
       case Ref(s) if s == expansionRef =>
         tr(tableExpansion.columns)
       case Bind(gen, te @ TableExpansion(_, t: TableNode, _), Pure(sel, _)) =>
         setTable(te)
-        tr(sel.replace({ case Ref(s) if s == gen => Ref(expansionRef) },
-            keepType = true))
+        tr(
+            sel.replace({ case Ref(s) if s == gen => Ref(expansionRef) },
+                        keepType = true))
       case _ =>
         throw new SlickException(
             "Cannot use node " + n + " for inserting data")
@@ -71,7 +70,8 @@ class InsertCompiler(val mode: InsertCompiler.Mode) extends Phase {
                      ProductNode(cols.result),
                      allFields.result).infer()
     ResultSetMapping(linearSym, ins, tree2) :@ CollectionType(
-        TypedCollectionTypeConstructor.seq, ins.nodeType)
+        TypedCollectionTypeConstructor.seq,
+        ins.nodeType)
   }
 }
 

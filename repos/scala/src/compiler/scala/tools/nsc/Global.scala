@@ -60,7 +60,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       settings.YclasspathImpl.value match {
         case ClassPathRepresentationType.Flat =>
           new loaders.PackageLoaderUsingFlatClassPath(
-              FlatClassPath.RootPackage, flatClassPath)
+              FlatClassPath.RootPackage,
+              flatClassPath)
         case ClassPathRepresentationType.Recursive =>
           new loaders.PackageLoader(recursiveClassPath)
       }
@@ -190,8 +191,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         if (lastPrintedSource == source)
           println(": tree is unchanged since " + lastPrintedPhase)
         else {
-          lastPrintedPhase =
-            phase.prev // since we're running inside "exitingPhase"
+          lastPrintedPhase = phase.prev // since we're running inside "exitingPhase"
           lastPrintedSource = source
           println("")
           println(source)
@@ -295,7 +295,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
 
   override def shouldLogAtThisPhase =
     settings.log.isSetByUser && ((settings.log containsPhase globalPhase) ||
-        (settings.log containsPhase phase))
+          (settings.log containsPhase phase))
   // Over 200 closure objects are eliminated by inlining this.
   @inline final def log(msg: => AnyRef) {
     if (shouldLogAtThisPhase)
@@ -345,7 +345,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         case ex: Throwable =>
           globalError(
               "exception while trying to instantiate source reader '" + name +
-              "'")
+                "'")
           None
       }
     }
@@ -358,7 +358,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   if (settings.verbose || settings.Ylogcp)
     reporter.echo(
         s"[search path for source files: ${classPath.asSourcePathString}]\n" +
-        s"[search path for class files: ${classPath.asClassPathString}]"
+          s"[search path for class files: ${classPath.asClassPathString}]"
     )
 
   // The current division between scala.reflect.* and scala.tools.nsc.* is pretty
@@ -769,20 +769,21 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         (if (max < 0 || s.length <= max) s
          else if (max < 4) s.take(max)
          else s.take(max - 3) + "...")
-      override def formatTo(
-          formatter: Formatter, flags: Int, width: Int, precision: Int) {
+      override def formatTo(formatter: Formatter,
+                            flags: Int,
+                            width: Int,
+                            precision: Int) {
         val p = elliptically(s, precision)
-        val w =
-          if (width > 0 && p.length < width) {
-            import FormattableFlags.LEFT_JUSTIFY
-            val leftly = (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY
-            val sb = new StringBuilder
-            def pad() = 1 to width - p.length foreach (_ => sb.append(' '))
-            if (!leftly) pad()
-            sb.append(p)
-            if (leftly) pad()
-            sb.toString
-          } else p
+        val w = if (width > 0 && p.length < width) {
+          import FormattableFlags.LEFT_JUSTIFY
+          val leftly = (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY
+          val sb = new StringBuilder
+          def pad() = 1 to width - p.length foreach (_ => sb.append(' '))
+          if (!leftly) pad()
+          sb.append(p)
+          if (leftly) pad()
+          sb.toString
+        } else p
         formatter.out.append(w)
       }
     }
@@ -837,8 +838,11 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     */
   private def isSystemPackageClass(pkg: Symbol) =
     pkg == RootClass ||
-    (pkg.hasTransOwner(definitions.ScalaPackageClass) && !pkg.hasTransOwner(
-            this.rootMirror.staticPackage("scala.tools").moduleClass.asClass))
+      (pkg.hasTransOwner(definitions.ScalaPackageClass) && !pkg.hasTransOwner(
+              this.rootMirror
+                .staticPackage("scala.tools")
+                .moduleClass
+                .asClass))
 
   /** Invalidates packages that contain classes defined in a classpath entry, and
     *  rescans that entry.
@@ -975,8 +979,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
             (root.info decl pname) orElse {
               // package does not exist in symbol table, create symbol to track it
               assert(!subPackage(oldEntries.get, pstr).isDefined)
-              loaders.enterPackage(
-                  root, pstr, new loaders.PackageLoader(allEntries.get))
+              loaders.enterPackage(root,
+                                   pstr,
+                                   new loaders.PackageLoader(allEntries.get))
             }
           mergeNewEntries(subPackage(newEntries, pstr).get,
                           pkg.moduleClass.asClass,
@@ -1022,8 +1027,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     (definitions.isDefinitionsInitialized && rootMirror.isMirrorInitialized)
   override def isPastTyper =
     ((curRun ne null) &&
-        isGlobalInitialized // defense against init order issues
-        && (globalPhase.id > currentRun.typerPhase.id))
+          isGlobalInitialized // defense against init order issues
+          && (globalPhase.id > currentRun.typerPhase.id))
 
   // TODO - trim these to the absolute minimum.
   @inline final def exitingErasure[T](op: => T): T =
@@ -1098,13 +1103,16 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         // Taking 3 before, 3 after the fingered line.
         val start = 0 max (tree.pos.line - 3)
         val xs =
-          scala.reflect.io.File(tree.pos.source.file.file).lines drop start take 7
+          scala.reflect.io
+            .File(tree.pos.source.file.file)
+            .lines drop start take 7
         val strs =
           xs.zipWithIndex map {
             case (line, idx) => f"${start + idx}%6d $line"
           }
-        strs.mkString(
-            "== Source file context for tree position ==\n\n", "\n", "")
+        strs.mkString("== Source file context for tree position ==\n\n",
+                      "\n",
+                      "")
       } catch {
         case t: Exception => devWarning("" + t); "<Cannot read source file>"
       }
@@ -1112,8 +1120,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       val info1 = formatExplain(
           "while compiling" -> currentSource.path,
           "during phase" ->
-          (if (globalPhase eq phase) phase
-           else "globalPhase=%s, enteringPhase=%s".format(globalPhase, phase)),
+            (if (globalPhase eq phase) phase
+             else
+               "globalPhase=%s, enteringPhase=%s".format(globalPhase, phase)),
           "library version" -> scala.util.Properties.versionString,
           "compiler version" -> Properties.versionString,
           "reconstructed args" -> settings.recreateArgs.mkString(" ")
@@ -1128,7 +1137,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
           "symbol package" -> sym.enclosingPackage.fullName,
           "symbol owners" -> ownerChainString(sym),
           "call site" ->
-          (site.fullLocationString + " in " + site.enclosingPackage)
+            (site.fullLocationString + " in " + site.enclosingPackage)
       )
       ("\n  " + errorMessage + "\n" +
           info1) :: info2 :: context_s :: Nil mkString "\n\n"
@@ -1141,8 +1150,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   def echoPhaseSummary(ph: Phase) = {
     /* Only output a summary message under debug if we aren't echoing each file. */
     if (settings.debug && !(settings.verbose || currentRun.size < 5))
-      inform("[running phase " + ph.name + " on " + currentRun.size +
-          " compilation units]")
+      inform(
+          "[running phase " + ph.name + " on " + currentRun.size +
+            " compilation units]")
   }
 
   def newSourceFile(code: String, filename: String = "<console>") =
@@ -1403,14 +1413,15 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       // issue warnings for any usage of deprecated settings
       settings.userSetSettings filter (_.isDeprecated) foreach { s =>
         currentRun.reporting.deprecationWarning(
-            NoPosition, s.name + " is deprecated: " + s.deprecationMessage.get)
+            NoPosition,
+            s.name + " is deprecated: " + s.deprecationMessage.get)
       }
       val supportedTarget = "jvm-1.8"
       if (settings.target.value != supportedTarget) {
         currentRun.reporting.deprecationWarning(
             NoPosition,
             settings.target.name + ":" + settings.target.value +
-            " is deprecated and has no effect, setting to " + supportedTarget)
+              " is deprecated and has no effect, setting to " + supportedTarget)
         settings.target.value = supportedTarget
       }
       settings.conflictWarning.foreach(reporter.warning(NoPosition, _))
@@ -1490,7 +1501,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         exitingPhase(phase) {
           trackers foreach { t =>
             t.snapshot()
-            inform(t.show(
+            inform(
+                t.show(
                     "Heading from " + phase.prev.name + " to " + phase.name))
           }
         }
@@ -1524,8 +1536,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     def compileUnits(units: List[CompilationUnit], fromPhase: Phase): Unit =
       compileUnitsInternal(units, fromPhase)
 
-    private def compileUnitsInternal(
-        units: List[CompilationUnit], fromPhase: Phase) {
+    private def compileUnitsInternal(units: List[CompilationUnit],
+                                     fromPhase: Phase) {
       def currentTime =
         java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(System.nanoTime())
 
@@ -1607,8 +1619,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       try {
         val sources: List[SourceFile] =
           if (settings.script.isSetByUser && filenames.size > 1)
-            returning(Nil)(
-                _ => globalError("can only compile one script at a time"))
+            returning(Nil)(_ =>
+                  globalError("can only compile one script at a time"))
           else filenames map getSourceFile
 
         compileSources(sources)
@@ -1665,8 +1677,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   /** We resolve the class/object ambiguity by passing a type/term name.
     */
   def showDef(fullName: Name, declsOnly: Boolean, ph: Phase) = {
-    val boringOwners = Set[Symbol](
-        definitions.AnyClass, definitions.AnyRefClass, definitions.ObjectClass)
+    val boringOwners = Set[Symbol](definitions.AnyClass,
+                                   definitions.AnyRefClass,
+                                   definitions.ObjectClass)
     def phased[T](body: => T): T = exitingPhase(ph)(body)
     def boringMember(sym: Symbol) = boringOwners(sym.owner)
     def symString(sym: Symbol) =
@@ -1683,15 +1696,16 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       // The name as given was not found, so we'll sift through every symbol in
       // the run looking for plausible matches.
       case NoSymbol =>
-        phased(currentRun.symSource.keys map
-            (sym => findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
+        phased(
+            currentRun.symSource.keys map
+              (sym => findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
       // The name as given matched, so show only that.
       case sym => List(sym)
     }
 
     syms foreach { sym =>
-      val name = "\n<<-- %s %s after phase '%s' -->>".format(
-          sym.kindString, sym.fullName, ph.name)
+      val name = "\n<<-- %s %s after phase '%s' -->>"
+        .format(sym.kindString, sym.fullName, ph.name)
       val baseClasses = bases(sym).mkString("Base classes:\n  ", "\n  ", "")
       val contents =
         if (declsOnly) decls(sym).mkString("Declarations:\n  ", "\n  ", "")
@@ -1705,8 +1719,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     }
   }
 
-  def getFile(
-      source: AbstractFile, segments: Array[String], suffix: String): File = {
+  def getFile(source: AbstractFile,
+              segments: Array[String],
+              suffix: String): File = {
     val outDir = Path(
         settings.outputDirs.outputDirFor(source).path match {
           case "" => "."

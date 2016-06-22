@@ -20,8 +20,9 @@ object PairingSystem extends AbstractPairingSystem {
                      users: WaitingUsers,
                      ranking: Ranking): Fu[Pairings] = {
     for {
-      lastOpponents <- PairingRepo.lastOpponents(
-                          tour.id, users.all, Math.min(100, users.size * 4))
+      lastOpponents <- PairingRepo.lastOpponents(tour.id,
+                                                 users.all,
+                                                 Math.min(100, users.size * 4))
       onlyTwoActivePlayers <- (tour.nbPlayers > 20).fold(
                                  fuccess(false),
                                  PlayerRepo.countActive(tour.id).map(2 ==))
@@ -33,7 +34,8 @@ object PairingSystem extends AbstractPairingSystem {
                   case _ => evenOrAll(data, users)
                 }
       pairings <- preps.map { prep =>
-                   UserRepo.firstGetsWhite(prep.user1.some, prep.user2.some) map prep.toPairing
+                   UserRepo
+                     .firstGetsWhite(prep.user1.some, prep.user2.some) map prep.toPairing
                  }.sequenceFu
     } yield pairings
   }.chronometer
@@ -50,8 +52,8 @@ object PairingSystem extends AbstractPairingSystem {
 
   val pairingGroupSize = 18
 
-  private def makePreps(
-      data: Data, users: List[String]): Fu[List[Pairing.Prep]] = {
+  private def makePreps(data: Data,
+                        users: List[String]): Fu[List[Pairing.Prep]] = {
     import data._
     if (users.size < 2) fuccess(Nil)
     else
@@ -61,7 +63,8 @@ object PairingSystem extends AbstractPairingSystem {
           idles.grouped(pairingGroupSize).toList match {
             case a :: b :: c :: _ =>
               smartPairings(data, a) ::: smartPairings(data, b) ::: naivePairings(
-                  tour, c take pairingGroupSize)
+                  tour,
+                  c take pairingGroupSize)
             case a :: b :: Nil =>
               smartPairings(data, a) ::: smartPairings(data, b)
             case a :: Nil => smartPairings(data, a)
@@ -74,16 +77,16 @@ object PairingSystem extends AbstractPairingSystem {
     }
     .result
 
-  private def naivePairings(
-      tour: Tournament, players: RankedPlayers): List[Pairing.Prep] =
+  private def naivePairings(tour: Tournament,
+                            players: RankedPlayers): List[Pairing.Prep] =
     players grouped 2 collect {
       case List(p1, p2) => Pairing.prep(tour, p1.player, p2.player)
     } toList
 
   private val smartPairingsMaxMillis = 400
 
-  private def smartPairings(
-      data: Data, players: RankedPlayers): List[Pairing.Prep] =
+  private def smartPairings(data: Data,
+                            players: RankedPlayers): List[Pairing.Prep] =
     players.nonEmpty ?? {
       import data._
 
@@ -97,11 +100,11 @@ object PairingSystem extends AbstractPairingSystem {
 
       def justPlayedTogether(u1: String, u2: String): Boolean =
         lastOpponents.hash.get(u1).contains(u2) ||
-        lastOpponents.hash.get(u2).contains(u1)
+          lastOpponents.hash.get(u2).contains(u1)
 
       def veryMuchJustPlayedTogether(u1: String, u2: String): Boolean =
         lastOpponents.hash.get(u1).contains(u2) &&
-        lastOpponents.hash.get(u2).contains(u1)
+          lastOpponents.hash.get(u2).contains(u1)
 
       // optimized for speed
       def score(pairs: Combination): Score = {
@@ -111,13 +114,13 @@ object PairingSystem extends AbstractPairingSystem {
             // lower is better
             i =
               i + Math.abs(a.rank - b.rank) * 1000 +
-              Math.abs(a.player.rating - b.player.rating) +
-              justPlayedTogether(a.player.userId, b.player.userId).?? {
-                if (veryMuchJustPlayedTogether(a.player.userId,
-                                               b.player.userId))
-                  9000 * 1000
-                else 8000 * 1000
-              }
+                Math.abs(a.player.rating - b.player.rating) +
+                justPlayedTogether(a.player.userId, b.player.userId).?? {
+                  if (veryMuchJustPlayedTogether(a.player.userId,
+                                                 b.player.userId))
+                    9000 * 1000
+                  else 8000 * 1000
+                }
         }
         i
       }

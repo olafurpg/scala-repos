@@ -18,16 +18,16 @@ class NNLS(val maxIters: Int = -1) extends SerializableLogging {
   type BDM = DenseMatrix[Double]
   type BDV = DenseVector[Double]
 
-  case class State private[NNLS](x: BDV,
-                                 grad: BDV,
-                                 dir: BDV,
-                                 lastDir: BDV,
-                                 res: BDV,
-                                 tmp: BDV,
-                                 lastNorm: Double,
-                                 lastWall: Int,
-                                 iter: Int,
-                                 converged: Boolean)
+  case class State private[NNLS] (x: BDV,
+                                  grad: BDV,
+                                  dir: BDV,
+                                  lastDir: BDV,
+                                  res: BDV,
+                                  tmp: BDV,
+                                  lastNorm: Double,
+                                  lastWall: Int,
+                                  iter: Int,
+                                  converged: Boolean)
 
   // find the optimal unconstrained step
   private def steplen(ata: BDM, dir: BDV, res: BDV, tmp: BDV): Double = {
@@ -78,8 +78,8 @@ class NNLS(val maxIters: Int = -1) extends SerializableLogging {
             atb: DenseVector[Double],
             state: State) = {
     import state._
-    require(
-        ata.cols == ata.rows, s"NNLS:iterations gram matrix must be symmetric")
+    require(ata.cols == ata.rows,
+            s"NNLS:iterations gram matrix must be symmetric")
     require(ata.rows == state.x.length,
             s"NNLS:iterations gram and linear dimension mismatch")
     x := 0.0
@@ -189,8 +189,8 @@ class NNLS(val maxIters: Int = -1) extends SerializableLogging {
     State(x, grad, dir, lastDir, res, tmp, nextNorm, nextWall, nextIter, false)
   }
 
-  def minimizeAndReturnState(
-      ata: DenseMatrix[Double], atb: DenseVector[Double]): State = {
+  def minimizeAndReturnState(ata: DenseMatrix[Double],
+                             atb: DenseVector[Double]): State = {
     val initialState = initialize(atb.length)
     minimizeAndReturnState(ata, atb, initialState)
   }

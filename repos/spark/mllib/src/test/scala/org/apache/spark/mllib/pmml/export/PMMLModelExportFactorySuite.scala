@@ -40,7 +40,7 @@ class PMMLModelExportFactorySuite extends SparkFunSuite {
 
   test(
       "PMMLModelExportFactory create GeneralizedLinearPMMLModelExport when passing a " +
-      "LinearRegressionModel, RidgeRegressionModel or LassoModel") {
+        "LinearRegressionModel, RidgeRegressionModel or LassoModel") {
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
 
@@ -63,16 +63,19 @@ class PMMLModelExportFactorySuite extends SparkFunSuite {
     assert(lassoModelExport.isInstanceOf[GeneralizedLinearPMMLModelExport])
   }
 
-  test("PMMLModelExportFactory create BinaryClassificationPMMLModelExport " +
-      "when passing a LogisticRegressionModel or SVMModel") {
+  test(
+      "PMMLModelExportFactory create BinaryClassificationPMMLModelExport " +
+        "when passing a LogisticRegressionModel or SVMModel") {
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
 
-    val logisticRegressionModel = new LogisticRegressionModel(
-        linearInput(0).features, linearInput(0).label)
+    val logisticRegressionModel =
+      new LogisticRegressionModel(linearInput(0).features,
+                                  linearInput(0).label)
     val logisticRegressionModelExport =
       PMMLModelExportFactory.createPMMLModelExport(logisticRegressionModel)
-    assert(logisticRegressionModelExport
+    assert(
+        logisticRegressionModelExport
           .isInstanceOf[BinaryClassificationPMMLModelExport])
 
     val svmModel = new SVMModel(linearInput(0).features, linearInput(0).label)
@@ -80,8 +83,9 @@ class PMMLModelExportFactorySuite extends SparkFunSuite {
     assert(svmModelExport.isInstanceOf[BinaryClassificationPMMLModelExport])
   }
 
-  test("PMMLModelExportFactory throw IllegalArgumentException " +
-      "when passing a Multinomial Logistic Regression") {
+  test(
+      "PMMLModelExportFactory throw IllegalArgumentException " +
+        "when passing a Multinomial Logistic Regression") {
 
     /** 3 classes, 2 features */
     val multiclassLogisticRegressionModel =

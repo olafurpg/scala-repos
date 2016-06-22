@@ -78,8 +78,8 @@ import akka.routing.Router
 import akka.japi.Util.immutableSeq
 import com.typesafe.config.Config
 
-final case class RedundancyGroup(
-    routeePaths: immutable.Iterable[String], nbrCopies: Int)
+final case class RedundancyGroup(routeePaths: immutable.Iterable[String],
+                                 nbrCopies: Int)
     extends Group {
 
   def this(config: Config) =
@@ -128,8 +128,9 @@ class CustomRouterDocSpec
     for (n <- 1 to 10) system.actorOf(Props[Storage], "s" + n)
 
     val paths = for (n <- 1 to 10) yield ("/user/s" + n)
-    val redundancy1: ActorRef = system.actorOf(
-        RedundancyGroup(paths, nbrCopies = 3).props(), name = "redundancy1")
+    val redundancy1: ActorRef =
+      system.actorOf(RedundancyGroup(paths, nbrCopies = 3).props(),
+                     name = "redundancy1")
     redundancy1 ! "important"
     //#usage-1
 

@@ -96,8 +96,9 @@ case class Expand(projections: Seq[Seq[Expression]],
     child.asInstanceOf[CodegenSupport].produce(ctx, this)
   }
 
-  override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  override def doConsume(ctx: CodegenContext,
+                         input: Seq[ExprCode],
+                         row: String): String = {
     /*
      * When the projections list looks like:
      *   expr1A, exprB, expr1C

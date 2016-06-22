@@ -40,7 +40,7 @@ object sessionFailureDetector
     extends GlobalFlag[String](
         "threshold:5.seconds:2:100:4.seconds",
         "The failure detector used to determine session liveness " +
-        "[none|threshold:minPeriod:threshold:win:closeTimeout]")
+          "[none|threshold:minPeriod:threshold:win:closeTimeout]")
 
 /**
   * Companion object capable of creating a FailureDetector based on parameterized config.
@@ -140,8 +140,13 @@ object FailureDetector {
                 double(threshold),
                 int(win),
                 duration(closeTimeout)) =>
-        new ThresholdFailureDetector(
-            ping, min, threshold, win, closeTimeout, nanoTime, statsReceiver)
+        new ThresholdFailureDetector(ping,
+                                     min,
+                                     threshold,
+                                     win,
+                                     closeTimeout,
+                                     nanoTime,
+                                     statsReceiver)
 
       case list("threshold", duration(min), double(threshold), int(win)) =>
         new ThresholdFailureDetector(ping,
@@ -159,12 +164,15 @@ object FailureDetector {
                                      statsReceiver = statsReceiver)
 
       case list("threshold", duration(min)) =>
-        new ThresholdFailureDetector(
-            ping, min, nanoTime = nanoTime, statsReceiver = statsReceiver)
+        new ThresholdFailureDetector(ping,
+                                     min,
+                                     nanoTime = nanoTime,
+                                     statsReceiver = statsReceiver)
 
       case list("threshold") =>
-        new ThresholdFailureDetector(
-            ping, nanoTime = nanoTime, statsReceiver = statsReceiver)
+        new ThresholdFailureDetector(ping,
+                                     nanoTime = nanoTime,
+                                     statsReceiver = statsReceiver)
 
       case list("none") =>
         NullFailureDetector

@@ -76,8 +76,8 @@ private[twitter] object ZipkinTracerTest {
                 LocalAddr(new InetSocketAddress(0))),
       // We only guarantee successful deserialization for primitive values and
       // Strings, here we test String.
-      for (v <- Gen.oneOf(arbitrary[AnyVal], arbitrary[String])) yield
-        BinaryAnnotation("k", v)
+      for (v <- Gen.oneOf(arbitrary[AnyVal], arbitrary[String]))
+        yield BinaryAnnotation("k", v)
   )
 
   def genEvent(etype: events.Event.Type): Gen[events.Event] =
@@ -86,6 +86,9 @@ private[twitter] object ZipkinTracerTest {
       tid <- arbitrary[Long]
       sid <- arbitrary[Long]
     } yield
-      events.Event(
-          etype, Time.now, objectVal = ann, traceIdVal = tid, spanIdVal = sid)
+      events.Event(etype,
+                   Time.now,
+                   objectVal = ann,
+                   traceIdVal = tid,
+                   spanIdVal = sid)
 }

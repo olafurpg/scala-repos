@@ -151,7 +151,8 @@ private[spark] object JsonProtocol {
     val properties = propertiesToJson(jobStart.properties)
     ("Event" -> Utils.getFormattedClassName(jobStart)) ~
     ("Job ID" -> jobStart.jobId) ~ ("Submission Time" -> jobStart.time) ~
-    ("Stage Infos" -> jobStart.stageInfos.map(stageInfoToJson)) ~ // Added in Spark 1.2.0
+    ("Stage Infos" -> jobStart.stageInfos
+          .map(stageInfoToJson)) ~ // Added in Spark 1.2.0
     ("Stage IDs" -> jobStart.stageIds) ~ ("Properties" -> properties)
   }
 
@@ -252,9 +253,9 @@ private[spark] object JsonProtocol {
     ("Metrics Updated" -> accumUpdates.map {
           case (taskId, stageId, stageAttemptId, updates) =>
             ("Task ID" -> taskId) ~ ("Stage ID" -> stageId) ~
-            ("Stage Attempt ID" -> stageAttemptId) ~
-            ("Accumulator Updates" -> JArray(
-                    updates.map(accumulableInfoToJson).toList))
+              ("Stage Attempt ID" -> stageAttemptId) ~
+              ("Accumulator Updates" -> JArray(
+                      updates.map(accumulableInfoToJson).toList))
         })
   }
 
@@ -316,8 +317,8 @@ private[spark] object JsonProtocol {
     *
     * The behavior here must match that of [[accumValueFromJson]]. Exposed for testing.
     */
-  private[util] def accumValueToJson(
-      name: Option[String], value: Any): JValue = {
+  private[util] def accumValueToJson(name: Option[String],
+                                     value: Any): JValue = {
     import AccumulatorParam._
     if (name.exists(_.startsWith(InternalAccumulator.METRICS_PREFIX))) {
       (value, InternalAccumulator.getParam(name.get)) match {
@@ -325,18 +326,15 @@ private[spark] object JsonProtocol {
         case (v: Long, LongAccumulatorParam) => JInt(v)
         case (v: String, StringAccumulatorParam) => JString(v)
         case (v, UpdatedBlockStatusesAccumulatorParam) =>
-          JArray(
-              v.asInstanceOf[Seq[(BlockId, BlockStatus)]]
-                .toList
-                .map {
-              case (id, status) =>
-                ("Block ID" -> id.toString) ~
+          JArray(v.asInstanceOf[Seq[(BlockId, BlockStatus)]].toList.map {
+            case (id, status) =>
+              ("Block ID" -> id.toString) ~
                 ("Status" -> blockStatusToJson(status))
-            })
+          })
         case (v, p) =>
           throw new IllegalArgumentException(
               s"unexpected combination of accumulator value " +
-              s"type (${v.getClass.getName}) and param (${p.getClass.getName}) in '${name.get}'")
+                s"type (${v.getClass.getName}) and param (${p.getClass.getName}) in '${name.get}'")
       }
     } else {
       // For all external accumulators, just use strings
@@ -368,8 +366,7 @@ private[spark] object JsonProtocol {
       ("Bytes Written" -> om.bytesWritten) ~
       ("Records Written" -> om.recordsWritten)
     }.getOrElse(JNothing)
-    val updatedBlocks = JArray(
-        taskMetrics.updatedBlockStatuses.toList.map {
+    val updatedBlocks = JArray(taskMetrics.updatedBlockStatuses.toList.map {
       case (id, status) =>
         ("Block ID" -> id.toString) ~ ("Status" -> blockStatusToJson(status))
     })
@@ -408,12 +405,12 @@ private[spark] object JsonProtocol {
         ("Accumulator Updates" -> accumUpdates)
       case taskCommitDenied: TaskCommitDenied =>
         ("Job ID" -> taskCommitDenied.jobID) ~
-        ("Partition ID" -> taskCommitDenied.partitionID) ~
-        ("Attempt Number" -> taskCommitDenied.attemptNumber)
+          ("Partition ID" -> taskCommitDenied.partitionID) ~
+          ("Attempt Number" -> taskCommitDenied.attemptNumber)
       case ExecutorLostFailure(executorId, exitCausedByApp, reason) =>
         ("Executor ID" -> executorId) ~
-        ("Exit Caused By App" -> exitCausedByApp) ~
-        ("Loss Reason" -> reason.map(_.toString))
+          ("Exit Caused By App" -> exitCausedByApp) ~
+          ("Loss Reason" -> reason.map(_.toString))
       case _ => Utils.emptyJson
     }
     ("Reason" -> reason) ~ json
@@ -438,7 +435,8 @@ private[spark] object JsonProtocol {
     val storageLevel = storageLevelToJson(rddInfo.storageLevel)
     val parentIds = JArray(rddInfo.parentIds.map(JInt(_)).toList)
     ("RDD ID" -> rddInfo.id) ~ ("Name" -> rddInfo.name) ~
-    ("Scope" -> rddInfo.scope.map(_.toJson)) ~ ("Callsite" -> rddInfo.callSite) ~
+    ("Scope" -> rddInfo.scope
+          .map(_.toJson)) ~ ("Callsite" -> rddInfo.callSite) ~
     ("Parent IDs" -> parentIds) ~ ("Storage Level" -> storageLevel) ~
     ("Number of Partitions" -> rddInfo.numPartitions) ~
     ("Number of Cached Partitions" -> rddInfo.numCachedPartitions) ~
@@ -484,13 +482,12 @@ private[spark] object JsonProtocol {
   }
 
   def stackTraceToJson(stackTrace: Array[StackTraceElement]): JValue = {
-    JArray(
-        stackTrace.map {
+    JArray(stackTrace.map {
       case line =>
         ("Declaring Class" -> line.getClassName) ~
-        ("Method Name" -> line.getMethodName) ~
-        ("File Name" -> line.getFileName) ~
-        ("Line Number" -> line.getLineNumber)
+          ("Method Name" -> line.getMethodName) ~
+          ("File Name" -> line.getFileName) ~
+          ("Line Number" -> line.getLineNumber)
     }.toList)
   }
 
@@ -610,9 +607,15 @@ private[spark] object JsonProtocol {
       .jsonOption(json \ "Stage Infos")
       .map(_.extract[Seq[JValue]].map(stageInfoFromJson))
       .getOrElse {
-        stageIds.map(id =>
-              new StageInfo(
-                  id, 0, "unknown", 0, Seq.empty, Seq.empty, "unknown"))
+        stageIds.map(
+            id =>
+              new StageInfo(id,
+                            0,
+                            "unknown",
+                            0,
+                            Seq.empty,
+                            Seq.empty,
+                            "unknown"))
       }
     SparkListenerJobStart(jobId, submissionTime, stageInfos, properties)
   }
@@ -664,8 +667,12 @@ private[spark] object JsonProtocol {
     val appAttemptId =
       Utils.jsonOption(json \ "App Attempt ID").map(_.extract[String])
     val driverLogs = Utils.jsonOption(json \ "Driver Logs").map(mapFromJson)
-    SparkListenerApplicationStart(
-        appName, appId, time, sparkUser, appAttemptId, driverLogs)
+    SparkListenerApplicationStart(appName,
+                                  appId,
+                                  time,
+                                  sparkUser,
+                                  appAttemptId,
+                                  driverLogs)
   }
 
   def applicationEndFromJson(json: JValue): SparkListenerApplicationEnd = {
@@ -736,8 +743,13 @@ private[spark] object JsonProtocol {
         case None => Seq[AccumulableInfo]()
       }
 
-    val stageInfo = new StageInfo(
-        stageId, attemptId, stageName, numTasks, rddInfos, parentIds, details)
+    val stageInfo = new StageInfo(stageId,
+                                  attemptId,
+                                  stageName,
+                                  numTasks,
+                                  rddInfos,
+                                  parentIds,
+                                  details)
     stageInfo.submissionTime = submissionTime
     stageInfo.completionTime = completionTime
     stageInfo.failureReason = failureReason
@@ -794,8 +806,13 @@ private[spark] object JsonProtocol {
     val countFailedValues =
       (json \ "Count Failed Values").extractOpt[Boolean].getOrElse(false)
     val metadata = (json \ "Metadata").extractOpt[String]
-    new AccumulableInfo(
-        id, name, update, value, internal, countFailedValues, metadata)
+    new AccumulableInfo(id,
+                        name,
+                        update,
+                        value,
+                        internal,
+                        countFailedValues,
+                        metadata)
   }
 
   /**
@@ -807,8 +824,8 @@ private[spark] object JsonProtocol {
     *
     * The behavior here must match that of [[accumValueToJson]]. Exposed for testing.
     */
-  private[util] def accumValueFromJson(
-      name: Option[String], value: JValue): Any = {
+  private[util] def accumValueFromJson(name: Option[String],
+                                       value: JValue): Any = {
     import AccumulatorParam._
     if (name.exists(_.startsWith(InternalAccumulator.METRICS_PREFIX))) {
       (value, InternalAccumulator.getParam(name.get)) match {
@@ -824,7 +841,7 @@ private[spark] object JsonProtocol {
         case (v, p) =>
           throw new IllegalArgumentException(
               s"unexpected combination of accumulator " +
-              s"value in JSON ($v) and accumulator param (${p.getClass.getName}) in '${name.get}'")
+                s"value in JSON ($v) and accumulator param (${p.getClass.getName}) in '${name.get}'")
       }
     } else {
       value.extract[String]
@@ -871,7 +888,8 @@ private[spark] object JsonProtocol {
       val writeMetrics = metrics.registerShuffleWriteMetrics()
       writeMetrics.incBytesWritten(
           (writeJson \ "Shuffle Bytes Written").extract[Long])
-      writeMetrics.incRecordsWritten((writeJson \ "Shuffle Records Written")
+      writeMetrics.incRecordsWritten(
+          (writeJson \ "Shuffle Records Written")
             .extractOpt[Long]
             .getOrElse(0L))
       writeMetrics.incWriteTime(
@@ -900,13 +918,12 @@ private[spark] object JsonProtocol {
 
     // Updated blocks
     Utils.jsonOption(json \ "Updated Blocks").foreach { blocksJson =>
-      metrics.setUpdatedBlockStatuses(blocksJson
-            .extract[List[JValue]]
-            .map { blockJson =>
+      metrics.setUpdatedBlockStatuses(blocksJson.extract[List[JValue]].map {
+        blockJson =>
           val id = BlockId((blockJson \ "Block ID").extract[String])
           val status = blockStatusFromJson(blockJson \ "Status")
           (id, status)
-        })
+      })
     }
 
     metrics
@@ -1032,8 +1049,13 @@ private[spark] object JsonProtocol {
     val memSize = (json \ "Memory Size").extract[Long]
     val diskSize = (json \ "Disk Size").extract[Long]
 
-    val rddInfo = new RDDInfo(
-        rddId, name, numPartitions, storageLevel, parentIds, callsite, scope)
+    val rddInfo = new RDDInfo(rddId,
+                              name,
+                              numPartitions,
+                              storageLevel,
+                              parentIds,
+                              callsite,
+                              scope)
     rddInfo.numCachedPartitions = numCachedPartitions
     rddInfo.memSize = memSize
     rddInfo.diskSize = diskSize

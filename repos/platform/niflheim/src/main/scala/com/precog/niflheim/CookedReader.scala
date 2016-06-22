@@ -34,8 +34,8 @@ import scalaz.std.list._
 object CookedReader {
   def load(baseDir: File,
            metadataFile: File,
-           blockFormat: CookedBlockFormat =
-             VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+           blockFormat: CookedBlockFormat = VersionedCookedBlockFormat(
+               Map(1 -> V1CookedBlockFormat)),
            segmentFormat: SegmentFormat = VersionedSegmentFormat(
                Map(1 -> V1SegmentFormat))): CookedReader =
     new CookedReader(baseDir, metadataFile, blockFormat, segmentFormat)
@@ -149,16 +149,17 @@ final class CookedReader(baseDir: File,
     }
   }
 
-  private def segmentsByRef: Validation[
-      IOException, Map[ColumnRef, List[File]]] = metadata map { md =>
-    md.segments
-      .groupBy(s => (s._1.cpath, s._1.ctype))
-      .map {
-        case ((cpath, ctype), segs) =>
-          (ColumnRef(cpath, ctype), segs.map(_._2).toList)
-      }
-      .toMap
-  }
+  private def segmentsByRef: Validation[IOException,
+                                        Map[ColumnRef, List[File]]] =
+    metadata map { md =>
+      md.segments
+        .groupBy(s => (s._1.cpath, s._1.ctype))
+        .map {
+          case ((cpath, ctype), segs) =>
+            (ColumnRef(cpath, ctype), segs.map(_._2).toList)
+        }
+        .toMap
+    }
 
   def load(paths: List[ColumnRef])
     : ValidationNel[IOException, List[(ColumnRef, List[Segment])]] = {

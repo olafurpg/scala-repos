@@ -14,8 +14,8 @@ trait JUnitTestBootstrapper {
   def invoke(instance: AnyRef, methodName: String): Unit
 }
 
-final class JUnitMethodMetadata(
-    val name: String, annotations: List[Annotation]) {
+final class JUnitMethodMetadata(val name: String,
+                                annotations: List[Annotation]) {
 
   def hasTestAnnotation: Boolean =
     annotations.exists(_.isInstanceOf[org.junit.Test])

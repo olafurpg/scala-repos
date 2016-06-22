@@ -28,7 +28,9 @@ class ScalaScriptRunConfiguration(
     val configurationFactory: ConfigurationFactory,
     val name: String)
     extends ModuleBasedConfiguration[RunConfigurationModule](
-        name, new RunConfigurationModule(project), configurationFactory)
+        name,
+        new RunConfigurationModule(project),
+        configurationFactory)
     with RefactoringListenerProvider {
   val SCALA_HOME = "-Dscala.home="
   val CLASSPATH = "-Denv.classpath=\"%CLASSPATH%\""
@@ -73,8 +75,8 @@ class ScalaScriptRunConfiguration(
     setWorkingDirectory(params.getWorkingDirectory)
   }
 
-  def getState(
-      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+  def getState(executor: Executor,
+               env: ExecutionEnvironment): RunProfileState = {
     def fileNotFoundError() {
       throw new ExecutionException("Scala script file not found.")
     }
@@ -105,10 +107,11 @@ class ScalaScriptRunConfiguration(
         params.getVMParametersList.add(EMACS)
 
         params.setMainClass(MAIN_CLASS)
-        params.getProgramParametersList.add("-nocompdaemon") //todo: seems to be a bug in scala compiler. Ticket #1498
+        params.getProgramParametersList
+          .add("-nocompdaemon") //todo: seems to be a bug in scala compiler. Ticket #1498
         params.getProgramParametersList.add("-classpath")
-        params.configureByModule(
-            module, JavaParameters.JDK_AND_CLASSES_AND_TESTS)
+        params
+          .configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS)
         params.getProgramParametersList.add(params.getClassPath.getPathsString)
         params.getClassPath.addAllFiles(
             module.scalaSdk.map(_.compilerClasspath).getOrElse(Seq.empty))
@@ -180,8 +183,8 @@ class ScalaScriptRunConfiguration(
               Integer.parseInt(cache.substring(0, cache.indexOf(":")))
             cache = cache.replaceFirst("[^:]", "")
             end += line.length - cache.length
-            val hyperlink = new OpenFileHyperlinkInfo(
-                getProject, file, lineNumber - 1)
+            val hyperlink =
+              new OpenFileHyperlinkInfo(getProject, file, lineNumber - 1)
             new Result(start, end, hyperlink)
           } catch {
             case _: Exception => return null
@@ -205,8 +208,8 @@ class ScalaScriptRunConfiguration(
         }
 
         //todo this method does not called when undo of moving action executed
-        def undoElementMovedOrRenamed(
-            newElement: PsiElement, oldQualifiedName: String) {
+        def undoElementMovedOrRenamed(newElement: PsiElement,
+                                      oldQualifiedName: String) {
           setScriptPath(oldQualifiedName)
         }
       }

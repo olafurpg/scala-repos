@@ -16,7 +16,7 @@ object EventAdapterSpec {
 
   final val JournalModelClassName =
     classOf[EventAdapterSpec].getCanonicalName + "$" +
-    classOf[JournalModel].getSimpleName
+      classOf[JournalModel].getSimpleName
   trait JournalModel {
     def payload: Any
     def tags: immutable.Set[String]
@@ -29,7 +29,7 @@ object EventAdapterSpec {
 
   final val DomainEventClassName =
     classOf[EventAdapterSpec].getCanonicalName + "$" +
-    classOf[DomainEvent].getSimpleName
+      classOf[DomainEvent].getSimpleName
   trait DomainEvent
   final case class TaggedDataChanged(tags: immutable.Set[String], value: Int)
       extends DomainEvent
@@ -80,8 +80,8 @@ object EventAdapterSpec {
     override def manifest(event: Any): String = ""
   }
 
-  class PersistAllIncomingActor(
-      name: String, override val journalPluginId: String)
+  class PersistAllIncomingActor(name: String,
+                                override val journalPluginId: String)
       extends NamedPersistentActor(name)
       with PersistentActor {
 
@@ -105,8 +105,9 @@ object EventAdapterSpec {
   }
 }
 
-class EventAdapterSpec(
-    journalName: String, journalConfig: Config, adapterConfig: Config)
+class EventAdapterSpec(journalName: String,
+                       journalConfig: Config,
+                       adapterConfig: Config)
     extends PersistenceSpec(journalConfig.withFallback(adapterConfig))
     with ImplicitSender {
 

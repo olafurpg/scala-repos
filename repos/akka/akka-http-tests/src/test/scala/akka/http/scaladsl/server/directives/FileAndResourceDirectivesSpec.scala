@@ -83,7 +83,8 @@ class FileAndResourceDirectivesSpec
         writeAllText("ABCDEFGHIJKLMNOPQRSTUVWXYZ", file)
         val rangeHeader = Range(ByteRange(1, 10), ByteRange.suffix(10))
         Get() ~> addHeader(rangeHeader) ~> getFromFile(
-            file, ContentTypes.`text/plain(UTF-8)`) ~> check {
+            file,
+            ContentTypes.`text/plain(UTF-8)`) ~> check {
           status shouldEqual StatusCodes.PartialContent
           header[`Content-Range`] shouldEqual None
           mediaType.withParams(Map.empty) shouldEqual `multipart/byteranges`
@@ -93,7 +94,8 @@ class FileAndResourceDirectivesSpec
             .awaitResult(3.seconds)
             .strictParts
           parts.map(_.entity.data.utf8String) should contain theSameElementsAs List(
-              "BCDEFGHIJK", "QRSTUVWXYZ")
+              "BCDEFGHIJK",
+              "QRSTUVWXYZ")
         }
       } finally file.delete
     }
@@ -281,8 +283,8 @@ class FileAndResourceDirectivesSpec
     val base = new File(getClass.getClassLoader.getResource("").toURI).getPath
     new File(base, "subDirectory/emptySub").mkdir()
     def eraseDateTime(s: String) =
-      s.replaceAll(
-          """\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d""", "xxxx-xx-xx xx:xx:xx")
+      s.replaceAll("""\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d""",
+                   "xxxx-xx-xx xx:xx:xx")
     implicit val settings =
       RoutingSettings.default.withRenderVanityFooter(false)
 

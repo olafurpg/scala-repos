@@ -201,8 +201,8 @@ class GenericTests {
 
     val e0 = star(e)
     typed[Employee](e0)
-    assertEquals(
-        Employee(Person("Joe Soap*", "Brighton*", 23), Salary(2000)), e0)
+    assertEquals(Employee(Person("Joe Soap*", "Brighton*", 23), Salary(2000)),
+                 e0)
   }
 
   @Test
@@ -634,17 +634,17 @@ class GenericTests {
     def apply[T](implicit tc: TC[T]): TC[T] = tc
 
     implicit def hnilTC: TC[HNil] = new TC[HNil] {}
-    implicit def hconsTC[H, T <: HList](
-        implicit hd: Lazy[TC[H]], tl: Lazy[TC[T]]): TC[H :: T] =
+    implicit def hconsTC[H, T <: HList](implicit hd: Lazy[TC[H]],
+                                        tl: Lazy[TC[T]]): TC[H :: T] =
       new TC[H :: T] {}
 
     implicit def cnilTC: TC[CNil] = new TC[CNil] {}
-    implicit def cconsTC[H, T <: Coproduct](
-        implicit hd: Lazy[TC[H]], tl: Lazy[TC[T]]): TC[H :+: T] =
+    implicit def cconsTC[H, T <: Coproduct](implicit hd: Lazy[TC[H]],
+                                            tl: Lazy[TC[T]]): TC[H :+: T] =
       new TC[H :+: T] {}
 
-    implicit def projectTC[F, G](
-        implicit gen: Generic.Aux[F, G], tc: Lazy[TC[G]]): TC[F] = new TC[F] {}
+    implicit def projectTC[F, G](implicit gen: Generic.Aux[F, G],
+                                 tc: Lazy[TC[G]]): TC[F] = new TC[F] {}
   }
 
   @Test
@@ -660,7 +660,8 @@ package GenericTestsAux2 {
     implicit val deriveHNil: Foo[HNil] = ???
 
     implicit def deriveLabelledGeneric[A, Rec <: HList](
-        implicit gen: Generic.Aux[A, Rec], auto: Foo[Rec]): Foo[A] = ???
+        implicit gen: Generic.Aux[A, Rec],
+        auto: Foo[Rec]): Foo[A] = ???
   }
 
   class Bar[A]
@@ -669,10 +670,12 @@ package GenericTestsAux2 {
     implicit def cnil: Bar[CNil] = ???
 
     implicit def deriveCoproduct[H, T <: Coproduct](
-        implicit headFoo: Foo[H], tailAux: Bar[T]): Bar[H :+: T] = ???
+        implicit headFoo: Foo[H],
+        tailAux: Bar[T]): Bar[H :+: T] = ???
 
     implicit def labelledGeneric[A, U <: Coproduct](
-        implicit gen: Generic.Aux[A, U], auto: Bar[U]): Bar[A] = ???
+        implicit gen: Generic.Aux[A, U],
+        auto: Bar[U]): Bar[A] = ???
   }
 
   class Outer1 {
@@ -1113,8 +1116,7 @@ object Thrift {
         val a: Double,
         val b: String,
         val _passthroughFields: scala.collection.immutable.Map[Short, Byte]
-    )
-        extends TProduct {
+    ) extends TProduct {
       def this(
           a: Double,
           b: String

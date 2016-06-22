@@ -77,15 +77,15 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
         setHandler(out, new OutHandler {
           override def onPull(): Unit =
-            emitMultiple(
-                out, Iterator.empty, () ⇒ emit(out, 42, () ⇒ completeStage()))
+            emitMultiple(out, Iterator.empty, () ⇒
+                  emit(out, 42, () ⇒ completeStage()))
         })
       }
   }
 
   final case class ReadNEmitN(n: Int) extends GraphStage[FlowShape[Int, Int]] {
-    override val shape = FlowShape(
-        Inlet[Int]("readN.in"), Outlet[Int]("readN.out"))
+    override val shape =
+      FlowShape(Inlet[Int]("readN.in"), Outlet[Int]("readN.out"))
 
     override def createLogic(
         inheritedAttributes: Attributes): GraphStageLogic =
@@ -101,8 +101,8 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
   final case class ReadNEmitRestOnComplete(n: Int)
       extends GraphStage[FlowShape[Int, Int]] {
-    override val shape = FlowShape(
-        Inlet[Int]("readN.in"), Outlet[Int]("readN.out"))
+    override val shape =
+      FlowShape(Inlet[Int]("readN.in"), Outlet[Int]("readN.out"))
 
     override def createLogic(
         inheritedAttributes: Attributes): GraphStageLogic =
@@ -189,8 +189,10 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
     "emit properly after empty iterable" in assertAllStagesStopped {
 
-      Source.fromGraph(emitEmptyIterable).runWith(Sink.seq).futureValue should ===(
-          List(42))
+      Source
+        .fromGraph(emitEmptyIterable)
+        .runWith(Sink.seq)
+        .futureValue should ===(List(42))
     }
 
     "invoke lifecycle hooks in the right order" in assertAllStagesStopped {

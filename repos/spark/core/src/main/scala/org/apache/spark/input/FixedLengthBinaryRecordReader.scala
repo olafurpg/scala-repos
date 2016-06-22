@@ -67,15 +67,15 @@ private[spark] class FixedLengthBinaryRecordReader
         Math
           .min(
               ((currentPosition - splitStart) / (splitEnd -
-                      splitStart)).toFloat,
+                        splitStart)).toFloat,
               1.0
           )
           .toFloat
     }
   }
 
-  override def initialize(
-      inputSplit: InputSplit, context: TaskAttemptContext) {
+  override def initialize(inputSplit: InputSplit,
+                          context: TaskAttemptContext) {
     // the file input
     val fileSplit = inputSplit.asInstanceOf[FileSplit]
 

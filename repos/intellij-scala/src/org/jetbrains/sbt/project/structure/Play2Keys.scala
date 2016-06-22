@@ -43,7 +43,7 @@ object Play2Keys {
                                .toMap))
       } else if (children.forall(_.child.forall(node =>
                            node.label == ENTRY_SEQ_NAME ||
-                           node.isInstanceOf[Text]))) {
+                             node.isInstanceOf[Text]))) {
         val values = children.flatMap {
           case _: Text => None
           case projectKey =>

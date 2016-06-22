@@ -55,11 +55,10 @@ abstract class ChangeSignatureTestBase
     val secondName = secondFileName(testName)
     val checkSecond = secondName != null
 
-    val secondFile =
-      if (checkSecond) {
-        val secondFileText = getTextFromTestData(secondName)
-        addFileToProject(secondName, secondFileText)
-      } else null
+    val secondFile = if (checkSecond) {
+      val secondFileText = getTextFromTestData(secondName)
+      addFileToProject(secondName, secondFileText)
+    } else null
 
     val fileName = mainFileName(testName)
     configureByFile(fileName)
@@ -87,7 +86,7 @@ abstract class ChangeSignatureTestBase
       VfsUtil.saveText(vFile, text)
       val psiFile = LightPlatformTestCase.getPsiManager.findFile(vFile)
       assertNotNull("Can't create PsiFile for '" + fileName +
-                    "'. Unknown file type most probably.",
+                      "'. Unknown file type most probably.",
                     vFile)
       assertTrue(psiFile.isPhysical)
       vFile.setCharset(CharsetToolkit.UTF8_CHARSET)
@@ -101,8 +100,8 @@ abstract class ChangeSignatureTestBase
     FileUtilRt.loadFile(file, CharsetToolkit.UTF8, true)
   }
 
-  protected def getPsiTypeFromText(
-      typeText: String, context: PsiElement): PsiType = {
+  protected def getPsiTypeFromText(typeText: String,
+                                   context: PsiElement): PsiType = {
     val factory: JavaCodeFragmentFactory =
       JavaCodeFragmentFactory.getInstance(getProjectAdapter)
     factory.createTypeCodeFragment(typeText, context, false).getType

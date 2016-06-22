@@ -35,8 +35,8 @@ private[serverset2] object Stabilizer {
   // the notify() run each epoch can trigger some slow work.
   // nettyHwt required to get TimerStats
   private val nettyHwt = new netty.HashedWheelTimer(
-      new NamedPoolThreadFactory(
-          "finagle-serversets Stabilizer timer", true /*daemons*/ ),
+      new NamedPoolThreadFactory("finagle-serversets Stabilizer timer",
+                                 true /*daemons*/ ),
       HashedWheelTimer.TickDuration.inMilliseconds,
       TimeUnit.MILLISECONDS,
       HashedWheelTimer.TicksPerWheel)
@@ -72,8 +72,9 @@ private[serverset2] object Stabilizer {
     )
 
   // Used for delaying removals
-  private case class State(
-      limbo: Option[Set[Address]], active: Option[Set[Address]], addr: Addr)
+  private case class State(limbo: Option[Set[Address]],
+                           active: Option[Set[Address]],
+                           addr: Addr)
 
   // Used for batching updates
   private case class States(publish: Option[Addr],

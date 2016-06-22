@@ -245,7 +245,8 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
   }
 
   def createCoordinator(): Unit = {
-    val replicator = system.actorOf(Replicator.props(ReplicatorSettings(system)
+    val replicator = system.actorOf(Replicator.props(
+                                        ReplicatorSettings(system)
                                           .withGossipInterval(1.second)
                                           .withMaxDeltaElements(10)),
                                     "replicator")
@@ -255,7 +256,8 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
                          rememberEntities: Boolean) = {
       val allocationStrategy =
         new ShardCoordinator.LeastShardAllocationStrategy(
-            rebalanceThreshold = 2, maxSimultaneousRebalance = 1)
+            rebalanceThreshold = 2,
+            maxSimultaneousRebalance = 1)
       val cfg = ConfigFactory
         .parseString(s"""
       handoff-timeout = 10s
@@ -269,8 +271,8 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
       if (settings.stateStoreMode == "persistence")
         ShardCoordinator.props(typeName, settings, allocationStrategy)
       else
-        ShardCoordinator.props(
-            typeName, settings, allocationStrategy, replicator)
+        ShardCoordinator
+          .props(typeName, settings, allocationStrategy, replicator)
     }
 
     List("counter",
@@ -323,19 +325,19 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
   }
 
   lazy val region = createRegion("counter", rememberEntities = false)
-  lazy val rebalancingRegion = createRegion(
-      "rebalancingCounter", rememberEntities = false)
+  lazy val rebalancingRegion =
+    createRegion("rebalancingCounter", rememberEntities = false)
 
-  lazy val persistentEntitiesRegion = createRegion(
-      "RememberCounterEntities", rememberEntities = true)
-  lazy val anotherPersistentRegion = createRegion(
-      "AnotherRememberCounter", rememberEntities = true)
-  lazy val persistentRegion = createRegion(
-      "RememberCounter", rememberEntities = true)
-  lazy val rebalancingPersistentRegion = createRegion(
-      "RebalancingRememberCounter", rememberEntities = true)
-  lazy val autoMigrateRegion = createRegion(
-      "AutoMigrateRememberRegionTest", rememberEntities = true)
+  lazy val persistentEntitiesRegion =
+    createRegion("RememberCounterEntities", rememberEntities = true)
+  lazy val anotherPersistentRegion =
+    createRegion("AnotherRememberCounter", rememberEntities = true)
+  lazy val persistentRegion =
+    createRegion("RememberCounter", rememberEntities = true)
+  lazy val rebalancingPersistentRegion =
+    createRegion("RebalancingRememberCounter", rememberEntities = true)
+  lazy val autoMigrateRegion =
+    createRegion("AutoMigrateRememberRegionTest", rememberEntities = true)
 
   s"Cluster sharding ($mode)" must {
 
@@ -653,8 +655,8 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
       expectMsg(1)
       //#counter-usage
 
-      ClusterSharding(system).shardRegion("AnotherCounter") ! EntityEnvelope(
-          123, Decrement)
+      ClusterSharding(system)
+        .shardRegion("AnotherCounter") ! EntityEnvelope(123, Decrement)
       ClusterSharding(system).shardRegion("AnotherCounter") ! Get(123)
       expectMsg(-1)
     }
@@ -664,8 +666,8 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
     // sixth is a frontend node, i.e. proxy only
     runOn(sixth) {
       for (n ← 1000 to 1010) {
-        ClusterSharding(system).shardRegion("Counter") ! EntityEnvelope(
-            n, Increment)
+        ClusterSharding(system)
+          .shardRegion("Counter") ! EntityEnvelope(n, Increment)
         ClusterSharding(system).shardRegion("Counter") ! Get(n)
         expectMsg(1)
         lastSender.path.address should not be (Cluster(system).selfAddress)
@@ -922,7 +924,7 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
           for (n ← 2 to 12) {
             val entity =
               system.actorSelection(rebalancingPersistentRegion.path /
-                  (n % 12).toString / n.toString)
+                    (n % 12).toString / n.toString)
             entity ! Identify(n)
             receiveOne(3 seconds) match {
               case ActorIdentity(id, Some(_)) if id == n ⇒ count = count + 1

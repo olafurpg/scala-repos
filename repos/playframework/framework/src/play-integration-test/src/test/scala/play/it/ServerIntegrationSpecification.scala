@@ -62,8 +62,10 @@ trait ServerIntegrationSpecification
   abstract class WithServer(app: play.api.Application =
                               play.api.test.FakeApplication(),
                             port: Int = play.api.test.Helpers.testServerPort)
-      extends play.api.test.WithServer(
-          app, port, serverProvider = Some(integrationServerProvider))
+      extends play.api.test.WithServer(app,
+                                       port,
+                                       serverProvider =
+                                         Some(integrationServerProvider))
 }
 trait NettyIntegrationSpecification extends ServerIntegrationSpecification {
   override def integrationServerProvider: ServerProvider = NettyServer.provider

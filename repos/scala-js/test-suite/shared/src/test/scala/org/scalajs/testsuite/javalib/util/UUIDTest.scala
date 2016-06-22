@@ -29,18 +29,18 @@ class UUIDTest {
 
   @Test def getLeastSignificantBits(): Unit = {
     assertEquals(0L, new UUID(0L, 0L).getLeastSignificantBits())
-    assertEquals(
-        Long.MinValue, new UUID(0L, Long.MinValue).getLeastSignificantBits())
-    assertEquals(
-        Long.MaxValue, new UUID(0L, Long.MaxValue).getLeastSignificantBits())
+    assertEquals(Long.MinValue,
+                 new UUID(0L, Long.MinValue).getLeastSignificantBits())
+    assertEquals(Long.MaxValue,
+                 new UUID(0L, Long.MaxValue).getLeastSignificantBits())
   }
 
   @Test def getMostSignificantBits(): Unit = {
     assertEquals(0L, new UUID(0L, 0L).getMostSignificantBits())
-    assertEquals(
-        Long.MinValue, new UUID(Long.MinValue, 0L).getMostSignificantBits())
-    assertEquals(
-        Long.MaxValue, new UUID(Long.MaxValue, 0L).getMostSignificantBits())
+    assertEquals(Long.MinValue,
+                 new UUID(Long.MinValue, 0L).getMostSignificantBits())
+    assertEquals(Long.MaxValue,
+                 new UUID(Long.MaxValue, 0L).getMostSignificantBits())
   }
 
   @Test def version(): Unit = {
@@ -66,7 +66,8 @@ class UUIDTest {
 
   @Test def timestamp(): Unit = {
     assertEquals(
-        0L, new UUID(0x0000000000001000L, 0x8000000000000000L).timestamp())
+        0L,
+        new UUID(0x0000000000001000L, 0x8000000000000000L).timestamp())
     assertEquals(
         0x333555577777777L,
         new UUID(0x7777777755551333L, 0x8000000000000000L).timestamp())
@@ -81,7 +82,8 @@ class UUIDTest {
 
   @Test def clockSequence(): Unit = {
     assertEquals(
-        0, new UUID(0x0000000000001000L, 0x8000000000000000L).clockSequence())
+        0,
+        new UUID(0x0000000000001000L, 0x8000000000000000L).clockSequence())
     assertEquals(
         0x0fff,
         new UUID(0x0000000000001000L, 0x8fff000000000000L).clockSequence())
@@ -128,8 +130,8 @@ class UUIDTest {
 
   @Test def hashCodeTest(): Unit = {
     assertEquals(0, new UUID(0L, 0L).hashCode())
-    assertEquals(
-        new UUID(123L, 123L).hashCode(), new UUID(123L, 123L).hashCode())
+    assertEquals(new UUID(123L, 123L).hashCode(),
+                 new UUID(123L, 123L).hashCode())
   }
 
   @Test def equalsTest(): Unit = {
@@ -201,18 +203,18 @@ class UUIDTest {
                  UUID.fromString("f81d4fae-7dec-11d0_a765-00a0c91e6bf6"))
     assertThrows(classOf[Exception],
                  UUID.fromString("f81d4fae-7dec-11d0-a765_00a0c91e6bf6"))
-    assertThrows(
-        classOf[Exception], UUID.fromString("-7dec-11d0-a765-00a0c91e6bf6"))
+    assertThrows(classOf[Exception],
+                 UUID.fromString("-7dec-11d0-a765-00a0c91e6bf6"))
     assertThrows(classOf[Exception],
                  UUID.fromString("f81d4fae--11d0-a765-00a0c91e6bf6"))
     assertThrows(classOf[Exception],
                  UUID.fromString("f81d4fae-7dec--a765-00a0c91e6bf6"))
     assertThrows(classOf[Exception],
                  UUID.fromString("f81d4fae-7dec-11d0--00a0c91e6bf6"))
-    assertThrows(
-        classOf[Exception], UUID.fromString("f81d4fae-7dec-11d0-a765-"))
-    assertThrows(
-        classOf[Exception], UUID.fromString("f81d4fae-7dec-11d0-a765"))
+    assertThrows(classOf[Exception],
+                 UUID.fromString("f81d4fae-7dec-11d0-a765-"))
+    assertThrows(classOf[Exception],
+                 UUID.fromString("f81d4fae-7dec-11d0-a765"))
     assertThrows(classOf[Exception],
                  UUID.fromString("f81d4fae-7dZc-11d0-a765-00a0c91e6bf6"))
   }

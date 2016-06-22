@@ -53,9 +53,9 @@ class TypedSpec(config: Config)
   def await[T](f: Future[T]): T =
     Await.result(f, 60.seconds.dilated(system.untyped))
 
-  val blackhole = await(
-      system ? Create(Props(ScalaDSL.Full[Any] { case _ ⇒ ScalaDSL.Same }),
-                      "blackhole"))
+  val blackhole = await(system ? Create(Props(ScalaDSL.Full[Any] {
+    case _ ⇒ ScalaDSL.Same
+  }), "blackhole"))
 
   /**
     * Run an Actor-based test. The test procedure is most conveniently
@@ -134,8 +134,8 @@ object TypedSpec {
   case class Failed(thr: Throwable) extends Status
   case object Timedout extends Status
 
-  def guardian(outstanding: Map[ActorRef[_], ActorRef[Status]] =
-        Map.empty): Behavior[Command] =
+  def guardian(outstanding: Map[ActorRef[_], ActorRef[Status]] = Map.empty)
+    : Behavior[Command] =
     FullTotal {
       case Sig(ctx, f @ t.Failed(ex, test)) ⇒
         outstanding get test match {

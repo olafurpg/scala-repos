@@ -154,7 +154,8 @@ abstract class Flatten extends InfoTransform {
               val ref = gen.mkAttributedRef(sym)
               if (isQualifierSafeToElide(qual)) ref
               else
-                Block(List(qual), ref).setType(tree.tpe) // need to execute the qualifier but refer directly to the lifted module.
+                Block(List(qual), ref)
+                  .setType(tree.tpe) // need to execute the qualifier but refer directly to the lifted module.
             }
           }
         case _ =>
@@ -164,8 +165,8 @@ abstract class Flatten extends InfoTransform {
     }
 
     /** Transform statements and add lifted definitions to them. */
-    override def transformStats(
-        stats: List[Tree], exprOwner: Symbol): List[Tree] = {
+    override def transformStats(stats: List[Tree],
+                                exprOwner: Symbol): List[Tree] = {
       val stats1 = super.transformStats(stats, exprOwner)
       if (currentOwner.isPackageClass) {
         val lifted = liftedDefs.remove(currentOwner).toList.flatten

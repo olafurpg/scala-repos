@@ -17,7 +17,8 @@ import scala.language.implicitConversions
 
 object RoutesKeys {
   val routesCompilerTasks = TaskKey[Seq[RoutesCompilerTask]](
-      "playRoutesTasks", "The routes files to compile")
+      "playRoutesTasks",
+      "The routes files to compile")
   val routes = TaskKey[Seq[File]]("playRoutes", "Compile the routes files")
   val routesImport =
     SettingKey[Seq[String]]("playRoutesImports", "Imports for the router")
@@ -166,8 +167,10 @@ object RoutesCompiler extends AutoPlugin {
       val exceptions = errors.map {
         case RoutesCompilationError(source, message, line, column) =>
           reportCompilationError(log,
-                                 RoutesCompilationException(
-                                     source, message, line, column.map(_ - 1)))
+                                 RoutesCompilationException(source,
+                                                            message,
+                                                            line,
+                                                            column.map(_ - 1)))
       }
       throw exceptions.head
     }
@@ -175,13 +178,13 @@ object RoutesCompiler extends AutoPlugin {
     products.to[Seq]
   }
 
-  private def reportCompilationError(
-      log: Logger, error: PlayException.ExceptionSource) = {
+  private def reportCompilationError(log: Logger,
+                                     error: PlayException.ExceptionSource) = {
     // log the source file and line number with the error message
     log.error(
         Option(error.sourceName).getOrElse("") +
-        Option(error.line).map(":" + _).getOrElse("") + ": " +
-        error.getMessage)
+          Option(error.line).map(":" + _).getOrElse("") + ": " +
+          error.getMessage)
     Option(error.interestingLines(0)).map(_.focus).flatMap(_.headOption) map {
       line =>
         // log the line
@@ -201,36 +204,39 @@ object RoutesCompiler extends AutoPlugin {
   val routesPositionMapper: Position => Option[Position] = position => {
     position.sourceFile collect {
       case GeneratedSource(generatedSource) => {
-          new xsbti.Position {
-            lazy val line = {
-              position.line
-                .flatMap(l => generatedSource.mapLine(l.asInstanceOf[Int]))
-                .map(l => xsbti.Maybe.just(l.asInstanceOf[java.lang.Integer]))
-                .getOrElse(xsbti.Maybe.nothing[java.lang.Integer])
-            }
-            lazy val lineContent = {
-              line flatMap { lineNo =>
-                sourceFile.flatMap { file =>
-                  IO.read(file).split('\n').lift(lineNo - 1)
-                }
-              } getOrElse ""
-            }
-            val offset = xsbti.Maybe.nothing[java.lang.Integer]
-            val pointer = xsbti.Maybe.nothing[java.lang.Integer]
-            val pointerSpace = xsbti.Maybe.nothing[String]
-            val sourceFile = xsbti.Maybe.just(generatedSource.source.get)
-            val sourcePath = xsbti.Maybe.just(sourceFile.get.getCanonicalPath)
+        new xsbti.Position {
+          lazy val line = {
+            position.line
+              .flatMap(l => generatedSource.mapLine(l.asInstanceOf[Int]))
+              .map(l => xsbti.Maybe.just(l.asInstanceOf[java.lang.Integer]))
+              .getOrElse(xsbti.Maybe.nothing[java.lang.Integer])
           }
+          lazy val lineContent = {
+            line flatMap { lineNo =>
+              sourceFile.flatMap { file =>
+                IO.read(file).split('\n').lift(lineNo - 1)
+              }
+            } getOrElse ""
+          }
+          val offset = xsbti.Maybe.nothing[java.lang.Integer]
+          val pointer = xsbti.Maybe.nothing[java.lang.Integer]
+          val pointerSpace = xsbti.Maybe.nothing[String]
+          val sourceFile = xsbti.Maybe.just(generatedSource.source.get)
+          val sourcePath = xsbti.Maybe.just(sourceFile.get.getCanonicalPath)
         }
+      }
     }
   }
 }
 
-private case class RoutesCompilerOp(
-    task: RoutesCompilerTask, generatorId: String, playVersion: String)
+private case class RoutesCompilerOp(task: RoutesCompilerTask,
+                                    generatorId: String,
+                                    playVersion: String)
 
-case class RoutesCompilationException(
-    source: File, message: String, atLine: Option[Int], column: Option[Int])
+case class RoutesCompilationException(source: File,
+                                      message: String,
+                                      atLine: Option[Int],
+                                      column: Option[Int])
     extends PlayException.ExceptionSource("Compilation error", message)
     with FeedbackProvidedException {
   def line = atLine.map(_.asInstanceOf[java.lang.Integer]).orNull

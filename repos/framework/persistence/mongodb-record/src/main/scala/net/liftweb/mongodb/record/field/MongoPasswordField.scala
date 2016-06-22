@@ -43,8 +43,8 @@ object MongoPasswordField {
     hash("{" + s + "} salt={" + salt + "}")
 }
 
-class MongoPasswordField[OwnerType <: BsonRecord[OwnerType]](
-    rec: OwnerType, minLen: Int)
+class MongoPasswordField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType,
+                                                             minLen: Int)
     extends JsonObjectField[OwnerType, Password](rec, Password) {
 
   def this(rec: OwnerType) = {
@@ -83,8 +83,8 @@ class MongoPasswordField[OwnerType <: BsonRecord[OwnerType]](
     }
 
   private def validatePassword(pwd: Password): List[FieldError] = pwd match {
-    case null | Password("", _) |
-        Password("*", _) | Password(MongoPasswordField.blankPw, _) =>
+    case null | Password("", _) | Password("*", _) |
+        Password(MongoPasswordField.blankPw, _) =>
       Text(S.?("password.must.be.set"))
     case Password(pwd, _) if pwd.length < minLen =>
       Text(S.?("password.too.short"))

@@ -23,8 +23,8 @@ class UnmarshallingSpec
       Unmarshal(HttpEntity("Hällö")).to[String] should evaluateTo("Hällö")
     }
     "charArrayUnmarshaller should unmarshal `text/plain` content in UTF-8 to char arrays" in {
-      Unmarshal(HttpEntity("árvíztűrő ütvefúrógép")).to[Array[Char]] should evaluateTo(
-          "árvíztűrő ütvefúrógép".toCharArray)
+      Unmarshal(HttpEntity("árvíztűrő ütvefúrógép"))
+        .to[Array[Char]] should evaluateTo("árvíztűrő ütvefúrógép".toCharArray)
     }
   }
   override def afterAll() = system.terminate()

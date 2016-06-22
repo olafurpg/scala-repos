@@ -34,8 +34,8 @@ trait Catalog {
 
   def tableExists(tableIdent: TableIdentifier): Boolean
 
-  def lookupRelation(
-      tableIdent: TableIdentifier, alias: Option[String] = None): LogicalPlan
+  def lookupRelation(tableIdent: TableIdentifier,
+                     alias: Option[String] = None): LogicalPlan
 
   def setCurrentDatabase(databaseName: String): Unit = {
     throw new UnsupportedOperationException
@@ -64,8 +64,8 @@ trait Catalog {
     if (tableIdent.database.isDefined) {
       throw new AnalysisException(
           "Specifying database name or other qualifiers are not allowed " +
-          "for temporary tables. If the table name has dots (.) in it, please quote the " +
-          "table name with backticks (`).")
+            "for temporary tables. If the table name has dots (.) in it, please quote the " +
+            "table name with backticks (`).")
     }
     if (conf.caseSensitiveAnalysis) {
       tableIdent.table
@@ -78,8 +78,8 @@ trait Catalog {
 class SimpleCatalog(val conf: CatalystConf) extends Catalog {
   private[this] val tables = new ConcurrentHashMap[String, LogicalPlan]
 
-  override def registerTable(
-      tableIdent: TableIdentifier, plan: LogicalPlan): Unit = {
+  override def registerTable(tableIdent: TableIdentifier,
+                             plan: LogicalPlan): Unit = {
     tables.put(getTableName(tableIdent), plan)
   }
 
@@ -146,9 +146,9 @@ trait OverrideCatalog extends Catalog {
     }
   }
 
-  abstract override def lookupRelation(tableIdent: TableIdentifier,
-                                       alias: Option[String] =
-                                         None): LogicalPlan = {
+  abstract override def lookupRelation(
+      tableIdent: TableIdentifier,
+      alias: Option[String] = None): LogicalPlan = {
     getOverriddenTable(tableIdent) match {
       case Some(table) =>
         val tableName = getTableName(tableIdent)
@@ -170,8 +170,8 @@ trait OverrideCatalog extends Catalog {
         databaseName)
   }
 
-  override def registerTable(
-      tableIdent: TableIdentifier, plan: LogicalPlan): Unit = {
+  override def registerTable(tableIdent: TableIdentifier,
+                             plan: LogicalPlan): Unit = {
     overrides.put(getTableName(tableIdent), plan)
   }
 
@@ -208,8 +208,8 @@ object EmptyCatalog extends Catalog {
     throw new UnsupportedOperationException
   }
 
-  override def registerTable(
-      tableIdent: TableIdentifier, plan: LogicalPlan): Unit = {
+  override def registerTable(tableIdent: TableIdentifier,
+                             plan: LogicalPlan): Unit = {
     throw new UnsupportedOperationException
   }
 

@@ -43,9 +43,11 @@ class SetterMethodSearcher
     }
   }
 
-  private def processAssignments(
-      element: PsiElement, name: String, project: Project)(
-      implicit consumer: Processor[PsiReference], scope: SearchScope) = {
+  private def processAssignments(element: PsiElement,
+                                 name: String,
+                                 project: Project)(
+      implicit consumer: Processor[PsiReference],
+      scope: SearchScope) = {
     val processor = new TextOccurenceProcessor {
       def execute(elem: PsiElement, offsetInElement: Int): Boolean = {
         inReadAction {
@@ -74,9 +76,11 @@ class SetterMethodSearcher
                                    true)
   }
 
-  private def processSimpleUsages(
-      element: PsiElement, name: String, project: Project)(
-      implicit consumer: Processor[PsiReference], scope: SearchScope) = {
+  private def processSimpleUsages(element: PsiElement,
+                                  name: String,
+                                  project: Project)(
+      implicit consumer: Processor[PsiReference],
+      scope: SearchScope) = {
     val processor = new TextOccurenceProcessor {
       def execute(elem: PsiElement, offsetInElement: Int): Boolean = {
         inReadAction {
@@ -98,7 +102,10 @@ class SetterMethodSearcher
       }
     }
     val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(project)
-    helper.processElementsWithWord(
-        processor, scope, name, UsageSearchContext.IN_CODE, true)
+    helper.processElementsWithWord(processor,
+                                   scope,
+                                   name,
+                                   UsageSearchContext.IN_CODE,
+                                   true)
   }
 }

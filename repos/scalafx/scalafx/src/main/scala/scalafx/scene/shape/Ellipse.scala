@@ -39,8 +39,10 @@ object Ellipse {
 
   def apply(radiusX: Double, radiusY: Double) =
     new Ellipse(new jfxss.Ellipse(radiusX, radiusY))
-  def apply(
-      centerX: Double, centerY: Double, radiusX: Double, radiusY: Double) =
+  def apply(centerX: Double,
+            centerY: Double,
+            radiusX: Double,
+            radiusY: Double) =
     new Ellipse(new jfxss.Ellipse(centerX, centerY, radiusX, radiusY))
 }
 

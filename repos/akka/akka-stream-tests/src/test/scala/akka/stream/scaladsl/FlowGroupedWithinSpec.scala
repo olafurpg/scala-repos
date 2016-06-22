@@ -47,7 +47,7 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
       }
       c.expectNoMsg(300.millis)
       c.expectNext(((demand1 + demand2 + 1).toInt to
-              (demand1 + demand2 + demand3).toInt).toVector)
+                (demand1 + demand2 + demand3).toInt).toVector)
       c.expectNoMsg(300.millis)
       pSub.expectRequest
       val last = input.next()

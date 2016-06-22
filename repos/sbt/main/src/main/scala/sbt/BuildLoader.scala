@@ -24,14 +24,14 @@ final class MultiHandler[S, T](builtIn: S => Option[T],
         if (ignored.nonEmpty)
           warn(
               "Using first of multiple matching non-root build resolvers for " +
-              getURI(info),
+                getURI(info),
               log(info),
               xs)
         Some(nr)
       case (Some(b), xs) =>
         if (xs.nonEmpty)
           warn("Ignoring shadowed non-root build resolver(s) for " +
-               getURI(info),
+                 getURI(info),
                log(info),
                xs)
         Some(b)
@@ -53,8 +53,9 @@ final class MultiHandler[S, T](builtIn: S => Option[T],
         }
     }
 
-  private[this] def warn(
-      baseMessage: String, log: Logger, matching: Seq[(URI, T)]): Unit = {
+  private[this] def warn(baseMessage: String,
+                         log: Logger,
+                         matching: Seq[(URI, T)]): Unit = {
     log.warn(baseMessage)
     log.debug("Non-root build resolvers defined in:")
     log.debug(matching.map(_._1).mkString("\n\t"))
@@ -216,8 +217,8 @@ final class BuildLoader(val fail: URI => Nothing,
                    full.applyFun,
                    transformAll)
   def apply(uri: URI): BuildUnit = {
-    val info = new LoadInfo(
-        uri, config.stagingDirectory, config, state, components)
+    val info =
+      new LoadInfo(uri, config.stagingDirectory, config, state, components)
     val load = full(info) getOrElse fail(uri)
     load()
   }

@@ -46,7 +46,7 @@ object SimpleFPGrowth {
     val minConfidence = 0.8
     model.generateAssociationRules(minConfidence).collect().foreach { rule =>
       println(rule.antecedent.mkString("[", ",", "]") + " => " +
-          rule.consequent.mkString("[", ",", "]") + ", " + rule.confidence)
+            rule.consequent.mkString("[", ",", "]") + ", " + rule.confidence)
     }
     // $example off$
   }

@@ -76,7 +76,7 @@ class ScalaJsonHttpSpec extends PlaySpecification with Results {
                 Place.save(place)
                 Ok(Json.obj("status" -> "OK",
                             "message" ->
-                            ("Place '" + place.name + "' saved.")))
+                              ("Place '" + place.name + "' saved.")))
               }
           )
         }.getOrElse {

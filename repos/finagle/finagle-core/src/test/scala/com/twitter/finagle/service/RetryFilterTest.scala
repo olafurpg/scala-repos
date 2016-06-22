@@ -54,10 +54,13 @@ class RetryFilterTest extends FunSpec with MockitoSugar with BeforeAndAfter {
     val filter =
       if (retryExceptionsOnly)
         new RetryExceptionsFilter[Int, Int](
-            RetryPolicy.tries(3, shouldRetryException), timer, stats)
+            RetryPolicy.tries(3, shouldRetryException),
+            timer,
+            stats)
       else
-        new RetryFilter[Int, Int](
-            RetryPolicy.tries(3, shouldRetryResponse), timer, stats)
+        new RetryFilter[Int, Int](RetryPolicy.tries(3, shouldRetryResponse),
+                                  timer,
+                                  stats)
     val retryingService = filter andThen service
   }
 
@@ -70,10 +73,14 @@ class RetryFilterTest extends FunSpec with MockitoSugar with BeforeAndAfter {
     val filter =
       if (retryExceptionsOnly)
         new RetryExceptionsFilter[Int, Int](
-            policy.asInstanceOf[RetryPolicy[Try[Nothing]]], theTimer, stats)
+            policy.asInstanceOf[RetryPolicy[Try[Nothing]]],
+            theTimer,
+            stats)
       else
         new RetryFilter[Int, Int](
-            policy.asInstanceOf[RetryPolicy[(Int, Try[Int])]], theTimer, stats)
+            policy.asInstanceOf[RetryPolicy[(Int, Try[Int])]],
+            theTimer,
+            stats)
     val service = mock[Service[Int, Int]]
     when(service.close(anyObject[Time])) thenReturn Future.Done
     val retryingService = filter andThen service
@@ -86,14 +93,17 @@ class RetryFilterTest extends FunSpec with MockitoSugar with BeforeAndAfter {
 
       // use a budget that just gets 2 retries
       val budgetRetries = 2
-      val budget = RetryBudget(
-          1.second, minRetriesPerSec = budgetRetries, percentCanRetry = 0.0)
+      val budget = RetryBudget(1.second,
+                               minRetriesPerSec = budgetRetries,
+                               percentCanRetry = 0.0)
 
       // have a policy that allows for way more retries than the budgets allows for
       val policy = RetryPolicy.tries(10, RetryPolicy.WriteExceptionsOnly)
 
-      val filter = new RetryExceptionsFilter[Throwable, Int](
-          policy, Timer.Nil, stats, budget)
+      val filter = new RetryExceptionsFilter[Throwable, Int](policy,
+                                                             Timer.Nil,
+                                                             stats,
+                                                             budget)
       val service: Service[Throwable, Int] = Service.mk(Future.exception)
 
       val svc = filter.andThen(service)
@@ -241,12 +251,13 @@ class RetryFilterTest extends FunSpec with MockitoSugar with BeforeAndAfter {
     }
 
     describe("with Success RetryPolicy.backoffJava") {
-      testSuccessPolicy(RetryPolicy.backoffJava(Backoff.toJava(backoffs),
-                                                shouldRetryResponse))
+      testSuccessPolicy(
+          RetryPolicy.backoffJava(Backoff.toJava(backoffs),
+                                  shouldRetryResponse))
     }
 
-    def testExceptionPolicy(
-        policy: RetryPolicy[_], retryExceptionsOnly: Boolean) {
+    def testExceptionPolicy(policy: RetryPolicy[_],
+                            retryExceptionsOnly: Boolean) {
 
       it("always try once") {
         new PolicyFixture(policy, retryExceptionsOnly, timer) {

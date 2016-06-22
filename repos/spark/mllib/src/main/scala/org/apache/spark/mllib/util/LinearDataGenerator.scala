@@ -104,8 +104,14 @@ object LinearDataGenerator {
                           nPoints: Int,
                           seed: Int,
                           eps: Double): Seq[LabeledPoint] = {
-    generateLinearInput(
-        intercept, weights, xMean, xVariance, nPoints, seed, eps, 0.0)
+    generateLinearInput(intercept,
+                        weights,
+                        xMean,
+                        xVariance,
+                        nPoints,
+                        seed,
+                        eps,
+                        0.0)
   }
 
   /**
@@ -144,7 +150,7 @@ object LinearDataGenerator {
           Vectors.dense(weights.indices.map { rndElement(_) }.toArray)
         val label =
           BLAS.dot(Vectors.dense(weights), features) + intercept +
-          eps * rnd.nextGaussian()
+            eps * rnd.nextGaussian()
         // Return LabeledPoints with DenseVector
         LabeledPoint(label, features)
       }
@@ -158,7 +164,7 @@ object LinearDataGenerator {
           Vectors.sparse(weights.length, indices.toArray, values.toArray)
         val label =
           BLAS.dot(Vectors.dense(weights), features) + intercept +
-          eps * rnd.nextGaussian()
+            eps * rnd.nextGaussian()
         // Return LabeledPoints with SparseVector
         LabeledPoint(label, features)
       }
@@ -192,8 +198,11 @@ object LinearDataGenerator {
       sc.parallelize(0 until nparts, nparts).flatMap { p =>
         val seed = 42 + p
         val examplesInPartition = nexamples / nparts
-        generateLinearInput(
-            intercept, w.toArray, examplesInPartition, seed, eps)
+        generateLinearInput(intercept,
+                            w.toArray,
+                            examplesInPartition,
+                            seed,
+                            eps)
       }
     data
   }
@@ -204,7 +213,7 @@ object LinearDataGenerator {
       // scalastyle:off println
       println(
           "Usage: LinearDataGenerator " +
-          "<master> <output_dir> [num_examples] [num_features] [num_partitions]")
+            "<master> <output_dir> [num_examples] [num_features] [num_partitions]")
       // scalastyle:on println
       System.exit(1)
     }

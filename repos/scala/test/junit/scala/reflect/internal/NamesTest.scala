@@ -21,8 +21,7 @@ class NamesTest {
   val fy = newTypeName("fisch")
 
   val uy = newTypeName("uhu")
-  val u =
-    uy.toTermName // calling toTermName after constructing a typeName. This tests the fact
+  val u = uy.toTermName // calling toTermName after constructing a typeName. This tests the fact
   // that creating a typeName always also first creates a termName. There is
   // an assertion for that in toTermName.
 
@@ -55,11 +54,11 @@ class NamesTest {
     assert(lookupTypeName("fisch".toCharArray) eq fy)
     assert(lookupTypeName("uhu".toCharArray) eq uy)
 
-    assertThrows[AssertionError](
-        lookupTypeName("dog".toCharArray), _ contains "not yet created")
+    assertThrows[AssertionError](lookupTypeName("dog".toCharArray),
+                                 _ contains "not yet created")
     val d = newTermName("dog")
-    assertThrows[AssertionError](
-        lookupTypeName("dog".toCharArray), _ contains "not yet created")
+    assertThrows[AssertionError](lookupTypeName("dog".toCharArray),
+                                 _ contains "not yet created")
     val dy = d.toTypeName
     assert(lookupTypeName("dog".toCharArray) eq dy)
   }

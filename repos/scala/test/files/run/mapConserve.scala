@@ -16,8 +16,9 @@ object Test {
     assert(xs.mapConserve(x => x) eq xs)
   }
 
-  def checkBehaviourUnchanged(
-      input: List[_], oldOutput: List[_], newOutput: List[_]) {
+  def checkBehaviourUnchanged(input: List[_],
+                              oldOutput: List[_],
+                              newOutput: List[_]) {
     if (oldOutput eq input) assert(newOutput eq oldOutput)
     else {
       assert(newOutput.head == oldOutput.head)
@@ -48,8 +49,9 @@ object Test {
       assert(callCount == 2 * length) // map, mapConserve call transform for each element in the list
 
       // Behaves like existing mapConserve with respect to  eq
-      checkBehaviourUnchanged(
-          data, data mapConserve lastHexDigit, data mapConserve lastHexDigit)
+      checkBehaviourUnchanged(data,
+                              data mapConserve lastHexDigit,
+                              data mapConserve lastHexDigit)
     }
 
     checkStackOverflow();

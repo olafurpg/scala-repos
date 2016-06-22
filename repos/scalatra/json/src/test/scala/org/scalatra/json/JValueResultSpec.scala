@@ -10,8 +10,7 @@ case class NamedThing(name: String = "tom")
 class Bottle(val of: String)
 
 class BottleSerializer
-    extends CustomSerializer[Bottle](
-        implicit formats =>
+    extends CustomSerializer[Bottle](implicit formats =>
           ({
         case json: JValue =>
           val b = for {
@@ -162,7 +161,7 @@ class JValueResultSpec extends MutableScalatraSpec {
     "render a map" in {
       get("/map") {
         parse(body) must_==
-          JObject(List(JField("rum", bottleRum), JField("thing", jValue)))
+        JObject(List(JField("rum", bottleRum), JField("thing", jValue)))
       }
     }
 

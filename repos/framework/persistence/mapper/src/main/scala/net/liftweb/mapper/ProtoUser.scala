@@ -308,7 +308,8 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     * Given a field pointer and an instance, get the field on that instance
     */
   protected def computeFieldFromPointer(
-      instance: TheUserType, pointer: FieldPointerType): Box[BaseField] =
+      instance: TheUserType,
+      pointer: FieldPointerType): Box[BaseField] =
     Full(getActualField(instance, pointer))
 
   /**

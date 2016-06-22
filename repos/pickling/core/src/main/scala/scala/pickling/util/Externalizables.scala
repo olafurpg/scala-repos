@@ -254,8 +254,8 @@ object Externalizables {
         def close(): Unit = ???
         def flush(): Unit = ???
         def write(x1: Array[Byte],x2: Int,x3: Int): Unit = ???
-        def write(x: Array[Byte]): Unit = ${finalTree(
-        typeOf[Array[Byte]], "arrByte")}
+        def write(x: Array[Byte]): Unit = ${finalTree(typeOf[Array[Byte]],
+                                                      "arrByte")}
         def write(x: Int): Unit = ???
         def writeObject(x: Any): Unit = ${finalTree(typeOf[AnyRef], "anyRef")}
       }

@@ -16,7 +16,7 @@ class MutateTest extends AsyncTest[JdbcTestDB] {
 
     var seenEndMarker = false
     db.run(data.schema.create >>
-          (data ++= Seq((1, "a"), (2, "b"), (3, "c"), (4, "d"))))
+            (data ++= Seq((1, "a"), (2, "b"), (3, "c"), (4, "d"))))
       .flatMap { _ =>
         foreach(db.stream(data.mutate.transactionally)) { m =>
           if (!m.end) {

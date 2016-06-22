@@ -33,8 +33,8 @@ private[summingbird] object FileVersionTracking {
     new Path(basePath, fileName)
 }
 
-private[summingbird] case class FileVersionTracking(
-    root: String, fs: FileSystem) {
+private[summingbird] case class FileVersionTracking(root: String,
+                                                    fs: FileSystem) {
   import FileVersionTracking._
 
   fs.mkdirs(root)

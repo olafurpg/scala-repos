@@ -152,7 +152,8 @@ trait WebSocketSpec
           .via(flow)
           .runWith(consumeFrames)
       }
-      frames must contain(exactly(
+      frames must contain(
+          exactly(
               closeFrame()
           ))
     }
@@ -267,7 +268,8 @@ trait WebSocketSpec
                     true)
             ).via(flow).runWith(consumeFrames)
           }
-          frames must contain(exactly(
+          frames must contain(
+              exactly(
                   closeFrame(1009)
               ))
         }
@@ -285,7 +287,8 @@ trait WebSocketSpec
                 TextMessage("foo")
             ).via(flow).runWith(consumeFrames)
           }
-          frames must contain(exactly(
+          frames must contain(
+              exactly(
                   closeFrame(1003)
               ))
         }
@@ -303,7 +306,8 @@ trait WebSocketSpec
                 CloseMessage(1000)
             ).via(flow).runWith(consumeFrames)
           }
-          frames must contain(exactly(
+          frames must contain(
+              exactly(
                   pongFrame(be_==("hello")),
                   closeFrame()
               ))
@@ -322,7 +326,8 @@ trait WebSocketSpec
                 CloseMessage(1000)
             ).via(flow).runWith(consumeFrames)
           }
-          frames must contain(exactly(
+          frames must contain(
+              exactly(
                   closeFrame()
               ))
         }
@@ -333,12 +338,9 @@ trait WebSocketSpec
 
       "allow consuming messages" in allowConsumingMessages { _ => consumed =>
         WebSocket.using[String] { req =>
-          (Iteratee
-             .getChunks[String]
-             .map { result =>
-               consumed.success(result)
-             },
-           Enumerator.empty)
+          (Iteratee.getChunks[String].map { result =>
+            consumed.success(result)
+          }, Enumerator.empty)
         }
       }
 

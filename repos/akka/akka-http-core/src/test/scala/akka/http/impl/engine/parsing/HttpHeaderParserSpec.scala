@@ -21,8 +21,8 @@ class HttpHeaderParserSpec
     with Matchers
     with BeforeAndAfterAll {
 
-  val testConf: Config =
-    ConfigFactory.parseString("""
+  val testConf: Config = ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = ERROR
     akka.http.parsing.max-header-name-length = 60
@@ -128,24 +128,29 @@ class HttpHeaderParserSpec
 
     "parse and cache a modelled header" in new TestSetup() {
       parseAndCache("Host: spray.io:123\r\nx")("HOST: spray.io:123\r\nx") shouldEqual Host(
-          "spray.io", 123)
+          "spray.io",
+          123)
     }
 
     "parse and cache an invalid modelled header as RawHeader" in new TestSetup() {
       parseAndCache("Content-Type: abc:123\r\nx")() shouldEqual RawHeader(
-          "content-type", "abc:123")
+          "content-type",
+          "abc:123")
       parseAndCache("Origin: localhost:8080\r\nx")() shouldEqual RawHeader(
-          "origin", "localhost:8080")
+          "origin",
+          "localhost:8080")
     }
 
     "parse and cache an X-Forwarded-For with a hostname in it as a RawHeader" in new TestSetup() {
       parseAndCache("X-Forwarded-For: 1.2.3.4, akka.io\r\nx")() shouldEqual RawHeader(
-          "x-forwarded-for", "1.2.3.4, akka.io")
+          "x-forwarded-for",
+          "1.2.3.4, akka.io")
     }
 
     "parse and cache an X-Real-Ip with a hostname as it's value as a RawHeader" in new TestSetup() {
       parseAndCache("X-Real-Ip: akka.io\r\nx")() shouldEqual RawHeader(
-          "x-real-ip", "akka.io")
+          "x-real-ip",
+          "akka.io")
     }
     "parse and cache a raw header" in new TestSetup(primed = false) {
       insert("hello: bob", 'Hello)
@@ -173,9 +178,11 @@ class HttpHeaderParserSpec
 
     "parse and cache a header with UTF8 chars in the value" in new TestSetup() {
       parseAndCache("2-UTF8-Bytes: árvíztűrő ütvefúrógép\r\nx")() shouldEqual RawHeader(
-          "2-UTF8-Bytes", "árvíztűrő ütvefúrógép")
+          "2-UTF8-Bytes",
+          "árvíztűrő ütvefúrógép")
       parseAndCache("3-UTF8-Bytes: The € or the $?\r\nx")() shouldEqual RawHeader(
-          "3-UTF8-Bytes", "The € or the $?")
+          "3-UTF8-Bytes",
+          "The € or the $?")
       parseAndCache(
           "4-UTF8-Bytes: Surrogate pairs: \uD801\uDC1B\uD801\uDC04\uD801\uDC1B!\r\nx")() shouldEqual RawHeader(
           "4-UTF8-Bytes",
@@ -279,8 +286,8 @@ class HttpHeaderParserSpec
     }
     def insert(line: String, value: AnyRef): Unit =
       if (parser.isEmpty)
-        HttpHeaderParser.insertRemainingCharsAsNewNodes(
-            parser, ByteString(line), value)
+        HttpHeaderParser
+          .insertRemainingCharsAsNewNodes(parser, ByteString(line), value)
       else HttpHeaderParser.insert(parser, ByteString(line), value)
 
     def parseLine(line: String) =

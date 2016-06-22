@@ -2,8 +2,9 @@ package lila.forum
 
 import org.joda.time.DateTime
 
-case class CategView(
-    categ: Categ, lastPost: Option[(Topic, Post, Int)], troll: Boolean) {
+case class CategView(categ: Categ,
+                     lastPost: Option[(Topic, Post, Int)],
+                     troll: Boolean) {
 
   def nbTopics = categ nbTopics troll
   def nbPosts = categ nbPosts troll

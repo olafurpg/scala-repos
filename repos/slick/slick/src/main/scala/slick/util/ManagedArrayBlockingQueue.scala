@@ -8,8 +8,9 @@ import java.util._
   * temporarily rejecting elements based on the current size. All features of the original
   * ArrayBlockingQueue have been ported, except the mutation methods of the iterator. See
   * `java.util.concurrent.ArrayBlockingQueue` for documentation. */
-abstract class ManagedArrayBlockingQueue[E >: Null <: AnyRef](
-    capacity: Int, fair: Boolean = false)
+abstract class ManagedArrayBlockingQueue[E >: Null <: AnyRef](capacity: Int,
+                                                              fair: Boolean =
+                                                                false)
     extends AbstractQueue[E]
     with BlockingQueue[E] {
   self =>

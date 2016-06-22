@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Monoid` */
-final class MonoidOps[F] private[syntax](val self: F)(
+final class MonoidOps[F] private[syntax] (val self: F)(
     implicit val F: Monoid[F])
     extends Ops[F] {
   ////

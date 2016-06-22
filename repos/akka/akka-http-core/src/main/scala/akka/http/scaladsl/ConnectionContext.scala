@@ -45,8 +45,10 @@ final class HttpsConnectionContext(
     with ConnectionContext {
 
   def firstSession =
-    NegotiateNewSession(
-        enabledCipherSuites, enabledProtocols, clientAuth, sslParameters)
+    NegotiateNewSession(enabledCipherSuites,
+                        enabledProtocols,
+                        clientAuth,
+                        sslParameters)
 
   override def getSslContext = sslContext
   override def getEnabledCipherSuites: Optional[JCollection[String]] =

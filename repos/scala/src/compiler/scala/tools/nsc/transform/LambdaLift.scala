@@ -147,7 +147,8 @@ abstract class LambdaLift extends InfoTransform {
         debuglog(
             "%s != %s".format(enclosure, sym.owner.logicallyEnclosingMember))
         if (enclosure.isPackageClass || !markFree(
-                sym, enclosure.skipConstructor.owner.logicallyEnclosingMember))
+                sym,
+                enclosure.skipConstructor.owner.logicallyEnclosingMember))
           false
         else {
           val ss = symSet(free, enclosure)
@@ -227,8 +228,9 @@ abstract class LambdaLift extends InfoTransform {
       def renameSym(sym: Symbol) {
         val originalName = sym.name
         sym setName newName(sym)
-        debuglog("renaming in %s: %s => %s".format(
-                sym.owner.fullLocationString, originalName, sym.name))
+        debuglog(
+            "renaming in %s: %s => %s"
+              .format(sym.owner.fullLocationString, originalName, sym.name))
       }
 
       // make sure that the name doesn't make the symbol accidentally `isAnonymousClass` (et.al) by
@@ -253,7 +255,7 @@ abstract class LambdaLift extends InfoTransform {
           if (originalName.isTermName && calledFromInner(sym))
             newTermNameCached(
                 nonAnon(sym.enclClass.fullName('$')) +
-                nme.EXPAND_SEPARATOR_STRING + name)
+                  nme.EXPAND_SEPARATOR_STRING + name)
           else name
         }
       }
@@ -269,14 +271,15 @@ abstract class LambdaLift extends InfoTransform {
         for ((owner, freeValues) <- free.toList) {
           val newFlags =
             SYNTHETIC |
-            (if (owner.isClass) PARAMACCESSOR | PrivateLocal
-             else PARAM)
+              (if (owner.isClass) PARAMACCESSOR | PrivateLocal
+               else PARAM)
 
           proxies(owner) = for (fv <- freeValues.toList) yield {
             val proxyName = proxyNames.getOrElse(fv, fv.name)
             debuglog(s"new proxy ${proxyName} in ${owner.fullLocationString}")
             val proxy =
-              owner.newValue(proxyName.toTermName, owner.pos, newFlags.toLong) setInfo fv.info
+              owner
+                .newValue(proxyName.toTermName, owner.pos, newFlags.toLong) setInfo fv.info
             if (owner.isClass) owner.info.decls enter proxy
             proxy
           }
@@ -289,15 +292,15 @@ abstract class LambdaLift extends InfoTransform {
         if (enclosure eq NoSymbol)
           throw new IllegalArgumentException(
               "Could not find proxy for " + sym.defString + " in " +
-              sym.ownerChain + " (currentOwner= " + currentOwner + " )")
+                sym.ownerChain + " (currentOwner= " + currentOwner + " )")
         debuglog(
             "searching for " + sym + "(" + sym.owner + ") in " + enclosure +
-            " " + enclosure.logicallyEnclosingMember)
+              " " + enclosure.logicallyEnclosingMember)
 
         val proxyName = proxyNames.getOrElse(sym, sym.name)
         val ps =
           (proxies get enclosure.logicallyEnclosingMember).toList.flatten find
-          (_.name == proxyName)
+            (_.name == proxyName)
         ps getOrElse searchIn(enclosure.skipConstructor.owner)
       }
       debuglog(
@@ -378,11 +381,13 @@ abstract class LambdaLift extends InfoTransform {
               ps map (p => ValDef(p) setPos tree.pos setType NoType)
 
             sym.updateInfo(
-                lifted(MethodType(addFree(sym,
-                                          free = paramSyms,
-                                          original = sym.info.params),
-                                  sym.info.resultType)))
-            copyDefDef(tree)(vparamss =
+                lifted(
+                    MethodType(addFree(sym,
+                                       free = paramSyms,
+                                       original = sym.info.params),
+                               sym.info.resultType)))
+            copyDefDef(tree)(
+                vparamss =
                   List(addFree(sym, free = paramDefs, original = vparams)))
           }
 
@@ -538,8 +543,8 @@ abstract class LambdaLift extends InfoTransform {
     }
 
     /** Transform statements and add lifted definitions to them. */
-    override def transformStats(
-        stats: List[Tree], exprOwner: Symbol): List[Tree] = {
+    override def transformStats(stats: List[Tree],
+                                exprOwner: Symbol): List[Tree] = {
       def addLifted(stat: Tree): Tree = stat match {
         case ClassDef(_, _, _, _) =>
           val lifted = liftedDefs remove stat.symbol match {
@@ -567,12 +572,13 @@ abstract class LambdaLift extends InfoTransform {
     }
   } // class LambdaLifter
 
-  private def addFree[A](
-      sym: Symbol, free: List[A], original: List[A]): List[A] = {
+  private def addFree[A](sym: Symbol,
+                         free: List[A],
+                         original: List[A]): List[A] = {
     val prependFree =
       (!sym.isConstructor // this condition is redundant for now. It will be needed if we remove the second condition in 2.12.x
-          && (settings.Ydelambdafy.value == "method" &&
-              sym.isDelambdafyTarget) // SI-8359 Makes the lambda body a viable as the target MethodHandle for a call to LambdaMetafactory
+            && (settings.Ydelambdafy.value == "method" &&
+                  sym.isDelambdafyTarget) // SI-8359 Makes the lambda body a viable as the target MethodHandle for a call to LambdaMetafactory
           )
     if (prependFree) free ::: original
     else original ::: free

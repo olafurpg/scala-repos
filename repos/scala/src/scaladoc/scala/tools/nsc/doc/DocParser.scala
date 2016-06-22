@@ -36,8 +36,8 @@ class DocParser(settings: nsc.Settings, reporter: Reporter)
     def loop(enclosing: List[Tree], tree: Tree): List[Parsed] = tree match {
       case x: PackageDef => x.stats flatMap (t => loop(enclosing :+ x, t))
       case x: DocDef =>
-        new Parsed(enclosing, x) :: loop(
-            enclosing :+ x.definition, x.definition)
+        new Parsed(enclosing, x) :: loop(enclosing :+ x.definition,
+                                         x.definition)
       case x => x.children flatMap (t => loop(enclosing, t))
     }
     loop(Nil, docUnit(code))
@@ -70,7 +70,9 @@ object DocParser {
     def raw: String = docDef.comment.raw
 
     override def toString =
-      (nameChain.init.map(x => if (x.isTypeName) x + "#" else x + ".").mkString +
-          nameChain.last)
+      (nameChain.init
+            .map(x => if (x.isTypeName) x + "#" else x + ".")
+            .mkString +
+            nameChain.last)
   }
 }

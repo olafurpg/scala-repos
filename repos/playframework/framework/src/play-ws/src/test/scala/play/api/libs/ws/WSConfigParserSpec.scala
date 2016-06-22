@@ -15,7 +15,8 @@ object WSConfigParserSpec extends Specification {
   "WSConfigParser" should {
 
     def parseThis(input: String)(implicit app: play.api.Application) = {
-      val config = play.api.Configuration(ConfigFactory
+      val config = play.api.Configuration(
+          ConfigFactory
             .parseString(input)
             .withFallback(ConfigFactory.defaultReference()))
       val parser =

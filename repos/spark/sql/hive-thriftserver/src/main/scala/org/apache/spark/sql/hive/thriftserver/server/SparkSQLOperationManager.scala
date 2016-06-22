@@ -50,12 +50,14 @@ private[thriftserver] class SparkSQLOperationManager()
     val hiveContext = sessionToContexts(parentSession.getSessionHandle)
     val runInBackground = async && hiveContext.hiveThriftServerAsync
     val operation = new SparkExecuteStatementOperation(
-        parentSession, statement, confOverlay, runInBackground)(
-        hiveContext, sessionToActivePool)
+        parentSession,
+        statement,
+        confOverlay,
+        runInBackground)(hiveContext, sessionToActivePool)
     handleToOperation.put(operation.getHandle, operation)
     logDebug(
         s"Created Operation for $statement with session=$parentSession, " +
-        s"runInBackground=$runInBackground")
+          s"runInBackground=$runInBackground")
     operation
   }
 }

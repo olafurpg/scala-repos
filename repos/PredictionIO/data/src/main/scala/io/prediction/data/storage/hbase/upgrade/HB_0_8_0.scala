@@ -92,7 +92,8 @@ object HB_0_8_0 {
       } catch {
         case e: Exception =>
           throw new RowKeyException(
-              s"Failed to convert String ${s} to RowKey because ${e}", e)
+              s"Failed to convert String ${s} to RowKey because ${e}",
+              e)
       }
     }
 
@@ -133,8 +134,8 @@ object HB_0_8_0 {
       val r = result.getValue(eBytes, colNames(col))
       require(r != null,
               s"Failed to get value for column ${col}. " +
-              s"Rowkey: ${rowKey.toString} " +
-              s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
+                s"Rowkey: ${rowKey.toString} " +
+                s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
 
       Bytes.toString(r)
     }

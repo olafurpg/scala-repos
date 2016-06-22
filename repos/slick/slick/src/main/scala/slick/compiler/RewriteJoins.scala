@@ -16,8 +16,9 @@ class RewriteJoins extends Phase {
   def apply(state: CompilerState) = state.map(tr _)
 
   def tr(n: Node): Node = n.mapChildren(tr, keepType = true) match {
-    case n @ Bind(
-        s1, f1, Bind(s2, Pure(StructNode(ConstArray()), _), select)) =>
+    case n @ Bind(s1,
+                  f1,
+                  Bind(s2, Pure(StructNode(ConstArray()), _), select)) =>
       logger.debug("Eliminating unnecessary Bind from:",
                    Ellipsis(n, List(0), List(1, 1)))
       Bind(s1, f1, select) :@ n.nodeType
@@ -49,8 +50,8 @@ class RewriteJoins extends Phase {
       flattenAliasingMap(res)
 
     case n @ Bind(s1, f1, Bind(s2, j: Join, select)) =>
-      logger.debug(
-          "Hoisting flatMapped Join from:", Ellipsis(n, List(0), List(1, 0)))
+      logger.debug("Hoisting flatMapped Join from:",
+                   Ellipsis(n, List(0), List(1, 0)))
       val sn, sj1, sj2 = new AnonSymbol
       val j2 = j.replace {
         case Ref(s) :@ tpe if s == s1 => Ref(sj1) :@ tpe
@@ -194,7 +195,7 @@ class RewriteJoins extends Phase {
         }
         val res = Filter(fs, Bind(b.generator, from1, sel), pred).infer()
         logger.debug("Hoisted Filter out of Bind (invalidated: " +
-                     tss.mkString(", ") + ") in:",
+                       tss.mkString(", ") + ") in:",
                      res)
         (res, tss)
       case _ => (b, Set.empty)
@@ -212,7 +213,7 @@ class RewriteJoins extends Phase {
       illegal: Set[TermSymbol],
       outsideRef: TermSymbol): (Join, Map[List[TermSymbol], Node]) = {
     logger.debug("Trying to eliminate illegal refs [" +
-                 illegal.mkString(", ") + "] from:",
+                   illegal.mkString(", ") + "] from:",
                  j)
     // Pull defs to one of `illegal` out of `sn`, creating required refs to `ok` instead
     def pullOut(
@@ -224,7 +225,7 @@ class RewriteJoins extends Phase {
       if (illegalDefs.isEmpty) (sn, Map.empty)
       else {
         logger.debug("Pulling refs to [" + illegal.mkString(", ") +
-                     "] with OK base " + ok + " out of:",
+                       "] with OK base " + ok + " out of:",
                      sn)
         val requiredOkPaths = illegalDefs
           .flatMap(
@@ -287,7 +288,8 @@ class RewriteJoins extends Phase {
         }
       val j2 = j.copy(left = l1, right = r1, on = on1).infer()
       logger.debug(
-          "Eliminated illegal refs [" + illegal.mkString(", ") + "] in:", j2)
+          "Eliminated illegal refs [" + illegal.mkString(", ") + "] in:",
+          j2)
       val m =
         l1m.map { case (p, n) => (ElementSymbol(1) :: p, n) } ++ r1m.map {
           case (p, n) => (ElementSymbol(2) :: p, n)
@@ -322,7 +324,7 @@ class RewriteJoins extends Phase {
                 JoinType.Inner,
                 on1) =>
         logger.debug("Trying to rearrange join conditions (alsoPull: " +
-                     alsoPull.mkString(", ") + ") in:",
+                       alsoPull.mkString(", ") + ") in:",
                      j)
         val pull = alsoPull + s1
         val j2b = rearrangeJoinConditions(j2a, pull)
@@ -332,15 +334,13 @@ class RewriteJoins extends Phase {
           splitConjunctions(j2b.on).partition(p => hasRefTo(p, pull))
         if (on1Down.nonEmpty || on2Up.nonEmpty) {
           val refS2 = Ref(s2) :@ j2b.nodeType.asCollectionType.elementType
-          val on1b = and(
-              on1Keep ++ on2Up.map(_.replace({
+          val on1b = and(on1Keep ++ on2Up.map(_.replace({
             case Ref(s) :@ tpe if s == j2b.leftGen =>
               Select(refS2, ElementSymbol(1)) :@ tpe
             case Ref(s) :@ tpe if s == j2b.rightGen =>
               Select(refS2, ElementSymbol(2)) :@ tpe
           }, keepType = true)))
-          val on2b = and(
-              on1Down.map(_.replace({
+          val on2b = and(on1Down.map(_.replace({
             case Select(Ref(s), ElementSymbol(i)) :@ tpe if s == s2 =>
               Ref(if (i == 0) j2b.leftGen else j2b.rightGen) :@ tpe
           }, keepType = true)) ++ on2Keep)

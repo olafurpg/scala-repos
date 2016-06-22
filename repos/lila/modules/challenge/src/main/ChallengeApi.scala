@@ -114,7 +114,8 @@ final class ChallengeApi(repo: ChallengeRepo,
   private def notify(userId: User.ID) {
     allFor(userId) foreach { all =>
       userRegister ! SendTo(
-          userId, lila.socket.Socket.makeMessage("challenges", jsonView(all)))
+          userId,
+          lila.socket.Socket.makeMessage("challenges", jsonView(all)))
     }
   }
 }

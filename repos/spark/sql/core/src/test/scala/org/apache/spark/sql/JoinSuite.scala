@@ -211,32 +211,56 @@ class JoinSuite extends QueryTest with SharedSQLContext {
   test("cartisian product join") {
     checkAnswer(testData3.join(testData3),
                 Row(1, null, 1, null) :: Row(1, null, 2, 2) :: Row(
-                    2, 2, 1, null) :: Row(2, 2, 2, 2) :: Nil)
+                    2,
+                    2,
+                    1,
+                    null) :: Row(2, 2, 2, 2) :: Nil)
   }
 
   test("left outer join") {
-    checkAnswer(upperCaseData.join(lowerCaseData, $"n" === $"N", "left"),
-                Row(1, "A", 1, "a") :: Row(2, "B", 2, "b") :: Row(
-                    3, "C", 3, "c") :: Row(4, "D", 4, "d") :: Row(
-                    5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
+    checkAnswer(
+        upperCaseData.join(lowerCaseData, $"n" === $"N", "left"),
+        Row(1, "A", 1, "a") :: Row(2, "B", 2, "b") :: Row(3, "C", 3, "c") :: Row(
+            4,
+            "D",
+            4,
+            "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
 
-    checkAnswer(upperCaseData.join(
-                    lowerCaseData, $"n" === $"N" && $"n" > 1, "left"),
+    checkAnswer(upperCaseData.join(lowerCaseData,
+                                   $"n" === $"N" && $"n" > 1,
+                                   "left"),
                 Row(1, "A", null, null) :: Row(2, "B", 2, "b") :: Row(
-                    3, "C", 3, "c") :: Row(4, "D", 4, "d") :: Row(
-                    5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
+                    3,
+                    "C",
+                    3,
+                    "c") :: Row(4, "D", 4, "d") :: Row(5, "E", null, null) :: Row(
+                    6,
+                    "F",
+                    null,
+                    null) :: Nil)
 
-    checkAnswer(upperCaseData.join(
-                    lowerCaseData, $"n" === $"N" && $"N" > 1, "left"),
+    checkAnswer(upperCaseData.join(lowerCaseData,
+                                   $"n" === $"N" && $"N" > 1,
+                                   "left"),
                 Row(1, "A", null, null) :: Row(2, "B", 2, "b") :: Row(
-                    3, "C", 3, "c") :: Row(4, "D", 4, "d") :: Row(
-                    5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
+                    3,
+                    "C",
+                    3,
+                    "c") :: Row(4, "D", 4, "d") :: Row(5, "E", null, null) :: Row(
+                    6,
+                    "F",
+                    null,
+                    null) :: Nil)
 
-    checkAnswer(upperCaseData.join(
-                    lowerCaseData, $"n" === $"N" && $"l" > $"L", "left"),
-                Row(1, "A", 1, "a") :: Row(2, "B", 2, "b") :: Row(
-                    3, "C", 3, "c") :: Row(4, "D", 4, "d") :: Row(
-                    5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
+    checkAnswer(
+        upperCaseData.join(lowerCaseData,
+                           $"n" === $"N" && $"l" > $"L",
+                           "left"),
+        Row(1, "A", 1, "a") :: Row(2, "B", 2, "b") :: Row(3, "C", 3, "c") :: Row(
+            4,
+            "D",
+            4,
+            "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
 
     // Make sure we are choosing left.outputPartitioning as the
     // outputPartitioning for the outer join operator.
@@ -247,7 +271,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         |GROUP BY l.N
       """.stripMargin),
         Row(1, 1) :: Row(2, 1) :: Row(3, 1) :: Row(4, 1) :: Row(5, 1) :: Row(
-            6, 1) :: Nil)
+            6,
+            1) :: Nil)
 
     checkAnswer(
         sql("""
@@ -259,25 +284,46 @@ class JoinSuite extends QueryTest with SharedSQLContext {
   }
 
   test("right outer join") {
-    checkAnswer(lowerCaseData.join(upperCaseData, $"n" === $"N", "right"),
-                Row(1, "a", 1, "A") :: Row(2, "b", 2, "B") :: Row(
-                    3, "c", 3, "C") :: Row(4, "d", 4, "D") :: Row(
-                    null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
-    checkAnswer(lowerCaseData.join(
-                    upperCaseData, $"n" === $"N" && $"n" > 1, "right"),
+    checkAnswer(
+        lowerCaseData.join(upperCaseData, $"n" === $"N", "right"),
+        Row(1, "a", 1, "A") :: Row(2, "b", 2, "B") :: Row(3, "c", 3, "C") :: Row(
+            4,
+            "d",
+            4,
+            "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
+    checkAnswer(lowerCaseData.join(upperCaseData,
+                                   $"n" === $"N" && $"n" > 1,
+                                   "right"),
                 Row(null, null, 1, "A") :: Row(2, "b", 2, "B") :: Row(
-                    3, "c", 3, "C") :: Row(4, "d", 4, "D") :: Row(
-                    null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
-    checkAnswer(lowerCaseData.join(
-                    upperCaseData, $"n" === $"N" && $"N" > 1, "right"),
+                    3,
+                    "c",
+                    3,
+                    "C") :: Row(4, "d", 4, "D") :: Row(null, null, 5, "E") :: Row(
+                    null,
+                    null,
+                    6,
+                    "F") :: Nil)
+    checkAnswer(lowerCaseData.join(upperCaseData,
+                                   $"n" === $"N" && $"N" > 1,
+                                   "right"),
                 Row(null, null, 1, "A") :: Row(2, "b", 2, "B") :: Row(
-                    3, "c", 3, "C") :: Row(4, "d", 4, "D") :: Row(
-                    null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
-    checkAnswer(lowerCaseData.join(
-                    upperCaseData, $"n" === $"N" && $"l" > $"L", "right"),
-                Row(1, "a", 1, "A") :: Row(2, "b", 2, "B") :: Row(
-                    3, "c", 3, "C") :: Row(4, "d", 4, "D") :: Row(
-                    null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
+                    3,
+                    "c",
+                    3,
+                    "C") :: Row(4, "d", 4, "D") :: Row(null, null, 5, "E") :: Row(
+                    null,
+                    null,
+                    6,
+                    "F") :: Nil)
+    checkAnswer(
+        lowerCaseData.join(upperCaseData,
+                           $"n" === $"N" && $"l" > $"L",
+                           "right"),
+        Row(1, "a", 1, "A") :: Row(2, "b", 2, "B") :: Row(3, "c", 3, "C") :: Row(
+            4,
+            "d",
+            4,
+            "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
 
     // Make sure we are choosing right.outputPartitioning as the
     // outputPartitioning for the outer join operator.
@@ -296,7 +342,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
           |GROUP BY r.N
         """.stripMargin),
         Row(1, 1) :: Row(2, 1) :: Row(3, 1) :: Row(4, 1) :: Row(5, 1) :: Row(
-            6, 1) :: Nil)
+            6,
+            1) :: Nil)
   }
 
   test("full outer join") {
@@ -306,30 +353,50 @@ class JoinSuite extends QueryTest with SharedSQLContext {
     val left = UnresolvedRelation(TableIdentifier("left"), None)
     val right = UnresolvedRelation(TableIdentifier("right"), None)
 
-    checkAnswer(left.join(right, $"left.N" === $"right.N", "full"),
-                Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(
-                    3, "C", 3, "C") :: Row(4, "D", 4, "D") :: Row(
-                    null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
+    checkAnswer(
+        left.join(right, $"left.N" === $"right.N", "full"),
+        Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(3,
+                                                                  "C",
+                                                                  3,
+                                                                  "C") :: Row(
+            4,
+            "D",
+            4,
+            "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
 
     checkAnswer(
-        left.join(
-            right, ($"left.N" === $"right.N") && ($"left.N" =!= 3), "full"),
+        left.join(right,
+                  ($"left.N" === $"right.N") && ($"left.N" =!= 3),
+                  "full"),
         Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(
-            3, "C", null, null) :: Row(null, null, 3, "C") :: Row(
-            4, "D", 4, "D") :: Row(null, null, 5, "E") :: Row(null,
-                                                              null,
-                                                              6,
-                                                              "F") :: Nil)
+            3,
+            "C",
+            null,
+            null) :: Row(null, null, 3, "C") :: Row(4, "D", 4, "D") :: Row(
+            null,
+            null,
+            5,
+            "E") :: Row(null,
+                        null,
+                        6,
+                        "F") :: Nil)
 
     checkAnswer(
-        left.join(
-            right, ($"left.N" === $"right.N") && ($"right.N" =!= 3), "full"),
+        left.join(right,
+                  ($"left.N" === $"right.N") && ($"right.N" =!= 3),
+                  "full"),
         Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(
-            3, "C", null, null) :: Row(null, null, 3, "C") :: Row(
-            4, "D", 4, "D") :: Row(null, null, 5, "E") :: Row(null,
-                                                              null,
-                                                              6,
-                                                              "F") :: Nil)
+            3,
+            "C",
+            null,
+            null) :: Row(null, null, 3, "C") :: Row(4, "D", 4, "D") :: Row(
+            null,
+            null,
+            5,
+            "E") :: Row(null,
+                        null,
+                        6,
+                        "F") :: Nil)
 
     // Make sure we are UnknownPartitioning as the outputPartitioning for the outer join
     // operator.
@@ -348,7 +415,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
           |GROUP BY r.N
         """.stripMargin),
         Row(1, 1) :: Row(2, 1) :: Row(3, 1) :: Row(4, 1) :: Row(5, 1) :: Row(
-            6, 1) :: Row(null, 4) :: Nil)
+            6,
+            1) :: Row(null, 4) :: Nil)
 
     checkAnswer(
         sql("""
@@ -357,7 +425,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
           |GROUP BY l.N
         """.stripMargin),
         Row(1, 1) :: Row(2, 1) :: Row(3, 1) :: Row(4, 1) :: Row(5, 1) :: Row(
-            6, 1) :: Row(null, 4) :: Nil)
+            6,
+            1) :: Row(null, 4) :: Nil)
 
     checkAnswer(
         sql("""
@@ -400,8 +469,9 @@ class JoinSuite extends QueryTest with SharedSQLContext {
       statisticSizeInByte(sqlContext.table("testData"))
 
     // we set the threshold is greater than statistic of the cached table testData
-    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key ->
-        (sizeInByteOfTestData + 1).toString()) {
+    withSQLConf(
+        SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key ->
+          (sizeInByteOfTestData + 1).toString()) {
 
       assert(
           statisticSizeInByte(sqlContext.table("testData2")) > sqlContext.conf.autoBroadcastJoinThreshold)
@@ -446,19 +516,25 @@ class JoinSuite extends QueryTest with SharedSQLContext {
             SELECT x.value, y.a, y.b FROM testData x JOIN testData2 y WHERE x.key = 2
           """.stripMargin),
                   Row("2", 1, 1) :: Row("2", 1, 2) :: Row("2", 2, 1) :: Row(
-                      "2", 2, 2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
+                      "2",
+                      2,
+                      2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
 
       checkAnswer(sql("""
             SELECT x.value, y.a, y.b FROM testData x JOIN testData2 y WHERE x.key < y.a
           """.stripMargin),
                   Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row(
-                      "1", 3, 2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
+                      "1",
+                      3,
+                      2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
 
       checkAnswer(sql("""
             SELECT x.value, y.a, y.b FROM testData x JOIN testData2 y ON x.key < y.a
           """.stripMargin),
                   Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row(
-                      "1", 3, 2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
+                      "1",
+                      3,
+                      2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
     }
 
     sql("UNCACHE TABLE testData")
@@ -469,6 +545,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
     checkAnswer(
         df,
         Row(1, 1) :: Row(1, 2) :: Row(2, 1) :: Row(2, 2) :: Row(3, 1) :: Row(
-            3, 2) :: Nil)
+            3,
+            2) :: Nil)
   }
 }

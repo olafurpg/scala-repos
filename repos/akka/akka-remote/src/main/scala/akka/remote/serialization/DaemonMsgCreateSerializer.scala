@@ -124,8 +124,8 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
     if (p._1.isEmpty && p._2 == "null") null
     else deserialize(p._1, system.dynamicAccess.getClassFor[AnyRef](p._2).get)
 
-  protected def deserialize[T: ClassTag](
-      data: ByteString, clazz: Class[T]): T = {
+  protected def deserialize[T: ClassTag](data: ByteString,
+                                         clazz: Class[T]): T = {
     val bytes = data.toByteArray
     serialization.deserialize(bytes, clazz) match {
       case Success(x: T) ⇒ x

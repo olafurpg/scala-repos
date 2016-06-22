@@ -17,7 +17,7 @@ package scala.beans
   *
   *  @author Ross Judson (rjudson@managedobjects.com)
   */
-@deprecated(
-    message = "the generation of BeanInfo classes is no longer supported",
-    since = "2.12.0")
+@deprecated(message =
+              "the generation of BeanInfo classes is no longer supported",
+            since = "2.12.0")
 class BeanInfo extends scala.annotation.Annotation

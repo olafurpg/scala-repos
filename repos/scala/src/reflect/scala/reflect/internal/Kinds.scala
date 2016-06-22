@@ -56,11 +56,12 @@ trait Kinds { self: SymbolTable =>
     // the place, but here we need it for the message to make sense.
     private def strictnessMessage(a: Symbol, p: Symbol) =
       kindMessage(a, p)(
-          "%s's bounds%s are stricter than %s's declared bounds%s".format(
-              _, a.info, _, p.info match {
-        case tb @ TypeBounds(_, _) if tb.isEmptyBounds => " >: Nothing <: Any"
-        case tb => "" + tb
-      }))
+          "%s's bounds%s are stricter than %s's declared bounds%s"
+            .format(_, a.info, _, p.info match {
+          case tb @ TypeBounds(_, _) if tb.isEmptyBounds =>
+            " >: Nothing <: Any"
+          case tb => "" + tb
+        }))
 
     private def varianceMessage(a: Symbol, p: Symbol) =
       kindMessage(a, p)(
@@ -74,8 +75,8 @@ trait Kinds { self: SymbolTable =>
               _,
               countAsString(p.typeParams.length)))
 
-    private def buildMessage(
-        xs: List[SymPair], f: (Symbol, Symbol) => String) =
+    private def buildMessage(xs: List[SymPair],
+                             f: (Symbol, Symbol) => String) =
       (if (xs.isEmpty) ""
        else
          xs map f.tupled mkString
@@ -84,9 +85,10 @@ trait Kinds { self: SymbolTable =>
 
     def errorMessage(targ: Type, tparam: Symbol): String =
       ((targ + "'s type parameters do not match " + tparam +
-              "'s expected parameters:") + buildMessage(arity, arityMessage) +
-          buildMessage(variance, varianceMessage) + buildMessage(
-              strictness, strictnessMessage))
+                "'s expected parameters:") + buildMessage(arity, arityMessage) +
+            buildMessage(variance, varianceMessage) + buildMessage(
+              strictness,
+              strictnessMessage))
   }
   val NoKindErrors = KindErrors(Nil, Nil, Nil)
 
@@ -156,11 +158,13 @@ trait Kinds { self: SymbolTable =>
       if (settings.debug) {
         log(
             "checkKindBoundsHK expected: " + param + " with params " +
-            hkparams + " by definition in " + paramowner)
-        log("checkKindBoundsHK supplied: " + arg + " with params " + hkargs +
-            " from " + owner)
-        log("checkKindBoundsHK under params: " + underHKParams +
-            " with args " + withHKArgs)
+              hkparams + " by definition in " + paramowner)
+        log(
+            "checkKindBoundsHK supplied: " + arg + " with params " + hkargs +
+              " from " + owner)
+        log(
+            "checkKindBoundsHK under params: " + underHKParams +
+              " with args " + withHKArgs)
       }
 
       if (!sameLength(hkargs, hkparams)) {
@@ -195,15 +199,16 @@ trait Kinds { self: SymbolTable =>
 
             debuglog(
                 "checkKindBoundsHK base case: " +
-                hkparam + " declared bounds: " + declaredBounds +
-                " after instantiating earlier hkparams: " +
-                declaredBoundsInst + "\n" + "checkKindBoundsHK base case: " +
-                hkarg + " has bounds: " + argumentBounds
+                  hkparam + " declared bounds: " + declaredBounds +
+                  " after instantiating earlier hkparams: " +
+                  declaredBoundsInst + "\n" + "checkKindBoundsHK base case: " +
+                  hkarg + " has bounds: " + argumentBounds
             )
           } else {
             hkarg.initialize // SI-7902 otherwise hkarg.typeParams yields List(NoSymbol)!
-            debuglog("checkKindBoundsHK recursing to compare params of " +
-                hkparam + " with " + hkarg)
+            debuglog(
+                "checkKindBoundsHK recursing to compare params of " +
+                  hkparam + " with " + hkarg)
             kindErrors ++= checkKindBoundsHK(
                 hkarg.typeParams,
                 hkarg,
@@ -222,7 +227,7 @@ trait Kinds { self: SymbolTable =>
     if (settings.debug && (tparams.nonEmpty || targs.nonEmpty))
       log(
           "checkKindBounds0(" + tparams + ", " + targs + ", " + pre + ", " +
-          owner + ", " + explainErrors + ")"
+            owner + ", " + explainErrors + ")"
       )
 
     flatMap2(tparams, targs) { (tparam, targ) =>
@@ -290,8 +295,9 @@ trait Kinds { self: SymbolTable =>
   }
   object Kind {
     private[internal] sealed trait ScalaNotation
-    private[internal] sealed case class Head(
-        order: Int, n: Option[Int], alias: Option[String])
+    private[internal] sealed case class Head(order: Int,
+                                             n: Option[Int],
+                                             alias: Option[String])
         extends ScalaNotation {
       override def toString: String = {
         alias getOrElse {
@@ -334,19 +340,18 @@ trait Kinds { self: SymbolTable =>
               case Head(o, _, _) => o
               case _ => 0
             }).max
-        StringState(
-            (tokens /: (0 to maxOrder)) { (ts: Seq[ScalaNotation], o: Int) =>
-          if (countByOrder(o) <= 1)
-            ts map {
-              case Head(`o`, _, a) => Head(o, None, a)
-              case t => t
-            } else ts
+        StringState((tokens /: (0 to maxOrder)) {
+          (ts: Seq[ScalaNotation], o: Int) =>
+            if (countByOrder(o) <= 1)
+              ts map {
+                case Head(`o`, _, a) => Head(o, None, a)
+                case t => t
+              } else ts
         })
       }
       // Replace Head(o, n, Some(_)) with Head(o, n, None), so F[F] becomes F[A].
       def removeAlias: StringState = {
-        StringState(
-            tokens map {
+        StringState(tokens map {
           case Head(o, n, Some(_)) => Head(o, n, None)
           case t => t
         })
@@ -378,8 +383,8 @@ trait Kinds { self: SymbolTable =>
     def unapply(ptk: ProperTypeKind): Some[TypeBounds] = Some(ptk.bounds)
   }
 
-  class TypeConKind(
-      val bounds: TypeBounds, val args: Seq[TypeConKind.Argument])
+  class TypeConKind(val bounds: TypeBounds,
+                    val args: Seq[TypeConKind.Argument])
       extends Kind {
     import Kind.StringState
     val order = (args map (_.kind.order)).max + 1
@@ -424,8 +429,8 @@ trait Kinds { self: SymbolTable =>
   object TypeConKind {
     def apply(args: Seq[TypeConKind.Argument]): TypeConKind =
       this(TypeBounds.empty, args)
-    def apply(
-        bounds: TypeBounds, args: Seq[TypeConKind.Argument]): TypeConKind =
+    def apply(bounds: TypeBounds,
+              args: Seq[TypeConKind.Argument]): TypeConKind =
       new TypeConKind(bounds, args)
     def unapply(
         tck: TypeConKind): Some[(TypeBounds, Seq[TypeConKind.Argument])] =

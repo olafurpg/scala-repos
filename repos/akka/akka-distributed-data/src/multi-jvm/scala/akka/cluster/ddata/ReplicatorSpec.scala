@@ -18,7 +18,9 @@ object ReplicatorSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+      ConfigFactory.parseString(
+          """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
@@ -41,7 +43,8 @@ class ReplicatorSpec
   override def initialParticipants = roles.size
 
   implicit val cluster = Cluster(system)
-  val replicator = system.actorOf(Replicator.props(ReplicatorSettings(system)
+  val replicator = system.actorOf(Replicator.props(
+                                      ReplicatorSettings(system)
                                         .withGossipInterval(1.second)
                                         .withMaxDeltaElements(10)),
                                   "replicator")

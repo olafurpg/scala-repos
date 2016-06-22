@@ -36,8 +36,8 @@ trait Strategys extends StrategysLow {
     * where N is equal to the number of available processors.
     */
   val DefaultExecutorService: ExecutorService = {
-    Executors.newFixedThreadPool(
-        Runtime.getRuntime.availableProcessors, DefaultDaemonThreadFactory)
+    Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors,
+                                 DefaultDaemonThreadFactory)
   }
 
   /**
@@ -132,8 +132,7 @@ trait StrategysLow {
     import java.util.concurrent.{Callable, FutureTask}
 
     def apply[A](a: => A) = {
-      val task = new FutureTask[A](
-          new Callable[A] {
+      val task = new FutureTask[A](new Callable[A] {
         def call = a
       })
       invokeLater(task)

@@ -44,8 +44,8 @@ object CachedTestDefns {
       def eqv(x: Int, y: Int): Boolean = x == y
     }
 
-    implicit def eqGeneric[T, R](
-        implicit gen: Generic.Aux[T, R], eqRepr: Lazy[Eq[R]]): Eq[T] =
+    implicit def eqGeneric[T, R](implicit gen: Generic.Aux[T, R],
+                                 eqRepr: Lazy[Eq[R]]): Eq[T] =
       new Eq[T] {
         def eqv(x: T, y: T): Boolean =
           eqRepr.value.eqv(gen.to(x), gen.to(y))
@@ -57,8 +57,8 @@ object CachedTestDefns {
     }
 
     // Induction step for products
-    implicit def eqHCons[H, T <: HList](
-        implicit eqH: Lazy[Eq[H]], eqT: Lazy[Eq[T]]): Eq[H :: T] =
+    implicit def eqHCons[H, T <: HList](implicit eqH: Lazy[Eq[H]],
+                                        eqT: Lazy[Eq[T]]): Eq[H :: T] =
       new Eq[H :: T] {
         def eqv(x: H :: T, y: H :: T): Boolean =
           eqH.value.eqv(x.head, y.head) && eqT.value.eqv(x.tail, y.tail)

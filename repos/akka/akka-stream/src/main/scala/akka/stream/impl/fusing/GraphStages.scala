@@ -133,8 +133,8 @@ object GraphStages {
   }
 
   object Breaker
-      extends GraphStageWithMaterializedValue[
-          FlowShape[Any, Any], Future[Breaker]] {
+      extends GraphStageWithMaterializedValue[FlowShape[Any, Any],
+                                              Future[Breaker]] {
     sealed trait Operation
     case object Complete extends Operation
     case object Cancel extends Operation
@@ -143,8 +143,8 @@ object GraphStages {
     case class FailAndCancel(ex: Throwable) extends Operation
 
     override val initialAttributes = Attributes.name("breaker")
-    override val shape = FlowShape(
-        Inlet[Any]("breaker.in"), Outlet[Any]("breaker.out"))
+    override val shape =
+      FlowShape(Inlet[Any]("breaker.in"), Outlet[Any]("breaker.out"))
     override def toString: String = "Breaker"
 
     override def createLogicAndMaterializedValue(attr: Attributes) = {
@@ -175,8 +175,8 @@ object GraphStages {
     Breaker.asInstanceOf[Graph[FlowShape[T, T], Future[Breaker]]]
 
   object BidiBreaker
-      extends GraphStageWithMaterializedValue[
-          BidiShape[Any, Any, Any, Any], Future[Breaker]] {
+      extends GraphStageWithMaterializedValue[BidiShape[Any, Any, Any, Any],
+                                              Future[Breaker]] {
     import Breaker._
 
     override val initialAttributes = Attributes.name("breaker")
@@ -237,8 +237,8 @@ object GraphStages {
     BidiBreaker.asInstanceOf[Graph[BidiShape[T1, T1, T2, T2], Future[Breaker]]]
 
   private object TerminationWatcher
-      extends GraphStageWithMaterializedValue[
-          FlowShape[Any, Any], Future[Done]] {
+      extends GraphStageWithMaterializedValue[FlowShape[Any, Any],
+                                              Future[Done]] {
     val in = Inlet[Any]("terminationWatcher.in")
     val out = Outlet[Any]("terminationWatcher.out")
     override val shape = FlowShape(in, out)
@@ -278,8 +278,8 @@ object GraphStages {
 
   def terminationWatcher[T]
     : GraphStageWithMaterializedValue[FlowShape[T, T], Future[Done]] =
-    TerminationWatcher.asInstanceOf[GraphStageWithMaterializedValue[
-            FlowShape[T, T], Future[Done]]]
+    TerminationWatcher.asInstanceOf[
+        GraphStageWithMaterializedValue[FlowShape[T, T], Future[Done]]]
 
   private object TickSource {
     class TickSourceCancellable(cancelled: AtomicBoolean) extends Cancellable {
@@ -296,8 +296,9 @@ object GraphStages {
     }
   }
 
-  final class TickSource[T](
-      initialDelay: FiniteDuration, interval: FiniteDuration, tick: T)
+  final class TickSource[T](initialDelay: FiniteDuration,
+                            interval: FiniteDuration,
+                            tick: T)
       extends GraphStageWithMaterializedValue[SourceShape[T], Cancellable] {
     override val shape = SourceShape(Outlet[T]("TickSource.out"))
     val out = shape.out
@@ -311,10 +312,10 @@ object GraphStages {
 
       val logic = new TimerGraphStageLogic(shape) {
         override def preStart() = {
-          schedulePeriodicallyWithInitialDelay(
-              "TickTimer", initialDelay, interval)
-          val callback = getAsyncCallback[Unit](
-              (_) ⇒ {
+          schedulePeriodicallyWithInitialDelay("TickTimer",
+                                               initialDelay,
+                                               interval)
+          val callback = getAsyncCallback[Unit]((_) ⇒ {
             completeStage()
             cancelled.set(true)
           })
@@ -344,7 +345,8 @@ object GraphStages {
     * This source is not reusable, it is only created internally.
     */
   private[stream] final class MaterializedValueSource[T](
-      val computation: MaterializedValueNode, val out: Outlet[T])
+      val computation: MaterializedValueNode,
+      val out: Outlet[T])
       extends GraphStage[SourceShape[T]] {
     def this(computation: MaterializedValueNode) =
       this(computation, Outlet[T]("matValue"))

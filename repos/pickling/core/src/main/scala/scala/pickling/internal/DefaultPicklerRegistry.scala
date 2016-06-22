@@ -39,8 +39,9 @@ final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator)
     }
   }
   def genPickler(
-      classLoader: ClassLoader, clazz: Class[_], tag: FastTypeTag[_])(
-      implicit share: refs.Share): Pickler[_] = {
+      classLoader: ClassLoader,
+      clazz: Class[_],
+      tag: FastTypeTag[_])(implicit share: refs.Share): Pickler[_] = {
     lookupPickler(tag.key) match {
       case Some(p) => p
       case None =>
@@ -129,7 +130,8 @@ final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator)
     * @param p  The unpickler to register.
     */
   override def registerPicklerUnpickler[T](
-      key: String, p: (Pickler[T] with Unpickler[T])): Unit = {
+      key: String,
+      p: (Pickler[T] with Unpickler[T])): Unit = {
     // TODO - Should we lock or something here?
     registerPickler(key, p)
     registerUnpickler(key, p)

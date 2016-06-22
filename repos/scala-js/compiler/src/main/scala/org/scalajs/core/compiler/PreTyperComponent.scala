@@ -96,8 +96,8 @@ abstract class PreTyperComponent
 
           case member => transform(member)
         }
-        val newImpl = treeCopy.Template(
-            tree.impl, tree.impl.parents, tree.impl.self, newBody)
+        val newImpl = treeCopy
+          .Template(tree.impl, tree.impl.parents, tree.impl.self, newBody)
         treeCopy.ClassDef(tree, tree.mods, tree.name, tree.tparams, newImpl)
 
       case tree: Template =>

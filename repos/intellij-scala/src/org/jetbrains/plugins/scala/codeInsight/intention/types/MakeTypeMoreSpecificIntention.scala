@@ -20,14 +20,16 @@ import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
   * Date: 22.12.15.
   */
 class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
-  override def invoke(
-      project: Project, editor: Editor, element: PsiElement): Unit = {
-    ToggleTypeAnnotation.complete(
-        new MakeTypeMoreSpecificStrategy(Option(editor)), element)
+  override def invoke(project: Project,
+                      editor: Editor,
+                      element: PsiElement): Unit = {
+    ToggleTypeAnnotation
+      .complete(new MakeTypeMoreSpecificStrategy(Option(editor)), element)
   }
 
-  override def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  override def isAvailable(project: Project,
+                           editor: Editor,
+                           element: PsiElement): Boolean = {
     if (element == null ||
         !IntentionAvailabilityChecker.checkIntention(this, element)) false
     else {
@@ -91,7 +93,9 @@ class MakeTypeMoreSpecificStrategy(editor: Option[Editor]) extends Strategy {
     if (types.size == 1) {
       val replaced = te.replace(
           ScalaPsiElementFactory.createTypeElementFromText(
-              types.head.canonicalText, te.getContext, te))
+              types.head.canonicalText,
+              te.getContext,
+              te))
       TypeAdjuster.markToAdjust(replaced)
     } else {
       val texts = types.map(ScTypeText)
@@ -148,8 +152,8 @@ class MakeTypeMoreSpecificStrategy(editor: Option[Editor]) extends Strategy {
 }
 
 object MakeTypeMoreSpecificStrategy {
-  def computeBaseTypes(
-      declaredType: ScType, dynamicType: ScType): Seq[ScType] = {
+  def computeBaseTypes(declaredType: ScType,
+                       dynamicType: ScType): Seq[ScType] = {
     val baseTypes = dynamicType +: BaseTypes.get(dynamicType)
     baseTypes.filter(t => t.conforms(declaredType) && !t.equiv(declaredType))
   }

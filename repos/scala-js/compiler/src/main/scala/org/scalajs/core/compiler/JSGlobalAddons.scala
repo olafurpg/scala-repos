@@ -76,7 +76,7 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
     /** checks if the given symbol is a JSExport */
     def isExport(sym: Symbol): Boolean =
       sym.unexpandedName.startsWith(exportPrefix) &&
-      !sym.hasFlag(Flags.DEFAULTPARAM)
+        !sym.hasFlag(Flags.DEFAULTPARAM)
 
     /** retrieves the originally assigned jsName of this export and whether it
       *  is a property
@@ -145,7 +145,9 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
       */
     def fullJSNameOf(sym: Symbol): String = {
       assert(sym.isClass, s"fullJSNameOf called for non-class symbol $sym")
-      sym.getAnnotation(JSFullNameAnnotation).flatMap(_.stringArg(0)) getOrElse {
+      sym
+        .getAnnotation(JSFullNameAnnotation)
+        .flatMap(_.stringArg(0)) getOrElse {
         jsNameOf(sym)
       }
     }

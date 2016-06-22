@@ -66,9 +66,9 @@ final class Tuple2Zipped[El1, Repr1, El2, Repr2](
     b.result()
   }
 
-  def filter[To1, To2](
-      f: (El1, El2) => Boolean)(implicit cbf1: CBF[Repr1, El1, To1],
-                                cbf2: CBF[Repr2, El2, To2]): (To1, To2) = {
+  def filter[To1, To2](f: (El1, El2) => Boolean)(
+      implicit cbf1: CBF[Repr1, El1, To1],
+      cbf2: CBF[Repr2, El2, To2]): (To1, To2) = {
     val b1 = cbf1(colls._1.repr)
     val b2 = cbf2(colls._2.repr)
     val elems2 = colls._2.iterator

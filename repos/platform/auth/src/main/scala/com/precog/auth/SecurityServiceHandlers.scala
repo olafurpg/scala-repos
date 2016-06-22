@@ -53,8 +53,8 @@ import scalaz.syntax.std.option._
 import shapeless._
 
 class SecurityServiceHandlers(
-    val apiKeyManager: APIKeyManager[Future], val clock: Clock)(
-    implicit executor: ExecutionContext) {
+    val apiKeyManager: APIKeyManager[Future],
+    val clock: Clock)(implicit executor: ExecutionContext) {
   import com.precog.common.security.service.v1
   type R = HttpResponse[JValue]
 
@@ -125,10 +125,11 @@ class SecurityServiceHandlers(
           }
 
         case Failure(e) =>
-          logger.warn("The API key request body \n" +
-              requestBody.renderPretty + "\n was invalid: " + e)
-          Promise successful badRequest(
-              "Invalid new API key request body.", Some(e.message))
+          logger.warn(
+              "The API key request body \n" +
+                requestBody.renderPretty + "\n was invalid: " + e)
+          Promise successful badRequest("Invalid new API key request body.",
+                                        Some(e.message))
       }
     }
 
@@ -213,8 +214,9 @@ class SecurityServiceHandlers(
           }
 
         case Failure(e) =>
-          logger.warn("Unable to parse grant ID from \n" +
-              requestBody.renderPretty + "\n: " + e)
+          logger.warn(
+              "Unable to parse grant ID from \n" +
+                requestBody.renderPretty + "\n: " + e)
           Promise successful badRequest(
               "Invalid add grant request body.",
               Some("Invalid add grant request body: " + e))
@@ -231,8 +233,8 @@ class SecurityServiceHandlers(
                        .toSuccess(badRequest(
                                "Missing body content for grant creation."))
                        .sequence[Future, JValue]
-          response <- (for (apiKey <- apiKeyV; content <- contentV) yield
-                       create(apiKey, content)).sequence[Future, R]
+          response <- (for (apiKey <- apiKeyV; content <- contentV)
+                       yield create(apiKey, content)).sequence[Future, R]
         } yield response.toEither.merge
     }
 
@@ -253,7 +255,7 @@ class SecurityServiceHandlers(
               else
                 badRequest("Invalid remove grant request.",
                            Some("Unable to remove grant " + grantId +
-                               " from API key " + apiKey))
+                                 " from API key " + apiKey))
             }
         } getOrElse {
           Promise successful badRequest(
@@ -295,10 +297,11 @@ class SecurityServiceHandlers(
           }
 
         case Failure(e) =>
-          logger.warn("The grant creation request body \n" +
-              requestBody.renderPretty + "\n was invalid: " + e)
-          Promise successful badRequest(
-              "Invalid new grant request body.", Some(e.message))
+          logger.warn(
+              "The grant creation request body \n" +
+                requestBody.renderPretty + "\n was invalid: " + e)
+          Promise successful badRequest("Invalid new grant request body.",
+                                        Some(e.message))
       }
     }
 
@@ -367,7 +370,8 @@ class SecurityServiceHandlers(
 
         case Failure(e) =>
           Promise successful badRequest(
-              "Invalid new child grant request body.", Some(e.message))
+              "Invalid new child grant request body.",
+              Some(e.message))
       }
     }
 
@@ -381,8 +385,8 @@ class SecurityServiceHandlers(
                        .toSuccess(badRequest(
                                "Missing body content for grant creation."))
                        .sequence[Future, JValue]
-          response <- (for (parentId <- parentIdV; content <- contentV) yield
-                       create(authAPIKey, parentId, content))
+          response <- (for (parentId <- parentIdV; content <- contentV)
+                       yield create(authAPIKey, parentId, content))
                        .sequence[Future, R]
         } yield response.toEither.merge
     }
@@ -415,7 +419,7 @@ class SecurityServiceHandlers(
                     else
                       Promise successful badRequest(
                           "Requestor does not have permission to delete grant " +
-                          grantId)
+                            grantId)
                 }
               }
 
@@ -452,7 +456,8 @@ class SecurityServiceHandlers(
           case Failure(e) =>
             logger.warn("The 'at paramter was not a valid DateTime: " + e)
             Promise successful badRequest(
-                "Invalid date provided to 'at parameter.", Some(e.message))
+                "Invalid date provided to 'at parameter.",
+                Some(e.message))
         }
     }
 

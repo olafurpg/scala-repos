@@ -76,8 +76,9 @@ object Base64Encoding extends ContentEncoding {
   def decode(compressed: String) = Base64.decodeBase64(compressed)
 }
 
-case class FileContent(
-    data: Array[Byte], mimeType: MimeType, encoding: ContentEncoding)
+case class FileContent(data: Array[Byte],
+                       mimeType: MimeType,
+                       encoding: ContentEncoding)
 
 object FileContent {
   import MimeTypes._
@@ -126,8 +127,9 @@ object FileContent {
           }
 
         case _ =>
-          Failure(Invalid("File contents " + jv.renderCompact +
-                  " was not properly encoded as a JSON object."))
+          Failure(
+              Invalid("File contents " + jv.renderCompact +
+                    " was not properly encoded as a JSON object."))
       }
     }
   }

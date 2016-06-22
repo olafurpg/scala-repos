@@ -9,8 +9,7 @@ object Bug {
 
     // workaround
     trait Y {
-      val ev2 =
-        ev // manually capture `ev` so that `ev2` is added to the trait interface.
+      val ev2 = ev // manually capture `ev` so that `ev2` is added to the trait interface.
       def qux = { () =>
         ev2
       }

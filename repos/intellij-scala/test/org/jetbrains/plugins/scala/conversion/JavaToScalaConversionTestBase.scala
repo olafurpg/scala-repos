@@ -31,8 +31,9 @@ abstract class JavaToScalaConversionTestBase
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+        FileUtil.loadFile(new File(file.getCanonicalPath),
+                          CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".java", fileText)
     val javaFile = getFileAdapter
     val offset = fileText.indexOf(startMarker)
@@ -57,8 +58,9 @@ abstract class JavaToScalaConversionTestBase
     var res = JavaToScala.convertPsisToText(buf.toArray)
     val newFile = PsiFileFactory
       .getInstance(getProjectAdapter)
-      .createFileFromText(
-          "dummyForJavaToScala.scala", ScalaFileType.SCALA_LANGUAGE, res)
+      .createFileFromText("dummyForJavaToScala.scala",
+                          ScalaFileType.SCALA_LANGUAGE,
+                          res)
     res = inWriteAction {
       CodeStyleManager.getInstance(getProjectAdapter).reformat(newFile).getText
     }

@@ -73,8 +73,8 @@ import org.apache.spark.storage.StorageLevel
   *
   * TODO: Move this out of MLlib?
   */
-private[spark] class PeriodicRDDCheckpointer[T](
-    checkpointInterval: Int, sc: SparkContext)
+private[spark] class PeriodicRDDCheckpointer[T](checkpointInterval: Int,
+                                                sc: SparkContext)
     extends PeriodicCheckpointer[RDD[T]](checkpointInterval, sc) {
 
   override protected def checkpoint(data: RDD[T]): Unit = data.checkpoint()

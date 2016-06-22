@@ -57,72 +57,71 @@ object BundleBuilder {
 
     val vals: List[ResourceBundle] = nodes.toList.flatMap {
       case e: Elem => {
-          val all: List[(EntryInfo, NodeSeq)] = e.child.toList.flatMap {
-            case e: Elem => {
-                e.attribute("name")
-                  .toList
-                  .map(attr =>
-                        EntryInfo(
-                            attr.text,
-                            e.attribute("lang").map(_.text),
-                            e.attribute("country").map(_.text),
-                            e.attribute("default")
-                              .map(_.text)
-                              .flatMap(Helpers.asBoolean) getOrElse false) ->
-                        (e.child: NodeSeq))
-              }
-
-            case _ => Nil
+        val all: List[(EntryInfo, NodeSeq)] = e.child.toList.flatMap {
+          case e: Elem => {
+            e.attribute("name")
+              .toList
+              .map(
+                  attr =>
+                    EntryInfo(attr.text,
+                              e.attribute("lang").map(_.text),
+                              e.attribute("country").map(_.text),
+                              e.attribute("default")
+                                .map(_.text)
+                                .flatMap(Helpers.asBoolean) getOrElse false) ->
+                      (e.child: NodeSeq))
           }
 
-          val map =
-            all.foldLeft[Map[String, List[(EntryInfo, NodeSeq)]]](Map()) {
-              case (map, pair @ (info, ns)) =>
-                map + (info.name -> (pair :: map.getOrElse(info.name, Nil)))
-            }
-
-          def points(i: EntryInfo): Int = {
-            (if (i.lang == lang) 4 else 0) + (if (i.country == country) 2
-                                              else
-                                                0) + (if (i.default) 1 else 0)
-          }
-
-          def choose(lst: List[(EntryInfo, NodeSeq)]): NodeSeq =
-            lst.reduceLeft { (a, b) =>
-              {
-                val ap = points(a._1)
-                val bp = points(b._1)
-                if (ap > bp) {
-                  a
-                } else if (bp > ap) {
-                  b
-                } else if (a._1.default) a
-                else b
-              }
-            }._2
-
-          val res: Map[String, NodeSeq] = Map(
-              map.map {
-            case (name, lst) => name -> choose(lst)
-          }.toSeq: _*)
-
-          List(new ResourceBundle {
-            def getKeys(): Enumeration[String] = {
-              val it = res.keys.iterator
-              new Enumeration[String] {
-                def hasMoreElements() = it.hasNext
-                def nextElement() = it.next
-              }
-            }
-
-            def handleGetObject(key: String): Object =
-              res.get(key) match {
-                case Some(IsText(str)) => str
-                case Some(ns) => ns
-                case _ => null
-              }
-          })
+          case _ => Nil
         }
+
+        val map =
+          all.foldLeft[Map[String, List[(EntryInfo, NodeSeq)]]](Map()) {
+            case (map, pair @ (info, ns)) =>
+              map + (info.name -> (pair :: map.getOrElse(info.name, Nil)))
+          }
+
+        def points(i: EntryInfo): Int = {
+          (if (i.lang == lang) 4 else 0) + (if (i.country == country) 2
+                                            else
+                                              0) + (if (i.default) 1 else 0)
+        }
+
+        def choose(lst: List[(EntryInfo, NodeSeq)]): NodeSeq =
+          lst.reduceLeft { (a, b) =>
+            {
+              val ap = points(a._1)
+              val bp = points(b._1)
+              if (ap > bp) {
+                a
+              } else if (bp > ap) {
+                b
+              } else if (a._1.default) a
+              else b
+            }
+          }._2
+
+        val res: Map[String, NodeSeq] = Map(map.map {
+          case (name, lst) => name -> choose(lst)
+        }.toSeq: _*)
+
+        List(new ResourceBundle {
+          def getKeys(): Enumeration[String] = {
+            val it = res.keys.iterator
+            new Enumeration[String] {
+              def hasMoreElements() = it.hasNext
+              def nextElement() = it.next
+            }
+          }
+
+          def handleGetObject(key: String): Object =
+            res.get(key) match {
+              case Some(IsText(str)) => str
+              case Some(ns) => ns
+              case _ => null
+            }
+        })
+      }
 
       case _ => Nil
     }

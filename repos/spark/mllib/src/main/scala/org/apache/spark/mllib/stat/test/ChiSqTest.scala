@@ -80,9 +80,9 @@ private[stat] object ChiSqTest extends Logging {
     * the independence test.
     * Returns an array containing the ChiSquaredTestResult for every feature against the label.
     */
-  def chiSquaredFeatures(data: RDD[LabeledPoint],
-                         methodName: String =
-                           PEARSON.name): Array[ChiSqTestResult] = {
+  def chiSquaredFeatures(
+      data: RDD[LabeledPoint],
+      methodName: String = PEARSON.name): Array[ChiSqTestResult] = {
     val maxCategories = 10000
     val numCols = data.first().features.size
     val results = new Array[ChiSqTestResult](numCols)
@@ -107,14 +107,14 @@ private[stat] object ChiSqTest extends Logging {
               if (distinctLabels.size > maxCategories) {
                 throw new SparkException(
                     s"Chi-square test expect factors (categorical values) but " +
-                    s"found more than $maxCategories distinct label values.")
+                      s"found more than $maxCategories distinct label values.")
               }
               allDistinctFeatures.foreach {
                 case (col, distinctFeatures) =>
                   if (distinctFeatures.size > maxCategories) {
                     throw new SparkException(
                         s"Chi-square test expect factors (categorical values) but " +
-                        s"found more than $maxCategories distinct values in column $col.")
+                          s"found more than $maxCategories distinct values in column $col.")
                   }
               }
             }
@@ -178,7 +178,7 @@ private[stat] object ChiSqTest extends Logging {
     if (size > 1000) {
       logWarning(
           "Chi-squared approximation may not be accurate due to low expected frequencies " +
-          s" as a result of a large number of categories: $size.")
+            s" as a result of a large number of categories: $size.")
     }
     val obsArr = observed.toArray
     val expArr =
@@ -205,7 +205,7 @@ private[stat] object ChiSqTest extends Logging {
           if (obs == 0.0) {
             throw new IllegalArgumentException(
                 "Chi-squared statistic undefined for input vectors due" +
-                " to 0.0 values in both observed and expected.")
+                  " to 0.0 values in both observed and expected.")
           } else {
             return new ChiSqTestResult(0.0,
                                        size - 1,
@@ -234,8 +234,8 @@ private[stat] object ChiSqTest extends Logging {
    * Pearson's independence test on the input contingency matrix.
    * TODO: optimize for SparseMatrix when it becomes supported.
    */
-  def chiSquaredMatrix(
-      counts: Matrix, methodName: String = PEARSON.name): ChiSqTestResult = {
+  def chiSquaredMatrix(counts: Matrix,
+                       methodName: String = PEARSON.name): ChiSqTestResult = {
     val method = methodFromString(methodName)
     val numRows = counts.numRows
     val numCols = counts.numCols
@@ -268,14 +268,14 @@ private[stat] object ChiSqTest extends Logging {
       if (colSum == 0.0) {
         throw new IllegalArgumentException(
             "Chi-squared statistic undefined for input matrix due to" +
-            s"0 sum in column [$col].")
+              s"0 sum in column [$col].")
       }
       val row = j % numRows
       val rowSum = rowSums(row)
       if (rowSum == 0.0) {
         throw new IllegalArgumentException(
             "Chi-squared statistic undefined for input matrix due to" +
-            s"0 sum in row [$row].")
+              s"0 sum in row [$row].")
       }
       val expected = colSum * rowSum / total
       statistic += method.chiSqFunc(colMajorArr(j), expected)
@@ -285,8 +285,11 @@ private[stat] object ChiSqTest extends Logging {
     if (df == 0) {
       // 1 column or 1 row. Constant distribution is independent of anything.
       // pValue = 1.0 and statistic = 0.0 in this case.
-      new ChiSqTestResult(
-          1.0, 0, 0.0, methodName, NullHypothesis.independence.toString)
+      new ChiSqTestResult(1.0,
+                          0,
+                          0.0,
+                          methodName,
+                          NullHypothesis.independence.toString)
     } else {
       val pValue =
         1.0 - new ChiSquaredDistribution(df).cumulativeProbability(statistic)

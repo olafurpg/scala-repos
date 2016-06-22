@@ -35,8 +35,8 @@ private[stream] object OutputStreamSourceStage {
 
 final private[stream] class OutputStreamSourceStage(
     writeTimeout: FiniteDuration)
-    extends GraphStageWithMaterializedValue[
-        SourceShape[ByteString], OutputStream] {
+    extends GraphStageWithMaterializedValue[SourceShape[ByteString],
+                                            OutputStream] {
   val out = Outlet[ByteString]("OutputStreamSource.out")
   override def initialAttributes = DefaultAttributes.outputStreamSource
   override val shape: SourceShape[ByteString] = SourceShape.of(out)
@@ -128,8 +128,10 @@ final private[stream] class OutputStreamSourceStage(
       })
     }
     (logic,
-     new OutputStreamAdapter(
-         dataQueue, downstreamStatus, logic.wakeUp, writeTimeout))
+     new OutputStreamAdapter(dataQueue,
+                             downstreamStatus,
+                             logic.wakeUp,
+                             writeTimeout))
   }
 }
 
@@ -166,8 +168,8 @@ private[akka] class OutputStreamAdapter(
     })
 
   @scala.throws(classOf[IOException])
-  private[this] def sendMessage(
-      message: AdapterToStageMessage, handleCancelled: Boolean = true) =
+  private[this] def sendMessage(message: AdapterToStageMessage,
+                                handleCancelled: Boolean = true) =
     send(() ⇒
           try {
         Await.ready(sendToStage(message), writeTimeout)

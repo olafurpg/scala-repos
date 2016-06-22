@@ -77,8 +77,8 @@ private[pickling] object PicklingAlgorithm {
       /**
         * Attempts to construct pickling logic for a given type.
         */
-      override def generate(
-          tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult =
+      override def generate(tpe: IrClass,
+                            logger: AlgorithmLogger): AlgorithmResult =
         algs.foldLeft(AlgorithmFailure(List()): AlgorithmResult) {
           (prev, next) =>
             prev match {

@@ -114,7 +114,8 @@ private[streaming] class JavaStreamingListenerWrapper(
 
   override def onBatchStarted(
       batchStarted: StreamingListenerBatchStarted): Unit = {
-    javaStreamingListener.onBatchStarted(new JavaStreamingListenerBatchStarted(
+    javaStreamingListener.onBatchStarted(
+        new JavaStreamingListenerBatchStarted(
             toJavaBatchInfo(batchStarted.batchInfo)))
   }
 

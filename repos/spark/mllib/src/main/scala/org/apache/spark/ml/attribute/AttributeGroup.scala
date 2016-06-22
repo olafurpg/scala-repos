@@ -69,11 +69,11 @@ class AttributeGroup private (val name: String,
   /**
     * Optional array of attributes. At most one of `numAttributes` and `attributes` can be defined.
     */
-  val attributes: Option[Array[Attribute]] = attrs.map(
-      _.view.zipWithIndex.map {
-    case (attr, i) =>
-      attr.withIndex(i)
-  }.toArray)
+  val attributes: Option[Array[Attribute]] =
+    attrs.map(_.view.zipWithIndex.map {
+      case (attr, i) =>
+        attr.withIndex(i)
+    }.toArray)
 
   private lazy val nameToIndex: Map[String, Int] = {
     attributes
@@ -136,16 +136,16 @@ class AttributeGroup private (val name: String,
       }
       val attrBldr = new MetadataBuilder
       if (numericMetadata.nonEmpty) {
-        attrBldr.putMetadataArray(
-            AttributeType.Numeric.name, numericMetadata.toArray)
+        attrBldr.putMetadataArray(AttributeType.Numeric.name,
+                                  numericMetadata.toArray)
       }
       if (nominalMetadata.nonEmpty) {
-        attrBldr.putMetadataArray(
-            AttributeType.Nominal.name, nominalMetadata.toArray)
+        attrBldr.putMetadataArray(AttributeType.Nominal.name,
+                                  nominalMetadata.toArray)
       }
       if (binaryMetadata.nonEmpty) {
-        attrBldr.putMetadataArray(
-            AttributeType.Binary.name, binaryMetadata.toArray)
+        attrBldr
+          .putMetadataArray(AttributeType.Binary.name, binaryMetadata.toArray)
       }
       bldr.putMetadata(ATTRIBUTES, attrBldr.build())
       bldr.putLong(NUM_ATTRIBUTES, attributes.get.length)
@@ -168,8 +168,10 @@ class AttributeGroup private (val name: String,
 
   /** Converts to a StructField with some existing metadata. */
   def toStructField(existingMetadata: Metadata): StructField = {
-    StructField(
-        name, new VectorUDT, nullable = false, toMetadata(existingMetadata))
+    StructField(name,
+                new VectorUDT,
+                nullable = false,
+                toMetadata(existingMetadata))
   }
 
   /** Converts to a StructField. */
@@ -179,7 +181,7 @@ class AttributeGroup private (val name: String,
     other match {
       case o: AttributeGroup =>
         (name == o.name) && (numAttributes == o.numAttributes) &&
-        (attributes.map(_.toSeq) == o.attributes.map(_.toSeq))
+          (attributes.map(_.toSeq) == o.attributes.map(_.toSeq))
       case _ =>
         false
     }
@@ -206,8 +208,8 @@ object AttributeGroup {
   import AttributeKeys._
 
   /** Creates an attribute group from a [[Metadata]] instance with name. */
-  private[attribute] def fromMetadata(
-      metadata: Metadata, name: String): AttributeGroup = {
+  private[attribute] def fromMetadata(metadata: Metadata,
+                                      name: String): AttributeGroup = {
     import org.apache.spark.ml.attribute.AttributeType._
     if (metadata.contains(ATTRIBUTES)) {
       val numAttrs = metadata.getLong(NUM_ATTRIBUTES).toInt

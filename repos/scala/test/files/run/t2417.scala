@@ -3,8 +3,7 @@ object Test {
 
   def parallel(numThreads: Int)(block: => Unit) {
     var failure: Throwable = null
-    val threads = Array.tabulate(numThreads)(
-        i =>
+    val threads = Array.tabulate(numThreads)(i =>
           new Thread {
         override def run {
           try {

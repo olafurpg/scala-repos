@@ -88,7 +88,7 @@ class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
         plan
           .find(p =>
                 p.isInstanceOf[WholeStageCodegen] &&
-                p.asInstanceOf[WholeStageCodegen].child.isInstanceOf[Sort])
+                  p.asInstanceOf[WholeStageCodegen].child.isInstanceOf[Sort])
           .isDefined)
     assert(df.collect() === Array(Row(1), Row(2), Row(3)))
   }

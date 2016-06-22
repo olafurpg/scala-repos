@@ -37,7 +37,7 @@ trait BaseTypeSeqs {
     *  This is necessary because when run from reflection every base type sequence needs to have a
     *  SynchronizedBaseTypeSeq as mixin.
     */
-  class BaseTypeSeq protected[reflect](
+  class BaseTypeSeq protected[reflect] (
       private[BaseTypeSeqs] val parents: List[Type],
       private[BaseTypeSeqs] val elems: Array[Type]) { self =>
     if (Statistics.canEnable) Statistics.incCounter(baseTypeSeqCount)
@@ -66,12 +66,13 @@ trait BaseTypeSeqs {
             //Console.println("compute closure of "+this+" => glb("+variants+")")
             pending += i
             try {
-              mergePrefixAndArgs(
-                  variants, Variance.Contravariant, lubDepth(variants)) match {
+              mergePrefixAndArgs(variants,
+                                 Variance.Contravariant,
+                                 lubDepth(variants)) match {
                 case NoType =>
                   typeError(
                       "no common type instance of base types " +
-                      (variants mkString ", and ") + " exists.")
+                        (variants mkString ", and ") + " exists.")
                 case tp0 =>
                   pending(i) = false
                   elems(i) = tp0
@@ -81,7 +82,7 @@ trait BaseTypeSeqs {
               case CyclicInheritance =>
                 typeError(
                     "computing the common type instance of base types " +
-                    (variants mkString ", and ") + " leads to a cycle.")
+                      (variants mkString ", and ") + " leads to a cycle.")
             }
           case tp =>
             tp
@@ -146,7 +147,7 @@ trait BaseTypeSeqs {
     private def typeError(msg: String): Nothing =
       throw new TypeError(
           "the type intersection " + (parents mkString " with ") +
-          " is malformed" + "\n --- because ---\n" + msg)
+            " is malformed" + "\n --- because ---\n" + msg)
   }
 
   /** A marker object for a base type sequence that's no yet computed.
@@ -213,8 +214,9 @@ trait BaseTypeSeqs {
           if (nextTypeSymbol(i) == minSym) {
             nextRawElem(i) match {
               case RefinedType(variants, decls) =>
-                for (tp <- variants) if (!alreadyInMinTypes(tp))
-                  minTypes ::= tp
+                for (tp <- variants)
+                  if (!alreadyInMinTypes(tp))
+                    minTypes ::= tp
               case tp =>
                 if (!alreadyInMinTypes(tp)) minTypes ::= tp
             }

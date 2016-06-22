@@ -29,10 +29,11 @@ class ScTemplateBodyElementType[Func <: ScTemplateBody]
     new ScTemplateBodyStubImpl(parentStub, this)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTemplateBodyStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScTemplateBodyStub = {
     new ScTemplateBodyStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this)
+        parentStub.asInstanceOf[StubElement[PsiElement]],
+        this)
   }
 
   def indexStub(stub: ScTemplateBodyStub, sink: IndexSink): Unit = {}

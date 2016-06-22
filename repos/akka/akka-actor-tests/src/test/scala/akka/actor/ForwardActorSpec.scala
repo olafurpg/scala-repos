@@ -13,8 +13,7 @@ object ForwardActorSpec {
   val ExpectedMessage = "FOO"
 
   def createForwardingChain(system: ActorSystem): ActorRef = {
-    val replier = system.actorOf(
-        Props(new Actor {
+    val replier = system.actorOf(Props(new Actor {
       def receive = { case x ⇒ sender() ! x }
     }))
 

@@ -56,9 +56,9 @@ class Response[T] {
         wait()
       } catch {
         case exc: InterruptedException => {
-            Thread.currentThread().interrupt()
-            raise(exc)
-          }
+          Thread.currentThread().interrupt()
+          raise(exc)
+        }
       }
     }
     data.get
@@ -77,9 +77,9 @@ class Response[T] {
         wait(timeout - (current - start))
       } catch {
         case exc: InterruptedException => {
-            Thread.currentThread().interrupt()
-            raise(exc)
-          }
+          Thread.currentThread().interrupt()
+          raise(exc)
+        }
       }
       current = System.currentTimeMillis
     }

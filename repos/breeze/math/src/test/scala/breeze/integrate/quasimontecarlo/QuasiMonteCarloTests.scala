@@ -59,8 +59,9 @@ class QuasiMonteCarloTest extends WordSpec with Matchers {
           Gaussian(mu, sigma).toQuasi,
           RejectionSampledGammaQuasiRandomVariable(alpha, beta))(
           16 * 1024 * 1024)
-      println("Integration result: " + integrationResult + " should be " +
-          alpha * beta * mu)
+      println(
+          "Integration result: " + integrationResult + " should be " +
+            alpha * beta * mu)
       math.abs(integrationResult - alpha * beta * mu) should be < 0.001
     }
   }

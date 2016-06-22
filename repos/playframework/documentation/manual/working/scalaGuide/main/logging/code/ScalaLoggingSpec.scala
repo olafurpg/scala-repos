@@ -36,9 +36,9 @@ class ScalaLoggingSpec extends Specification with Mockito {
         Logger.debug(s"Result=$result")
       } catch {
         case t: Throwable => {
-            // Log error with message and Throwable.
-            Logger.error("Exception with riskyCalculation", t)
-          }
+          // Log error with message and Throwable.
+          Logger.error("Exception with riskyCalculation", t)
+        }
       }
       //#logging-default-logger
 
@@ -113,9 +113,9 @@ class ScalaLoggingSpec extends Specification with Mockito {
             Ok(s"Result=$result")
           } catch {
             case t: Throwable => {
-                logger.error("Exception with riskyCalculation", t)
-                InternalServerError("Error in calculation: " + t.getMessage())
-              }
+              logger.error("Exception with riskyCalculation", t)
+              InternalServerError("Error in calculation: " + t.getMessage())
+            }
           }
         }
       }
@@ -144,11 +144,10 @@ class ScalaLoggingSpec extends Specification with Mockito {
             request: RequestHeader): Future[Result] = {
           val resultFuture = next(request)
 
-          resultFuture.foreach(
-              result => {
+          resultFuture.foreach(result => {
             val msg =
               s"method=${request.method} uri=${request.uri} remote-address=${request.remoteAddress}" +
-              s" status=${result.header.status}";
+                s" status=${result.header.status}";
             accessLogger.info(msg)
           })
 

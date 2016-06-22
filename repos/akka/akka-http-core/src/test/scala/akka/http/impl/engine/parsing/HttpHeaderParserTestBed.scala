@@ -6,8 +6,8 @@ import com.typesafe.config.{ConfigFactory, Config}
 
 object HttpHeaderParserTestBed extends App {
 
-  val testConf: Config =
-    ConfigFactory.parseString("""
+  val testConf: Config = ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = ERROR
     akka.http.parsing.max-header-name-length = 20
@@ -29,8 +29,9 @@ object HttpHeaderParserTestBed extends App {
        |%TRIE%
        |
        |formatSizes: ${parser.formatSizes}
-       |contentHistogram: ${parser.contentHistogram.mkString(
-           "\n  ", "\n  ", "\n")}
+       |contentHistogram: ${parser.contentHistogram.mkString("\n  ",
+                                                             "\n  ",
+                                                             "\n")}
      """.stripMargin.replace("%TRIE%", parser.formatTrie)
   }
 

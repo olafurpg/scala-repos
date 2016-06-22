@@ -38,8 +38,8 @@ class ScImportExprElementType[Func <: ScImportExpr]
     new ScImportExprStubImpl(parentStub, this, refText, singleW)
   }
 
-  def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScImportExprStub = {
+  def deserializeImpl(dataStream: StubInputStream,
+                      parentStub: Any): ScImportExprStub = {
     val refText: String = StringRef.toString(dataStream.readName)
     val singleW: Boolean = dataStream.readBoolean
     new ScImportExprStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],

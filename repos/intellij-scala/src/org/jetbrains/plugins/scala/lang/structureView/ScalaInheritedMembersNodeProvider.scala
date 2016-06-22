@@ -51,11 +51,13 @@ class ScalaInheritedMembersNodeProvider
                   case named: ScNamedElement =>
                     ScalaPsiUtil.nameContext(named) match {
                       case x: ScValue if x.containingClass != clazz =>
-                        children.add(new ScalaValueStructureViewElement(
-                                named.nameId, true))
+                        children.add(
+                            new ScalaValueStructureViewElement(named.nameId,
+                                                               true))
                       case x: ScVariable if x.containingClass != clazz =>
-                        children.add(new ScalaVariableStructureViewElement(
-                                named.nameId, true))
+                        children.add(
+                            new ScalaVariableStructureViewElement(named.nameId,
+                                                                  true))
                       case _ =>
                     }
                   case _ =>

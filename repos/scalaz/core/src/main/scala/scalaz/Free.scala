@@ -64,8 +64,8 @@ object Free extends FreeInstances {
     val f: C => Free[S, B]
   }
 
-  private def gosub[S[_], B, C0](
-      a0: Free[S, C0])(f0: C0 => Free[S, B]): Free[S, B] =
+  private def gosub[S[_], B, C0](a0: Free[S, C0])(
+      f0: C0 => Free[S, B]): Free[S, B] =
     new Gosub[S, B] {
       type C = C0
       val a = a0
@@ -125,8 +125,7 @@ sealed abstract class Free[S[_], A] {
 
   /** Changes the suspension functor by the given natural transformation. */
   final def mapSuspension[T[_]](f: S ~> T): Free[T, A] =
-    flatMapSuspension(
-        new (S ~> Free[T, ?]) {
+    flatMapSuspension(new (S ~> Free[T, ?]) {
       def apply[X](s: S[X]) = Suspend(f(s))
     })
 
@@ -155,8 +154,8 @@ sealed abstract class Free[S[_], A] {
     Zap.monadComonadZap.zapWith(this, bs)(f)
 
   /** Applies a function in a comonad to the corresponding value in this monad, annihilating both. */
-  final def zap[G[_], B](fs: Cofree[G, A => B])(
-      implicit S: Functor[S], d: Zap[S, G]): B =
+  final def zap[G[_], B](fs: Cofree[G, A => B])(implicit S: Functor[S],
+                                                d: Zap[S, G]): B =
     zapWith(fs)((a, f) => f(a))
 
   /** Runs a single step, using a function that extracts the resumption from its suspension functor. */
@@ -180,7 +179,8 @@ sealed abstract class Free[S[_], A] {
     * @since 7.0.1
     */
   final def runM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(
-      implicit S: Functor[S], M: Monad[M]): M[A] = {
+      implicit S: Functor[S],
+      M: Monad[M]): M[A] = {
     def runM2(t: Free[S, A]): M[A] = t.resume match {
       case -\/(s) => Monad[M].bind(f(s))(runM2)
       case \/-(r) => Monad[M].pure(r)
@@ -192,7 +192,9 @@ sealed abstract class Free[S[_], A] {
     * Run Free using constant stack.
     */
   final def runRecM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(
-      implicit S: Functor[S], M: Applicative[M], B: BindRec[M]): M[A] = {
+      implicit S: Functor[S],
+      M: Applicative[M],
+      B: BindRec[M]): M[A] = {
     def go(e: S[Free[S, A]] \/ A): M[Free[S, A] \/ A] =
       e match {
         case -\/(sf) => M.map(f(sf))(\/.left)
@@ -233,8 +235,8 @@ sealed abstract class Free[S[_], A] {
       case a @ Gosub() => M.bind(a.a foldMap f)(c => a.f(c) foldMap f)
     }
 
-  final def foldMapRec[M[_]](f: S ~> M)(
-      implicit M: Applicative[M], B: BindRec[M]): M[A] =
+  final def foldMapRec[M[_]](f: S ~> M)(implicit M: Applicative[M],
+                                        B: BindRec[M]): M[A] =
     B.tailrecM[Free[S, A], A] {
       _.step match {
         case Return(a) => M.point(\/-(a))
@@ -251,8 +253,8 @@ sealed abstract class Free[S[_], A] {
   /**
     * Folds this free recursion to the right using the given natural transformations.
     */
-  final def foldRight[G[_]](z: Id ~> G)(
-      f: λ[α => S[G[α]]] ~> G)(implicit S: Functor[S]): G[A] =
+  final def foldRight[G[_]](z: Id ~> G)(f: λ[α => S[G[α]]] ~> G)(
+      implicit S: Functor[S]): G[A] =
     this.resume match {
       case -\/(s) => f(S.map(s)(_.foldRight(z)(f)))
       case \/-(r) => z(r)
@@ -346,8 +348,7 @@ sealed abstract class Free[S[_], A] {
 
   /** Extension in `Free` as a comonad in the endofunctor category. */
   def extendF[T[_]](f: Free[S, ?] ~> T): Free[T, A] =
-    mapSuspension(
-        new (S ~> T) {
+    mapSuspension(new (S ~> T) {
       def apply[X](x: S[X]) = f(liftF(x))
     })
 
@@ -462,8 +463,8 @@ sealed abstract class FreeInstances
         f(a).flatMap(_.fold(tailrecM(f), point(_)))
     }
 
-  implicit def freeZip[S[_]](
-      implicit F: Functor[S], Z: Zip[S]): Zip[Free[S, ?]] =
+  implicit def freeZip[S[_]](implicit F: Functor[S],
+                             Z: Zip[S]): Zip[Free[S, ?]] =
     new Zip[Free[S, ?]] {
       override def zip[A, B](aa: => Free[S, A], bb: => Free[S, B]) =
         (aa.resume, bb.resume) match {
@@ -557,8 +558,8 @@ private sealed abstract class FreeTraverse1[F[_]]
     with FreeFoldable1[F] {
   implicit def F: Traverse1[F]
 
-  override final def traverse1Impl[G[_], A, B](fa: Free[F, A])(
-      f: A => G[B])(implicit G: Apply[G]): G[Free[F, B]] =
+  override final def traverse1Impl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(
+      implicit G: Apply[G]): G[Free[F, B]] =
     fa.resume match {
       case -\/(s) =>
         G.map(F.traverse1Impl(s)(traverse1Impl[G, A, B](_)(f)))(roll(_))

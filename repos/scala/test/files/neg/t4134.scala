@@ -13,7 +13,7 @@ trait Q1 {
 
 //trait T3 extends Q1 with T2 {
 trait T3 extends T2 with Q1 {
-  abstract override def f: String = super [Q1].f + " " + super [T2].f + " hoo"
+  abstract override def f: String = super[Q1].f + " " + super[T2].f + " hoo"
 }
 
 class Konkret extends T3

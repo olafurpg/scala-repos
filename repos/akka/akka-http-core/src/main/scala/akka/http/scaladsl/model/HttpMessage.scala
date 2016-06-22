@@ -64,13 +64,13 @@ sealed trait HttpMessage extends jm.HttpMessage {
   def withEntity(entity: MessageEntity): Self
 
   /** Returns a sharable and serializable copy of this message with a strict entity. */
-  def toStrict(timeout: FiniteDuration)(
-      implicit ec: ExecutionContext, fm: Materializer): Future[Self] =
+  def toStrict(timeout: FiniteDuration)(implicit ec: ExecutionContext,
+                                        fm: Materializer): Future[Self] =
     entity.toStrict(timeout).fast.map(this.withEntity)
 
   /** Returns a copy of this message with the entity and headers set to the given ones. */
-  def withHeadersAndEntity(
-      headers: immutable.Seq[HttpHeader], entity: MessageEntity): Self
+  def withHeadersAndEntity(headers: immutable.Seq[HttpHeader],
+                           entity: MessageEntity): Self
 
   /** Returns a copy of this message with the list of headers transformed by the given function */
   def mapHeaders(
@@ -145,7 +145,8 @@ sealed trait HttpMessage extends jm.HttpMessage {
 
 object HttpMessage {
   private[http] def connectionCloseExpected(
-      protocol: HttpProtocol, connectionHeader: Option[Connection]): Boolean =
+      protocol: HttpProtocol,
+      connectionHeader: Option[Connection]): Boolean =
     protocol match {
       case HttpProtocols.`HTTP/1.1` ⇒
         connectionHeader.isDefined && connectionHeader.get.hasClose
@@ -169,7 +170,7 @@ final class HttpRequest(val method: HttpMethod,
   require(entity.isKnownEmpty || method.isEntityAccepted,
           s"Requests with method '${method.value}' must have an empty entity")
   require(protocol != HttpProtocols.`HTTP/1.0` ||
-          !entity.isInstanceOf[HttpEntity.Chunked],
+            !entity.isInstanceOf[HttpEntity.Chunked],
           "HTTP/1.0 requests must not have a chunked entity")
 
   type Self = HttpRequest
@@ -185,10 +186,10 @@ final class HttpRequest(val method: HttpMethod,
     * Throws an [[IllegalUriException]] if the URI is relative and the `headers` don't
     * include a valid [[akka.http.scaladsl.model.headers.Host]] header or if URI authority and [[akka.http.scaladsl.model.headers.Host]] header don't match.
     */
-  def effectiveUri(
-      securedConnection: Boolean, defaultHostHeader: Host = Host.empty): Uri =
-    HttpRequest.effectiveUri(
-        uri, headers, securedConnection, defaultHostHeader)
+  def effectiveUri(securedConnection: Boolean,
+                   defaultHostHeader: Host = Host.empty): Uri =
+    HttpRequest
+      .effectiveUri(uri, headers, securedConnection, defaultHostHeader)
 
   /**
     * Returns a copy of this request with the URI resolved according to the logic defined at
@@ -212,8 +213,8 @@ final class HttpRequest(val method: HttpMethod,
   override def withHeaders(headers: immutable.Seq[HttpHeader]): HttpRequest =
     if (headers eq this.headers) this else copy(headers = headers)
 
-  override def withHeadersAndEntity(
-      headers: immutable.Seq[HttpHeader], entity: RequestEntity): HttpRequest =
+  override def withHeadersAndEntity(headers: immutable.Seq[HttpHeader],
+                                    entity: RequestEntity): HttpRequest =
     copy(headers = headers, entity = entity)
   override def withEntity(entity: jm.RequestEntity): HttpRequest =
     copy(entity = entity.asInstanceOf[RequestEntity])
@@ -262,7 +263,7 @@ final class HttpRequest(val method: HttpMethod,
   override def equals(obj: scala.Any): Boolean = obj match {
     case HttpRequest(_method, _uri, _headers, _entity, _protocol) =>
       method == _method && uri == _uri && headers == _headers &&
-      entity == _entity && protocol == _protocol
+        entity == _entity && protocol == _protocol
     case _ => false
   }
 
@@ -330,7 +331,7 @@ object HttpRequest {
         // ok
         case 5
             if c(0) == 'h' && c(1) == 't' && c(2) == 't' && c(3) == 'p' &&
-            c(4) == 's' ⇒ // ok
+              c(4) == 's' ⇒ // ok
         case _ ⇒
           throw new IllegalArgumentException(
               """`uri` must have scheme "http", "https" or no scheme""")
@@ -362,7 +363,7 @@ final class HttpResponse(val status: StatusCode,
   require(entity.isKnownEmpty || status.allowsEntity,
           "Responses with this status code must have an empty entity")
   require(protocol == HttpProtocols.`HTTP/1.1` ||
-          !entity.isInstanceOf[HttpEntity.Chunked],
+            !entity.isInstanceOf[HttpEntity.Chunked],
           "HTTP/1.0 responses must not have a chunked entity")
 
   type Self = HttpResponse
@@ -411,7 +412,7 @@ final class HttpResponse(val status: StatusCode,
   override def equals(obj: scala.Any): Boolean = obj match {
     case HttpResponse(_status, _headers, _entity, _protocol) =>
       status == _status && headers == _headers && entity == _entity &&
-      protocol == _protocol
+        protocol == _protocol
     case _ => false
   }
 

@@ -29,8 +29,9 @@ trait StandardScalaSettings { self: AbsScalaSettings =>
   val javabootclasspath = PathSetting("-javabootclasspath",
                                       "Override java boot classpath.",
                                       Defaults.javaBootClassPath)
-  val javaextdirs = PathSetting(
-      "-javaextdirs", "Override java extdirs classpath.", Defaults.javaExtDirs)
+  val javaextdirs = PathSetting("-javaextdirs",
+                                "Override java extdirs classpath.",
+                                Defaults.javaExtDirs)
   val sourcepath = PathSetting("-sourcepath",
                                "Specify location(s) of source files.",
                                "") // Defaults.scalaSourcePath
@@ -49,8 +50,8 @@ trait StandardScalaSettings { self: AbsScalaSettings =>
       "encoding",
       "Specify character encoding used by source files.",
       Properties.sourceEncoding)
-  val explaintypes = BooleanSetting(
-      "-explaintypes", "Explain type errors in more detail.")
+  val explaintypes =
+    BooleanSetting("-explaintypes", "Explain type errors in more detail.")
   val feature = BooleanSetting(
       "-feature",
       "Emit warning and location for usages of features that should be imported explicitly.")
@@ -63,7 +64,8 @@ trait StandardScalaSettings { self: AbsScalaSettings =>
   val nowarn = BooleanSetting("-nowarn", "Generate no warnings.")
   val optimise: BooleanSetting // depends on post hook which mutates other settings
   val print = BooleanSetting(
-      "-print", "Print program with Scala-specific features removed.")
+      "-print",
+      "Print program with Scala-specific features removed.")
   val target = ChoiceSettingForcedDefault(
       "-target",
       "target",
@@ -74,12 +76,16 @@ trait StandardScalaSettings { self: AbsScalaSettings =>
       "-unchecked",
       "Enable additional warnings where generated code depends on assumptions.")
   val uniqid = BooleanSetting(
-      "-uniqid", "Uniquely tag all identifiers in debugging output.")
+      "-uniqid",
+      "Uniquely tag all identifiers in debugging output.")
   val usejavacp = BooleanSetting(
-      "-usejavacp", "Utilize the java.class.path in classpath resolution.")
+      "-usejavacp",
+      "Utilize the java.class.path in classpath resolution.")
   val usemanifestcp = BooleanSetting(
-      "-usemanifestcp", "Utilize the manifest in classpath resolution.")
+      "-usemanifestcp",
+      "Utilize the manifest in classpath resolution.")
   val verbose = BooleanSetting(
-      "-verbose", "Output messages about what the compiler is doing.")
+      "-verbose",
+      "Output messages about what the compiler is doing.")
   val version = BooleanSetting("-version", "Print product version and exit.")
 }

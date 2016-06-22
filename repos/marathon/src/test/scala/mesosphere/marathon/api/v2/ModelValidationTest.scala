@@ -133,7 +133,8 @@ class ModelValidationTest
         id,
         container = Some(
             Container(
-                docker = Some(Docker(
+                docker = Some(
+                    Docker(
                         image = "demothing",
                         network = Some(Network.BRIDGE),
                         portMappings = Some(

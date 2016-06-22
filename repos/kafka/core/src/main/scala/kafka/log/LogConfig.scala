@@ -91,8 +91,8 @@ case class LogConfig(props: java.util.Map[_, _])
   def randomSegmentJitter: Long =
     if (segmentJitterMs == 0) 0
     else
-      Utils.abs(scala.util.Random.nextInt()) % math.min(
-          segmentJitterMs, segmentMs)
+      Utils.abs(scala.util.Random.nextInt()) % math.min(segmentJitterMs,
+                                                        segmentMs)
 }
 
 object LogConfig {
@@ -133,7 +133,7 @@ object LogConfig {
     "The soft maximum on the amount of time before a new log segment is rolled"
   val SegmentJitterMsDoc =
     "The maximum random jitter subtracted from segmentMs to avoid thundering herds of segment" +
-    " rolling"
+      " rolling"
   val FlushIntervalDoc =
     "The number of messages that can be written to the log before a flush is forced"
   val FlushMsDoc =
@@ -150,7 +150,7 @@ object LogConfig {
     "The time to wait before deleting a file from the filesystem"
   val DeleteRetentionMsDoc =
     "The time to retain delete markers in the log. Only applicable for logs that are being" +
-    " compacted."
+      " compacted."
   val MinCleanableRatioDoc =
     "The ratio of bytes that are available for cleaning to the bytes already cleaned"
   val CompactDoc =
@@ -159,11 +159,11 @@ object LogConfig {
     "Indicates whether unclean leader election is enabled"
   val MinInSyncReplicasDoc =
     "If number of insync replicas drops below this number, we stop accepting writes with" +
-    " -1 (or all) required acks"
+      " -1 (or all) required acks"
   val CompressionTypeDoc =
     "Specify the final compression type for a given topic. This configuration accepts the " +
-    "standard compression codecs ('gzip', 'snappy', lz4). It additionally accepts 'uncompressed' which is equivalent to " +
-    "no compression; and 'producer' which means retain the original compression codec set by the producer."
+      "standard compression codecs ('gzip', 'snappy', lz4). It additionally accepts 'uncompressed' which is equivalent to " +
+      "no compression; and 'producer' which means retain the original compression codec set by the producer."
   val PreAllocateEnableDoc =
     "Should pre allocate file when create new segment?"
   val MessageFormatVersionDoc = KafkaConfig.LogMessageFormatVersionDoc
@@ -322,8 +322,8 @@ object LogConfig {
     */
   def validateNames(props: Properties) {
     val names = configNames
-    for (name <- props.keys.asScala) require(
-        names.contains(name), s"Unknown configuration `$name`.")
+    for (name <- props.keys.asScala)
+      require(names.contains(name), s"Unknown configuration `$name`.")
   }
 
   /**

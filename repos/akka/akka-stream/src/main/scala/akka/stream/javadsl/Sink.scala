@@ -252,8 +252,8 @@ object Sink {
       output1: Sink[U, _],
       output2: Sink[U, _],
       rest: java.util.List[Sink[U, _]],
-      strategy: function.Function[
-          java.lang.Integer, Graph[UniformFanOutShape[T, U], NotUsed]])
+      strategy: function.Function[java.lang.Integer,
+                                  Graph[UniformFanOutShape[T, U], NotUsed]])
     : Sink[T, NotUsed] = {
     import scala.collection.JavaConverters._
     val seq = if (rest != null) rest.asScala.map(_.asScala) else Seq()
@@ -304,8 +304,8 @@ final class Sink[-In, +Mat](delegate: scaladsl.Sink[In, Mat])
   /**
     * Connect this `Sink` to a `Source` and run it.
     */
-  def runWith[M](
-      source: Graph[SourceShape[In], M], materializer: Materializer): M =
+  def runWith[M](source: Graph[SourceShape[In], M],
+                 materializer: Materializer): M =
     asScala.runWith(source)(materializer)
 
   /**

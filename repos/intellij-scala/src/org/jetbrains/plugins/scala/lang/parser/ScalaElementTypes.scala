@@ -274,8 +274,8 @@ object ScalaElementTypes {
   val XML_ELEMENT = new ScalaElementType("Xml element")
 
   class ScCodeBlockElementType()
-      extends IErrorCounterReparseableElementType(
-          "block of expressions", ScalaFileType.SCALA_LANGUAGE)
+      extends IErrorCounterReparseableElementType("block of expressions",
+                                                  ScalaFileType.SCALA_LANGUAGE)
       with ICompositeElementType {
 
     override def createNode(text: CharSequence): ASTNode = {
@@ -286,8 +286,9 @@ object ScalaElementTypes {
       new ScBlockExprImpl(null)
     }
 
-    def getErrorsCount(
-        seq: CharSequence, fileLanguage: Language, project: Project): Int = {
+    def getErrorsCount(seq: CharSequence,
+                       fileLanguage: Language,
+                       project: Project): Int = {
       import com.intellij.psi.tree.IErrorCounterReparseableElementType._
       val lexer: Lexer = new ScalaLexer
       lexer.start(seq)

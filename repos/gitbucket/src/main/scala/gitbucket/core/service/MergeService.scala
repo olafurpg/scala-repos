@@ -276,12 +276,14 @@ object MergeService {
             "This pull request can't merge automatically.")
       }
       val mergeResultCommit = parseCommit(
-          Option(repository.resolve(mergedBranchName))
-            .getOrElse(throw new RuntimeException(
+          Option(repository.resolve(mergedBranchName)).getOrElse(
+              throw new RuntimeException(
                   s"not found branch ${mergedBranchName}")))
       // creates merge commit
       val mergeCommitId = createMergeCommit(
-          mergeResultCommit.getTree().getId(), committer, message)
+          mergeResultCommit.getTree().getId(),
+          committer,
+          message)
       // update refs
       Util.updateRefs(repository,
                       s"refs/heads/${branch}",
@@ -291,8 +293,9 @@ object MergeService {
                       Some("merged"))
     }
     // return treeId
-    private def createMergeCommit(
-        treeId: ObjectId, committer: PersonIdent, message: String) =
+    private def createMergeCommit(treeId: ObjectId,
+                                  committer: PersonIdent,
+                                  message: String) =
       Util.createMergeCommit(repository,
                              treeId,
                              committer,

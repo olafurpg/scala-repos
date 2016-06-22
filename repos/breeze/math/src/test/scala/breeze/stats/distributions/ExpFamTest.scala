@@ -39,8 +39,7 @@ trait ExpFamTest[D <: Density[T] with Rand[T], T]
   }
 
   test("Rescale doesn't affect MLE") {
-    check(
-        Prop.forAll { (p: expFam.Parameter) =>
+    check(Prop.forAll { (p: expFam.Parameter) =>
       val dist: D = expFam.distribution(p)
       val suffstat = dist.sample(100).map(sufficientStatisticFor).reduce(_ + _)
       val mle = expFam.mle(suffstat)

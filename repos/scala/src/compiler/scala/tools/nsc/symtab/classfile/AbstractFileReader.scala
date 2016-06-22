@@ -54,7 +54,7 @@ class AbstractFileReader(val file: AbstractFile) {
     */
   def nextInt: Int =
     ((nextByte & 0xff) << 24) + ((nextByte & 0xff) << 16) +
-    ((nextByte & 0xff) << 8) + (nextByte & 0xff)
+      ((nextByte & 0xff) << 8) + (nextByte & 0xff)
 
   /** extract a character at position bp from buf
     */
@@ -65,7 +65,7 @@ class AbstractFileReader(val file: AbstractFile) {
     */
   def getInt(mybp: Int): Int =
     ((buf(mybp) & 0xff) << 24) + ((buf(mybp + 1) & 0xff) << 16) +
-    ((buf(mybp + 2) & 0xff) << 8) + (buf(mybp + 3) & 0xff)
+      ((buf(mybp + 2) & 0xff) << 8) + (buf(mybp + 3) & 0xff)
 
   /** extract a long integer at position bp from buf
     */

@@ -7,7 +7,7 @@ import akka.http.impl.util.{SingletonValueRenderable, ObjectRegistry}
 import akka.http.javadsl.{model ⇒ jm}
 
 /** The protocol of an HTTP message */
-final case class HttpProtocol private[http](override val value: String)
+final case class HttpProtocol private[http] (override val value: String)
     extends jm.HttpProtocol
     with SingletonValueRenderable
 

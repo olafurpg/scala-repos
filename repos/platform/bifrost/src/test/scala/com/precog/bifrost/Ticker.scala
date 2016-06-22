@@ -81,8 +81,9 @@ class Ticker(ticks: AtomicLong) extends Actor {
   * manually. The current time will always be `start + duration * ticks.get`,
   * where the duration is in milliseconds.
   */
-class ManualClock(
-    ticks: AtomicLong, start: DateTime = new DateTime, val duration: Long = 50)
+class ManualClock(ticks: AtomicLong,
+                  start: DateTime = new DateTime,
+                  val duration: Long = 50)
     extends Clock {
   def now(): DateTime = {
     val cur = start.getMillis() + ticks.get() * duration

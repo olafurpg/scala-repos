@@ -106,7 +106,8 @@ object Ensemble extends JFXApp {
             maxHeight = 76
             id = "mainToolBar"
             content = List(new ImageView {
-              image = new Image(this.getClass
+              image = new Image(
+                  this.getClass
                     .getResourceAsStream("/scalafx/ensemble/images/logo.png"))
               margin = Insets(0, 0, 0, 10)
             }, new Region {

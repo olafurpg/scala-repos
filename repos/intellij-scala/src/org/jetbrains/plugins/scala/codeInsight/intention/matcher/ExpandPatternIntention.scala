@@ -25,8 +25,9 @@ import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
 class ExpandPatternIntention extends PsiElementBaseIntentionAction {
   def getFamilyName: String = "Expand to Constructor pattern"
 
-  def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(project: Project,
+                  editor: Editor,
+                  element: PsiElement): Boolean = {
     findReferencePattern(element) match {
       case Some((_, newPatternText)) =>
         setText("Expand to: " + StringUtils.abbreviate(newPatternText, 25))
@@ -44,8 +45,8 @@ class ExpandPatternIntention extends PsiElementBaseIntentionAction {
         IdeDocumentHistory
           .getInstance(project)
           .includeCurrentPlaceAsChangePlace()
-        val newPattern = ScalaPsiElementFactory.createPatternFromText(
-            newPatternText, element.getManager)
+        val newPattern = ScalaPsiElementFactory
+          .createPatternFromText(newPatternText, element.getManager)
         val replaced = origPattern.replace(newPattern)
         ScalaPsiUtil.adjustTypes(replaced)
       case None =>

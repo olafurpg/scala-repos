@@ -58,7 +58,7 @@ object StandardTestDBs {
     val dbName = "hsqldb-" + confName
     val url =
       "jdbc:hsqldb:file:" + TestkitConfig.testDBPath + "/" + dbName +
-      ";user=SA;password=;shutdown=true;hsqldb.applog=0"
+        ";user=SA;password=;shutdown=true;hsqldb.applog=0"
     override def cleanUpBefore() = TestDB.deleteDBFiles(dbName)
     // Recreating the DB is faster than dropping everything individually
     override def dropUserArtifacts(implicit session: profile.Backend#Session) = {
@@ -68,7 +68,8 @@ object StandardTestDBs {
   }
 
   lazy val SQLiteMem = new SQLiteTestDB(
-      "jdbc:sqlite:file:slick_test?mode=memory&cache=shared", "sqlitemem") {
+      "jdbc:sqlite:file:slick_test?mode=memory&cache=shared",
+      "sqlitemem") {
     override def isPersistent = false
   }
 
@@ -103,7 +104,7 @@ object StandardTestDBs {
     override def cleanUpBefore() = {
       val dropUrl =
         "jdbc:derby:" + TestkitConfig.testDBPath + "/" + dbName +
-        ";shutdown=true"
+          ";shutdown=true"
       try {
         await(
             profile.backend.Database
@@ -188,8 +189,7 @@ object StandardTestDBs {
 
     override def cleanUpBefore(): Unit = {
       import ExecutionContext.Implicits.global
-      await(
-          databaseFor("testConn").run(for {
+      await(databaseFor("testConn").run(for {
         _ <- dropSchema
         _ = println(s"[Creating DB2 schema '$schema']")
         _ <- sqlu"create schema #$schema"
@@ -213,7 +213,8 @@ object StandardTestDBs {
 
     override def localTables(
         implicit ec: ExecutionContext): DBIO[Vector[String]] =
-      ResultSetAction[(String, String, String, String)](_.conn
+      ResultSetAction[(String, String, String, String)](
+          _.conn
             .getMetaData()
             .getTables(testDB, defaultSchema, null, null)).map { ts =>
         ts.map(_._3).sorted
@@ -253,7 +254,7 @@ object StandardTestDBs {
     override def canGetLocalTables = false
     override def capabilities =
       super.capabilities - TestDB.capabilities.jdbcMetaGetIndexInfo -
-      TestDB.capabilities.transactionIsolation
+        TestDB.capabilities.transactionIsolation
 
     /* Only drop and recreate the user. This is much faster than dropping
      * the tablespace. */
@@ -272,7 +273,7 @@ abstract class H2TestDB(confName: String, keepAlive: Boolean)
   val jdbcDriver = "org.h2.Driver"
   override def capabilities =
     super.capabilities - TestDB.capabilities.jdbcMetaGetFunctions -
-    TestDB.capabilities.jdbcMetaGetClientInfoProperties
+      TestDB.capabilities.jdbcMetaGetClientInfoProperties
   override def createDB(): profile.Backend#Database =
     database.forURL(url, driver = jdbcDriver, keepAliveConnection = keepAlive)
 }
@@ -303,8 +304,8 @@ class SQLiteTestDB(dburl: String, confName: String)
 abstract class DerbyDB(confName: String) extends InternalJdbcTestDB(confName) {
   import profile.api.actionBasedSQLInterpolation
   val profile = DerbyProfile
-  System.setProperty(
-      "derby.stream.error.method", classOf[DerbyDB].getName + ".DEV_NULL")
+  System.setProperty("derby.stream.error.method",
+                     classOf[DerbyDB].getName + ".DEV_NULL")
   val jdbcDriver = "org.apache.derby.jdbc.EmbeddedDriver"
   override def localTables(
       implicit ec: ExecutionContext): DBIO[Vector[String]] =
@@ -322,22 +323,25 @@ abstract class DerbyDB(confName: String) extends InternalJdbcTestDB(confName) {
                              where c.schemaid = s.schemaid and c.tableid = t.tableid and s.schemaname = 'APP'
                           """.as[(String, String)]
           _ <- DBIO.seq(
-                  (for ((c, t) <- constraints if !c.startsWith("SQL")) yield
-                    sqlu"""alter table ${profile.quoteIdentifier(t)} drop constraint ${profile
-                  .quoteIdentifier(c)}"""): _*)
+                  (for ((c, t) <- constraints if !c.startsWith("SQL"))
+                    yield
+                      sqlu"""alter table ${profile
+                    .quoteIdentifier(t)} drop constraint ${profile
+                    .quoteIdentifier(c)}"""): _*)
           tables <- localTables
           sequences <- localSequences
           _ <- DBIO.seq((tables.map(t =>
-                            sqlu"""drop table #${profile.quoteIdentifier(t)}""") ++ sequences
-                        .map(t =>
-                            sqlu"""drop sequence #${profile.quoteIdentifier(t)}""")): _*)
+                            sqlu"""drop table #${profile
+                      .quoteIdentifier(t)}""") ++ sequences.map(t =>
+                            sqlu"""drop sequence #${profile
+                      .quoteIdentifier(t)}""")): _*)
         } yield ()
       }
     } catch {
       case e: Exception =>
         println(
             "[Caught Exception while dropping user artifacts in Derby: " + e +
-            "]")
+              "]")
         session.close()
         cleanUpBefore()
     }

@@ -14,8 +14,7 @@ class RequestHandler(
     envelope: RpcRequestEnvelope,
     project: ActorRef,
     server: ActorRef
-)
-    extends Actor
+) extends Actor
     with ActorLogging {
 
   override def preStart(): Unit = {

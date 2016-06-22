@@ -65,8 +65,8 @@ private[hive] case class InsertIntoHiveTable(
 
     FileOutputFormat.setOutputPath(
         conf.value,
-        SparkHiveWriterContainer.createPathFromString(
-            fileSinkConf.getDirName, conf.value))
+        SparkHiveWriterContainer.createPathFromString(fileSinkConf.getDirName,
+                                                      conf.value))
     log.debug("Saving as hadoop file of type " + valueClass.getSimpleName)
     writerContainer.driverSideSetup()
     sc.sparkContext.runJob(rdd, writerContainer.writeToFile _)
@@ -148,25 +148,23 @@ private[hive] case class InsertIntoHiveTable(
     if (speculationEnabled && outputCommitterClass.contains("Direct")) {
       val warningMessage =
         s"$outputCommitterClass may be an output committer that writes data directly to " +
-        "the final location. Because speculation is enabled, this output committer may " +
-        "cause data loss (see the case in SPARK-10063). If possible, please use a output " +
-        "committer that does not have this behavior (e.g. FileOutputCommitter)."
+          "the final location. Because speculation is enabled, this output committer may " +
+          "cause data loss (see the case in SPARK-10063). If possible, please use a output " +
+          "committer that does not have this behavior (e.g. FileOutputCommitter)."
       logWarning(warningMessage)
     }
 
-    val writerContainer =
-      if (numDynamicPartitions > 0) {
-        val dynamicPartColNames =
-          partitionColumnNames.takeRight(numDynamicPartitions)
-        new SparkHiveDynamicPartitionWriterContainer(jobConf,
-                                                     fileSinkConf,
-                                                     dynamicPartColNames,
-                                                     child.output,
-                                                     table)
-      } else {
-        new SparkHiveWriterContainer(
-            jobConf, fileSinkConf, child.output, table)
-      }
+    val writerContainer = if (numDynamicPartitions > 0) {
+      val dynamicPartColNames =
+        partitionColumnNames.takeRight(numDynamicPartitions)
+      new SparkHiveDynamicPartitionWriterContainer(jobConf,
+                                                   fileSinkConf,
+                                                   dynamicPartColNames,
+                                                   child.output,
+                                                   table)
+    } else {
+      new SparkHiveWriterContainer(jobConf, fileSinkConf, child.output, table)
+    }
 
     @transient val outputClass =
       writerContainer.newSerializer(table.tableDesc).getSerializedClass
@@ -188,8 +186,8 @@ private[hive] case class InsertIntoHiveTable(
       // loadPartition call orders directories created on the iteration order of the this map
       val orderedPartitionSpec = new util.LinkedHashMap[String, String]()
       table.hiveQlTable.getPartCols.asScala.foreach { entry =>
-        orderedPartitionSpec.put(
-            entry.getName, partitionSpec.getOrElse(entry.getName, ""))
+        orderedPartitionSpec.put(entry.getName,
+                                 partitionSpec.getOrElse(entry.getName, ""))
       }
 
       // inheritTableSpecs is set to true. It should be set to false for a IMPORT query
@@ -246,7 +244,7 @@ private[hive] case class InsertIntoHiveTable(
   override def executeCollect(): Array[InternalRow] = sideEffectResult.toArray
 
   protected override def doExecute(): RDD[InternalRow] = {
-    sqlContext.sparkContext.parallelize(
-        sideEffectResult.asInstanceOf[Seq[InternalRow]], 1)
+    sqlContext.sparkContext
+      .parallelize(sideEffectResult.asInstanceOf[Seq[InternalRow]], 1)
   }
 }

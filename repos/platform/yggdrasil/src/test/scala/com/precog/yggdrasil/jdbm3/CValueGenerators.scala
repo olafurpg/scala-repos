@@ -35,15 +35,16 @@ trait CValueGenerators {
   def maxArraySize = 16
   def maxArrayDepth = 3
 
-  def genColumn(
-      size: Int, values: Gen[Array[CValue]]): Gen[List[Seq[CValue]]] =
+  def genColumn(size: Int,
+                values: Gen[Array[CValue]]): Gen[List[Seq[CValue]]] =
     containerOfN[List, Seq[CValue]](size, values.map(_.toSeq))
 
   private def containerOfAtMostN[C[_], T](maxSize: Int, g: Gen[T])(
       implicit b: org.scalacheck.util.Buildable[T, C]): Gen[C[T]] =
-    Gen.sized(size =>
-          for (n <- choose(0, size min maxSize); c <- containerOfN[C, T](n, g)) yield
-          c)
+    Gen.sized(
+        size =>
+          for (n <- choose(0, size min maxSize); c <- containerOfN[C, T](n, g))
+            yield c)
 
   private def indexedSeqOf[A](gen: Gen[A]): Gen[IndexedSeq[A]] =
     containerOfAtMostN[List, A](maxArraySize, gen) map (_.toIndexedSeq)
@@ -54,8 +55,8 @@ trait CValueGenerators {
   private def genNonArrayCValueType: Gen[CValueType[_]] =
     Gen.oneOf[CValueType[_]](CString, CBoolean, CLong, CDouble, CNum, CDate)
 
-  def genCValueType(
-      maxDepth: Int = maxArrayDepth, depth: Int = 0): Gen[CValueType[_]] = {
+  def genCValueType(maxDepth: Int = maxArrayDepth,
+                    depth: Int = 0): Gen[CValueType[_]] = {
     if (depth >= maxDepth) genNonArrayCValueType
     else {
       frequency(0 -> (genCValueType(maxDepth, depth + 1) map (CArrayType(_))),
@@ -64,8 +65,8 @@ trait CValueGenerators {
   }
 
   def genCType: Gen[CType] =
-    frequency(
-        7 -> genCValueType(), 3 -> Gen.oneOf(CNull, CEmptyObject, CEmptyArray))
+    frequency(7 -> genCValueType(),
+              3 -> Gen.oneOf(CNull, CEmptyObject, CEmptyArray))
 
   def genValueForCValueType[A](cType: CValueType[A]): Gen[CWrappedValue[A]] =
     cType match {

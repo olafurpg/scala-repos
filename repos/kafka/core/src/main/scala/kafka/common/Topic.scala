@@ -34,18 +34,18 @@ object Topic {
     else if (topic.length > maxNameLength)
       throw new org.apache.kafka.common.errors.InvalidTopicException(
           "topic name is illegal, can't be longer than " + maxNameLength +
-          " characters")
+            " characters")
 
     rgx.findFirstIn(topic) match {
       case Some(t) =>
         if (!t.equals(topic))
           throw new org.apache.kafka.common.errors.InvalidTopicException(
               "topic name " + topic +
-              " is illegal, contains a character other than ASCII alphanumerics, '.', '_' and '-'")
+                " is illegal, contains a character other than ASCII alphanumerics, '.', '_' and '-'")
       case None =>
         throw new org.apache.kafka.common.errors.InvalidTopicException(
             "topic name " + topic +
-            " is illegal,  contains a character other than ASCII alphanumerics, '.', '_' and '-'")
+              " is illegal,  contains a character other than ASCII alphanumerics, '.', '_' and '-'")
     }
   }
 

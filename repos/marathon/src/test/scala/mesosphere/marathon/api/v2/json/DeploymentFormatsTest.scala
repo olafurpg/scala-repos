@@ -45,7 +45,8 @@ class DeploymentFormatsTest extends MarathonSpec {
 
   test("Can write/read GroupUpdate") {
     marshalUnmarshal(genGroupUpdate())
-    marshalUnmarshal(genGroupUpdate(
+    marshalUnmarshal(
+        genGroupUpdate(
             Set(genGroupUpdate(), genGroupUpdate(Set(genGroupUpdate())))))
   }
 

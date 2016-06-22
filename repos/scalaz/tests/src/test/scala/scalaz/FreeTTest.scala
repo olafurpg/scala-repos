@@ -67,10 +67,10 @@ object FreeTListOption {
 }
 
 object FreeTTest extends SpecLite {
-  def freeTGen[F[_], G[_], A](
-      g: Gen[F[FreeT[F, G, A]]])(implicit F: Functor[F],
-                                 G: Applicative[G],
-                                 A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
+  def freeTGen[F[_], G[_], A](g: Gen[F[FreeT[F, G, A]]])(
+      implicit F: Functor[F],
+      G: Applicative[G],
+      A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
     Gen.frequency(
         (1, Functor[Arbitrary].map(A)(FreeT.point[F, G, A](_)).arbitrary),
         (1,
@@ -85,7 +85,8 @@ object FreeTTest extends SpecLite {
 
     "not stack overflow with 50k binds" in {
       val expected = Applicative[FreeTListOption].point(())
-      val result = BindRec[FreeTListOption].tailrecM((i: Int) =>
+      val result = BindRec[FreeTListOption].tailrecM(
+          (i: Int) =>
             if (i < 50000)
               Applicative[FreeTListOption].point(\/.left[Int, Unit](i + 1))
             else

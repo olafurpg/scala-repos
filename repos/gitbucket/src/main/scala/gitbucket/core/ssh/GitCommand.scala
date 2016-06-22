@@ -78,12 +78,14 @@ abstract class DefaultGitCommand(val owner: String, val repoName: String)
     extends GitCommand { self: RepositoryService with AccountService =>
 
   protected def isWritableUser(
-      username: String, repositoryInfo: RepositoryService.RepositoryInfo)(
+      username: String,
+      repositoryInfo: RepositoryService.RepositoryInfo)(
       implicit session: Session): Boolean =
     getAccountByUserName(username) match {
       case Some(account) =>
-        hasWritePermission(
-            repositoryInfo.owner, repositoryInfo.name, Some(account))
+        hasWritePermission(repositoryInfo.owner,
+                           repositoryInfo.name,
+                           Some(account))
       case None => false
     }
 }
@@ -140,8 +142,8 @@ class PluginGitUploadPack(repoName: String, routing: GitRepositoryRouting)
 
   override protected def runTask(user: String)(
       implicit session: Session): Unit = {
-    if (routing.filter.filter(
-            "/" + repoName, Some(user), loadSystemSettings(), false)) {
+    if (routing.filter
+          .filter("/" + repoName, Some(user), loadSystemSettings(), false)) {
       val path =
         routing.urlPattern.r.replaceFirstIn(repoName, routing.localPath)
       using(Git.open(new File(Directory.GitBucketHome, path))) { git =>
@@ -159,8 +161,8 @@ class PluginGitReceivePack(repoName: String, routing: GitRepositoryRouting)
 
   override protected def runTask(user: String)(
       implicit session: Session): Unit = {
-    if (routing.filter.filter(
-            "/" + repoName, Some(user), loadSystemSettings(), true)) {
+    if (routing.filter
+          .filter("/" + repoName, Some(user), loadSystemSettings(), true)) {
       val path =
         routing.urlPattern.r.replaceFirstIn(repoName, routing.localPath)
       using(Git.open(new File(Directory.GitBucketHome, path))) { git =>

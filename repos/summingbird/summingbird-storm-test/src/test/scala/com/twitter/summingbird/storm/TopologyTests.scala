@@ -174,7 +174,8 @@ class TopologyTests extends WordSpec {
       .name("Throw away name")
       .sumByKey(TestStore.createStore[Int, Int]()._2)
 
-    val opts = Map(nodeName -> Options()
+    val opts = Map(
+        nodeName -> Options()
           .set(FlatMapParallelism(50))
           .set(SourceParallelism(30)))
     val storm = Storm.local(opts)

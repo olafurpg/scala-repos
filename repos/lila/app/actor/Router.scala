@@ -9,8 +9,9 @@ import akka.pattern.{ask, pipe}
 import controllers.{routes => R}
 
 // returns String urls, not Call objects
-private[app] final class Router(
-    baseUrl: String, protocol: String, domain: String)
+private[app] final class Router(baseUrl: String,
+                                protocol: String,
+                                domain: String)
     extends Actor {
 
   import makeTimeout.large

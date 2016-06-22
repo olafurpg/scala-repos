@@ -33,18 +33,18 @@ private[scalajs] object CoreJSLibs {
 
   def lib(semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
     synchronized {
-      cachedLibByConfig.getOrElseUpdate(
-          (semantics, outputMode), makeLib(semantics, outputMode))
+      cachedLibByConfig.getOrElseUpdate((semantics, outputMode),
+                                        makeLib(semantics, outputMode))
     }
   }
 
-  private def makeLib(
-      semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
+  private def makeLib(semantics: Semantics,
+                      outputMode: OutputMode): VirtualJSFile = {
     new ScalaJSEnvVirtualJSFile(makeContent(semantics, outputMode))
   }
 
-  private def makeContent(
-      semantics: Semantics, outputMode: OutputMode): String = {
+  private def makeContent(semantics: Semantics,
+                          outputMode: OutputMode): String = {
     // This is a basic sort-of-C-style preprocessor
 
     def getOption(name: String): String = name match {
@@ -66,44 +66,43 @@ private[scalajs] object CoreJSLibs {
     var skipping = false
     var skipDepth = 0
     val lines = for (line <- originalLines) yield {
-      val includeThisLine =
-        if (skipping) {
-          if (line == "//!else" && skipDepth == 1) {
-            skipping = false
-            skipDepth = 0
+      val includeThisLine = if (skipping) {
+        if (line == "//!else" && skipDepth == 1) {
+          skipping = false
+          skipDepth = 0
+        } else if (line == "//!endif") {
+          skipDepth -= 1
+          if (skipDepth == 0) skipping = false
+        } else if (line.startsWith("//!if ")) {
+          skipDepth += 1
+        }
+        false
+      } else {
+        if (line.startsWith("//!")) {
+          if (line.startsWith("//!if ")) {
+            val Array(_, option, op, value) = line.split(" ")
+            val optionValue = getOption(option)
+            val success = op match {
+              case "==" => optionValue == value
+              case "!=" => optionValue != value
+            }
+            if (!success) {
+              skipping = true
+              skipDepth = 1
+            }
+          } else if (line == "//!else") {
+            skipping = true
+            skipDepth = 1
           } else if (line == "//!endif") {
-            skipDepth -= 1
-            if (skipDepth == 0) skipping = false
-          } else if (line.startsWith("//!if ")) {
-            skipDepth += 1
+            // nothing to do
+          } else {
+            throw new MatchError(line)
           }
           false
         } else {
-          if (line.startsWith("//!")) {
-            if (line.startsWith("//!if ")) {
-              val Array(_, option, op, value) = line.split(" ")
-              val optionValue = getOption(option)
-              val success = op match {
-                case "==" => optionValue == value
-                case "!=" => optionValue != value
-              }
-              if (!success) {
-                skipping = true
-                skipDepth = 1
-              }
-            } else if (line == "//!else") {
-              skipping = true
-              skipDepth = 1
-            } else if (line == "//!endif") {
-              // nothing to do
-            } else {
-              throw new MatchError(line)
-            }
-            false
-          } else {
-            true
-          }
+          true
         }
+      }
       if (includeThisLine) line
       else "" // blank line preserves line numbers in source maps
     }
