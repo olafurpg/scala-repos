@@ -99,9 +99,8 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
     val numParams = clazz.typeParams.size
     if (clazz.typeParams.isEmpty) Ident(clazz)
     else
-      AppliedTypeTree(
-          Ident(clazz),
-          1 to numParams map (_ => Bind(tpnme.WILDCARD, EmptyTree)) toList)
+      AppliedTypeTree(Ident(clazz), 1 to numParams map (_ =>
+                Bind(tpnme.WILDCARD, EmptyTree)) toList)
   }
   def mkBindForCase(patVar: Symbol, clazz: Symbol, targs: List[Type]): Tree = {
     Bind(patVar,

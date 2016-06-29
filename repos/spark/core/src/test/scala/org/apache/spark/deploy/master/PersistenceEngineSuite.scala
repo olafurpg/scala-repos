@@ -33,9 +33,7 @@ class PersistenceEngineSuite extends SparkFunSuite {
     val dir = Utils.createTempDir()
     try {
       val conf = new SparkConf()
-      testPersistenceEngine(
-          conf,
-          serializer =>
+      testPersistenceEngine(conf, serializer =>
             new FileSystemPersistenceEngine(dir.getAbsolutePath, serializer))
     } finally {
       Utils.deleteRecursively(dir)

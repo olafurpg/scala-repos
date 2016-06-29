@@ -52,9 +52,10 @@ object SVDPlusPlus {
     *
     * @return a graph with vertex attributes containing the trained model
     */
-  def run(edges: RDD[Edge[Double]], conf: Conf)
-    : (Graph[(Array[Double], Array[Double], Double, Double), Double],
-       Double) = {
+  def run(edges: RDD[Edge[Double]],
+          conf: Conf): (Graph[(Array[Double], Array[Double], Double, Double),
+                              Double],
+                        Double) = {
     require(conf.maxIters > 0,
             s"Maximum of iterations must be greater than 0," +
               s" but got ${conf.maxIters}")

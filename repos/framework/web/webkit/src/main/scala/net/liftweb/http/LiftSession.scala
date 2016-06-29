@@ -1386,11 +1386,9 @@ class LiftSession(private[http] val _contextPath: String,
 
   private def instantiateOrRedirect[T](c: Class[T]): Box[T] = {
     try {
-      LiftSession.constructFrom(
-          this,
-          S.location.flatMap(_.currentValue.map(v =>
-                    ParamPair(v, v.asInstanceOf[Object].getClass))),
-          c)
+      LiftSession
+        .constructFrom(this, S.location.flatMap(_.currentValue.map(v =>
+                      ParamPair(v, v.asInstanceOf[Object].getClass))), c)
     } catch {
       case e: IllegalAccessException => Empty
     }
@@ -1761,10 +1759,8 @@ class LiftSession(private[http] val _contextPath: String,
                   if (inst.dispatch.isDefinedAt(method)) {
                     val res = inst.dispatch(method)(kids)
 
-                    inst.mergeIntoForm(
-                        isForm,
-                        res,
-                        SHtml.hidden(() => inst.registerThisSnippet))
+                    inst.mergeIntoForm(isForm, res, SHtml.hidden(() =>
+                              inst.registerThisSnippet))
                     /* (if (isForm && !res.isEmpty) SHtml.hidden(() => inst.registerThisSnippet) else NodeSeq.Empty) ++
                       res*/
                   } else
@@ -2397,13 +2393,10 @@ class LiftSession(private[http] val _contextPath: String,
             S.withCurrentSnippetNodeSeq(elem) {
               S.doSnippet(snippetName) {
                 S.withAttrs(attrs) {
-                  processSurroundAndInclude(page,
-                                            NamedPF((snippetName,
-                                                     element,
-                                                     attrs,
-                                                     kids,
-                                                     page),
-                                                    liftTagProcessing))
+                  processSurroundAndInclude(
+                      page,
+                      NamedPF((snippetName, element, attrs, kids, page),
+                              liftTagProcessing))
                 }
               }
             }
@@ -2868,64 +2861,61 @@ class LiftSession(private[http] val _contextPath: String,
       }
 
       def localFunc(in: JValue): JsCmd = {
-        LAScheduler
-          .execute(() => {
-            executeInScope(currentReq, renderVersion)(for {
-              JString(guid) <- in \ "guid"
-              JString(name) <- in \ "name"
-              func <- map.get(name)
-              payload = in \ "payload"
-              reified <- if (func.manifest == jvmanifest) Some(payload)
-                        else {
-                          try {
-                            Some(
-                                payload.extract(defaultFormats, func.manifest))
-                          } catch {
-                            case e: Exception =>
-                              logger.error("Failed to extract " +
-                                             payload + " as " + func.manifest,
-                                           e)
-                              ca ! FailMsg(guid,
-                                           "Failed to extract payload as " +
-                                             func.manifest + " exception " +
-                                             e.getMessage)
-                              None
-                          }
+        LAScheduler.execute(() => {
+          executeInScope(currentReq, renderVersion)(for {
+            JString(guid) <- in \ "guid"
+            JString(name) <- in \ "name"
+            func <- map.get(name)
+            payload = in \ "payload"
+            reified <- if (func.manifest == jvmanifest) Some(payload)
+                      else {
+                        try {
+                          Some(payload.extract(defaultFormats, func.manifest))
+                        } catch {
+                          case e: Exception =>
+                            logger.error("Failed to extract " +
+                                           payload + " as " + func.manifest,
+                                         e)
+                            ca ! FailMsg(guid,
+                                         "Failed to extract payload as " +
+                                           func.manifest + " exception " +
+                                           e.getMessage)
+                            None
                         }
-            } {
-              func match {
-                case StreamRoundTrip(_, func) =>
-                  try {
-                    for (v <- func.asInstanceOf[Function1[Any, Stream[Any]]](
-                                 reified)) {
-                      v match {
-                        case jsCmd: JsCmd => ca ! jsCmd
-                        case jsExp: JsExp => ca ! jsExp
-                        case v => ca ! ItemMsg(guid, fixIt(v))
                       }
-                    }
-                    ca ! DoneMsg(guid)
-                  } catch {
-                    case e: Exception => ca ! FailMsg(guid, e.getMessage)
-                  }
-
-                case SimpleRoundTrip(_, func) =>
-                  try {
-                    func.asInstanceOf[Function1[Any, Any]](reified) match {
+          } {
+            func match {
+              case StreamRoundTrip(_, func) =>
+                try {
+                  for (v <- func.asInstanceOf[Function1[Any, Stream[Any]]](
+                               reified)) {
+                    v match {
                       case jsCmd: JsCmd => ca ! jsCmd
                       case jsExp: JsExp => ca ! jsExp
                       case v => ca ! ItemMsg(guid, fixIt(v))
                     }
-                    ca ! DoneMsg(guid)
-                  } catch {
-                    case e: Exception => ca ! FailMsg(guid, e.getMessage)
                   }
+                  ca ! DoneMsg(guid)
+                } catch {
+                  case e: Exception => ca ! FailMsg(guid, e.getMessage)
+                }
 
-                case HandledRoundTrip(_, func) =>
-                  try {
-                    func.asInstanceOf[Function2[Any,
-                                                RoundTripHandlerFunc,
-                                                Unit]](
+              case SimpleRoundTrip(_, func) =>
+                try {
+                  func.asInstanceOf[Function1[Any, Any]](reified) match {
+                    case jsCmd: JsCmd => ca ! jsCmd
+                    case jsExp: JsExp => ca ! jsExp
+                    case v => ca ! ItemMsg(guid, fixIt(v))
+                  }
+                  ca ! DoneMsg(guid)
+                } catch {
+                  case e: Exception => ca ! FailMsg(guid, e.getMessage)
+                }
+
+              case HandledRoundTrip(_, func) =>
+                try {
+                  func
+                    .asInstanceOf[Function2[Any, RoundTripHandlerFunc, Unit]](
                         reified,
                         new RoundTripHandlerFunc {
                           @volatile private var done_? = false
@@ -2965,17 +2955,16 @@ class LiftSession(private[http] val _contextPath: String,
 
                           def send(value: JValue) {
                             if (!done_?) {
-                              ca ! ItemMsg(guid,
-                                           value)
+                              ca ! ItemMsg(guid, value)
                             }
                           }
                         })
-                  } catch {
-                    case e: Exception => ca ! FailMsg(guid, e.getMessage)
-                  }
-              }
-            })
+                } catch {
+                  case e: Exception => ca ! FailMsg(guid, e.getMessage)
+                }
+            }
           })
+        })
 
         _Noop
       }

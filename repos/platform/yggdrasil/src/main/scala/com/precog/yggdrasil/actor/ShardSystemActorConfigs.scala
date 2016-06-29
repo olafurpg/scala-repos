@@ -124,8 +124,8 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
                   topic = yggConfig.kafkaTopic,
                   permissionsFinder = permissionsFinder,
                   routingActor = routingActor,
-                  ingestFailureLog = ingestFailureLog(checkpoint,
-                                                      conf.failureLogRoot),
+                  ingestFailureLog =
+                    ingestFailureLog(checkpoint, conf.failureLogRoot),
                   fetchBufferSize = conf.bufferSize,
                   idleDelay = yggConfig.batchStoreDelay,
                   ingestTimeout = conf.batchTimeout,

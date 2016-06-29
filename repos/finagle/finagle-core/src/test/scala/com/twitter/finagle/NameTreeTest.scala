@@ -89,10 +89,8 @@ class NameTreeTest extends FunSuite {
       NameTree.Leaf(Path.Utf8(elems: _*))
     }
 
-    val leaves = Seq[() => NameTree[Path]](() => NameTree.Fail,
-                                           () => NameTree.Empty,
-                                           () => NameTree.Neg,
-                                           () => newPath())
+    val leaves = Seq[() => NameTree[Path]](() => NameTree.Fail, () =>
+          NameTree.Empty, () => NameTree.Neg, () => newPath())
 
     def newLeaf(): NameTree[Path] = pick(leaves).apply()
 

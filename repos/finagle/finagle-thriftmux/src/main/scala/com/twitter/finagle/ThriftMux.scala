@@ -337,11 +337,9 @@ object ThriftMux
     ): Closable = {
       val param.Tracer(tracer) = params[param.Tracer]
 
-      val negotiatedTrans = mux.Handshake.server(
-          trans = transport,
-          version = Mux.LatestVersion,
-          headers = _ => Nil,
-          negotiate = mux.Handshake.NoopNegotiator)
+      val negotiatedTrans = mux.Handshake
+        .server(trans = transport, version = Mux.LatestVersion, headers = _ =>
+              Nil, negotiate = mux.Handshake.NoopNegotiator)
 
       mux.ServerDispatcher.newRequestResponse(
           negotiatedTrans,

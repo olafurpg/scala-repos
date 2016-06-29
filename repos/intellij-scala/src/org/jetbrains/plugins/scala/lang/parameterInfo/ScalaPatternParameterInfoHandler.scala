@@ -265,8 +265,7 @@ class ScalaPatternParameterInfoHandler
                               ScSubstitutor.empty)(
                               (s, p) =>
                                 s.bindT(
-                                    (p.name,
-                                     ScalaPsiUtil.getPsiElementId(p)),
+                                    (p.name, ScalaPsiUtil.getPsiElementId(p)),
                                     ScUndefinedType(
                                         new ScTypeParameterType(p,
                                                                 substitutor))))

@@ -73,9 +73,7 @@ trait ScTypePsiTypeBridge {
                 val typeParameters: Array[PsiTypeParameter] =
                   clazz.getTypeParameters
                 if (typeParameters.length > 0) {
-                  ScParameterizedType(
-                      res,
-                      typeParameters.map(ptp =>
+                  ScParameterizedType(res, typeParameters.map(ptp =>
                             new ScTypeParameterType(ptp, ScSubstitutor.empty)))
                 } else res
               } else res

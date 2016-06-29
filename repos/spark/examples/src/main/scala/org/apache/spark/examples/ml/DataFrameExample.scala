@@ -85,9 +85,8 @@ object DataFrameExample {
     // Convert features column to an RDD of vectors.
     val features = df.select("features").rdd.map { case Row(v: Vector) => v }
     val featureSummary =
-      features.aggregate(new MultivariateOnlineSummarizer())(
-          (summary, feat) => summary.add(feat),
-          (sum1, sum2) => sum1.merge(sum2))
+      features.aggregate(new MultivariateOnlineSummarizer())((summary, feat) =>
+            summary.add(feat), (sum1, sum2) => sum1.merge(sum2))
     println(
         s"Selected features column with average values:\n ${featureSummary.mean.toString}")
 

@@ -484,9 +484,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   val statelessSession: FactoryMaker[Req => LiftSession with StatelessSession] =
     new FactoryMaker(
         (req: Req) =>
-          new LiftSession(req.contextPath,
-                          Helpers.nextFuncName,
-                          Empty) with StatelessSession) {}
+          new LiftSession(req.contextPath, Helpers.nextFuncName, Empty)
+          with StatelessSession) {}
 
   /**
     * Holds user functions that are executed after the response is sent to client. The functions' result

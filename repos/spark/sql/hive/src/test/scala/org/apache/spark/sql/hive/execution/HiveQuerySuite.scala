@@ -168,8 +168,7 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     }
   }
 
-  createQueryTest("! operator",
-                  """
+  createQueryTest("! operator", """
       |SELECT a FROM (
       |  SELECT 1 AS a UNION ALL SELECT 2 AS a) t
       |WHERE !(a>1)
@@ -645,8 +644,7 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
       |select value from q1 union all select value from q2
     """.stripMargin)
 
-  createQueryTest("CTE feature #3",
-                  """with q1 as (select key from src)
+  createQueryTest("CTE feature #3", """with q1 as (select key from src)
       |from q1
       |select * where key = 4
     """.stripMargin)

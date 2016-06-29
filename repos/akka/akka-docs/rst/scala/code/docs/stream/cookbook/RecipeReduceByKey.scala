@@ -63,11 +63,10 @@ class RecipeReduceByKey extends RecipeSpec {
           .mergeSubstreams
       }
 
-      val wordCounts = words.via(
-          reduceByKey(MaximumDistinctWords,
-                      groupKey = (word: String) => word,
-                      map = (word: String) => 1)((left: Int, right: Int) =>
-                left + right))
+      val wordCounts = words
+        .via(reduceByKey(MaximumDistinctWords, groupKey = (word: String) =>
+                  word, map = (word: String) => 1)((left: Int, right: Int) =>
+                  left + right))
       //#reduce-by-key-general
 
       Await

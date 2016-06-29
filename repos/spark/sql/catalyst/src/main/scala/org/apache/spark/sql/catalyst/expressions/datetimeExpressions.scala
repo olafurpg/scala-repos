@@ -287,9 +287,7 @@ case class WeekOfYear(child: Expression)
     nullSafeCodeGen(ctx, ev, time => {
       val cal = classOf[Calendar].getName
       val c = ctx.freshName("cal")
-      ctx.addMutableState(cal,
-                          c,
-                          s"""
+      ctx.addMutableState(cal, c, s"""
           $c = $cal.getInstance(java.util.TimeZone.getTimeZone("UTC"));
           $c.setFirstDayOfWeek($cal.MONDAY);
           $c.setMinimalDaysInFirstWeek(4);

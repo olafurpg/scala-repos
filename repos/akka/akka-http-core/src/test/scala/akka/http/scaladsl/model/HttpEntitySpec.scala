@@ -210,12 +210,11 @@ class HttpEntitySpec
               .withoutSizeLimit)
       }
       "Chunked" in {
-        withReturnType[Chunked](
-            Chunked(tpe,
-                    source(Chunk(abc),
-                           Chunk(fgh),
-                           Chunk(ijk),
-                           LastChunk)).withoutSizeLimit)
+        withReturnType[Chunked](Chunked(tpe,
+                                        source(Chunk(abc),
+                                               Chunk(fgh),
+                                               Chunk(ijk),
+                                               LastChunk)).withoutSizeLimit)
         withReturnType[RequestEntity](
             Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk))
               .asInstanceOf[RequestEntity]

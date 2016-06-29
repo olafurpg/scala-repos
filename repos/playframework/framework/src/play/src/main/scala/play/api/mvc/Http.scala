@@ -224,17 +224,9 @@ package play.api.mvc {
            _headers,
            _remoteAddress,
            _secure,
-           _clientCertificateChain) = (id,
-                                       tags,
-                                       uri,
-                                       path,
-                                       method,
-                                       version,
-                                       queryString,
-                                       headers,
-                                       () => remoteAddress,
-                                       () => secure,
-                                       clientCertificateChain)
+           _clientCertificateChain) =
+        (id, tags, uri, path, method, version, queryString, headers, () =>
+              remoteAddress, () => secure, clientCertificateChain)
       new RequestHeader {
         override val id = _id
         override val tags = _tags

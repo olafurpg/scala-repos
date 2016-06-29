@@ -60,9 +60,8 @@ private[spark] object JettyUtils extends Logging {
 
   implicit def htmlResponderToServlet(
       responder: Responder[Seq[Node]]): ServletParams[Seq[Node]] =
-    new ServletParams(responder,
-                      "text/html",
-                      (in: Seq[Node]) => "<!DOCTYPE html>" + in.toString)
+    new ServletParams(responder, "text/html", (in: Seq[Node]) =>
+          "<!DOCTYPE html>" + in.toString)
 
   implicit def textResponderToServlet(
       responder: Responder[String]): ServletParams[String] =

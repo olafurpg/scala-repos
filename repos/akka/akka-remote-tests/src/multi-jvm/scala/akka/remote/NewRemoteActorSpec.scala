@@ -35,8 +35,7 @@ object NewRemoteActorMultiJvmSpec extends MultiNodeConfig {
   val master = role("master")
   val slave = role("slave")
 
-  deployOn(master,
-           """
+  deployOn(master, """
     /service-hello.remote = "@slave@"
     /service-hello-null.remote = "@slave@"
     /service-hello3.remote = "@slave@"

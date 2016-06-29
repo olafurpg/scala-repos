@@ -70,11 +70,8 @@ trait Tuples {
               value._4) :: Nil)
   }
 
-  implicit def Tuple5JSON[A: JSON,
-                          B: JSON,
-                          C: JSON,
-                          D: JSON,
-                          E: JSON]: JSON[(A, B, C, D, E)] =
+  implicit def Tuple5JSON[A: JSON, B: JSON, C: JSON, D: JSON, E: JSON]
+    : JSON[(A, B, C, D, E)] =
     new JSON[(A, B, C, D, E)] {
       def read(json: JValue) = json match {
         case JArray(a :: b :: c :: d :: e :: _) =>

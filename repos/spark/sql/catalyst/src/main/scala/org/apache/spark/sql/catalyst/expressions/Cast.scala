@@ -348,9 +348,8 @@ case class Cast(child: Expression, dataType: DataType)
             case _: NumberFormatException => null
         })
       case BooleanType =>
-        buildCast[Boolean](
-            _,
-            b => changePrecision(if (b) Decimal.ONE else Decimal.ZERO, target))
+        buildCast[Boolean](_, b =>
+              changePrecision(if (b) Decimal.ONE else Decimal.ZERO, target))
       case DateType =>
         buildCast[Int](_, d => null) // date can't cast to decimal in Hive
       case TimestampType =>

@@ -13,8 +13,8 @@ import akka.cluster.routing.ClusterRouterPoolSettings
 import akka.cluster.routing.ClusterRouterGroupSettings
 
 object ClusterDeployerSpec {
-  val deployerConf = ConfigFactory.parseString(
-      """
+  val deployerConf = ConfigFactory
+    .parseString("""
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
       akka.actor.deployment {
         /user/service1 {
@@ -35,8 +35,7 @@ object ClusterDeployerSpec {
         }
       }
       akka.remote.netty.tcp.port = 0
-      """,
-      ConfigParseOptions.defaults)
+      """, ConfigParseOptions.defaults)
 
   class RecipeActor extends Actor {
     def receive = { case _ ⇒ }

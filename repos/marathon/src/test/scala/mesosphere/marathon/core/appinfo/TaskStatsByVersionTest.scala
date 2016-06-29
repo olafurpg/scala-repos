@@ -86,9 +86,8 @@ class TaskStatsByVersionTest
                 TaskStats.forSomeTasks(now,
                                        afterLastConfigChangeTasks,
                                        statuses),
-              maybeWithOutdatedConfig = TaskStats.forSomeTasks(now,
-                                                               outdatedTasks,
-                                                               statuses),
+              maybeWithOutdatedConfig =
+                TaskStats.forSomeTasks(now, outdatedTasks, statuses),
               maybeTotalSummary = TaskStats.forSomeTasks(now, tasks, statuses)
           )
       )

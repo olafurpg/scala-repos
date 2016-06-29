@@ -113,9 +113,7 @@ class DecrBy(val key: ChannelBuffer, val amount: Long)
   val command = Commands.DECRBY
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.DECRBY,
-            key,
-            StringToChannelBuffer(amount.toString)))
+        Seq(CommandBytes.DECRBY, key, StringToChannelBuffer(amount.toString)))
   override def toString = "DecrBy(%s, %d)".format(key, amount)
   override def equals(other: Any) = other match {
     case that: DecrBy =>

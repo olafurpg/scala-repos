@@ -22,8 +22,7 @@ object WriteSupportProvider {
                    fValue: Tree,
                    groupName: TermName): (Int, Tree) = {
       def writePrimitiveField(wTree: Tree) =
-        (idx + 1,
-         q"""rc.startField($groupName.getFieldName($idx), $idx)
+        (idx + 1, q"""rc.startField($groupName.getFieldName($idx), $idx)
                       $wTree
                       rc.endField($groupName.getFieldName($idx), $idx)""")
 
@@ -64,8 +63,7 @@ object WriteSupportProvider {
           val innerType = tpe.asInstanceOf[TypeRefApi].args.head
           val (_, subTree) =
             matchField(idx, innerType, q"$cacheName", groupName)
-          (idx + 1,
-           q"""if($fValue.isDefined) {
+          (idx + 1, q"""if($fValue.isDefined) {
                           val $cacheName = $fValue.get
                           $subTree
                         }
@@ -76,9 +74,7 @@ object WriteSupportProvider {
           val innerType = tpe.asInstanceOf[TypeRefApi].args.head
           val newGroupName = createGroupName()
           val (_, subTree) = matchField(0, innerType, q"element", newGroupName)
-          (idx + 1,
-           writeCollectionField(newGroupName,
-                                q"""
+          (idx + 1, writeCollectionField(newGroupName, q"""
                           rc.startField("list", 0)
                           $fValue.foreach{ element =>
                             rc.startGroup()
@@ -92,9 +88,7 @@ object WriteSupportProvider {
           val (_, keySubTree) = matchField(0, keyType, q"key", newGroupName)
           val (_, valueSubTree) =
             matchField(1, valueType, q"value", newGroupName)
-          (idx + 1,
-           writeCollectionField(newGroupName,
-                                q"""
+          (idx + 1, writeCollectionField(newGroupName, q"""
                           rc.startField("map", 0)
                           $fValue.foreach{ case(key, value) =>
                             rc.startGroup()
@@ -127,8 +121,7 @@ object WriteSupportProvider {
                                              getter.returnType,
                                              q"$pValueTree.$getter",
                                              groupName)
-          (newIdx,
-           q"""
+          (newIdx, q"""
                       $existingTree
                       $subTree
                     """)

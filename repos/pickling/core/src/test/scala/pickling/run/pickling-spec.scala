@@ -16,8 +16,8 @@ object PicklingSpec {
   final class D(i: Int) extends Base { override def toString = "D" }
 
   implicit val arbitraryBase: Arbitrary[Base] = Arbitrary[Base](
-      oneOf(arbitrary[String].map(s => new C(s)),
-            arbitrary[Int].map(i => new D(i))))
+      oneOf(arbitrary[String].map(s => new C(s)), arbitrary[Int].map(i =>
+                new D(i))))
 
   sealed abstract class CaseBase
   case class CaseC(s: String) extends CaseBase

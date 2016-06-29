@@ -229,13 +229,11 @@ class UDFSuite extends QueryTest with SharedSQLContext {
     checkAnswer(sql("""
            | SELECT tmp.t.* FROM
            | (SELECT decimalDataFunc(a, b) AS t FROM decimalData) tmp
-          """.stripMargin).toDF(),
-                decimalData)
+          """.stripMargin).toDF(), decimalData)
     checkAnswer(sql("""
            | SELECT tmp.t.* FROM
            | (SELECT binaryDataFunc(a, b) AS t FROM binaryData) tmp
-          """.stripMargin).toDF(),
-                binaryData)
+          """.stripMargin).toDF(), binaryData)
     checkAnswer(
         sql("""
            | SELECT tmp.t.* FROM
@@ -244,8 +242,7 @@ class UDFSuite extends QueryTest with SharedSQLContext {
         arrayData.toDF())
     checkAnswer(sql("""
            | SELECT mapDataFunc(data) AS t FROM mapData
-          """.stripMargin).toDF(),
-                mapData.toDF())
+          """.stripMargin).toDF(), mapData.toDF())
     checkAnswer(
         sql("""
            | SELECT tmp.t.* FROM

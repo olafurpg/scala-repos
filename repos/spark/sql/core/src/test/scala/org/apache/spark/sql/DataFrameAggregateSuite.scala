@@ -231,9 +231,7 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
             1) :: Row(3, 2, 2) :: Row(1, null, 3) :: Row(2, null, 3) :: Row(
             3,
             null,
-            3) :: Row(null, 1, 3) :: Row(null, 2, 6) :: Row(null,
-                                                            null,
-                                                            9) :: Nil
+            3) :: Row(null, 1, 3) :: Row(null, 2, 6) :: Row(null, null, 9) :: Nil
     )
   }
 

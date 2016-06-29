@@ -704,8 +704,8 @@ trait HashVector_GenericOps {
     }
   }
 
-  class CanZipMapValuesHashVector[@spec(Double, Int, Float, Long) V,
-                                  @spec(Int, Double) RV: ClassTag: Zero]
+  class CanZipMapValuesHashVector[
+      @spec(Double, Int, Float, Long) V, @spec(Int, Double) RV: ClassTag: Zero]
       extends CanZipMapValues[HashVector[V], V, RV, HashVector[RV]] {
 
     def create(length: Int) = zeros(length)
@@ -737,8 +737,8 @@ trait HashVector_GenericOps {
   implicit val zipMap_i: CanZipMapValuesHashVector[Int, Int] =
     new CanZipMapValuesHashVector[Int, Int]
 
-  class CanZipMapKeyValuesHashVector[@spec(Double, Int, Float, Long) V,
-                                     @spec(Int, Double) RV: ClassTag: Zero]
+  class CanZipMapKeyValuesHashVector[
+      @spec(Double, Int, Float, Long) V, @spec(Int, Double) RV: ClassTag: Zero]
       extends CanZipMapKeyValues[HashVector[V], Int, V, RV, HashVector[RV]] {
 
     def create(length: Int) = zeros(length)

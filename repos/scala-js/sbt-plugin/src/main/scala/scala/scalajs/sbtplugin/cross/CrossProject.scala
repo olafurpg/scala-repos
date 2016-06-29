@@ -334,9 +334,7 @@ object CrossProject extends CrossProjectExtra {
 
   def crossProject_impl(c: Context): c.Expr[Builder] = {
     import c.universe._
-    val enclosingValName = MacroUtils.definingValName(
-        c,
-        methodName =>
+    val enclosingValName = MacroUtils.definingValName(c, methodName =>
           s"""$methodName must be directly assigned to a val, such as `val x = $methodName`.""")
     val name = c.Expr[String](Literal(Constant(enclosingValName)))
     reify { new Builder(name.splice, new File(name.splice)) }

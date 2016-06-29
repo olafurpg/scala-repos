@@ -145,9 +145,8 @@ class MutableSettings(val errorFn: String => Unit)
       } else {
         for {
           (p, args) <- StringOps.splitWhere(s, _ == ':', doDropIndex = true)
-          rest <- tryToSetIfExists(p,
-                                   (args split ",").toList,
-                                   (s: Setting) => s.tryToSetColon _)
+          rest <- tryToSetIfExists(p, (args split ",").toList, (s: Setting) =>
+                       s.tryToSetColon _)
         } yield rest
       }
 

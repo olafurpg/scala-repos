@@ -823,12 +823,11 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
             if (hasStableSymbol(p)) p.symbol.name.toString // tp.toString
             else p.toString //+"#"+ id
 
-          Const.unique(
-              narrowTp,
-              new ValueConst(
-                  narrowTp,
-                  checkableType(wideTp),
-                  toString)) // must make wide type checkable so that it is comparable to types from TypeConst
+          Const.unique(narrowTp,
+                       new ValueConst(
+                           narrowTp,
+                           checkableType(wideTp),
+                           toString)) // must make wide type checkable so that it is comparable to types from TypeConst
         }
       }
     }

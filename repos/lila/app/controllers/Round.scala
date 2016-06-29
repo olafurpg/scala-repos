@@ -243,9 +243,9 @@ object Round extends LilaController with TheftPrevention {
     import play.api.data.Forms._
     import play.api.data._
     implicit val req = ctx.body
-    Form(single("text" -> text)).bindFromRequest.fold(
-        err => fuccess(BadRequest),
-        text => Env.round.noteApi.set(gameId, me.id, text.trim take 10000))
+    Form(single("text" -> text)).bindFromRequest.fold(err =>
+          fuccess(BadRequest), text =>
+          Env.round.noteApi.set(gameId, me.id, text.trim take 10000))
   }
 
   private def sides(pov: Pov, isPlayer: Boolean)(implicit ctx: Context) =

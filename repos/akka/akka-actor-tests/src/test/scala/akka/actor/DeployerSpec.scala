@@ -12,8 +12,8 @@ import akka.routing._
 import scala.concurrent.duration._
 
 object DeployerSpec {
-  val deployerConf = ConfigFactory.parseString(
-      """
+  val deployerConf =
+    ConfigFactory.parseString("""
       akka.actor.deployment {
         /service1 {
         }
@@ -61,8 +61,7 @@ object DeployerSpec {
           router = scatter-gather-pool
         }
       }
-      """,
-      ConfigParseOptions.defaults)
+      """, ConfigParseOptions.defaults)
 
   class RecipeActor extends Actor {
     def receive = { case _ ⇒ }
@@ -139,17 +138,15 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
 
     "detect invalid number-of-instances" in {
       intercept[com.typesafe.config.ConfigException.WrongType] {
-        val invalidDeployerConf = ConfigFactory
-          .parseString("""
+        val invalidDeployerConf =
+          ConfigFactory.parseString("""
             akka.actor.deployment {
               /service-invalid-number-of-instances {
                 router = round-robin-pool
                 nr-of-instances = boom
               }
             }
-            """,
-                       ConfigParseOptions.defaults)
-          .withFallback(AkkaSpec.testConf)
+            """, ConfigParseOptions.defaults).withFallback(AkkaSpec.testConf)
 
         shutdown(
             ActorSystem("invalid-number-of-instances", invalidDeployerConf))
@@ -158,17 +155,15 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
 
     "detect invalid deployment path" in {
       val e = intercept[InvalidActorNameException] {
-        val invalidDeployerConf = ConfigFactory
-          .parseString("""
+        val invalidDeployerConf =
+          ConfigFactory.parseString("""
             akka.actor.deployment {
               /gul/ubåt {
                 router = round-robin-pool
                 nr-of-instances = 2
               }
             }
-            """,
-                       ConfigParseOptions.defaults)
-          .withFallback(AkkaSpec.testConf)
+            """, ConfigParseOptions.defaults).withFallback(AkkaSpec.testConf)
 
         shutdown(ActorSystem("invalid-path", invalidDeployerConf))
       }

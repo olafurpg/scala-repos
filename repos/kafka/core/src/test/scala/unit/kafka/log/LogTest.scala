@@ -850,20 +850,12 @@ class LogTest extends JUnitSuite {
     val config = LogConfig(logProps)
 
     // create a log
-    var log = new Log(logDir,
-                      config,
-                      recoveryPoint = 0L,
-                      time.scheduler,
-                      time)
+    var log = new Log(logDir, config, recoveryPoint = 0L, time.scheduler, time)
 
     // add enough messages to roll over several segments then close and re-open and attempt to truncate
     for (i <- 0 until 100) log.append(set)
     log.close()
-    log = new Log(logDir,
-                  config,
-                  recoveryPoint = 0L,
-                  time.scheduler,
-                  time)
+    log = new Log(logDir, config, recoveryPoint = 0L, time.scheduler, time)
     log.truncateTo(3)
     assertEquals("All but one segment should be deleted.",
                  1,
@@ -887,11 +879,7 @@ class LogTest extends JUnitSuite {
       .put(LogConfig.FileDeleteDelayMsProp, asyncDeleteMs: java.lang.Integer)
     val config = LogConfig(logProps)
 
-    val log = new Log(logDir,
-                      config,
-                      recoveryPoint = 0L,
-                      time.scheduler,
-                      time)
+    val log = new Log(logDir, config, recoveryPoint = 0L, time.scheduler, time)
 
     // append some messages to create some segments
     for (i <- 0 until 100) log.append(set)
@@ -929,11 +917,7 @@ class LogTest extends JUnitSuite {
       .put(LogConfig.SegmentBytesProp, set.sizeInBytes * 5: java.lang.Integer)
     logProps.put(LogConfig.SegmentIndexBytesProp, 1000: java.lang.Integer)
     val config = LogConfig(logProps)
-    var log = new Log(logDir,
-                      config,
-                      recoveryPoint = 0L,
-                      time.scheduler,
-                      time)
+    var log = new Log(logDir, config, recoveryPoint = 0L, time.scheduler, time)
 
     // append some messages to create some segments
     for (i <- 0 until 100) log.append(set)
@@ -941,11 +925,7 @@ class LogTest extends JUnitSuite {
     log.deleteOldSegments((s) => true)
     log.close()
 
-    log = new Log(logDir,
-                  config,
-                  recoveryPoint = 0L,
-                  time.scheduler,
-                  time)
+    log = new Log(logDir, config, recoveryPoint = 0L, time.scheduler, time)
     assertEquals("The deleted segments should be gone.",
                  1,
                  log.numberOfSegments)
@@ -953,11 +933,8 @@ class LogTest extends JUnitSuite {
 
   @Test
   def testAppendMessageWithNullPayload() {
-    val log = new Log(logDir,
-                      LogConfig(),
-                      recoveryPoint = 0L,
-                      time.scheduler,
-                      time)
+    val log =
+      new Log(logDir, LogConfig(), recoveryPoint = 0L, time.scheduler, time)
     log.append(new ByteBufferMessageSet(new Message(bytes = null)))
     val messageSet = log.read(0, 4096, None).messageSet
     assertEquals(0, messageSet.head.offset)
@@ -967,11 +944,8 @@ class LogTest extends JUnitSuite {
 
   @Test(expected = classOf[IllegalArgumentException])
   def testAppendWithOutOfOrderOffsetsThrowsException() {
-    val log = new Log(logDir,
-                      LogConfig(),
-                      recoveryPoint = 0L,
-                      time.scheduler,
-                      time)
+    val log =
+      new Log(logDir, LogConfig(), recoveryPoint = 0L, time.scheduler, time)
     val messages =
       (0 until 2).map(id => new Message(id.toString.getBytes)).toArray
     messages.foreach(message => log.append(new ByteBufferMessageSet(message)))
@@ -993,11 +967,8 @@ class LogTest extends JUnitSuite {
     for (iteration <- 0 until 50) {
       // create a log and write some messages to it
       logDir.mkdirs()
-      var log = new Log(logDir,
-                        config,
-                        recoveryPoint = 0L,
-                        time.scheduler,
-                        time)
+      var log =
+        new Log(logDir, config, recoveryPoint = 0L, time.scheduler, time)
       val numMessages = 50 + TestUtils.random.nextInt(50)
       for (i <- 0 until numMessages) log.append(set)
       val messages = log.logSegments.flatMap(_.log.iterator.toList)

@@ -466,8 +466,8 @@ class DirectKafkaStreamSuite
         (mmd: MessageAndMetadata[String, String]) => (mmd.key, mmd.message)
       val m = kc
         .getEarliestLeaderOffsets(topicPartitions)
-        .fold(e => Map.empty[TopicAndPartition, Long],
-              m => m.mapValues(lo => lo.offset))
+        .fold(e => Map.empty[TopicAndPartition, Long], m =>
+              m.mapValues(lo => lo.offset))
 
       new DirectKafkaInputDStream[String,
                                   String,

@@ -219,13 +219,14 @@ class UpdateJobStatusHandler(jobs: JobManager[Future])(
                   Left("Invalid status ID '%s'." format badId)
                 case None => Right(None)
               }
-              val result = prevId.right map { prevId =>
-                jobs.updateStatus(jobId,
-                                  prevId,
-                                  msg,
-                                  progress,
-                                  unit,
-                                  content \? "info")
+              val result = prevId.right map {
+                prevId =>
+                  jobs.updateStatus(jobId,
+                                    prevId,
+                                    msg,
+                                    progress,
+                                    unit,
+                                    content \? "info")
               } match {
                 case Right(resultM) => resultM
                 case Left(error) => Future(Left(error))

@@ -165,9 +165,8 @@ trait MarkupParsers { self: Parsers =>
 
     def xUnparsed: Tree = {
       val start = curOffset
-      xTakeUntil(handle.unparsed,
-                 () => r2p(start, start, curOffset),
-                 "</xml:unparsed>")
+      xTakeUntil(handle.unparsed, () =>
+            r2p(start, start, curOffset), "</xml:unparsed>")
     }
 
     /** Comment ::= '<!--' ((Char - '-') | ('-' (Char - '-')))* '-->'

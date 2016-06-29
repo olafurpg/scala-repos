@@ -449,11 +449,8 @@ object Multipart {
                  file: File,
                  chunkSize: Int = -1): Multipart.FormData =
       Multipart.FormData(
-          Source.single(
-              Multipart.FormData.BodyPart.fromFile(name,
-                                                   contentType,
-                                                   file,
-                                                   chunkSize)))
+          Source.single(Multipart.FormData.BodyPart
+                .fromFile(name, contentType, file, chunkSize)))
 
     /**
       * Strict [[FormData]].

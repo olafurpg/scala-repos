@@ -273,9 +273,9 @@ class JsonFormatSpec extends FunSuite {
       head = ApiPullRequest.Commit(sha = sha1,
                                    ref = "new-topic",
                                    repo = repository)("octocat"),
-      base = ApiPullRequest.Commit(sha = sha1,
-                                   ref = "master",
-                                   repo = repository)("octocat"),
+      base =
+        ApiPullRequest.Commit(sha = sha1, ref = "master", repo = repository)(
+            "octocat"),
       mergeable = None,
       title = "new-feature",
       body = "Please pull these awesome changes",

@@ -524,10 +524,9 @@ case class TungstenAggregate(
 
     // create grouping key
     ctx.currentVars = input
-    val keyCode = GenerateUnsafeProjection.createCode(
-        ctx,
-        groupingExpressions.map(e =>
-              BindReferences.bindReference[Expression](e, child.output)))
+    val keyCode =
+      GenerateUnsafeProjection.createCode(ctx, groupingExpressions.map(e =>
+                BindReferences.bindReference[Expression](e, child.output)))
     val key = keyCode.value
     val buffer = ctx.freshName("aggBuffer")
 

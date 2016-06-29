@@ -46,9 +46,8 @@ case class ParallelDataSource(val dsp: DataSourceParams)
 
     MLUtils.kFold(points, dsp.k, dsp.seed).zipWithIndex.map {
       case (dataSet, index) =>
-        (Int.box(index),
-         dataSet._1,
-         dataSet._2.map(p => (p.features, p.label)))
+        (Int.box(index), dataSet._1, dataSet._2.map(p =>
+                  (p.features, p.label)))
     }
   }
 }

@@ -245,9 +245,8 @@ package scalaguide.forms.scalaforms {
 
       // #form-bodyparser-errors
       val userPostWithErrors = Action(
-          parse.form(userForm,
-                     onErrors = (formWithErrors: Form[UserData]) =>
-                       BadRequest(views.html.user(formWithErrors)))) {
+          parse.form(userForm, onErrors = (formWithErrors: Form[UserData]) =>
+                BadRequest(views.html.user(formWithErrors)))) {
         implicit request =>
           val userData = request.body
           val newUser = models.User(userData.name, userData.age)

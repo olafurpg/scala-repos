@@ -139,10 +139,7 @@ case class Perfs(standard: Perf,
                 volatility = subs
                   .map(s => s.glicko.volatility * (s.nb / nb.toDouble))
                   .sum)
-            Perf(glicko = glicko,
-                 nb = nb,
-                 recent = Nil,
-                 latest = date.some)
+            Perf(glicko = glicko, nb = nb, recent = Nil, latest = date.some)
         }
       }
   )

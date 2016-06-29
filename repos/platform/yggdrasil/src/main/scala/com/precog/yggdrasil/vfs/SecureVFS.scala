@@ -146,8 +146,8 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
                    version: Version): EitherT[M, ResourceError, Long] = {
       readResource(apiKey, path, version, AccessMode.ReadMetadata) flatMap {
         //need mapM
-        _.fold(br => EitherT.right(br.byteLength.point[M]),
-               pr => EitherT.right(pr.recordCount))
+        _.fold(br => EitherT.right(br.byteLength.point[M]), pr =>
+              EitherT.right(pr.recordCount))
       }
     }
 

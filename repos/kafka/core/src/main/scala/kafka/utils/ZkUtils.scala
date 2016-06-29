@@ -1119,10 +1119,7 @@ class ZKCheckedEphemeral(path: String,
   var result: Code = Code.OK
 
   private class CreateCallback extends StringCallback {
-    def processResult(rc: Int,
-                      path: String,
-                      ctx: Object,
-                      name: String) {
+    def processResult(rc: Int, path: String, ctx: Object, name: String) {
       Code.get(rc) match {
         case Code.OK =>
           setResult(Code.OK)

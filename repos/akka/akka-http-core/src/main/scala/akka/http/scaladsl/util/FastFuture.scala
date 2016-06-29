@@ -64,9 +64,8 @@ class FastFuture[A](val future: Future[A]) extends AnyVal {
 
   def recover[B >: A](pf: PartialFunction[Throwable, B])(
       implicit ec: ExecutionContext): Future[B] =
-    transformWith(
-        FastFuture.successful,
-        t ⇒ if (pf isDefinedAt t) FastFuture.successful(pf(t)) else future)
+    transformWith(FastFuture.successful, t ⇒
+          if (pf isDefinedAt t) FastFuture.successful(pf(t)) else future)
 
   def recoverWith[B >: A](pf: PartialFunction[Throwable, Future[B]])(
       implicit ec: ExecutionContext): Future[B] =

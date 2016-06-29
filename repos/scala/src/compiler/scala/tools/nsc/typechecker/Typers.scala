@@ -3327,8 +3327,8 @@ trait Typers
       val (argpts, respt) = ptNorm baseType FunctionSymbol match {
         case TypeRef(_, FunctionSymbol, args :+ res) => (args, res)
         case _ =>
-          (fun.vparams map (_ => if (pt == ErrorType) ErrorType else NoType),
-           WildcardType)
+          (fun.vparams map (_ =>
+                    if (pt == ErrorType) ErrorType else NoType), WildcardType)
       }
 
       if (!FunctionSymbol.exists) MaxFunctionArityError(fun)

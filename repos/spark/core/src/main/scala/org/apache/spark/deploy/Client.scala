@@ -88,15 +88,15 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
           .getOrElse(Seq.empty)
         val sparkJavaOpts = Utils.sparkJavaOpts(conf)
         val javaOpts = sparkJavaOpts ++ extraJavaOpts
-        val command = new Command(
-            mainClass,
-            Seq("{{WORKER_URL}}",
-                "{{USER_JAR}}",
-                driverArgs.mainClass) ++ driverArgs.driverOptions,
-            sys.env,
-            classPathEntries,
-            libraryPathEntries,
-            javaOpts)
+        val command =
+          new Command(mainClass,
+                      Seq("{{WORKER_URL}}",
+                          "{{USER_JAR}}",
+                          driverArgs.mainClass) ++ driverArgs.driverOptions,
+                      sys.env,
+                      classPathEntries,
+                      libraryPathEntries,
+                      javaOpts)
 
         val driverDescription = new DriverDescription(driverArgs.jarUrl,
                                                       driverArgs.memory,

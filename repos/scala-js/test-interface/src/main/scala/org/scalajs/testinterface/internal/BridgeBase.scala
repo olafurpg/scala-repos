@@ -51,9 +51,8 @@ abstract class BridgeBase(frameworkName: String) {
 
   protected def tasks2TaskInfos(tasks: Array[Task], runner: Runner): js.Any = {
     tasks.map { task =>
-      val serTask = runner.serializeTask(
-          task,
-          taskDef => js.JSON.stringify(TaskDefSerializer.serialize(taskDef)))
+      val serTask = runner.serializeTask(task, taskDef =>
+            js.JSON.stringify(TaskDefSerializer.serialize(taskDef)))
 
       lit(serializedTask = serTask,
           taskDef = TaskDefSerializer.serialize(task.taskDef),

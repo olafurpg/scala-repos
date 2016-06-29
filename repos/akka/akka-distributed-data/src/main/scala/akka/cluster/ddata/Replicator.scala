@@ -1369,8 +1369,8 @@ final class Replicator(settings: ReplicatorSettings)
               if owner == selfUniqueAddress &&
                 (nodes.isEmpty || nodes.forall(seen)) ⇒
             val newEnvelope = envelope.prune(removed)
-            pruningPerformed = pruningPerformed.updated(removed,
-                                                        allReachableClockTime)
+            pruningPerformed =
+              pruningPerformed.updated(removed, allReachableClockTime)
             log.debug("Perform pruning of [{}] from [{}] to [{}]",
                       key,
                       removed,

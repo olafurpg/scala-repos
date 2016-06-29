@@ -567,8 +567,8 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
         case DefDef(_, _, _, vparams :: Nil, _, EmptyTree)
             if stat.symbol.isSuperAccessor =>
           val body = atPos(stat.pos)(
-              Apply(SuperSelect(clazz, stat.symbol.alias),
-                    vparams map (v => Ident(v.symbol))))
+              Apply(SuperSelect(clazz, stat.symbol.alias), vparams map (v =>
+                        Ident(v.symbol))))
           val pt = stat.symbol.tpe.resultType
 
           copyDefDef(stat)(
@@ -710,11 +710,8 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
                                                 retVal,
                                                 attrThis,
                                                 args)
-        If(cond,
-           fn(This(clazz),
-              slowPathSym,
-              args.map(arg => Ident(arg.symbol)): _*),
-           retVal)
+        If(cond, fn(This(clazz), slowPathSym, args.map(arg =>
+                      Ident(arg.symbol)): _*), retVal)
       }
 
       /* Always copy the tree if we are going to perform sym substitution,

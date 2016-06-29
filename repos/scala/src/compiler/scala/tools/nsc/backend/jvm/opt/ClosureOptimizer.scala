@@ -460,8 +460,8 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
             canInlineFromSource = canInlineFromSource,
             annotatedInline = false,
             annotatedNoInline = false,
-            samParamTypes = callGraph.samParamTypes(bodyMethodNode,
-                                                    bodyDeclClassType),
+            samParamTypes =
+              callGraph.samParamTypes(bodyMethodNode, bodyDeclClassType),
             calleeInfoWarning = None)
     })
     val argInfos =

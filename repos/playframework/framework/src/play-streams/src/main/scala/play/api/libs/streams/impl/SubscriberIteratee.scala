@@ -86,8 +86,8 @@ private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
   private def awaitDemand[B](promise: Promise[B],
                              folder: (Step[T, Unit]) => Future[B],
                              ec: ExecutionContext): AwaitingDemand = {
-    AwaitingDemand(() => demand(promise, folder, ec),
-                   () => cancelled(promise, folder, ec))
+    AwaitingDemand(() => demand(promise, folder, ec), () =>
+          cancelled(promise, folder, ec))
   }
 
   private def demand[B](promise: Promise[B],

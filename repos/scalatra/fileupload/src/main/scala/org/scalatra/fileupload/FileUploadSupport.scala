@@ -85,12 +85,12 @@ trait FileUploadSupport extends ServletBase {
                         fileItemToString(req, item) :: params.formParams
                           .getOrElse(item.getFieldName, List[String]()))))
               else
-                BodyParams(params.fileParams +
-                             ((item.getFieldName,
-                               item +: params.fileParams.getOrElse(
-                                   item.getFieldName,
-                                   List[FileItem]()))),
-                           params.formParams)
+                BodyParams(
+                    params.fileParams +
+                      ((item.getFieldName,
+                        item +: params.fileParams
+                          .getOrElse(item.getFieldName, List[FileItem]()))),
+                    params.formParams)
           }
         req(BodyParamsKey) = bodyParams
         bodyParams

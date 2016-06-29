@@ -142,17 +142,15 @@ abstract class UseRoleIgnoredSpec
       runOn(first) {
         val role = Some("b")
 
-        val router =
-          system.actorOf(ClusterRouterGroup(
-                             RoundRobinGroup(paths = Nil),
-                             ClusterRouterGroupSettings(totalInstances = 6,
-                                                        routeesPaths =
-                                                          List("/user/foo",
-                                                               "/user/bar"),
-                                                        allowLocalRoutees =
-                                                          false,
-                                                        useRole = role)).props,
-                         "router-2b")
+        val router = system.actorOf(
+            ClusterRouterGroup(
+                RoundRobinGroup(paths = Nil),
+                ClusterRouterGroupSettings(totalInstances = 6,
+                                           routeesPaths =
+                                             List("/user/foo", "/user/bar"),
+                                           allowLocalRoutees = false,
+                                           useRole = role)).props,
+            "router-2b")
 
         awaitAssert(currentRoutees(router).size should ===(4))
 
@@ -209,17 +207,15 @@ abstract class UseRoleIgnoredSpec
       runOn(first) {
         val role = Some("b")
 
-        val router =
-          system.actorOf(ClusterRouterGroup(
-                             RoundRobinGroup(paths = Nil),
-                             ClusterRouterGroupSettings(totalInstances = 6,
-                                                        routeesPaths =
-                                                          List("/user/foo",
-                                                               "/user/bar"),
-                                                        allowLocalRoutees =
-                                                          true,
-                                                        useRole = role)).props,
-                         "router-3b")
+        val router = system.actorOf(
+            ClusterRouterGroup(
+                RoundRobinGroup(paths = Nil),
+                ClusterRouterGroupSettings(totalInstances = 6,
+                                           routeesPaths =
+                                             List("/user/foo", "/user/bar"),
+                                           allowLocalRoutees = true,
+                                           useRole = role)).props,
+            "router-3b")
 
         awaitAssert(currentRoutees(router).size should ===(4))
 
@@ -276,17 +272,15 @@ abstract class UseRoleIgnoredSpec
       runOn(first) {
         val role = Some("a")
 
-        val router =
-          system.actorOf(ClusterRouterGroup(
-                             RoundRobinGroup(paths = Nil),
-                             ClusterRouterGroupSettings(totalInstances = 6,
-                                                        routeesPaths =
-                                                          List("/user/foo",
-                                                               "/user/bar"),
-                                                        allowLocalRoutees =
-                                                          true,
-                                                        useRole = role)).props,
-                         "router-4b")
+        val router = system.actorOf(
+            ClusterRouterGroup(
+                RoundRobinGroup(paths = Nil),
+                ClusterRouterGroupSettings(totalInstances = 6,
+                                           routeesPaths =
+                                             List("/user/foo", "/user/bar"),
+                                           allowLocalRoutees = true,
+                                           useRole = role)).props,
+            "router-4b")
 
         awaitAssert(currentRoutees(router).size should ===(2))
 
@@ -343,17 +337,15 @@ abstract class UseRoleIgnoredSpec
       runOn(first) {
         val role = Some("c")
 
-        val router =
-          system.actorOf(ClusterRouterGroup(
-                             RoundRobinGroup(paths = Nil),
-                             ClusterRouterGroupSettings(totalInstances = 6,
-                                                        routeesPaths =
-                                                          List("/user/foo",
-                                                               "/user/bar"),
-                                                        allowLocalRoutees =
-                                                          true,
-                                                        useRole = role)).props,
-                         "router-5b")
+        val router = system.actorOf(
+            ClusterRouterGroup(
+                RoundRobinGroup(paths = Nil),
+                ClusterRouterGroupSettings(totalInstances = 6,
+                                           routeesPaths =
+                                             List("/user/foo", "/user/bar"),
+                                           allowLocalRoutees = true,
+                                           useRole = role)).props,
+            "router-5b")
 
         awaitAssert(currentRoutees(router).size should ===(6))
 

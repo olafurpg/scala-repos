@@ -168,8 +168,8 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         offer,
         app,
         runningTasks = Set(),
-        ResourceSelector(Set("*", "marathon"),
-                         reserved = false)) should be(None)
+        ResourceSelector(Set("*", "marathon"), reserved = false)) should be(
+        None)
   }
 
   test("match resources should not consider resources with disk infos") {

@@ -55,9 +55,8 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
                                                  zero: Zero[E]) =
     this(new Array[Int](0), new Array[E](0), 0, length)
 
-  def this()(implicit ring: Semiring[E],
-             man: ClassTag[E],
-             zero: Zero[E]) = this(-1)
+  def this()(implicit ring: Semiring[E], man: ClassTag[E], zero: Zero[E]) =
+    this(-1)
 
   def size = length
 

@@ -59,10 +59,8 @@ trait Reporting extends scala.reflect.internal.Reporting {
       new ConditionalWarning("unchecked", settings.unchecked)
     private val _featureWarnings =
       new ConditionalWarning("feature", settings.feature)
-    private val _inlinerWarnings = new ConditionalWarning(
-        "inliner",
-        () => !settings.YoptWarningsSummaryOnly,
-        settings.YoptWarnings)
+    private val _inlinerWarnings = new ConditionalWarning("inliner", () =>
+          !settings.YoptWarningsSummaryOnly, settings.YoptWarnings)
     private val _allConditionalWarnings = List(_deprecationWarnings,
                                                _uncheckedWarnings,
                                                _featureWarnings,

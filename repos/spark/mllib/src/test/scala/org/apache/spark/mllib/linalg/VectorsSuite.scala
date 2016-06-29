@@ -341,13 +341,11 @@ class VectorsSuite extends SparkFunSuite with Logging {
           sv.toArray.map(math.abs).max relTol 1E-8)
 
     assert(
-        Vectors.norm(dv, 3.7) ~== math.pow(
-            dv.toArray.foldLeft(0.0)((a, v) => a + math.pow(math.abs(v), 3.7)),
-            1.0 / 3.7) relTol 1E-8)
+        Vectors.norm(dv, 3.7) ~== math.pow(dv.toArray.foldLeft(0.0)((a, v) =>
+                  a + math.pow(math.abs(v), 3.7)), 1.0 / 3.7) relTol 1E-8)
     assert(
-        Vectors.norm(sv, 3.7) ~== math.pow(
-            sv.toArray.foldLeft(0.0)((a, v) => a + math.pow(math.abs(v), 3.7)),
-            1.0 / 3.7) relTol 1E-8)
+        Vectors.norm(sv, 3.7) ~== math.pow(sv.toArray.foldLeft(0.0)((a, v) =>
+                  a + math.pow(math.abs(v), 3.7)), 1.0 / 3.7) relTol 1E-8)
   }
 
   test("Vector numActive and numNonzeros") {

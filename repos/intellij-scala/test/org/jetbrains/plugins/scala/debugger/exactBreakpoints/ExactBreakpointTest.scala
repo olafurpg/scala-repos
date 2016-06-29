@@ -119,8 +119,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
     checkNotStoppedAtBreakpointAt(Breakpoint(2, 2))
   }
 
-  addSourceFile("Either.scala",
-                """object Either {
+  addSourceFile("Either.scala", """object Either {
       |  def main(args: Array[String]) {
       |    val x: Either[String, Int] = Right(1)
       |    val y: Either[String, Int] = Left("aaa")
@@ -299,8 +298,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
                                                      "new ZZZ(\"1\")")
   }
 
-  addSourceFile("LineStartsWithDot.scala",
-                """object LineStartsWithDot {
+  addSourceFile("LineStartsWithDot.scala", """object LineStartsWithDot {
       |  def main(args: Array[String]) {
       |    Some(1)
       |      .map(_ + 1)
@@ -326,8 +324,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
     )
   }
 
-  addSourceFile("PartialFunctionArg.scala",
-                """object PartialFunctionArg {
+  addSourceFile("PartialFunctionArg.scala", """object PartialFunctionArg {
        |  def main(args: Array[String]) {
        |    Seq(Option(1)).exists {
        |      case None =>
@@ -345,8 +342,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
     )
   }
 
-  addSourceFile("LikeDefaultArgName.scala",
-                """object LikeDefaultArgName {
+  addSourceFile("LikeDefaultArgName.scala", """object LikeDefaultArgName {
     |  def main(args: Array[String]) {
     |    def default() = {
     |      "stop here"

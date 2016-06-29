@@ -438,8 +438,7 @@ abstract class ExplicitOuter
               if (!currentClass.isTrait)
                 for (mc <- currentClass.mixinClasses)
                   if (outerAccessor(mc) != NoSymbol &&
-                      !skipMixinOuterAccessor(currentClass,
-                                              mc))
+                      !skipMixinOuterAccessor(currentClass, mc))
                     newDefs += mixinOuterAccessorDef(mc)
             }
           }

@@ -282,8 +282,8 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
                     //Collect shadowed elements
                     shadowed += ((selector, result.getElement))
                     var newState: ResolveState = state
-                    newState = state.put(ResolverEnv.nameKey,
-                                         selector.importedName)
+                    newState =
+                      state.put(ResolverEnv.nameKey, selector.importedName)
                     newState = newState
                       .put(ImportUsed.key,
                            Set(importsUsed.toSeq: _*) +

@@ -174,9 +174,7 @@ class ParamsSuite extends SparkFunSuite {
       // StringArrayParam
       val param = new StringArrayParam(dummy, "name", "doc")
       val values: Seq[Array[String]] =
-        Seq(Array(),
-            Array(""),
-            Array("", "1", "abc", "quote\"", "newline\n"))
+        Seq(Array(), Array(""), Array("", "1", "abc", "quote\"", "newline\n"))
       for (value <- values) {
         val json = param.jsonEncode(value)
         assert(param.jsonDecode(json) === value)

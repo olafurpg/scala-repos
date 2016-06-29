@@ -403,10 +403,8 @@ case class Bin(child: Expression)
     UTF8String.fromString(jl.Long.toBinaryString(input.asInstanceOf[Long]))
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    defineCodeGen(
-        ctx,
-        ev,
-        (c) => s"UTF8String.fromString(java.lang.Long.toBinaryString($c))")
+    defineCodeGen(ctx, ev, (c) =>
+          s"UTF8String.fromString(java.lang.Long.toBinaryString($c))")
   }
 }
 

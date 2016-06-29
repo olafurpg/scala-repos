@@ -78,12 +78,9 @@ private[spark] abstract class WebUI(val securityManager: SecurityManager,
   /** Attach a page to this UI. */
   def attachPage(page: WebUIPage) {
     val pagePath = "/" + page.prefix
-    val renderHandler = createServletHandler(
-        pagePath,
-        (request: HttpServletRequest) => page.render(request),
-        securityManager,
-        conf,
-        basePath)
+    val renderHandler =
+      createServletHandler(pagePath, (request: HttpServletRequest) =>
+            page.render(request), securityManager, conf, basePath)
     val renderJsonHandler = createServletHandler(
         pagePath.stripSuffix("/") + "/json",
         (request: HttpServletRequest) => page.renderJson(request),

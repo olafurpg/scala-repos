@@ -611,12 +611,8 @@ class AsyncProducerTest {
   }
 
   def messagesToSet(messages: Seq[String]): ByteBufferMessageSet = {
-    new ByteBufferMessageSet(NoCompressionCodec,
-                             messages.map(
-                                 m =>
-                                   new Message(m.getBytes,
-                                               0L,
-                                               Message.MagicValue_V1)): _*)
+    new ByteBufferMessageSet(NoCompressionCodec, messages.map(m =>
+              new Message(m.getBytes, 0L, Message.MagicValue_V1)): _*)
   }
 
   def messagesToSet(key: Array[Byte],

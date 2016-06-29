@@ -896,9 +896,8 @@ object Console extends Logging {
       val r = if (ca.common.verbose) {
         buildCmd.!(ProcessLogger(line => info(line), line => error(line)))
       } else {
-        buildCmd.!(
-            ProcessLogger(line => outputSbtError(line),
-                          line => outputSbtError(line)))
+        buildCmd.!(ProcessLogger(line => outputSbtError(line), line =>
+                  outputSbtError(line)))
       }
       if (r != 0) {
         error(s"Return code of previous step is ${r}. Aborting.")

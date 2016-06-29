@@ -140,10 +140,7 @@ private[mesos] object MesosSchedulerBackendUtil extends Logging {
     val portmaps = conf
       .getOption("spark.mesos.executor.docker.portmaps")
       .map(parsePortMappingsSpec)
-    addDockerInfo(builder,
-                  imageName,
-                  volumes = volumes,
-                  portmaps = portmaps)
+    addDockerInfo(builder, imageName, volumes = volumes, portmaps = portmaps)
     logDebug("setupContainerDockerInfo: using docker image: " + imageName)
   }
 }

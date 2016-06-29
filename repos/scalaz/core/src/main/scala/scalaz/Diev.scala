@@ -103,8 +103,7 @@ trait DievImplementation {
               else {
                 if (value < start)
                   Between(liftedIntervals(adjustedPosition - 1).map(_ =>
-                                adjustedPosition - 1),
-                          adjustedPosition.some)
+                            adjustedPosition - 1), adjustedPosition.some)
                 else
                   Between(adjustedPosition.some,
                           liftedIntervals(adjustedPosition + 1).map(_ =>

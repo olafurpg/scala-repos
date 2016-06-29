@@ -137,8 +137,7 @@ class ResponseParserSpec
           |Content-Length: 17
           |Content-Type: text/plain; charset=UTF-8
           |
-          |Sh""",
-            "ake your BOODY!HTTP/1.") should generalMultiParseTo(
+          |Sh""", "ake your BOODY!HTTP/1.") should generalMultiParseTo(
             Right(HttpResponse(InternalServerError,
                                List(`User-Agent`("curl/7.19.7 xyz"),
                                     Connection("close")),
@@ -183,13 +182,10 @@ class ResponseParserSpec
             |abc
             |10;some=stuff;bla
             |0123456789ABCDEF
-            |""",
-            "10;foo=",
-            """bar
+            |""", "10;foo=", """bar
             |0123456789ABCDEF
             |10
-            |0123456789""",
-            """ABCDEF
+            |0123456789""", """ABCDEF
             |0
             |
             |""") should generalMultiParseTo(
@@ -215,8 +211,7 @@ class ResponseParserSpec
       }
 
       "message end with extension, trailer and remaining content" in new Test {
-        Seq(start,
-            """000;nice=true
+        Seq(start, """000;nice=true
             |Foo: pip
             | apo
             |Bar: xyz
@@ -237,8 +232,7 @@ class ResponseParserSpec
       "response with additional transfer encodings" in new Test {
         Seq("""HTTP/1.1 200 OK
           |Transfer-Encoding: fancy, chunked
-          |Cont""",
-            """ent-Type: application/pdf
+          |Cont""", """ent-Type: application/pdf
           |
           |""") should generalMultiParseTo(
             Right(

@@ -10,8 +10,8 @@ import com.typesafe.config._
 import akka.ConfigurationException
 
 object RemoteDeployerSpec {
-  val deployerConf = ConfigFactory.parseString(
-      """
+  val deployerConf = ConfigFactory
+    .parseString("""
       akka.actor.provider = "akka.remote.RemoteActorRefProvider"
       akka.actor.deployment {
         /service2 {
@@ -22,8 +22,7 @@ object RemoteDeployerSpec {
         }
       }
       akka.remote.netty.tcp.port = 0
-      """,
-      ConfigParseOptions.defaults)
+      """, ConfigParseOptions.defaults)
 
   class RecipeActor extends Actor {
     def receive = { case _ ⇒ }

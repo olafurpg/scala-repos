@@ -301,9 +301,8 @@ class GroupManagerTest
     when(f.groupRepo.store(any(), any()))
       .thenReturn(Future.successful(groupWithVersionInfo))
 
-    Await.result(
-        f.manager.update(group.id, _ => group, version = Timestamp(1)),
-        3.seconds)
+    Await.result(f.manager.update(group.id, _ =>
+              group, version = Timestamp(1)), 3.seconds)
 
     verify(f.groupRepo).store(GroupRepository.zkRootName, groupWithVersionInfo)
     verify(f.appRepo).store(appWithVersionInfo)
@@ -325,9 +324,8 @@ class GroupManagerTest
     when(f.groupRepo.store(any(), any()))
       .thenReturn(Future.successful(groupEmpty))
 
-    Await.result(
-        f.manager.update(group.id, _ => groupEmpty, version = Timestamp(1)),
-        3.seconds)
+    Await.result(f.manager.update(group.id, _ =>
+              groupEmpty, version = Timestamp(1)), 3.seconds)
 
     verify(f.groupRepo).store(GroupRepository.zkRootName, groupEmpty)
     verify(f.appRepo).expunge(app.id)

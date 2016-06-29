@@ -37,8 +37,7 @@ private[expr] object ExpectedTypes {
                         fromUnderscore: Boolean = true): Option[ScType] =
     smartExpectedTypeEx(expr, fromUnderscore).map(_._1)
 
-  def smartExpectedTypeEx(expr: ScExpression,
-                          fromUnderscore: Boolean = true)
+  def smartExpectedTypeEx(expr: ScExpression, fromUnderscore: Boolean = true)
     : Option[(ScType, Option[ScTypeElement])] = {
     val types = expectedExprTypes(expr,
                                   withResolvedFunction = true,
@@ -49,8 +48,7 @@ private[expr] object ExpectedTypes {
     }
   }
 
-  def expectedExprType(expr: ScExpression,
-                       fromUnderscore: Boolean = true)
+  def expectedExprType(expr: ScExpression, fromUnderscore: Boolean = true)
     : Option[(ScType, Option[ScTypeElement])] = {
     val types = expr.expectedTypesEx(fromUnderscore)
     types.length match {

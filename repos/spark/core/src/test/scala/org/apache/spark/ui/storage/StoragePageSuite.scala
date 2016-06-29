@@ -187,11 +187,8 @@ class StoragePageSuite extends SparkFunSuite {
             "2"))
 
     val blockTable = (xmlNodes \\ "table")(1)
-    val blockHeaders = Seq("Block ID",
-                           "Replication Level",
-                           "Location",
-                           "Storage Level",
-                           "Size")
+    val blockHeaders =
+      Seq("Block ID", "Replication Level", "Location", "Storage Level", "Size")
     assert((blockTable \\ "th").map(_.text) === blockHeaders)
 
     assert((blockTable \\ "tr").size === 4)

@@ -190,8 +190,8 @@ sealed trait HKeyedField
   }
 
   def enclosingObjectField: HObjectField =
-    forParent(keyedParent => keyedParent.enclosingObjectField,
-              objectField => objectField)
+    forParent(keyedParent => keyedParent.enclosingObjectField, objectField =>
+          objectField)
 
   def enclosingEntries: HObjectEntries =
     enclosingObjectField.parent.get
@@ -199,8 +199,8 @@ sealed trait HKeyedField
   def fieldsInPathForward: Stream[HKeyedField]
 
   def fieldsInPathBackward: Stream[HKeyedField] =
-    forParent(keyedField => this #:: keyedField.fieldsInPathBackward,
-              of => Stream(this))
+    forParent(keyedField => this #:: keyedField.fieldsInPathBackward, of =>
+          Stream(this))
 
   def startingField: HKeyedField =
     forParent(_.startingField, _ => this)

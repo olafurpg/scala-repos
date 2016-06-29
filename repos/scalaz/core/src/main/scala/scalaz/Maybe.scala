@@ -362,6 +362,6 @@ private sealed trait MaybeEqual[A] extends Equal[Maybe[A]] {
   implicit def A: Equal[A]
 
   override final def equal(fa1: Maybe[A], fa2: Maybe[A]) =
-    fa1.cata(a1 => fa2.cata(a2 => A.equal(a1, a2), false),
-             fa2.cata(_ => false, true))
+    fa1.cata(a1 =>
+          fa2.cata(a2 => A.equal(a1, a2), false), fa2.cata(_ => false, true))
 }

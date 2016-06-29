@@ -96,12 +96,10 @@ object IterateesSpec
 
     "fold input with fold1" in {
       mustExecute(1) { foldEC =>
-        mustTranslate3To(5)(
-            it =>
-              Iteratee.flatten(
-                  it.fold1((a, i) => Future.successful(Done(a + 2, i)),
-                           _ => ???,
-                           (_, _) => ???)(foldEC)))
+        mustTranslate3To(5)(it =>
+              Iteratee.flatten(it.fold1((a, i) =>
+                        Future.successful(Done(a + 2, i)), _ => ???, (_, _) =>
+                        ???)(foldEC)))
       }
     }
 
@@ -128,9 +126,8 @@ object IterateesSpec
     "fold input with flatFold" in {
       mustExecute(1) { foldEC =>
         mustTranslate3To(9)(
-            _.flatFold((_, _) => Future.successful(Done[Int, Int](9)),
-                       _ => ???,
-                       (_, _) => ???)(foldEC))
+            _.flatFold((_, _) => Future.successful(Done[Int, Int](9)), _ =>
+                  ???, (_, _) => ???)(foldEC))
       }
     }
 

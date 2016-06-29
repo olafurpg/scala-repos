@@ -168,9 +168,8 @@ object RecordSpec extends Specification {
       }
     }
 
-    testOneHarness(
-        "the field level",
-        rec => rec.stringFieldWithCallbacks: HarnessedLifecycleCallbacks)
+    testOneHarness("the field level", rec =>
+          rec.stringFieldWithCallbacks: HarnessedLifecycleCallbacks)
   }
 
   "Record" should {

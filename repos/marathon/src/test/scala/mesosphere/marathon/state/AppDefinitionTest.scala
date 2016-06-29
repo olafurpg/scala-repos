@@ -155,10 +155,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
                     "baz" -> "buzz"
                 ),
                 discoveryInfo = DiscoveryInfo(
-                    ports = Vector(
-                        DiscoveryInfo.Port(name = "http",
-                                           number = 80,
-                                           protocol = "tcp"))
+                    ports = Vector(DiscoveryInfo
+                          .Port(name = "http", number = 80, protocol = "tcp"))
                 )
             )
         )

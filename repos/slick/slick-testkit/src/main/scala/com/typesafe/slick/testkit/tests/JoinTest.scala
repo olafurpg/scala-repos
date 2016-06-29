@@ -293,8 +293,8 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
       q4 = for {
         res <- categories
                 .sortBy(_.id)
-                .zipWith(posts.sortBy(_.id),
-                         (c: Categories, p: Posts) => (c.id, p.category))
+                .zipWith(posts.sortBy(_.id), (c: Categories, p: Posts) =>
+                      (c.id, p.category))
       } yield res
       _ <- mark("q4", q4.result)
             .map(_ shouldBe List((1, -1), (2, 1), (3, 2), (4, 3)))

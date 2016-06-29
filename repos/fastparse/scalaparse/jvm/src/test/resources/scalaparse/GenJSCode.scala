@@ -2742,10 +2742,7 @@ abstract class GenJSCode
                 val reflBox = genNew(reflBoxClassPatched,
                                      reflBoxClassPatched.primaryConstructor,
                                      List(castCallTrg))
-                genApplyMethod(reflBox,
-                               proxyIdent,
-                               arguments,
-                               jstpe.AnyType)
+                genApplyMethod(reflBox, proxyIdent, arguments, jstpe.AnyType)
               }
             }
           }, {

@@ -741,9 +741,8 @@ class DistributedLDAModel private[clustering] (
 
   /** Java-friendly version of [[topicAssignments]] */
   @Since("1.5.0")
-  lazy val javaTopicAssignments: JavaRDD[(java.lang.Long,
-                                          Array[Int],
-                                          Array[Int])] = {
+  lazy val javaTopicAssignments: JavaRDD[
+      (java.lang.Long, Array[Int], Array[Int])] = {
     topicAssignments
       .asInstanceOf[RDD[(java.lang.Long, Array[Int], Array[Int])]]
       .toJavaRDD()

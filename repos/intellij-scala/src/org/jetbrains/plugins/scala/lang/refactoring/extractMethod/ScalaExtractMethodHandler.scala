@@ -422,10 +422,9 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     }
 
     def insertMethodCall() =
-      ScalaExtractMethodUtils.replaceWithMethodCall(settings,
-                                                    settings.elements,
-                                                    param => param.oldName,
-                                                    output => output.paramName)
+      ScalaExtractMethodUtils
+        .replaceWithMethodCall(settings, settings.elements, param =>
+              param.oldName, output => output.paramName)
 
     PsiDocumentManager
       .getInstance(editor.getProject)

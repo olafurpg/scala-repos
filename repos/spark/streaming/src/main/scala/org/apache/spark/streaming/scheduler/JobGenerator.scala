@@ -63,11 +63,9 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
     }
   }
 
-  private val timer = new RecurringTimer(
-      clock,
-      ssc.graph.batchDuration.milliseconds,
-      longTime => eventLoop.post(GenerateJobs(new Time(longTime))),
-      "JobGenerator")
+  private val timer =
+    new RecurringTimer(clock, ssc.graph.batchDuration.milliseconds, longTime =>
+          eventLoop.post(GenerateJobs(new Time(longTime))), "JobGenerator")
 
   // This is marked lazy so that this is initialized after checkpoint duration has been set
   // in the context and the generator has been started.

@@ -288,24 +288,22 @@ trait BlockSortSpec[M[+ _]]
 
   // Simple test of sorting on heterogeneous data
   def heterogeneousSortSampleDescending = {
-    val sampleData = SampleData(
-        (JParser.parseUnsafe("""[
+    val sampleData =
+      SampleData((JParser.parseUnsafe("""[
         {"key":[2],"value":{"y":false}},
         {"key":[3],"value":{"y":{"pvbT":1}}}
-      ]""") --> classOf[JArray]).elements.toStream,
-        None)
+      ]""") --> classOf[JArray]).elements.toStream, None)
 
     testSortDense(sampleData, SortDescending, false, JPath(".y"))
   }
 
   // Simple test of sorting on heterogeneous data
   def heterogeneousSortSampleAscending = {
-    val sampleData = SampleData(
-        (JParser.parseUnsafe("""[
+    val sampleData =
+      SampleData((JParser.parseUnsafe("""[
         {"key":[2],"value":{"y":false}},
         {"key":[3],"value":{"y":{"pvbT":1}}}
-      ]""") --> classOf[JArray]).elements.toStream,
-        None)
+      ]""") --> classOf[JArray]).elements.toStream, None)
 
     testSortDense(sampleData, SortAscending, false, JPath(".y"))
   }

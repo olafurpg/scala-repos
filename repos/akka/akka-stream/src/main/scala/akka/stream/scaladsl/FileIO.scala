@@ -56,8 +56,7 @@ object FileIO {
     * @param f the File to write to
     * @param options File open options, defaults to Set(WRITE, CREATE)
     */
-  def toFile(f: File,
-             options: Set[StandardOpenOption] = Set(WRITE, CREATE))
+  def toFile(f: File, options: Set[StandardOpenOption] = Set(WRITE, CREATE))
     : Sink[ByteString, Future[IOResult]] =
     new Sink(
         new FileSink(f,

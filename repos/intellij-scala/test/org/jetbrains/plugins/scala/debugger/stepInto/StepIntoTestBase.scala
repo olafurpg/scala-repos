@@ -17,8 +17,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     waitForBreakpoint()
   }
 
-  addFileWithBreakpoints("Simple.scala",
-                         s"""
+  addFileWithBreakpoints("Simple.scala", s"""
        |object Simple {
        |  def main(args: Array[String]) {
        |    val x = AAA.foo("123") $bp
@@ -40,16 +39,14 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("Constructor.scala",
-                         s"""
+  addFileWithBreakpoints("Constructor.scala", s"""
        |object Constructor {
        |  def main(args: Array[String]) {
        |    val x = new ZZZ(1).foo() $bp
        |  }
        |}
       """.stripMargin.trim())
-  addSourceFile("ZZZ.scala",
-                s"""
+  addSourceFile("ZZZ.scala", s"""
        |class ZZZ(z: Int) { //should step here
        |  val x = z
        |
@@ -64,16 +61,14 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("Sample.scala",
-                         s"""
+  addFileWithBreakpoints("Sample.scala", s"""
        |object ApplyMethod {
        |  def main(args: Array[String]) {
        |    val x = QQQ(1).foo() $bp
        |  }
        |}
       """.stripMargin.trim())
-  addFileWithBreakpoints("QQQ.scala",
-                         s"""
+  addFileWithBreakpoints("QQQ.scala", s"""
        |class QQQ(z: Int) {
        |  val x = z
        |
@@ -94,8 +89,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("IntoPackageObject.scala",
-                         s"""
+  addFileWithBreakpoints("IntoPackageObject.scala", s"""
        |package test
        |
        |object IntoPackageObject {
@@ -105,8 +99,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
        |}
        |
       """.stripMargin.trim())
-  addSourceFile("test/package.scala",
-                s"""
+  addSourceFile("test/package.scala", s"""
        |package object test {
        |  def foo(i: Int): Unit = {
        |    println("foo!") //should step here
@@ -122,8 +115,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addSourceFile("test1/FromPackageObject.scala",
-                s"""
+  addSourceFile("test1/FromPackageObject.scala", s"""
        |package test1
        |
        |object FromPackageObject {
@@ -137,8 +129,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
        |}
        |
       """.stripMargin.trim())
-  addFileWithBreakpoints("test1/package.scala",
-                         s"""
+  addFileWithBreakpoints("test1/package.scala", s"""
        |package object test1 {
        |  def foo(i: Int): Unit = {
        |    FromPackageObject.bar() $bp
@@ -153,16 +144,14 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("WithDefaultParam.scala",
-                         s"""
+  addFileWithBreakpoints("WithDefaultParam.scala", s"""
        |object WithDefaultParam {
        |  def main(args: Array[String]) {
        |    val x = EEE.withDefault(1)  $bp
        |  }
        |}
       """.stripMargin.trim())
-  addSourceFile("EEE.scala",
-                s"""
+  addSourceFile("EEE.scala", s"""
        |object EEE {
        |  def withDefault(z: Int, s: String = "default") = {
        |    println("hello")  //should step here
@@ -176,16 +165,14 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("TraitMethod.scala",
-                         s"""
+  addFileWithBreakpoints("TraitMethod.scala", s"""
        |object TraitMethod extends RRR{
        |  def main(args: Array[String]) {
        |    val x = foo(1)  $bp
        |  }
        |}
       """.stripMargin.trim())
-  addFileWithBreakpoints("RRR.scala",
-                         s"""
+  addFileWithBreakpoints("RRR.scala", s"""
        |trait RRR {
        |  def foo(z: Int) = {
        |    println("hello")  //should step here
@@ -199,8 +186,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("UnapplyMethod.scala",
-                         s"""
+  addFileWithBreakpoints("UnapplyMethod.scala", s"""
        |object UnapplyMethod {
        |  def main(args: Array[String]) {
        |    val z = Some(1)
@@ -211,8 +197,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
        |  }
        |}
       """.stripMargin.trim())
-  addFileWithBreakpoints("TTT.scala",
-                         s"""
+  addFileWithBreakpoints("TTT.scala", s"""
        |object TTT {
        |  def unapply(z: Option[Int]) = z  //should step here
        |
@@ -226,8 +211,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ImplicitConversion.scala",
-                         s"""
+  addFileWithBreakpoints("ImplicitConversion.scala", s"""
        |import scala.language.implicitConversions
        |
        |object ImplicitConversion {
@@ -252,8 +236,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("LazyVal.scala",
-                         s"""
+  addFileWithBreakpoints("LazyVal.scala", s"""
        |object LazyVal {
        |  lazy val lzy = Some(1)  //should step here
        |
@@ -270,8 +253,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("LazyVal2.scala",
-                         s"""
+  addFileWithBreakpoints("LazyVal2.scala", s"""
        |object LazyVal2 {
        |  lazy val lzy = new AAA
        |
@@ -293,8 +275,7 @@ abstract class StepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("SimpleGetters.scala",
-                         s"""object SimpleGetters {
+  addFileWithBreakpoints("SimpleGetters.scala", s"""object SimpleGetters {
       |  val z = 0
       |
       |  def main(args: Array[String]) {

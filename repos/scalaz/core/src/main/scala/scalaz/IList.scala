@@ -423,8 +423,8 @@ sealed abstract class IList[A] extends Product with Serializable {
   }
 
   def toEphemeralStream: EphemeralStream[A] =
-    uncons(EphemeralStream(),
-           (h, t) => EphemeralStream.cons(h, t.toEphemeralStream))
+    uncons(EphemeralStream(), (h, t) =>
+          EphemeralStream.cons(h, t.toEphemeralStream))
 
   def toList: List[A] =
     foldRight(Nil: List[A])(_ :: _)

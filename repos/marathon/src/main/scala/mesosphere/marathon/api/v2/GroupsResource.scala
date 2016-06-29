@@ -305,9 +305,7 @@ class GroupsResource @Inject()(groupManager: GroupManager,
     versionChange orElse scaleChange getOrElse createOrUpdateChange
   }
 
-  private def updateOrCreate(id: PathId,
-                             update: GroupUpdate,
-                             force: Boolean)(
+  private def updateOrCreate(id: PathId, update: GroupUpdate, force: Boolean)(
       implicit identity: Identity): (DeploymentPlan, PathId) = {
     val version = Timestamp.now()
 

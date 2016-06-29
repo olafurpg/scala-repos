@@ -31,9 +31,8 @@ object MonadCatchIOTest extends SpecLite {
     if (t == err1) Some(t.getMessage) else None
 
   "MonadCatchIO.catchSome" should {
-    val test =
-      mkTest[Int, Int](_.catchSome(_)(catch1, (s: String) => ok(s.length)),
-                       _.catchSome(catch1, (s: String) => ok(s.length)))
+    val test = mkTest[Int, Int](_.catchSome(_)(catch1, (s: String) =>
+              ok(s.length)), _.catchSome(catch1, (s: String) => ok(s.length)))
     "do nothing if nothing thrown" in {
       test(ok(3))(_.run(1).unsafePerformIO == 3)
     }

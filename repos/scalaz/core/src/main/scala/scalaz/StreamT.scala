@@ -10,10 +10,8 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   import StreamT._
 
   def uncons(implicit M: Monad[M]): M[Option[(A, StreamT[M, A])]] =
-    M.bind(step)(
-        _ (yieldd = (a, s) => M.point(Some((a, s))),
-           skip = s => s.uncons,
-           done = M.point(None)))
+    M.bind(step)(_ (yieldd = (a, s) => M.point(Some((a, s))), skip = s =>
+              s.uncons, done = M.point(None)))
 
   def ::(a: => A)(implicit M: Applicative[M]): StreamT[M, A] =
     StreamT[M, A](M.point(Yield(a, this)))
@@ -32,10 +30,9 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   def trans[N[_]](t: M ~> N)(implicit M: Functor[M],
                              N: Functor[N]): StreamT[N, A] =
     StreamT(
-        t(
-            M.map(this.step)(_ (yieldd = (a, as) => Yield(a, as trans t),
-                                skip = as => Skip(as trans t),
-                                done = Done))))
+        t(M.map(this.step)(
+                _ (yieldd = (a, as) => Yield(a, as trans t), skip = as =>
+                      Skip(as trans t), done = Done))))
 
   def filter(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] =
     stepMap {
@@ -80,9 +77,8 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 
   def flatMap[B](f: A => StreamT[M, B])(
       implicit m: Functor[M]): StreamT[M, B] = stepMap {
-    _ (yieldd = (a, s) => Skip(f(a) ++ (s flatMap f)),
-       skip = s => Skip(s flatMap f),
-       done = Done)
+    _ (yieldd = (a, s) => Skip(f(a) ++ (s flatMap f)), skip = s =>
+          Skip(s flatMap f), done = Done)
   }
 
   def map[B](f: A => B)(implicit m: Functor[M]): StreamT[M, B] = stepMap {
@@ -106,9 +102,8 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 
   def foldLeft[B](z: => B)(f: (=> B, => A) => B)(implicit M: Monad[M]): M[B] =
     M.bind(step) {
-      _ (yieldd = (a, s) => s.foldLeft(f(z, a))(f),
-         skip = s => s.foldLeft(z)(f),
-         done = M.point(z))
+      _ (yieldd = (a, s) => s.foldLeft(f(z, a))(f), skip = s =>
+            s.foldLeft(z)(f), done = M.point(z))
     }
 
   /**
@@ -143,9 +138,8 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 
   def foldMap[B](f: A => B)(implicit M: Foldable[M], B: Monoid[B]): B =
     M.foldMap(step) {
-      _ (yieldd = (a, s) => B.append(f(a), s.foldMap(f)),
-         skip = s => s.foldMap(f),
-         done = B.zero)
+      _ (yieldd = (a, s) => B.append(f(a), s.foldMap(f)), skip = s =>
+            s.foldMap(f), done = B.zero)
     }
 
   def length(implicit m: Monad[M]): M[Int] = {
@@ -264,9 +258,8 @@ object StreamT extends StreamTInstances {
                        s0: S): StreamT[Id, A] =
     StreamT[Id, A]({
       val (s1, sa) = stream.step(s0)
-      sa((a, as) => Yield(a, runStreamT(as, s1)),
-         as => Skip(runStreamT(as, s1)),
-         Done)
+      sa((a, as) => Yield(a, runStreamT(as, s1)), as =>
+            Skip(runStreamT(as, s1)), Done)
     })
 
   object Yield {
@@ -355,9 +348,8 @@ private trait StreamTHoist extends Hoist[StreamT] {
       implicit M: Monad[M]): StreamT[M, ?] ~> StreamT[N, ?] =
     new (StreamT[M, ?] ~> StreamT[N, ?]) {
       def apply[A](a: StreamT[M, A]): StreamT[N, A] =
-        StreamT[N, A](
-            f(M.map(a.step)(_ (yieldd = (a, as) => Yield(a, hoist(f) apply as),
-                               skip = as => Skip(hoist(f) apply as),
-                               done = Done))))
+        StreamT[N, A](f(M.map(a.step)(_ (yieldd = (a, as) =>
+                          Yield(a, hoist(f) apply as), skip = as =>
+                          Skip(hoist(f) apply as), done = Done))))
     }
 }

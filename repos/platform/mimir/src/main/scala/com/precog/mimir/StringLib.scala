@@ -240,46 +240,36 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       val tpe = BinaryOperationType(StrAndDateT, JNumberT, JNumberT)
       def f2(ctx: MorphContext): F2 = CF2P("builtin::str::op2sll::" + name) {
         case (c1: StrColumn, c2: DoubleColumn) =>
-          new LongFrom.SD(c1,
-                          c2,
-                          (s, n) => (n % 1 == 0) && defined(s, n.toLong),
-                          (s, n) => f(s, n.toLong))
+          new LongFrom.SD(c1, c2, (s, n) =>
+                (n % 1 == 0) && defined(s, n.toLong), (s, n) => f(s, n.toLong))
 
         case (c1: StrColumn, c2: LongColumn) =>
           new LongFrom.SL(c1, c2, defined, f)
 
         case (c1: StrColumn, c2: NumColumn) =>
-          new LongFrom.SN(c1,
-                          c2,
-                          (s, n) => (n % 1 == 0) && defined(s, n.toLong),
-                          (s, n) => f(s, n.toLong))
+          new LongFrom.SN(c1, c2, (s, n) =>
+                (n % 1 == 0) && defined(s, n.toLong), (s, n) => f(s, n.toLong))
 
         case (c1: DateColumn, c2: DoubleColumn) =>
-          new LongFrom.SD(dateToStrCol(c1),
-                          c2,
-                          (s, n) => (n % 1 == 0) && defined(s, n.toLong),
-                          (s, n) => f(s, n.toLong))
+          new LongFrom.SD(dateToStrCol(c1), c2, (s, n) =>
+                (n % 1 == 0) && defined(s, n.toLong), (s, n) => f(s, n.toLong))
 
         case (c1: DateColumn, c2: LongColumn) =>
           new LongFrom.SL(dateToStrCol(c1), c2, defined, f)
 
         case (c1: DateColumn, c2: NumColumn) =>
-          new LongFrom.SN(dateToStrCol(c1),
-                          c2,
-                          (s, n) => (n % 1 == 0) && defined(s, n.toLong),
-                          (s, n) => f(s, n.toLong))
+          new LongFrom.SN(dateToStrCol(c1), c2, (s, n) =>
+                (n % 1 == 0) && defined(s, n.toLong), (s, n) => f(s, n.toLong))
       }
     }
 
     object codePointAt
-        extends Op2SLL("codePointAt",
-                       (s, n) => n >= 0 && s.length > n,
-                       (s, n) => s.codePointAt(n.toInt))
+        extends Op2SLL("codePointAt", (s, n) =>
+              n >= 0 && s.length > n, (s, n) => s.codePointAt(n.toInt))
 
     object codePointBefore
-        extends Op2SLL("codePointBefore",
-                       (s, n) => n >= 0 && s.length > n,
-                       (s, n) => s.codePointBefore(n.toInt))
+        extends Op2SLL("codePointBefore", (s, n) =>
+              n >= 0 && s.length > n, (s, n) => s.codePointBefore(n.toInt))
 
     class Substring(name: String)(f: (String, Int) => String)
         extends Op2F2(StringNamespace, name) {

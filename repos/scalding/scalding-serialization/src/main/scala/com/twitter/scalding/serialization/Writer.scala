@@ -104,13 +104,9 @@ object Writer {
       }
     }
 
-  implicit def array[@specialized(Boolean,
-                                  Byte,
-                                  Short,
-                                  Int,
-                                  Long,
-                                  Float,
-                                  Double) T: Writer]: Writer[Array[T]] =
+  implicit def array[
+      @specialized(Boolean, Byte, Short, Int, Long, Float, Double) T: Writer]
+    : Writer[Array[T]] =
     new Writer[Array[T]] {
       val writerT = implicitly[Writer[T]]
       def write(os: OutputStream, a: Array[T]) = {

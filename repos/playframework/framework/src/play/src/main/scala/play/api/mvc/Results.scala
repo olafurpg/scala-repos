@@ -317,8 +317,8 @@ object Codec {
     * Create a Codec from an encoding already supported by the JVM.
     */
   def javaSupported(charset: String) =
-    Codec(charset)(str => ByteString.apply(str, charset),
-                   bytes => bytes.decodeString(charset))
+    Codec(charset)(str => ByteString.apply(str, charset), bytes =>
+          bytes.decodeString(charset))
 
   /**
     * Codec for UTF-8

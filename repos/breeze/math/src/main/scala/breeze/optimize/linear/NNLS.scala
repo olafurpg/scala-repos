@@ -74,9 +74,7 @@ class NNLS(val maxIters: Int = -1) extends SerializableLogging {
     State(x, grad, dir, lastDir, res, tmp, lastNorm, lastWall, 0, false)
   }
 
-  def reset(ata: DenseMatrix[Double],
-            atb: DenseVector[Double],
-            state: State) = {
+  def reset(ata: DenseMatrix[Double], atb: DenseVector[Double], state: State) = {
     import state._
     require(ata.cols == ata.rows,
             s"NNLS:iterations gram matrix must be symmetric")

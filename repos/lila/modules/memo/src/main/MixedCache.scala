@@ -51,9 +51,7 @@ object MixedCache {
     val async = AsyncCache.single(f, timeToLive = 1 minute)
     val sync = Builder.cache[Boolean, V](timeToLive, (_: Boolean) =>
           async(true) await makeTimeout(awaitTime))
-    new MixedCache(sync,
-                   _ => default,
-                   invalidate(async, sync) _,
-                   logger branch "MixedCache")
+    new MixedCache(sync, _ =>
+          default, invalidate(async, sync) _, logger branch "MixedCache")
   }
 }

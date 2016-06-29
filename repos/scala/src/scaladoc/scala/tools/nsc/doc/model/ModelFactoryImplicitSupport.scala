@@ -632,8 +632,7 @@ trait ModelFactoryImplicitSupport {
     // !(t1 matches t2)
     if (t1.paramss.map(_.length) == t2.paramss.map(_.length)) {
       for ((t1p, t2p) <- t1.paramss.flatten zip t2.paramss.flatten)
-        if (!isSubType(t1 memberInfo t1p,
-                       t2 memberInfo t2p))
+        if (!isSubType(t1 memberInfo t1p, t2 memberInfo t2p))
           return true // if on the corresponding parameter you give a type that is in t1 but not in t2
       // def foo(a: Either[Int, Double]): Int = 3
       // def foo(b: Left[T1]): Int = 6

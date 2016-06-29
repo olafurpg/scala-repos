@@ -56,11 +56,9 @@ case class TypeAliasSignature(name: String,
                               variance: Int,
                               withCopy: Boolean = true): TypeAliasSignature = {
     def updateTypeParam(tp: TypeParameter): TypeParameter = {
-      new TypeParameter(tp.name,
-                        tp.typeParams.map(updateTypeParam),
-                        () => fun(tp.lowerType(), variance),
-                        () => fun(tp.upperType(), -variance),
-                        tp.ptp)
+      new TypeParameter(tp.name, tp.typeParams.map(updateTypeParam), () =>
+            fun(tp.lowerType(), variance), () =>
+            fun(tp.upperType(), -variance), tp.ptp)
     }
     val res = TypeAliasSignature(name,
                                  typeParams.map(updateTypeParam),

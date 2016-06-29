@@ -95,15 +95,11 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
         ctx.sendToDst(Array(ctx.srcId))
       }, _ ++ _, TripletFields.None)
     } else if (edgeDirection == EdgeDirection.Out) {
-      graph.aggregateMessages[Array[VertexId]](
-          ctx => ctx.sendToSrc(Array(ctx.dstId)),
-          _ ++ _,
-          TripletFields.None)
+      graph.aggregateMessages[Array[VertexId]](ctx =>
+            ctx.sendToSrc(Array(ctx.dstId)), _ ++ _, TripletFields.None)
     } else if (edgeDirection == EdgeDirection.In) {
-      graph.aggregateMessages[Array[VertexId]](
-          ctx => ctx.sendToDst(Array(ctx.srcId)),
-          _ ++ _,
-          TripletFields.None)
+      graph.aggregateMessages[Array[VertexId]](ctx =>
+            ctx.sendToDst(Array(ctx.srcId)), _ ++ _, TripletFields.None)
     } else {
       throw new SparkException(
           "It doesn't make sense to collect neighbor ids without a " +
@@ -135,15 +131,13 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
           ctx.sendToDst(Array((ctx.srcId, ctx.srcAttr)))
         }, (a, b) => a ++ b, TripletFields.All)
       case EdgeDirection.In =>
-        graph.aggregateMessages[Array[(VertexId, VD)]](
-            ctx => ctx.sendToDst(Array((ctx.srcId, ctx.srcAttr))),
-            (a, b) => a ++ b,
-            TripletFields.Src)
+        graph.aggregateMessages[Array[(VertexId, VD)]](ctx =>
+              ctx.sendToDst(Array((ctx.srcId, ctx.srcAttr))), (a, b) =>
+              a ++ b, TripletFields.Src)
       case EdgeDirection.Out =>
-        graph.aggregateMessages[Array[(VertexId, VD)]](
-            ctx => ctx.sendToSrc(Array((ctx.dstId, ctx.dstAttr))),
-            (a, b) => a ++ b,
-            TripletFields.Dst)
+        graph.aggregateMessages[Array[(VertexId, VD)]](ctx =>
+              ctx.sendToSrc(Array((ctx.dstId, ctx.dstAttr))), (a, b) =>
+              a ++ b, TripletFields.Dst)
       case EdgeDirection.Both =>
         throw new SparkException(
             "collectEdges does not support EdgeDirection.Both. Use" +

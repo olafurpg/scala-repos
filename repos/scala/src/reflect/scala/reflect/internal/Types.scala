@@ -4829,11 +4829,7 @@ trait Types
     if (!specializesSym(thistp, sym, depth)) {
       if (sym.isTerm)
         for (alt <- tp.nonPrivateDecl(sym.name).alternatives)
-          if (specializesSym(thistp,
-                             sym,
-                             thistp,
-                             alt,
-                             depth))
+          if (specializesSym(thistp, sym, thistp, alt, depth))
             tp.decls unlink alt
       tp.decls enter sym
     }

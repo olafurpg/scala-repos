@@ -111,10 +111,8 @@ object Puzzle extends LilaController {
     env.forms.difficulty.bindFromRequest.fold(
         err => fuccess(BadRequest(errorsAsJson(err))),
         value =>
-          Env.pref.api.setPref(
-              me,
-              (p: lila.pref.Pref) => p.copy(puzzleDifficulty = value),
-              notifyChange = false) >> {
+          Env.pref.api.setPref(me, (p: lila.pref.Pref) =>
+                p.copy(puzzleDifficulty = value), notifyChange = false) >> {
             reqToCtx(ctx.req) flatMap {
               newCtx =>
                 selectPuzzle(newCtx.me) zip env.userInfos(newCtx.me) map {

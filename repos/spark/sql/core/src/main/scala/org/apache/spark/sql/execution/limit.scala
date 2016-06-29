@@ -74,8 +74,7 @@ trait BaseLimit extends UnaryNode with CodegenSupport {
     val stopEarly = ctx.freshName("stopEarly")
     ctx.addMutableState("boolean", stopEarly, s"$stopEarly = false;")
 
-    ctx.addNewFunction("shouldStop",
-                       s"""
+    ctx.addNewFunction("shouldStop", s"""
       @Override
       protected boolean shouldStop() {
         return !currentRows.isEmpty() || $stopEarly;

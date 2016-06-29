@@ -87,9 +87,8 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
     // check accuracy of predictions
     val validationData =
       LinearDataGenerator.generateLinearInput(0.0, Array(10.0, 10.0), 100, 17)
-    validatePrediction(
-        validationData.map(row => model.latestModel().predict(row.features)),
-        validationData)
+    validatePrediction(validationData.map(row =>
+              model.latestModel().predict(row.features)), validationData)
   }
 
   // Test that parameter estimates improve when learning Y = 10*X1 on streaming data

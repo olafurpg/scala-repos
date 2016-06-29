@@ -17,9 +17,7 @@ private[setup] object AnonConfigRepo {
     configOption(req) flatMap {
       _ ?? { config =>
         anonConfigTube.coll
-          .update(BSONDocument("_id" -> config.id),
-                  f(config),
-                  upsert = true)
+          .update(BSONDocument("_id" -> config.id), f(config), upsert = true)
           .void
       }
     }

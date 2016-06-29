@@ -662,9 +662,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                     s"${getStackTraceString(e)}\n\n"
                 log.error(msg)
                 args.logUrl map { url =>
-                  remoteLog(url,
-                            args.logPrefix.getOrElse(""),
-                            msg)
+                  remoteLog(url, args.logPrefix.getOrElse(""), msg)
                 }
                 complete(StatusCodes.InternalServerError, msg)
             }

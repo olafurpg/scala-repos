@@ -107,10 +107,8 @@ class InterpreterStressSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
     "work with a massive chain of batches by overflowing to the heap" in {
 
-      val batch = Batch(0L,
-                        ConstantFun.zeroLong,
-                        (in: Int) ⇒ in,
-                        (agg: Int, in: Int) ⇒ agg + in)
+      val batch = Batch(0L, ConstantFun.zeroLong, (in: Int) ⇒
+            in, (agg: Int, in: Int) ⇒ agg + in)
 
       new OneBoundedSetup[Int](Vector.fill(chainLength / 10)(batch): _*) {
 

@@ -338,9 +338,7 @@ private[spark] class MesosSchedulerBackend(scheduler: TaskSchedulerImpl,
           slavesIdsOfAcceptedOffers += slaveId
           taskIdToSlaveId(taskDesc.taskId) = slaveId
           val (mesosTask, remainingResources) =
-            createMesosTask(taskDesc,
-                            slaveIdToResources(slaveId),
-                            slaveId)
+            createMesosTask(taskDesc, slaveIdToResources(slaveId), slaveId)
           mesosTasks
             .getOrElseUpdate(slaveId, new JArrayList[MesosTaskInfo])
             .add(mesosTask)

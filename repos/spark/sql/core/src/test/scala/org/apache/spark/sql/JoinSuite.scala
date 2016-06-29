@@ -376,10 +376,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
             null,
             null,
             5,
-            "E") :: Row(null,
-                        null,
-                        6,
-                        "F") :: Nil)
+            "E") :: Row(null, null, 6, "F") :: Nil)
 
     checkAnswer(
         left.join(right,
@@ -393,10 +390,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
             null,
             null,
             5,
-            "E") :: Row(null,
-                        null,
-                        6,
-                        "F") :: Nil)
+            "E") :: Row(null, null, 6, "F") :: Nil)
 
     // Make sure we are UnknownPartitioning as the outputPartitioning for the outer join
     // operator.

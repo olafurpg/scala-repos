@@ -60,8 +60,8 @@ class FastFutureSpec extends FreeSpec with Matchers {
         }
       }
       "Success -> Failure" in {
-        test(Success(23),
-             _.transformWith(_ ⇒ FastFuture.failed(TheException), neverCalled)) {
+        test(Success(23), _.transformWith(_ ⇒
+                  FastFuture.failed(TheException), neverCalled)) {
           _ shouldEqual Failure(TheException)
         }
       }
@@ -72,8 +72,8 @@ class FastFutureSpec extends FreeSpec with Matchers {
         }
       }
       "Failure -> Failure" in {
-        test(Failure(TheException),
-             _.transformWith(neverCalled, _ ⇒ FastFuture.failed(TheException))) {
+        test(Failure(TheException), _.transformWith(neverCalled, _ ⇒
+                  FastFuture.failed(TheException))) {
           _ shouldEqual Failure(TheException)
         }
       }

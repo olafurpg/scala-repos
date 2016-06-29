@@ -140,10 +140,8 @@ object PageRank extends Logging {
 
       // Compute the outgoing rank contributions of each vertex, perform local preaggregation, and
       // do the final aggregation at the receiving vertices. Requires a shuffle for aggregation.
-      val rankUpdates = rankGraph.aggregateMessages[Double](
-          ctx => ctx.sendToDst(ctx.srcAttr * ctx.attr),
-          _ + _,
-          TripletFields.Src)
+      val rankUpdates = rankGraph.aggregateMessages[Double](ctx =>
+            ctx.sendToDst(ctx.srcAttr * ctx.attr), _ + _, TripletFields.Src)
 
       // Apply the final rank updates to get the new ranks, using join to preserve ranks of vertices
       // that didn't receive a message. Requires a shuffle for broadcasting updated ranks to the

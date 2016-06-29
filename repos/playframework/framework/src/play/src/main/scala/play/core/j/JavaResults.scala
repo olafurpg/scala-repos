@@ -39,8 +39,8 @@ object JavaResults
     case xml: play.twirl.api.Xml => xml.body.trim; case c => c.body
   }
   def writeString(mimeType: String)(implicit codec: Codec): Writeable[String] =
-    Writeable((s: String) => codec.encode(s),
-              Some(ContentTypes.withCharset(mimeType)))
+    Writeable((s: String) =>
+          codec.encode(s), Some(ContentTypes.withCharset(mimeType)))
   def writeString(implicit codec: Codec): Writeable[String] =
     writeString(MimeTypes.TEXT)
   def writeBytes: Writeable[Array[Byte]] = Writeable.wByteArray

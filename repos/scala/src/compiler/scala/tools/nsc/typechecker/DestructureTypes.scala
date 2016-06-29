@@ -53,9 +53,8 @@ trait DestructureTypes {
       val (names, args) = ann.assocs.toIndexedSeq.unzip
       if (names.isEmpty) wrapEmpty
       else
-        node("assocs",
-             nodeList(names.indices.toList,
-                      (i: Int) => atom(names(i).toString, args(i))))
+        node("assocs", nodeList(names.indices.toList, (i: Int) =>
+                  atom(names(i).toString, args(i))))
     }
     private def typeTypeName(tp: Type) = tp match {
       case mt @ MethodType(_, _) if mt.isImplicit => "ImplicitMethodType"

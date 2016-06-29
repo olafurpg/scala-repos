@@ -1228,13 +1228,11 @@ trait EvaluatorModule[M[+ _]]
       */
     def inlineNodeValue(graph: DepGraph, from: DepGraph, result: RValue) = {
       val replacements = graph.foldDown(true) {
-        case join @ Join(DerefArray,
-                         Cross(_),
-                         Join(DerefArray,
-                              Cross(_),
-                              `from`,
-                              Const(CLong(index1))),
-                         Const(CLong(index2))) =>
+        case join @ Join(
+            DerefArray,
+            Cross(_),
+            Join(DerefArray, Cross(_), `from`, Const(CLong(index1))),
+            Const(CLong(index2))) =>
           List((join, Const(result)(from.loc)))
       }
 

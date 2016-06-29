@@ -36,8 +36,7 @@ class GetAllClassesTest_212
 
 abstract class GetAllClassesTestBase extends PositionManagerTestBase {
 
-  setupFile("Simple.scala",
-            s"""
+  setupFile("Simple.scala", s"""
       |object Simple {
       |  def main(args: Array[String]) {
       |    $offsetMarker"" $bp
@@ -49,8 +48,7 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
     checkGetAllClasses("Simple$")
   }
 
-  setupFile("SimpleClass.scala",
-            s"""
+  setupFile("SimpleClass.scala", s"""
        |object SimpleClass {
        |  def main(args: Array[String]) {
        |    new TestClass().foo()
@@ -68,8 +66,7 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
     checkGetAllClasses("TestClass")
   }
 
-  setupFile("SimpleClassWithComplexName.scala",
-            s"""
+  setupFile("SimpleClassWithComplexName.scala", s"""
        |object SimpleClassWithComplexName {
        |  def main(args: Array[String]) {
        |    new `Hi there`().foo()
@@ -87,8 +84,7 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
     checkGetAllClasses("Hi$u0020there")
   }
 
-  setupFile("SimpleTrait.scala",
-            s"""
+  setupFile("SimpleTrait.scala", s"""
        |object SimpleTrait extends Test {
        |  def main(args: Array[String]) {
        |    foo()
@@ -106,8 +102,7 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
     checkGetAllClasses("Test$class")
   }
 
-  setupFile("InnerClassInObject.scala",
-            s"""
+  setupFile("InnerClassInObject.scala", s"""
        |object InnerClassInObject {
        |  def main(args: Array[String]) {
        |    new A
@@ -147,8 +142,7 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
                        "LocalClassInAnonClass$$anon$1")
   }
 
-  setupFile("LocalObject.scala",
-            s"""
+  setupFile("LocalObject.scala", s"""
        |object LocalObject {
        |  def main(args: Array[String]) {
        |    object A {
@@ -165,8 +159,7 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
     checkGetAllClasses("LocalObject$A$2$")
   }
 
-  setupFile("LocalClassSymbolicName.scala",
-            s"""
+  setupFile("LocalClassSymbolicName.scala", s"""
        |object LocalClassSymbolicName {
        |  def main(args: Array[String]) {
        |    class !!! {
@@ -240,8 +233,7 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
                        "ForStmt$$anonfun$main$1$$anonfun$apply$2")
   }
 
-  setupFile("AnonClass.scala",
-            s"""
+  setupFile("AnonClass.scala", s"""
        |object AnonClass {
        |  def main(args: Array[String]) {
        |    val r = new Runnable {
@@ -255,8 +247,7 @@ abstract class GetAllClassesTestBase extends PositionManagerTestBase {
     checkGetAllClasses("AnonClass$$anon$1")
   }
 
-  setupFile("ByNameParamInBlock.scala",
-            s"""
+  setupFile("ByNameParamInBlock.scala", s"""
        |object ByNameParamInBlock {
        |  def main (args: Array[String]){
        |    getOrElse(None) {

@@ -84,8 +84,7 @@ class ScExistentialTypeElementImpl(node: ASTNode)
             if (!processor.execute(alias, state)) return false
           case valDecl: ScValueDeclaration =>
             for (declared <- valDecl.declaredElements)
-              if (!processor.execute(declared,
-                                     state))
+              if (!processor.execute(declared, state))
                 return false
         }
       }

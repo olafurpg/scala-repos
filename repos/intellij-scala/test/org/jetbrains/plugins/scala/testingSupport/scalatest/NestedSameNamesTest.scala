@@ -9,8 +9,7 @@ trait NestedSameNamesTest extends ScalaTestTestCase {
     List("[root]", "FunSpecTest", "FunSpecTest", "FunSpecTest", "FunSpecTest")
 
   def testNestedSameNames(): Unit = {
-    addFileToProject("FunSpecTest.scala",
-                     """
+    addFileToProject("FunSpecTest.scala", """
         |import org.scalatest._
         |
         |class FunSpecTest extends FunSpec {

@@ -74,8 +74,7 @@ trait AnalysisTest extends PlanTest {
             |
             |Partial Analysis
             |$analysisAttempt
-          """.stripMargin,
-             a)
+          """.stripMargin, a)
     }
   }
 

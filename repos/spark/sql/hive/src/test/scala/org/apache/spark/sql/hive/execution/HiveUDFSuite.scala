@@ -96,14 +96,12 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
         |SELECT max(named_struct(
         |           "key", key,
         |           "value", value)).value FROM src
-      """.stripMargin),
-                Seq(Row("val_498")))
+      """.stripMargin), Seq(Row("val_498")))
     checkAnswer(sql("""
         |SELECT min(named_struct(
         |           "key", key,
         |           "value", value)).value FROM src
-      """.stripMargin),
-                Seq(Row("val_0")))
+      """.stripMargin), Seq(Row("val_0")))
 
     // nested struct cases
     checkAnswer(sql("""
@@ -112,16 +110,14 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
                             "key", key,
                             "value", value),
         |           "value", value)).value FROM src
-      """.stripMargin),
-                Seq(Row("val_498")))
+      """.stripMargin), Seq(Row("val_498")))
     checkAnswer(sql("""
         |SELECT min(named_struct(
         |           "key", named_struct(
                            "key", key,
                            "value", value),
         |           "value", value)).value FROM src
-      """.stripMargin),
-                Seq(Row("val_0")))
+      """.stripMargin), Seq(Row("val_0")))
   }
 
   test("SPARK-6409 UDAF Average test") {

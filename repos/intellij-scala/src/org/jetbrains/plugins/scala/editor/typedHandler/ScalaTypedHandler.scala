@@ -386,13 +386,8 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
                                               project: Project,
                                               element: PsiElement,
                                               offset: Int) = {
-    indentElement(file)(
-        document,
-        project,
-        element,
-        offset,
-        _ => true,
-        elem => elem.getParent.isInstanceOf[ScReferenceExpression])
+    indentElement(file)(document, project, element, offset, _ => true, elem =>
+          elem.getParent.isInstanceOf[ScReferenceExpression])
   }
 
   private def indentParametersComma(file: PsiFile)(document: Document,

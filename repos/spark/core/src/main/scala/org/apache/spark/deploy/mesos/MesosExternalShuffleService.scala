@@ -138,8 +138,7 @@ private[mesos] class MesosExternalShuffleService(
 private[spark] object MesosExternalShuffleService extends Logging {
 
   def main(args: Array[String]): Unit = {
-    ExternalShuffleService.main(args,
-                                (conf: SparkConf, sm: SecurityManager) =>
-                                  new MesosExternalShuffleService(conf, sm))
+    ExternalShuffleService.main(args, (conf: SparkConf, sm: SecurityManager) =>
+          new MesosExternalShuffleService(conf, sm))
   }
 }

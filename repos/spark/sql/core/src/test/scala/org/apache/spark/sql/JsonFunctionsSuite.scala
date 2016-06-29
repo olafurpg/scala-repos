@@ -58,12 +58,7 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
           null,
           null,
           null,
-          null) :: Row("6",
-                       null,
-                       null,
-                       null,
-                       null,
-                       null) :: Nil
+          null) :: Row("6", null, null, null, null, null) :: Nil
 
     checkAnswer(df.select($"key",
                           functions.get_json_object($"jstring", "$.f1"),
@@ -94,12 +89,7 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
           null,
           null,
           null,
-          null) :: Row("6",
-                       null,
-                       null,
-                       null,
-                       null,
-                       null) :: Nil
+          null) :: Row("6", null, null, null, null, null) :: Nil
 
     checkAnswer(
         df.select(

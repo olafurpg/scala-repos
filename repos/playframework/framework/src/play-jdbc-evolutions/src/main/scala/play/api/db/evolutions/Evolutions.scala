@@ -133,8 +133,7 @@ object Evolutions {
                             downs: String)(implicit environment: Environment) {
     val evolutions = environment.getFile(fileName(db, revision))
     Files.createDirectory(environment.getFile(directoryName(db)).toPath)
-    writeFileIfChanged(evolutions,
-                       """|# --- %s
+    writeFileIfChanged(evolutions, """|# --- %s
          |
          |# --- !Ups
          |%s

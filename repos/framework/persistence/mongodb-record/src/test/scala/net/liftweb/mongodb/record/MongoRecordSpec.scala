@@ -179,9 +179,8 @@ class MongoRecordSpec extends Specification with MongoTestKit {
       }
     }
 
-    testOneHarness(
-        "the field level",
-        rec => rec.stringFieldWithCallbacks: HarnessedLifecycleCallbacks)
+    testOneHarness("the field level", rec =>
+          rec.stringFieldWithCallbacks: HarnessedLifecycleCallbacks)
   }
 
   "MongoRecord" should {

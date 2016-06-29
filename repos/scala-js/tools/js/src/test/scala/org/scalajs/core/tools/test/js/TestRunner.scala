@@ -27,9 +27,8 @@ object TestRunner {
 
     def taskLoop(tasks: Iterable[Task]): Unit = {
       if (tasks.nonEmpty)
-        tasks.head.execute(eventHandler,
-                           loggers,
-                           newTasks => taskLoop(tasks.tail ++ newTasks))
+        tasks.head.execute(eventHandler, loggers, newTasks =>
+              taskLoop(tasks.tail ++ newTasks))
       else if (eventHandler.hasFailed) sys.error("Some tests have failed")
     }
 

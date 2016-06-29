@@ -262,16 +262,16 @@ object Test {
                 String),
       rows: (A, B, C, D, E, F, G, H, I)*): Tuple9[A, B, C, D, E, F, G, H, I] =
     null
-  def foo[A, B, C, D, E, F, G, H](
-      heading: (String,
-                String,
-                String,
-                String,
-                String,
-                String,
-                String,
-                String),
-      rows: (A, B, C, D, E, F, G, H)*): Tuple8[A, B, C, D, E, F, G, H] = null
+  def foo[A, B, C, D, E, F, G, H](heading: (String,
+                                            String,
+                                            String,
+                                            String,
+                                            String,
+                                            String,
+                                            String,
+                                            String),
+                                  rows: (A, B, C, D, E, F, G, H)*)
+    : Tuple8[A, B, C, D, E, F, G, H] = null
   def foo[A, B, C, D, E, F, G](
       heading: (String, String, String, String, String, String, String),
       rows: (A, B, C, D, E, F, G)*): Tuple7[A, B, C, D, E, F, G] = null

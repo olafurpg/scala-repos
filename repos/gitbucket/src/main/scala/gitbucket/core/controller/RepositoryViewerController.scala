@@ -237,9 +237,9 @@ trait RepositoryViewerControllerBase extends ControllerBase {
         path = form.path,
         newFileName = Some(form.newFileName),
         oldFileName = None,
-        content = appendNewLine(convertLineSeparator(form.content,
-                                                     form.lineSeparator),
-                                form.lineSeparator),
+        content =
+          appendNewLine(convertLineSeparator(form.content, form.lineSeparator),
+                        form.lineSeparator),
         charset = form.charset,
         message = form.message.getOrElse(s"Create ${form.newFileName}")
     )
@@ -257,9 +257,9 @@ trait RepositoryViewerControllerBase extends ControllerBase {
         path = form.path,
         newFileName = Some(form.newFileName),
         oldFileName = form.oldFileName,
-        content = appendNewLine(convertLineSeparator(form.content,
-                                                     form.lineSeparator),
-                                form.lineSeparator),
+        content =
+          appendNewLine(convertLineSeparator(form.content, form.lineSeparator),
+                        form.lineSeparator),
         charset = form.charset,
         message = if (form.oldFileName.exists(_ == form.newFileName)) {
           form.message.getOrElse(s"Update ${form.newFileName}")

@@ -287,10 +287,8 @@ class MarathonSchedulerActor private (
         if (origSender != Actor.noSender) origSender ! cmd.answer
       case Failure(e: LockingFailedException) if cmd.force =>
         deploymentManager ! CancelConflictingDeployments(plan)
-        val cancellationHandler = context.system.scheduler.scheduleOnce(
-            cancellationTimeout,
-            self,
-            CancellationTimeoutExceeded)
+        val cancellationHandler = context.system.scheduler
+          .scheduleOnce(cancellationTimeout, self, CancellationTimeoutExceeded)
 
         context.become(
             awaitCancellation(plan, origSender, cancellationHandler))

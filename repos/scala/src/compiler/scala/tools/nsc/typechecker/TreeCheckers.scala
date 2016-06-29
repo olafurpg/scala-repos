@@ -443,10 +443,8 @@ abstract class TreeCheckers extends Analyzer {
             case _ => mk[Type]("and tpe", treeTpe) :: Nil
           }
           def ref =
-            mk[Symbol](
-                "ref to",
-                outOfScope,
-                (s: Symbol) => s.nameString + " (" + s.debugFlagString + ")")
+            mk[Symbol]("ref to", outOfScope, (s: Symbol) =>
+                  s.nameString + " (" + s.debugFlagString + ")")
 
           val pairs = front ++ tpes ++ encls ++ (ref :: Nil)
           val width = pairs.map(_._2.length).max

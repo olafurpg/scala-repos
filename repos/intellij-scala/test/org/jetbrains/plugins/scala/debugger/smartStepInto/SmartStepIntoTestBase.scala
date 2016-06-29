@@ -71,16 +71,14 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     waitForBreakpoint()
   }
 
-  addFileWithBreakpoints("ChainedMethodsAndConstructor.scala",
-                         s"""
+  addFileWithBreakpoints("ChainedMethodsAndConstructor.scala", s"""
        |object ChainedMethodsAndConstructor {
        |  def main(args: Array[String]) {
        |    val s = new A(11).id1().id2.asString  $bp
        |  }
        |}
       """.stripMargin.trim())
-  addSourceFile("A.scala",
-                s"""
+  addSourceFile("A.scala", s"""
        |class A(i: Int) {
        |
        |  val a = i
@@ -114,8 +112,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("InnerClassAndConstructor.scala",
-                         s"""
+  addFileWithBreakpoints("InnerClassAndConstructor.scala", s"""
        |object InnerClassAndConstructor {
        |  def main(args: Array[String]) {
        |    val s = new A(10).id1().asString $bp
@@ -147,8 +144,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("InArguments.scala",
-                         s"""
+  addFileWithBreakpoints("InArguments.scala", s"""
        |object InArguments {
        |
        |  def foo(a: B, a1: B) = {}
@@ -180,8 +176,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("InfixAndApply.scala",
-                         s"""
+  addFileWithBreakpoints("InfixAndApply.scala", s"""
        |object InfixAndApply {
        |
        |  def main(args: Array[String]) {
@@ -212,8 +207,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("PostfixAndUnapply.scala",
-                         s"""
+  addFileWithBreakpoints("PostfixAndUnapply.scala", s"""
        |object PostfixAndUnapply {
        |
        |  def main(args: Array[String]) {
@@ -246,8 +240,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     //    }
   }
 
-  addFileWithBreakpoints("AnonymousClassFromTrait.scala",
-                         s"""
+  addFileWithBreakpoints("AnonymousClassFromTrait.scala", s"""
        |object AnonymousClassFromTrait {
        |
        |  def execute(processor: Processor) = processor.execute()
@@ -286,8 +279,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("AnonymousClassFromClass.scala",
-                         s"""
+  addFileWithBreakpoints("AnonymousClassFromClass.scala", s"""
        |object AnonymousClassFromClass {
        |
        |  def execute(processor: ProcessorClass) = processor.execute()
@@ -326,8 +318,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ByNameArgument.scala",
-                         s"""
+  addFileWithBreakpoints("ByNameArgument.scala", s"""
        |object ByNameArgument {
        |
        |  def inTryBlock(u: => String): Unit = {
@@ -361,8 +352,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("LocalFunction.scala",
-                         s"""
+  addFileWithBreakpoints("LocalFunction.scala", s"""
        |object LocalFunction {
        |
        |  def main(args: Array[String]) {
@@ -381,8 +371,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ImplicitConversion.scala",
-                         s"""
+  addFileWithBreakpoints("ImplicitConversion.scala", s"""
        |import scala.language.implicitConversions
        |
        |object ImplicitConversion {
@@ -408,8 +397,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ImplicitClass.scala",
-                         s"""
+  addFileWithBreakpoints("ImplicitClass.scala", s"""
        |import scala.language.implicitConversions
        |
        |object ImplicitClass {
@@ -433,8 +421,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ImplicitValueClass.scala",
-                         s"""
+  addFileWithBreakpoints("ImplicitValueClass.scala", s"""
        |import scala.language.implicitConversions
        |
        |object ImplicitValueClass {
@@ -458,8 +445,7 @@ abstract class SmartStepIntoTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("MethodValue.scala",
-                         s"""
+  addFileWithBreakpoints("MethodValue.scala", s"""
        |object MethodValue {
        |  def main(args: Array[String]): Unit = {
        |    val a = new A(Seq(1, 2, 3))

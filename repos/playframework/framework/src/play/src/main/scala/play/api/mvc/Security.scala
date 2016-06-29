@@ -83,9 +83,8 @@ object Security {
     * @param action the action to wrap
     */
   def Authenticated(action: String => EssentialAction): EssentialAction =
-    Authenticated(
-        req => req.session.get(username),
-        _ => Unauthorized(views.html.defaultpages.unauthorized()))(action)
+    Authenticated(req => req.session.get(username), _ =>
+          Unauthorized(views.html.defaultpages.unauthorized()))(action)
 
   /**
     * An authenticated request

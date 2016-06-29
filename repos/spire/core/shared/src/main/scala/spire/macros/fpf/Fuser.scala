@@ -36,9 +36,7 @@ private[spire] trait Fuser[C <: Context, A] {
       val (apx0, mes0, ind0, exact0) = freshApproxNames()
       val indValDef = ind.fold(t => q"val $ind0 = $t" :: Nil, _ => Nil)
       val stats1 =
-        List(q"val $apx0 = $apx",
-             q"val $mes0 = $mes",
-             q"def $exact0 = $exact") ++ indValDef
+        List(q"val $apx0 = $apx", q"val $mes0 = $mes", q"def $exact0 = $exact") ++ indValDef
       Fused(stats0 ++ stats1, apx0, mes0, ind.left.map(_ => ind0), exact0)
     }
   }
@@ -256,8 +254,7 @@ private[spire] trait Fuser[C <: Context, A] {
     val Fused(stats, apx, mes, ind, exact) = extract(tree)
     val err = freshTermName(c)("fpf$err$")
     val ind0 = ind.fold(name => q"$name", intLit)
-    val block = Block(stats :+ q"val $err = $mes * $ind0 * $Epsilon",
-                      q"""
+    val block = Block(stats :+ q"val $err = $mes * $ind0 * $Epsilon", q"""
         if ($apx > $err && $apx < $PositiveInfinity) 1
         else if ($apx < -$err && $apx > $NegativeInfinity) -1
         else if ($err == 0D) 0

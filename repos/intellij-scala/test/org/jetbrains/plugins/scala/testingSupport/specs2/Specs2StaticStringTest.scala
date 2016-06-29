@@ -8,8 +8,7 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
   def testValString() = {
     val testClassName = "ValStringTest"
     val valFileName = testClassName + ".scala"
-    addFileToProject(valFileName,
-                     """
+    addFileToProject(valFileName, """
       |import org.specs2.mutable.Specification
       |
       |class ValStringTest extends Specification {
@@ -32,8 +31,7 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
   def testStringSum() = {
     val testClassName = "StringSumTest"
     val sumFileName = testClassName + ".scala"
-    addFileToProject(sumFileName,
-                     """
+    addFileToProject(sumFileName, """
       |import org.specs2.mutable.Specification
       |
       |class StringSumTest extends Specification {
@@ -55,8 +53,7 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
   def testNonConst() = {
     val testClassName = "BadStringTest"
     val badFileName = testClassName + ".scala"
-    addFileToProject(badFileName,
-                     """
+    addFileToProject(badFileName, """
       |import org.specs2.mutable.Specification
       |
       |class BadStringTest extends Specification {

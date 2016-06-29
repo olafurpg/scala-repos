@@ -203,9 +203,7 @@ object InferUtil {
                     searchImplicitsRecursively: Int = 0,
                     abstractSubstitutor: ScSubstitutor = ScSubstitutor.empty,
                     polymorphicSubst: ScSubstitutor = ScSubstitutor.empty)
-    : (Seq[Parameter],
-       Seq[Compatibility.Expression],
-       Seq[ScalaResolveResult]) = {
+    : (Seq[Parameter], Seq[Compatibility.Expression], Seq[ScalaResolveResult]) = {
     val exprs = new ArrayBuffer[Expression]
     val paramsForInfer = new ArrayBuffer[Parameter]()
     val resolveResults = new ArrayBuffer[ScalaResolveResult]

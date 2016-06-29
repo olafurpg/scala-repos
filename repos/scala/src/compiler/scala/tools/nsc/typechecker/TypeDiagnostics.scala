@@ -657,9 +657,9 @@ trait TypeDiagnostics { self: Analyzer =>
 
         tparams.filter(_.name != typeNames.WILDCARD).foreach { tp =>
           // we don't care about type params shadowing other type params in the same declaration
-          enclClassOrMethodOrTypeMember(context).outer.lookupSymbol(
-              tp.name,
-              s => s != tp.symbol && s.hasRawInfo && reallyExists(s)) match {
+          enclClassOrMethodOrTypeMember(context).outer
+            .lookupSymbol(tp.name, s =>
+                  s != tp.symbol && s.hasRawInfo && reallyExists(s)) match {
             case LookupSucceeded(_, sym2) =>
               context.warning(
                   tp.pos,

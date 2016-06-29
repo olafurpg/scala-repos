@@ -200,9 +200,8 @@ class LogManagerTest {
   @Test
   def testLeastLoadedAssignment() {
     // create a log manager with multiple data directories
-    val dirs = Array(TestUtils.tempDir(),
-                     TestUtils.tempDir(),
-                     TestUtils.tempDir())
+    val dirs =
+      Array(TestUtils.tempDir(), TestUtils.tempDir(), TestUtils.tempDir())
     logManager.shutdown()
     logManager = createLogManager()
 

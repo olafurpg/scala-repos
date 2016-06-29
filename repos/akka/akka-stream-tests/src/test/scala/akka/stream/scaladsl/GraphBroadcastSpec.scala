@@ -75,11 +75,8 @@ class GraphBroadcastSpec extends AkkaSpec {
       import system.dispatcher
       val result = RunnableGraph
         .fromGraph(
-            GraphDSL.create(headSink,
-                            headSink,
-                            headSink,
-                            headSink,
-                            headSink)((fut1, fut2, fut3, fut4, fut5) ⇒
+            GraphDSL.create(headSink, headSink, headSink, headSink, headSink)(
+                (fut1, fut2, fut3, fut4, fut5) ⇒
                   Future.sequence(List(fut1, fut2, fut3, fut4, fut5))) {
           implicit b ⇒ (p1, p2, p3, p4, p5) ⇒
             val bcast = b.add(Broadcast[Int](5))

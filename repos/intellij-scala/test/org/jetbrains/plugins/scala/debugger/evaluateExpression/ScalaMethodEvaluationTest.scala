@@ -16,8 +16,7 @@ class ScalaMethodEvaluationTest_212
 
 abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
 
-  addFileWithBreakpoints("SmartBoxing.scala",
-                         s"""
+  addFileWithBreakpoints("SmartBoxing.scala", s"""
       |object SmartBoxing {
       |  def foo(x: AnyVal) = 1
       |  def goo(x: Int) = x + 1
@@ -35,8 +34,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("FunctionWithSideEffects.scala",
-                         s"""
+  addFileWithBreakpoints("FunctionWithSideEffects.scala", s"""
       |object FunctionWithSideEffects {
       |  var i = 1
       |  def foo = {
@@ -56,8 +54,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("SimpleFunction.scala",
-                         s"""
+  addFileWithBreakpoints("SimpleFunction.scala", s"""
       |object SimpleFunction {
       |  def foo() = 2
       |  def main(args: Array[String]) {
@@ -72,8 +69,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("PrivateMethods.scala",
-                         s"""
+  addFileWithBreakpoints("PrivateMethods.scala", s"""
       |import PrivateMethods._
       |object PrivateMethods {
       |  private def foo() = 2
@@ -93,8 +89,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ApplyCall.scala",
-                         s"""
+  addFileWithBreakpoints("ApplyCall.scala", s"""
       |object ApplyCall {
       |  class A {
       |    def apply(x: Int) = x + 1
@@ -113,8 +108,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("CurriedFunction.scala",
-                         s"""
+  addFileWithBreakpoints("CurriedFunction.scala", s"""
       |object CurriedFunction {
       |  def foo(x: Int)(y: Int) = x * 2 + y
       |  def main(args: Array[String]) {
@@ -129,8 +123,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ArrayApplyFunction.scala",
-                         s"""
+  addFileWithBreakpoints("ArrayApplyFunction.scala", s"""
       |object ArrayApplyFunction {
       |  def main(args : Array[String]) {
       |    val s = Array.ofDim[String](2, 2)
@@ -146,8 +139,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("OverloadedFunction.scala",
-                         s"""
+  addFileWithBreakpoints("OverloadedFunction.scala", s"""
       |object OverloadedFunction {
       |  def foo(x: Int) = 1
       |  def foo(x: String) = 2
@@ -164,8 +156,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ImplicitConversion.scala",
-                         s"""
+  addFileWithBreakpoints("ImplicitConversion.scala", s"""
       |object ImplicitConversion {
       |  def main(args : Array[String]) {
       |    ""$bp
@@ -181,8 +172,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("SequenceArgument.scala",
-                         s"""
+  addFileWithBreakpoints("SequenceArgument.scala", s"""
       |object SequenceArgument {
       |  def moo(x: String*) = x.foldLeft(0)(_ + _.length())
       |  def main(args: Array[String]) {
@@ -198,8 +188,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ArrayLengthFunction.scala",
-                         s"""
+  addFileWithBreakpoints("ArrayLengthFunction.scala", s"""
       |object ArrayLengthFunction {
       |  def main(args : Array[String]) {
       |    val s = Array(1, 2, 3)
@@ -215,8 +204,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("SimpleFunctionFromInner.scala",
-                         s"""
+  addFileWithBreakpoints("SimpleFunctionFromInner.scala", s"""
       |object SimpleFunctionFromInner {
       |  def foo() = 2
       |  def main(args: Array[String]) {
@@ -236,8 +224,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("LibraryFunctions.scala",
-                         s"""
+  addFileWithBreakpoints("LibraryFunctions.scala", s"""
       |object LibraryFunctions {
       |  def main(args: Array[String]) {
       |    ""$bp
@@ -262,8 +249,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("DynamicFunctionApplication.scala",
-                         s"""
+  addFileWithBreakpoints("DynamicFunctionApplication.scala", s"""
        |class A
        |class B extends A {
        |  def foo() = 1
@@ -284,8 +270,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("NonStaticFunction.scala",
-                         s"""
+  addFileWithBreakpoints("NonStaticFunction.scala", s"""
       |object NonStaticFunction {
       |  def foo() = 2
       |  val x = 1
@@ -315,8 +300,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("DefaultAndNamedParameters.scala",
-                         s"""
+  addFileWithBreakpoints("DefaultAndNamedParameters.scala", s"""
       |object DefaultAndNamedParameters {
       |  def foo(x: Int, y: Int = 1, z: Int)(h: Int = x + y, m: Int) = x + y + z + h + m
       |  def main(args: Array[String]) {
@@ -333,8 +317,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("RepeatedParameters.scala",
-                         s"""
+  addFileWithBreakpoints("RepeatedParameters.scala", s"""
       |object RepeatedParameters {
       |  def foo(x: String*) = x.foldLeft("")(_ + _)
       |  def main(args: Array[String]) {
@@ -352,8 +335,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ImplicitParameters.scala",
-                         s"""
+  addFileWithBreakpoints("ImplicitParameters.scala", s"""
       |object ImplicitParameters {
       |  def moo(x: Int)(implicit s: String) = x + s.length()
       |  def foo(x: Int)(implicit y: Int) = {
@@ -377,8 +359,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("CaseClasses.scala",
-                         s"""
+  addFileWithBreakpoints("CaseClasses.scala", s"""
       |case class CCA(x: Int)
       |object CaseClasses {
       |  case class CCB(x: Int)
@@ -397,8 +378,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("PrivateInTrait.scala",
-                         s"""
+  addFileWithBreakpoints("PrivateInTrait.scala", s"""
       |trait Privates {
       |
       |  private[this] def privThis(i: Int) = i + 1
@@ -429,8 +409,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("LocalsInTrait.scala",
-                         s"""trait TTT {
+  addFileWithBreakpoints("LocalsInTrait.scala", s"""trait TTT {
       |  def foo() = {
       |    def bar() = {
       |      def baz() = 1
@@ -462,8 +441,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
 
   // tests for local functions ----------------------------------------------
 
-  addFileWithBreakpoints("LocalFunctions.scala",
-                         s"""
+  addFileWithBreakpoints("LocalFunctions.scala", s"""
        |object LocalFunctions {
        |  val field = 1
        |
@@ -576,8 +554,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("Closure.scala",
-                         s"""
+  addFileWithBreakpoints("Closure.scala", s"""
        |object Closure {
        |  def main(args: Array[String]) {
        |    def outer() {
@@ -603,8 +580,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("LocalWithDefaultAndNamedParams.scala",
-                         s"""
+  addFileWithBreakpoints("LocalWithDefaultAndNamedParams.scala", s"""
        |object LocalWithDefaultAndNamedParams {
        |  def main(args: Array[String]) {
        |    def outer() {
@@ -631,8 +607,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("LocalMethodsWithSameName.scala",
-                         s"""
+  addFileWithBreakpoints("LocalMethodsWithSameName.scala", s"""
        |object LocalMethodsWithSameName {
        |  def main(args: Array[String]) {
        |    def foo(i: Int = 1) = {
@@ -671,8 +646,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ClosureWithDefaultParameter.scala",
-                         s"""
+  addFileWithBreakpoints("ClosureWithDefaultParameter.scala", s"""
        |object ClosureWithDefaultParameter {
        |  def main(args: Array[String]) {
        |    def outer() {
@@ -700,8 +674,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("FunctionsWithLocalParameters.scala",
-                         s"""
+  addFileWithBreakpoints("FunctionsWithLocalParameters.scala", s"""
        |object FunctionsWithLocalParameters {
        |  def main(args: Array[String]) {
        |    val x = 1
@@ -784,8 +757,7 @@ abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("InForStmt.scala",
-                         s"""
+  addFileWithBreakpoints("InForStmt.scala", s"""
       |object InForStmt {
       |  def main(args: Array[String]) {
       |    for {

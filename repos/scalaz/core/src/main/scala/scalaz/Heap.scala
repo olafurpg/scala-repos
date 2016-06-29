@@ -205,9 +205,7 @@ sealed abstract class Heap[A] {
         Heap(s + 1,
              f,
              Node(Ranked(0, y),
-                  skewInsert(f,
-                             Node(Ranked(0, x), Stream()),
-                             t.subForest)))
+                  skewInsert(f, Node(Ranked(0, x), Stream()), t.subForest)))
     })
 
   private def splitWithList(f: List[A] => (List[A], List[A])) = {

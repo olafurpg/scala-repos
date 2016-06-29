@@ -29,10 +29,8 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
   protected def genericCompletionComprasion(initialText: String,
                                             finalText: String,
                                             preferedLookupString: String) {
-    genericCompletionComparison(
-        initialText,
-        finalText,
-        (le: LookupElement) => le.getLookupString == preferedLookupString)
+    genericCompletionComparison(initialText, finalText, (le: LookupElement) =>
+          le.getLookupString == preferedLookupString)
   }
 
   def testTagNameCompletion() {

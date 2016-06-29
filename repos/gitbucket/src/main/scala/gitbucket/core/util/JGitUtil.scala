@@ -302,11 +302,8 @@ object JGitUtil {
 
       @tailrec
       def findLastCommits(
-          result: List[(ObjectId,
-                        FileMode,
-                        String,
-                        Option[String],
-                        RevCommit)],
+          result: List[
+              (ObjectId, FileMode, String, Option[String], RevCommit)],
           restList: List[((ObjectId, FileMode, String, Option[String]),
                           Map[RevCommit, RevCommit])],
           revIterator: java.util.Iterator[RevCommit])

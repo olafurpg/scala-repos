@@ -108,10 +108,7 @@ class KeyValueGroupedDataset[K, V] private[sql] (
   def flatMapGroups[U: Encoder](
       f: (K, Iterator[V]) => TraversableOnce[U]): Dataset[U] = {
     Dataset[U](sqlContext,
-               MapGroups(f,
-                         groupingAttributes,
-                         dataAttributes,
-                         logicalPlan))
+               MapGroups(f, groupingAttributes, dataAttributes, logicalPlan))
   }
 
   /**

@@ -205,8 +205,7 @@ class LogCleaner(val config: CleanerConfig,
         id = threadId,
         offsetMap = new SkimpyOffsetMap(
             memory = math
-              .min(config.dedupeBufferSize / config.numThreads,
-                   Int.MaxValue)
+              .min(config.dedupeBufferSize / config.numThreads, Int.MaxValue)
               .toInt,
             hashAlgorithm = config.hashAlgorithm),
         ioBufferSize = config.ioBufferSize / config.numThreads / 2,
@@ -299,12 +298,10 @@ class LogCleaner(val config: CleanerConfig,
                       stats.elapsedIndexSecs),
                 100 * (stats.elapsedSecs -
                       stats.elapsedIndexSecs).toDouble / stats.elapsedSecs) +
-          "\tStart size: %,.1f MB (%,d messages)%n".format(
-              mb(stats.bytesRead),
-              stats.messagesRead) +
-          "\tEnd size: %,.1f MB (%,d messages)%n".format(
-              mb(stats.bytesWritten),
-              stats.messagesWritten) +
+          "\tStart size: %,.1f MB (%,d messages)%n"
+            .format(mb(stats.bytesRead), stats.messagesRead) +
+          "\tEnd size: %,.1f MB (%,d messages)%n"
+            .format(mb(stats.bytesWritten), stats.messagesWritten) +
           "\t%.1f%% size reduction (%.1f%% fewer messages)%n".format(
               100.0 * (1.0 - stats.bytesWritten.toDouble / stats.bytesRead),
               100.0 * (1.0 -

@@ -442,13 +442,12 @@ class EngineEvalSuite extends FunSuite with Inside with SharedSparkContext {
     val qn = 5
 
     val evalDataSet: Seq[(EvalInfo, RDD[(Query, Prediction, Actual)])] =
-      Engine.eval(sc,
-                  new PDataSource1(id = 1, en = en, qn = qn),
-                  new PPreparator0(id = 2),
-                  Seq(new PAlgo0(id = 3),
-                      new PAlgo1(id = 4),
-                      new NAlgo1(id = 5)),
-                  new LServing0(id = 10))
+      Engine.eval(
+          sc,
+          new PDataSource1(id = 1, en = en, qn = qn),
+          new PPreparator0(id = 2),
+          Seq(new PAlgo0(id = 3), new PAlgo1(id = 4), new NAlgo1(id = 5)),
+          new LServing0(id = 10))
 
     val pd = ProcessedData(2, TrainingData(1))
     val model0 = PAlgo0.Model(3, pd)
@@ -493,13 +492,12 @@ class EngineEvalSuite extends FunSuite with Inside with SharedSparkContext {
     val qn = 5
 
     val evalDataSet: Seq[(EvalInfo, RDD[(Query, Prediction, Actual)])] =
-      Engine.eval(sc,
-                  new PDataSource1(id = 1, en = en, qn = qn),
-                  new PPreparator0(id = 2),
-                  Seq(new PAlgo0(id = 3),
-                      new PAlgo1(id = 4),
-                      new NAlgo1(id = 5)),
-                  new LServing2(id = 10))
+      Engine.eval(
+          sc,
+          new PDataSource1(id = 1, en = en, qn = qn),
+          new PPreparator0(id = 2),
+          Seq(new PAlgo0(id = 3), new PAlgo1(id = 4), new NAlgo1(id = 5)),
+          new LServing2(id = 10))
 
     val pd = ProcessedData(2, TrainingData(1))
     val model0 = PAlgo0.Model(3, pd)
@@ -548,13 +546,12 @@ class EngineEvalSuite extends FunSuite with Inside with SharedSparkContext {
     val qn = 5
 
     val evalDataSet: Seq[(EvalInfo, RDD[(Query, Prediction, Actual)])] =
-      Engine.eval(sc,
-                  new LDataSource0(id = 1, en = en, qn = qn),
-                  new LPreparator0(id = 2),
-                  Seq(new LAlgo0(id = 3),
-                      new LAlgo1(id = 4),
-                      new LAlgo1(id = 5)),
-                  new LServing0(id = 10))
+      Engine.eval(
+          sc,
+          new LDataSource0(id = 1, en = en, qn = qn),
+          new LPreparator0(id = 2),
+          Seq(new LAlgo0(id = 3), new LAlgo1(id = 4), new LAlgo1(id = 5)),
+          new LServing0(id = 10))
 
     val pd = ProcessedData(2, TrainingData(1))
     val model0 = LAlgo0.Model(3, pd)

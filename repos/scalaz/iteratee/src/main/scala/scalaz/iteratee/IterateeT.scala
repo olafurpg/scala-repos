@@ -334,9 +334,7 @@ trait IterateeTFunctions {
   /**An iteratee that skips the first n elements of the input **/
   def drop[E, F[_]: Applicative](n: Int): IterateeT[E, F, Unit] = {
     def step(s: Input[E]): IterateeT[E, F, Unit] =
-      s(el = _ => drop(n - 1),
-        empty = cont(step),
-        eof = done((), eofInput[E]))
+      s(el = _ => drop(n - 1), empty = cont(step), eof = done((), eofInput[E]))
     if (n == 0) done((), emptyInput[E])
     else cont(step)
   }

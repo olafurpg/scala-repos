@@ -103,8 +103,8 @@ object TreeOrderedBuf {
       val tempLen = freshT("tempLen")
       val lensLen = freshT("lensLen")
       val element = freshT("element")
-      val callDynamic = (q"""override def staticSize: Option[Int] = None""",
-                         q"""
+      val callDynamic =
+        (q"""override def staticSize: Option[Int] = None""", q"""
 
       override def dynamicSize($element: $typeName): Option[Int] = {
         if(skipLenCalc) None else {
@@ -128,8 +128,7 @@ object TreeOrderedBuf {
       t.length(q"$element") match {
         case _: NoLengthCalculationAvailable[_] =>
           (q"""
-          override def staticSize: Option[Int] = None""",
-           q"""
+          override def staticSize: Option[Int] = None""", q"""
           override def dynamicSize($element: $typeName): Option[Int] = None""")
         case const: ConstantLengthCalculation[_] =>
           (q"""

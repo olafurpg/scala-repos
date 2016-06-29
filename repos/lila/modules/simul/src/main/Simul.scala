@@ -128,27 +128,27 @@ object Simul {
            clock: SimulClock,
            variants: List[Variant],
            color: String): Simul =
-    Simul(_id = Random nextStringUppercase 8,
-          name = RandomName(),
-          status = SimulStatus.Created,
-          clock = clock,
-          hostId = host.id,
-          hostRating = host.perfs.bestRatingIn {
-            variants flatMap {
-              variant =>
-                lila.game.PerfPicker.perfType(
-                    speed = chess.Speed(clock.chessClock.some),
-                    variant = variant,
-                    daysPerTurn = none)
-            }
-          },
-          hostGameId = none,
-          createdAt = DateTime.now,
-          variants = variants,
-          applicants = Nil,
-          pairings = Nil,
-          startedAt = none,
-          finishedAt = none,
-          hostSeenAt = DateTime.now.some,
-          color = color.some)
+    Simul(
+        _id = Random nextStringUppercase 8,
+        name = RandomName(),
+        status = SimulStatus.Created,
+        clock = clock,
+        hostId = host.id,
+        hostRating = host.perfs.bestRatingIn {
+          variants flatMap { variant =>
+            lila.game.PerfPicker.perfType(speed =
+                                            chess.Speed(clock.chessClock.some),
+                                          variant = variant,
+                                          daysPerTurn = none)
+          }
+        },
+        hostGameId = none,
+        createdAt = DateTime.now,
+        variants = variants,
+        applicants = Nil,
+        pairings = Nil,
+        startedAt = none,
+        finishedAt = none,
+        hostSeenAt = DateTime.now.some,
+        color = color.some)
 }

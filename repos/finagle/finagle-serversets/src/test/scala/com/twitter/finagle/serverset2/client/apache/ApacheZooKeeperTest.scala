@@ -438,11 +438,8 @@ class ApacheZooKeeperTest
   "setData" should "submit properly constructed versioned setData" in {
     val nodeStat = zk.setData(path, Some(data), Some(version))
 
-    verify(mockZK).setData(meq(path),
-                           meq(_data),
-                           meq(version),
-                           statCB.capture,
-                           meq(null))
+    verify(mockZK)
+      .setData(meq(path), meq(_data), meq(version), statCB.capture, meq(null))
 
     statCB.getValue.processResult(apacheOk, path, null, apacheStat)
     assert(Await.result(nodeStat) == stat)
@@ -452,11 +449,8 @@ class ApacheZooKeeperTest
   "setData" should "submit properly constructed unversioned setData" in {
     val nodeStat = zk.setData(path, Some(data), None)
 
-    verify(mockZK).setData(meq(path),
-                           meq(_data),
-                           meq(-1),
-                           statCB.capture,
-                           meq(null))
+    verify(mockZK)
+      .setData(meq(path), meq(_data), meq(-1), statCB.capture, meq(null))
 
     statCB.getValue.processResult(apacheOk, path, null, apacheStat)
     assert(Await.result(nodeStat) == stat)
@@ -466,11 +460,8 @@ class ApacheZooKeeperTest
   "setData" should "submit properly constructed unversioned empty znode setData" in {
     val nodeStat = zk.setData(path, None, None)
 
-    verify(mockZK).setData(meq(path),
-                           meq(null),
-                           meq(-1),
-                           statCB.capture,
-                           meq(null))
+    verify(mockZK)
+      .setData(meq(path), meq(null), meq(-1), statCB.capture, meq(null))
 
     statCB.getValue.processResult(apacheOk, path, null, apacheStat)
     assert(Await.result(nodeStat) == stat)
@@ -480,11 +471,8 @@ class ApacheZooKeeperTest
   "setData" should "handle ZK error" in {
     val nodeStat = zk.setData(path, Some(data), Some(version))
 
-    verify(mockZK).setData(meq(path),
-                           meq(_data),
-                           meq(version),
-                           statCB.capture,
-                           meq(null))
+    verify(mockZK)
+      .setData(meq(path), meq(_data), meq(version), statCB.capture, meq(null))
 
     statCB.getValue.processResult(apacheConnLoss, path, null, null)
     intercept[KeeperException.ConnectionLoss] {
@@ -502,11 +490,8 @@ class ApacheZooKeeperTest
                        meq(null))).thenThrow(new IllegalArgumentException)
     val nodeStat = zk.setData(path, Some(data), Some(version))
 
-    verify(mockZK).setData(meq(path),
-                           meq(_data),
-                           meq(version),
-                           statCB.capture,
-                           meq(null))
+    verify(mockZK)
+      .setData(meq(path), meq(_data), meq(version), statCB.capture, meq(null))
 
     intercept[IllegalArgumentException] {
       Await.result(nodeStat)
@@ -566,11 +551,8 @@ class ApacheZooKeeperTest
   "setACL" should "submit properly constructed unversioned setACL" in {
     val nodeStat = zk.setACL(path, acls, None)
 
-    verify(mockZK).setACL(meq(path),
-                          meq(apacheACLS),
-                          meq(-1),
-                          statCB.capture,
-                          meq(null))
+    verify(mockZK)
+      .setACL(meq(path), meq(apacheACLS), meq(-1), statCB.capture, meq(null))
 
     statCB.getValue.processResult(apacheOk, path, null, apacheStat)
     assert(Await.result(nodeStat) == stat)

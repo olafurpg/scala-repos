@@ -475,11 +475,9 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
           myDependentMethodTypesFunDefined
         substCopy.myDependentMethodTypes = myDependentMethodTypes
         def substTypeParam(tp: TypeParameter): TypeParameter = {
-          new TypeParameter(tp.name,
-                            tp.typeParams.map(substTypeParam),
-                            () => substInternal(tp.lowerType()),
-                            () => substInternal(tp.upperType()),
-                            tp.ptp)
+          new TypeParameter(tp.name, tp.typeParams.map(substTypeParam), () =>
+                substInternal(tp.lowerType()), () =>
+                substInternal(tp.upperType()), tp.ptp)
         }
         val middleRes =
           ScCompoundType(comps.map(substInternal), signatureMap.map {

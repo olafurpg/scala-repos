@@ -160,9 +160,8 @@ sealed trait TupleInstances1 extends TupleInstances0 {
     def _1 = implicitly
     def _2 = implicitly
   }
-  implicit def tuple4BindRec[A1: Semigroup,
-                             A2: Semigroup,
-                             A3: Semigroup]: BindRec[(A1, A2, A3, ?)] =
+  implicit def tuple4BindRec[A1: Semigroup, A2: Semigroup, A3: Semigroup]
+    : BindRec[(A1, A2, A3, ?)] =
     new Tuple4BindRec[A1, A2, A3] {
       def _1 = implicitly
       def _2 = implicitly

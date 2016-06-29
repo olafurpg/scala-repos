@@ -907,11 +907,9 @@ object Project extends ProjectExtra {
                            value)(f))
       }
     def keepAs(key: TaskKey[S]): Def.Initialize[Task[S]] =
-      (i, Keys.resolvedScoped)(
-          (t, scoped) =>
-            tx(t,
-               (state, value) =>
-                 set(resolveContext(key, scoped.scope, state), state, value)))
+      (i, Keys.resolvedScoped)((t, scoped) =>
+            tx(t, (state, value) =>
+                  set(resolveContext(key, scoped.scope, state), state, value)))
   }
 
   import scala.reflect._
@@ -919,9 +917,7 @@ object Project extends ProjectExtra {
 
   def projectMacroImpl(c: Context): c.Expr[Project] = {
     import c.universe._
-    val enclosingValName = std.KeyMacro.definingValName(
-        c,
-        methodName =>
+    val enclosingValName = std.KeyMacro.definingValName(c, methodName =>
           s"""$methodName must be directly assigned to a val, such as `val x = $methodName`.""")
     val name = c.Expr[String](Literal(Constant(enclosingValName)))
     reify { Project(name.splice, new File(name.splice)) }

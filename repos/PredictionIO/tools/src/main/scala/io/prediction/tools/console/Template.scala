@@ -169,10 +169,8 @@ object Template extends Logging {
   }
 
   def sub(repo: String, name: String, email: String, org: String): Unit = {
-    val data = Map("repo" -> repo,
-                   "name" -> name,
-                   "email" -> email,
-                   "org" -> org)
+    val data =
+      Map("repo" -> repo, "name" -> name, "email" -> email, "org" -> org)
     try {
       httpOptionalProxy("http://update.prediction.io/templates.subscribe")
         .postData("json=" + write(data))

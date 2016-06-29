@@ -51,10 +51,7 @@ object CombinableBox {
     case Left(Nil) => Empty
     case Left(f :: Nil) => f
     case Left(f) =>
-      new ParamFailure("Multiple Failures",
-                       Empty,
-                       Empty,
-                       FailureList(f))
+      new ParamFailure("Multiple Failures", Empty, Empty, FailureList(f))
     case Right(x) => Full(x)
   }
 

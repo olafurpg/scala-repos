@@ -64,10 +64,8 @@ object PreferredReplicaLeaderElectionCommand extends Logging {
     var zkUtils: ZkUtils = null
     try {
       zkClient = ZkUtils.createZkClient(zkConnect, 30000, 30000)
-      zkUtils = ZkUtils(zkConnect,
-                        30000,
-                        30000,
-                        JaasUtils.isZkSecurityEnabled())
+      zkUtils =
+        ZkUtils(zkConnect, 30000, 30000, JaasUtils.isZkSecurityEnabled())
       val partitionsForPreferredReplicaElection =
         if (!options.has(jsonFileOpt)) zkUtils.getAllPartitions()
         else

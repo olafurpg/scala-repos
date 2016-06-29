@@ -110,15 +110,13 @@ class HiveWindowFunctionQuerySuite
   // Tests based on windowing_multipartitioning.q
   // Results of the original query file are not deterministic.
   /////////////////////////////////////////////////////////////////////////////
-  createQueryTest("windowing_multipartitioning.q (deterministic) 1",
-                  s"""
+  createQueryTest("windowing_multipartitioning.q (deterministic) 1", s"""
       |select s,
       |rank() over (partition by s order by si) r,
       |sum(b) over (partition by s order by si) sum
       |from over1k
       |order by s, r, sum;
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
   /* timestamp comparison issue with Hive?
   createQueryTest("windowing_multipartitioning.q (deterministic) 2",
@@ -132,30 +130,23 @@ class HiveWindowFunctionQuerySuite
      """.stripMargin, reset = false)
    */
 
-  createQueryTest("windowing_multipartitioning.q (deterministic) 3",
-                  s"""
+  createQueryTest("windowing_multipartitioning.q (deterministic) 3", s"""
       |select s, sum(i) over (partition by s), sum(f) over (partition by si)
       |from over1k where s = 'tom allen' or s = 'bob steinbeck';
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
-  createQueryTest("windowing_multipartitioning.q (deterministic) 4",
-                  s"""
+  createQueryTest("windowing_multipartitioning.q (deterministic) 4", s"""
       |select s, rank() over (partition by s order by bo),
       |rank() over (partition by si order by bin desc) from over1k
       |where s = 'tom allen' or s = 'bob steinbeck';
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
-  createQueryTest("windowing_multipartitioning.q (deterministic) 5",
-                  s"""
+  createQueryTest("windowing_multipartitioning.q (deterministic) 5", s"""
       |select s, sum(f) over (partition by i), row_number() over (order by f)
       |from over1k where s = 'tom allen' or s = 'bob steinbeck';
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
-  createQueryTest("windowing_multipartitioning.q (deterministic) 6",
-                  s"""
+  createQueryTest("windowing_multipartitioning.q (deterministic) 6", s"""
       |select s, rank() over w1,
       |rank() over w2
       |from over1k
@@ -163,8 +154,7 @@ class HiveWindowFunctionQuerySuite
       |window
       |w1 as (partition by s order by dec),
       |w2 as (partition by si order by f) ;
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests based on windowing_navfn.q
@@ -172,8 +162,7 @@ class HiveWindowFunctionQuerySuite
   // Also, the original query of
   // select i, lead(s) over (partition by bin order by d,i desc) from over1k ;
   /////////////////////////////////////////////////////////////////////////////
-  createQueryTest("windowing_navfn.q (deterministic)",
-                  s"""
+  createQueryTest("windowing_navfn.q (deterministic)", s"""
       |select s, row_number() over (partition by d order by dec) rn from over1k
       |order by s, rn desc;
       |select i, lead(s) over (partition by cast(bin as string) order by d,i desc) as l
@@ -187,15 +176,13 @@ class HiveWindowFunctionQuerySuite
       |order by s, f;
       |select t, s, i, last_value(i) over (partition by t order by s)
       |from over1k where (s = 'oscar allen' or s = 'oscar carson') and t = 10;
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests based on windowing_ntile.q
   // Results of the original query file are not deterministic.
   /////////////////////////////////////////////////////////////////////////////
-  createQueryTest("windowing_ntile.q (deterministic)",
-                  s"""
+  createQueryTest("windowing_ntile.q (deterministic)", s"""
       |select i, ntile(10) over (partition by s order by i) n from over1k
       |order by i, n;
       |select s, ntile(100) over (partition by i order by s) n from over1k
@@ -204,15 +191,13 @@ class HiveWindowFunctionQuerySuite
       |order by f, n;
       |select d, ntile(1000) over (partition by dec order by d) n from over1k
       |order by d, n;
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests based on windowing_udaf.q
   // Results of the original query file are not deterministic.
   /////////////////////////////////////////////////////////////////////////////
-  createQueryTest("windowing_udaf.q (deterministic)",
-                  s"""
+  createQueryTest("windowing_udaf.q (deterministic)", s"""
       |select s, min(i) over (partition by s) m from over1k
       |order by s, m;
       |select s, avg(f) over (partition by si order by s) a from over1k
@@ -223,15 +208,13 @@ class HiveWindowFunctionQuerySuite
       |order by m window w as (partition by f) ;
       |select s, avg(d) over (partition by t order by f) a from over1k
       |order by s, a;
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests based on windowing_windowspec.q
   // Results of the original query file are not deterministic.
   /////////////////////////////////////////////////////////////////////////////
-  createQueryTest("windowing_windowspec.q (deterministic)",
-                  s"""
+  createQueryTest("windowing_windowspec.q (deterministic)", s"""
       |select s, sum(b) over (partition by i order by s,b rows unbounded preceding) as sum
       |from over1k order by s, sum;
       |select s, sum(f) over (partition by d order by s,f rows unbounded preceding) as sum
@@ -255,15 +238,13 @@ class HiveWindowFunctionQuerySuite
       |select s, i, round((avg(d) over  w1 + 10.0) - (avg(d) over w1 - 10.0),2) avg
       |from over1k
       |order by s, i, avg window w1 as (partition by s order by i);
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests based on windowing_rank.q
   // Results of the original query file are not deterministic.
   /////////////////////////////////////////////////////////////////////////////
-  createQueryTest("windowing_rank.q (deterministic) 1",
-                  s"""
+  createQueryTest("windowing_rank.q (deterministic) 1", s"""
       |select s, rank() over (partition by f order by t) r from over1k order by s, r;
       |select s, dense_rank() over (partition by ts order by i,s desc) as r from over1k
       |order by s desc, r desc;
@@ -271,11 +252,9 @@ class HiveWindowFunctionQuerySuite
       |order by s, cd;
       |select s, percent_rank() over (partition by dec order by f) r from over1k
       |order by s desc, r desc;
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
-  createQueryTest("windowing_rank.q (deterministic) 2",
-                  s"""
+  createQueryTest("windowing_rank.q (deterministic) 2", s"""
       |select ts, dec, rnk
       |from
       |  (select ts, dec,
@@ -288,11 +267,9 @@ class HiveWindowFunctionQuerySuite
       |  ) ranked
       |where rnk =  1
       |order by ts, dec, rnk;
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
-  createQueryTest("windowing_rank.q (deterministic) 3",
-                  s"""
+  createQueryTest("windowing_rank.q (deterministic) 3", s"""
       |select ts, dec, rnk
       |from
       |  (select ts, dec,
@@ -305,11 +282,9 @@ class HiveWindowFunctionQuerySuite
       |  ) ranked
       |where dec = 89.5
       |order by ts, dec, rnk;
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
-  createQueryTest("windowing_rank.q (deterministic) 4",
-                  s"""
+  createQueryTest("windowing_rank.q (deterministic) 4", s"""
       |select ts, dec, rnk
       |from
       |  (select ts, dec,
@@ -323,8 +298,7 @@ class HiveWindowFunctionQuerySuite
       |  ) ranked
       |where rnk = 1
       |order by ts, dec, rnk;
-     """.stripMargin,
-                  reset = false)
+     """.stripMargin, reset = false)
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests from windowing.q
@@ -332,19 +306,16 @@ class HiveWindowFunctionQuerySuite
   // many tests and the syntax of test "-- 7. testJoinWithWindowingAndPTF"
   // is not supported right now.
   /////////////////////////////////////////////////////////////////////////////
-  createQueryTest("windowing.q -- 1. testWindowing",
-                  s"""
+  createQueryTest("windowing.q -- 1. testWindowing", s"""
       |select p_mfgr, p_name, p_size,
       |rank() over(distribute by p_mfgr sort by p_name) as r,
       |dense_rank() over(distribute by p_mfgr sort by p_name) as dr,
       |sum(p_retailprice) over
       |(distribute by p_mfgr sort by p_name rows between unbounded preceding and current row) as s1
       |from part
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 2. testGroupByWithPartitioning",
-                  s"""
+  createQueryTest("windowing.q -- 2. testGroupByWithPartitioning", s"""
       |select p_mfgr, p_name, p_size,
       |min(p_retailprice),
       |rank() over(distribute by p_mfgr sort by p_name)as r,
@@ -352,11 +323,9 @@ class HiveWindowFunctionQuerySuite
       |p_size, p_size - lag(p_size,1,p_size) over(distribute by p_mfgr sort by p_name) as deltaSz
       |from part
       |group by p_mfgr, p_name, p_size
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 3. testGroupByHavingWithSWQ",
-                  s"""
+  createQueryTest("windowing.q -- 3. testGroupByHavingWithSWQ", s"""
       |select p_mfgr, p_name, p_size, min(p_retailprice),
       |rank() over(distribute by p_mfgr sort by p_name) as r,
       |dense_rank() over(distribute by p_mfgr sort by p_name) as dr,
@@ -364,19 +333,15 @@ class HiveWindowFunctionQuerySuite
       |from part
       |group by p_mfgr, p_name, p_size
       |having p_size > 0
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 4. testCount",
-                  s"""
+  createQueryTest("windowing.q -- 4. testCount", s"""
       |select p_mfgr, p_name,
       |count(p_size) over(distribute by p_mfgr sort by p_name) as cd
       |from part
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 5. testCountWithWindowingUDAF",
-                  s"""
+  createQueryTest("windowing.q -- 5. testCountWithWindowingUDAF", s"""
       |select p_mfgr, p_name,
       |rank() over(distribute by p_mfgr sort by p_name) as r,
       |dense_rank() over(distribute by p_mfgr sort by p_name) as dr,
@@ -385,11 +350,9 @@ class HiveWindowFunctionQuerySuite
       |                                  rows between unbounded preceding and current row) as s1,
       |p_size, p_size - lag(p_size,1,p_size) over(distribute by p_mfgr sort by p_name) as deltaSz
       |from part
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 6. testCountInSubQ",
-                  s"""
+  createQueryTest("windowing.q -- 6. testCountInSubQ", s"""
       |select sub1.r, sub1.dr, sub1.cd, sub1.s1, sub1.deltaSz
       |from (select p_mfgr, p_name,
       |rank() over(distribute by p_mfgr sort by p_name) as r,
@@ -400,27 +363,22 @@ class HiveWindowFunctionQuerySuite
       |p_size, p_size - lag(p_size,1,p_size) over(distribute by p_mfgr sort by p_name) as deltaSz
       |from part
       |) sub1
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 8. testMixedCaseAlias",
-                  s"""
+  createQueryTest("windowing.q -- 8. testMixedCaseAlias", s"""
       |select p_mfgr, p_name, p_size,
       |rank() over(distribute by p_mfgr sort by p_name, p_size desc) as R
       |from part
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 9. testHavingWithWindowingNoGBY",
-                  s"""
+  createQueryTest("windowing.q -- 9. testHavingWithWindowingNoGBY", s"""
       |select p_mfgr, p_name, p_size,
       |rank() over(distribute by p_mfgr sort by p_name) as r,
       |dense_rank() over(distribute by p_mfgr sort by p_name) as dr,
       |sum(p_retailprice) over (distribute by p_mfgr sort by p_name
       |                        rows between unbounded preceding and current row)  as s1
       |from part
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
   createQueryTest("windowing.q -- 10. testHavingWithWindowingCondRankNoGBY",
                   s"""
@@ -433,8 +391,7 @@ class HiveWindowFunctionQuerySuite
     """.stripMargin,
                   reset = false)
 
-  createQueryTest("windowing.q -- 11. testFirstLast",
-                  s"""
+  createQueryTest("windowing.q -- 11. testFirstLast", s"""
       |select  p_mfgr,p_name, p_size,
       |sum(p_size) over (distribute by p_mfgr sort by p_name
       |rows between current row and current row) as s2,
@@ -442,11 +399,9 @@ class HiveWindowFunctionQuerySuite
       |last_value(p_size, false) over w1  as l
       |from part
       |window w1 as (distribute by p_mfgr sort by p_name rows between 2 preceding and 2 following)
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 12. testFirstLastWithWhere",
-                  s"""
+  createQueryTest("windowing.q -- 12. testFirstLastWithWhere", s"""
       |select  p_mfgr,p_name, p_size,
       |rank() over(distribute by p_mfgr sort by p_name) as r,
       |sum(p_size) over (distribute by p_mfgr sort by p_name
@@ -456,29 +411,24 @@ class HiveWindowFunctionQuerySuite
       |from part
       |where p_mfgr = 'Manufacturer#3'
       |window w1 as (distribute by p_mfgr sort by p_name rows between 2 preceding and 2 following)
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 13. testSumWindow",
-                  s"""
+  createQueryTest("windowing.q -- 13. testSumWindow", s"""
       |select  p_mfgr,p_name, p_size,
       |sum(p_size) over w1 as s1,
       |sum(p_size) over (distribute by p_mfgr  sort by p_name
       |rows between current row and current row)  as s2
       |from part
       |window w1 as (distribute by p_mfgr  sort by p_name rows between 2 preceding and 2 following)
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 14. testNoSortClause",
-                  s"""
+  createQueryTest("windowing.q -- 14. testNoSortClause", s"""
       |select  p_mfgr,p_name, p_size,
       |rank() over(distribute by p_mfgr sort by p_name) as r,
       |dense_rank() over(distribute by p_mfgr sort by p_name) as dr
       |from part
       |window w1 as (distribute by p_mfgr sort by p_name rows between 2 preceding and 2 following)
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
   /* Disabled because:
      - Spark uses a different default stddev.
@@ -502,8 +452,7 @@ class HiveWindowFunctionQuerySuite
       |             rows between 2 preceding and 2 following)
     """.stripMargin, reset = false)
    */
-  createQueryTest("windowing.q -- 16. testMultipleWindows",
-                  s"""
+  createQueryTest("windowing.q -- 16. testMultipleWindows", s"""
       |select  p_mfgr,p_name, p_size,
       |rank() over(distribute by p_mfgr sort by p_name) as r,
       |dense_rank() over(distribute by p_mfgr sort by p_name) as dr,
@@ -516,11 +465,9 @@ class HiveWindowFunctionQuerySuite
       |from part
       |window w1 as (distribute by p_mfgr sort by p_mfgr, p_name
       |             rows between 2 preceding and 2 following)
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 17. testCountStar",
-                  s"""
+  createQueryTest("windowing.q -- 17. testCountStar", s"""
       |select  p_mfgr,p_name, p_size,
       |count(*) over(distribute by p_mfgr sort by p_name ) as c,
       |count(p_size) over(distribute by p_mfgr sort by p_name) as ca,
@@ -528,11 +475,9 @@ class HiveWindowFunctionQuerySuite
       |from part
       |window w1 as (distribute by p_mfgr sort by p_mfgr, p_name
       |             rows between 2 preceding and 2 following)
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
-  createQueryTest("windowing.q -- 18. testUDAFs",
-                  s"""
+  createQueryTest("windowing.q -- 18. testUDAFs", s"""
       |select  p_mfgr,p_name, p_size,
       |sum(p_retailprice) over w1 as s,
       |min(p_retailprice) over w1 as mi,
@@ -541,8 +486,7 @@ class HiveWindowFunctionQuerySuite
       |from part
       |window w1 as (distribute by p_mfgr sort by p_mfgr, p_name
       |             rows between 2 preceding and 2 following)
-    """.stripMargin,
-                  reset = false)
+    """.stripMargin, reset = false)
 
   createQueryTest("windowing.q -- 19. testUDAFsWithGBY",
                   """

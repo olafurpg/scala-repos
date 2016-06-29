@@ -350,10 +350,10 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Serializing Java EngineParams works using option Gson") {
-    val ep = new EngineParams(dataSourceParams = ("ds", new JavaParams("dsp")),
-                              algorithmParamsList =
-                                Seq(("a0", new JavaParams("ap")),
-                                    ("a1", new JavaParams("ap2"))))
+    val ep = new EngineParams(
+        dataSourceParams = ("ds", new JavaParams("dsp")),
+        algorithmParamsList =
+          Seq(("a0", new JavaParams("ap")), ("a1", new JavaParams("ap2"))))
 
     val json = JsonExtractor.engineParamsToJson(JsonExtractorOption.Gson, ep)
 
@@ -363,10 +363,10 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Serializing Java EngineParams works using option Both") {
-    val ep = new EngineParams(dataSourceParams = ("ds", new JavaParams("dsp")),
-                              algorithmParamsList =
-                                Seq(("a0", new JavaParams("ap")),
-                                    ("a1", new JavaParams("ap2"))))
+    val ep = new EngineParams(
+        dataSourceParams = ("ds", new JavaParams("dsp")),
+        algorithmParamsList =
+          Seq(("a0", new JavaParams("ap")), ("a1", new JavaParams("ap2"))))
 
     val json = JsonExtractor.engineParamsToJson(JsonExtractorOption.Both, ep)
 

@@ -243,11 +243,9 @@ private[sbt] object SettingCompletions {
     }
     val configurations: Map[String, Configuration] =
       context.configurations.map(c => (configScalaID(c.name), c)).toMap
-    val configParser = axisParser[ConfigKey](
-        _.config,
-        c => configScalaID(c.name),
-        ck => configurations.get(ck.name).map(_.description),
-        "configuration")
+    val configParser =
+      axisParser[ConfigKey](_.config, c => configScalaID(c.name), ck =>
+            configurations.get(ck.name).map(_.description), "configuration")
     val taskParser = axisParser[AttributeKey[_]](_.task, k =>
           keyScalaID(k.label), _.description, "task")
     val nonGlobal =

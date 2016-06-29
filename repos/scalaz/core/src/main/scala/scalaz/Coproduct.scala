@@ -13,8 +13,8 @@ final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
   def cobind[B](f: Coproduct[F, G, A] => B)(implicit F: Cobind[F],
                                             G: Cobind[G]): Coproduct[F, G, B] =
     Coproduct(
-        run.bimap(a => F.cobind(a)(x => f(leftc(x))),
-                  a => G.cobind(a)(x => f(rightc(x))))
+        run.bimap(a => F.cobind(a)(x => f(leftc(x))), a =>
+              G.cobind(a)(x => f(rightc(x))))
     )
 
   def duplicate(implicit F: Cobind[F],

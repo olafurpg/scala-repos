@@ -175,10 +175,8 @@ class DefaultHttpErrorHandler(environment: Environment,
   protected def onBadRequest(request: RequestHeader,
                              message: String): Future[Result] =
     Future.successful(
-        BadRequest(
-            views.html.defaultpages.badRequest(request.method,
-                                               request.uri,
-                                               message)))
+        BadRequest(views.html.defaultpages
+              .badRequest(request.method, request.uri, message)))
 
   /**
     * Invoked when a client makes a request that was forbidden.

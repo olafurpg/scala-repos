@@ -312,10 +312,8 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                         )
 
                         val message =
-                          "Ingest to %s with %s succeeded. Result: %s".format(
-                              path,
-                              apiKey,
-                              responseContent.renderPretty)
+                          "Ingest to %s with %s succeeded. Result: %s"
+                            .format(path, apiKey, responseContent.renderPretty)
                         logger.info(message)
                         notifyJob(durability,
                                   JobManager.channels.Info,

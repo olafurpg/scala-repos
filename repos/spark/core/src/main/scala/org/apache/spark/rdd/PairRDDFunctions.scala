@@ -189,10 +189,8 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
 
     // We will clean the combiner closure later in `combineByKey`
     val cleanedSeqOp = self.context.clean(seqOp)
-    combineByKeyWithClassTag[U]((v: V) => cleanedSeqOp(createZero(), v),
-                                cleanedSeqOp,
-                                combOp,
-                                partitioner)
+    combineByKeyWithClassTag[U]((v: V) =>
+          cleanedSeqOp(createZero(), v), cleanedSeqOp, combOp, partitioner)
   }
 
   /**
@@ -244,10 +242,8 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       () => cachedSerializer.deserialize[V](ByteBuffer.wrap(zeroArray))
 
     val cleanedFunc = self.context.clean(func)
-    combineByKeyWithClassTag[V]((v: V) => cleanedFunc(createZero(), v),
-                                cleanedFunc,
-                                cleanedFunc,
-                                partitioner)
+    combineByKeyWithClassTag[V]((v: V) =>
+          cleanedFunc(createZero(), v), cleanedFunc, cleanedFunc, partitioner)
   }
 
   /**

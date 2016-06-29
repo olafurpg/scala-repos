@@ -14,8 +14,7 @@ class CodeFragmentEvaluationTest_212
 
 abstract class CodeFragmentEvaluationTestBase extends ScalaDebuggerTestCase {
 
-  addFileWithBreakpoints("CodeFragments.scala",
-                         s"""
+  addFileWithBreakpoints("CodeFragments.scala", s"""
        |object CodeFragments {
        |  var n = 0
        |  def main(args: Array[String]) {

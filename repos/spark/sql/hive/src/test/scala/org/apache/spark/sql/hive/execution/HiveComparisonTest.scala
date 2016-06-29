@@ -121,10 +121,8 @@ abstract class HiveComparisonTest
   }
 
   /** All directories that contain per-query output files */
-  val outputDirectories = Seq(passedDirectory,
-                              failedDirectory,
-                              wrongDirectory,
-                              hiveFailedDirectory)
+  val outputDirectories =
+    Seq(passedDirectory, failedDirectory, wrongDirectory, hiveFailedDirectory)
 
   protected val cacheDigest = java.security.MessageDigest.getInstance("MD5")
   protected def getMd5(str: String): String = {

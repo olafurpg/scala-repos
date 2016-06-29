@@ -335,9 +335,7 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
           val resultDestination = (intoClause orElse destClause).getOrElse(
               sys.error("No destination found."))
           val overwrite = intoClause.isEmpty
-          nodeToDest(resultDestination,
-                     withWindowDefinitions,
-                     overwrite)
+          nodeToDest(resultDestination, withWindowDefinitions, overwrite)
       }
 
       // If there are multiple INSERTS just UNION them together into one query.
@@ -875,9 +873,7 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
                              frameSpecification = UnspecifiedFrame)
       case spec =>
         val (partitionClause :: rowFrame :: rangeFrame :: Nil) = getClauses(
-            Seq("TOK_PARTITIONINGSPEC",
-                "TOK_WINDOWRANGE",
-                "TOK_WINDOWVALUES"),
+            Seq("TOK_PARTITIONINGSPEC", "TOK_WINDOWRANGE", "TOK_WINDOWVALUES"),
             spec)
 
         // Handle Partition By and Order By.

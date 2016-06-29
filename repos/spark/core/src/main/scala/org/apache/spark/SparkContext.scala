@@ -1905,9 +1905,8 @@ class SparkContext(config: SparkConf)
                              func: Iterator[T] => U,
                              partitions: Seq[Int]): Array[U] = {
     val cleanedFunc = clean(func)
-    runJob(rdd,
-           (ctx: TaskContext, it: Iterator[T]) => cleanedFunc(it),
-           partitions)
+    runJob(rdd, (ctx: TaskContext, it: Iterator[T]) =>
+          cleanedFunc(it), partitions)
   }
 
   /**

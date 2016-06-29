@@ -44,8 +44,8 @@ class LightArrayRevolverScheduler(config: Config,
 
   val WheelSize = config
     .getInt("akka.scheduler.ticks-per-wheel")
-    .requiring(ticks ⇒ (ticks & (ticks - 1)) == 0,
-               "ticks-per-wheel must be a power of 2")
+    .requiring(ticks ⇒
+          (ticks & (ticks - 1)) == 0, "ticks-per-wheel must be a power of 2")
   val TickDuration = config
     .getMillisDuration("akka.scheduler.tick-duration")
     .requiring(

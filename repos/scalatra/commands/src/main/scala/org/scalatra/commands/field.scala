@@ -414,8 +414,7 @@ object BindingValidators {
       : FieldDescriptor[T] =
       b.validateWith(BindingValidators.greaterThan(min, messageFormat))
 
-    def lessThan(max: T,
-                 messageFormat: String = "%%s must be less than %s")
+    def lessThan(max: T, messageFormat: String = "%%s must be less than %s")
       : FieldDescriptor[T] =
       b.validateWith(BindingValidators.lessThan(max, messageFormat))
 

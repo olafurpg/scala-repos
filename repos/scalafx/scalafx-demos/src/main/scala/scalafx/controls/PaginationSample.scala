@@ -48,8 +48,7 @@ object PaginationSample extends JFXApp {
         visited = true
       }
       new VBox {
-        children = List(link,
-                        new Label("""|Search results
+        children = List(link, new Label("""|Search results
                        |for %s""".stripMargin.format(link.text.value)))
       }
     }

@@ -722,9 +722,9 @@ class JDBCSuite
         doCompileFilter(Or(EqualTo("col0", 2), EqualTo("col1", "ghi"))) === "(col0 = 2) OR (col1 = 'ghi')")
     assert(doCompileFilter(LessThan("col0", 5)) === "col0 < 5")
     assert(
-        doCompileFilter(
-            LessThan("col3",
-                     Timestamp.valueOf("1995-11-21 00:00:00.0"))) === "col3 < '1995-11-21 00:00:00.0'")
+        doCompileFilter(LessThan(
+                "col3",
+                Timestamp.valueOf("1995-11-21 00:00:00.0"))) === "col3 < '1995-11-21 00:00:00.0'")
     assert(
         doCompileFilter(LessThan("col4", Date.valueOf("1983-08-04"))) === "col4 < '1983-08-04'")
     assert(doCompileFilter(LessThanOrEqual("col0", 5)) === "col0 <= 5")

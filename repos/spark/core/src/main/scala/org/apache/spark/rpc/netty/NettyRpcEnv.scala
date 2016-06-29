@@ -242,11 +242,9 @@ private[netty] class NettyRpcEnv(
         }(ThreadUtils.sameThread)
         dispatcher.postLocalMessage(message, p)
       } else {
-        val rpcMessage = RpcOutboxMessage(
-            serialize(message),
-            onFailure,
-            (client,
-             response) => onSuccess(deserialize[Any](client, response)))
+        val rpcMessage =
+          RpcOutboxMessage(serialize(message), onFailure, (client, response) =>
+                onSuccess(deserialize[Any](client, response)))
         postToOutbox(message.receiver, rpcMessage)
         promise.future.onFailure {
           case _: TimeoutException => rpcMessage.onTimeout()

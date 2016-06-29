@@ -124,9 +124,8 @@ abstract class Directive[L](implicit val ev: Tuple[L]) {
       recovery: PartialFunction[immutable.Seq[Rejection], Directive[R]])
     : Directive[R] =
     recover { rejections ⇒
-      recovery.applyOrElse(
-          rejections,
-          (rejs: Seq[Rejection]) ⇒ RouteDirectives.reject(rejs: _*))
+      recovery.applyOrElse(rejections, (rejs: Seq[Rejection]) ⇒
+            RouteDirectives.reject(rejs: _*))
     }
 
   //#basic

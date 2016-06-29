@@ -89,8 +89,7 @@ class TemplateExample
     Template.page(title, content, url(_, includeServletPath = false))
 
   get("/date/:year/:month/:day") {
-    displayPage("Scalatra: Date Example",
-                <ul>
+    displayPage("Scalatra: Date Example", <ul>
         <li>Year: { params("year") }</li>
         <li>Month: { params("month") }</li>
         <li>Day: { params("day") }</li>
@@ -145,14 +144,12 @@ class TemplateExample
 
   get("/logout") {
     session.invalidate
-    displayPage("Scalatra: Session Example",
-                <pre>You have logged out</pre>
+    displayPage("Scalatra: Session Example", <pre>You have logged out</pre>
       <pre>Route: /logout</pre>)
   }
 
   get("/") {
-    displayPage("Scalatra: Hello World",
-                <h2>Hello world!</h2>
+    displayPage("Scalatra: Hello World", <h2>Hello world!</h2>
       <p>Referer: { (request referrer) map { Text(_) } getOrElse { <i>none</i> } }</p>
       <pre>Route: /</pre>)
   }

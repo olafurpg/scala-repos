@@ -125,25 +125,26 @@ object PlatformBuild extends Build {
     </dependencies>
   )
 
-  val jprofilerSettings = Seq(
-      fork in profileTask := true,
-      fork in run := true,
-      jprofilerLib := "/Applications/jprofiler7/bin/macos/libjprofilerti.jnilib",
-      jprofilerConf := "src/main/resources/jprofile.xml",
-      jprofilerId := "116",
-      javaOptions in profileTask <<=
-        (javaOptions,
-         jprofilerLib,
-         jprofilerConf,
-         jprofilerId,
-         baseDirectory) map { (opts, lib, conf, id, d) =>
-          // download jnilib if necessary. a bit sketchy, but convenient
-          Process("./jprofiler/setup-jnilib.py").!!
-          opts ++ Seq(
-              "-agentpath:%s/jprofiler.jnilib=offline,config=%s/%s,id=%s" format
-                (d, d, conf, id))
-        }
-  )
+  val jprofilerSettings =
+    Seq(
+        fork in profileTask := true,
+        fork in run := true,
+        jprofilerLib := "/Applications/jprofiler7/bin/macos/libjprofilerti.jnilib",
+        jprofilerConf := "src/main/resources/jprofile.xml",
+        jprofilerId := "116",
+        javaOptions in profileTask <<=
+          (javaOptions,
+           jprofilerLib,
+           jprofilerConf,
+           jprofilerId,
+           baseDirectory) map { (opts, lib, conf, id, d) =>
+            // download jnilib if necessary. a bit sketchy, but convenient
+            Process("./jprofiler/setup-jnilib.py").!!
+            opts ++ Seq(
+                "-agentpath:%s/jprofiler.jnilib=offline,config=%s/%s,id=%s" format
+                  (d, d, conf, id))
+          }
+    )
 
   val commonPluginsSettings =
     ScctPlugin.instrumentSettings ++ cpdSettings ++ graphSettings ++ commonSettings

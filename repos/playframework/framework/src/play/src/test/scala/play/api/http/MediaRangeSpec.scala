@@ -133,12 +133,11 @@ object MediaRangeSpec extends Specification {
     }
     "be able to be convert back to a string" in {
       new MediaType("foo", "bar", Nil).toString must_== "foo/bar"
-      new MediaType(
-          "foo",
-          "bar",
-          Seq("p1" -> Some("v1"),
-              "p2" -> Some(""" v\"v"""),
-              "p3" -> None)).toString must_== """foo/bar; p1=v1; p2=" v\\\"v"; p3"""
+      new MediaType("foo",
+                    "bar",
+                    Seq("p1" -> Some("v1"),
+                        "p2" -> Some(""" v\"v"""),
+                        "p3" -> None)).toString must_== """foo/bar; p1=v1; p2=" v\\\"v"; p3"""
       new MediaRange("foo", "bar", Nil, None, Nil).toString must_== "foo/bar"
       new MediaRange("foo", "bar", Nil, Some(0.25f), Nil).toString must_== "foo/bar; q=0.25"
       new MediaRange(

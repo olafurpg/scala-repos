@@ -211,11 +211,8 @@ final class RhinoJSEnv private (
       // Optionally setup scalaJSCom
       var recvCallback: Option[String => Unit] = None
       for (channel <- optChannel) {
-        setupCom(context,
-                 scope,
-                 channel,
-                 setCallback = cb => recvCallback = Some(cb),
-                 clrCallback = () => recvCallback = None)
+        setupCom(context, scope, channel, setCallback = cb =>
+              recvCallback = Some(cb), clrCallback = () => recvCallback = None)
       }
 
       try {
@@ -234,10 +231,8 @@ final class RhinoJSEnv private (
         // Start the event loop
 
         for (channel <- optChannel) {
-          comEventLoop(taskQ,
-                       channel,
-                       () => recvCallback.get,
-                       () => recvCallback.isDefined)
+          comEventLoop(taskQ, channel, () => recvCallback.get, () =>
+                recvCallback.isDefined)
         }
 
         // Channel is closed. Fall back to basic event loop
@@ -312,9 +307,8 @@ final class RhinoJSEnv private (
 
       val deadline = Context.toNumber(args(1)).toInt.millis.fromNow
 
-      val task = new TimeoutTask(
-          deadline,
-          () => cb.call(context, scope, scope, args.slice(2, args.length)))
+      val task = new TimeoutTask(deadline, () =>
+            cb.call(context, scope, scope, args.slice(2, args.length)))
 
       taskQ += task
 
@@ -329,10 +323,8 @@ final class RhinoJSEnv private (
       val interval = Context.toNumber(args(1)).toInt.millis
       val firstDeadline = interval.fromNow
 
-      val task = new IntervalTask(
-          firstDeadline,
-          interval,
-          () => cb.call(context, scope, scope, args.slice(2, args.length)))
+      val task = new IntervalTask(firstDeadline, interval, () =>
+            cb.call(context, scope, scope, args.slice(2, args.length)))
 
       taskQ += task
 

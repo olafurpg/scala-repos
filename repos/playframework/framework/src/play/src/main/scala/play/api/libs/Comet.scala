@@ -100,8 +100,7 @@ object Comet {
     *   Ok.chunked(htmlStream via Comet.flow("parent.clockChanged"))
     * }}}
     */
-  def flow(callbackName: String,
-           initialChunk: ByteString = initialByteString)
+  def flow(callbackName: String, initialChunk: ByteString = initialByteString)
     : Flow[ByteString, ByteString, NotUsed] = {
     val cb: ByteString = ByteString.fromString(callbackName)
     Flow

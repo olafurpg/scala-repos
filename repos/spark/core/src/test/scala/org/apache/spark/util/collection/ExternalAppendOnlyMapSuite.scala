@@ -94,12 +94,7 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
     val map = createExternalMap[Int]
 
     map.insertAll(
-        Seq((1, 10),
-            (2, 20),
-            (3, 30),
-            (1, 100),
-            (2, 200),
-            (1, 1000)))
+        Seq((1, 10), (2, 20), (3, 30), (1, 100), (2, 200), (1, 1000)))
     val it = map.iterator
     assert(it.hasNext)
     val result =

@@ -182,13 +182,13 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
     /** Left fold is consistent with foldMap1. */
     def leftFM1Consistent[A: Equal](fa: F[A]): Boolean =
-      Equal[Vector[A]].equal(foldMap1(fa)(Vector(_)),
-                             foldMapLeft1(fa)(Vector(_))(_ :+ _))
+      Equal[Vector[A]]
+        .equal(foldMap1(fa)(Vector(_)), foldMapLeft1(fa)(Vector(_))(_ :+ _))
 
     /** Right fold is consistent with foldMap1. */
     def rightFM1Consistent[A: Equal](fa: F[A]): Boolean =
-      Equal[Vector[A]].equal(foldMap1(fa)(Vector(_)),
-                             foldMapRight1(fa)(Vector(_))(_ +: _))
+      Equal[Vector[A]]
+        .equal(foldMap1(fa)(Vector(_)), foldMapRight1(fa)(Vector(_))(_ +: _))
   }
   def foldable1Law = new Foldable1Law {}
 

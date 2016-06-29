@@ -93,8 +93,9 @@ object RenameSuperMembersUtil {
         "object RenameAll",
         classes.last.getContainingFile,
         classes.last)
-    val additional = if (oneSuperClass) Nil
-    else Seq((renameAllMarkerObject, null)) //option for rename all
+    val additional =
+      if (oneSuperClass) Nil
+      else Seq((renameAllMarkerObject, null)) //option for rename all
     val classesToNamed = additional ++: Map(classes.zip(allElements): _*)
     val selection = classesToNamed.keys.head
 

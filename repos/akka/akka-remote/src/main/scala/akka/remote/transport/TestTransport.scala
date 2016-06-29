@@ -126,9 +126,9 @@ class TestTransport(val localAddress: Address,
   /**
     * The [[akka.remote.transport.TestTransport.SwitchableLoggedBehavior]] for the shutdown() method.
     */
-  val shutdownBehavior = new SwitchableLoggedBehavior[Unit, Boolean](
-      (_) ⇒ defaultShutdown,
-      (_) ⇒ registry.logActivity(ShutdownAttempt(localAddress)))
+  val shutdownBehavior =
+    new SwitchableLoggedBehavior[Unit, Boolean]((_) ⇒ defaultShutdown, (_) ⇒
+          registry.logActivity(ShutdownAttempt(localAddress)))
 
   override def listen: Future[(Address, Promise[AssociationEventListener])] =
     listenBehavior(())

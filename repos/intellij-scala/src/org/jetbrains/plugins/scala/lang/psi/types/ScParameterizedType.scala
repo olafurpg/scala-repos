@@ -102,10 +102,9 @@ class ScParameterizedType private (val designator: ScType,
   override protected def isAliasTypeInner: Option[AliasType] = {
     this match {
       case ScParameterizedType(ScDesignatorType(ta: ScTypeAlias), args) =>
-        val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-            ta.typeParameters.map(tp =>
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
-            args)
+        val genericSubst =
+          ScalaPsiUtil.typesCallSubstitutor(ta.typeParameters.map(tp =>
+                    (tp.name, ScalaPsiUtil.getPsiElementId(tp))), args)
         Some(
             AliasType(ta,
                       ta.lowerBound.map(genericSubst.subst),
@@ -114,10 +113,9 @@ class ScParameterizedType private (val designator: ScType,
           if p.actualElement.isInstanceOf[ScTypeAlias] =>
         val ta: ScTypeAlias = p.actualElement.asInstanceOf[ScTypeAlias]
         val subst: ScSubstitutor = p.actualSubst
-        val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-            ta.typeParameters.map(tp =>
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
-            args)
+        val genericSubst =
+          ScalaPsiUtil.typesCallSubstitutor(ta.typeParameters.map(tp =>
+                    (tp.name, ScalaPsiUtil.getPsiElementId(tp))), args)
         val s = subst.followed(genericSubst)
         Some(
             AliasType(ta,
@@ -168,9 +166,8 @@ class ScParameterizedType private (val designator: ScType,
       case _ =>
         ScType.extractDesignated(designator, withoutAliases = false) match {
           case Some((owner: ScTypeParametersOwner, s)) =>
-            forParams(owner.typeParameters.iterator,
-                      s,
-                      (tp: ScTypeParam) => ScalaPsiManager.typeVariable(tp))
+            forParams(owner.typeParameters.iterator, s, (tp: ScTypeParam) =>
+                  ScalaPsiManager.typeVariable(tp))
           case Some((owner: PsiTypeParameterListOwner, s)) =>
             forParams(
                 owner.getTypeParameters.iterator,

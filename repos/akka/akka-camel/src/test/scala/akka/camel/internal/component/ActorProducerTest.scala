@@ -366,8 +366,8 @@ private[camel] trait ActorProducerFixture
       override val log = mock[LoggingAdapter]
       override lazy val template = mock[ProducerTemplate]
       override lazy val context = mock[DefaultCamelContext]
-      override val settings = new CamelSettings(
-          ConfigFactory.parseString("""
+      override val settings =
+        new CamelSettings(ConfigFactory.parseString("""
           akka {
             camel {
               jmx = off
@@ -379,8 +379,7 @@ private[camel] trait ActorProducerFixture
               }
             }
           }
-        """).withFallback(config),
-          sys.dynamicAccess)
+        """).withFallback(config), sys.dynamicAccess)
     }
     camel = camelWithMocks
 

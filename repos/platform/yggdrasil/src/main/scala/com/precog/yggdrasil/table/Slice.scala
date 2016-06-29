@@ -107,9 +107,8 @@ trait Slice { source =>
 
       resultColumns.groupBy(_.tpe) map {
         case (tpe, cols) =>
-          (ColumnRef(CPath.Identity, tpe),
-           cols.reduceLeft((c1, c2) =>
-                 Column.unionRightSemigroup.append(c1, c2)))
+          (ColumnRef(CPath.Identity, tpe), cols.reduceLeft((c1, c2) =>
+                    Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -621,9 +620,8 @@ trait Slice { source =>
 
       resultColumns.groupBy(_.tpe) map {
         case (tpe, cols) =>
-          (ColumnRef(to, tpe),
-           cols.reduceLeft((c1, c2) =>
-                 Column.unionRightSemigroup.append(c1, c2)))
+          (ColumnRef(to, tpe), cols.reduceLeft((c1, c2) =>
+                    Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -644,9 +642,8 @@ trait Slice { source =>
 
       resultColumns.groupBy(_.tpe) map {
         case (tpe, cols) =>
-          (ColumnRef(to, tpe),
-           cols.reduceLeft((c1, c2) =>
-                 Column.unionRightSemigroup.append(c1, c2)))
+          (ColumnRef(to, tpe), cols.reduceLeft((c1, c2) =>
+                    Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }

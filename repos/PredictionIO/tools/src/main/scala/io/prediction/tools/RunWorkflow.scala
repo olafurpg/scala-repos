@@ -207,9 +207,7 @@ object RunWorkflow extends Logging {
          else
            Seq()) ++ Seq("--json-extractor", ca.common.jsonExtractor.toString)
 
-    Runner.runOnSpark("io.prediction.workflow.CreateWorkflow",
-                      args,
-                      ca,
-                      jarFiles)
+    Runner
+      .runOnSpark("io.prediction.workflow.CreateWorkflow", args, ca, jarFiles)
   }
 }

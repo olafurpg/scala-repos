@@ -77,10 +77,7 @@ trait MethodSynthesis { self: Analyzer =>
 
     def createMethod(name: Name, paramTypes: List[Type], returnType: Type)(
         f: Symbol => Tree): Tree =
-      createInternal(
-          name,
-          f,
-          (m: Symbol) =>
+      createInternal(name, f, (m: Symbol) =>
             MethodType(m newSyntheticValueParams paramTypes, returnType))
 
     def createMethod(name: Name, returnType: Type)(f: Symbol => Tree): Tree =

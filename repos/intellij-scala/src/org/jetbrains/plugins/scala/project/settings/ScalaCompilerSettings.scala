@@ -45,12 +45,10 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
   private val ToggleOptions: Seq[(String, () => Boolean, Boolean => Unit)] =
     Seq(("-language:dynamics", () => dynamics, dynamics = _),
         ("-language:postfixOps", () => postfixOps, postfixOps = _),
-        ("-language:reflectiveCalls",
-         () => reflectiveCalls,
-         reflectiveCalls = _),
-        ("-language:implicitConversions",
-         () => implicitConversions,
-         implicitConversions = _),
+        ("-language:reflectiveCalls", () =>
+              reflectiveCalls, reflectiveCalls = _),
+        ("-language:implicitConversions", () =>
+              implicitConversions, implicitConversions = _),
         ("-language:higherKinds", () => higherKinds, higherKinds = _),
         ("-language:existentials", () => existentials, existentials = _),
         ("-language:experimental.macros", () => macros, macros = _),
@@ -61,9 +59,8 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
         ("-feature", () => featureWarnings, featureWarnings = _),
         ("-optimise", () => optimiseBytecode, optimiseBytecode = _),
         ("-explaintypes", () => explainTypeErrors, explainTypeErrors = _),
-        ("-no-specialization",
-         () => !specialization,
-         (b: Boolean) => specialization = !b),
+        ("-no-specialization", () => !specialization, (b: Boolean) =>
+              specialization = !b),
         ("-P:continuations:enable", () => continuations, continuations = _))
 
   private val DebuggingOptions: Map[String, DebuggingInfoLevel] = Map(

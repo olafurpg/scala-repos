@@ -141,10 +141,8 @@ class ScalaFunctionParameterInfoHandler
         //todo: var isGreen = true
         var namedMode = false
         def paramText(param: ScParameter, subst: ScSubstitutor) = {
-          ScalaDocumentationProvider.parseParameter(
-              param,
-              (t: ScType) => ScType.presentableText(subst.subst(t)),
-              escape = false)
+          ScalaDocumentationProvider.parseParameter(param, (t: ScType) =>
+                ScType.presentableText(subst.subst(t)), escape = false)
         }
         def applyToParameters(parameters: Seq[(Parameter, String)],
                               subst: ScSubstitutor,

@@ -1696,12 +1696,12 @@ abstract class GenJSCode
           js.Skip()
 
         // do { body } while (cond)
-        case LabelDef(lname,
-                      Nil,
-                      Block(bodyStats,
-                            If(cond,
-                               Apply(target @ Ident(lname2), Nil),
-                               Literal(_)))) if (target.symbol == sym) =>
+        case LabelDef(
+            lname,
+            Nil,
+            Block(bodyStats,
+                  If(cond, Apply(target @ Ident(lname2), Nil), Literal(_))))
+            if (target.symbol == sym) =>
           js.DoWhile(js.Block(bodyStats map genStat), genExpr(cond))
 
         // do { body } while (cond); result
@@ -3316,10 +3316,7 @@ abstract class GenJSCode
                 val reflBox = genNew(reflBoxClassPatched,
                                      reflBoxClassPatched.primaryConstructor,
                                      List(castCallTrg))
-                genApplyMethod(reflBox,
-                               proxyIdent,
-                               arguments,
-                               jstpe.AnyType)
+                genApplyMethod(reflBox, proxyIdent, arguments, jstpe.AnyType)
               }
             }
           }, {

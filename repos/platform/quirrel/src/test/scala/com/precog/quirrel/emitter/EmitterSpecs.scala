@@ -267,10 +267,7 @@ object EmitterSpecs
 
     "emit negation of sum of two literal numeric loads with value provenance" in {
       testEmit("neg (5 + 2)")(
-          Vector(PushNum("5"),
-                 PushNum("2"),
-                 Map2Cross(Add),
-                 Map1(Neg)))
+          Vector(PushNum("5"), PushNum("2"), Map2Cross(Add), Map1(Neg)))
     }
 
     "emit and mark new expression" in {
@@ -283,9 +280,7 @@ object EmitterSpecs
 
     "emit wrap object for object with single field having constant numeric value" in {
       testEmit("{foo: 1}")(
-          Vector(PushString("foo"),
-                 PushNum("1"),
-                 Map2Cross(WrapObject)))
+          Vector(PushString("foo"), PushNum("1"), Map2Cross(WrapObject)))
     }
 
     "emit wrap object for object with single field having null value" in {
@@ -795,11 +790,7 @@ object EmitterSpecs
 
     "emit filter match for where loads from same provenance" in {
       testEmit("""foo := load("foo") foo where foo""")(
-          Vector(PushString("foo"),
-                 AbsoluteLoad,
-                 Dup,
-                 Swap(1),
-                 FilterMatch))
+          Vector(PushString("foo"), AbsoluteLoad, Dup, Swap(1), FilterMatch))
     }
 
     "emit filter match for loads from same provenance when performing equality filter" in {

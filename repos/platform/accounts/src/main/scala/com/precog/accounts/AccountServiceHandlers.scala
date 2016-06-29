@@ -244,9 +244,8 @@ class AccountServiceHandlers(
                 }
             }
             .map { accountId =>
-              HttpResponse[JValue](OK,
-                                   content = accountId.map(id =>
-                                         WrappedAccountId(id).serialize))
+              HttpResponse[JValue](OK, content = accountId.map(id =>
+                        WrappedAccountId(id).serialize))
             }
         }
       }
@@ -551,9 +550,7 @@ class AccountServiceHandlers(
                 jvalue.validated[String]("password") match {
                   case Success(newPassword) =>
                     accountManager
-                      .resetAccountPassword(accountId,
-                                            resetToken,
-                                            newPassword)
+                      .resetAccountPassword(accountId, resetToken, newPassword)
                       .map {
                         case \/-(true) =>
                           logger.info(

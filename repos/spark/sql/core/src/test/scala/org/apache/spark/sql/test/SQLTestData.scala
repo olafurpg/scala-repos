@@ -157,17 +157,15 @@ private[sql] trait SQLTestData { self =>
   }
 
   protected lazy val mapData: RDD[MapData] = {
-    val rdd = sqlContext.sparkContext.parallelize(
-        MapData(
-            Map(1 -> "a1",
-                2 -> "b1",
-                3 -> "c1",
-                4 -> "d1",
-                5 -> "e1")) :: MapData(
-            Map(1 -> "a2", 2 -> "b2", 3 -> "c2", 4 -> "d2")) :: MapData(
-            Map(1 -> "a3", 2 -> "b3", 3 -> "c3")) :: MapData(
-            Map(1 -> "a4",
-                2 -> "b4")) :: MapData(Map(1 -> "a5")) :: Nil)
+    val rdd =
+      sqlContext.sparkContext.parallelize(MapData(Map(1 -> "a1",
+                                                      2 -> "b1",
+                                                      3 -> "c1",
+                                                      4 -> "d1",
+                                                      5 -> "e1")) :: MapData(
+              Map(1 -> "a2", 2 -> "b2", 3 -> "c2", 4 -> "d2")) :: MapData(
+              Map(1 -> "a3", 2 -> "b3", 3 -> "c3")) :: MapData(
+              Map(1 -> "a4", 2 -> "b4")) :: MapData(Map(1 -> "a5")) :: Nil)
     rdd.toDF().registerTempTable("mapData")
     rdd
   }
@@ -254,14 +252,13 @@ private[sql] trait SQLTestData { self =>
 
   protected lazy val complexData: DataFrame = {
     val df = sqlContext.sparkContext
-      .parallelize(
-          ComplexData(Map("1" -> 1),
-                      TestData(1, "1"),
-                      Seq(1, 1, 1),
-                      true) :: ComplexData(Map("2" -> 2),
-                                           TestData(2, "2"),
-                                           Seq(2, 2, 2),
-                                           false) :: Nil)
+      .parallelize(ComplexData(Map("1" -> 1),
+                               TestData(1, "1"),
+                               Seq(1, 1, 1),
+                               true) :: ComplexData(Map("2" -> 2),
+                                                    TestData(2, "2"),
+                                                    Seq(2, 2, 2),
+                                                    false) :: Nil)
       .toDF()
     df.registerTempTable("complexData")
     df

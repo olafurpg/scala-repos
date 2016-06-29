@@ -45,9 +45,8 @@ class CallGraphTest extends ClearAfterClass {
   import compiler.genBCode.bTypes._
   import callGraph._
 
-  def compile(code: String,
-              allowMessage: StoreReporter#Info => Boolean = _ => false)
-    : List[ClassNode] = {
+  def compile(code: String, allowMessage: StoreReporter#Info => Boolean = _ =>
+        false): List[ClassNode] = {
     CallGraphTest.notPerRun.foreach(_.clear())
     compileClasses(compiler)(code, allowMessage = allowMessage).map(c =>
           byteCodeRepository.classNode(c.name).get)

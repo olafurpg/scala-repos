@@ -1288,10 +1288,8 @@ class Analyzer(catalog: Catalog,
         val ((partitionSpec, orderSpec), windowExpressions) =
           groupedWindowExpressions(i)
         // Set currentChild to the newly created Window operator.
-        currentChild = Window(windowExpressions,
-                              partitionSpec,
-                              orderSpec,
-                              currentChild)
+        currentChild =
+          Window(windowExpressions, partitionSpec, orderSpec, currentChild)
 
         // Move to next Window Spec.
         i += 1

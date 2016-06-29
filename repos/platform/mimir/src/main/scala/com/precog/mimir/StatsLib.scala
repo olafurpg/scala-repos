@@ -100,10 +100,10 @@ trait StatsLibModule[M[+ _]]
           median <- if (count % 2 == 0) {
                      val middleValues =
                        sortedTable.takeRange((count.toLong / 2) - 1, 2)
-                     val transformedTable = middleValues.transform(
-                         trans.DerefObjectStatic(
-                             Leaf(Source),
-                             paths.Value)) //todo make function for this
+                     val transformedTable =
+                       middleValues.transform(trans.DerefObjectStatic(
+                               Leaf(Source),
+                               paths.Value)) //todo make function for this
                      Mean(transformedTable, ctx)
                    } else {
                      val middleValue =
@@ -1047,12 +1047,11 @@ trait StatsLibModule[M[+ _]]
 
       lazy val alignment = MorphismAlignment.Match(M.point(morph1))
 
-      type InitialResult =
-        (BigDecimal,
-         BigDecimal,
-         BigDecimal,
-         BigDecimal,
-         BigDecimal) // (count, sum1, sum2, sumsq1, productSum)
+      type InitialResult = (BigDecimal,
+                            BigDecimal,
+                            BigDecimal,
+                            BigDecimal,
+                            BigDecimal) // (count, sum1, sum2, sumsq1, productSum)
       type Result =
         Option[(BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal)]
 
@@ -1347,12 +1346,11 @@ trait StatsLibModule[M[+ _]]
 
       lazy val alignment = MorphismAlignment.Match(M.point(morph1))
 
-      type InitialResult =
-        (BigDecimal,
-         BigDecimal,
-         BigDecimal,
-         BigDecimal,
-         BigDecimal) // (count, sum1, sum2, sumsq1, productSum)
+      type InitialResult = (BigDecimal,
+                            BigDecimal,
+                            BigDecimal,
+                            BigDecimal,
+                            BigDecimal) // (count, sum1, sum2, sumsq1, productSum)
       type Result =
         Option[(BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal)]
 

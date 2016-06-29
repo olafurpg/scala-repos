@@ -82,15 +82,12 @@ object DefaultPool {
                                        statsReceiver))
         }
 
-        stack.push(
-            Role.watermarkPool,
-            (sf: ServiceFactory[Req, Rep]) =>
+        stack.push(Role.watermarkPool, (sf: ServiceFactory[Req, Rep]) =>
               new WatermarkPool(sf, low, high, statsReceiver, maxWaiters))
 
         if (bufferSize > 0) {
-          stack.push(Role.bufferingPool,
-                     (sf: ServiceFactory[Req, Rep]) =>
-                       new BufferingPool(sf, bufferSize))
+          stack.push(Role.bufferingPool, (sf: ServiceFactory[Req, Rep]) =>
+                new BufferingPool(sf, bufferSize))
         }
 
         stack.result

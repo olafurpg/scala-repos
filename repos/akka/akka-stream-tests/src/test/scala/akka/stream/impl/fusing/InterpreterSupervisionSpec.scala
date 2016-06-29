@@ -211,9 +211,8 @@ class InterpreterSupervisionSpec
       }
 
       new OneBoundedSetup[Int](
-          Seq(Map((x: Int) ⇒ x + 1, restartingDecider),
-              stage,
-              Map((x: Int) ⇒ x + 100, restartingDecider))) {
+          Seq(Map((x: Int) ⇒ x + 1, restartingDecider), stage, Map((x: Int) ⇒
+                    x + 100, restartingDecider))) {
 
         downstream.requestOne()
         lastEvents() should be(Set(RequestOne))
@@ -240,9 +239,8 @@ class InterpreterSupervisionSpec
       }
 
       new OneBoundedSetup[Int](
-          Seq(Map((x: Int) ⇒ x + 1, restartingDecider),
-              stage,
-              Map((x: Int) ⇒ x + 100, restartingDecider))) {
+          Seq(Map((x: Int) ⇒ x + 1, restartingDecider), stage, Map((x: Int) ⇒
+                    x + 100, restartingDecider))) {
 
         downstream.requestOne()
         lastEvents() should be(Set(RequestOne))
@@ -272,9 +270,8 @@ class InterpreterSupervisionSpec
       }
 
       new OneBoundedSetup[Int](
-          Seq(Map((x: Int) ⇒ x + 1, restartingDecider),
-              stage,
-              Map((x: Int) ⇒ x + 100, restartingDecider))) {
+          Seq(Map((x: Int) ⇒ x + 1, restartingDecider), stage, Map((x: Int) ⇒
+                    x + 100, restartingDecider))) {
 
         downstream.requestOne()
         lastEvents() should be(Set(RequestOne))
@@ -331,9 +328,8 @@ class InterpreterSupervisionSpec
     }
 
     "resume when Scan throws" in new OneBoundedSetup[Int](
-        Seq(Scan(1,
-                 (acc: Int, x: Int) ⇒ if (x == 10) throw TE else acc + x,
-                 resumingDecider))) {
+        Seq(Scan(1, (acc: Int, x: Int) ⇒
+                  if (x == 10) throw TE else acc + x, resumingDecider))) {
       downstream.requestOne()
       lastEvents() should be(Set(OnNext(1)))
       downstream.requestOne()
@@ -351,9 +347,8 @@ class InterpreterSupervisionSpec
     }
 
     "restart when Scan throws" in new OneBoundedSetup[Int](
-        Seq(Scan(1,
-                 (acc: Int, x: Int) ⇒ if (x == 10) throw TE else acc + x,
-                 restartingDecider))) {
+        Seq(Scan(1, (acc: Int, x: Int) ⇒
+                  if (x == 10) throw TE else acc + x, restartingDecider))) {
       downstream.requestOne()
       lastEvents() should be(Set(OnNext(1)))
       downstream.requestOne()

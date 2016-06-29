@@ -1,9 +1,8 @@
 import org.scalacheck._, Prop._, Gen._, Arbitrary._
 
 object ErrorProps extends QuasiquoteProperties("errors") {
-  property("can't extract two .. rankinalities in a row") = fails(
-      "Can't extract with .. here",
-      """
+  property("can't extract two .. rankinalities in a row") =
+    fails("Can't extract with .. here", """
       val xs = List(q"x1", q"x2")
       val q"f(..$xs1, ..$xs2)" = xs
     """)
@@ -26,9 +25,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
         TypeDef(Modifiers(), T1, List(T2), t)
     """)
 
-  property("can't unquote annotations with ... rank") = fails(
-      "Can't unquote with ... here",
-      """
+  property("can't unquote annotations with ... rank") =
+    fails("Can't unquote with ... here", """
       val annots = List(List(q"Foo"))
       q"@...$annots def foo"
     """)
@@ -40,9 +38,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       StringContext(s).q()
     """)
 
-  property("don't know how to unquote inside of strings") = fails(
-      "Don't know how to unquote here",
-      """
+  property("don't know how to unquote inside of strings") =
+    fails("Don't know how to unquote here", """
       val x: Tree = EmptyTree
       StringContext("\"", "\"").q(x)
     """)

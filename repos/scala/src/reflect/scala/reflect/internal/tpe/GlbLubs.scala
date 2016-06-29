@@ -580,9 +580,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
                 val dss = ts flatMap refinedToDecls
                 for (ds <- dss; sym <- ds.iterator)
                   if (globalGlbDepth < globalGlbLimit &&
-                      !specializesSym(glbThisType,
-                                      sym,
-                                      depth))
+                      !specializesSym(glbThisType, sym, depth))
                     try {
                       addMember(glbThisType, glbRefined, glbsym(sym), depth)
                     } catch {

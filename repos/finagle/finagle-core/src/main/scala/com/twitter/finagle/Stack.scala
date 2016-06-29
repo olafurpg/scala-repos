@@ -474,9 +474,8 @@ object Stack {
     final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]])
     def make(p1: P1, next: T): T
     def toStack(next: Stack[T]): Stack[T] =
-      Node(this,
-           (prms, next) => Leaf(this, make(prms[P1], next.make(prms))),
-           next)
+      Node(this, (prms, next) =>
+            Leaf(this, make(prms[P1], next.make(prms))), next)
   }
 
   /** A module of 2 parameters. */
@@ -485,18 +484,15 @@ object Stack {
       Seq(implicitly[Param[P1]], implicitly[Param[P2]])
     def make(p1: P1, p2: P2, next: T): T
     def toStack(next: Stack[T]) =
-      Node(this,
-           (prms,
-            next) => Leaf(this, make(prms[P1], prms[P2], next.make(prms))),
-           next)
+      Node(this, (prms, next) =>
+            Leaf(this, make(prms[P1], prms[P2], next.make(prms))), next)
   }
 
   /** A module of 3 parameters. */
   abstract class Module3[P1: Param, P2: Param, P3: Param, T]
       extends Stackable[T] {
-    final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]],
-                                                    implicitly[Param[P2]],
-                                                    implicitly[Param[P3]])
+    final val parameters: Seq[Stack.Param[_]] =
+      Seq(implicitly[Param[P1]], implicitly[Param[P2]], implicitly[Param[P3]])
     def make(p1: P1, p2: P2, p3: P3, next: T): T
     def toStack(next: Stack[T]): Stack[T] =
       Node(this,
@@ -547,13 +543,8 @@ object Stack {
   }
 
   /** A module of 6 parameters. */
-  abstract class Module6[P1: Param,
-                         P2: Param,
-                         P3: Param,
-                         P4: Param,
-                         P5: Param,
-                         P6: Param,
-                         T]
+  abstract class Module6[
+      P1: Param, P2: Param, P3: Param, P4: Param, P5: Param, P6: Param, T]
       extends Stackable[T] {
     final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]],
                                                     implicitly[Param[P2]],

@@ -37,9 +37,8 @@ final class Cached(mongoCache: MongoCache.Builder, defaultTtl: FiniteDuration) {
   private val countShortTtl = AsyncCache[JsObject, Int](f = (o: JsObject) =>
         $count(o), timeToLive = 5.seconds)
 
-  private val count = mongoCache(prefix = "game:count",
-                                 f = (o: JsObject) => $count(o),
-                                 timeToLive = defaultTtl)
+  private val count = mongoCache(prefix = "game:count", f = (o: JsObject) =>
+        $count(o), timeToLive = defaultTtl)
 
   object Divider {
 

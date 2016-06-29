@@ -536,11 +536,7 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
                 tableName: String,
                 replace: Boolean,
                 holdDDLTime: Boolean): Unit = withHiveState {
-    shim.loadTable(client,
-                   new Path(loadPath),
-                   tableName,
-                   replace,
-                   holdDDLTime)
+    shim.loadTable(client, new Path(loadPath), tableName, replace, holdDDLTime)
   }
 
   def loadDynamicPartitions(loadPath: String,

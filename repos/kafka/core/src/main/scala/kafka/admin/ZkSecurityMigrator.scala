@@ -223,10 +223,7 @@ class ZkSecurityMigrator(zkUtils: ZkUtils) extends Logging {
   }
 
   private object SetACLCallback extends StatCallback {
-    def processResult(rc: Int,
-                      path: String,
-                      ctx: Object,
-                      stat: Stat) {
+    def processResult(rc: Int, path: String, ctx: Object, stat: Stat) {
       val zkHandle = zkUtils.zkConnection.getZookeeper
       val promise = ctx.asInstanceOf[Promise[String]]
 

@@ -110,13 +110,9 @@ class AsyncRDDActions[T: ClassTag](self: RDD[T])
         val buf = new Array[Array[T]](p.size)
         self.context.setCallSite(callSite)
         self.context.setLocalProperties(localProperties)
-        val job =
-          jobSubmitter.submitJob(self,
-                                 (it: Iterator[T]) => it.take(left).toArray,
-                                 p,
-                                 (index: Int,
-                                  data: Array[T]) => buf(index) = data,
-                                 Unit)
+        val job = jobSubmitter.submitJob(self, (it: Iterator[T]) =>
+              it.take(left).toArray, p, (index: Int, data: Array[T]) =>
+              buf(index) = data, Unit)
         job.flatMap { _ =>
           buf.foreach(results ++= _.take(num - results.size))
           continue(partsScanned + p.size)

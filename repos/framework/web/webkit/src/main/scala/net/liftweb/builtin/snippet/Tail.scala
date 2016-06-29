@@ -35,12 +35,7 @@ object Tail extends DispatchSnippet {
   * a chunk of 
   */
 object Head extends DispatchSnippet {
-  lazy val valid = Set("title",
-                       "base",
-                       "link",
-                       "meta",
-                       "style",
-                       "script")
+  lazy val valid = Set("title", "base", "link", "meta", "style", "script")
 
   def dispatch: DispatchIt = {
     case _ => render _

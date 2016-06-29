@@ -31,10 +31,7 @@ class RecipeParseLines extends RecipeSpec {
 
       Await
         .result(linesStream.limit(10).runWith(Sink.seq), 3.seconds) should be(
-          List("Hello World\r!",
-               "Hello Akka!",
-               "Hello Streams!",
-               ""))
+          List("Hello World\r!", "Hello Akka!", "Hello Streams!", ""))
     }
   }
 }

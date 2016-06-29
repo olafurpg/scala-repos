@@ -93,8 +93,8 @@ object NonBlockingMutexSpec extends Specification {
       var errorPercentage = 0
       while (errorPercentage < 90 && runSize < 1000000) {
         runSize = runSize << 1
-        errorPercentage = percentageOfRunsWithOrderingErrors(runSize,
-                                                             new NaiveTester())
+        errorPercentage =
+          percentageOfRunsWithOrderingErrors(runSize, new NaiveTester())
       }
       //println(s"Got $errorPercentage% ordering errors on run size of $runSize")
 

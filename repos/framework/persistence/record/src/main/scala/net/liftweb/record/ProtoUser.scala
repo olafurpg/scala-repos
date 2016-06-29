@@ -332,12 +332,7 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     * The list of fields presented to the user at sign-up
     */
   def signupFields: List[FieldPointerType] =
-    List(firstName,
-         lastName,
-         email,
-         locale,
-         timezone,
-         password)
+    List(firstName, lastName, email, locale, timezone, password)
 
   /**
     * The list of fields presented to the user for editing

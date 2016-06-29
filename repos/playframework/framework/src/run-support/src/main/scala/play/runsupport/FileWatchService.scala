@@ -242,9 +242,8 @@ private object JNotifyFileWatchService {
 
               if (!nativeLibrariesDirectory.exists) {
                 // Unzip native libraries from the jnotify jar to target/native_libraries
-                IO.unzip(jnotifyJarFile,
-                         targetDirectory,
-                         (name: String) => name.startsWith("native_libraries"))
+                IO.unzip(jnotifyJarFile, targetDirectory, (name: String) =>
+                      name.startsWith("native_libraries"))
               }
 
               val libs = new File(nativeLibrariesDirectory,

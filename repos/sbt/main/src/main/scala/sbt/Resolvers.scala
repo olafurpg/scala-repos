@@ -93,12 +93,7 @@ object Resolvers {
     } else
       Some { () =>
         creates(localCopy) {
-          run("git",
-              "clone",
-              "--depth",
-              "1",
-              from,
-              localCopy.getAbsolutePath)
+          run("git", "clone", "--depth", "1", from, localCopy.getAbsolutePath)
         }
       }
   }

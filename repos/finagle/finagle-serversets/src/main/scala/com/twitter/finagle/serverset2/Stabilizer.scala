@@ -46,10 +46,8 @@ private[serverset2] object Stabilizer {
                        10.milliseconds,
                        FinagleStatsReceiver.scope("zk2").scope("timer"))
 
-  TimerStats.hashedWheelTimerInternals(
-      nettyHwt,
-      () => 10.seconds,
-      FinagleStatsReceiver.scope("zk2").scope("timer"))
+  TimerStats.hashedWheelTimerInternals(nettyHwt, () =>
+        10.seconds, FinagleStatsReceiver.scope("zk2").scope("timer"))
 
   private val notifyMs = FinagleStatsReceiver
     .scope("serverset2")

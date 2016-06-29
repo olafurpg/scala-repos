@@ -355,16 +355,17 @@ private[openid] object Discovery {
         .findFirstIn(response.body)
         .orElse(serverRegex.findFirstIn(response.body))
         .flatMap(extractHref(_))
-      serverUrl.map(url => {
-        val delegate: Option[String] = localidRegex
-          .findFirstIn(response.body)
-          .orElse(delegateRegex.findFirstIn(response.body))
-          .flatMap(extractHref(_))
-        OpenIDServer(
-            "http://specs.openid.net/auth/2.0/signon",
-            url,
-            delegate) //protocol version due to http://openid.net/specs/openid-authentication-2_0.html#html_disco
-      })
+      serverUrl
+        .map(url => {
+          val delegate: Option[String] = localidRegex
+            .findFirstIn(response.body)
+            .orElse(delegateRegex.findFirstIn(response.body))
+            .flatMap(extractHref(_))
+          OpenIDServer(
+              "http://specs.openid.net/auth/2.0/signon",
+              url,
+              delegate) //protocol version due to http://openid.net/specs/openid-authentication-2_0.html#html_disco
+        })
     }
 
     private def extractHref(link: String): Option[String] =

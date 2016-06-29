@@ -297,9 +297,8 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
     sparkListener.synchronized {
       val outputOpWithJobs = outputOps.map {
         case (outputOpData, sparkJobIds) =>
-          (outputOpData,
-           sparkJobIds.map(sparkJobId =>
-                 SparkJobIdWithUIData(sparkJobId, getJobData(sparkJobId))))
+          (outputOpData, sparkJobIds.map(sparkJobId =>
+                    SparkJobIdWithUIData(sparkJobId, getJobData(sparkJobId))))
       }
 
       <table id="batch-job-table" class="table table-bordered table-striped table-condensed">

@@ -504,10 +504,8 @@ object TestNodeProvider {
       project: Project): Option[TestStructureViewElement] = {
     lazy val children =
       processChildren(getInnerInfixExprs(expr), extractFreeSpec, project)
-    extractScalaTestScInfixExpr(
-        expr,
-        ExtractEntry("$minus", true, false, _ => children, List("void")),
-        project).orElse(
+    extractScalaTestScInfixExpr(expr, ExtractEntry("$minus", true, false, _ =>
+              children, List("void")), project).orElse(
         extractScalaTestScInfixExpr(
             expr,
             ExtractEntry("in", true, true, List("void")),
@@ -563,22 +561,14 @@ object TestNodeProvider {
                   List("void"),
                   List("org.scalatest.words.StringVerbBlockRegistration")),
               project))
-      .orElse(
-          extractScalaTestScInfixExpr(expr,
-                                      ExtractEntry("when",
-                                                   false,
-                                                   false,
-                                                   _ => children,
-                                                   List("void")),
-                                      project))
-      .orElse(
-          extractScalaTestScInfixExpr(expr,
-                                      ExtractEntry("which",
-                                                   false,
-                                                   false,
-                                                   _ => children,
-                                                   List("void")),
-                                      project))
+      .orElse(extractScalaTestScInfixExpr(
+              expr,
+              ExtractEntry("when", false, false, _ => children, List("void")),
+              project))
+      .orElse(extractScalaTestScInfixExpr(
+              expr,
+              ExtractEntry("which", false, false, _ => children, List("void")),
+              project))
   }
 
   private def extractFunSpec(
@@ -586,14 +576,8 @@ object TestNodeProvider {
       project: Project): Option[TestStructureViewElement] = {
     lazy val children =
       processChildren(getInnerMethodCalls(expr), extractFunSpec, project)
-    extractScMethodCall(expr,
-                        ExtractEntry("describe",
-                                     true,
-                                     true,
-                                     _ => children,
-                                     List("java.lang.String"),
-                                     List("void")),
-                        project)
+    extractScMethodCall(expr, ExtractEntry("describe", true, true, _ =>
+              children, List("java.lang.String"), List("void")), project)
       .orElse(
           extractScMethodCall(
               expr,
@@ -610,18 +594,13 @@ object TestNodeProvider {
       project: Project): Option[TestStructureViewElement] = {
     lazy val children =
       processChildren(getInnerMethodCalls(expr), extractFeatureSpec, project)
-    extractScMethodCall(expr,
-                        ExtractEntry("feature",
-                                     true,
-                                     false,
-                                     _ => children,
-                                     List("java.lang.String"),
-                                     List("void")),
-                        project).orElse(
-        extractScMethodCall(
-            expr,
-            ExtractEntry("scenario", true, true, scMethodCallDefaultArg: _*),
-            project))
+    extractScMethodCall(expr, ExtractEntry("feature", true, false, _ =>
+              children, List("java.lang.String"), List("void")), project)
+      .orElse(
+          extractScMethodCall(
+              expr,
+              ExtractEntry("scenario", true, true, scMethodCallDefaultArg: _*),
+              project))
   }
 
   private def extractPropSpec(

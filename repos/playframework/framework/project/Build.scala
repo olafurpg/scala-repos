@@ -246,10 +246,7 @@ object PlayBuild extends Build {
         libraryDependencies ++=
           runtime(scalaVersion.value) ++ scalacheckDependencies,
         sourceGenerators in Compile <+=
-          (version,
-           scalaVersion,
-           sbtVersion,
-           sourceManaged in Compile) map PlayVersion,
+          (version, scalaVersion, sbtVersion, sourceManaged in Compile) map PlayVersion,
         sourceDirectories in (Compile, TwirlKeys.compileTemplates) :=
           (unmanagedSourceDirectories in Compile).value,
         TwirlKeys.templateImports += "play.api.templates.PlayMagic._",

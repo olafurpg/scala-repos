@@ -51,13 +51,7 @@ object Servlet30AsyncProvider extends AsyncProviderMeta {
       (true, cc, asyncClass, startAsync, getResponse, complete, isSupported)
     } catch {
       case e: Exception =>
-        (false,
-         null,
-         null,
-         null,
-         null,
-         null,
-         null)
+        (false, null, null, null, null, null, null)
     }
   }
 

@@ -153,18 +153,14 @@ object ApplyUsage extends App {
     applyVLO.apply2(Vector(List(1.some, none[Int]), List(2.some, 3.some)),
                     Vector(List("a".some, "b".some, "c".some)))(_.toString + _)
 
-  val expectedDeep = Vector(List(Some("1a"),
-                                 Some("1b"),
-                                 Some("1c"),
-                                 None,
-                                 None,
-                                 None),
-                            List(Some("2a"),
-                                 Some("2b"),
-                                 Some("2c"),
-                                 Some("3a"),
-                                 Some("3b"),
-                                 Some("3c")))
+  val expectedDeep = Vector(
+      List(Some("1a"), Some("1b"), Some("1c"), None, None, None),
+      List(Some("2a"),
+           Some("2b"),
+           Some("2c"),
+           Some("3a"),
+           Some("3b"),
+           Some("3c")))
 
   assert(deepResult === expectedDeep)
 }

@@ -59,10 +59,8 @@ class ScalaIntroduceParameterUsageProcessor
         manager.doPostponedOperationsAndUnblockDocument(
             manager.getDocument(file))
 
-        ScalaRefactoringUtil.replaceOccurences(
-            textRangeUsages.map(usage => TextRange.create(usage.range)),
-            text,
-            file)
+        ScalaRefactoringUtil.replaceOccurences(textRangeUsages.map(usage =>
+                  TextRange.create(usage.range)), text, file)
         textRangeUsages.foreach(_.processed = true)
         true
       case _ => false

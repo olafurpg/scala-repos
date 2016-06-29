@@ -117,8 +117,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           |SELECT x.str, COUNT(*)
           |FROM df x JOIN df y ON x.str = y.str
           |GROUP BY x.str
-        """.stripMargin),
-                Row("1", 1) :: Row("2", 1) :: Row("3", 1) :: Nil)
+        """.stripMargin), Row("1", 1) :: Row("2", 1) :: Row("3", 1) :: Nil)
   }
 
   test("support table.star") {
@@ -144,8 +143,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           |SELECT x.str, SUM(x.strCount)
           |FROM df x JOIN df y ON x.str = y.str
           |GROUP BY x.str
-        """.stripMargin),
-                Row("1", 1) :: Row("2", 1) :: Row("3", 1) :: Nil)
+        """.stripMargin), Row("1", 1) :: Row("2", 1) :: Row("3", 1) :: Nil)
   }
 
   test("SPARK-8668 expr function") {
@@ -207,8 +205,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           |  from rows
           |  group by nested.attribute) a
           |group by attribute
-        """.stripMargin),
-                Row(1, 1) :: Nil)
+        """.stripMargin), Row(1, 1) :: Nil)
   }
 
   test("SPARK-6201 IN type conversion") {
@@ -552,8 +549,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     checkAnswer(sql("""
         |select key from ((select * from testData)
         |  union all (select * from testData)) x limit 1
-      """.stripMargin),
-                Row(1))
+      """.stripMargin), Row(1))
 
     checkAnswer(sql("select key from (select * from testData) x limit 1"),
                 Row(1))
@@ -644,8 +640,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           |SELECT * FROM
           |  (SELECT * FROM testData2 WHERE a = 1) x JOIN
           |  (SELECT * FROM testData2 WHERE a = 2) y
-          |WHERE x.a = y.a""".stripMargin),
-                Nil)
+          |WHERE x.a = y.a""".stripMargin), Nil)
   }
 
   test("big inner join, 4 matches per row") {
@@ -710,10 +705,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
             4,
             "D",
             4,
-            "D") :: Row(null, null, 5, "E") :: Row(null,
-                                                   null,
-                                                   6,
-                                                   "F") :: Nil)
+            "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
   }
 
   test("SPARK-11111 null-safe join should not use cartesian product") {
@@ -761,10 +753,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
             4,
             "D",
             4,
-            "D") :: Row(null, null, 5, "E") :: Row(null,
-                                                   null,
-                                                   6,
-                                                   "F") :: Nil)
+            "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
   }
 
   test("select with table name as qualifier") {
@@ -787,18 +776,12 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         sql(
             "SELECT upperCaseData.N, upperCaseData.L FROM upperCaseData JOIN lowerCaseData " +
               "ON lowerCaseData.n = upperCaseData.N"),
-        Seq(Row(1, "A"),
-            Row(2, "B"),
-            Row(3, "C"),
-            Row(4, "D")))
+        Seq(Row(1, "A"), Row(2, "B"), Row(3, "C"), Row(4, "D")))
   }
 
   test("system function upper()") {
     checkAnswer(sql("SELECT n,UPPER(l) FROM lowerCaseData"),
-                Seq(Row(1, "A"),
-                    Row(2, "B"),
-                    Row(3, "C"),
-                    Row(4, "D")))
+                Seq(Row(1, "A"), Row(2, "B"), Row(3, "C"), Row(4, "D")))
 
     checkAnswer(sql("SELECT n, UPPER(s) FROM nullStrings"),
                 Seq(Row(1, "ABC"), Row(2, "ABC"), Row(3, null)))
@@ -1275,8 +1258,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           |FROM testData a
           |JOIN testData b ON a.key = b.key
           |JOIN testData c ON a.key = c.key
-        """.stripMargin),
-                (1 to 100).map(i => Row(i, i, i)))
+        """.stripMargin), (1 to 100).map(i => Row(i, i, i)))
   }
 
   test("SPARK-3483 Special chars in column names") {
@@ -1306,8 +1288,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     checkAnswer(sql("""SELECT a.key, b.key, c.key
           |FROM testData a,testData b,testData c
           |where a.key = b.key and a.key = c.key
-        """.stripMargin),
-                (1 to 100).map(i => Row(i, i, i)))
+        """.stripMargin), (1 to 100).map(i => Row(i, i, i)))
   }
 
   test(
@@ -1433,24 +1414,21 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           |FROM orderByData
           |GROUP BY a
           |ORDER BY sum(b)
-        """.stripMargin),
-                Row("4") :: Row("1") :: Row("3") :: Row("2") :: Nil)
+        """.stripMargin), Row("4") :: Row("1") :: Row("3") :: Row("2") :: Nil)
 
     checkAnswer(sql("""
           |SELECT sum(b)
           |FROM orderByData
           |GROUP BY a
           |ORDER BY sum(b)
-        """.stripMargin),
-                Row(3) :: Row(7) :: Row(11) :: Row(15) :: Nil)
+        """.stripMargin), Row(3) :: Row(7) :: Row(11) :: Row(15) :: Nil)
 
     checkAnswer(sql("""
           |SELECT sum(b)
           |FROM orderByData
           |GROUP BY a
           |ORDER BY sum(b), max(b)
-        """.stripMargin),
-                Row(3) :: Row(7) :: Row(11) :: Row(15) :: Nil)
+        """.stripMargin), Row(3) :: Row(7) :: Row(11) :: Row(15) :: Nil)
 
     checkAnswer(
         sql("""
@@ -1475,8 +1453,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
             |FROM orderByData
             |GROUP BY a
             |ORDER BY count(*)
-          """.stripMargin),
-                Row(2) :: Row(2) :: Row(2) :: Row(2) :: Nil)
+          """.stripMargin), Row(2) :: Row(2) :: Row(2) :: Row(2) :: Nil)
 
     checkAnswer(sql("""
             |SELECT a
@@ -1825,15 +1802,13 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     checkAnswer(sql("""
         | SELECT min(struct(record.*)) FROM
         |   (select struct(a,b) as record from testData2) tmp
-      """.stripMargin),
-                Row(Row(1, 1)) :: Nil)
+      """.stripMargin), Row(Row(1, 1)) :: Nil)
 
     // Try with an alias on the select list
     checkAnswer(sql("""
         | SELECT max(struct(record.*)) as r FROM
         |   (select struct(a,b) as record from testData2) tmp
-      """.stripMargin).select($"r.*"),
-                Row(3, 2) :: Nil)
+      """.stripMargin).select($"r.*"), Row(3, 2) :: Nil)
 
     // With GROUP BY
     checkAnswer(
@@ -2028,8 +2003,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
             |    SELECT 'foo' AS v UNION ALL
             |    SELECT NULL AS v
             |  ) my_union WHERE isnull(v)
-            |) my_subview""".stripMargin),
-                Seq(Row(0)))
+            |) my_subview""".stripMargin), Seq(Row(0)))
   }
 
   test(
@@ -2043,8 +2017,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           |    SELECT 'foo' AS v UNION ALL SELECT null AS v
           |  ) my_union
           |) my_view
-        """.stripMargin),
-                Row(false) :: Row(true) :: Nil)
+        """.stripMargin), Row(false) :: Row(true) :: Nil)
   }
 
   test("rollup") {
@@ -2085,14 +2058,10 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         Row(null, 113000.0, 3) :: Row("Java", 20000.0, 0) :: Row(
             "Java",
             30000.0,
-            0) :: Row("Java", 50000.0, 1) :: Row("dotNET",
-                                                 5000.0,
-                                                 0) :: Row(
+            0) :: Row("Java", 50000.0, 1) :: Row("dotNET", 5000.0, 0) :: Row(
             "dotNET",
             10000.0,
-            0) :: Row("dotNET", 48000.0, 0) :: Row("dotNET",
-                                                   63000.0,
-                                                   1) :: Nil
+            0) :: Row("dotNET", 48000.0, 0) :: Row("dotNET", 63000.0, 1) :: Nil
     )
   }
 
@@ -2344,11 +2313,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
               null,
               null,
               "r3c2",
-              "t3r3c3") :: Row(null,
-                               null,
-                               null,
-                               "r1c2",
-                               "t3r1c3") :: Nil)
+              "t3r3c3") :: Row(null, null, null, "r1c2", "t3r1c3") :: Nil)
 
       // Self join with using columns.
       checkAnswer(sql("SELECT * FROM t1 join t1 using (c1)"),

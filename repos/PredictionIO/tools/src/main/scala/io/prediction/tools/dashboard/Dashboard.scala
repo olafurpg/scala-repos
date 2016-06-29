@@ -92,10 +92,7 @@ trait DashboardService
             complete {
               val completedInstances = evaluationInstances.getCompleted
               html
-                .index(dc,
-                       serverStartTime,
-                       pioEnvVars,
-                       completedInstances)
+                .index(dc, serverStartTime, pioEnvVars, completedInstances)
                 .toString
             }
           }

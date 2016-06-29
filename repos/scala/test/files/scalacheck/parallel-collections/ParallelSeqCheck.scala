@@ -253,10 +253,8 @@ abstract class ParallelSeqCheck[T](collName: String)
             ("with par" |: s.patch(from, pat, repl) == coll.patch(from,
                                                                   fromSeq(pat),
                                                                   repl)) &&
-            ("with empty" |: s.patch(from, Nil, repl) == coll.patch(
-                    from,
-                    fromSeq(Nil),
-                    repl)) &&
+            ("with empty" |: s.patch(from, Nil, repl) == coll
+                  .patch(from, fromSeq(Nil), repl)) &&
             ("with one" |:
                   (s.length == 0 || s.patch(from, List(s(0)), 1) == coll
                         .patch(from, fromSeq(List(coll(0))), 1)))

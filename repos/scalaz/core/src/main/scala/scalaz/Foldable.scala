@@ -348,13 +348,13 @@ trait Foldable[F[_]] { self =>
 
     /** Left fold is consistent with foldMap. */
     def leftFMConsistent[A: Equal](fa: F[A]): Boolean =
-      Equal[Vector[A]].equal(foldMap(fa)(Vector(_)),
-                             foldLeft(fa, Vector.empty[A])(_ :+ _))
+      Equal[Vector[A]]
+        .equal(foldMap(fa)(Vector(_)), foldLeft(fa, Vector.empty[A])(_ :+ _))
 
     /** Right fold is consistent with foldMap. */
     def rightFMConsistent[A: Equal](fa: F[A]): Boolean =
-      Equal[Vector[A]].equal(foldMap(fa)(Vector(_)),
-                             foldRight(fa, Vector.empty[A])(_ +: _))
+      Equal[Vector[A]]
+        .equal(foldMap(fa)(Vector(_)), foldRight(fa, Vector.empty[A])(_ +: _))
   }
   def foldableLaw = new FoldableLaw {}
 

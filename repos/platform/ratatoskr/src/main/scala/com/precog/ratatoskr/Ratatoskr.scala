@@ -742,9 +742,8 @@ object ZookeeperTools extends Command {
             setCheckpoint(path, YggCheckpoint.Empty)
           case s =>
             println("Loading initial checkpoint from : " + s)
-            setCheckpoint(
-                path,
-                parseCheckpoint(s).valueOr(err => sys.error(err.message)))
+            setCheckpoint(path, parseCheckpoint(s).valueOr(err =>
+                      sys.error(err.message)))
         }
     }
 

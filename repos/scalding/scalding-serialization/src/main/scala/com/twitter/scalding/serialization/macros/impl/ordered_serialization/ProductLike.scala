@@ -95,9 +95,8 @@ object ProductLike {
   }
 
   def length(c: Context)(element: c.Tree)(
-      elementData: List[(c.universe.Type,
-                         c.universe.TermName,
-                         TreeOrderedBuf[c.type])])
+      elementData: List[
+          (c.universe.Type, c.universe.TermName, TreeOrderedBuf[c.type])])
     : CompileTimeLengthTypes[c.type] = {
     import c.universe._
     import CompileTimeLengthTypes._

@@ -87,15 +87,12 @@ object GeneratedCodeTest {
           val k1Options = optionsOfColumn(E.baseTableRow.k1)
           val k2Options = optionsOfColumn(E.baseTableRow.k2)
           val sOptions = optionsOfColumn(E.baseTableRow.s)
-          assertTrue("k1 should be AutoInc",
-                     k1Options.exists(option =>
-                           (option equals E.baseTableRow.O.AutoInc)))
-          assertTrue("k2 should not be AutoInc",
-                     k2Options.forall(option =>
-                           !(option equals E.baseTableRow.O.AutoInc)))
-          assertTrue("s should not be AutoInc",
-                     sOptions.forall(option =>
-                           !(option equals E.baseTableRow.O.AutoInc)))
+          assertTrue("k1 should be AutoInc", k1Options.exists(option =>
+                    (option equals E.baseTableRow.O.AutoInc)))
+          assertTrue("k2 should not be AutoInc", k2Options.forall(option =>
+                    !(option equals E.baseTableRow.O.AutoInc)))
+          assertTrue("s should not be AutoInc", sOptions.forall(option =>
+                    !(option equals E.baseTableRow.O.AutoInc)))
           // test default values
           assertEquals(None, ERow(1, 2).n)
           assertEquals("test", ERow(1, 2).s)

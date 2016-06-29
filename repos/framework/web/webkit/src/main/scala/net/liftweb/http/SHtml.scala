@@ -202,8 +202,8 @@ trait SHtml extends Loggable {
     * @return the function ID and JavaScript that makes the call
     */
   def jsonCall(jsCalcValue: JsExp, func: JsonAST.JValue => JsCmd): GUIDJsExp =
-    jsonCall_*(jsCalcValue,
-               SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse Noop))
+    jsonCall_*(jsCalcValue, SFuncHolder(s =>
+              parseOptOrLog(s).map(func) getOrElse Noop))
 
   /**
     * Build a JavaScript function that will perform a JSON call based on a value calculated in JavaScript.
@@ -219,9 +219,8 @@ trait SHtml extends Loggable {
   def jsonCall(jsCalcValue: JsExp,
                jsContext: JsContext,
                func: JsonAST.JValue => JsCmd): GUIDJsExp =
-    jsonCall_*(jsCalcValue,
-               jsContext,
-               SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse Noop))
+    jsonCall_*(jsCalcValue, jsContext, SFuncHolder(s =>
+              parseOptOrLog(s).map(func) getOrElse Noop))
 
   /**
     * Build a JavaScript function that will perform a JSON call based on a value calculated in JavaScript.
@@ -238,10 +237,8 @@ trait SHtml extends Loggable {
   def jsonCall(jsCalcValue: JsExp,
                jsonContext: JsonContext,
                func: JsonAST.JValue => JsonAST.JValue): GUIDJsExp =
-    jsonCall_*(jsCalcValue,
-               jsonContext,
-               S.SFuncHolder(s =>
-                     parseOptOrLog(s).map(func) getOrElse JsonAST.JNothing))
+    jsonCall_*(jsCalcValue, jsonContext, S.SFuncHolder(s =>
+              parseOptOrLog(s).map(func) getOrElse JsonAST.JNothing))
 
   /**
     * Build a JavaScript function that will perform an AJAX call based on a value calculated in JavaScript
@@ -553,9 +550,7 @@ trait SHtml extends Loggable {
         editForm ++ <input type="submit" value={S.?("ok")} /> ++ hidden(
             onSubmit) ++ <input type="button" onclick={swapJsCmd(dispName,editName).toJsCmd + " return false;"} value={S.?("cancel")} />
 
-      ajaxForm(formData,
-               Noop,
-               setAndSwap(dispName, displayMarkup, editName))
+      ajaxForm(formData, Noop, setAndSwap(dispName, displayMarkup, editName))
     }
 
     <div>
@@ -908,10 +903,8 @@ trait SHtml extends Loggable {
   def ajaxCheckbox(value: Boolean,
                    func: Boolean => JsCmd,
                    attrs: ElemAttr*): Elem =
-    ajaxCheckbox_*(value,
-                   Empty,
-                   LFuncHolder(in => func(in.exists(toBoolean(_)))),
-                   attrs: _*)
+    ajaxCheckbox_*(value, Empty, LFuncHolder(in =>
+              func(in.exists(toBoolean(_)))), attrs: _*)
 
   def ajaxCheckboxElem(settable: Settable { type ValueType = Boolean }, jsFunc: Call, attrs: ElemAttr*)
     : Elem =
@@ -924,10 +917,8 @@ trait SHtml extends Loggable {
                    jsFunc: Call,
                    func: Boolean => JsCmd,
                    attrs: ElemAttr*): Elem =
-    ajaxCheckbox_*(value,
-                   Full(jsFunc),
-                   LFuncHolder(in => func(in.exists(toBoolean(_)))),
-                   attrs: _*)
+    ajaxCheckbox_*(value, Full(jsFunc), LFuncHolder(in =>
+              func(in.exists(toBoolean(_)))), attrs: _*)
 
   private def ajaxCheckbox_*(value: Boolean,
                              jsFunc: Box[Call],
@@ -1625,11 +1616,8 @@ trait SHtml extends Loggable {
     */
   def number(settable: Settable { type ValueType = Int }, min: Int, max: Int, attrs: ElemAttr*)
     : Elem =
-    number_*(settable.get,
-             min,
-             max,
-             SFuncHolder(s => Helpers.asInt(s).map(s => settable.set(s))),
-             attrs: _*)
+    number_*(settable.get, min, max, SFuncHolder(s =>
+              Helpers.asInt(s).map(s => settable.set(s))), attrs: _*)
 
   private def number_*(value: Int,
                        min: Int,
@@ -1654,12 +1642,8 @@ trait SHtml extends Loggable {
              max: Double,
              step: Double,
              attrs: ElemAttr*): Elem =
-    number_double_*(value,
-                    min,
-                    max,
-                    step,
-                    SFuncHolder(s => Helpers.asDouble(s).map(func)),
-                    attrs: _*)
+    number_double_*(value, min, max, step, SFuncHolder(s =>
+              Helpers.asDouble(s).map(func)), attrs: _*)
 
   /**
     * Generate a number input element for the Settable. It allows for Double if your step is
@@ -1669,13 +1653,8 @@ trait SHtml extends Loggable {
     */
   def number(settable: Settable { type ValueType = Double }, min: Double, max: Double, step: Double, attrs: ElemAttr*)
     : Elem =
-    number_double_*(
-        settable.get,
-        min,
-        max,
-        step: Double,
-        SFuncHolder(s => Helpers.asDouble(s).map(s => settable.set(s))),
-        attrs: _*)
+    number_double_*(settable.get, min, max, step: Double, SFuncHolder(s =>
+              Helpers.asDouble(s).map(s => settable.set(s))), attrs: _*)
 
   private def number_double_*(value: Double,
                               min: Double,
@@ -1712,11 +1691,8 @@ trait SHtml extends Loggable {
     */
   def range(settable: Settable { type ValueType = Int }, min: Int, max: Int, attrs: ElemAttr*)
     : Elem =
-    range_*(settable.get,
-            min,
-            max,
-            SFuncHolder(s => Helpers.asInt(s).map(s => settable.set(s))),
-            attrs: _*)
+    range_*(settable.get, min, max, SFuncHolder(s =>
+              Helpers.asInt(s).map(s => settable.set(s))), attrs: _*)
 
   private def range_*(value: Int,
                       min: Int,
@@ -2070,10 +2046,8 @@ trait SHtml extends Loggable {
     * @param onSubmit -- the function to execute on form submission
     * @param f -- the function that converts a T to a Display String.
     */
-  def selectElem[T](
-      options: Seq[T],
-      settable: LiftValue[T],
-      attrs: ElemAttr*)(implicit f: PairStringPromoter[T]): Elem = {
+  def selectElem[T](options: Seq[T], settable: LiftValue[T], attrs: ElemAttr*)(
+      implicit f: PairStringPromoter[T]): Elem = {
     selectObj[T](options.map(v => SelectableOption(v, f(v))),
                  Full(settable.get),
                  s => settable.set(s),

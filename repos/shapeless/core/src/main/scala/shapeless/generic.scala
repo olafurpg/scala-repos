@@ -856,9 +856,8 @@ trait CaseClassMacros extends ReprTypes {
           isAccessible(companionTpe, applySym)) {
         val applyParamss = applySym.asMethod.paramLists
         if (applyParamss.length == 1)
-          alignFields(
-              tpe,
-              applyParamss.head.map(tpe => unByName(tpe.infoIn(companionTpe))))
+          alignFields(tpe, applyParamss.head.map(tpe =>
+                    unByName(tpe.infoIn(companionTpe))))
         else None
       } else None
     }

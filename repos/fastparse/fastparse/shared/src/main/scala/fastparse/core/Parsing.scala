@@ -87,9 +87,7 @@ object Parsed {
     * @param extra Extra supplementary information (including trace information).
     *              For details see [[Parsed.Failure.Extra]]
     */
-  case class Failure(lastParser: Parser[_],
-                     index: Int,
-                     extra: Failure.Extra)
+  case class Failure(lastParser: Parser[_], index: Int, extra: Failure.Extra)
       extends Parsed[Nothing] {
 
     def msg = Failure.formatStackTrace(

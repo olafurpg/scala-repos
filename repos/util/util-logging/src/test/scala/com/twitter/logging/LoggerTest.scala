@@ -275,10 +275,9 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
           assert(handler.append == false)
           assert(handler.getLevel == Level.INFO)
           val formatter = handler.formatter
-          assert(
-              formatter.formatPrefix(javalog.Level.WARNING,
-                                     "10:55",
-                                     "hello") == "WARNING 10:55 hello")
+          assert(formatter.formatPrefix(javalog.Level.WARNING,
+                                        "10:55",
+                                        "hello") == "WARNING 10:55 hello")
           assert(log.name == "com.twitter")
           assert(formatter.truncateAt == 1024)
           assert(formatter.useFullPackageNames == true)

@@ -152,10 +152,7 @@ object UnauthorizedDigestResponse {
             qop: Qop.Value,
             nonce: String,
             opaque: String): UnauthorizedDigestResponse =
-    new UnauthorizedDigestResponse(realm,
-                                   qop,
-                                   nonce,
-                                   opaque)
+    new UnauthorizedDigestResponse(realm, qop, nonce, opaque)
 }
 
 /**

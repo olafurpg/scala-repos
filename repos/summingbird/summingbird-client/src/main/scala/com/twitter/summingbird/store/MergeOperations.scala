@@ -101,8 +101,7 @@ object MergeOperations {
   def generateOnlineKeys[K](ks: Seq[K], nowBatch: BatchID, batchesToKeep: Int)(
       lookup: K => FOpt[BatchID])(
       implicit collect: FutureCollector[(K, Iterable[BatchID])])
-    : Future[Set[(K,
-                  BatchID)]] =
+    : Future[Set[(K, BatchID)]] =
     for {
       collected <- collect(
                       ks.map { k =>

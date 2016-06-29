@@ -101,9 +101,8 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
             .build())
       fetchedMessage = fetched.messageSet(topic, 0)
     }
-    assertEquals(
-        sent1,
-        fetchedMessage.map(m => TestUtils.readString(m.message.payload)))
+    assertEquals(sent1, fetchedMessage.map(m =>
+              TestUtils.readString(m.message.payload)))
     val newOffset = fetchedMessage.last.nextOffset
 
     // send some more messages
@@ -119,9 +118,8 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
             .build())
       fetchedMessage = fetched.messageSet(topic, 0)
     }
-    assertEquals(
-        sent2,
-        fetchedMessage.map(m => TestUtils.readString(m.message.payload)))
+    assertEquals(sent2, fetchedMessage.map(m =>
+              TestUtils.readString(m.message.payload)))
 
     consumer.close()
     producer.close()

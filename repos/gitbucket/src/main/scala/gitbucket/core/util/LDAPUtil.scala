@@ -213,12 +213,11 @@ object LDAPUtil {
       case x => "(&(" + x + ")(" + userNameAttribute + "=" + userName + "))"
     }
 
-    getEntries(
-        conn.search(baseDN,
-                    LDAPConnection.SCOPE_SUB,
-                    filterCond,
-                    null,
-                    false)).collectFirst {
+    getEntries(conn.search(baseDN,
+                           LDAPConnection.SCOPE_SUB,
+                           filterCond,
+                           null,
+                           false)).collectFirst {
       case x => x.getDN
     }
   }

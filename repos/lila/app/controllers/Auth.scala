@@ -119,54 +119,42 @@ object Auth extends LilaController {
     implicit val req = ctx.body
     Firewall {
       negotiate(
-          html = forms.signup.website.bindFromRequest.fold(
-              err =>
+          html = forms.signup.website.bindFromRequest.fold(err =>
                 forms.anyCaptcha map { captcha =>
-                  BadRequest(
-                      html.auth.signup(err,
-                                       captcha,
-                                       env.RecaptchaPublicKey))
-              },
-              data =>
-                env.recaptcha
-                  .verify(data.recaptchaResponse,
-                          req)
+              BadRequest(
+                  html.auth.signup(err, captcha, env.RecaptchaPublicKey))
+          }, data =>
+                env.recaptcha.verify(data.recaptchaResponse, req).flatMap {
+              case false =>
+                forms.signup.websiteWithCaptcha map {
+                  case (form, captcha) =>
+                    BadRequest(html.auth.signup(form fill data,
+                                                captcha,
+                                                env.RecaptchaPublicKey))
+                }
+              case true =>
+                lila.mon.user.register.website()
+                val email =
+                  env.emailAddress
+                    .validate(data.email) err s"Invalid email ${data.email}"
+                UserRepo
+                  .create(data.username,
+                          data.password,
+                          email.some,
+                          ctx.blindMode,
+                          none)
+                  .flatten(s"No user could be created for ${data.username}")
+                  .map(_ -> email)
                   .flatMap {
-                    case false =>
-                      forms.signup.websiteWithCaptcha map {
-                        case (form,
-                              captcha) =>
-                          BadRequest(html.auth.signup(form fill data,
-                                                      captcha,
-                                                      env.RecaptchaPublicKey))
+                    case (user, email) =>
+                      env.emailConfirm.send(user, email) >> {
+                        if (env.emailConfirm.effective)
+                          Redirect(routes.Auth.checkYourEmail(user.username)).fuccess
+                        else
+                          saveAuthAndRedirect(user)
                       }
-                    case true =>
-                      lila.mon.user.register.website()
-                      val email =
-                        env.emailAddress
-                          .validate(data.email) err s"Invalid email ${data.email}"
-                      UserRepo
-                        .create(data.username,
-                                data.password,
-                                email.some,
-                                ctx.blindMode,
-                                none)
-                        .flatten(
-                            s"No user could be created for ${data.username}")
-                        .map(_ -> email)
-                        .flatMap {
-                          case (user,
-                                email) =>
-                            env.emailConfirm.send(user,
-                                                  email) >> {
-                              if (env.emailConfirm.effective)
-                                Redirect(routes.Auth.checkYourEmail(
-                                        user.username)).fuccess
-                              else
-                                saveAuthAndRedirect(user)
-                            }
-                        }
-                }),
+                  }
+          }),
           api = apiVersion =>
             forms.signup.mobile.bindFromRequest.fold(
                 err => fuccess(BadRequest(jsonError(errorsAsJson(err)))),
@@ -207,10 +195,8 @@ object Auth extends LilaController {
   }
 
   private def noTorResponse(implicit ctx: Context) =
-    negotiate(
-        html = Unauthorized(html.auth.tor()).fuccess,
-        api =
-          _ => Unauthorized(jsonError("Can't login from TOR, sorry!")).fuccess)
+    negotiate(html = Unauthorized(html.auth.tor()).fuccess, api = _ =>
+          Unauthorized(jsonError("Can't login from TOR, sorry!")).fuccess)
 
   def setFingerprint(fp: String, ms: Int) = Auth { ctx => me =>
     api.setFingerprint(ctx.req, fp) flatMap {

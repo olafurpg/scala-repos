@@ -120,9 +120,7 @@ class PlannerSuite extends SharedSQLContext {
       ArrayType(DoubleType, true) :: ArrayType(StringType, false) :: MapType(
           IntegerType,
           StringType,
-          true) :: MapType(IntegerType,
-                           ArrayType(DoubleType),
-                           false) :: StructType(
+          true) :: MapType(IntegerType, ArrayType(DoubleType), false) :: StructType(
           Seq(StructField("a", IntegerType, nullable = true),
               StructField("b", ArrayType(DoubleType), nullable = false),
               StructField("c", DoubleType, nullable = false))) :: Nil

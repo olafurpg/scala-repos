@@ -455,11 +455,10 @@ class MessageSpec extends FreeSpec with Matchers with WithMaterializerSpec {
         val pingData = maskedASCII("pling", pingMask)._1
         val pingData0 = pingData.take(3)
         val pingData1 = pingData.drop(3)
-        pushInput(
-            frameHeader(Opcode.Ping,
-                        5,
-                        fin = true,
-                        mask = Some(pingMask)) ++ pingData0)
+        pushInput(frameHeader(Opcode.Ping,
+                              5,
+                              fin = true,
+                              mask = Some(pingMask)) ++ pingData0)
         expectNoNetworkData()
         pushInput(pingData1)
         expectFrameOnNetwork(Opcode.Pong,

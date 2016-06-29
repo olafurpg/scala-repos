@@ -98,8 +98,7 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       val nrOfValues = 10
       //Fill index
       for (key ← 0 until nrOfKeys; value ← 0 until nrOfValues)
-        index.put(key,
-                  value)
+        index.put(key, value)
       //Tasks to be executed in parallel
       def putTask() = Future {
         index.put(Random.nextInt(nrOfKeys), Random.nextInt(nrOfValues))

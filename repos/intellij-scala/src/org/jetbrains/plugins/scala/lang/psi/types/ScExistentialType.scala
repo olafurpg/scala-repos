@@ -419,14 +419,10 @@ case class ScExistentialType(quantified: ScType,
                   ScExistentialArgument(
                       arg.name,
                       arg.args.map(arg =>
-                            updateRecursive(
-                                arg,
-                                newSet,
-                                -variance).asInstanceOf[ScTypeParameterType]),
+                            updateRecursive(arg, newSet, -variance)
+                              .asInstanceOf[ScTypeParameterType]),
                       updateRecursive(arg.lowerBound, newSet, -variance),
-                      updateRecursive(arg.upperBound,
-                                      newSet,
-                                      variance))))
+                      updateRecursive(arg.upperBound, newSet, variance))))
       case ScThisType(clazz) => tp
       case ScDesignatorType(element) =>
         element match {

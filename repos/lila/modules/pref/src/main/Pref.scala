@@ -140,9 +140,8 @@ object Pref {
     val PREMOVE = 2
     val ALWAYS = 3
 
-    val choices = Seq(NEVER -> "Never",
-                      ALWAYS -> "Always",
-                      PREMOVE -> "When premoving")
+    val choices =
+      Seq(NEVER -> "Never", ALWAYS -> "Always", PREMOVE -> "When premoving")
   }
 
   object SubmitMove {
@@ -208,10 +207,8 @@ object Pref {
     val NORMAL = 2
     val SLOW = 3
 
-    val choices = Seq(NONE -> "None",
-                      FAST -> "Fast",
-                      NORMAL -> "Normal",
-                      SLOW -> "Slow")
+    val choices =
+      Seq(NONE -> "None", FAST -> "Fast", NORMAL -> "Normal", SLOW -> "Slow")
   }
 
   object Coords {

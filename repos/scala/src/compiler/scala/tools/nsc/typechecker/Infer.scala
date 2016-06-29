@@ -1354,11 +1354,8 @@ trait Infer extends Checkable { self: Analyzer =>
       val tvars1 = tvars map (_.cloneInternal)
       // Note: right now it's not clear that solving is complete, or how it can be made complete!
       // So we should come back to this and investigate.
-      solve(tvars1,
-            tvars1 map (_.origin.typeSymbol),
-            tvars1 map (_ => Variance.Covariant),
-            upper = false,
-            Depth.AnyDepth)
+      solve(tvars1, tvars1 map (_.origin.typeSymbol), tvars1 map (_ =>
+                Variance.Covariant), upper = false, Depth.AnyDepth)
     }
 
     // this is quite nasty: it destructively changes the info of the syms of e.g., method type params

@@ -357,25 +357,27 @@ trait IssuesControllerBase extends ControllerBase {
 
   ajaxPost("/:owner/:repository/issues/:id/label/new")(collaboratorsOnly {
     repository =>
-      defining(params("id").toInt) { issueId =>
-        registerIssueLabel(repository.owner,
-                           repository.name,
-                           issueId,
-                           params("labelId").toInt)
-        html.labellist(
-            getIssueLabels(repository.owner, repository.name, issueId))
+      defining(params("id").toInt) {
+        issueId =>
+          registerIssueLabel(repository.owner,
+                             repository.name,
+                             issueId,
+                             params("labelId").toInt)
+          html.labellist(
+              getIssueLabels(repository.owner, repository.name, issueId))
       }
   })
 
   ajaxPost("/:owner/:repository/issues/:id/label/delete")(collaboratorsOnly {
     repository =>
-      defining(params("id").toInt) { issueId =>
-        deleteIssueLabel(repository.owner,
-                         repository.name,
-                         issueId,
-                         params("labelId").toInt)
-        html.labellist(
-            getIssueLabels(repository.owner, repository.name, issueId))
+      defining(params("id").toInt) {
+        issueId =>
+          deleteIssueLabel(repository.owner,
+                           repository.name,
+                           issueId,
+                           params("labelId").toInt)
+          html.labellist(
+              getIssueLabels(repository.owner, repository.name, issueId))
       }
   })
 
@@ -429,18 +431,23 @@ trait IssuesControllerBase extends ControllerBase {
     }
   })
 
-  post("/:owner/:repository/issues/batchedit/label")(
-      collaboratorsOnly { repository =>
-    params("value").toIntOpt.map { labelId =>
-      executeBatch(repository) { issueId =>
-        getIssueLabel(repository.owner, repository.name, issueId, labelId) getOrElse {
-          registerIssueLabel(repository.owner,
-                             repository.name,
-                             issueId,
-                             labelId)
-        }
-      }
-    } getOrElse NotFound
+  post("/:owner/:repository/issues/batchedit/label")(collaboratorsOnly {
+    repository =>
+      params("value").toIntOpt.map {
+        labelId =>
+          executeBatch(repository) {
+            issueId =>
+              getIssueLabel(repository.owner,
+                            repository.name,
+                            issueId,
+                            labelId) getOrElse {
+                registerIssueLabel(repository.owner,
+                                   repository.name,
+                                   issueId,
+                                   labelId)
+              }
+          }
+      } getOrElse NotFound
   })
 
   post("/:owner/:repository/issues/batchedit/assign")(collaboratorsOnly {

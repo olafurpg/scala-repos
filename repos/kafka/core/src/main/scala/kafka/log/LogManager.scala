@@ -387,11 +387,7 @@ class LogManager(val logDirs: Array[File],
         new File(dataDir,
                  topicAndPartition.topic + "-" + topicAndPartition.partition)
       dir.mkdirs()
-      log = new Log(dir,
-                    config,
-                    recoveryPoint = 0L,
-                    scheduler,
-                    time)
+      log = new Log(dir, config, recoveryPoint = 0L, scheduler, time)
       logs.put(topicAndPartition, log)
       info(
           "Created log for partition [%s,%d] in %s with properties {%s}."

@@ -392,10 +392,8 @@ object Load {
              options: Seq[String]): Eval =
     mkEval(defs.target ++ plugs.classpath, defs.base, options)
   def mkEval(classpath: Seq[File], base: File, options: Seq[String]): Eval =
-    new Eval(options,
-             classpath,
-             s => new ConsoleReporter(s),
-             Some(evalOutputDirectory(base)))
+    new Eval(options, classpath, s =>
+          new ConsoleReporter(s), Some(evalOutputDirectory(base)))
 
   /**
     * This will clean up left-over files in the config-classes directory if they are no longer used.
@@ -548,9 +546,8 @@ object Load {
     val rootProject = getRootProject(builds)
     builds map {
       case (uri, unit) =>
-        (uri,
-         unit.resolveRefs(ref =>
-               Scope.resolveProjectRef(uri, rootProject, ref)))
+        (uri, unit.resolveRefs(ref =>
+                  Scope.resolveProjectRef(uri, rootProject, ref)))
     }
   }
   def checkAll(referenced: Map[URI, List[ProjectReference]],

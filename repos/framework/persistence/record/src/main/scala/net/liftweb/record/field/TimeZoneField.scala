@@ -47,9 +47,8 @@ trait TimeZoneTypedField extends StringTypedField {
     else TimeZoneField.timeZoneList
 
   private def elem =
-    SHtml.select(buildDisplayList,
-                 Full(valueBox openOr ""),
-                 timezone => setBox(Full(timezone))) %
+    SHtml.select(buildDisplayList, Full(valueBox openOr ""), timezone =>
+          setBox(Full(timezone))) %
       ("tabindex" -> tabIndex.toString)
 
   override def toForm: Box[NodeSeq] =
