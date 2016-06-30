@@ -359,7 +359,8 @@ object ScalaRunTime {
 
     // The try/catch is defense against iterables which aren't actually designed
     // to be iterated, such as some scala.tools.nsc.io.AbstractFile derived classes.
-    try inner(arg) catch {
+    try inner(arg)
+    catch {
       case _: UnsupportedOperationException | _: AssertionError => "" + arg
     }
   }

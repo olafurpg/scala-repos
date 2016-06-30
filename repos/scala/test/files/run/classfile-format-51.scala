@@ -144,7 +144,8 @@ object Test extends DirectTest {
 
     val fos = new FileOutputStream(
         new File(s"${testOutput.path}/$invokerClassName.class"))
-    try fos write bytes finally fos.close()
+    try fos write bytes
+    finally fos.close()
   }
 
   def code =

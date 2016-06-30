@@ -232,17 +232,17 @@ class FilteredScanSuite
       "SELECT x.a, y.b FROM oneToTenFiltered x JOIN oneToTenFiltered y ON x.a = y.b",
       (2 to 10 by 2).map(i => Row(i, i)).toSeq)
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE a = 1", Seq(1).map(i =>
-            Row(i, i * 2)))
+  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE a = 1",
+          Seq(1).map(i => Row(i, i * 2)))
 
   sqlTest("SELECT a, b FROM oneToTenFiltered WHERE a IN (1,3,5)",
           Seq(1, 3, 5).map(i => Row(i, i * 2)))
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE A = 1", Seq(1).map(i =>
-            Row(i, i * 2)))
+  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE A = 1",
+          Seq(1).map(i => Row(i, i * 2)))
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE b = 2", Seq(1).map(i =>
-            Row(i, i * 2)))
+  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE b = 2",
+          Seq(1).map(i => Row(i, i * 2)))
 
   sqlTest("SELECT a, b FROM oneToTenFiltered WHERE a IS NULL", Seq.empty[Row])
 

@@ -268,11 +268,13 @@ object EnumeratorsSpec
         val completeCount = new AtomicInteger(0)
         val completeDone = new CountDownLatch(1)
         val errorCount = new AtomicInteger(0)
-        val enumerator = Enumerator.fromCallback1(b =>
-              Future(if (it.hasNext) Some((b, it.next())) else None), () => {
-          completeCount.incrementAndGet()
-          completeDone.countDown()
-        }, (_: String, _: Input[(Boolean, Int)]) =>
+        val enumerator = Enumerator.fromCallback1(
+            b => Future(if (it.hasNext) Some((b, it.next())) else None),
+            () => {
+              completeCount.incrementAndGet()
+              completeDone.countDown()
+            },
+            (_: String, _: Input[(Boolean, Int)]) =>
               errorCount.incrementAndGet())(callbackEC)
         mustEnumerateTo((true, 1), (false, 2), (false, 3))(enumerator)
         completeDone.await(30, TimeUnit.SECONDS) must beTrue

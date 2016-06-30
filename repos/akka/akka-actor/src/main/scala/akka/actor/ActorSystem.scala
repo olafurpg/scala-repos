@@ -756,7 +756,8 @@ private[akka] class ActorSystemImpl(
     this
   } catch {
     case NonFatal(e) ⇒
-      try terminate() catch { case NonFatal(_) ⇒ Try(stopScheduler()) }
+      try terminate()
+      catch { case NonFatal(_) ⇒ Try(stopScheduler()) }
       throw e
   }
 

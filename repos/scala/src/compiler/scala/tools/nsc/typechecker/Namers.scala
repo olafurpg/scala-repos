@@ -294,7 +294,8 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
       }
       tree.symbol match {
         case NoSymbol =>
-          try dispatch() catch typeErrorHandler(tree, this.context)
+          try dispatch()
+          catch typeErrorHandler(tree, this.context)
         case sym => enterExistingSym(sym, tree)
       }
     }
@@ -1610,7 +1611,8 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
           importSig(imp)
       }
 
-      try getSig catch typeErrorHandler(tree, ErrorType)
+      try getSig
+      catch typeErrorHandler(tree, ErrorType)
     }
 
     def includeParent(tpe: Type, parent: Symbol): Type = tpe match {
@@ -1627,7 +1629,8 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
       val enabled = settings.debug.value
       @inline final def apply[T](entity: S)(body: => T): T = {
         if (enabled) log(onEnter(entity))
-        try body finally if (enabled) log(onExit(entity))
+        try body
+        finally if (enabled) log(onExit(entity))
       }
     }
     private val logDefinition = new LogTransitions[Symbol](
@@ -1749,7 +1752,8 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
 
     override def complete(sym: Symbol) = {
       _lockedCount += 1
-      try completeImpl(sym) finally _lockedCount -= 1
+      try completeImpl(sym)
+      finally _lockedCount -= 1
     }
   }
 

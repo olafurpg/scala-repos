@@ -166,7 +166,8 @@ trait Imports { self: IMain =>
 
     def wrapBeforeAndAfter[T](op: => T): T = {
       addWrapper()
-      try op finally addWrapper()
+      try op
+      finally addWrapper()
     }
 
     // imports from Predef are relocated to the template header to allow hiding.

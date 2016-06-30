@@ -329,7 +329,8 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
       val msg = messageList.head
       messageList = messageList.tail
       msg.unlink()
-      try dlm.systemEnqueue(actor.self, msg) catch {
+      try dlm.systemEnqueue(actor.self, msg)
+      catch {
         case e: InterruptedException ⇒ interruption = e
         case NonFatal(e) ⇒
           actor.system.eventStream.publish(

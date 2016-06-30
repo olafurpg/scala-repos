@@ -89,7 +89,8 @@ class HtmlFactory(val universe: doc.Universe, val reporter: ScalaDocReporter) {
       val dest = Directory(siteRoot) / subPath
       dest.parent.createDirectory()
       val out = dest.toFile.bufferedOutput()
-      try out.write(bytes, 0, bytes.length) finally out.close()
+      try out.write(bytes, 0, bytes.length)
+      finally out.close()
     }
 
     libResources foreach (s => copyResource("lib/" + s))

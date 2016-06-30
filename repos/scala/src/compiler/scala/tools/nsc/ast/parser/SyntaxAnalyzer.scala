@@ -28,7 +28,8 @@ abstract class SyntaxAnalyzer
     private var depth: Int = 0
     private def lower[T](body: => T): T = {
       depth += 1
-      try body finally depth -= 1
+      try body
+      finally depth -= 1
     }
     def currentDepth = depth
 

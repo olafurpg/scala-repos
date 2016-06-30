@@ -25,9 +25,10 @@ object arityize {
 
         val results = for (order <- 1 to maxOrder) yield {
           val bindings = Map(name.encoded -> order)
-          val newTemplate =
-            Template(impl.parents, impl.self, impl.body.flatMap(x =>
-                      expandArity(c, order, bindings)(x)))
+          val newTemplate = Template(
+              impl.parents,
+              impl.self,
+              impl.body.flatMap(x => expandArity(c, order, bindings)(x)))
           val newTargs =
             targs.flatMap(arg => expandTypeDef(c, order, bindings)(arg))
           ClassDef(mods,
@@ -81,9 +82,10 @@ object arityize {
       case x @ ClassDef(mods, name, targs, impl) =>
         val newParents =
           impl.parents.flatMap(tree => expandArity(c, order, bindings)(tree))
-        val newTemplate =
-          Template(newParents, impl.self, impl.body.flatMap(x =>
-                    expandArity(c, order, bindings)(x)))
+        val newTemplate = Template(
+            newParents,
+            impl.self,
+            impl.body.flatMap(x => expandArity(c, order, bindings)(x)))
         val newTargs =
           targs.flatMap(arg => expandTypeDef(c, order, bindings)(arg))
         Seq(ClassDef(mods, name, newTargs, newTemplate))

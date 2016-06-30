@@ -144,8 +144,9 @@ class LinearRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
         sparseValidationData)
 
     // Test prediction on Array.
-    validatePrediction(sparseValidationData.map(row =>
-              model.predict(row.features)), sparseValidationData)
+    validatePrediction(
+        sparseValidationData.map(row => model.predict(row.features)),
+        sparseValidationData)
   }
 
   test("model save/load") {

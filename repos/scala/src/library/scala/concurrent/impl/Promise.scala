@@ -30,7 +30,9 @@ private[concurrent] trait Promise[T]
       implicit executor: ExecutionContext): Future[S] = {
     val p = new DefaultPromise[S]()
     onComplete { result =>
-      p.complete(try f(result) catch { case NonFatal(t) => Failure(t) })
+      p.complete(
+          try f(result)
+          catch { case NonFatal(t) => Failure(t) })
     }
     p.future
   }
@@ -67,7 +69,8 @@ private final class CallbackRunnable[T](val executor: ExecutionContext,
 
   override def run() = {
     require(value ne null) // must set value to non-null before running!
-    try onComplete(value) catch {
+    try onComplete(value)
+    catch {
       case NonFatal(e) => executor reportFailure e
     }
   }
@@ -77,7 +80,8 @@ private final class CallbackRunnable[T](val executor: ExecutionContext,
     value = v
     // Note that we cannot prepare the ExecutionContext at this point, since we might
     // already be running on a different thread!
-    try executor.execute(this) catch {
+    try executor.execute(this)
+    catch {
       case NonFatal(t) => executor reportFailure t
     }
   }

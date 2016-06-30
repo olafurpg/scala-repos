@@ -213,14 +213,18 @@ class JavaTimer(isDaemon: Boolean, name: Option[String]) extends Timer {
   }
 
   protected def scheduleOnce(when: Time)(f: => Unit): TimerTask = {
-    val task = toJavaTimerTask(try f catch catcher)
+    val task = toJavaTimerTask(
+        try f
+        catch catcher)
     underlying.schedule(task, safeTime(when).toDate)
     toTimerTask(task)
   }
 
   protected def schedulePeriodically(when: Time, period: Duration)(
       f: => Unit): TimerTask = {
-    val task = toJavaTimerTask(try f catch catcher)
+    val task = toJavaTimerTask(
+        try f
+        catch catcher)
     underlying.schedule(task, safeTime(when).toDate, period.inMillis)
     toTimerTask(task)
   }

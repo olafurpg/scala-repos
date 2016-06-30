@@ -72,8 +72,9 @@ object StackServer {
     stk.push(RequestSemaphoreFilter.module)
     stk.push(MaskCancelFilter.module)
     stk.push(ExceptionSourceFilter.module)
-    stk.push(Role.jvmTracing, ((next: ServiceFactory[Req, Rep]) =>
-                                 newJvmFilter[Req, Rep]() andThen next))
+    stk.push(Role.jvmTracing,
+             ((next: ServiceFactory[Req, Rep]) =>
+                newJvmFilter[Req, Rep]() andThen next))
     stk.push(ServerStatsFilter.module)
     stk.push(Role.protoTracing, identity[ServiceFactory[Req, Rep]](_))
     stk.push(ServerTracingFilter.module)

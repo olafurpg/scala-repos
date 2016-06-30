@@ -294,8 +294,8 @@ object UserRepo {
 
   def usernamesLike(username: String, max: Int = 10): Fu[List[String]] = {
     import java.util.regex.Matcher.quoteReplacement
-    val escaped = """^([\w-]*).*$""".r.replaceAllIn(normalize(username), m =>
-          quoteReplacement(m group 1))
+    val escaped = """^([\w-]*).*$""".r
+      .replaceAllIn(normalize(username), m => quoteReplacement(m group 1))
     val regex = "^" + escaped + ".*$"
     $primitive(
         $select.byId($regex(regex)) ++ enabledSelect,

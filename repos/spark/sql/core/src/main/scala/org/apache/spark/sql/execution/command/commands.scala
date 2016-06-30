@@ -223,7 +223,8 @@ case class SetCommand(kv: Option[(String, Option[String])])
       // Queries a single property.
       case Some((key, None)) =>
         val runFunc = (sqlContext: SQLContext) => {
-          val value = try sqlContext.getConf(key) catch {
+          val value = try sqlContext.getConf(key)
+          catch {
             case _: NoSuchElementException => "<undefined>"
           }
           Seq(Row(key, value))

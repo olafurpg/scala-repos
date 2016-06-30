@@ -51,7 +51,10 @@ object s {
     act(reify { null: D with E /* CompoundTypeTree */ })
     act(reify { type T = Int /* TypeDef */ })
     act(reify { type CC[T <: D] = C[T] /* TypeBoundsTree */ })
-    act(reify { try 0 finally println("") /* Try */ })
+    act(reify {
+      try 0
+      finally println("") /* Try */
+    })
     act(reify { (x: Int) =>
       x /* Function */
     })

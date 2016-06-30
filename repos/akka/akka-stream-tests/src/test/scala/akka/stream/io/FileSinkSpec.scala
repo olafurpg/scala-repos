@@ -157,7 +157,8 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
   private def targetFile(block: File ⇒ Unit, create: Boolean = true) {
     val targetFile = File.createTempFile("synchronous-file-sink", ".tmp")
     if (!create) targetFile.delete()
-    try block(targetFile) finally targetFile.delete()
+    try block(targetFile)
+    finally targetFile.delete()
   }
 
   def checkFileContents(f: File, contents: String): Unit = {

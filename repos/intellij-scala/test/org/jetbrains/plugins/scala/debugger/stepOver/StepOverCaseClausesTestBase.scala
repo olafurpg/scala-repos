@@ -10,7 +10,8 @@ class StepOverCaseClausesTest
     with ScalaVersion_2_11
 
 abstract class StepOverCaseClausesTestBase extends StepOverTestBase {
-  addFileWithBreakpoints("Simple.scala", s"""
+  addFileWithBreakpoints("Simple.scala",
+                         s"""
       |object Simple {
       |  def main (args: Array[String]){
       |    ""$bp
@@ -30,7 +31,8 @@ abstract class StepOverCaseClausesTestBase extends StepOverTestBase {
     testStepThrough(Seq(2, 3, 4, 5, 6, 8, 1))
   }
 
-  addFileWithBreakpoints("MultilineExpr.scala", s"""
+  addFileWithBreakpoints("MultilineExpr.scala",
+                         s"""
        |object MultilineExpr {
        |  def main (args: Array[String]){
        |    ""$bp
@@ -50,7 +52,8 @@ abstract class StepOverCaseClausesTestBase extends StepOverTestBase {
     testStepThrough(Seq(2, 3, 4, 6, 8, 9, 1))
   }
 
-  addFileWithBreakpoints("SkipStoreResult.scala", s"""
+  addFileWithBreakpoints("SkipStoreResult.scala",
+                         s"""
        |object SkipStoreResult {
        |  def main (args: Array[String]){
        |    ""
@@ -73,7 +76,8 @@ abstract class StepOverCaseClausesTestBase extends StepOverTestBase {
     testStepThrough(Seq(2, 3, 4, 5, 6, 11))
   }
 
-  addFileWithBreakpoints("PartialFun.scala", s"""
+  addFileWithBreakpoints("PartialFun.scala",
+                         s"""
         |object PartialFun {
         |  def main (args: Array[String]){
         |    ""
@@ -96,7 +100,8 @@ abstract class StepOverCaseClausesTestBase extends StepOverTestBase {
     testStepThrough(Seq(4, 5, 6, 3, 4, 7, 8, 9, 3, 4, 7, 3, 11))
   }
 
-  addFileWithBreakpoints("ComplexPattern.scala", s"""
+  addFileWithBreakpoints("ComplexPattern.scala",
+                         s"""
        |object ComplexPattern {
        |  def main (args: Array[String]){
        |    ""
@@ -133,7 +138,8 @@ abstract class StepOverCaseClausesTestBase extends StepOverTestBase {
     testStepThrough(Seq(2, 3, 4, 7, 10, 11, 12, 14))
   }
 
-  addFileWithBreakpoints("NestedMatch.scala", s"""
+  addFileWithBreakpoints("NestedMatch.scala",
+                         s"""
        |object NestedMatch {
        |  def main (args: Array[String]){
        |    ""
@@ -160,7 +166,8 @@ abstract class StepOverCaseClausesTestBase extends StepOverTestBase {
     testStepThrough(Seq(2, 3, 4, 5, 8, 9, 10, 14))
   }
 
-  addFileWithBreakpoints("CaseClausesReturn.scala", s"""
+  addFileWithBreakpoints("CaseClausesReturn.scala",
+                         s"""
       |object CaseClausesReturn {
       |  def main(args: Array[String]) {
       |    foo()

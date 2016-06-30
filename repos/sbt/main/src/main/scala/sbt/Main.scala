@@ -55,7 +55,8 @@ final class ConsoleMain extends xsbti.AppMain {
 object StandardMain {
   def runManaged(s: State): xsbti.MainResult = {
     val previous = TrapExit.installManager()
-    try MainLoop.runLogged(s) finally TrapExit.uninstallManager(previous)
+    try MainLoop.runLogged(s)
+    finally TrapExit.uninstallManager(previous)
   }
 
   /** The common interface to standard output, used for all built-in ConsoleLoggers. */
@@ -252,8 +253,8 @@ object BuiltinCommands {
         val prominentOnly = verbosity <= 1
         val verboseFilter =
           if (prominentOnly) highPass(cutoff) else topNRanked(25 * verbosity)
-        System.out.println(tasksHelp(s, keys =>
-                  verboseFilter(keys filter keep), selected))
+        System.out.println(
+            tasksHelp(s, keys => verboseFilter(keys filter keep), selected))
         System.out.println()
         if (prominentOnly)
           System.out.println(moreAvailableMessage(command, selected.isDefined))
@@ -280,7 +281,8 @@ object BuiltinCommands {
       .keys(Some(currentRef))
       .toSeq
       .map { key =>
-        try Some(index.keyMap(key)) catch {
+        try Some(index.keyMap(key))
+        catch {
           case NonFatal(ex) =>
             s.log error ex.getMessage
             None
@@ -473,9 +475,11 @@ object BuiltinCommands {
     } yield
       () => {
         def export0(s: State): State = lastImpl(s, kvs, Some(ExportStream))
-        val newS = try f() catch {
+        val newS = try f()
+        catch {
           case e: Exception =>
-            try export0(s) finally { throw e }
+            try export0(s)
+            finally { throw e }
         }
         export0(newS)
       }
@@ -590,7 +594,8 @@ object BuiltinCommands {
   def transformExtraBuilds(s: State, f: List[URI] => List[URI]): State = {
     val original = Project.extraBuilds(s)
     val extraUpdated = Project.updateExtraBuilds(s, f)
-    try doLoadProject(extraUpdated, LoadAction.Current) catch {
+    try doLoadProject(extraUpdated, LoadAction.Current)
+    catch {
       case e: Exception =>
         s.log.error("Project loading failed: reverting to previous state.")
         Project.setExtraBuilds(s, original)
@@ -665,12 +670,12 @@ object BuiltinCommands {
     val s =
       if (s1 has Keys.stateCompilerCache) s1 else registerCompilerCache(s1)
 
-    val (eval, structure) = try Load.defaultLoad(
-        s,
-        base,
-        s.log,
-        Project.inPluginProject(s),
-        Project.extraBuilds(s)) catch {
+    val (eval, structure) = try Load.defaultLoad(s,
+                                                 base,
+                                                 s.log,
+                                                 Project.inPluginProject(s),
+                                                 Project.extraBuilds(s))
+    catch {
       case ex: compiler.EvalException =>
         s0.log.debug(ex.getMessage)
         ex.getStackTrace map (ste => s"\tat $ste") foreach (s0.log.debug(_))
@@ -687,7 +692,8 @@ object BuiltinCommands {
     val cache =
       if (maxCompilers == null) CompilerCache.fresh
       else {
-        val num = try maxCompilers.toInt catch {
+        val num = try maxCompilers.toInt
+        catch {
           case e: NumberFormatException =>
             throw new RuntimeException(
                 "Resident compiler limit must be an integer.",

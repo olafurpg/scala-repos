@@ -46,7 +46,8 @@ trait BaseConfig extends Config {
         }
       }
     }
- """, io.BlockFormat)
+ """,
+                                                  io.BlockFormat)
 
   lazy private val cfg = localDefaults ++ config
 

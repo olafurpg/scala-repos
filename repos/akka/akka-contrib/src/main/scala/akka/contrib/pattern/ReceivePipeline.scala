@@ -85,7 +85,8 @@ trait ReceivePipeline extends Actor {
         outerInterceptor.andThen {
           case Inner(msg) ⇒ innerHandler(msg)
           case InnerAndAfter(msg, after) ⇒
-            try innerHandler(msg) finally after()
+            try innerHandler(msg)
+            finally after()
           case HandledCompletely ⇒ Done
         }
     }

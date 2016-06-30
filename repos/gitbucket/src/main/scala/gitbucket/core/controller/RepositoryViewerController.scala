@@ -197,15 +197,14 @@ trait RepositoryViewerControllerBase extends ControllerBase {
         val revCommit =
           JGitUtil.getRevCommitFromId(git, git.getRepository.resolve(branch))
 
-        getPathObjectId(git, path, revCommit).map {
-          objectId =>
-            val paths = path.split("/")
-            html.editor(branch,
-                        repository,
-                        paths.take(paths.size - 1).toList,
-                        Some(paths.last),
-                        JGitUtil.getContentInfo(git, path, objectId),
-                        protectedBranch)
+        getPathObjectId(git, path, revCommit).map { objectId =>
+          val paths = path.split("/")
+          html.editor(branch,
+                      repository,
+                      paths.take(paths.size - 1).toList,
+                      Some(paths.last),
+                      JGitUtil.getContentInfo(git, path, objectId),
+                      protectedBranch)
         } getOrElse NotFound
     }
   })
@@ -217,14 +216,13 @@ trait RepositoryViewerControllerBase extends ControllerBase {
         val revCommit =
           JGitUtil.getRevCommitFromId(git, git.getRepository.resolve(branch))
 
-        getPathObjectId(git, path, revCommit).map {
-          objectId =>
-            val paths = path.split("/")
-            html.delete(branch,
-                        repository,
-                        paths.take(paths.size - 1).toList,
-                        paths.last,
-                        JGitUtil.getContentInfo(git, path, objectId))
+        getPathObjectId(git, path, revCommit).map { objectId =>
+          val paths = path.split("/")
+          html.delete(branch,
+                      repository,
+                      paths.take(paths.size - 1).toList,
+                      paths.last,
+                      JGitUtil.getContentInfo(git, path, objectId))
         } getOrElse NotFound
     }
   })
@@ -297,14 +295,13 @@ trait RepositoryViewerControllerBase extends ControllerBase {
       git =>
         val revCommit =
           JGitUtil.getRevCommitFromId(git, git.getRepository.resolve(id))
-        getPathObjectId(git, path, revCommit).flatMap {
-          objectId =>
-            JGitUtil.getObjectLoaderFromId(git, objectId) { loader =>
-              contentType = FileUtil.getMimeType(path)
-              response.setContentLength(loader.getSize.toInt)
-              loader.copyTo(response.outputStream)
-              ()
-            }
+        getPathObjectId(git, path, revCommit).flatMap { objectId =>
+          JGitUtil.getObjectLoaderFromId(git, objectId) { loader =>
+            contentType = FileUtil.getMimeType(path)
+            response.setContentLength(loader.getSize.toInt)
+            loader.copyTo(response.outputStream)
+            ()
+          }
         } getOrElse NotFound
     }
   })
@@ -555,13 +552,12 @@ trait RepositoryViewerControllerBase extends ControllerBase {
       readableUsersOnly { (form, repository) =>
     defining(repository.owner, repository.name) {
       case (owner, name) =>
-        getCommitComment(owner, name, params("id")).map {
-          comment =>
-            if (isEditable(owner, name, comment.commentedUserName)) {
-              updateCommitComment(comment.commentId, form.content)
-              redirect(
-                  s"/${owner}/${name}/commit_comments/_data/${comment.commentId}")
-            } else Unauthorized
+        getCommitComment(owner, name, params("id")).map { comment =>
+          if (isEditable(owner, name, comment.commentedUserName)) {
+            updateCommitComment(comment.commentId, form.content)
+            redirect(
+                s"/${owner}/${name}/commit_comments/_data/${comment.commentId}")
+          } else Unauthorized
         } getOrElse NotFound
     }
   })

@@ -294,7 +294,8 @@ trait Erasure {
     override def applyInArray(tp: Type): Type = {
       val saved = boxPrimitives
       boxPrimitives = false
-      try super.applyInArray(tp) finally boxPrimitives = saved
+      try super.applyInArray(tp)
+      finally boxPrimitives = saved
     }
 
     override def eraseNormalClassRef(tref: TypeRef) =

@@ -86,13 +86,14 @@ class ScConstructorPatternImpl(node: ASTNode)
               .calculateReferenceType(ref, shapesOnly = false)
               .getOrElse(ScType.designator(td))
             val newSubst = {
-              val clazzType =
-                ScParameterizedType(refType, td.getTypeParameters.map(tp =>
-                          ScUndefinedType(tp match {
-                    case tp: ScTypeParam =>
-                      new ScTypeParameterType(tp, r.substitutor)
-                    case _ => new ScTypeParameterType(tp, r.substitutor)
-                  })))
+              val clazzType = ScParameterizedType(
+                  refType,
+                  td.getTypeParameters.map(tp =>
+                        ScUndefinedType(tp match {
+                      case tp: ScTypeParam =>
+                        new ScTypeParameterType(tp, r.substitutor)
+                      case _ => new ScTypeParameterType(tp, r.substitutor)
+                    })))
               val emptySubst: ScSubstitutor =
                 new ScSubstitutor(
                     Map(

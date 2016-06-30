@@ -40,7 +40,8 @@ class IdeaIncrementalCompiler(scalac: AnalyzingCompiler)
                        reporter,
                        CompilerCache.fresh,
                        logger,
-                       Option(progress)) catch {
+                       Option(progress))
+    catch {
       case _: xsbti.CompileFailed =>
       // the error should be already handled via the `reporter`
     }

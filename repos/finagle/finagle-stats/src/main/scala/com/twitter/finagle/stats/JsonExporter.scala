@@ -155,7 +155,8 @@ class JsonExporter(registry: Metrics, timer: Timer)
       filtered: Boolean,
       counterDeltasOn: Boolean = false
   ): String = {
-    val gauges = try registry.sampleGauges().asScala catch {
+    val gauges = try registry.sampleGauges().asScala
+    catch {
       case NonFatal(e) =>
         // because gauges run arbitrary user code, we want to protect ourselves here.
         // while the underlying registry should protect against individual misbehaving

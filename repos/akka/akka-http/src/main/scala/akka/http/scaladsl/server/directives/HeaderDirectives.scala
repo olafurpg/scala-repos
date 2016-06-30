@@ -21,7 +21,8 @@ trait HeaderDirectives {
     */
   def headerValue[T](f: HttpHeader ⇒ Option[T]): Directive1[T] = {
     val protectedF: HttpHeader ⇒ Option[Either[Rejection, T]] = header ⇒
-      try f(header).map(Right.apply) catch {
+      try f(header).map(Right.apply)
+      catch {
         case NonFatal(e) ⇒
           Some(
               Left(

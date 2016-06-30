@@ -284,14 +284,15 @@ class LogSegment(val log: FileMessageSet,
           e)
 
     try log.renameTo(
-        new File(CoreUtils
-              .replaceSuffix(log.file.getPath, oldSuffix, newSuffix))) catch {
+        new File(
+            CoreUtils.replaceSuffix(log.file.getPath, oldSuffix, newSuffix)))
+    catch {
       case e: IOException => throw kafkaStorageException("log", e)
     }
     try index.renameTo(
-        new File(CoreUtils.replaceSuffix(index.file.getPath,
-                                         oldSuffix,
-                                         newSuffix))) catch {
+        new File(
+            CoreUtils.replaceSuffix(index.file.getPath, oldSuffix, newSuffix)))
+    catch {
       case e: IOException => throw kafkaStorageException("index", e)
     }
   }

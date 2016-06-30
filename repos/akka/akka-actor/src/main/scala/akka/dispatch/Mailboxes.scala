@@ -181,7 +181,8 @@ private[akka] class Mailboxes(val settings: ActorSystem.Settings,
                hasMailboxType) {
       verifyRequirements(lookup(dispatcherConfig.getString("id")))
     } else if (hasRequiredType(actorClass)) {
-      try verifyRequirements(lookupByQueueType(getRequiredType(actorClass))) catch {
+      try verifyRequirements(lookupByQueueType(getRequiredType(actorClass)))
+      catch {
         case NonFatal(thr) if (hasMailboxRequirement) ⇒
           verifyRequirements(lookupByQueueType(mailboxRequirement))
       }

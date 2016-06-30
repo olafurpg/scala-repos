@@ -87,7 +87,9 @@ trait JdbcBackend extends RelationalBackend {
       * [[slick.util.AsyncExecutor]] with the thread pool for asynchronous execution is shut
       * down. If this object represents a connection pool managed directly by Slick, it is also
       * closed. */
-    def close: Unit = try executor.close() finally source.close()
+    def close: Unit =
+      try executor.close()
+      finally source.close()
   }
 
   trait DatabaseFactoryDef {
@@ -431,7 +433,8 @@ trait JdbcBackend extends RelationalBackend {
                                 defaultType,
                                 defaultConcurrency,
                                 defaultHoldability)
-      try f(st) finally st.close()
+      try f(st)
+      finally st.close()
     }
 
     /** A wrapper around the JDBC Connection's prepareInsertStatement method, that automatically closes the statement. */
@@ -440,7 +443,8 @@ trait JdbcBackend extends RelationalBackend {
                                                new Array[String](0))(
         f: (PreparedStatement => T)): T = {
       val st = prepareInsertStatement(sql, columnNames)
-      try f(st) finally st.close()
+      try f(st)
+      finally st.close()
     }
 
     /** A wrapper around the JDBC Connection's prepareInsertStatement method, that automatically closes the statement. */
@@ -448,7 +452,8 @@ trait JdbcBackend extends RelationalBackend {
         sql: String,
         columnIndexes: Array[Int])(f: (PreparedStatement => T)): T = {
       val st = prepareInsertStatement(sql, columnIndexes)
-      try f(st) finally st.close()
+      try f(st)
+      finally st.close()
     }
 
     /** A wrapper around the JDBC Connection's createStatement method, that automatically closes the statement. */
@@ -461,7 +466,8 @@ trait JdbcBackend extends RelationalBackend {
         f: (Statement => T)): T = {
       val st =
         createStatement(defaultType, defaultConcurrency, defaultHoldability)
-      try f(st) finally st.close()
+      try f(st)
+      finally st.close()
     }
 
     def close(): Unit
@@ -547,7 +553,9 @@ trait JdbcBackend extends RelationalBackend {
 
     private[slick] def endInTransaction(f: => Unit): Unit = {
       inTransactionally -= 1
-      if (!isInTransaction) try f finally conn.setAutoCommit(true)
+      if (!isInTransaction)
+        try f
+        finally conn.setAutoCommit(true)
     }
 
     def getTransactionality: (Int, Boolean) =

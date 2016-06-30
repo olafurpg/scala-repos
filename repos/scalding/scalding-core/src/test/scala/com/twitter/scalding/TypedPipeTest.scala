@@ -1486,8 +1486,8 @@ object TypedSketchJoinTestHelper {
       .arg("reducers", reducers.toString)
       .source(TypedText.tsv[(Int, Int)]("input0"),
               generateInput(1000, 100, dist))
-      .source(TypedText.tsv[(Int, Int)]("input1"), generateInput(100, 100, x =>
-                1))
+      .source(TypedText.tsv[(Int, Int)]("input1"),
+              generateInput(100, 100, x => 1))
       .typedSink(TypedText.tsv[(Int, Int, Int)]("output-sketch")) { outBuf =>
         sketchResult ++= outBuf
       }
@@ -1514,14 +1514,16 @@ class TypedSketchJoinJobTest extends WordSpec with Matchers {
     }
 
     "get the same result when half the left keys are missing" in {
-      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_), 10, x =>
-            if (x < 50) 0 else 1)
+      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_),
+                                            10,
+                                            x => if (x < 50) 0 else 1)
       sk shouldBe inner
     }
 
     "get the same result with a massive skew to one key" in {
-      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_), 10, x =>
-            if (x == 50) 1000 else 1)
+      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_),
+                                            10,
+                                            x => if (x == 50) 1000 else 1)
       sk shouldBe inner
     }
 
@@ -1532,8 +1534,9 @@ class TypedSketchJoinJobTest extends WordSpec with Matchers {
     }
 
     "still work with massive skew and only one reducer" in {
-      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_), 1, x =>
-            if (x == 50) 1000 else 1)
+      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_),
+                                            1,
+                                            x => if (x == 50) 1000 else 1)
       sk shouldBe inner
     }
   }
@@ -1551,14 +1554,16 @@ class TypedSketchLeftJoinJobTest extends WordSpec with Matchers {
     }
 
     "get the same result when half the left keys are missing" in {
-      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_), 10, x =>
-            if (x < 50) 0 else 1)
+      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_),
+                                            10,
+                                            x => if (x < 50) 0 else 1)
       sk shouldBe inner
     }
 
     "get the same result with a massive skew to one key" in {
-      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_), 10, x =>
-            if (x == 50) 1000 else 1)
+      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_),
+                                            10,
+                                            x => if (x == 50) 1000 else 1)
       sk shouldBe inner
     }
 
@@ -1569,8 +1574,9 @@ class TypedSketchLeftJoinJobTest extends WordSpec with Matchers {
     }
 
     "still work with massive skew and only one reducer" in {
-      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_), 1, x =>
-            if (x == 50) 1000 else 1)
+      val (sk, inner) = runJobWithArguments(new TypedSketchJoinJob(_),
+                                            1,
+                                            x => if (x == 50) 1000 else 1)
       sk shouldBe inner
     }
   }

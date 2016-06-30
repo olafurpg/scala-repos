@@ -55,7 +55,8 @@ class BaseCharsetTest(val charset: Charset) {
           case BufferPart(buf) =>
             val bufArray = new Array[Char](buf.remaining)
             buf.mark()
-            try buf.get(bufArray) finally buf.reset()
+            try buf.get(bufArray)
+            finally buf.reset()
             expectedChars ++= bufArray
           case Malformed(len) =>
             malformedAction match {
@@ -140,7 +141,8 @@ class BaseCharsetTest(val charset: Charset) {
           case BufferPart(buf) =>
             val bufArray = new Array[Byte](buf.remaining)
             buf.mark()
-            try buf.get(bufArray) finally buf.reset()
+            try buf.get(bufArray)
+            finally buf.reset()
             expectedBytes ++= bufArray
           case Malformed(len) =>
             malformedAction match {

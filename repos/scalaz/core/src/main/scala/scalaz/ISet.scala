@@ -596,27 +596,29 @@ sealed abstract class ISet[A] {
 
   final def filterGt(a: Option[A])(implicit o: Order[A]): ISet[A] =
     cata(a)(s =>
-          this match {
-        case Tip() => ISet.empty
-        case Bin(x, l, r) =>
-          o.order(s, x) match {
-            case LT => join(x, l.filterGt(a), r)
-            case EQ => r
-            case GT => r.filterGt(a)
-          }
-    }, this)
+              this match {
+                case Tip() => ISet.empty
+                case Bin(x, l, r) =>
+                  o.order(s, x) match {
+                    case LT => join(x, l.filterGt(a), r)
+                    case EQ => r
+                    case GT => r.filterGt(a)
+                  }
+            },
+            this)
 
   final def filterLt(a: Option[A])(implicit o: Order[A]): ISet[A] =
     cata(a)(s =>
-          this match {
-        case Tip() => ISet.empty
-        case Bin(x, l, r) =>
-          o.order(x, s) match {
-            case LT => join(x, l, r.filterLt(a))
-            case EQ => l
-            case GT => l.filterLt(a)
-          }
-    }, this)
+              this match {
+                case Tip() => ISet.empty
+                case Bin(x, l, r) =>
+                  o.order(x, s) match {
+                    case LT => join(x, l, r.filterLt(a))
+                    case EQ => l
+                    case GT => l.filterLt(a)
+                  }
+            },
+            this)
 
   override final def equals(other: Any): Boolean =
     other match {

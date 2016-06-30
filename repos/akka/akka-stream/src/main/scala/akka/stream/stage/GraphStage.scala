@@ -1439,6 +1439,7 @@ private[akka] trait CallbackWrapper[T] extends AsyncCallback[T] {
 
   private[this] def locked(body: ⇒ Unit): Unit = {
     lock.lock()
-    try body finally if (lock.isLocked) lock.unlock()
+    try body
+    finally if (lock.isLocked) lock.unlock()
   }
 }

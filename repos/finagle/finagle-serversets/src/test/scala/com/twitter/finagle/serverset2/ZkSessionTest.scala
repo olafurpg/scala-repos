@@ -190,8 +190,9 @@ class ZkSessionTest extends FunSuite with Eventually with IntegrationPatience {
       val zkState: Var[WatchState] with Updatable[WatchState] =
         Var(WatchState.Pending)
       val watchedZk = Watched(new OpqueueZkReader(), zkState)
-      val zk = ZkSession.retrying(retryStream, () =>
-            new ZkSession(retryStream, watchedZk, NullStatsReceiver))
+      val zk = ZkSession.retrying(
+          retryStream,
+          () => new ZkSession(retryStream, watchedZk, NullStatsReceiver))
 
       zk.changes.respond {
         case _ => ()

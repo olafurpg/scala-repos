@@ -414,7 +414,8 @@ object ConsoleConsumer extends Logging {
     }
 
     def tryParse(parser: OptionParser, args: Array[String]) = {
-      try parser.parse(args: _*) catch {
+      try parser.parse(args: _*)
+      catch {
         case e: OptionException =>
           Utils.croak(e.getMessage)
           null

@@ -332,7 +332,8 @@ trait TestKitBase {
     val prev_end = end
     end = start + max_diff
 
-    val ret = try f finally end = prev_end
+    val ret = try f
+    finally end = prev_end
 
     val diff = now - start
     assert(
@@ -871,7 +872,8 @@ object TestKit {
                           duration: Duration = 10.seconds,
                           verifySystemShutdown: Boolean = false): Unit = {
     actorSystem.terminate()
-    try Await.ready(actorSystem.whenTerminated, duration) catch {
+    try Await.ready(actorSystem.whenTerminated, duration)
+    catch {
       case _: TimeoutException ⇒
         val msg = "Failed to stop [%s] within [%s] \n%s".format(
             actorSystem.name,

@@ -45,11 +45,13 @@ final class SbtHandler(directory: File,
   private[this] def onNewSbtInstance(
       f: (Process, IPC.Server) => Unit): Option[SbtInstance] = {
     val server = IPC.unmanagedServer
-    val p = try newRemote(server) catch {
+    val p = try newRemote(server)
+    catch {
       case e: Throwable => server.close(); throw e
     }
     val ai = Some(SbtInstance(p, server))
-    try f(p, server) catch {
+    try f(p, server)
+    catch {
       case e: Throwable =>
         // TODO: closing is necessary only because StatementHandler uses exceptions for signaling errors
         finish(ai); throw e

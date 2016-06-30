@@ -34,7 +34,9 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
   class StringOps(s: String) {
     def should[A](a: => Any): Unit = {
       val saved = context
-      context = s; try a finally context = saved
+      context = s;
+      try a
+      finally context = saved
     }
     def ![A](a: => A)(implicit ev: (A) => Prop): Unit = in(a)
 

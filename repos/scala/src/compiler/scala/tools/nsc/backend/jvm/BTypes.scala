@@ -946,8 +946,9 @@ abstract class BTypes {
           s"Invalid interfaces in $this: ${info.get.interfaces}"
       )
 
-      assert(info.get.nestedClasses.forall(c =>
-                ifInit(c)(_.isNestedClass.get)), info.get.nestedClasses)
+      assert(
+          info.get.nestedClasses.forall(c => ifInit(c)(_.isNestedClass.get)),
+          info.get.nestedClasses)
     }
 
     /**

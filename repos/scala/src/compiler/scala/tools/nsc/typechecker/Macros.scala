@@ -187,9 +187,9 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
           case _ => Other
         }
 
-        val transformed =
-          transformTypeTagEvidenceParams(macroImplRef, (param, tparam) =>
-                tparam)
+        val transformed = transformTypeTagEvidenceParams(macroImplRef,
+                                                         (param,
+                                                          tparam) => tparam)
         mmap(transformed)(p =>
               if (p.isTerm) fingerprint(p.info) else Tagged(p.paramPos))
       }
@@ -316,8 +316,8 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
 
         // Step III. Transform c.prefix.value.XXX to this.XXX and implParam.value.YYY to defParam.YYY
         def unsigma(tpe: Type): Type =
-          transformTypeTagEvidenceParams(macroImplRef, (param, tparam) =>
-                NoSymbol) match {
+          transformTypeTagEvidenceParams(macroImplRef,
+                                         (param, tparam) => NoSymbol) match {
             case (implCtxParam :: Nil) :: implParamss =>
               val implToDef = flatMap2(implParamss, macroDdef.vparamss)(
                   map2(_, _)((_, _))).toMap
@@ -670,8 +670,9 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
               expanded match {
                 case Success(expanded) =>
                   // also see http://groups.google.com/group/scala-internals/browse_thread/thread/492560d941b315cc
-                  val expanded1 = try onSuccess(duplicateAndKeepPositions(
-                          expanded)) finally popMacroContext()
+                  val expanded1 =
+                    try onSuccess(duplicateAndKeepPositions(expanded))
+                    finally popMacroContext()
                   if (!hasMacroExpansionAttachment(expanded1))
                     linkExpandeeAndExpanded(expandee, expanded1)
                   if (settings.Ymacroexpand.value == settings.MacroExpand.Discard) {

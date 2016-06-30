@@ -179,7 +179,8 @@ abstract class TreeCheckers extends Analyzer {
   def posstr(p: Position): String =
     (if (p eq null) ""
      else {
-       try p.source.path + ":" + p.line catch {
+       try p.source.path + ":" + p.line
+       catch {
          case _: UnsupportedOperationException =>
            p.toString
        }
@@ -198,7 +199,8 @@ abstract class TreeCheckers extends Analyzer {
     if (!cond) errorFn(msg)
 
   private def wrap[T](msg: => Any)(body: => T): T = {
-    try body catch {
+    try body
+    catch {
       case x: Throwable =>
         Console.println("Caught " + x)
         Console.println(msg)
@@ -297,7 +299,8 @@ abstract class TreeCheckers extends Analyzer {
       private var enclosingMemberDefs: List[MemberDef] = Nil
       private def pushMemberDef[T](md: MemberDef)(body: => T): T = {
         enclosingMemberDefs ::= md
-        try body finally enclosingMemberDefs = enclosingMemberDefs.tail
+        try body
+        finally enclosingMemberDefs = enclosingMemberDefs.tail
       }
       override def traverse(tree: Tree): Unit = tree match {
         case md: MemberDef => pushMemberDef(md)(traverseInternal(tree))
@@ -443,8 +446,10 @@ abstract class TreeCheckers extends Analyzer {
             case _ => mk[Type]("and tpe", treeTpe) :: Nil
           }
           def ref =
-            mk[Symbol]("ref to", outOfScope, (s: Symbol) =>
-                  s.nameString + " (" + s.debugFlagString + ")")
+            mk[Symbol](
+                "ref to",
+                outOfScope,
+                (s: Symbol) => s.nameString + " (" + s.debugFlagString + ")")
 
           val pairs = front ++ tpes ++ encls ++ (ref :: Nil)
           val width = pairs.map(_._2.length).max

@@ -209,7 +209,9 @@ class RichCursor(c: Cursor) extends Iterable[Cursor] {
     }
   }
 
-  def closeAfter[T](body: RichCursor => T) = try body(this) finally c.close()
+  def closeAfter[T](body: RichCursor => T) =
+    try body(this)
+    finally c.close()
 
   def orm[T](body: Cursor => T) = closeAfter(_.map(body).toList)
 

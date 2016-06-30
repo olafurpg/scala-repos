@@ -122,8 +122,8 @@ class REMatcher(val str: String, val compiled: Pattern) {
     matcher.reset
     val m = matcher
     while (matcher.find) {
-      func(str.substring(pos, m.start), (0 to m.groupCount).toList.map(i =>
-                m.group(i)))
+      func(str.substring(pos, m.start),
+           (0 to m.groupCount).toList.map(i => m.group(i)))
       pos = matcher.end
     }
 

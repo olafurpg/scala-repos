@@ -212,7 +212,8 @@ trait Contexts { self: Analyzer =>
     @inline private def savingEnclClass[A](c: Context)(a: => A): A = {
       val saved = enclClass
       enclClass = c
-      try a finally enclClass = saved
+      try a
+      finally enclClass = saved
     }
 
     /** A bitmask containing all the boolean flags in a context, e.g. are implicit views enabled */
@@ -342,7 +343,8 @@ trait Contexts { self: Analyzer =>
       withMode() {
         setAmbiguousErrors(reportAmbiguous)
         val saved = extractUndetparams()
-        try body finally undetparams = saved
+        try body
+        finally undetparams = saved
       }
     }
 
@@ -407,7 +409,8 @@ trait Contexts { self: Analyzer =>
         disabled: ContextMode = NOmode)(op: => T): T = {
       val saved = contextMode
       set(enabled, disabled)
-      try op finally contextMode = saved
+      try op
+      finally contextMode = saved
     }
 
     @inline final def withImplicitsEnabled[T](op: => T): T =
@@ -456,7 +459,8 @@ trait Contexts { self: Analyzer =>
       setAmbiguousErrors(false)
       _reporter = new BufferingReporter
 
-      try expr finally {
+      try expr
+      finally {
         contextMode = savedContextMode
         _reporter = savedReporter
       }
@@ -849,7 +853,8 @@ trait Contexts { self: Analyzer =>
                 s"Discarding inferred $current_s because $sym does not appear in")(
                 current)
       }
-      try restore() finally {
+      try restore()
+      finally {
         for ((sym, savedInfo) <- savedTypeBounds)
           sym setInfo debuglogResult(
               s"Discarding inferred $sym=${sym.info}, restoring saved info")(

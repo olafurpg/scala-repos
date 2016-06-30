@@ -106,7 +106,8 @@ class ReplSuite extends SparkFunSuite {
 
   test("simple foreach with accumulator") {
     val output =
-      runInterpreter("local", """
+      runInterpreter("local",
+                     """
         |val accum = sc.accumulator(0)
         |sc.parallelize(1 to 10).foreach(x => accum += x)
         |accum.value
@@ -253,7 +254,8 @@ class ReplSuite extends SparkFunSuite {
   }
 
   test("SPARK-2452 compound statements.") {
-    val output = runInterpreter("local", """
+    val output = runInterpreter("local",
+                                """
         |val x = 4 ; def f() = x
         |f()
       """.stripMargin)

@@ -146,7 +146,9 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
     val broadcast = ctx.addReferenceObj("broadcast", broadcastRelation)
     val relationTerm = ctx.freshName("relation")
     val clsName = broadcastRelation.value.getClass.getName
-    ctx.addMutableState(clsName, relationTerm, s"""
+    ctx.addMutableState(clsName,
+                        relationTerm,
+                        s"""
          | $relationTerm = ($clsName) $broadcast.value();
          | incPeakExecutionMemory($relationTerm.getMemorySize());
        """.stripMargin)

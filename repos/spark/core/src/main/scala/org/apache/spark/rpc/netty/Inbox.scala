@@ -207,9 +207,11 @@ private[netty] class Inbox(val endpointRef: NettyRpcEndpointRef,
     * Calls action closure, and calls the endpoint's onError function in the case of exceptions.
     */
   private def safelyCall(endpoint: RpcEndpoint)(action: => Unit): Unit = {
-    try action catch {
+    try action
+    catch {
       case NonFatal(e) =>
-        try endpoint.onError(e) catch {
+        try endpoint.onError(e)
+        catch {
           case NonFatal(ee) => logError(s"Ignoring error", ee)
         }
     }

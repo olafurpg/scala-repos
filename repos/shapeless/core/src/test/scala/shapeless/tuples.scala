@@ -668,8 +668,8 @@ class TupleTests {
     // equalInferredTypes(mimsmimemdArray, mWithEx)
     // typed[Array[M[_]]](mWithEx)
     // The line above compiles when mimsmimemd is an HList, not when it it a tuple, as in testToSizedArray
-    assertArrayEquals2(mimsmimemdArray.map(x => x: Any), mWithEx.map(x =>
-              x: Any))
+    assertArrayEquals2(mimsmimemdArray.map(x => x: Any),
+                       mWithEx.map(x => x: Any))
 
     val m2 = m2im2sm2im2im2d.to[Array]
     equalInferredTypes(m2im2sm2im2im2dArray, m2)
@@ -680,8 +680,8 @@ class TupleTests {
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, m2e)
     // typed[Array[M2[_ >: Int with String with Double, _]]](m2e)
     // Same remark as above
-    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x =>
-              x: Any))
+    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any),
+                       m2e.map(x => x: Any))
   }
 
   @Test
@@ -752,8 +752,8 @@ class TupleTests {
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, m2e)
     // typed[Array[M2[_ >: Int with String with Double, _]]](m2e)
     // The line above compiles when mimsmimemd is an HList, not when it is a tuple...
-    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x =>
-              x: Any))
+    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any),
+                       m2e.map(x => x: Any))
   }
 
   @Test

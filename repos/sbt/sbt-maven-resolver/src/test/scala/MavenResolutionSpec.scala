@@ -284,7 +284,8 @@ class MavenResolutionSpec extends BaseIvySpecification {
     )
     sbt.io.IO.withTemporaryDirectory { dir =>
       val pomFile = new java.io.File(dir, "pom.xml")
-      sbt.io.IO.write(pomFile, """
+      sbt.io.IO.write(pomFile,
+                      """
           |<project>
           |   <groupId>com.example</groupId>
           |   <name>test-it</name>

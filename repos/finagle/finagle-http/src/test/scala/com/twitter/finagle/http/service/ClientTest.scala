@@ -24,7 +24,8 @@ class ClientTest extends FunSuite {
       .hostConnectionLimit(1)
       .codec(HttpCodec())
 
-    try spec(builder) finally {
+    try spec(builder)
+    finally {
       Await.result(server.close())
     }
   }

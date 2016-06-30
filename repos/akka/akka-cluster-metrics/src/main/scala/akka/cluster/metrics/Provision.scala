@@ -98,7 +98,8 @@ case class DefaultSigarProvider(settings: ClusterMetricsSettings)
   */
 private[metrics] object TryNative {
   def apply[T](r: ⇒ T): Try[T] =
-    try Success(r) catch {
+    try Success(r)
+    catch {
       // catching all, for example java.lang.LinkageError that are not caught by `NonFatal` in `Try`
       case e: Throwable ⇒ Failure(e)
     }

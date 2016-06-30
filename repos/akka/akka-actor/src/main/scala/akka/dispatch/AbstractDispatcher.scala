@@ -39,7 +39,8 @@ final case class TaskInvocation(eventStream: EventStream,
   }
 
   def run(): Unit =
-    try runnable.run() catch {
+    try runnable.run()
+    catch {
       case NonFatal(e) ⇒
         eventStream.publish(
             Error(e, "TaskInvocation", this.getClass, e.getMessage))
@@ -154,7 +155,8 @@ abstract class MessageDispatcher(
     * Detaches the specified actor instance from this dispatcher
     */
   final def detach(actor: ActorCell): Unit =
-    try unregister(actor) finally ifSensibleToDoSoThenScheduleShutdown()
+    try unregister(actor)
+    finally ifSensibleToDoSoThenScheduleShutdown()
   final protected def resubmitOnBlock: Boolean =
     true // We want to avoid starvation
   final override protected def unbatchedExecute(r: Runnable): Unit = {
@@ -197,7 +199,8 @@ abstract class MessageDispatcher(
       override def execute(runnable: Runnable): Unit = runnable.run()
       override def reportFailure(t: Throwable): Unit =
         MessageDispatcher.this.reportFailure(t)
-    }) catch {
+    })
+    catch {
       case _: IllegalStateException ⇒ shutdown()
     }
   }

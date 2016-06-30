@@ -40,7 +40,8 @@ class DataSourceTest {
     MockDriver.reset
     val db = JdbcBackend.Database.forConfig("databaseUrl")
     try {
-      try Await.result(db.run(sqlu"dummy"), Duration.Inf) catch {
+      try Await.result(db.run(sqlu"dummy"), Duration.Inf)
+      catch {
         case ex: SQLException =>
       }
       val (url, info) = MockDriver.getLast.getOrElse(

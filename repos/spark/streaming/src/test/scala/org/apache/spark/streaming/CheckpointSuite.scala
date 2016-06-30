@@ -578,15 +578,14 @@ class CheckpointSuite
               Seq("", ""),
               Seq()),
           (s: DStream[String]) => {
-            s.transform {
-              (rdd, time) =>
-                val output = rdd.map(x => (x, 1)).reduceByKey(_ + _)
-                output.saveAsHadoopFile(
-                    new File(tempDir, "result-" + time.milliseconds).getAbsolutePath,
-                    classOf[Text],
-                    classOf[IntWritable],
-                    classOf[TextOutputFormat[Text, IntWritable]])
-                output
+            s.transform { (rdd, time) =>
+              val output = rdd.map(x => (x, 1)).reduceByKey(_ + _)
+              output.saveAsHadoopFile(
+                  new File(tempDir, "result-" + time.milliseconds).getAbsolutePath,
+                  classOf[Text],
+                  classOf[IntWritable],
+                  classOf[TextOutputFormat[Text, IntWritable]])
+              output
             }
           },
           Seq(Seq(("a", 2), ("b", 1)),

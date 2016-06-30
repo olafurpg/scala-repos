@@ -317,7 +317,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     val defaultEncoding = Properties.sourceEncoding
 
     def loadCharset(name: String) =
-      try Some(Charset.forName(name)) catch {
+      try Some(Charset.forName(name))
+      catch {
         case _: IllegalCharsetNameException =>
           globalError("illegal charset name '" + name + "'")
           None
@@ -341,7 +342,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       try Some(
           ccon
             .newInstance(charset.newDecoder(), reporter)
-            .asInstanceOf[SourceReader]) catch {
+            .asInstanceOf[SourceReader])
+      catch {
         case ex: Throwable =>
           globalError(
               "exception while trying to instantiate source reader '" + name +
@@ -1609,7 +1611,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
 
     /** Compile list of abstract files. */
     def compileFiles(files: List[AbstractFile]) {
-      try compileSources(files map getSourceFile) catch {
+      try compileSources(files map getSourceFile)
+      catch {
         case ex: IOException => globalError(ex.getMessage())
       }
     }

@@ -15,7 +15,8 @@ class ScalaFieldEvaluationTest_212
 
 abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
 
-  addFileWithBreakpoints("Static.scala", s"""
+  addFileWithBreakpoints("Static.scala",
+                         s"""
       |object Static {
       |  val x = 23
       |  private[this] val y = 1
@@ -36,14 +37,16 @@ abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("test/Java.java", s"""
+  addFileWithBreakpoints("test/Java.java",
+                         s"""
       |package test;
       |public class Java {
       |  public int x = 23;
       |  public static int y = 42;
       |}
     """.stripMargin.trim())
-  addFileWithBreakpoints("SimpleJava.scala", s"""
+  addFileWithBreakpoints("SimpleJava.scala",
+                         s"""
       |object SimpleJava {
       |  import test.Java
       |  val x = new Java
@@ -60,7 +63,8 @@ abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("PrivateThisField.scala", s"""
+  addFileWithBreakpoints("PrivateThisField.scala",
+                         s"""
       |object PrivateThisField {
       |  private[this] val x = 1
       |
@@ -94,7 +98,8 @@ abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("NonStatic.scala", s"""
+  addFileWithBreakpoints("NonStatic.scala",
+                         s"""
       |object NonStatic {
       |  def main(args: Array[String]) {
       |    val a = new A(2, 3)
@@ -120,7 +125,8 @@ abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("SimpleDynamicField.scala", s"""
+  addFileWithBreakpoints("SimpleDynamicField.scala",
+                         s"""
        |class A1
        |class B1 extends A1 {val x = 23}
        |object SimpleDynamicField {

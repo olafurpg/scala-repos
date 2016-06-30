@@ -89,7 +89,8 @@ object ClassPath {
   }
 
   def specToURL(spec: String): Option[URL] =
-    try Some(new URL(spec)) catch { case _: MalformedURLException => None }
+    try Some(new URL(spec))
+    catch { case _: MalformedURLException => None }
 
   /** A class modeling aspects of a ClassPath which should be
     *  propagated to any classpaths it creates.
@@ -319,8 +320,9 @@ class DirectoryClassPath(val dir: AbstractFile,
 
 class DeltaClassPath[T](original: MergedClassPath[T],
                         subst: Map[ClassPath[T], ClassPath[T]])
-    extends MergedClassPath[T](original.entries map (e =>
-              subst getOrElse (e, e)), original.context) {
+    extends MergedClassPath[T](
+        original.entries map (e => subst getOrElse (e, e)),
+        original.context) {
   // not sure we should require that here. Commented out for now.
   // require(subst.keySet subsetOf original.entries.toSet)
   // We might add specialized operations for computing classes packages here. Not sure it's worth it.

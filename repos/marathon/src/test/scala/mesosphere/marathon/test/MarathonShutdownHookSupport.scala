@@ -17,6 +17,7 @@ trait MarathonShutdownHookSupport extends BeforeAndAfterEach {
   }
 
   override protected def afterEach(): Unit = {
-    try super.afterEach() finally shutdownHooks.shutdown()
+    try super.afterEach()
+    finally shutdownHooks.shutdown()
   }
 }

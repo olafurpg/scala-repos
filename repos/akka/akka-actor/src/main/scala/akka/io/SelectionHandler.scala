@@ -172,7 +172,8 @@ private[io] object SelectionHandler {
 
       override def run(): Unit =
         if (selector.isOpen)
-          try super.run() finally executionContext
+          try super.run()
+          finally executionContext
             .execute(this) // re-schedule select behind all currently queued tasks
     }
 
@@ -200,13 +201,14 @@ private[io] object SelectionHandler {
             // thorough 'close' of the Selector
             @tailrec def closeNextChannel(it: JIterator[SelectionKey]): Unit =
               if (it.hasNext) {
-                try it.next().channel.close() catch {
+                try it.next().channel.close()
+                catch {
                   case NonFatal(e) ⇒ log.debug("Error closing channel: {}", e)
                 }
                 closeNextChannel(it)
               }
-            try closeNextChannel(selector.keys.iterator) finally selector
-              .close()
+            try closeNextChannel(selector.keys.iterator)
+            finally selector.close()
           }
         }
       }
@@ -245,7 +247,8 @@ private[io] object SelectionHandler {
     private abstract class Task extends Runnable {
       def tryRun()
       def run() {
-        try tryRun() catch {
+        try tryRun()
+        catch {
           case _: CancelledKeyException ⇒
           // ok, can be triggered while setting interest ops
           case NonFatal(e) ⇒

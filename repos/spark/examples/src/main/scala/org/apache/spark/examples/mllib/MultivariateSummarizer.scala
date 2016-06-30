@@ -78,15 +78,15 @@ object MultivariateSummarizer {
     println(s"${examples.count()} data points")
 
     // Summarize labels
-    val labelSummary =
-      examples.aggregate(new MultivariateOnlineSummarizer())((summary, lp) =>
-            summary.add(Vectors.dense(lp.label)), (sum1, sum2) =>
-            sum1.merge(sum2))
+    val labelSummary = examples.aggregate(new MultivariateOnlineSummarizer())(
+        (summary, lp) => summary.add(Vectors.dense(lp.label)),
+        (sum1, sum2) => sum1.merge(sum2))
 
     // Summarize features
     val featureSummary =
-      examples.aggregate(new MultivariateOnlineSummarizer())((summary, lp) =>
-            summary.add(lp.features), (sum1, sum2) => sum1.merge(sum2))
+      examples.aggregate(new MultivariateOnlineSummarizer())(
+          (summary, lp) => summary.add(lp.features),
+          (sum1, sum2) => sum1.merge(sum2))
 
     println()
     println(s"Summary statistics")

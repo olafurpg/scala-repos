@@ -178,7 +178,8 @@ abstract class NumericRange[T](
     isWithinBoundaries(x) && (((x - start) % step) == zero)
 
   override def contains[A1 >: T](x: A1): Boolean =
-    try containsTyped(x.asInstanceOf[T]) catch {
+    try containsTyped(x.asInstanceOf[T])
+    catch {
       case _: ClassCastException => false
     }
 

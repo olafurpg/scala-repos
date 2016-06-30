@@ -29,17 +29,19 @@ private[process] trait ProcessImpl { self: Process.type =>
     def apply[T](f: => T): (Thread, () => T) = {
       val result = new SyncVar[Either[Throwable, T]]
       def run(): Unit =
-        try result set Right(f) catch {
+        try result set Right(f)
+        catch {
           case e: Exception => result set Left(e)
         }
 
       val t = Spawn(run())
 
-      (t, () =>
-            result.get match {
-          case Right(value) => value
-          case Left(exception) => throw exception
-      })
+      (t,
+       () =>
+         result.get match {
+           case Right(value) => value
+           case Left(exception) => throw exception
+       })
     }
   }
 
@@ -108,7 +110,8 @@ private[process] trait ProcessImpl { self: Process.type =>
 
     protected[this] def runInterruptible[T](action: => T)(
         destroyImpl: => Unit): Option[T] = {
-      try Some(action) catch onInterrupt { destroyImpl; None }
+      try Some(action)
+      catch onInterrupt { destroyImpl; None }
     }
   }
 
@@ -139,11 +142,13 @@ private[process] trait ProcessImpl { self: Process.type =>
         else defaultIO.withOutput(source.connectIn)
       val secondIO = defaultIO.withInput(sink.connectOut)
 
-      val second = try b.run(secondIO) catch onError { err =>
+      val second = try b.run(secondIO)
+      catch onError { err =>
         releaseResources(source, sink)
         throw err
       }
-      val first = try a.run(firstIO) catch onError { err =>
+      val first = try a.run(firstIO)
+      catch onError { err =>
         releaseResources(source, sink, second)
         throw err
       }
@@ -165,8 +170,9 @@ private[process] trait ProcessImpl { self: Process.type =>
     def run(): Unit
 
     private[process] def runloop(src: InputStream, dst: OutputStream): Unit = {
-      try BasicIO
-        .transferFully(src, dst) catch ioFailure(ioHandler) finally BasicIO close {
+      try BasicIO.transferFully(src, dst)
+      catch ioFailure(ioHandler)
+      finally BasicIO close {
         if (isSink) dst else src
       }
     }
@@ -186,7 +192,8 @@ private[process] trait ProcessImpl { self: Process.type =>
           case Some(in) => runloop(in, pipe)
           case None =>
         }
-      } catch onInterrupt(()) finally BasicIO close pipe
+      } catch onInterrupt(())
+      finally BasicIO close pipe
     }
     def connectIn(in: InputStream): Unit = source add Some(in)
     def connectOut(sink: PipeSink): Unit = sink connectIn pipe
@@ -206,7 +213,8 @@ private[process] trait ProcessImpl { self: Process.type =>
           case Some(out) => runloop(pipe, out)
           case None =>
         }
-      } catch onInterrupt(()) finally BasicIO close pipe
+      } catch onInterrupt(())
+      finally BasicIO close pipe
     }
     def connectOut(out: OutputStream): Unit = sink add Some(out)
     def connectIn(pipeOut: PipedOutputStream): Unit = pipe connect pipeOut

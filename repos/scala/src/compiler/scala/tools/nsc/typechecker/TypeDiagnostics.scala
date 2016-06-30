@@ -62,7 +62,8 @@ trait TypeDiagnostics { self: Analyzer =>
   def typingInPattern[T](body: => T): T = {
     val saved = isTyperInPattern
     isTyperInPattern = true
-    try body finally isTyperInPattern = saved
+    try body
+    finally isTyperInPattern = saved
   }
 
   def setAddendum(pos: Position, msg: () => String) =
@@ -609,7 +610,8 @@ trait TypeDiagnostics { self: Analyzer =>
         if (fn.symbol != null && fn.symbol.isMethod &&
             !fn.symbol.isConstructor) {
           exprStack push fn.symbol
-          try f finally exprStack.pop()
+          try f
+          finally exprStack.pop()
         } else f
       }
       def apply(tree: Tree): Tree = {
@@ -657,9 +659,9 @@ trait TypeDiagnostics { self: Analyzer =>
 
         tparams.filter(_.name != typeNames.WILDCARD).foreach { tp =>
           // we don't care about type params shadowing other type params in the same declaration
-          enclClassOrMethodOrTypeMember(context).outer
-            .lookupSymbol(tp.name, s =>
-                  s != tp.symbol && s.hasRawInfo && reallyExists(s)) match {
+          enclClassOrMethodOrTypeMember(context).outer.lookupSymbol(
+              tp.name,
+              s => s != tp.symbol && s.hasRawInfo && reallyExists(s)) match {
             case LookupSucceeded(_, sym2) =>
               context.warning(
                   tp.pos,

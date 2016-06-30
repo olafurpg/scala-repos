@@ -8,7 +8,8 @@ trait EnsimeTestData {
   // duplicating utils to minimise dependencies
   private def canon(s: String) = {
     val file = new File(s)
-    try file.getCanonicalFile catch {
+    try file.getCanonicalFile
+    catch {
       case t: Throwable => file.getAbsoluteFile
     }
   }

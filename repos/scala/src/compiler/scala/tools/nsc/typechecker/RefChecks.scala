@@ -130,7 +130,8 @@ abstract class RefChecks
     var inPattern: Boolean = false
     @inline final def savingInPattern[A](body: => A): A = {
       val saved = inPattern
-      try body finally inPattern = saved
+      try body
+      finally inPattern = saved
     }
 
     var checkedCombinations = Set[List[Type]]()
@@ -424,7 +425,8 @@ abstract class RefChecks
           val otherAccess = accessFlagsToString(other)
           overrideError(
               "has weaker access privileges; it should be " +
-                (if (otherAccess == "") "public" else "at least " + otherAccess))
+                (if (otherAccess == "") "public"
+                 else "at least " + otherAccess))
         }
 
         //Console.println(infoString(member) + " overrides " + infoString(other) + " in " + clazz);//DEBUG
@@ -1442,7 +1444,8 @@ abstract class RefChecks
     def transformStat(tree: Tree, index: Int): List[Tree] = tree match {
       case t if treeInfo.isSelfConstrCall(t) =>
         assert(index == 0, index)
-        try transform(tree) :: Nil finally if (currentLevel.maxindex > 0) {
+        try transform(tree) :: Nil
+        finally if (currentLevel.maxindex > 0) {
           // An implementation restriction to avoid VerifyErrors and lazyvals mishaps; see SI-4717
           debuglog("refsym = " + currentLevel.refsym)
           reporter.error(
@@ -1476,8 +1479,8 @@ abstract class RefChecks
                             owner: Symbol,
                             tparams: List[Symbol],
                             argtps: List[Type]): Unit =
-      try typer.infer
-        .checkBounds(tree0, pre, owner, tparams, argtps, "") catch {
+      try typer.infer.checkBounds(tree0, pre, owner, tparams, argtps, "")
+      catch {
         case ex: TypeError =>
           reporter.error(tree0.pos, ex.getMessage())
           if (settings.explaintypes) {
@@ -1526,7 +1529,8 @@ abstract class RefChecks
       if (sym.hasMigrationAnnotation &&
           settings.Xmigration.value != NoScalaVersion) {
         val changed = try settings.Xmigration.value < ScalaVersion(
-            sym.migrationVersion.get) catch {
+            sym.migrationVersion.get)
+        catch {
           case e: NumberFormatException =>
             reporter.warning(
                 pos,

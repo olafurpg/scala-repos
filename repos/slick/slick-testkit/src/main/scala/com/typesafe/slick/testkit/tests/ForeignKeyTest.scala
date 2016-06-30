@@ -71,8 +71,8 @@ class ForeignKeyTest extends AsyncTest[RelationalTestDB] {
       def s = column[String]("s")
       def * = (k1, k2, s)
       def bFK =
-        foreignKey("b_fk", (k1, k2), bs)(b =>
-              (b.f1, b.f2), onDelete = ForeignKeyAction.Cascade)
+        foreignKey("b_fk", (k1, k2), bs)(b => (b.f1, b.f2),
+                                         onDelete = ForeignKeyAction.Cascade)
     }
     lazy val as = TableQuery[A]
 

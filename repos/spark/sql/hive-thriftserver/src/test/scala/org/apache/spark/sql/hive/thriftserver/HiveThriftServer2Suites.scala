@@ -71,7 +71,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
     val client = new ThriftCLIServiceClient(new Client(protocol))
 
     transport.open()
-    try f(client) finally transport.close()
+    try f(client)
+    finally transport.close()
   }
 
   test("GetInfo Thrift API") {

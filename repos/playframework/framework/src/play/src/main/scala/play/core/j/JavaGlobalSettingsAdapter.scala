@@ -48,8 +48,8 @@ class JavaGlobalSettingsAdapter(val underlying: play.GlobalSettings)
   override def onBadRequest(request: RequestHeader,
                             error: String): Future[Result] = {
     JavaHelpers
-      .invokeWithContextOpt(request, req =>
-            underlying.onBadRequest(req, error))
+      .invokeWithContextOpt(request,
+                            req => underlying.onBadRequest(req, error))
       .getOrElse(super.onBadRequest(request, error))
   }
 

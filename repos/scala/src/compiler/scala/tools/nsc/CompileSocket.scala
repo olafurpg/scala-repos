@@ -35,7 +35,8 @@ trait HasCompileSocket {
           compileSocket.warn(line)
           loop()
       }
-      try loop() finally sock.close()
+      try loop()
+      finally sock.close()
     }
   }
 }
@@ -116,7 +117,8 @@ class CompileSocket extends CompileOutputCommon {
       portsDir.list.toList match {
         case Nil => -1
         case x :: xs =>
-          try x.name.toInt catch {
+          try x.name.toInt
+          catch {
             case e: Exception =>
               x.delete()
               throw e
@@ -156,7 +158,8 @@ class CompileSocket extends CompileOutputCommon {
     val file = portFile(port)
     val secret = new SecureRandom().nextInt.toString
 
-    try file writeAll secret catch {
+    try file writeAll secret
+    catch {
       case e @ (_: FileNotFoundException | _: SecurityException) =>
         fatal("Cannot create file: %s".format(file.path))
     }

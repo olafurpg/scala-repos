@@ -51,7 +51,8 @@ object ForkRun {
     if (running.compareAndSet(true, false)) {
       log.info("Stopping Play fork run ...")
       forkRun ! Close
-      try system.awaitTermination(30.seconds) catch {
+      try system.awaitTermination(30.seconds)
+      catch {
         case _: TimeoutException => System.exit(1)
       }
     } else {

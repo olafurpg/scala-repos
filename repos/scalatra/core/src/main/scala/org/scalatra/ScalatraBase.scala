@@ -229,7 +229,8 @@ trait ScalatraBase
   }
 
   private[this] def cradleHalt(body: => Any, error: Throwable => Any): Any = {
-    try body catch {
+    try body
+    catch {
       case e: HaltException => {
         try {
           handleStatusCode(extractStatusCode(e)) match {
@@ -627,8 +628,9 @@ trait ScalatraBase
   protected def addRoute(method: HttpMethod,
                          transformers: Seq[RouteTransformer],
                          action: => Any): Route = {
-    val route = Route(transformers, () => action, (req: HttpServletRequest) =>
-          routeBasePath(req))
+    val route = Route(transformers,
+                      () => action,
+                      (req: HttpServletRequest) => routeBasePath(req))
     routes.prependRoute(method, route)
     route
   }
@@ -648,8 +650,9 @@ trait ScalatraBase
   }
 
   protected[scalatra] def addStatusRoute(codes: Range, action: => Any): Unit = {
-    val route = Route(Seq.empty, () => action, (req: HttpServletRequest) =>
-          routeBasePath(req))
+    val route = Route(Seq.empty,
+                      () => action,
+                      (req: HttpServletRequest) => routeBasePath(req))
     routes.addStatusRoute(codes, route)
   }
 

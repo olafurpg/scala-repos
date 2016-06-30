@@ -466,7 +466,8 @@ trait PathMatchers {
     */
   val DoubleNumber: PathMatcher1[Double] =
     PathMatcher("""[+-]?\d*\.?\d*""".r) flatMap { string ⇒
-      try Some(java.lang.Double.parseDouble(string)) catch {
+      try Some(java.lang.Double.parseDouble(string))
+      catch {
         case _: NumberFormatException ⇒ None
       }
     }
@@ -478,7 +479,8 @@ trait PathMatchers {
     PathMatcher(
         """[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}""".r) flatMap {
       string ⇒
-        try Some(UUID.fromString(string)) catch {
+        try Some(UUID.fromString(string))
+        catch {
           case _: IllegalArgumentException ⇒ None
         }
     }

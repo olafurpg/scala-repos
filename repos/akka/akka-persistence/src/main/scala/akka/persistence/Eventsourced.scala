@@ -185,7 +185,8 @@ private[persistence] trait Eventsourced
   }
 
   private def stashInternally(currMsg: Any): Unit =
-    try internalStash.stash() catch {
+    try internalStash.stash()
+    catch {
       case e: StashOverflowException ⇒
         internalStashOverflowStrategy match {
           case DiscardToDeadLetterStrategy ⇒
@@ -600,8 +601,8 @@ private[persistence] trait Eventsourced
           Eventsourced. super.aroundReceive(recoveryBehavior, p)
         } catch {
           case NonFatal(t) ⇒
-            try onRecoveryFailure(t, Some(p.payload)) finally context.stop(
-                self)
+            try onRecoveryFailure(t, Some(p.payload))
+            finally context.stop(self)
         }
       case RecoverySuccess(highestSeqNr) ⇒
         onReplaySuccess() // callback for subclass implementation
@@ -611,7 +612,8 @@ private[persistence] trait Eventsourced
         internalStash.unstashAll()
         Eventsourced. super.aroundReceive(recoveryBehavior, RecoveryCompleted)
       case ReplayMessagesFailure(cause) ⇒
-        try onRecoveryFailure(cause, event = None) finally context.stop(self)
+        try onRecoveryFailure(cause, event = None)
+        finally context.stop(self)
       case other ⇒
         stashInternally(other)
     }
@@ -627,7 +629,8 @@ private[persistence] trait Eventsourced
   }
 
   private def peekApplyHandler(payload: Any): Unit =
-    try pendingInvocations.peek().handler(payload) finally flushBatch()
+    try pendingInvocations.peek().handler(payload)
+    finally flushBatch()
 
   /**
     * Common receive handler for processingCommands and persistingEvents
@@ -661,8 +664,8 @@ private[persistence] trait Eventsourced
         // while message is in flight, in that case the handler has already been discarded
         if (id == instanceId) {
           onWriteMessageComplete(err = false)
-          try onPersistFailure(cause, p.payload, p.sequenceNr) finally context
-            .stop(self)
+          try onPersistFailure(cause, p.payload, p.sequenceNr)
+          finally context.stop(self)
         }
       case LoopMessageSuccess(l, id) ⇒
         // instanceId mismatch can happen for persistAsync and defer in case of actor restart

@@ -68,7 +68,8 @@ class PipedProcessTest {
           classOf[Process.PipeSource],
           classOf[Process.PipeSink])
       m.setAccessible(true)
-      try m.invoke(this, source, sink).asInstanceOf[Option[Int]] catch {
+      try m.invoke(this, source, sink).asInstanceOf[Option[Int]]
+      catch {
         case err: InvocationTargetException => throw err.getTargetException
       }
     }

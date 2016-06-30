@@ -238,7 +238,8 @@ class HoistClientOps extends Phase {
       case GetOrElse(OptionApply(ch), _) => ch
       case n @ GetOrElse(ch :@ OptionType(tpe), default) =>
         logger.debug("Translating GetOrElse to IfNull", n)
-        val d = try default() catch {
+        val d = try default()
+        catch {
           case NonFatal(ex) =>
             throw new SlickException(
                 "Caught exception while computing default value for Rep[Option[_]].getOrElse -- " +

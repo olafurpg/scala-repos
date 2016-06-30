@@ -723,8 +723,10 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
        *   def m$I(x: Int) = <body>/adapted to env {A -> Int} // om
        */
       def forwardToOverload(m: Symbol): Symbol = {
-        val specMember = enterMember(cloneInSpecializedClass(m, f =>
-                  (f | OVERRIDE) & ~(DEFERRED | CASEACCESSOR)))
+        val specMember = enterMember(
+            cloneInSpecializedClass(
+                m,
+                f => (f | OVERRIDE) & ~(DEFERRED | CASEACCESSOR)))
         val om = specializedOverload(sClass, m, env).setFlag(OVERRIDE)
         val original = info.get(m) match {
           case Some(NormalizedMember(tg)) => tg
@@ -1629,7 +1631,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     }
 
     def reportError[T](body: => T)(handler: TypeError => T): T =
-      try body catch {
+      try body
+      catch {
         case te: TypeError =>
           reporter.error(te.pos, te.msg)
           handler(te)
@@ -2038,10 +2041,12 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
           // flag. nobody has to see this anyway :)
           sym.setFlag(SPECIALIZED)
           // create empty bodies for specializations
-          localTyper.typed(Block(norm.tail.map(sym =>
-                        DefDef(sym, { vparamss: List[List[Symbol]] =>
-              EmptyTree
-            })), ddef))
+          localTyper.typed(
+              Block(norm.tail.map(sym =>
+                          DefDef(sym, { vparamss: List[List[Symbol]] =>
+                    EmptyTree
+                  })),
+                    ddef))
         } else
           tree
       case _ =>

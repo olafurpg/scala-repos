@@ -34,8 +34,9 @@ object Headers {
         classTag[HttpHeader])
 
   def byClass[T <: HttpHeader](clazz: Class[T]): Header[T] =
-    HeaderImpl[T](clazz.getSimpleName, ct ⇒
-          optionalHeaderValueByType(ClassMagnet(ct)), ClassTag(clazz))
+    HeaderImpl[T](clazz.getSimpleName,
+                  ct ⇒ optionalHeaderValueByType(ClassMagnet(ct)),
+                  ClassTag(clazz))
 
   private def optionalHeaderInstanceByName(
       lowercaseName: String): Directive1[Optional[model.HttpHeader]] =

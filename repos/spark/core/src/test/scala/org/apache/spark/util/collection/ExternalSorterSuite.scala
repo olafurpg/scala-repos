@@ -657,8 +657,10 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     conf.set("spark.shuffle.manager", "sort")
     sc = new SparkContext("local", "test", conf)
     val agg = if (withPartialAgg) {
-      Some(new Aggregator[Int, Int, Int](i => i, (i, j) => i + j, (i, j) =>
-                i + j))
+      Some(
+          new Aggregator[Int, Int, Int](i => i,
+                                        (i, j) => i + j,
+                                        (i, j) => i + j))
     } else {
       None
     }

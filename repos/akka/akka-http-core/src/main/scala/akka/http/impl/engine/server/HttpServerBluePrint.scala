@@ -652,7 +652,8 @@ private[http] object HttpServerBluePrint {
             createEntity: EntityCreator[T, RequestEntity]) =
           StreamedEntityCreator {
             createEntity.compose[Source[T, NotUsed]] {
-              _.via(Flow[T]
+              _.via(
+                  Flow[T]
                     .transform(() ⇒
                           new PushPullStage[T, T] {
                     private var oneHundredContinueSent = false

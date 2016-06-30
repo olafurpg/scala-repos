@@ -48,7 +48,8 @@ class GraphiteClient(address: InetSocketAddress) extends Closeable {
 
   /** Closes underlying connection. */
   def close() {
-    try socket.close() finally writer.close()
+    try socket.close()
+    finally writer.close()
   }
 
   protected def sanitize(s: String): String = {

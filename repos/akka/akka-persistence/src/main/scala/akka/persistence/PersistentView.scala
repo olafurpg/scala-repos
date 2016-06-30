@@ -222,7 +222,8 @@ trait PersistentView
   }
 
   override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-    try internalStash.unstashAll() finally super.preRestart(reason, message)
+    try internalStash.unstashAll()
+    finally super.preRestart(reason, message)
   }
 
   override def postStop(): Unit = {
@@ -321,7 +322,8 @@ trait PersistentView
       case _: RecoverySuccess ⇒
         onReplayComplete()
       case ReplayMessagesFailure(cause) ⇒
-        try onReplayError(cause) finally onReplayComplete()
+        try onReplayError(cause)
+        finally onReplayComplete()
       case ScheduledUpdate(_) ⇒ // ignore
       case Update(a, _) ⇒
         if (a) internalStash.stash()

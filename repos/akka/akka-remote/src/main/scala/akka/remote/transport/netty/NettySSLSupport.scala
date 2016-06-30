@@ -124,9 +124,8 @@ private[akka] object NettySSLSupport {
           trustManagerFactory.init({
             val trustStore = KeyStore.getInstance(KeyStore.getDefaultType)
             val fin = new FileInputStream(trustStorePath)
-            try trustStore
-              .load(fin, trustStorePassword.toCharArray) finally Try(
-                fin.close())
+            try trustStore.load(fin, trustStorePassword.toCharArray)
+            finally Try(fin.close())
             trustStore
           })
           trustManagerFactory.getTrustManagers
@@ -197,8 +196,8 @@ private[akka] object NettySSLSupport {
         factory.init({
           val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
           val fin = new FileInputStream(keyStorePath)
-          try keyStore.load(fin, keyStorePassword.toCharArray) finally Try(
-              fin.close())
+          try keyStore.load(fin, keyStorePassword.toCharArray)
+          finally Try(fin.close())
           keyStore
         }, keyPassword.toCharArray)
 
@@ -210,7 +209,8 @@ private[akka] object NettySSLSupport {
             trustManagerFactory.init({
               val trustStore = KeyStore.getInstance(KeyStore.getDefaultType)
               val fin = new FileInputStream(path)
-              try trustStore.load(fin, pwd) finally Try(fin.close())
+              try trustStore.load(fin, pwd)
+              finally Try(fin.close())
               trustStore
             })
             trustManagerFactory.getTrustManagers

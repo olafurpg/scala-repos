@@ -127,7 +127,8 @@ abstract class FormatInterpolator {
             } else {
               currentRun.reporting
                 .deprecationWarning(errPoint, msg("deprecated"))
-              try StringContext.treatEscapes(s0) catch escapeHatch
+              try StringContext.treatEscapes(s0)
+              catch escapeHatch
             }
           }
           if (e.index == s0.length - 1) {
@@ -140,7 +141,8 @@ abstract class FormatInterpolator {
             s0
           }
       }
-      val s = try StringContext.processEscapes(s0) catch escapeHatch
+      val s = try StringContext.processEscapes(s0)
+      catch escapeHatch
       val ms = fpat findAllMatchIn s
 
       def errorLeading(op: Conversion) =

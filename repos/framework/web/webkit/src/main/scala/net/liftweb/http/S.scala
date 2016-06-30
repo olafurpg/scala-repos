@@ -3015,8 +3015,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     import json._
 
     val name = formFuncName
-    addFunctionMap(name, SFuncHolder((s: String) =>
-              JsonParser.parseOpt(s).map(in) getOrElse JsCmds.Noop))
+    addFunctionMap(name,
+                   SFuncHolder((s: String) =>
+                         JsonParser.parseOpt(s).map(in) getOrElse JsCmds.Noop))
     f(name)
   }
 

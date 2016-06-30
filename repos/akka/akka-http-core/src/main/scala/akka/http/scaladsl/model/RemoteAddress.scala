@@ -53,7 +53,8 @@ object RemoteAddress {
 
   def apply(bytes: Array[Byte]): RemoteAddress = {
     require(bytes.length == 4 || bytes.length == 16)
-    try IP(InetAddress.getByAddress(bytes)) catch {
+    try IP(InetAddress.getByAddress(bytes))
+    catch {
       case _: UnknownHostException ⇒ Unknown
     }
   }

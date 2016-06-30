@@ -25,8 +25,8 @@ class TellOnlyBenchmark {
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    system =
-      ActorSystem("TellOnlyBenchmark", ConfigFactory.parseString(s"""| akka {
+    system = ActorSystem("TellOnlyBenchmark",
+                         ConfigFactory.parseString(s"""| akka {
           |   log-dead-letters = off
           |   actor {
           |     default-dispatcher {

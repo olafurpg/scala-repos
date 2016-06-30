@@ -231,7 +231,8 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
     // with the HiveConf in `state` to override the context class loader of the current
     // thread.
     shim.setCurrentSessionState(state)
-    val ret = try f finally {
+    val ret = try f
+    finally {
       Thread.currentThread().setContextClassLoader(original)
     }
     ret

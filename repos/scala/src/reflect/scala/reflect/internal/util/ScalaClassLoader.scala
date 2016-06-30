@@ -139,7 +139,8 @@ object ScalaClassLoader {
     Thread.currentThread.setContextClassLoader(cl)
   def savingContextLoader[T](body: => T): T = {
     val saved = contextLoader
-    try body finally setContext(saved)
+    try body
+    finally setContext(saved)
   }
 
   class URLClassLoader(urls: Seq[URL], parent: JClassLoader)

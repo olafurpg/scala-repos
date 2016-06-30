@@ -386,8 +386,8 @@ abstract class RDD[T: ClassTag](
     */
   def flatMap[U: ClassTag](f: T => TraversableOnce[U]): RDD[U] = withScope {
     val cleanF = sc.clean(f)
-    new MapPartitionsRDD[U, T](this, (context, pid, iter) =>
-          iter.flatMap(cleanF))
+    new MapPartitionsRDD[U, T](this,
+                               (context, pid, iter) => iter.flatMap(cleanF))
   }
 
   /**
@@ -395,8 +395,9 @@ abstract class RDD[T: ClassTag](
     */
   def filter(f: T => Boolean): RDD[T] = withScope {
     val cleanF = sc.clean(f)
-    new MapPartitionsRDD[T, T](this, (context, pid, iter) =>
-          iter.filter(cleanF), preservesPartitioning = true)
+    new MapPartitionsRDD[T, T](this,
+                               (context, pid, iter) => iter.filter(cleanF),
+                               preservesPartitioning = true)
   }
 
   /**
@@ -675,8 +676,9 @@ abstract class RDD[T: ClassTag](
     * Return an RDD created by coalescing all elements within each partition into an array.
     */
   def glom(): RDD[Array[T]] = withScope {
-    new MapPartitionsRDD[Array[T], T](this, (context, pid, iter) =>
-          Iterator(iter.toArray))
+    new MapPartitionsRDD[Array[T], T](this,
+                                      (context, pid,
+                                       iter) => Iterator(iter.toArray))
   }
 
   /**

@@ -132,7 +132,8 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
   private def checkNaNWithoutCodegen(
       expression: Expression,
       inputRow: InternalRow = EmptyRow): Unit = {
-    val actual = try evaluate(expression, inputRow) catch {
+    val actual = try evaluate(expression, inputRow)
+    catch {
       case e: Exception => fail(s"Exception evaluating $expression", e)
     }
     if (!actual.asInstanceOf[Double].isNaN) {
@@ -265,8 +266,9 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     testUnary(Ceil, (d: Double) => math.ceil(d).toLong)
     checkConsistencyBetweenInterpretedAndCodegen(Ceil, DoubleType)
 
-    testUnary(Ceil, (d: Decimal) =>
-          d.ceil, (-20 to 20).map(x => Decimal(x * 0.1)))
+    testUnary(Ceil,
+              (d: Decimal) => d.ceil,
+              (-20 to 20).map(x => Decimal(x * 0.1)))
     checkConsistencyBetweenInterpretedAndCodegen(Ceil, DecimalType(25, 3))
     checkConsistencyBetweenInterpretedAndCodegen(Ceil, DecimalType(25, 0))
     checkConsistencyBetweenInterpretedAndCodegen(Ceil, DecimalType(5, 0))
@@ -276,8 +278,9 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     testUnary(Floor, (d: Double) => math.floor(d).toLong)
     checkConsistencyBetweenInterpretedAndCodegen(Floor, DoubleType)
 
-    testUnary(Floor, (d: Decimal) =>
-          d.floor, (-20 to 20).map(x => Decimal(x * 0.1)))
+    testUnary(Floor,
+              (d: Decimal) => d.floor,
+              (-20 to 20).map(x => Decimal(x * 0.1)))
     checkConsistencyBetweenInterpretedAndCodegen(Floor, DecimalType(25, 3))
     checkConsistencyBetweenInterpretedAndCodegen(Floor, DecimalType(25, 0))
     checkConsistencyBetweenInterpretedAndCodegen(Floor, DecimalType(5, 0))

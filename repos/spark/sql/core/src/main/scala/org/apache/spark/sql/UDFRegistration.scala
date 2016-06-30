@@ -1345,7 +1345,9 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
     * @since 1.3.0
     */
   def register(name: String, f: UDF1[_, _], returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name, (e: Seq[Expression]) =>
+    functionRegistry.registerFunction(
+        name,
+        (e: Seq[Expression]) =>
           ScalaUDF(f.asInstanceOf[UDF1[Any, Any]].call(_: Any), returnType, e))
   }
 

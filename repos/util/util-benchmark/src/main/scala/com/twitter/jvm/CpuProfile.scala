@@ -64,7 +64,8 @@ object CpuProfileBenchmark {
         yield
           new Thread {
             override def run() {
-              try stack() catch {
+              try stack()
+              catch {
                 case _: InterruptedException =>
               }
             }

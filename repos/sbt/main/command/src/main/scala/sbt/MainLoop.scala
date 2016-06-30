@@ -52,7 +52,8 @@ object MainLoop {
 
   /** Runs the next sequence of commands, cleaning up global logging after any exceptions. */
   def runAndClearLast(state: State, logBacking: GlobalLogBacking): RunNext =
-    try runWithNewLog(state, logBacking) catch {
+    try runWithNewLog(state, logBacking)
+    catch {
       case e: xsbti.FullReload =>
         deleteLastLog(logBacking)
         throw e // pass along a reboot request
@@ -75,7 +76,8 @@ object MainLoop {
       val newLogging = state.globalLogging.newLogger(out, logBacking)
       transferLevels(state, newLogging)
       val loggedState = state.copy(globalLogging = newLogging)
-      try run(loggedState) finally out.close()
+      try run(loggedState)
+      finally out.close()
     }
 
   /** Transfers logging and trace levels from the old global loggers to the new ones. */

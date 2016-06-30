@@ -168,7 +168,8 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     }
   }
 
-  createQueryTest("! operator", """
+  createQueryTest("! operator",
+                  """
       |SELECT a FROM (
       |  SELECT 1 AS a UNION ALL SELECT 2 AS a) t
       |WHERE !(a>1)
@@ -426,17 +427,20 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
   val delimiter = "'\t'"
 
-  createQueryTest("transform with custom field delimiter", s"""
+  createQueryTest("transform with custom field delimiter",
+                  s"""
       |SELECT TRANSFORM (key) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter}
       |USING 'cat' AS (tKey) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter} FROM src;
     """.stripMargin.replaceAll("\n", " "))
 
-  createQueryTest("transform with custom field delimiter2", s"""
+  createQueryTest("transform with custom field delimiter2",
+                  s"""
       |SELECT TRANSFORM (key, value) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter}
       |USING 'cat' ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter} FROM src;
     """.stripMargin.replaceAll("\n", " "))
 
-  createQueryTest("transform with custom field delimiter3", s"""
+  createQueryTest("transform with custom field delimiter3",
+                  s"""
       |SELECT TRANSFORM (*) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter}
       |USING 'cat' ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter} FROM src;
     """.stripMargin.replaceAll("\n", " "))
@@ -644,7 +648,8 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
       |select value from q1 union all select value from q2
     """.stripMargin)
 
-  createQueryTest("CTE feature #3", """with q1 as (select key from src)
+  createQueryTest("CTE feature #3",
+                  """with q1 as (select key from src)
       |from q1
       |select * where key = 4
     """.stripMargin)

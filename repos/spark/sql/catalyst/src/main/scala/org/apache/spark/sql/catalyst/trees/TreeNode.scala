@@ -61,7 +61,8 @@ object CurrentOrigin {
 
   def withOrigin[A](o: Origin)(f: => A): A = {
     set(o)
-    val ret = try f finally { reset() }
+    val ret = try f
+    finally { reset() }
     reset()
     ret
   }
@@ -396,7 +397,8 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
         }
       } catch {
         case e: java.lang.IllegalArgumentException =>
-          throw new TreeNodeException(this, s"""
+          throw new TreeNodeException(this,
+                                      s"""
              |Failed to copy node.
              |Is otherCopyArgs specified correctly for $nodeName.
              |Exception message: ${e.getMessage}
@@ -719,7 +721,8 @@ object TreeNode {
                   |ctor: ${maybeCtor.get}
                   |types: ${parameters.map(_.getClass).mkString(", ")}
                   |args: ${parameters.mkString(", ")}
-                """.stripMargin, e)
+                """.stripMargin,
+                                         e)
           }
         }
       }

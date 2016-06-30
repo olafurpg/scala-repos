@@ -122,7 +122,8 @@ class ExecutorBasedEventDrivenDispatcher(
 
   private[akka] def executeFuture(invocation: FutureInvocation[_]): Unit =
     if (active.isOn) {
-      try executorService.get() execute invocation catch {
+      try executorService.get() execute invocation
+      catch {
         case e: RejectedExecutionException =>
           EventHandler.warning(this, e.toString)
           throw e

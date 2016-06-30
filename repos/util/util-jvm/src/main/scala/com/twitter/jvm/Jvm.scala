@@ -253,7 +253,8 @@ object Jvm {
       1,
       new NamedPoolThreadFactory("util-jvm-timer", true))
 
-  private lazy val _jvm = try new Hotspot catch {
+  private lazy val _jvm = try new Hotspot
+  catch {
     case NonFatal(_) => NilJvm
   }
 

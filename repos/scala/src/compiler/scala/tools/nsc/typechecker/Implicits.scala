@@ -203,7 +203,8 @@ trait Implicits { self: Analyzer =>
   private val implicitSearchId = {
     var id = 1;
     () =>
-      try id finally id += 1
+      try id
+      finally id += 1
   }
 
   private def isInvalidConversionSource(tpe: Type): Boolean = tpe match {
@@ -285,7 +286,8 @@ trait Implicits { self: Analyzer =>
     }
 
     private[this] final def computeIsCyclicOrErroneous =
-      try sym.hasFlag(LOCKED) || containsError(tpe) catch {
+      try sym.hasFlag(LOCKED) || containsError(tpe)
+      catch {
         case _: CyclicReference => true
       }
 
@@ -1100,7 +1102,8 @@ trait Implicits { self: Analyzer =>
         case Nil => acc
         case firstPending :: otherPending =>
           def firstPendingImproves(alt: ImplicitInfo) =
-            firstPending == alt || (try improves(firstPending, alt) catch {
+            firstPending == alt || (try improves(firstPending, alt)
+                catch {
                   case e: CyclicReference =>
                     devWarning(
                         s"Discarding $firstPending during implicit search due to cyclic reference.")
@@ -1135,8 +1138,8 @@ trait Implicits { self: Analyzer =>
       def findAll() =
         linkedMapFrom(eligible)(
             x =>
-              try typedImplicit(x, ptChecked = false, isLocalToCallsite) finally context.reporter
-                .clearAll())
+              try typedImplicit(x, ptChecked = false, isLocalToCallsite)
+              finally context.reporter.clearAll())
 
       /** Returns the SearchResult of the best match.
         */
@@ -1169,7 +1172,9 @@ trait Implicits { self: Analyzer =>
           DivergentImplicitRecovery.issueSavedDivergentError()
 
           if (invalidImplicits.nonEmpty)
-            setAddendum(pos, () =>
+            setAddendum(
+                pos,
+                () =>
                   s"\n Note: implicit ${invalidImplicits.head} is not applicable here because it comes after the application point and it lacks an explicit result type")
         }
 

@@ -197,7 +197,8 @@ abstract class NodePrinters {
 
     @inline private def indent[T](body: => T): T = {
       level += 1
-      try body finally level -= 1
+      try body
+      finally level -= 1
     }
 
     def traverseList(ifEmpty: String, what: String)(trees: List[Tree]) {

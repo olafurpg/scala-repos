@@ -34,7 +34,8 @@ class PipeliningDispatcher[Req, Rep](trans: Transport[Req, Rep],
 
   private[this] val transRead: Promise[Rep] => Unit = p =>
     trans.read().respond { res =>
-      try p.update(res) finally loop()
+      try p.update(res)
+      finally loop()
   }
 
   private[this] def loop(): Unit =

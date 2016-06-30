@@ -155,7 +155,8 @@ private final class TrapExit(delegateManager: SecurityManager)
   /** Executes `f` in a managed context. */
   def runManaged(f: xsbti.F0[Unit], xlog: xsbti.Logger): Int = {
     val _ = running.incrementAndGet()
-    try runManaged0(f, xlog) finally running.decrementAndGet()
+    try runManaged0(f, xlog)
+    finally running.decrementAndGet()
   }
   private[this] def runManaged0(f: xsbti.F0[Unit], xlog: xsbti.Logger): Int = {
     val log: Logger = xlog
@@ -256,7 +257,8 @@ private final class TrapExit(delegateManager: SecurityManager)
     val exitCode = new ExitCode
 
     def run(): Unit = {
-      try execute() catch {
+      try execute()
+      catch {
         case x: Throwable =>
           exitCode
             .set(1) //exceptions in the main thread cause the exit code to be 1

@@ -15,7 +15,8 @@ class DependencyTest extends SimpleTestCase {
       class C
       classOf[C]
     }
-    """, ("C", "ScClass: C", "O.C"))
+    """,
+                          ("C", "ScClass: C", "O.C"))
   }
 
   def testSyntheticClass() {
@@ -32,7 +33,8 @@ class DependencyTest extends SimpleTestCase {
       object Foo
       Foo
     }
-    """, ("Foo", "ScObject: Foo", "O.Foo"))
+    """,
+                          ("Foo", "ScObject: Foo", "O.Foo"))
   }
 
   def testQualifier() {
@@ -41,7 +43,8 @@ class DependencyTest extends SimpleTestCase {
       object Foo
     }
     O.Foo
-    """, ("O", "ScObject: O", "O"))
+    """,
+                          ("O", "ScObject: O", "O"))
   }
 
   def testPrimaryConstructor() {
@@ -50,7 +53,8 @@ class DependencyTest extends SimpleTestCase {
       class C
       new C
     }
-    """, ("C", "PrimaryConstructor", "O.C"))
+    """,
+                          ("C", "PrimaryConstructor", "O.C"))
   }
 
   def testSecondaryConstructor() {
@@ -63,7 +67,8 @@ class DependencyTest extends SimpleTestCase {
       }
       new C(1)
     }
-    """, ("C", "ScFunctionDefinition: this", "O.C"))
+    """,
+                          ("C", "ScFunctionDefinition: this", "O.C"))
   }
 
   def testCaseClassCopy() {
@@ -72,7 +77,8 @@ class DependencyTest extends SimpleTestCase {
       case class C(v: Any)
       C(null).copy(v = null)
     }
-    """, ("C", "ScFunctionDefinition: apply", "O.C"))
+    """,
+                          ("C", "ScFunctionDefinition: apply", "O.C"))
   }
 
   def testSyntheticApply() {
@@ -81,7 +87,8 @@ class DependencyTest extends SimpleTestCase {
       case class C()
       C()
     }
-    """, ("C", "ScFunctionDefinition: apply", "O.C"))
+    """,
+                          ("C", "ScFunctionDefinition: apply", "O.C"))
   }
 
   def testSyntheticUnapply() {
@@ -92,7 +99,8 @@ class DependencyTest extends SimpleTestCase {
         case C() =>
       }
     }
-    """, ("C", "ScFunctionDefinition: unapply", "O.C"))
+    """,
+                          ("C", "ScFunctionDefinition: unapply", "O.C"))
   }
 
   def testSyntheticInfixUnapply() {
@@ -103,7 +111,8 @@ class DependencyTest extends SimpleTestCase {
         case _ C _ =>
       }
     }
-    """, ("C", "ScFunctionDefinition: unapply", "O.C"))
+    """,
+                          ("C", "ScFunctionDefinition: unapply", "O.C"))
   }
 
   def testSyntheticUnapplySeq() {
@@ -114,7 +123,8 @@ class DependencyTest extends SimpleTestCase {
         case C(1, 2, 3) =>
       }
     }
-    """, ("C", "ScFunctionDefinition: unapplySeq", "O.C"))
+    """,
+                          ("C", "ScFunctionDefinition: unapplySeq", "O.C"))
   }
 
   def testExplicitApply() {
@@ -125,7 +135,8 @@ class DependencyTest extends SimpleTestCase {
       }
       Foo()
     }
-    """, ("Foo", "ScFunctionDefinition: apply", "O.Foo"))
+    """,
+                          ("Foo", "ScFunctionDefinition: apply", "O.Foo"))
   }
 
   def testExplicitUnapply() {
@@ -138,7 +149,8 @@ class DependencyTest extends SimpleTestCase {
         case Foo() =>
       }
     }
-    """, ("Foo", "ScFunctionDefinition: unapply", "O.Foo"))
+    """,
+                          ("Foo", "ScFunctionDefinition: unapply", "O.Foo"))
   }
 
   def testExplicitInfixUnapply() {
@@ -151,7 +163,8 @@ class DependencyTest extends SimpleTestCase {
         case _ Foo _ =>
       }
     }
-    """, ("Foo", "ScFunctionDefinition: unapply", "O.Foo"))
+    """,
+                          ("Foo", "ScFunctionDefinition: unapply", "O.Foo"))
   }
 
   def testExplicitUnapplySeq() {
@@ -164,7 +177,8 @@ class DependencyTest extends SimpleTestCase {
         case Foo(1, 2, 3) =>
       }
     }
-    """, ("Foo", "ScFunctionDefinition: unapplySeq", "O.Foo"))
+    """,
+                          ("Foo", "ScFunctionDefinition: unapplySeq", "O.Foo"))
   }
 
   def testFunction() {
@@ -173,7 +187,8 @@ class DependencyTest extends SimpleTestCase {
       def foo() {}
       foo()
     }
-    """, ("foo", "ScFunctionDefinition: foo", "O.foo"))
+    """,
+                          ("foo", "ScFunctionDefinition: foo", "O.foo"))
   }
 
   def testValue() {
@@ -181,7 +196,8 @@ class DependencyTest extends SimpleTestCase {
     object O {
       val foo = 1
       foo
-    }""", ("foo", "ReferencePattern: foo", "O.foo"))
+    }""",
+                          ("foo", "ReferencePattern: foo", "O.foo"))
   }
 
   def testVariable() {
@@ -189,7 +205,8 @@ class DependencyTest extends SimpleTestCase {
     object O {
       var foo = 1
       foo
-    }""", ("foo", "ReferencePattern: foo", "O.foo"))
+    }""",
+                          ("foo", "ReferencePattern: foo", "O.foo"))
   }
 
   def testNonStaticMembers() {
@@ -206,7 +223,8 @@ class DependencyTest extends SimpleTestCase {
         moo
       }
     }
-    """, ("A", "PrimaryConstructor", "O.A"))
+    """,
+                          ("A", "PrimaryConstructor", "O.A"))
   }
 
   def testInheritedMemberImport() {

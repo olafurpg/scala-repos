@@ -77,14 +77,12 @@ class RowFormatSpec
   def genCValuesForColumnRefs(refs: List[ColumnRef]): Gen[List[CValue]] =
     Gen.sequence[List, List[CValue]](groupConsecutive(refs)(_.selector) map {
       case refs =>
-        Gen.choose(0, refs.size - 1) flatMap {
-          i =>
-            Gen.sequence[List, CValue](refs.zipWithIndex map {
-              case (ColumnRef(_, cType), `i`) =>
-                Gen.frequency(5 -> genCValue(cType),
-                              1 -> Gen.value(CUndefined))
-              case (_, _) => Gen.value(CUndefined)
-            })
+        Gen.choose(0, refs.size - 1) flatMap { i =>
+          Gen.sequence[List, CValue](refs.zipWithIndex map {
+            case (ColumnRef(_, cType), `i`) =>
+              Gen.frequency(5 -> genCValue(cType), 1 -> Gen.value(CUndefined))
+            case (_, _) => Gen.value(CUndefined)
+          })
         }
     }) map (_.flatten)
 

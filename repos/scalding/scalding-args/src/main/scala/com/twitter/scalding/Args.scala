@@ -179,7 +179,8 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
   def int(key: String, default: Int): Int = {
     optional(key)
       .map(value =>
-            try value.toInt catch {
+            try value.toInt
+            catch {
           case NonFatal(_) =>
             throw ArgsException(s"Invalid value ${value} for -- ${key}")
       })
@@ -188,7 +189,8 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
 
   def int(key: String): Int = {
     val value = required(key)
-    try value.toInt catch {
+    try value.toInt
+    catch {
       case NonFatal(_) =>
         throw ArgsException(s"Invalid value ${value} for -- ${key}")
     }
@@ -197,7 +199,8 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
   def long(key: String, default: Long): Long = {
     optional(key)
       .map(value =>
-            try value.toLong catch {
+            try value.toLong
+            catch {
           case NonFatal(_) =>
             throw ArgsException(s"Invalid value ${value} for -- ${key}")
       })
@@ -206,7 +209,8 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
 
   def long(key: String): Long = {
     val value = required(key)
-    try value.toLong catch {
+    try value.toLong
+    catch {
       case NonFatal(_) =>
         throw ArgsException(s"Invalid value ${value} for -- ${key}")
     }
@@ -215,7 +219,8 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
   def float(key: String, default: Float): Float = {
     optional(key)
       .map(value =>
-            try value.toFloat catch {
+            try value.toFloat
+            catch {
           case NonFatal(_) =>
             throw ArgsException(s"Invalid value ${value} for -- ${key}")
       })
@@ -224,7 +229,8 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
 
   def float(key: String): Float = {
     val value = required(key)
-    try value.toFloat catch {
+    try value.toFloat
+    catch {
       case NonFatal(_) =>
         throw ArgsException(s"Invalid value ${value} for -- ${key}")
     }
@@ -233,7 +239,8 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
   def double(key: String, default: Double): Double = {
     optional(key)
       .map(value =>
-            try value.toDouble catch {
+            try value.toDouble
+            catch {
           case NonFatal(_) =>
             throw ArgsException(s"Invalid value ${value} for -- ${key}")
       })
@@ -242,7 +249,8 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
 
   def double(key: String): Double = {
     val value = required(key)
-    try value.toDouble catch {
+    try value.toDouble
+    catch {
       case NonFatal(_) =>
         throw ArgsException(s"Invalid value ${value} for -- ${key}")
     }

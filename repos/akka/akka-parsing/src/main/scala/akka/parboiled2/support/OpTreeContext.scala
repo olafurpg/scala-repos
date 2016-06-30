@@ -140,8 +140,9 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
   }
 
   def OpTree(tree: Tree): OpTree =
-    opTreePF.applyOrElse(tree, (t: Tree) ⇒
-          c.abort(t.pos, "Invalid rule definition: " + t))
+    opTreePF.applyOrElse(
+        tree,
+        (t: Tree) ⇒ c.abort(t.pos, "Invalid rule definition: " + t))
 
   def Sequence(lhs: OpTree, rhs: OpTree): Sequence =
     lhs -> rhs match {

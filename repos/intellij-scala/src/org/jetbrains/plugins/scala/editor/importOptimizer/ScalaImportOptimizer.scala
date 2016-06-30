@@ -826,8 +826,9 @@ object ScalaImportOptimizer {
     collectUsedImportedNamesSorted(holder).map(_._1).toSet
   }
 
-  def createInfo(imp: ScImportStmt, isImportUsed: ImportUsed => Boolean = _ =>
-        true): Seq[ImportInfo] =
+  def createInfo(
+      imp: ScImportStmt,
+      isImportUsed: ImportUsed => Boolean = _ => true): Seq[ImportInfo] =
     imp.importExprs.flatMap(ImportInfo(_, isImportUsed))
 
   private def allElementsIn(

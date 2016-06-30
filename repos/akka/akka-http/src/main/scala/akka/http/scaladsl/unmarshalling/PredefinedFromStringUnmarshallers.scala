@@ -65,7 +65,8 @@ trait PredefinedFromStringUnmarshallers {
   private def numberUnmarshaller[T](f: String ⇒ T,
                                     target: String): Unmarshaller[String, T] =
     Unmarshaller.strict[String, T] { string ⇒
-      try f(string) catch numberFormatError(string, target)
+      try f(string)
+      catch numberFormatError(string, target)
     }
 
   private def numberFormatError(

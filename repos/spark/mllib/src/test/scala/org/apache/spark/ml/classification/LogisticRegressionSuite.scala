@@ -834,16 +834,18 @@ class LogisticRegressionSuite
 
     val histogram = binaryDataset.rdd.map {
       case Row(label: Double, features: Vector) => label
-    }.treeAggregate(new MultiClassSummarizer)(seqOp = (c, v) =>
+    }.treeAggregate(new MultiClassSummarizer)(
+          seqOp = (c, v) =>
             (c, v) match {
-          case (classSummarizer: MultiClassSummarizer, label: Double) =>
-            classSummarizer.add(label)
-      }, combOp = (c1, c2) =>
+              case (classSummarizer: MultiClassSummarizer, label: Double) =>
+                classSummarizer.add(label)
+          },
+          combOp = (c1, c2) =>
             (c1, c2) match {
-          case (classSummarizer1: MultiClassSummarizer,
-                classSummarizer2: MultiClassSummarizer) =>
-            classSummarizer1.merge(classSummarizer2)
-      })
+              case (classSummarizer1: MultiClassSummarizer,
+                    classSummarizer2: MultiClassSummarizer) =>
+                classSummarizer1.merge(classSummarizer2)
+          })
       .histogram
 
     /*

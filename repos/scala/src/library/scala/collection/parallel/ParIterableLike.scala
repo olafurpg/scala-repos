@@ -523,11 +523,12 @@ trait ParIterableLike[
 
   def map[S, That](f: T => S)(implicit bf: CanBuildFrom[Repr, S, That]): That =
     if (bf(repr).isCombiner) {
-      tasksupport
-        .executeAndWaitResult(new Map[S, That](f, combinerFactory(() =>
-                      bf(repr).asCombiner), splitter) mapResult {
-          _.resultWithTaskSupport
-        })
+      tasksupport.executeAndWaitResult(
+          new Map[S, That](f,
+                           combinerFactory(() => bf(repr).asCombiner),
+                           splitter) mapResult {
+        _.resultWithTaskSupport
+      })
     } else setTaskSupport(seq.map(f)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
     tasksupport.executeAndWaitResult(new Map[S, That](f, pbf, splitter) mapResult { _.result })
@@ -536,11 +537,12 @@ trait ParIterableLike[
   def collect[S, That](pf: PartialFunction[T, S])(
       implicit bf: CanBuildFrom[Repr, S, That]): That =
     if (bf(repr).isCombiner) {
-      tasksupport
-        .executeAndWaitResult(new Collect[S, That](pf, combinerFactory(() =>
-                      bf(repr).asCombiner), splitter) mapResult {
-          _.resultWithTaskSupport
-        })
+      tasksupport.executeAndWaitResult(
+          new Collect[S, That](pf,
+                               combinerFactory(() => bf(repr).asCombiner),
+                               splitter) mapResult {
+        _.resultWithTaskSupport
+      })
     } else setTaskSupport(seq.collect(pf)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
     tasksupport.executeAndWaitResult(new Collect[S, That](pf, pbf, splitter) mapResult { _.result })
@@ -549,11 +551,12 @@ trait ParIterableLike[
   def flatMap[S, That](f: T => GenTraversableOnce[S])(
       implicit bf: CanBuildFrom[Repr, S, That]): That =
     if (bf(repr).isCombiner) {
-      tasksupport
-        .executeAndWaitResult(new FlatMap[S, That](f, combinerFactory(() =>
-                      bf(repr).asCombiner), splitter) mapResult {
-          _.resultWithTaskSupport
-        })
+      tasksupport.executeAndWaitResult(
+          new FlatMap[S, That](f,
+                               combinerFactory(() => bf(repr).asCombiner),
+                               splitter) mapResult {
+        _.resultWithTaskSupport
+      })
     } else setTaskSupport(seq.flatMap(f)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
     tasksupport.executeAndWaitResult(new FlatMap[S, That](f, pbf, splitter) mapResult { _.result })
@@ -811,9 +814,13 @@ trait ParIterableLike[
           tasksupport.executeAndWaitResult(
               new CreateScanTree(0, size, z, op, splitter) mapResult { tree =>
             tasksupport.executeAndWaitResult(
-                new FromScanTree(tree, z, op, combinerFactory(() =>
-                          bf(repr).asCombiner)) mapResult { cb =>
-              cb.resultWithTaskSupport
+                new FromScanTree(
+                    tree,
+                    z,
+                    op,
+                    combinerFactory(() => bf(repr).asCombiner)) mapResult {
+              cb =>
+                cb.resultWithTaskSupport
             })
           })
         else setTaskSupport((bf(repr) += z).result(), tasksupport)

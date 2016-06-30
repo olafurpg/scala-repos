@@ -16,8 +16,9 @@ class MyClassPickler[A](implicit val format: PickleFormat,
 
   override def pickle(picklee: MyClass[A], builder: PBuilder) = {
     builder.beginEntry(picklee, tag)
-    builder.putField("myString", b =>
-          b.beginEntry(picklee.myString, FastTypeTag.String).endEntry())
+    builder.putField(
+        "myString",
+        b => b.beginEntry(picklee.myString, FastTypeTag.String).endEntry())
     builder.putField("a", b => {
       aPickler.pickle(picklee.a, b)
     })

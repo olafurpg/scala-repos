@@ -35,7 +35,8 @@ object ProdServerStartSpec extends Specification {
       extends Exception(s"Exit with $message, $returnCode", cause.orNull)
 
   def exitResult[A](f: => A): Either[(String, Option[String]), A] =
-    try Right(f) catch {
+    try Right(f)
+    catch {
       case ExitException(message, cause, _) =>
         val causeMessage: Option[String] =
           cause.flatMap(c => Option(c.getMessage))

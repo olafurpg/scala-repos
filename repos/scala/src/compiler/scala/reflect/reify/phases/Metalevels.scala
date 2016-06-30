@@ -107,7 +107,8 @@ trait Metalevels { self: Reifier =>
     def withinSplice[T](op: => T) = {
       val old = insideSplice
       insideSplice = true
-      try op finally insideSplice = old
+      try op
+      finally insideSplice = old
     }
 
     // Q: here we deal with all sorts of reified trees. what about ReifiedType(_, _, _, _, _, _)?

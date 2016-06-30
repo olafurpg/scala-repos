@@ -164,13 +164,11 @@ trait PullRequestsControllerBase extends ControllerBase {
                     hasWritePermission(pullreq.requestUserName,
                                        pullreq.requestRepositoryName,
                                        context.loginAccount) &&
-                      context.loginAccount.map {
-                        u =>
-                          !getProtectedBranchInfo(
-                              pullreq.requestUserName,
-                              pullreq.requestRepositoryName,
-                              pullreq.requestBranch).needStatusCheck(
-                              u.userName)
+                      context.loginAccount.map { u =>
+                        !getProtectedBranchInfo(
+                            pullreq.requestUserName,
+                            pullreq.requestRepositoryName,
+                            pullreq.requestBranch).needStatusCheck(u.userName)
                       }.getOrElse(false),
                   hasMergePermission = hasMergePermission,
                   commitIdTo = pullreq.commitIdTo)
@@ -215,121 +213,118 @@ trait PullRequestsControllerBase extends ControllerBase {
       } getOrElse NotFound
   })
 
-  post("/:owner/:repository/pull/:id/update_branch")(referrersOnly {
-    baseRepository =>
-      (for {
-        issueId <- params("id").toIntOpt
-        loginAccount <- context.loginAccount
-        (issue, pullreq) <- getPullRequest(baseRepository.owner,
-                                           baseRepository.name,
-                                           issueId)
-        owner = pullreq.requestUserName
-        name = pullreq.requestRepositoryName
-        if hasWritePermission(owner, name, context.loginAccount)
-      } yield {
-        val branchProtection =
-          getProtectedBranchInfo(owner, name, pullreq.requestBranch)
-        if (branchProtection.needStatusCheck(loginAccount.userName)) {
-          flash +=
-          "error" -> s"branch ${pullreq.requestBranch} is protected need status check."
-        } else {
-          val repository = getRepository(owner, name).get
-          LockUtil.lock(s"${owner}/${name}") {
-            val alias =
-              if (pullreq.repositoryName == pullreq.requestRepositoryName &&
-                  pullreq.userName == pullreq.requestUserName) {
-                pullreq.branch
-              } else {
-                s"${pullreq.userName}:${pullreq.branch}"
-              }
-            val existIds =
-              using(Git.open(Directory.getRepositoryDir(owner, name))) { git =>
-                JGitUtil.getAllCommitIds(git)
-              }.toSet
-            pullRemote(
-                owner,
-                name,
-                pullreq.requestBranch,
-                pullreq.userName,
-                pullreq.repositoryName,
-                pullreq.branch,
-                loginAccount,
-                "Merge branch '${alias}' into ${pullreq.requestBranch}") match {
-              case None => // conflict
-                flash +=
-                  "error" -> s"Can't automatic merging branch '${alias}' into ${pullreq.requestBranch}."
-              case Some(oldId) =>
-                // update pull request
-                updatePullRequests(owner, name, pullreq.requestBranch)
-
-                using(Git.open(Directory.getRepositoryDir(owner, name))) {
-                  git =>
-                    //  after update branch
-
-                    val newCommitId = git.getRepository.resolve(
-                        s"refs/heads/${pullreq.requestBranch}")
-                    val commits = git.log
-                      .addRange(oldId, newCommitId)
-                      .call
-                      .iterator
-                      .asScala
-                      .map(c => new JGitUtil.CommitInfo(c))
-                      .toList
-
-                    commits.foreach { commit =>
-                      if (!existIds.contains(commit.id)) {
-                        createIssueComment(owner, name, commit)
-                      }
-                    }
-
-                    // record activity
-                    recordPushActivity(owner,
-                                       name,
-                                       loginAccount.userName,
-                                       pullreq.branch,
-                                       commits)
-
-                    // close issue by commit message
-                    if (pullreq.requestBranch == repository.repository.defaultBranch) {
-                      commits.map {
-                        commit =>
-                          closeIssuesFromMessage(commit.fullMessage,
-                                                 loginAccount.userName,
-                                                 owner,
-                                                 name)
-                      }
-                    }
-
-                    // call web hook
-                    callPullRequestWebHookByRequestBranch(
-                        "synchronize",
-                        repository,
-                        pullreq.requestBranch,
-                        baseUrl,
-                        loginAccount)
-                    callWebHookOf(owner, name, WebHook.Push) {
-                      for {
-                        ownerAccount <- getAccountByUserName(owner)
-                      } yield {
-                        WebHookService.WebHookPushPayload(
-                            git,
-                            loginAccount,
-                            pullreq.requestBranch,
-                            repository,
-                            commits,
-                            ownerAccount,
-                            oldId = oldId,
-                            newId = newCommitId)
-                      }
-                    }
-                }
-                flash +=
-                "info" -> s"Merge branch '${alias}' into ${pullreq.requestBranch}"
+  post("/:owner/:repository/pull/:id/update_branch")(
+      referrersOnly { baseRepository =>
+    (for {
+      issueId <- params("id").toIntOpt
+      loginAccount <- context.loginAccount
+      (issue, pullreq) <- getPullRequest(baseRepository.owner,
+                                         baseRepository.name,
+                                         issueId)
+      owner = pullreq.requestUserName
+      name = pullreq.requestRepositoryName
+      if hasWritePermission(owner, name, context.loginAccount)
+    } yield {
+      val branchProtection =
+        getProtectedBranchInfo(owner, name, pullreq.requestBranch)
+      if (branchProtection.needStatusCheck(loginAccount.userName)) {
+        flash +=
+        "error" -> s"branch ${pullreq.requestBranch} is protected need status check."
+      } else {
+        val repository = getRepository(owner, name).get
+        LockUtil.lock(s"${owner}/${name}") {
+          val alias =
+            if (pullreq.repositoryName == pullreq.requestRepositoryName &&
+                pullreq.userName == pullreq.requestUserName) {
+              pullreq.branch
+            } else {
+              s"${pullreq.userName}:${pullreq.branch}"
             }
+          val existIds =
+            using(Git.open(Directory.getRepositoryDir(owner, name))) { git =>
+              JGitUtil.getAllCommitIds(git)
+            }.toSet
+          pullRemote(
+              owner,
+              name,
+              pullreq.requestBranch,
+              pullreq.userName,
+              pullreq.repositoryName,
+              pullreq.branch,
+              loginAccount,
+              "Merge branch '${alias}' into ${pullreq.requestBranch}") match {
+            case None => // conflict
+              flash +=
+                "error" -> s"Can't automatic merging branch '${alias}' into ${pullreq.requestBranch}."
+            case Some(oldId) =>
+              // update pull request
+              updatePullRequests(owner, name, pullreq.requestBranch)
+
+              using(Git.open(Directory.getRepositoryDir(owner, name))) {
+                git =>
+                  //  after update branch
+
+                  val newCommitId = git.getRepository.resolve(
+                      s"refs/heads/${pullreq.requestBranch}")
+                  val commits = git.log
+                    .addRange(oldId, newCommitId)
+                    .call
+                    .iterator
+                    .asScala
+                    .map(c => new JGitUtil.CommitInfo(c))
+                    .toList
+
+                  commits.foreach { commit =>
+                    if (!existIds.contains(commit.id)) {
+                      createIssueComment(owner, name, commit)
+                    }
+                  }
+
+                  // record activity
+                  recordPushActivity(owner,
+                                     name,
+                                     loginAccount.userName,
+                                     pullreq.branch,
+                                     commits)
+
+                  // close issue by commit message
+                  if (pullreq.requestBranch == repository.repository.defaultBranch) {
+                    commits.map { commit =>
+                      closeIssuesFromMessage(commit.fullMessage,
+                                             loginAccount.userName,
+                                             owner,
+                                             name)
+                    }
+                  }
+
+                  // call web hook
+                  callPullRequestWebHookByRequestBranch("synchronize",
+                                                        repository,
+                                                        pullreq.requestBranch,
+                                                        baseUrl,
+                                                        loginAccount)
+                  callWebHookOf(owner, name, WebHook.Push) {
+                    for {
+                      ownerAccount <- getAccountByUserName(owner)
+                    } yield {
+                      WebHookService.WebHookPushPayload(git,
+                                                        loginAccount,
+                                                        pullreq.requestBranch,
+                                                        repository,
+                                                        commits,
+                                                        ownerAccount,
+                                                        oldId = oldId,
+                                                        newId = newCommitId)
+                    }
+                  }
+              }
+              flash +=
+              "info" -> s"Merge branch '${alias}' into ${pullreq.requestBranch}"
           }
-          redirect(s"/${repository.owner}/${repository.name}/pull/${issueId}")
         }
-      }) getOrElse NotFound
+        redirect(s"/${repository.owner}/${repository.name}/pull/${issueId}")
+      }
+    }) getOrElse NotFound
   })
 
   post("/:owner/:repository/pull/:id/merge", mergeForm)(collaboratorsOnly {
@@ -388,12 +383,11 @@ trait PullRequestsControllerBase extends ControllerBase {
                     val defaultBranch =
                       getRepository(owner, name).get.repository.defaultBranch
                     if (pullreq.branch == defaultBranch) {
-                      commits.flatten.foreach {
-                        commit =>
-                          closeIssuesFromMessage(commit.fullMessage,
-                                                 loginAccount.userName,
-                                                 owner,
-                                                 name)
+                      commits.flatten.foreach { commit =>
+                        closeIssuesFromMessage(commit.fullMessage,
+                                               loginAccount.userName,
+                                               owner,
+                                               name)
                       }
                       issue.content match {
                         case Some(content) =>
@@ -498,10 +492,9 @@ trait PullRequestsControllerBase extends ControllerBase {
                                    forkedRepository.repository.originRepositoryName
                                  } else {
                                    // Sibling repository
-                                   getUserRepositories(originOwner).find {
-                                     x =>
-                                       x.repository.originUserName == forkedRepository.repository.originUserName &&
-                                       x.repository.originRepositoryName == forkedRepository.repository.originRepositoryName
+                                   getUserRepositories(originOwner).find { x =>
+                                     x.repository.originUserName == forkedRepository.repository.originUserName &&
+                                     x.repository.originRepositoryName == forkedRepository.repository.originRepositoryName
                                    }.map(_.repository.repositoryName)
                                  };
           originRepository <- getRepository(originOwner, originRepositoryName))
@@ -679,19 +672,14 @@ trait PullRequestsControllerBase extends ControllerBase {
           if (writable) {
             form.labelNames.map { value =>
               val labels = getLabels(owner, name)
-              value
-                .split(",")
-                .foreach { labelName =>
-                  labels
-                    .find(_.labelName == labelName)
-                    .map {
-                      label =>
-                        registerIssueLabel(repository.owner,
-                                           repository.name,
-                                           issueId,
-                                           label.labelId)
-                    }
+              value.split(",").foreach { labelName =>
+                labels.find(_.labelName == labelName).map { label =>
+                  registerIssueLabel(repository.owner,
+                                     repository.name,
+                                     issueId,
+                                     label.labelId)
                 }
+              }
             }
           }
 

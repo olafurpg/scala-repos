@@ -77,8 +77,9 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
         setHandler(out, new OutHandler {
           override def onPull(): Unit =
-            emitMultiple(out, Iterator.empty, () ⇒
-                  emit(out, 42, () ⇒ completeStage()))
+            emitMultiple(out,
+                         Iterator.empty,
+                         () ⇒ emit(out, 42, () ⇒ completeStage()))
         })
       }
   }
@@ -110,9 +111,9 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
         setHandler(shape.in, EagerTerminateInput)
         setHandler(shape.out, EagerTerminateOutput)
         override def preStart(): Unit =
-          readN(shape.in, n)(_ ⇒
-                failStage(new IllegalStateException("Shouldn't happen!")), e ⇒
-                emitMultiple(shape.out, e.iterator, () ⇒ completeStage()))
+          readN(shape.in, n)(
+              _ ⇒ failStage(new IllegalStateException("Shouldn't happen!")),
+              e ⇒ emitMultiple(shape.out, e.iterator, () ⇒ completeStage()))
       }
   }
 

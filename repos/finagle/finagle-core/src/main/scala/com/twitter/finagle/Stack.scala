@@ -474,8 +474,9 @@ object Stack {
     final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]])
     def make(p1: P1, next: T): T
     def toStack(next: Stack[T]): Stack[T] =
-      Node(this, (prms, next) =>
-            Leaf(this, make(prms[P1], next.make(prms))), next)
+      Node(this,
+           (prms, next) => Leaf(this, make(prms[P1], next.make(prms))),
+           next)
   }
 
   /** A module of 2 parameters. */
@@ -484,8 +485,10 @@ object Stack {
       Seq(implicitly[Param[P1]], implicitly[Param[P2]])
     def make(p1: P1, p2: P2, next: T): T
     def toStack(next: Stack[T]) =
-      Node(this, (prms, next) =>
-            Leaf(this, make(prms[P1], prms[P2], next.make(prms))), next)
+      Node(this,
+           (prms,
+            next) => Leaf(this, make(prms[P1], prms[P2], next.make(prms))),
+           next)
   }
 
   /** A module of 3 parameters. */

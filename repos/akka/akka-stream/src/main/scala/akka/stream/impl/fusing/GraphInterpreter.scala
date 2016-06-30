@@ -571,7 +571,8 @@ private[stream] final class GraphInterpreter(
     try {
       while (eventsRemaining > 0 && queueTail != queueHead) {
         val connection = dequeue()
-        try processEvent(connection) catch {
+        try processEvent(connection)
+        catch {
           case NonFatal(e) ⇒
             if (activeStage == null) throw e
             else {
@@ -605,7 +606,8 @@ private[stream] final class GraphInterpreter(
       currentInterpreterHolder(0) = this
       try {
         activeStage = logic
-        try handler(evt) catch {
+        try handler(evt)
+        catch {
           case NonFatal(ex) ⇒ logic.failStage(ex)
         }
         afterStageHasRun(logic)

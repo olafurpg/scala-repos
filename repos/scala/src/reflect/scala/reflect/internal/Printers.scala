@@ -1442,11 +1442,10 @@ trait Printers extends api.Printers { self: SymbolTable =>
       }
     }
 
-    def printProduct(
-        p: Product,
-        preamble: Product => Unit = p => print(p.productPrefix),
-        body: Any => Unit = print(_),
-        postamble: Product => Unit = p => print("")): Unit = {
+    def printProduct(p: Product,
+                     preamble: Product => Unit = p => print(p.productPrefix),
+                     body: Any => Unit = print(_),
+                     postamble: Product => Unit = p => print("")): Unit = {
       preamble(p)
       printIterable(p.productIterator.toList, body = body)
       postamble(p)

@@ -270,14 +270,18 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     def lookupAll(name: Name): Iterator[Symbol] = new Iterator[Symbol] {
       var e = lookupEntry(name)
       def hasNext: Boolean = e ne null
-      def next(): Symbol = try e.sym finally e = lookupNextEntry(e)
+      def next(): Symbol =
+        try e.sym
+        finally e = lookupNextEntry(e)
     }
 
     def lookupAllEntries(name: Name): Iterator[ScopeEntry] =
       new Iterator[ScopeEntry] {
         var e = lookupEntry(name)
         def hasNext: Boolean = e ne null
-        def next(): ScopeEntry = try e finally e = lookupNextEntry(e)
+        def next(): ScopeEntry =
+          try e
+          finally e = lookupNextEntry(e)
       }
 
     def lookupUnshadowedEntries(name: Name): Iterator[ScopeEntry] = {

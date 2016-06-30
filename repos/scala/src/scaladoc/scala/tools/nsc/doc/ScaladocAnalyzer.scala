@@ -176,8 +176,8 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       def parseComment(comment: DocComment) = {
         val nowarnings = settings.nowarn.value
         settings.nowarn.value = true
-        try parseAtSymbol(comment.raw, comment.raw, comment.pos) finally settings.nowarn.value =
-          nowarnings
+        try parseAtSymbol(comment.raw, comment.raw, comment.pos)
+        finally settings.nowarn.value = nowarnings
       }
 
       override def internalLink(sym: Symbol, site: Symbol): Option[LinkTo] =
@@ -214,7 +214,9 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
         reporter.warning(doc.pos, "discarding unmoored doc comment")
     }
 
-    override def flushDoc(): DocComment = (try lastDoc finally lastDoc = null)
+    override def flushDoc(): DocComment =
+      (try lastDoc
+      finally lastDoc = null)
 
     override protected def putCommentChar() {
       if (inDocComment) docBuffer append ch

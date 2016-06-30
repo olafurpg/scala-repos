@@ -40,15 +40,13 @@ private[stream] object Fusing {
      * First perform normalization by descending the module tree and recording
      * information in the BuildStructuralInfo instance.
      */
-    val matValue = try descend(g.module,
-                               Attributes.none,
-                               struct,
-                               struct.newGroup(0),
-                               0) catch {
-      case NonFatal(ex) ⇒
-        if (Debug) struct.dump()
-        throw ex
-    }
+    val matValue =
+      try descend(g.module, Attributes.none, struct, struct.newGroup(0), 0)
+      catch {
+        case NonFatal(ex) ⇒
+          if (Debug) struct.dump()
+          throw ex
+      }
     /*
      * Then create a copy of the original Shape with the new copied ports.
      */

@@ -52,18 +52,26 @@ private[game] object GameDiff {
     d(castleLastMoveTime,
       _.castleLastMoveTime,
       CastleLastMoveTime.castleLastMoveTimeBSONHandler.write)
-    d(moveTimes, _.moveTimes, (x: Vector[Int]) =>
-          ByteArray.ByteArrayBSONHandler.write(BinaryFormat.moveTime write x))
+    d(moveTimes,
+      _.moveTimes,
+      (x: Vector[Int]) =>
+        ByteArray.ByteArrayBSONHandler.write(BinaryFormat.moveTime write x))
     dOpt(positionHashes, _.positionHashes, w.bytesO)
-    dOpt(clock, _.clock, (o: Option[Clock]) =>
-          o map { c =>
-        BSONHandlers.clockBSONWrite(a.createdAt, c)
-    })
-    dOpt(checkCount, _.checkCount, (o: CheckCount) =>
-          o.nonEmpty option { BSONHandlers.checkCountWriter write o })
+    dOpt(clock,
+         _.clock,
+         (o: Option[Clock]) =>
+           o map { c =>
+             BSONHandlers.clockBSONWrite(a.createdAt, c)
+         })
+    dOpt(checkCount,
+         _.checkCount,
+         (o: CheckCount) =>
+           o.nonEmpty option { BSONHandlers.checkCountWriter write o })
     if (a.variant == Crazyhouse)
-      dOpt(crazyData, _.crazyData, (o: Option[Crazyhouse.Data]) =>
-            o map BSONHandlers.crazyhouseDataBSONHandler.write)
+      dOpt(crazyData,
+           _.crazyData,
+           (o: Option[Crazyhouse.Data]) =>
+             o map BSONHandlers.crazyhouseDataBSONHandler.write)
     for (i ← 0 to 1) {
       import Player.BSONFields._
       val name = s"p$i."

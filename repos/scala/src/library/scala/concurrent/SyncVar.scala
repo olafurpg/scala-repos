@@ -72,7 +72,8 @@ class SyncVar[A] {
     * @return value that was held in this container
     */
   def take(): A = synchronized {
-    try get finally unsetVal()
+    try get
+    finally unsetVal()
   }
 
   /** Wait at least `timeout` milliseconds (possibly more) for this `SyncVar`
@@ -84,7 +85,8 @@ class SyncVar[A] {
     *  @throws NoSuchElementException on timeout
     */
   def take(timeout: Long): A = synchronized {
-    try get(timeout).get finally unsetVal()
+    try get(timeout).get
+    finally unsetVal()
   }
 
   // TODO: this method should be private

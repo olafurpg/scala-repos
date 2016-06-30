@@ -504,7 +504,8 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
 
       private val toolBoxLock = new Object
       def apply[T](f: CompilerApi => T): T = toolBoxLock.synchronized {
-        try f(api) catch {
+        try f(api)
+        catch {
           case ex: FatalError =>
             throw ToolBoxError(s"fatal compiler error", ex)
         } finally api.compiler.cleanupCaches()

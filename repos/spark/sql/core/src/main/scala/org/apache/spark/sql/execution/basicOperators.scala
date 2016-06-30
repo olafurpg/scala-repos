@@ -255,7 +255,8 @@ case class Range(start: Long,
       s"$number > $partitionEnd"
     }
 
-    ctx.addNewFunction("initRange", s"""
+    ctx.addNewFunction("initRange",
+                       s"""
         | private void initRange(int idx) {
         |   $BigInt index = $BigInt.valueOf(idx);
         |   $BigInt numSlice = $BigInt.valueOf(${numSlices}L);

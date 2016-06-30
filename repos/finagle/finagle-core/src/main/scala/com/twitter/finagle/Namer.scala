@@ -39,7 +39,8 @@ object Namer {
   import NameTree._
 
   private[finagle] val namerOfKind: (String => Namer) = Memoize { kind =>
-    try Class.forName(kind).newInstance().asInstanceOf[Namer] catch {
+    try Class.forName(kind).newInstance().asInstanceOf[Namer]
+    catch {
       case NonFatal(exc) => FailingNamer(exc)
     }
   }

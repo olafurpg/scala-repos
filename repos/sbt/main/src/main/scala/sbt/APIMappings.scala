@@ -34,7 +34,8 @@ private[sbt] object APIMappings {
   private[this] def parseURL(s: String,
                              forEntry: File,
                              log: Logger): Option[URL] =
-    try Some(new URL(s)) catch {
+    try Some(new URL(s))
+    catch {
       case e: MalformedURLException =>
         log.warn(
             s"Invalid API base URL '$s' for classpath entry '$forEntry': ${e.toString}")

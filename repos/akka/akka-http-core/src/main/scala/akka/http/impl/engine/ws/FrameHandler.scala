@@ -79,9 +79,9 @@ private[http] object FrameHandler {
           implicit ctx: Ctx): SyncDirective = publish(data)
 
       private def publish(part: FrameEvent)(implicit ctx: Ctx): SyncDirective =
-        try publishMessagePart(createMessagePart(
-                part.data,
-                last = finSeen && part.lastPart)) catch {
+        try publishMessagePart(
+            createMessagePart(part.data, last = finSeen && part.lastPart))
+        catch {
           case NonFatal(e) ⇒
             closeWithCode(Protocol.CloseCodes.InconsistentData)
         }

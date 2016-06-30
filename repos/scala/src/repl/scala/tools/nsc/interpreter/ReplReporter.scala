@@ -29,7 +29,8 @@ class ReplReporter(intp: IMain)
   def withoutTruncating[T](body: => T): T = {
     val saved = _truncationOK
     _truncationOK = false
-    try body finally _truncationOK = saved
+    try body
+    finally _truncationOK = saved
   }
 
   override def warning(pos: Position, msg: String): Unit =

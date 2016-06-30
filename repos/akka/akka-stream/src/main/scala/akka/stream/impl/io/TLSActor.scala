@@ -287,14 +287,16 @@ private[akka] class TLSActor(settings: ActorMaterializerSettings,
 
   val flushingOutbound = TransferPhase(outboundHalfClosed) { () ⇒
     if (tracing) log.debug("flushingOutbound")
-    try doWrap() catch { case ex: SSLException ⇒ nextPhase(completedPhase) }
+    try doWrap()
+    catch { case ex: SSLException ⇒ nextPhase(completedPhase) }
   }
 
   val awaitingClose = TransferPhase(
       inputBunch.inputsAvailableFor(TransportIn) && engineInboundOpen) { () ⇒
     if (tracing) log.debug("awaitingClose")
     transportInChoppingBlock.chopInto(transportInBuffer)
-    try doUnwrap(ignoreOutput = true) catch {
+    try doUnwrap(ignoreOutput = true)
+    catch {
       case ex: SSLException ⇒ nextPhase(completedPhase)
     }
   }
@@ -304,7 +306,8 @@ private[akka] class TLSActor(settings: ActorMaterializerSettings,
     val continue = doInbound(isOutboundClosed = true, inbound)
     if (continue && outboundHalfClosed.isReady) {
       if (tracing) log.debug("outboundClosed continue")
-      try doWrap() catch { case ex: SSLException ⇒ nextPhase(completedPhase) }
+      try doWrap()
+      catch { case ex: SSLException ⇒ nextPhase(completedPhase) }
     }
   }
 
@@ -326,7 +329,8 @@ private[akka] class TLSActor(settings: ActorMaterializerSettings,
     if (inputBunch.isDepleted(TransportIn) &&
         transportInChoppingBlock.isEmpty) {
       if (tracing) log.debug("closing inbound")
-      try engine.closeInbound() catch {
+      try engine.closeInbound()
+      catch {
         case ex: SSLException ⇒ outputBunch.enqueue(UserOut, SessionTruncated)
       }
       completeOrFlush()
@@ -374,7 +378,8 @@ private[akka] class TLSActor(settings: ActorMaterializerSettings,
       nextPhase(completedPhase)
     } else if (outbound.isReady) {
       if (userHasData.isReady) userInChoppingBlock.chopInto(userInBuffer)
-      try doWrap() catch {
+      try doWrap()
+      catch {
         case ex: SSLException ⇒
           if (tracing) log.debug(s"SSLException during doWrap: $ex")
           fail(ex, closeTransport = false)

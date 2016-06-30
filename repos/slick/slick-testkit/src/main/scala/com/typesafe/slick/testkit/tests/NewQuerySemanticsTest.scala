@@ -175,13 +175,12 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
         ifCap(rcap.pagingNested) {
           mark("q1b", q1b.result)
             .named("q1b: Explicit join with condition")
-            .map {
-              r1b =>
-                r1b.toSet shouldBe Set(
-                    ("French_Roast", "Mendocino", "Colombian"),
-                    ("French_Roast", "Mendocino", "French_Roast"),
-                    ("French_Roast", "Mendocino", "Colombian_Decaf")
-                )
+            .map { r1b =>
+              r1b.toSet shouldBe Set(
+                  ("French_Roast", "Mendocino", "Colombian"),
+                  ("French_Roast", "Mendocino", "French_Roast"),
+                  ("French_Roast", "Mendocino", "Colombian_Decaf")
+              )
             }
         }
     )

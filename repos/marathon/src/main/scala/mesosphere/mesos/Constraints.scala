@@ -72,8 +72,8 @@ object Constraints {
         case Operator.UNIQUE =>
           tasks.forall(_.agentInfo.host != offer.getHostname)
         case Operator.GROUP_BY =>
-          checkGroupBy(offer.getHostname, (task: Task) =>
-                Some(task.agentInfo.host))
+          checkGroupBy(offer.getHostname,
+                       (task: Task) => Some(task.agentInfo.host))
         case Operator.CLUSTER =>
           // Hostname must match or be empty
           (value.isEmpty || value == offer.getHostname) &&

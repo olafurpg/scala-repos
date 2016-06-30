@@ -208,7 +208,8 @@ private[io] abstract class TcpConnection(val tcp: TcpExt,
                       commander: ActorRef,
                       options: immutable.Traversable[SocketOption]): Unit = {
     // Turn off Nagle's algorithm by default
-    try channel.socket.setTcpNoDelay(true) catch {
+    try channel.socket.setTcpNoDelay(true)
+    catch {
       case e: SocketException ⇒
         // as reported in #16653 some versions of netcat (`nc -z`) doesn't allow setTcpNoDelay
         // continue anyway

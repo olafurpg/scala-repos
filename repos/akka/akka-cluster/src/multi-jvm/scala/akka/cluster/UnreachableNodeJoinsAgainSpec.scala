@@ -175,8 +175,8 @@ abstract class UnreachableNodeJoinsAgainSpec
           system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         Await.ready(system.whenTerminated, 10 seconds)
         // create new ActorSystem with same host:port
-        val freshSystem =
-          ActorSystem(system.name, ConfigFactory.parseString(s"""
+        val freshSystem = ActorSystem(system.name,
+                                      ConfigFactory.parseString(s"""
             akka.remote.netty.tcp {
               hostname = ${victimAddress.host.get}
               port = ${victimAddress.port.get}

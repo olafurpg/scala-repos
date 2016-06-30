@@ -33,12 +33,15 @@ object CollectionsOnListTest extends CollectionsTestBase {
                                                   new CustomComparable(_),
                                                   (x, y) => x.compareTo(y),
                                                   false)
-      test_sort_with_comparator[jl.Integer](factory, _.toInt, (x, y) =>
-            x.compareTo(y))
-      test_sort_with_comparator[jl.Long](factory, _.toLong, (x, y) =>
-            x.compareTo(y))
-      test_sort_with_comparator[jl.Double](factory, _.toDouble, (x, y) =>
-            x.compareTo(y))
+      test_sort_with_comparator[jl.Integer](factory,
+                                            _.toInt,
+                                            (x, y) => x.compareTo(y))
+      test_sort_with_comparator[jl.Long](factory,
+                                         _.toLong,
+                                         (x, y) => x.compareTo(y))
+      test_sort_with_comparator[jl.Double](factory,
+                                           _.toDouble,
+                                           (x, y) => x.compareTo(y))
     }
   }
 

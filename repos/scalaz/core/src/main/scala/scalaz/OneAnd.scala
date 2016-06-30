@@ -202,8 +202,8 @@ private sealed trait OneAndTraverse[F[_]]
       implicit G: Apply[G]) =
     G.applyApplicative
       .traverse(fa.tail)(f andThen \/.left)(F)
-      .fold(ftl => G.apply2(f(fa.head), ftl)(OneAnd.apply), tl =>
-            G.map(f(fa.head))(OneAnd(_, tl)))
+      .fold(ftl => G.apply2(f(fa.head), ftl)(OneAnd.apply),
+            tl => G.map(f(fa.head))(OneAnd(_, tl)))
 
   override def traverseImpl[G[_], A, B](fa: OneAnd[F, A])(f: A => G[B])(
       implicit G: Applicative[G]) =

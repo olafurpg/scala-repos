@@ -702,7 +702,8 @@ private[akka] final class PromiseActorRef private (
         if (updateState(null, Stopped)) ensureCompleted() else stop()
       case p: ActorPath ⇒
         if (updateState(p, StoppedWithPath(p))) {
-          try ensureCompleted() finally provider.unregisterTempActor(p)
+          try ensureCompleted()
+          finally provider.unregisterTempActor(p)
         } else stop()
       case Stopped | _: StoppedWithPath ⇒ // already stopped
       case Registering ⇒
@@ -736,7 +737,8 @@ private[akka] object PromiseActorRef {
               s"""Ask timed out on [$targetName] after [${timeout.duration.toMillis} ms]. Sender[$sender] sent message of type "${a.messageClassName}"."""))
     }
     result.future onComplete { _ ⇒
-      try a.stop() finally f.cancel()
+      try a.stop()
+      finally f.cancel()
     }
     a
   }

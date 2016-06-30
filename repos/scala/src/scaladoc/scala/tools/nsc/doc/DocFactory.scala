@@ -127,7 +127,8 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) {
       docletInstance.generate()
     }
 
-    try generate() catch documentError
+    try generate()
+    catch documentError
   }
 
   private[doc] def docdbg(msg: String) {

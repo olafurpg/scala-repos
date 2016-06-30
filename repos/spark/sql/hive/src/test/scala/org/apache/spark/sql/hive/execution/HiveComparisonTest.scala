@@ -425,7 +425,8 @@ abstract class HiveComparisonTest
                         |
                         |# Resolved query plan:
                         |${originalQuery.analyzed.treeString}
-                     """.stripMargin, e)
+                     """.stripMargin,
+                             e)
                     }
 
                     try {
@@ -446,7 +447,8 @@ abstract class HiveComparisonTest
                         |
                         |# Converted SQL query string:
                         |$convertedSQL
-                     """.stripMargin, e)
+                     """.stripMargin,
+                             e)
                     }
                   }
                 }

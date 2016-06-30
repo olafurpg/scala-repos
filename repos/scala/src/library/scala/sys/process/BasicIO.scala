@@ -52,8 +52,9 @@ object BasicIO {
           else Stream.empty
         case Right(s) => Stream.cons(s, next())
       }
-      new Streamed((s: T) => q put Right(s), code => q put Left(code), () =>
-            next())
+      new Streamed((s: T) => q put Right(s),
+                   code => q put Left(code),
+                   () => next())
     }
   }
 
@@ -148,7 +149,9 @@ object BasicIO {
   private def processOutFully(log: ProcessLogger) = processFully(log out _)
 
   /** Closes a `Closeable` without throwing an exception */
-  def close(c: Closeable) = try c.close() catch { case _: IOException => () }
+  def close(c: Closeable) =
+    try c.close()
+    catch { case _: IOException => () }
 
   /** Returns a function `InputStream => Unit` that appends all data read to the
     * provided `Appendable`. This function can be used to create a
@@ -176,8 +179,8 @@ object BasicIO {
   def processFully(processLine: String => Unit): InputStream => Unit =
     in => {
       val reader = new BufferedReader(new InputStreamReader(in))
-      try processLinesFully(processLine)(reader.readLine) finally reader
-        .close()
+      try processLinesFully(processLine)(reader.readLine)
+      finally reader.close()
     }
 
   /** Calls `processLine` with the result of `readLine` until the latter returns
@@ -188,7 +191,8 @@ object BasicIO {
     def halting = { Thread.currentThread.interrupt(); null }
     def readFully(): Unit =
       if (working) {
-        val line = try readLine() catch {
+        val line = try readLine()
+        catch {
           case _: InterruptedException => halting
           case e: IOException if !working => halting
         }
@@ -235,7 +239,8 @@ object BasicIO {
     * input stream once it's all read.
     */
   def transferFully(in: InputStream, out: OutputStream): Unit =
-    try transferFullyImpl(in, out) catch onIOInterrupt(())
+    try transferFullyImpl(in, out)
+    catch onIOInterrupt(())
 
   private[this] def appendLine(buffer: Appendable): String => Unit =
     line => {

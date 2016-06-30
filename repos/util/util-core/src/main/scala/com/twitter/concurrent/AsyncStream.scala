@@ -401,8 +401,8 @@ sealed abstract class AsyncStream[+A] {
       case FromFuture(fa) =>
         Cons(Future.value(z), () => FromFuture(fa.map(f(z, _))))
       case Cons(fa, more) =>
-        Cons(Future.value(z), () =>
-              Embed(fa.map(a => more().scanLeft(f(z, a))(f))))
+        Cons(Future.value(z),
+             () => Embed(fa.map(a => more().scanLeft(f(z, a))(f))))
     }
 
   /**

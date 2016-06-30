@@ -821,7 +821,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
     getUnit(pos.source) match {
       case None =>
         reloadSources(List(pos.source))
-        try typedTreeAt(pos) finally afterRunRemoveUnitsOf(List(pos.source))
+        try typedTreeAt(pos)
+        finally afterRunRemoveUnitsOf(List(pos.source))
       case Some(unit) =>
         informIDE("typedTreeAt " + pos)
         parseAndEnter(unit)
@@ -1394,7 +1395,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
         }
       case None =>
         debugLog("load unit and type")
-        try reloadSources(List(source)) finally {
+        try reloadSources(List(source))
+        finally {
           waitLoadedTyped(source, response, onSameThread)
           if (!keepLoaded) removeUnitOf(source)
         }

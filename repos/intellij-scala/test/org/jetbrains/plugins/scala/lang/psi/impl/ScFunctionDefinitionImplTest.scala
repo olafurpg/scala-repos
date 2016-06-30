@@ -84,7 +84,8 @@ class ScFunctionDefinitionImplTest extends SimpleTestCase {
         |    case 1234 => f(n - 1)
         |    case _ => 1234
         |  }
-      """.stripMargin, TailRecursion)
+      """.stripMargin,
+                          TailRecursion)
   }
 
   def testGetReturnUsages() {
@@ -97,7 +98,10 @@ class ScFunctionDefinitionImplTest extends SimpleTestCase {
           }
           f[A](n - 1)(body)
         }
-      """, "return Some(body)", "return None", "f[A](n - 1)(body)")
+      """,
+                 "return Some(body)",
+                 "return None",
+                 "f[A](n - 1)(body)")
   }
 
   private def assertUsages(@Language("Scala") code: String,

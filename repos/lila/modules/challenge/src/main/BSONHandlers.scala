@@ -78,8 +78,8 @@ private object BSONHandlers {
       if (r contains "id") Right(RegisteredBSONHandler reads r)
       else Left(AnonymousBSONHandler reads r)
     def writes(w: Writer, c: EitherChallenger) =
-      c.fold(a => AnonymousBSONHandler.writes(w, a), r =>
-            RegisteredBSONHandler.writes(w, r))
+      c.fold(a => AnonymousBSONHandler.writes(w, a),
+             r => RegisteredBSONHandler.writes(w, r))
   }
 
   implicit val ChallengeBSONHandler = Macros.handler[Challenge]

@@ -802,7 +802,8 @@ class SigarMetricsCollector(address: Address,
   // This will by design throw exception if sigar isn't usable
   val pid: Long = createMethodFrom(sigar, "getPid") match {
     case Some(method) ⇒
-      try method.invoke(sigar).asInstanceOf[Long] catch {
+      try method.invoke(sigar).asInstanceOf[Long]
+      catch {
         case e: InvocationTargetException
             if e.getCause.isInstanceOf[LinkageError] ⇒
           // native libraries not in place

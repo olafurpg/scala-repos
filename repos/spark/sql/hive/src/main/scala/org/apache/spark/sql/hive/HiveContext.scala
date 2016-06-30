@@ -122,9 +122,9 @@ class HiveContext private[hive] (
 
   // The Hive UDF current_database() is foldable, will be evaluated by optimizer,
   // but the optimizer can't access the SessionState of metadataHive.
-  sessionState.functionRegistry
-    .registerFunction("current_database", (e: Seq[Expression]) =>
-          new CurrentDatabase(self))
+  sessionState.functionRegistry.registerFunction(
+      "current_database",
+      (e: Seq[Expression]) => new CurrentDatabase(self))
 
   /**
     * When true, enables an experimental feature where metastore tables that use the parquet SerDe

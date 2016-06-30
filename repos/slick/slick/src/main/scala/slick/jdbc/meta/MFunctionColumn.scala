@@ -30,7 +30,8 @@ object MFunctionColumn {
       try s.metaData.getFunctionColumns(functionPattern.catalog_?,
                                         functionPattern.schema_?,
                                         functionPattern.name,
-                                        columnNamePattern) catch {
+                                        columnNamePattern)
+      catch {
         case _: AbstractMethodError => null
       }
     } { r =>

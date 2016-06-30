@@ -42,7 +42,8 @@ class FastFuture[A](val future: Future[A]) extends AnyVal {
   def transformWith[B](s: A ⇒ Future[B], f: Throwable ⇒ Future[B])(
       implicit executor: ExecutionContext): Future[B] = {
     def strictTransform[T](x: T, f: T ⇒ Future[B]) =
-      try f(x) catch { case NonFatal(e) ⇒ ErrorFuture(e) }
+      try f(x)
+      catch { case NonFatal(e) ⇒ ErrorFuture(e) }
 
     future match {
       case FulfilledFuture(a) ⇒ strictTransform(a, s)
@@ -64,13 +65,14 @@ class FastFuture[A](val future: Future[A]) extends AnyVal {
 
   def recover[B >: A](pf: PartialFunction[Throwable, B])(
       implicit ec: ExecutionContext): Future[B] =
-    transformWith(FastFuture.successful, t ⇒
-          if (pf isDefinedAt t) FastFuture.successful(pf(t)) else future)
+    transformWith(
+        FastFuture.successful,
+        t ⇒ if (pf isDefinedAt t) FastFuture.successful(pf(t)) else future)
 
   def recoverWith[B >: A](pf: PartialFunction[Throwable, Future[B]])(
       implicit ec: ExecutionContext): Future[B] =
-    transformWith(FastFuture.successful, t ⇒
-          pf.applyOrElse(t, (_: Throwable) ⇒ future))
+    transformWith(FastFuture.successful,
+                  t ⇒ pf.applyOrElse(t, (_: Throwable) ⇒ future))
 }
 
 object FastFuture {

@@ -72,7 +72,8 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
 
   private[this] val log = Logger.getLogger(getClass.getName)
   private[this] def safeLog(msg: String, level: Level = Level.INFO): Unit =
-    try log.log(level, msg) catch {
+    try log.log(level, msg)
+    catch {
       case _: Throwable =>
     }
 

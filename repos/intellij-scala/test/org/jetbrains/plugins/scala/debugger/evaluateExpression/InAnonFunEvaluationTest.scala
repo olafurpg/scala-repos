@@ -30,7 +30,8 @@ class InAnonFunEvaluationTest_212
 
 abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
 
-  addFileWithBreakpoints("FunctionValue.scala", s"""
+  addFileWithBreakpoints("FunctionValue.scala",
+                         s"""
        |object FunctionValue {
        |  def main(args: Array[String]) {
        |    val a = "a"
@@ -54,7 +55,8 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("PartialFunction.scala", s"""
+  addFileWithBreakpoints("PartialFunction.scala",
+                         s"""
        |object PartialFunction {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -83,7 +85,8 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("FunctionExpr.scala", s"""
+  addFileWithBreakpoints("FunctionExpr.scala",
+                         s"""
        |object FunctionExpr {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -111,7 +114,8 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("ForStmt.scala", s"""
+  addFileWithBreakpoints("ForStmt.scala",
+                         s"""
        |object ForStmt {
        |  val name = "name"
        |  def main(args: Array[String]) {

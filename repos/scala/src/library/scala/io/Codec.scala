@@ -78,7 +78,8 @@ class Codec(val charSet: Charset) {
   }
 
   def wrap(body: => Int): Int =
-    try body catch {
+    try body
+    catch {
       case e: CharacterCodingException => _onCodingException(e)
     }
 }

@@ -298,7 +298,8 @@ class TestkitDocSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       //#put-your-test-code-here
       val probe = TestProbe()
       probe.send(testActor, "hello")
-      try expectMsg("hello") catch {
+      try expectMsg("hello")
+      catch {
         case NonFatal(e) => system.terminate(); throw e
       }
       //#put-your-test-code-here

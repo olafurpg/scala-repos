@@ -46,8 +46,8 @@ final class DataForm(val captcher: akka.actor.ActorSelection,
                               error =
                                 "The username must not start with a number")
       )
-      .verifying("This user already exists", u =>
-            !$count.exists(u.toLowerCase) awaitSeconds 2)
+      .verifying("This user already exists",
+                 u => !$count.exists(u.toLowerCase) awaitSeconds 2)
       .verifying("This username is not acceptable", u => !LameName(u))
 
     val website = Form(

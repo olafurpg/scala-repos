@@ -364,8 +364,9 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
         s.flatMap(e =>
               e match {
             case elem: Elem =>
-              elem.copy(child = toForm(inst, elem.child.flatMap(n =>
-                            toForm(inst, n))))
+              elem.copy(
+                  child =
+                    toForm(inst, elem.child.flatMap(n => toForm(inst, n))))
 
             case x => x
         })

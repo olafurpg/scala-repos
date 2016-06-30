@@ -106,7 +106,8 @@ class IndexService(path: File) {
   }
 
   def commit(): Unit = {
-    try lucene.commit() catch {
+    try lucene.commit()
+    catch {
       case e: FileNotFoundException =>
         // one of those useless exceptions that is either harmless
         // (testing, commits are happening after we're interested) or

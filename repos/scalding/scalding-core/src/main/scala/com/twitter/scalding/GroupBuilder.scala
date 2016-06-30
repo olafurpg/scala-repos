@@ -258,8 +258,11 @@ class GroupBuilder(val groupFields: Fields)
     //Check arity
     conv.assertArityMatches(inFields)
     setter.assertArityMatches(outFields)
-    val b = new BufferOp[Unit, T, X]((), (u: Unit, it: Iterator[T]) =>
-          mapfn(it), outFields, conv, setter)
+    val b = new BufferOp[Unit, T, X]((),
+                                     (u: Unit, it: Iterator[T]) => mapfn(it),
+                                     outFields,
+                                     conv,
+                                     setter)
     every(
         pipe => new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
   }

@@ -543,13 +543,12 @@ class ZkClientTest extends WordSpec with MockitoSugar {
         watch(znode.path)(Future(result.stat))(Future(event))
         Await.ready(znode.exists.watch() onSuccess {
           case ZNode.Watch(r, update) =>
-            r onSuccess {
-              exists =>
-                assert(exists == result)
-                update onSuccess {
-                  case e @ NodeEvent.Deleted(name) => assert(e == event)
-                  case e => fail("Incorrect event: %s".format(e))
-                }
+            r onSuccess { exists =>
+              assert(exists == result)
+              update onSuccess {
+                case e @ NodeEvent.Deleted(name) => assert(e == event)
+                case e => fail("Incorrect event: %s".format(e))
+              }
             }
         })
       }

@@ -97,14 +97,13 @@ private final class Streaming(system: ActorSystem,
                       Nil
                   }
               }
-            (twitch |+| hitbox |+| youtube) map {
-              ss =>
-                StreamsOnAir {
-                  ss.foldLeft(List.empty[StreamOnAir]) {
-                    case (acc, s) if acc.exists(_.id == s.id) => acc
-                    case (acc, s) => acc :+ s
-                  }
+            (twitch |+| hitbox |+| youtube) map { ss =>
+              StreamsOnAir {
+                ss.foldLeft(List.empty[StreamOnAir]) {
+                  case (acc, s) if acc.exists(_.id == s.id) => acc
+                  case (acc, s) => acc :+ s
                 }
+              }
             } pipeTo self
         }
 

@@ -145,8 +145,9 @@ class MutableSettings(val errorFn: String => Unit)
       } else {
         for {
           (p, args) <- StringOps.splitWhere(s, _ == ':', doDropIndex = true)
-          rest <- tryToSetIfExists(p, (args split ",").toList, (s: Setting) =>
-                       s.tryToSetColon _)
+          rest <- tryToSetIfExists(p,
+                                   (args split ",").toList,
+                                   (s: Setting) => s.tryToSetColon _)
         } yield rest
       }
 
@@ -633,7 +634,8 @@ class MutableSettings(val errorFn: String => Unit)
     value = default
     override def value_=(str: String) {
       super.value_=(str)
-      try outputDirs.setSingleOutput(str) catch {
+      try outputDirs.setSingleOutput(str)
+      catch {
         case FatalError(msg) => errorFn(msg)
       }
     }

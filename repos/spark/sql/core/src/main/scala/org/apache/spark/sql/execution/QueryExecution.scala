@@ -32,7 +32,8 @@ import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, ReturnAnswer}
 class QueryExecution(val sqlContext: SQLContext, val logical: LogicalPlan) {
 
   def assertAnalyzed(): Unit =
-    try sqlContext.sessionState.analyzer.checkAnalysis(analyzed) catch {
+    try sqlContext.sessionState.analyzer.checkAnalysis(analyzed)
+    catch {
       case e: AnalysisException =>
         val ae = new AnalysisException(e.message,
                                        e.line,
@@ -67,7 +68,8 @@ class QueryExecution(val sqlContext: SQLContext, val logical: LogicalPlan) {
   lazy val toRdd: RDD[InternalRow] = executedPlan.execute()
 
   protected def stringOrError[A](f: => A): String =
-    try f.toString catch { case e: Throwable => e.toString }
+    try f.toString
+    catch { case e: Throwable => e.toString }
 
   def simpleString: String = {
     s"""== Physical Plan ==

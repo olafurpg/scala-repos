@@ -803,7 +803,8 @@ private sealed trait StepIteratee[E, A]
 
   protected[play] final override def pureFoldNoEC[B](
       folder: Step[E, A] => B): Future[B] = {
-    try Future.successful(folder(immediateUnflatten)) catch {
+    try Future.successful(folder(immediateUnflatten))
+    catch {
       case NonFatal(e) => Future.failed(e)
     }
   }

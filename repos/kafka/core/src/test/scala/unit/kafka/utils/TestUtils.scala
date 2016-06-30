@@ -936,17 +936,16 @@ object TestUtils extends Logging {
     var leader: Int = -1
     TestUtils.waitUntilTrue(
         () =>
-          servers.foldLeft(true) {
-            (result, server) =>
-              val partitionStateOpt =
-                server.apis.metadataCache.getPartitionInfo(topic, partition)
-              partitionStateOpt match {
-                case None => false
-                case Some(partitionState) =>
-                  leader =
-                    partitionState.leaderIsrAndControllerEpoch.leaderAndIsr.leader
-                  result && Request.isValidBrokerId(leader)
-              }
+          servers.foldLeft(true) { (result, server) =>
+            val partitionStateOpt =
+              server.apis.metadataCache.getPartitionInfo(topic, partition)
+            partitionStateOpt match {
+              case None => false
+              case Some(partitionState) =>
+                leader =
+                  partitionState.leaderIsrAndControllerEpoch.leaderAndIsr.leader
+                result && Request.isValidBrokerId(leader)
+            }
         },
         "Partition [%s,%d] metadata not propagated after %d ms"
           .format(topic, partition, timeout),
@@ -1224,16 +1223,18 @@ object TestUtils extends Logging {
                      topicAndPartitions.forall(tp =>
                            server.getLogManager().getLog(tp).isEmpty)))
     // ensure that topic is removed from all cleaner offsets
-    TestUtils.waitUntilTrue(() =>
+    TestUtils.waitUntilTrue(
+        () =>
           servers.forall(server =>
                 topicAndPartitions.forall { tp =>
-          val checkpoints = server.getLogManager().logDirs.map { logDir =>
-            new OffsetCheckpoint(new File(logDir, "cleaner-offset-checkpoint"))
-              .read()
-          }
-          checkpoints.forall(checkpointsPerLogDir =>
-                !checkpointsPerLogDir.contains(tp))
-      }), "Cleaner offset for deleted partition should have been removed")
+              val checkpoints = server.getLogManager().logDirs.map { logDir =>
+                new OffsetCheckpoint(
+                    new File(logDir, "cleaner-offset-checkpoint")).read()
+              }
+              checkpoints.forall(checkpointsPerLogDir =>
+                    !checkpointsPerLogDir.contains(tp))
+          }),
+        "Cleaner offset for deleted partition should have been removed")
   }
 
   /**
@@ -1319,7 +1320,8 @@ object TestUtils extends Logging {
       futures.foreach { future =>
         if (future.isCancelled) failWithTimeout()
         else
-          try future.get() catch {
+          try future.get()
+          catch {
             case e: Exception =>
               exceptions += e
           }

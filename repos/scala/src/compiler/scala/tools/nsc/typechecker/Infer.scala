@@ -102,7 +102,8 @@ trait Infer extends Checkable { self: Analyzer =>
         throw new NoInstance("cyclic instantiation")
       case TypeVar(_, constr) =>
         excludedVars += tv
-        try apply(constr.inst) finally excludedVars -= tv
+        try apply(constr.inst)
+        finally excludedVars -= tv
     }
     def apply(tp: Type): Type = tp match {
       case WildcardType | BoundedWildcardType(_) | NoType =>
@@ -113,7 +114,8 @@ trait Infer extends Checkable { self: Analyzer =>
   }
 
   @inline final def falseIfNoInstance(body: => Boolean): Boolean =
-    try body catch { case _: NoInstance => false }
+    try body
+    catch { case _: NoInstance => false }
 
   /** Is type fully defined, i.e. no embedded anytypes or wildcards in it?
     */
@@ -199,7 +201,8 @@ trait Infer extends Checkable { self: Analyzer =>
       // (but it'd be nicer if that weren't so)
       def name = {
         val sym = tree.symbol
-        val nameStr = try sym.toString catch {
+        val nameStr = try sym.toString
+        catch {
           case _: CyclicReference => sym.nameString
         }
         newTermName(s"<error: $nameStr>")
@@ -311,7 +314,8 @@ trait Infer extends Checkable { self: Analyzer =>
               if (sym.isTerm)
                 sym.cookJavaRawInfo()
               else sym // xform java rawtypes into existentials
-            val owntype = (try pre memberType sym1 catch {
+            val owntype = (try pre memberType sym1
+            catch {
               case ex: MalformedType =>
                 malformed(ex, pre memberType underlyingSymbol(sym))
             })
@@ -425,7 +429,9 @@ trait Infer extends Checkable { self: Analyzer =>
                     upper = false,
                     lubDepth(restpe :: pt :: Nil))
 
-      if (conforms) try solve() catch { case _: NoInstance => null } else null
+      if (conforms)
+        try solve()
+        catch { case _: NoInstance => null } else null
     }
 
     /** Overload which allocates fresh type vars.
@@ -479,8 +485,10 @@ trait Infer extends Checkable { self: Analyzer =>
       if (isConservativelyCompatible(
               restpe.instantiateTypeParams(tparams, tvars),
               pt))
-        map2(tparams, tvars)((tparam, tvar) =>
-              try instantiateToBound(tvar, varianceInTypes(formals)(tparam)) catch {
+        map2(tparams, tvars)(
+            (tparam, tvar) =>
+              try instantiateToBound(tvar, varianceInTypes(formals)(tparam))
+              catch {
             case ex: NoInstance => WildcardType
         })
       else tvars map (_ => WildcardType)
@@ -848,8 +856,9 @@ trait Infer extends Checkable { self: Analyzer =>
       val formals =
         formalTypes(mt.paramTypes, argtpes0.length, removeByName = false)
       def missingArgs =
-        missingParams[Type](argtpes0, mt.params, x =>
-              Some(x) collect { case NamedType(n, _) => n })
+        missingParams[Type](argtpes0,
+                            mt.params,
+                            x => Some(x) collect { case NamedType(n, _) => n })
       def argsTupled = tupleIfNecessary(mt.paramTypes, argtpes0)
       def argsPlusDefaults = missingArgs match {
         case (args, _) if args forall (_.hasDefault) =>
@@ -1207,8 +1216,9 @@ trait Infer extends Checkable { self: Analyzer =>
         try {
           val pt = if (pt0.typeSymbol == UnitClass) WildcardType else pt0
           val formals = formalTypes(mt.paramTypes, args.length)
-          val argtpes = tupleIfNecessary(formals, args map (x =>
-                    elimAnonymousClass(x.tpe.deconst)))
+          val argtpes = tupleIfNecessary(
+              formals,
+              args map (x => elimAnonymousClass(x.tpe.deconst)))
           val restpe = fn.tpe.resultType(argtpes)
 
           val AdjustedTypeArgs
@@ -1298,8 +1308,10 @@ trait Infer extends Checkable { self: Analyzer =>
 
       def inferForApproxPt =
         if (isFullyDefined(pt)) {
-          inferFor(pt.instantiateTypeParams(ptparams, ptparams map (x =>
-                        WildcardType))) flatMap { targs =>
+          inferFor(
+              pt.instantiateTypeParams(ptparams,
+                                       ptparams map (x =>
+                                             WildcardType))) flatMap { targs =>
             val ctorTpInst = tree.tpe.instantiateTypeParams(undetparams, targs)
             val resTpInst = skipImplicit(ctorTpInst.finalResultType)
             val ptvars =
@@ -1354,8 +1366,11 @@ trait Infer extends Checkable { self: Analyzer =>
       val tvars1 = tvars map (_.cloneInternal)
       // Note: right now it's not clear that solving is complete, or how it can be made complete!
       // So we should come back to this and investigate.
-      solve(tvars1, tvars1 map (_.origin.typeSymbol), tvars1 map (_ =>
-                Variance.Covariant), upper = false, Depth.AnyDepth)
+      solve(tvars1,
+            tvars1 map (_.origin.typeSymbol),
+            tvars1 map (_ => Variance.Covariant),
+            upper = false,
+            Depth.AnyDepth)
     }
 
     // this is quite nasty: it destructively changes the info of the syms of e.g., method type params

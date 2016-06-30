@@ -527,8 +527,9 @@ object Real extends RealInstances {
                     x * x)
 
   def cosDr(x: Real): Real =
-    powerSeries(accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n - 1))), n =>
-          n, x * x)
+    powerSeries(accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n - 1))),
+                n => n,
+                x * x)
 
   def atanDr(x: Real): Real = {
     val y = x * x + Real(1)

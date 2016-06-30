@@ -163,12 +163,11 @@ private[serverset2] class ServiceDiscoverer(
               // We end up with a Seq[Seq[Entity]] here, b/c cache.get() returns a Seq[Entity]
               // flatten() to fix this (see the comment on ZkNodeDataCache for why we get a Seq[])
               .map(tries => tries.collect { case Return(e) => e }.flatten)
-              .map {
-                seq =>
-                  // if we have *any* results or no-failure, we consider it a success
-                  if (seenFailures && seq.isEmpty)
-                    u() = Activity.Failed(EntryLookupFailureException)
-                  else u() = Activity.Ok(seq)
+              .map { seq =>
+                // if we have *any* results or no-failure, we consider it a success
+                if (seenFailures && seq.isEmpty)
+                  u() = Activity.Failed(EntryLookupFailureException)
+                else u() = Activity.Ok(seq)
               }
               .ensure {
                 if (seenFailures) {

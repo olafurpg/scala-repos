@@ -341,7 +341,8 @@ private[remote] class ReliableDeliverySupervisor(
     case ack: Ack ⇒
       // If we are not sure about the UID just ignore the ack. Ignoring is fine.
       if (uidConfirmed) {
-        try resendBuffer = resendBuffer.acknowledge(ack) catch {
+        try resendBuffer = resendBuffer.acknowledge(ack)
+        catch {
           case NonFatal(e) ⇒
             throw new HopelessAssociation(
                 localAddress,
@@ -551,7 +552,8 @@ private[remote] abstract class EndpointActor(val localAddress: Address,
     tryPublish(DisassociatedEvent(localAddress, remoteAddress, inbound))
 
   private def tryPublish(ev: AssociationEvent): Unit =
-    try eventPublisher.notifyListeners(ev) catch {
+    try eventPublisher.notifyListeners(ev)
+    catch {
       case NonFatal(e) ⇒
         log.error(e, "Unable to publish error event to EventStream.")
     }

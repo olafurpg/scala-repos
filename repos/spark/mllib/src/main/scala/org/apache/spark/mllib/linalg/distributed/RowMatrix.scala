@@ -443,10 +443,9 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     */
   @Since("1.0.0")
   def computeColumnSummaryStatistics(): MultivariateStatisticalSummary = {
-    val summary = rows
-      .treeAggregate(new MultivariateOnlineSummarizer)((aggregator, data) =>
-            aggregator.add(data), (aggregator1, aggregator2) =>
-            aggregator1.merge(aggregator2))
+    val summary = rows.treeAggregate(new MultivariateOnlineSummarizer)(
+        (aggregator, data) => aggregator.add(data),
+        (aggregator1, aggregator2) => aggregator1.merge(aggregator2))
     updateNumRows(summary.count)
     summary
   }

@@ -255,13 +255,14 @@ abstract class AbstractFetcherThread(name: String,
 
   def removePartitions(topicAndPartitions: Set[TopicAndPartition]) {
     partitionMapLock.lockInterruptibly()
-    try topicAndPartitions
-      .foreach(partitionMap.remove) finally partitionMapLock.unlock()
+    try topicAndPartitions.foreach(partitionMap.remove)
+    finally partitionMapLock.unlock()
   }
 
   def partitionCount() = {
     partitionMapLock.lockInterruptibly()
-    try partitionMap.size finally partitionMapLock.unlock()
+    try partitionMap.size
+    finally partitionMapLock.unlock()
   }
 }
 

@@ -21,12 +21,14 @@ trait FutureTimeoutSupport {
   def after[T](duration: FiniteDuration, using: Scheduler)(value: ⇒ Future[T])(
       implicit ec: ExecutionContext): Future[T] =
     if (duration.isFinite() && duration.length < 1) {
-      try value catch { case NonFatal(t) ⇒ Future.failed(t) }
+      try value
+      catch { case NonFatal(t) ⇒ Future.failed(t) }
     } else {
       val p = Promise[T]()
       using.scheduleOnce(duration) {
         p completeWith {
-          try value catch { case NonFatal(t) ⇒ Future.failed(t) }
+          try value
+          catch { case NonFatal(t) ⇒ Future.failed(t) }
         }
       }
       p.future
@@ -40,7 +42,8 @@ trait FutureTimeoutSupport {
       value: ⇒ CompletionStage[T])(
       implicit ec: ExecutionContext): CompletionStage[T] =
     if (duration.isFinite() && duration.length < 1) {
-      try value catch { case NonFatal(t) ⇒ Futures.failedCompletionStage(t) }
+      try value
+      catch { case NonFatal(t) ⇒ Futures.failedCompletionStage(t) }
     } else {
       val p = new CompletableFuture[T]
       using.scheduleOnce(duration) {

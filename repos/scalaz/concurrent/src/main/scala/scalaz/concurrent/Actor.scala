@@ -48,7 +48,8 @@ final case class Actor[A](
 
   @annotation.tailrec
   private def act(n: Node[A], i: Int = 1024): Unit = {
-    try handler(n.a) catch {
+    try handler(n.a)
+    catch {
       case ex: Throwable => onError(ex)
     }
     val n2 = n.get

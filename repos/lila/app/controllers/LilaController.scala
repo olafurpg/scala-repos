@@ -41,8 +41,8 @@ private[controllers] trait LilaController
 
   protected implicit def LilaFunitToResult(funit: Funit)(
       implicit ctx: Context): Fu[Result] =
-    negotiate(html = fuccess(Ok("ok")), api = _ =>
-          fuccess(Ok(Json.obj("ok" -> true)) as JSON))
+    negotiate(html = fuccess(Ok("ok")),
+              api = _ => fuccess(Ok(Json.obj("ok" -> true)) as JSON))
 
   implicit def lang(implicit req: RequestHeader) = Env.i18n.pool lang req
 
@@ -241,8 +241,8 @@ private[controllers] trait LilaController
 
   protected def FormResult[A](form: Form[A])(op: A => Fu[Result])(
       implicit req: Request[_]): Fu[Result] =
-    form.bindFromRequest.fold(form =>
-          fuccess(BadRequest(form.errors mkString "\n")), op)
+    form.bindFromRequest
+      .fold(form => fuccess(BadRequest(form.errors mkString "\n")), op)
 
   protected def FormFuResult[A, B: Writeable: ContentTypeOf](form: Form[A])(
       err: Form[A] => Fu[B])(op: A => Fu[Result])(implicit req: Request[_]) =

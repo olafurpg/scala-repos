@@ -14,7 +14,8 @@ object Test extends App {
       List(list),
       Apply(Select(Ident(definitions.PredefModule), TermName("println")),
             List(Ident(list.name))))
-  try cm.mkToolBox().eval(tree) catch {
+  try cm.mkToolBox().eval(tree)
+  catch {
     case ex: Throwable => println(ex.getMessage)
   }
 }

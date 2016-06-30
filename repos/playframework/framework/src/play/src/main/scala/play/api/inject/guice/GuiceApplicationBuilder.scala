@@ -238,8 +238,8 @@ private class FakeRoutes(injected: PartialFunction[(String, String), Handler],
       override def applyOrElse[A <: RequestHeader, B >: Handler](
           rh: A,
           default: A => B) =
-        injected.applyOrElse((rh.method, rh.path), (_: (String, String)) =>
-              default(rh))
+        injected.applyOrElse((rh.method, rh.path),
+                             (_: (String, String)) => default(rh))
       def isDefinedAt(rh: RequestHeader) =
         injected.isDefinedAt((rh.method, rh.path))
     } orElse new AbstractPartialFunction[RequestHeader, Handler] {

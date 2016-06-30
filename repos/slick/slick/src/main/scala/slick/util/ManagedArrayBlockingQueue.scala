@@ -265,11 +265,13 @@ abstract class ManagedArrayBlockingQueue[E >: Null <: AnyRef](capacity: Int,
 
   @inline private[this] def locked[T](f: => T) = {
     lock.lock
-    try f finally lock.unlock
+    try f
+    finally lock.unlock
   }
 
   @inline private[this] def lockedInterruptibly[T](f: => T) = {
     lock.lockInterruptibly
-    try f finally lock.unlock
+    try f
+    finally lock.unlock
   }
 }

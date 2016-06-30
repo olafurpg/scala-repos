@@ -105,8 +105,8 @@ package Generic1TestsAux {
           icc.pack(
               icc
                 .unpack(fa)
-                .fold(hd => Left(icc.fh.map(hd)(f)), tl =>
-                      Right(icc.ft.map(tl)(f))))
+                .fold(hd => Left(icc.fh.map(hd)(f)),
+                      tl => Right(icc.ft.map(tl)(f))))
       }
 
     implicit def generic[F[_]](

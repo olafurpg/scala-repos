@@ -2408,7 +2408,8 @@ trait Typers
       }
       def resultType = meth.tpe_*.finalResultType
       def nthParamPos(n1: Int, n2: Int) =
-        try ddef.vparamss(n1)(n2).pos catch {
+        try ddef.vparamss(n1)(n2).pos
+        catch {
           case _: IndexOutOfBoundsException => meth.pos
         }
 
@@ -3327,8 +3328,8 @@ trait Typers
       val (argpts, respt) = ptNorm baseType FunctionSymbol match {
         case TypeRef(_, FunctionSymbol, args :+ res) => (args, res)
         case _ =>
-          (fun.vparams map (_ =>
-                    if (pt == ErrorType) ErrorType else NoType), WildcardType)
+          (fun.vparams map (_ => if (pt == ErrorType) ErrorType else NoType),
+           WildcardType)
       }
 
       if (!FunctionSymbol.exists) MaxFunctionArityError(fun)
@@ -4045,8 +4046,8 @@ trait Typers
                   // returns those undetparams which have not been instantiated.
                   val undetparams =
                     inferMethodInstance(fun, tparams, args1, pt)
-                  try doTypedApply(tree, fun, args1, mode, pt) finally context.undetparams =
-                    undetparams
+                  try doTypedApply(tree, fun, args1, mode, pt)
+                  finally context.undetparams = undetparams
                 }
               }
               handlePolymorphicCall
@@ -4316,7 +4317,8 @@ trait Typers
               if (Statistics.canEnable)
                 Statistics.startTimer(isReferencedNanos)
               else null
-            try !isReferencedFrom(context, sym) finally if (Statistics.canEnable)
+            try !isReferencedFrom(context, sym)
+            finally if (Statistics.canEnable)
               Statistics.stopTimer(isReferencedNanos, start)
           })
 
@@ -6181,7 +6183,8 @@ trait Typers
         else null
       if (Statistics.canEnable)
         Statistics.incCounter(visitsByType, tree.getClass)
-      try body finally if (Statistics.canEnable)
+      try body
+      finally if (Statistics.canEnable)
         Statistics.popTimer(byTypeStack, startByType)
     }
 
@@ -6231,7 +6234,8 @@ trait Typers
         result
       }
 
-      try runTyper() catch {
+      try runTyper()
+      catch {
         case ex: TypeError =>
           tree.clearType()
           // The only problematic case are (recoverable) cyclic reference errors which can pop up almost anywhere.

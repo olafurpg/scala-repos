@@ -70,7 +70,8 @@ private[http] abstract class HttpMessageParser[
   }
   final def parseBytes(input: ByteString): Output = {
     @tailrec def run(next: ByteString ⇒ StateResult): StateResult =
-      (try next(input) catch {
+      (try next(input)
+      catch {
         case e: ParsingException ⇒ failMessageStart(e.status, e.info)
         case NotEnoughDataException ⇒
           // we are missing a try/catch{continue} wrapper somewhere
@@ -107,7 +108,8 @@ private[http] abstract class HttpMessageParser[
                                       offset: Int): StateResult = {
     if (offset < input.length)
       setCompletionHandling(CompletionIsMessageStartError)
-    try parseMessage(input, offset) catch {
+    try parseMessage(input, offset)
+    catch {
       case NotEnoughDataException ⇒ continue(input, offset)(startNewMessage)
     }
   }
@@ -389,10 +391,10 @@ private[http] abstract class HttpMessageParser[
                      headers: List[HttpHeader] = Nil,
                      headerCount: Int = 0): StateResult = {
       var errorInfo: ErrorInfo = null
-      val lineEnd =
-        try headerParser.parseHeaderLine(input, lineStart)() catch {
-          case e: ParsingException ⇒ errorInfo = e.info; 0
-        }
+      val lineEnd = try headerParser.parseHeaderLine(input, lineStart)()
+      catch {
+        case e: ParsingException ⇒ errorInfo = e.info; 0
+      }
       if (errorInfo eq null) {
         headerParser.resultHeader match {
           case EmptyHeader ⇒
@@ -472,7 +474,8 @@ private[http] abstract class HttpMessageParser[
         failEntityStream(
             s"HTTP chunk size exceeds the configured limit of $maxChunkSize bytes")
 
-    try parseSize(offset, 0) catch {
+    try parseSize(offset, 0)
+    catch {
       case NotEnoughDataException ⇒
         continue(input, offset)(
             parseChunk(_, _, isLastMessage, totalBytesRead))

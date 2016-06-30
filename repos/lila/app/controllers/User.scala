@@ -208,10 +208,11 @@ object User extends LilaController {
   }
 
   def topWeek = Open { implicit ctx =>
-    negotiate(html = notFound, api = _ =>
-          env.cached.topWeek(true).map { users =>
-        Ok(Json toJson users.map(env.jsonView.lightPerfIsOnline))
-    })
+    negotiate(html = notFound,
+              api = _ =>
+                env.cached.topWeek(true).map { users =>
+                  Ok(Json toJson users.map(env.jsonView.lightPerfIsOnline))
+              })
   }
 
   def mod(username: String) = Secure(_.UserSpy) { implicit ctx => me =>

@@ -166,7 +166,8 @@ class RowEncoderSuite extends SparkFunSuite {
           fail(s"""
                |schema: ${schema.simpleString}
                |input: ${input}
-             """.stripMargin, e)
+             """.stripMargin,
+               e)
       }
     }
   }

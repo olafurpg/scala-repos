@@ -105,7 +105,8 @@ private[io] class UdpListener(val udp: UdpExt,
     }
 
     val buffer = bufferPool.acquire()
-    try innerReceive(BatchReceiveLimit, buffer) finally {
+    try innerReceive(BatchReceiveLimit, buffer)
+    finally {
       bufferPool.release(buffer)
       registration.enableInterest(OP_READ)
     }
@@ -114,7 +115,8 @@ private[io] class UdpListener(val udp: UdpExt,
   override def postStop(): Unit = {
     if (channel.isOpen) {
       log.debug("Closing DatagramChannel after being stopped")
-      try channel.close() catch {
+      try channel.close()
+      catch {
         case NonFatal(e) ⇒ log.debug("Error closing DatagramChannel: {}", e)
       }
     }

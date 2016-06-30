@@ -349,7 +349,8 @@ object TypedActor
     protected def withContext[U](unitOfWork: ⇒ U): U = {
       TypedActor.selfReference set proxyVar.get
       TypedActor.currentContext set context
-      try unitOfWork finally {
+      try unitOfWork
+      finally {
         TypedActor.selfReference set null
         TypedActor.currentContext set null
       }

@@ -268,17 +268,16 @@ object WebSocketClient {
           val broadcast = b.add(Broadcast[WebSocketFrame](2))
           val merge = b.add(Merge[WebSocketFrame](2, eagerComplete = true))
 
-          val handleServerClose = Flow[WebSocketFrame].filter {
-            frame =>
-              if (frame.isInstanceOf[CloseWebSocketFrame] &&
-                  !clientInitiatedClose.get()) {
-                serverInitiatedClose.set(true)
-                true
-              } else {
-                // If we're going to drop it, we need to release it first
-                ReferenceCountUtil.release(frame)
-                false
-              }
+          val handleServerClose = Flow[WebSocketFrame].filter { frame =>
+            if (frame.isInstanceOf[CloseWebSocketFrame] &&
+                !clientInitiatedClose.get()) {
+              serverInitiatedClose.set(true)
+              true
+            } else {
+              // If we're going to drop it, we need to release it first
+              ReferenceCountUtil.release(frame)
+              false
+            }
           }
 
           val handleConnectionTerminated = Flow[WebSocketFrame].transform(() =>

@@ -111,7 +111,8 @@ abstract class UnCurry
     // which hit at this point should not be hard to come by, but the immediate
     // motivation can be seen in continuations-neg/t3718.
     override def transform(tree: Tree): Tree =
-      (try postTransform(mainTransform(tree)) catch {
+      (try postTransform(mainTransform(tree))
+      catch {
         case ex: TypeError =>
           reporter.error(ex.pos, ex.msg)
           debugStack(ex)
@@ -446,7 +447,8 @@ abstract class UnCurry
       @inline def withNeedLift(needLift: Boolean)(f: => Tree): Tree = {
         val saved = needTryLift
         needTryLift = needLift
-        try f finally needTryLift = saved
+        try f
+        finally needTryLift = saved
       }
 
       /* Transform tree `t` to { def f = t; f } where `f` is a fresh name */
@@ -466,7 +468,8 @@ abstract class UnCurry
       def withInConstructorFlag(inConstructorFlag: Long)(f: => Tree): Tree = {
         val saved = this.inConstructorFlag
         this.inConstructorFlag = inConstructorFlag
-        try f finally this.inConstructorFlag = saved
+        try f
+        finally this.inConstructorFlag = saved
       }
 
       val sym = tree.symbol

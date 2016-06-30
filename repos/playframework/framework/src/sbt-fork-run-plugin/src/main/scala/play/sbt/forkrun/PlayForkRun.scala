@@ -165,8 +165,9 @@ object PlayForkRun extends AutoPlugin {
   }
 
   def compileTask = Def.task[CompileResult] {
-    PlayReload.compile(() => PlayInternalKeys.playReload.result.value, () =>
-          PlayInternalKeys.playReloaderClasspath.result.value, () =>
-          Option(streamsManager.value))
+    PlayReload.compile(
+        () => PlayInternalKeys.playReload.result.value,
+        () => PlayInternalKeys.playReloaderClasspath.result.value,
+        () => Option(streamsManager.value))
   }
 }

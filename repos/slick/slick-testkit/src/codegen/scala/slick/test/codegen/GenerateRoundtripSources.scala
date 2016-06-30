@@ -42,8 +42,9 @@ object GenerateRoundtripSources {
       })
     val db = Database
       .forURL(url = url, driver = jdbcDriver, keepAliveConnection = true)
-    val (gen, gen2) = try Await
-      .result(db.run(ddl.create >> (a1 zip a2)), Duration.Inf) finally db.close
+    val (gen, gen2) =
+      try Await.result(db.run(ddl.create >> (a1 zip a2)), Duration.Inf)
+      finally db.close
     val pkg = "slick.test.codegen.roundtrip"
     gen.writeToFile("slick.jdbc.H2Profile", args(0), pkg)
     gen2.writeToFile("slick.jdbc.H2Profile", args(0), pkg + "2")

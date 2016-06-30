@@ -212,7 +212,8 @@ trait ActorPublisher[T] extends Actor {
     case Active | PreSubscriber ⇒
       lifecycleState = Completed
       if (subscriber ne null) // otherwise onComplete will be called when the subscription arrives
-        try tryOnComplete(subscriber) finally subscriber = null
+        try tryOnComplete(subscriber)
+        finally subscriber = null
     case Completed | CompleteThenStop ⇒
       throw new IllegalStateException("onComplete must only be called once")
     case _: ErrorEmitted ⇒
@@ -234,7 +235,8 @@ trait ActorPublisher[T] extends Actor {
     case Active | PreSubscriber ⇒
       lifecycleState = CompleteThenStop
       if (subscriber ne null) // otherwise onComplete will be called when the subscription arrives
-        try tryOnComplete(subscriber) finally context.stop(self)
+        try tryOnComplete(subscriber)
+        finally context.stop(self)
     case _ ⇒ onComplete()
   }
 
@@ -246,7 +248,8 @@ trait ActorPublisher[T] extends Actor {
     case Active | PreSubscriber ⇒
       lifecycleState = ErrorEmitted(cause, stop = false)
       if (subscriber ne null) // otherwise onError will be called when the subscription arrives
-        try tryOnError(subscriber, cause) finally subscriber = null
+        try tryOnError(subscriber, cause)
+        finally subscriber = null
     case _: ErrorEmitted ⇒
       throw new IllegalStateException("onError must only be called once")
     case Completed | CompleteThenStop ⇒
@@ -268,7 +271,8 @@ trait ActorPublisher[T] extends Actor {
     case Active | PreSubscriber ⇒
       lifecycleState = ErrorEmitted(cause, stop = true)
       if (subscriber ne null) // otherwise onError will be called when the subscription arrives
-        try tryOnError(subscriber, cause) finally context.stop(self)
+        try tryOnError(subscriber, cause)
+        finally context.stop(self)
     case _ ⇒ onError(cause)
   }
 
@@ -384,7 +388,8 @@ trait ActorPublisher[T] extends Actor {
   protected[akka] override def aroundPostStop(): Unit = {
     state.remove(self)
     try if (lifecycleState == Active)
-      tryOnComplete(subscriber) finally super.aroundPostStop()
+      tryOnComplete(subscriber)
+    finally super.aroundPostStop()
   }
 }
 

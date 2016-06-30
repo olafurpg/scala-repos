@@ -115,8 +115,9 @@ trait TaskExtra {
   final implicit def joinTasks[S](in: Seq[Task[S]]): JoinTask[S, Seq] =
     new JoinTask[S, Seq] {
       def join: Task[Seq[S]] =
-        Task[Seq[S]](Info(), new Join(in, (s: Seq[Result[S]]) =>
-                  Right(TaskExtra.all(s))))
+        Task[Seq[S]](
+            Info(),
+            new Join(in, (s: Seq[Result[S]]) => Right(TaskExtra.all(s))))
       def reduced(f: (S, S) => S): Task[S] =
         TaskExtra.reduced(in.toIndexedSeq, f)
     }

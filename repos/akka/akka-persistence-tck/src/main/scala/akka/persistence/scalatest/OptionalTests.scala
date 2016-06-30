@@ -19,7 +19,8 @@ trait OptionalTests {
          else "")
     info(msg)
     if (flag.value)
-      try test catch {
+      try test
+      catch {
         case ex: Exception ⇒
           throw new AssertionError(
               "Imlpementation did not pass this spec. " +

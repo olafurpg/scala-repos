@@ -64,8 +64,9 @@ class ShuffleDependencySuite extends SparkFunSuite with LocalSparkContext {
     val rdd = sc
       .parallelize(1 to 5, 4)
       .map(key => (KeyClass(), ValueClass()))
-      .combineByKey((v: ValueClass) => v, (c: AnyRef, v: ValueClass) =>
-            c, (c1: AnyRef, c2: AnyRef) => c1)
+      .combineByKey((v: ValueClass) => v,
+                    (c: AnyRef, v: ValueClass) => c,
+                    (c1: AnyRef, c2: AnyRef) => c1)
     val dep = rdd.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]]
     assert(dep.keyClassName == classOf[KeyClass].getName)
     assert(dep.valueClassName == classOf[ValueClass].getName)

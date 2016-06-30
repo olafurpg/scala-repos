@@ -32,7 +32,8 @@ class TraceInitializationTest extends FunSuite {
     val tracer = new BufferingTracer
 
     val (svc, closable) = f(tracer, tracer)
-    try Await.result(svc(req)) finally {
+    try Await.result(svc(req))
+    finally {
       Closable.all(svc, closable).close()
     }
 

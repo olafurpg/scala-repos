@@ -147,12 +147,15 @@ object ZipperTest extends SpecLite {
       }
   }
 
-  insertionTest("insertRight changes focus and appends to lefts", (z, e) =>
-        z.insertRight(e), leftAndFocusChanged)
-  insertionTest("insert changes focus and appends to lefts", (z, e) =>
-        z.insert(e), leftAndFocusChanged)
-  insertionTest("insertLeft changes focus and appends to lefts", (z, e) =>
-        z.insertLeft(e), rightAndFocusChanged)
+  insertionTest("insertRight changes focus and appends to lefts",
+                (z, e) => z.insertRight(e),
+                leftAndFocusChanged)
+  insertionTest("insert changes focus and appends to lefts",
+                (z, e) => z.insert(e),
+                leftAndFocusChanged)
+  insertionTest("insertLeft changes focus and appends to lefts",
+                (z, e) => z.insertLeft(e),
+                rightAndFocusChanged)
 
   "DeleteRight Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (for (z <- xs.toZipper; zn <- z.deleteRight)

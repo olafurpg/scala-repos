@@ -1386,9 +1386,11 @@ class LiftSession(private[http] val _contextPath: String,
 
   private def instantiateOrRedirect[T](c: Class[T]): Box[T] = {
     try {
-      LiftSession
-        .constructFrom(this, S.location.flatMap(_.currentValue.map(v =>
-                      ParamPair(v, v.asInstanceOf[Object].getClass))), c)
+      LiftSession.constructFrom(
+          this,
+          S.location.flatMap(_.currentValue.map(v =>
+                    ParamPair(v, v.asInstanceOf[Object].getClass))),
+          c)
     } catch {
       case e: IllegalAccessException => Empty
     }
@@ -1759,8 +1761,10 @@ class LiftSession(private[http] val _contextPath: String,
                   if (inst.dispatch.isDefinedAt(method)) {
                     val res = inst.dispatch(method)(kids)
 
-                    inst.mergeIntoForm(isForm, res, SHtml.hidden(() =>
-                              inst.registerThisSnippet))
+                    inst.mergeIntoForm(
+                        isForm,
+                        res,
+                        SHtml.hidden(() => inst.registerThisSnippet))
                     /* (if (isForm && !res.isEmpty) SHtml.hidden(() => inst.registerThisSnippet) else NodeSeq.Empty) ++
                       res*/
                   } else

@@ -249,19 +249,18 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
               } recoverWith {
                 case t: Throwable =>
                   for {
-                    _ <- storedQueryResult.cachingJob.traverse {
-                          jobId =>
-                            jobManager.abort(jobId, t.getMessage) map {
-                              case Right(jobAbortSuccess) =>
-                                ourself ! TaskComplete(
-                                    task.id,
-                                    clock.now(),
-                                    0,
-                                    Option(t.getMessage) orElse Some(
-                                        t.getClass.toString))
-                              case Left(jobAbortFailure) =>
-                                sys.error(jobAbortFailure.toString)
-                            }
+                    _ <- storedQueryResult.cachingJob.traverse { jobId =>
+                          jobManager.abort(jobId, t.getMessage) map {
+                            case Right(jobAbortSuccess) =>
+                              ourself ! TaskComplete(
+                                  task.id,
+                                  clock.now(),
+                                  0,
+                                  Option(t.getMessage) orElse Some(
+                                      t.getClass.toString))
+                            case Left(jobAbortFailure) =>
+                              sys.error(jobAbortFailure.toString)
+                          }
                         }
                   } yield PrecogUnit
               }

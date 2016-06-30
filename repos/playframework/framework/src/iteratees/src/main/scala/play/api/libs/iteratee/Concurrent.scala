@@ -609,8 +609,9 @@ object Concurrent {
     def getPatchCord(): Enumerator[E]
   }
 
-  private def hub[E](e: Enumerator[E], interestIsDownToZero: () => Unit = () =>
-        ())(implicit ec: ExecutionContext): Hub[E] = {
+  private def hub[E](e: Enumerator[E],
+                     interestIsDownToZero: () => Unit = () => ())(
+      implicit ec: ExecutionContext): Hub[E] = {
     val pec = ec.prepare()
 
     import scala.concurrent.stm._

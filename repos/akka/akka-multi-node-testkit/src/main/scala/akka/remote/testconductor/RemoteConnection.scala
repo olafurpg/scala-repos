@@ -122,6 +122,7 @@ private[akka] object RemoteConnection {
   }
 
   def shutdown(channel: Channel) =
-    try channel.close() finally try channel.getFactory
-      .shutdown() finally channel.getFactory.releaseExternalResources()
+    try channel.close()
+    finally try channel.getFactory.shutdown()
+    finally channel.getFactory.releaseExternalResources()
 }

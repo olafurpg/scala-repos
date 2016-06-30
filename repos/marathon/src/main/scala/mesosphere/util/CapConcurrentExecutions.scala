@@ -153,7 +153,8 @@ private[util] class RestrictParallelExecutionsActor(
         active += 1
 
         val future: Future[_] =
-          try metrics.processingTimer.timeFuture(next.func()) catch {
+          try metrics.processingTimer.timeFuture(next.func())
+          catch {
             case NonFatal(e) => Future.failed(e)
           }
 

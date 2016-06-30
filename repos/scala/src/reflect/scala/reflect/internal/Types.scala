@@ -1652,7 +1652,8 @@ trait Types
             defineBaseClassesOfCompoundType(tpe, force = true)
           else {
             baseClassesCycleMonitor push clazz
-            try define() finally baseClassesCycleMonitor pop clazz
+            try define()
+            finally baseClassesCycleMonitor pop clazz
           }
         case _ =>
           define()
@@ -2342,7 +2343,8 @@ trait Types
 
     private def baseTypeOfNonClassTypeRefLogged(clazz: Symbol) =
       if (pendingBaseTypes add this)
-        try relativeInfo.baseType(clazz) finally {
+        try relativeInfo.baseType(clazz)
+        finally {
           pendingBaseTypes remove this
         }
       // TODO: is this optimization for AnyClass worth it? (or is it playing last-ditch cycle defense?)
@@ -4717,7 +4719,8 @@ trait Types
     val saved = tvs map (_.suspended)
     tvs foreach (_.suspended = true)
 
-    try op finally foreach2(tvs, saved)(_.suspended = _)
+    try op
+    finally foreach2(tvs, saved)(_.suspended = _)
   }
 
   /** Compute lub (if `variance == Covariant`) or glb (if `variance == Contravariant`) of given list
@@ -4807,7 +4810,8 @@ trait Types
     case SingleType(_, sym) :: rest =>
       val pres = tps map (_.prefix)
       val pre = if (variance.isPositive) lub(pres, depth) else glb(pres, depth)
-      try singleType(pre, sym) catch { case ex: MalformedType => NoType }
+      try singleType(pre, sym)
+      catch { case ex: MalformedType => NoType }
     case ExistentialType(tparams, quantified) :: rest =>
       mergePrefixAndArgs(quantified :: rest, variance, depth) match {
         case NoType => NoType

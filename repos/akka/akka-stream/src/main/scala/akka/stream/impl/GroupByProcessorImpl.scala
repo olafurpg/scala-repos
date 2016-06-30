@@ -66,7 +66,8 @@ private[akka] class GroupByProcessorImpl(settings: ActorMaterializerSettings,
   }
 
   private def tryKeyFor(elem: Any): Any =
-    try keyFor(elem) catch {
+    try keyFor(elem)
+    catch {
       case NonFatal(e) if decider(e) != Supervision.Stop ⇒
         if (settings.debugLogging)
           log.debug(

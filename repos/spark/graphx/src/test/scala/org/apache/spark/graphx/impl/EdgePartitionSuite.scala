@@ -71,8 +71,8 @@ class EdgePartitionSuite extends SparkFunSuite {
       builder.add(e.srcId, e.dstId, e.attr)
     }
     val edgePartition = builder.toEdgePartition
-    val filtered = edgePartition.filter(et => et.srcId == 0, (vid, attr) =>
-          vid == 0 || vid == 1)
+    val filtered = edgePartition.filter(et => et.srcId == 0,
+                                        (vid, attr) => vid == 0 || vid == 1)
     assert(
         filtered
           .tripletIterator()

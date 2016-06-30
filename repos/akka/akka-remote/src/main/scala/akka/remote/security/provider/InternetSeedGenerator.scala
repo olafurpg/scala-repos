@@ -55,7 +55,8 @@ final class InternetSeedGenerator extends SeedGenerator {
   def generateSeed(length: Int): Array[Byte] =
     InternetSeedGenerator.Generators.view
       .flatMap(g ⇒
-            try Option(g.generateSeed(length)) catch {
+            try Option(g.generateSeed(length))
+            catch {
           case _: SeedException ⇒ None
       })
       .headOption

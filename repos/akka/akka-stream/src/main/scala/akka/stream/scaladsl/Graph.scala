@@ -1006,7 +1006,8 @@ object GraphDSL extends GraphApply {
       def ~>[Out](junction: UniformFanOutShape[T, Out])(
           implicit b: Builder[_]): PortOps[Out] = {
         b.addEdge(importAndGetPort(b), junction.in)
-        try findOut(b, junction, 0) catch {
+        try findOut(b, junction, 0)
+        catch {
           case e: IllegalArgumentException ⇒ new DisabledPortOps(e.getMessage)
         }
       }
@@ -1053,7 +1054,8 @@ object GraphDSL extends GraphApply {
       def <~[In](junction: UniformFanInShape[In, T])(
           implicit b: Builder[_]): ReversePortOps[In] = {
         b.addEdge(junction.out, importAndGetPortReverse(b))
-        try findIn(b, junction, 0) catch {
+        try findIn(b, junction, 0)
+        catch {
           case e: IllegalArgumentException ⇒
             new DisabledReversePortOps(e.getMessage)
         }

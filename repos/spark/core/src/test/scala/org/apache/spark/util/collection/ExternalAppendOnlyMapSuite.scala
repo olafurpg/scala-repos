@@ -379,8 +379,11 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
              (size / 2).toString)
     sc = new SparkContext("local-cluster[1,1,1024]", "test", conf)
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
-    val map = new ExternalAppendOnlyMap[FixedHashObject, Int, Int](_ =>
-          1, _ + _, _ + _, context = context)
+    val map = new ExternalAppendOnlyMap[FixedHashObject, Int, Int](_ => 1,
+                                                                   _ + _,
+                                                                   _ + _,
+                                                                   context =
+                                                                     context)
 
     // Insert 10 copies each of lots of objects whose hash codes are either 0 or 1. This causes
     // problems if the map fails to group together the objects with the same code (SPARK-2043).

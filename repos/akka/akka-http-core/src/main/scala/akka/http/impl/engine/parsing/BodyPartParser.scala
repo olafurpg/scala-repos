@@ -77,7 +77,8 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
 
   override def onPush(input: ByteString, ctx: Context[Output]): SyncDirective =
     if (!terminated) {
-      try state(input) catch {
+      try state(input)
+      catch {
         case e: ParsingException ⇒ fail(e.info)
         case NotEnoughDataException ⇒
           // we are missing a try/catch{continue} wrapper somewhere

@@ -769,8 +769,9 @@ private[spark] object JsonProtocolSuite extends Assertions {
               assert(taskId1 === taskId2)
               assert(stageId1 === stageId2)
               assert(stageAttemptId1 === stageAttemptId2)
-              assertSeqEquals[AccumulableInfo](updates1, updates2, (a, b) =>
-                    a.equals(b))
+              assertSeqEquals[AccumulableInfo](updates1,
+                                               updates2,
+                                               (a, b) => a.equals(b))
             })
       case (e1, e2) =>
         assert(e1 === e2)

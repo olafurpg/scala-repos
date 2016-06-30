@@ -43,9 +43,9 @@ class IteratorInterpreterSpec extends AkkaSpec {
     }
 
     "throw exceptions on empty iterator" in {
-      val itr =
-        new IteratorInterpreter[Int, Int](List(1).iterator, Seq(Map((x: Int) ⇒
-                      x, stoppingDecider))).iterator
+      val itr = new IteratorInterpreter[Int, Int](
+          List(1).iterator,
+          Seq(Map((x: Int) ⇒ x, stoppingDecider))).iterator
 
       itr.next() should be(1)
       a[NoSuchElementException] should be thrownBy { itr.next() }
@@ -88,9 +88,9 @@ class IteratorInterpreterSpec extends AkkaSpec {
     }
 
     "work with an empty iterator" in {
-      val itr =
-        new IteratorInterpreter[Int, Int](Iterator.empty, Seq(Map((x: Int) ⇒
-                      x + 1, stoppingDecider))).iterator
+      val itr = new IteratorInterpreter[Int, Int](
+          Iterator.empty,
+          Seq(Map((x: Int) ⇒ x + 1, stoppingDecider))).iterator
 
       itr.hasNext should be(false)
       a[NoSuchElementException] should be thrownBy { itr.next() }

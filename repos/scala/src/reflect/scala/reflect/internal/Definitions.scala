@@ -912,10 +912,12 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
            else
              pendingVolatiles(sym) || {
                pendingVolatiles += sym
-               try volatileUpperBound finally pendingVolatiles -= sym
+               try volatileUpperBound
+               finally pendingVolatiles -= sym
              })
         volatileRecursions += 1
-        try safeIsVolatile finally volatileRecursions -= 1
+        try safeIsVolatile
+        finally volatileRecursions -= 1
       }
 
       /** A refined type P1 with ... with Pn { decls } is volatile if

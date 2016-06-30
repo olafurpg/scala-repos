@@ -49,7 +49,8 @@ class ForkRun(config: ForkOptions) extends ScalaRun {
       process.destroy()
       1
     }
-    val exitCode = try process.exitValue() catch {
+    val exitCode = try process.exitValue()
+    catch {
       case e: InterruptedException => cancel()
     }
     processExitCode(exitCode, "runner")

@@ -195,9 +195,8 @@ final class BackoffSupervisor(val childProps: Props,
                         oneForOne.withinTimeRange,
                         oneForOne.loggingEnabled) {
         case ex ⇒
-          val defaultDirective: Directive =
-            super.supervisorStrategy.decider.applyOrElse(ex, (_: Any) ⇒
-                  Escalate)
+          val defaultDirective: Directive = super.supervisorStrategy.decider
+            .applyOrElse(ex, (_: Any) ⇒ Escalate)
 
           strategy.decider.applyOrElse(ex, (_: Any) ⇒ defaultDirective)
       }

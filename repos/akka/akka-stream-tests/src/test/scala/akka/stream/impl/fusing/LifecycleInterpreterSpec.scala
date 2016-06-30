@@ -92,8 +92,10 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
     }
 
     "onError when preStart fails with stages after" in new OneBoundedSetup[
-        String](Seq(Map((x: Int) ⇒ x, stoppingDecider), PreStartFailer(() ⇒
-                  throw TE("Boom!")), Map((x: Int) ⇒ x, stoppingDecider))) {
+        String](
+        Seq(Map((x: Int) ⇒ x, stoppingDecider),
+            PreStartFailer(() ⇒ throw TE("Boom!")),
+            Map((x: Int) ⇒ x, stoppingDecider))) {
       lastEvents() should ===(Set(Cancel, OnError(TE("Boom!"))))
     }
 

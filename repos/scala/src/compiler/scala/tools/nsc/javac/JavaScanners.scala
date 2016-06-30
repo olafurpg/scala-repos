@@ -203,7 +203,8 @@ trait JavaScanners extends ast.parser.ScannersCommon {
       case SLASHEQ => "`/='"
       case TILDE => "`~'"
       case _ =>
-        try ("`" + tokenName(token) + "'") catch {
+        try ("`" + tokenName(token) + "'")
+        catch {
           case _: ArrayIndexOutOfBoundsException =>
             "`<" + token + ">'"
           case _: NullPointerException =>

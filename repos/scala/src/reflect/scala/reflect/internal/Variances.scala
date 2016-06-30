@@ -26,7 +26,8 @@ trait Variances { self: SymbolTable =>
     @inline private def withinRefinement(body: => Type): Type = {
       val saved = inRefinement
       inRefinement = true
-      try body finally inRefinement = saved
+      try body
+      finally inRefinement = saved
     }
 
     /** Is every symbol in the owner chain between `site` and the owner of `sym`
@@ -150,7 +151,8 @@ trait Variances { self: SymbolTable =>
       def validateDefinition(base: Symbol) {
         val saved = this.base
         this.base = base
-        try apply(base.info) finally this.base = saved
+        try apply(base.info)
+        finally this.base = saved
       }
     }
 

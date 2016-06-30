@@ -99,7 +99,8 @@ class ExecutorServiceFuturePool protected[this] (val executor: ExecutorService,
         val current = Local.save()
         Local.restore(saved)
 
-        try p.updateIfEmpty(Try(f)) catch {
+        try p.updateIfEmpty(Try(f))
+        catch {
           case nlrc: NonLocalReturnControl[_] =>
             val fnlrc = new FutureNonLocalReturnControl(nlrc)
             p.updateIfEmpty(Throw(fnlrc))
@@ -114,7 +115,8 @@ class ExecutorServiceFuturePool protected[this] (val executor: ExecutorService,
     // This is safe: the only thing that can call task.run() is
     // executor, the only thing that can raise an interrupt is the
     // receiver of this value, which will then be fully initialized.
-    val javaFuture = try executor.submit(task) catch {
+    val javaFuture = try executor.submit(task)
+    catch {
       case e: RejectedExecutionException =>
         runOk.set(false)
         p.setException(e)

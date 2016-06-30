@@ -46,15 +46,14 @@ class QueryDeleteHandler[A](jobManager: JobManager[Future], clock: Clock)(
 
   val service = { (request: HttpRequest[A]) =>
     Success({ (apiKey: APIKey) =>
-      request.parameters get 'jobId map {
-        jobId =>
-          jobManager
-            .cancel(jobId, "User request through HTTP.", clock.now()) map {
-            case Left(error) =>
-              HttpResponse[A](HttpStatus(BadRequest, error))
-            case Right(_) =>
-              HttpResponse[A](Accepted)
-          }
+      request.parameters get 'jobId map { jobId =>
+        jobManager
+          .cancel(jobId, "User request through HTTP.", clock.now()) map {
+          case Left(error) =>
+            HttpResponse[A](HttpStatus(BadRequest, error))
+          case Right(_) =>
+            HttpResponse[A](Accepted)
+        }
       } getOrElse {
         Future(
             HttpResponse[A](

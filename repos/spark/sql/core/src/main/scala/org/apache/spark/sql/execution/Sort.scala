@@ -136,7 +136,8 @@ case class Sort(sortOrder: Seq[SortOrder],
                         "")
 
     val addToSorter = ctx.freshName("addToSorter")
-    ctx.addNewFunction(addToSorter, s"""
+    ctx.addNewFunction(addToSorter,
+                       s"""
         | private void $addToSorter() throws java.io.IOException {
         |   ${child.asInstanceOf[CodegenSupport].produce(ctx, this)}
         | }

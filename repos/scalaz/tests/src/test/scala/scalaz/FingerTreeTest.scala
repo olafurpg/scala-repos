@@ -160,13 +160,15 @@ object FingerTreeTest extends SpecLite {
 
   "viewl works correctly" ! forAll { (tree: SequenceTree[Int]) =>
     val asStream = tree.toStream
-    tree.viewl.fold[Boolean](true, (x, t) =>
-          (x === asStream.head) && (t.toStream === asStream.tail))
+    tree.viewl.fold[Boolean](
+        true,
+        (x, t) => (x === asStream.head) && (t.toStream === asStream.tail))
   }
 
   "viewr works correctly" ! forAll { (tree: SequenceTree[Int]) =>
     val asStream = tree.toStream
-    tree.viewr.fold[Boolean](true, (i, x) =>
-          (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
+    tree.viewr.fold[Boolean](
+        true,
+        (i, x) => (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
   }
 }

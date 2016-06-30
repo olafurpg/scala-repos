@@ -193,7 +193,9 @@ trait PatternTypers { self: Analyzer =>
         (tparam.isTypeParameterOrSkolem && tparam.owner.isTerm &&
               (settings.strictInference || !variance.isInvariant))
 
-      def skolems = try skolemBuffer.toList finally skolemBuffer.clear()
+      def skolems =
+        try skolemBuffer.toList
+        finally skolemBuffer.clear()
       def apply(tp: Type): Type = mapOver(tp) match {
         case tp @ TypeRef(NoPrefix, tpSym, Nil) if eligible(tpSym) =>
           val bounds =

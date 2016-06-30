@@ -85,7 +85,8 @@ trait BytecodeWriters {
       val path = jclassName + ".class"
       val out = writer.newOutputStream(path)
 
-      try out.write(jclassBytes, 0, jclassBytes.length) finally out.flush()
+      try out.write(jclassBytes, 0, jclassBytes.length)
+      finally out.flush()
 
       informProgress("added " + label + path + " to jar")
     }
@@ -143,8 +144,8 @@ trait BytecodeWriters {
           "Precisely this override requires its invoker to hand out a non-null AbstractFile.")
       val outstream = new DataOutputStream(outfile.bufferedOutput)
 
-      try outstream.write(jclassBytes, 0, jclassBytes.length) finally outstream
-        .close()
+      try outstream.write(jclassBytes, 0, jclassBytes.length)
+      finally outstream.close()
       informProgress("wrote '" + label + "' to " + outfile)
     }
   }
@@ -165,8 +166,8 @@ trait BytecodeWriters {
       dumpFile.parent.createDirectory()
       val outstream = new DataOutputStream(new FileOutputStream(dumpFile.path))
 
-      try outstream.write(jclassBytes, 0, jclassBytes.length) finally outstream
-        .close()
+      try outstream.write(jclassBytes, 0, jclassBytes.length)
+      finally outstream.close()
     }
   }
 }

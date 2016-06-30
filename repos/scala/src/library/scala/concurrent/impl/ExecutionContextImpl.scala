@@ -67,7 +67,9 @@ private[concurrent] object ExecutionContextImpl {
       if (reserveThread())
         wire(new Thread(new Runnable {
           // We have to decrement the current thread count when the thread exits
-          override def run() = try runnable.run() finally deregisterThread()
+          override def run() =
+            try runnable.run()
+            finally deregisterThread()
         }))
       else null
 
@@ -104,7 +106,8 @@ private[concurrent] object ExecutionContextImpl {
   def createDefaultExecutorService(
       reporter: Throwable => Unit): ExecutorService = {
     def getInt(name: String, default: String) =
-      (try System.getProperty(name, default) catch {
+      (try System.getProperty(name, default)
+      catch {
         case e: SecurityException => default
       }) match {
         case s if s.charAt(0) == 'x' =>

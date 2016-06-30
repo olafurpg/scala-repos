@@ -23,7 +23,8 @@ trait Reify
 
     @inline final def push[T](reifee: Any)(body: => T): T = {
       currents ::= reifee
-      try body finally currents = currents.tail
+      try body
+      finally currents = currents.tail
     }
   }
   def boundSymbolsInCallstack = flatCollect(reifyStack.currents) {

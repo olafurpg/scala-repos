@@ -82,15 +82,19 @@ object PlayForkProcess {
           log.info(s"Forked Play process exited with status: $x")
       }
       // now join our logging threads (process is supposed to be gone, so nothing to log)
-      try process.getInputStream.close() catch { case _: Exception => }
-      try process.getErrorStream.close() catch { case _: Exception => }
+      try process.getInputStream.close()
+      catch { case _: Exception => }
+      try process.getErrorStream.close()
+      catch { case _: Exception => }
       outputThread.join()
       errorThread.join()
     }
     val shutdownHook = newThread { stop() }
     JRuntime.getRuntime.addShutdownHook(shutdownHook)
-    try process.waitFor() catch { case _: InterruptedException => stop() }
-    try JRuntime.getRuntime.removeShutdownHook(shutdownHook) catch {
+    try process.waitFor()
+    catch { case _: InterruptedException => stop() }
+    try JRuntime.getRuntime.removeShutdownHook(shutdownHook)
+    catch {
       case _: IllegalStateException =>
     } // thrown when already shutting down
   }

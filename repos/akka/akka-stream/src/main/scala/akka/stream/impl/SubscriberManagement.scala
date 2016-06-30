@@ -114,10 +114,9 @@ private[akka] trait SubscriberManagement[T]
       import ReactiveStreamsCompliance._
       // check for illegal demand See 3.9
       if (elements < 1) {
-        try tryOnError(
-            subscription.subscriber,
-            numberOfElementsInRequestMustBePositiveException) finally unregisterSubscriptionInternal(
-            subscription)
+        try tryOnError(subscription.subscriber,
+                       numberOfElementsInRequestMustBePositiveException)
+        finally unregisterSubscriptionInternal(subscription)
       } else {
         endOfStream match {
           case eos @ (NotReached | Completed) ⇒
@@ -264,7 +263,8 @@ private[akka] trait SubscriberManagement[T]
     val newSubscription = createSubscription(subscriber)
     subscriptions ::= newSubscription
     buffer.initCursor(newSubscription)
-    try tryOnSubscribe(subscriber, newSubscription) catch {
+    try tryOnSubscribe(subscriber, newSubscription)
+    catch {
       case _: SpecViolation ⇒ unregisterSubscriptionInternal(newSubscription)
     }
   }

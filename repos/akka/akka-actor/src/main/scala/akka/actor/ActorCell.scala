@@ -726,7 +726,8 @@ private[akka] class ActorCell(
 
   // logging is not the main purpose, and if it fails there’s nothing we can do
   protected final def publish(e: LogEvent): Unit =
-    try system.eventStream.publish(e) catch { case NonFatal(_) ⇒ }
+    try system.eventStream.publish(e)
+    catch { case NonFatal(_) ⇒ }
 
   protected final def clazz(o: AnyRef): Class[_] =
     if (o eq null) this.getClass else o.getClass

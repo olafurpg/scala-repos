@@ -74,7 +74,8 @@ trait UnrestrictedStash extends Actor with StashSupport {
     *  clears the stash, stops all children and invokes the postStop() callback.
     */
   override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-    try unstashAll() finally super.preRestart(reason, message)
+    try unstashAll()
+    finally super.preRestart(reason, message)
   }
 
   /**
@@ -82,7 +83,9 @@ trait UnrestrictedStash extends Actor with StashSupport {
     *  Must be called when overriding this method, otherwise stashed messages won't be propagated to DeadLetters
     *  when actor stops.
     */
-  override def postStop(): Unit = try unstashAll() finally super.postStop()
+  override def postStop(): Unit =
+    try unstashAll()
+    finally super.postStop()
 }
 
 /**

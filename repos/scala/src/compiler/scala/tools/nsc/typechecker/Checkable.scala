@@ -193,7 +193,8 @@ trait Checkable { self: Analyzer =>
             val derived =
               P map
                 (tp =>
-                      if (possibles(tp) && !(tp =:= targ)) WildcardType else tp)
+                      if (possibles(tp) && !(tp =:= targ)) WildcardType
+                      else tp)
             !(XR <:< derived)
           }
         opt getOrElse NoType

@@ -122,7 +122,8 @@ final class ClosureLinkerBackend(
     sourceMap.foreach { sm =>
       sm.setWrapperPrefix(header)
       val w = output.sourceMapWriter
-      try sm.appendTo(w, output.name) finally w.close()
+      try sm.appendTo(w, output.name)
+      finally w.close()
     }
   }
 

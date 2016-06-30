@@ -113,8 +113,9 @@ class AbstractFileClassLoaderTest {
     val x = new AbstractFileClassLoader(fuzz, NoClassLoader)
     val r = x.getResourceAsStream("buzz/booz.class")
     assertNotNull(r)
-    assertEquals("hello, world", Streamable.closing(r)(is =>
-              Source.fromInputStream(is).mkString))
+    assertEquals(
+        "hello, world",
+        Streamable.closing(r)(is => Source.fromInputStream(is).mkString))
   }
 
   @Test

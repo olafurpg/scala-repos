@@ -73,26 +73,27 @@ object CacheIvy {
   implicit lazy val updateReportFormat: Format[UpdateReport] = {
     import DefaultProtocol.{StringFormat, FileFormat}
     wrap[UpdateReport,
-         (File, Seq[ConfigurationReport], UpdateStats, Map[File, Long])](rep =>
+         (File, Seq[ConfigurationReport], UpdateStats, Map[File, Long])](
+        rep =>
           (rep.cachedDescriptor, rep.configurations, rep.stats, rep.stamps), {
-      case (cd, cs, stats, stamps) =>
-        new UpdateReport(cd, cs, stats, stamps)
-    })
+          case (cd, cs, stats, stamps) =>
+            new UpdateReport(cd, cs, stats, stamps)
+        })
   }
   implicit def updateStatsFormat: Format[UpdateStats] =
-    wrap[UpdateStats, (Long, Long, Long)](us =>
-          (us.resolveTime, us.downloadTime, us.downloadSize), {
-      case (rt, dt, ds) => new UpdateStats(rt, dt, ds, true)
-    })
+    wrap[UpdateStats, (Long, Long, Long)](
+        us => (us.resolveTime, us.downloadTime, us.downloadSize), {
+          case (rt, dt, ds) => new UpdateStats(rt, dt, ds, true)
+        })
   implicit def confReportFormat(implicit m: Format[String],
                                 mr: Format[Seq[ModuleReport]],
                                 oar: Format[Seq[OrganizationArtifactReport]])
     : Format[ConfigurationReport] =
     wrap[ConfigurationReport,
-         (String, Seq[ModuleReport], Seq[OrganizationArtifactReport])](r =>
-          (r.configuration, r.modules, r.details), {
-      case (c, m, d) => new ConfigurationReport(c, m, d)
-    })
+         (String, Seq[ModuleReport], Seq[OrganizationArtifactReport])](
+        r => (r.configuration, r.modules, r.details), {
+          case (c, m, d) => new ConfigurationReport(c, m, d)
+        })
   implicit def moduleReportFormat(implicit cf: Format[Seq[Caller]],
                                   ff: Format[File]): Format[ModuleReport] = {
     wrap[ModuleReport,
@@ -181,10 +182,10 @@ object CacheIvy {
       implicit sf: Format[String],
       bf: Format[Boolean],
       df: Format[Seq[ModuleReport]]): Format[OrganizationArtifactReport] =
-    wrap[OrganizationArtifactReport, (String, String, Seq[ModuleReport])](m =>
-          (m.organization, m.name, m.modules), {
-      case (o, n, r) => OrganizationArtifactReport(o, n, r)
-    })
+    wrap[OrganizationArtifactReport, (String, String, Seq[ModuleReport])](
+        m => (m.organization, m.name, m.modules), {
+          case (o, n, r) => OrganizationArtifactReport(o, n, r)
+        })
   implicit def callerFormat: Format[Caller] =
     wrap[Caller,
          (ModuleID,
@@ -206,10 +207,10 @@ object CacheIvy {
                     })
   implicit def exclusionRuleFormat(
       implicit sf: Format[String]): Format[InclExclRule] =
-    wrap[InclExclRule, (String, String, String, Seq[String])](e =>
-          (e.organization, e.name, e.artifact, e.configurations), {
-      case (o, n, a, cs) => InclExclRule(o, n, a, cs)
-    })
+    wrap[InclExclRule, (String, String, String, Seq[String])](
+        e => (e.organization, e.name, e.artifact, e.configurations), {
+          case (o, n, a, cs) => InclExclRule(o, n, a, cs)
+        })
   implicit def crossVersionFormat: Format[CrossVersion] =
     wrap(crossToInt, crossFromInt)
   implicit def sourcePositionFormat: Format[SourcePosition] =

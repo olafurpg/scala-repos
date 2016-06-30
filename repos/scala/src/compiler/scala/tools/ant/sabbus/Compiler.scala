@@ -29,7 +29,8 @@ class Compiler(classpath: Array[URL], val settings: Settings) {
                             args: Array[AnyRef]) =
     try foreignCompiler.getClass
       .getMethod(method, types: _*)
-      .invoke(foreignCompiler, args: _*) catch {
+      .invoke(foreignCompiler, args: _*)
+    catch {
       case e: InvocationTargetException => throw e.getCause
     }
 

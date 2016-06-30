@@ -167,7 +167,8 @@ private[collection] trait Wrappers {
       sz < underlying.size
     }
     override def remove(elem: AnyRef) =
-      try underlying remove elem.asInstanceOf[A] catch {
+      try underlying remove elem.asInstanceOf[A]
+      catch {
         case ex: ClassCastException => false
       }
     override def clear() = underlying.clear()

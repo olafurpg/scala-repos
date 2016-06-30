@@ -547,9 +547,11 @@ private[sql] object ParquetRelation extends Logging {
             LegacyTypeStringParser.parse(serializedSchema.get)
         }.recover {
           case cause: Throwable =>
-            logWarning(s"""Failed to parse serialized Spark schema in Parquet key-value metadata:
+            logWarning(
+                s"""Failed to parse serialized Spark schema in Parquet key-value metadata:
                  |\t$serializedSchema
-               """.stripMargin, cause)
+               """.stripMargin,
+                cause)
         }.map(_.asInstanceOf[StructType]).getOrElse {
           // Falls back to Parquet schema if Spark SQL schema can't be parsed.
           parseParquetSchema(metadata.getSchema)
@@ -560,7 +562,8 @@ private[sql] object ParquetRelation extends Logging {
     }
 
     finalSchemas.reduceOption { (left, right) =>
-      try left.merge(right) catch {
+      try left.merge(right)
+      catch {
         case e: Throwable =>
           throw new SparkException(
               s"Failed to merge incompatible schemas $left and $right",

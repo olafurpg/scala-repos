@@ -9,9 +9,10 @@ object Test extends App {
   def foo[T: TypeTag](x: T) = typeOf[T].toString
   val n = 1000
   val rng = new scala.util.Random()
-  val types = List(() => typeOf[java.lang.reflect.Method], () =>
-        typeOf[java.lang.annotation.Annotation], () =>
-        typeOf[scala.io.BufferedSource], () => typeOf[scala.io.Codec])
+  val types = List(() => typeOf[java.lang.reflect.Method],
+                   () => typeOf[java.lang.annotation.Annotation],
+                   () => typeOf[scala.io.BufferedSource],
+                   () => typeOf[scala.io.Codec])
   val perms = types.permutations.toList
   def force(lazytpe: () => Type): String = {
     lazytpe().typeSymbol.info

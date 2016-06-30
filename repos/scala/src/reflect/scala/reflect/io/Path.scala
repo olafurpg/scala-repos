@@ -214,17 +214,20 @@ class Path private[io] (val jfile: JFile) {
   def canWrite = jfile.canWrite()
   def exists = {
     if (Statistics.canEnable) Statistics.incCounter(IOStats.fileExistsCount)
-    try jfile.exists() catch { case ex: SecurityException => false }
+    try jfile.exists()
+    catch { case ex: SecurityException => false }
   }
 
   def isFile = {
     if (Statistics.canEnable) Statistics.incCounter(IOStats.fileIsFileCount)
-    try jfile.isFile() catch { case ex: SecurityException => false }
+    try jfile.isFile()
+    catch { case ex: SecurityException => false }
   }
   def isDirectory = {
     if (Statistics.canEnable)
       Statistics.incCounter(IOStats.fileIsDirectoryCount)
-    try jfile.isDirectory() catch {
+    try jfile.isDirectory()
+    catch {
       case ex: SecurityException => jfile.getPath == "."
     }
   }

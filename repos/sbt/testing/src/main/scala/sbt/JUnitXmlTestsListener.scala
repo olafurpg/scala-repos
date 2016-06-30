@@ -17,7 +17,8 @@ import testing.{Event => TEvent, Status => TStatus, OptionalThrowable, TestSelec
 class JUnitXmlTestsListener(val outputDir: String) extends TestsListener {
 
   /**Current hostname so we know which machine executed the tests*/
-  val hostname = try InetAddress.getLocalHost.getHostName catch {
+  val hostname = try InetAddress.getLocalHost.getHostName
+  catch {
     case x: IOException => "localhost"
   }
 

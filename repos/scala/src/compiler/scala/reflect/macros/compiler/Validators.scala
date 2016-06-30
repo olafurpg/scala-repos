@@ -148,9 +148,8 @@ trait Validators { self: DefaultMacroCompiler =>
       */
     private lazy val macroImplSig: MacroImplSig = {
       val tparams = macroImpl.typeParams
-      val paramss =
-        transformTypeTagEvidenceParams(macroImplRef, (param, tparam) =>
-              NoSymbol)
+      val paramss = transformTypeTagEvidenceParams(macroImplRef,
+                                                   (param, tparam) => NoSymbol)
       val ret = macroImpl.info.finalResultType
       MacroImplSig(tparams, paramss, ret)
     }

@@ -291,20 +291,28 @@ class StatsReportListener extends SparkListener with Logging {
     implicit val sc = stageCompleted
     this.logInfo(
         s"Finished stage: ${getStatusDetail(stageCompleted.stageInfo)}")
-    showMillisDistribution("task runtime:", (info, _) =>
-          Some(info.duration), taskInfoMetrics)
+    showMillisDistribution("task runtime:",
+                           (info, _) => Some(info.duration),
+                           taskInfoMetrics)
 
     // Shuffle write
-    showBytesDistribution("shuffle bytes written:", (_, metric) =>
-          metric.shuffleWriteMetrics.map(_.bytesWritten), taskInfoMetrics)
+    showBytesDistribution(
+        "shuffle bytes written:",
+        (_, metric) => metric.shuffleWriteMetrics.map(_.bytesWritten),
+        taskInfoMetrics)
 
     // Fetch & I/O
-    showMillisDistribution("fetch wait time:", (_, metric) =>
-          metric.shuffleReadMetrics.map(_.fetchWaitTime), taskInfoMetrics)
-    showBytesDistribution("remote bytes read:", (_, metric) =>
-          metric.shuffleReadMetrics.map(_.remoteBytesRead), taskInfoMetrics)
-    showBytesDistribution("task result size:", (_, metric) =>
-          Some(metric.resultSize), taskInfoMetrics)
+    showMillisDistribution(
+        "fetch wait time:",
+        (_, metric) => metric.shuffleReadMetrics.map(_.fetchWaitTime),
+        taskInfoMetrics)
+    showBytesDistribution(
+        "remote bytes read:",
+        (_, metric) => metric.shuffleReadMetrics.map(_.remoteBytesRead),
+        taskInfoMetrics)
+    showBytesDistribution("task result size:",
+                          (_, metric) => Some(metric.resultSize),
+                          taskInfoMetrics)
 
     // Runtime breakdown
     val runtimePcts = taskInfoMetrics.map {

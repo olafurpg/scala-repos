@@ -41,8 +41,11 @@ object Agent {
     def sendOff(f: T ⇒ T)(implicit ec: ExecutionContext): Unit =
       withinTransaction(new Runnable {
         def run =
-          try updater.suspend() finally ec.execute(new Runnable {
-            def run = try ref.single.transform(f) finally updater.resume()
+          try updater.suspend()
+          finally ec.execute(new Runnable {
+            def run =
+              try ref.single.transform(f)
+              finally updater.resume()
           })
       })
 
@@ -57,7 +60,8 @@ object Agent {
         def run = {
           updater.suspend()
           result completeWith Future(
-              try ref.single.transformAndGet(f) finally updater.resume())
+              try ref.single.transformAndGet(f)
+              finally updater.resume())
         }
       })
       result.future

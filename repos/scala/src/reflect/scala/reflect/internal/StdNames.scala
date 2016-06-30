@@ -37,7 +37,9 @@ trait StdNames { self: SymbolTable =>
       kws = kws + result
       result
     }
-    def result: Set[TermName] = try kws finally kws = null
+    def result: Set[TermName] =
+      try kws
+      finally kws = null
   }
 
   private[reflect] def compactifyName(orig: String): String = compactify(orig)

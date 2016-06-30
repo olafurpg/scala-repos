@@ -727,8 +727,9 @@ abstract class DStream[T: ClassTag](
     // DStreams can't be serialized with closures, we can't proactively check
     // it for serializability and so we pass the optional false to SparkContext.clean
     val cleanedF = ssc.sparkContext.clean(transformFunc, false)
-    transformWith(other, (rdd1: RDD[T], rdd2: RDD[U], time: Time) =>
-          cleanedF(rdd1, rdd2))
+    transformWith(other,
+                  (rdd1: RDD[T], rdd2: RDD[U],
+                   time: Time) => cleanedF(rdd1, rdd2))
   }
 
   /**

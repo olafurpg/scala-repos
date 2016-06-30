@@ -39,7 +39,8 @@ object Test {
 
   def main(args: Array[String]) {
     // figuring this will otherwise break on windows
-    try t1() catch { case _: java.io.IOException => () }
+    try t1()
+    catch { case _: java.io.IOException => () }
 
     t2()
   }

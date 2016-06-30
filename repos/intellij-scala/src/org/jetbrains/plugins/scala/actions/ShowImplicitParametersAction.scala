@@ -174,15 +174,18 @@ class ShowImplicitParametersAction
       } else if (expressions.length == 1) {
         chooseExpression(expressions(0))
       } else {
-        ScalaRefactoringUtil
-          .showChooser(editor, expressions, (elem: PsiElement) =>
-                chooseExpression(elem), "Expressions", (expr: PsiElement) => {
-            expr match {
-              case expr: ScExpression =>
-                ScalaRefactoringUtil.getShortText(expr)
-              case _ => expr.getText.slice(0, 20)
-            }
-          })
+        ScalaRefactoringUtil.showChooser(
+            editor,
+            expressions,
+            (elem: PsiElement) => chooseExpression(elem),
+            "Expressions",
+            (expr: PsiElement) => {
+              expr match {
+                case expr: ScExpression =>
+                  ScalaRefactoringUtil.getShortText(expr)
+                case _ => expr.getText.slice(0, 20)
+              }
+            })
       }
     }
   }

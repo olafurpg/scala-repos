@@ -88,8 +88,9 @@ class DeploymentPlanRevertTest
 
     When(
         "we add an unrelated app and try to revert that without concurrent changes")
-    val target = original.updateApp("test".toPath, _ =>
-          AppDefinition("test".toPath), Timestamp.now())
+    val target = original.updateApp("test".toPath,
+                                    _ => AppDefinition("test".toPath),
+                                    Timestamp.now())
     val plan = DeploymentPlan(original, target)
     val revertToOriginal = plan.revert(target)
 
@@ -146,8 +147,9 @@ class DeploymentPlanRevertTest
     )
 
     When("we add a group and try to revert that without concurrent changes")
-    val target = original.update("test".toPath, _ =>
-          Group("supergroup".toRootPath), Timestamp.now())
+    val target = original.update("test".toPath,
+                                 _ => Group("supergroup".toRootPath),
+                                 Timestamp.now())
     val plan = DeploymentPlan(original, target)
     val revertToOriginal = plan.revert(target)
 
@@ -574,8 +576,10 @@ class DeploymentPlanRevertTest
                _.update(parent, _.removeApplication(appId), Timestamp.now()))
   }
   private[this] def addApp(appId: String) =
-    Deployment(s"add app '$appId'", _.updateApp(appId.toRootPath, _ =>
-              AppDefinition(appId.toRootPath), Timestamp.now()))
+    Deployment(s"add app '$appId'",
+               _.updateApp(appId.toRootPath,
+                           _ => AppDefinition(appId.toRootPath),
+                           Timestamp.now()))
   private[this] def addGroup(groupId: String) =
     Deployment(s"add group '$groupId'", _.makeGroup(groupId.toRootPath))
   private[this] def removeGroup(groupId: String) =

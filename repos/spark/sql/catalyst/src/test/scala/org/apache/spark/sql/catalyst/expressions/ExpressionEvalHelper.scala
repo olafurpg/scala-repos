@@ -95,7 +95,8 @@ trait ExpressionEvalHelper extends GeneratorDrivenPropertyChecks {
       expected: Any,
       inputRow: InternalRow = EmptyRow): Unit = {
 
-    val actual = try evaluate(expression, inputRow) catch {
+    val actual = try evaluate(expression, inputRow)
+    catch {
       case e: Exception => fail(s"Exception evaluating $expression", e)
     }
     if (!checkResult(actual, expected)) {

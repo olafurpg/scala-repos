@@ -108,7 +108,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     val saved = settings.nowarn.value
     if (!saved) settings.nowarn.value = true
 
-    try body finally if (!saved) settings.nowarn.value = false
+    try body
+    finally if (!saved) settings.nowarn.value = false
   }
 
   /** construct an interpreter that reports to Console */
@@ -148,8 +149,9 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   def initialize(postInitSignal: => Unit) {
     synchronized {
       if (_isInitialized == null) {
-        _isInitialized = Future(try _initialize() finally postInitSignal)(
-            ExecutionContext.global)
+        _isInitialized = Future(
+            try _initialize()
+            finally postInitSignal)(ExecutionContext.global)
       }
     }
   }
@@ -171,9 +173,11 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
   lazy val runtimeMirror = ru.runtimeMirror(classLoader)
 
-  private def noFatal(body: => Symbol): Symbol = try body catch {
-    case _: FatalError => NoSymbol
-  }
+  private def noFatal(body: => Symbol): Symbol =
+    try body
+    catch {
+      case _: FatalError => NoSymbol
+    }
 
   def getClassIfDefined(path: String) =
     (noFatal(runtimeMirror staticClass path) orElse noFatal(
@@ -215,12 +219,14 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   def beQuietDuring[T](body: => T): T = {
     val saved = printResults
     printResults = false
-    try body finally printResults = saved
+    try body
+    finally printResults = saved
   }
   def beSilentDuring[T](operation: => T): T = {
     val saved = totalSilence
     totalSilence = true
-    try operation finally totalSilence = saved
+    try operation
+    finally totalSilence = saved
   }
 
   def quietRun[T](code: String) = beQuietDuring(interpret(code))
@@ -230,8 +236,9 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     assert(bindExceptions, "withLastExceptionLock called incorrectly.")
     bindExceptions = false
 
-    try beQuietDuring(body) catch logAndDiscard("withLastExceptionLock", alt) finally bindExceptions =
-      true
+    try beQuietDuring(body)
+    catch logAndDiscard("withLastExceptionLock", alt)
+    finally bindExceptions = true
   }
 
   def executionWrapper = _executionWrapper
@@ -476,7 +483,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   }
 
   private def safePos(t: Tree, alt: Int): Int =
-    try t.pos.start catch { case _: UnsupportedOperationException => alt }
+    try t.pos.start
+    catch { case _: UnsupportedOperationException => alt }
 
   // Given an expression like 10 * 10 * 10 we receive the parent tree positioned
   // at a '*'.  So look at each subtree and find the earliest of all positions.
@@ -821,7 +829,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     }
 
     def callEither(name: String, args: Any*): Either[Throwable, AnyRef] =
-      try Right(call(name, args: _*)) catch { case ex: Throwable => Left(ex) }
+      try Right(call(name, args: _*))
+      catch { case ex: Throwable => Left(ex) }
 
     class EvalException(msg: String, cause: Throwable)
         extends RuntimeException(msg, cause) {}
@@ -832,7 +841,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
           ex)
 
     private def load(path: String): Class[_] = {
-      try Class.forName(path, true, classLoader) catch {
+      try Class.forName(path, true, classLoader)
+      catch {
         case ex: Throwable => evalError(path, unwrap(ex))
       }
     }
@@ -1209,7 +1219,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
       invoker.get
     }
 
-    try Some(value()) catch { case _: Exception => None }
+    try Some(value())
+    catch { case _: Exception => None }
   }
 
   /** It's a bit of a shotgun approach, but for now we will gain in
@@ -1333,7 +1344,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   def withoutUnwrapping(op: => Unit): Unit = {
     val saved = isettings.unwrapStrings
     isettings.unwrapStrings = false
-    try op finally isettings.unwrapStrings = saved
+    try op
+    finally isettings.unwrapStrings = saved
   }
 
   def withoutTruncating[A](body: => A): A = reporter withoutTruncating body

@@ -399,7 +399,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
         } else Nil
       }
 
-      try impls ++ extras catch {
+      try impls ++ extras
+      catch {
         case _: TypeError if reporter.hasErrors => Nil
       }
     }

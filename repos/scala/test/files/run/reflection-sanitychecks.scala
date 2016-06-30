@@ -30,9 +30,11 @@ object Test extends App {
   val im = cm.reflect(new D)
 
   def test(tpe: Type): Unit = {
-    def failsafe(action: => Any): Any = try action catch {
-      case ex: Throwable => ex.toString
-    }
+    def failsafe(action: => Any): Any =
+      try action
+      catch {
+        case ex: Throwable => ex.toString
+      }
     println(
         s"=========members of ${tpe.typeSymbol.name} in a mirror of D=========")
     println(

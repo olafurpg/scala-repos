@@ -245,7 +245,8 @@ abstract class SymbolTable
   /** Perform given operation at given phase. */
   @inline final def enteringPhase[T](ph: Phase)(op: => T): T = {
     val saved = pushPhase(ph)
-    try op finally popPhase(saved)
+    try op
+    finally popPhase(saved)
   }
 
   final def findPhaseWithName(phaseName: String): Phase = {

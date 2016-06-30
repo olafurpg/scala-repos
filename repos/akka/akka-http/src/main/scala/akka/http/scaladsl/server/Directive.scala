@@ -48,7 +48,8 @@ abstract class Directive[L](implicit val ev: Tuple[L]) {
         implicit tupler: Tupler[R]): Directive[tupler.Out] =
       Directive[tupler.Out] { inner ⇒
         tapply { values ⇒ ctx ⇒
-          try inner(tupler(f(values)))(ctx) catch {
+          try inner(tupler(f(values)))(ctx)
+          catch {
             case e: IllegalArgumentException ⇒
               ctx.reject(
                   ValidationRejection(e.getMessage.nullAsEmpty, Some(e)))
@@ -124,8 +125,9 @@ abstract class Directive[L](implicit val ev: Tuple[L]) {
       recovery: PartialFunction[immutable.Seq[Rejection], Directive[R]])
     : Directive[R] =
     recover { rejections ⇒
-      recovery.applyOrElse(rejections, (rejs: Seq[Rejection]) ⇒
-            RouteDirectives.reject(rejs: _*))
+      recovery.applyOrElse(
+          rejections,
+          (rejs: Seq[Rejection]) ⇒ RouteDirectives.reject(rejs: _*))
     }
 
   //#basic

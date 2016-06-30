@@ -49,7 +49,8 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
 
   private def withLock[T](body: => T): T = {
     initLock.lock()
-    try body finally initLock.unlock()
+    try body
+    finally initLock.unlock()
   }
   // a condition used to ensure serial access to the compiler.
   @volatile private var initIsComplete = false

@@ -83,14 +83,13 @@ object RoutesCompiler extends AutoPlugin {
             }
 
             // Find the routes compile tasks for this project
-            val thisProjectTasks = (sources in routes).value.map {
-              file =>
-                RoutesCompilerTask(file,
-                                   routesImport.value,
-                                   forwardsRouter = true,
-                                   reverseRouter = generateReverseRouter.value,
-                                   namespaceReverseRouter =
-                                     namespaceReverseRouter.value)
+            val thisProjectTasks = (sources in routes).value.map { file =>
+              RoutesCompilerTask(file,
+                                 routesImport.value,
+                                 forwardsRouter = true,
+                                 reverseRouter = generateReverseRouter.value,
+                                 namespaceReverseRouter =
+                                   namespaceReverseRouter.value)
             }
 
             thisProjectTasks ++ reverseRouterTasks

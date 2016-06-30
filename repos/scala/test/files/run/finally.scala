@@ -67,7 +67,8 @@ object Test extends App {
   // return inside finally (each finally is executed once)
   def retFinally {
     try {
-      try println("body") finally {
+      try println("body")
+      finally {
         println("in finally 1")
         return
       }
@@ -77,7 +78,8 @@ object Test extends App {
   // throw inside finally (finally is executed once, exception is propagated)
   def throwFinally {
     try {
-      try println("body") finally {
+      try println("body")
+      finally {
         println("in finally")
         throw new Exception
       }

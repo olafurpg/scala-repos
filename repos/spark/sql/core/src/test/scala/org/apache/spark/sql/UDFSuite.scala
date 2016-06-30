@@ -178,8 +178,8 @@ class UDFSuite extends QueryTest with SharedSQLContext {
   }
 
   test("struct UDF") {
-    sqlContext.udf.register("returnStruct", (f1: String, f2: String) =>
-          FunctionResult(f1, f2))
+    sqlContext.udf.register("returnStruct",
+                            (f1: String, f2: String) => FunctionResult(f1, f2))
 
     val result = sql("SELECT returnStruct('test', 'test2') as ret")
       .select($"ret.f1")
@@ -229,11 +229,13 @@ class UDFSuite extends QueryTest with SharedSQLContext {
     checkAnswer(sql("""
            | SELECT tmp.t.* FROM
            | (SELECT decimalDataFunc(a, b) AS t FROM decimalData) tmp
-          """.stripMargin).toDF(), decimalData)
+          """.stripMargin).toDF(),
+                decimalData)
     checkAnswer(sql("""
            | SELECT tmp.t.* FROM
            | (SELECT binaryDataFunc(a, b) AS t FROM binaryData) tmp
-          """.stripMargin).toDF(), binaryData)
+          """.stripMargin).toDF(),
+                binaryData)
     checkAnswer(
         sql("""
            | SELECT tmp.t.* FROM
@@ -242,7 +244,8 @@ class UDFSuite extends QueryTest with SharedSQLContext {
         arrayData.toDF())
     checkAnswer(sql("""
            | SELECT mapDataFunc(data) AS t FROM mapData
-          """.stripMargin).toDF(), mapData.toDF())
+          """.stripMargin).toDF(),
+                mapData.toDF())
     checkAnswer(
         sql("""
            | SELECT tmp.t.* FROM

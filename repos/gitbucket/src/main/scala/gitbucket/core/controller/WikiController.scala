@@ -113,22 +113,22 @@ trait WikiControllerBase extends ControllerBase {
     }
   })
 
-  get("/:owner/:repository/wiki/_compare/:commitId")(referrersOnly {
-    repository =>
-      val Array(from, to) = params("commitId").split("\\.\\.\\.")
+  get("/:owner/:repository/wiki/_compare/:commitId")(
+      referrersOnly { repository =>
+    val Array(from, to) = params("commitId").split("\\.\\.\\.")
 
-      using(Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
-        git =>
-          html.compare(None,
-                       from,
-                       to,
-                       JGitUtil.getDiffs(git, from, to, true),
-                       repository,
-                       hasWritePermission(repository.owner,
-                                          repository.name,
-                                          context.loginAccount),
-                       flash.get("info"))
-      }
+    using(Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
+      git =>
+        html.compare(None,
+                     from,
+                     to,
+                     JGitUtil.getDiffs(git, from, to, true),
+                     repository,
+                     hasWritePermission(repository.owner,
+                                        repository.name,
+                                        context.loginAccount),
+                     flash.get("info"))
+    }
   })
 
   get("/:owner/:repository/wiki/:page/_revert/:commitId")(
@@ -189,14 +189,13 @@ trait WikiControllerBase extends ControllerBase {
               loginAccount,
               form.message.getOrElse(""),
               Some(form.id)
-          ).map {
-            commitId =>
-              updateLastActivityDate(repository.owner, repository.name)
-              recordEditWikiPageActivity(repository.owner,
-                                         repository.name,
-                                         loginAccount.userName,
-                                         form.pageName,
-                                         commitId)
+          ).map { commitId =>
+            updateLastActivityDate(repository.owner, repository.name)
+            recordEditWikiPageActivity(repository.owner,
+                                       repository.name,
+                                       loginAccount.userName,
+                                       form.pageName,
+                                       commitId)
           }
           if (notReservedPageName(form.pageName)) {
             redirect(

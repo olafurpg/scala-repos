@@ -54,8 +54,8 @@ trait TraceSymbolActivity {
   private def showSym(sym: Symbol) {
     def prefix = ("  " * (sym.ownerChain.length - 1)) + sym.id
     try println(
-        "%s#%s %s"
-          .format(prefix, sym.accurateKindString, sym.name.decode)) catch {
+        "%s#%s %s".format(prefix, sym.accurateKindString, sym.name.decode))
+    catch {
       case x: Throwable => println(prefix + " failed: " + x)
     }
     allChildren(sym.id).sorted foreach showIdAndRemove

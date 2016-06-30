@@ -52,8 +52,12 @@ private[spark] class MetricsServlet(val property: Properties,
 
   def getHandlers(conf: SparkConf): Array[ServletContextHandler] = {
     Array[ServletContextHandler](
-        createServletHandler(servletPath, new ServletParams(request =>
-                  getMetricsSnapshot(request), "text/json"), securityMgr, conf)
+        createServletHandler(
+            servletPath,
+            new ServletParams(request => getMetricsSnapshot(request),
+                              "text/json"),
+            securityMgr,
+            conf)
     )
   }
 

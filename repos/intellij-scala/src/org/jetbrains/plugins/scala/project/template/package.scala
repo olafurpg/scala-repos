@@ -50,7 +50,8 @@ package object template {
 
     try {
       block(directory)
-    } catch handler1 finally {
+    } catch handler1
+    finally {
       try {
         FileUtils.deleteDirectory(directory)
       } catch handler2

@@ -107,8 +107,8 @@ object BijectionT extends BijectionTInstances {
 
   def zipB[X[_], A, B](implicit Z: Zip[X],
                        U: Unzip[X]): Bijection[(X[A], X[B]), X[(A, B)]] =
-    bijection[Id, Id, (X[A], X[B]), X[(A, B)]](x =>
-          Z.zip(x._1, x._2), U.unzip(_))
+    bijection[Id, Id, (X[A], X[B]), X[(A, B)]](x => Z.zip(x._1, x._2),
+                                               U.unzip(_))
 
   def zipListB[A, B]: Bijection[(List[A], List[B]), List[(A, B)]] =
     zipB[List, A, B]

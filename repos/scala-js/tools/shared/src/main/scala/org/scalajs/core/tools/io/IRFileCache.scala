@@ -281,7 +281,8 @@ final class IRFileCache {
     */
   @inline
   private def clearOnThrow[T](body: => T): T = {
-    try body catch {
+    try body
+    catch {
       case t: Throwable =>
         globalCache.clear()
         throw t

@@ -378,8 +378,10 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
             (t.elementType.asInstanceOf[ScalaBaseType[Any]].ordering, true)
           case t => (t.asInstanceOf[ScalaBaseType[Any]].ordering, false)
         }
-        reduceOptionIt[Any](it, opt, identity, (a, b) =>
-              if (ord.lt(b, a)) b else a)
+        reduceOptionIt[Any](it,
+                            opt,
+                            identity,
+                            (a, b) => if (ord.lt(b, a)) b else a)
       case Library.Max(ch) =>
         val coll = run(ch).asInstanceOf[Coll]
         val (it, itType) = unwrapSingleColumn(coll, ch.nodeType)
@@ -388,8 +390,10 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
             (t.elementType.asInstanceOf[ScalaBaseType[Any]].ordering, true)
           case t => (t.asInstanceOf[ScalaBaseType[Any]].ordering, false)
         }
-        reduceOptionIt[Any](it, opt, identity, (a, b) =>
-              if (ord.gt(b, a)) b else a)
+        reduceOptionIt[Any](it,
+                            opt,
+                            identity,
+                            (a, b) => if (ord.gt(b, a)) b else a)
       case Library.==(ch, LiteralNode(null)) =>
         val chV = run(ch)
         chV == null || chV.asInstanceOf[Option[_]].isEmpty

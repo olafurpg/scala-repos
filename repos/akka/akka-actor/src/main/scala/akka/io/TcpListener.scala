@@ -98,7 +98,8 @@ private[io] class TcpListener(selectorRouter: ActorRef,
     case FailedRegisterIncoming(socketChannel) ⇒
       log.warning(
           "Could not register incoming connection since selector capacity limit is reached, closing connection")
-      try socketChannel.close() catch {
+      try socketChannel.close()
+      catch {
         case NonFatal(e) ⇒ log.debug("Error closing socket channel: {}", e)
       }
 
@@ -113,7 +114,8 @@ private[io] class TcpListener(selectorRouter: ActorRef,
   @tailrec final def acceptAllPending(registration: ChannelRegistration,
                                       limit: Int): Int = {
     val socketChannel = if (limit > 0) {
-      try channel.accept() catch {
+      try channel.accept()
+      catch {
         case NonFatal(e) ⇒ {
           log.error(e, "Accept error: could not accept new connection"); null
         }

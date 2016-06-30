@@ -27,7 +27,8 @@ class BasicTest extends SlickOsgiHelper {
       .head
       .map(res => assertEquals("TEST-OSGI", res))
     val db = Database.forURL("jdbc:h2:mem:test-osgi")
-    try Await.result(db.run(a), Duration.Inf) finally db.close
+    try Await.result(db.run(a), Duration.Inf)
+    finally db.close
   }
 
   @Test

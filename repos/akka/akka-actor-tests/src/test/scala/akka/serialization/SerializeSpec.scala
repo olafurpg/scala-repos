@@ -175,7 +175,8 @@ class SerializeSpec extends AkkaSpec(SerializationTests.serializeConf) {
       val a = system.actorOf(Props(new Actor {
         def receive = {
           case o: ObjectOutputStream ⇒
-            try o.writeObject(this) catch {
+            try o.writeObject(this)
+            catch {
               case _: NotSerializableException ⇒ testActor ! "pass"
             }
         }

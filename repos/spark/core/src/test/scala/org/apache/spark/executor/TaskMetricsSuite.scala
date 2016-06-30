@@ -243,8 +243,11 @@ class TaskMetricsSuite extends SparkFunSuite {
     def assertValEquals[T](tmValue: ShuffleReadMetrics => T,
                            name: String,
                            value: T): Unit = {
-      assertValueEquals(tm, tm =>
-            tmValue(tm.shuffleReadMetrics.get), accums, name, value)
+      assertValueEquals(tm,
+                        tm => tmValue(tm.shuffleReadMetrics.get),
+                        accums,
+                        name,
+                        value)
     }
     // create shuffle read metrics
     assert(tm.shuffleReadMetrics.isEmpty)
@@ -300,8 +303,11 @@ class TaskMetricsSuite extends SparkFunSuite {
     def assertValEquals[T](tmValue: ShuffleWriteMetrics => T,
                            name: String,
                            value: T): Unit = {
-      assertValueEquals(tm, tm =>
-            tmValue(tm.shuffleWriteMetrics.get), accums, name, value)
+      assertValueEquals(tm,
+                        tm => tmValue(tm.shuffleWriteMetrics.get),
+                        accums,
+                        name,
+                        value)
     }
     // create shuffle write metrics
     assert(tm.shuffleWriteMetrics.isEmpty)

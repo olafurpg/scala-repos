@@ -72,9 +72,9 @@ object TaskTest {
   def run[T](root: Task[T],
              checkCycles: Boolean,
              restrictions: ConcurrentRestrictions[Task[_]]): Result[T] = {
-    val (service, shutdown) =
-      completionService[Task[_], Completed](restrictions, (x: String) =>
-            System.err.println(x))
+    val (service, shutdown) = completionService[Task[_], Completed](
+        restrictions,
+        (x: String) => System.err.println(x))
 
     val x =
       new Execute[Task](Execute.config(checkCycles),

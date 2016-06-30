@@ -106,7 +106,8 @@ object HttpCharsets extends ObjectRegistry[String, HttpCharset] {
 
   /** Register non-standard charsets that may be missing on some platforms */
   private def tryRegister(value: String)(aliases: String*): Unit =
-    try register(value)(aliases: _*) catch {
+    try register(value)(aliases: _*)
+    catch {
       case e: java.nio.charset.UnsupportedCharsetException ⇒ // ignore
     }
 

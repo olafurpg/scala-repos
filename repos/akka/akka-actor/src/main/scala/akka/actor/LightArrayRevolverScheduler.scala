@@ -44,8 +44,8 @@ class LightArrayRevolverScheduler(config: Config,
 
   val WheelSize = config
     .getInt("akka.scheduler.ticks-per-wheel")
-    .requiring(ticks ⇒
-          (ticks & (ticks - 1)) == 0, "ticks-per-wheel must be a power of 2")
+    .requiring(ticks ⇒ (ticks & (ticks - 1)) == 0,
+               "ticks-per-wheel must be a power of 2")
   val TickDuration = config
     .getMillisDuration("akka.scheduler.tick-duration")
     .requiring(
@@ -86,7 +86,8 @@ class LightArrayRevolverScheduler(config: Config,
     val sleepMs =
       if (Helpers.isWindows) (nanos + 4999999) / 10000000 * 10
       else (nanos + 999999) / 1000000
-    try Thread.sleep(sleepMs) catch {
+    try Thread.sleep(sleepMs)
+    catch {
       case _: InterruptedException ⇒
         Thread.currentThread.interrupt() // we got woken up
     }
@@ -149,13 +150,15 @@ class LightArrayRevolverScheduler(config: Config,
 
   override def scheduleOnce(delay: FiniteDuration, runnable: Runnable)(
       implicit executor: ExecutionContext): Cancellable =
-    try schedule(executor.prepare(), runnable, roundUp(delay)) catch {
+    try schedule(executor.prepare(), runnable, roundUp(delay))
+    catch {
       case SchedulerException(msg) ⇒ throw new IllegalStateException(msg)
     }
 
   override def close(): Unit =
     Await.result(stop(), getShutdownTimeout) foreach { task ⇒
-      try task.run() catch {
+      try task.run()
+      catch {
         case e: InterruptedException ⇒ throw e
         case _: SchedulerException ⇒ // ignore terminated actors
         case NonFatal(e) ⇒ log.error(e, "exception while executing timer task")
@@ -256,14 +259,16 @@ class LightArrayRevolverScheduler(config: Config,
     }
 
     override final def run =
-      try nextTick() catch {
+      try nextTick()
+      catch {
         case t: Throwable ⇒
           log.error(t, "exception on LARS’ timer thread")
           stopped.get match {
             case null ⇒
               val thread = threadFactory.newThread(this)
               log.info("starting new LARS thread")
-              try thread.start() catch {
+              try thread.start()
+              catch {
                 case e: Throwable ⇒
                   log.error(e,
                             "LARS cannot start new thread, ship’s going down!")

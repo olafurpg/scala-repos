@@ -341,11 +341,13 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
     def trueEval = expressionFromTextEvaluator("true", ref)
     def falseEval = expressionFromTextEvaluator("false", ref)
     def conditionalOr =
-      binaryEval("||", (first, second) =>
-            new ScalaIfEvaluator(first, trueEval, Some(second)))
+      binaryEval("||",
+                 (first, second) =>
+                   new ScalaIfEvaluator(first, trueEval, Some(second)))
     def conditionalAnd =
-      binaryEval("&&", (first, second) =>
-            new ScalaIfEvaluator(first, second, Some(falseEval)))
+      binaryEval("&&",
+                 (first, second) =>
+                   new ScalaIfEvaluator(first, second, Some(falseEval)))
 
     name match {
       case "isInstanceOf" => isInstanceOfEval

@@ -131,7 +131,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       try incomingConnection.flow
         .viaMat(StreamUtils.identityFinishReporter)(Keep.right)
         .joinMat(handler)(Keep.left)
-        .run() catch {
+        .run()
+      catch {
         case NonFatal(e) ⇒
           log.error(e,
                     "Could not materialize handling flow for {}",
@@ -693,7 +694,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     hostPoolCache.putIfAbsent(setup, gatewayPromise.future) match {
       case null ⇒ // only one thread can get here at a time
         val whenShuttingDown = Promise[Done]()
-        val gateway = try new PoolGateway(setup, whenShuttingDown) catch {
+        val gateway = try new PoolGateway(setup, whenShuttingDown)
+        catch {
           case NonFatal(e) ⇒
             hostPoolCache.remove(setup)
             gatewayPromise.failure(e)

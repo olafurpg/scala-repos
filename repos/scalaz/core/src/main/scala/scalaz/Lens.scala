@@ -381,17 +381,19 @@ trait LensFunctions extends LensFamilyFunctions {
     lens(l => Store(NonEmptyList.nel(_, l.tail), l.head))
 
   def nelTailLens[A]: NonEmptyList[A] @> List[A] =
-    lens(l =>
-          Store(ll =>
-                NonEmptyList.nel(l.head, IList.fromList(ll)), l.tail.toList))
+    lens(
+        l =>
+          Store(ll => NonEmptyList.nel(l.head, IList.fromList(ll)),
+                l.tail.toList))
 
   /** Access the value at a particular key of a Map **/
   def mapVLens[K, V](k: K): Map[K, V] @> Option[V] =
     lensg(m =>
-          ({
-        case None => m - k
-        case Some(v) => m.updated(k, v)
-      }: Option[V] => Map[K, V]), _ get k)
+            ({
+              case None => m - k
+              case Some(v) => m.updated(k, v)
+            }: Option[V] => Map[K, V]),
+          _ get k)
 
   /** Access the value at a particular key of a Map.WithDefault */
   def mapWithDefaultLens[K, V](k: K): Map.WithDefault[K, V] @> V =
@@ -532,18 +534,21 @@ abstract class LensInstances extends LensInstances0 {
 
     /** Allows both viewing and setting the value of a member of the map */
     def member(k: K): LensFamily[S1, S2, Option[V], Option[V]] =
-      lensFamilyg[S1, S2, Option[V], Option[V]](s =>
+      lensFamilyg[S1, S2, Option[V], Option[V]](
+          s =>
             opt =>
               lens.mod((m: Map[K, V]) =>
-                    (opt match {
-              case Some(v) => m + (k -> v)
-              case None => m - k
-            }): Map[K, V], s): Id[S2], s => lens.get(s).get(k))
+                         (opt match {
+                           case Some(v) => m + (k -> v)
+                           case None => m - k
+                         }): Map[K, V],
+                       s): Id[S2],
+          s => lens.get(s).get(k))
 
     /** This lens has undefined behavior when accessing an element not present in the map! */
     def at(k: K): LensFamily[S1, S2, V, V] =
-      lensFamilyg[S1, S2, V, V](s =>
-            v => lens.mod(_ + (k -> v), s): Id[S2], lens.get(_) apply k)
+      lensFamilyg[S1, S2, V, V](s => v => lens.mod(_ + (k -> v), s): Id[S2],
+                                lens.get(_) apply k)
 
     def +=(elem1: (K, V),
            elem2: (K, V),

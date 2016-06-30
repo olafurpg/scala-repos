@@ -78,7 +78,8 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
 
   private def prepareTable(sqlContext: SQLContext): CatalogTable = {
     val expandedText = if (sqlContext.conf.canonicalView) {
-      try rebuildViewQueryString(sqlContext) catch {
+      try rebuildViewQueryString(sqlContext)
+      catch {
         case NonFatal(e) => wrapViewTextWithSelect
       }
     } else {

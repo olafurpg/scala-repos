@@ -233,7 +233,8 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     override def toString() =
       if (name != null) name
       else
-        try thisenum.nameOf(i) catch {
+        try thisenum.nameOf(i)
+        catch {
           case _: NoSuchElementException =>
             "<Invalid enum: no field for #" + i + ">"
         }

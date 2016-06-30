@@ -228,7 +228,8 @@ object Analysis {
 
     private def indented[A](body: => A): A = {
       indentation += "  "
-      try body finally indentation = indentation.substring(2)
+      try body
+      finally indentation = indentation.substring(2)
     }
 
     private def logCallStackImpl(level: Level,

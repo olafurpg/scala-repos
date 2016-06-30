@@ -63,7 +63,8 @@ trait InteractiveTestSettings
     val optsFile =
       outDir / "%s.%s".format(System.getProperty("partest.testname"),
                               TestOptionsFileExtension)
-    val str = try File(optsFile).slurp() catch {
+    val str = try File(optsFile).slurp()
+    catch {
       case e: java.io.IOException => ""
     }
     str.lines.filter(!_.startsWith(CommentStartDelimiter)).mkString(" ")

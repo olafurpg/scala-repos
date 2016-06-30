@@ -799,7 +799,8 @@ final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
     */
   def toBigIntExact(): Option[BigInt] =
     if (isWhole()) {
-      try Some(new BigInt(this.bigDecimal.toBigIntegerExact())) catch {
+      try Some(new BigInt(this.bigDecimal.toBigIntegerExact()))
+      catch {
         case _: ArithmeticException => None
       }
     } else None

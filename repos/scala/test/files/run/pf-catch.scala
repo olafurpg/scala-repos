@@ -9,7 +9,8 @@ object Test {
   }
 
   def fn[T: Handler](body: => T): T = {
-    try body catch implicitly[Handler[T]]
+    try body
+    catch implicitly[Handler[T]]
   }
 
   def f1 = {
@@ -27,7 +28,8 @@ object Test {
   }
 
   def main(args: Array[String]): Unit = {
-    try f1 catch {
+    try f1
+    catch {
       case x: Throwable => println(shortName(x) + " slipped by.")
     }
 

@@ -358,9 +358,10 @@ object Conformance {
                 return
             }
             val uBound = subst.subst(upper)
-            val genericSubst =
-              ScalaPsiUtil.typesCallSubstitutor(a.typeParameters.map(tp =>
-                        (tp.name, ScalaPsiUtil.getPsiElementId(tp))), args)
+            val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
+                a.typeParameters.map(tp =>
+                      (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+                args)
             val s = subst.followed(genericSubst)
             result = conformsInner(l, s.subst(uBound), visited, undefinedSubst)
           case des: ScDesignatorType =>
@@ -374,9 +375,10 @@ object Conformance {
                     result = (false, undefinedSubst)
                     return
                 }
-                val genericSubst =
-                  ScalaPsiUtil.typesCallSubstitutor(a.typeParameters.map(tp =>
-                            (tp.name, ScalaPsiUtil.getPsiElementId(tp))), args)
+                val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
+                    a.typeParameters.map(tp =>
+                          (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+                    args)
                 result = conformsInner(l,
                                        genericSubst.subst(uBound),
                                        visited,
@@ -1120,9 +1122,10 @@ object Conformance {
               return
           }
           val lBound = subst.subst(lower)
-          val genericSubst =
-            ScalaPsiUtil.typesCallSubstitutor(a.typeParameters.map(tp =>
-                      (tp.name, ScalaPsiUtil.getPsiElementId(tp))), args)
+          val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
+              a.typeParameters.map(tp =>
+                    (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+              args)
           val s = subst.followed(genericSubst)
           result = conformsInner(s.subst(lBound), r, visited, undefinedSubst)
           return
@@ -1144,9 +1147,10 @@ object Conformance {
               return
           }
           val lBound = lower
-          val genericSubst =
-            ScalaPsiUtil.typesCallSubstitutor(a.typeParameters.map(tp =>
-                      (tp.name, ScalaPsiUtil.getPsiElementId(tp))), args)
+          val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
+              a.typeParameters.map(tp =>
+                    (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+              args)
           result = conformsInner(genericSubst.subst(lBound),
                                  r,
                                  visited,

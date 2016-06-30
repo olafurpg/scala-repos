@@ -133,12 +133,13 @@ object SVDPlusPlus {
     for (i <- 0 until conf.maxIters) {
       // Phase 1, calculate pu + |N(u)|^(-0.5)*sum(y) for user nodes
       g.cache()
-      val t1 = g.aggregateMessages[Array[Double]](ctx =>
-            ctx.sendToSrc(ctx.dstAttr._2), (g1, g2) => {
-        val out = g1.clone()
-        blas.daxpy(out.length, 1.0, g2, 1, out, 1)
-        out
-      })
+      val t1 = g.aggregateMessages[Array[Double]](
+          ctx => ctx.sendToSrc(ctx.dstAttr._2),
+          (g1, g2) => {
+            val out = g1.clone()
+            blas.daxpy(out.length, 1.0, g2, 1, out, 1)
+            out
+          })
       val gJoinT1 = g
         .outerJoinVertices(t1) {
           (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),

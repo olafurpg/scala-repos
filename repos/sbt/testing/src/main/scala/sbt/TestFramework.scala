@@ -101,9 +101,9 @@ final class TestRunner(delegate: Runner,
         def handle(e: Event): Unit = { results += e }
       }
       val loggers = listeners.flatMap(_.contentLogger(testDefinition))
-      val nestedTasks = try testTask
-        .execute(handler, loggers.map(_.log).toArray) finally loggers.foreach(
-          _.flush())
+      val nestedTasks =
+        try testTask.execute(handler, loggers.map(_.log).toArray)
+        finally loggers.foreach(_.flush())
       val event = TestEvent(results)
       safeListenersCall(_.testEvent(event))
       (SuiteResult(results), nestedTasks.toSeq)
@@ -135,8 +135,10 @@ object TestFramework {
 
   private[sbt] def safeForeach[T](it: Iterable[T], log: Logger)(
       f: T => Unit): Unit =
-    it.foreach(i =>
-          try f(i) catch {
+    it.foreach(
+        i =>
+          try f(i)
+          catch {
         case e: Exception => log.trace(e); log.error(e.toString)
     })
 
@@ -248,8 +250,12 @@ object TestFramework {
       name.startsWith("org.scalatools.testing.") ||
         name.startsWith("sbt.testing.")
     val notInterfaceFilter = (name: String) => !interfaceFilter(name)
-    val dual = new DualLoader(scalaInstance.loader, notInterfaceFilter, x =>
-          true, getClass.getClassLoader, interfaceFilter, x => false)
+    val dual = new DualLoader(scalaInstance.loader,
+                              notInterfaceFilter,
+                              x => true,
+                              getClass.getClassLoader,
+                              interfaceFilter,
+                              x => false)
     val main =
       ClasspathUtilities.makeLoader(classpath, dual, scalaInstance, tempDir)
     // TODO - There's actually an issue with the classpath facility such that unmanagedScalaInstances are not added
@@ -263,7 +269,10 @@ object TestFramework {
                          taskDef: TaskDef,
                          runner: TestRunner,
                          testTask: TestTask): TestFunction =
-    new TestFunction(taskDef, runner, (r: TestRunner) =>
+    new TestFunction(
+        taskDef,
+        runner,
+        (r: TestRunner) =>
           withContextLoader(loader) { r.run(taskDef, testTask) }) {
       def tags = testTask.tags
     }

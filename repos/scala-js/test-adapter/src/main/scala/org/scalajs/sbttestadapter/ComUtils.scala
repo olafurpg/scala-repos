@@ -39,7 +39,8 @@ private[testadapter] object ComUtils {
   def receiveResponse[T](com: ComJSRunner, timeout: Duration)(
       handler: Handler[T]): T = {
     val resp = {
-      try com.receive(timeout) catch {
+      try com.receive(timeout)
+      catch {
         case t: ComJSEnv.ComClosedException =>
           // Check if runner failed. If it did, throw that exception instead
           if (!com.isRunning()) com.await() // Will throw if runner failed
@@ -61,7 +62,8 @@ private[testadapter] object ComUtils {
     val data = resp.substring(pos + 1)
 
     def throwable = {
-      try fromJSON[RemoteException](readJSON(data)) catch {
+      try fromJSON[RemoteException](readJSON(data))
+      catch {
         case t: Throwable => badResponse(t)
       }
     }
@@ -77,7 +79,8 @@ private[testadapter] object ComUtils {
     }
 
     val result = {
-      try handler.lift((status, data)) catch {
+      try handler.lift((status, data))
+      catch {
         case t: Throwable => badResponse(t)
       }
     }

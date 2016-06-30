@@ -145,9 +145,8 @@ trait ScalaSessionAPI {
     * were used.
     */
   def peerCertificates: List[Certificate] =
-    try Option(session.getPeerCertificates)
-      .map(_.toList)
-      .getOrElse(Nil) catch {
+    try Option(session.getPeerCertificates).map(_.toList).getOrElse(Nil)
+    catch {
       case e: SSLPeerUnverifiedException ⇒ Nil
     }
 
@@ -156,7 +155,8 @@ trait ScalaSessionAPI {
     * this session’s negotiation.
     */
   def peerPrincipal: Option[Principal] =
-    try Option(session.getPeerPrincipal) catch {
+    try Option(session.getPeerPrincipal)
+    catch {
       case e: SSLPeerUnverifiedException ⇒ None
     }
 }

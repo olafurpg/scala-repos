@@ -639,7 +639,8 @@ private[stream] final class VirtualProcessor[T]
 
     if (s == null) {
       val ex = subscriberMustNotBeNullException
-      try rec(Inert.subscriber) finally throw ex // must throw NPE, rule 2:13
+      try rec(Inert.subscriber)
+      finally throw ex // must throw NPE, rule 2:13
     } else rec(s.asInstanceOf[Subscriber[Any]])
   }
 
@@ -667,14 +668,16 @@ private[stream] final class VirtualProcessor[T]
 
     if (s == null) {
       val ex = subscriptionMustNotBeNullException
-      try rec(ErrorPublisher(ex, "failed-VirtualProcessor")) finally throw ex // must throw NPE, rule 2:13
+      try rec(ErrorPublisher(ex, "failed-VirtualProcessor"))
+      finally throw ex // must throw NPE, rule 2:13
     } else rec(s)
   }
 
   private def establishSubscription(subscriber: Subscriber[_],
                                     subscription: Subscription): Unit = {
     val wrapped = new WrappedSubscription(subscription)
-    try subscriber.onSubscribe(wrapped) catch {
+    try subscriber.onSubscribe(wrapped)
+    catch {
       case NonFatal(ex) =>
         set(Inert)
         tryCancel(subscription)
@@ -701,7 +704,8 @@ private[stream] final class VirtualProcessor[T]
           else if (t == null) throw ex
         case Both(s) =>
           set(Inert)
-          try tryOnError(s, ex) finally if (t == null)
+          try tryOnError(s, ex)
+          finally if (t == null)
             throw ex // must throw NPE, rule 2:13
         case s: Subscriber[_] => // spec violation
           getAndSet(Inert) match {
@@ -740,9 +744,11 @@ private[stream] final class VirtualProcessor[T]
                                ErrorPublisher(ex, "failed-VirtualProcessor")))
               rec()
           case s: Subscriber[_] =>
-            try s.onError(ex) catch { case NonFatal(_) => } finally set(Inert)
+            try s.onError(ex)
+            catch { case NonFatal(_) => } finally set(Inert)
           case Both(s) =>
-            try s.onError(ex) catch { case NonFatal(_) => } finally set(Inert)
+            try s.onError(ex)
+            catch { case NonFatal(_) => } finally set(Inert)
           case _ =>
           // spec violation or cancellation race, but nothing we can do
         }
@@ -752,7 +758,8 @@ private[stream] final class VirtualProcessor[T]
       @tailrec def rec(): Unit =
         get() match {
           case Both(s) =>
-            try s.onNext(t) catch {
+            try s.onNext(t)
+            catch {
               case NonFatal(e) =>
                 set(Inert)
                 throw new IllegalStateException(
@@ -952,7 +959,8 @@ private[stream] abstract class MaterializerSession(
         topLevel.isRunnable,
         s"The top level module cannot be materialized because it has unconnected ports: ${(topLevel.inPorts ++ topLevel.outPorts)
           .mkString(", ")}")
-    try materializeModule(topLevel, initialAttributes and topLevel.attributes) catch {
+    try materializeModule(topLevel, initialAttributes and topLevel.attributes)
+    catch {
       case NonFatal(cause) ⇒
         // PANIC!!! THE END OF THE MATERIALIZATION IS NEAR!
         // Cancels all intermediate Publishers and fails all intermediate Subscribers.

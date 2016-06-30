@@ -215,7 +215,8 @@ trait Holes { self: Quasiquotes =>
     val treeNoUnlift = Bind(placeholderName, Ident(nme.WILDCARD))
     lazy val tree = tptopt.map { tpt =>
       val TypeDef(_, _, _, typedTpt) =
-        try c.typecheck(TypeDef(NoMods, TypeName("T"), Nil, tpt)) catch {
+        try c.typecheck(TypeDef(NoMods, TypeName("T"), Nil, tpt))
+        catch {
           case TypecheckException(pos, msg) =>
             c.abort(pos.asInstanceOf[c.Position], msg)
         }

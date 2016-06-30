@@ -55,7 +55,8 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
   private def checkSqlGeneration(hiveQl: String): Unit = {
     val df = sql(hiveQl)
 
-    val convertedSQL = try new SQLBuilder(df).toSQL catch {
+    val convertedSQL = try new SQLBuilder(df).toSQL
+    catch {
       case NonFatal(e) =>
         fail(
             s"""Cannot convert the following HiveQL query plan back to SQL query string:
@@ -82,7 +83,8 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
           |
           |# Resolved query plan:
           |${df.queryExecution.analyzed.treeString}
-         """.stripMargin, cause)
+         """.stripMargin,
+             cause)
     }
   }
 

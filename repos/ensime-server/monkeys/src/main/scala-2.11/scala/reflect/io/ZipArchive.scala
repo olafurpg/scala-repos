@@ -242,14 +242,16 @@ final class URLZipArchive(val url: URL) extends ZipArchive(null) {
     }
 
     loop()
-    try root.iterator finally dirs.clear()
+    try root.iterator
+    finally dirs.clear()
   }
 
   def name = url.getFile()
   def path = url.getPath()
   def input = url.openStream()
   def lastModified =
-    try url.openConnection().getLastModified() catch {
+    try url.openConnection().getLastModified()
+    catch {
       case _: IOException => 0
     }
 
@@ -286,7 +288,8 @@ final class ManifestResources(val url: URL) extends ZipArchive(null) {
       }
     }
 
-    try root.iterator finally dirs.clear()
+    try root.iterator
+    finally dirs.clear()
   }
 
   def name = path
@@ -297,7 +300,8 @@ final class ManifestResources(val url: URL) extends ZipArchive(null) {
   }
   def input = url.openStream()
   def lastModified =
-    try url.openConnection().getLastModified() catch {
+    try url.openConnection().getLastModified()
+    catch {
       case _: IOException => 0
     }
 

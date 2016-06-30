@@ -888,7 +888,8 @@ private[akka] final class FunctionRef(override val path: ActorPath,
   }
 
   private def publish(e: Logging.LogEvent): Unit =
-    try eventStream.publish(e) catch { case NonFatal(_) ⇒ }
+    try eventStream.publish(e)
+    catch { case NonFatal(_) ⇒ }
 
   /**
     * Have this FunctionRef watch the given Actor. This method must not be

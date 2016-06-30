@@ -187,8 +187,8 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
         val ref = expectMsgType[Children].children
           .find(_.path.toString contains "fileSource")
           .get
-        try assertDispatcher(ref, "akka.stream.default-blocking-io-dispatcher") finally p
-          .cancel()
+        try assertDispatcher(ref, "akka.stream.default-blocking-io-dispatcher")
+        finally p.cancel()
       } finally shutdown(sys)
     }
 
@@ -213,8 +213,8 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
         val ref = expectMsgType[Children].children
           .find(_.path.toString contains "File")
           .get
-        try assertDispatcher(ref, "akka.actor.default-dispatcher") finally p
-          .cancel()
+        try assertDispatcher(ref, "akka.actor.default-dispatcher")
+        finally p.cancel()
       } finally shutdown(sys)
     }
 

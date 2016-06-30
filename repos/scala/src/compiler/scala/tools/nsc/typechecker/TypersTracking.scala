@@ -53,7 +53,8 @@ trait TypersTracking { self: Analyzer =>
     private var depth = 0
     private def atLowerIndent[T](body: => T): T = {
       depth -= 1
-      try body finally depth += 1
+      try body
+      finally depth += 1
     }
     private def resetIfEmpty(s: String) =
       if (trees.isEmpty) resetColor(s) else s
@@ -78,7 +79,8 @@ trait TypersTracking { self: Analyzer =>
 
     @inline final def runWith[T](t: Tree)(body: => T): T = {
       push(t)
-      try body finally pop(t)
+      try body
+      finally pop(t)
     }
     def push(t: Tree): Unit = {
       trees ::= new Frame(t)

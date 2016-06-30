@@ -576,14 +576,16 @@ private class AFTCostFun(data: RDD[AFTPoint], fitIntercept: Boolean)
 
   override def calculate(parameters: BDV[Double]): (Double, BDV[Double]) = {
 
-    val aftAggregator = data.treeAggregate(
-        new AFTAggregator(parameters, fitIntercept))(seqOp = (c, v) =>
-          (c, v) match {
-        case (aggregator, instance) => aggregator.add(instance)
-    }, combOp = (c1, c2) =>
-          (c1, c2) match {
-        case (aggregator1, aggregator2) => aggregator1.merge(aggregator2)
-    })
+    val aftAggregator =
+      data.treeAggregate(new AFTAggregator(parameters, fitIntercept))(
+          seqOp = (c, v) =>
+            (c, v) match {
+              case (aggregator, instance) => aggregator.add(instance)
+          },
+          combOp = (c1, c2) =>
+            (c1, c2) match {
+              case (aggregator1, aggregator2) => aggregator1.merge(aggregator2)
+          })
 
     (aftAggregator.loss, aftAggregator.gradient)
   }

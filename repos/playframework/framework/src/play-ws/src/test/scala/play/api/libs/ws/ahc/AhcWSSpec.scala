@@ -53,8 +53,9 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .setShutdownTimeout(0)
       implicit val sslClient =
         new play.api.libs.ws.ahc.AhcWSClient(sslBuilder.build())
-      try WS.clientUrl("http://example.com/feed") must beAnInstanceOf[
-          WSRequest] finally sslClient.close()
+      try WS
+        .clientUrl("http://example.com/feed") must beAnInstanceOf[WSRequest]
+      finally sslClient.close()
     }
 
     "AhcWSClient.underlying" in new WithApplication {

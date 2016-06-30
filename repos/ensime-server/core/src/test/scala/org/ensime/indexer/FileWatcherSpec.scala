@@ -342,13 +342,15 @@ abstract class FileWatcherSpec
   def withClassWatcher[T](base: File)(
       code: Watcher => T)(implicit vfs: EnsimeVFS, tk: TestKit) = {
     val w = createClassWatcher(base)
-    try code(w) finally w.shutdown()
+    try code(w)
+    finally w.shutdown()
   }
 
   def withJarWatcher[T](jar: File)(code: Watcher => T)(implicit vfs: EnsimeVFS,
                                                        tk: TestKit) = {
     val w = createJarWatcher(jar)
-    try code(w) finally w.shutdown()
+    try code(w)
+    finally w.shutdown()
   }
 
   def listeners(implicit vfs: EnsimeVFS, tk: TestKit) = List(

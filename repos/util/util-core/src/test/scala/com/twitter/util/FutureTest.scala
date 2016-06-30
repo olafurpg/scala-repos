@@ -1162,10 +1162,11 @@ class FutureTest
         }
       }
 
-      testSequence("flatMap", (a, next) =>
-            a flatMap { _ =>
-          next()
-      })
+      testSequence("flatMap",
+                   (a, next) =>
+                     a flatMap { _ =>
+                       next()
+                   })
       testSequence("before", (a, next) => a before next())
 
       "flatMap (values)" should {

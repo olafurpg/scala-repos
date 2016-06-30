@@ -218,7 +218,8 @@ abstract class TailCalls extends Transform {
     def transform(tree: Tree, nctx: TailContext): Tree = {
       val saved = ctx
       ctx = nctx
-      try transform(tree) finally this.ctx = saved
+      try transform(tree)
+      finally this.ctx = saved
     }
 
     def yesTailTransform(tree: Tree): Tree =
@@ -454,7 +455,8 @@ abstract class TailCalls extends Transform {
     def traverse(tree: Tree, maybeTailNew: Boolean): Unit = {
       val saved = maybeTail
       maybeTail = maybeTailNew
-      try traverse(tree) finally maybeTail = saved
+      try traverse(tree)
+      finally maybeTail = saved
     }
 
     def traverseNoTail(tree: Tree) = traverse(tree, maybeTailNew = false)

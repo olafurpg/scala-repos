@@ -400,7 +400,8 @@ abstract class Pickler extends SubComponent {
       @inline private def asRefs[T](body: => T): T = {
         val saved = refs
         refs = true
-        try body finally refs = saved
+        try body
+        finally refs = saved
       }
       override def traverseModifiers(mods: Modifiers): Unit =
         if (refs) writeRef(mods) else super.traverseModifiers(mods)

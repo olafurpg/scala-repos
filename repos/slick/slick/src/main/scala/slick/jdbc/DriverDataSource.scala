@@ -71,12 +71,14 @@ class DriverDataSource(
                 .getOrElse {
                   logger.debug(
                       s"Loaded driver $driverClassName but it did not register with DriverManager; trying to instantiate directly")
-                  try cl.newInstance.asInstanceOf[Driver] catch {
+                  try cl.newInstance.asInstanceOf[Driver]
+                  catch {
                     case ex: Exception =>
                       logger.debug(
                           s"Instantiating driver class $driverClassName failed; asking DriverManager to handle URL $url",
                           ex)
-                      try DriverManager.getDriver(url) catch {
+                      try DriverManager.getDriver(url)
+                      catch {
                         case ex: Exception =>
                           throw new SlickException(
                               s"Driver $driverClassName does not know how to handle URL $url",
@@ -86,7 +88,8 @@ class DriverDataSource(
                 }
             }
         } else
-          try DriverManager.getDriver(url) catch {
+          try DriverManager.getDriver(url)
+          catch {
             case ex: Exception =>
               throw new SlickException(
                   s"No driver specified and DriverManager does not know how to handle URL $url",
@@ -101,7 +104,8 @@ class DriverDataSource(
       connectionProps = propsWithUserAndPassword(properties, user, password)
     } catch {
       case NonFatal(ex) =>
-        try close() catch ignoreFollowOnError
+        try close()
+        catch ignoreFollowOnError
         throw ex
     } finally initialized = true
   }
@@ -146,9 +150,8 @@ class DriverDataSource(
     throw new SQLFeatureNotSupportedException()
 
   def getParentLogger: Logger = {
-    try driver
-      .asInstanceOf[{ def getParentLogger(): Logger }]
-      .getParentLogger catch {
+    try driver.asInstanceOf[{ def getParentLogger(): Logger }].getParentLogger
+    catch {
       case _: NoSuchMethodException =>
         throw new SQLFeatureNotSupportedException()
     }

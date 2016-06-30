@@ -126,14 +126,13 @@ trait IssuesControllerBase extends ControllerBase {
 
           // insert labels
           if (writable) {
-            form.labelNames.map {
-              value =>
-                val labels = getLabels(owner, name)
-                value.split(",").foreach { labelName =>
-                  labels.find(_.labelName == labelName).map { label =>
-                    registerIssueLabel(owner, name, issueId, label.labelId)
-                  }
+            form.labelNames.map { value =>
+              val labels = getLabels(owner, name)
+              value.split(",").foreach { labelName =>
+                labels.find(_.labelName == labelName).map { label =>
+                  registerIssueLabel(owner, name, issueId, label.labelId)
                 }
+              }
             }
           }
 
@@ -257,13 +256,12 @@ trait IssuesControllerBase extends ControllerBase {
       readableUsersOnly { (form, repository) =>
     defining(repository.owner, repository.name) {
       case (owner, name) =>
-        getComment(owner, name, params("id")).map {
-          comment =>
-            if (isEditable(owner, name, comment.commentedUserName)) {
-              updateComment(comment.commentId, form.content)
-              redirect(
-                  s"/${owner}/${name}/issue_comments/_data/${comment.commentId}")
-            } else Unauthorized
+        getComment(owner, name, params("id")).map { comment =>
+          if (isEditable(owner, name, comment.commentedUserName)) {
+            updateComment(comment.commentId, form.content)
+            redirect(
+                s"/${owner}/${name}/issue_comments/_data/${comment.commentId}")
+          } else Unauthorized
         } getOrElse NotFound
     }
   })
@@ -357,27 +355,25 @@ trait IssuesControllerBase extends ControllerBase {
 
   ajaxPost("/:owner/:repository/issues/:id/label/new")(collaboratorsOnly {
     repository =>
-      defining(params("id").toInt) {
-        issueId =>
-          registerIssueLabel(repository.owner,
-                             repository.name,
-                             issueId,
-                             params("labelId").toInt)
-          html.labellist(
-              getIssueLabels(repository.owner, repository.name, issueId))
+      defining(params("id").toInt) { issueId =>
+        registerIssueLabel(repository.owner,
+                           repository.name,
+                           issueId,
+                           params("labelId").toInt)
+        html.labellist(
+            getIssueLabels(repository.owner, repository.name, issueId))
       }
   })
 
   ajaxPost("/:owner/:repository/issues/:id/label/delete")(collaboratorsOnly {
     repository =>
-      defining(params("id").toInt) {
-        issueId =>
-          deleteIssueLabel(repository.owner,
-                           repository.name,
-                           issueId,
-                           params("labelId").toInt)
-          html.labellist(
-              getIssueLabels(repository.owner, repository.name, issueId))
+      defining(params("id").toInt) { issueId =>
+        deleteIssueLabel(repository.owner,
+                         repository.name,
+                         issueId,
+                         params("labelId").toInt)
+        html.labellist(
+            getIssueLabels(repository.owner, repository.name, issueId))
       }
   })
 
@@ -431,23 +427,18 @@ trait IssuesControllerBase extends ControllerBase {
     }
   })
 
-  post("/:owner/:repository/issues/batchedit/label")(collaboratorsOnly {
-    repository =>
-      params("value").toIntOpt.map {
-        labelId =>
-          executeBatch(repository) {
-            issueId =>
-              getIssueLabel(repository.owner,
-                            repository.name,
-                            issueId,
-                            labelId) getOrElse {
-                registerIssueLabel(repository.owner,
-                                   repository.name,
-                                   issueId,
-                                   labelId)
-              }
-          }
-      } getOrElse NotFound
+  post("/:owner/:repository/issues/batchedit/label")(
+      collaboratorsOnly { repository =>
+    params("value").toIntOpt.map { labelId =>
+      executeBatch(repository) { issueId =>
+        getIssueLabel(repository.owner, repository.name, issueId, labelId) getOrElse {
+          registerIssueLabel(repository.owner,
+                             repository.name,
+                             issueId,
+                             labelId)
+        }
+      }
+    } getOrElse NotFound
   })
 
   post("/:owner/:repository/issues/batchedit/assign")(collaboratorsOnly {

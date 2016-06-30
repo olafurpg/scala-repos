@@ -104,7 +104,8 @@ object Duration {
     * The extractor will not match for malformed strings or non-finite durations.
     */
   def unapply(s: String): Option[(Long, TimeUnit)] =
-    (try Some(apply(s)) catch { case _: RuntimeException => None }) flatMap unapply
+    (try Some(apply(s))
+    catch { case _: RuntimeException => None }) flatMap unapply
 
   /**
     * Extract length and time unit out of a duration, if it is finite.

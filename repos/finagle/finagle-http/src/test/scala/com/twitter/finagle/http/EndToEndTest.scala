@@ -678,8 +678,8 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
     val server = finagle.Http.serve(new InetSocketAddress(0), service)
     val client = finagle.Http.client
       .configured(Stats(st))
-      .configured(FailureAccrualFactory.Param(failureAccrualFailures, () =>
-                1.minute))
+      .configured(
+          FailureAccrualFactory.Param(failureAccrualFailures, () => 1.minute))
       .newService(
           Name.bound(
               Address(server.boundAddress.asInstanceOf[InetSocketAddress])),

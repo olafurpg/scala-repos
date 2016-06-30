@@ -521,7 +521,8 @@ trait Future[+T] extends Awaitable[T] {
   def andThen[U](pf: PartialFunction[Try[T], U])(
       implicit executor: ExecutionContext): Future[T] =
     transform { result =>
-      try pf.applyOrElse[Try[T], Any](result, Predef.conforms[Try[T]]) catch {
+      try pf.applyOrElse[Try[T], Any](result, Predef.conforms[Try[T]])
+      catch {
         case NonFatal(t) => executor reportFailure t
       }
 

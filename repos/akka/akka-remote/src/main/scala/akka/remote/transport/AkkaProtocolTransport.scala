@@ -742,7 +742,8 @@ private[transport] class ProtocolStateActor(
   }
 
   private def decodePdu(pdu: ByteString): AkkaPdu =
-    try codec.decodePdu(pdu) catch {
+    try codec.decodePdu(pdu)
+    catch {
       case NonFatal(e) ⇒
         throw new AkkaProtocolException(
             "Error while decoding incoming Akka PDU of length: " + pdu.length,
@@ -753,7 +754,8 @@ private[transport] class ProtocolStateActor(
   //  - Missing heartbeats are not critical
   //  - Disassociate messages are not guaranteed anyway
   private def sendHeartbeat(wrappedHandle: AssociationHandle): Boolean =
-    try wrappedHandle.write(codec.constructHeartbeat) catch {
+    try wrappedHandle.write(codec.constructHeartbeat)
+    catch {
       case NonFatal(e) ⇒
         throw new AkkaProtocolException("Error writing HEARTBEAT to transport",
                                         e)
@@ -761,7 +763,8 @@ private[transport] class ProtocolStateActor(
 
   private def sendDisassociate(wrappedHandle: AssociationHandle,
                                info: DisassociateInfo): Unit =
-    try wrappedHandle.write(codec.constructDisassociate(info)) catch {
+    try wrappedHandle.write(codec.constructDisassociate(info))
+    catch {
       case NonFatal(e) ⇒
         throw new AkkaProtocolException(
             "Error writing DISASSOCIATE to transport",

@@ -149,12 +149,14 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     .getDuration("akka.cluster.distributed-data.serializer-cache-time-to-live",
                  TimeUnit.MILLISECONDS)
     .millis
-  private val readCache =
-    new SmallCache[Read, Array[Byte]](4, cacheTimeToLive, m ⇒
-          readToProto(m).toByteArray)
-  private val writeCache =
-    new SmallCache[Write, Array[Byte]](4, cacheTimeToLive, m ⇒
-          writeToProto(m).toByteArray)
+  private val readCache = new SmallCache[Read, Array[Byte]](
+      4,
+      cacheTimeToLive,
+      m ⇒ readToProto(m).toByteArray)
+  private val writeCache = new SmallCache[Write, Array[Byte]](
+      4,
+      cacheTimeToLive,
+      m ⇒ writeToProto(m).toByteArray)
   system.scheduler.schedule(cacheTimeToLive, cacheTimeToLive / 2) {
     readCache.evict()
     writeCache.evict()

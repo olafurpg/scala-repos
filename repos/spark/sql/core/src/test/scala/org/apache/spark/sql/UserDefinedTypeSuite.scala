@@ -93,8 +93,9 @@ class UserDefinedTypeSuite
   }
 
   test("UDTs and UDFs") {
-    sqlContext.udf.register("testType", (d: MyDenseVector) =>
-          d.isInstanceOf[MyDenseVector])
+    sqlContext.udf.register(
+        "testType",
+        (d: MyDenseVector) => d.isInstanceOf[MyDenseVector])
     pointsRDD.registerTempTable("points")
     checkAnswer(sql("SELECT testType(features) from points"),
                 Seq(Row(true), Row(true)))

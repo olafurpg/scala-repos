@@ -406,7 +406,8 @@ private[internal] trait GlbLubs { self: SymbolTable =>
           // which are refined by every type in ts.
           for (sym <- lubBase.nonPrivateMembers; if !excludeFromLub(sym)) {
             try lubsym(sym) andAlso
-              (addMember(lubThisType, lubRefined, _, depth)) catch {
+              (addMember(lubThisType, lubRefined, _, depth))
+            catch {
               case ex: NoCommonType =>
             }
           }

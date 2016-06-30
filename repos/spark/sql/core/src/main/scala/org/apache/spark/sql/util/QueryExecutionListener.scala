@@ -135,7 +135,8 @@ class ExecutionListenerManager private[sql] () extends Logging {
   private def readLock[A](f: => A): A = {
     val rl = lock.readLock()
     rl.lock()
-    try f finally {
+    try f
+    finally {
       rl.unlock()
     }
   }
@@ -144,7 +145,8 @@ class ExecutionListenerManager private[sql] () extends Logging {
   private def writeLock[A](f: => A): A = {
     val wl = lock.writeLock()
     wl.lock()
-    try f finally {
+    try f
+    finally {
       wl.unlock()
     }
   }

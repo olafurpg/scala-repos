@@ -82,7 +82,8 @@ class DataSourceJdbcDataSource(val ds: DataSource,
 
   def close(): Unit = {
     try if (keepAliveConnection && (openedKeepAliveConnection ne null))
-      openedKeepAliveConnection.close() finally ds match {
+      openedKeepAliveConnection.close()
+    finally ds match {
       case ds: Closeable => ds.close()
       case _ =>
     }
@@ -134,7 +135,8 @@ trait DriverBasedJdbcDataSource extends JdbcDataSource {
 
   protected[this] def registerDriver(driverName: String, url: String): Unit =
     if (driverName ne null) {
-      val oldDriver = try DriverManager.getDriver(url) catch {
+      val oldDriver = try DriverManager.getDriver(url)
+      catch {
         case ex: SQLException if "08001" == ex.getSQLState => null
       }
       if (oldDriver eq null) {

@@ -109,7 +109,8 @@ trait PojoSRTestSupport extends Suite with BeforeAndAfterAll {
     builders map (_.build)
 
   def filterErrors()(block: ⇒ Unit): Unit =
-    try block catch {
+    try block
+    catch {
       case e: Throwable ⇒
         System.err.write(bufferedLoadingErrors.toByteArray); throw e
     }
@@ -182,7 +183,8 @@ class BundleDescriptorBuilder(name: String) {
   def tinybundleToJarFile(name: String): File = {
     val file = new File("target/%s-%tQ.jar".format(name, new Date()))
     val fos = new FileOutputStream(file)
-    try copy(tinybundle.build(), fos) finally fos.close()
+    try copy(tinybundle.build(), fos)
+    finally fos.close()
 
     file
   }

@@ -57,7 +57,8 @@ class PersistenceQuerySpec
       .withFallback(ConfigFactory.load())
 
     val sys = ActorSystem(s"sys-${systemCounter.incrementAndGet()}", config)
-    try block(sys) finally Await.ready(sys.terminate(), 10.seconds)
+    try block(sys)
+    finally Await.ready(sys.terminate(), 10.seconds)
   }
 }
 

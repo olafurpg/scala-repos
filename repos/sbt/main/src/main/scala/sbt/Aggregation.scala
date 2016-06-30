@@ -26,8 +26,10 @@ final object Aggregation {
   final case class KeyValue[+T](key: ScopedKey[_], value: T)
 
   def defaultShow(state: State, showTasks: Boolean): ShowConfig =
-    ShowConfig(settingValues = true, taskValues = showTasks, s =>
-          state.log.info(s), success = true)
+    ShowConfig(settingValues = true,
+               taskValues = showTasks,
+               s => state.log.info(s),
+               success = true)
   def printSettings(xs: Seq[KeyValue[_]], print: String => Unit)(
       implicit display: Show[ScopedKey[_]]) =
     xs match {

@@ -5,7 +5,8 @@ object Test extends App {
   val tree = Typed(Apply(Select(Ident(TermName("Macros")), TermName("foo")),
                          List(Literal(Constant(42)))),
                    Ident(TypeName("String")))
-  try cm.mkToolBox().eval(tree) catch {
+  try cm.mkToolBox().eval(tree)
+  catch {
     case ex: Throwable => println(ex.getMessage)
   }
 }

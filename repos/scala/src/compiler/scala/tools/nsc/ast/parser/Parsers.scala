@@ -225,7 +225,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     @inline private def withSmartParsing[T](body: => T): T = {
       val saved = smartParsing
       smartParsing = true
-      try body finally smartParsing = saved
+      try body
+      finally smartParsing = saved
     }
     def withPatches(patches: List[BracePatch]): UnitParser =
       new UnitParser(unit, patches)
@@ -290,7 +291,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     @inline final def lookingAhead[T](body: => T): T = {
       val saved = new ScannerData {} copyFrom in
       in.nextToken()
-      try body finally in copyFrom saved
+      try body
+      finally in copyFrom saved
     }
 
     /** Perform an operation while peeking ahead.
@@ -307,7 +309,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       }
       peekahead()
       // try it, in case it is recoverable
-      val res = try tree catch { case e: Exception => pushback(); throw e }
+      val res = try tree
+      catch { case e: Exception => pushback(); throw e }
       if (res.isEmpty) pushback()
       res
     }
@@ -337,7 +340,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     private var classContextBounds: List[Tree] = Nil
     @inline private def savingClassContextBounds[T](op: => T): T = {
       val saved = classContextBounds
-      try op finally classContextBounds = saved
+      try op
+      finally classContextBounds = saved
     }
 
     /** Are we inside the Scala package? Set for files that start with package scala
@@ -537,7 +541,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     @inline private def fromWithinReturnType[T](body: => T): T = {
       val saved = inFunReturnType
       inFunReturnType = true
-      try body finally inFunReturnType = saved
+      try body
+      finally inFunReturnType = saved
     }
 
     protected def skip(targetToken: Token): Unit = {
@@ -901,7 +906,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
 
     private def opHead = opstack.head
     private def headPrecedence = opHead.precedence
-    private def popOpInfo(): OpInfo = try opHead finally opstack = opstack.tail
+    private def popOpInfo(): OpInfo =
+      try opHead
+      finally opstack = opstack.tail
     private def pushOpInfo(top: Tree): Unit = {
       val name = in.name
       val offset = in.offset
@@ -1201,7 +1208,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
              nme.ERROR))
 
     def ident(): Name = ident(skipIt = true)
-    def rawIdent(): Name = try in.name finally in.nextToken()
+    def rawIdent(): Name =
+      try in.name
+      finally in.nextToken()
 
     /** For when it's known already to be a type name. */
     def identForType(): TypeName = ident().toTypeName
@@ -1332,7 +1341,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
                 inPattern: Boolean = false,
                 start: Offset = in.offset): Tree = atPos(start) {
       def finish(value: Any): Tree =
-        try newLiteral(value) finally in.nextToken()
+        try newLiteral(value)
+        finally in.nextToken()
       if (in.token == SYMBOLLIT)
         Apply(scalaDot(nme.Symbol), List(finish(in.strVal)))
       else if (in.token == INTERPOLATIONID)

@@ -56,7 +56,8 @@ object BasicCommands {
 
   def helpParser(s: State) = {
     val h = (Help.empty /: s.definedCommands) { (a, b) =>
-      a ++ (try b.help(s) catch { case NonFatal(ex) => Help.empty })
+      a ++ (try b.help(s)
+          catch { case NonFatal(ex) => Help.empty })
     }
     val helpCommands = h.detail.keySet
     val spacedArg = singleArgument(helpCommands).?
@@ -64,7 +65,8 @@ object BasicCommands {
   }
 
   def runHelp(s: State, h: Help)(arg: Option[String]): State = {
-    val message = try Help.message(h, arg) catch {
+    val message = try Help.message(h, arg)
+    catch {
       case NonFatal(ex) =>
         ex.toString
     }

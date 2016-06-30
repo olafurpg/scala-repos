@@ -631,17 +631,17 @@ class RichPresentationCompiler(
   }
 
   def wrapTypeMembers(p: Position): List[Member] =
-    wrap[List[Member]](r => new AskTypeCompletionItem(p, r).apply(), _ =>
-          List.empty)
+    wrap[List[Member]](r => new AskTypeCompletionItem(p, r).apply(),
+                       _ => List.empty)
 
   def wrapTypedTree(source: SourceFile, forceReload: Boolean): Tree =
-    wrap[Tree](r => new AskTypeItem(source, forceReload, r).apply(), t =>
-          throw t)
+    wrap[Tree](r => new AskTypeItem(source, forceReload, r).apply(),
+               t => throw t)
 
   def wrapTypedTreeAt(position: Position): Tree =
     wrap[Tree](r => new AskTypeAtItem(position, r).apply(), t => throw t)
 
   def wrapLinkPos(sym: Symbol, source: SourceFile): Position =
-    wrap[Position](r => new AskLinkPosItem(sym, source, r).apply(), t =>
-          throw t)
+    wrap[Position](r => new AskLinkPosItem(sym, source, r).apply(),
+                   t => throw t)
 }

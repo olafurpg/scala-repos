@@ -87,7 +87,9 @@ object Promise {
     def apply(result: Try[A]) {
       val current = Local.save()
       Local.restore(saved)
-      try k(result) catch Monitor.catcher finally Local.restore(current)
+      try k(result)
+      catch Monitor.catcher
+      finally Local.restore(current)
     }
   }
 
@@ -110,7 +112,8 @@ object Promise {
       extends K[A] {
     private[this] def k(r: Try[A]) = {
       promise.become(
-          try f(r) catch {
+          try f(r)
+          catch {
             case e: NonLocalReturnControl[_] =>
               Future.exception(new FutureNonLocalReturnControl(e))
             case NonFatal(e) => Future.exception(e)
@@ -121,7 +124,8 @@ object Promise {
     def apply(result: Try[A]) {
       val current = Local.save()
       Local.restore(saved)
-      try k(result) catch {
+      try k(result)
+      catch {
         case t: Throwable =>
           Monitor.handle(t)
           throw t

@@ -100,7 +100,8 @@ object Exception {
 
     /** Apply this catch logic to the supplied body. */
     def apply[U >: T](body: => U): U =
-      try body catch {
+      try body
+      catch {
         case x if rethrow(x) => throw x
         case x if pf isDefinedAt x => pf(x)
       } finally fin foreach (_.invoke())

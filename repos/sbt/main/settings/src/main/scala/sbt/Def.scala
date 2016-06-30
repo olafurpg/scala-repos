@@ -37,8 +37,9 @@ object Def extends Init[Scope] with TaskMacroExtra {
       keyNameColor: Option[String] = None): Show[ScopedKey[_]] =
     new Show[ScopedKey[_]] {
       def apply(key: ScopedKey[_]) =
-        Scope.display(key.scope, colored(key.key.label, keyNameColor), ref =>
-              displayRelative(current, multi, ref))
+        Scope.display(key.scope,
+                      colored(key.key.label, keyNameColor),
+                      ref => displayRelative(current, multi, ref))
     }
   def displayRelative(current: ProjectRef,
                       multi: Boolean,

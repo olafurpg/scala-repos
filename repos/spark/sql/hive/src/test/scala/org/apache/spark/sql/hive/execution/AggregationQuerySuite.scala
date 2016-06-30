@@ -259,7 +259,8 @@ abstract class AggregationQuerySuite
           |  COUNT(DISTINCT value)
           |FROM emptyTable
           |GROUP BY key
-        """.stripMargin), Nil)
+        """.stripMargin),
+                Nil)
   }
 
   test("null literal") {
@@ -272,7 +273,8 @@ abstract class AggregationQuerySuite
           |  MAX(null),
           |  MIN(null),
           |  SUM(null)
-        """.stripMargin), Row(null, 0, null, null, null, null, null) :: Nil)
+        """.stripMargin),
+                Row(null, 0, null, null, null, null, null) :: Nil)
   }
 
   test("only do grouping") {
@@ -280,7 +282,8 @@ abstract class AggregationQuerySuite
           |SELECT key
           |FROM agg1
           |GROUP BY key
-        """.stripMargin), Row(1) :: Row(2) :: Row(3) :: Row(null) :: Nil)
+        """.stripMargin),
+                Row(1) :: Row(2) :: Row(3) :: Row(null) :: Nil)
 
     checkAnswer(
         sqlContext.sql("""
@@ -410,7 +413,8 @@ abstract class AggregationQuerySuite
 
     checkAnswer(sqlContext.sql("""
           |SELECT avg(value) FROM agg1
-        """.stripMargin), Row(11.125) :: Nil)
+        """.stripMargin),
+                Row(11.125) :: Nil)
   }
 
   test("first_value and last_value") {
@@ -428,7 +432,8 @@ abstract class AggregationQuerySuite
             |  firSt(key, true),
             |  lASt(key, true)
             |FROM (SELECT key FROM agg1 ORDER BY key) tmp
-          """.stripMargin), Row(null, 3, null, 3, 1, 3, 1, 3) :: Nil)
+          """.stripMargin),
+                  Row(null, 3, null, 3, 1, 3, 1, 3) :: Nil)
 
       checkAnswer(
           sqlContext.sql("""
@@ -484,11 +489,13 @@ abstract class AggregationQuerySuite
 
     checkAnswer(sqlContext.sql("""
           |SELECT mydoublesum(value) FROM agg1
-        """.stripMargin), Row(89.0) :: Nil)
+        """.stripMargin),
+                Row(89.0) :: Nil)
 
     checkAnswer(sqlContext.sql("""
           |SELECT mydoublesum(null)
-        """.stripMargin), Row(null) :: Nil)
+        """.stripMargin),
+                Row(null) :: Nil)
   }
 
   test("interpreted and expression-based aggregation functions") {
@@ -532,7 +539,8 @@ abstract class AggregationQuerySuite
           |  avg(value2),
           |  max(distinct value1)
           |FROM agg2
-        """.stripMargin), Row(-60, 70.0, 101.0 / 9.0, 5.6, 100))
+        """.stripMargin),
+                Row(-60, 70.0, 101.0 / 9.0, 5.6, 100))
 
     checkAnswer(sqlContext.sql("""
           |SELECT
@@ -808,15 +816,18 @@ abstract class AggregationQuerySuite
 
     checkAnswer(sqlContext.sql("""
           |SELECT corr(b, c) FROM covar_tab WHERE a < 1
-        """.stripMargin), Row(null) :: Nil)
+        """.stripMargin),
+                Row(null) :: Nil)
 
     checkAnswer(sqlContext.sql("""
           |SELECT corr(b, c) FROM covar_tab WHERE a < 3
-        """.stripMargin), Row(null) :: Nil)
+        """.stripMargin),
+                Row(null) :: Nil)
 
     checkAnswer(sqlContext.sql("""
           |SELECT corr(b, c) FROM covar_tab WHERE a = 3
-        """.stripMargin), Row(Double.NaN) :: Nil)
+        """.stripMargin),
+                Row(Double.NaN) :: Nil)
 
     checkAnswer(
         sqlContext.sql(
@@ -977,12 +988,14 @@ abstract class AggregationQuerySuite
             |SELECT key, noInputSchema(myArray)
             |FROM noInputSchemaUDAF
             |GROUP BY key
-          """.stripMargin), Row(1, 21) :: Row(2, -10) :: Nil)
+          """.stripMargin),
+                  Row(1, 21) :: Row(2, -10) :: Nil)
 
       checkAnswer(sqlContext.sql("""
             |SELECT noInputSchema(myArray)
             |FROM noInputSchemaUDAF
-          """.stripMargin), Row(11) :: Nil)
+          """.stripMargin),
+                  Row(11) :: Nil)
     }
   }
 }

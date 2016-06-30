@@ -41,8 +41,10 @@ object LocSpec extends Specification {
     }
 
     "calculate href for menu with parameters" in {
-      val loc = (Menu.param[Param]("Test", "Test", s => Full(Param(s)), p =>
-                p.s) / "foo" / "bar" / *).toLoc
+      val loc = (Menu.param[Param]("Test",
+                                   "Test",
+                                   s => Full(Param(s)),
+                                   p => p.s) / "foo" / "bar" / *).toLoc
       loc.calcHref(Param("myparam")) mustEqual "/foo/bar/myparam"
     }
 

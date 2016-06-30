@@ -325,7 +325,9 @@ private[sql] class SQLListener(conf: SparkConf)
           }.filter {
             case (id, _) => executionUIData.accumulatorMetrics.contains(id)
           }
-          mergeAccumulatorUpdates(accumulatorUpdates, accumulatorId =>
+          mergeAccumulatorUpdates(
+              accumulatorUpdates,
+              accumulatorId =>
                 executionUIData.accumulatorMetrics(accumulatorId).metricParam)
         case None =>
           // This execution has been dropped

@@ -234,8 +234,9 @@ class SettingsTest {
         _ contains "'-_' is not a valid choice")
     assertThrows[IllegalArgumentException](check("-m:a,b,-ab")(_ => true),
                                            _ contains "'ab' cannot be negated")
-    assertThrows[IllegalArgumentException](check("-m:a,ac,-uber,uber")(_ =>
-              true), _ contains "'uber' cannot be negated")
+    assertThrows[IllegalArgumentException](
+        check("-m:a,ac,-uber,uber")(_ => true),
+        _ contains "'uber' cannot be negated")
   }
 
   @Test def xSourceTest(): Unit = {

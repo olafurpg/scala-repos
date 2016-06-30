@@ -57,14 +57,17 @@ class Jar(file: File) extends Iterable[JarEntry] {
         case null => f(None)
         case entry =>
           val in = Some(jarFile getInputStream entry)
-          try f(in) finally in map (_.close())
+          try f(in)
+          finally in map (_.close())
       }
-    try apply() finally jarFile.close()
+    try apply()
+    finally jarFile.close()
   }
 
   def withJarInput[T](f: JarInputStream => T): T = {
     val in = new JarInputStream(file.inputStream())
-    try f(in) finally in.close()
+    try f(in)
+    finally in.close()
   }
   def jarWriter(mainAttrs: (Attributes.Name, String)*) = {
     new JarWriter(file, Jar.WManifest(mainAttrs: _*).underlying)
@@ -91,11 +94,13 @@ class JarWriter(val file: File, val manifest: Manifest) {
   }
 
   def writeAllFrom(dir: Directory) {
-    try dir.list foreach (x => addEntry(x, "")) finally out.close()
+    try dir.list foreach (x => addEntry(x, ""))
+    finally out.close()
   }
   def addStream(entry: JarEntry, in: InputStream) {
     out putNextEntry entry
-    try transfer(in, out) finally out.closeEntry()
+    try transfer(in, out)
+    finally out.closeEntry()
   }
   def addFile(file: File, prefix: String) {
     val entry = new JarEntry(prefix + file.name)

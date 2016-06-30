@@ -688,10 +688,10 @@ object MapTest extends SpecLite {
     }
 
     "mapWithKeys" in {
-      fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c")).mapKeysWith(_ =>
-            1, _ + _) must_=== (singleton(1, "cdab"))
-      fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c")).mapKeysWith(_ =>
-            3, _ + _) must_=== (singleton(3, "cdab"))
+      fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c"))
+        .mapKeysWith(_ => 1, _ + _) must_=== (singleton(1, "cdab"))
+      fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c"))
+        .mapKeysWith(_ => 3, _ + _) must_=== (singleton(3, "cdab"))
     }
 
     "mapOption" in {

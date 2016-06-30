@@ -297,7 +297,8 @@ class BridgedThreadPoolScheduler(
         def run() {
           BridgedThreadPoolScheduler.this.submit(r)
         }
-      }) catch {
+      })
+      catch {
         case _: RejectedExecutionException => local.submit(r)
       }
   }

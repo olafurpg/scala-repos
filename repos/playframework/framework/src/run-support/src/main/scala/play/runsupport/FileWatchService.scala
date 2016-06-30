@@ -242,8 +242,9 @@ private object JNotifyFileWatchService {
 
               if (!nativeLibrariesDirectory.exists) {
                 // Unzip native libraries from the jnotify jar to target/native_libraries
-                IO.unzip(jnotifyJarFile, targetDirectory, (name: String) =>
-                      name.startsWith("native_libraries"))
+                IO.unzip(jnotifyJarFile,
+                         targetDirectory,
+                         (name: String) => name.startsWith("native_libraries"))
               }
 
               val libs = new File(nativeLibrariesDirectory,
@@ -348,18 +349,17 @@ private[play] class JDK7FileWatchService(logger: LoggerProxy)
 
             import scala.collection.JavaConversions._
             // If a directory has been created, we must watch it and its sub directories
-            events.foreach {
-              event =>
-                if (event.kind == ENTRY_CREATE) {
-                  val file = watchKey.watchable
-                    .asInstanceOf[Path]
-                    .resolve(event.context.asInstanceOf[Path])
-                    .toFile
+            events.foreach { event =>
+              if (event.kind == ENTRY_CREATE) {
+                val file = watchKey.watchable
+                  .asInstanceOf[Path]
+                  .resolve(event.context.asInstanceOf[Path])
+                  .toFile
 
-                  if (file.isDirectory) {
-                    allSubDirectories(Seq(file)).foreach(watchDir)
-                  }
+                if (file.isDirectory) {
+                  allSubDirectories(Seq(file)).foreach(watchDir)
                 }
+              }
             }
 
             onChange()

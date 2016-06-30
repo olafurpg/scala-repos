@@ -143,7 +143,8 @@ class ScriptRunner extends HasCompileSocket {
                 // running an empty script should succeed
                 true
               } else {
-                try io.Jar.create(jarFile, compiledPath, mainClass) catch {
+                try io.Jar.create(jarFile, compiledPath, mainClass)
+                catch {
                   case _: Exception => jarFile.delete()
                 }
 
@@ -202,7 +203,8 @@ class ScriptRunner extends HasCompileSocket {
       settings: GenericRunnerSettings,
       scriptFile: String,
       scriptArgs: List[String]): Either[Throwable, Boolean] = {
-    try Right(runScript(settings, scriptFile, scriptArgs)) catch {
+    try Right(runScript(settings, scriptFile, scriptArgs))
+    catch {
       case e: Throwable => Left(unwrap(e))
     }
   }

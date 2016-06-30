@@ -32,7 +32,8 @@ class SharedLeveldbStore extends {
       val writeResult = (prepared match {
         case Success(prep) ⇒
           // in case the asyncWriteMessages throws
-          try asyncWriteMessages(prep) catch {
+          try asyncWriteMessages(prep)
+          catch {
             case NonFatal(e) ⇒ Future.failed(e)
           }
         case f @ Failure(_) ⇒

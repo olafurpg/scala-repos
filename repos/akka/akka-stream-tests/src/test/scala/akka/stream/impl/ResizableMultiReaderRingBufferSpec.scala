@@ -205,7 +205,8 @@ class ResizableMultiReaderRingBufferSpec extends WordSpec with ShouldMatchers {
   class Test(iSize: Int, mSize: Int, cursorCount: Int)
       extends TestBuffer(iSize, mSize, new SimpleCursors(cursorCount)) {
     def read(cursorIx: Int): Integer =
-      try read(cursors.cursors(cursorIx)) catch {
+      try read(cursors.cursors(cursorIx))
+      catch {
         case NothingToReadException ⇒ null
       }
   }

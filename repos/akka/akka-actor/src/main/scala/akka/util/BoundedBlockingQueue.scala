@@ -150,7 +150,8 @@ class BoundedBlockingQueue[E <: AnyRef](val maxCapacity: Int,
   override def contains(e: AnyRef): Boolean = {
     if (e eq null) throw new NullPointerException
     lock.lock()
-    try backing.contains(e) finally lock.unlock()
+    try backing.contains(e)
+    finally lock.unlock()
   }
 
   override def clear() {
@@ -170,12 +171,14 @@ class BoundedBlockingQueue[E <: AnyRef](val maxCapacity: Int,
 
   def size(): Int = {
     lock.lock()
-    try backing.size() finally lock.unlock()
+    try backing.size()
+    finally lock.unlock()
   }
 
   def peek(): E = {
     lock.lock()
-    try backing.peek() finally lock.unlock()
+    try backing.peek()
+    finally lock.unlock()
   }
 
   def drainTo(c: Collection[_ >: E]): Int = drainTo(c, Int.MaxValue)
@@ -205,7 +208,8 @@ class BoundedBlockingQueue[E <: AnyRef](val maxCapacity: Int,
 
   override def containsAll(c: Collection[_]): Boolean = {
     lock.lock()
-    try backing.containsAll(c) finally lock.unlock()
+    try backing.containsAll(c)
+    finally lock.unlock()
   }
 
   override def removeAll(c: Collection[_]): Boolean = {
@@ -273,16 +277,19 @@ class BoundedBlockingQueue[E <: AnyRef](val maxCapacity: Int,
 
   override def toArray(): Array[AnyRef] = {
     lock.lock()
-    try backing.toArray finally lock.unlock()
+    try backing.toArray
+    finally lock.unlock()
   }
 
   override def isEmpty(): Boolean = {
     lock.lock()
-    try backing.isEmpty() finally lock.unlock()
+    try backing.isEmpty()
+    finally lock.unlock()
   }
 
   override def toArray[X](a: Array[X with AnyRef]) = {
     lock.lock()
-    try backing.toArray[X](a) finally lock.unlock()
+    try backing.toArray[X](a)
+    finally lock.unlock()
   }
 }

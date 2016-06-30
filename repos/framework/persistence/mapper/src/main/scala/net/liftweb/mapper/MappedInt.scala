@@ -223,8 +223,10 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
                                       v => this.set(fromInt(v))))
     else
      */
-    Full(SHtml.selectObj[Int](buildDisplayList, Full(toInt), v =>
-              this.set(fromInt(v))))
+    Full(
+        SHtml.selectObj[Int](buildDisplayList,
+                             Full(toInt),
+                             v => this.set(fromInt(v))))
 }
 
 abstract class MappedIntIndex[T <: Mapper[T]](owner: T)

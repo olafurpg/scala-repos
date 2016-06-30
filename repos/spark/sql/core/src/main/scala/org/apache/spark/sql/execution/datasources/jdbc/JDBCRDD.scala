@@ -491,8 +491,9 @@ private[sql] class JDBCRDD(sc: SparkContext,
                     case DecimalConversion(p, s) =>
                       array.asInstanceOf[Array[java.math.BigDecimal]].map {
                         decimal =>
-                          nullSafeConvert[java.math.BigDecimal](decimal, d =>
-                                Decimal(d, p, s))
+                          nullSafeConvert[java.math.BigDecimal](
+                              decimal,
+                              d => Decimal(d, p, s))
                       }
                     case BinaryLongConversion =>
                       throw new IllegalArgumentException(

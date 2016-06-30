@@ -108,7 +108,8 @@ object SwaggerSupportSyntax {
         copy(path = path + "{" + name + "}")
 
       def optional(builder: Builder => Builder): Builder =
-        try builder(this) catch { case e: Exception => this }
+        try builder(this)
+        catch { case e: Exception => this }
 
       // appends additional params as a query string
       def get: String = path

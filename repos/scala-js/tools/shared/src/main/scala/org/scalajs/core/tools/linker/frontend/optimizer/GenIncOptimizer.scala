@@ -100,7 +100,8 @@ abstract class GenIncOptimizer private[optimizer] (
   private def withLogger[A](logger: Logger)(body: => A): A = {
     assert(this.logger == null)
     this.logger = logger
-    try body finally this.logger = null
+    try body
+    finally this.logger = null
   }
 
   /** Update the incremental analyzer with a new run. */

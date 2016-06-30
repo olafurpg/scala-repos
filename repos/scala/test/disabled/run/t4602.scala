@@ -34,7 +34,8 @@ object Test extends App {
       dir.createDirectory()
       val file = path.jfile
       val out = new FileWriter(file)
-      try out.write(s"object ${name}\n") finally out.close
+      try out.write(s"object ${name}\n")
+      finally out.close
   }
 
   val success = (scala.Console withOut ps) {

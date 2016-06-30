@@ -245,7 +245,8 @@ private[sql] case class DataSourceScan(
     ctx.currentVars = null
     val columns1 = exprs.map(_.gen(ctx))
     val scanBatches = ctx.freshName("processBatches")
-    ctx.addNewFunction(scanBatches, s"""
+    ctx.addNewFunction(scanBatches,
+                       s"""
       | private void $scanBatches() throws java.io.IOException {
       |  while (true) {
       |     int numRows = $batch.numRows();
@@ -271,7 +272,8 @@ private[sql] case class DataSourceScan(
     val columns2 = exprs.map(_.gen(ctx))
     val inputRow = if (outputUnsafeRows) row else null
     val scanRows = ctx.freshName("processRows")
-    ctx.addNewFunction(scanRows, s"""
+    ctx.addNewFunction(scanRows,
+                       s"""
        | private void $scanRows(InternalRow $row) throws java.io.IOException {
        |   boolean firstRow = true;
        |   while (!shouldStop() && (firstRow || $input.hasNext())) {

@@ -52,7 +52,8 @@ trait FindMembers {
         if (Statistics.canEnable)
           Statistics.pushTimer(typeOpsStack, findMemberNanos)
         else null
-      try searchConcreteThenDeferred finally if (Statistics.canEnable)
+      try searchConcreteThenDeferred
+      finally if (Statistics.canEnable)
         Statistics.popTimer(typeOpsStack, start)
     }
 

@@ -153,8 +153,8 @@ object ResourceUtil {
                       usedResource.getType)
                   None
                 } else
-                  try ResourceUtil
-                    .consumeResource(resource, usedResource) catch {
+                  try ResourceUtil.consumeResource(resource, usedResource)
+                  catch {
                     case NonFatal(e) =>
                       log.warn("while consuming {} of type {}",
                                resource.getName,

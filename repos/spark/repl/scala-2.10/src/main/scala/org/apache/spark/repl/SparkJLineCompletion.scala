@@ -417,7 +417,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
         *  because there are some spots which like to throw an assertion
         *  once, then work after that. Yeah, what can I say.
         */
-      try tryAll catch {
+      try tryAll
+      catch {
         case ex: Throwable =>
           logWarning(
               "Error: complete(%s, %s) provoked".format(buf, cursor) + ex)

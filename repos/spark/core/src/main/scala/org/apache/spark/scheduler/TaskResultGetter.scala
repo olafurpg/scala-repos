@@ -99,16 +99,15 @@ private[spark] class TaskResultGetter(sparkEnv: SparkEnv,
           // Set the task result size in the accumulator updates received from the executors.
           // We need to do this here on the driver because if we did this on the executors then
           // we would have to serialize the result again after updating the size.
-          result.accumUpdates = result.accumUpdates.map {
-            a =>
-              if (a.name == Some(InternalAccumulator.RESULT_SIZE)) {
-                assert(
-                    a.update == Some(0L),
-                    "task result size should not have been set on the executors")
-                a.copy(update = Some(size.toLong))
-              } else {
-                a
-              }
+          result.accumUpdates = result.accumUpdates.map { a =>
+            if (a.name == Some(InternalAccumulator.RESULT_SIZE)) {
+              assert(
+                  a.update == Some(0L),
+                  "task result size should not have been set on the executors")
+              a.copy(update = Some(size.toLong))
+            } else {
+              a
+            }
           }
 
           scheduler.handleSuccessfulTask(taskSetManager, tid, result)

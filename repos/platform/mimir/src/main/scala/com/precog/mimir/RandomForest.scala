@@ -736,17 +736,16 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
                       val defined: BitSet = BitSetUtil.create()
                       val values: Array[A] = new Array[A](head.size)
 
-                      vecsOpt map {
-                        vectors =>
-                          var i = 0
-                          while (i < vectors.length) {
-                            val v = vectors(i)
-                            if (v != null) {
-                              defined.set(i)
-                              values(i) = forest.predict(v)
-                            }
-                            i += 1
+                      vecsOpt map { vectors =>
+                        var i = 0
+                        while (i < vectors.length) {
+                          val v = vectors(i)
+                          if (v != null) {
+                            defined.set(i)
+                            values(i) = forest.predict(v)
                           }
+                          i += 1
+                        }
                       }
 
                       val cols = makeColumns(defined, values)

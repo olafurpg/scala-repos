@@ -24,7 +24,8 @@ import scala.util.{Failure, Success, Try}
 object FutureSpec {
 
   def ready[T](awaitable: Awaitable[T], atMost: Duration): awaitable.type =
-    try Await.ready(awaitable, atMost) catch {
+    try Await.ready(awaitable, atMost)
+    catch {
       case t: TimeoutException ⇒ throw t
       case e if NonFatal(e) ⇒ awaitable //swallow
     }

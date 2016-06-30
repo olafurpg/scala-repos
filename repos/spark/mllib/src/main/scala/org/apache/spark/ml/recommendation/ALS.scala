@@ -1309,8 +1309,8 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
       case (srcBlockId, (srcOutBlock, srcFactors)) =>
         srcOutBlock.view.zipWithIndex.map {
           case (activeIndices, dstBlockId) =>
-            (dstBlockId, (srcBlockId, activeIndices.map(idx =>
-                          srcFactors(idx))))
+            (dstBlockId,
+             (srcBlockId, activeIndices.map(idx => srcFactors(idx))))
         }
     }
     val merged =

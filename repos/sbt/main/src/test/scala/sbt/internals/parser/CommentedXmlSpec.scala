@@ -12,7 +12,10 @@ class CommentedXmlSpec extends CheckIfParsedSpec {
          |
          |val tra = "</scm>"
          |
-       """.stripMargin, "Xml in string", false, true),
+       """.stripMargin,
+       "Xml in string",
+       false,
+       true),
       ("""
         |val scmpom = taskKey[xml.NodeBuffer]("Node buffer")
         |
@@ -32,7 +35,10 @@ class CommentedXmlSpec extends CheckIfParsedSpec {
         |
         |publishMavenStyle := true
         |
-      """.stripMargin, "Wrong Commented xml ", false, true),
+      """.stripMargin,
+       "Wrong Commented xml ",
+       false,
+       true),
       ("""
         |val scmpom = taskKey[xml.NodeBuffer]("Node buffer")
         |
@@ -52,14 +58,23 @@ class CommentedXmlSpec extends CheckIfParsedSpec {
         |
         |publishMavenStyle := true
         |
-      """.stripMargin, "Commented xml ", false, true),
+      """.stripMargin,
+       "Commented xml ",
+       false,
+       true),
       ("""
         |import sbt._
         |
         |// </a
-      """.stripMargin, "Xml in comment", true, false),
+      """.stripMargin,
+       "Xml in comment",
+       true,
+       false),
       ("""
         |// a/>
-      """.stripMargin, "Xml in comment2", false, false)
+      """.stripMargin,
+       "Xml in comment2",
+       false,
+       false)
   )
 }

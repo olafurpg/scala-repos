@@ -22,8 +22,8 @@ abstract class StatementInvoker[+R] extends Invoker[R] { self =>
 
   def iteratorTo(maxRows: Int)(
       implicit session: JdbcBackend#Session): CloseableIterator[R] =
-    results(maxRows).fold(r =>
-          new CloseableIterator.Single[R](r.asInstanceOf[R]), identity)
+    results(maxRows)
+      .fold(r => new CloseableIterator.Single[R](r.asInstanceOf[R]), identity)
 
   /** Invoke the statement and return the raw results. */
   def results(

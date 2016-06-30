@@ -1212,20 +1212,19 @@ object Build extends sbt.Build {
 
               var i = 0
               val pat = "/\\*{2,3}/".r
-              val replaced = pat.replaceAllIn(template, {
-                mat =>
-                  val lNo = lineNo(mat.before)
-                  val res =
-                    if (mat.end - mat.start == 5)
-                      // matching a /***/
-                      s"if (TC.is($i)) { throw new TestException($lNo) } else "
-                    else
-                      // matching a /**/
-                      s"; if (TC.is($i)) { throw new TestException($lNo) } ;"
+              val replaced = pat.replaceAllIn(template, { mat =>
+                val lNo = lineNo(mat.before)
+                val res =
+                  if (mat.end - mat.start == 5)
+                    // matching a /***/
+                    s"if (TC.is($i)) { throw new TestException($lNo) } else "
+                  else
+                    // matching a /**/
+                    s"; if (TC.is($i)) { throw new TestException($lNo) } ;"
 
-                  i += 1
+                i += 1
 
-                  res
+                res
               })
 
               val outFile = dir / "SourceMapTest.scala"

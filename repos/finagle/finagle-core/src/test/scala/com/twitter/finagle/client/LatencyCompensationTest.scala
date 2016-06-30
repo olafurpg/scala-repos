@@ -118,8 +118,8 @@ class LatencyCompensationTest
       val client =
         echoClient.newService(Name.Bound(Var.value(addr), "id"), "label")
 
-      try f(client) finally Await
-        .result(client.close() join server.close(), 10.seconds)
+      try f(client)
+      finally Await.result(client.close() join server.close(), 10.seconds)
     }
   }
 

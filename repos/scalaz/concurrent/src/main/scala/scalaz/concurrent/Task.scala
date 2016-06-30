@@ -114,7 +114,8 @@ class Task[+A](val get: Future[Throwable \/ A]) {
 
   /** Like `run`, but returns exceptions as values. */
   def unsafePerformSyncAttempt: Throwable \/ A =
-    try get.unsafePerformSync catch { case t: Throwable => -\/(t) }
+    try get.unsafePerformSync
+    catch { case t: Throwable => -\/(t) }
 
   @deprecated("use unsafePerformSyncAttempt", "7.2")
   def attemptRun: Throwable \/ A =
@@ -479,7 +480,8 @@ object Task {
 
   /** Utility function - evaluate `a` and catch and return any exceptions. */
   def Try[A](a: => A): Throwable \/ A =
-    try \/-(a) catch { case e: Throwable => -\/(e) }
+    try \/-(a)
+    catch { case e: Throwable => -\/(e) }
 
   def fromMaybe[A](ma: Maybe[A])(t: => Throwable): Task[A] =
     ma.cata(Task.now, Task.fail(t))

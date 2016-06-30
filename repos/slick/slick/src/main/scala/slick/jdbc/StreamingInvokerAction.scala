@@ -42,7 +42,8 @@ trait StreamingInvokerAction[R, T, -E <: Effect]
       }
     } catch {
       case NonFatal(ex) =>
-        try it.close() catch ignoreFollowOnError
+        try it.close()
+        catch ignoreFollowOnError
         throw ex
     }
     if (if (bufferNext) it.hasNext else count == limit) it else null

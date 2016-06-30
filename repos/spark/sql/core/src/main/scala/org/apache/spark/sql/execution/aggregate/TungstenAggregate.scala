@@ -197,7 +197,8 @@ case class TungstenAggregate(
         val resultVars = resultExpressions.map { e =>
           BindReferences.bindReference(e, aggregateAttributes).gen(ctx)
         }
-        (resultVars, s"""
+        (resultVars,
+         s"""
         |$evaluateAggResults
         |${evaluateVariables(resultVars)}
        """.stripMargin)
@@ -211,7 +212,8 @@ case class TungstenAggregate(
       }
 
     val doAgg = ctx.freshName("doAggregateWithoutKey")
-    ctx.addNewFunction(doAgg, s"""
+    ctx.addNewFunction(doAgg,
+                       s"""
          | private void $doAgg() throws java.io.IOException {
          |   // initialize aggregation buffer
          |   $initBufVar
@@ -478,7 +480,8 @@ case class TungstenAggregate(
                         "")
 
     val doAgg = ctx.freshName("doAggregateWithKeys")
-    ctx.addNewFunction(doAgg, s"""
+    ctx.addNewFunction(doAgg,
+                       s"""
         private void $doAgg() throws java.io.IOException {
           ${child.asInstanceOf[CodegenSupport].produce(ctx, this)}
 
@@ -524,9 +527,10 @@ case class TungstenAggregate(
 
     // create grouping key
     ctx.currentVars = input
-    val keyCode =
-      GenerateUnsafeProjection.createCode(ctx, groupingExpressions.map(e =>
-                BindReferences.bindReference[Expression](e, child.output)))
+    val keyCode = GenerateUnsafeProjection.createCode(
+        ctx,
+        groupingExpressions.map(e =>
+              BindReferences.bindReference[Expression](e, child.output)))
     val key = keyCode.value
     val buffer = ctx.freshName("aggBuffer")
 

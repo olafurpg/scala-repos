@@ -63,7 +63,8 @@ object DecompilerUtil {
   private def attributesSupported = !ScalaLoader.isUnderUpsource
 
   def isScalaFile(file: VirtualFile): Boolean =
-    try isScalaFile(file, file.contentsToByteArray) catch {
+    try isScalaFile(file, file.contentsToByteArray)
+    catch {
       case e: IOException => false
     }
   def isScalaFile(file: VirtualFile, bytes: => Array[Byte]): Boolean =

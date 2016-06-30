@@ -55,7 +55,8 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
     */
   def start(): this.type = {
     context.start()
-    try template.start() catch { case NonFatal(e) ⇒ context.stop(); throw e }
+    try template.start()
+    catch { case NonFatal(e) ⇒ context.stop(); throw e }
     log.debug("Started CamelContext[{}] for ActorSystem[{}]",
               context.getName,
               system.name)
@@ -70,8 +71,10 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
     * @see akka.camel.internal.DefaultCamel#start
     */
   def shutdown(): Unit = {
-    try context.stop() finally {
-      try template.stop() catch {
+    try context.stop()
+    finally {
+      try template.stop()
+      catch {
         case NonFatal(e) ⇒
           log.debug(
               "Swallowing non-fatal exception [{}] on stopping Camel producer template",

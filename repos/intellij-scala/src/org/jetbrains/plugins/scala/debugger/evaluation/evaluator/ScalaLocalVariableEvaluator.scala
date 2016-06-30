@@ -36,7 +36,8 @@ class ScalaLocalVariableEvaluator(name: String, sourceName: String)
   }
 
   private def sourceName(frameProxy: StackFrameProxyImpl) =
-    try frameProxy.location().sourceName() catch {
+    try frameProxy.location().sourceName()
+    catch {
       case e: AbsentInformationException => ""
     }
 

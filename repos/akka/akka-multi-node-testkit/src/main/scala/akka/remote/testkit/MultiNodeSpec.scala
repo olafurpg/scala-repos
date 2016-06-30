@@ -413,7 +413,8 @@ abstract class MultiNodeSpec(val myself: RoleName,
       if (selfIndex == 0)
         tc.startController(initialParticipants, myself, controllerAddr)
       else tc.startClient(myself, controllerAddr)
-    try Await.result(startFuture, timeout) catch {
+    try Await.result(startFuture, timeout)
+    catch {
       case NonFatal(x) ⇒
         throw new RuntimeException("failure while attaching new conductor", x)
     }
@@ -438,7 +439,8 @@ abstract class MultiNodeSpec(val myself: RoleName,
           base.indexOf(tag) match {
             case -1 ⇒ base
             case start ⇒
-              val replaceWith = try r.addr catch {
+              val replaceWith = try r.addr
+              catch {
                 case NonFatal(e) ⇒
                   // might happen if all test cases are ignored (excluded) and
                   // controller node is finished/exited before r.addr is run

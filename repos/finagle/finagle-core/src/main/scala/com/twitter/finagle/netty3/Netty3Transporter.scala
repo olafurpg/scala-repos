@@ -43,7 +43,8 @@ private[netty3] class ChannelConnector[In, Out](
     require(addr != null)
     val elapsed = Stopwatch.start()
 
-    val ch = try newChannel() catch {
+    val ch = try newChannel()
+    catch {
       case NonFatal(exc) => return Future.exception(exc)
     }
 

@@ -252,7 +252,8 @@ object Trace {
       Trace.recordRpc(rpc)
       hostOpt.map { Trace.recordServerAddr(_) }
       Trace.record(Annotation.ServerRecv())
-      try f finally {
+      try f
+      finally {
         Trace.record(Annotation.ServerSend())
       }
     }

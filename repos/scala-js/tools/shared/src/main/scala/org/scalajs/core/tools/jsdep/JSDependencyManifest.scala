@@ -82,7 +82,8 @@ object JSDependencyManifest {
 
   def write(dep: JSDependencyManifest, output: WritableVirtualTextFile): Unit = {
     val writer = output.contentWriter
-    try write(dep, writer) finally writer.close()
+    try write(dep, writer)
+    finally writer.close()
   }
 
   def write(dep: JSDependencyManifest, writer: Writer): Unit =
@@ -90,7 +91,8 @@ object JSDependencyManifest {
 
   def read(file: VirtualTextFile): JSDependencyManifest = {
     val reader = file.reader
-    try read(reader) finally reader.close()
+    try read(reader)
+    finally reader.close()
   }
 
   def read(reader: Reader): JSDependencyManifest =

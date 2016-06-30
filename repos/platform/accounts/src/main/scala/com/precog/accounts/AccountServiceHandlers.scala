@@ -244,8 +244,9 @@ class AccountServiceHandlers(
                 }
             }
             .map { accountId =>
-              HttpResponse[JValue](OK, content = accountId.map(id =>
-                        WrappedAccountId(id).serialize))
+              HttpResponse[JValue](OK,
+                                   content = accountId.map(id =>
+                                         WrappedAccountId(id).serialize))
             }
         }
       }
@@ -313,17 +314,15 @@ class AccountServiceHandlers(
                                                 details =>
                                                   details.apiKey
                                               }
-                                          } map {
-                                            account =>
-                                              logger.debug(
-                                                  "Account successfully created: " +
-                                                    account.accountId)
-                                              HttpResponse[JValue](
-                                                  OK,
-                                                  content = Some(
-                                                      jobject(jfield(
-                                                              "accountId",
-                                                              account.accountId))))
+                                          } map { account =>
+                                            logger.debug(
+                                                "Account successfully created: " +
+                                                  account.accountId)
+                                            HttpResponse[JValue](
+                                                OK,
+                                                content = Some(jobject(jfield(
+                                                            "accountId",
+                                                            account.accountId))))
                                           }
                                         }
                     } yield accountResponse

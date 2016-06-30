@@ -20,7 +20,8 @@ object EchoServer extends App {
   implicit val system = ActorSystem("EchoServer", config)
 
   // make sure to stop the system so that the application stops
-  try run() finally system.terminate()
+  try run()
+  finally system.terminate()
 
   def run(): Unit = {
     import ActorDSL._

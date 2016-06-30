@@ -178,7 +178,8 @@ object LineNumbers {
     } catch {
       case NonFatal(ex) ⇒ UnknownSourceFormat(s"parse error: ${ex.getMessage}")
     } finally {
-      try dis.close() catch {
+      try dis.close()
+      catch {
         case ex: InterruptedException ⇒ throw ex
         case NonFatal(ex) ⇒ // ignore
       }

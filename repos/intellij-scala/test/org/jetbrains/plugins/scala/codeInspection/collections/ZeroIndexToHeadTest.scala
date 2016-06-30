@@ -35,7 +35,9 @@ class ZeroIndexToHeadTest extends OperationsOnCollectionInspectionTest {
                          hint,
                          inspectionClass)
     checkTextHasNoErrors("""import scala.collection.immutable.Vector
-        |Vector(1, 2)(0)""".stripMargin, hint, inspectionClass)
+        |Vector(1, 2)(0)""".stripMargin,
+                         hint,
+                         inspectionClass)
     checkTextHasNoErrors("scala.collection.mutable.ArrayBuffer(1, 2)(0)",
                          hint,
                          inspectionClass)

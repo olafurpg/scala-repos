@@ -87,7 +87,8 @@ abstract class UnPickler {
     @inline private def runAtIndex[T](i: Int)(body: => T): T = {
       val saved = readIndex
       readIndex = index(i)
-      try body finally readIndex = saved
+      try body
+      finally readIndex = saved
     }
 
     // Laboriously unrolled for performance.

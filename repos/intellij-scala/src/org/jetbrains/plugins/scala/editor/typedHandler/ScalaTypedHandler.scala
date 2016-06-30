@@ -386,31 +386,48 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
                                               project: Project,
                                               element: PsiElement,
                                               offset: Int) = {
-    indentElement(file)(document, project, element, offset, _ => true, elem =>
-          elem.getParent.isInstanceOf[ScReferenceExpression])
+    indentElement(file)(
+        document,
+        project,
+        element,
+        offset,
+        _ => true,
+        elem => elem.getParent.isInstanceOf[ScReferenceExpression])
   }
 
   private def indentParametersComma(file: PsiFile)(document: Document,
                                                    project: Project,
                                                    element: PsiElement,
                                                    offset: Int) = {
-    indentElement(file)(document, project, element, offset, _ => true, elem =>
+    indentElement(file)(
+        document,
+        project,
+        element,
+        offset,
+        _ => true,
+        elem =>
           Option(elem.getParent).map(_.getParent).exists {
-        case _: ScParameterClause | _: ScArgumentExprList => true
-        case _ => false
-    })
+            case _: ScParameterClause | _: ScArgumentExprList => true
+            case _ => false
+        })
   }
 
   private def indentDefinitionAssign(file: PsiFile)(document: Document,
                                                     project: Project,
                                                     element: PsiElement,
                                                     offset: Int) = {
-    indentElement(file)(document, project, element, offset, _ => true, elem =>
+    indentElement(file)(
+        document,
+        project,
+        element,
+        offset,
+        _ => true,
+        elem =>
           Option(elem.getParent).map(_.getParent).exists {
-        case _: ScFunction | _: ScVariable | _: ScValue | _: ScTypeAlias =>
-          true
-        case _ => false
-    })
+            case _: ScFunction | _: ScVariable | _: ScValue | _: ScTypeAlias =>
+              true
+            case _ => false
+        })
   }
 
   private def indentValBraceStyle(file: PsiFile)(document: Document,

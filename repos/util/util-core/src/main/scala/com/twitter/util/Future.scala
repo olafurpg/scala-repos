@@ -1952,7 +1952,9 @@ class ConstFuture[A](result: Try[A]) extends Future[A] {
       def run() {
         val current = Local.save()
         Local.restore(saved)
-        try k(result) catch Monitor.catcher finally Local.restore(current)
+        try k(result)
+        catch Monitor.catcher
+        finally Local.restore(current)
       }
     })
     this
@@ -1967,7 +1969,8 @@ class ConstFuture[A](result: Try[A]) extends Future[A] {
       def run() {
         val current = Local.save()
         Local.restore(saved)
-        val computed = try f(result) catch {
+        val computed = try f(result)
+        catch {
           case e: NonLocalReturnControl[_] =>
             Future.exception(new FutureNonLocalReturnControl(e))
           case NonFatal(e) => Future.exception(e)

@@ -130,7 +130,7 @@ private[sql] object ParquetCompatibilityTest {
     val writeSupport = new DirectWriteSupport(messageType, metadata)
     val parquetWriter =
       new ParquetWriter[RecordConsumer => Unit](new Path(path), writeSupport)
-    try recordWriters.foreach(parquetWriter.write) finally parquetWriter
-      .close()
+    try recordWriters.foreach(parquetWriter.write)
+    finally parquetWriter.close()
   }
 }

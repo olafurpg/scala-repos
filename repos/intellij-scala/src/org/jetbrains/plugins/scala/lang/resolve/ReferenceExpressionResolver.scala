@@ -37,8 +37,9 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
     e.getContext match {
       case generic: ScGenericCall => getContextInfo(ref, generic)
       case call: ScMethodCall if !call.isUpdateCall =>
-        ContextInfo(Some(call.argumentExpressions), () =>
-              call.expectedType(), isUnderscore = false)
+        ContextInfo(Some(call.argumentExpressions),
+                    () => call.expectedType(),
+                    isUnderscore = false)
       case call: ScMethodCall =>
         val args =
           call.argumentExpressions ++ call.getContext

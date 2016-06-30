@@ -246,16 +246,15 @@ trait DescriptiveStats {
               mean = mean / numRowsD
 
               //Second compute the covariance
-              data.foreach {
-                x =>
-                  cfor(0)(i => i < dataSize, i => i + 1)(i => {
-                    val a = x(i) - mean(i)
-                    cfor(0)(j => j < dataSize, j => j + 1)(j => {
-                      val b = x(j) - mean(j)
-                      result(i, j) =
-                        result(i, j) + (a * b / (numRowsD - 1)) //Use
-                    })
+              data.foreach { x =>
+                cfor(0)(i => i < dataSize, i => i + 1)(i => {
+                  val a = x(i) - mean(i)
+                  cfor(0)(j => j < dataSize, j => j + 1)(j => {
+                    val b = x(j) - mean(j)
+                    result(i, j) =
+                      result(i, j) + (a * b / (numRowsD - 1)) //Use
                   })
+                })
               }
 
               result

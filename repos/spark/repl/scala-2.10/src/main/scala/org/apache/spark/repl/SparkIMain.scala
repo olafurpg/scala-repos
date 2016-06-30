@@ -162,7 +162,8 @@ class SparkIMain(initialSettings: Settings,
     val saved = settings.nowarn.value
     if (!saved) settings.nowarn.value = true
 
-    try body finally if (!saved) settings.nowarn.value = false
+    try body
+    finally if (!saved) settings.nowarn.value = false
   }
 
   /** construct an interpreter that reports to Console */
@@ -217,7 +218,8 @@ class SparkIMain(initialSettings: Settings,
     synchronized {
       if (_isInitialized == null) {
         _isInitialized = io.spawn {
-          try _initialize() finally postInitSignal
+          try _initialize()
+          finally postInitSignal
         }
       }
     }
@@ -309,7 +311,8 @@ class SparkIMain(initialSettings: Settings,
   def beQuietDuring[T](body: => T): T = {
     val saved = printResults
     printResults = false
-    try body finally printResults = saved
+    try body
+    finally printResults = saved
   }
 
   /**
@@ -325,7 +328,8 @@ class SparkIMain(initialSettings: Settings,
   def beSilentDuring[T](operation: => T): T = {
     val saved = totalSilence
     totalSilence = true
-    try operation finally totalSilence = saved
+    try operation
+    finally totalSilence = saved
   }
 
   // NOTE: Exposed to repl package since used by SparkILoop
@@ -345,8 +349,9 @@ class SparkIMain(initialSettings: Settings,
     assert(bindExceptions, "withLastExceptionLock called incorrectly.")
     bindExceptions = false
 
-    try beQuietDuring(body) catch logAndDiscard("withLastExceptionLock", alt) finally bindExceptions =
-      true
+    try beQuietDuring(body)
+    catch logAndDiscard("withLastExceptionLock", alt)
+    finally bindExceptions = true
   }
 
   /**
@@ -712,7 +717,8 @@ class SparkIMain(initialSettings: Settings,
   }
 
   private def safePos(t: Tree, alt: Int): Int =
-    try t.pos.startOrPoint catch {
+    try t.pos.startOrPoint
+    catch {
       case _: UnsupportedOperationException => alt
     }
 
@@ -1088,10 +1094,12 @@ class SparkIMain(initialSettings: Settings,
     }
 
     def callEither(name: String, args: Any*): Either[Throwable, AnyRef] =
-      try Right(call(name, args: _*)) catch { case ex: Throwable => Left(ex) }
+      try Right(call(name, args: _*))
+      catch { case ex: Throwable => Left(ex) }
 
     def callOpt(name: String, args: Any*): Option[AnyRef] =
-      try Some(call(name, args: _*)) catch {
+      try Some(call(name, args: _*))
+      catch {
         case ex: Throwable => bindError(ex); None
       }
 
@@ -1105,7 +1113,8 @@ class SparkIMain(initialSettings: Settings,
 
     private def load(path: String): Class[_] = {
       // scalastyle:off classforname
-      try Class.forName(path, true, classLoader) catch {
+      try Class.forName(path, true, classLoader)
+      catch {
         case ex: Throwable => evalError(path, unwrap(ex))
       }
       // scalastyle:on classforname
@@ -1746,7 +1755,8 @@ class SparkIMain(initialSettings: Settings,
   private def withoutUnwrapping(op: => Unit): Unit = {
     val saved = isettings.unwrapStrings
     isettings.unwrapStrings = false
-    try op finally isettings.unwrapStrings = saved
+    try op
+    finally isettings.unwrapStrings = saved
   }
 
   // NOTE: Exposed to repl package since used by SparkILoop

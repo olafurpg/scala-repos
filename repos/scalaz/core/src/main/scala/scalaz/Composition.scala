@@ -282,6 +282,6 @@ private trait CompositionBitraverseTraverses[F[_, _], G[_], H[_]]
 
   override def bitraverseImpl[K[_]: Applicative, A, B, C, D](
       fgahb: F[G[A], H[B]])(f: A => K[C], g: B => K[D]): K[F[G[C], H[D]]] =
-    F.bitraverseImpl(fgahb)(ga => G.traverseImpl(ga)(f), hb =>
-          H.traverseImpl(hb)(g))
+    F.bitraverseImpl(fgahb)(ga => G.traverseImpl(ga)(f),
+                            hb => H.traverseImpl(hb)(g))
 }

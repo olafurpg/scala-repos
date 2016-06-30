@@ -59,7 +59,7 @@ sealed abstract class EndoInstances {
 
     // CAUTION: cheats with null
     def unzip[A, B](a: Endo[(A, B)]) =
-      (Endo(x => a((x, null.asInstanceOf[B]))._1), Endo(x =>
-                a((null.asInstanceOf[A], x))._2))
+      (Endo(x => a((x, null.asInstanceOf[B]))._1),
+       Endo(x => a((null.asInstanceOf[A], x))._2))
   }
 }

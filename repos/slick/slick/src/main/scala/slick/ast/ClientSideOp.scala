@@ -28,8 +28,8 @@ object ClientSideOp {
       f: ResultSetMapping => Node): Node = n match {
     case r: ResultSetMapping => f(r)
     case n: ClientSideOp =>
-      n.nodeMapServerSide(keepType, (ch =>
-                                       mapResultSetMapping(ch, keepType)(f)))
+      n.nodeMapServerSide(keepType,
+                          (ch => mapResultSetMapping(ch, keepType)(f)))
     case n => throw new SlickException("No ResultSetMapping found in tree")
   }
 }

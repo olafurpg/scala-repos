@@ -46,22 +46,24 @@ object Fishnet extends LilaController {
     Action.async(BodyParsers.parse.tolerantJson) { req =>
       req.body
         .validate[A]
-        .fold(err => {
-          logger.warn(s"Malformed request: $err\n${req.body}")
-          BadRequest(jsonError(JsError toJson err)).fuccess
-        }, data =>
+        .fold(
+            err => {
+              logger.warn(s"Malformed request: $err\n${req.body}")
+              BadRequest(jsonError(JsError toJson err)).fuccess
+            },
+            data =>
               api.authenticateClient(data, clientIp(req)) flatMap {
-            case Failure(msg) => {
-              val ip = lila.common.HTTPRequest.lastRemoteAddress(req)
-              logger.info(
-                  s"key: ${data.fishnet.apikey} ip: $ip | ${msg.getMessage}")
-              Unauthorized(jsonError(msg.getMessage)).fuccess
-            }
-            case Success(client) =>
-              f(data)(client).map {
-                case Some(work) => Accepted(Json toJson work)
-                case _ => NoContent
-              }
-        })
+                case Failure(msg) => {
+                  val ip = lila.common.HTTPRequest.lastRemoteAddress(req)
+                  logger.info(
+                      s"key: ${data.fishnet.apikey} ip: $ip | ${msg.getMessage}")
+                  Unauthorized(jsonError(msg.getMessage)).fuccess
+                }
+                case Success(client) =>
+                  f(data)(client).map {
+                    case Some(work) => Accepted(Json toJson work)
+                    case _ => NoContent
+                  }
+            })
     }
 }

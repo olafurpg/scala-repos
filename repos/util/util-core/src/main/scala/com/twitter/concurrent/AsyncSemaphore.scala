@@ -137,7 +137,8 @@ class AsyncSemaphore protected (initialPermits: Int, maxWaiters: Option[Int]) {
     */
   def acquireAndRun[T](func: => Future[T]): Future[T] = {
     acquire() flatMap { permit =>
-      val f = try func catch {
+      val f = try func
+      catch {
         case NonFatal(e) =>
           Future.exception(e)
         case e: Throwable =>

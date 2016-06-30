@@ -58,7 +58,8 @@ private[parser] trait LinkHeader {
 
   def URI = rule {
     capture(oneOrMore(!'"' ~ !';' ~ !',' ~ VCHAR)) ~> { s ⇒
-      try new UriParser(s).parseUriReference() catch {
+      try new UriParser(s).parseUriReference()
+      catch {
         case IllegalUriException(info) ⇒
           throw ParsingException(
               info.withSummaryPrepended("Illegal `Link` header relation-type"))

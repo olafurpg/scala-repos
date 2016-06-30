@@ -76,7 +76,8 @@ class BoyerMooreSpec extends WordSpec with Matchers {
            skipFindsThatStartInFinds: Boolean = false): Seq[Int] = {
     val boyerMoore = new BoyerMoore(needle.toArray[Byte])
     @tailrec def rec(offset: Int, result: Seq[Int]): Seq[Int] = {
-      val ix = try boyerMoore.nextIndex(haystack, offset) catch {
+      val ix = try boyerMoore.nextIndex(haystack, offset)
+      catch {
         case NotEnoughDataException ⇒ -1
       }
       if (ix >= 0)

@@ -200,11 +200,13 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     def withVariance[T](v: Variance)(body: => T): T = {
       val saved = variance
       variance = v
-      try body finally variance = saved
+      try body
+      finally variance = saved
     }
     @inline final def flipped[T](body: => T): T = {
       if (trackVariance) variance = variance.flip
-      try body finally if (trackVariance) variance = variance.flip
+      try body
+      finally if (trackVariance) variance = variance.flip
     }
     protected def mapOverArgs(args: List[Type],
                               tparams: List[Symbol]): List[Type] =
@@ -679,7 +681,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       else {
         val saved = wroteAnnotation
         wroteAnnotation = false
-        try annotationArgRewriter transform tree finally if (wroteAnnotation)
+        try annotationArgRewriter transform tree
+        finally if (wroteAnnotation)
           giveup()
         else wroteAnnotation = saved
       }

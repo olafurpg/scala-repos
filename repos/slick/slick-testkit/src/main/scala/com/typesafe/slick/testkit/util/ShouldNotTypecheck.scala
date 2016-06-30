@@ -28,7 +28,8 @@ object ShouldNotTypecheck {
          "Expected error matching: " + s)
     }
 
-    try ctx.typecheck(ctx.parse("{ " + codeStr + " }")) catch {
+    try ctx.typecheck(ctx.parse("{ " + codeStr + " }"))
+    catch {
       case e: TypecheckException =>
         val msg = e.getMessage
         if ((expected ne null) && !(expPat.matcher(msg)).matches)

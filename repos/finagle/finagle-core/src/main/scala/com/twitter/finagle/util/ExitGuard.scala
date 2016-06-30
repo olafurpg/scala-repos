@@ -71,7 +71,8 @@ object ExitGuard {
 
       override def run() {
         while (true) {
-          try Thread.sleep(Long.MaxValue) catch {
+          try Thread.sleep(Long.MaxValue)
+          catch {
             case _: InterruptedException => return
           }
         }

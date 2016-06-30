@@ -469,8 +469,11 @@ object TypeDefinitionMembers {
                   }
                   if (beanProperty || booleanBeanProperty) {
                     addSignature(
-                        new Signature("set" + dcl.name.capitalize, Seq(() =>
-                                  t), 1, subst, dcl))
+                        new Signature("set" + dcl.name.capitalize,
+                                      Seq(() => t),
+                                      1,
+                                      subst,
+                                      dcl))
                   }
                 case _ =>
               }
@@ -528,8 +531,11 @@ object TypeDefinitionMembers {
                                   param))
                 if (!param.isStable) {
                   addSignature(
-                      new Signature("set" + param.name.capitalize, Seq(() =>
-                                t), 1, subst, param))
+                      new Signature("set" + param.name.capitalize,
+                                    Seq(() => t),
+                                    1,
+                                    subst,
+                                    param))
                 }
               } else if (booleanBeanProperty) {
                 addSignature(
@@ -540,8 +546,11 @@ object TypeDefinitionMembers {
                                   param))
                 if (!param.isStable) {
                   addSignature(
-                      new Signature("set" + param.name.capitalize, Seq(() =>
-                                t), 1, subst, param))
+                      new Signature("set" + param.name.capitalize,
+                                    Seq(() => t),
+                                    1,
+                                    subst,
+                                    param))
                 }
               }
             }

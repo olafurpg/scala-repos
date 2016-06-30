@@ -87,26 +87,24 @@ object Opening extends LilaController {
               case Some(me) =>
                 env.finisher(opening, me, win) flatMap {
                   case (newAttempt, None) =>
-                    UserRepo byId me.id map (_ | me) flatMap {
-                      me2 =>
-                        (env.api.opening find id) zip
-                        (env userInfos me2.some) flatMap {
-                          case (o2, infos) =>
-                            makeData(o2 | opening,
-                                     infos,
-                                     false,
-                                     newAttempt.some,
-                                     none)
-                        }
+                    UserRepo byId me.id map (_ | me) flatMap { me2 =>
+                      (env.api.opening find id) zip
+                      (env userInfos me2.some) flatMap {
+                        case (o2, infos) =>
+                          makeData(o2 | opening,
+                                   infos,
+                                   false,
+                                   newAttempt.some,
+                                   none)
+                      }
                     }
                   case (oldAttempt, Some(win)) =>
-                    env userInfos me.some flatMap {
-                      infos =>
-                        makeData(opening,
-                                 infos,
-                                 false,
-                                 oldAttempt.some,
-                                 win.some)
+                    env userInfos me.some flatMap { infos =>
+                      makeData(opening,
+                               infos,
+                               false,
+                               oldAttempt.some,
+                               win.some)
                     }
                 }
               case None => makeData(opening, none, false, none, win.some)

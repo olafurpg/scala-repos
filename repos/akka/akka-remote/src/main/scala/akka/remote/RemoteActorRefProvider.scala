@@ -524,7 +524,8 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
     addr match {
       case _ if hasAddress(addr) ⇒ Some(local.rootPath.address)
       case Address(_, _, Some(_), Some(_)) ⇒
-        try Some(transport.localAddressForRemote(addr)) catch {
+        try Some(transport.localAddressForRemote(addr))
+        catch {
           case NonFatal(_) ⇒ None
         }
       case _ ⇒ None
@@ -630,7 +631,8 @@ private[akka] class RemoteActorRef private[akka] (
   override def !(message: Any)(
       implicit sender: ActorRef = Actor.noSender): Unit = {
     if (message == null) throw new InvalidMessageException("Message is null")
-    try remote.send(message, Option(sender), this) catch handleException
+    try remote.send(message, Option(sender), this)
+    catch handleException
   }
 
   override def provider: RemoteActorRefProvider = remote.provider

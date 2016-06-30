@@ -148,7 +148,9 @@ class PrimitiveApiTest
       val response = consumer.fetch(request)
       for ((topic, partition) <- topics) {
         val fetched = response.messageSet(topic, partition)
-        assertEquals(messages(topic), fetched.map(messageAndOffset =>
+        assertEquals(
+            messages(topic),
+            fetched.map(messageAndOffset =>
                   TestUtils.readString(messageAndOffset.message.payload)))
       }
     }
@@ -218,7 +220,9 @@ class PrimitiveApiTest
     val response = consumer.fetch(request)
     for ((topic, partition) <- topics) {
       val fetched = response.messageSet(topic, partition)
-      assertEquals(messages(topic), fetched.map(messageAndOffset =>
+      assertEquals(
+          messages(topic),
+          fetched.map(messageAndOffset =>
                 TestUtils.readString(messageAndOffset.message.payload)))
     }
   }
@@ -330,7 +334,9 @@ class PrimitiveApiTest
     val response = consumer.fetch(request)
     for ((topic, partition) <- topics) {
       val fetched = response.messageSet(topic, partition)
-      assertEquals(messages(topic), fetched.map(messageAndOffset =>
+      assertEquals(
+          messages(topic),
+          fetched.map(messageAndOffset =>
                 TestUtils.readString(messageAndOffset.message.payload)))
     }
   }

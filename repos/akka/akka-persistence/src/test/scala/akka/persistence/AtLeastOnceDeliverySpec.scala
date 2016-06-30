@@ -183,7 +183,8 @@ object AtLeastOnceDeliverySpec {
     override def receiveCommand = {
       case any ⇒
         // this is not supported currently, so expecting exception
-        try deliver(context.actorSelection("*"))(id ⇒ s"$any$id") catch {
+        try deliver(context.actorSelection("*"))(id ⇒ s"$any$id")
+        catch {
           case ex: Exception ⇒ sender() ! Failure(ex)
         }
     }

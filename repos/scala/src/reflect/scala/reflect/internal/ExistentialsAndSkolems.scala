@@ -33,7 +33,8 @@ trait ExistentialsAndSkolems { self: SymbolTable =>
 
     val saved = skolemizationLevel
     skolemizationLevel = 0
-    try new Deskolemizer().typeSkolems finally skolemizationLevel = saved
+    try new Deskolemizer().typeSkolems
+    finally skolemizationLevel = saved
   }
 
   def isRawParameter(sym: Symbol) =

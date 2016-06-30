@@ -63,9 +63,10 @@ class FlowSpec
   val faultyFlow: Flow[Any, Any, NotUsed] ⇒ Flow[Any, Any, NotUsed] = in ⇒
     in.via({
       val stage = new PushPullGraphStage((_) ⇒
-            fusing.Map({ x: Any ⇒
-          x
-        }, stoppingDecider), Attributes.none)
+                                           fusing.Map({ x: Any ⇒
+                                             x
+                                           }, stoppingDecider),
+                                         Attributes.none)
 
       val assembly = new GraphAssembly(Array(stage),
                                        Array(Attributes.none),

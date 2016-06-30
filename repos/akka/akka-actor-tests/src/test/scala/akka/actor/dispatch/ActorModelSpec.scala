@@ -396,7 +396,8 @@ abstract class ActorModelSpec(config: String)
     def spawn(f: ⇒ Unit) {
       (new Thread {
         override def run(): Unit =
-          try f catch {
+          try f
+          catch {
             case e: Throwable ⇒
               system.eventStream.publish(
                   Error(e, "spawn", this.getClass, "error in spawned thread"))

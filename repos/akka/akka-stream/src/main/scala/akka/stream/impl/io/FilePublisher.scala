@@ -102,7 +102,8 @@ private[akka] final class FilePublisher(f: File,
   def readAhead(maxChunks: Int,
                 chunks: Vector[ByteString]): Vector[ByteString] =
     if (chunks.size <= maxChunks && isActive && !eofEncountered) {
-      (try chan.read(buf) catch {
+      (try chan.read(buf)
+      catch {
         case NonFatal(ex) ⇒ onErrorThenStop(ex); Int.MinValue
       }) match {
         case -1 ⇒ // EOF

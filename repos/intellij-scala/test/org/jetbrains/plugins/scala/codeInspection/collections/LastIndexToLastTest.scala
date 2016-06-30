@@ -15,10 +15,12 @@ class LastIndexToLastTest extends OperationsOnCollectionInspectionTest {
     doTest(s"""
          |val seq = Seq(1, 2)
          |seq.${START}apply(seq.size - 1)$END
-       """.stripMargin, """
+       """.stripMargin,
+           """
         |val seq = Seq(1, 2)
         |seq.apply(seq.size - 1)
-      """.stripMargin, """
+      """.stripMargin,
+           """
         |val seq = Seq(1, 2)
         |seq.last
       """.stripMargin)
@@ -28,10 +30,12 @@ class LastIndexToLastTest extends OperationsOnCollectionInspectionTest {
     doTest(s"""
          |val seq = Seq(1, 2)
          |seq$START(seq.size - 1)$END
-       """.stripMargin, """
+       """.stripMargin,
+           """
         |val seq = Seq(1, 2)
         |seq(seq.size - 1)
-      """.stripMargin, """
+      """.stripMargin,
+           """
         |val seq = Seq(1, 2)
         |seq.last
       """.stripMargin)
@@ -41,10 +45,12 @@ class LastIndexToLastTest extends OperationsOnCollectionInspectionTest {
     doTest(s"""
          |val seq = Seq(1, 2)
          |seq$START(seq.length - 1)$END
-       """.stripMargin, """
+       """.stripMargin,
+           """
         |val seq = Seq(1, 2)
         |seq(seq.length - 1)
-      """.stripMargin, """
+      """.stripMargin,
+           """
         |val seq = Seq(1, 2)
         |seq.last
       """.stripMargin)
@@ -74,10 +80,14 @@ class LastIndexToLastTest extends OperationsOnCollectionInspectionTest {
 
   def testIndexedSeq(): Unit = {
     checkTextHasNoErrors("""val seq = scala.collection.IndexedSeq(1, 2)
-        |seq(seq.size - 1)""".stripMargin, hint, inspectionClass)
+        |seq(seq.size - 1)""".stripMargin,
+                         hint,
+                         inspectionClass)
     checkTextHasNoErrors("""import scala.collection.immutable.Vector
         |val v = Vector(1, 2)
-        |v(v.length - 1)""".stripMargin, hint, inspectionClass)
+        |v(v.length - 1)""".stripMargin,
+                         hint,
+                         inspectionClass)
     checkTextHasNoErrors(
         """val buf = scala.collection.mutable.ArrayBuffer(1, 2)
         |buf(buf.size - 1)""".stripMargin,

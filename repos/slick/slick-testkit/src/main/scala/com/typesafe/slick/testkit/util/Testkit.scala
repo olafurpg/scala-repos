@@ -73,7 +73,8 @@ class Testkit(clazz: Class[_ <: ProfileTest], runnerBuilder: RunnerBuilder)
             if (previousTestObject ne null) previousTestObject
             else preparedTestObject
           previousTestObject = null
-          try ch.run(testObject) finally {
+          try ch.run(testObject)
+          finally {
             val skipCleanup =
               idx == last ||
                 (testObject.reuseInstance && (ch.cl eq is(idx + 1)._1._1.cl))
@@ -99,7 +100,8 @@ case class TestMethod(name: String,
                       method: Method,
                       cl: Class[_ <: GenericTest[_ >: Null <: TestDB]]) {
   private[this] def await[T](f: Future[T]): T =
-    try Await.result(f, TestkitConfig.asyncTimeout) catch {
+    try Await.result(f, TestkitConfig.asyncTimeout)
+    catch {
       case ex: ExecutionException => throw ex.getCause
     }
 
@@ -156,8 +158,10 @@ sealed abstract class GenericTest[TDB >: Null <: TestDB](
   }
 
   final def cleanup() = if (keepAliveSession ne null) {
-    try if (tdb.isPersistent) tdb.dropUserArtifacts(keepAliveSession) finally {
-      try db.close() finally closeKeepAlive()
+    try if (tdb.isPersistent) tdb.dropUserArtifacts(keepAliveSession)
+    finally {
+      try db.close()
+      finally closeKeepAlive()
     }
   }
 
@@ -333,7 +337,8 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
       def onComplete(): Unit = pr.success(builder.result())
       def onError(t: Throwable): Unit = pr.failure(t)
       def onNext(t: T): Unit = builder += t
-    }) catch { case NonFatal(ex) => pr.failure(ex) }
+    })
+    catch { case NonFatal(ex) => pr.failure(ex) }
     pr.future
   }
 
@@ -345,7 +350,8 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
       def onComplete(): Unit = pr.success(())
       def onError(t: Throwable): Unit = pr.failure(t)
       def onNext(t: T): Unit = f(t)
-    }) catch { case NonFatal(ex) => pr.failure(ex) }
+    })
+    catch { case NonFatal(ex) => pr.failure(ex) }
     pr.future
   }
 
@@ -396,7 +402,8 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
             sub.cancel()
         }(ec)
       }
-    }) catch { case NonFatal(ex) => pr.tryFailure(ex) }
+    })
+    catch { case NonFatal(ex) => pr.tryFailure(ex) }
     val f = pr.future
     f.onComplete(_ => exe.shutdown())
     f
@@ -404,14 +411,16 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
 
   implicit class AssertionExtensionMethods[T](v: T) {
     private[this] val cln = getClass.getName
-    private[this] def fixStack(f: => Unit): Unit = try f catch {
-      case ex: AssertionError =>
-        ex.setStackTrace(
-            ex.getStackTrace.iterator
-              .filterNot(_.getClassName.startsWith(cln))
-              .toArray)
-        throw ex
-    }
+    private[this] def fixStack(f: => Unit): Unit =
+      try f
+      catch {
+        case ex: AssertionError =>
+          ex.setStackTrace(
+              ex.getStackTrace.iterator
+                .filterNot(_.getClassName.startsWith(cln))
+                .toArray)
+          throw ex
+      }
 
     def shouldBe(o: Any): Unit = fixStack(Assert.assertEquals(o, v))
 
@@ -437,14 +446,16 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
 
   implicit class CollectionAssertionExtensionMethods[T](v: TraversableOnce[T]) {
     private[this] val cln = getClass.getName
-    private[this] def fixStack(f: => Unit): Unit = try f catch {
-      case ex: AssertionError =>
-        ex.setStackTrace(
-            ex.getStackTrace.iterator
-              .filterNot(_.getClassName.startsWith(cln))
-              .toArray)
-        throw ex
-    }
+    private[this] def fixStack(f: => Unit): Unit =
+      try f
+      catch {
+        case ex: AssertionError =>
+          ex.setStackTrace(
+              ex.getStackTrace.iterator
+                .filterNot(_.getClassName.startsWith(cln))
+                .toArray)
+          throw ex
+      }
 
     def shouldAllMatch(f: PartialFunction[T, _]) = v.foreach { x =>
       if (!f.isDefinedAt(x))

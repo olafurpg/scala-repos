@@ -101,8 +101,11 @@ class PackageCollectionFillerSpec
     if (newContent == null || newContent.isEmpty) {
       this.emptyEvaluation(analyzer, originalList)
     } else {
-      this.filledEvaluation(analyzer, originalList, newContent, (an, li) =>
-            an.addedElements.toList should be(li.toList))
+      this.filledEvaluation(
+          analyzer,
+          originalList,
+          newContent,
+          (an, li) => an.addedElements.toList should be(li.toList))
     }
     this.finalEvaluation(analyzer)
   }
@@ -165,8 +168,10 @@ class PackageCollectionFillerSpec
     val newValue = "1"
     fillCollectionWithOne(originalList, newValue)
 
-    this.filledEvaluation(analyzer, originalList, List(newValue), (an, li) =>
-          an.addedElements.size should be(1))
+    this.filledEvaluation(analyzer,
+                          originalList,
+                          List(newValue),
+                          (an, li) => an.addedElements.size should be(1))
     this.finalEvaluation(analyzer)
   }
 

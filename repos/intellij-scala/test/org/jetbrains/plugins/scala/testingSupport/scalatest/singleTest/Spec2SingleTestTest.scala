@@ -9,7 +9,8 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
 trait Spec2SingleTestTest extends ScalaTestTestCase {
   //TODO: stop ignoring this test once finders API is functioning
   def __ignored__testSpec() {
-    addFileToProject("Spec.scala", """
+    addFileToProject("Spec.scala",
+                     """
       |import org.scalatest._
       |
       |class SpecTest extends Spec {

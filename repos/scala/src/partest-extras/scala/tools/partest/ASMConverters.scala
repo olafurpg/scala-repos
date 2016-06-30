@@ -180,8 +180,10 @@ object ASMConverters {
       case i: t.JumpInsnNode => Jump(op(i), applyLabel(i.label))
       case i: t.LdcInsnNode => Ldc(op(i), i.cst: Any)
       case i: t.LookupSwitchInsnNode =>
-        LookupSwitch(op(i), applyLabel(i.dflt), lst(i.keys) map (x =>
-                  x: Int), lst(i.labels) map applyLabel)
+        LookupSwitch(op(i),
+                     applyLabel(i.dflt),
+                     lst(i.keys) map (x => x: Int),
+                     lst(i.labels) map applyLabel)
       case i: t.TableSwitchInsnNode =>
         TableSwitch(op(i),
                     i.min,

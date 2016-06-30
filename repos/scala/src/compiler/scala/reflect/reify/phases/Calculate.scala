@@ -44,7 +44,8 @@ trait Calculate { self: Reifier =>
     override def traverse(tree: Tree): Unit = tree match {
       case TreeSplice(_) =>
         currMetalevel -= 1
-        try super.traverse(tree) finally currMetalevel += 1
+        try super.traverse(tree)
+        finally currMetalevel += 1
       case tree if tree.isDef =>
         if (reifyDebug)
           println(

@@ -114,7 +114,8 @@ trait GenSetLike[A, +Repr]
   override def equals(that: Any): Boolean = that match {
     case that: GenSet[_] =>
       (this eq that) || (that canEqual this) && (this.size == that.size) &&
-        (try this subsetOf that.asInstanceOf[GenSet[A]] catch {
+        (try this subsetOf that.asInstanceOf[GenSet[A]]
+            catch {
               case ex: ClassCastException => false
             })
     case _ =>

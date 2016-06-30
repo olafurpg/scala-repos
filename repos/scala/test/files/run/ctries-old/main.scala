@@ -27,7 +27,8 @@ object Test {
     def evaluating[U](body: => U) = new {
       def shouldProduce[T <: Throwable: ClassManifest]() = {
         var produced = false
-        try body catch {
+        try body
+        catch {
           case e: Throwable =>
             if (e.getClass == implicitly[ClassManifest[T]].runtimeClass)
               produced = true

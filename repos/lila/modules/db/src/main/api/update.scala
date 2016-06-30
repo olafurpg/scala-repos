@@ -9,8 +9,8 @@ object $update {
   import play.modules.reactivemongo.json._
 
   def apply[ID: Writes, A <: Identified[ID]: JsTubeInColl](doc: A): Funit =
-    (implicitly[JsTube[A]] toMongo doc).fold(e => fufail(e.toString), js =>
-          apply($select(doc.id), js))
+    (implicitly[JsTube[A]] toMongo doc)
+      .fold(e => fufail(e.toString), js => apply($select(doc.id), js))
   def apply[A <: Identified[String]: JsTubeInColl](doc: A): Funit =
     apply[String, A](doc)
 

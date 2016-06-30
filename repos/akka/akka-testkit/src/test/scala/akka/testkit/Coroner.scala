@@ -103,7 +103,8 @@ object Coroner {
           watchedHandle.expired()
           out.println(
               s"Coroner not cancelled after ${duration.toMillis}ms. Looking for signs of foul play...")
-          try printReport(reportTitle, out) catch {
+          try printReport(reportTitle, out)
+          catch {
             case NonFatal(ex) ⇒ {
               out.println("Error displaying Coroner's Report")
               ex.printStackTrace(out)

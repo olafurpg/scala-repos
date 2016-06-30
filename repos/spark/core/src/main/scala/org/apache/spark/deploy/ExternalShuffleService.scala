@@ -103,8 +103,9 @@ object ExternalShuffleService extends Logging {
   private val barrier = new CountDownLatch(1)
 
   def main(args: Array[String]): Unit = {
-    main(args, (conf: SparkConf, sm: SecurityManager) =>
-          new ExternalShuffleService(conf, sm))
+    main(args,
+         (conf: SparkConf,
+          sm: SecurityManager) => new ExternalShuffleService(conf, sm))
   }
 
   /** A helper main method that allows the caller to call this with a custom shuffle service. */

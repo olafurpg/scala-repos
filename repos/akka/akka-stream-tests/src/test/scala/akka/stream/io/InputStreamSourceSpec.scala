@@ -58,18 +58,19 @@ class InputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       val latch = new CountDownLatch(1)
       val probe = StreamConverters
         .fromInputStream(() ⇒
-              new InputStream {
-            @volatile var emitted = false
-            override def read(): Int = {
-              if (!emitted) {
-                emitted = true
-                'M'.toInt
-              } else {
-                latch.await()
-                -1
-              }
-            }
-        }, chunkSize = 1)
+                           new InputStream {
+                             @volatile var emitted = false
+                             override def read(): Int = {
+                               if (!emitted) {
+                                 emitted = true
+                                 'M'.toInt
+                               } else {
+                                 latch.await()
+                                 -1
+                               }
+                             }
+                         },
+                         chunkSize = 1)
         .runWith(TestSink.probe)
 
       probe.request(4)

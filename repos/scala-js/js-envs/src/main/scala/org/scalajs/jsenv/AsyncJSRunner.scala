@@ -73,6 +73,7 @@ trait AsyncJSRunner {
     *  }}}
     */
   final def awaitOrStop(atMost: Duration): Unit = {
-    try await(atMost) finally stop()
+    try await(atMost)
+    finally stop()
   }
 }

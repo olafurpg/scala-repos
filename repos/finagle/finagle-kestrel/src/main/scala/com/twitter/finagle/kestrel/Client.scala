@@ -509,13 +509,17 @@ protected[kestrel] class ConnectedClient(
     val closeAndOpen = MemCommand(CloseAndOpen(queueBuffer, SomeTop)) _
     val abort = MemCommand(Abort(Buf.Utf8(queueName))) _
 
-    read((response: Response) =>
+    read(
+        (response: Response) =>
           response match {
-        case Values(Seq(Value(_, item))) => Return(Some((item, ())))
-        case Values(Seq()) => Return(None)
-        case _ =>
-          Throw(new IllegalArgumentException("invalid reply from kestrel"))
-    }, open, (Unit) => closeAndOpen, (Unit) => abort)
+            case Values(Seq(Value(_, item))) => Return(Some((item, ())))
+            case Values(Seq()) => Return(None)
+            case _ =>
+              Throw(new IllegalArgumentException("invalid reply from kestrel"))
+        },
+        open,
+        (Unit) => closeAndOpen,
+        (Unit) => abort)
   }
 }
 

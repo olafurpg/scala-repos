@@ -373,9 +373,8 @@ abstract class Erasure
     if (needsJavaSig(info, throwsArgs)) {
       try Some(
           jsig(info, toplevel = true) +
-            throwsArgs
-              .map("^" + jsig(_, toplevel = true))
-              .mkString("")) catch {
+            throwsArgs.map("^" + jsig(_, toplevel = true)).mkString(""))
+      catch {
         case ex: UnknownSig => None
       }
     } else None
@@ -760,7 +759,8 @@ abstract class Erasure
           abort("unrecoverable error")
         case ex: Exception =>
           //if (settings.debug.value)
-          try Console.println("exception when typing " + tree) finally throw ex
+          try Console.println("exception when typing " + tree)
+          finally throw ex
           throw ex
       }
 
@@ -813,7 +813,8 @@ abstract class Erasure
           if (exitingRefchecks(lowType matches highType)) ""
           else " after erasure: " + exitingPostErasure(highType)
 
-        reporter.error(pos, s"""|$what:
+        reporter.error(pos,
+                       s"""|$what:
               |${exitingRefchecks(highString)} and
               |${exitingRefchecks(lowString)}
               |have same type$when""".trim.stripMargin)
@@ -1260,9 +1261,8 @@ abstract class Erasure
                             trees map transform)
                 .clearType()
             case DefDef(_, _, _, _, tpt, _) =>
-              try super
-                .transform(tree1)
-                .clearType() finally tpt setType specialErasure(tree1.symbol)(
+              try super.transform(tree1).clearType()
+              finally tpt setType specialErasure(tree1.symbol)(
                   tree1.symbol.tpe).resultType
             case ApplyDynamic(
                 qual,

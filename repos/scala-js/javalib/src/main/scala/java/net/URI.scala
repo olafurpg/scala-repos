@@ -320,7 +320,8 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
 object URI {
 
   def create(str: String): URI = {
-    try new URI(str) catch {
+    try new URI(str)
+    catch {
       case e: URISyntaxException => throw new IllegalArgumentException(e)
     }
   }

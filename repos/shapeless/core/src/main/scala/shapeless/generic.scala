@@ -856,8 +856,9 @@ trait CaseClassMacros extends ReprTypes {
           isAccessible(companionTpe, applySym)) {
         val applyParamss = applySym.asMethod.paramLists
         if (applyParamss.length == 1)
-          alignFields(tpe, applyParamss.head.map(tpe =>
-                    unByName(tpe.infoIn(companionTpe))))
+          alignFields(
+              tpe,
+              applyParamss.head.map(tpe => unByName(tpe.infoIn(companionTpe))))
         else None
       } else None
     }
@@ -893,8 +894,8 @@ trait CaseClassMacros extends ReprTypes {
         case Some(ctorSym) if !isNonGeneric(ctorSym) =>
           val ctorParamss = ctorSym.asMethod.infoIn(tpe).paramLists
           if (ctorParamss.length == 1)
-            alignFields(tpe, ctorParamss.head.map(param =>
-                      unByName(param.info)))
+            alignFields(tpe,
+                        ctorParamss.head.map(param => unByName(param.info)))
           else None
         case _ => None
       }

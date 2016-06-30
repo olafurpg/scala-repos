@@ -21,8 +21,9 @@ class StatusTest
 
   test("Status.bestOf can terminate early") {
     val res = Status.bestOf[Function0[Status]](
-        List(() => Status.Busy, () => Status.Open, () =>
-              fail("element should not be evaluated")),
+        List(() => Status.Busy,
+             () => Status.Open,
+             () => fail("element should not be evaluated")),
         _.apply
     )
     assert(res == Status.Open)
@@ -30,8 +31,9 @@ class StatusTest
 
   test("Status.worstOf can terminate early") {
     val res = Status.worstOf[Function0[Status]](
-        List(() => Status.Busy, () => Status.Closed, () =>
-              fail("element should not be evaluated")),
+        List(() => Status.Busy,
+             () => Status.Closed,
+             () => fail("element should not be evaluated")),
         _.apply
     )
     assert(res == Status.Closed)

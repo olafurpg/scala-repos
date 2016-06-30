@@ -367,7 +367,8 @@ class Flag[T: Flaggable] private[app] (val name: String,
   def let(t: T)(f: => Unit): Unit = {
     val prev = localValue
     setLocalValue(Some(t))
-    try f finally {
+    try f
+    finally {
       setLocalValue(prev)
     }
   }
@@ -627,7 +628,8 @@ class Flags(argv0: String,
           // Mandatory argument with another argument
           case Array(k) =>
             i += 1
-            try flag(k).parse(args(i - 1)) catch {
+            try flag(k).parse(args(i - 1))
+            catch {
               case NonFatal(e) =>
                 return Error(
                     "Error parsing flag \"%s\": %s\n%s".format(k,
@@ -638,7 +640,8 @@ class Flags(argv0: String,
 
           // Mandatory k=v
           case Array(k, v) =>
-            try flag(k).parse(v) catch {
+            try flag(k).parse(v)
+            catch {
               case e: Throwable =>
                 return Error(
                     "Error parsing flag \"%s\": %s\n%s".format(k,
@@ -905,7 +908,8 @@ class GlobalFlag[T] private[app] (
   override protected[this] def parsingDone: Boolean = true
   private[this] lazy val propertyValue =
     Option(System.getProperty(name)) flatMap { p =>
-      try Some(flaggable.parse(p)) catch {
+      try Some(flaggable.parse(p))
+      catch {
         case NonFatal(exc) =>
           java.util.logging.Logger
             .getLogger("")

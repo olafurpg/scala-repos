@@ -164,7 +164,8 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv, val maxRetries: Int)
 
     private def logAndDo(task: LogItem) = {
       log += task
-      try executeTask(task) catch {
+      try executeTask(task)
+      catch {
         case NonFatal(t) => retry(t)
       }
     }

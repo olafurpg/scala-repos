@@ -52,7 +52,8 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
     // `block` should not affect constraints on typevars
     def undo[T](block: => T): T = {
       val before = log
-      try block finally undoTo(before)
+      try block
+      finally undoTo(before)
     }
   }
 

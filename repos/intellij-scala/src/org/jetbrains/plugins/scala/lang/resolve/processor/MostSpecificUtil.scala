@@ -33,19 +33,21 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
       applicable: Set[ScalaResolveResult],
       hasTypeParametersCall: Boolean = false,
       expandInnerResult: Boolean = true): Option[ScalaResolveResult] = {
-    mostSpecificGeneric(applicable.map(r =>
+    mostSpecificGeneric(
+        applicable.map(r =>
               r.innerResolveResult match {
-        case Some(rr) if expandInnerResult =>
-          new InnerScalaResolveResult(rr.element,
-                                      rr.implicitConversionClass,
-                                      r,
-                                      r.substitutor)
-        case _ =>
-          new InnerScalaResolveResult(r.element,
-                                      r.implicitConversionClass,
-                                      r,
-                                      r.substitutor)
-    }), noImplicit = false).map(_.repr)
+            case Some(rr) if expandInnerResult =>
+              new InnerScalaResolveResult(rr.element,
+                                          rr.implicitConversionClass,
+                                          r,
+                                          r.substitutor)
+            case _ =>
+              new InnerScalaResolveResult(r.element,
+                                          r.implicitConversionClass,
+                                          r,
+                                          r.substitutor)
+        }),
+        noImplicit = false).map(_.repr)
   }
 
   def mostSpecificForImplicitParameters(

@@ -94,7 +94,8 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
   def point(catchFailures: Boolean): this.type =
     underlying match {
       case u: UnstartedCell ⇒
-        val cell = try newCell(u) catch {
+        val cell = try newCell(u)
+        catch {
           case NonFatal(ex) if catchFailures ⇒
             val safeDispatcher = system.dispatchers.defaultGlobalDispatcher
             new ActorCell(system, this, props, safeDispatcher, supervisor)
@@ -313,6 +314,7 @@ private[akka] class UnstartedCell(val systemImpl: ActorSystemImpl,
 
   private[this] final def locked[T](body: ⇒ T): T = {
     lock.lock()
-    try body finally lock.unlock()
+    try body
+    finally lock.unlock()
   }
 }

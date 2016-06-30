@@ -48,7 +48,8 @@ private[finagle] class ServerStatsFilter[Req, Rep](
 
   def apply(request: Req, service: Service[Req, Rep]): Future[Rep] = {
     val startAt = nowNanos()
-    try service(request) finally {
+    try service(request)
+    finally {
       val elapsedNs = nowNanos() - startAt
       handletime.add(
           TimeUnit.MICROSECONDS.convert(elapsedNs, TimeUnit.NANOSECONDS))

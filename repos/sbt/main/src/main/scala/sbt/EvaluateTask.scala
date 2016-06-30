@@ -517,7 +517,8 @@ object EvaluateTask {
     // Register with our cancel handler we're about to start.
     val strat = config.cancelStrategy
     val cancelState = strat.onTaskEngineStart(runningEngine)
-    try run() finally strat.onTaskEngineFinish(cancelState)
+    try run()
+    finally strat.onTaskEngineFinish(cancelState)
   }
 
   private[this] def storeValuesForPrevious(results: RMap[Task, Result],

@@ -6,5 +6,6 @@ object Test {
   }
 
   def main(args: Array[String]): Unit =
-    try foo(0) catch { case _: java.lang.StackOverflowError => println("ok") }
+    try foo(0)
+    catch { case _: java.lang.StackOverflowError => println("ok") }
 }

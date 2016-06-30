@@ -36,7 +36,8 @@ trait Monitor { self =>
     * monitor.
     */
   def apply(f: => Unit): Unit = Monitor.using(this) {
-    try f catch { case exc: Throwable => if (!handle(exc)) throw exc }
+    try f
+    catch { case exc: Throwable => if (!handle(exc)) throw exc }
   }
 
   /**
@@ -119,7 +120,8 @@ object Monitor extends Monitor {
   @inline
   def restoring[T](f: => T): T = {
     val saved = local()
-    try f finally local.set(saved)
+    try f
+    finally local.set(saved)
   }
 
   /**
@@ -136,7 +138,8 @@ object Monitor extends Monitor {
     * monitor.
     */
   override def apply(f: => Unit): Unit =
-    try f catch catcher
+    try f
+    catch catcher
 
   /**
     * Handle `exc` with the current [[Local]] monitor. If the

@@ -79,7 +79,8 @@ trait AsyncWriteJournal
         val writeResult = (prepared match {
           case Success(prep) ⇒
             // try in case the asyncWriteMessages throws
-            try breaker.withCircuitBreaker(asyncWriteMessages(prep)) catch {
+            try breaker.withCircuitBreaker(asyncWriteMessages(prep))
+            catch {
               case NonFatal(e) ⇒ Future.failed(e)
             }
           case f @ Failure(_) ⇒

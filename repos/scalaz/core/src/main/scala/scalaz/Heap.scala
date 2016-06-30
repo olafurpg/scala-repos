@@ -67,17 +67,18 @@ sealed abstract class Heap[A] {
 
   /**Delete the minimum key from the heap and return the resulting heap. O(log n) */
   def deleteMin: Heap[A] = {
-    fold(Empty[A], (s, leq, t) =>
-          t match {
-        case Node(_, Stream()) => Empty[A]
-        case Node(_, f0) => {
-          val (Node(Ranked(r, x), cf), ts2) = getMin(leq, f0)
-          val (zs, ts1, f1) = splitForest(r, Stream(), Stream(), cf)
-          val f2 = skewMeld(leq, skewMeld(leq, ts1, ts2), f1)
-          val f3 = zs.foldRight(f2)(skewInsert(leq, _, _))
-          Heap(s - 1, leq, Node(Ranked(0, x), f3))
-        }
-    })
+    fold(Empty[A],
+         (s, leq, t) =>
+           t match {
+             case Node(_, Stream()) => Empty[A]
+             case Node(_, f0) => {
+               val (Node(Ranked(r, x), cf), ts2) = getMin(leq, f0)
+               val (zs, ts1, f1) = splitForest(r, Stream(), Stream(), cf)
+               val f2 = skewMeld(leq, skewMeld(leq, ts1, ts2), f1)
+               val f3 = zs.foldRight(f2)(skewInsert(leq, _, _))
+               Heap(s - 1, leq, Node(Ranked(0, x), f3))
+             }
+         })
   }
 
   def adjustMin(f: A => A): Heap[A] = this match {

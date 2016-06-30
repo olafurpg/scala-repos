@@ -147,7 +147,8 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
         compiler = newGlobal(newSettings, reporter)
       }
       val c = compiler
-      try new c.Run() compile command.files catch {
+      try new c.Run() compile command.files
+      catch {
         case ex @ FatalError(msg) =>
           reporter.error(null, "fatal error: " + msg)
           clearCompiler()

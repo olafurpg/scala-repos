@@ -134,7 +134,8 @@ abstract class Pasted(prompt: String) {
     */
   def apply(lines: TraversableOnce[String]): Option[String] = {
     isRunning = true
-    try new PasteAnalyzer(lines.toList).run() finally isRunning = false
+    try new PasteAnalyzer(lines.toList).run()
+    finally isRunning = false
   }
   def unapply(line: String): Boolean = isPrompted(line)
 }

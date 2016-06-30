@@ -51,12 +51,14 @@ class StandardScaler @Since("1.1.0")(withMean: Boolean, withStd: Boolean)
   @Since("1.1.0")
   def fit(data: RDD[Vector]): StandardScalerModel = {
     // TODO: skip computation if both withMean and withStd are false
-    val summary = data
-      .treeAggregate(new MultivariateOnlineSummarizer)((aggregator, data) =>
-            aggregator.add(data), (aggregator1, aggregator2) =>
-            aggregator1.merge(aggregator2))
-    new StandardScalerModel(Vectors.dense(summary.variance.toArray.map(v =>
-                  math.sqrt(v))), summary.mean, withStd, withMean)
+    val summary = data.treeAggregate(new MultivariateOnlineSummarizer)(
+        (aggregator, data) => aggregator.add(data),
+        (aggregator1, aggregator2) => aggregator1.merge(aggregator2))
+    new StandardScalerModel(
+        Vectors.dense(summary.variance.toArray.map(v => math.sqrt(v))),
+        summary.mean,
+        withStd,
+        withMean)
   }
 }
 

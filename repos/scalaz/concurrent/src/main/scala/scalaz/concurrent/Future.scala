@@ -271,8 +271,9 @@ sealed abstract class Future[+A] {
         }
       }, timeoutInMillis, TimeUnit.MILLISECONDS)
 
-      unsafePerformAsyncInterruptibly(a =>
-            if (done.compareAndSet(false, true)) cb(\/-(a)), cancel)
+      unsafePerformAsyncInterruptibly(
+          a => if (done.compareAndSet(false, true)) cb(\/-(a)),
+          cancel)
     }
 
   def unsafePerformTimed(timeout: Duration)(

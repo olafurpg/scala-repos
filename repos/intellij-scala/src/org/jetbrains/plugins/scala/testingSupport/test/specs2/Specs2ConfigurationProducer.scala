@@ -171,8 +171,10 @@ with AbstractTestConfigurationProducer {
       return (null, null)
     val testClassPath = testClassDef.qualifiedName
 
-    ScalaPsiUtil.getParentWithProperty(element, strict = false, e =>
-          TestNodeProvider.isSpecs2TestExpr(e)) match {
+    ScalaPsiUtil.getParentWithProperty(
+        element,
+        strict = false,
+        e => TestNodeProvider.isSpecs2TestExpr(e)) match {
       case Some(infixExpr: ScInfixExpr) =>
         (testClassDef, extractStaticTestName(infixExpr).orNull)
       case _ => (testClassDef, null)

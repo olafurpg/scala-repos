@@ -111,18 +111,17 @@ object ResolveUtils {
     new ScMethodType(retType, m match {
       case f: FakePsiMethod => f.params.toSeq
       case _ =>
-        m.getParameterList.getParameters.map {
-          param =>
-            val scType = s.subst(param.exactParamType())
-            new Parameter("",
-                          None,
-                          scType,
-                          scType,
-                          false,
-                          param.isVarArgs,
-                          false,
-                          param.index,
-                          Some(param))
+        m.getParameterList.getParameters.map { param =>
+          val scType = s.subst(param.exactParamType())
+          new Parameter("",
+                        None,
+                        scType,
+                        scType,
+                        false,
+                        param.isVarArgs,
+                        false,
+                        param.index,
+                        Some(param))
         }
     }, false)(m.getProject, scope)
   }

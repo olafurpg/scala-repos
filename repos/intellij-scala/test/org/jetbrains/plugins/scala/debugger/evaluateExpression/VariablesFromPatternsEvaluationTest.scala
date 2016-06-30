@@ -17,7 +17,8 @@ class VariablesFromPatternsEvaluationTest_212
 
 abstract class VariablesFromPatternsEvaluationTestBase
     extends ScalaDebuggerTestCase {
-  addFileWithBreakpoints("Match.scala", s"""
+  addFileWithBreakpoints("Match.scala",
+                         s"""
        |object Match {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -44,7 +45,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
     }
   }
 
-  addFileWithBreakpoints("MatchInForStmt.scala", s"""
+  addFileWithBreakpoints("MatchInForStmt.scala",
+                         s"""
        |object MatchInForStmt {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -103,7 +105,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
     }
   }
 
-  addFileWithBreakpoints("Multilevel.scala", s"""
+  addFileWithBreakpoints("Multilevel.scala",
+                         s"""
        |object Multilevel {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -135,7 +138,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
     }
   }
 
-  addFileWithBreakpoints("LocalInMatch.scala", s"""
+  addFileWithBreakpoints("LocalInMatch.scala",
+                         s"""
        |object LocalInMatch {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -161,7 +165,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
     }
   }
 
-  addFileWithBreakpoints("AnonymousInMatch.scala", s"""
+  addFileWithBreakpoints("AnonymousInMatch.scala",
+                         s"""
        |object AnonymousInMatch {
        |  val name = "name"
        |  def main(args: Array[String]) {

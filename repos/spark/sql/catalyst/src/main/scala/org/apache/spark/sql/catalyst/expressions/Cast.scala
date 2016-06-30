@@ -136,11 +136,12 @@ case class Cast(child: Expression, dataType: DataType)
   private[this] def castToString(from: DataType): Any => Any = from match {
     case BinaryType => buildCast[Array[Byte]](_, UTF8String.fromBytes)
     case DateType =>
-      buildCast[Int](_, d =>
-            UTF8String.fromString(DateTimeUtils.dateToString(d)))
+      buildCast[Int](_,
+                     d => UTF8String.fromString(DateTimeUtils.dateToString(d)))
     case TimestampType =>
-      buildCast[Long](_, t =>
-            UTF8String.fromString(DateTimeUtils.timestampToString(t)))
+      buildCast[Long](
+          _,
+          t => UTF8String.fromString(DateTimeUtils.timestampToString(t)))
     case _ => buildCast[Any](_, o => UTF8String.fromString(o.toString))
   }
 
@@ -185,8 +186,9 @@ case class Cast(child: Expression, dataType: DataType)
   // TimestampConverter
   private[this] def castToTimestamp(from: DataType): Any => Any = from match {
     case StringType =>
-      buildCast[UTF8String](_, utfs =>
-            DateTimeUtils.stringToTimestamp(utfs).orNull)
+      buildCast[UTF8String](
+          _,
+          utfs => DateTimeUtils.stringToTimestamp(utfs).orNull)
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1L else 0)
     case LongType =>
@@ -256,10 +258,12 @@ case class Cast(child: Expression, dataType: DataType)
   // LongConverter
   private[this] def castToLong(from: DataType): Any => Any = from match {
     case StringType =>
-      buildCast[UTF8String](_, s =>
-            try s.toString.toLong catch {
-          case _: NumberFormatException => null
-      })
+      buildCast[UTF8String](_,
+                            s =>
+                              try s.toString.toLong
+                              catch {
+                                case _: NumberFormatException => null
+                            })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1L else 0L)
     case DateType =>
@@ -274,10 +278,12 @@ case class Cast(child: Expression, dataType: DataType)
   // IntConverter
   private[this] def castToInt(from: DataType): Any => Any = from match {
     case StringType =>
-      buildCast[UTF8String](_, s =>
-            try s.toString.toInt catch {
-          case _: NumberFormatException => null
-      })
+      buildCast[UTF8String](_,
+                            s =>
+                              try s.toString.toInt
+                              catch {
+                                case _: NumberFormatException => null
+                            })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1 else 0)
     case DateType =>
@@ -292,10 +298,12 @@ case class Cast(child: Expression, dataType: DataType)
   // ShortConverter
   private[this] def castToShort(from: DataType): Any => Any = from match {
     case StringType =>
-      buildCast[UTF8String](_, s =>
-            try s.toString.toShort catch {
-          case _: NumberFormatException => null
-      })
+      buildCast[UTF8String](_,
+                            s =>
+                              try s.toString.toShort
+                              catch {
+                                case _: NumberFormatException => null
+                            })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1.toShort else 0.toShort)
     case DateType =>
@@ -310,10 +318,12 @@ case class Cast(child: Expression, dataType: DataType)
   // ByteConverter
   private[this] def castToByte(from: DataType): Any => Any = from match {
     case StringType =>
-      buildCast[UTF8String](_, s =>
-            try s.toString.toByte catch {
-          case _: NumberFormatException => null
-      })
+      buildCast[UTF8String](_,
+                            s =>
+                              try s.toString.toByte
+                              catch {
+                                case _: NumberFormatException => null
+                            })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1.toByte else 0.toByte)
     case DateType =>
@@ -341,21 +351,26 @@ case class Cast(child: Expression, dataType: DataType)
                                   target: DecimalType): Any => Any =
     from match {
       case StringType =>
-        buildCast[UTF8String](_, s =>
+        buildCast[UTF8String](
+            _,
+            s =>
               try {
-            changePrecision(Decimal(new JavaBigDecimal(s.toString)), target)
-          } catch {
-            case _: NumberFormatException => null
-        })
+                changePrecision(Decimal(new JavaBigDecimal(s.toString)),
+                                target)
+              } catch {
+                case _: NumberFormatException => null
+            })
       case BooleanType =>
-        buildCast[Boolean](_, b =>
-              changePrecision(if (b) Decimal.ONE else Decimal.ZERO, target))
+        buildCast[Boolean](
+            _,
+            b => changePrecision(if (b) Decimal.ONE else Decimal.ZERO, target))
       case DateType =>
         buildCast[Int](_, d => null) // date can't cast to decimal in Hive
       case TimestampType =>
         // Note that we lose precision here.
-        buildCast[Long](_, t =>
-              changePrecision(Decimal(timestampToDouble(t)), target))
+        buildCast[Long](
+            _,
+            t => changePrecision(Decimal(timestampToDouble(t)), target))
       case dt: DecimalType =>
         b =>
           changePrecision(b.asInstanceOf[Decimal].clone(), target)
@@ -379,10 +394,12 @@ case class Cast(child: Expression, dataType: DataType)
   // DoubleConverter
   private[this] def castToDouble(from: DataType): Any => Any = from match {
     case StringType =>
-      buildCast[UTF8String](_, s =>
-            try s.toString.toDouble catch {
-          case _: NumberFormatException => null
-      })
+      buildCast[UTF8String](_,
+                            s =>
+                              try s.toString.toDouble
+                              catch {
+                                case _: NumberFormatException => null
+                            })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1d else 0d)
     case DateType =>
@@ -397,10 +414,12 @@ case class Cast(child: Expression, dataType: DataType)
   // FloatConverter
   private[this] def castToFloat(from: DataType): Any => Any = from match {
     case StringType =>
-      buildCast[UTF8String](_, s =>
-            try s.toString.toFloat catch {
-          case _: NumberFormatException => null
-      })
+      buildCast[UTF8String](_,
+                            s =>
+                              try s.toString.toFloat
+                              catch {
+                                case _: NumberFormatException => null
+                            })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1f else 0f)
     case DateType =>

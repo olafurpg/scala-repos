@@ -110,15 +110,13 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
         request.content map { contentFuture =>
           val responseVF = for {
             sreq <- EitherT {
-                     contentFuture map {
-                       jv =>
-                         jv.validated[AddScheduledQueryRequest]
-                           .disjunction leftMap {
-                           err =>
-                             badRequest(
-                                 "Request body %s is not a valid scheduling query request: %s"
-                                   .format(jv.renderCompact, err.message))
-                         }
+                     contentFuture map { jv =>
+                       jv.validated[AddScheduledQueryRequest]
+                         .disjunction leftMap { err =>
+                         badRequest(
+                             "Request body %s is not a valid scheduling query request: %s"
+                               .format(jv.renderCompact, err.message))
+                       }
                      }
                    }
 
@@ -131,13 +129,12 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                           }
 
             okToReads <- EitherT.right {
-                          authorities.accountIds.toStream traverse {
-                            acctId =>
-                              permissionsFinder.apiKeyFinder.hasCapability(
-                                  apiKey,
-                                  Set(ExecutePermission(sreq.source,
-                                                        WrittenBy(acctId))),
-                                  None)
+                          authorities.accountIds.toStream traverse { acctId =>
+                            permissionsFinder.apiKeyFinder.hasCapability(
+                                apiKey,
+                                Set(ExecutePermission(sreq.source,
+                                                      WrittenBy(acctId))),
+                                None)
                           }
                         }
             okToRead = okToReads.exists(_ == true)
@@ -164,15 +161,14 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                                            sreq.context,
                                            sreq.source,
                                            sreq.sink,
-                                           sreq.timeout) leftMap {
-                           error =>
-                             logger.error(
-                                 "Failure adding scheduled execution: " +
-                                   error)
-                             HttpResponse(
-                                 status = HttpStatus(InternalServerError),
-                                 content = Some(
-                                     "An error occurred scheduling your query".serialize))
+                                           sreq.timeout) leftMap { error =>
+                           logger.error(
+                               "Failure adding scheduled execution: " +
+                                 error)
+                           HttpResponse(
+                               status = HttpStatus(InternalServerError),
+                               content = Some(
+                                   "An error occurred scheduling your query".serialize))
                          }
 
                        case Some(errors) =>

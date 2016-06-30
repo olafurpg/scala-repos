@@ -745,7 +745,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     val reporter = new ConsoleReporter(settings)
     val compiler = newGlobal(settings, reporter) // compiles the actual code
 
-    try new compiler.Run compile (sourceFiles map (_.toString)) catch {
+    try new compiler.Run compile (sourceFiles map (_.toString))
+    catch {
       case ex: Throwable =>
         ex.printStackTrace()
         val msg =

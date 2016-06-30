@@ -26,7 +26,8 @@ package play.api.libs.iteratee {
       * TODO: Rename to `tryFuture`.
       */
     def eagerFuture[A](body: => A): Future[A] =
-      try Future.successful(body) catch {
+      try Future.successful(body)
+      catch {
         case NonFatal(e) => Future.failed(e)
       }
 

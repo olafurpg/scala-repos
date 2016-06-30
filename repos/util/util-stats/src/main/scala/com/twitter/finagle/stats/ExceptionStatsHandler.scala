@@ -64,8 +64,10 @@ class CategorizingExceptionStatsHandler(
 
   private[this] val underlying: ExceptionStatsHandler = {
     val mkLabel: Throwable => String = t => categorizer(t).getOrElse(Failures)
-    new MultiCategorizingExceptionStatsHandler(mkLabel, _ =>
-          Set.empty, sourceFunction, rollup)
+    new MultiCategorizingExceptionStatsHandler(mkLabel,
+                                               _ => Set.empty,
+                                               sourceFunction,
+                                               rollup)
   }
 
   def record(statsReceiver: StatsReceiver, t: Throwable): Unit =

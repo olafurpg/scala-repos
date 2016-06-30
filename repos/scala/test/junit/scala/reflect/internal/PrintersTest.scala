@@ -156,13 +156,15 @@ trait BasePrintTests {
     |if (a.>(1))
     |  ((a): Int)
     |else
-    |  ((a.toString): String)""", typedCode = sm"""
+    |  ((a.toString): String)""",
+         typedCode = sm"""
     |val a = 1;
     |if (PrintersContext.this.a.>(1))
     |  ((PrintersContext.this.a): scala.Int)
     |else
     |  ((PrintersContext.this.a.toString()): scala.Predef.String)
-    """, wrap = true)
+    """,
+         wrap = true)
 
   @Test def testIfExpr2 = assertPrintedCode(sm"""
     |class A {
@@ -208,10 +210,12 @@ trait BasePrintTests {
     |new foo()
     |""")(parsedCode = sm"""
     |class foo;
-    |new foo()""", typedCode = sm"""
+    |new foo()""",
+          typedCode = sm"""
     |class foo;
     |new PrintersContext.this.foo()
-    |""", wrap = true)
+    |""",
+          wrap = true)
 
   @Test def testNewExpr2 =
     assertResultCode(code = sm"""
@@ -224,14 +228,16 @@ trait BasePrintTests {
     |    "test"
     |  };
     |  new $$anon()
-    |}""", typedCode = sm"""
+    |}""",
+          typedCode = sm"""
     |class foo;
     |{
     |  final class $$anon extends PrintersContext.this.foo {
     |    "test"
     |  };
     |  new $$anon()
-    |}""", wrap = true)
+    |}""",
+          wrap = true)
 
   @Test def testNewExpr3 = assertPrintedCode(sm"""
     |{
@@ -267,7 +273,8 @@ trait BasePrintTests {
     |    };
     |    new $$anon()
     |  }
-    |}""", typedCode = sm"""
+    |}""",
+          typedCode = sm"""
     |{
     |  class foo[t](x: scala.Int);
     |  {
@@ -487,7 +494,8 @@ trait ClassPrintTests {
     |  };
     |  val a = x$$1._1;
     |  val b = x$$1._2
-    |}""", typedCode = sm"""
+    |}""",
+           typedCode = sm"""
     |class Test {
     |  private[this] val x$$1 = (scala.Tuple2.apply[Int, Int](1, 2): @scala.unchecked) match {
     |    case scala.Tuple2((a @ _), (b @ _)) => scala.Tuple2.apply[Int, Int](a, b)
@@ -507,7 +515,8 @@ trait ClassPrintTests {
     |  };
     |  val a = x$$1._1;
     |  val b = x$$1._2
-    |}""", typedCode = sm"""
+    |}""",
+           typedCode = sm"""
     |class Test {
     |  private[this] val x$$1 = (scala.Predef.ArrowAssoc[Int](1).->[Int](2): @scala.unchecked) match {
     |    case scala.Tuple2((a @ _), (b @ _)) => scala.Tuple2.apply[Int, Int](a, b)
@@ -568,7 +577,8 @@ trait ClassPrintTests {
     |{
     |  implicit class X(protected[this] var x: scala.Int);
     |  ()
-    |}""", checkTypedTree = true)
+    |}""",
+                      checkTypedTree = true)
 
   @Test def testAbstractClass =
     assertPrintedCode("abstract class X(protected[this] var x: scala.Int)")
@@ -767,7 +777,8 @@ trait ClassPrintTests {
     |  List(1, 2) match {
     |    case ::((x @ _), (xs @ _)) => x
     |  }
-    |}""", typedCode = sm"""
+    |}""",
+           typedCode = sm"""
     |object PM5 {
     |  scala.collection.immutable.List.apply[Int](1, 2) match {
     |    case scala.`package`.::((x @ _), (xs @ _)) => x
@@ -848,7 +859,8 @@ trait ClassPrintTests {
     |    case (ioe @ ((_): IOException)) => println("ioe")
     |    case (e @ ((_): Exception)) => println("e")
     |  } finally println("finally")
-    |}""", typedCode = sm"""
+    |}""",
+           typedCode = sm"""
     |object Test {
     |  import java.io._;
     |  var file: java.io.PrintStream = null;
@@ -901,7 +913,8 @@ trait TraitPrintTests {
     assertPrintedCode(sm"""
     |trait X extends {
     |  val x: Int = 1
-    |} with AnyRef""", checkTypedTree = false)
+    |} with AnyRef""",
+                      checkTypedTree = false)
 
   @Test def testTraitWithEarly2 = assertPrintedCode(sm"""
     |trait X extends {
@@ -975,7 +988,8 @@ trait TraitPrintTests {
     |  type B >: Nothing <: AnyRef;
     |  protected type C >: Nothing;
     |  type D <: AnyRef
-    |}""", typedCode = sm"""
+    |}""",
+           typedCode = sm"""
     |trait Test {
     |  type A = scala.Int;
     |  type B <: scala.AnyRef;
@@ -1162,14 +1176,17 @@ trait ValAndDefPrintTests {
     |  ((x: @unchecked): @foo3(4)(2.0F, new foo1[A1, B1]())) match {
     |    case _ => true
     |  }
-    |}""", wrapCode = true)
+    |}""",
+                      wrapCode = true)
 }
 
 trait PackagePrintTests {
-  @Test def testPackage1 = assertPrintedCode(sm"""
+  @Test def testPackage1 =
+    assertPrintedCode(sm"""
     |package foo.bar {
     |  
-    |}""", checkTypedTree = false)
+    |}""",
+                      checkTypedTree = false)
 
   @Test def testPackage2 =
     assertPrintedCode(sm"""
@@ -1177,14 +1194,16 @@ trait PackagePrintTests {
     |  class C
     |
     |  object D
-    |}""", checkTypedTree = false)
+    |}""",
+                      checkTypedTree = false)
 
   //package object foo extends a with b
   @Test def testPackage3 =
     assertPrintedCode(sm"""
     |package foo {
     |  object `package` extends a with b
-    |}""", checkTypedTree = false)
+    |}""",
+                      checkTypedTree = false)
 
   //package object foo { def foo; val x = 1 }
   @Test def testPackage4 =
@@ -1194,7 +1213,8 @@ trait PackagePrintTests {
     |    def foo: scala.Unit = ();
     |    val x = 1
     |  }
-    |}""", checkTypedTree = false)
+    |}""",
+                      checkTypedTree = false)
 
   //package object foo extends { val x = 1; type I = Int } with Any
   @Test def testPackage5 =
@@ -1204,7 +1224,8 @@ trait PackagePrintTests {
     |    val x = 1;
     |    type I = Int
     |  } with AnyRef
-    |}""", checkTypedTree = false)
+    |}""",
+                      checkTypedTree = false)
 }
 
 trait QuasiTreesPrintTests {

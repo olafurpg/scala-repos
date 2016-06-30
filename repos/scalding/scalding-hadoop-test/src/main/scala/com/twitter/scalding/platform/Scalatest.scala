@@ -47,7 +47,8 @@ trait HadoopPlatformTest extends BeforeAndAfterEach {
   //TODO is there a way to buffer such that we see test results AFTER afterEach? Otherwise the results
   // get lost in the logging
   override def afterEach() {
-    try super.afterEach() finally {
+    try super.afterEach()
+    finally {
       // Necessary because afterAll can be called from a different thread and we want to make sure that the state
       // is visible. Note that this assumes there is no contention for LocalCluster (which LocalCluster ensures),
       // otherwise there could be deadlock.

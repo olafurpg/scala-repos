@@ -24,14 +24,16 @@ private[akka] class HdrHistogram(highestTrackableValue: Long,
     new hdr.Histogram(highestTrackableValue, numberOfSignificantValueDigits)
 
   def update(value: Long) {
-    try hist.recordValue(value) catch {
+    try hist.recordValue(value)
+    catch {
       case ex: ArrayIndexOutOfBoundsException ⇒
         throw wrapHistogramOutOfBoundsException(value, ex)
     }
   }
 
   def updateWithCount(value: Long, count: Long) {
-    try hist.recordValueWithCount(value, count) catch {
+    try hist.recordValueWithCount(value, count)
+    catch {
       case ex: ArrayIndexOutOfBoundsException ⇒
         throw wrapHistogramOutOfBoundsException(value, ex)
     }

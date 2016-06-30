@@ -34,7 +34,8 @@ private[finagle] object FinagleScheduler {
           "java.util.concurrent.LinkedTransferQueue"
       )
       .newInstance
-      .asInstanceOf[BlockingQueue[Runnable]] catch {
+      .asInstanceOf[BlockingQueue[Runnable]]
+    catch {
       case _: ClassNotFoundException => {
         log.info(
             "bridged scheduler is not available on pre java 7, using local instead")

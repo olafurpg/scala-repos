@@ -152,6 +152,7 @@ class HttpConfigurationSpec extends AkkaSpec {
       ConfigFactory.parseString(overrides).withFallback(ConfigFactory.load())
     // we go via ActorSystem in order to hit the settings caching infrastructure
     val sys = ActorSystem("config-testing", config)
-    try block(sys) finally sys.terminate()
+    try block(sys)
+    finally sys.terminate()
   }
 }

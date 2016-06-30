@@ -380,7 +380,8 @@ class ClientServerSpec
             .outgoingConnection(hostname, port)
             .runWith(Source.single(HttpRequest()), Sink.head)(materializer2)
           try Await.result(responseFuture, 5.second).status should ===(
-              StatusCodes.InternalServerError) catch {
+              StatusCodes.InternalServerError)
+          catch {
             case _: StreamTcpException ⇒
             // Also fine, depends on the race between abort and 500, caused by materialization panic which
             // tries to tear down everything, but the order is nondeterministic
@@ -405,7 +406,8 @@ class ClientServerSpec
             .outgoingConnection(hostname, port)
             .runWith(Source.single(HttpRequest()), Sink.head)(materializer2)
           try Await.result(responseFuture, 5.seconds).status should ===(
-              StatusCodes.InternalServerError) catch {
+              StatusCodes.InternalServerError)
+          catch {
             case _: StreamTcpException ⇒
             // Also fine, depends on the race between abort and 500, caused by materialization panic which
             // tries to tear down everything, but the order is nondeterministic

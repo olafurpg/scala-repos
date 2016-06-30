@@ -189,8 +189,10 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
 
     // We will clean the combiner closure later in `combineByKey`
     val cleanedSeqOp = self.context.clean(seqOp)
-    combineByKeyWithClassTag[U]((v: V) =>
-          cleanedSeqOp(createZero(), v), cleanedSeqOp, combOp, partitioner)
+    combineByKeyWithClassTag[U]((v: V) => cleanedSeqOp(createZero(), v),
+                                cleanedSeqOp,
+                                combOp,
+                                partitioner)
   }
 
   /**
@@ -242,8 +244,10 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       () => cachedSerializer.deserialize[V](ByteBuffer.wrap(zeroArray))
 
     val cleanedFunc = self.context.clean(func)
-    combineByKeyWithClassTag[V]((v: V) =>
-          cleanedFunc(createZero(), v), cleanedFunc, cleanedFunc, partitioner)
+    combineByKeyWithClassTag[V]((v: V) => cleanedFunc(createZero(), v),
+                                cleanedFunc,
+                                cleanedFunc,
+                                partitioner)
   }
 
   /**
@@ -819,11 +823,13 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
   def flatMapValues[U](f: V => TraversableOnce[U]): RDD[(K, U)] =
     self.withScope {
       val cleanF = self.context.clean(f)
-      new MapPartitionsRDD[(K, U), (K, V)](self, (context, pid, iter) =>
-            iter.flatMap {
-          case (k, v) =>
-            cleanF(v).map(x => (k, x))
-      }, preservesPartitioning = true)
+      new MapPartitionsRDD[(K, U), (K, V)](self,
+                                           (context, pid, iter) =>
+                                             iter.flatMap {
+                                               case (k, v) =>
+                                                 cleanF(v).map(x => (k, x))
+                                           },
+                                           preservesPartitioning = true)
     }
 
   /**

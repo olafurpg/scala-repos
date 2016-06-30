@@ -59,7 +59,8 @@ abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
 
     var text: String = null
 
-    try text = template getText properties catch {
+    try text = template getText properties
+    catch {
       case e: Exception =>
         throw new RuntimeException(
             "Unable to load template for " +

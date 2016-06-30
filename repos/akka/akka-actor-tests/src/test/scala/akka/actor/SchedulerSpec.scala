@@ -327,7 +327,8 @@ trait SchedulerSpec
       val latencies = within(10.seconds) {
         for (i ← 1 to N)
           yield
-            try expectMsgType[Long] catch {
+            try expectMsgType[Long]
+            catch {
               case NonFatal(e) ⇒
                 throw new Exception(s"failed expecting the $i-th latency", e)
             }
@@ -405,7 +406,8 @@ class LightArrayRevolverSchedulerSpec
       val latencies = within(10.seconds) {
         for (i ← 1 to (N - cancelled))
           yield
-            try expectMsgType[Long] catch {
+            try expectMsgType[Long]
+            catch {
               case NonFatal(e) ⇒
                 throw new Exception(s"failed expecting the $i-th latency", e)
             }
@@ -592,7 +594,8 @@ class LightArrayRevolverSchedulerSpec
         try time += (lbq.get match {
               case q: LinkedBlockingQueue[Long] ⇒ q.take()
               case _ ⇒ 0L
-            }) catch {
+            })
+        catch {
           case _: InterruptedException ⇒ Thread.currentThread.interrupt()
         }
       }
@@ -611,7 +614,8 @@ class LightArrayRevolverSchedulerSpec
       }
     }
     driver.expectWait()
-    try thunk(sched, driver) catch {
+    try thunk(sched, driver)
+    catch {
       case NonFatal(ex) ⇒
         try {
           driver.close()

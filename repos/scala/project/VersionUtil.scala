@@ -141,7 +141,8 @@ object VersionUtil {
   lazy val versionProps: Map[String, String] = {
     val props = new Properties()
     val in = new FileInputStream(file("versions.properties"))
-    try props.load(in) finally in.close()
+    try props.load(in)
+    finally in.close()
     props.asScala.toMap.map {
       case (k, v) =>
         (k, sys.props.getOrElse(k, v)) // allow system properties to override versions.properties

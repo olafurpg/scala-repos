@@ -39,7 +39,8 @@ private[serverset2] object Selector {
       }
     case Array("member", which) => Some(Member(which))
     case Array("shard", which) =>
-      try Some(Shard(which.toInt)) catch {
+      try Some(Shard(which.toInt))
+      catch {
         case NonFatal(_) => None
       }
     case _ => None

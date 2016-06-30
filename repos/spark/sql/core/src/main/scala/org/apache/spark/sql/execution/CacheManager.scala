@@ -49,7 +49,8 @@ private[sql] class CacheManager extends Logging {
   private def readLock[A](f: => A): A = {
     val lock = cacheLock.readLock()
     lock.lock()
-    try f finally {
+    try f
+    finally {
       lock.unlock()
     }
   }
@@ -58,7 +59,8 @@ private[sql] class CacheManager extends Logging {
   private def writeLock[A](f: => A): A = {
     val lock = cacheLock.writeLock()
     lock.lock()
-    try f finally {
+    try f
+    finally {
       lock.unlock()
     }
   }

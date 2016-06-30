@@ -290,7 +290,8 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
       val row = encoder.toRow(input)
       val schema = encoder.schema.toAttributes
       val boundEncoder = encoder.defaultBinding
-      val convertedBack = try boundEncoder.fromRow(row) catch {
+      val convertedBack = try boundEncoder.fromRow(row)
+      catch {
         case e: Exception =>
           fail(s"""Exception thrown while decoding
               |Converted: $row
@@ -300,7 +301,8 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
               |Encoder:
               |$boundEncoder
               |
-            """.stripMargin, e)
+            """.stripMargin,
+               e)
       }
 
       // Test the correct resolution of serialization / deserialization.

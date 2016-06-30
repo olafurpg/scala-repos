@@ -46,7 +46,8 @@ private[akka] object Reflect {
     * @return a new instance from the default constructor of the given class
     */
   private[akka] def instantiate[T](clazz: Class[T]): T =
-    try clazz.newInstance catch {
+    try clazz.newInstance
+    catch {
       case iae: IllegalAccessException ⇒
         val ctor = clazz.getDeclaredConstructor()
         ctor.setAccessible(true)
@@ -69,7 +70,8 @@ private[akka] object Reflect {
   private[akka] def instantiate[T](constructor: Constructor[T],
                                    args: immutable.Seq[Any]): T = {
     constructor.setAccessible(true)
-    try constructor.newInstance(args.asInstanceOf[Seq[AnyRef]]: _*) catch {
+    try constructor.newInstance(args.asInstanceOf[Seq[AnyRef]]: _*)
+    catch {
       case e: IllegalArgumentException ⇒
         val argString = args map safeGetClass mkString ("[", ", ", "]")
         throw new IllegalArgumentException(

@@ -88,8 +88,9 @@ final class Slave(frameworkName: String,
     ensureRunnerExists()
 
     val sTask = data.serializedTask.asInstanceOf[String]
-    val task = runner.deserializeTask(sTask, str =>
-          TaskDefSerializer.deserialize(js.JSON.parse(str)))
+    val task = runner.deserializeTask(
+        sTask,
+        str => TaskDefSerializer.deserialize(js.JSON.parse(str)))
 
     val eventHandler = new RemoteEventHandler
 

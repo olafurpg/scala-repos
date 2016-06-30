@@ -67,7 +67,8 @@ object FileVirtualTextFile extends (File => FileVirtualTextFile) {
   /** Reads the entire content of a file as a UTF-8 string. */
   def readFileToString(file: File): String = {
     val stream = new FileInputStream(file)
-    try IO.readInputStreamToString(stream) finally stream.close()
+    try IO.readInputStreamToString(stream)
+    finally stream.close()
   }
 }
 
@@ -105,7 +106,8 @@ object FileVirtualBinaryFile extends (File => FileVirtualBinaryFile) {
   /** Reads the entire content of a file as byte array. */
   def readFileToByteArray(file: File): Array[Byte] = {
     val stream = new FileInputStream(file)
-    try IO.readInputStreamToByteArray(stream) finally stream.close()
+    try IO.readInputStreamToByteArray(stream)
+    finally stream.close()
   }
 }
 

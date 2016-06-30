@@ -981,8 +981,10 @@ class LiftServlet extends Loggable {
       originalRequest: Req): () => Box[LiftResponse] =
     () => {
       val f = new LAFuture[List[AnswerRender]]
-      val cont = new ContinuationActor(request, session, actors, answers =>
-            f.satisfy(answers))
+      val cont = new ContinuationActor(request,
+                                       session,
+                                       actors,
+                                       answers => f.satisfy(answers))
 
       try {
         cont ! BeginContinuation

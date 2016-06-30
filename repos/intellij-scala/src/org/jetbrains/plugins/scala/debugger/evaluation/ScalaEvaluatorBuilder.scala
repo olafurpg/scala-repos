@@ -39,7 +39,8 @@ object ScalaEvaluatorBuilder extends EvaluatorBuilder {
 
     val cache = ScalaEvaluatorCache.getInstance(project)
     val cached: Option[Evaluator] = {
-      try cache.get(position, codeFragment) catch {
+      try cache.get(position, codeFragment)
+      catch {
         case e: Exception =>
           cache.clear()
           None

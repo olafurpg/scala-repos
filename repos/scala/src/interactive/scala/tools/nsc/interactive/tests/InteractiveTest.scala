@@ -77,7 +77,8 @@ abstract class InteractiveTest
 
   /** Test's entry point */
   def main(args: Array[String]) {
-    try execute() finally askShutdown()
+    try execute()
+    finally askShutdown()
   }
 
   protected def execute(): Unit = {

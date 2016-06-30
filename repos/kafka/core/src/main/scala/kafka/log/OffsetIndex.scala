@@ -356,8 +356,8 @@ class OffsetIndex(@volatile var file: File,
     * @throws IOException if rename fails
     */
   def renameTo(f: File) {
-    try Utils.atomicMoveWithFallback(file.toPath, f.toPath) finally this.file =
-      f
+    try Utils.atomicMoveWithFallback(file.toPath, f.toPath)
+    finally this.file = f
   }
 
   /**

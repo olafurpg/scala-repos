@@ -111,8 +111,10 @@ private[scala] trait MarkupParserCommon {
 
   def xCharRef(it: Iterator[Char]): String = {
     var c = it.next()
-    Utility.parseCharRef(() =>
-          c, () => { c = it.next() }, reportSyntaxError _, truncatedError _)
+    Utility.parseCharRef(() => c,
+                         () => { c = it.next() },
+                         reportSyntaxError _,
+                         truncatedError _)
   }
 
   def xCharRef: String = xCharRef(() => ch, () => nextch())
@@ -170,7 +172,8 @@ private[scala] trait MarkupParserCommon {
   /** Execute body with a variable saved and restored after execution */
   def saving[A, B](getter: A, setter: A => Unit)(body: => B): B = {
     val saved = getter
-    try body finally setter(saved)
+    try body
+    finally setter(saved)
   }
 
   /** Take characters from input stream until given String "until"

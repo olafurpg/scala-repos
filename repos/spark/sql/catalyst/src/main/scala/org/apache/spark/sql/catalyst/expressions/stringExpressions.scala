@@ -134,12 +134,13 @@ case class ConcatWs(children: Seq[Expression])
               if (!${eval.isNull}) {
                 $varargNum += ${eval.value}.numElements();
               }
-            """, s"""
+            """,
+                 s"""
             if (!${eval.isNull}) {
               final int $size = ${eval.value}.numElements();
               for (int j = 0; j < $size; j ++) {
                 $array[$idxInVararg ++] = ${ctx
-                  .getValue(eval.value, StringType, "j")};
+                   .getValue(eval.value, StringType, "j")};
               }
             }
             """)
@@ -359,8 +360,9 @@ case class FindInSet(left: Expression, right: Expression)
     set.asInstanceOf[UTF8String].findInSet(word.asInstanceOf[UTF8String])
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (word, set) =>
-          s"${ev.value} = $set.findInSet($word);")
+    nullSafeCodeGen(ctx,
+                    ev,
+                    (word, set) => s"${ev.value} = $set.findInSet($word);")
   }
 
   override def dataType: DataType = IntegerType
@@ -469,8 +471,10 @@ case class SubstringIndex(strExpr: Expression,
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    defineCodeGen(ctx, ev, (str, delim, count) =>
-          s"$str.subStringIndex($delim, $count)")
+    defineCodeGen(ctx,
+                  ev,
+                  (str, delim,
+                   count) => s"$str.subStringIndex($delim, $count)")
   }
 }
 
@@ -733,7 +737,10 @@ case class StringSpace(child: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (length) =>
+    nullSafeCodeGen(
+        ctx,
+        ev,
+        (length) =>
           s"""${ev.value} = UTF8String.blankString(($length < 0) ? 0 : $length);""")
   }
 
@@ -823,8 +830,10 @@ case class Levenshtein(left: Expression, right: Expression)
       .levenshteinDistance(rightValue.asInstanceOf[UTF8String])
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (left, right) =>
-          s"${ev.value} = $left.levenshteinDistance($right);")
+    nullSafeCodeGen(
+        ctx,
+        ev,
+        (left, right) => s"${ev.value} = $left.levenshteinDistance($right);")
   }
 }
 
@@ -950,7 +959,9 @@ case class Decode(bin: Expression, charset: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (bytes, charset) => s"""
+    nullSafeCodeGen(ctx,
+                    ev,
+                    (bytes, charset) => s"""
         try {
           ${ev.value} = UTF8String.fromString(new String($bytes, $charset.toString()));
         } catch (java.io.UnsupportedEncodingException e) {
@@ -980,7 +991,9 @@ case class Encode(value: Expression, charset: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (string, charset) => s"""
+    nullSafeCodeGen(ctx,
+                    ev,
+                    (string, charset) => s"""
         try {
           ${ev.value} = $string.toString().getBytes($charset.toString());
         } catch (java.io.UnsupportedEncodingException e) {

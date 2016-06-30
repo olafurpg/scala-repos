@@ -25,7 +25,8 @@ private[sbt] final class Previous(
     import referenced.{stamped, task}
     lazy val previousValue: Option[T] = {
       val in = streams(task).readBinary(task, StreamName)
-      try read(in, stamped) finally in.close()
+      try read(in, stamped)
+      finally in.close()
     }
   }
 
@@ -79,7 +80,8 @@ object Previous {
     def impl[T](key: ScopedKey[_], result: T): Unit =
       for (i <- map.get(key.asInstanceOf[ScopedTaskKey[T]])) {
         val out = streams.apply(i.task).binary(StreamName)
-        try write(out, i.stamped, result) finally out.close()
+        try write(out, i.stamped, result)
+        finally out.close()
       }
 
     for {
@@ -89,12 +91,14 @@ object Previous {
   }
 
   private def read[T](stream: InputStream, format: Format[T]): Option[T] =
-    try Some(format.reads(stream)) catch { case e: Exception => None }
+    try Some(format.reads(stream))
+    catch { case e: Exception => None }
 
   private def write[T](stream: OutputStream,
                        format: Format[T],
                        value: T): Unit =
-    try format.writes(stream, value) catch { case e: Exception => () }
+    try format.writes(stream, value)
+    catch { case e: Exception => () }
 
   /** Public as a macro implementation detail.  Do not call directly. */
   def runtime[T](skey: TaskKey[T])(

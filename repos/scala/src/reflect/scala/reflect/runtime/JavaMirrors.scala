@@ -89,7 +89,8 @@ private[scala] trait JavaMirrors
     // hence we need to be optimistic and create packages out of thin air
     // the same thing is done by the `missingHook` below
     override def staticPackage(fullname: String): ModuleSymbol =
-      try super.staticPackage(fullname) catch {
+      try super.staticPackage(fullname)
+      catch {
         case _: ScalaReflectionException => makeScalaPackage(fullname)
       }
 
@@ -293,7 +294,8 @@ private[scala] trait JavaMirrors
           ErrorNotField(field)
         val name = if (field.isAccessor) field.localName else field.name
         val field1 = (field.owner.info decl name).asTerm
-        try fieldToJava(field1) catch {
+        try fieldToJava(field1)
+        catch {
           case _: NoSuchFieldException => ErrorNonExistentField(field1)
         }
         new JavaFieldMirror(instance, field1)
@@ -758,7 +760,8 @@ private[scala] trait JavaMirrors
 
     /** Does `path` correspond to a Java class with that fully qualified name in the current class loader? */
     def tryJavaClass(path: String): Option[jClass[_]] =
-      (try Some(javaClass(path)) catch {
+      (try Some(javaClass(path))
+      catch {
         case ex @ (_: LinkageError | _: ClassNotFoundException) => None
       } // TODO - log
       )
@@ -1528,7 +1531,8 @@ private[scala] trait JavaMirrors
     def fieldToJava(fld: TermSymbol): jField = fieldCache.toJava(fld) {
       val jclazz = classToJava(fld.owner.asClass)
       val jname = fld.name.dropLocal.toString
-      try jclazz getDeclaredField jname catch {
+      try jclazz getDeclaredField jname
+      catch {
         case ex: NoSuchFieldException =>
           jclazz getDeclaredField expandedName(fld)
       }
@@ -1541,7 +1545,8 @@ private[scala] trait JavaMirrors
       val jclazz = classToJava(meth.owner.asClass)
       val paramClasses = transformedType(meth).paramTypes map typeToJavaClass
       val jname = meth.name.dropLocal.toString
-      try jclazz getDeclaredMethod (jname, paramClasses: _*) catch {
+      try jclazz getDeclaredMethod (jname, paramClasses: _*)
+      catch {
         case ex: NoSuchMethodException =>
           jclazz getDeclaredMethod (expandedName(meth), paramClasses: _*)
       }

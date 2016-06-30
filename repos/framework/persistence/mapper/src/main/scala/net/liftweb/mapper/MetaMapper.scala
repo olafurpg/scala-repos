@@ -374,8 +374,9 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
   }
 
   def findAll(by: QueryParam[A]*): List[A] =
-    dealWithPrecache(findMapDb(dbDefaultConnectionIdentifier, by: _*)(v =>
-              Full(v)), by)
+    dealWithPrecache(
+        findMapDb(dbDefaultConnectionIdentifier, by: _*)(v => Full(v)),
+        by)
 
   def findAllDb(dbId: ConnectionIdentifier, by: QueryParam[A]*): List[A] =
     dealWithPrecache(findMapDb(dbId, by: _*)(v => Full(v)), by)
@@ -708,19 +709,17 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
               val ret = DB.prepareStatement(
                   "DELETE FROM " + MapperRules.quoteTableName.vend(
                       _dbTableNameLC) + " WHERE " + im + " = ?",
-                  conn) {
-                st =>
-                  val indVal = indexedField(toDelete)
-                  indVal.map {
-                    indVal =>
-                      setPreparedStatementValue(conn,
-                                                st,
-                                                1,
-                                                indVal,
-                                                im,
-                                                objectSetterFor(indVal))
-                      st.executeUpdate == 1
-                  } openOr false
+                  conn) { st =>
+                val indVal = indexedField(toDelete)
+                indVal.map { indVal =>
+                  setPreparedStatementValue(conn,
+                                            st,
+                                            1,
+                                            indVal,
+                                            im,
+                                            objectSetterFor(indVal))
+                  st.executeUpdate == 1
+                } openOr false
               }
               _afterDelete(toDelete)
               ret
@@ -1204,12 +1203,11 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
                     (rs: ResultSet, pos: Int, objInst: A) =>
                       bsl(objInst, rs.getBoolean(pos), rs.wasNull)
                   }
-                  case _ => {
-                    (rs: ResultSet, pos: Int, objInst: A) =>
-                      {
-                        val res = rs.getObject(pos)
-                        findApplier(colName, res).foreach(f => f(objInst, res))
-                      }
+                  case _ => { (rs: ResultSet, pos: Int, objInst: A) =>
+                    {
+                      val res = rs.getObject(pos)
+                      findApplier(colName, res).foreach(f => f(objInst, res))
+                    }
                   }
                 })
               }
@@ -1649,8 +1647,9 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
 
       case pcf =>
         if (!inst.addedPostCommit) {
-          DB.appendPostTransaction(inst.connectionIdentifier, dontUse =>
-                (clearPCFunc :: pcf).foreach(_ (inst)))
+          DB.appendPostTransaction(
+              inst.connectionIdentifier,
+              dontUse => (clearPCFunc :: pcf).foreach(_ (inst)))
           inst.addedPostCommit = true
         }
     }

@@ -105,7 +105,8 @@ final class ChatApi(coll: Coll,
     val domainRegex = netDomain.replace(".", """\.""")
     val gameUrlRegex = (domainRegex + """\b/([\w]{8})[\w]{4}\b""").r
     def noPrivateUrl(str: String): String =
-      gameUrlRegex.replaceAllIn(str, m =>
-            quoteReplacement(netDomain + "/" + (m group 1)))
+      gameUrlRegex.replaceAllIn(
+          str,
+          m => quoteReplacement(netDomain + "/" + (m group 1)))
   }
 }

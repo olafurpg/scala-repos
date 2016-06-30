@@ -40,7 +40,8 @@ object MappedToBase {
             )
         ))
     val res = reify { new Isomorphism[E, E#Underlying](_.value, cons.splice) }
-    try c.typecheck(res.tree) catch {
+    try c.typecheck(res.tree)
+    catch {
       case NonFatal(ex) =>
         val p = c.enclosingPosition
         val msg = "Error typechecking MappedTo expansion: " + ex.getMessage

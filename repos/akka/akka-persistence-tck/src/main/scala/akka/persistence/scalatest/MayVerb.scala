@@ -18,7 +18,8 @@ trait MayVerb {
   def mayVerbStacktraceContextFrames = 3
 
   def optional(whenSkippedMessage: String)(body: ⇒ Unit): Unit =
-    try body catch {
+    try body
+    catch {
       case cause: Throwable ⇒
         val shortTrace =
           cause.getStackTrace.take(mayVerbStacktraceContextFrames)

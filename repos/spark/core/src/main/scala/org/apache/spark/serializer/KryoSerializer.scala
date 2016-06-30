@@ -739,7 +739,8 @@ private object JavaIterableWrapperSerializer extends Logging {
 
   // Get the underlying method so we can use it to get the Scala collection for serialization.
   private val underlyingMethodOpt = {
-    try Some(wrapperClass.getDeclaredMethod("underlying")) catch {
+    try Some(wrapperClass.getDeclaredMethod("underlying"))
+    catch {
       case e: Exception =>
         logError("Failed to find the underlying field in " + wrapperClass, e)
         None

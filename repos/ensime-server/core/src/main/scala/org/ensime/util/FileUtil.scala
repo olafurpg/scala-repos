@@ -44,7 +44,8 @@ object FileUtils {
 
   // prefer file.readString()
   def readFile(f: File, cs: Charset): Either[IOException, String] =
-    try Right(f.readString()(cs)) catch {
+    try Right(f.readString()(cs))
+    catch {
       case e: IOException => Left(e)
     }
 

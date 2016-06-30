@@ -345,8 +345,9 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
   implicit class ToGraphStage[I, O](stage: Stage[I, O]) {
     def toGS: PushPullGraphStage[Any, Any, Any] = {
       val s = stage
-      new PushPullGraphStage[Any, Any, Any]((_) ⇒
-            s.asInstanceOf[Stage[Any, Any]], Attributes.none)
+      new PushPullGraphStage[Any, Any, Any](
+          (_) ⇒ s.asInstanceOf[Stage[Any, Any]],
+          Attributes.none)
     }
   }
 

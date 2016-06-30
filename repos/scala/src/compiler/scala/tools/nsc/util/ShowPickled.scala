@@ -282,7 +282,8 @@ object ShowPickled extends Names {
 
   def fromFile(path: String) = fromBytes(io.File(path).toByteArray())
   def fromBytes(data: => Array[Byte]): Option[PickleBuffer] =
-    try Some(new PickleBuffer(data, 0, data.length)) catch {
+    try Some(new PickleBuffer(data, 0, data.length))
+    catch {
       case _: Exception => None
     }
 

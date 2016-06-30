@@ -168,7 +168,8 @@ object ByteBufferMessageSet {
             }
           // Not using inner offset and timestamps
           case None =>
-            try readMessageFromStream() catch {
+            try readMessageFromStream()
+            catch {
               case eofe: EOFException =>
                 compressed.close()
                 allDone()

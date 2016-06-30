@@ -58,13 +58,12 @@ private[http] object OutgoingConnectionBlueprint {
       import GraphDSL.Implicits._
 
       val renderingContextCreation = b.add {
-        Flow[HttpRequest] map {
-          request ⇒
-            val sendEntityTrigger =
-              request.headers collectFirst {
-                case headers.Expect.`100-continue` ⇒ Promise[NotUsed]().future
-              }
-            RequestRenderingContext(request, hostHeader, sendEntityTrigger)
+        Flow[HttpRequest] map { request ⇒
+          val sendEntityTrigger =
+            request.headers collectFirst {
+              case headers.Expect.`100-continue` ⇒ Promise[NotUsed]().future
+            }
+          RequestRenderingContext(request, hostHeader, sendEntityTrigger)
         }
       }
 
@@ -95,13 +94,12 @@ private[http] object OutgoingConnectionBlueprint {
         // will not be mutated, all "shared copy" parsers copy on first-write into the header cache
         val rootParser =
           new HttpResponseParser(parserSettings,
-                                 HttpHeaderParser(parserSettings) {
-                                   info ⇒
-                                     if (parserSettings.illegalHeaderWarnings)
-                                       logParsingError(
-                                           info withSummaryPrepended "Illegal response header",
-                                           log,
-                                           parserSettings.errorLoggingVerbosity)
+                                 HttpHeaderParser(parserSettings) { info ⇒
+                                   if (parserSettings.illegalHeaderWarnings)
+                                     logParsingError(
+                                         info withSummaryPrepended "Illegal response header",
+                                         log,
+                                         parserSettings.errorLoggingVerbosity)
                                  })
         new ResponseParsingMerge(rootParser)
       }

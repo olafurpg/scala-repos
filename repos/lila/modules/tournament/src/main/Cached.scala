@@ -7,13 +7,14 @@ import lila.memo._
 private[tournament] final class Cached(createdTtl: FiniteDuration,
                                        rankingTtl: FiniteDuration) {
 
-  private val nameCache =
-    MixedCache[String, Option[String]](((id: String) =>
-                                          TournamentRepo byId id map2 {
-                                        (tour: Tournament) =>
-                                          tour.fullName
-                                      }), timeToLive = 6 hours, default = _ =>
-          none, logger = logger)
+  private val nameCache = MixedCache[String, Option[String]](
+      ((id: String) =>
+         TournamentRepo byId id map2 { (tour: Tournament) =>
+           tour.fullName
+         }),
+      timeToLive = 6 hours,
+      default = _ => none,
+      logger = logger)
 
   def name(id: String): Option[String] = nameCache get id
 

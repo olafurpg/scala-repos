@@ -250,25 +250,30 @@ private[finagle] class BindingFactory[Req, Rep](
 
   private[this] val tree = NameTree.Leaf(path)
 
-  private[this] val nameCache =
-    new ServiceFactoryCache[Name.Bound, Req, Rep](bound =>
-          new ServiceFactoryProxy(newFactory(bound)) {
-        private val boundShow = Showable.show(bound)
-        override def apply(conn: ClientConnection) = {
-          Trace.recordBinary("namer.name", boundShow)
-          super.apply(conn)
-        }
-    }, statsReceiver.scope("namecache"), maxNameCacheSize)
+  private[this] val nameCache = new ServiceFactoryCache[Name.Bound, Req, Rep](
+      bound =>
+        new ServiceFactoryProxy(newFactory(bound)) {
+          private val boundShow = Showable.show(bound)
+          override def apply(conn: ClientConnection) = {
+            Trace.recordBinary("namer.name", boundShow)
+            super.apply(conn)
+          }
+      },
+      statsReceiver.scope("namecache"),
+      maxNameCacheSize)
 
   private[this] val nameTreeCache =
-    new ServiceFactoryCache[NameTree[Name.Bound], Req, Rep](tree =>
+    new ServiceFactoryCache[NameTree[Name.Bound], Req, Rep](
+        tree =>
           new ServiceFactoryProxy(NameTreeFactory(path, tree, nameCache)) {
-        private val treeShow = tree.show
-        override def apply(conn: ClientConnection) = {
-          Trace.recordBinary("namer.tree", treeShow)
-          super.apply(conn)
-        }
-    }, statsReceiver.scope("nametreecache"), maxNameTreeCacheSize)
+            private val treeShow = tree.show
+            override def apply(conn: ClientConnection) = {
+              Trace.recordBinary("namer.tree", treeShow)
+              super.apply(conn)
+            }
+        },
+        statsReceiver.scope("nametreecache"),
+        maxNameTreeCacheSize)
 
   private[this] val dtabCache = {
     val newFactory: ((Dtab, Dtab)) => ServiceFactory[Req, Rep] = {

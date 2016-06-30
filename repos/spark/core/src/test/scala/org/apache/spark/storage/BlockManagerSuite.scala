@@ -226,10 +226,12 @@ class BlockManagerSuite
     assert(master.getLocations("a3").size === 0, "master was told about a3")
 
     // Drop a1 and a2 from memory; this should be reported back to the master
-    store.dropFromMemoryIfExists("a1", () =>
-          null: Either[Array[Any], ChunkedByteBuffer])
-    store.dropFromMemoryIfExists("a2", () =>
-          null: Either[Array[Any], ChunkedByteBuffer])
+    store.dropFromMemoryIfExists(
+        "a1",
+        () => null: Either[Array[Any], ChunkedByteBuffer])
+    store.dropFromMemoryIfExists(
+        "a2",
+        () => null: Either[Array[Any], ChunkedByteBuffer])
     assert(store.getSingleAndReleaseLock("a1") === None,
            "a1 not removed from store")
     assert(store.getSingleAndReleaseLock("a2") === None,
@@ -495,10 +497,12 @@ class BlockManagerSuite
       t2.join()
       t3.join()
 
-      store.dropFromMemoryIfExists("a1", () =>
-            null: Either[Array[Any], ChunkedByteBuffer])
-      store.dropFromMemoryIfExists("a2", () =>
-            null: Either[Array[Any], ChunkedByteBuffer])
+      store.dropFromMemoryIfExists(
+          "a1",
+          () => null: Either[Array[Any], ChunkedByteBuffer])
+      store.dropFromMemoryIfExists(
+          "a2",
+          () => null: Either[Array[Any], ChunkedByteBuffer])
       store.waitForAsyncReregister()
     }
   }

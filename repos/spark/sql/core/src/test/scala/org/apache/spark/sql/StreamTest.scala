@@ -395,7 +395,8 @@ trait StreamTest extends QueryTest with Timeouts {
                 }
             }
 
-            val allData = try sink.allData catch {
+            val allData = try sink.allData
+            catch {
               case e: Exception =>
                 failTest("Exception while getting data from sink", e)
             }

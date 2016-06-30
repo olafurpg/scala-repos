@@ -236,8 +236,9 @@ abstract class RemoteSupport
     */
   @deprecated("Will be removed after 1.1", "1.1")
   def actorOf[T <: Actor: ClassTag](host: String, port: Int): ActorRef =
-    clientManagedActorOf(() =>
-          createActorFromClass(classTag[T].erasure), host, port)
+    clientManagedActorOf(() => createActorFromClass(classTag[T].erasure),
+                         host,
+                         port)
 
   protected def createActorFromClass(clazz: Class[_]): Actor = {
     import ReflectiveAccess.{createInstance, noParams, noArgs}

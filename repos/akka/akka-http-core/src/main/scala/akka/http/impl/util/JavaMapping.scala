@@ -373,7 +373,8 @@ private[http] object JavaMapping {
   }
 
   private def cast[T](obj: AnyRef)(implicit classTag: ClassTag[T]): T =
-    try classTag.runtimeClass.cast(obj).asInstanceOf[T] catch {
+    try classTag.runtimeClass.cast(obj).asInstanceOf[T]
+    catch {
       case exp: ClassCastException ⇒
         throw new IllegalArgumentException(
             s"Illegal custom subclass of $classTag. " +

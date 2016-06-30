@@ -138,7 +138,8 @@ class TestCodeRunner(tests: TestCodeRunner.AllTests) {
       try {
         val a = t.test
         val db = tdb.createDB()
-        try Await.result(db.run(a.withPinnedSession), Duration.Inf) catch {
+        try Await.result(db.run(a.withPinnedSession), Duration.Inf)
+        catch {
           case e: ExecutionException => throw e.getCause
         } finally db.close()
       } finally tdb.cleanUpAfter()

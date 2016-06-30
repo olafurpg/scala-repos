@@ -1438,7 +1438,8 @@ private[cluster] class OnMemberStatusChangedListener(callback: Runnable,
   }
 
   private def done(): Unit = {
-    try callback.run() catch {
+    try callback.run()
+    catch {
       case NonFatal(e) ⇒
         log.error(e,
                   "[{}] callback failed with [{}]",

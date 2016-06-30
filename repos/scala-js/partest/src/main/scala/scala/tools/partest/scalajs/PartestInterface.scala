@@ -117,7 +117,8 @@ case class PartestTask(taskDef: TaskDef, args: Array[String]) extends Task {
                   options,
                   scalaVersion)
 
-      try runner execute Array("run", "pos", "neg") catch {
+      try runner execute Array("run", "pos", "neg")
+      catch {
         case ex: ClassNotFoundException =>
           loggers foreach { l =>
             l.error(

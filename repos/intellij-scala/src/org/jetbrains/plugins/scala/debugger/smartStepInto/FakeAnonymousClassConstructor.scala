@@ -12,8 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.StdType
   */
 class FakeAnonymousClassConstructor(templ: ScNewTemplateDefinition,
                                     interfaceName: String)
-    extends FakePsiMethod(templ, interfaceName, Array.empty, StdType.UNIT, _ =>
-          false) {
+    extends FakePsiMethod(templ,
+                          interfaceName,
+                          Array.empty,
+                          StdType.UNIT,
+                          _ => false) {
   override def isConstructor: Boolean = true
 
   override def getIcon(flags: Int): Icon = Icons.CLASS

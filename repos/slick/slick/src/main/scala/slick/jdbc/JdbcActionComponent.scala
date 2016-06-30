@@ -55,16 +55,16 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
   protected object Commit
       extends SynchronousDatabaseAction[Unit, NoStream, Backend, Effect] {
     def run(ctx: Backend#Context): Unit =
-      try ctx.session
-        .endInTransaction(ctx.session.conn.commit()) finally ctx.unpin
+      try ctx.session.endInTransaction(ctx.session.conn.commit())
+      finally ctx.unpin
     def getDumpInfo = DumpInfo(name = "Commit")
   }
 
   protected object Rollback
       extends SynchronousDatabaseAction[Unit, NoStream, Backend, Effect] {
     def run(ctx: Backend#Context): Unit =
-      try ctx.session
-        .endInTransaction(ctx.session.conn.rollback()) finally ctx.unpin
+      try ctx.session.endInTransaction(ctx.session.conn.rollback())
+      finally ctx.unpin
     def getDumpInfo = DumpInfo(name = "Rollback")
   }
 
@@ -231,7 +231,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
           }
         } catch {
           case NonFatal(ex) =>
-            try prit.close() catch ignoreFollowOnError
+            try prit.close()
+            catch ignoreFollowOnError
             throw ex
         }
         if (state < 2) this else null
@@ -743,8 +744,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
             res
           } finally {
             if (!done)
-              try ctx.session
-                .endInTransaction(ctx.session.conn.rollback()) catch ignoreFollowOnError
+              try ctx.session.endInTransaction(ctx.session.conn.rollback())
+              catch ignoreFollowOnError
           }
         } else f
       }
@@ -767,7 +768,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
           st.clearParameters()
           compiled.checkInsert.converter.set(value, st)
           val rs = st.executeQuery()
-          try rs.next() finally rs.close()
+          try rs.next()
+          finally rs.close()
         }
         if (found)
           preparedOther(updateSql, session) { st =>
@@ -842,8 +844,9 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       extends InsertActionComposerImpl[U](compiled)
       with ReturningInsertActionComposer[U, RU] {
     def into[R](f: (U, RU) => R): IntoInsertActionComposer[U, R] =
-      createReturningInsertActionComposer[U, QR, R](compiled, keys, (v, r) =>
-            f(v, mux(v, r)))
+      createReturningInsertActionComposer[U, QR, R](compiled,
+                                                    keys,
+                                                    (v, r) => f(v, mux(v, r)))
 
     override protected def useServerSideUpsert =
       self.useServerSideUpsertReturning

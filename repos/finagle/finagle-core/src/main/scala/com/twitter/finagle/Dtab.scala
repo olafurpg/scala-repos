@@ -217,7 +217,8 @@ object Dtab {
 
   def unwind[T](f: => T): T = {
     val save = l()
-    try f finally l.set(save)
+    try f
+    finally l.set(save)
   }
 
   /**

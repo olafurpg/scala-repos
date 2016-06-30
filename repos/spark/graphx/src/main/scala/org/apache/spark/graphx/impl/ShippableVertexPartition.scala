@@ -39,8 +39,10 @@ private[graphx] object ShippableVertexPartition {
   /** Construct a `ShippableVertexPartition` from the given vertices without any routing table. */
   def apply[VD: ClassTag](
       iter: Iterator[(VertexId, VD)]): ShippableVertexPartition[VD] =
-    apply(iter, RoutingTablePartition.empty, null.asInstanceOf[VD], (a, b) =>
-          a)
+    apply(iter,
+          RoutingTablePartition.empty,
+          null.asInstanceOf[VD],
+          (a, b) => a)
 
   /**
     * Construct a `ShippableVertexPartition` from the given vertices with the specified routing

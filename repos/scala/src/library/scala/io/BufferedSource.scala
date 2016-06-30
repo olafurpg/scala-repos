@@ -74,7 +74,9 @@ class BufferedSource(inputStream: InputStream, bufferSize: Int)(
     override def next(): String = {
       val result = {
         if (nextLine == null) lineReader.readLine
-        else try nextLine finally nextLine = null
+        else
+          try nextLine
+          finally nextLine = null
       }
       if (result == null) Iterator.empty.next()
       else result

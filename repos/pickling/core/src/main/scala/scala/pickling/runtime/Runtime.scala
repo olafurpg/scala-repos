@@ -148,7 +148,8 @@ class InterpretedPicklerRuntime(classLoader: ClassLoader, preclazz: Class[_])(
           }
           builder.beginEntry(picklee, tag)
           GRL.lock()
-          try putFields() finally GRL.unlock()
+          try putFields()
+          finally GRL.unlock()
           builder.endEntry()
         } else {
           builder.beginEntry(null, FastTypeTag.Null)

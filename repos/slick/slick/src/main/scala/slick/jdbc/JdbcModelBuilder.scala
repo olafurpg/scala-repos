@@ -342,7 +342,8 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
 
     private def convenientDefault: Option[
         RelationalProfile.ColumnOption.Default[_]] =
-      try defaultColumnOption catch {
+      try defaultColumnOption
+      catch {
         case e: java.lang.NumberFormatException if ignoreInvalidDefaults =>
           logger.debug(
               s"NumberFormatException: Could not parse" +

@@ -107,7 +107,8 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       val segs1R = h.snapshotRef(None).segments
       segs1R mustEqual segs1
 
-      h.write(17, json("""
+      h.write(17,
+              json("""
         999
         123.0
         "cat"

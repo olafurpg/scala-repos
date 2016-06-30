@@ -298,7 +298,8 @@ object ImportInfo {
       if (rootUsed)
         (explicitQualifierString(qualifier, withDeepest = false), false)
       else {
-        val qualifiedDeepRef = try qualifiedRef(deepRef) catch {
+        val qualifiedDeepRef = try qualifiedRef(deepRef)
+        catch {
           case _: IllegalStateException => return None
         }
         val prefixQual =

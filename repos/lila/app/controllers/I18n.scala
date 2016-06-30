@@ -26,18 +26,17 @@ object I18n extends LilaController {
             }
           } >> negotiate(html = Redirect {
             s"${Env.api.Net.Protocol}${lang}.${Env.api.Net.Domain}" + {
-              HTTPRequest.referer(ctx.req).fold(routes.Lobby.home.url) {
-                str =>
-                  try {
-                    val pageUrl = new java.net.URL(str);
-                    val path = pageUrl.getPath
-                    val query = pageUrl.getQuery
-                    if (query == null) path
-                    else path + "?" + query
-                  } catch {
-                    case e: java.net.MalformedURLException =>
-                      routes.Lobby.home.url
-                  }
+              HTTPRequest.referer(ctx.req).fold(routes.Lobby.home.url) { str =>
+                try {
+                  val pageUrl = new java.net.URL(str);
+                  val path = pageUrl.getPath
+                  val query = pageUrl.getQuery
+                  if (query == null) path
+                  else path + "?" + query
+                } catch {
+                  case e: java.net.MalformedURLException =>
+                    routes.Lobby.home.url
+                }
               }
             }
           }.fuccess, api = _ => Ok(Json.obj("lang" -> lang)).fuccess)

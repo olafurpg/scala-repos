@@ -48,7 +48,8 @@ object TermConstructionProps
       $t1
       $t2
       $t3
-    }""", List(t1, t2, t3))
+    }""",
+                     List(t1, t2, t3))
   }
 
   property("unquote tree into new") = forAll { (tree: Tree) =>

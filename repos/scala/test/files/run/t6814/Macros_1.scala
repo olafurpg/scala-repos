@@ -6,7 +6,8 @@ object Macros {
     import c.universe._
 
     def test(tree: Tree, mode: c.TypecheckMode): String = {
-      try c.typecheck(tree, mode, silent = false).tpe.toString catch {
+      try c.typecheck(tree, mode, silent = false).tpe.toString
+      catch {
         case c.TypecheckException(_, msg) => msg
       }
     }

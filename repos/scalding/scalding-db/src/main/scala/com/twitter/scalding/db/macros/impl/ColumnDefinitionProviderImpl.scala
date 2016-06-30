@@ -224,7 +224,8 @@ object ColumnDefinitionProviderImpl {
       formats.map(_.fieldName).groupBy(identity).filter(_._2.size > 1).keys
 
     if (duplicateFields.nonEmpty) {
-      c.abort(c.enclosingPosition, s"""
+      c.abort(c.enclosingPosition,
+              s"""
         Duplicate field names found: ${duplicateFields.mkString(",")}.
         Please check your nested case classes.
         """)

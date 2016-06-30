@@ -15,7 +15,8 @@ object StateMetrics {
     def timedFuture[T](f: => Future[T]): Future[T] = {
       requestMeter.mark()
       val t0 = nanoTime()
-      val result: Future[T] = try f catch {
+      val result: Future[T] = try f
+      catch {
         case NonFatal(t) =>
           // if the function did not even manage to return the Future
           val t1 = nanoTime()

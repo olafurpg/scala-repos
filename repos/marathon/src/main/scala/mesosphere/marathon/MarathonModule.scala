@@ -460,8 +460,10 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
   @Singleton
   def provideFrameworkIdStore(store: PersistentStore,
                               metrics: Metrics): EntityStore[FrameworkId] = {
-    entityStore(store, metrics, "framework:", () =>
-          new FrameworkId(UUID.randomUUID().toString))
+    entityStore(store,
+                metrics,
+                "framework:",
+                () => new FrameworkId(UUID.randomUUID().toString))
   }
 
   @Named(ModuleNames.STORE_GROUP)
@@ -522,8 +524,10 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
   def provideEventSubscribersStore(
       store: PersistentStore,
       metrics: Metrics): EntityStore[EventSubscribers] = {
-    entityStore(store, metrics, "events:", () =>
-          new EventSubscribers(Set.empty[String]))
+    entityStore(store,
+                metrics,
+                "events:",
+                () => new EventSubscribers(Set.empty[String]))
   }
 
   private[this] def entityStore[

@@ -34,13 +34,12 @@ class IndexScript(universe: doc.Universe) extends Page {
           val ary = merged.keys.toList
             .sortBy(_.toLowerCase)
             .map(key => {
-              val pairs = merged(key).flatMap {
-                t: DocTemplateEntity =>
-                  Seq(kindToString(t) -> relativeLinkTo(t),
-                      "kind" -> kindToString(t),
-                      "members" -> membersToJSON(
-                          t.members.filter(!_.isShadowedOrAmbiguousImplicit)),
-                      "shortDescription" -> shortDesc(t))
+              val pairs = merged(key).flatMap { t: DocTemplateEntity =>
+                Seq(kindToString(t) -> relativeLinkTo(t),
+                    "kind" -> kindToString(t),
+                    "members" -> membersToJSON(
+                        t.members.filter(!_.isShadowedOrAmbiguousImplicit)),
+                    "shortDescription" -> shortDesc(t))
               }
 
               JSONObject(Map(pairs: _*) + ("name" -> key))

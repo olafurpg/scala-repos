@@ -37,7 +37,8 @@ object BundleBuilderSpec extends Specification with XmlMatchers {
                                     <div name="dog" lang="en">Dog</div>
                                     <div name="dog" lang="fr">Chien</div>
                                     <div name="cat"><div>hi</div></div>
-                                    </div>, Locale.US)
+                                    </div>,
+                 Locale.US)
         .openOrThrowException("Test")
 
       b.getObject("dog") must_== "Dog"
@@ -50,7 +51,8 @@ object BundleBuilderSpec extends Specification with XmlMatchers {
                                     <div name="dog" lang="zz">Dog</div>
                                     <div name="dog" lang="fr" default="true" >Chien</div>
                                     <div name="cat"><div>hi</div></div>
-                                    </div>, Locale.US)
+                                    </div>,
+                 Locale.US)
         .openOrThrowException("Test")
 
       b.getObject("dog") must_== "Chien"

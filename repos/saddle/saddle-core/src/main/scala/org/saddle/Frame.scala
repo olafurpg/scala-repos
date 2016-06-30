@@ -1675,8 +1675,11 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
       }
 
       // now build row strings
-      buf.append(util.buildStr(nrows, numRows, (r: Int) =>
-                createIx(r) + " -> " + createVals(r), rowBreakStr))
+      buf.append(
+          util.buildStr(nrows,
+                        numRows,
+                        (r: Int) => createIx(r) + " -> " + createVals(r),
+                        rowBreakStr))
     }
     buf.toString()
   }

@@ -127,9 +127,9 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
       *  Compiler might ignore them, but they should be loadable with macros.
       */
     override def staticClass(fullname: String): ClassSymbol =
-      try ensureClassSymbol(
-          fullname,
-          staticModuleOrClass(newTypeNameCached(fullname))) catch {
+      try ensureClassSymbol(fullname,
+                            staticModuleOrClass(newTypeNameCached(fullname)))
+      catch {
         case mre: MissingRequirementError =>
           throw new ScalaReflectionException(mre.msg)
       }
@@ -175,7 +175,8 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     override def staticModule(fullname: String): ModuleSymbol =
       try ensureModuleSymbol(fullname,
                              staticModuleOrClass(newTermNameCached(fullname)),
-                             allowPackages = false) catch {
+                             allowPackages = false)
+      catch {
         case mre: MissingRequirementError =>
           throw new ScalaReflectionException(mre.msg)
       }
@@ -219,7 +220,8 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     override def staticPackage(fullname: String): ModuleSymbol =
       try ensurePackageSymbol(fullname.toString,
                               getModuleOrClass(newTermNameCached(fullname)),
-                              allowModules = false) catch {
+                              allowModules = false)
+      catch {
         case mre: MissingRequirementError =>
           throw new ScalaReflectionException(mre.msg)
       }
@@ -238,7 +240,8 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     }
 
     @inline final def wrapMissing(body: => Symbol): Symbol =
-      try body catch { case _: MissingRequirementError => NoSymbol }
+      try body
+      catch { case _: MissingRequirementError => NoSymbol }
 
     /** getModule2/getClass2 aren't needed at present but may be again,
       *  so for now they're mothballed.

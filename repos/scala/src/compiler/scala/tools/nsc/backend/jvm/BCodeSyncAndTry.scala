@@ -217,7 +217,8 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
        * please notice `tmp` has type tree.tpe, while `earlyReturnVar` has the method return type.
        * Because those two types can be different, dedicated vars are needed.
        */
-      val tmp = if (guardResult) locals.makeLocal(tpeTK(tree), "tmp") else null;
+      val tmp =
+        if (guardResult) locals.makeLocal(tpeTK(tree), "tmp") else null;
 
       /*
        * upon early return from the try-body or one of its EHs (but not the EH-version of the finally-clause)

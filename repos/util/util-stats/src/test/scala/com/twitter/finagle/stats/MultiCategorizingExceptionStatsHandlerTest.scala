@@ -9,9 +9,11 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
   test("uses label, flags, source, exception chain and rolls up") {
     val receiver = new InMemoryStatsReceiver
 
-    val handler =
-      new MultiCategorizingExceptionStatsHandler(_ => "clienterrors", _ =>
-            Set("interrupted", "restartable"), _ => Some("service"), true)
+    val handler = new MultiCategorizingExceptionStatsHandler(
+        _ => "clienterrors",
+        _ => Set("interrupted", "restartable"),
+        _ => Some("service"),
+        true)
 
     val cwe = new RuntimeException(new Exception("e"))
     handler.record(receiver, cwe)
@@ -74,8 +76,11 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
   test("skips flags when it's empty") {
     val receiver = new InMemoryStatsReceiver
 
-    val handler = new MultiCategorizingExceptionStatsHandler(_ =>
-          "clienterrors", _ => Set(), _ => Some("service"), true)
+    val handler =
+      new MultiCategorizingExceptionStatsHandler(_ => "clienterrors",
+                                                 _ => Set(),
+                                                 _ => Some("service"),
+                                                 true)
 
     val cwe = new RuntimeException(new Exception("e"))
     handler.record(receiver, cwe)
@@ -137,9 +142,11 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
   test("support no roll up") {
     val receiver = new InMemoryStatsReceiver
 
-    val handler =
-      new MultiCategorizingExceptionStatsHandler(_ => "clienterrors", _ =>
-            Set("interrupted", "restartable"), _ => Some("service"), false)
+    val handler = new MultiCategorizingExceptionStatsHandler(
+        _ => "clienterrors",
+        _ => Set("interrupted", "restartable"),
+        _ => Some("service"),
+        false)
 
     val cwe = new RuntimeException(new Exception("e"))
     handler.record(receiver, cwe)

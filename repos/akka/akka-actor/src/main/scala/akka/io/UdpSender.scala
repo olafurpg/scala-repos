@@ -45,7 +45,8 @@ private[io] class UdpSender(val udp: UdpExt,
 
   override def postStop(): Unit = if (channel.isOpen) {
     log.debug("Closing DatagramChannel after being stopped")
-    try channel.close() catch {
+    try channel.close()
+    catch {
       case NonFatal(e) ⇒ log.debug("Error closing DatagramChannel: {}", e)
     }
   }

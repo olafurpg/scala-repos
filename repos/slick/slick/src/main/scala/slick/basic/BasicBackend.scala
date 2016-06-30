@@ -89,7 +89,8 @@ trait BasicBackend { self =>
       try runInContext(a,
                        createDatabaseActionContext(useSameThread),
                        false,
-                       true) catch {
+                       true)
+      catch {
         case NonFatal(ex) => Future.failed(ex)
       }
 
@@ -120,8 +121,9 @@ trait BasicBackend { self =>
     private[slick] final def streamInternal[T](
         a: DBIOAction[_, Streaming[T], Nothing],
         useSameThread: Boolean): DatabasePublisher[T] =
-      createPublisher(a, s =>
-            createStreamingDatabaseActionContext(s, useSameThread))
+      createPublisher(
+          a,
+          s => createStreamingDatabaseActionContext(s, useSameThread))
 
     /** Create a Reactive Streams `Publisher` using the given context factory. */
     protected[this] def createPublisher[T](
@@ -284,7 +286,8 @@ trait BasicBackend { self =>
     protected[this] final def releaseSession(ctx: Context,
                                              discardErrors: Boolean): Unit =
       if (!ctx.isPinned) {
-        try ctx.currentSession.close() catch {
+        try ctx.currentSession.close()
+        catch {
           case NonFatal(ex) if (discardErrors) =>
         }
         ctx.currentSession = null
@@ -306,7 +309,8 @@ trait BasicBackend { self =>
               ctx.readSync
               val res = try {
                 acquireSession(ctx)
-                val res = try a.run(ctx) catch {
+                val res = try a.run(ctx)
+                catch {
                   case NonFatal(ex) =>
                     releaseSession(ctx, true)
                     throw ex
@@ -384,8 +388,8 @@ trait BasicBackend { self =>
                   } catch {
                     case NonFatal(ex) =>
                       if (state ne null)
-                        try a
-                          .cancelStream(ctx, state) catch ignoreFollowOnError
+                        try a.cancelStream(ctx, state)
+                        catch ignoreFollowOnError
                       releaseSession(ctx, true)
                       throw ex
                   } finally {
@@ -551,7 +555,8 @@ trait BasicBackend { self =>
       if (streamLogger.isDebugEnabled)
         streamLogger.debug("Signaling onComplete()")
       finished = true
-      try subscriber.onComplete() catch {
+      try subscriber.onComplete()
+      catch {
         case NonFatal(ex) =>
           streamLogger.warn("Subscriber.onComplete failed unexpectedly", ex)
       }
@@ -563,7 +568,8 @@ trait BasicBackend { self =>
       if (streamLogger.isDebugEnabled)
         streamLogger.debug(s"Signaling onError($t)")
       finished = true
-      try subscriber.onError(t) catch {
+      try subscriber.onError(t)
+      catch {
         case NonFatal(ex) =>
           streamLogger.warn("Subscriber.onError failed unexpectedly", ex)
       }

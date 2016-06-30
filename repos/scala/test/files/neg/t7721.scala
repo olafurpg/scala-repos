@@ -131,7 +131,8 @@ object Test {
   object bo extends Base with B
 
   private def wrap(body: => Any) {
-    try println(body) catch { case ex: NoSuchMethodException => println(ex) }
+    try println(body)
+    catch { case ex: NoSuchMethodException => println(ex) }
   }
 
   def main(args: Array[String]) {

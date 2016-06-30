@@ -80,7 +80,8 @@ class MavenRemoteRepositoryResolver(val repo: MavenRepository,
     val metadataResultOpt = try system
       .resolveMetadata(session, java.util.Arrays.asList(metadataRequest))
       .asScala
-      .headOption catch {
+      .headOption
+    catch {
       case e: org.eclipse.aether.resolution.ArtifactResolutionException => None
     }
     try metadataResultOpt match {
@@ -89,8 +90,8 @@ class MavenRemoteRepositoryResolver(val repo: MavenRepository,
         import org.codehaus.plexus.util.ReaderFactory
         val readMetadata = {
           val reader = ReaderFactory.newXmlReader(md.getMetadata.getFile)
-          try new MetadataXpp3Reader().read(reader, false) finally reader
-            .close()
+          try new MetadataXpp3Reader().read(reader, false)
+          finally reader.close()
         }
         val timestampOpt = for {
           v <- Option(readMetadata.getVersioning)

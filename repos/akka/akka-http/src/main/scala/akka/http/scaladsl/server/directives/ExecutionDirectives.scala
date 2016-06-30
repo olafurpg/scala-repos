@@ -23,7 +23,8 @@ trait ExecutionDirectives {
       import ctx.executionContext
       def handleException: PartialFunction[Throwable, Future[RouteResult]] =
         handler andThen (_ (ctx.withAcceptAll))
-      try innerRouteBuilder(())(ctx).fast.recoverWith(handleException) catch {
+      try innerRouteBuilder(())(ctx).fast.recoverWith(handleException)
+      catch {
         case NonFatal(e) ⇒
           handleException
             .applyOrElse[Throwable, Future[RouteResult]](e, throw _)

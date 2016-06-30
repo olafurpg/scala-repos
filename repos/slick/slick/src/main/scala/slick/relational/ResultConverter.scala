@@ -148,9 +148,12 @@ final class GetOrElseResultConverter[M <: ResultConverterDomain, T](
   def set(value: T, pp: Writer) = child.set(Some(value), pp)
   def width = child.width
   override def getDumpInfo =
-    super.getDumpInfo.copy(mainInfo = (try default().toString catch {
-      case e: Throwable => "[" + e.getClass.getName + "]"
-    }), children = Vector(("child", child)))
+    super.getDumpInfo.copy(
+        mainInfo = (try default().toString
+        catch {
+          case e: Throwable => "[" + e.getClass.getName + "]"
+        }),
+        children = Vector(("child", child)))
 }
 
 final class IsDefinedResultConverter[M <: ResultConverterDomain](

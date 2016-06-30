@@ -137,8 +137,8 @@ abstract class RemoteRestartedQuarantinedSpec
 
         Await.result(system.whenTerminated, 10.seconds)
 
-        val freshSystem =
-          ActorSystem(system.name, ConfigFactory.parseString(s"""
+        val freshSystem = ActorSystem(system.name,
+                                      ConfigFactory.parseString(s"""
                     akka.remote.retry-gate-closed-for = 0.5 s
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}

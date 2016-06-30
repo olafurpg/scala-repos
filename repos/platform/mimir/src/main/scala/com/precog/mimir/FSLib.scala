@@ -91,15 +91,14 @@ trait FSLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
                     }
 
                   StreamT wrapEffect {
-                    expanded.sequence map {
-                      pathSets =>
-                        val unprefixed: Stream[String] = for {
-                          paths <- pathSets
-                          path <- paths
-                          suffix <- (path - ctx.evalContext.basePath)
-                        } yield suffix.toString
+                    expanded.sequence map { pathSets =>
+                      val unprefixed: Stream[String] = for {
+                        paths <- pathSets
+                        path <- paths
+                        suffix <- (path - ctx.evalContext.basePath)
+                      } yield suffix.toString
 
-                        Table.constString(unprefixed.toSet).slices
+                      Table.constString(unprefixed.toSet).slices
                     }
                   }
               } getOrElse {

@@ -68,7 +68,8 @@ object Serialization {
           case null ⇒ path.toSerializationFormat
           case system ⇒
             try path.toSerializationFormatWithAddress(
-                system.provider.getDefaultAddress) catch {
+                system.provider.getDefaultAddress)
+            catch {
               case NonFatal(_) ⇒ path.toSerializationFormat
             }
         }
@@ -112,7 +113,8 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
                      serializerId: Int,
                      clazz: Option[Class[_ <: T]]): Try[T] =
     Try {
-      val serializer = try serializerByIdentity(serializerId) catch {
+      val serializer = try serializerByIdentity(serializerId)
+      catch {
         case _: NoSuchElementException ⇒
           throw new NotSerializableException(
               s"Cannot find serializer with id [$serializerId]. The most probable reason is that the configuration entry " +
@@ -130,7 +132,8 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
                   serializerId: Int,
                   manifest: String): Try[AnyRef] =
     Try {
-      val serializer = try serializerByIdentity(serializerId) catch {
+      val serializer = try serializerByIdentity(serializerId)
+      catch {
         case _: NoSuchElementException ⇒
           throw new NotSerializableException(
               s"Cannot find serializer with id [$serializerId]. The most probable reason is that the configuration entry " +

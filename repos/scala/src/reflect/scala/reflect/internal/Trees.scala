@@ -1906,7 +1906,8 @@ trait Trees extends api.Trees { self: SymbolTable =>
     val path: mutable.Stack[Tree] = mutable.Stack()
     abstract override def traverse(t: Tree) = {
       path push t
-      try super.traverse(t) finally path.pop()
+      try super.traverse(t)
+      finally path.pop()
     }
   }
 
@@ -1925,7 +1926,8 @@ trait Trees extends api.Trees { self: SymbolTable =>
       if ((treeInfo isSelfOrSuperConstrCall tree) ||
           (treeInfo isEarlyDef tree)) {
         selfOrSuperCalls push currentOwner.owner
-        try super.transform(tree) finally selfOrSuperCalls.pop()
+        try super.transform(tree)
+        finally selfOrSuperCalls.pop()
       } else super.transform(tree)
     }
   }

@@ -60,7 +60,8 @@ object SnapshotSpec extends Spec {
         setName("Reader " + name)
 
         override def run() =
-          try check() catch {
+          try check()
+          catch {
             case ex: Exception => e = ex
           }
 
@@ -186,7 +187,8 @@ object SnapshotSpec extends Spec {
         setName("Worker " + name)
 
         override def run() =
-          try check() catch {
+          try check()
+          catch {
             case ex: Exception => e = ex
           }
 

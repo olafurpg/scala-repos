@@ -118,7 +118,8 @@ private object ClassPath {
       buf: mutable.Buffer[Info],
       seenUris: mutable.Set[URI]
   ): Unit = {
-    val jarFile = try new JarFile(file) catch {
+    val jarFile = try new JarFile(file)
+    catch {
       case _: IOException => return // not a Jar file
     }
 
@@ -136,7 +137,8 @@ private object ClassPath {
         if isClass(n)
       } buf += Info(n, loader)
     } finally {
-      try jarFile.close() catch {
+      try jarFile.close()
+      catch {
         case _: IOException =>
       }
     }

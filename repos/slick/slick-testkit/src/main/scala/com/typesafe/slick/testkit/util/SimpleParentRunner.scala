@@ -32,7 +32,8 @@ abstract class SimpleParentRunner[T](testClass: Class[_])
   protected def runChild(child: T, notifier: RunNotifier): Unit = {
     val desc = describeChild(child)
     notifier.fireTestStarted(desc)
-    try runChildInner(child, notifier) catch {
+    try runChildInner(child, notifier)
+    catch {
       case t: Throwable => addFailure(t, notifier, desc)
     } finally notifier.fireTestFinished(desc)
   }
@@ -59,7 +60,8 @@ abstract class SimpleParentRunner[T](testClass: Class[_])
   }
 
   def run(notifier: RunNotifier) {
-    try runChildren(notifier) catch {
+    try runChildren(notifier)
+    catch {
       case e: StoppedByUserException => throw e
       case e: Throwable => addFailure(e, notifier, getDescription)
     }

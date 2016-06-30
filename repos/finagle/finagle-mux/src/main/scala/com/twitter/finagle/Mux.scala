@@ -163,10 +163,11 @@ object Mux
       val param.Tracer(tracer) = params[param.Tracer]
       val Lessor.Param(lessor) = params[Lessor.Param]
 
-      val negotiatedTrans =
-        mux.Handshake
-          .server(trans = transport, version = LatestVersion, headers = _ =>
-                Nil, negotiate = mux.Handshake.NoopNegotiator)
+      val negotiatedTrans = mux.Handshake.server(
+          trans = transport,
+          version = LatestVersion,
+          headers = _ => Nil,
+          negotiate = mux.Handshake.NoopNegotiator)
 
       mux.ServerDispatcher.newRequestResponse(negotiatedTrans,
                                               service,

@@ -42,7 +42,8 @@ class LocationOfLineTest_212
 abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
   val noLocations = Set.empty[Loc]
 
-  setupFile("Simple.scala", s"""
+  setupFile("Simple.scala",
+            s"""
         |object Simple {
         |  ${offsetMarker}val z = 1
         |  def main(args: Array[String]) {
@@ -69,7 +70,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("SimpleClass.scala", s"""
+  setupFile("SimpleClass.scala",
+            s"""
        |object SimpleClass {
        |  def main(args: Array[String]) {
        |    val b = new Bar(1)
@@ -94,7 +96,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("Lambdas.scala", s"""
+  setupFile("Lambdas.scala",
+            s"""
         |object Lambdas {
         |  def main(args: Array[String]): Unit = {
         |    val list = List(1, 2)
@@ -116,7 +119,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("LocalFunction.scala", s"""
+  setupFile("LocalFunction.scala",
+            s"""
         |object LocalFunction {
         |
         |  def main(args: Array[String]) {
@@ -141,7 +145,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("Multilevel.scala", s"""
+  setupFile("Multilevel.scala",
+            s"""
         |object Multilevel {
         |  def main(args: Array[String]) {
         |    ${offsetMarker}class This {

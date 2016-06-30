@@ -158,7 +158,8 @@ object PluginDiscovery {
       data: PluginData,
       names: Seq[String],
       loader: ClassLoader): Seq[(String, T)] =
-    try ModuleUtilities.getCheckedObjects[T](names, loader) catch {
+    try ModuleUtilities.getCheckedObjects[T](names, loader)
+    catch {
       case e: ExceptionInInitializerError =>
         val cause = e.getCause
         if (cause eq null) throw e else throw cause

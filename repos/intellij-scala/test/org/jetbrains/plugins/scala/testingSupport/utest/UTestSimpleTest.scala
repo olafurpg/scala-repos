@@ -13,7 +13,8 @@ trait UTestSimpleTest extends UTestTestCase {
   protected def uTestFileName = uTestTestName + ".scala"
 
   protected def addUTestTest(): Unit = {
-    addFileToProject(uTestFileName, """
+    addFileToProject(uTestFileName,
+                     """
         |import utest._
         |import utest.framework.TestSuite
         |

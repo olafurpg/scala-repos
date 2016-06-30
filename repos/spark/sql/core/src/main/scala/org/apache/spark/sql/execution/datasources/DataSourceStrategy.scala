@@ -106,13 +106,21 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
     case PhysicalOperation(projects,
                            filters,
                            l @ LogicalRelation(t: PrunedFilteredScan, _, _)) =>
-      pruneFilterProject(l, projects, filters, (a, f) =>
+      pruneFilterProject(
+          l,
+          projects,
+          filters,
+          (a, f) =>
             toCatalystRDD(l, a, t.buildScan(a.map(_.name).toArray, f))) :: Nil
 
     case PhysicalOperation(projects,
                            filters,
                            l @ LogicalRelation(t: PrunedScan, _, _)) =>
-      pruneFilterProject(l, projects, filters, (a, _) =>
+      pruneFilterProject(
+          l,
+          projects,
+          filters,
+          (a, _) =>
             toCatalystRDD(l, a, t.buildScan(a.map(_.name).toArray))) :: Nil
 
     // Scanning partitioned HadoopFsRelation

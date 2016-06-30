@@ -78,9 +78,8 @@ class FlowDocSpec extends AkkaSpec {
     import scala.concurrent.duration._
     case object Tick
 
-    val timer =
-      Source.tick(initialDelay = 1.second, interval = 1.seconds, tick = () =>
-            Tick)
+    val timer = Source
+      .tick(initialDelay = 1.second, interval = 1.seconds, tick = () => Tick)
 
     val timerCancel: Cancellable = Sink.ignore.runWith(timer)
     timerCancel.cancel()

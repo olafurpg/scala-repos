@@ -46,11 +46,13 @@ object ParquetReadBenchmark {
   def withTempPath(f: File => Unit): Unit = {
     val path = Utils.createTempDir()
     path.delete()
-    try f(path) finally Utils.deleteRecursively(path)
+    try f(path)
+    finally Utils.deleteRecursively(path)
   }
 
   def withTempTable(tableNames: String*)(f: => Unit): Unit = {
-    try f finally tableNames.foreach(sqlContext.dropTempTable)
+    try f
+    finally tableNames.foreach(sqlContext.dropTempTable)
   }
 
   def withSQLConf(pairs: (String, String)*)(f: => Unit): Unit = {
@@ -58,7 +60,8 @@ object ParquetReadBenchmark {
     val currentValues =
       keys.map(key => Try(sqlContext.conf.getConfString(key)).toOption)
     (keys, values).zipped.foreach(sqlContext.conf.setConfString)
-    try f finally {
+    try f
+    finally {
       keys.zip(currentValues).foreach {
         case (key, Some(value)) => sqlContext.conf.setConfString(key, value)
         case (key, None) => sqlContext.conf.unsetConf(key)

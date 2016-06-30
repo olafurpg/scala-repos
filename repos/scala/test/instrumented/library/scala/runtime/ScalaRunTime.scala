@@ -167,7 +167,8 @@ object ScalaRunTime {
   // More background at ticket #2318.
   def ensureAccessible(m: JMethod): JMethod = {
     if (!m.isAccessible) {
-      try m setAccessible true catch { case _: SecurityException => () }
+      try m setAccessible true
+      catch { case _: SecurityException => () }
     }
     m
   }
@@ -354,7 +355,8 @@ object ScalaRunTime {
 
     // The try/catch is defense against iterables which aren't actually designed
     // to be iterated, such as some scala.tools.nsc.io.AbstractFile derived classes.
-    try inner(arg) catch {
+    try inner(arg)
+    catch {
       case _: StackOverflowError | _: UnsupportedOperationException |
           _: AssertionError =>
         "" + arg

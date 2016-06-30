@@ -61,11 +61,13 @@ class MarathonHealthCheckManagerTest
     taskCreationHandler = taskTrackerModule.taskCreationHandler
     taskUpdater = taskTrackerModule.taskUpdater
 
-    appRepository = new AppRepository(
-        new MarathonStore[AppDefinition](new InMemoryStore, metrics, () =>
-              AppDefinition(), "app:"),
-        None,
-        metrics)
+    appRepository =
+      new AppRepository(new MarathonStore[AppDefinition](new InMemoryStore,
+                                                         metrics,
+                                                         () => AppDefinition(),
+                                                         "app:"),
+                        None,
+                        metrics)
 
     eventStream = new EventStream()
 

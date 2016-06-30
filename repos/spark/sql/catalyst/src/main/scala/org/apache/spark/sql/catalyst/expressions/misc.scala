@@ -53,7 +53,10 @@ case class Md5(child: Expression)
     UTF8String.fromString(DigestUtils.md5Hex(input.asInstanceOf[Array[Byte]]))
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    defineCodeGen(ctx, ev, c =>
+    defineCodeGen(
+        ctx,
+        ev,
+        c =>
           s"UTF8String.fromString(org.apache.commons.codec.digest.DigestUtils.md5Hex($c))")
   }
 }
@@ -159,7 +162,10 @@ case class Sha1(child: Expression)
     UTF8String.fromString(DigestUtils.sha1Hex(input.asInstanceOf[Array[Byte]]))
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    defineCodeGen(ctx, ev, c =>
+    defineCodeGen(
+        ctx,
+        ev,
+        c =>
           s"UTF8String.fromString(org.apache.commons.codec.digest.DigestUtils.sha1Hex($c))")
   }
 }
@@ -474,7 +480,9 @@ case class PrintToStderr(child: Expression) extends UnaryExpression {
   protected override def nullSafeEval(input: Any): Any = input
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, c => s"""
+    nullSafeCodeGen(ctx,
+                    ev,
+                    c => s"""
          | System.err.println("Result of ${child.simpleString} is " + $c);
          | ${ev.value} = $c;
        """.stripMargin)

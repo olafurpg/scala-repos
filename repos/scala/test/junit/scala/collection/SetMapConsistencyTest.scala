@@ -83,8 +83,9 @@ class SetMapConsistencyTest {
                                              "mutable.TreeMap")
 
   def boxMarm[A <: AnyRef] =
-    new BoxMutableMap[A, cm.AnyRefMap[A, Int]](new cm.AnyRefMap[A, Int](_ =>
-              -1), "mutable.AnyRefMap") {
+    new BoxMutableMap[A, cm.AnyRefMap[A, Int]](
+        new cm.AnyRefMap[A, Int](_ => -1),
+        "mutable.AnyRefMap") {
       private def arm: cm.AnyRefMap[A, Int] =
         m.asInstanceOf[cm.AnyRefMap[A, Int]]
       override def adders = 3

@@ -43,7 +43,8 @@ object MavenRepositoryResolver {
   // Example: 2014 12 18  09 33 56
   val LAST_UPDATE_FORMAT = new java.text.SimpleDateFormat("yyyyMMddhhmmss")
   def parseTimeString(in: String): Option[Long] =
-    try Some(LAST_UPDATE_FORMAT.parse(in).getTime) catch {
+    try Some(LAST_UPDATE_FORMAT.parse(in).getTime)
+    catch {
       case _: java.text.ParseException => None
     }
   val DEFAULT_ARTIFACT_CONFIGURATION = "master"

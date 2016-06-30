@@ -49,14 +49,15 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
     ThreadUtils.newDaemonSingleThreadScheduledExecutor(
         "client-forward-message")
   // Used to provide the implicit parameter of `Future` methods.
-  private val forwardMessageExecutionContext =
-    ExecutionContext.fromExecutor(forwardMessageThread, t =>
-          t match {
-        case ie: InterruptedException => // Exit normally
-        case e: Throwable =>
-          logError(e.getMessage, e)
-          System.exit(SparkExitCode.UNCAUGHT_EXCEPTION)
-    })
+  private val forwardMessageExecutionContext = ExecutionContext.fromExecutor(
+      forwardMessageThread,
+      t =>
+        t match {
+          case ie: InterruptedException => // Exit normally
+          case e: Throwable =>
+            logError(e.getMessage, e)
+            System.exit(SparkExitCode.UNCAUGHT_EXCEPTION)
+      })
 
   private val lostMasters = new HashSet[RpcAddress]
   private var activeMasterEndpoint: RpcEndpointRef = null

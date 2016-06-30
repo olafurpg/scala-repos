@@ -126,7 +126,8 @@ trait MarkupParsers { self: Parsers =>
           case '"' | '\'' =>
             val tmp = xAttributeValue(ch_returning_nextch)
 
-            try handle.parseAttribute(r2p(start, mid, curOffset), tmp) catch {
+            try handle.parseAttribute(r2p(start, mid, curOffset), tmp)
+            catch {
               case e: RuntimeException =>
                 errorAndResult("error parsing attribute value",
                                parser.errorTermTree)
@@ -165,8 +166,9 @@ trait MarkupParsers { self: Parsers =>
 
     def xUnparsed: Tree = {
       val start = curOffset
-      xTakeUntil(handle.unparsed, () =>
-            r2p(start, start, curOffset), "</xml:unparsed>")
+      xTakeUntil(handle.unparsed,
+                 () => r2p(start, start, curOffset),
+                 "</xml:unparsed>")
     }
 
     /** Comment ::= '<!--' ((Char - '-') | ('-' (Char - '-')))* '-->'
@@ -349,7 +351,8 @@ trait MarkupParsers { self: Parsers =>
     /** Some try/catch/finally logic used by xLiteral and xLiteralPattern.  */
     private def xLiteralCommon(f: () => Tree,
                                ifTruncated: String => Unit): Tree = {
-      try return f() catch {
+      try return f()
+      catch {
         case c @ TruncatedXMLControl =>
           ifTruncated(c.getMessage)
         case c @ (MissingEndTagControl | ConfusedAboutBracesControl) =>

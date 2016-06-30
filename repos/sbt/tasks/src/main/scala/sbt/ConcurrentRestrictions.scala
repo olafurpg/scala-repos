@@ -169,7 +169,9 @@ object ConcurrentRestrictions {
       }
       private[this] def submitValid(node: A, work: () => R) = {
         running += 1
-        val wrappedWork = () => try work() finally cleanup(node)
+        val wrappedWork = () =>
+          try work()
+          finally cleanup(node)
         CompletionService.submit(wrappedWork, jservice)
       }
       private[this] def cleanup(node: A): Unit = synchronized {

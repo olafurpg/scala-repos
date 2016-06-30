@@ -111,20 +111,19 @@ object Puzzle extends LilaController {
     env.forms.difficulty.bindFromRequest.fold(
         err => fuccess(BadRequest(errorsAsJson(err))),
         value =>
-          Env.pref.api.setPref(me, (p: lila.pref.Pref) =>
-                p.copy(puzzleDifficulty = value), notifyChange = false) >> {
-            reqToCtx(ctx.req) flatMap {
-              newCtx =>
-                selectPuzzle(newCtx.me) zip env.userInfos(newCtx.me) map {
-                  case (Some(puzzle), infos) =>
-                    Ok(
-                        JsData(
-                            puzzle,
+          Env.pref.api.setPref(
+              me,
+              (p: lila.pref.Pref) => p.copy(puzzleDifficulty = value),
+              notifyChange = false) >> {
+            reqToCtx(ctx.req) flatMap { newCtx =>
+              selectPuzzle(newCtx.me) zip env.userInfos(newCtx.me) map {
+                case (Some(puzzle), infos) =>
+                  Ok(JsData(puzzle,
                             infos,
                             ctx.isAuth.fold("play", "try"),
                             animationDuration = env.AnimationDuration)(newCtx))
-                  case (None, _) => NotFound(noMorePuzzleJson)
-                }
+                case (None, _) => NotFound(noMorePuzzleJson)
+              }
             }
         }
     ) map (_ as JSON)
@@ -145,31 +144,29 @@ object Puzzle extends LilaController {
               case Some(me) =>
                 env.finisher(puzzle, me, data) flatMap {
                   case (newAttempt, None) =>
-                    UserRepo byId me.id map (_ | me) flatMap {
-                      me2 =>
-                        env.api.puzzle find id zip (env userInfos me2.some) zip
-                        (env.api.attempt hasVoted me2) map {
-                          case ((p2, infos), voted) =>
-                            Ok {
-                              JsData(p2 | puzzle,
-                                     infos,
-                                     "view",
-                                     attempt = newAttempt.some,
-                                     voted = voted.some,
-                                     animationDuration = env.AnimationDuration)
-                            }
-                        }
-                    }
-                  case (oldAttempt, Some(win)) =>
-                    env userInfos me.some map {
-                      infos =>
-                        Ok(
-                            JsData(puzzle,
+                    UserRepo byId me.id map (_ | me) flatMap { me2 =>
+                      env.api.puzzle find id zip (env userInfos me2.some) zip
+                      (env.api.attempt hasVoted me2) map {
+                        case ((p2, infos), voted) =>
+                          Ok {
+                            JsData(p2 | puzzle,
                                    infos,
                                    "view",
-                                   attempt = oldAttempt.some,
-                                   win = win.some,
-                                   animationDuration = env.AnimationDuration))
+                                   attempt = newAttempt.some,
+                                   voted = voted.some,
+                                   animationDuration = env.AnimationDuration)
+                          }
+                      }
+                    }
+                  case (oldAttempt, Some(win)) =>
+                    env userInfos me.some map { infos =>
+                      Ok(
+                          JsData(puzzle,
+                                 infos,
+                                 "view",
+                                 attempt = oldAttempt.some,
+                                 win = win.some,
+                                 animationDuration = env.AnimationDuration))
                     }
                 }
               case None =>

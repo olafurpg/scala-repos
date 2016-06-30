@@ -100,7 +100,8 @@ object Marshaller
     : Marshaller[A, B] =
     new Marshaller[A, B] {
       def apply(value: A)(implicit ec: ExecutionContext) =
-        try f(ec)(value) catch { case NonFatal(e) ⇒ FastFuture.failed(e) }
+        try f(ec)(value)
+        catch { case NonFatal(e) ⇒ FastFuture.failed(e) }
     }
 
   /**

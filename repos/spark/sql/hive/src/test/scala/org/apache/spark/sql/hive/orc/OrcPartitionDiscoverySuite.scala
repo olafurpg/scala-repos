@@ -50,7 +50,8 @@ class OrcPartitionDiscoverySuite
 
   def withTempDir(f: File => Unit): Unit = {
     val dir = Utils.createTempDir().getCanonicalFile
-    try f(dir) finally Utils.deleteRecursively(dir)
+    try f(dir)
+    finally Utils.deleteRecursively(dir)
   }
 
   def makeOrcFile[T <: Product: ClassTag: TypeTag](data: Seq[T],
@@ -64,7 +65,8 @@ class OrcPartitionDiscoverySuite
   }
 
   protected def withTempTable(tableName: String)(f: => Unit): Unit = {
-    try f finally hiveContext.dropTempTable(tableName)
+    try f
+    finally hiveContext.dropTempTable(tableName)
   }
 
   protected def makePartitionDir(basePath: File,

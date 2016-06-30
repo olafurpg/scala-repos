@@ -1896,8 +1896,8 @@ class SortingJobTest extends WordSpec with Matchers {
   import Dsl._
   "A SortingJob" should {
     JobTest(new SortingJob(_))
-      .source(Tsv("in", ('x, 'y, 'z)), (1 to 100).map(i =>
-                (i, i * i % 5, i * i * i)))
+      .source(Tsv("in", ('x, 'y, 'z)),
+              (1 to 100).map(i => (i, i * i % 5, i * i * i)))
       .sink[(Int, Int, Int)](Tsv("output")) { outBuf =>
         "keep all the columns" in {
           val correct =

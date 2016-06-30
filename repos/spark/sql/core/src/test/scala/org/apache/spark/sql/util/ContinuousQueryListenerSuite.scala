@@ -184,7 +184,8 @@ class ContinuousQueryListenerSuite
       progressStatuses.clear()
 
       // To reset the waiter
-      try asyncTestWaiter.await(timeout(1 milliseconds)) catch {
+      try asyncTestWaiter.await(timeout(1 milliseconds))
+      catch {
         case NonFatal(e) =>
       }
     }

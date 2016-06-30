@@ -34,7 +34,8 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL {
   def timedWithKnownOps[T](key: MetricKey, ops: Long)(run: ⇒ T): T = {
     val c = getOrRegister(key.toString,
                           new KnownOpsInTimespanTimer(expectedOps = ops))
-    try run finally c.stop()
+    try run
+    finally c.stop()
   }
 
   /**

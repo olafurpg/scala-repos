@@ -35,7 +35,8 @@ private[twitter] object ThriftUtil {
       classOf[ResponseClassifier])
 
   def findClass1(name: String): Option[Class[_]] =
-    try Some(Class.forName(name)) catch {
+    try Some(Class.forName(name))
+    catch {
       case _: ClassNotFoundException => None
     }
 
@@ -55,7 +56,8 @@ private[twitter] object ThriftUtil {
   def findMethod(clz: Class[_],
                  name: String,
                  params: Class[_]*): Option[Method] =
-    try Some(clz.getMethod(name, params: _*)) catch {
+    try Some(clz.getMethod(name, params: _*))
+    catch {
       case _: NoSuchMethodException => None
     }
 

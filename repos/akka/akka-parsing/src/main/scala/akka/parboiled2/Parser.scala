@@ -146,7 +146,8 @@ abstract class Parser(initialValueStackSize: Int = 16,
       _cursor = -1
       __advance()
       valueStack.clear()
-      try rule ne null catch {
+      try rule ne null
+      catch {
         case CutError ⇒ false
       }
     }
@@ -429,7 +430,8 @@ abstract class Parser(initialValueStackSize: Int = 16,
         __updateMaxCursor()
         __matchStringWrapped(string, ix + 1)
       } else {
-        try __registerMismatch() catch {
+        try __registerMismatch()
+        catch {
           case Parser.StartTracingException ⇒
             import RuleTrace._
             __bubbleUp(NonTerminal(StringMatch(string), -ix) :: Nil,
@@ -460,7 +462,8 @@ abstract class Parser(initialValueStackSize: Int = 16,
         __updateMaxCursor()
         __matchIgnoreCaseStringWrapped(string, ix + 1)
       } else {
-        try __registerMismatch() catch {
+        try __registerMismatch()
+        catch {
           case Parser.StartTracingException ⇒
             import RuleTrace._
             __bubbleUp(NonTerminal(IgnoreCaseString(string), -ix) :: Nil,

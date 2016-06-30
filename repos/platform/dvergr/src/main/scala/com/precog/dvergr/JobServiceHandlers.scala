@@ -86,18 +86,16 @@ class CreateJobHandler(jobs: JobManager[Future],
         Success(contentM flatMap { content =>
           (content \ "name", content \ "type", content \? "data") match {
             case (JString(name), JString(tpe), data) =>
-              request.parameters.get('apiKey) map {
-                apiKey =>
-                  auth.isValid(apiKey) flatMap {
-                    case true =>
-                      jobs.createJob(apiKey, name, tpe, data, None) map {
-                        job =>
-                          HttpResponse[JValue](Created,
-                                               content = Some(job.serialize))
-                      }
-                    case false =>
-                      Future(HttpResponse[JValue](Forbidden))
-                  }
+              request.parameters.get('apiKey) map { apiKey =>
+                auth.isValid(apiKey) flatMap {
+                  case true =>
+                    jobs.createJob(apiKey, name, tpe, data, None) map { job =>
+                      HttpResponse[JValue](Created,
+                                           content = Some(job.serialize))
+                    }
+                  case false =>
+                    Future(HttpResponse[JValue](Forbidden))
+                }
               } getOrElse {
                 Future(
                     HttpResponse[JValue](
@@ -219,14 +217,13 @@ class UpdateJobStatusHandler(jobs: JobManager[Future])(
                   Left("Invalid status ID '%s'." format badId)
                 case None => Right(None)
               }
-              val result = prevId.right map {
-                prevId =>
-                  jobs.updateStatus(jobId,
-                                    prevId,
-                                    msg,
-                                    progress,
-                                    unit,
-                                    content \? "info")
+              val result = prevId.right map { prevId =>
+                jobs.updateStatus(jobId,
+                                  prevId,
+                                  msg,
+                                  progress,
+                                  unit,
+                                  content \? "info")
               } match {
                 case Right(resultM) => resultM
                 case Left(error) => Future(Left(error))

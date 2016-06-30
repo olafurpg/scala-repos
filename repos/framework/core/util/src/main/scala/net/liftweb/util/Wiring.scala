@@ -148,8 +148,8 @@ trait Cell[T] extends Dependent {
     * will be performed on a separate thread asynchronously
     */
   def notifyDependents(): Unit = {
-    Schedule.schedule(() =>
-          dependents.foreach(_.predicateChanged(this)), TimeSpan(0))
+    Schedule.schedule(() => dependents.foreach(_.predicateChanged(this)),
+                      TimeSpan(0))
   }
 
   /**

@@ -79,7 +79,8 @@ object ScalaSyntheticProvider {
   }
 
   private def onlyInvokesStatic(m: Method): Boolean = {
-    val bytecodes = try m.bytecodes() catch {
+    val bytecodes = try m.bytecodes()
+    catch {
       case t: Throwable => return false
     }
 

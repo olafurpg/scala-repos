@@ -108,7 +108,8 @@ private[sql] trait SQLTestUtils
     val currentValues =
       keys.map(key => Try(sqlContext.conf.getConfString(key)).toOption)
     (keys, values).zipped.foreach(sqlContext.conf.setConfString)
-    try f finally {
+    try f
+    finally {
       keys.zip(currentValues).foreach {
         case (key, Some(value)) => sqlContext.conf.setConfString(key, value)
         case (key, None) => sqlContext.conf.unsetConf(key)
@@ -125,7 +126,8 @@ private[sql] trait SQLTestUtils
   protected def withTempPath(f: File => Unit): Unit = {
     val path = Utils.createTempDir()
     path.delete()
-    try f(path) finally Utils.deleteRecursively(path)
+    try f(path)
+    finally Utils.deleteRecursively(path)
   }
 
   /**
@@ -136,17 +138,20 @@ private[sql] trait SQLTestUtils
     */
   protected def withTempDir(f: File => Unit): Unit = {
     val dir = Utils.createTempDir().getCanonicalFile
-    try f(dir) finally Utils.deleteRecursively(dir)
+    try f(dir)
+    finally Utils.deleteRecursively(dir)
   }
 
   /**
     * Drops temporary table `tableName` after calling `f`.
     */
   protected def withTempTable(tableNames: String*)(f: => Unit): Unit = {
-    try f finally {
+    try f
+    finally {
       // If the test failed part way, we don't want to mask the failure by failing to remove
       // temp tables that never got created.
-      try tableNames.foreach(sqlContext.dropTempTable) catch {
+      try tableNames.foreach(sqlContext.dropTempTable)
+      catch {
         case _: NoSuchTableException =>
       }
     }
@@ -156,7 +161,8 @@ private[sql] trait SQLTestUtils
     * Drops table `tableName` after calling `f`.
     */
   protected def withTable(tableNames: String*)(f: => Unit): Unit = {
-    try f finally {
+    try f
+    finally {
       tableNames.foreach { name =>
         sqlContext.sql(s"DROP TABLE IF EXISTS $name")
       }
@@ -167,7 +173,8 @@ private[sql] trait SQLTestUtils
     * Drops view `viewName` after calling `f`.
     */
   protected def withView(viewNames: String*)(f: => Unit): Unit = {
-    try f finally {
+    try f
+    finally {
       viewNames.foreach { name =>
         sqlContext.sql(s"DROP VIEW IF EXISTS $name")
       }
@@ -190,7 +197,8 @@ private[sql] trait SQLTestUtils
         fail("Failed to create temporary database", cause)
     }
 
-    try f(dbName) finally sqlContext.sql(s"DROP DATABASE $dbName CASCADE")
+    try f(dbName)
+    finally sqlContext.sql(s"DROP DATABASE $dbName CASCADE")
   }
 
   /**
@@ -199,7 +207,8 @@ private[sql] trait SQLTestUtils
     */
   protected def activateDatabase(db: String)(f: => Unit): Unit = {
     sqlContext.sql(s"USE $db")
-    try f finally sqlContext.sql(s"USE default")
+    try f
+    finally sqlContext.sql(s"USE default")
   }
 
   /**

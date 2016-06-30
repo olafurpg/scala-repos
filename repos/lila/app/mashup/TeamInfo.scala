@@ -26,12 +26,14 @@ object TeamInfo {
 
   private case class Cachable(bestUserIds: List[User.ID], toints: Int)
 
-  private val cache = lila.memo.AsyncCache[String, Cachable](teamId =>
+  private val cache = lila.memo.AsyncCache[String, Cachable](
+      teamId =>
         for {
-      userIds ← MemberRepo userIdsByTeam teamId
-      bestUserIds ← UserRepo.idsByIdsSortRating(userIds, 10)
-      toints ← UserRepo.idsSumToints(userIds)
-    } yield Cachable(bestUserIds, toints), timeToLive = 10 minutes)
+          userIds ← MemberRepo userIdsByTeam teamId
+          bestUserIds ← UserRepo.idsByIdsSortRating(userIds, 10)
+          toints ← UserRepo.idsSumToints(userIds)
+        } yield Cachable(bestUserIds, toints),
+      timeToLive = 10 minutes)
 
   def apply(api: TeamApi,
             getForumNbPosts: String => Fu[Int],

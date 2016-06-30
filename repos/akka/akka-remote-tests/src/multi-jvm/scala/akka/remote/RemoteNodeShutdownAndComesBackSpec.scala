@@ -146,8 +146,8 @@ abstract class RemoteNodeShutdownAndComesBackSpec
 
         Await.ready(system.whenTerminated, 30.seconds)
 
-        val freshSystem =
-          ActorSystem(system.name, ConfigFactory.parseString(s"""
+        val freshSystem = ActorSystem(system.name,
+                                      ConfigFactory.parseString(s"""
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}
                       port = ${addr.port.get}

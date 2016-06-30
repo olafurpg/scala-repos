@@ -121,8 +121,9 @@ object Literal {
     case arr: ArrayType => create(Array(), arr)
     case map: MapType => create(Map(), map)
     case struct: StructType =>
-      create(InternalRow.fromSeq(struct.fields.map(f =>
-                    default(f.dataType).value)), struct)
+      create(InternalRow.fromSeq(
+                 struct.fields.map(f => default(f.dataType).value)),
+             struct)
     case other =>
       throw new RuntimeException(s"no default for type $dataType")
   }

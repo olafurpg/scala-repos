@@ -281,7 +281,8 @@ trait EnumeratorTFunctions {
         }
 
         checkCont1(contFactory =>
-              state => k => k(elInput(e)) >>== contFactory(f(state)), e)
+                     state => k => k(elInput(e)) >>== contFactory(f(state)),
+                   e)
       }
     }
 }

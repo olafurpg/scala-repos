@@ -86,7 +86,8 @@ trait Managed[+T] { selfT =>
     */
   def foreach(f: T => Unit) {
     val r = this.make()
-    try f(r.get) finally r.dispose()
+    try f(r.get)
+    finally r.dispose()
   }
 
   /**

@@ -131,11 +131,14 @@ abstract class ClassfileParser {
           s"illegal class file dependency between '$sym' and '$busy'")
 
     busy = sym
-    try body catch parseErrorHandler finally busy = NoSymbol
+    try body
+    catch parseErrorHandler
+    finally busy = NoSymbol
   }
   @inline private def raiseLoaderLevel[T](body: => T): T = {
     loaders.parentsLevel += 1
-    try body finally loaders.parentsLevel -= 1
+    try body
+    finally loaders.parentsLevel -= 1
   }
 
   def parse(file: AbstractFile, root: Symbol): Unit = {
@@ -432,7 +435,8 @@ abstract class ClassfileParser {
   def classNameToSymbol(name: Name): Symbol = {
     if (innerClasses contains name) innerClasses innerSymbol name
     else
-      try lookupClass(name) catch {
+      try lookupClass(name)
+      catch {
         case _: FatalError => loadClassSymbol(name)
       }
   }

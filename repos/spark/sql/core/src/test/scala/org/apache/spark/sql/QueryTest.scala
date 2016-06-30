@@ -86,14 +86,16 @@ abstract class QueryTest extends PlanTest {
   }
 
   protected def checkDecoding[T](ds: => Dataset[T], expectedAnswer: T*): Unit = {
-    val decoded = try ds.collect().toSet catch {
+    val decoded = try ds.collect().toSet
+    catch {
       case e: Exception =>
         fail(s"""
              |Exception collecting dataset as objects
              |${ds.resolvedTEncoder}
              |${ds.resolvedTEncoder.fromRowExpression.treeString}
              |${ds.queryExecution}
-           """.stripMargin, e)
+           """.stripMargin,
+             e)
     }
 
     // Handle the case where the return type is an array
@@ -123,7 +125,8 @@ abstract class QueryTest extends PlanTest {
     * @param expectedAnswer the expected result in a [[Seq]] of [[Row]]s.
     */
   protected def checkAnswer(df: => DataFrame, expectedAnswer: Seq[Row]): Unit = {
-    val analyzedDF = try df catch {
+    val analyzedDF = try df
+    catch {
       case ae: AnalysisException =>
         if (ae.plan.isDefined) {
           fail(s"""
@@ -222,7 +225,8 @@ abstract class QueryTest extends PlanTest {
         fail(s"""
              |Failed to parse logical plan to JSON:
              |${logicalPlan.treeString}
-           """.stripMargin, e)
+           """.stripMargin,
+             e)
     }
 
     // scala function is not serializable to JSON, use null to replace them so that we can compare
@@ -250,7 +254,8 @@ abstract class QueryTest extends PlanTest {
              |${logicalPlan.treeString}
              |
              |${logicalPlan.prettyJson}
-           """.stripMargin, e)
+           """.stripMargin,
+             e)
     }
 
     val normalized2 =
@@ -318,7 +323,8 @@ object QueryTest {
   def checkAnswer(df: DataFrame, expectedAnswer: Seq[Row]): Option[String] = {
     val isSorted = df.logicalPlan.collect { case s: logical.Sort => s }.nonEmpty
 
-    val sparkAnswer = try df.collect().toSeq catch {
+    val sparkAnswer = try df.collect().toSeq
+    catch {
       case e: Exception =>
         val errorMessage = s"""
             |Exception thrown while executing query:

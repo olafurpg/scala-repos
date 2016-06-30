@@ -45,8 +45,10 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
                             planFunction: SparkPlan => SparkPlan,
                             expectedAnswer: Seq[Row],
                             sortAnswers: Boolean = true): Unit = {
-    doCheckAnswer(input :: Nil, (plans: Seq[SparkPlan]) =>
-          planFunction(plans.head), expectedAnswer, sortAnswers)
+    doCheckAnswer(input :: Nil,
+                  (plans: Seq[SparkPlan]) => planFunction(plans.head),
+                  expectedAnswer,
+                  sortAnswers)
   }
 
   /**
@@ -64,8 +66,10 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
                              planFunction: (SparkPlan, SparkPlan) => SparkPlan,
                              expectedAnswer: Seq[Row],
                              sortAnswers: Boolean = true): Unit = {
-    doCheckAnswer(left :: right :: Nil, (plans: Seq[SparkPlan]) =>
-          planFunction(plans(0), plans(1)), expectedAnswer, sortAnswers)
+    doCheckAnswer(left :: right :: Nil,
+                  (plans: Seq[SparkPlan]) => planFunction(plans(0), plans(1)),
+                  expectedAnswer,
+                  sortAnswers)
   }
 
   /**

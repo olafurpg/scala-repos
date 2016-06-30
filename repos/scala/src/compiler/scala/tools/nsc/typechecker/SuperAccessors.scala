@@ -456,7 +456,8 @@ abstract class SuperAccessors
     private def withInvalidOwner[A](trans: => A): A = {
       val saved = validCurrentOwner
       validCurrentOwner = false
-      try trans finally validCurrentOwner = saved
+      try trans
+      finally validCurrentOwner = saved
     }
 
     /** Add a protected accessor, if needed, and return a tree that calls

@@ -110,7 +110,8 @@ class Slf4jLogger
     MDC.put(mdcAkkaTimestamp, formatTimestamp(logEvent.timestamp))
     MDC.put(mdcActorSystemAttributeName, actorSystemName)
     logEvent.mdc foreach { case (k, v) ⇒ MDC.put(k, String.valueOf(v)) }
-    try logStatement finally {
+    try logStatement
+    finally {
       MDC.remove(mdcAkkaSourceAttributeName)
       MDC.remove(mdcThreadAttributeName)
       MDC.remove(mdcAkkaTimestamp)

@@ -378,7 +378,8 @@ abstract class SupervisorStrategy {
 
   // logging is not the main purpose, and if it fails there’s nothing we can do
   private def publish(context: ActorContext, logEvent: LogEvent): Unit =
-    try context.system.eventStream.publish(logEvent) catch {
+    try context.system.eventStream.publish(logEvent)
+    catch {
       case NonFatal(_) ⇒
     }
 

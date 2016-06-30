@@ -96,7 +96,8 @@ class DefaultingResultConverter[@specialized(Byte,
     super.getDumpInfo.copy(
         mainInfo =
           s"idx=$idx, default=" + {
-            try default() catch {
+            try default()
+            catch {
               case e: Throwable => "[" + e.getClass.getName + "]"
             }
           },

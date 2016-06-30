@@ -155,7 +155,8 @@ trait LocationLineManager { self: ScalaPositionManager =>
 
       def skipTypeCheckOptimization(method: Method,
                                     caseLineLocations: Seq[Location]): Unit = {
-        val bytecodes = try method.bytecodes() catch {
+        val bytecodes = try method.bytecodes()
+        catch {
           case t: Throwable => return
         }
 
@@ -189,7 +190,8 @@ trait LocationLineManager { self: ScalaPositionManager =>
       def skipReturnValueAssignment(
           method: Method,
           caseLinesLocations: Seq[Seq[Location]]): Unit = {
-        val bytecodes = try method.bytecodes() catch {
+        val bytecodes = try method.bytecodes()
+        catch {
           case t: Throwable => return
         }
 
@@ -224,7 +226,8 @@ trait LocationLineManager { self: ScalaPositionManager =>
             !customizedLocationsCache.contains(_))
         if (locations.size <= 1) return
 
-        val bytecodes = try method.bytecodes() catch {
+        val bytecodes = try method.bytecodes()
+        catch {
           case t: Throwable => return
         }
 
@@ -244,7 +247,8 @@ trait LocationLineManager { self: ScalaPositionManager =>
 
       def customizeFor(caseClauses: ScCaseClauses): Unit = {
         def tooSmall(m: Method) = {
-          try m.allLineLocations().size() <= 3 catch {
+          try m.allLineLocations().size() <= 3
+          catch {
             case ae: AbsentInformationException => true
           }
         }

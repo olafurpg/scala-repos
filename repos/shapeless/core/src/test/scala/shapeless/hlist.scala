@@ -995,8 +995,8 @@ class HListTests {
     val m2e = m2eim2esm2eim2eem2ed.to[Array]
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, m2e)
     typed[Array[M2[_ >: Int with String with Double, _]]](m2e)
-    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x =>
-              x: Any))
+    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any),
+                       m2e.map(x => x: Any))
   }
 
   @Test
@@ -1085,8 +1085,8 @@ class HListTests {
     val m2e = m2eim2esm2eim2eem2ed.toArray
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, m2e)
     typed[Array[M2[_ >: Int with String with Double, _]]](m2e)
-    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x =>
-              x: Any))
+    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any),
+                       m2e.map(x => x: Any))
   }
 
   @Test

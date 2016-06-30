@@ -207,8 +207,9 @@ object LazyEitherT extends LazyEitherTInstances {
 
     def flatMap[C](f: (=> A) => LazyEitherT[F, C, B])(
         implicit M: Monad[F]): LazyEitherT[F, C, B] =
-      LazyEitherT(M.bind(lazyEitherT.run)(_.fold(a => f(a).run, b =>
-                    M.point(LazyEither.lazyRight[C](b)))))
+      LazyEitherT(
+          M.bind(lazyEitherT.run)(
+              _.fold(a => f(a).run, b => M.point(LazyEither.lazyRight[C](b)))))
   }
 
   implicit def lazyEitherTMonadPlus[F[_], L](

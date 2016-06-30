@@ -276,7 +276,8 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
     }
     val sparkContext = new SparkContext(sparkConf)
     val sqlContext = new TestSQLContext(sparkContext)
-    try f(sqlContext) finally sparkContext.stop()
+    try f(sqlContext)
+    finally sparkContext.stop()
   }
 
   Seq(Some(3), None).foreach { minNumPostShufflePartitions =>

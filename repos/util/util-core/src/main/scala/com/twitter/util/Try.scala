@@ -20,7 +20,8 @@ object Try {
     * errors.
     */
   def withFatals[R](r: => R)(f: PartialFunction[Throwable, Try[R]]): Try[R] =
-    try Try(r) catch {
+    try Try(r)
+    catch {
       case e: Throwable if f.isDefinedAt(e) => f(e)
     }
 
@@ -277,12 +278,14 @@ final case class Return[+R](r: R) extends Try[R] {
   def apply(): R = r
 
   def flatMap[R2](f: R => Try[R2]): Try[R2] =
-    try f(r) catch { case NonFatal(e) => Throw(e) }
+    try f(r)
+    catch { case NonFatal(e) => Throw(e) }
 
   def flatten[T](implicit ev: R <:< Try[T]): Try[T] = r
 
   def map[X](f: R => X): Try[X] =
-    try Return(f(r)) catch { case NonFatal(e) => Throw(e) }
+    try Return(f(r))
+    catch { case NonFatal(e) => Throw(e) }
 
   def exists(p: R => Boolean): Boolean = p(r)
 

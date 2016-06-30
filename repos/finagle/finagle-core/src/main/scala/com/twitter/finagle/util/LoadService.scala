@@ -124,7 +124,8 @@ private object ClassPath {
                         loader: ClassLoader,
                         buf: mutable.Buffer[Info],
                         history: mutable.Set[String]) {
-    val jarFile = try new JarFile(file) catch {
+    val jarFile = try new JarFile(file)
+    catch {
       case _: IOException => return // not a Jar file
     }
 
@@ -142,7 +143,8 @@ private object ClassPath {
         buf += Info(n, iface, lines)
       }
     } finally {
-      try jarFile.close() catch {
+      try jarFile.close()
+      catch {
         case _: IOException =>
       }
     }

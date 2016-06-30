@@ -187,7 +187,8 @@ object ToHeadUsages extends Specification {
     }
 
     "Exclude from context rewriting" in {
-      val first = http.Req.fixHtml("/wombat", <span>
+      val first = http.Req.fixHtml("/wombat",
+                                   <span>
           <a href="/foo" id="foo">foo</a>
           <a href="/bar" id="bar">bar</a>
         </span>)
@@ -196,7 +197,8 @@ object ToHeadUsages extends Specification {
 
       val second =
         LiftRules.excludePathFromContextPathRewriting.doWith(excludeBar _) {
-          Req.fixHtml("/wombat", <span>
+          Req.fixHtml("/wombat",
+                      <span>
             <a href="/foo" id="foo">foo</a>
             <a href="/bar" id="bar">bar</a>
           </span>)

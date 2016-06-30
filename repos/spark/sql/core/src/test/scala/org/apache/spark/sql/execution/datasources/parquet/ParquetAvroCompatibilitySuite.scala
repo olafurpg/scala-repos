@@ -44,7 +44,8 @@ class ParquetAvroCompatibilitySuite
        """.stripMargin)
 
     val writer = new AvroParquetWriter[T](new Path(path), schema)
-    try f(writer) finally writer.close()
+    try f(writer)
+    finally writer.close()
   }
 
   test("required primitives") {

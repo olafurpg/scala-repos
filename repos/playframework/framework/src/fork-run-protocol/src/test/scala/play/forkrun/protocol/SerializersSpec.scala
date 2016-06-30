@@ -78,7 +78,8 @@ trait PicklingTestUtils extends Specification {
   import org.specs2.matcher._
 
   private def addWhatWeWerePickling[T, U](t: T)(body: => U): U =
-    try body catch {
+    try body
+    catch {
       case e: Throwable =>
         e.printStackTrace()
         throw new AssertionError(

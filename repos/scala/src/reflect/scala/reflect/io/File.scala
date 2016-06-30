@@ -87,35 +87,41 @@ class File(jfile: JFile)(implicit constructorCodec: Codec)
   /** Creates a new file and writes all the Strings to it. */
   def writeAll(strings: String*): Unit = {
     val out = bufferedWriter()
-    try strings foreach (out write _) finally out.close()
+    try strings foreach (out write _)
+    finally out.close()
   }
 
   def appendAll(strings: String*): Unit = {
     val out = bufferedWriter(append = true)
-    try strings foreach (out write _) finally out.close()
+    try strings foreach (out write _)
+    finally out.close()
   }
 
   /** Calls println on each string (so it adds a newline in the PrintWriter fashion.) */
   def printlnAll(strings: String*): Unit = {
     val out = printWriter()
-    try strings foreach (out println _) finally out.close()
+    try strings foreach (out println _)
+    finally out.close()
   }
 
   def safeSlurp(): Option[String] =
-    try Some(slurp()) catch { case _: IOException => None }
+    try Some(slurp())
+    catch { case _: IOException => None }
 
   /** Reflection since we're into the java 6+ API.
     */
   def setExecutable(executable: Boolean, ownerOnly: Boolean = true): Boolean = {
     type JBoolean = java.lang.Boolean
     val method = try classOf[JFile]
-      .getMethod("setExecutable", classOf[Boolean], classOf[Boolean]) catch {
+      .getMethod("setExecutable", classOf[Boolean], classOf[Boolean])
+    catch {
       case _: NoSuchMethodException => return false
     }
 
     try method
       .invoke(jfile, executable: JBoolean, ownerOnly: JBoolean)
       .asInstanceOf[JBoolean]
-      .booleanValue catch { case _: Exception => false }
+      .booleanValue
+    catch { case _: Exception => false }
   }
 }

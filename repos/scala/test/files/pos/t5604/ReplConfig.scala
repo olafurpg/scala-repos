@@ -24,7 +24,8 @@ trait ReplConfig {
 
   private def parens(x: Any) = "(" + x + ")"
   private def echo(msg: => String) =
-    try Console println msg catch {
+    try Console println msg
+    catch {
       case x: AssertionError =>
         Console.println("Assertion error printing debugging output: " + x)
     }
@@ -45,7 +46,8 @@ trait ReplConfig {
     substituteAndLog("" + alt, alt)(body)
   private[nsc] def substituteAndLog[T](label: String, alt: => T)(
       body: => T): T = {
-    try body catch logAndDiscard(label, alt)
+    try body
+    catch logAndDiscard(label, alt)
   }
   private[nsc] def squashAndLog(label: String)(body: => Unit): Unit =
     substituteAndLog(label, ())(body)

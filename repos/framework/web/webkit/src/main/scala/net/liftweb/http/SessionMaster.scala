@@ -275,14 +275,16 @@ object SessionMaster extends LiftActor with Loggable {
             }
           })
         } else {
-          Schedule.schedule(() =>
+          Schedule.schedule(
+              () =>
                 f(ses, shutDown => {
-              if (!shutDown.session.markedForShutDown_?) {
-                shutDown.session.markedForShutDown_? = true
+                  if (!shutDown.session.markedForShutDown_?) {
+                    shutDown.session.markedForShutDown_? = true
 
-                this ! RemoveSession(shutDown.session.underlyingId)
-              }
-            }), 0.seconds)
+                    this ! RemoveSession(shutDown.session.underlyingId)
+                  }
+                }),
+              0.seconds)
         }
       }
 
