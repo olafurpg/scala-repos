@@ -645,9 +645,9 @@ class MergeTest extends WordSpec with Matchers {
       .sink[(Double, Double)](Tsv("out2")) { outBuf =>
         "correctly self merge" in {
           outBuf.toMap shouldBe
-          (big.groupBy(_._1).mapValues { iter =>
-                iter.map(_._2).max
-              })
+            (big.groupBy(_._1).mapValues { iter =>
+                  iter.map(_._2).max
+                })
         }
       }
       .run
@@ -988,12 +988,12 @@ class CrossTest extends WordSpec with Matchers {
         (idx + ": must look exactly right") in {
           outBuf should have size 6
           outBuf.toSet shouldBe
-          (Set((0, 1, 4),
-               (0, 1, 5),
-               (1, 2, 4),
-               (1, 2, 5),
-               (2, 3, 4),
-               (2, 3, 5)))
+            (Set((0, 1, 4),
+                 (0, 1, 5),
+                 (1, 2, 4),
+                 (1, 2, 5),
+                 (2, 3, 4),
+                 (2, 3, 5)))
         }
         idx += 1
       }
@@ -1230,12 +1230,12 @@ class PivotTest extends WordSpec with Matchers with FieldConversions {
         "unpivot columns correctly" in {
           outBuf should have size 6
           outBuf.toList.sorted shouldBe
-          (List(("1", "w", "a"),
-                ("1", "y", "b"),
-                ("1", "z", "c"),
-                ("2", "w", "d"),
-                ("2", "y", "e"),
-                ("2", "z", "f")).sorted)
+            (List(("1", "w", "a"),
+                  ("1", "y", "b"),
+                  ("1", "z", "c"),
+                  ("2", "w", "d"),
+                  ("2", "y", "e"),
+                  ("2", "z", "f")).sorted)
         }
       }
       .sink[(String, String, String, String)](Tsv("pivot")) { outBuf =>
@@ -1249,7 +1249,7 @@ class PivotTest extends WordSpec with Matchers with FieldConversions {
         "pivot back to the original with the missing column replace by the specified default" in {
           outBuf should have size 2
           outBuf.toList.sorted shouldBe
-          (List(("1", "a", "b", "c", 2.0), ("2", "d", "e", "f", 2.0)).sorted)
+            (List(("1", "a", "b", "c", 2.0), ("2", "d", "e", "f", 2.0)).sorted)
         }
       }
       .run

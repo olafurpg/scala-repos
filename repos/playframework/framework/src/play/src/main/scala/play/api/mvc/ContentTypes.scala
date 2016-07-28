@@ -264,7 +264,7 @@ case class RawBuffer(memoryThreshold: Int,
 
   override def toString = {
     "RawBuffer(inMemory=" + Option(inMemory).map(_.size).orNull +
-    ", backedByTemporaryFile=" + backedByTemporaryFile + ")"
+      ", backedByTemporaryFile=" + backedByTemporaryFile + ")"
   }
 }
 

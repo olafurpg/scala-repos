@@ -39,7 +39,7 @@ final class NoteApi(coll: lila.db.Types.Coll,
 
     import lila.hub.actorApi.timeline.{Propagate, NoteCreate}
     timeline !
-    (Propagate(NoteCreate(note.from, note.to)) toFriendsOf from.id exceptUser note.to)
+      (Propagate(NoteCreate(note.from, note.to)) toFriendsOf from.id exceptUser note.to)
 
     coll insert note
   }

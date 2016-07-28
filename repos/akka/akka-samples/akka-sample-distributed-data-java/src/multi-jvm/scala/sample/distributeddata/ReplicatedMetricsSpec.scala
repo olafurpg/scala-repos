@@ -94,7 +94,7 @@ class ReplicatedMetricsSpec
           .percentPerNode
           .asScala
           .toMap should not contain
-        (nodeKey(node3Address))
+          (nodeKey(node3Address))
       }
       enterBarrier("after-3")
     }

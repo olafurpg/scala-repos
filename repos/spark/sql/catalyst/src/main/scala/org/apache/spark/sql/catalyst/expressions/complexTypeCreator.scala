@@ -63,7 +63,7 @@ case class CreateArray(children: Seq[Expression]) extends Expression {
           }
          """
     }.mkString("\n") +
-    s"final ArrayData ${ev.value} = new $arrayClass($values);"
+      s"final ArrayData ${ev.value} = new $arrayClass($values);"
   }
 
   override def prettyName: String = "array"
@@ -115,7 +115,7 @@ case class CreateStruct(children: Seq[Expression]) extends Expression {
           }
          """
     }.mkString("\n") +
-    s"final InternalRow ${ev.value} = new $rowClass($values);"
+      s"final InternalRow ${ev.value} = new $rowClass($values);"
   }
 
   override def prettyName: String = "struct"
@@ -199,7 +199,7 @@ case class CreateNamedStruct(children: Seq[Expression]) extends Expression {
           }
          """
     }.mkString("\n") +
-    s"final InternalRow ${ev.value} = new $rowClass($values);"
+      s"final InternalRow ${ev.value} = new $rowClass($values);"
   }
 
   override def prettyName: String = "named_struct"

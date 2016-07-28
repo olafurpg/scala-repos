@@ -142,7 +142,7 @@ final class TeamApi(cached: Cached,
     belongsTo(team.id, userId) ?? {
       MemberRepo.remove(team.id, userId) >> TeamRepo
         .incMembers(team.id, -1) >>-
-      (cached.teamIdsCache invalidate userId)
+        (cached.teamIdsCache invalidate userId)
     }
 
   def quitAll(userId: String): Funit = MemberRepo.removeByUser(userId)

@@ -342,15 +342,15 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
 
       if (shouldShowActiveJobs) {
         content ++=
-        <h4 id="active">Active Jobs ({activeJobs.size})</h4> ++ activeJobsTable
+          <h4 id="active">Active Jobs ({activeJobs.size})</h4> ++ activeJobsTable
       }
       if (shouldShowCompletedJobs) {
         content ++=
-        <h4 id="completed">Completed Jobs ({completedJobNumStr})</h4> ++ completedJobsTable
+          <h4 id="completed">Completed Jobs ({completedJobNumStr})</h4> ++ completedJobsTable
       }
       if (shouldShowFailedJobs) {
         content ++=
-        <h4 id ="failed">Failed Jobs ({failedJobs.size})</h4> ++ failedJobsTable
+          <h4 id ="failed">Failed Jobs ({failedJobs.size})</h4> ++ failedJobsTable
       }
 
       val helpText =

@@ -142,7 +142,7 @@ final class JUnitExecuteTest(taskDef: TaskDef,
     } else {
       val msg = {
         s"failed: Expected exception: ${testAnnotation.expected} " +
-        s"took $timeInSeconds sec"
+          s"took $timeInSeconds sec"
       }
       logFormattedError(methodName, msg, None)
       taskFailed(methodName)
@@ -222,7 +222,7 @@ final class JUnitExecuteTest(taskDef: TaskDef,
                                         timeInSeconds: Double): Unit = {
     val msg = {
       "failed: org.junit." + c("AssumptionViolatedException", ERRMSG) + ": " +
-      ex.getMessage + ", took " + timeInSeconds + " sec"
+        ex.getMessage + ", took " + timeInSeconds + " sec"
     }
     logFormattedWarn("Test assumption in test ", methodName, msg)
   }

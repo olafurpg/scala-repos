@@ -183,7 +183,7 @@ trait ShardQueryExecutorPlatform[M[+ _]]
                     }
                 } map { errors =>
                   faults ->
-                  (if (errors.exists(_ == true)) Table.empty else table)
+                    (if (errors.exists(_ == true)) Table.empty else table)
                 }
               }
             }

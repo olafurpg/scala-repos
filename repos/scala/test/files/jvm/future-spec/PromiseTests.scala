@@ -35,9 +35,9 @@ class PromiseTests extends MinimalScalaTest {
       val timedOut = Promise.successful[String]("Timedout").future
 
       Await.result(failure fallbackTo timedOut, defaultTimeout) mustBe
-      ("Timedout")
+        ("Timedout")
       Await.result(timedOut fallbackTo empty, defaultTimeout) mustBe
-      ("Timedout")
+        ("Timedout")
       Await.result(otherFailure fallbackTo failure fallbackTo timedOut,
                    defaultTimeout) mustBe ("Timedout")
       intercept[RuntimeException] {
@@ -164,7 +164,7 @@ class PromiseTests extends MinimalScalaTest {
     "filter result" in {
       f { (future, result) =>
         Await.result((future filter (_ => true)), defaultTimeout) mustBe
-        (result)
+          (result)
         intercept[NoSuchElementException] {
           Await.result((future filter (_ => false)), defaultTimeout)
         }

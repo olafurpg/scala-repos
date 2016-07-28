@@ -505,10 +505,10 @@ case class AllForOneStrategy(maxNrOfRetries: Int = -1,
       if (restart &&
           children.forall(_.requestRestartPermission(retriesWindow)))
         children foreach
-        (crs ⇒
-              restartChild(crs.child,
-                           cause,
-                           suspendFirst = (crs.child != child)))
+          (crs ⇒
+                restartChild(crs.child,
+                             cause,
+                             suspendFirst = (crs.child != child)))
       else for (c ← children) context.stop(c.child)
     }
   }

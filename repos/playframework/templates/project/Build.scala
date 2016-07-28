@@ -395,7 +395,7 @@ object Templates {
           }
       }
     (Space ~> rep1sep(templateParser, Space)) ~
-    (token(Space ~> matched(state.combinedParser)) ?? "")
+      (token(Space ~> matched(state.combinedParser)) ?? "")
   }
 
   private class TemplateBuildFailed(template: String)

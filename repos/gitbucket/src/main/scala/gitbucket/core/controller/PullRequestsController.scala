@@ -229,7 +229,7 @@ trait PullRequestsControllerBase extends ControllerBase {
         getProtectedBranchInfo(owner, name, pullreq.requestBranch)
       if (branchProtection.needStatusCheck(loginAccount.userName)) {
         flash +=
-        "error" -> s"branch ${pullreq.requestBranch} is protected need status check."
+          "error" -> s"branch ${pullreq.requestBranch} is protected need status check."
       } else {
         val repository = getRepository(owner, name).get
         LockUtil.lock(s"${owner}/${name}") {
@@ -319,7 +319,7 @@ trait PullRequestsControllerBase extends ControllerBase {
                   }
               }
               flash +=
-              "info" -> s"Merge branch '${alias}' into ${pullreq.requestBranch}"
+                "info" -> s"Merge branch '${alias}' into ${pullreq.requestBranch}"
           }
         }
         redirect(s"/${repository.owner}/${repository.name}/pull/${issueId}")

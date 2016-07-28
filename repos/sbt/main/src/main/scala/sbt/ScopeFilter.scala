@@ -185,7 +185,7 @@ object ScopeFilter {
     ref =>
       Project.getProject(ref, structure).toList flatMap { p =>
         (if (classpath) p.dependencies.map(_.project) else Nil) ++
-        (if (aggregate) p.aggregate else Nil)
+          (if (aggregate) p.aggregate else Nil)
     }
 
   private[this] def byDeps(ref: ProjectReference,

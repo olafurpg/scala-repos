@@ -74,7 +74,7 @@ class CacheIvyTest extends Properties("CacheIvy") {
     def str(m: ModuleID) = {
       import m._
       s"ModuleID($organization, ${m.name}, $revision, $configurations, $isChanging, $isTransitive, $isForce, $explicitArtifacts, $exclusions, " +
-      s"$inclusions, $extraAttributes, $crossVersion, $branchName)"
+        s"$inclusions, $extraAttributes, $crossVersion, $branchName)"
     }
     def eq(a: ModuleID, b: ModuleID): Prop = {
       import CrossVersion._

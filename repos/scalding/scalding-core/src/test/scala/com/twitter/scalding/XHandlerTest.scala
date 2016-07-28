@@ -62,19 +62,19 @@ class XHandlerTest extends WordSpec with Matchers {
       val PlannerExceptionString = "cascadingflowplannerplannerexception"
       val ModeLoadExceptionString = "comtwitterscaldingmodeloadexception"
       RichXHandler.createXUrl(new PlannerException) shouldBe
-      (RichXHandler.gitHubUrl + PlannerExceptionString)
+        (RichXHandler.gitHubUrl + PlannerExceptionString)
       RichXHandler
         .createXUrl(new InvalidSourceException("Invalid Source")) shouldBe
-      (RichXHandler.gitHubUrl + InvalidSouceExceptionString)
+        (RichXHandler.gitHubUrl + InvalidSouceExceptionString)
       RichXHandler.createXUrl(new NoSuchMethodError) shouldBe
-      (RichXHandler.gitHubUrl + NoSuchMethodErrorString)
+        (RichXHandler.gitHubUrl + NoSuchMethodErrorString)
       RichXHandler.createXUrl(new AbstractMethodError) shouldBe
-      (RichXHandler.gitHubUrl + AbstractMethodErrorString)
+        (RichXHandler.gitHubUrl + AbstractMethodErrorString)
       RichXHandler.createXUrl(new NoClassDefFoundError) shouldBe
-      (RichXHandler.gitHubUrl + NoClassDefFoundErrorString)
+        (RichXHandler.gitHubUrl + NoClassDefFoundErrorString)
       RichXHandler.createXUrl(
           ModeLoadException("dummy", new ClassNotFoundException)) shouldBe
-      (RichXHandler.gitHubUrl + ModeLoadExceptionString)
+        (RichXHandler.gitHubUrl + ModeLoadExceptionString)
     }
   }
 }

@@ -33,7 +33,7 @@ private[spark] object PythonUtils {
     val pythonPath = new ArrayBuffer[String]
     for (sparkHome <- sys.env.get("SPARK_HOME")) {
       pythonPath +=
-      Seq(sparkHome, "python", "lib", "pyspark.zip").mkString(File.separator)
+        Seq(sparkHome, "python", "lib", "pyspark.zip").mkString(File.separator)
       pythonPath += Seq(sparkHome, "python", "lib", "py4j-0.9.2-src.zip")
         .mkString(File.separator)
     }

@@ -55,7 +55,7 @@ private[launchqueue] class RateLimiter(clock: Clock) {
           log.info(
               s"$message. Task launch delay for [${app.id}] changed from [$priorTimeLeft] to [$timeLeft].")
           taskLaunchDelays +=
-          ((app.id, app.versionInfo.lastConfigChangeVersion) -> newDelay)
+            ((app.id, app.versionInfo.lastConfigChangeVersion) -> newDelay)
         }
         newDelay.deadline
 
@@ -67,7 +67,7 @@ private[launchqueue] class RateLimiter(clock: Clock) {
 
   def resetDelay(app: AppDefinition): Unit = {
     if (taskLaunchDelays contains
-        (app.id -> app.versionInfo.lastConfigChangeVersion)) {
+          (app.id -> app.versionInfo.lastConfigChangeVersion)) {
       log.info(
           s"Task launch delay for [${app.id} - ${app.versionInfo.lastConfigChangeVersion}}] reset to zero")
       taskLaunchDelays -= (app.id -> app.versionInfo.lastConfigChangeVersion)

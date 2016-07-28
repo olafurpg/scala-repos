@@ -292,39 +292,39 @@ trait Reshape { self: Reifier =>
             (vodeff => vodeff.symbol -> vodeff)).toMap
       val accessors = scala.collection.mutable.Map[ValDef, List[DefDef]]()
       stats collect { case ddef: DefDef => ddef } foreach
-      (defdef => {
-            val valdef =
-              symdefs get defdef.symbol.accessedOrSelf collect {
-                case vdef: ValDef => vdef
-              } getOrElse null
-            if (valdef != null)
-              accessors(valdef) = accessors.getOrElse(valdef, Nil) :+ defdef
+        (defdef => {
+              val valdef =
+                symdefs get defdef.symbol.accessedOrSelf collect {
+                  case vdef: ValDef => vdef
+                } getOrElse null
+              if (valdef != null)
+                accessors(valdef) = accessors.getOrElse(valdef, Nil) :+ defdef
 
-            def detectBeanAccessors(prefix: String): Unit = {
-              if (defdef.name.startsWith(prefix)) {
-                val name = defdef.name.toString.substring(prefix.length)
-                def uncapitalize(s: String) =
-                  if (s.length == 0) ""
-                  else {
-                    val chars = s.toCharArray; chars(0) = chars(0).toLower;
-                    new String(chars)
+              def detectBeanAccessors(prefix: String): Unit = {
+                if (defdef.name.startsWith(prefix)) {
+                  val name = defdef.name.toString.substring(prefix.length)
+                  def uncapitalize(s: String) =
+                    if (s.length == 0) ""
+                    else {
+                      val chars = s.toCharArray; chars(0) = chars(0).toLower;
+                      new String(chars)
+                    }
+                  def findValDef(name: String) = symdefs.values collectFirst {
+                    case vdef: ValDef if vdef.name.dropLocal string_== name =>
+                      vdef
                   }
-                def findValDef(name: String) = symdefs.values collectFirst {
-                  case vdef: ValDef if vdef.name.dropLocal string_== name =>
-                    vdef
+                  val valdef = findValDef(name)
+                    .orElse(findValDef(uncapitalize(name)))
+                    .orNull
+                  if (valdef != null)
+                    accessors(valdef) =
+                      accessors.getOrElse(valdef, Nil) :+ defdef
                 }
-                val valdef = findValDef(name)
-                  .orElse(findValDef(uncapitalize(name)))
-                  .orNull
-                if (valdef != null)
-                  accessors(valdef) =
-                    accessors.getOrElse(valdef, Nil) :+ defdef
               }
-            }
-            detectBeanAccessors("get")
-            detectBeanAccessors("set")
-            detectBeanAccessors("is")
-          })
+              detectBeanAccessors("get")
+              detectBeanAccessors("set")
+              detectBeanAccessors("is")
+            })
 
       val stats1 =
         stats flatMap {
@@ -375,30 +375,31 @@ trait Reshape { self: Reifier =>
       // lazy valdef and defdef are in the same block.
       // only that valdef needs to have its rhs rebuilt from defdef
       stats flatMap
-      (stat =>
-            stat match {
-              case vdef: ValDef if vdef.symbol.isLazy =>
-                if (reifyDebug)
-                  println(s"reconstructing original lazy value for $vdef")
-                val ddefSym = vdef.symbol.lazyAccessor
-                val vdef1 = lazyvaldefs.get(ddefSym) match {
-                  case Some(ddef) =>
-                    toPreTyperLazyVal(ddef)
-                  case None =>
-                    if (reifyDebug)
-                      println("couldn't find corresponding lazy val accessor")
-                    vdef
-                }
-                if (reifyDebug) println(s"reconstructed lazy val is $vdef1")
-                vdef1 :: Nil
-              case ddef: DefDef if ddef.symbol.isLazy =>
-                if (isUnitType(ddef.symbol.info)) {
-                  // since lazy values of type Unit don't have val's
-                  // we need to create them from scratch
-                  toPreTyperLazyVal(ddef) :: Nil
-                } else Nil
-              case _ => stat :: Nil
-          })
+        (stat =>
+              stat match {
+                case vdef: ValDef if vdef.symbol.isLazy =>
+                  if (reifyDebug)
+                    println(s"reconstructing original lazy value for $vdef")
+                  val ddefSym = vdef.symbol.lazyAccessor
+                  val vdef1 = lazyvaldefs.get(ddefSym) match {
+                    case Some(ddef) =>
+                      toPreTyperLazyVal(ddef)
+                    case None =>
+                      if (reifyDebug)
+                        println(
+                            "couldn't find corresponding lazy val accessor")
+                      vdef
+                  }
+                  if (reifyDebug) println(s"reconstructed lazy val is $vdef1")
+                  vdef1 :: Nil
+                case ddef: DefDef if ddef.symbol.isLazy =>
+                  if (isUnitType(ddef.symbol.info)) {
+                    // since lazy values of type Unit don't have val's
+                    // we need to create them from scratch
+                    toPreTyperLazyVal(ddef) :: Nil
+                  } else Nil
+                case _ => stat :: Nil
+            })
     }
 
     private def trimSyntheticCaseClassMembers(deff: Tree,

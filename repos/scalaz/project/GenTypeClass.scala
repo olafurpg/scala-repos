@@ -17,7 +17,7 @@ case class TypeClass(name: String,
     "[[" + fqn + "]]" +
       (if (extendsList.nonEmpty)
          " extends " +
-         extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ")
+           extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ")
        else "")
 }
 

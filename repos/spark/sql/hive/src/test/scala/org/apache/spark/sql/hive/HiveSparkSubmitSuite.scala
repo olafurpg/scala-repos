@@ -327,7 +327,7 @@ object SparkSQLConfTest extends Logging {
 
         // Always add these two metastore settings at the beginning.
         ("spark.sql.hive.metastore.version" -> "0.12") +:
-        ("spark.sql.hive.metastore.jars" -> "maven") +: filteredSettings
+          ("spark.sql.hive.metastore.jars" -> "maven") +: filteredSettings
       }
 
       // For this simple test, we do not really clone this object.

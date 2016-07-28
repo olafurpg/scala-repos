@@ -511,11 +511,11 @@ trait LinearRegressionSpecs[M[+ _]]
 
   "linear regression" should {
     "pass randomly generated test with a single feature" in
-    (testTrivial or testTrivial)
+      (testTrivial or testTrivial)
     "pass randomly generated test with three features inside an object" in
-    (testThreeFeatures or testThreeFeatures)
+      (testThreeFeatures or testThreeFeatures)
     "pass randomly generated test with three distinct schemata" in
-    (testThreeSchemata or testThreeSchemata)
+      (testThreeSchemata or testThreeSchemata)
   }
 
   //more comprehensive linear prediction tests in muspelheim

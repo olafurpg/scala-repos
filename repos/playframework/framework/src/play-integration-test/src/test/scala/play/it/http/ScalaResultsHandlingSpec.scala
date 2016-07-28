@@ -311,7 +311,7 @@ trait ScalaResultsHandlingSpec
                 Cookies.decodeSetCookieHeader(headerValue).to[Set]
             }.to[Set]
             decodedCookieHeaders must_==
-            (Set(Set(aCookie), Set(bCookie), Set(cCookie)))
+              (Set(Set(aCookie), Set(bCookie), Set(cCookie)))
         }
       }
     }

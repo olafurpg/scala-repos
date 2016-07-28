@@ -24,7 +24,7 @@ final class Winners(mongoCache: lila.memo.MongoCache.Builder,
       TournamentRepo.lastFinishedScheduledByFreq(freq, since)
     }.sequenceFu.map(_.flatten) flatMap { stds =>
       TournamentRepo.lastFinishedDaily(chess.variant.Crazyhouse) map
-      (stds ::: _.toList)
+        (stds ::: _.toList)
     } flatMap toursToWinners
   }
 

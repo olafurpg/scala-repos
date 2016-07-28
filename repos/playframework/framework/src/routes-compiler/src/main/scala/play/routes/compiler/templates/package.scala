@@ -106,12 +106,12 @@ package object templates {
           val paramName: String = paramNameOnQueryString(p.name)
           p.fixed.map { v =>
             """Param[""" + p.typeName + """]("""" + paramName +
-            """", Right(""" + v + """))"""
+              """", Right(""" + v + """))"""
           }.getOrElse {
             """params.""" + (if (route.path.has(paramName)) "fromPath"
                              else "fromQuery") +
-            """[""" + p.typeName + """]("""" + paramName + """", """ +
-            p.default.map("Some(" + _ + ")").getOrElse("None") + """)"""
+              """[""" + p.typeName + """]("""" + paramName + """", """ +
+              p.default.map("Some(" + _ + ")").getOrElse("None") + """)"""
           }
         }
         if (ps.size < 22) ps.mkString(", ") else ps
@@ -347,14 +347,14 @@ package object templates {
               val paramName: String = paramNameOnQueryString(param.name)
               if (encode && encodeable(param.typeName))
                 """implicitly[PathBindable[""" + param.typeName +
-                """]].unbind("""" + paramName + """", dynamicString(""" +
-                safeKeyword(localNames.get(param.name).getOrElse(param.name)) +
-                """))"""
+                  """]].unbind("""" + paramName + """", dynamicString(""" +
+                  safeKeyword(localNames.get(param.name).getOrElse(param.name)) +
+                  """))"""
               else
                 """implicitly[PathBindable[""" + param.typeName +
-                """]].unbind("""" + paramName + """", """ +
-                safeKeyword(localNames.get(param.name).getOrElse(param.name)) +
-                """)"""
+                  """]].unbind("""" + paramName + """", """ +
+                  safeKeyword(localNames.get(param.name).getOrElse(param.name)) +
+                  """)"""
             }
             .getOrElse {
               throw new Error("missing key " + name)
@@ -372,9 +372,9 @@ package object templates {
     } else {
       """ + queryString(List(%s))""".format(queryParams.map { p =>
         ("""implicitly[QueryStringBindable[""" + p.typeName +
-            """]].unbind("""" + paramNameOnQueryString(p.name) + """", """ +
-            safeKeyword(localNames.get(p.name).getOrElse(p.name)) +
-            """)""") -> p
+              """]].unbind("""" + paramNameOnQueryString(p.name) + """", """ +
+              safeKeyword(localNames.get(p.name).getOrElse(p.name)) +
+              """)""") -> p
       }.map {
         case (u, Parameter(name, typeName, None, Some(default))) =>
           """if(""" + safeKeyword(localNames.getOrElse(name, name)) +
@@ -403,7 +403,7 @@ package object templates {
       }
           .map { p =>
         localNames(p.name) + " == \"\"\" + implicitly[JavascriptLiteral[" +
-        p.typeName + "]].to(" + p.fixed.get + ") + \"\"\""
+          p.typeName + "]].to(" + p.fixed.get + ") + \"\"\""
       }).filterNot(_.isEmpty).map(_.mkString(" && "))
   }
 
@@ -450,14 +450,14 @@ package object templates {
               val paramName: String = paramNameOnQueryString(param.name)
               if (encode && encodeable(param.typeName))
                 " + (\"\"\" + implicitly[PathBindable[" + param.typeName +
-                "]].javascriptUnbind + \"\"\")" + """("""" + paramName +
-                """", encodeURIComponent(""" +
-                localNames.get(param.name).getOrElse(param.name) + """))"""
+                  "]].javascriptUnbind + \"\"\")" + """("""" + paramName +
+                  """", encodeURIComponent(""" +
+                  localNames.get(param.name).getOrElse(param.name) + """))"""
               else
                 " + (\"\"\" + implicitly[PathBindable[" + param.typeName +
-                "]].javascriptUnbind + \"\"\")" + """("""" + paramName +
-                """", """ +
-                localNames.get(param.name).getOrElse(param.name) + """)"""
+                  "]].javascriptUnbind + \"\"\")" + """("""" + paramName +
+                  """", """ +
+                  localNames.get(param.name).getOrElse(param.name) + """)"""
             }
             .getOrElse {
               throw new Error("missing key " + name)
@@ -477,9 +477,9 @@ package object templates {
       """ + _qS([%s])""".format(queryParams.map { p =>
         val paramName: String = paramNameOnQueryString(p.name)
         ("(\"\"\" + implicitly[QueryStringBindable[" +
-            p.typeName + "]].javascriptUnbind + \"\"\")" + """("""" +
-            paramName + """", """ +
-            localNames.get(p.name).getOrElse(p.name) + """)""") -> p
+              p.typeName + "]].javascriptUnbind + \"\"\")" + """("""" +
+              paramName + """", """ +
+              localNames.get(p.name).getOrElse(p.name) + """)""") -> p
       }.map {
         case (u, Parameter(name, typeName, None, Some(default))) =>
           """(""" + localNames.get(name).getOrElse(name) +

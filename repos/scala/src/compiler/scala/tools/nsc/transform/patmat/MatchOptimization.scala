@@ -177,7 +177,7 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
       lazy val treesToHoist: List[Tree] = {
         nextBinder setFlag MUTABLE
         List(storedCond, nextBinder) map
-        (b => ValDef(b, codegen.mkZero(b.info)))
+          (b => ValDef(b, codegen.mkZero(b.info)))
       }
 
       // TODO: finer-grained duplication
@@ -422,8 +422,8 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
           if (unguardedComesLastOrAbsent /*(1)*/ &&
               impliesCurr.forall(caseEquals(currCase)) /*(2)*/ ) {
             collapsed +=
-            (if (impliesCurr.isEmpty && !isGuardedCase(currCase)) currCase
-             else collapse(currCase :: impliesCurr, currIsDefault))
+              (if (impliesCurr.isEmpty && !isGuardedCase(currCase)) currCase
+               else collapse(currCase :: impliesCurr, currIsDefault))
 
             remainingCases = others
           } else {

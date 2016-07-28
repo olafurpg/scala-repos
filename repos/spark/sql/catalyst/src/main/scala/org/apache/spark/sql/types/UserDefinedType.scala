@@ -60,7 +60,7 @@ abstract class UserDefinedType[UserType >: Null]
 
   override private[sql] def jsonValue: JValue = {
     ("type" -> "udt") ~ ("class" -> this.getClass.getName) ~
-    ("pyClass" -> pyUDT) ~ ("sqlType" -> sqlType.jsonValue)
+      ("pyClass" -> pyUDT) ~ ("sqlType" -> sqlType.jsonValue)
   }
 
   /**
@@ -108,7 +108,7 @@ private[sql] class PythonUserDefinedType(
 
   override private[sql] def jsonValue: JValue = {
     ("type" -> "udt") ~ ("pyClass" -> pyUDT) ~
-    ("serializedClass" -> serializedPyClass) ~ ("sqlType" -> sqlType.jsonValue)
+      ("serializedClass" -> serializedPyClass) ~ ("sqlType" -> sqlType.jsonValue)
   }
 
   override def equals(other: Any): Boolean = other match {

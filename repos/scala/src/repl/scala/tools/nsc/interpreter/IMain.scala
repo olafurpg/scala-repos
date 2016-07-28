@@ -516,9 +516,9 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
                 // so I had to rewrite this a bit
                 val subs = t collect { case sub => sub }
                 subs map
-                (t0 =>
-                      "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                      "\n") mkString ""
+                  (t0 =>
+                        "  " + safePos(t0, -1) + ": " + t0.shortClass +
+                        "\n") mkString ""
               }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the

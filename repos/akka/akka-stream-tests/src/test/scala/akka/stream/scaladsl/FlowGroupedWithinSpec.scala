@@ -163,7 +163,7 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
           Seq(x, y, z) -> Seq(immutable.Seq(x, y, z))
         }: _*)
       TestConfig.RandomTestRange foreach
-      (_ ⇒ runScript(script, settings)(_.groupedWithin(3, 10.minutes)))
+        (_ ⇒ runScript(script, settings)(_.groupedWithin(3, 10.minutes)))
     }
 
     "group with rest" in {
@@ -173,7 +173,7 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
               Seq(x, y, z) -> Seq(immutable.Seq(x, y, z))
             } :+ { val x = random.nextInt(); Seq(x) -> Seq(immutable.Seq(x)) }): _*)
       TestConfig.RandomTestRange foreach
-      (_ ⇒ runScript(script, settings)(_.groupedWithin(3, 10.minutes)))
+        (_ ⇒ runScript(script, settings)(_.groupedWithin(3, 10.minutes)))
     }
   }
 }

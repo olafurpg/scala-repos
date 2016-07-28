@@ -92,7 +92,7 @@ class PhiAccrualFailureDetector(
     val mean = firstHeartbeatEstimate.toMillis
     val stdDeviation = mean / 4
     HeartbeatHistory(maxSampleSize) :+ (mean - stdDeviation) :+
-    (mean + stdDeviation)
+      (mean + stdDeviation)
   }
 
   private val acceptableHeartbeatPauseMillis =

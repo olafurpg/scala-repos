@@ -84,9 +84,9 @@ private[kafka] class ZookeeperConsumerConnector(
     val scalaTopicCountMap: Map[String, Int] = {
       import JavaConversions._
       Map.empty[String, Int] ++
-      (topicCountMap
-            .asInstanceOf[java.util.Map[String, Int]]: mutable.Map[String,
-                                                                   Int])
+        (topicCountMap
+              .asInstanceOf[java.util.Map[String, Int]]: mutable.Map[String,
+                                                                     Int])
     }
     val scalaReturn =
       underlying.consume(scalaTopicCountMap, keyDecoder, valueDecoder)

@@ -647,7 +647,7 @@ trait EvaluatorModule
           }
 
         merged ++ (leftRec drop merged.length) ++
-        (rightRec drop merged.length)
+          (rightRec drop merged.length)
       }
 
       case prov => prov :: Nil

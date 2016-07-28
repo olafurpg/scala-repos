@@ -140,7 +140,7 @@ object HtmlHelpersSpec
       val removed = removeAttribute("attribute", element.attributes)
 
       (removed("attribute") must_== null) and
-      (removed("otherAttribute") must_== Text("good-bye"))
+        (removed("otherAttribute") must_== Text("good-bye"))
     }
   }
 
@@ -164,8 +164,8 @@ object HtmlHelpersSpec
       val uniqued = <wrapper>{ensureUniqueId(xml).head}</wrapper>
 
       (uniqued must \("boom", "id" -> "thing")) and
-      (uniqued must \\("hello", "id" -> "other-thing")) and
-      (uniqued must \\("bye", "id" -> "third-thing"))
+        (uniqued must \\("hello", "id" -> "other-thing")) and
+        (uniqued must \\("bye", "id" -> "third-thing"))
     }
 
     "strip the ids if elements have an id matching a previous one" in {
@@ -193,7 +193,7 @@ object HtmlHelpersSpec
       val uniqued = <wrapper>{ensureUniqueId(xml).head}</wrapper>
 
       (uniqued must \\("hello", "id" -> "thing")) and
-      (uniqued must \\("bye", "id" -> "thing"))
+        (uniqued must \\("bye", "id" -> "thing"))
     }
   }
 
@@ -207,8 +207,8 @@ object HtmlHelpersSpec
       val uniqued = <wrapper>{deepEnsureUniqueId(xml).head}</wrapper>
 
       (uniqued must \("boom", "id" -> "thing")) and
-      (uniqued must \\("hello", "id" -> "other-thing")) and
-      (uniqued must \\("bye", "id" -> "third-thing"))
+        (uniqued must \\("hello", "id" -> "other-thing")) and
+        (uniqued must \\("bye", "id" -> "third-thing"))
     }
 
     "strip the ids if elements have an id matching a previous one" in {

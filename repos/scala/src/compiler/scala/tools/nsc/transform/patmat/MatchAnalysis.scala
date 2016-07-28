@@ -348,7 +348,7 @@ trait MatchApproximation
           // reverse substitution that would otherwise replace a variable we already encountered by a new variable
           // NOTE: this forgets the more precise type we have for these later variables, but that's probably okay
           normalize >>=
-          Substitution(boundTo map (_.symbol), boundFrom map (CODE.REF(_)))
+            Substitution(boundTo map (_.symbol), boundFrom map (CODE.REF(_)))
           // debug.patmat ("normalize subst: "+ normalize)
 
           val okSubst = Substitution(unboundFrom, unboundTo map (normalize(_))) // it's important substitution does not duplicate trees here -- it helps to keep hash consing simple, anyway

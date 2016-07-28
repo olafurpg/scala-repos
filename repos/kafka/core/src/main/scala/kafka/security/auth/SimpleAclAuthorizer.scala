@@ -293,7 +293,7 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
 
   def toResourcePath(resource: Resource): String = {
     SimpleAclAuthorizer.AclZkPath + "/" + resource.resourceType + "/" +
-    resource.name
+      resource.name
   }
 
   private def logAuditMessage(principal: KafkaPrincipal,

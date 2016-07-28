@@ -146,7 +146,7 @@ class SeriesCheck extends Specification with ScalaCheck {
             s(i -> j) must_== exp
             s.sliceBy(i, j) must_== exp
             s.sliceBy(i, j, inclusive = false) must_==
-            s.take(Range(i, j).toArray)
+              s.take(Range(i, j).toArray)
         }
       }
     }

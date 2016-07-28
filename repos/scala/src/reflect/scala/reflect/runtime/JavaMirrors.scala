@@ -1022,11 +1022,11 @@ private[scala] trait JavaMirrors
 
         pendingLoadActions ::= { () =>
           jclazz.getDeclaredFields foreach
-          (f => enter(jfieldAsScala(f), f.javaFlags))
+            (f => enter(jfieldAsScala(f), f.javaFlags))
           jclazz.getDeclaredMethods foreach
-          (m => enter(jmethodAsScala(m), m.javaFlags))
+            (m => enter(jmethodAsScala(m), m.javaFlags))
           jclazz.getConstructors foreach
-          (c => enter(jconstrAsScala(c), c.javaFlags))
+            (c => enter(jconstrAsScala(c), c.javaFlags))
           enterEmptyCtorIfNecessary()
         }
 

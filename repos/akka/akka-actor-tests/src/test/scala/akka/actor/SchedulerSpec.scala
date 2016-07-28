@@ -439,7 +439,7 @@ class LightArrayRevolverSchedulerSpec
             if (ThreadLocalRandom.current.nextBoolean) step * 2 else step
           val N = 1000000
           (1 to N) foreach
-          (_ ⇒ sched.scheduleOnce(delay)(counter.incrementAndGet()))
+            (_ ⇒ sched.scheduleOnce(delay)(counter.incrementAndGet()))
           sched.close()
           Await.result(terminated, 3.seconds.dilated) should be > 10
           awaitCond(counter.get == N)
@@ -452,7 +452,7 @@ class LightArrayRevolverSchedulerSpec
         import driver._
         val start = step / 2
         (0 to 3) foreach
-        (i ⇒ sched.scheduleOnce(start + step * i, testActor, "hello"))
+          (i ⇒ sched.scheduleOnce(start + step * i, testActor, "hello"))
         expectNoMsg(step)
         wakeUp(step)
         expectWait(step)
@@ -485,7 +485,7 @@ class LightArrayRevolverSchedulerSpec
           import driver._
           val start = step / 2
           (0 to 3) foreach
-          (i ⇒ sched.scheduleOnce(start + step * i, probe.ref, "hello"))
+            (i ⇒ sched.scheduleOnce(start + step * i, probe.ref, "hello"))
           probe.expectNoMsg(step)
           wakeUp(step)
           expectWait(step)
@@ -513,7 +513,7 @@ class LightArrayRevolverSchedulerSpec
         import driver._
         val start = step / 2
         (0 to 3) foreach
-        (i ⇒ sched.scheduleOnce(start + step * i, testActor, "hello"))
+          (i ⇒ sched.scheduleOnce(start + step * i, testActor, "hello"))
         expectNoMsg(step)
         wakeUp(step)
         expectWait(step)

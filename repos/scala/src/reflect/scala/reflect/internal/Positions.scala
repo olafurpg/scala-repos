@@ -82,7 +82,7 @@ trait Positions extends api.Positions { self: SymbolTable =>
       if (tree.pos.isOpaqueRange) {
         val wpos = wrappingPos(tree.pos, children, focus)
         tree setPos
-        (if (isOverlapping(wpos)) tree.pos.makeTransparent else wpos)
+          (if (isOverlapping(wpos)) tree.pos.makeTransparent else wpos)
       }
     }
   }
@@ -130,7 +130,9 @@ trait Positions extends api.Positions { self: SymbolTable =>
                 "%15s %s".format("unpositioned", treeStatus(tree, encltree)))
             inform("%15s %s".format("enclosing", treeStatus(encltree)))
             encltree.children foreach
-            (t => inform("%15s %s".format("sibling", treeStatus(t, encltree))))
+              (t =>
+                    inform(
+                        "%15s %s".format("sibling", treeStatus(t, encltree))))
           }
         if (tree.pos.isRange) {
           if (!encltree.pos.isRange)

@@ -153,7 +153,7 @@ class ConsumerFetcherManager(private val consumerIdString: String,
         .toMap
       this.cluster = cluster
       noLeaderPartitionSet ++=
-      topicInfos.map(tpi => TopicAndPartition(tpi.topic, tpi.partitionId))
+        topicInfos.map(tpi => TopicAndPartition(tpi.topic, tpi.partitionId))
       cond.signalAll()
     }
   }

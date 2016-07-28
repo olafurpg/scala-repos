@@ -711,6 +711,6 @@ private object YarnAllocator {
     val matcher = pattern.matcher(diagnostics)
     val diag = if (matcher.find()) " " + matcher.group() + "." else ""
     ("Container killed by YARN for exceeding memory limits." + diag +
-        " Consider boosting spark.yarn.executor.memoryOverhead.")
+          " Consider boosting spark.yarn.executor.memoryOverhead.")
   }
 }

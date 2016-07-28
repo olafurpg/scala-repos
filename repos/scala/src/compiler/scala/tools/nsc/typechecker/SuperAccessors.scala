@@ -299,7 +299,7 @@ abstract class SuperAccessors
                   if (sym.isPrivateLocal && sym.paramss.isEmpty) {
                     qual.symbol.ancestors foreach { parent =>
                       parent.info.decls filterNot
-                      (x => x.isPrivate || x.isLocalToThis) foreach { m2 =>
+                        (x => x.isPrivate || x.isLocalToThis) foreach { m2 =>
                         if (sym.name == m2.name && m2.isGetter &&
                             m2.accessed.isMutable) {
                           reporter.warning(

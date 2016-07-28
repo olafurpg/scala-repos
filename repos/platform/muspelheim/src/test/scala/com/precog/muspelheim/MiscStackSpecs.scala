@@ -717,8 +717,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         }
 
       results2 mustEqual
-      (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
-           SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
+        (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
+             SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
     }
 
     "solve with a generic where inside a function" in {
@@ -745,8 +745,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         }
 
       results2 mustEqual
-      (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
-           SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
+        (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
+             SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
     }
 
     "solve the results of a set and a stdlib op1 function" in {

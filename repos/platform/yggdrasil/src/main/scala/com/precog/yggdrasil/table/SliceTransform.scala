@@ -1384,7 +1384,7 @@ trait ConcatHelpers {
                      leftDefinedBits: BitSet,
                      rightDefinedBits: BitSet): BitSet = {
     (rightEmptyBits & leftEmptyBits) | (rightEmptyBits &~ leftDefinedBits) |
-    (leftEmptyBits &~ rightDefinedBits)
+      (leftEmptyBits &~ rightDefinedBits)
   }
 
   def buildInnerBits(leftEmptyBits: BitSet,

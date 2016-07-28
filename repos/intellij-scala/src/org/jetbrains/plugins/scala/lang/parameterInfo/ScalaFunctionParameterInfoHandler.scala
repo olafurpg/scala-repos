@@ -739,9 +739,10 @@ class ScalaFunctionParameterInfoHandler
                               Map.empty,
                               None)
                           res +=
-                          ((new PhysicalSignature(constructor,
-                                                  substitutor.followed(subst)),
-                            i))
+                            ((new PhysicalSignature(
+                                  constructor,
+                                  substitutor.followed(subst)),
+                              i))
                         case _ =>
                           res +=
                             ((new PhysicalSignature(constructor, subst), i))
@@ -776,7 +777,7 @@ class ScalaFunctionParameterInfoHandler
                   if (!PsiTreeUtil.isAncestor(constr, self, true) &&
                       constr.getTextRange.getStartOffset < self.getTextRange.getStartOffset) {
                     res +=
-                    ((new PhysicalSignature(constr, ScSubstitutor.empty), i))
+                      ((new PhysicalSignature(constr, ScSubstitutor.empty), i))
                   }
                 }
               case _ =>

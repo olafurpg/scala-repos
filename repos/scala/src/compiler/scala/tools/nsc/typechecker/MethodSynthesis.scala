@@ -179,7 +179,7 @@ trait MethodSynthesis { self: Analyzer =>
                                             defaultRetention = true)
 
       annotations filterNot (retained contains _) foreach
-      (ann => issueAnnotationWarning(tree, ann, targetClass))
+        (ann => issueAnnotationWarning(tree, ann, targetClass))
     }
     private def issueAnnotationWarning(tree: Tree,
                                        ann: AnnotationInfo,
@@ -207,9 +207,9 @@ trait MethodSynthesis { self: Analyzer =>
         // well as fields of the class, etc.
         if (!mods.isParamAccessor)
           annotations foreach
-          (ann =>
-                if (!trees.exists(_.symbol hasAnnotation ann.symbol))
-                  issueAnnotationWarning(vd, ann, GetterTargetClass))
+            (ann =>
+                  if (!trees.exists(_.symbol hasAnnotation ann.symbol))
+                    issueAnnotationWarning(vd, ann, GetterTargetClass))
 
         trees
       case vd: ValDef =>
@@ -224,11 +224,11 @@ trait MethodSynthesis { self: Analyzer =>
           case Some(mdef) =>
             context.unit.synthetics -= meth
             meth setAnnotations
-            (annotations filter annotationFilter(MethodTargetClass,
-                                                 defaultRetention = false))
+              (annotations filter annotationFilter(MethodTargetClass,
+                                                   defaultRetention = false))
             cd.symbol setAnnotations
-            (annotations filter annotationFilter(ClassTargetClass,
-                                                 defaultRetention = true))
+              (annotations filter annotationFilter(ClassTargetClass,
+                                                   defaultRetention = true))
             List(cd, mdef)
           case _ =>
             // Shouldn't happen, but let's give ourselves a reasonable error when it does

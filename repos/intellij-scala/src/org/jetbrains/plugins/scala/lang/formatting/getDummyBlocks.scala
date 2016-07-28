@@ -981,7 +981,7 @@ object getDummyBlocks {
         if (settings useTabCharacter ScalaFileType.SCALA_FILE_TYPE) {
           val tabsCount = line.prefixLength(_ == '\t')
           tabsCount /* *settings.getTabSize(ScalaFileType.SCALA_FILE_TYPE)*/ +
-          line.substring(tabsCount).prefixLength(_ == ' ')
+            line.substring(tabsCount).prefixLength(_ == ' ')
         } else {
           line.prefixLength(_ == ' ')
         }

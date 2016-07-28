@@ -133,14 +133,14 @@ object ScopeSuggester {
         getAllAvailablePackages(scPackage.fullPackageName, currentElement)
       for ((resultPackage, resultDirectory) <- allPackages) {
         result +=
-        PackageScopeItem(resultPackage.getQualifiedName,
-                         resultDirectory,
-                         needDirectoryCreating = false,
-                         Array(
-                             NameSuggester
-                               .suggestNamesByType(currentElement.calcType)
-                               .apply(0)
-                               .capitalize))
+          PackageScopeItem(resultPackage.getQualifiedName,
+                           resultDirectory,
+                           needDirectoryCreating = false,
+                           Array(
+                               NameSuggester
+                                 .suggestNamesByType(currentElement.calcType)
+                                 .apply(0)
+                                 .capitalize))
       }
     }
 

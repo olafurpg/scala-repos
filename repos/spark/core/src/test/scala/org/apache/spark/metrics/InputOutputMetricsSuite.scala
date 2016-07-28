@@ -349,7 +349,7 @@ class InputOutputMetricsSuite
       sc.addSparkListener(new SparkListener() {
         override def onTaskEnd(taskEnd: SparkListenerTaskEnd) {
           taskBytesWritten +=
-          taskEnd.taskMetrics.outputMetrics.get.bytesWritten
+            taskEnd.taskMetrics.outputMetrics.get.bytesWritten
         }
       })
 

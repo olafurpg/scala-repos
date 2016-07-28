@@ -59,8 +59,8 @@ private[parser] trait CommonRules {
     var saved: String = null
     rule {
       &('(') ~ run(saved = sb.toString) ~
-      (comment ~ prependSB(saved + " (") ~ appendSB(')') | setSB(saved) ~ test(
-              false))
+        (comment ~ prependSB(saved + " (") ~ appendSB(')') | setSB(saved) ~ test(
+                false))
     }
   }
 
@@ -80,7 +80,7 @@ private[parser] trait CommonRules {
   def `IMF-fixdate` = rule {
     // mixture of the spec-ed `IMF-fixdate` and `rfc850-date`
     (`day-name-l` | `day-name`) ~ ", " ~ (date1 | date2) ~ ' ' ~ `time-of-day` ~ ' ' ~
-    ("GMT" | "UTC") ~> { (wkday, day, month, year, hour, min, sec) ⇒
+      ("GMT" | "UTC") ~> { (wkday, day, month, year, hour, min, sec) ⇒
       createDateTime(year, month, day, hour, min, sec, wkday)
     }
   }
@@ -114,7 +114,7 @@ private[parser] trait CommonRules {
   // per #17714, parse two digit year to https://tools.ietf.org/html/rfc6265#section-5.1.1
   def date2 = rule {
     day ~ '-' ~ month ~ '-' ~ digit2 ~>
-    (y ⇒ if (y <= 69) y + 2000 else y + 1900)
+      (y ⇒ if (y <= 69) y + 2000 else y + 1900)
   }
 
   def `day-name-l` =
@@ -199,8 +199,8 @@ private[parser] trait CommonRules {
 
   def `challenge-or-credentials`: Rule2[String, Seq[(String, String)]] = rule {
     `auth-scheme` ~
-    (oneOrMore(`auth-param` ~> (_ -> _)).separatedBy(listSep) | `token68` ~>
-        (x ⇒ ("" -> x) :: Nil) | push(Nil))
+      (oneOrMore(`auth-param` ~> (_ -> _)).separatedBy(listSep) | `token68` ~>
+            (x ⇒ ("" -> x) :: Nil) | push(Nil))
   }
 
   // ******************************************************************************************
@@ -215,7 +215,7 @@ private[parser] trait CommonRules {
 
   def `entity-tag` = rule {
     ("W/" ~ push(true) | push(false)) ~ `opaque-tag` ~>
-    ((weak, tag) ⇒ EntityTag(tag, weak))
+      ((weak, tag) ⇒ EntityTag(tag, weak))
   }
 
   def `opaque-tag` = rule {
@@ -242,7 +242,7 @@ private[parser] trait CommonRules {
 
   def `generic-credentials` = rule {
     `challenge-or-credentials` ~>
-    ((scheme, params) ⇒ GenericHttpCredentials(scheme, params.toMap))
+      ((scheme, params) ⇒ GenericHttpCredentials(scheme, params.toMap))
   }
 
   /**
@@ -251,8 +251,8 @@ private[parser] trait CommonRules {
     */
   def `optional-cookie-pair`: Rule1[Option[HttpCookiePair]] = rule {
     (`cookie-pair` ~ &(`cookie-separator`) ~> (Some(_: HttpCookiePair))) | // fallback that parses and discards everything until the next semicolon
-    (zeroOrMore(!`cookie-separator` ~ ANY) ~ &(`cookie-separator`) ~ push(
-            None))
+      (zeroOrMore(!`cookie-separator` ~ ANY) ~ &(`cookie-separator`) ~ push(
+              None))
   }
 
   def `cookie-pair`: Rule1[HttpCookiePair] = rule {
@@ -369,8 +369,8 @@ private[parser] trait CommonRules {
 
   def `byte-range-resp` = rule {
     `byte-range` ~ ws('/') ~
-    (`complete-length` ~> (Some(_)) | ws('*') ~ push(None)) ~>
-    (ContentRange(_, _, _))
+      (`complete-length` ~> (Some(_)) | ws('*') ~ push(None)) ~>
+      (ContentRange(_, _, _))
   }
 
   def `byte-range-set` = rule {
@@ -380,7 +380,8 @@ private[parser] trait CommonRules {
 
   def `byte-range-spec` = rule {
     `first-byte-pos` ~ ws('-') ~
-    (`last-byte-pos` ~> (ByteRange(_: Long, _)) | run(ByteRange.fromOffset(_)))
+      (`last-byte-pos` ~> (ByteRange(_: Long, _)) | run(
+              ByteRange.fromOffset(_)))
   }
 
   def `byte-ranges-specifier` = rule {
@@ -452,7 +453,7 @@ private[parser] trait CommonRules {
 
   def `transfer-extension` = rule {
     token ~ zeroOrMore(ws(';') ~ `transfer-parameter`) ~> (_.toMap) ~>
-    (TransferEncodings.Extension(_, _))
+      (TransferEncodings.Extension(_, _))
   }
 
   def `transfer-parameter` = rule { token ~ ws('=') ~ word ~> (_ -> _) }

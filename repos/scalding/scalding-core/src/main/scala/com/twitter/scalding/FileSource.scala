@@ -169,9 +169,9 @@ object FileSource {
         // private field name in hadoop FileInputFormat
         //
         dir ->
-        (dir, OrVal(SuccessFileFilter.accept(fileStatus.getPath) &&
-                  fileStatus.isFile),
-            OrVal(HiddenFileFilter.accept(fileStatus.getPath)))
+          (dir, OrVal(SuccessFileFilter.accept(fileStatus.getPath) &&
+                    fileStatus.isFile),
+              OrVal(HiddenFileFilter.accept(fileStatus.getPath)))
     }
 
     // OR by key

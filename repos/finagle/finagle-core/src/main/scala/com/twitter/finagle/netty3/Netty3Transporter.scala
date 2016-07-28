@@ -163,7 +163,7 @@ object Netty3Transporter {
 
     val opts = new mutable.HashMap[String, Object]()
     opts += "connectTimeoutMillis" ->
-    ((connectTimeout + compensation).inMilliseconds: java.lang.Long)
+      ((connectTimeout + compensation).inMilliseconds: java.lang.Long)
     opts += "tcpNoDelay" -> (noDelay: java.lang.Boolean)
     opts += "reuseAddress" -> (reuseAddr: java.lang.Boolean)
     for (v <- keepAlive) opts += "keepAlive" -> (v: java.lang.Boolean)

@@ -187,7 +187,7 @@ final class MongoJobManager(
     // It'll include at least the last status, but rarely much more.
 
     listMessages(jobId, channels.Status, None) map
-    (_.lastOption flatMap (Status.fromMessage(_)))
+      (_.lastOption flatMap (Status.fromMessage(_)))
   }
 
   private def nextMessageId(jobId: JobId): Future[Long] = {
@@ -208,9 +208,9 @@ final class MongoJobManager(
     database {
       distinct("channel").from(settings.messages).where("jobId" === jobId)
     } map
-    (_.collect {
-          case JString(channel) => channel
-        }.toList)
+      (_.collect {
+            case JString(channel) => channel
+          }.toList)
   }
 
   def addMessage(jobId: JobId,

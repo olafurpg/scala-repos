@@ -293,7 +293,7 @@ trait MultiNodeClusterSpec
              "expectedLeader [%s], got leader [%s], members [%s]"
                .format(expectedLeader, leader, clusterView.members))
       clusterView.status should
-      (be(MemberStatus.Up) or be(MemberStatus.Leaving))
+        (be(MemberStatus.Up) or be(MemberStatus.Leaving))
     }
 
   /**

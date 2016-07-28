@@ -313,12 +313,12 @@ private[sql] object PartitioningUtils {
       distinctPartColNames.sortBy(_.length).flatMap(partColNamesToPaths)
 
     s"Conflicting partition column names detected:\n" +
-    distinctPartColLists.mkString("\n\t", "\n\t", "\n\n") +
-    "For partitioned table directories, data files should only live in leaf directories.\n" +
-    "And directories at the same level should have the same partition column name.\n" +
-    "Please check the following directories for unexpected files or " +
-    "inconsistent partition column names:\n" +
-    suspiciousPaths.map("\t" + _).mkString("\n", "\n", "")
+      distinctPartColLists.mkString("\n\t", "\n\t", "\n\n") +
+      "For partitioned table directories, data files should only live in leaf directories.\n" +
+      "And directories at the same level should have the same partition column name.\n" +
+      "Please check the following directories for unexpected files or " +
+      "inconsistent partition column names:\n" +
+      suspiciousPaths.map("\t" + _).mkString("\n", "\n", "")
   }
 
   /**

@@ -450,7 +450,7 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
       if (instanceCountDelta == 0) ""
       else s"instance count delta $instanceCountDelta."
     s"$tasksToLaunch tasksToLaunch, $inFlight in flight, " +
-    s"$tasksLaunchedOrRunning confirmed. $matchInstanceStr $backoffStr"
+      s"$tasksLaunchedOrRunning confirmed. $matchInstanceStr $backoffStr"
   }
 
   /** Manage registering this actor as offer matcher. Only register it if tasksToLaunch > 0. */

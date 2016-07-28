@@ -94,9 +94,8 @@ class JavaCopyPastePostProcessor
             }
             if (elem.getTextRange.getEndOffset < endOffset) {
               buffer +=
-              TextPart(
-                  new TextRange(elem.getTextRange.getEndOffset, endOffset)
-                    .substring(file.getText))
+                TextPart(new TextRange(elem.getTextRange.getEndOffset,
+                                       endOffset).substring(file.getText))
             }
           }
         }

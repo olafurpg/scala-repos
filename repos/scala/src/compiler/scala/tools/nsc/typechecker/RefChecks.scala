@@ -206,10 +206,10 @@ abstract class RefChecks
             clazz.info.decl(sym.name).alternatives filterNot (_.isModule)
           if (alts.size > 1)
             alts foreach
-            (x =>
-                  reporter.warning(
-                      x.pos,
-                      "parameterized overloaded implicit methods are not visible as view bounds"))
+              (x =>
+                    reporter.warning(
+                        x.pos,
+                        "parameterized overloaded implicit methods are not visible as view bounds"))
         }
       }
     }
@@ -333,7 +333,7 @@ abstract class RefChecks
                 msg + (if (others1.isEmpty) ""
                        else
                          ";\n other members with override errors are: " +
-                         (others1 mkString ", ")))
+                           (others1 mkString ", ")))
         }
       }
 
@@ -343,16 +343,16 @@ abstract class RefChecks
       def infoString0(sym: Symbol, showLocation: Boolean) = {
         val sym1 = analyzer.underlyingSymbol(sym)
         sym1.toString() +
-        (if (showLocation)
-           sym1.locationString + (if (sym1.isAliasType)
-                                    ", which equals " + self.memberInfo(sym1)
-                                  else if (sym1.isAbstractType)
-                                    " with bounds" + self.memberInfo(sym1)
-                                  else if (sym1.isModule) ""
-                                  else if (sym1.isTerm)
-                                    " of type " + self.memberInfo(sym1)
-                                  else "")
-         else "")
+          (if (showLocation)
+             sym1.locationString + (if (sym1.isAliasType)
+                                      ", which equals " + self.memberInfo(sym1)
+                                    else if (sym1.isAbstractType)
+                                      " with bounds" + self.memberInfo(sym1)
+                                    else if (sym1.isModule) ""
+                                    else if (sym1.isTerm)
+                                      " of type " + self.memberInfo(sym1)
+                                    else "")
+           else "")
       }
 
       /* Check that all conditions for overriding `other` by `member`
@@ -442,7 +442,7 @@ abstract class RefChecks
             return
           }
           if (clazz.parentSymbols exists
-              (p => subOther(p) && subMember(p) && deferredCheck)) {
+                (p => subOther(p) && subMember(p) && deferredCheck)) {
             //Console.println(infoString(member) + " shadows2 " + infoString(other) + " in " + clazz);//DEBUG
             return
           }
@@ -739,7 +739,7 @@ abstract class RefChecks
             def membersStrings(members: List[Symbol]) = {
               members foreach fullyInitializeSymbol
               members.sortBy(_.name) map
-              (m => m.defStringSeenAs(clazz.tpe_* memberType m) + " = ???")
+                (m => m.defStringSeenAs(clazz.tpe_* memberType m) + " = ???")
             }
 
             if (regrouped.tail.isEmpty) membersStrings(regrouped.head._2)
@@ -1488,9 +1488,9 @@ abstract class RefChecks
               tparams map
                 (tp => tp.info.instantiateTypeParams(tparams, argtps).bounds)
             (argtps, bounds).zipped map
-            ((targ, bound) => explainTypes(bound.lo, targ))
+              ((targ, bound) => explainTypes(bound.lo, targ))
             (argtps, bounds).zipped map
-            ((targ, bound) => explainTypes(targ, bound.hi))
+              ((targ, bound) => explainTypes(targ, bound.hi))
             ()
           }
       }

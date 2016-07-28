@@ -34,7 +34,7 @@ private[api] final class RoundApi(
           initialFen = initialFen,
           withBlurs = ctx.me ?? Granter(_.ViewBlurs)) zip getTourAndRanks(
           pov.game) zip (pov.game.simulId ?? getSimul) zip
-      (ctx.me ?? (me => noteApi.get(pov.gameId, me.id))) zip forecastApi
+        (ctx.me ?? (me => noteApi.get(pov.gameId, me.id))) zip forecastApi
         .loadForDisplay(pov) map {
         case ((((json, tourOption), simulOption), note), forecast) =>
           (blindMode _ compose withTournament(pov, tourOption) _ compose withSimul(
@@ -70,8 +70,8 @@ private[api] final class RoundApi(
             withBlurs = ctx.me ?? Granter(_.ViewBlurs),
             initialFen = initialFen,
             withMoveTimes = withMoveTimes) zip getTourAndRanks(pov.game) zip
-        (pov.game.simulId ?? getSimul) zip
-        (ctx.me ?? (me => noteApi.get(pov.gameId, me.id))) map {
+          (pov.game.simulId ?? getSimul) zip
+          (ctx.me ?? (me => noteApi.get(pov.gameId, me.id))) map {
           case (((json, tourOption), simulOption), note) =>
             (blindMode _ compose withTournament(pov, tourOption) _ compose withSimul(
                     pov,

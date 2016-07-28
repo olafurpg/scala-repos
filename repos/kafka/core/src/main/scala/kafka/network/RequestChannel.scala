@@ -148,10 +148,10 @@ object RequestChannel extends Logging {
         val isFromFollower =
           requestObj.asInstanceOf[FetchRequest].isFromFollower
         metricsList ::=
-        (if (isFromFollower)
-           RequestMetrics.metricsMap(RequestMetrics.followFetchMetricName)
-         else
-           RequestMetrics.metricsMap(RequestMetrics.consumerFetchMetricName))
+          (if (isFromFollower)
+             RequestMetrics.metricsMap(RequestMetrics.followFetchMetricName)
+           else
+             RequestMetrics.metricsMap(RequestMetrics.consumerFetchMetricName))
       }
       metricsList.foreach { m =>
         m.requestRate.mark()

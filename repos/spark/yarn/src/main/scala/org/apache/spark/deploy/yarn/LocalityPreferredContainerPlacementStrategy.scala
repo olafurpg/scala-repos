@@ -151,7 +151,7 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
           RackResolver.resolve(yarnConf, h).getNetworkLocation
         }.toSet
         containerLocalityPreferences +=
-        ContainerLocalityPreferences(hosts, racks.toArray)
+          ContainerLocalityPreferences(hosts, racks.toArray)
 
         // Minus 1 each time when the host is used. When the current ratio is 0,
         // which means all the required ratio is satisfied, this host will not be allocated again.
@@ -168,7 +168,7 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
   private def numExecutorsPending(numTasksPending: Int): Int = {
     val coresPerExecutor = resource.getVirtualCores
     (numTasksPending * sparkConf.get(CPUS_PER_TASK) + coresPerExecutor -
-        1) / coresPerExecutor
+          1) / coresPerExecutor
   }
 
   /**

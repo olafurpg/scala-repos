@@ -71,9 +71,9 @@ object Delegates extends Properties("delegates") {
     all(keys.scopes map { scope =>
       val delegates = keys.env.delegates(scope)
       ("Scope: " + Scope.display(scope, "_")) |:
-      ("Delegates:\n\t" + delegates
-            .map(scope => Scope.display(scope, "_"))
-            .mkString("\n\t")) |: f(scope, delegates)
+        ("Delegates:\n\t" + delegates
+              .map(scope => Scope.display(scope, "_"))
+              .mkString("\n\t")) |: f(scope, delegates)
     }: _*)
   def alwaysGlobal(s: Scope,
                    ds: Seq[Scope],

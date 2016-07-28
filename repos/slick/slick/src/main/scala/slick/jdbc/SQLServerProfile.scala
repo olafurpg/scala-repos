@@ -234,9 +234,9 @@ trait SQLServerProfile extends JdbcProfile {
                               fk.targetTable.tableName)
       // SQLServer has no RESTRICT. Equivalent is NO ACTION. http://technet.microsoft.com/en-us/library/aa902684%28v=sql.80%29.aspx
       sb append ") on update " append
-      (if (updateAction == "RESTRICT") "NO ACTION" else updateAction)
+        (if (updateAction == "RESTRICT") "NO ACTION" else updateAction)
       sb append " on delete " append
-      (if (deleteAction == "RESTRICT") "NO ACTION" else deleteAction)
+        (if (deleteAction == "RESTRICT") "NO ACTION" else deleteAction)
     }
   }
 

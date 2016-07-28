@@ -31,7 +31,7 @@ final class Pattern private (jsRegExp: js.RegExp,
       val jsFlags = {
         (if (jsRegExp.global) "g" else "") + (if (jsRegExp.ignoreCase) "i"
                                               else "") +
-        (if (jsRegExp.multiline) "m" else "")
+          (if (jsRegExp.multiline) "m" else "")
       }
       new js.RegExp(jsRegExp.source, jsFlags)
     }
@@ -92,13 +92,13 @@ object Pattern {
         (quote(regex), flags)
       } else {
         trySplitHack(regex, flags) orElse tryFlagHack(regex, flags) getOrElse
-        (regex, flags)
+          (regex, flags)
       }
     }
 
     val jsFlags = {
       "g" + (if ((flags1 & CASE_INSENSITIVE) != 0) "i" else "") +
-      (if ((flags1 & MULTILINE) != 0) "m" else "")
+        (if ((flags1 & MULTILINE) != 0) "m" else "")
     }
 
     val jsRegExp = new js.RegExp(jsPattern, jsFlags)

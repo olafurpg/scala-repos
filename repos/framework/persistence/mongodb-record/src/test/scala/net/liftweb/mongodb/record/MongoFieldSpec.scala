@@ -349,14 +349,14 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       val rec = PasswordTestRecord.createRecord
       rec.password.setPassword("")
       rec.validate must_==
-      (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
+        (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
     }
 
     "require at least 3 character password" in {
       val rec = PasswordTestRecord.createRecord
       rec.password.setPassword("ab")
       rec.validate must_==
-      (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
+        (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
     }
   }
 

@@ -200,7 +200,7 @@ abstract class NumericRange[T](
     else if (numRangeElements == 1) head
     else
       ((this.num fromInt numRangeElements) * (head + last) /
-          (this.num fromInt 2))
+            (this.num fromInt 2))
   }
 
   override lazy val hashCode = super.hashCode()

@@ -319,7 +319,7 @@ class Eval(target: Option[File]) {
    */
   private[this] def wrapCodeInClass(className: String, code: String) = {
     "class " + className + " extends (() => Any) {\n" + "  def apply() = {\n" +
-    code + "\n" + "  }\n" + "}\n"
+      code + "\n" + "  }\n" + "}\n"
   }
 
   /*
@@ -524,12 +524,12 @@ class Eval(target: Option[File]) {
             case _: Throwable => ""
           }
           messages += (severityName + lineMessage + ": " + message) ::
-          (if (pos.isDefined) {
-             pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
-             (" " * (pos.column - 1) + "^") :: Nil
-           } else {
-             Nil
-           })
+            (if (pos.isDefined) {
+               pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
+                 (" " * (pos.column - 1) + "^") :: Nil
+             } else {
+               Nil
+             })
         }
 
         def displayPrompt {

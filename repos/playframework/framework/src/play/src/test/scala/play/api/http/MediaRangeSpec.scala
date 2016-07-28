@@ -44,21 +44,21 @@ object MediaRangeSpec extends Specification {
       mediaType.mediaType must_== "application"
       mediaType.mediaSubType must_== "ld+json"
       mediaType.parameters must_==
-      Seq("profile" -> Some("http://www.w3.org/ns/json-ld#compacted"))
+        Seq("profile" -> Some("http://www.w3.org/ns/json-ld#compacted"))
     }
     "not choke on invalid media types" in {
       MediaType.parse("foo") must beNone
     }
     "allow anything in a quoted string" in {
       MediaRange.parse("""foo/bar, foo2/bar2; p="v,/\"\\vv"; p2=v2""") must_==
-      Seq(
-          new MediaRange("foo", "bar", Nil, None, Nil),
-          new MediaRange("foo2",
-                         "bar2",
-                         Seq("p" -> Some("""v,/"\vv"""), "p2" -> Some("v2")),
-                         None,
-                         Nil)
-      )
+        Seq(
+            new MediaRange("foo", "bar", Nil, None, Nil),
+            new MediaRange("foo2",
+                           "bar2",
+                           Seq("p" -> Some("""v,/"\vv"""), "p2" -> Some("v2")),
+                           None,
+                           Nil)
+        )
     }
     "allow valueless parameters" in {
       MediaType.parse("foo/bar;param") must beSome(
@@ -66,7 +66,7 @@ object MediaRangeSpec extends Specification {
     }
     "extract the qvalue from the parameters" in {
       parseSingleMediaRange("foo/bar;q=0.25") must_==
-      new MediaRange("foo", "bar", Nil, Some(0.25f), Nil)
+        new MediaRange("foo", "bar", Nil, Some(0.25f), Nil)
     }
     "differentiate between media type parameters and accept extensions" in {
       parseSingleMediaRange("foo/bar;p1;q=0.25;p2") must_== new MediaRange(
@@ -78,7 +78,7 @@ object MediaRangeSpec extends Specification {
     }
     "support non spec compliant everything media ranges" in {
       parseSingleMediaRange("*") must_==
-      new MediaRange("*", "*", Nil, None, Nil)
+        new MediaRange("*", "*", Nil, None, Nil)
     }
     "maintain the original order of media ranges in the accept header" in {
       MediaRange.parse("foo1/bar1, foo3/bar3, foo2/bar2") must contain(
@@ -179,9 +179,9 @@ object MediaRangeSpec extends Specification {
     }
     "gracefully handle invalid q values" in {
       parseSingleMediaRange("foo/bar;q=a") must_==
-      new MediaRange("foo", "bar", Nil, None, Nil)
+        new MediaRange("foo", "bar", Nil, None, Nil)
       parseSingleMediaRange("foo/bar;q=1.01") must_==
-      new MediaRange("foo", "bar", Nil, None, Nil)
+        new MediaRange("foo", "bar", Nil, None, Nil)
     }
   }
 }

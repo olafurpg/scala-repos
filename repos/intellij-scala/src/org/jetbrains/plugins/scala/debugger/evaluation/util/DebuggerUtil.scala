@@ -550,7 +550,7 @@ object DebuggerUtil {
               case c: ScClass if isLocalClass(c) =>
                 visited += c
                 buf ++=
-                localParamsForConstructor(c, visited).filter(atRightPlace)
+                  localParamsForConstructor(c, visited).filter(atRightPlace)
               case _ =>
             }
           case td: ScTypedDefinition if isLocalV(td) && atRightPlace(td) =>

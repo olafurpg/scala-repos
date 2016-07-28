@@ -16,31 +16,31 @@ abstract class AbstractSourceCodeGenerator(model: m.Model)
       @group Basic customization overrides */
   def code = {
     "import slick.model.ForeignKeyAction\n" +
-    (if (tables.exists(_.hlistEnabled)) {
-       "import slick.collection.heterogeneous._\n" +
-       "import slick.collection.heterogeneous.syntax._\n"
-     } else "") +
-    (if (tables.exists(_.PlainSqlMapper.enabled)) {
-       "// NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.\n" +
-       "import slick.jdbc.{GetResult => GR}\n"
-     } else "") + (if (ddlEnabled) {
-                     "\n/** DDL for all tables. Call .create to execute. */" +
-                     (if (tables.length > 5)
-                        "\nlazy val schema: profile.SchemaDescription = Array(" +
-                        tables
-                          .map(_.TableValue.name + ".schema")
-                          .mkString(", ") + ").reduceLeft(_ ++ _)"
-                      else if (tables.nonEmpty)
-                        "\nlazy val schema: profile.SchemaDescription = " +
-                        tables
-                          .map(_.TableValue.name + ".schema")
-                          .mkString(" ++ ")
-                      else
-                        "\nlazy val schema: profile.SchemaDescription = profile.DDL(Nil, Nil)") +
-                     "\n@deprecated(\"Use .schema instead of .ddl\", \"3.0\")" +
-                     "\ndef ddl = schema" + "\n\n"
-                   } else
-                     "") + tables.map(_.code.mkString("\n")).mkString("\n\n")
+      (if (tables.exists(_.hlistEnabled)) {
+         "import slick.collection.heterogeneous._\n" +
+           "import slick.collection.heterogeneous.syntax._\n"
+       } else "") +
+      (if (tables.exists(_.PlainSqlMapper.enabled)) {
+         "// NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.\n" +
+           "import slick.jdbc.{GetResult => GR}\n"
+       } else "") + (if (ddlEnabled) {
+                       "\n/** DDL for all tables. Call .create to execute. */" +
+                         (if (tables.length > 5)
+                            "\nlazy val schema: profile.SchemaDescription = Array(" +
+                              tables
+                                .map(_.TableValue.name + ".schema")
+                                .mkString(", ") + ").reduceLeft(_ ++ _)"
+                          else if (tables.nonEmpty)
+                            "\nlazy val schema: profile.SchemaDescription = " +
+                              tables
+                                .map(_.TableValue.name + ".schema")
+                                .mkString(" ++ ")
+                          else
+                            "\nlazy val schema: profile.SchemaDescription = profile.DDL(Nil, Nil)") +
+                         "\n@deprecated(\"Use .schema instead of .ddl\", \"3.0\")" +
+                         "\ndef ddl = schema" + "\n\n"
+                     } else
+                       "") + tables.map(_.code.mkString("\n")).mkString("\n\n")
   }
 
   protected def tuple(i: Int) = termName(s"_${i + 1}")

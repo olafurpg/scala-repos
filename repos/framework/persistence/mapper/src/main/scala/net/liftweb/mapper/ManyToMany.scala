@@ -229,8 +229,8 @@ trait ManyToMany extends BaseKeyedMapper {
       }
 
       removedJoins.forall { _.delete_! } &
-      (// continue saving even if deleting fails
-          children.forall(_.save) && joins.forall(_.save))
+        (// continue saving even if deleting fails
+            children.forall(_.save) && joins.forall(_.save))
     }
 
     /**

@@ -71,7 +71,7 @@ trait TestResult[DF] {
     }
 
     s"degrees of freedom = ${degreesOfFreedom.toString} \n" +
-    s"statistic = $statistic \n" + s"pValue = $pValue \n" + pValueExplain
+      s"statistic = $statistic \n" + s"pValue = $pValue \n" + pValueExplain
   }
 }
 

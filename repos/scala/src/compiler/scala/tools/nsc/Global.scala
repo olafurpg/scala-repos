@@ -689,9 +689,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       val (satisfied, unhappy) =
         enabled partition (_.requires forall isEnabled)
       unhappy foreach
-      (u =>
-            globalError(
-                s"Phase '${u.phaseName}' requires: ${u.requires filterNot isEnabled}"))
+        (u =>
+              globalError(
+                  s"Phase '${u.phaseName}' requires: ${u.requires filterNot isEnabled}"))
       satisfied // they're happy now, but they may need an unhappy phase that was booted
     }
     computeInternalPhases() // Global.scala
@@ -1081,7 +1081,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     (if (sym == null) ""
      else
        sym.ownerChain takeWhile
-       (!_.isPackageClass) mkString " -> ")
+         (!_.isPackageClass) mkString " -> ")
 
   private def formatExplain(pairs: (String, Any)*): String =
     (pairs.toList collect {
@@ -1142,7 +1142,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
             (site.fullLocationString + " in " + site.enclosingPackage)
       )
       ("\n  " + errorMessage + "\n" +
-          info1) :: info2 :: context_s :: Nil mkString "\n\n"
+            info1) :: info2 :: context_s :: Nil mkString "\n\n"
     } catch { case _: Exception | _: TypeError => errorMessage }
 
   /** The id of the currently active run
@@ -1654,7 +1654,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         // we might get here during initialization, is a source is newer than the binary
         val maxId = math.max(globalPhase.id, typerPhase.id)
         firstPhase.iterator takeWhile (_.id < maxId) foreach
-        (ph => enteringPhase(ph)(ph.asInstanceOf[GlobalPhase] applyPhase unit))
+          (ph =>
+                enteringPhase(ph)(
+                    ph.asInstanceOf[GlobalPhase] applyPhase unit))
         refreshProgress()
       }
     }

@@ -124,9 +124,9 @@ class MessageSerializer(val system: ExtendedActorSystem)
       .iterator()
       .asScala foreach { next ⇒
       unconfirmedDeliveries +=
-      UnconfirmedDelivery(next.getDeliveryId,
-                          ActorPath.fromString(next.getDestination),
-                          payload(next.getPayload))
+        UnconfirmedDelivery(next.getDeliveryId,
+                            ActorPath.fromString(next.getDestination),
+                            payload(next.getPayload))
     }
 
     AtLeastOnceDeliverySnapshot(

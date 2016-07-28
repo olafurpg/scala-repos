@@ -43,10 +43,10 @@ class DIMSUMModel(
 
   override def toString = {
     s"similarities: [${similarities.count()}]" +
-    s"(${similarities.take(2).toList}...)" +
-    s" itemStringIntMap: [${itemStringIntMap.size}]" +
-    s"(${itemStringIntMap.take(2).toString}...)]" +
-    s" items: [${items.size}]" + s"(${items.take(2).toString}...)]"
+      s"(${similarities.take(2).toList}...)" +
+      s" itemStringIntMap: [${itemStringIntMap.size}]" +
+      s"(${itemStringIntMap.take(2).toString}...)]" +
+      s" items: [${items.size}]" + s"(${items.take(2).toString}...)]"
   }
 }
 

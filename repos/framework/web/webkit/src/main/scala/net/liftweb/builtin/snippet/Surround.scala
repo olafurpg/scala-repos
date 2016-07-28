@@ -49,7 +49,7 @@ object Surround extends DispatchSnippet {
         lazy val paramsMap = {
           val q = mainParam // perform the side-effecting thing here
           WithParamVar.get +
-          q // WithParamVar is the side effects of processing the template
+            q // WithParamVar is the side effects of processing the template
         }
         ctx.findAndMerge(S.attr("with"), paramsMap)
       }

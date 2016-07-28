@@ -256,8 +256,8 @@ class CSRFAction(next: EssentialAction,
             case Array(key, value) =>
               val (endIndex, headers) = extractHeaders(nextCrlf + 2)
               endIndex ->
-              ((key.trim().toLowerCase(Locale.ENGLISH) -> value
-                        .trim()) :: headers)
+                ((key.trim().toLowerCase(Locale.ENGLISH) -> value
+                          .trim()) :: headers)
           }
         }
       }

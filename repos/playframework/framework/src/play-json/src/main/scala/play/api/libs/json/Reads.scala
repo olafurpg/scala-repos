@@ -1010,7 +1010,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
   implicit object ObjectNodeReads extends Reads[ObjectNode] {
     def reads(json: JsValue): JsResult[ObjectNode] = {
       json.validate[JsObject] map
-      (jo => JacksonJson.jsValueToJsonNode(jo).asInstanceOf[ObjectNode])
+        (jo => JacksonJson.jsValueToJsonNode(jo).asInstanceOf[ObjectNode])
     }
   }
 
@@ -1020,7 +1020,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
   implicit object ArrayNodeReads extends Reads[ArrayNode] {
     def reads(json: JsValue): JsResult[ArrayNode] = {
       json.validate[JsArray] map
-      (ja => JacksonJson.jsValueToJsonNode(ja).asInstanceOf[ArrayNode])
+        (ja => JacksonJson.jsValueToJsonNode(ja).asInstanceOf[ArrayNode])
     }
   }
 

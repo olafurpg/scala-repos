@@ -168,9 +168,9 @@ private[deploy] object IvyTestUtils {
     var result =
       "\n" + "  " * tabCount + s"<groupId>${artifact.groupId}</groupId>"
     result += "\n" + "  " * tabCount +
-    s"<artifactId>${artifact.artifactId}</artifactId>"
+      s"<artifactId>${artifact.artifactId}</artifactId>"
     result +=
-    "\n" + "  " * tabCount + s"<version>${artifact.version}</version>"
+      "\n" + "  " * tabCount + s"<version>${artifact.version}</version>"
     result
   }
 

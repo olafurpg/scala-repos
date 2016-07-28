@@ -436,7 +436,7 @@ trait CommentFactoryBase {
             (key.symbol, bs.head)
           }
           Map.empty[String, Body] ++
-          (if (filterEmpty) pairs.filterNot(_._2.blocks.isEmpty) else pairs)
+            (if (filterEmpty) pairs.filterNot(_._2.blocks.isEmpty) else pairs)
         }
 
         def linkedExceptions: Map[String, Body] = {

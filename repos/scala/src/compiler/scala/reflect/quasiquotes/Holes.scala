@@ -130,7 +130,9 @@ trait Holes { self: Quasiquotes =>
           "bottom type values often indicate programmer mistake"
         else
           "consider " +
-          List(rankSuggestion, liftSuggestion).filter(_ != "").mkString(" or ")
+            List(rankSuggestion, liftSuggestion)
+              .filter(_ != "")
+              .mkString(" or ")
       c.abort(unquotee.pos, s"Can't $action, $advice")
     }
 

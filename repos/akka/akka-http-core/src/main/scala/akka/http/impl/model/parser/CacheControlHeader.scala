@@ -13,7 +13,7 @@ private[parser] trait CacheControlHeader {
   // http://tools.ietf.org/html/rfc7234#section-5.2
   def `cache-control` = rule {
     oneOrMore(`cache-directive`).separatedBy(listSep) ~ EOI ~>
-    (`Cache-Control`(_))
+      (`Cache-Control`(_))
   }
 
   def `cache-directive` =

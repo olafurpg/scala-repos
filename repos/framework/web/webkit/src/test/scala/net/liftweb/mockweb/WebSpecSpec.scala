@@ -89,7 +89,7 @@ class WebSpecSpec extends WebSpec(WebSpecSpecBoot.boot _) {
     }
 
     "properly set up S with a String url and session" withSFor
-    (testUrl, testSession) in {
+      (testUrl, testSession) in {
       TestVar("foo!")
       TestVar.is must_== "foo!"
     }
@@ -108,7 +108,7 @@ class WebSpecSpec extends WebSpec(WebSpecSpecBoot.boot _) {
     }
 
     "properly set up a Req with a String url and context path" withReqFor
-    (testUrl, "/test") in {
+      (testUrl, "/test") in {
       _.path.partPath must_== List("stateless")
     }
 
@@ -117,7 +117,7 @@ class WebSpecSpec extends WebSpec(WebSpecSpecBoot.boot _) {
     }
 
     "properly set a plain text body" withReqFor (testUrl) withPost
-    ("This is a test") in { req =>
+      ("This is a test") in { req =>
       req.contentType must_== Full("text/plain")
       req.post_? must_== true
       req.body match {
@@ -148,12 +148,12 @@ class WebSpecSpec extends WebSpec(WebSpecSpecBoot.boot _) {
     }
 
     "properly mutate the request" withSFor (testUrl) withMods
-    (_.contentType = "application/xml") in {
+      (_.contentType = "application/xml") in {
       (S.request.map(_.xml_?) openOr false) must_== true
     }
 
     "process a JSON RestHelper Request" withReqFor
-    ("http://foo.com/api/info.json") in { req =>
+      ("http://foo.com/api/info.json") in { req =>
       (WebSpecSpecRest(req)() match {
         case Full(JsonResponse(_, _, _, 200)) => success
         case other => failure("Invalid response : " + other)
@@ -161,7 +161,7 @@ class WebSpecSpec extends WebSpec(WebSpecSpecBoot.boot _) {
     }
 
     "properly process a template" withTemplateFor
-    ("http://foo.com/net/liftweb/mockweb/webspecspectemplate") in {
+      ("http://foo.com/net/liftweb/mockweb/webspecspectemplate") in {
       case Full(template) =>
         template.toString.contains("Hello, WebSpec!") must_== true
       case other => failure("Error on template : " + other)

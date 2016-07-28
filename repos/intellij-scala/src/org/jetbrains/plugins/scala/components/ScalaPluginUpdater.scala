@@ -295,7 +295,7 @@ object ScalaPluginUpdater {
       .getEventMulticaster
       .removeDocumentListener(updateListener)
     if (lastUpdateTime == 0L || System.currentTimeMillis() -
-        lastUpdateTime > TimeUnit.DAYS.toMillis(1)) {
+          lastUpdateTime > TimeUnit.DAYS.toMillis(1)) {
       ApplicationManager.getApplication.executeOnPooledThread(new Runnable {
         override def run() = {
           val buildNumber = ApplicationInfo.getInstance().getBuild.asString()

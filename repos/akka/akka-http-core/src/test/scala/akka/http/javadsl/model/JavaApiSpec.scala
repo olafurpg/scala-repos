@@ -44,7 +44,7 @@ class JavaApiSpec extends FreeSpec with MustMatchers {
           .pathSegments()
           .asScala
           .toSeq must contain inOrderOnly
-        ("abc", "def", "ghi", "jkl")
+          ("abc", "def", "ghi", "jkl")
       }
       "access parameterMap" in {
         Uri
@@ -52,7 +52,7 @@ class JavaApiSpec extends FreeSpec with MustMatchers {
           .query()
           .toMap
           .asScala must contain allOf
-        ("name" -> "blub", "age" -> "28")
+          ("name" -> "blub", "age" -> "28")
       }
       "access parameters" in {
         val Seq(param1, param2, param3) = Uri

@@ -115,8 +115,10 @@ class SummarizingStatsReceiver extends StatsReceiverWithCumulativeGauges {
     lazy val fmtTails = sortedTails.map(fmt)
 
     "# counters\n" + fmtCounters.mkString("\n") + "\n# gauges\n" +
-    fmtGauges.sorted.mkString("\n") + "\n# stats\n" + fmtStats.mkString("\n") +
-    (if (includeTails) "\n# stats-tails\n" + (fmtTails mkString "\n") else "")
+      fmtGauges.sorted.mkString("\n") + "\n# stats\n" + fmtStats
+      .mkString("\n") +
+      (if (includeTails) "\n# stats-tails\n" + (fmtTails mkString "\n")
+       else "")
   }
 
   def print() = println(summary(false))

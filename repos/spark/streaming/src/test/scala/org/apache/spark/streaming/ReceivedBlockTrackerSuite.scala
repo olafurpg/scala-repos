@@ -363,7 +363,7 @@ class ReceivedBlockTrackerSuite
   /** Get the log file name for the given log start time. */
   def getLogFileName(time: Long, rollingIntervalSecs: Int = 1): String = {
     checkpointDirectory.toString + File.separator + "receivedBlockMetadata" +
-    File.separator + s"log-$time-${time + rollingIntervalSecs * 1000}"
+      File.separator + s"log-$time-${time + rollingIntervalSecs * 1000}"
   }
 
   /**

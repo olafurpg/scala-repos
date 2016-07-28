@@ -211,7 +211,7 @@ case class TestResults(res: List[Tracker]) {
     }
 
     "Ran " + testCnt + " tests and " + assertCnt + " asserts in " +
-    (end - start) / 1000L + " seconds" + append
+      (end - start) / 1000L + " seconds" + append
   }
 }
 

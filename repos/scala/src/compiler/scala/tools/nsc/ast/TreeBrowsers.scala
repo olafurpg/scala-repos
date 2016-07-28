@@ -544,10 +544,10 @@ abstract class TreeBrowsers {
         var str = s.flagString
         if (s.isStaticMember) str = str + " isStatic "
         (str + " annotations: " + s.annotations.mkString("", " ", "") +
-            (if (s.isTypeSkolem)
-               "\ndeSkolemized annotations: " +
-               s.deSkolemize.annotations.mkString("", " ", "")
-             else ""))
+              (if (s.isTypeSkolem)
+                 "\ndeSkolemized annotations: " +
+                   s.deSkolemize.annotations.mkString("", " ", "")
+               else ""))
       } else ""
     }
   }

@@ -23,7 +23,7 @@ final class Class[A] private (data: ScalaJSClassData[A]) extends Object {
 
   override def toString(): String = {
     (if (isInterface()) "interface " else if (isPrimitive()) "" else "class ") +
-    getName()
+      getName()
   }
 
   def isInstance(obj: Object): scala.Boolean =

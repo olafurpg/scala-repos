@@ -102,7 +102,7 @@ object ExtCoreArtifacts extends JSArtifacts {
   def setHtml(id: String, xml: NodeSeq): JsCmd = new JsCmd {
     def toJsCmd = fixHtmlCmdFunc(id, xml) { s =>
       "try { Ext.fly(" + id.encJs + ").dom.innerHTML = " + s +
-      "; } catch (e) {}"
+        "; } catch (e) {}"
     }
   }
 

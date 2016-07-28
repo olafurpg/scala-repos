@@ -85,11 +85,11 @@ object HttpHelpersSpec
     "an insureField function" in {
       "checking that the appropriate fields are in the header" in {
         insureField(List(("name", "hello")), List(("name", "hello"))) must_==
-        List(("name", "hello"))
+          List(("name", "hello"))
       }
       "checking that the appropriate fields are in the header, adding them if necessary" in {
         insureField(List(("name2", "hello")), List(("name", "hello"))) must_==
-        List(("name", "hello"), ("name2", "hello"))
+          List(("name", "hello"), ("name2", "hello"))
       }
     }
     "an implicit definition to transform a pair to an UnprefixedAttribute" in {

@@ -103,6 +103,6 @@ class BitSpecParser(val input: ParserInput) extends parboiled2.Parser {
   }
   def value: Rule1[Long] = rule {
     capture(oneOrMore(CharPredicate.HexDigit)) ~>
-    ((str: String) ⇒ java.lang.Long.parseLong(str, 16))
+      ((str: String) ⇒ java.lang.Long.parseLong(str, 16))
   }
 }

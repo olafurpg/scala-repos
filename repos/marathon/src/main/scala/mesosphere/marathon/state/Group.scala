@@ -245,7 +245,7 @@ object Group {
       group.apps is every(AppDefinition.validNestedAppDefinition(base))
       group is noAppsAndGroupsWithSameName
       (group.id.isRoot is false) or
-      (group.dependencies is noCyclicDependencies(group))
+        (group.dependencies is noCyclicDependencies(group))
       group is validPorts
 
       group.dependencies is every(validPathWithBase(base))

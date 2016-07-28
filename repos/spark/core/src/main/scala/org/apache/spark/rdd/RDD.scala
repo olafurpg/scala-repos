@@ -1166,7 +1166,7 @@ abstract class RDD[T: ClassTag](
 
       // Don't trigger TreeAggregation when it doesn't save wall-clock time
       while (numPartitions > scale +
-             math.ceil(numPartitions.toDouble / scale)) {
+               math.ceil(numPartitions.toDouble / scale)) {
         numPartitions /= scale
         val curNumPartitions = numPartitions
         partiallyAggregated = partiallyAggregated.mapPartitionsWithIndex {

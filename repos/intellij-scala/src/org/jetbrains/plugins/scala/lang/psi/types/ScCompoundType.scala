@@ -338,12 +338,12 @@ object ScCompoundType {
             signatureMapVal += ((new Signature(e.name, Seq.empty, 0, subst, e),
                                  varType.getOrAny))
             signatureMapVal +=
-            ((new Signature(e.name + "_=",
-                            Seq(() => varType.getOrAny),
-                            1,
-                            subst,
-                            e),
-              psi.types.Unit)) //setter
+              ((new Signature(e.name + "_=",
+                              Seq(() => varType.getOrAny),
+                              1,
+                              subst,
+                              e),
+                psi.types.Unit)) //setter
           }
         case valDecl: ScValue =>
           for (e <- valDecl.declaredElements) {

@@ -296,7 +296,7 @@ private[http] class HttpResponseRendererFactory(
 
                 if (renderConnectionHeader)
                   r ~~ Connection ~~
-                  (if (close) CloseBytes else KeepAliveBytes) ~~ CrLf
+                    (if (close) CloseBytes else KeepAliveBytes) ~~ CrLf
                 else if (connHeader != null && connHeader.hasUpgrade) {
                   r ~~ connHeader ~~ CrLf
                   headers.collectFirst {

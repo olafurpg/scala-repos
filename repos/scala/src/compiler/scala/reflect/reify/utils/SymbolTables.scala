@@ -167,16 +167,16 @@ trait SymbolTables { self: Utils =>
     def apply(encoded: List[Tree]): SymbolTable = {
       var result = new SymbolTable(original = Some(encoded))
       encoded foreach
-      (entry =>
-            (entry.attachments.get[ReifyBindingAttachment],
-             entry.attachments.get[ReifyAliasAttachment]) match {
-              case (Some(ReifyBindingAttachment(_)), _) => result += entry
-              case (_, Some(ReifyAliasAttachment(sym, alias))) =>
-                result = new SymbolTable(result.symtab,
-                                         result.aliases :+ ((sym, alias)))
-              case _ =>
-              // do nothing, this is boilerplate that can easily be recreated by subsequent `result.encode`
-          })
+        (entry =>
+              (entry.attachments.get[ReifyBindingAttachment],
+               entry.attachments.get[ReifyAliasAttachment]) match {
+                case (Some(ReifyBindingAttachment(_)), _) => result += entry
+                case (_, Some(ReifyAliasAttachment(sym, alias))) =>
+                  result = new SymbolTable(result.symtab,
+                                           result.aliases :+ ((sym, alias)))
+                case _ =>
+                // do nothing, this is boilerplate that can easily be recreated by subsequent `result.encode`
+            })
       result
     }
 
@@ -244,19 +244,19 @@ trait SymbolTables { self: Utils =>
                   val sym = reifyBinding(entry).symbol
                   if (sym != NoSymbol)
                     result ++= cumulativeAliases.distinct filter
-                    (alias =>
-                          alias._1 == sym &&
-                            alias._2 != currtab.symName(sym)) map
-                    (alias => {
-                          val canonicalName = currtab.symName(sym)
-                          val aliasName = alias._2
-                          ValDef(NoMods,
-                                 aliasName,
-                                 TypeTree(),
-                                 Ident(canonicalName)) updateAttachment ReifyAliasAttachment(
-                              sym,
-                              aliasName)
-                        })
+                      (alias =>
+                            alias._1 == sym &&
+                              alias._2 != currtab.symName(sym)) map
+                      (alias => {
+                            val canonicalName = currtab.symName(sym)
+                            val aliasName = alias._2
+                            ValDef(NoMods,
+                                   aliasName,
+                                   TypeTree(),
+                                   Ident(canonicalName)) updateAttachment ReifyAliasAttachment(
+                                sym,
+                                aliasName)
+                          })
                   result.toList
                 })
 

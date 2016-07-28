@@ -120,7 +120,7 @@ object HB_0_8_0 {
   case class PartialRowKey(val appId: Int, val millis: Option[Long] = None) {
     val toBytes: Array[Byte] = {
       Bytes.toBytes(appId) ++
-      (millis.map(Bytes.toBytes(_)).getOrElse(Array[Byte]()))
+        (millis.map(Bytes.toBytes(_)).getOrElse(Array[Byte]()))
     }
   }
 

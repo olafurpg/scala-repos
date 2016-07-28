@@ -103,7 +103,7 @@ trait ScaladocAnalyzer extends Analyzer {
 
       if (settings.debug)
         useCase.defined foreach
-        (sym => println("defined use cases: %s:%s".format(sym, sym.tpe)))
+          (sym => println("defined use cases: %s:%s".format(sym, sym.tpe)))
 
       useCase.defined
     }

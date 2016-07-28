@@ -157,7 +157,7 @@ trait PrepJSExports {
 
   private def createFactoryInOuterClassHint = {
     "Create an exported factory method in the outer class to work " +
-    "around this limitation."
+      "around this limitation."
   }
 
   /** retrieves the names a sym should be exported to from its annotations

@@ -50,7 +50,7 @@ object RecordSpec extends Specification {
 
     "introspect only the expected fields" in {
       rec.fields().map(_.name).sortWith(_ < _) must_==
-      allExpectedFieldNames.sortWith(_ < _)
+        allExpectedFieldNames.sortWith(_ < _)
     }
 
     "correctly look up fields by name" in {

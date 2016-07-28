@@ -620,10 +620,10 @@ object DispatcherModelSpec {
         type = PinnedDispatcher
       }
     """ +
-    // use unique dispatcher id for each test, since MessageDispatcherInterceptor holds state
-    (for (n ← 1 to 30)
-      yield
-        """
+      // use unique dispatcher id for each test, since MessageDispatcherInterceptor holds state
+      (for (n ← 1 to 30)
+        yield
+          """
         test-dispatcher-%s {
           type = "akka.actor.dispatch.DispatcherModelSpec$MessageDispatcherInterceptorConfigurator"
         }""".format(n)).mkString
@@ -710,10 +710,10 @@ object BalancingDispatcherModelSpec {
         type = PinnedDispatcher
       }
     """ +
-    // use unique dispatcher id for each test, since MessageDispatcherInterceptor holds state
-    (for (n ← 1 to 30)
-      yield
-        """
+      // use unique dispatcher id for each test, since MessageDispatcherInterceptor holds state
+      (for (n ← 1 to 30)
+        yield
+          """
         test-balancing-dispatcher-%s {
           type = "akka.actor.dispatch.BalancingDispatcherModelSpec$BalancingMessageDispatcherInterceptorConfigurator"
           throughput=1

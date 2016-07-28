@@ -118,7 +118,7 @@ class PermissionsFinder[M[+ _]: Monad](val apiKeyFinder: APIKeyFinder[M],
     apiKeyFinder.findAPIKey(apiKey, None) flatMap {
       _ map {
         (filterWritePermissions(_: v1.APIKeyDetails, path, at)) andThen
-        (selectWriter _)
+          (selectWriter _)
       } getOrElse { None.point[M] }
     }
   }

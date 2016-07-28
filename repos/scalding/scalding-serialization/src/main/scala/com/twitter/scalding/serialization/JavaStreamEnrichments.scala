@@ -172,9 +172,9 @@ object JavaStreamEnrichments {
       val buf = new Array[Byte](8)
       readFully(buf)
       (buf(0).toLong << 56) + ((buf(1) & 255).toLong << 48) +
-      ((buf(2) & 255).toLong << 40) + ((buf(3) & 255).toLong << 32) +
-      ((buf(4) & 255).toLong << 24) + ((buf(5) & 255) << 16) +
-      ((buf(6) & 255) << 8) + (buf(7) & 255)
+        ((buf(2) & 255).toLong << 40) + ((buf(3) & 255).toLong << 32) +
+        ((buf(4) & 255).toLong << 24) + ((buf(5) & 255) << 16) +
+        ((buf(6) & 255) << 8) + (buf(7) & 255)
     }
 
     def readChar: Char = {

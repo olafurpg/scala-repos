@@ -246,7 +246,7 @@ case class DefaultOptimalSizeExploringResizer(
           val toUpdate = performanceLog.get(currentSize).fold(last) {
             oldSpeed ⇒
               (oldSpeed * (1.0 - weightOfLatestMetric)) +
-              (last * weightOfLatestMetric)
+                (last * weightOfLatestMetric)
           }
           performanceLog + (currentSize → toUpdate)
         } else performanceLog
@@ -279,7 +279,7 @@ case class DefaultOptimalSizeExploringResizer(
         else optimize(currentSize)
       }
     Math.max(lowerBound, Math.min(proposedChange + currentSize, upperBound)) -
-    currentSize
+      currentSize
   }
 
   private def optimize(currentSize: PoolSize): Int = {

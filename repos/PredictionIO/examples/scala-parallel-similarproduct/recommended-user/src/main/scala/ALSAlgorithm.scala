@@ -25,11 +25,11 @@ class ALSModel(
 
   override def toString = {
     s" similarUserFeatures: [${similarUserFeatures.size}]" +
-    s"(${similarUserFeatures.take(2).toList}...)" +
-    s" similarUserStringIntMap: [${similarUserStringIntMap.size}]" +
-    s"(${similarUserStringIntMap.take(2).toString()}...)]" +
-    s" users: [${similarUsers.size}]" +
-    s"(${similarUsers.take(2).toString()}...)]"
+      s"(${similarUserFeatures.take(2).toList}...)" +
+      s" similarUserStringIntMap: [${similarUserStringIntMap.size}]" +
+      s"(${similarUserStringIntMap.take(2).toString()}...)]" +
+      s" users: [${similarUsers.size}]" +
+      s"(${similarUsers.take(2).toString()}...)]"
   }
 }
 

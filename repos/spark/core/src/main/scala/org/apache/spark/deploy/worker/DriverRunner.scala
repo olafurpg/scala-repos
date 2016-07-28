@@ -212,7 +212,7 @@ private[deploy] class DriverRunner(conf: SparkConf,
       val processStart = clock.getTimeMillis()
       val exitCode = process.get.waitFor()
       if (clock.getTimeMillis() -
-          processStart > successfulRunDuration * 1000) {
+            processStart > successfulRunDuration * 1000) {
         waitSeconds = 1
       }
 

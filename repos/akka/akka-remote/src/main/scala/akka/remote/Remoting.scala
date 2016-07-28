@@ -461,7 +461,7 @@ private[remote] object EndpointManager {
     def markAsFailed(endpoint: ActorRef, timeOfRelease: Deadline): Unit =
       if (isWritable(endpoint)) {
         addressToWritable +=
-        writableToAddress(endpoint) -> Gated(timeOfRelease)
+          writableToAddress(endpoint) -> Gated(timeOfRelease)
         writableToAddress -= endpoint
       } else if (isReadOnly(endpoint)) {
         addressToReadonly -= readonlyToAddress(endpoint)
@@ -803,7 +803,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
       } yield flushStatus && shutdownStatus) pipeTo sender()
 
       pendingReadHandoffs.valuesIterator foreach
-      (_.disassociate(AssociationHandle.Shutdown))
+        (_.disassociate(AssociationHandle.Shutdown))
 
       // Ignore all other writes
       normalShutdown = true
@@ -842,7 +842,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
                 if (!writerIsIdle) {
                   ep ! ReliableDeliverySupervisor.IsIdle
                   stashedInbound += ep ->
-                  (stashedInbound.getOrElse(ep, Vector.empty) :+ ia)
+                    (stashedInbound.getOrElse(ep, Vector.empty) :+ ia)
                 } else
                   createAndRegisterEndpoint(
                       handle,
@@ -1039,7 +1039,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
   override def postStop(): Unit = {
     pruneTimerCancellable.cancel()
     pendingReadHandoffs.valuesIterator foreach
-    (_.disassociate(AssociationHandle.Shutdown))
+      (_.disassociate(AssociationHandle.Shutdown))
 
     if (!normalShutdown) {
       // Remaining running endpoints are children, so they will clean up themselves.

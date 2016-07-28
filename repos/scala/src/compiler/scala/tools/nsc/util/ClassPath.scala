@@ -85,7 +85,7 @@ object ClassPath {
 
     val baseDir = file.parent
     new Jar(file).classPathElements map
-    (elem => specToURL(elem) getOrElse (baseDir / elem).toURL)
+      (elem => specToURL(elem) getOrElse (baseDir / elem).toURL)
   }
 
   def specToURL(spec: String): Option[URL] =

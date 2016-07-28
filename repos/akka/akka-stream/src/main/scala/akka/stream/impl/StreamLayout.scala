@@ -59,25 +59,25 @@ object StreamLayout {
       problems ::= "shape has duplicate inlets: " + ins(shape.inlets)
     if (inset != inPorts)
       problems ::=
-      s"shape has extra ${ins(inset -- inPorts)}, module has extra ${ins(inPorts -- inset)}"
+        s"shape has extra ${ins(inset -- inPorts)}, module has extra ${ins(inPorts -- inset)}"
     if (inset.intersect(upstreams.keySet).nonEmpty)
       problems ::=
-      s"found connected inlets ${inset.intersect(upstreams.keySet)}"
+        s"found connected inlets ${inset.intersect(upstreams.keySet)}"
     if (outset.size != shape.outlets.size)
       problems ::= "shape has duplicate outlets: " + outs(shape.outlets)
     if (outset != outPorts)
       problems ::=
-      s"shape has extra ${outs(outset -- outPorts)}, module has extra ${outs(outPorts -- outset)}"
+        s"shape has extra ${outs(outset -- outPorts)}, module has extra ${outs(outPorts -- outset)}"
     if (outset.intersect(downstreams.keySet).nonEmpty)
       problems ::=
-      s"found connected outlets ${outset.intersect(downstreams.keySet)}"
+        s"found connected outlets ${outset.intersect(downstreams.keySet)}"
     val ups = upstreams.toSet
     val ups2 = ups.map(_.swap)
     val downs = downstreams.toSet
     val inter = ups2.intersect(downs)
     if (downs != ups2)
       problems ::=
-      s"inconsistent maps: ups ${pairs(ups2 -- inter)} downs ${pairs(downs -- inter)}"
+        s"inconsistent maps: ups ${pairs(ups2 -- inter)} downs ${pairs(downs -- inter)}"
     val (allIn, dupIn, allOut, dupOut) = subModules.foldLeft(
         (Set.empty[InPort],
          Set.empty[InPort],
@@ -118,7 +118,7 @@ object StreamLayout {
     }
     if ((atomic -- subModules -- graphValues - m).nonEmpty)
       problems ::=
-      s"computation refers to non-existent modules [${atomic -- subModules -- graphValues - m mkString ","}]"
+        s"computation refers to non-existent modules [${atomic -- subModules -- graphValues - m mkString ","}]"
 
     val print = doPrint || problems.nonEmpty
 

@@ -34,11 +34,11 @@ object Test extends ScaladocModelTest {
       val E = base._trait("E")
 
       base.contentDiagram.get.toString + "\n" +
-      A.inheritanceDiagram.get.toString + "\n" +
-      B.inheritanceDiagram.get.toString + "\n" +
-      C.inheritanceDiagram.get.toString + "\n" +
-      D.inheritanceDiagram.get.toString + "\n" +
-      E.inheritanceDiagram.get.toString
+        A.inheritanceDiagram.get.toString + "\n" +
+        B.inheritanceDiagram.get.toString + "\n" +
+        C.inheritanceDiagram.get.toString + "\n" +
+        D.inheritanceDiagram.get.toString + "\n" +
+        E.inheritanceDiagram.get.toString
     }
 
     // 1. check that several runs produce the same output

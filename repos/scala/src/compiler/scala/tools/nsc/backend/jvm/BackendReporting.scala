@@ -116,21 +116,21 @@ object BackendReporting {
                           missingClasses) =>
         val (javaDef, others) = missingClasses.partition(_.definedInJavaSource)
         s"The method $name$descriptor could not be found in the class $ownerInternalName or any of its parents." +
-        (if (others.isEmpty) ""
-         else
-           others
-             .map(_.internalName)
-             .mkString(
-                 "\nNote that the following parent classes could not be found on the classpath: ",
-                 ", ",
-                 "")) + (if (javaDef.isEmpty) ""
-                         else
-                           javaDef
-                             .map(_.internalName)
-                             .mkString(
-                                 "\nNote that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: ",
-                                 ",",
-                                 ""))
+          (if (others.isEmpty) ""
+           else
+             others
+               .map(_.internalName)
+               .mkString(
+                   "\nNote that the following parent classes could not be found on the classpath: ",
+                   ", ",
+                   "")) + (if (javaDef.isEmpty) ""
+                           else
+                             javaDef
+                               .map(_.internalName)
+                               .mkString(
+                                   "\nNote that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: ",
+                                   ",",
+                                   ""))
 
       case FieldNotFound(name, descriptor, ownerInternalName, missingClass) =>
         s"The field node $name$descriptor could not be found because the classfile $ownerInternalName cannot be found on the classpath." +

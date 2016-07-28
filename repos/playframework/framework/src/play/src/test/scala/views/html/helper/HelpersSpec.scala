@@ -32,7 +32,7 @@ object HelpersSpec extends Specification {
 
       // Make sure it doesn't have it twice, issue #478
       body.substring(body.indexOf(idAttr) + idAttr.length) must not contain
-      (idAttr)
+        (idAttr)
     }
 
     "default to a type of text" in {
@@ -51,7 +51,7 @@ object HelpersSpec extends Specification {
 
       // Make sure it doesn't contain it twice
       body.substring(body.indexOf(typeAttr) + typeAttr.length) must not contain
-      (typeAttr)
+        (typeAttr)
     }
   }
 
@@ -88,7 +88,7 @@ object HelpersSpec extends Specification {
 
       // Make sure it doesn't have it twice, issue #478
       body.substring(body.indexOf(idAttr) + idAttr.length) must not contain
-      (idAttr)
+        (idAttr)
     }
 
     "allow setting custom data attributes" in {
@@ -105,7 +105,7 @@ object HelpersSpec extends Specification {
 
       // Make sure it doesn't have it twice, issue #478
       body.substring(body.indexOf(dataTestAttr) + dataTestAttr.length) must not contain
-      (dataTestAttr)
+        (dataTestAttr)
     }
 
     "Work as a simple select" in {

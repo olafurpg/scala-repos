@@ -131,7 +131,7 @@ class TopicDeletionManager(controller: KafkaController,
     if (isDeleteTopicEnabled) {
       topicsToBeDeleted ++= topics
       partitionsToBeDeleted ++=
-      topics.flatMap(controllerContext.partitionsForTopic)
+        topics.flatMap(controllerContext.partitionsForTopic)
       resumeTopicDeletionThread()
     }
   }

@@ -47,7 +47,7 @@ class InputFormatInfo(val configuration: Configuration,
 
   override def toString: String = {
     "InputFormatInfo " + super.toString + " .. inputFormatClazz " +
-    inputFormatClazz + ", " + "path : " + path
+      inputFormatClazz + ", " + "path : " + path
   }
 
   override def hashCode(): Int = {

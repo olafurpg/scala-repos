@@ -55,11 +55,11 @@ object Query {
                                         60 * 30),
                                    _ / 60,
                                    "%d minute{s}").toList) :+
-    (60 * 60 * 1, "One hour") :+ (60 * 60 * 3, "Three hours") :+
-    (60 * 60 * 24, "One day") :+ (60 * 60 * 24 * 3, "Three days") :+
-    (60 * 60 * 24 * 7, "One week") :+ (60 * 60 * 24 * 7 * 2, "Two weeks") :+
-    (60 * 60 * 24 * 30, "One month") :+ (60 * 60 * 24 * 30 * 3, "Three months") :+
-    (60 * 60 * 24 * 30 * 6, "6 months") :+ (60 * 60 * 24 * 365, "One year")
+      (60 * 60 * 1, "One hour") :+ (60 * 60 * 3, "Three hours") :+
+      (60 * 60 * 24, "One day") :+ (60 * 60 * 24 * 3, "Three days") :+
+      (60 * 60 * 24 * 7, "One week") :+ (60 * 60 * 24 * 7 * 2, "Two weeks") :+
+      (60 * 60 * 24 * 30, "One month") :+ (60 * 60 * 24 * 30 * 3, "Three months") :+
+      (60 * 60 * 24 * 30 * 6, "6 months") :+ (60 * 60 * 24 * 365, "One year")
   }
 
   val clockInits =

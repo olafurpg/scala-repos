@@ -201,7 +201,7 @@ private[streaming] class ReceiverSchedulingPolicy {
       if (sortedExecutors.nonEmpty) {
         val minWeight = sortedExecutors(0)._2
         scheduledLocations ++=
-        sortedExecutors.takeWhile(_._2 == minWeight).map(_._1)
+          sortedExecutors.takeWhile(_._2 == minWeight).map(_._1)
       } else {
         // This should not happen since "executors" is not empty
       }
@@ -230,7 +230,7 @@ private[streaming] class ReceiverSchedulingPolicy {
           .filter(_.isInstanceOf[ExecutorCacheTaskLocation])
           .map { location =>
             location.asInstanceOf[ExecutorCacheTaskLocation] ->
-            (1.0 / scheduledLocations.size)
+              (1.0 / scheduledLocations.size)
           }
       case ReceiverState.ACTIVE =>
         Seq(receiverTrackingInfo.runningExecutor.get -> 1.0)

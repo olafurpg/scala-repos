@@ -320,7 +320,7 @@ object DiscoveryClientSpec extends Specification with Mockito {
       realm: Option[String] = None) = {
     "valid request parameters need to be present" in {
       params.get("openid.ns") must_==
-      Some(Seq("http://specs.openid.net/auth/2.0"))
+        Some(Seq("http://specs.openid.net/auth/2.0"))
       params.get("openid.mode") must_== Some(Seq("checkid_setup"))
       params.get("openid.claimed_id") must_== Some(Seq(claimedId))
       params.get("openid.return_to") must_== Some(Seq(returnTo))

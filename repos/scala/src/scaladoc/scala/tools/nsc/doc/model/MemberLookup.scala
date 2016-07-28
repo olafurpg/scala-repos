@@ -16,7 +16,7 @@ trait MemberLookup extends base.MemberLookupBase { thisFactory: ModelFactory =>
       case None =>
         findTemplateMaybe(site) flatMap { inTpl =>
           inTpl.members find (_.asInstanceOf[EntityImpl].sym == sym) map
-          (LinkToMember(_, inTpl))
+            (LinkToMember(_, inTpl))
         }
     }
 

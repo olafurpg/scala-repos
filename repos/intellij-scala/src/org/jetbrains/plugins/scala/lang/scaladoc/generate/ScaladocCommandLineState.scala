@@ -204,7 +204,7 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
 
     def filterModulesList(files: VirtualFile*) {
       modulesNeeded ++=
-      allModules.filter(m => files.exists(f => m.getModuleScope.contains(f)))
+        allModules.filter(m => files.exists(f => m.getModuleScope.contains(f)))
       allModules --= modulesNeeded
     }
 

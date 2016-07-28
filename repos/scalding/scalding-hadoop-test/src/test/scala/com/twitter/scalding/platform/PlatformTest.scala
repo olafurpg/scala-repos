@@ -496,9 +496,9 @@ class PlatformTest
           _.map { f: Float =>
             (f * 10).toInt
           }.toList shouldBe
-          (outputData.map { f: Float =>
-                (f * 10).toInt
-              }.toList)
+            (outputData.map { f: Float =>
+                  (f * 10).toInt
+                }.toList)
         }
         .run
     }

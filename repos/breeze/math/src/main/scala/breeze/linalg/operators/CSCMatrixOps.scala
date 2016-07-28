@@ -793,7 +793,7 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
           var j = b.colPtrs(i)
           while (j < b.colPtrs(i + 1)) {
             numnz +=
-            a.colPtrs(b.rowIndices(j) + 1) - a.colPtrs(b.rowIndices(j))
+              a.colPtrs(b.rowIndices(j) + 1) - a.colPtrs(b.rowIndices(j))
             j += 1
           }
           i += 1
@@ -1106,7 +1106,7 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
           var j = b.colPtrs(i)
           while (j < b.colPtrs(i + 1)) {
             numnz +=
-            a.colPtrs(b.rowIndices(j) + 1) - a.colPtrs(b.rowIndices(j))
+              a.colPtrs(b.rowIndices(j) + 1) - a.colPtrs(b.rowIndices(j))
             j += 1
           }
           i += 1

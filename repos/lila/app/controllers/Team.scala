@@ -211,7 +211,7 @@ object Team extends LilaController {
       implicit ctx: Context): Fu[Result] =
     api.hasCreatedRecently(me) flatMap { did =>
       (did && !Granter.superAdmin(me)) fold
-      (Forbidden(views.html.team.createLimit()).fuccess, a)
+        (Forbidden(views.html.team.createLimit()).fuccess, a)
     }
 
   private def Owner(team: TeamModel)(a: => Fu[Result])(

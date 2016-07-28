@@ -254,7 +254,7 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
         val columns = if (includeIdField) {
           columns0 get ColumnRef(Key \ 0, CString) map { idCol =>
             columns0 +
-            (ColumnRef(Value \ CPathField("_id"), CString) -> idCol)
+              (ColumnRef(Value \ CPathField("_id"), CString) -> idCol)
           } getOrElse columns0
         } else columns0
       }

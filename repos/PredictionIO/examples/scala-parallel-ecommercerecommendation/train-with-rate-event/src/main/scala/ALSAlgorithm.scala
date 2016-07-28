@@ -39,13 +39,13 @@ class ALSModel(
 
   override def toString = {
     s" rank: ${rank}" + s" userFeatures: [${userFeatures.size}]" +
-    s"(${userFeatures.take(2).toList}...)" +
-    s" productFeatures: [${productFeatures.size}]" +
-    s"(${productFeatures.take(2).toList}...)" +
-    s" userStringIntMap: [${userStringIntMap.size}]" +
-    s"(${userStringIntMap.take(2).toString}...)]" +
-    s" itemStringIntMap: [${itemStringIntMap.size}]" +
-    s"(${itemStringIntMap.take(2).toString}...)]"
+      s"(${userFeatures.take(2).toList}...)" +
+      s" productFeatures: [${productFeatures.size}]" +
+      s"(${productFeatures.take(2).toList}...)" +
+      s" userStringIntMap: [${userStringIntMap.size}]" +
+      s"(${userStringIntMap.take(2).toString}...)]" +
+      s" itemStringIntMap: [${itemStringIntMap.size}]" +
+      s"(${itemStringIntMap.take(2).toString}...)]"
   }
 }
 

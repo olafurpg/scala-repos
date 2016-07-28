@@ -305,7 +305,7 @@ private class ErrorServlet extends RestServlet {
         s"Malformed path $path."
     }
     msg +=
-    s" Please submit requests through http://[host]:[port]/$serverVersion/submissions/..."
+      s" Please submit requests through http://[host]:[port]/$serverVersion/submissions/..."
     val error = handleError(msg)
     // If there is a version mismatch, include the highest protocol version that
     // this server supports in case the client wants to retry with our version

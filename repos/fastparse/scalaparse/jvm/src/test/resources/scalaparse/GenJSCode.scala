@@ -251,7 +251,7 @@ abstract class GenJSCode
                 .addInterfaces(tree.interfaces.map(_.name))
 
               generatedClasses +=
-              ((sym, tree, currentClassInfoBuilder.result()))
+                ((sym, tree, currentClassInfoBuilder.result()))
             }
           }
         }

@@ -451,7 +451,7 @@ object MethodResolveProcessor {
             problems += DoesNotTakeTypeParameters
           } else if (typeParamCount < typeArgCount) {
             problems ++=
-            typeArgElements.drop(typeParamCount).map(ExcessTypeArgument)
+              typeArgElements.drop(typeParamCount).map(ExcessTypeArgument)
           } else {
             problems ++= tp.typeParameters
               .drop(typeArgCount)
@@ -479,7 +479,7 @@ object MethodResolveProcessor {
             problems += DoesNotTakeTypeParameters
           } else if (typeParamCount < typeArgCount) {
             problems ++=
-            typeArgElements.drop(typeParamCount).map(ExcessTypeArgument)
+              typeArgElements.drop(typeParamCount).map(ExcessTypeArgument)
           } else {
             problems ++= tp.getTypeParameters
               .drop(typeArgCount)

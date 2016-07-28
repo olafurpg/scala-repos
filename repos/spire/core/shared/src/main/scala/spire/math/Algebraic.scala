@@ -1172,7 +1172,7 @@ object Algebraic extends AlgebraicInstances {
   final def nroot(value: JBigDecimal, n: Int, mc: MathContext): JBigDecimal = {
     val result = nroot(value, n) { x =>
       x.scale - ceil(x.unscaledValue.bitLength * bits2dec).toInt +
-      mc.getPrecision + 1
+        mc.getPrecision + 1
     }
     result.round(mc)
   }

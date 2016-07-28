@@ -121,7 +121,7 @@ trait ApiFormats extends ScalatraBase {
   private[this] def getFromResponseHeader(
       implicit response: HttpServletResponse): Option[String] = {
     response.contentType flatMap
-    (ctt => ctt.split(";").headOption flatMap mimeTypes.get)
+      (ctt => ctt.split(";").headOption flatMap mimeTypes.get)
   }
 
   private def parseAcceptHeader(

@@ -228,9 +228,9 @@ object InferUtil {
         resolveResults += results.head
         def updateExpr() {
           exprs +=
-          new Expression(
-              polymorphicSubst subst extractImplicitParameterType(
-                  results.head))
+            new Expression(
+                polymorphicSubst subst extractImplicitParameterType(
+                    results.head))
         }
         val evaluator = ScalaMacroEvaluator.getInstance(place.getProject)
         evaluator.isMacro(results.head.getElement) match {

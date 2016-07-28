@@ -466,7 +466,7 @@ object Multipart {
       } catch {
         case NotEnoughDataException =>
           if (memoryBufferSize + (input.length - partStart -
-                  needle.length) > maxMemoryBufferSize) {
+                    needle.length) > maxMemoryBufferSize) {
             bufferExceeded("Memory buffer full on part " + partName)
           }
           continue(input, partStart)(

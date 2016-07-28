@@ -226,7 +226,7 @@ trait MemberLookupBase {
     }
     if (last_index < length)
       members ::=
-      query.substring(last_index, length).replaceAll("\\\\\\.", ".")
+        query.substring(last_index, length).replaceAll("\\\\\\.", ".")
     members.reverse
   }
 

@@ -38,12 +38,12 @@ trait Plugins { global: Global =>
     val (goods, errors) = maybes partition (_.isSuccess)
     // Explicit parameterization of recover to avoid -Xlint warning about inferred Any
     errors foreach
-    (_.recover[Any] {
-          // legacy behavior ignores altogether, so at least warn devs
-          case e: MissingPluginException =>
-            if (global.isDeveloper) warning(e.getMessage)
-          case e: Exception => inform(e.getMessage)
-        })
+      (_.recover[Any] {
+            // legacy behavior ignores altogether, so at least warn devs
+            case e: MissingPluginException =>
+              if (global.isDeveloper) warning(e.getMessage)
+            case e: Exception => inform(e.getMessage)
+          })
     val classes = goods map (_.get) // flatten
 
     // Each plugin must only be instantiated once. A common pattern
@@ -106,9 +106,9 @@ trait Plugins { global: Global =>
 
     // Plugins may opt out, unless we just want to show info
     plugs filter
-    (p =>
-          p.init(p.options, globalError) ||
-            (settings.debug && settings.isInfo))
+      (p =>
+            p.init(p.options, globalError) ||
+              (settings.debug && settings.isInfo))
   }
 
   lazy val plugins: List[Plugin] = loadPlugins()

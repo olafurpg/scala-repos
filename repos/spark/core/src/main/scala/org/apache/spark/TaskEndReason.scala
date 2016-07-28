@@ -95,7 +95,7 @@ case class FetchFailed(
   override def toErrorString: String = {
     val bmAddressString = if (bmAddress == null) "null" else bmAddress.toString
     s"FetchFailed($bmAddressString, shuffleId=$shuffleId, mapId=$mapId, reduceId=$reduceId, " +
-    s"message=\n$message\n)"
+      s"message=\n$message\n)"
   }
 }
 
@@ -261,9 +261,9 @@ case class ExecutorLostFailure(execId: String,
       "unrelated to the running tasks"
     }
     s"ExecutorLostFailure (executor ${execId} exited ${exitBehavior})" +
-    reason.map { r =>
-      s" Reason: $r"
-    }.getOrElse("")
+      reason.map { r =>
+        s" Reason: $r"
+      }.getOrElse("")
   }
 
   override def countTowardsTaskFailures: Boolean = exitCausedByApp

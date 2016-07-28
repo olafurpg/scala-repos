@@ -320,7 +320,7 @@ case class Game(
     clock.ifTrue(berserkable && !player(color).berserk).map { c =>
       val newClock = c berserk color
       withClock(newClock).map(_.withPlayer(color, _.goBerserk)) +
-      Event.Clock(newClock) + Event.Berserk(color)
+        Event.Clock(newClock) + Event.Berserk(color)
     }
 
   def withPlayer(color: Color, f: Player => Player) =

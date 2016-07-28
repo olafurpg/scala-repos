@@ -106,7 +106,7 @@ object RenameSuperMembersUtil {
           val mainOne = classesToNamed(classes(0))
           superMembersToRename.clear()
           superMembersToRename ++=
-          classes.dropRight(1).drop(1).map(classesToNamed)
+            classes.dropRight(1).drop(1).map(classesToNamed)
           action(mainOne)
         }
         false

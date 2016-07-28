@@ -428,7 +428,7 @@ trait Crudify {
 
   private def hasParamFor(pp: ParsePath, toTest: List[String]): Boolean = {
     pp.wholePath.startsWith(toTest) && pp.wholePath.length ==
-    (toTest.length + 1) && findForParam(pp.wholePath.last).isDefined
+      (toTest.length + 1) && findForParam(pp.wholePath.last).isDefined
   }
 
   /**
@@ -663,9 +663,9 @@ trait Crudify {
   protected def doCrudAllRows(list: List[TheCrudType]): (NodeSeq) => NodeSeq = {
     "^" #> list.take(rowsPerPage).map { rowItem =>
       ".row-item" #> doCrudAllRowItem(rowItem) & ".view [href]" #>
-      (s"$viewPathString/${obscurePrimaryKey(rowItem)}") & ".edit [href]" #>
-      (s"$editPathString/${obscurePrimaryKey(rowItem)}") & ".delete [href]" #>
-      (s"$deletePathString/${obscurePrimaryKey(rowItem)}")
+        (s"$viewPathString/${obscurePrimaryKey(rowItem)}") & ".edit [href]" #>
+        (s"$editPathString/${obscurePrimaryKey(rowItem)}") & ".delete [href]" #>
+        (s"$deletePathString/${obscurePrimaryKey(rowItem)}")
     }
   }
 

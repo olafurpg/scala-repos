@@ -101,7 +101,7 @@ class OffsetCheckpoint(val file: File) extends Logging {
               WhiteSpacesPattern.split(line) match {
                 case Array(topic, partition, offset) =>
                   offsets +=
-                  TopicAndPartition(topic, partition.toInt) -> offset.toLong
+                    TopicAndPartition(topic, partition.toInt) -> offset.toLong
                   line = reader.readLine()
                 case _ => throw malformedLineException(line)
               }

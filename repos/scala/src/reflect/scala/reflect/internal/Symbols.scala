@@ -1876,7 +1876,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
         this modifyInfo rawToExistential
       else if (isOverloaded)
         alternatives withFilter (_.isJavaDefined) foreach
-        (_ modifyInfo rawToExistential)
+          (_ modifyInfo rawToExistential)
 
       this
     }

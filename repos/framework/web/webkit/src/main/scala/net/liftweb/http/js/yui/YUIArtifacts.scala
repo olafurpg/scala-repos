@@ -112,7 +112,7 @@ object YUIArtifacts extends JSArtifacts {
   def setHtml(uid: String, content: NodeSeq): JsCmd = new JsCmd {
     val toJsCmd = fixHtmlCmdFunc(uid, content) { s =>
       "try{document.getElementById(" + uid.encJs + ").innerHTML = " + s +
-      ";} catch (e) {}"
+        ";} catch (e) {}"
     }
   }
 

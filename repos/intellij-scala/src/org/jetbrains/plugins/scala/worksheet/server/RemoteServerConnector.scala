@@ -159,7 +159,7 @@ object RemoteServerConnector {
 
           buffer append lines(linesLength - 2)
             .substring(differ) append "\n" append
-          (if (lines1.length > differ) lines1.substring(differ) else lines1) append "\n"
+            (if (lines1.length > differ) lines1.substring(differ) else lines1) append "\n"
           buffer.toString()
         }
 

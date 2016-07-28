@@ -149,7 +149,7 @@ class ExecutionTest extends WordSpec with Matchers {
         .shouldFail()
       // If both are good, we succeed:
       Execution.from(1).zip(Execution.from("1")).shouldSucceed() shouldBe
-      (1, "1")
+        (1, "1")
     }
 
     "Config transformer will isolate Configs" in {

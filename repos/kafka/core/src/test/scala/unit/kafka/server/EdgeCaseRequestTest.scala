@@ -90,7 +90,7 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
                                  correlationId: Int = -1): Array[Byte] = {
     val size = {
       2 /* apiKey */ + 2 /* version id */ + 4 /* correlation id */ +
-      Type.NULLABLE_STRING.sizeOf(clientId) /* client id */
+        Type.NULLABLE_STRING.sizeOf(clientId) /* client id */
     }
 
     val buffer = ByteBuffer.allocate(size)

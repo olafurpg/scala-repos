@@ -111,7 +111,7 @@ abstract class AggregationIterator(
         case function => function
       }
       mutableBufferOffset +=
-      funcWithUpdatedAggBufferOffset.aggBufferSchema.length
+        funcWithUpdatedAggBufferOffset.aggBufferSchema.length
       functions(i) = funcWithUpdatedAggBufferOffset
       i += 1
     }

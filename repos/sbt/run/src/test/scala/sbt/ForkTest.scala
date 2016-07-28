@@ -50,7 +50,7 @@ object ForkTest extends Properties("Fork") {
             s"temporary directory: ${dir.getAbsolutePath}" |: s"required classpath: ${requiredEntries
               .mkString("\n\t", "\n\t", "")}" |: s"main and args: ${mainAndArgs.mkString(
                 " ")}" |: s"args length: ${args.mkString(" ").length}" |: s"exitCode: $exitCode, expected: $expectedCode" |:
-            (exitCode == expectedCode)
+              (exitCode == expectedCode)
           }
         }
     }

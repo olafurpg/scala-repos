@@ -120,6 +120,6 @@ final class TaskDef(_fullyQualifiedName: String,
 
   override def toString(): String = {
     "TaskDef(" + _fullyQualifiedName + ", " + _fingerprint + ", " +
-    _explicitlySpecified + ", " + _selectors.mkString("[", ", ", "]") + ")"
+      _explicitlySpecified + ", " + _selectors.mkString("[", ", ", "]") + ")"
   }
 }

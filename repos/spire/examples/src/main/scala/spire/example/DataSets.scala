@@ -204,7 +204,7 @@ object Variable {
 
         { s =>
           orderedCategories map
-          (cat => if (cat == s) Ring[F].one else Ring[F].zero)
+            (cat => if (cat == s) Ring[F].one else Ring[F].zero)
         }
       }
     }

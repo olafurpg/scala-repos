@@ -116,7 +116,7 @@ case class DagViz[P <: Platform[P]](dag: Dag[P]) {
     }
 
     "digraph summingbirdGraph {\n" +
-    (clusters ++ producerMappings ++ clusterMappings).mkString("\n") + "\n}"
+      (clusters ++ producerMappings ++ clusterMappings).mkString("\n") + "\n}"
   }
 
   override def toString(): String = genClusters

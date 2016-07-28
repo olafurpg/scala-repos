@@ -526,7 +526,7 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
 
     def maybeFlushAndCommitOffsets() {
       if (System.currentTimeMillis() -
-          lastOffsetCommitMs > offsetCommitIntervalMs) {
+            lastOffsetCommitMs > offsetCommitIntervalMs) {
         debug("Committing MirrorMaker state automatically.")
         producer.flush()
         commitOffsets(mirrorMakerConsumer)

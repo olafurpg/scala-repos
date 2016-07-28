@@ -69,7 +69,7 @@ class ScalaUnusedImportPass(val file: PsiFile,
 
         val list = new util.ArrayList[HighlightInfo](annotations.length)
         annotations foreach
-        (annotation => list add (HighlightInfo fromAnnotation annotation))
+          (annotation => list add (HighlightInfo fromAnnotation annotation))
 
         if (ScalaApplicationSettings
               .getInstance()

@@ -39,7 +39,7 @@ trait Adaptations { self: Analyzer =>
                                         t.symbol.signatureString
                                       else
                                         "." + t.symbol.decodedName +
-                                        t.symbol.signatureString)
+                                          t.symbol.signatureString)
       def givenString = if (args.isEmpty) "<none>" else args.mkString(", ")
       def adaptedArgs =
         if (args.isEmpty) "(): Unit"

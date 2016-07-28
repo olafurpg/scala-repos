@@ -77,7 +77,7 @@ object MockHttpRequestSpec extends Specification {
       val testRequest = new MockHttpServletRequest(TEST_URL, "/test")
 
       testRequest.headers +=
-      IF_MODIFIED_HEADER -> List("this is not a valid date")
+        IF_MODIFIED_HEADER -> List("this is not a valid date")
 
       testRequest.getDateHeader(IF_MODIFIED_HEADER) must throwA[
           IllegalArgumentException]

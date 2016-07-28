@@ -106,7 +106,7 @@ class EnsimeConfigSpec extends EnsimeSpec {
                config.sourceMode shouldBe sourceMode
                config.runtimeClasspath shouldBe Set(abc)
                config.compileClasspath shouldBe
-               (if (sourceMode) Set.empty else Set(abc))
+                 (if (sourceMode) Set.empty else Set(abc))
              })
       }
     }

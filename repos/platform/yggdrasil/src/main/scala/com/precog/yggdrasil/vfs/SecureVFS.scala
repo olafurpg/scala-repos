@@ -120,7 +120,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         version: Version,
         readMode: ReadMode): EitherT[M, ResourceError, Resource] = {
       vfs.readResource(path, version) >>=
-      verifyResourceAccess(apiKey, path, readMode)
+        verifyResourceAccess(apiKey, path, readMode)
     }
 
     final def readQuery(
@@ -129,7 +129,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         version: Version,
         readMode: ReadMode): EitherT[M, ResourceError, String] = {
       readResource(apiKey, path, version, readMode) >>=
-      Resource.asQuery(path, version)
+        Resource.asQuery(path, version)
     }
 
     final def readProjection(
@@ -138,7 +138,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         version: Version,
         readMode: ReadMode): EitherT[M, ResourceError, Projection] = {
       readResource(apiKey, path, version, readMode) >>=
-      Resource.asProjection(path, version)
+        Resource.asProjection(path, version)
     }
 
     final def size(apiKey: APIKey,
@@ -157,7 +157,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         selector: CPath,
         version: Version): EitherT[M, ResourceError, PathStructure] = {
       readProjection(apiKey, path, version, AccessMode.ReadMetadata) >>=
-      VFS.pathStructure(selector)
+        VFS.pathStructure(selector)
     }
 
     final def findDirectChildren(

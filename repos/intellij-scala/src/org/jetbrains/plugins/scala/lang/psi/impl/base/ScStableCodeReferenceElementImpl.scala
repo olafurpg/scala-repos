@@ -123,7 +123,7 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
     }
     if (completion)
       result + ResolveTargets.PACKAGE + ResolveTargets.OBJECT +
-      ResolveTargets.VAL
+        ResolveTargets.VAL
     else result
   }
 

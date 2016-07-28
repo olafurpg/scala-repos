@@ -453,14 +453,14 @@ final case class GroupBy(fromGen: TermSymbol,
       if ((from2 eq from) && (by2 eq by)) this
       else copy(from = from2, by = by2)
     this2 :@
-    (if (!hasType)
-       CollectionType(
-           from2Type.cons,
-           ProductType(
-               ConstArray(NominalType(identity, by2.nodeType),
-                          CollectionType(TypedCollectionTypeConstructor.seq,
-                                         from2Type.elementType))))
-     else nodeType)
+      (if (!hasType)
+         CollectionType(
+             from2Type.cons,
+             ProductType(
+                 ConstArray(NominalType(identity, by2.nodeType),
+                            CollectionType(TypedCollectionTypeConstructor.seq,
+                                           from2Type.elementType))))
+       else nodeType)
   }
 }
 
@@ -544,10 +544,11 @@ final case class Join(leftGen: TermSymbol,
       case _ => (left2Type.elementType, right2Type.elementType)
     }
     withChildren(ConstArray[Node](left2, right2, on2)) :@
-    (if (!hasType)
-       CollectionType(left2Type.cons,
-                      ProductType(ConstArray(joinedLeftType, joinedRightType)))
-     else nodeType)
+      (if (!hasType)
+         CollectionType(
+             left2Type.cons,
+             ProductType(ConstArray(joinedLeftType, joinedRightType)))
+       else nodeType)
   }
 }
 
@@ -589,10 +590,10 @@ final case class Bind(generator: TermSymbol, from: Node, select: Node)
       if ((from2 eq from) && (select2 eq select)) this
       else rebuild(from2, select2)
     withCh :@
-    (if (!hasType)
-       CollectionType(from2Type.cons,
-                      select2.nodeType.asCollectionType.elementType)
-     else nodeType)
+      (if (!hasType)
+         CollectionType(from2Type.cons,
+                        select2.nodeType.asCollectionType.elementType)
+       else nodeType)
   }
 }
 
@@ -889,7 +890,7 @@ final case class OptionFold(from: Node,
       scope + (gen -> from2.nodeType.structural.asOptionType.elementType)
     val map2 = map.infer(genScope, typeChildren)
     withChildren(ConstArray[Node](from2, ifEmpty2, map2)) :@
-    (if (!hasType) map2.nodeType else nodeType)
+      (if (!hasType) map2.nodeType else nodeType)
   }
   override def getDumpInfo = super.getDumpInfo.copy(mainInfo = "")
 }

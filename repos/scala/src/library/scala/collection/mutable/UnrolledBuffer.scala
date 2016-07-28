@@ -308,7 +308,7 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
     }
     protected def tryMergeWithNext() =
       if (next != null && (size + next.size) <
-          (array.length * waterline / waterlineDelim)) {
+            (array.length * waterline / waterlineDelim)) {
         // copy the next array, then discard the next node
         Array.copy(next.array, 0, array, size, next.size)
         size = size + next.size

@@ -126,7 +126,7 @@ class RFormula(override val uid: String)
           case column if column.dataType == StringType =>
             val indexCol = tmpColumn("stridx")
             encoderStages +=
-            new StringIndexer().setInputCol(term).setOutputCol(indexCol)
+              new StringIndexer().setInputCol(term).setOutputCol(indexCol)
             (term, indexCol)
           case _ =>
             (term, term)
@@ -157,7 +157,7 @@ class RFormula(override val uid: String)
       .setInputCols(encodedTerms.toArray)
       .setOutputCol($(featuresCol))
     encoderStages +=
-    new VectorAttributeRewriter($(featuresCol), prefixesToRewrite.toMap)
+      new VectorAttributeRewriter($(featuresCol), prefixesToRewrite.toMap)
     encoderStages += new ColumnPruner(tempColumns.toSet)
 
     if (dataset.schema.fieldNames.contains(resolvedFormula.label) &&

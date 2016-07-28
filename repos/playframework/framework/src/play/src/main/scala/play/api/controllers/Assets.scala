@@ -370,7 +370,7 @@ object Assets extends AssetsBuilder(LazyHttpErrorHandler) {
               .fold(minPath) { dgst =>
                 val lastSep = minPath.lastIndexOf("/")
                 minPath.take(lastSep + 1) + dgst + "-" +
-                minPath.drop(lastSep + 1)
+                  minPath.drop(lastSep + 1)
               }
               .drop(base.size + 1)
           }

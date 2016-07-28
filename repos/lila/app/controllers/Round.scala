@@ -64,9 +64,9 @@ object Round extends LilaController with TheftPrevention {
         html = pov.game.started.fold(
             PreventTheft(pov) {
               myTour(pov.game.tournamentId, true) zip
-              (pov.game.simulId ?? Env.simul.repo.find) zip Env.game
+                (pov.game.simulId ?? Env.simul.repo.find) zip Env.game
                 .crosstableApi(pov.game) zip
-              (pov.game.isSwitchable ?? otherPovs(pov.game)) flatMap {
+                (pov.game.isSwitchable ?? otherPovs(pov.game)) flatMap {
                 case (((tour, simul), crosstable), playing) =>
                   simul foreach Env.simul.api.onPlayerConnection(pov.game,
                                                                  ctx.me)
@@ -180,7 +180,7 @@ object Round extends LilaController with TheftPrevention {
                 Analyse.replay(pov, userTv = userTv)
               else if (HTTPRequest.isHuman(ctx.req))
                 myTour(pov.game.tournamentId, false) zip
-                (pov.game.simulId ?? Env.simul.repo.find) zip Env.game
+                  (pov.game.simulId ?? Env.simul.repo.find) zip Env.game
                   .crosstableApi(pov.game) zip Env.api.roundApi.watcher(
                     pov,
                     lila.api.Mobile.Api.currentVersion,

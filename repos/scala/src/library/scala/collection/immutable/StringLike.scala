@@ -196,9 +196,9 @@ trait StringLike[+Repr]
       var index = 0
       while (index < len && line.charAt(index) <= ' ') index += 1
       buf append
-      (if (index < len && line.charAt(index) == marginChar)
-         line.substring(index + 1)
-       else line)
+        (if (index < len && line.charAt(index) == marginChar)
+           line.substring(index + 1)
+         else line)
     }
     buf.toString
   }

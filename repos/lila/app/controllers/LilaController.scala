@@ -159,9 +159,9 @@ private[controllers] trait LilaController
       implicit ctx: Context): Fu[Result] =
     Env.security.firewall.accepts(ctx.req) flatMap {
       _ fold
-      (a, {
-            fuccess { Redirect(routes.Lobby.home()) }
-          })
+        (a, {
+              fuccess { Redirect(routes.Lobby.home()) }
+            })
     }
 
   protected def NoEngine[A <: Result](a: => Fu[A])(

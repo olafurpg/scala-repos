@@ -38,7 +38,7 @@ object Packaging {
             ParserUtils.parseLoopUntilRBrace(builder, () => {
               //parse packaging body
               TopStatSeq parse
-              (builder, true)
+                (builder, true)
             })
             builder.restoreNewlinesState
             packMarker.done(ScalaElementTypes.PACKAGING)

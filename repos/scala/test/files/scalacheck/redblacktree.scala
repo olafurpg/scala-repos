@@ -220,9 +220,9 @@ package scala.collection.immutable.redblacktree {
         val from = parm._1 flatMap (nodeAt(tree, _) map (_._1))
         val to = parm._2 flatMap (nodeAt(tree, _) map (_._1))
         ("lower boundary" |:
-            (from forall (key => keysIterator(newTree) forall (key <=)))) &&
+              (from forall (key => keysIterator(newTree) forall (key <=)))) &&
         ("upper boundary" |:
-            (to forall (key => keysIterator(newTree) forall (key >))))
+              (to forall (key => keysIterator(newTree) forall (key >))))
     }
 
     property("range returns all elements") = forAll(genInput) {

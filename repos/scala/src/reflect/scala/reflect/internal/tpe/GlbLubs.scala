@@ -396,11 +396,11 @@ private[internal] trait GlbLubs { self: SymbolTable =>
           def refines(tp: Type, sym: Symbol): Boolean = {
             val syms = tp.nonPrivateMember(sym.name).alternatives
             !syms.isEmpty && (syms forall
-                (alt =>
-                      // todo alt != sym is strictly speaking not correct, but without it we lose
-                      // efficiency.
-                      alt != sym &&
-                        !specializesSym(lubThisType, sym, tp, alt, depth)))
+                  (alt =>
+                        // todo alt != sym is strictly speaking not correct, but without it we lose
+                        // efficiency.
+                        alt != sym &&
+                          !specializesSym(lubThisType, sym, tp, alt, depth)))
           }
           // add a refinement symbol for all non-class members of lubBase
           // which are refined by every type in ts.

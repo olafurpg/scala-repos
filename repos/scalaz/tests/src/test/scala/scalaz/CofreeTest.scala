@@ -150,7 +150,7 @@ object CofreeTest extends SpecLite {
     val b = Applicative[CofreeZip[IList, ?]].point(a)
     val size = 10
     Foldable[Cofree[IList, ?]].toStream(Tag.unwrap(b)).take(size) must_===
-    Stream.fill(size)(a)
+      Stream.fill(size)(a)
   }
 
   "Applicative[λ[α => CofreeZip[LazyOption, α]]] is Applicative[λ[α => Stream[α] @@ Zip]]" ! forAll {

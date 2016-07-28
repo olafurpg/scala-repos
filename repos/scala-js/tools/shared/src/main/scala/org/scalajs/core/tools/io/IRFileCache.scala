@@ -296,7 +296,7 @@ object IRFileCache {
     /** Descriptive line to display in logs */
     def logLine: String = {
       s"reused: $reused -- " + s"invalidated: $invalidated -- " +
-      s"trees read: $treesRead"
+        s"trees read: $treesRead"
     }
   }
 

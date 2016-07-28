@@ -224,7 +224,7 @@ private[sql] class ExchangeCoordinator(
           // submitMapStage does not accept RDD with 0 partition.
           // So, we will not submit this dependency.
           submittedStageFutures +=
-          exchange.sqlContext.sparkContext.submitMapStage(shuffleDependency)
+            exchange.sqlContext.sparkContext.submitMapStage(shuffleDependency)
         }
         i += 1
       }

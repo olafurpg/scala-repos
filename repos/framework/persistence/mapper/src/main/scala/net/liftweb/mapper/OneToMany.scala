@@ -38,7 +38,7 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
         getSingleton,
         net.liftweb.common.Logger(classOf[OneToMany[K, T]])
     ).accessorMethods map
-    (_.invoke(this).asInstanceOf[MappedOneToManyBase[Rec]])
+      (_.invoke(this).asInstanceOf[MappedOneToManyBase[Rec]])
   }
 
   /**

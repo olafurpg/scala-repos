@@ -40,7 +40,7 @@ case class TopicMetadataResponse(brokers: Seq[BrokerEndPoint],
     extends RequestOrResponse() {
   val sizeInBytes: Int = {
     4 + 4 + brokers.map(_.sizeInBytes).sum + 4 +
-    topicsMetadata.map(_.sizeInBytes).sum
+      topicsMetadata.map(_.sizeInBytes).sum
   }
 
   def writeTo(buffer: ByteBuffer) {

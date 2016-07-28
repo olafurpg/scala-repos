@@ -96,7 +96,7 @@ object ScalaSpacingProcessor extends ScalaTokenTypes {
       if (textRange.contains(rightNode.getTextRange) &&
           textRange.contains(leftNode.getTextRange)) {
         leftNode.getTextRange.substring(fileText) +
-        rightNode.getTextRange.substring(fileText)
+          rightNode.getTextRange.substring(fileText)
       } else return 0
     (leftNode.getTreeParent.getElementType,
      rightNode.getTreeParent.getElementType) match {

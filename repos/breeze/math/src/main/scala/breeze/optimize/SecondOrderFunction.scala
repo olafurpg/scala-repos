@@ -182,7 +182,7 @@ class FisherMatrix[T](grads: IndexedSeq[T])(
 
   def *(t: T): T = {
     grads.view.map(g => g * (g dot t)).reduceLeft(_ += _) /=
-    grads.length.toDouble
+      grads.length.toDouble
   }
 }
 

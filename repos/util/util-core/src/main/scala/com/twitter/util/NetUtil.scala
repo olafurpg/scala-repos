@@ -93,7 +93,7 @@ object NetUtil {
       case inetAddress: Inet4Address =>
         val addr = inetAddress.getAddress
         ((addr(0) & 0xff) << 24) | ((addr(1) & 0xff) << 16) |
-        ((addr(2) & 0xff) << 8) | (addr(3) & 0xff)
+          ((addr(2) & 0xff) << 8) | (addr(3) & 0xff)
       case _ =>
         throw new IllegalArgumentException(
             "non-Inet4Address cannot be converted to an Int")

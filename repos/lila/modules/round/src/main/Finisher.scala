@@ -77,11 +77,11 @@ private[round] final class Finisher(messenger: Messenger,
       game.player(color).userId foreach { userId =>
         game.perfType foreach { perfType =>
           timeline !
-          (Propagate(
-                  GameEnd(playerId = game fullIdOf color,
-                          opponent = game.player(!color).userId,
-                          win = game.winnerColor map (color ==),
-                          perf = perfType.key)) toUser userId)
+            (Propagate(
+                    GameEnd(playerId = game fullIdOf color,
+                            opponent = game.player(!color).userId,
+                            win = game.winnerColor map (color ==),
+                            perf = perfType.key)) toUser userId)
         }
       }
   }

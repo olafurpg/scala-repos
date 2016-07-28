@@ -80,8 +80,8 @@ trait Kinds { self: SymbolTable =>
       (if (xs.isEmpty) ""
        else
          xs map f.tupled mkString
-         ("\n", ", ",
-             ""))
+           ("\n", ", ",
+               ""))
 
     def errorMessage(targ: Type, tparam: Symbol): String =
       ((targ + "'s type parameters do not match " + tparam +
@@ -421,8 +421,8 @@ trait Kinds { self: SymbolTable =>
       (args map { arg =>
             (if (arg.kind.order == 0) arg.kind.starNotation
              else "(" + arg.kind.starNotation + ")") +
-            (if (arg.variance == Invariant) " -> "
-             else " -(" + arg.variance.symbolicString + ")-> ")
+              (if (arg.variance == Invariant) " -> "
+               else " -(" + arg.variance.symbolicString + ")-> ")
           }).mkString + "*" + bounds.starNotation(_.toString)
     }
   }

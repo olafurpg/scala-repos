@@ -120,10 +120,10 @@ trait Metalevels { self: Reifier =>
         if (reifyDebug) println("entering inlineable splice: " + tree)
         val inlinees = symtab.syms filter (_.isLocalToReifee)
         inlinees foreach
-        (inlinee =>
-              symtab.symAliases(inlinee) foreach
-                (alias =>
-                      inlineableBindings(alias) = symtab.symBinding(inlinee)))
+          (inlinee =>
+                symtab.symAliases(inlinee) foreach
+                  (alias =>
+                        inlineableBindings(alias) = symtab.symBinding(inlinee)))
         val symtab1 = symtab -- inlinees
         if (reifyDebug)
           println(

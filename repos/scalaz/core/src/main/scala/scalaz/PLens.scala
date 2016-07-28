@@ -164,10 +164,10 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
           (that run c).flatMap(x => {
         val (ac, a) = x.run
         run(a) map
-        (y => {
-              val (ba, b) = y.run
-              IndexedStore(ac compose ba, b)
-            })
+          (y => {
+                val (ba, b) = y.run
+                IndexedStore(ac compose ba, b)
+              })
       }))
 
   /** alias for `compose` */

@@ -716,10 +716,10 @@ sealed abstract class IListInstances extends IListInstance0 {
             case ICons(x, xs) => commaSep(xs, (acc :+ ",") ++ A.show(x))
           }
         "[" +:
-        (as match {
-              case INil() => Cord()
-              case ICons(x, xs) => commaSep(xs, A.show(x))
-            }) :+ "]"
+          (as match {
+                case INil() => Cord()
+                case ICons(x, xs) => commaSep(xs, A.show(x))
+              }) :+ "]"
       }
     }
 }

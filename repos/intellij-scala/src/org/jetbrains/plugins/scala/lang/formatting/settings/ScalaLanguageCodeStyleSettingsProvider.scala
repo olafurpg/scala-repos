@@ -134,7 +134,7 @@ class ScalaLanguageCodeStyleSettingsProvider
 
       //if statement
       buffer ++=
-      Seq("IF_BRACE_FORCE", "ELSE_ON_NEW_LINE", "SPECIAL_ELSE_IF_TREATMENT")
+        Seq("IF_BRACE_FORCE", "ELSE_ON_NEW_LINE", "SPECIAL_ELSE_IF_TREATMENT")
 
       //brace forces
       buffer ++= Seq("FOR_BRACE_FORCE",

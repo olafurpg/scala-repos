@@ -173,7 +173,7 @@ object ClassFileParser extends ByteCodeReader {
       case bootstrapMethodIndex ~ nameAndTypeIndex =>
         pool =>
           "InvokeDynamic: " + pool(bootstrapMethodIndex) + ", " +
-          pool(nameAndTypeIndex)
+            pool(nameAndTypeIndex)
     }
 
   val constantPoolEntry =

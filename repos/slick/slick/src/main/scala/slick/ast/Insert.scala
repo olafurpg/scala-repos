@@ -21,7 +21,7 @@ final case class Insert(tableSym: TermSymbol,
     val lin2 =
       linear.infer(scope + (tableSym -> table2.nodeType), typeChildren)
     withChildren(ConstArray[Node](table2, lin2)) :@
-    (if (!hasType) lin2.nodeType else nodeType)
+      (if (!hasType) lin2.nodeType else nodeType)
   }
   override def getDumpInfo =
     super.getDumpInfo

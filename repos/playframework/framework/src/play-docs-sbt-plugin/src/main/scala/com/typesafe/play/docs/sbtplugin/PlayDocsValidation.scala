@@ -148,7 +148,7 @@ object PlayDocsValidation {
                       .stripPrefix(base.getCanonicalPath)
                       .stripPrefix("/") + "/" + relative
                   resourceLinks +=
-                  LinkRef(link, markdownFile, node.getStartIndex + 2)
+                    LinkRef(link, markdownFile, node.getStartIndex + 2)
               }
 
             case link =>

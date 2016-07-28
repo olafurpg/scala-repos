@@ -41,7 +41,7 @@ class WorksheetFoldGroup(
                 spaces: Int,
                 leftSideLength: Int) {
     regions +=
-    FoldRegionInfo(region, region.isExpanded, start, spaces, leftSideLength)
+      FoldRegionInfo(region, region.isExpanded, start, spaces, leftSideLength)
   }
 
   def removeRegion(region: WorksheetFoldRegionDelegate) {

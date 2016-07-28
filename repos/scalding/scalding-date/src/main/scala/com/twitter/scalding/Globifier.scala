@@ -119,7 +119,7 @@ class BaseGlobifier(dur: Duration,
       // [start <= mid1 < mid2 <= end]
       // First check to see if we even need to check our children:
       simpleCase(DateRange(dr.start, mid1 - Millisecs(1))) ++
-      (asteriskChildren(mid1) :: globify(DateRange(mid1 + dur, dr.end)))
+        (asteriskChildren(mid1) :: globify(DateRange(mid1 + dur, dr.end)))
     }
   }
 }

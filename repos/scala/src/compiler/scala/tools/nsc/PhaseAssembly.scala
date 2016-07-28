@@ -293,9 +293,9 @@ trait PhaseAssembly { self: Global =>
             "\"->\"" + edge.to.allPhaseNames + "(" + edge.to.level + ")" + "\"")
       if (!edge.frm.phaseobj.get.head.internal) extnodes += edge.frm
       edge.frm.phaseobj foreach
-      (phobjs => if (phobjs.tail.nonEmpty) fatnodes += edge.frm)
+        (phobjs => if (phobjs.tail.nonEmpty) fatnodes += edge.frm)
       edge.to.phaseobj foreach
-      (phobjs => if (phobjs.tail.nonEmpty) fatnodes += edge.to)
+        (phobjs => if (phobjs.tail.nonEmpty) fatnodes += edge.to)
       val color = if (edge.hard) "#0000ff" else "#000000"
       sbuf.append(s""" [color="$color"]\n""")
     }

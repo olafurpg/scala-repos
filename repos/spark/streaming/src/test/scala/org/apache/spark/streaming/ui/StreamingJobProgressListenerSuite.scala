@@ -268,8 +268,8 @@ class StreamingJobProgressListenerSuite extends TestSuiteBase with Matchers {
 
     // We should not leak memory
     listener.batchTimeToOutputOpIdSparkJobIdPair.size() should be <=
-    (listener.waitingBatches.size + listener.runningBatches.size +
-        listener.retainedCompletedBatches.size + 10)
+      (listener.waitingBatches.size + listener.runningBatches.size +
+            listener.retainedCompletedBatches.size + 10)
   }
 
   test("detect memory leak") {
@@ -325,7 +325,7 @@ class StreamingJobProgressListenerSuite extends TestSuiteBase with Matchers {
     listener.runningBatches.size should be(0)
     listener.retainedCompletedBatches.size should be(limit)
     listener.batchTimeToOutputOpIdSparkJobIdPair.size() should be <=
-    (listener.waitingBatches.size + listener.runningBatches.size +
-        listener.retainedCompletedBatches.size + 10)
+      (listener.waitingBatches.size + listener.runningBatches.size +
+            listener.retainedCompletedBatches.size + 10)
   }
 }

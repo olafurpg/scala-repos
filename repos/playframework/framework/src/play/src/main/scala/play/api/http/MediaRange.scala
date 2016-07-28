@@ -26,8 +26,8 @@ case class MediaType(mediaType: String,
           "=" + value
         } else {
           "=\"" +
-          value.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"") +
-          "\""
+            value.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"") +
+            "\""
         }
       }.getOrElse("")
     }.mkString("")

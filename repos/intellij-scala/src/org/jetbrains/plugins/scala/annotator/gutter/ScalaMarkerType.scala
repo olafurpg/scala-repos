@@ -296,7 +296,7 @@ object ScalaMarkerType {
           val presentation = method.containingClass.getPresentation
           if (presentation != null)
             presentation.getPresentableText + " " +
-            presentation.getLocationString
+              presentation.getLocationString
           else {
             ClassPresentationUtil
               .getNameForClass(method.containingClass, false)
@@ -304,7 +304,7 @@ object ScalaMarkerType {
         case xlass: PsiClass =>
           val presentation = xlass.getPresentation
           presentation.getPresentableText + " " +
-          presentation.getLocationString
+            presentation.getLocationString
         case x: PsiNamedElement
             if ScalaPsiUtil.nameContext(x).isInstanceOf[ScMember] =>
           val containing =
@@ -313,12 +313,12 @@ object ScalaMarkerType {
           else {
             val presentation = containing.getPresentation
             presentation.getPresentableText + " " +
-            presentation.getLocationString
+              presentation.getLocationString
           }
         case x: ScClassParameter =>
           val presentation = x.getPresentation
           presentation.getPresentableText + " " +
-          presentation.getLocationString
+            presentation.getLocationString
         case x: PsiNamedElement => x.name
         case _ => defaultPresentation
       }

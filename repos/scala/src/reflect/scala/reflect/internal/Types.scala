@@ -1406,7 +1406,7 @@ trait Types
       */
     private[internal] def scalaNotation(typeString: Type => String): String = {
       (if (emptyLowerBound) "" else " >: " + typeString(lo)) +
-      (if (emptyUpperBound) "" else " <: " + typeString(hi))
+        (if (emptyUpperBound) "" else " <: " + typeString(hi))
     }
 
     /** Bounds notation used in http://adriaanm.github.com/files/higher.pdf.
@@ -3425,7 +3425,7 @@ trait Types
                   (// @PP: Is it going to be faster to filter out the parents we just checked?
                       // That's what's done here but I'm not sure it matters.
                       tp.baseTypeSeq.toList.tail filterNot
-                      (tp.parents contains _) exists unifyFull)))
+                        (tp.parents contains _) exists unifyFull)))
         }
     }
 
@@ -4246,9 +4246,9 @@ trait Types
          isNumericValueClass(tp2.typeSymbol)
        else
          tp1.baseClasses forall
-         (bc =>
-               tp2.baseTypeIndex(bc) < 0 ||
-                 isConsistent(tp1.baseType(bc), tp2.baseType(bc))))
+           (bc =>
+                 tp2.baseTypeIndex(bc) < 0 ||
+                   isConsistent(tp1.baseType(bc), tp2.baseType(bc))))
 
     check(tp1, tp2) && check(tp2, tp1)
   }

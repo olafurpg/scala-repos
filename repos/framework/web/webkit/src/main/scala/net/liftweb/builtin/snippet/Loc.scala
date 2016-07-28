@@ -69,9 +69,9 @@ object Loc extends DispatchSnippet {
 
   def render(locId: String, kids: NodeSeq): NodeSeq = {
     S.loc(locId) openOr
-    (S.attr("locid") match {
-          case Full(id) => S.loc(id, kids)
-          case _ => S.loc(kids.text, kids)
-        })
+      (S.attr("locid") match {
+            case Full(id) => S.loc(id, kids)
+            case _ => S.loc(kids.text, kids)
+          })
   }
 }

@@ -115,7 +115,7 @@ object Bits {
     if (areTypedArraysSupported) {
       float64Array(0) = value
       ((int32Array(highOffset).toLong << 32) |
-          (int32Array(lowOffset).toLong & 0xffffffffL))
+            (int32Array(lowOffset).toLong & 0xffffffffL))
     } else {
       doubleToLongBitsPolyfill(value)
     }

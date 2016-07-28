@@ -273,7 +273,7 @@ object ActorSystem {
       }
 
     Option(Thread.currentThread.getContextClassLoader) orElse
-    (Reflect.getCallerClass map findCaller) getOrElse getClass.getClassLoader
+      (Reflect.getCallerClass map findCaller) getOrElse getClass.getClassLoader
   }
 }
 
@@ -916,7 +916,8 @@ private[akka] class ActorSystemImpl(
         case wc: ActorRefWithCell ⇒
           val cell = wc.underlying
           (if (indent.isEmpty) "-> " else indent.dropRight(1) + "⌊-> ") +
-          node.path.name + " " + Logging.simpleName(node) + " " + (cell match {
+            node.path.name + " " + Logging
+            .simpleName(node) + " " + (cell match {
                 case real: ActorCell ⇒
                   if (real.actor ne null) real.actor.getClass else "null"
                 case _ ⇒ Logging.simpleName(cell)

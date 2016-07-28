@@ -161,7 +161,7 @@ class ParHashMap[K, V] private[collection] (
       else if (index(elemHashCode(e.key)) == i) check(e.next)
       else
         ("Element " + e.key + " at " + i + " with " + elemHashCode(e.key) +
-            " maps to " + index(elemHashCode(e.key))) :: check(e.next)
+              " maps to " + index(elemHashCode(e.key))) :: check(e.next)
     check(table(i))
   }
 }

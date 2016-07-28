@@ -334,14 +334,14 @@ trait JobManagerSpec[M[+ _]] extends Specification {
         jobs.addMessage(job.id, "chat", say("Tom", "That sucks.")).copoint
 
       jobs.listMessages(job.id, "chat", Some(m1.id)).copoint.toList must_==
-      List(m2, m3, m4, m5, m6, m7)
+        List(m2, m3, m4, m5, m6, m7)
       jobs.listMessages(job.id, "chat", Some(m4.id)).copoint.toList must_==
-      List(m5, m6, m7)
+        List(m5, m6, m7)
       jobs.listMessages(job.id, "chat", Some(m6.id)).copoint.toList must_==
-      List(m7)
+        List(m7)
       jobs.listMessages(job.id, "chat", Some(m7.id)).copoint.toList must_== Nil
       jobs.listMessages(job.id, "chat", None).copoint.toList must_==
-      List(m1, m2, m3, m4, m5, m6, m7)
+        List(m1, m2, m3, m4, m5, m6, m7)
     }
 
     "list channels that have been posted to" in {

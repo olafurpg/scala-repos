@@ -136,7 +136,7 @@ object ScalaRefCountHolder {
 
     Option(myFile getUserData SCALA_REF_COUNT_HOLDER_IN_FILE_KEY) getOrElse {
       myFile.asInstanceOf[UserDataHolderEx] putUserDataIfAbsent
-      (SCALA_REF_COUNT_HOLDER_IN_FILE_KEY, new ScalaRefCountHolder)
+        (SCALA_REF_COUNT_HOLDER_IN_FILE_KEY, new ScalaRefCountHolder)
     }
   }
 }

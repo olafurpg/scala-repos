@@ -250,7 +250,7 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
       if (!classesForSelfType.contains(cl) &&
           !classesForSelfType.exists(_.isInheritor(cl, true))) {
         classesForSelfType --=
-        classesForSelfType.filter(cl.isInheritor(_, true))
+          classesForSelfType.filter(cl.isInheritor(_, true))
         classesForSelfType += cl
       }
     }

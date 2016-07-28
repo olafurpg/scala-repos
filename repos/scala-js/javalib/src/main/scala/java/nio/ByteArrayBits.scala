@@ -108,7 +108,7 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
                          b6: Byte,
                          b7: Byte): Long = {
     (makeIntBE(b0, b1, b2, b3).toLong << 32) |
-    (makeIntBE(b4, b5, b6, b7).toLong & 0xffffffffL)
+      (makeIntBE(b4, b5, b6, b7).toLong & 0xffffffffL)
   }
 
   @inline

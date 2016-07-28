@@ -269,7 +269,7 @@ object Compatibility {
             List(new TypeMismatch(expr.expr, paramType))
           } else {
             undefSubst +=
-            Conformance.undefinedSubst(paramType, exprType, checkWeak = true)
+              Conformance.undefinedSubst(paramType, exprType, checkWeak = true)
             List.empty
           }
         }
@@ -313,7 +313,7 @@ object Compatibility {
                 matched ::= (param, expr)
                 matchedTypes ::= (param, exprType)
                 undefSubst +=
-                Conformance.undefinedSubst(tp, exprType, checkWeak = true)
+                  Conformance.undefinedSubst(tp, exprType, checkWeak = true)
               }
             }
           } else {
@@ -330,7 +330,7 @@ object Compatibility {
               else assign.getRExpression.getOrElse(assign)
             }
             problems :::=
-            doNoNamed(Expression(extractExpression(assign))).reverse
+              doNoNamed(Expression(extractExpression(assign))).reverse
           } else {
             if (!checkNames)
               return ConformanceExtResult(Seq(new ApplicabilityProblem("9")),
@@ -429,7 +429,7 @@ object Compatibility {
             matched ::= (parameters.last, exprs(k).expr)
             matchedTypes ::= (parameters.last, exprType)
             undefSubst +=
-            Conformance.undefinedSubst(paramType, exprType, checkWeak = true)
+              Conformance.undefinedSubst(paramType, exprType, checkWeak = true)
           }
         }
         k = k + 1

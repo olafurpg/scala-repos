@@ -200,7 +200,7 @@ private[tournament] final class TournamentApi(
         publish()
         if (!tour.`private`)
           timeline !
-          (Propagate(TourJoin(me.id, tour.id, tour.fullName)) toFollowersOf me.id)
+            (Propagate(TourJoin(me.id, tour.id, tour.fullName)) toFollowersOf me.id)
       }
     }
   }

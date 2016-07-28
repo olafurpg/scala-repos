@@ -258,7 +258,7 @@ class VM(val mode: VmMode,
         val length = v.length()
         if (length > 3)
           "Array[" + v.getValues(0, 3).map(valueSummary).mkString(", ") +
-          ",...]"
+            ",...]"
         else "Array[" + v.getValues.map(valueSummary).mkString(", ") + "]"
       case v: ObjectReference =>
         val tpe = v.referenceType()

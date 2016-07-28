@@ -96,10 +96,10 @@ case class PartestTask(taskDef: TaskDef, args: Array[String]) extends Task {
 
     if (Runtime.getRuntime().maxMemory() / (1024 * 1024) < 800)
       loggers foreach
-      (_.warn(s"""Low heap size detected (~ ${Runtime
-            .getRuntime()
-            .maxMemory() /
-            (1024 * 1024)}M). Please add the following to your build.sbt: javaOptions in Test += "-Xmx1G""""))
+        (_.warn(s"""Low heap size detected (~ ${Runtime
+              .getRuntime()
+              .maxMemory() /
+              (1024 * 1024)}M). Please add the following to your build.sbt: javaOptions in Test += "-Xmx1G""""))
 
     val maybeOptions =
       ScalaJSPartestOptions(args, str => loggers.foreach(_.error(str)))

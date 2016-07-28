@@ -32,7 +32,7 @@ private object UciToPgn {
                      success(replay.setup.situation)
                    else
                      replay moveAtPly ply map
-                     (_.fold(_.situationBefore, _.situationBefore)) toValid "No move found"
+                       (_.fold(_.situationBefore, _.situationBefore)) toValid "No move found"
         ucis ← variation
                 .map(Uci.Move.apply)
                 .sequence toValid "Invalid UCI moves " +

@@ -278,7 +278,7 @@ object ScalaI18nUtil {
       import scala.collection.JavaConversions._
       for (propertiesFile <- propertiesFiles) {
         containedInPropertiesFile |=
-        propertiesFile.findPropertyByKey(key) != null
+          propertiesFile.findPropertyByKey(key) != null
       }
       containedInPropertiesFile
     }

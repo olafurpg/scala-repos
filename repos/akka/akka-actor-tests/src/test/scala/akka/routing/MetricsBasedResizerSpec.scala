@@ -264,7 +264,7 @@ class MetricsBasedResizerSpec
 
       val after = LocalDateTime.now
       resizer.performanceLog(2).toMillis shouldBe
-      (java.time.Duration.between(before, after).toMillis / 2 +- 1)
+        (java.time.Duration.between(before, after).toMillis / 2 +- 1)
 
       router.close()
     }
@@ -295,7 +295,7 @@ class MetricsBasedResizerSpec
       val newSpeed = java.time.Duration.between(before, after).toMillis / 2
 
       resizer.performanceLog(2).toMillis shouldBe
-      ((newSpeed + oldSpeed) / 2 +- 1)
+        ((newSpeed + oldSpeed) / 2 +- 1)
 
       router.close()
     }

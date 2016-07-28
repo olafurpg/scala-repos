@@ -457,7 +457,7 @@ private[spark] class CoarseGrainedSchedulerBackend(
       return true
     }
     if ((System.currentTimeMillis() -
-            createTime) >= maxRegisteredWaitingTimeMs) {
+              createTime) >= maxRegisteredWaitingTimeMs) {
       logInfo(
           "SchedulerBackend is ready for scheduling beginning after waiting " +
             s"maxRegisteredResourcesWaitingTime: $maxRegisteredWaitingTimeMs(ms)")

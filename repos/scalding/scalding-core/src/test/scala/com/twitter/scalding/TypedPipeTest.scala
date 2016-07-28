@@ -242,7 +242,7 @@ class TypedPipeDistinctByTest extends WordSpec with Matchers {
           val outSet = outputBuffer.toSet
           outSet should have size 3
           List(outSet) should contain oneOf
-          (Set((0, 1), (2, 2), (2, 5)), Set((1, 1), (2, 2), (2, 5)))
+            (Set((0, 1), (2, 2), (2, 5)), Set((1, 1), (2, 2), (2, 5)))
         }
       }
       .run
@@ -628,7 +628,7 @@ class TypedJoinTakeTest extends WordSpec with Matchers {
           val sortedL = outbuf.toList.sorted
           (idx + ": dedup keys by using take") in {
             sortedL shouldBe
-            (List((3, "you"), (3, "all"), (2, "you"), (2, "all")).sorted)
+              (List((3, "you"), (3, "all"), (2, "you"), (2, "all")).sorted)
           }
           idx += 1
         }
@@ -1337,7 +1337,7 @@ class TypedSelfLeftCrossTest extends WordSpec with Matchers {
           val sum = input.reduceOption(_ + _)
           // toString to deal with our hadoop testing jank
           outBuf.toList.sortBy(_._1).toString shouldBe
-          (input.sorted.map((_, sum)).toString)
+            (input.sorted.map((_, sum)).toString)
         }
         idx += 1
       }(implicitly[TypeDescriptor[(Int, Option[Int])]].converter)

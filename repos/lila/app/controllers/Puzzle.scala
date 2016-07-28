@@ -146,7 +146,7 @@ object Puzzle extends LilaController {
                   case (newAttempt, None) =>
                     UserRepo byId me.id map (_ | me) flatMap { me2 =>
                       env.api.puzzle find id zip (env userInfos me2.some) zip
-                      (env.api.attempt hasVoted me2) map {
+                        (env.api.attempt hasVoted me2) map {
                         case ((p2, infos), voted) =>
                           Ok {
                             JsData(p2 | puzzle,

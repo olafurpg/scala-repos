@@ -201,7 +201,7 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
   "AtLeastOnceDelivery" must {
     List(true, false).foreach { deliverUsingActorSelection ⇒
       s"deliver messages in order when nothing is lost (using actorSelection: $deliverUsingActorSelection)" taggedAs
-      (TimingTest) in {
+        (TimingTest) in {
         val probe = TestProbe()
         val probeA = TestProbe()
         val destinations =
@@ -221,7 +221,7 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       }
 
       s"re-deliver lost messages (using actorSelection: $deliverUsingActorSelection)" taggedAs
-      (TimingTest) in {
+        (TimingTest) in {
         val probe = TestProbe()
         val probeA = TestProbe()
         val dst = system.actorOf(destinationProps(probeA.ref))
@@ -305,7 +305,7 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
     }
 
     "re-send replayed deliveries with an 'initially in-order' strategy, before delivering fresh messages" taggedAs
-    (TimingTest) in {
+      (TimingTest) in {
       val probe = TestProbe()
       val probeA = TestProbe()
       val dst = system.actorOf(destinationProps(probeA.ref))

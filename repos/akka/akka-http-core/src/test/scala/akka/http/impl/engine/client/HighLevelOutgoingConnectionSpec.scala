@@ -46,7 +46,7 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
         .runFold(0)(_ + _)
 
       result.futureValue(PatienceConfig(10.seconds)) shouldEqual N * (N +
-          1) / 2
+            1) / 2
       binding.futureValue.unbind()
     }
 
@@ -87,7 +87,7 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
         .runFold(0)(_ + _)
 
       result.futureValue(PatienceConfig(10.seconds)) shouldEqual C * N *
-      (N + 1) / 2
+        (N + 1) / 2
       binding.futureValue.unbind()
     }
 

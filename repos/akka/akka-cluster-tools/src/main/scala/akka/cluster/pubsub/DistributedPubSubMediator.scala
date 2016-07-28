@@ -686,9 +686,9 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
             val myBucket = registry(b.owner)
             if (b.version > myBucket.version) {
               registry +=
-              (b.owner -> myBucket.copy(version = b.version,
-                                        content =
-                                          myBucket.content ++ b.content))
+                (b.owner -> myBucket.copy(version = b.version,
+                                          content =
+                                            myBucket.content ++ b.content))
             }
           }
         }
@@ -854,7 +854,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
         }
         if (oldRemoved.nonEmpty)
           registry +=
-          owner -> bucket.copy(content = bucket.content -- oldRemoved)
+            owner -> bucket.copy(content = bucket.content -- oldRemoved)
     }
   }
 

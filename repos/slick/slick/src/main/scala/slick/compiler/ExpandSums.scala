@@ -184,11 +184,11 @@ class ExpandSums extends Phase {
         }
       val local = find(t, Nil).sortBy { ss =>
         (if (global contains ss) 3 else 1) *
-        (ss.head match {
-              case f: FieldSymbol =>
-                if (f.options contains ColumnOption.PrimaryKey) -2 else -1
-              case _ => 0
-            })
+          (ss.head match {
+                case f: FieldSymbol =>
+                  if (f.options contains ColumnOption.PrimaryKey) -2 else -1
+                case _ => 0
+              })
       }
       logger.debug(
           "Local candidates: " + local.map(Path.toString).mkString(", "))

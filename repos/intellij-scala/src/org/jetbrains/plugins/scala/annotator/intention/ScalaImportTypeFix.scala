@@ -142,7 +142,7 @@ class ScalaImportTypeFix(private var classes: Array[TypeToImport],
                                 classes(0).qualifiedName + "? Alt+Enter"
                               else
                                 classes(0).qualifiedName +
-                                "? (multiple choices...) Alt+Enter",
+                                  "? (multiple choices...) Alt+Enter",
                               offset,
                               offset + ref.getTextLength,
                               action)

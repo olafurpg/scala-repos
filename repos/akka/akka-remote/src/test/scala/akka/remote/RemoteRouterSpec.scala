@@ -95,8 +95,8 @@ class RemoteRouterSpec
       children should have size 2
       children.map(_.parent) should have size 1
       children foreach
-      (_.address.toString should ===(
-              s"akka.tcp://${sysName}@localhost:${port}"))
+        (_.address.toString should ===(
+                s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
@@ -116,8 +116,8 @@ class RemoteRouterSpec
       children should have size 2
       children.map(_.parent) should have size 1
       children foreach
-      (_.address.toString should ===(
-              s"akka.tcp://${sysName}@localhost:${port}"))
+        (_.address.toString should ===(
+                s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
@@ -133,8 +133,8 @@ class RemoteRouterSpec
       children.size should be >= 2
       children.map(_.parent) should have size 1
       children foreach
-      (_.address.toString should ===(
-              s"akka.tcp://${sysName}@localhost:${port}"))
+        (_.address.toString should ===(
+                s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
@@ -154,8 +154,8 @@ class RemoteRouterSpec
       parents should have size 1
       parents.head should ===(router.path)
       children foreach
-      (_.address.toString should ===(
-              s"akka.tcp://${sysName}@localhost:${port}"))
+        (_.address.toString should ===(
+                s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
@@ -179,8 +179,8 @@ class RemoteRouterSpec
       parents should have size 1
       parents.head should ===(router.path)
       children foreach
-      (_.address.toString should ===(
-              s"akka.tcp://${sysName}@localhost:${port}"))
+        (_.address.toString should ===(
+                s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
@@ -204,8 +204,8 @@ class RemoteRouterSpec
       parents.head.address should ===(
           Address("akka.tcp", sysName, "localhost", port))
       children foreach
-      (_.address.toString should ===(
-              s"akka.tcp://${sysName}@localhost:${port}"))
+        (_.address.toString should ===(
+                s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
@@ -229,8 +229,8 @@ class RemoteRouterSpec
       parents should have size 1
       parents.head should ===(router.path)
       children foreach
-      (_.address.toString should ===(
-              s"akka.tcp://${sysName}@localhost:${port}"))
+        (_.address.toString should ===(
+                s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
@@ -254,8 +254,8 @@ class RemoteRouterSpec
       parents should have size 1
       parents.head should ===(router.path)
       children foreach
-      (_.address.toString should ===(
-              s"akka.tcp://${sysName}@localhost:${port}"))
+        (_.address.toString should ===(
+                s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 

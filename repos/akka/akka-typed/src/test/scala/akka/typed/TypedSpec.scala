@@ -95,7 +95,7 @@ class TypedSpec(config: Config)
     */
   def assertEmpty(inboxes: Inbox.SyncInbox[_]*): Unit = {
     inboxes foreach
-    (i ⇒ withClue(s"inbox $i had messages")(i.hasMessages should be(false)))
+      (i ⇒ withClue(s"inbox $i had messages")(i.hasMessages should be(false)))
   }
 
   // for ScalaTest === compare of Class objects

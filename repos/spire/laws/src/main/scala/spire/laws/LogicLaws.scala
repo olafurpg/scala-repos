@@ -41,7 +41,7 @@ trait LogicLaws[A] extends Laws {
         },
         "distributive" -> forAll { (x: A, y: A, z: A) =>
           (x & (y | z)) === ((x & y) | (x & z)) && (x | (y & z)) ===
-          ((x | y) & (x | z))
+            ((x | y) & (x | z))
         },
         "consistent" -> forAll { (x: A) =>
           (x & ~x) === A.zero

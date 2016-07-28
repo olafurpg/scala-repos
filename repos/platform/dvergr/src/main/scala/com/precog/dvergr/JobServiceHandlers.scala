@@ -451,7 +451,7 @@ class PutJobStateHandler(jobs: JobManager[Future])(
                 transition(obj) { (timestamp, _) =>
                   jobs
                     .start(jobId, timestamp) map (Validation.fromEither(_)) map
-                  (_ map (_.state))
+                    (_ map (_.state))
                 }
 
               case JString("cancelled") =>
@@ -467,7 +467,7 @@ class PutJobStateHandler(jobs: JobManager[Future])(
               case JString("finished") =>
                 transition(obj) { (timestamp, _) =>
                   jobs.finish(jobId, timestamp) map
-                  (Validation.fromEither(_)) map (_ map (_.state))
+                    (Validation.fromEither(_)) map (_ map (_.state))
                 }
 
               case JString("aborted") =>
@@ -483,7 +483,7 @@ class PutJobStateHandler(jobs: JobManager[Future])(
               case JString("expired") =>
                 transition(obj) { (timestamp, _) =>
                   jobs.expire(jobId, timestamp) map
-                  (Validation.fromEither(_)) map (_ map (_.state))
+                    (Validation.fromEither(_)) map (_ map (_.state))
                 }
 
               case JString(state) =>

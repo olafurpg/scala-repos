@@ -180,7 +180,7 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     sendRecords(1000, new TopicPartition(topic4, 1))
 
     subscriptions ++=
-    Set(new TopicPartition(topic4, 0), new TopicPartition(topic4, 1))
+      Set(new TopicPartition(topic4, 0), new TopicPartition(topic4, 1))
 
     TestUtils.waitUntilTrue(() => {
       this.consumers(0).poll(50)
@@ -1095,7 +1095,7 @@ class PlaintextConsumerTest extends BaseConsumerTest {
         new KafkaConsumer[Array[Byte], Array[Byte]](this.consumerConfig)
       consumerGroup += newConsumer
       consumerPollers +=
-      subscribeConsumerAndStartPolling(newConsumer, topicsToSubscribe)
+        subscribeConsumerAndStartPolling(newConsumer, topicsToSubscribe)
     }
 
     // wait until topics get re-assigned and validate assignment
@@ -1135,7 +1135,7 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     TestUtils.waitUntilTrue(
         () => {
           consumerPollers forall
-          (poller => poller.isSubscribeRequestProcessed())
+            (poller => poller.isSubscribeRequestProcessed())
         },
         s"Failed to call subscribe on all consumers in the group for subscription ${subscriptions}",
         1000L)

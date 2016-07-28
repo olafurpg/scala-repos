@@ -395,7 +395,7 @@ private[storage] class BlockInfoManager extends Logging {
     */
   private[storage] def getNumberOfMapEntries: Long = synchronized {
     size + readLocksByTask.size + readLocksByTask.map(_._2.size()).sum +
-    writeLocksByTask.size + writeLocksByTask.map(_._2.size).sum
+      writeLocksByTask.size + writeLocksByTask.map(_._2.size).sum
   }
 
   /**

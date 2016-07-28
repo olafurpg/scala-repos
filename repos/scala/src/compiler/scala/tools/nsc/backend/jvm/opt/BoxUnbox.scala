@@ -571,7 +571,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
         }
         val locs = newLocals(vi.`var`)
         replacements += vi ->
-        (if (isLoad) locs.map(typedVarOp) else locs.reverseMap(typedVarOp))
+          (if (isLoad) locs.map(typedVarOp) else locs.reverseMap(typedVarOp))
 
       case copyOp =>
         if (copyOp.getOpcode == DUP && valueTypes.lengthCompare(1) == 0) {

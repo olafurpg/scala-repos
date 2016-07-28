@@ -127,7 +127,7 @@ object SerializationBenchmark
         var pos = 0
         while (pos < max) {
           effectInt ^=
-          UnsignedComparisons.unsignedLongCompare(a(pos), a(pos + 1))
+            UnsignedComparisons.unsignedLongCompare(a(pos), a(pos + 1))
           pos += 2
         }
       }
@@ -148,7 +148,7 @@ object SerializationBenchmark
         var pos = 0
         while (pos < max) {
           effectInt ^=
-          UnsignedComparisons.unsignedIntCompare(a(pos), a(pos + 1))
+            UnsignedComparisons.unsignedIntCompare(a(pos), a(pos + 1))
           pos += 2
         }
       }
@@ -169,7 +169,7 @@ object SerializationBenchmark
         var pos = 0
         while (pos < max) {
           effectInt ^=
-          UnsignedComparisons.unsignedShortCompare(a(pos), a(pos + 1))
+            UnsignedComparisons.unsignedShortCompare(a(pos), a(pos + 1))
           pos += 2
         }
       }
@@ -190,7 +190,7 @@ object SerializationBenchmark
         var pos = 0
         while (pos < max) {
           effectInt ^=
-          UnsignedComparisons.unsignedByteCompare(a(pos), a(pos + 1))
+            UnsignedComparisons.unsignedByteCompare(a(pos), a(pos + 1))
           pos += 2
         }
       }

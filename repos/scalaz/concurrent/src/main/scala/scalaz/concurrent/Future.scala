@@ -103,7 +103,7 @@ sealed abstract class Future[+A] {
             x =>
               if (!cancel.get)
                 Trampoline.delay(g(x)) map
-                (_ unsafePerformListenInterruptibly (cb, cancel))
+                  (_ unsafePerformListenInterruptibly (cb, cancel))
               else Trampoline.done(()))
       case _ if cancel.get => ()
     }

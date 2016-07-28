@@ -1066,7 +1066,7 @@ private class LogisticAggregator(coefficients: Vector,
               features.foreachActive { (index, value) =>
                 if (featuresStd(index) != 0.0 && value != 0.0) {
                   sum += localCoefficientsArray(index) *
-                  (value / featuresStd(index))
+                    (value / featuresStd(index))
                 }
               }
               sum + {
@@ -1079,7 +1079,7 @@ private class LogisticAggregator(coefficients: Vector,
             features.foreachActive { (index, value) =>
               if (featuresStd(index) != 0.0 && value != 0.0) {
                 localGradientSumArray(index) += multiplier *
-                (value / featuresStd(index))
+                  (value / featuresStd(index))
               }
             }
 

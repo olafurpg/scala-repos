@@ -136,7 +136,7 @@ case class PartitionMetadata(partitionId: Int,
     extends Logging {
   def sizeInBytes: Int = {
     2 /* error code */ + 4 /* partition id */ + 4 /* leader */ + 4 +
-    4 * replicas.size /* replica array */ + 4 + 4 * isr.size /* isr array */
+      4 * replicas.size /* replica array */ + 4 + 4 * isr.size /* isr array */
   }
 
   def writeTo(buffer: ByteBuffer) {

@@ -114,9 +114,9 @@ trait Variances { self: SymbolTable =>
       }
       override def mapOver(decls: Scope): Scope = {
         decls foreach
-        (sym =>
-              withVariance(if (sym.isAliasType) Invariant else variance)(
-                  this(sym.info)))
+          (sym =>
+                withVariance(if (sym.isAliasType) Invariant else variance)(
+                    this(sym.info)))
         decls
       }
       private def resultTypeOnly(tp: Type) = tp match {

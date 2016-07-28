@@ -111,7 +111,10 @@ object Metadata {
       m1.foldLeft(m2) { (acc, t) =>
         val (mtype, meta) = t
         acc +
-        (mtype -> acc.get(mtype).map(combineMetadata(_, meta)).getOrElse(meta))
+          (mtype -> acc
+                .get(mtype)
+                .map(combineMetadata(_, meta))
+                .getOrElse(meta))
       }
 
     def combineMetadata(m1: Metadata, m2: Metadata) =

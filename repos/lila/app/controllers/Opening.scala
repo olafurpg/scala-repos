@@ -89,7 +89,7 @@ object Opening extends LilaController {
                   case (newAttempt, None) =>
                     UserRepo byId me.id map (_ | me) flatMap { me2 =>
                       (env.api.opening find id) zip
-                      (env userInfos me2.some) flatMap {
+                        (env userInfos me2.some) flatMap {
                         case (o2, infos) =>
                           makeData(o2 | opening,
                                    infos,

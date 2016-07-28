@@ -291,15 +291,15 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
             })) <~ '\'') ^^ {
           case s => s.mkString
         }) |
-    (('"' ~> rep(elem("isValid", (c: Char) => {
-              c != '"' && c >= ' '
-            })) <~ '"') ^^ {
-          case s => s.mkString
-        }) |
-    (rep1(elem("isValid", (c: Char) => {
-          c != '\'' && c != '"' && c > ' '
-        })) ^^ {
-          case s => s.mkString
-        })
+      (('"' ~> rep(elem("isValid", (c: Char) => {
+                c != '"' && c >= ' '
+              })) <~ '"') ^^ {
+            case s => s.mkString
+          }) |
+      (rep1(elem("isValid", (c: Char) => {
+            c != '\'' && c != '"' && c > ' '
+          })) ^^ {
+            case s => s.mkString
+          })
   }
 }

@@ -105,7 +105,7 @@ object Analysis {
           ir.Definitions.decodeMethodName(encodedName)
 
         simpleName + "(" + paramTypes.map(typeDisplayName).mkString(",") +
-        ")" + resultType.fold("")(typeDisplayName)
+          ")" + resultType.fold("")(typeDisplayName)
       }
     }
 

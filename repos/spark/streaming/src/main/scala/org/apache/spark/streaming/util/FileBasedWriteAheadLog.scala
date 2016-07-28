@@ -70,7 +70,7 @@ private[streaming] class FileBasedWriteAheadLog(
 
   override protected def logName = {
     getClass.getName.stripSuffix("$") +
-    callerName.map("_" + _).getOrElse("").replaceAll("[ ]", "_")
+      callerName.map("_" + _).getOrElse("").replaceAll("[ ]", "_")
   }
 
   private var currentLogPath: Option[String] = None
@@ -225,7 +225,7 @@ private[streaming] class FileBasedWriteAheadLog(
         resetWriter()
         currentLogPath.foreach {
           pastLogs +=
-          LogInfo(currentLogWriterStartTime, currentLogWriterStopTime, _)
+            LogInfo(currentLogWriterStartTime, currentLogWriterStopTime, _)
         }
         currentLogWriterStartTime = currentTime
         currentLogWriterStopTime = currentTime + (rollingIntervalSecs * 1000)

@@ -152,7 +152,7 @@ class H5StoreSpec extends Specification {
       // try slicing
       H5Store
         .readSeriesSlice[DateTime, Double](fid, "s1", d2, d3, true) must_==
-      s1.sliceBy(d2, d3)
+        s1.sliceBy(d2, d3)
 
       H5Store.closeFile(fid)
 
@@ -261,7 +261,7 @@ class H5StoreSpec extends Specification {
                                                     3,
                                                     true,
                                                     true) must_==
-      df1.colSliceBy(2, 3).rowSliceBy(d2, d3)
+        df1.colSliceBy(2, 3).rowSliceBy(d2, d3)
 
       H5Store.closeFile(fid)
 

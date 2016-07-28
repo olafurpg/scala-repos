@@ -161,10 +161,10 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       vf shouldBe (new Fields(int2Integer(1), int2Integer(2), int2Integer(3)))
       vf = (1, 2, 3, 4)
       vf shouldBe
-      (new Fields(int2Integer(1),
-                  int2Integer(2),
-                  int2Integer(3),
-                  int2Integer(4)))
+        (new Fields(int2Integer(1),
+                    int2Integer(2),
+                    int2Integer(3),
+                    int2Integer(4)))
     }
     "convert from general string tuples" in {
       var vf: Fields = Tuple1("hey")
@@ -223,7 +223,7 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
 
       f2 = (0 until 10) -> 'you
       f2 shouldBe
-      (new Fields((0 until 10).map(int2Integer): _*), new Fields("you"))
+        (new Fields((0 until 10).map(int2Integer): _*), new Fields("you"))
 
       f2 = (('hey, 'world) -> 'other)
       f2 shouldBe (new Fields("hey", "world"), new Fields("other"))
@@ -233,7 +233,7 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
 
       f2 = (0, (1, "you"))
       f2 shouldBe
-      (new Fields(int2Integer(0)), new Fields(int2Integer(1), "you"))
+        (new Fields(int2Integer(0)), new Fields(int2Integer(1), "you"))
 
       val foo = Field[java.math.BigInteger]("foo")
       val bar = Field[java.math.BigDecimal]("bar")
@@ -249,17 +249,17 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
 
       f2 = Seq("one", "two", "three") -> Seq("1", "2", "3")
       f2 shouldBe
-      (new Fields("one", "two", "three"), new Fields("1", "2", "3"))
+        (new Fields("one", "two", "three"), new Fields("1", "2", "3"))
       f2 = List("one", "two", "three") -> List("1", "2", "3")
       f2 shouldBe
-      (new Fields("one", "two", "three"), new Fields("1", "2", "3"))
+        (new Fields("one", "two", "three"), new Fields("1", "2", "3"))
       f2 = List('one, 'two, 'three) -> List('n1, 'n2, 'n3)
       f2 shouldBe
-      (new Fields("one", "two", "three"), new Fields("n1", "n2", "n3"))
+        (new Fields("one", "two", "three"), new Fields("n1", "n2", "n3"))
       f2 = List(4, 5, 6) -> List(1, 2, 3)
       f2 shouldBe
-      (new Fields(int2Integer(4), int2Integer(5), int2Integer(6)),
-          new Fields(int2Integer(1), int2Integer(2), int2Integer(3)))
+        (new Fields(int2Integer(4), int2Integer(5), int2Integer(6)),
+            new Fields(int2Integer(1), int2Integer(2), int2Integer(3)))
 
       object Schema extends Enumeration {
         val one, two, three = Value

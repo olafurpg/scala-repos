@@ -47,7 +47,7 @@ trait Names extends api.Names {
   private def hashValue(cs: Array[Char], offset: Int, len: Int): Int =
     if (len > 0)
       (len * (41 * 41 * 41) + cs(offset) * (41 * 41) +
-          cs(offset + len - 1) * 41 + cs(offset + (len >> 1)))
+            cs(offset + len - 1) * 41 + cs(offset + (len >> 1)))
     else 0
 
   /** Is (the ASCII representation of) name at given index equal to

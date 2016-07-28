@@ -157,10 +157,10 @@ trait ListInstances extends ListInstances0 {
           case x :: xs => commaSep(xs, (acc :+ ",") ++ Show[A].show(x))
         }
       "[" +:
-      (as match {
-            case Nil => Cord()
-            case x :: xs => commaSep(xs, Show[A].show(x))
-          }) :+ "]"
+        (as match {
+              case Nil => Cord()
+              case x :: xs => commaSep(xs, Show[A].show(x))
+            }) :+ "]"
     }
   }
 

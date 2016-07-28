@@ -330,7 +330,7 @@ trait ItemsListEditor[T <: Mapper[T]] {
       ".title *" #> title & ".insertBtn" #> SHtml.submit(?("Insert"),
                                                          onInsert _,
                                                          noPrompt) & ".item" #>
-      (bindRegularItems ++ bindRemovedItems) & ".saveBtn" #> SHtml
+        (bindRegularItems ++ bindRemovedItems) & ".saveBtn" #> SHtml
         .submit(?("Save"), onSubmit _, noPrompt)
     }
   }

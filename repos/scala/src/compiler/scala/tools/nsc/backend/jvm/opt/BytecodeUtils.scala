@@ -242,7 +242,7 @@ object BytecodeUtils {
     */
   def parametersSize(methodNode: MethodNode): Int = {
     (Type.getArgumentsAndReturnSizes(methodNode.desc) >> 2) -
-    (if (isStaticMethod(methodNode)) 1 else 0)
+      (if (isStaticMethod(methodNode)) 1 else 0)
   }
 
   def labelReferences(method: MethodNode): Map[LabelNode, Set[AnyRef]] = {
@@ -314,7 +314,7 @@ object BytecodeUtils {
     }
 
     (roughUpperBound(caller) +
-        roughUpperBound(callee) > maxMethodSizeAfterInline) &&
+          roughUpperBound(callee) > maxMethodSizeAfterInline) &&
     (maxSize(caller) + maxSize(callee) > maxMethodSizeAfterInline)
   }
 

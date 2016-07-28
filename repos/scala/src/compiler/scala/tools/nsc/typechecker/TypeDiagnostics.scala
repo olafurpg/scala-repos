@@ -317,7 +317,7 @@ trait TypeDiagnostics { self: Analyzer =>
       if (clazz.isCaseClass && (clazz isSubClass ptSym))
         (clazz.caseFieldAccessors map (_ =>
                   "_") // could use the actual param names here
-            mkString (s"`case ${clazz.name}(", ",", ")`"))
+              mkString (s"`case ${clazz.name}(", ",", ")`"))
       else
         "`case _: " + (clazz.typeParams match {
               case Nil => "" + clazz.name

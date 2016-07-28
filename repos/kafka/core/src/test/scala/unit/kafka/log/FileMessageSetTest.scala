@@ -127,7 +127,7 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
         OffsetPosition(1L, position),
         messageSet.searchFor(1, position))
     position += MessageSet.entrySize(messageSet.tail.head.message) +
-    MessageSet.entrySize(messageSet.tail.tail.head.message)
+      MessageSet.entrySize(messageSet.tail.tail.head.message)
     assertEquals(
         "Should be able to find fourth message from a non-existant offset",
         OffsetPosition(50L, position),

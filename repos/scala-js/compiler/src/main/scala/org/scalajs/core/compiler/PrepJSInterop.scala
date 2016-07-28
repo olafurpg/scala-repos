@@ -241,7 +241,7 @@ abstract class PrepJSInterop
             // Generate exporters for this ddef if required
             exporters.getOrElseUpdate(ddef.symbol.owner,
                                       mutable.ListBuffer.empty) ++=
-            genExportMember(ddef)
+              genExportMember(ddef)
           }
           super.transform(tree)
 
@@ -424,8 +424,8 @@ abstract class PrepJSInterop
               val base = "You may not export a local definition"
               if (sym.owner.isPrimaryConstructor)
                 base + ". To export a (case) class field, use the " +
-                "meta-annotation scala.annotation.meta.field like this: " +
-                "@(JSExport @field)."
+                  "meta-annotation scala.annotation.meta.field like this: " +
+                  "@(JSExport @field)."
               else base
             }
             reporter.error(exp.pos, msg)
@@ -633,12 +633,12 @@ abstract class PrepJSInterop
           val msg = {
             def memberDefString(membSym: Symbol) = {
               membSym.defStringSeenAs(sym.thisType.memberType(membSym)) +
-              membSym.locationString + " with JSName '" +
-              jsInterop.jsNameOf(membSym) + '\''
+                membSym.locationString + " with JSName '" +
+                jsInterop.jsNameOf(membSym) + '\''
             }
             "A member of a JS class is overriding another member with a different JS name.\n\n" +
-            memberDefString(low) + "\n" + "    is conflicting with\n" +
-            memberDefString(high) + "\n"
+              memberDefString(low) + "\n" + "    is conflicting with\n" +
+              memberDefString(high) + "\n"
           }
 
           reporter.warning(pos, msg)

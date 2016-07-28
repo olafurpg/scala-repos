@@ -154,26 +154,26 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
           if (incomingImplicits.isEmpty) ""
           else
             "subgraph clusterIncoming {\n" + "style=\"invis\"\n" +
-            incomingImplicits.reverse.map(n => node2Dot(n)).mkString +
-            (if (incomingImplicits.size > 1)
-               incomingImplicits
-                 .map(n => "node" + node2Index(n))
-                 .mkString(" -> ") +
-               " [constraint=\"false\", style=\"invis\", minlen=\"0.0\"];\n"
-             else "") + "}"
+              incomingImplicits.reverse.map(n => node2Dot(n)).mkString +
+              (if (incomingImplicits.size > 1)
+                 incomingImplicits
+                   .map(n => "node" + node2Index(n))
+                   .mkString(" -> ") +
+                   " [constraint=\"false\", style=\"invis\", minlen=\"0.0\"];\n"
+               else "") + "}"
         }
         // dot cluster containing outgoing implicit nodes, if any
         val outgoingCluster = {
           if (outgoingImplicits.isEmpty) ""
           else
             "subgraph clusterOutgoing {\n" + "style=\"invis\"\n" +
-            outgoingImplicits.reverse.map(n => node2Dot(n)).mkString +
-            (if (outgoingImplicits.size > 1)
-               outgoingImplicits
-                 .map(n => "node" + node2Index(n))
-                 .mkString(" -> ") +
-               " [constraint=\"false\", style=\"invis\", minlen=\"0.0\"];\n"
-             else "") + "}"
+              outgoingImplicits.reverse.map(n => node2Dot(n)).mkString +
+              (if (outgoingImplicits.size > 1)
+                 outgoingImplicits
+                   .map(n => "node" + node2Index(n))
+                   .mkString(" -> ") +
+                   " [constraint=\"false\", style=\"invis\", minlen=\"0.0\"];\n"
+               else "") + "}"
         }
 
         // assemble clusters into another cluster
@@ -184,22 +184,22 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
           thisNode.name + " can be implicitly converted to " +
             outgoingImplicits.map(_.name).mkString(", ")
         "subgraph clusterAll {\n" + "style=\"invis\"\n" + outgoingCluster +
-        "\n" + thisCluster + "\n" + incomingCluster + "\n" +
-        // incoming implicit edge
-        (if (!incomingImplicits.isEmpty) {
-           val n = incomingImplicits.last
-           "node" + node2Index(n) + " -> node" + node2Index(thisNode) +
-           " [id=\"" + cssClass(n, thisNode) + "|" + node2Index(n) + "_" +
-           node2Index(thisNode) + "\", tooltip=\"" + incomingTooltip + "\"" +
-           ", constraint=\"false\", minlen=\"2\", ltail=\"clusterIncoming\", lhead=\"clusterThis\", label=\"implicitly\"];\n"
-         } else "") + // outgoing implicit edge
-        (if (!outgoingImplicits.isEmpty) {
-           val n = outgoingImplicits.head
-           "node" + node2Index(thisNode) + " -> node" + node2Index(n) +
-           " [id=\"" + cssClass(thisNode, n) + "|" + node2Index(thisNode) +
-           "_" + node2Index(n) + "\", tooltip=\"" + outgoingTooltip + "\"" +
-           ", constraint=\"false\", minlen=\"2\", ltail=\"clusterThis\", lhead=\"clusterOutgoing\", label=\"implicitly\"];\n"
-         } else "") + "}"
+          "\n" + thisCluster + "\n" + incomingCluster + "\n" +
+          // incoming implicit edge
+          (if (!incomingImplicits.isEmpty) {
+             val n = incomingImplicits.last
+             "node" + node2Index(n) + " -> node" + node2Index(thisNode) +
+               " [id=\"" + cssClass(n, thisNode) + "|" + node2Index(n) + "_" +
+               node2Index(thisNode) + "\", tooltip=\"" + incomingTooltip + "\"" +
+               ", constraint=\"false\", minlen=\"2\", ltail=\"clusterIncoming\", lhead=\"clusterThis\", label=\"implicitly\"];\n"
+           } else "") + // outgoing implicit edge
+          (if (!outgoingImplicits.isEmpty) {
+             val n = outgoingImplicits.head
+             "node" + node2Index(thisNode) + " -> node" + node2Index(n) +
+               " [id=\"" + cssClass(thisNode, n) + "|" + node2Index(thisNode) +
+               "_" + node2Index(n) + "\", tooltip=\"" + outgoingTooltip + "\"" +
+               ", constraint=\"false\", minlen=\"2\", ltail=\"clusterThis\", lhead=\"clusterOutgoing\", label=\"implicitly\"];\n"
+           } else "") + "}"
       }
     }
 
@@ -221,13 +221,13 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
                 // the X -> Y edge is inverted twice to keep the diagram flowing the right way
                 // that is, an edge from node X to Y will result in a dot instruction nodeY -> nodeX [dir="back"]
                 "node" + node2Index(to) + " -> node" + node2Index(from) +
-                " [id=\"" + cssClass(to, from) + "|" + id + "\", " +
-                "tooltip=\"" + from.name + (if (from.name.endsWith(
-                                                    MultiSuffix))
-                                              " are subtypes of "
-                                            else
-                                              " is a subtype of ") + to.name +
-                "\", dir=\"back\", arrowtail=\"empty\"];\n"
+                  " [id=\"" + cssClass(to, from) + "|" + id + "\", " +
+                  "tooltip=\"" + from.name + (if (from.name.endsWith(
+                                                      MultiSuffix))
+                                                " are subtypes of "
+                                              else
+                                                " is a subtype of ") + to.name +
+                  "\", dir=\"back\", arrowtail=\"empty\"];\n"
               })
               .mkString
         }.mkString + "}"
@@ -302,7 +302,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
 
     // return dot string
     "node" + node2Index(node) + " [label=" + label + "," +
-    flatten(attr.toMap) + "];\n"
+      flatten(attr.toMap) + "];\n"
   }
 
   /**

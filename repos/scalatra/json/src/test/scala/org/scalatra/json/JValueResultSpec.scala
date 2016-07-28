@@ -161,7 +161,7 @@ class JValueResultSpec extends MutableScalatraSpec {
     "render a map" in {
       get("/map") {
         parse(body) must_==
-        JObject(List(JField("rum", bottleRum), JField("thing", jValue)))
+          JObject(List(JField("rum", bottleRum), JField("thing", jValue)))
       }
     }
 

@@ -174,10 +174,10 @@ trait DiagramFactory extends DiagramDirectiveParser {
           }
 
           mapNodes += node ->
-          (if (node.inTemplate == pack &&
-               (node.isDocTemplate || node.isAbstractType || node.isAliasType))
-             NormalNode(node.resultType, Some(node))()
-           else OutsideNode(node.resultType, Some(node))())
+            (if (node.inTemplate == pack &&
+                 (node.isDocTemplate || node.isAbstractType || node.isAliasType))
+               NormalNode(node.resultType, Some(node))()
+             else OutsideNode(node.resultType, Some(node))())
         }
 
         if (nodesShown.isEmpty) None

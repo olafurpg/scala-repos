@@ -530,9 +530,9 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
           appsToRetain += (app.id -> app)
         } else if (toRetain.nonEmpty) {
           appsToRetain +=
-          (app.id -> new FsApplicationHistoryInfo(app.id,
-                                                  app.name,
-                                                  toRetain.toList))
+            (app.id -> new FsApplicationHistoryInfo(app.id,
+                                                    app.name,
+                                                    toRetain.toList))
         }
       }
 
@@ -754,7 +754,7 @@ private class FsApplicationAttemptInfo(val logPath: String,
   /** extend the superclass string value with the extra attributes of this class */
   override def toString: String = {
     s"FsApplicationAttemptInfo($name, $appId," +
-    s" ${super.toString}, source=$logPath, size=$fileSize"
+      s" ${super.toString}, source=$logPath, size=$fileSize"
   }
 }
 

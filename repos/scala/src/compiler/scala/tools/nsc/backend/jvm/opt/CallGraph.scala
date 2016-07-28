@@ -217,10 +217,10 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
                                             instantiatedMethodType)
             val capturedArgInfos = computeCapturedArgInfos(lmf, prodCons)
             methodClosureInstantiations +=
-            indy -> ClosureInstantiation(lmf,
-                                         methodNode,
-                                         definingClass,
-                                         capturedArgInfos)
+              indy -> ClosureInstantiation(lmf,
+                                           methodNode,
+                                           definingClass,
+                                           capturedArgInfos)
 
           case _ =>
         }

@@ -258,10 +258,10 @@ object JsonValidSpec extends Specification {
 
       (json.validate((__ \ "day1").read(Reads.enumNameReads(Weekdays)))
             .asOpt must beSome(Weekdays.Mon)) and
-      (json.validate((__ \ "day2").read(Reads.enumNameReads(Weekdays)))
-            .asOpt must beNone) and
-      (json.validate((__ \ "day3").read(Reads.enumNameReads(Weekdays)))
-            .asOpt must beNone)
+        (json.validate((__ \ "day2").read(Reads.enumNameReads(Weekdays)))
+              .asOpt must beNone) and
+        (json.validate((__ \ "day3").read(Reads.enumNameReads(Weekdays)))
+              .asOpt must beNone)
     }
 
     "Can reads with nullable" in {
@@ -277,7 +277,7 @@ object JsonValidSpec extends Specification {
 
       (json \ "foo").validateOpt[String] must_== JsSuccess(None)
       (json \ "bar").validateOpt[Int] must_==
-      JsError("error.expected.jsnumber")
+        JsError("error.expected.jsnumber")
       (json \ "bar").validateOpt[String] must_== JsSuccess(Some("bar"))
       (json \ "baz").validateOpt[String] must_== JsSuccess(None)
     }
@@ -363,8 +363,8 @@ object JsonValidSpec extends Specification {
       implicit val userFormats = {
         import Format.path._; import Format.constraints._
         ((__ \ "name").rw(Reads.minLength[String](5), of[String]) and
-            (__ \ "age").rw(Reads.min(40), of[Int])) apply
-        (User, unlift(User.unapply))
+              (__ \ "age").rw(Reads.min(40), of[Int])) apply
+          (User, unlift(User.unapply))
       }
 
       val js = Json.toJson(bobby)

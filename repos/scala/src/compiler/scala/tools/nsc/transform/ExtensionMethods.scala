@@ -55,7 +55,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
         def altName(index: Int) =
           newTermName(imeth.name + "$extension" + index)
         altName(index) #::
-        ((0 until alts.length).toStream filter (index != _) map altName)
+          ((0 until alts.length).toStream filter (index != _) map altName)
       case tpe =>
         assert(tpe != NoType,
                imeth.name + " not found in " + imeth.owner + "'s decls: " +

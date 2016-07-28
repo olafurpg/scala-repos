@@ -268,7 +268,7 @@ class SbtProjectResolver
     val classifierOption =
       if (id.classifier.isEmpty) None else Some(id.classifier)
     s"${id.organization}:${id.name}:${id.revision}" +
-    classifierOption.map(":" + _).getOrElse("") + s":${id.artifactType}"
+      classifierOption.map(":" + _).getOrElse("") + s":${id.artifactType}"
   }
 
   private def createModule(project: sbtStructure.ProjectData,

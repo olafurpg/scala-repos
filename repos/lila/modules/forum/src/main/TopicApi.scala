@@ -34,9 +34,9 @@ private[forum] final class TopicApi(
              case (categ, topic) =>
                lila.mon.forum.topic.view()
                (TopicRepo incViews topic) >>
-               (env.postApi.paginator(topic, page, troll) map {
-                     (categ, topic, _).some
-                   })
+                 (env.postApi.paginator(topic, page, troll) map {
+                       (categ, topic, _).some
+                     })
            }
     } yield res
 
@@ -100,7 +100,7 @@ private[forum] final class TopicApi(
   def delete(categ: Categ, topic: Topic): Funit =
     PostRepo.idsByTopicId(topic.id) flatMap { postIds =>
       (PostRepo removeByTopic topic.id zip $remove(topic)) >>
-      (env.categApi denormalize categ) >>- (indexer ! RemovePosts(postIds)) >> env.recent.invalidate
+        (env.categApi denormalize categ) >>- (indexer ! RemovePosts(postIds)) >> env.recent.invalidate
     }
 
   def toggleClose(categ: Categ, topic: Topic, mod: User): Funit =

@@ -262,7 +262,7 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
 
     val returnType = name + typeParameters.map(_.name).mkString("[", ",", "]")
     "def copy" + typeParamString + paramString + " : " + returnType +
-    " = throw new Error(\"\")"
+      " = throw new Error(\"\")"
   }
 
   private def implicitMethodText: String = {
@@ -300,8 +300,8 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         }.mkString(if (clause.isImplicit) "(implicit " else "(", ", ", ")")
     }.mkString
     getModifierList.accessModifier.map(am => am.getText + " ").getOrElse("") +
-    "implicit def " + name + typeParametersText + parametersText + " : " +
-    returnType + " = throw new Error(\"\")"
+      "implicit def " + name + typeParametersText + parametersText + " : " +
+      returnType + " = throw new Error(\"\")"
   }
 
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)

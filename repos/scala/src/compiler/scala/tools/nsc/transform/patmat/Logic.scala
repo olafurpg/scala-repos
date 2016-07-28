@@ -40,7 +40,7 @@ trait Logic extends Debugging {
     padded.transpose
       .map(alignedColumns)
       .transpose map (_.mkString(sep)) mkString
-    (lineSep)
+      (lineSep)
   }
 
   // ftp://ftp.cis.upenn.edu/pub/cis511/public_html/Spring04/chap3.pdf

@@ -173,10 +173,10 @@ trait REPL
           for (graph <- eitherGraph.right) {
             val result = {
               consumeEval(graph, dummyEvaluationContext) fold
-              (error =>
-                    "An error occurred processing your query: " +
-                      error.getMessage, results =>
-                    JArray(results.toList.map(_._2.toJValue)).renderPretty)
+                (error =>
+                      "An error occurred processing your query: " +
+                        error.getMessage, results =>
+                      JArray(results.toList.map(_._2.toJValue)).renderPretty)
             }
 
             out.println()

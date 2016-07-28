@@ -104,7 +104,7 @@ class SweetCookies(private[this] val reqCookies: Map[String, String],
 
   def apply(key: String): String = {
     cookies.get(key) getOrElse
-    (throw new Exception("No cookie could be found for the specified key"))
+      (throw new Exception("No cookie could be found for the specified key"))
   }
 
   def update(name: String, value: String)(
