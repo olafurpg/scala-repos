@@ -8,7 +8,7 @@ package templates
 import com.intellij.lang.ASTNode
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */

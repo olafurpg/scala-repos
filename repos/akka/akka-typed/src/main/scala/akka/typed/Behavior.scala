@@ -58,7 +58,7 @@ abstract class Behavior[T] {
 
 /*
  * FIXME
- * 
+ *
  * Closing over ActorContext makes a Behavior immobile: it cannot be moved to
  * another context and executed there, and therefore it cannot be replicated or
  * forked either.

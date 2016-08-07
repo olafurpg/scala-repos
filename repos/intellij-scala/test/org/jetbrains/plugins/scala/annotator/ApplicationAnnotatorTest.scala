@@ -35,7 +35,7 @@ class ApplicationAnnotatorTest extends SimpleTestCase {
   /*def testDoesNotTakeParameters {
     assertMatches(messages("def f {}; f(Unit, null)")) {
       case Error("(Unit, null)", "f does not take parameters") :: Nil =>
-    }    
+    }
   }*/
 
   def testMissedParametersClause() {

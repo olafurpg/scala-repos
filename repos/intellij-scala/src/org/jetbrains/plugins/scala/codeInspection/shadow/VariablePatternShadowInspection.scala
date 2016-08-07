@@ -7,10 +7,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiElement, PsiNamedElement, ResolveResult}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScReferencePattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause, ScReferencePattern
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.resolve.processor.ResolveProcessor
-import org.jetbrains.plugins.scala.lang.resolve.{ResolvableStableCodeReferenceElement, StdKinds}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolvableStableCodeReferenceElement, StdKinds
+}
 
 class VariablePatternShadowInspection
     extends AbstractInspection("VariablePatternShadow",

@@ -181,27 +181,27 @@ class IRs[U <: Universe with Singleton](val uni: U) {
     val canCallCtor =
       primaryCtor != NoSymbol && primaryCtorParamsOpt.nonEmpty &&
         (primaryCtorParamsOpt.get.forall { preSym =>
-              // println(s"!!! tpe ${tpe.toString}, ctor param $preSym:")
-              val notTransient =
-                !transientAccessors.exists(_.name == preSym.name)
-              // println(s"$notTransient")
-              if (notTransient) {
-                val symOpt = //tpe.declaration(preSym.name)
-                filteredAccessors.find(_.name == preSym.name)
-                symOpt match {
-                  case None => false
-                  case Some(sym) =>
-                    val isVal = sym.asTerm.isVal
-                    val getterExists = sym.asTerm.getter != NoSymbol
-                    // println(s"$isVal (public: ${sym.asTerm.isPublic}, isParamAcc: ${sym.asTerm.isParamAccessor}), $getterExists (${sym.asTerm.getter}, public: ${sym.asTerm.getter.isPublic})")
-                    (isVal && sym.asTerm.isPublic) ||
-                    (getterExists && sym.asTerm.getter.isPublic)
-                }
-              } else false
+          // println(s"!!! tpe ${tpe.toString}, ctor param $preSym:")
+          val notTransient =
+            !transientAccessors.exists(_.name == preSym.name)
+          // println(s"$notTransient")
+          if (notTransient) {
+            val symOpt = //tpe.declaration(preSym.name)
+            filteredAccessors.find(_.name == preSym.name)
+            symOpt match {
+              case None => false
+              case Some(sym) =>
+                val isVal = sym.asTerm.isVal
+                val getterExists = sym.asTerm.getter != NoSymbol
+                // println(s"$isVal (public: ${sym.asTerm.isPublic}, isParamAcc: ${sym.asTerm.isParamAccessor}), $getterExists (${sym.asTerm.getter}, public: ${sym.asTerm.getter.isPublic})")
+                (isVal && sym.asTerm.isPublic) ||
+                (getterExists && sym.asTerm.getter.isPublic)
+            }
+          } else false
 
-              // println(s"$notTransient, $isMethod, $getterExists, $getterIsMetod")
-              // notTransient && isMethod && getterExists && getterIsMetod
-            })
+          // println(s"$notTransient, $isMethod, $getterExists, $getterIsMetod")
+          // notTransient && isMethod && getterExists && getterIsMetod
+        })
 
     val (quantified, rawTpe) = tpe match {
       case ExistentialType(quantified, rtpe) => (quantified, rtpe);

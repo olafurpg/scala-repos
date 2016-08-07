@@ -12,7 +12,6 @@ class NameClash {
 
 /*
 import java.awt.{BasicStroke, Color, Dimension, Graphics2D, Point}
-
 class NameClash {
   def render(g: Graphics2D) {
     g.setColor(Color.red)

@@ -1,7 +1,9 @@
 package spire
 package math
 
-import spire.algebra.{AdditiveAbGroup, IsReal, MultiplicativeAbGroup, Order, NRoot, Ring, Trig}
+import spire.algebra.{
+  AdditiveAbGroup, IsReal, MultiplicativeAbGroup, Order, NRoot, Ring, Trig
+}
 import spire.std._
 
 /**

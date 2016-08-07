@@ -122,7 +122,7 @@ object Preferences {
 
 class Extra(val activity: SActivity) extends AnyVal with Dynamic {
   def updateDynamic(name: String)(value: Any) {
-    // TODO inline after https://github.com/daniel-trinh/scalariform/issues/44 is fixed 
+    // TODO inline after https://github.com/daniel-trinh/scalariform/issues/44 is fixed
     import android.os.Parcelable
     activity.intent.foreach { i =>
       value match {

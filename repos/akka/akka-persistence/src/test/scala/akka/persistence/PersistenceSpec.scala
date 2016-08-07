@@ -24,8 +24,7 @@ abstract class PersistenceSpec(config: Config)
     extends AkkaSpec(config)
     with BeforeAndAfterEach
     with Cleanup
-    with PersistenceMatchers {
-  this: AkkaSpec ⇒
+    with PersistenceMatchers { this: AkkaSpec ⇒
   private var _name: String = _
 
   lazy val extension = Persistence(system)
@@ -73,8 +72,7 @@ object PersistenceSpec {
     """))
 }
 
-trait Cleanup {
-  this: AkkaSpec ⇒
+trait Cleanup { this: AkkaSpec ⇒
   val storageLocations =
     List("akka.persistence.journal.leveldb.dir",
          "akka.persistence.journal.leveldb-shared.store.dir",
@@ -94,8 +92,7 @@ abstract class NamedPersistentActor(name: String) extends PersistentActor {
   override def persistenceId: String = name
 }
 
-trait TurnOffRecoverOnStart {
-  this: Eventsourced ⇒
+trait TurnOffRecoverOnStart { this: Eventsourced ⇒
   override def recovery = Recovery.none
 }
 

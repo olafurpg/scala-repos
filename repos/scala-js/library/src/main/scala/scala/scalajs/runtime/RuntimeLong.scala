@@ -47,8 +47,7 @@ import js.JSStringOps._
 final class RuntimeLong(val lo: Int, val hi: Int)
     extends java.lang.Number
     with java.io.Serializable
-    with java.lang.Comparable[java.lang.Long] {
-  a =>
+    with java.lang.Comparable[java.lang.Long] { a =>
 
   import RuntimeLong._
   import Utils._

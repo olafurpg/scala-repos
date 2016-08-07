@@ -14,7 +14,9 @@ import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.util.{JavaClassPath, ClassPath}
 import scala.tools.nsc.Settings
 import scala.tools.nsc.util.ClassPath.{JavaContext, DefaultJavaContext}
-import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{Annotation, ConstValueIndex}
+import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{
+  Annotation, ConstValueIndex
+}
 import scala.tools.scalap.scalax.rules.scalasig._
 import scala.tools.util.PathResolver
 

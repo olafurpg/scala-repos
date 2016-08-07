@@ -17,11 +17,19 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{ScMethodType, ScTypePolymorphicType}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory, ScalaPsiManager
+}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  ScMethodType, ScTypePolymorphicType
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
-import org.jetbrains.plugins.scala.lang.resolve.processor.{CompoundTypeCheckSignatureProcessor, CompoundTypeCheckTypeAliasProcessor}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  CompoundTypeCheckSignatureProcessor, CompoundTypeCheckTypeAliasProcessor
+}
 import org.jetbrains.plugins.scala.util.ScEquivalenceUtil
 
 import _root_.scala.collection.immutable.HashSet
@@ -639,7 +647,6 @@ object Conformance {
 
       /*If T<:Ui for i=1,...,n and for every binding d of a type or value x in R there exists a member binding
       of x in T which subsumes d, then T conforms to the compound type	U1	with	. . .	with	Un	{R }.
-
       U1	with	. . .	with	Un	{R } === t1
       T                             === t2
       U1	with	. . .	with	Un       === comps1
@@ -889,9 +896,9 @@ object Conformance {
           val args = p2.typeArgs
           val des = p2.designator
           if (args.length == 1 && (ScType.extractClass(des) match {
-                    case Some(q) => q.qualifiedName == "scala.Array"
-                    case _ => false
-                  })) {
+                case Some(q) => q.qualifiedName == "scala.Array"
+                case _ => false
+              })) {
             val arg = a1.arg
             val argsPair = (arg, args(0))
             argsPair match {
@@ -1169,9 +1176,9 @@ object Conformance {
           val args = p.typeArgs
           val des = p.designator
           if (args.length == 1 && (ScType.extractClass(des) match {
-                    case Some(q) => q.qualifiedName == "scala.Array"
-                    case _ => false
-                  })) {
+                case Some(q) => q.qualifiedName == "scala.Array"
+                case _ => false
+              })) {
             val arg = r.asInstanceOf[JavaArrayType].arg
             val argsPair = (arg, args(0))
             argsPair match {

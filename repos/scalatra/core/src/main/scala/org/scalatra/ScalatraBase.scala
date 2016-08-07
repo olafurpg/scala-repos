@@ -1,7 +1,9 @@
 package org.scalatra
 
 import java.io.{File, FileInputStream}
-import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
+import javax.servlet.http.{
+  HttpServlet, HttpServletRequest, HttpServletResponse
+}
 import javax.servlet.{ServletRegistration, Filter, ServletContext}
 
 import org.scalatra.ScalatraBase._
@@ -74,7 +76,7 @@ object ScalatraBase {
 
   def runCallbacks(data: Try[Any])(
       implicit request: HttpServletRequest): Unit = {
-    callbacks.reverse foreach (_ (data))
+    callbacks.reverse foreach (_(data))
   }
 
   def renderCallbacks(
@@ -91,7 +93,7 @@ object ScalatraBase {
 
   def runRenderCallbacks(data: Try[Any])(
       implicit request: HttpServletRequest): Unit = {
-    renderCallbacks.reverse foreach (_ (data))
+    renderCallbacks.reverse foreach (_(data))
   }
 
   def getServletRegistration(app: ScalatraBase): Option[ServletRegistration] = {

@@ -26,8 +26,7 @@ import Helpers._
 import JE._
 import JsCmds._
 
-trait JxYieldFunc {
-  this: JxBase =>
+trait JxYieldFunc { this: JxBase =>
   def yieldFunction: JsExp
 }
 

@@ -1,16 +1,22 @@
 package org.jetbrains.plugins.scala
 package codeInspection.deprecation
 
-import com.intellij.codeInspection.{LocalInspectionTool, ProblemHighlightType, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalInspectionTool, ProblemHighlightType, ProblemsHolder
+}
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeProjection
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScPrimaryConstructor, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScPrimaryConstructor, ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScAnnotationsHolder, ScFunction}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScAnnotationsHolder, ScFunction
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
 /**

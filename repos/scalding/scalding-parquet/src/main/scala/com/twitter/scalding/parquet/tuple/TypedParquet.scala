@@ -4,7 +4,9 @@ import org.apache.parquet.filter2.predicate.FilterPredicate
 import cascading.scheme.Scheme
 import com.twitter.scalding._
 import com.twitter.scalding.parquet.HasFilterPredicate
-import com.twitter.scalding.parquet.tuple.scheme.{ParquetReadSupport, ParquetWriteSupport, TypedParquetTupleScheme}
+import com.twitter.scalding.parquet.tuple.scheme.{
+  ParquetReadSupport, ParquetWriteSupport, TypedParquetTupleScheme
+}
 
 /**
   * Typed parquet tuple

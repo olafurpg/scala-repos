@@ -15,7 +15,9 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTemplateDefinition
+}
 
 import scala.collection.mutable
 
@@ -112,11 +114,11 @@ private object ScalaGoToSuperActionHandler {
           (if (el != null &&
                elements.contains(el.asInstanceOf[ScTypedDefinition])) {
          ScalaPsiUtil.superValsSignatures(el.asInstanceOf[ScTypedDefinition])
-       } else ScalaPsiUtil.superValsSignatures(elements.head)).flatMap(
-              _.namedElement match {
-        case n: NavigatablePsiElement => Some(n)
-        case _ => None
-      }): _*)
+       } else ScalaPsiUtil.superValsSignatures(elements.head))
+            .flatMap(_.namedElement match {
+          case n: NavigatablePsiElement => Some(n)
+          case _ => None
+        }): _*)
       supers.toArray
     }
 

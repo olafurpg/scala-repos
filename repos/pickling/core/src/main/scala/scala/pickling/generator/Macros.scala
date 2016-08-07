@@ -4,12 +4,12 @@ package generator
 // TODO - move these into Pickler/Unpickler and replace the existing macros.
 private[pickling] object PicklingMacros {
   import scala.language.experimental.macros
-  def genPickler[T]: Pickler[T] with Generated = macro scala.pickling.generator.Compat
-    .genPickler_impl[T]
-  def genUnpickler[T]: Unpickler[T] with Generated = macro scala.pickling.generator.Compat
-    .genUnpickler_impl[T]
-  def genPicklerUnpickler[T]: AbstractPicklerUnpickler[T] with Generated = macro scala.pickling.generator.Compat
-    .genPicklerUnpickler_impl[T]
+  def genPickler[T]: Pickler[T] with Generated =
+    macro scala.pickling.generator.Compat.genPickler_impl[T]
+  def genUnpickler[T]: Unpickler[T] with Generated =
+    macro scala.pickling.generator.Compat.genUnpickler_impl[T]
+  def genPicklerUnpickler[T]: AbstractPicklerUnpickler[T] with Generated =
+    macro scala.pickling.generator.Compat.genPicklerUnpickler_impl[T]
 }
 private[pickling] trait PicklingMacros
     extends Macro

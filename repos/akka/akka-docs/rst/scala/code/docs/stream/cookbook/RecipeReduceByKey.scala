@@ -1,7 +1,9 @@
 package docs.stream.cookbook
 
 import akka.NotUsed
-import akka.stream.{Graph, FlowShape, Inlet, Outlet, Attributes, OverflowStrategy}
+import akka.stream.{
+  Graph, FlowShape, Inlet, Outlet, Attributes, OverflowStrategy
+}
 import akka.stream.scaladsl._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._

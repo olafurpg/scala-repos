@@ -11,12 +11,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiDocumentManager, PsiFile, PsiFileFactory}
 import org.jetbrains.plugins.scala.actions.ScalaActionUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.worksheet.actions.{CleanWorksheetAction, TopComponentAction}
+import org.jetbrains.plugins.scala.worksheet.actions.{
+  CleanWorksheetAction, TopComponentAction
+}
 import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**
   * @author Ksenia.Sautina
-  * @author Dmitry Naydanov        
+  * @author Dmitry Naydanov
   * @since 10/17/12
   */
 class RunMacrosheetAction extends AnAction with TopComponentAction {

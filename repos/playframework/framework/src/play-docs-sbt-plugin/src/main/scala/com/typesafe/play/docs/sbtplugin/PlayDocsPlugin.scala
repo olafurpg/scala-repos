@@ -6,7 +6,9 @@ package com.typesafe.play.docs.sbtplugin
 import java.io.Closeable
 import java.util.concurrent.Callable
 
-import com.typesafe.play.docs.sbtplugin.PlayDocsValidation.{ValidationConfig, CodeSamplesReport, MarkdownRefReport}
+import com.typesafe.play.docs.sbtplugin.PlayDocsValidation.{
+  ValidationConfig, CodeSamplesReport, MarkdownRefReport
+}
 import play.core.BuildDocHandler
 import play.core.PlayVersion
 import play.core.server.ServerWithStop

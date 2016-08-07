@@ -65,8 +65,7 @@ class MapSemiring[K, V](implicit val scalar: Semiring[V])
 class MapRng[K, V](override implicit val scalar: Rng[V])
     extends MapSemiring[K, V]
     with RingAlgebra[Map[K, V], V]
-    with Serializable {
-  self =>
+    with Serializable { self =>
   def negate(x: Map[K, V]): Map[K, V] = x mapValues (scalar.negate(_))
 
   def timesl(r: V, v: Map[K, V]): Map[K, V] = v mapValues (scalar.times(r, _))

@@ -4,7 +4,10 @@ import java.io.FileInputStream
 
 import sbt.internal.librarymanagement.BaseIvySpecification
 import sbt.internal.librarymanagement.mavenint.PomExtraDependencyAttributes
-import sbt.librarymanagement.{Artifact, Configurations, CrossVersion, DefaultMavenRepository, MavenRepository, ModuleID, Resolver, UpdateOptions}
+import sbt.librarymanagement.{
+  Artifact, Configurations, CrossVersion, DefaultMavenRepository,
+  MavenRepository, ModuleID, Resolver, UpdateOptions
+}
 
 import sbt.internal.util.ShowLines
 

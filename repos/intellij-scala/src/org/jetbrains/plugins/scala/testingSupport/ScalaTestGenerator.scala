@@ -10,7 +10,9 @@ import com.intellij.psi._
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.refactoring.util.classMembers.MemberInfo
 import com.intellij.testIntegration.TestFramework
-import com.intellij.testIntegration.createTest.{CreateTestDialog, TestGenerator}
+import com.intellij.testIntegration.createTest.{
+  CreateTestDialog, TestGenerator
+}
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.plugins.scala.actions.NewScalaTypeDefinitionAction
 import org.jetbrains.plugins.scala.extensions._
@@ -20,9 +22,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.refactoring.extractTrait.ExtractSuperUtil
-import org.jetbrains.plugins.scala.testingSupport.test.{AbstractTestFramework, TestConfigurationUtil}
+import org.jetbrains.plugins.scala.testingSupport.test.{
+  AbstractTestFramework, TestConfigurationUtil
+}
 
 class ScalaTestGenerator extends TestGenerator {
   def generateTest(project: Project, d: CreateTestDialog): PsiElement = {

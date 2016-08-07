@@ -80,7 +80,6 @@ object TokenBucket {
     * @param reserve The number of reserve tokens over the TTL
     * period. That is, every `ttl` has `reserve` tokens in addition to
     * the ones added to the bucket.
-
     * @param nowMs The current time in milliseconds
     */
   def newLeakyBucket(ttl: Duration,

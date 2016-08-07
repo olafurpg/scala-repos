@@ -15,7 +15,10 @@ import org.scalajs.testsuite.utils.Platform._
 
 import java.util._
 
-import java.lang.{Double => JDouble, Float => JFloat, Integer => JInteger, Long => JLong, Byte => JByte, Short => JShort, Boolean => JBoolean, String => JString}
+import java.lang.{
+  Double => JDouble, Float => JFloat, Integer => JInteger, Long => JLong,
+  Byte => JByte, Short => JShort, Boolean => JBoolean, String => JString
+}
 
 class FormatterTest {
 

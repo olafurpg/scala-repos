@@ -29,7 +29,8 @@ import scala.reflect.macros.{whitebox, TypecheckException}
   */
 object illTyped {
   def apply(code: String): Unit = macro IllTypedMacros.applyImplNoExp
-  def apply(code: String, expected: String): Unit = macro IllTypedMacros.applyImpl
+  def apply(code: String, expected: String): Unit =
+    macro IllTypedMacros.applyImpl
 }
 
 @macrocompat.bundle

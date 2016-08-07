@@ -3,7 +3,10 @@ package com.twitter.app
 import com.twitter.util._
 import com.twitter.util.registry.GlobalRegistry
 import java.io.File
-import java.lang.{Boolean => JBoolean, Double => JDouble, Float => JFloat, Integer => JInteger, Long => JLong}
+import java.lang.{
+  Boolean => JBoolean, Double => JDouble, Float => JFloat, Integer => JInteger,
+  Long => JLong
+}
 import java.net.InetSocketAddress
 import java.util.{List => JList, Map => JMap, Set => JSet}
 import java.util.concurrent.atomic.AtomicBoolean

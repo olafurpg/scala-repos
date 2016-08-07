@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.SelfType
 
 import scala.annotation.tailrec
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 08.02.2008
   */

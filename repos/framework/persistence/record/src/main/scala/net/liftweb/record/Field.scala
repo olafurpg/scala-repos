@@ -208,7 +208,7 @@ trait TypedField[ThisType] extends BaseField {
 
   /** Helper function that does validation of a value by using the validators specified for the field */
   protected def runValidation(in: Box[MyType]): List[FieldError] = in match {
-    case Full(_) => validations.flatMap(_ (toValueType(in))).distinct
+    case Full(_) => validations.flatMap(_(toValueType(in))).distinct
     case Empty => Nil
     case Failure(msg, _, _) => Text(msg)
   }
@@ -510,8 +510,7 @@ object FieldHelpers {
                                              else notA.getClass.getName))
 }
 
-trait LifecycleCallbacks {
-  this: BaseField =>
+trait LifecycleCallbacks { this: BaseField =>
 
   def beforeValidation {}
   def afterValidation {}

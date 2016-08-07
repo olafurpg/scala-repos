@@ -312,7 +312,7 @@ class RandomForestRegression[V, @sp(Double) F](
   }
 
   protected def fromForest(forest: Forest): V => F = { v =>
-    forest.trees.map(_ (v)).qmean
+    forest.trees.map(_(v)).qmean
   }
 }
 

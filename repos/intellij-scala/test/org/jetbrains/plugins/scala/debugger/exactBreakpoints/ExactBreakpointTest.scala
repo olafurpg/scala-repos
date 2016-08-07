@@ -5,7 +5,10 @@ import com.intellij.debugger.engine.SourcePositionHighlighter
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.util.DocumentUtil
 import com.intellij.xdebugger.XDebuggerUtil
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaPositionManager, ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase, ScalaPositionManager, ScalaVersion_2_11,
+  ScalaVersion_2_12
+}
 import org.jetbrains.plugins.scala.extensions.inReadAction
 import org.junit.Assert
 

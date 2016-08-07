@@ -19,7 +19,9 @@ package org.apache.spark.util.random
 
 import scala.util.Random
 
-import org.apache.commons.math3.distribution.{BinomialDistribution, PoissonDistribution}
+import org.apache.commons.math3.distribution.{
+  BinomialDistribution, PoissonDistribution
+}
 
 import org.apache.spark.SparkFunSuite
 

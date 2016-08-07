@@ -7,7 +7,9 @@ import com.intellij.ide.startup.impl.StartupManagerImpl
 import com.intellij.openapi.externalSystem.util.ExternalSystemConstants
 import com.intellij.openapi.module.{Module, ModuleManager, ModuleUtilCore}
 import com.intellij.openapi.projectRoots.{JavaSdk, Sdk}
-import com.intellij.openapi.roots.{ModifiableRootModel, ModuleRootModificationUtil}
+import com.intellij.openapi.roots.{
+  ModifiableRootModel, ModuleRootModificationUtil
+}
 import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.vfs.{LocalFileSystem, VfsUtilCore}
 import com.intellij.psi.PsiManager

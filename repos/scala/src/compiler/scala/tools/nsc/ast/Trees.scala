@@ -365,12 +365,10 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
   }
 
   /* New pattern matching cases:
-
    case Parens(expr)                                               (only used during parsing)
    case DocDef(comment, defn) =>                                   (eliminated by typer)
    case TypeTreeWithDeferredRefCheck() =>                          (created and eliminated by typer)
    case SelectFromArray(_, _, _) =>                                (created and eliminated by erasure)
    case InjectDerivedValue(_) =>                                   (created and eliminated by erasure)
-
  */
 }

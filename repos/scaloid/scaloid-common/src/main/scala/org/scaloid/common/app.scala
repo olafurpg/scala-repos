@@ -148,7 +148,7 @@ trait SActivity
   protected override def onCreate(b: Bundle) {
     super.onCreate(b)
     AppHelpers.createBundle.withValue(Option(b)) {
-      onCreateBodies.foreach(_ ())
+      onCreateBodies.foreach(_())
     }
   }
 
@@ -162,7 +162,7 @@ trait SActivity
 
   override def onStart {
     super.onStart()
-    onStartBodies.foreach(_ ())
+    onStartBodies.foreach(_())
   }
 
   protected var onStartBodies = Vector[() => Any]()
@@ -175,7 +175,7 @@ trait SActivity
 
   override def onResume {
     super.onResume()
-    onResumeBodies.foreach(_ ())
+    onResumeBodies.foreach(_())
   }
 
   protected var onResumeBodies = Vector[() => Any]()
@@ -187,7 +187,7 @@ trait SActivity
   }
 
   override def onPause {
-    onPauseBodies.foreach(_ ())
+    onPauseBodies.foreach(_())
     super.onPause()
   }
 
@@ -200,7 +200,7 @@ trait SActivity
   }
 
   override def onStop {
-    onStopBodies.foreach(_ ())
+    onStopBodies.foreach(_())
     super.onStop()
   }
 
@@ -213,7 +213,7 @@ trait SActivity
   }
 
   override def onDestroy {
-    onDestroyBodies.foreach(_ ())
+    onDestroyBodies.foreach(_())
     super.onDestroy()
   }
 }
@@ -235,11 +235,11 @@ trait SService
 
   override def onCreate() {
     super.onCreate()
-    onCreateBodies.foreach(_ ())
+    onCreateBodies.foreach(_())
   }
 
   override def onDestroy() {
-    onDestroyBodies.foreach(_ ())
+    onDestroyBodies.foreach(_())
     super.onDestroy()
   }
 }

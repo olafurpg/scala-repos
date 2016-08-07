@@ -7,7 +7,9 @@ import com.twitter.conversions.time._
 import com.twitter.finagle.stats.{DefaultStatsReceiver, StatsReceiver}
 import com.twitter.finagle.util._
 import com.twitter.util._
-import java.net.{InetAddress, InetSocketAddress, SocketAddress, UnknownHostException}
+import java.net.{
+  InetAddress, InetSocketAddress, SocketAddress, UnknownHostException
+}
 import java.util.logging.Logger
 
 /**

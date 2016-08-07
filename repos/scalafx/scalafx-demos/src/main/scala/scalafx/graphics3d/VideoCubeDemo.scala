@@ -40,7 +40,9 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 import scalafx.scene.text.{Font, Text}
 import scalafx.scene.transform.Rotate
-import scalafx.scene.{DepthTest, Group, Node, PerspectiveCamera, Scene, SceneAntialiasing}
+import scalafx.scene.{
+  DepthTest, Group, Node, PerspectiveCamera, Scene, SceneAntialiasing
+}
 
 /**
   * The type VideoCubeDemo a demonstration of the JavaOne 2011 key note with

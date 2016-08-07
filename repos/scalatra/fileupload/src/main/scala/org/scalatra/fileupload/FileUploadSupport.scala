@@ -2,11 +2,15 @@ package org.scalatra
 package fileupload
 
 import java.util.{HashMap => JHashMap, List => JList, Map => JMap}
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
+import javax.servlet.http.{
+  HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse
+}
 
 import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
 import org.apache.commons.fileupload.servlet.ServletFileUpload
-import org.apache.commons.fileupload.{FileItem, FileItemFactory, FileUploadBase, FileUploadException}
+import org.apache.commons.fileupload.{
+  FileItem, FileItemFactory, FileUploadBase, FileUploadException
+}
 import org.scalatra.servlet._
 
 import scala.collection.JavaConversions._
@@ -60,10 +64,10 @@ trait FileUploadSupport extends ServletBase {
     val isPostOrPut = Set("POST", "PUT").contains(req.getMethod)
 
     isPostOrPut && (req.contentType match {
-          case Some(contentType) =>
-            contentType.startsWith(FileUploadBase.MULTIPART)
-          case _ => false
-        })
+      case Some(contentType) =>
+        contentType.startsWith(FileUploadBase.MULTIPART)
+      case _ => false
+    })
   }
 
   private def extractMultipartParams(req: HttpServletRequest): BodyParams =
@@ -153,7 +157,7 @@ trait FileUploadSupport extends ServletBase {
     * `newServletFileUpload`.  By default, we use a DiskFileItemFactory.
     */
   /*
-   * [non-scaladoc] This method predates newServletFileUpload.  If I had it 
+   * [non-scaladoc] This method predates newServletFileUpload.  If I had it
    * to do over again, we'd have that instead of this.  Oops.
    */
   protected def fileItemFactory: FileItemFactory = new DiskFileItemFactory

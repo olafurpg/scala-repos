@@ -7,9 +7,16 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiClass, PsiElement, PsiElementVisitor}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScConstructor
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScFunctionalTypeElement, ScInfixTypeElement, ScParameterizedTypeElement, ScSimpleTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScClassParents, ScTraitParents}
-import org.jetbrains.plugins.scala.lang.psi.api.{ScalaElementVisitor, ScalaFile}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScFunctionalTypeElement, ScInfixTypeElement, ScParameterizedTypeElement,
+  ScSimpleTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScClassParents, ScTraitParents
+}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaElementVisitor, ScalaFile
+}
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
 
 class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
@@ -154,7 +161,6 @@ object sugar {
   type a6 = Function1[Int, () => Int] <:< Function1[Int, Int]
   type a7 = Function0[Int] <:< Function1[Int, Int]
 }
-
 object sugar {
   type a1 = (Int, /*comment*/ String) => Int
   type a2 = (Int, /*comment*/ String, Int)

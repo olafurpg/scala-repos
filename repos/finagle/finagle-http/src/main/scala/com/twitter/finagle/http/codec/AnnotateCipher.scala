@@ -1,6 +1,8 @@
 package com.twitter.finagle.http.codec
 
-import org.jboss.netty.channel.{ChannelHandlerContext, MessageEvent, SimpleChannelHandler}
+import org.jboss.netty.channel.{
+  ChannelHandlerContext, MessageEvent, SimpleChannelHandler
+}
 import org.jboss.netty.handler.codec.http.HttpRequest
 import org.jboss.netty.handler.ssl.SslHandler
 

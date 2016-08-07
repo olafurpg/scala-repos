@@ -49,13 +49,10 @@ object UriEncodingSpec extends Specification {
 
     /*
 RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax
-
 2.2.  Reserved Characters
    ...
       reserved    = gen-delims / sub-delims
-
       gen-delims  = ":" / "/" / "?" / "#" / "[" / "]" / "@"
-
       sub-delims  = "!" / "$" / "&" / "'" / "(" / ")"
                   / "*" / "+" / "," / ";" / "="
    ...
@@ -70,7 +67,6 @@ RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax
       segment-nz    = 1*pchar
       segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
                     ; non-zero-length segment without any colon ":"
-
       pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
      */
     "percent-encode reserved characters that aren't allowed in a path segment" in {
@@ -124,7 +120,6 @@ RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax
 
     /*
 2.1.  Percent-Encoding
-
    A percent-encoding mechanism is used to represent a data octet in a
    component when that octet's corresponding character is outside the
    allowed set...
@@ -158,19 +153,16 @@ RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax
 
     /*
 2.1.  Percent-Encoding
-
       ... A percent-encoded octet is encoded as a character
    triplet, consisting of the percent character "%" followed by the two
    hexadecimal digits representing that octet's numeric value. ...
-
       pct-encoded = "%" HEXDIG HEXDIG
-
    The uppercase hexadecimal digits 'A' through 'F' are equivalent to
    the lowercase digits 'a' through 'f', respectively.  If two URIs
    differ only in the case of hexadecimal digits used in percent-encoded
    octets, they are equivalent.  For consistency, URI producers and
    normalizers should use uppercase hexadecimal digits for all percent-
-   encodings.    
+   encodings.
      */
     "percent-encode to triplets with upper-case hex" in {
       encodingFor("\u0000", "ISO-8859-1") must_== PercentEncoded("%00")

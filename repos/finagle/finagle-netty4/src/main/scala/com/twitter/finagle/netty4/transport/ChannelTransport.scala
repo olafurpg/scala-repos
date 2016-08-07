@@ -4,7 +4,10 @@ import com.twitter.concurrent.AsyncQueue
 import com.twitter.finagle._
 import com.twitter.finagle.transport.Transport
 import com.twitter.util.{Future, Promise, Return, Time}
-import io.netty.channel.{Channel, ChannelHandlerContext, ChannelFutureListener, ChannelFuture, SimpleChannelInboundHandler}
+import io.netty.channel.{
+  Channel, ChannelHandlerContext, ChannelFutureListener, ChannelFuture,
+  SimpleChannelInboundHandler
+}
 import java.net.SocketAddress
 import java.security.cert.Certificate
 import java.util.concurrent.atomic.AtomicBoolean

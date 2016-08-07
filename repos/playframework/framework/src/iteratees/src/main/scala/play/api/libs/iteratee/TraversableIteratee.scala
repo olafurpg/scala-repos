@@ -3,7 +3,9 @@
  */
 package play.api.libs.iteratee
 
-import play.api.libs.iteratee.Execution.Implicits.{defaultExecutionContext => dec}
+import play.api.libs.iteratee.Execution.Implicits.{
+  defaultExecutionContext => dec
+}
 import scala.concurrent.{ExecutionContext, Future}
 
 /**

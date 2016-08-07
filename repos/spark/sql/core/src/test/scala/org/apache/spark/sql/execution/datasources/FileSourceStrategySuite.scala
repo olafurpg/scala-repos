@@ -26,7 +26,9 @@ import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionSet, PredicateHelper}
+import org.apache.spark.sql.catalyst.expressions.{
+  Expression, ExpressionSet, PredicateHelper
+}
 import org.apache.spark.sql.catalyst.util
 import org.apache.spark.sql.execution.{DataSourceScan, PhysicalRDD}
 import org.apache.spark.sql.functions._

@@ -4,7 +4,10 @@
 package play.api.libs
 
 import java.io._
-import java.nio.file.{FileAlreadyExistsException, StandardCopyOption, SimpleFileVisitor, Path, FileVisitResult}
+import java.nio.file.{
+  FileAlreadyExistsException, StandardCopyOption, SimpleFileVisitor, Path,
+  FileVisitResult
+}
 import java.nio.file.attribute.BasicFileAttributes
 
 import javax.inject.{Inject, Singleton}

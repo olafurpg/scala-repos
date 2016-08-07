@@ -10,7 +10,9 @@ import mesosphere.marathon.event.{HealthStatusChanged, MesosStatusUpdateEvent}
 import mesosphere.marathon.health.HealthCheck
 import mesosphere.marathon.state.{AppDefinition, PathId}
 import mesosphere.marathon.test.{Mockito, MarathonActorSupport}
-import mesosphere.marathon.{MarathonTestHelper, AppStartCanceledException, MarathonSpec, SchedulerActions}
+import mesosphere.marathon.{
+  MarathonTestHelper, AppStartCanceledException, MarathonSpec, SchedulerActions
+}
 import org.apache.mesos.SchedulerDriver
 import org.mockito.Mockito.verify
 import org.scalatest.mock.MockitoSugar

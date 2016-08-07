@@ -4,7 +4,9 @@ package org.ensime.server
 
 import akka.actor.Props
 import java.net.{InetSocketAddress, ServerSocket, Socket}
-import org.ensime.fixture.{EnsimeConfigFixture, IsolatedEnsimeConfigFixture, IsolatedTestKitFixture}
+import org.ensime.fixture.{
+  EnsimeConfigFixture, IsolatedEnsimeConfigFixture, IsolatedTestKitFixture
+}
 import org.ensime.util.EnsimeSpec
 import scala.concurrent.duration._
 import org.ensime.util.file._

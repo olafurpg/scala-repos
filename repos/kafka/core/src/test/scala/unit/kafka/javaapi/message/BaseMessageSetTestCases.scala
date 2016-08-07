@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -20,7 +20,9 @@ import org.junit.Assert._
 import org.scalatest.junit.JUnitSuite
 import org.junit.Test
 import kafka.utils.TestUtils
-import kafka.message.{DefaultCompressionCodec, NoCompressionCodec, CompressionCodec, Message}
+import kafka.message.{
+  DefaultCompressionCodec, NoCompressionCodec, CompressionCodec, Message
+}
 
 trait BaseMessageSetTestCases extends JUnitSuite {
 

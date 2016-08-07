@@ -22,7 +22,9 @@ import breeze.linalg.{DenseMatrix => BDM, Matrix => BM}
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.internal.Logging
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.stat.correlation.{Correlations, PearsonCorrelation, SpearmanCorrelation}
+import org.apache.spark.mllib.stat.correlation.{
+  Correlations, PearsonCorrelation, SpearmanCorrelation
+}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class CorrelationSuite

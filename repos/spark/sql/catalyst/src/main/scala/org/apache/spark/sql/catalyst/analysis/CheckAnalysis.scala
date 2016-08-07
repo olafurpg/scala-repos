@@ -286,7 +286,7 @@ trait CheckAnalysis {
           case _ => // Analysis successful!
         }
     }
-    extendedCheckRules.foreach(_ (plan))
+    extendedCheckRules.foreach(_(plan))
 
     plan.foreach(_.setAnalyzed())
   }

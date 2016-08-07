@@ -1,8 +1,12 @@
 package com.twitter.finagle.httpproxy
 
 import com.twitter.finagle.client.Transporter.Credentials
-import com.twitter.finagle.netty3.{SocketAddressResolveHandler, SocketAddressResolver}
-import com.twitter.finagle.{ChannelClosedException, ConnectionFailedException, InconsistentStateException}
+import com.twitter.finagle.netty3.{
+  SocketAddressResolveHandler, SocketAddressResolver
+}
+import com.twitter.finagle.{
+  ChannelClosedException, ConnectionFailedException, InconsistentStateException
+}
 import com.twitter.io.Charsets
 import com.twitter.util.Base64StringEncoder
 

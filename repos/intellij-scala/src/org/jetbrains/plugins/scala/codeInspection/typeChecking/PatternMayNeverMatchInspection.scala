@@ -3,11 +3,17 @@ package org.jetbrains.plugins.scala.codeInspection.typeChecking
 import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.annotator.PatternAnnotatorUtil
-import org.jetbrains.plugins.scala.codeInspection.typeChecking.PatternMayNeverMatchInspection.{ScPatternExpectedAndPatternType, inspectionId, inspectionName}
-import org.jetbrains.plugins.scala.codeInspection.{AbstractInspection, InspectionBundle}
+import org.jetbrains.plugins.scala.codeInspection.typeChecking.PatternMayNeverMatchInspection.{
+  ScPatternExpectedAndPatternType, inspectionId, inspectionName
+}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractInspection, InspectionBundle
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScPattern
 import org.jetbrains.plugins.scala.lang.psi.types.ComparingUtil._
-import org.jetbrains.plugins.scala.lang.psi.types.{Conformance, ScType, ScTypePresentation}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  Conformance, ScType, ScTypePresentation
+}
 
 /**
   * Author: Svyatoslav Ilinskiy

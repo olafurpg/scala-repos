@@ -5,7 +5,9 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink, StubElement, StubInputStream, StubOutputStream
+}
 import com.intellij.util.io.StringRef
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScAccessModifier
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScAccessModifierImpl

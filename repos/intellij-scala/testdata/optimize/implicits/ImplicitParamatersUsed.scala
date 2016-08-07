@@ -20,11 +20,9 @@ class ImplicitParamatersUsed {
     class A
     implicit val a = new A
   }
-
   class G {
     def map(x: Int => Int)(implicit a: Z.A) = 123
   }
-
   def moo() {
     import Z._
     val b = new G

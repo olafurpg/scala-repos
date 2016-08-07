@@ -4,7 +4,9 @@ import com.twitter.io.Buf
 import java.io.{InputStream, OutputStream}
 import java.nio.{ByteBuffer, ByteOrder, ReadOnlyBufferException}
 import java.nio.channels.{GatheringByteChannel, ScatteringByteChannel}
-import org.jboss.netty.buffer.{AbstractChannelBuffer, ChannelBuffer, ChannelBuffers, ChannelBufferFactory}
+import org.jboss.netty.buffer.{
+  AbstractChannelBuffer, ChannelBuffer, ChannelBuffers, ChannelBufferFactory
+}
 
 /**
   * Class BufChannelBufferFactory is a Netty ChannelBufferFactory that

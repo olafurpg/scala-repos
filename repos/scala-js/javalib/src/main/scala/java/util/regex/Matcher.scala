@@ -225,9 +225,9 @@ object Matcher {
     while (i < s.length) {
       val c = s.charAt(i)
       result += ((c: @switch) match {
-            case '\\' | '$' => "\\" + c
-            case _ => c
-          })
+        case '\\' | '$' => "\\" + c
+        case _ => c
+      })
       i += 1
     }
     result

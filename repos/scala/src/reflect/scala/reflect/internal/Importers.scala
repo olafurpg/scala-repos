@@ -51,7 +51,7 @@ trait Importers { to: SymbolTable =>
       if (pendingSyms == 0 && pendingTpes == 0) {
         val fixups = this.fixups.toList
         this.fixups.clear()
-        fixups foreach { _ () }
+        fixups foreach { _() }
       }
     }
 

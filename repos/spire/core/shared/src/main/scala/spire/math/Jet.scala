@@ -38,7 +38,6 @@ case class JetDim(dimension: Int) {
   * two components: the "real" component x, and an "infinitesimal" component y.
   * Surprisingly, this leads to a convenient method for computing exact
   * derivatives without needing to manipulate complicated symbolic expressions.
-
   * For example, consider the function
   * {{{
   *   f(x) = x * x ,
@@ -97,7 +96,6 @@ case class JetDim(dimension: Int) {
   *
   *   val xValue = 9.47892774
   *   val yValue = 0.287740
-
   *   // The "2" means there should be 2 dual number components.
   *   implicit val dimension = JetDim(2)
   *   val x: Jet[Double] = xValue + Jet.h[Double](0);  // Pick the 0th dual number for x.
@@ -206,8 +204,7 @@ object Jet extends JetInstances {
 final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
     extends ScalaNumber
     with ScalaNumericConversions
-    with Serializable {
-  lhs =>
+    with Serializable { lhs =>
 
   import spire.syntax.order._
 

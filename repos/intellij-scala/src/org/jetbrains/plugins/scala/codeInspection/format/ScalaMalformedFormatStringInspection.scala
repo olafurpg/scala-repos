@@ -8,7 +8,6 @@ import org.jetbrains.plugins.scala.format.{Injection, Span, _}
 
 /**
   // Acceptance test
-
   // Expression kind
   "value: %d".format("123") // call format
   "value: %d" format "123"  //  infix format
@@ -18,23 +17,19 @@ import org.jetbrains.plugins.scala.format.{Injection, Span, _}
   String format ("%d", "123") // java infix format
   printf("%d", "123") // printf
   System.out.printf("%d", "123") // System.out.printf
-
   // Warning kind
   "value: %d".format() // no argument
   "value: %1$d".format() // no positional argument
   "value: %d".format("123") // inconvertible type
   "value: ".format(123) // unused argument
-
   // Multi-line string
   """value: %d""".format("123") // call format
-
   // Specifier type
   "value: %d".format(123) // call format
   "value: %b".format(true) // call format
   "value: %f".format(0.5F) // call format
   "value: %c".format('c') // call format
   "value: %s".format(123) // call format
-
   // Interpolated strings ...
   */
 /**

@@ -1,6 +1,8 @@
 package scala.reflect.reify
 
-import scala.reflect.macros.{ReificationException, UnexpectedReificationException, TypecheckException}
+import scala.reflect.macros.{
+  ReificationException, UnexpectedReificationException, TypecheckException
+}
 import scala.reflect.macros.contexts.Context
 
 abstract class Taggers {

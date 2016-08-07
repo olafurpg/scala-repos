@@ -17,7 +17,9 @@
 package net.liftweb
 package util
 
-import scala.util.parsing.combinator.{PackratParsers, Parsers, ImplicitConversions}
+import scala.util.parsing.combinator.{
+  PackratParsers, Parsers, ImplicitConversions
+}
 import scala.xml.{Elem, NodeSeq}
 
 import net.liftweb.common._
@@ -270,15 +272,17 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
             (opt('*') ~ '[' ~> attrName <~ ']' ^^ { name =>
                   AttrSubNode(name)
                 }) | ('!' ~ '!' ^^ (a =>
-                    DontMergeAttributes)) | ('<' ~ '*' ~ '>') ^^
+                                      DontMergeAttributes)) | ('<' ~ '*' ~ '>') ^^
             (a => SurroundKids()) | ('-' ~ '*' ^^ (a =>
-                    PrependKidsSubNode())) |
+                                                     PrependKidsSubNode())) |
             ('>' ~ '*' ^^ (a => PrependKidsSubNode())) |
             ('*' ~ '+' ^^ (a => AppendKidsSubNode())) |
-            ('*' ~ '<' ^^ (a => AppendKidsSubNode())) | '*' ^^ (a =>
-                KidsSubNode()) | '^' ~ '*' ^^
+            ('*' ~ '<' ^^ (a =>
+                             AppendKidsSubNode())) | '*' ^^ (a =>
+                                                               KidsSubNode()) | '^' ~ '*' ^^
             (a => SelectThisNode(true)) | '^' ~ '^' ^^ (a =>
-                SelectThisNode(false)))
+                                                          SelectThisNode(
+                                                              false)))
 
   private lazy val attrName: Parser[String] =
     (letter | '_' | ':') ~ rep(letter | number | '-' | '_' | ':' | '.') ^^ {

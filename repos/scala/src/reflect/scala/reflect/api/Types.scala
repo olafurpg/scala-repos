@@ -437,8 +437,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait ThisTypeApi extends TypeApi {
-    this: ThisType =>
+  trait ThisTypeApi extends TypeApi { this: ThisType =>
 
     /** The underlying class symbol. */
     def sym: Symbol
@@ -481,8 +480,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait SingleTypeApi extends TypeApi {
-    this: SingleType =>
+  trait SingleTypeApi extends TypeApi { this: SingleType =>
 
     /** The type of the qualifier. */
     def pre: Type
@@ -528,8 +526,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait SuperTypeApi extends TypeApi {
-    this: SuperType =>
+  trait SuperTypeApi extends TypeApi { this: SuperType =>
 
     /** The type of the qualifier.
       *  See the example for [[scala.reflect.api.Trees#SuperExtractor]].
@@ -575,8 +572,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait ConstantTypeApi extends TypeApi {
-    this: ConstantType =>
+  trait ConstantTypeApi extends TypeApi { this: ConstantType =>
 
     /** The compile-time constant underlying this type. */
     def value: Constant
@@ -621,8 +617,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait TypeRefApi extends TypeApi {
-    this: TypeRef =>
+  trait TypeRefApi extends TypeApi { this: TypeRef =>
 
     /** The prefix of the type reference.
       *  Is equal to `NoPrefix` if the prefix is not applicable.
@@ -691,8 +686,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait RefinedTypeApi extends TypeApi {
-    this: RefinedType =>
+  trait RefinedTypeApi extends TypeApi { this: RefinedType =>
 
     /** The superclasses of the type. */
     def parents: List[Type]
@@ -740,8 +734,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait ClassInfoTypeApi extends TypeApi {
-    this: ClassInfoType =>
+  trait ClassInfoTypeApi extends TypeApi { this: ClassInfoType =>
 
     /** The superclasses of the class type. */
     def parents: List[Type]
@@ -793,8 +786,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait MethodTypeApi extends TypeApi {
-    this: MethodType =>
+  trait MethodTypeApi extends TypeApi { this: MethodType =>
 
     /** The symbols that correspond to the parameters of the method. */
     def params: List[Symbol]
@@ -833,8 +825,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait NullaryMethodTypeApi extends TypeApi {
-    this: NullaryMethodType =>
+  trait NullaryMethodTypeApi extends TypeApi { this: NullaryMethodType =>
 
     /** The result type of the method. */
     def resultType: Type
@@ -871,8 +862,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait PolyTypeApi extends TypeApi {
-    this: PolyType =>
+  trait PolyTypeApi extends TypeApi { this: PolyType =>
 
     /** The symbols corresponding to the type parameters. */
     def typeParams: List[Symbol]
@@ -913,8 +903,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait ExistentialTypeApi extends TypeApi {
-    this: ExistentialType =>
+  trait ExistentialTypeApi extends TypeApi { this: ExistentialType =>
 
     /** The symbols corresponding to the `forSome` clauses of the existential type. */
     def quantified: List[Symbol]
@@ -955,8 +944,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait AnnotatedTypeApi extends TypeApi {
-    this: AnnotatedType =>
+  trait AnnotatedTypeApi extends TypeApi { this: AnnotatedType =>
 
     /** The annotations. */
     def annotations: List[Annotation]
@@ -1002,8 +990,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait TypeBoundsApi extends TypeApi {
-    this: TypeBounds =>
+  trait TypeBoundsApi extends TypeApi { this: TypeBounds =>
 
     /** The lower bound.
       *  Is equal to `definitions.NothingTpe` if not specified explicitly.
@@ -1059,8 +1046,7 @@ trait Types { self: Universe =>
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait BoundedWildcardTypeApi extends TypeApi {
-    this: BoundedWildcardType =>
+  trait BoundedWildcardTypeApi extends TypeApi { this: BoundedWildcardType =>
 
     /** Type bounds for the wildcard type. */
     def bounds: TypeBounds

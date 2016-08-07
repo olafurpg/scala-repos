@@ -1,8 +1,13 @@
 package spire
 
-import spire.algebra.{Eq, EuclideanRing, Field, PartialOrder, Order, Ring, Signed}
+import spire.algebra.{
+  Eq, EuclideanRing, Field, PartialOrder, Order, Ring, Signed
+}
 import spire.math.{ConvertableFrom, ConvertableTo}
-import spire.math.{ScalaEquivWrapper, ScalaFractionalWrapper, ScalaIntegralWrapper, ScalaNumericWrapper, ScalaPartialOrderingWrapper, ScalaOrderingWrapper}
+import spire.math.{
+  ScalaEquivWrapper, ScalaFractionalWrapper, ScalaIntegralWrapper,
+  ScalaNumericWrapper, ScalaPartialOrderingWrapper, ScalaOrderingWrapper
+}
 
 private[spire] trait CompatPriority1 {
   implicit def numeric[A: Ring: ConvertableFrom: Signed: Order]

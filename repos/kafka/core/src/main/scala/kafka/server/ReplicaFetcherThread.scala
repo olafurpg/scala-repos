@@ -25,9 +25,16 @@ import kafka.message.ByteBufferMessageSet
 import kafka.api.{KAFKA_0_10_0_IV0, KAFKA_0_9_0}
 import kafka.common.{KafkaStorageException, TopicAndPartition}
 import ReplicaFetcherThread._
-import org.apache.kafka.clients.{ManualMetadataUpdater, NetworkClient, ClientRequest, ClientResponse}
-import org.apache.kafka.common.network.{LoginType, Selectable, ChannelBuilders, NetworkReceive, Selector, Mode}
-import org.apache.kafka.common.requests.{ListOffsetResponse, FetchResponse, RequestSend, AbstractRequest, ListOffsetRequest}
+import org.apache.kafka.clients.{
+  ManualMetadataUpdater, NetworkClient, ClientRequest, ClientResponse
+}
+import org.apache.kafka.common.network.{
+  LoginType, Selectable, ChannelBuilders, NetworkReceive, Selector, Mode
+}
+import org.apache.kafka.common.requests.{
+  ListOffsetResponse, FetchResponse, RequestSend, AbstractRequest,
+  ListOffsetRequest
+}
 import org.apache.kafka.common.requests.{FetchRequest => JFetchRequest}
 import org.apache.kafka.common.security.ssl.SslFactory
 import org.apache.kafka.common.{Node, TopicPartition}

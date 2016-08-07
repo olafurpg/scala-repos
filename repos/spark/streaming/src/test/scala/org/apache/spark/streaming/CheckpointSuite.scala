@@ -17,7 +17,9 @@
 
 package org.apache.spark.streaming
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File, ObjectOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, File, ObjectOutputStream
+}
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -29,7 +31,9 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.hadoop.io.{IntWritable, Text}
 import org.apache.hadoop.mapred.TextOutputFormat
-import org.apache.hadoop.mapreduce.lib.output.{TextOutputFormat => NewTextOutputFormat}
+import org.apache.hadoop.mapreduce.lib.output.{
+  TextOutputFormat => NewTextOutputFormat
+}
 import org.mockito.Mockito.mock
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.time.SpanSugar._
@@ -38,7 +42,9 @@ import org.apache.spark.{SparkConf, SparkContext, SparkFunSuite, TestUtils}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream._
 import org.apache.spark.streaming.scheduler._
-import org.apache.spark.util.{Clock, ManualClock, MutableURLClassLoader, ResetSystemProperties, Utils}
+import org.apache.spark.util.{
+  Clock, ManualClock, MutableURLClassLoader, ResetSystemProperties, Utils
+}
 
 /**
   * A input stream that records the times of restore() invoked

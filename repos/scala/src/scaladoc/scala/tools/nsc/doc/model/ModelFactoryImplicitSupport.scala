@@ -45,7 +45,10 @@ import scala.collection._
   * TODO: Give an overview here
   */
 trait ModelFactoryImplicitSupport {
-  thisFactory: ModelFactory with ModelFactoryTypeSupport with CommentFactory with TreeFactory =>
+  thisFactory: ModelFactory
+    with ModelFactoryTypeSupport
+    with CommentFactory
+    with TreeFactory =>
 
   import global._
   import global.analyzer._

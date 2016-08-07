@@ -1,7 +1,9 @@
 package com.typesafe.slick.testkit.util
 
 import org.junit.runner.{Runner, Description}
-import org.junit.runner.notification.{StoppedByUserException, Failure, RunNotifier}
+import org.junit.runner.notification.{
+  StoppedByUserException, Failure, RunNotifier
+}
 import org.junit.runner.manipulation._
 import org.junit.runners.model._
 import scala.collection.JavaConverters._

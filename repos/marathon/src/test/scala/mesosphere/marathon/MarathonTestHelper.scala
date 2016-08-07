@@ -16,8 +16,15 @@ import mesosphere.marathon.core.task.tracker.impl.TaskSerializer
 import mesosphere.marathon.core.task.tracker.{TaskTracker, TaskTrackerModule}
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.PathId._
-import mesosphere.marathon.state.{AppDefinition, Container, MarathonStore, MarathonTaskState, PathId, PersistentVolume, PersistentVolumeInfo, Residency, TaskRepository, Timestamp, Volume}
-import mesosphere.mesos.protos.{FrameworkID, OfferID, Range, RangesResource, Resource, ScalarResource, SlaveID}
+import mesosphere.marathon.state.{
+  AppDefinition, Container, MarathonStore, MarathonTaskState, PathId,
+  PersistentVolume, PersistentVolumeInfo, Residency, TaskRepository, Timestamp,
+  Volume
+}
+import mesosphere.mesos.protos.{
+  FrameworkID, OfferID, Range, RangesResource, Resource, ScalarResource,
+  SlaveID
+}
 import mesosphere.util.state.{FrameworkId, PersistentStore}
 import mesosphere.util.state.memory.InMemoryStore
 import org.apache.mesos.Protos.Resource.{DiskInfo, ReservationInfo}

@@ -9,7 +9,9 @@ import org.specs2.mutable._
 import java.io.{ByteArrayInputStream, File, FileOutputStream, OutputStream}
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 import java.util.concurrent.atomic.AtomicInteger
-import play.api.libs.iteratee.Execution.Implicits.{defaultExecutionContext => dec}
+import play.api.libs.iteratee.Execution.Implicits.{
+  defaultExecutionContext => dec
+}
 import scala.concurrent.{Promise, Future, Await}
 import scala.concurrent.duration.Duration
 
@@ -120,7 +122,6 @@ object EnumeratorsSpec
   }
 
   /*"Enumerator's PatchPanel" should {
-
   "allow to patch in different Enumerators" in {
       import play.api.libs.concurrent.Promise
     val pp = Promise[Concurrent.PatchPanel[Int]]()
@@ -132,7 +133,6 @@ object EnumeratorsSpec
     p.patchIn(Enumerator.eof)
     sum.flatMap(_.run).value1.get must equalTo(10)
   }
-
 }*/
 
   "Enumerator.apply" should {

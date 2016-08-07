@@ -4,9 +4,13 @@ package debugger.evaluation
 import com.intellij.debugger.codeinsight.RuntimeTypeEvaluator
 import com.intellij.debugger.engine.ContextUtil
 import com.intellij.debugger.engine.evaluation.expression.ExpressionEvaluator
-import com.intellij.debugger.engine.evaluation.{CodeFragmentKind, EvaluationContextImpl, TextWithImportsImpl}
+import com.intellij.debugger.engine.evaluation.{
+  CodeFragmentKind, EvaluationContextImpl, TextWithImportsImpl
+}
 import com.intellij.debugger.impl.DebuggerContextImpl
-import com.intellij.debugger.{DebuggerBundle, DebuggerInvocationUtil, EvaluatingComputable}
+import com.intellij.debugger.{
+  DebuggerBundle, DebuggerInvocationUtil, EvaluatingComputable
+}
 import com.intellij.openapi.application.{AccessToken, ReadAction}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.progress.ProgressIndicator

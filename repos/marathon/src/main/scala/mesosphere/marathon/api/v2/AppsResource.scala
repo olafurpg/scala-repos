@@ -12,14 +12,19 @@ import mesosphere.marathon.api.v2.Validation._
 import mesosphere.marathon.api.v2.json.AppUpdate
 import mesosphere.marathon.api.v2.json.Formats._
 import mesosphere.marathon.api.{AuthResource, MarathonMediaType, RestResource}
-import mesosphere.marathon.core.appinfo.{AppInfoService, AppSelector, TaskCounts}
+import mesosphere.marathon.core.appinfo.{
+  AppInfoService, AppSelector, TaskCounts
+}
 import mesosphere.marathon.core.appinfo.AppInfo
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.event.{ApiPostEvent, EventModule}
 import mesosphere.marathon.plugin.auth._
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
-import mesosphere.marathon.{ConflictingChangeException, MarathonConf, MarathonSchedulerService, UnknownAppException}
+import mesosphere.marathon.{
+  ConflictingChangeException, MarathonConf, MarathonSchedulerService,
+  UnknownAppException
+}
 import play.api.libs.json.Json
 import scala.collection.JavaConverters._
 

@@ -7,7 +7,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScPattern, ScPatternArgumentList, ScConstructorPattern, ScCaseClause}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScPattern, ScPatternArgumentList, ScConstructorPattern, ScCaseClause
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester

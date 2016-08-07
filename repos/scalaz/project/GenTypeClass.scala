@@ -297,10 +297,10 @@ object GenTypeClass {
     def extendsToSyntaxListText = kind match {
       case Kind.*->* | Kind.*^*->* =>
         "extends To" + typeClassName + "Ops0" + (extendsList match {
-              case Seq() => ""
-              case es =>
-                es.map(n => "To" + n + "Ops").mkString(" with ", " with ", "")
-            })
+          case Seq() => ""
+          case es =>
+            es.map(n => "To" + n + "Ops").mkString(" with ", " with ", "")
+        })
       case _ =>
         extendsList match {
           case Seq() => ""

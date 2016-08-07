@@ -31,7 +31,9 @@ import javafx.{event => jfxe}
 
 import scala.language.implicitConversions
 import scalafx.scene.input.KeyCombination.{Modifier, ModifierValue}
-import scalafx.scene.input.ScrollEvent.{HorizontalTextScrollUnits, VerticalTextScrollUnits}
+import scalafx.scene.input.ScrollEvent.{
+  HorizontalTextScrollUnits, VerticalTextScrollUnits
+}
 import scalafx.scene.input.TouchPoint.State
 
 object InputIncludes extends InputIncludes

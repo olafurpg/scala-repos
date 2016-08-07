@@ -103,7 +103,7 @@ object StyleConverter {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/css/StyleConverter.html JavaFX
   * StyleConverter]].
   *
-  * @constructor Creates a new ScalaFX StyleConverter from a JavaFX StyleConverter. 
+  * @constructor Creates a new ScalaFX StyleConverter from a JavaFX StyleConverter.
   *              Its default value is a new JavaFX StyleConverter.
   * @param delegate JavaFX StyleConverter.
   * @tparam F

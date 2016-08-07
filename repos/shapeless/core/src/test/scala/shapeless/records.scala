@@ -636,8 +636,8 @@ class RecordTests {
         ("name" ->> "Bif") :: ("age" ->> 1L) :: ("teeth" ->> 1) :: HNil
     )
 
-    ps.sortBy(_ ("age"))
-    ps.sortBy(_ ("teeth"))
+    ps.sortBy(_("age"))
+    ps.sortBy(_("teeth"))
   }
 
   @Test

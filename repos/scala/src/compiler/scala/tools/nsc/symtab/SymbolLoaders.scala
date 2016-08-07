@@ -218,11 +218,11 @@ abstract class SymbolLoaders {
     private def setSource(sym: Symbol) {
       sourcefile foreach
         (sf =>
-              sym match {
-                case cls: ClassSymbol => cls.associatedFile = sf
-                case mod: ModuleSymbol => mod.moduleClass.associatedFile = sf
-                case _ => ()
-            })
+           sym match {
+             case cls: ClassSymbol => cls.associatedFile = sf
+             case mod: ModuleSymbol => mod.moduleClass.associatedFile = sf
+             case _ => ()
+           })
     }
 
     override def complete(root: Symbol) {

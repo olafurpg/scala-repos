@@ -5,7 +5,9 @@ import java.util
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions.childOf
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScCaseClauses}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause, ScCaseClauses
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScMatchStmt
 
 /**

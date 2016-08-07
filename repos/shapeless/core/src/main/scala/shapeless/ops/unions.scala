@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-15 Miles Sabin 
+ * Copyright (c) 2014-15 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ object union {
 
   /**
     * Type class supporting collecting the keys of a union as an `HList`.
-    * 
+    *
     * @author Miles Sabin
     */
   trait Keys[U <: Coproduct] extends DepFn0 with Serializable {
@@ -95,7 +95,7 @@ object union {
 
   /**
     * Type class supporting collecting the value of a union as a `Coproduct`.
-    * 
+    *
     * @author Miles Sabin
     */
   trait Values[U <: Coproduct] extends DepFn1[U] with Serializable {

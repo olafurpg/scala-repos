@@ -20,13 +20,17 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScDeclaredElementsHolder
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScClassParents, ScExtendsBlock, ScTemplateBody}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScClassParents, ScExtendsBlock, ScTemplateBody
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil._
-import org.jetbrains.plugins.scala.lang.refactoring.util.{ScalaRefactoringUtil, ScalaVariableValidator}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  ScalaRefactoringUtil, ScalaVariableValidator
+}
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 import org.jetbrains.plugins.scala.util.ScalaUtils
 
@@ -34,8 +38,7 @@ import org.jetbrains.plugins.scala.util.ScalaUtils
   * Created by Kate Ustyuzhanina
   * on 9/18/15
   */
-trait IntroduceExpressions {
-  this: ScalaIntroduceVariableHandler =>
+trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
 
   val INTRODUCE_VARIABLE_REFACTORING_NAME =
     ScalaBundle.message("introduce.variable.title")

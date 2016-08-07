@@ -31,7 +31,9 @@ import javafx.{stage => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty, StringProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Scene
 import scalafx.scene.input.KeyCombination

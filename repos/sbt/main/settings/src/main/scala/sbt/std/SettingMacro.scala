@@ -4,7 +4,9 @@ package std
 import Def.{Initialize, Setting}
 import sbt.internal.util.Types.{idFun, Id}
 import sbt.internal.util.AList
-import sbt.internal.util.appmacro.{Convert, Converted, Instance, MixedBuilder, MonadInstance}
+import sbt.internal.util.appmacro.{
+  Convert, Converted, Instance, MixedBuilder, MonadInstance
+}
 
 object InitializeInstance extends MonadInstance {
   type M[x] = Initialize[x]

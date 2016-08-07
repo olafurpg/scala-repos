@@ -51,7 +51,7 @@ trait Loc[T] {
     * When the menu item is displayed, what CSS class do we add to the
     * node?
     */
-  def cssClassForMenuItem: Box[String] = cacheCssClassForMenuItem.map(_ ())
+  def cssClassForMenuItem: Box[String] = cacheCssClassForMenuItem.map(_())
 
   /**
     * By default, this lazy val looks for the MenuCssClass LocParam and
@@ -104,7 +104,7 @@ trait Loc[T] {
     * Calculate the Query parameters
     */
   def queryParameters(what: Box[T]): List[(String, String)] =
-    addlQueryParams.flatMap(_ ()) ::: calcQueryParams.flatMap(_ (what))
+    addlQueryParams.flatMap(_()) ::: calcQueryParams.flatMap(_(what))
 
   protected def appendQueryParams(what: T)(nodeSeq: NodeSeq): NodeSeq =
     Text(appendQueryParameters(nodeSeq.text, Full(what)))
@@ -725,7 +725,7 @@ object Loc {
       with AnyLocParam {
 
     /**
-      * The NodeSeq => NodeSeq function 
+      * The NodeSeq => NodeSeq function
       */
     def func: NodeSeq => NodeSeq = _func
 

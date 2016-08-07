@@ -1,6 +1,8 @@
 package play.libs.streams
 
-import java.util.concurrent.{CompletableFuture, CompletionStage, ExecutionException, TimeUnit}
+import java.util.concurrent.{
+  CompletableFuture, CompletionStage, ExecutionException, TimeUnit
+}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._

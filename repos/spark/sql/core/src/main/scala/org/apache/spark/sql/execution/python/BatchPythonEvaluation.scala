@@ -25,7 +25,9 @@ import org.apache.spark.TaskContext
 import org.apache.spark.api.python.PythonRunner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Attribute, GenericMutableRow, JoinedRow, UnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.{
+  Attribute, GenericMutableRow, JoinedRow, UnsafeProjection
+}
 import org.apache.spark.sql.execution.SparkPlan
 import org.apache.spark.sql.types.{StructField, StructType}
 

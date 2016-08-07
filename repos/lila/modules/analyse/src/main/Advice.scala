@@ -17,9 +17,9 @@ sealed trait Advice {
     withEval.??(evalComment ?? { c =>
       s"($c) "
     }) + (this match {
-          case MateAdvice(seq, _, _, _) => seq.desc
-          case CpAdvice(nag, _, _) => nag.toString
-        }) + "." + {
+      case MateAdvice(seq, _, _, _) => seq.desc
+      case CpAdvice(nag, _, _) => nag.toString
+    }) + "." + {
       withBestMove ?? {
         info.variation.headOption ?? { move =>
           s" Best move was $move."

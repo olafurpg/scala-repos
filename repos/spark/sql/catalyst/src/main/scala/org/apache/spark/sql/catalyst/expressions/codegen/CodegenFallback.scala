@@ -17,7 +17,9 @@
 
 package org.apache.spark.sql.catalyst.expressions.codegen
 
-import org.apache.spark.sql.catalyst.expressions.{Expression, LeafExpression, Nondeterministic}
+import org.apache.spark.sql.catalyst.expressions.{
+  Expression, LeafExpression, Nondeterministic
+}
 import org.apache.spark.sql.catalyst.util.toCommentSafeString
 
 /**

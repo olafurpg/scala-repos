@@ -8,7 +8,9 @@ import base._
 trait MemberLookup extends base.MemberLookupBase { thisFactory: ModelFactory =>
 
   import global._
-  import definitions.{NothingClass, AnyClass, AnyValClass, AnyRefClass, ListClass}
+  import definitions.{
+    NothingClass, AnyClass, AnyValClass, AnyRefClass, ListClass
+  }
 
   override def internalLink(sym: Symbol, site: Symbol): Option[LinkTo] =
     findTemplateMaybe(sym) match {

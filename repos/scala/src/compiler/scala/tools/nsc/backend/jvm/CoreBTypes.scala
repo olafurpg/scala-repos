@@ -31,7 +31,9 @@ import scala.tools.nsc.backend.jvm.BTypes.InternalName
 class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
   import bTypes._
   import global._
-  import rootMirror.{requiredClass, requiredModule, getRequiredClass, getClassIfDefined}
+  import rootMirror.{
+    requiredClass, requiredModule, getRequiredClass, getClassIfDefined
+  }
   import definitions._
 
   /**
@@ -337,10 +339,10 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
   lazy val String_valueOf: Symbol = {
     getMember(StringModule, nme.valueOf) filter
       (sym =>
-            sym.info.paramTypes match {
-              case List(pt) => pt.typeSymbol == ObjectClass
-              case _ => false
-          })
+         sym.info.paramTypes match {
+           case List(pt) => pt.typeSymbol == ObjectClass
+           case _ => false
+         })
   }
 
   lazy val lambdaMetaFactoryBootstrapHandle = new asm.Handle(

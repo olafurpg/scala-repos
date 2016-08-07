@@ -2,7 +2,9 @@ package mesosphere.marathon.integration
 
 import java.io.File
 
-import mesosphere.marathon.integration.setup.{ProcessKeeper, IntegrationFunSuite}
+import mesosphere.marathon.integration.setup.{
+  ProcessKeeper, IntegrationFunSuite
+}
 import org.scalatest.{GivenWhenThen, BeforeAndAfter, Matchers}
 
 class MarathonCommandLineHelpTest

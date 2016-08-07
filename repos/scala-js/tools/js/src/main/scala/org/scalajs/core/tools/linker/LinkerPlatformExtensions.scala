@@ -14,8 +14,7 @@ import org.scalajs.core.tools.linker.frontend.LinkerFrontend
 import org.scalajs.core.tools.linker.frontend.optimizer.IncOptimizer
 import org.scalajs.core.tools.linker.backend._
 
-trait LinkerPlatformExtensions {
-  this: Linker.type =>
+trait LinkerPlatformExtensions { this: Linker.type =>
   def apply(
       semantics: Semantics = Semantics.Defaults,
       outputMode: OutputMode = OutputMode.Default,

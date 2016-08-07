@@ -1,8 +1,14 @@
 package com.twitter.finagle.netty3.socks
 
-import com.twitter.finagle.{ChannelClosedException, ConnectionFailedException, InconsistentStateException}
-import com.twitter.finagle.netty3.{SocketAddressResolveHandler, SocketAddressResolver}
-import com.twitter.finagle.socks.{AuthenticationSetting, Unauthenticated, UsernamePassAuthenticationSetting}
+import com.twitter.finagle.{
+  ChannelClosedException, ConnectionFailedException, InconsistentStateException
+}
+import com.twitter.finagle.netty3.{
+  SocketAddressResolveHandler, SocketAddressResolver
+}
+import com.twitter.finagle.socks.{
+  AuthenticationSetting, Unauthenticated, UsernamePassAuthenticationSetting
+}
 import com.twitter.io.Charsets
 import java.net.{Inet4Address, Inet6Address, InetSocketAddress, SocketAddress}
 import java.util.concurrent.atomic.AtomicReference

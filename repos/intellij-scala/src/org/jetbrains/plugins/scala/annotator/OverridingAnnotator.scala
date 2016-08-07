@@ -3,9 +3,13 @@ package org.jetbrains.plugins.scala.annotator
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.internal.statistic.UsageTrigger
 import com.intellij.lang.annotation.{Annotation, AnnotationHolder}
-import com.intellij.psi.{PsiElement, PsiMethod, PsiModifier, PsiModifierListOwner}
+import com.intellij.psi.{
+  PsiElement, PsiMethod, PsiModifier, PsiModifierListOwner
+}
 import org.jetbrains.plugins.scala.ScalaBundle
-import org.jetbrains.plugins.scala.annotator.quickfix.modifiers.{AddModifierQuickFix, AddModifierWithValOrVarQuickFix, RemoveModifierQuickFix}
+import org.jetbrains.plugins.scala.annotator.quickfix.modifiers.{
+  AddModifierQuickFix, AddModifierWithValOrVarQuickFix, RemoveModifierQuickFix
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
@@ -13,7 +17,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScRefinement
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScModifierListOwner, ScNamedElement}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScModifierListOwner, ScNamedElement
+}
 import org.jetbrains.plugins.scala.lang.psi.types.Signature
 
 /**

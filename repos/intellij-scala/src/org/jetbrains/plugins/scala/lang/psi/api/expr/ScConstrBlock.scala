@@ -5,7 +5,7 @@ package api
 package expr
 
 /**
-  * @author Alexander.Podkhalyuzin 
+  * @author Alexander.Podkhalyuzin
   */
 trait ScConstrBlock extends ScBlockExpr {
   def selfInvocation: Option[ScSelfInvocation] =

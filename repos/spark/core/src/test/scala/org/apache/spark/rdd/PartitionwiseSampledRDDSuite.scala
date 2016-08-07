@@ -18,7 +18,9 @@
 package org.apache.spark.rdd
 
 import org.apache.spark.{SharedSparkContext, SparkFunSuite}
-import org.apache.spark.util.random.{BernoulliSampler, PoissonSampler, RandomSampler}
+import org.apache.spark.util.random.{
+  BernoulliSampler, PoissonSampler, RandomSampler
+}
 
 /** a sampler that outputs its seed */
 class MockSampler extends RandomSampler[Long, Long] {

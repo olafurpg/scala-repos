@@ -5,7 +5,9 @@ import chess.Pos.posAt
 import chess.{Status, Role, Color, MoveOrDrop}
 import scalaz.Validation.FlatMap._
 
-import actorApi.round.{HumanPlay, DrawNo, TakebackNo, PlayResult, Cheat, ForecastPlay}
+import actorApi.round.{
+  HumanPlay, DrawNo, TakebackNo, PlayResult, Cheat, ForecastPlay
+}
 import akka.actor.ActorRef
 import lila.game.{Game, GameRepo, Pov, Progress, UciMemo}
 import lila.hub.actorApi.map.Tell

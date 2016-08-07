@@ -100,8 +100,7 @@ class LightArrayRevolverScheduler(config: Config,
     checkMaxDelay(roundUp(delay).toNanos)
     val preparedEC = executor.prepare()
     try new AtomicReference[Cancellable](InitialRepeatMarker)
-    with Cancellable {
-      self ⇒
+    with Cancellable { self ⇒
       compareAndSet(
           InitialRepeatMarker,
           schedule(
@@ -231,9 +230,9 @@ class LightArrayRevolverScheduler(config: Config,
           case x ⇒ collect(q, acc :+ x)
         }
       }
-      ((0 until WheelSize) flatMap (i ⇒
-                collect(wheel(i), Vector.empty))) ++ collect(queue,
-                                                             Vector.empty)
+      ((0 until WheelSize) flatMap (i ⇒ collect(wheel(i), Vector.empty))) ++ collect(
+          queue,
+          Vector.empty)
     }
 
     @tailrec

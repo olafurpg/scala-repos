@@ -11,7 +11,10 @@ import scala.concurrent.duration.Duration
 import java.io.File
 import Def.{displayFull, dummyState, ScopedKey, Setting}
 import Keys.{streams, Streams, TaskStreams}
-import Keys.{dummyRoots, dummyStreamsManager, executionRoots, pluginData, streamsManager, taskDefinitionKey, transformState}
+import Keys.{
+  dummyRoots, dummyStreamsManager, executionRoots, pluginData, streamsManager,
+  taskDefinitionKey, transformState
+}
 import Project.richInitializeTask
 import Scope.{GlobalScope, ThisScope}
 import sbt.internal.util.Types.const
@@ -469,7 +472,9 @@ object EvaluateTask {
                  triggers: Triggers[Task],
                  config: EvaluateTaskConfig)(
       implicit taskToNode: NodeView[Task]): (State, Result[T]) = {
-    import ConcurrentRestrictions.{completionService, TagMap, Tag, tagged, tagsKey}
+    import ConcurrentRestrictions.{
+      completionService, TagMap, Tag, tagged, tagsKey
+    }
 
     val log = state.log
     log.debug(

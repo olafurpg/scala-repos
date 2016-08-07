@@ -14,7 +14,9 @@ import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.{PsiElement, PsiFile, PsiFileFactory, _}
 import com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{MethodInvocation, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  MethodInvocation, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScMacroDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
@@ -82,7 +84,7 @@ object ScalaMacroDebuggingUtil {
       }
 
       //linesRed ++= line
-      //unpack debug info 
+      //unpack debug info
       val offsets = ListBuffer.empty[(Int, Int, Int)]
       @inline def parse(s: String) = Integer parseInt s
       line split '|' foreach {

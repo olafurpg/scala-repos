@@ -3,7 +3,7 @@
   */
 package akka.cluster
 
-// TODO remove metrics 
+// TODO remove metrics
 
 import java.io.Closeable
 import scala.collection.immutable

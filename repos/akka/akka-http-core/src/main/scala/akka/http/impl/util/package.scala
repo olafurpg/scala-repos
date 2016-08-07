@@ -204,8 +204,7 @@ package util {
     def receive = { case x ⇒ log.warning(x.toString) }
   }
 
-  private[http] trait LogMessages extends ActorLogging {
-    this: Actor ⇒
+  private[http] trait LogMessages extends ActorLogging { this: Actor ⇒
     def logMessages(mark: String = "")(r: Receive): Receive =
       new Receive {
         def isDefinedAt(x: Any): Boolean = r.isDefinedAt(x)

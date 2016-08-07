@@ -128,8 +128,7 @@ private[collection] trait Wrappers {
   @SerialVersionUID(1L)
   class SetWrapper[A](underlying: Set[A])
       extends ju.AbstractSet[A]
-      with Serializable {
-    self =>
+      with Serializable { self =>
     // Note various overrides to avoid performance gotchas.
     override def contains(o: Object): Boolean = {
       try { underlying.contains(o.asInstanceOf[A]) } catch {
@@ -202,8 +201,7 @@ private[collection] trait Wrappers {
   @SerialVersionUID(1L)
   class MapWrapper[A, B](underlying: Map[A, B])
       extends ju.AbstractMap[A, B]
-      with Serializable {
-    self =>
+      with Serializable { self =>
     override def size = underlying.size
 
     override def get(key: AnyRef): B =
@@ -328,8 +326,8 @@ private[collection] trait Wrappers {
   }
 
   /** Wraps a Java map as a Scala one.  If the map is to support concurrent access,
-    * use [[JConcurrentMapWrapper]] instead.  If the wrapped map is synchronized 
-    * (e.g. from `java.util.Collections.synchronizedMap`), it is your responsibility 
+    * use [[JConcurrentMapWrapper]] instead.  If the wrapped map is synchronized
+    * (e.g. from `java.util.Collections.synchronizedMap`), it is your responsibility
     * to wrap all non-atomic operations with `underlying.synchronized`.
     * This includes `get`, as `java.util.Map`'s API does not allow for an
     * atomic `get` when `null` values may be present.

@@ -5,7 +5,9 @@ import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt, ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
@@ -49,10 +51,10 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   //  def f(implicit p: Int, a: Int) {}
   //  def f(p: Int*, a: Int) {}
 
-  // no args for method with def or impl args: def f(); f 
+  // no args for method with def or impl args: def f(); f
   // * must be last
   // positional then by name
-  // by name duplicates  
+  // by name duplicates
 
   // return signature
   // multiple *, expanding
@@ -64,7 +66,7 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   // named
   // implicits
   // nfix
-  // constructor 
+  // constructor
   // inside block expression
   // java interop
   // syntetic methods (apply, unapply)

@@ -13,9 +13,9 @@ object Util {
   def crossBuild: Seq[Setting[_]] =
     Seq(
         crossPaths := (scalaBinaryVersion.value match {
-              case "2.11" => true
-              case _ => false
-            })
+          case "2.11" => true
+          case _ => false
+        })
     )
 
   lazy val javaOnlySettings = Seq[Setting[_]](

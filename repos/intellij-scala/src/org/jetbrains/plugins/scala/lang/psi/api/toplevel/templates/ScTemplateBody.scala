@@ -7,7 +7,9 @@ package templates
 
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSelfTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScDeclaredElementsHolder, ScFunction, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScDeclaredElementsHolder, ScFunction, ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 
 /**

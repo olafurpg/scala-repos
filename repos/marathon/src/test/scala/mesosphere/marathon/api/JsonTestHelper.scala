@@ -2,7 +2,9 @@ package mesosphere.marathon.api
 
 import gnieh.diffson.{Operation, JsonDiff, Add, Copy}
 import org.scalatest.{Matchers, Assertions}
-import play.api.libs.json.{JsArray, JsObject, JsNull, JsValue, Format, Json, Writes}
+import play.api.libs.json.{
+  JsArray, JsObject, JsNull, JsValue, Format, Json, Writes
+}
 
 import scala.collection.Map
 

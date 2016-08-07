@@ -5,7 +5,9 @@ import java.util
 
 import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScFinallyBlock, ScTryBlock, ScTryStmt}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScFinallyBlock, ScTryBlock, ScTryStmt
+}
 
 /**
   * Nikolay.Tropin

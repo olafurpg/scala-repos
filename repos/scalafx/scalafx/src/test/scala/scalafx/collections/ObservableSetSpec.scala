@@ -165,12 +165,12 @@ class ObservableSetSpec[T]
     (set add 1) should be(false)
     set(2) = true
 
-    // Verification 
+    // Verification
     addedValues should equal((0 to 7).toBuffer)
   }
 
   it should "notify each remotion individually" in {
-    // Preparation 
+    // Preparation
     val set = ObservableSet((0 to 15))
     val removedValues = Buffer.empty[Int]
     set onChange { (sourceSet, change) =>

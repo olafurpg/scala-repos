@@ -20,7 +20,9 @@ import com.intellij.psi.search.{FileTypeIndex, GlobalSearchScope}
 import com.intellij.psi.{PsiElement, PsiManager}
 import com.intellij.testFramework.IdeaTestUtil
 import org.jetbrains.SbtStructureSetup
-import org.jetbrains.plugins.scala.annotator.{AnnotatorHolderMock, ScalaAnnotator}
+import org.jetbrains.plugins.scala.annotator.{
+  AnnotatorHolderMock, ScalaAnnotator
+}
 import org.jetbrains.plugins.scala.finder.SourceFilterScope
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor

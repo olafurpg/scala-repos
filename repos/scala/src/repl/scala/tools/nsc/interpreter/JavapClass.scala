@@ -10,10 +10,16 @@ import scala.language.reflectiveCalls
 
 import java.lang.{Iterable => JIterable}
 import scala.reflect.internal.util.ScalaClassLoader
-import java.io.{ByteArrayInputStream, CharArrayWriter, FileNotFoundException, PrintWriter, StringWriter, Writer}
+import java.io.{
+  ByteArrayInputStream, CharArrayWriter, FileNotFoundException, PrintWriter,
+  StringWriter, Writer
+}
 import java.util.{Locale}
 import java.util.concurrent.ConcurrentLinkedQueue
-import javax.tools.{Diagnostic, DiagnosticListener, ForwardingJavaFileManager, JavaFileManager, JavaFileObject, SimpleJavaFileObject, StandardLocation}
+import javax.tools.{
+  Diagnostic, DiagnosticListener, ForwardingJavaFileManager, JavaFileManager,
+  JavaFileObject, SimpleJavaFileObject, StandardLocation
+}
 import scala.reflect.io.File
 import scala.io.Source
 import scala.util.{Try, Success, Failure}

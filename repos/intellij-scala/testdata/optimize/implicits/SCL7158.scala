@@ -5,7 +5,6 @@ object A {
 }
 /*
 import java.{lang ⇒ jl}
-
 object A {
   val s: jl.String = "text"
 }

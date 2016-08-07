@@ -32,7 +32,9 @@ import javafx.beans.value.{ChangeListener, ObservableValue}
 import scalafx.Includes.{observableList2ObservableBuffer, _}
 import scalafx.application.JFXApp
 import scalafx.collections.ObservableBuffer
-import scalafx.controls.controls.{ControlControls, PropertiesNodes, TextInputControlControls}
+import scalafx.controls.controls.{
+  ControlControls, PropertiesNodes, TextInputControlControls
+}
 import scalafx.geometry.Pos
 import scalafx.scene.Scene
 import scalafx.scene.control.{CheckBox, ChoiceBox, Label, TextArea}

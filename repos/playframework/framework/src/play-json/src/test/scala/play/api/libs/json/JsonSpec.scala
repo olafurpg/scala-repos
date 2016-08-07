@@ -87,14 +87,14 @@ object JsonSpec extends org.specs2.mutable.Specification {
           )
       ) must not equalTo
         (Json.obj(
-                "field2" -> "beta",
-                "field3" -> Json.obj(
-                    "field31" -> true,
-                    "field33" -> Json.arr("blabla", 456L),
-                    "field32" -> 123.45
-                ),
-                "field1" -> 123
-            ))
+            "field2" -> "beta",
+            "field3" -> Json.obj(
+                "field31" -> true,
+                "field33" -> Json.arr("blabla", 456L),
+                "field32" -> 123.45
+            ),
+            "field1" -> 123
+        ))
 
       Json.obj(
           "field1" -> 123,
@@ -106,13 +106,13 @@ object JsonSpec extends org.specs2.mutable.Specification {
           )
       ) must not equalTo
         (Json.obj(
-                "field3" -> Json.obj(
-                    "field31" -> true,
-                    "field33" -> Json.arr("blabla", 456L, JsNull),
-                    "field32" -> 123.45
-                ),
-                "field1" -> 123
-            ))
+            "field3" -> Json.obj(
+                "field31" -> true,
+                "field33" -> Json.arr("blabla", 456L, JsNull),
+                "field32" -> 123.45
+            ),
+            "field1" -> 123
+        ))
     }
 
     "support basic array operations" in {

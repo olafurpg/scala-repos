@@ -279,7 +279,7 @@ object Commands {
     commandMap
       .get(cmd.toUpperCase)
       .map {
-        _ (args)
+        _(args)
       }
       .getOrElse(throw ClientError("Unsupported command: " + cmd))
 

@@ -5,7 +5,9 @@ import java.io.File
 
 import com.intellij.openapi.externalSystem.model.ExternalSystemException
 import com.intellij.openapi.externalSystem.model.project.ExternalSystemSourceType
-import org.jetbrains.sbt.project.data.{ContentRootNode, LibraryNode, ModuleDependencyNode, ModuleNode}
+import org.jetbrains.sbt.project.data.{
+  ContentRootNode, LibraryNode, ModuleDependencyNode, ModuleNode
+}
 import org.jetbrains.sbt.project.sources.SharedSourcesModuleType
 import org.jetbrains.sbt.{structure => sbtStructure}
 

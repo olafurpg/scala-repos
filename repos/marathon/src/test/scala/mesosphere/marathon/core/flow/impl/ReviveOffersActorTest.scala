@@ -5,7 +5,9 @@ import akka.testkit.{TestActorRef, TestProbe}
 import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.flow.ReviveOffersConfig
 import mesosphere.marathon.core.flow.impl.ReviveOffersActor.TimedCheck
-import mesosphere.marathon.event.{SchedulerRegisteredEvent, SchedulerReregisteredEvent}
+import mesosphere.marathon.event.{
+  SchedulerRegisteredEvent, SchedulerReregisteredEvent
+}
 import mesosphere.marathon.{MarathonSchedulerDriverHolder, MarathonSpec}
 import org.apache.mesos.SchedulerDriver
 import org.mockito.Mockito

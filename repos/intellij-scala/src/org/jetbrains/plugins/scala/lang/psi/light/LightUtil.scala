@@ -4,7 +4,9 @@ package lang.psi.light
 import com.intellij.psi.{PsiClass, PsiClassType}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScAnnotationsHolder
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
 
 import _root_.scala.collection.mutable.ArrayBuffer

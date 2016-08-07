@@ -14,11 +14,8 @@ class Groups3 {
 package pack {
 class G
 }
-
 import pack.G
-
 import scala.collection.mutable.ArrayBuffer
-
 class Groups3 {
   val b: ArrayBuffer[Int] = null
   val d: G = null

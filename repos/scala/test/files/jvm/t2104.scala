@@ -1,10 +1,8 @@
 /* https://lampsvn.epfl.ch/trac/scala/ticket/2104
    symptom: Source via Buffered Source always loses the last char of the input file.
    cause: BufferedSource? doesn't check return for -1 (EOF), and uses reader.ready() improperly as a substitute.
-
   test: check over all possible strings of length up to N over alphabet chars:
   write file, then read back its chars, and get back the original.
-
  */
 object Test {
   val N = 4

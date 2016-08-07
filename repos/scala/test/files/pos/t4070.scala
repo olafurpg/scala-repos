@@ -24,7 +24,6 @@ package b {
 [   setInst] tv[Int]                  ( In Foo#crash, _$1=tv[Int] )
 [    create] tv[Int]                  ( In Foo#crash )
 [     clone] tv[Int]                  ( Foo#crash )
-
 // With crash above the classes:
 % scalac -Dscalac.debug.tvar ./a.scala
 [    create] ?tv                      ( In Foo#crash )

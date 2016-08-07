@@ -15,8 +15,7 @@ import akka.http.impl.engine.server.HttpServerTestSetupBase
 class WebSocketServerSpec
     extends FreeSpec
     with Matchers
-    with WithMaterializerSpec {
-  spec ⇒
+    with WithMaterializerSpec { spec ⇒
 
   "The server-side WebSocket integration should" - {
     "establish a websocket connection when the user requests it" - {

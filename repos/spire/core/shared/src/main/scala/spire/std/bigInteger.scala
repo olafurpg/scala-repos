@@ -3,7 +3,9 @@ package std
 
 import java.math.BigInteger
 
-import spire.algebra.{EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed}
+import spire.algebra.{
+  EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed
+}
 
 trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
   override def minus(a: BigInteger, b: BigInteger): BigInteger = a subtract b

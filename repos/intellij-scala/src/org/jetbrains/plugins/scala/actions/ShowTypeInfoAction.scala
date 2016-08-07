@@ -3,14 +3,18 @@ package actions
 
 import _root_.com.intellij.codeInsight.TargetElementUtil
 import _root_.com.intellij.psi._
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent, CommonDataKeys}
+import com.intellij.openapi.actionSystem.{
+  AnAction, AnActionEvent, CommonDataKeys
+}
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.util.{PsiTreeUtil, PsiUtilBase}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.types.{ScSubstitutor, ScType, ScTypePresentation}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScSubstitutor, ScType, ScTypePresentation
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 
 /**

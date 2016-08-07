@@ -246,9 +246,9 @@ class ActorMailboxSpec(conf: Config)
     val q = expectMsgType[MessageQueue]
     types foreach
       (t ⇒
-            assert(
-                t isInstance q,
-                s"Type [${q.getClass.getName}] is not assignable to [${t.getName}]"))
+         assert(
+             t isInstance q,
+             s"Type [${q.getClass.getName}] is not assignable to [${t.getName}]"))
     q
   }
 

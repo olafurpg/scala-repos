@@ -19,8 +19,7 @@ import scala.language.postfixOps
   *
   * @author Manohar Jonnalagedda
   * @author Gilles Dubochet */
-trait CommentFactoryBase {
-  this: MemberLookupBase =>
+trait CommentFactoryBase { this: MemberLookupBase =>
 
   val global: Global
   import global.{reporter, Symbol, NoSymbol}

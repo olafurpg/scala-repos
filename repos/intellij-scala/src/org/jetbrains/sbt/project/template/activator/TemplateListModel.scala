@@ -18,10 +18,10 @@ class TemplateListModel(
 
   /**
     * We have to preserve both index and id in order to
-    * be able extract any item in correct order (for display in the list, in lex order) and 
+    * be able extract any item in correct order (for display in the list, in lex order) and
     * to extract particular selected item. We can't relay on index only because filtering feature in the UI uses
     * model changing (so new model will probably have other amount of items and other indices). Also we can't preserve
-    * id's only as we want to show items in actual order without ugly hacks like using LinkedHashSet 
+    * id's only as we want to show items in actual order without ugly hacks like using LinkedHashSet
     */
   private val (indexedItems, idToItem) = {
     val a1 = items.sortBy(a => a._2.title)

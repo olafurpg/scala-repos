@@ -21,7 +21,9 @@ import java.nio.ByteBuffer
 
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.CatalystTypeConverters
-import org.apache.spark.sql.catalyst.expressions.{GenericMutableRow, UnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.{
+  GenericMutableRow, UnsafeProjection
+}
 import org.apache.spark.sql.types._
 
 class TestNullableColumnAccessor[JvmType](buffer: ByteBuffer,

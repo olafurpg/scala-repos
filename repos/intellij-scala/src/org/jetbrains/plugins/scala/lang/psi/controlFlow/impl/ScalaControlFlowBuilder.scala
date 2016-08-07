@@ -4,12 +4,18 @@ package lang.psi.controlFlow.impl
 import _root_.org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScCaseClause, ScPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern, ScCaseClause, ScPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScParameterOwner, ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScParameterOwner, ScPatternDefinition, ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
-import org.jetbrains.plugins.scala.lang.psi.controlFlow.{Instruction, ScControlFlowPolicy}
+import org.jetbrains.plugins.scala.lang.psi.controlFlow.{
+  Instruction, ScControlFlowPolicy
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScFunctionType
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
 
@@ -366,9 +372,9 @@ class ScalaControlFlowBuilder(startInScope: ScalaPsiElement,
   override def visitReturnStatement(ret: ScReturnStmt) {
     val isNodeNeeded =
       myHead == null || (myHead.element match {
-            case Some(e) => e != ret
-            case None => false
-          })
+        case Some(e) => e != ret
+        case None => false
+      })
     ret.expr match {
       case Some(e) => e.accept(this)
       case None =>
@@ -466,9 +472,9 @@ class ScalaControlFlowBuilder(startInScope: ScalaPsiElement,
   override def visitThrowExpression(throwStmt: ScThrowStmt) {
     val isNodeNeeded =
       myHead == null || (myHead.element match {
-            case Some(e) => e != throwStmt
-            case None => false
-          })
+        case Some(e) => e != throwStmt
+        case None => false
+      })
     throwStmt.body.map(_.accept(this))
     if (isNodeNeeded)
       startNode(Some(throwStmt)) { rs =>

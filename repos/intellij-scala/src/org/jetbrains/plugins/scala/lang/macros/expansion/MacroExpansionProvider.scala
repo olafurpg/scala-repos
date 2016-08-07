@@ -4,7 +4,10 @@ import java.awt.event.MouseEvent
 import java.util
 
 import com.intellij.codeHighlighting.Pass
-import com.intellij.codeInsight.daemon.{GutterIconNavigationHandler, LineMarkerInfo, LineMarkerProvider, RelatedItemLineMarkerInfo}
+import com.intellij.codeInsight.daemon.{
+  GutterIconNavigationHandler, LineMarkerInfo, LineMarkerProvider,
+  RelatedItemLineMarkerInfo
+}
 import com.intellij.navigation.GotoRelatedItem
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.{PsiElement, PsiManager}

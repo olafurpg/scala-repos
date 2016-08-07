@@ -9,8 +9,7 @@ import org.objectweb.asm._
 
 import scala.collection.immutable.Queue
 
-trait ClassfileIndexer {
-  this: SLF4JLogging =>
+trait ClassfileIndexer { this: SLF4JLogging =>
 
   /**
     * @param file to index
@@ -132,8 +131,7 @@ trait ClassfileIndexer {
 
   // factors out much of the verbose code that looks for references to members
   // TODO: we need a classesInSignature (which needs the ability to parse signature)
-  private trait ReferenceInClassHunter {
-    this: ClassVisitor =>
+  private trait ReferenceInClassHunter { this: ClassVisitor =>
 
     def clazz: RawClassfile
 
@@ -211,8 +209,7 @@ trait ClassfileIndexer {
     ) = handleAnn(desc)
   }
 
-  private trait ReferenceInMethodHunter {
-    this: MethodVisitor =>
+  private trait ReferenceInMethodHunter { this: MethodVisitor =>
 
     protected var internalRefs = Queue.empty[FullyQualifiedName]
 

@@ -23,7 +23,7 @@ trait Name {
 }
 
 /** A factory for rules.
-  * 
+  *
   * @author Andrew Foggin
   *
   * Inspired by the Scala parser combinator.

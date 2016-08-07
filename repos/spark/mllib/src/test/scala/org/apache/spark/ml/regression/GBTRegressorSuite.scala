@@ -22,7 +22,9 @@ import org.apache.spark.ml.tree.impl.TreeTests
 import org.apache.spark.ml.util.MLTestingUtils
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.{EnsembleTestHelper, GradientBoostedTrees => OldGBT}
+import org.apache.spark.mllib.tree.{
+  EnsembleTestHelper, GradientBoostedTrees => OldGBT
+}
 import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.rdd.RDD
@@ -139,12 +141,10 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("model save/load") {
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
-
     val trees = Range(0, 3).map(_ => OldDecisionTreeSuite.createModel(OldAlgo.Regression)).toArray
     val treeWeights = Array(0.1, 0.3, 1.1)
     val oldModel = new OldGBTModel(OldAlgo.Regression, trees, treeWeights)
     val newModel = GBTRegressionModel.fromOld(oldModel)
-
     // Save model, load it back, and compare.
     try {
       newModel.save(sc, path)

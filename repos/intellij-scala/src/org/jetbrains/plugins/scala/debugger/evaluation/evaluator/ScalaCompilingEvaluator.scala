@@ -8,9 +8,13 @@ import java.util
 import com.intellij.codeInsight.CodeInsightUtilCore
 import com.intellij.debugger.engine._
 import com.intellij.debugger.engine.evaluation._
-import com.intellij.debugger.engine.evaluation.expression.{Evaluator, ExpressionEvaluator, Modifier}
+import com.intellij.debugger.engine.evaluation.expression.{
+  Evaluator, ExpressionEvaluator, Modifier
+}
 import com.intellij.debugger.jdi.VirtualMachineProxyImpl
-import com.intellij.debugger.{DebuggerInvocationUtil, EvaluatingComputable, SourcePosition}
+import com.intellij.debugger.{
+  DebuggerInvocationUtil, EvaluatingComputable, SourcePosition
+}
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
@@ -20,7 +24,9 @@ import com.intellij.psi.{PsiElement, PsiFile, PsiFileFactory}
 import com.sun.jdi._
 import org.jetbrains.plugins.scala.debugger.evaluation._
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScBlockStatement}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock, ScBlockStatement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass

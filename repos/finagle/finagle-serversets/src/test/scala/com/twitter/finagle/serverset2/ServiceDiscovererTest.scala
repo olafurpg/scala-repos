@@ -4,7 +4,9 @@ import com.twitter.common.io.JsonCodec
 import com.twitter.common.zookeeper.ServerSets
 import com.twitter.conversions.time._
 import com.twitter.finagle.serverset2.ServiceDiscoverer.ClientHealth
-import com.twitter.finagle.serverset2.ZkOp.{GetData, GetChildrenWatch, ExistsWatch}
+import com.twitter.finagle.serverset2.ZkOp.{
+  GetData, GetChildrenWatch, ExistsWatch
+}
 import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.finagle.serverset2.client._
 import com.twitter.finagle.util.DefaultTimer

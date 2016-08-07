@@ -17,7 +17,7 @@
 package net.liftweb
 package json
 
-/** Use fundep encoding to improve return type of merge function 
+/** Use fundep encoding to improve return type of merge function
   *  (see: http://www.chuusai.com/2011/07/16/fundeps-in-scala/)
   *
   *  JObject merge JObject = JObject

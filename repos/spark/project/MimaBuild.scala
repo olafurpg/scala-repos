@@ -22,7 +22,9 @@ import com.typesafe.tools.mima.core._
 import com.typesafe.tools.mima.core.MissingClassProblem
 import com.typesafe.tools.mima.core.MissingTypesProblem
 import com.typesafe.tools.mima.core.ProblemFilters._
-import com.typesafe.tools.mima.plugin.MimaKeys.{binaryIssueFilters, previousArtifact}
+import com.typesafe.tools.mima.plugin.MimaKeys.{
+  binaryIssueFilters, previousArtifact
+}
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 
 object MimaBuild {

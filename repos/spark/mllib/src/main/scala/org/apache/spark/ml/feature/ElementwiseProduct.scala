@@ -20,7 +20,9 @@ package org.apache.spark.ml.feature
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.UnaryTransformer
 import org.apache.spark.ml.param.Param
-import org.apache.spark.ml.util.{DefaultParamsReadable, DefaultParamsWritable, Identifiable}
+import org.apache.spark.ml.util.{
+  DefaultParamsReadable, DefaultParamsWritable, Identifiable
+}
 import org.apache.spark.mllib.feature
 import org.apache.spark.mllib.linalg.{Vector, VectorUDT}
 import org.apache.spark.sql.types.DataType

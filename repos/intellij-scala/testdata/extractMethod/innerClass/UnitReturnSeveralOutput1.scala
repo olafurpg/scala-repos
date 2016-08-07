@@ -15,7 +15,6 @@ class UnitReturnSeveralOutput1 {
 //inner class
 class UnitReturnSeveralOutput1 {
   def foo(i: Int) {
-
     val testMethodNameResult: TestMethodNameResult = testMethodName match {
       case Some(result) => result
       case None => return
@@ -24,13 +23,9 @@ class UnitReturnSeveralOutput1 {
     var y: String = testMethodNameResult.y
     var z: Int = testMethodNameResult.z
     val zz: String = testMethodNameResult.zz
-
-
     println(x + y + z + zz)
   }
-
   class TestMethodNameResult(val x: Int, val y: String, val z: Int, val zz: String)
-
   def testMethodName: Option[TestMethodNameResult] = {
     if (true) return None
     var x = 0

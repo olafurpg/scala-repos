@@ -6,7 +6,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.{LocalSearchScope, SearchScope}
 import com.intellij.psi.tree.{IElementType, TokenSet}
 import org.jetbrains.plugins.scala.extensions.implementation.PsiElementExtTrait
-import org.jetbrains.plugins.scala.lang.psi.api.{ScalaElementVisitor, ScalaFile}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaElementVisitor, ScalaFile
+}
 import org.jetbrains.plugins.scala.util.monads.MonadTransformer
 
 trait ScalaPsiElement

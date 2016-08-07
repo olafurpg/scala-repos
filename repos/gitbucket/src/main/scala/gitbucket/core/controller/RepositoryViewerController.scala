@@ -49,7 +49,20 @@ class RepositoryViewerController
   * The repository viewer.
   */
 trait RepositoryViewerControllerBase extends ControllerBase {
-  self: RepositoryService with AccountService with ActivityService with IssuesService with WebHookService with CommitsService with ReadableUsersAuthenticator with ReferrerAuthenticator with CollaboratorsAuthenticator with PullRequestService with CommitStatusService with WebHookPullRequestService with WebHookPullRequestReviewCommentService with ProtectedBranchService =>
+  self: RepositoryService
+    with AccountService
+    with ActivityService
+    with IssuesService
+    with WebHookService
+    with CommitsService
+    with ReadableUsersAuthenticator
+    with ReferrerAuthenticator
+    with CollaboratorsAuthenticator
+    with PullRequestService
+    with CommitStatusService
+    with WebHookPullRequestService
+    with WebHookPullRequestReviewCommentService
+    with ProtectedBranchService =>
 
   ArchiveCommand.registerFormat("zip", new ZipFormat)
   ArchiveCommand.registerFormat("tar.gz", new TgzFormat)

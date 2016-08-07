@@ -4,7 +4,10 @@ import com.intellij.application.options.SmartIndentOptionsEditor
 import com.intellij.lang.Language
 import com.intellij.openapi.application.ApplicationBundle
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider.SettingsType
-import com.intellij.psi.codeStyle.{CodeStyleSettingsCustomizable, CommonCodeStyleSettings, DisplayPriority, LanguageCodeStyleSettingsProvider}
+import com.intellij.psi.codeStyle.{
+  CodeStyleSettingsCustomizable, CommonCodeStyleSettings, DisplayPriority,
+  LanguageCodeStyleSettingsProvider
+}
 import org.jetbrains.plugins.scala.ScalaFileType
 
 import scala.collection.mutable.ArrayBuffer

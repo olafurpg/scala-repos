@@ -1,6 +1,8 @@
 package com.twitter.util
 
-import java.util.concurrent.atomic.{AtomicLong, AtomicReference, AtomicReferenceArray}
+import java.util.concurrent.atomic.{
+  AtomicLong, AtomicReference, AtomicReferenceArray
+}
 import java.util.{List => JList}
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._

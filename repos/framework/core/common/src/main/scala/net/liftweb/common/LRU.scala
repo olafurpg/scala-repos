@@ -185,7 +185,7 @@ class LRUMap[K, V](initMaxSize: Int,
       toRemove.remove
       localMap.remove(toRemove.value1)
       expired(toRemove.value1, toRemove.value2)
-      expiredFunc.foreach(_ (toRemove.value1, toRemove.value2))
+      expiredFunc.foreach(_(toRemove.value1, toRemove.value2))
     }
   }
 

@@ -6,7 +6,9 @@ import org.jetbrains.plugins.scala.annotator.quickfix.ImplementMethodsQuickFix
 import org.jetbrains.plugins.scala.annotator.quickfix.modifiers.AddModifierQuickFix
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.overrideImplement.ScAliasMember
 import org.jetbrains.plugins.scala.overrideImplement.ScalaOIUtil._
 

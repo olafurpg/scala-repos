@@ -7,7 +7,9 @@ import com.intellij.lang._
 import com.intellij.openapi.util._
 import com.intellij.psi._
 import com.intellij.psi.codeStyle.CodeStyleSettings
-import com.intellij.psi.formatter.{FormattingDocumentModelImpl, PsiBasedFormattingModel}
+import com.intellij.psi.formatter.{
+  FormattingDocumentModelImpl, PsiBasedFormattingModel
+}
 import com.intellij.psi.impl.source.tree.TreeUtil
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.scala.lang.formatting.ScalaFormattingModelBuilder._

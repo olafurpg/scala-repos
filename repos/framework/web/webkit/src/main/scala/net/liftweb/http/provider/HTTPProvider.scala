@@ -54,7 +54,7 @@ trait HTTPProvider {
     */
   protected def service(req: HTTPRequest, resp: HTTPResponse)(chain: => Unit) = {
     tryo {
-      LiftRules.early.toList.foreach(_ (req))
+      LiftRules.early.toList.foreach(_(req))
     }
 
     CurrentHTTPReqResp.doWith(req -> resp) {
@@ -160,9 +160,9 @@ trait HTTPProvider {
       case Full(b) => b
       case _ =>
         session.path.endSlash || (session.path.wholePath.takeRight(1) match {
-              case Nil => true
-              case x :: xs => liftHandled(x)
-            }) || context.resource(session.uri) == null
+          case Nil => true
+          case x :: xs => liftHandled(x)
+        }) || context.resource(session.uri) == null
     }
   }
 }

@@ -8,7 +8,10 @@
 
 package scala.concurrent.impl
 
-import scala.concurrent.{ExecutionContext, CanAwait, OnCompleteRunnable, TimeoutException, ExecutionException}
+import scala.concurrent.{
+  ExecutionContext, CanAwait, OnCompleteRunnable, TimeoutException,
+  ExecutionException
+}
 import scala.concurrent.Future.InternalCallbackExecutor
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.annotation.tailrec

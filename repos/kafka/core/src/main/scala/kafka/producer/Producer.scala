@@ -21,7 +21,9 @@ import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
 
 import kafka.common.{AppInfo, QueueFullException}
 import kafka.metrics._
-import kafka.producer.async.{DefaultEventHandler, EventHandler, ProducerSendThread}
+import kafka.producer.async.{
+  DefaultEventHandler, EventHandler, ProducerSendThread
+}
 import kafka.serializer.Encoder
 import kafka.utils._
 

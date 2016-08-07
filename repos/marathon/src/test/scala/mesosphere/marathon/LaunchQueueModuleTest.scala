@@ -3,7 +3,9 @@ package mesosphere.marathon
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.launcher.TaskOpFactory
 import mesosphere.marathon.core.launcher.impl.TaskOpFactoryHelper
-import mesosphere.marathon.core.launchqueue.{LaunchQueueConfig, LaunchQueueModule}
+import mesosphere.marathon.core.launchqueue.{
+  LaunchQueueConfig, LaunchQueueModule
+}
 import mesosphere.marathon.core.leadership.AlwaysElectedLeadershipModule
 import mesosphere.marathon.core.matcher.DummyOfferMatcherManager
 import mesosphere.marathon.core.task.Task

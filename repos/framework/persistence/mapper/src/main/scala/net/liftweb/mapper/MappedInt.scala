@@ -199,7 +199,6 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
   /*
   Mapper dependency on Widgets is the wrong order.  There should be a trait in Widgets that's
   mixed into this class that provides autocomplete.  dpp 2009/12/01
-
   /**
    * Whether or not to use autocomplete in toForm
    */

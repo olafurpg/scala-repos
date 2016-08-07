@@ -35,7 +35,6 @@ class IterativelyReweightedLeastSquaresSuite
     super.beforeAll()
     /*
        R code:
-
        A <- matrix(c(0, 1, 2, 3, 5, 2, 1, 3), 4, 2)
        b <- c(1, 0, 1, 0)
        w <- c(1, 2, 3, 4)
@@ -50,7 +49,6 @@ class IterativelyReweightedLeastSquaresSuite
         2)
     /*
        R code:
-
        A <- matrix(c(0, 1, 2, 3, 5, 7, 11, 13), 4, 2)
        b <- c(2, 8, 3, 9)
        w <- c(1, 2, 3, 4)
@@ -68,13 +66,11 @@ class IterativelyReweightedLeastSquaresSuite
   test("IRLS against GLM with Binomial errors") {
     /*
        R code:
-
        df <- as.data.frame(cbind(A, b))
        for (formula in c(b ~ . -1, b ~ .)) {
          model <- glm(formula, family="binomial", data=df, weights=w)
          print(as.vector(coef(model)))
        }
-
        [1] -0.30216651 -0.04452045
        [1]  3.5651651 -1.2334085 -0.7348971
      */
@@ -112,13 +108,11 @@ class IterativelyReweightedLeastSquaresSuite
   test("IRLS against GLM with Poisson errors") {
     /*
        R code:
-
        df <- as.data.frame(cbind(A, b))
        for (formula in c(b ~ . -1, b ~ .)) {
          model <- glm(formula, family="poisson", data=df, weights=w)
          print(as.vector(coef(model)))
        }
-
        [1] -0.09607792  0.18375613
        [1]  6.299947  3.324107 -1.081766
      */
@@ -157,15 +151,12 @@ class IterativelyReweightedLeastSquaresSuite
   test("IRLS against L1Regression") {
     /*
        R code:
-
        library(quantreg)
-
        df <- as.data.frame(cbind(A, b))
        for (formula in c(b ~ . -1, b ~ .)) {
          model <- rq(formula, data=df, weights=w)
          print(as.vector(coef(model)))
        }
-
        [1] 1.266667 0.400000
        [1] 29.5 17.0 -5.5
      */

@@ -124,7 +124,7 @@ object Msgs extends DispatchSnippet {
         val styles = ajaxStorage.get.flatMap(_.cssClasses)
 
         // Compute the resulting div
-        f(messages).toList.map(e => ( <li>{e}</li>)) match {
+        f(messages).toList.map(e => (<li>{e}</li>)) match {
           case Nil => Nil
           case msgList => {
             val ret = <div id={noticeType.id}>{title}<ul>{msgList}</ul></div>
@@ -142,7 +142,7 @@ object Msgs extends DispatchSnippet {
   }
 
   /**
-    *  This method wraps the JavaScript fade and effect scripts into lift's page 
+    *  This method wraps the JavaScript fade and effect scripts into lift's page
     *  script that runs onLoad.
     */
   private[snippet] def appendScript(script: JsCmd): NodeSeq = {
@@ -169,7 +169,7 @@ object Msgs extends DispatchSnippet {
 
   /**
     * This method produces and appends a script element to lift's page script
-    * to fade out the given notice type. 
+    * to fade out the given notice type.
     *
     * @see net.liftweb.http.LiftRules.noticesAutoFadeOut
     */

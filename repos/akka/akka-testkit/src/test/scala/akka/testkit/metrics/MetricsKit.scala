@@ -12,7 +12,9 @@ import com.typesafe.config.Config
 import java.util
 import scala.util.matching.Regex
 import scala.collection.mutable
-import akka.testkit.metrics.reporter.{GraphiteClient, AkkaGraphiteReporter, AkkaConsoleReporter}
+import akka.testkit.metrics.reporter.{
+  GraphiteClient, AkkaGraphiteReporter, AkkaConsoleReporter
+}
 import org.scalatest.Notifying
 import scala.reflect.ClassTag
 
@@ -26,8 +28,7 @@ import scala.reflect.ClassTag
   * Reporting defaults to `ConsoleReporter`.
   * In order to send registry to Graphite run sbt with the following property: `-Dakka.registry.reporting.0=graphite`.
   */
-private[akka] trait MetricsKit extends MetricsKitOps {
-  this: Notifying ⇒
+private[akka] trait MetricsKit extends MetricsKitOps { this: Notifying ⇒
 
   import MetricsKit._
   import collection.JavaConverters._
@@ -217,8 +218,7 @@ private[akka] object MetricsKit {
 }
 
 /** Provides access to custom Akka `com.codahale.metrics.Metric`, with named methods. */
-trait AkkaMetricRegistry {
-  this: MetricRegistry ⇒
+trait AkkaMetricRegistry { this: MetricRegistry ⇒
 
   def getKnownOpsInTimespanCounters =
     filterFor(classOf[KnownOpsInTimespanTimer])

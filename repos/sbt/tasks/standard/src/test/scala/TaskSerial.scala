@@ -9,7 +9,9 @@ import TaskGen.{MaxWorkers, MaxWorkersGen}
 import org.scalacheck._
 import Prop.forAll
 import Transform.taskToNode
-import ConcurrentRestrictions.{All, completionService, limitTotal, tagged => tagged0, TagMap, unrestricted}
+import ConcurrentRestrictions.{
+  All, completionService, limitTotal, tagged => tagged0, TagMap, unrestricted
+}
 
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 

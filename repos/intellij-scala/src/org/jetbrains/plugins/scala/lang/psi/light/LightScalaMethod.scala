@@ -5,7 +5,9 @@ import java.util
 import com.intellij.psi.impl.PsiSuperMethodImplUtil
 import com.intellij.psi.impl.light.LightMethod
 import com.intellij.psi.util.MethodSignatureBackedByPsiMethod
-import com.intellij.psi.{HierarchicalMethodSignature, PsiClass, PsiManager, PsiMethod}
+import com.intellij.psi.{
+  HierarchicalMethodSignature, PsiClass, PsiManager, PsiMethod
+}
 
 /**
   * @author Alefas

@@ -104,9 +104,9 @@ class OpenHashMap[Key, Value](initialSize: Int)
 
   /** Return the index of the first slot in the hash table (in probe order)
     * that either is empty, or is or was last occupied by the given key.
-    * 
+    *
     * This method is an optimization for when the hash value is in hand.
-    * 
+    *
     * @param hash hash value for `key`
     */
   private[this] def findIndex(key: Key, hash: Int): Int = {

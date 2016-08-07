@@ -30,7 +30,10 @@ import javafx.{event => jfxe, stage => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{DoubleProperty, ObjectProperty, ReadOnlyBooleanProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  DoubleProperty, ObjectProperty, ReadOnlyBooleanProperty,
+  ReadOnlyDoubleProperty, ReadOnlyObjectProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.event.{Event, EventHandlerDelegate}
 

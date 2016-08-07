@@ -32,7 +32,7 @@ object Tail extends DispatchSnippet {
 
 /**
   * The 'head' snippet.  Use this snippet to move
-  * a chunk of 
+  * a chunk of
   */
 object Head extends DispatchSnippet {
   lazy val valid = Set("title", "base", "link", "meta", "style", "script")

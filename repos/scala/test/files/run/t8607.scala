@@ -16,21 +16,17 @@ object Test {
     new p1.C.<init>(
       c.$asInstanceOf[scala.this.Int]()
     ).a();
-
-
     new p1.C.<init>(
       new p1.C.<init>(
         c.$asInstanceOf[scala.this.Int]()
       ).$asInstanceOf[ErasedValueType(class C, scala.this.Int)]()
        .$asInstanceOf[scala.this.Int]()
     ).a();
-
     new p1.C.<init>(
       new p1.C.<init>(c)
         .$asInstanceOf[scala.this.Int]()
         .$asInstanceOf[scala.this.Int]()
       ).a();
-
    */
   }
 }

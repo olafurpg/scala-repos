@@ -7,7 +7,9 @@ import lila.db.api._
 import lila.forum.MiniForumPost
 import lila.game.{GameRepo, Game}
 import lila.team.tube._
-import lila.team.{Team, Request, RequestRepo, MemberRepo, RequestWithUser, TeamApi}
+import lila.team.{
+  Team, Request, RequestRepo, MemberRepo, RequestWithUser, TeamApi
+}
 import lila.user.{User, UserRepo}
 
 case class TeamInfo(mine: Boolean,

@@ -5,8 +5,7 @@ package akka.http.impl.model.parser
 
 import akka.parboiled2._
 
-private[parser] trait IpAddressParsing {
-  this: Parser ⇒
+private[parser] trait IpAddressParsing { this: Parser ⇒
   import CharacterClasses._
 
   def `ip-v4-address` = rule {

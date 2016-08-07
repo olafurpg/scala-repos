@@ -14,13 +14,25 @@ import akka.{OnlyCauseStackTrace, ConfigurationException}
 import com.typesafe.config.Config
 import java.net.{SocketAddress, InetAddress, InetSocketAddress}
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.{ConcurrentHashMap, Executors, CancellationException}
-import org.jboss.netty.bootstrap.{ConnectionlessBootstrap, Bootstrap, ClientBootstrap, ServerBootstrap}
+import java.util.concurrent.{
+  ConcurrentHashMap, Executors, CancellationException
+}
+import org.jboss.netty.bootstrap.{
+  ConnectionlessBootstrap, Bootstrap, ClientBootstrap, ServerBootstrap
+}
 import org.jboss.netty.buffer.{ChannelBuffers, ChannelBuffer}
 import org.jboss.netty.channel._
-import org.jboss.netty.channel.group.{DefaultChannelGroup, ChannelGroup, ChannelGroupFuture, ChannelGroupFutureListener}
-import org.jboss.netty.channel.socket.nio.{NioWorkerPool, NioDatagramChannelFactory, NioServerSocketChannelFactory, NioClientSocketChannelFactory}
-import org.jboss.netty.handler.codec.frame.{LengthFieldBasedFrameDecoder, LengthFieldPrepender}
+import org.jboss.netty.channel.group.{
+  DefaultChannelGroup, ChannelGroup, ChannelGroupFuture,
+  ChannelGroupFutureListener
+}
+import org.jboss.netty.channel.socket.nio.{
+  NioWorkerPool, NioDatagramChannelFactory, NioServerSocketChannelFactory,
+  NioClientSocketChannelFactory
+}
+import org.jboss.netty.handler.codec.frame.{
+  LengthFieldBasedFrameDecoder, LengthFieldPrepender
+}
 import org.jboss.netty.handler.ssl.SslHandler
 import scala.concurrent.duration.{FiniteDuration}
 import scala.concurrent.{ExecutionContext, Promise, Future, blocking}

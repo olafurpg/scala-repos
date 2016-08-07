@@ -48,8 +48,8 @@ object QueryableMacros {
 }
 class Queryable[T] {
   def _map[S](projection: T => S): Queryable[S] = ???
-  def map[S](projection: T => S): Queryable[S] = macro QueryableMacros
-    .map[T, S]
+  def map[S](projection: T => S): Queryable[S] =
+    macro QueryableMacros.map[T, S]
 }
 object Queryable {
   def factory[S](projection: ru.Expr[Queryable[S]]): Queryable[S] = null

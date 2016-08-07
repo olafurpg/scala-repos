@@ -283,7 +283,6 @@ trait Counter2Ops {
     val field = implicitly[Ring[V]]
     def apply(c: Counter2[K1, K2, V], n: Double): Double = {
       import c._
-
       if (n == 1) {
         var sum = 0.0
         activeValuesIterator foreach (v => sum += field.norm(v))

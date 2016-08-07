@@ -114,8 +114,7 @@ trait Trees extends api.Trees { self: SymbolTable =>
       (duplicator transform this).asInstanceOf[this.type]
   }
 
-  abstract class TreeContextApiImpl extends TreeApi {
-    this: Tree =>
+  abstract class TreeContextApiImpl extends TreeApi { this: Tree =>
 
     override def orElse(alt: => Tree) = if (!isEmpty) this else alt
 

@@ -32,7 +32,19 @@ class AccountController
     with RepositoryCreationService
 
 trait AccountControllerBase extends AccountManagementControllerBase {
-  self: AccountService with RepositoryService with ActivityService with WikiService with LabelsService with SshKeyService with OneselfAuthenticator with UsersAuthenticator with GroupManagerAuthenticator with ReadableUsersAuthenticator with AccessTokenService with WebHookService with RepositoryCreationService =>
+  self: AccountService
+    with RepositoryService
+    with ActivityService
+    with WikiService
+    with LabelsService
+    with SshKeyService
+    with OneselfAuthenticator
+    with UsersAuthenticator
+    with GroupManagerAuthenticator
+    with ReadableUsersAuthenticator
+    with AccessTokenService
+    with WebHookService
+    with RepositoryCreationService =>
 
   case class AccountNewForm(userName: String,
                             password: String,

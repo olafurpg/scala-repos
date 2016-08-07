@@ -2,7 +2,10 @@ package com.twitter.util
 
 import com.twitter.concurrent.NamedPoolThreadFactory
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.{CancellationException, ExecutionException, ExecutorService, Executors, RejectedExecutionException}
+import java.util.concurrent.{
+  CancellationException, ExecutionException, ExecutorService, Executors,
+  RejectedExecutionException
+}
 import scala.runtime.NonLocalReturnControl
 
 /**

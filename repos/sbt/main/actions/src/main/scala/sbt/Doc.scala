@@ -12,9 +12,14 @@ import sbt.io.Path._
 import sbt.io.IO
 
 import sbinary.DefaultProtocol.FileFormat
-import sbt.internal.util.Cache.{defaultEquiv, hConsCache, hNilCache, seqCache, seqFormat, streamFormat, StringFormat, UnitFormat, wrapIn}
+import sbt.internal.util.Cache.{
+  defaultEquiv, hConsCache, hNilCache, seqCache, seqFormat, streamFormat,
+  StringFormat, UnitFormat, wrapIn
+}
 import sbt.internal.util.Tracked.{inputChanged, outputChanged}
-import sbt.internal.util.{FilesInfo, HashFileInfo, HNil, ModifiedFileInfo, PlainFileInfo}
+import sbt.internal.util.{
+  FilesInfo, HashFileInfo, HNil, ModifiedFileInfo, PlainFileInfo
+}
 import sbt.internal.util.FilesInfo.{exists, hash, lastModified}
 import xsbti.Reporter
 

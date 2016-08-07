@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -65,8 +65,7 @@ trait BlockStoreColumnarTableModuleConfig {
 
 trait BlockStoreColumnarTableModule[M[+ _]]
     extends ColumnarTableModule[M]
-    with YggConfigComponent {
-  self =>
+    with YggConfigComponent { self =>
 
   protected lazy val blockModuleLogger = LoggerFactory.getLogger(
       "com.precog.yggdrasil.table.BlockStoreColumnarTableModule")
@@ -645,7 +644,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
             }
           }
 
-          // This function exists so that we can correctly nandle the situation where the right side is out of data 
+          // This function exists so that we can correctly nandle the situation where the right side is out of data
           // and we need to continue in a span on the left.
           def continue(nextStep: NextStep,
                        comparator: RowComparator,
@@ -746,7 +745,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                       (span: @unchecked) match {
                         case NoSpan =>
                           //println("No more data on right and not in a span; emitting left based on bitset " + leq.toList.mkString("[", ",", "]"))
-                          // entirely done; just emit both 
+                          // entirely done; just emit both
                           val lemission = leq.nonEmpty.option(lhead.mapColumns(
                                   cf.util.filter(0, lhead.size, leq)))
                           (lemission map { e =>
@@ -1559,7 +1558,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
     /**
       * Sorts the KV table by ascending or descending order of a transformation
       * applied to the rows.
-      * 
+      *
       * @see com.precog.yggdrasil.TableModule#sort(TransSpec1, DesiredSortOrder, Boolean)
       */
     def sort(sortKey: TransSpec1,
@@ -1573,7 +1572,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
     /**
       * Sorts the KV table by ascending or descending order based on a seq of transformations
       * applied to the rows.
-      * 
+      *
       * @see com.precog.yggdrasil.TableModule#groupByN(TransSpec1, DesiredSortOrder, Boolean)
       */
     def groupByN(groupKeys: Seq[TransSpec1],

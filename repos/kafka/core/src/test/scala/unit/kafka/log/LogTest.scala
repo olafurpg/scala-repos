@@ -20,7 +20,10 @@ import java.io._
 import java.util.Properties
 import java.util.concurrent.atomic._
 
-import org.apache.kafka.common.errors.{CorruptRecordException, OffsetOutOfRangeException, RecordBatchTooLargeException, RecordTooLargeException}
+import org.apache.kafka.common.errors.{
+  CorruptRecordException, OffsetOutOfRangeException,
+  RecordBatchTooLargeException, RecordTooLargeException
+}
 import kafka.api.ApiVersion
 import kafka.common.LongRef
 import org.junit.Assert._

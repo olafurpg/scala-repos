@@ -20,7 +20,9 @@ package org.apache.spark.sql.execution.datasources.csv
 import java.io.{ByteArrayOutputStream, OutputStreamWriter, StringReader}
 import java.nio.charset.StandardCharsets
 
-import com.univocity.parsers.csv.{CsvParser, CsvParserSettings, CsvWriter, CsvWriterSettings}
+import com.univocity.parsers.csv.{
+  CsvParser, CsvParserSettings, CsvWriter, CsvWriterSettings
+}
 
 import org.apache.spark.internal.Logging
 

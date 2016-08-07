@@ -2,16 +2,22 @@ package com.twitter.finagle.netty3
 
 import com.twitter.finagle.client.{LatencyCompensation, Transporter}
 import com.twitter.finagle.httpproxy.HttpConnectHandler
-import com.twitter.finagle.netty3.channel.{ChannelRequestStatsHandler, ChannelStatsHandler, IdleChannelHandler}
+import com.twitter.finagle.netty3.channel.{
+  ChannelRequestStatsHandler, ChannelStatsHandler, IdleChannelHandler
+}
 import com.twitter.finagle.netty3.socks.SocksConnectHandler
 import com.twitter.finagle.netty3.ssl.SslConnectHandler
 import com.twitter.finagle.netty3.transport.ChannelTransport
-import com.twitter.finagle.socks.{SocksProxyFlags, Unauthenticated, UsernamePassAuthenticationSetting}
+import com.twitter.finagle.socks.{
+  SocksProxyFlags, Unauthenticated, UsernamePassAuthenticationSetting
+}
 import com.twitter.finagle.ssl.Engine
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.transport.Transport
 import com.twitter.finagle.util.DefaultTimer
-import com.twitter.finagle.{Stack, WriteException, CancelledConnectionException}
+import com.twitter.finagle.{
+  Stack, WriteException, CancelledConnectionException
+}
 import com.twitter.util.{Future, Promise, Duration, NonFatal, Stopwatch}
 import java.net.{InetSocketAddress, SocketAddress}
 import java.nio.channels.UnresolvedAddressException
@@ -20,7 +26,9 @@ import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 import org.jboss.netty.channel.ChannelHandler
 import org.jboss.netty.channel.socket.ChannelRunnableWrapper
-import org.jboss.netty.channel.socket.nio.{NioSocketChannel, NioClientSocketChannelFactory}
+import org.jboss.netty.channel.socket.nio.{
+  NioSocketChannel, NioClientSocketChannelFactory
+}
 import org.jboss.netty.channel.{ChannelFactory => NettyChannelFactory, _}
 import org.jboss.netty.handler.timeout.IdleStateHandler
 import scala.collection.JavaConverters._

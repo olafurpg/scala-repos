@@ -31,7 +31,10 @@ import javafx.{event => jfxe, scene => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty, ReadOnlyObjectProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty,
+  ReadOnlyObjectProperty, StringProperty
+}
 import scalafx.css.Styleable
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node

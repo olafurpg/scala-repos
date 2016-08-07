@@ -119,7 +119,6 @@ class RankingMetrics[T: ClassTag](
     *    sum,,i=1,,^k^ (2^{relevance of ''i''th item}^ - 1) / log(i + 1),
     * and the NDCG is obtained by dividing the DCG value on the ground truth set. In the current
     * implementation, the relevance value is binary.
-
     * If a query has an empty ground truth set, zero will be used as ndcg together with
     * a log warning.
     *

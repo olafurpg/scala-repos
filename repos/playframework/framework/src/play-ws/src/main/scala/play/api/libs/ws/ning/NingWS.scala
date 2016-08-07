@@ -8,7 +8,9 @@ import org.asynchttpclient._
 import play.api._
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.ws._
-import play.api.libs.ws.ahc.{AhcWSClientConfigParser, AhcWSAPI, AhcWSClient, AhcWSRequest}
+import play.api.libs.ws.ahc.{
+  AhcWSClientConfigParser, AhcWSAPI, AhcWSClient, AhcWSRequest
+}
 import play.api.libs.ws.ssl._
 
 /**

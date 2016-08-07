@@ -15,7 +15,10 @@ trait Uncompilable {
   val global: Global
   val settings: Settings
 
-  import global.{reporter, inform, warning, newTypeName, newTermName, Symbol, DocComment, NoSymbol}
+  import global.{
+    reporter, inform, warning, newTypeName, newTermName, Symbol, DocComment,
+    NoSymbol
+  }
   import global.definitions.AnyRefClass
   import global.rootMirror.RootClass
 
@@ -43,8 +46,8 @@ trait Uncompilable {
   def templates =
     symbols filter
       (x =>
-            x.isClass || x.isTrait ||
-              x == AnyRefClass /* which is now a type alias */ ) toSet
+         x.isClass || x.isTrait ||
+           x == AnyRefClass /* which is now a type alias */ ) toSet
   def comments = {
     if (settings.debug || settings.verbose)
       inform(

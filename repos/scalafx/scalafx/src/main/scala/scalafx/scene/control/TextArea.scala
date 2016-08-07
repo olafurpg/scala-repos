@@ -31,7 +31,9 @@ import javafx.scene.{control => jfxsc}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, IntegerProperty
+}
 import scalafx.delegate.SFXDelegate
 
 object TextArea {

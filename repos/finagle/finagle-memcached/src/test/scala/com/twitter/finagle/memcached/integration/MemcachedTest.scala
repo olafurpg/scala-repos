@@ -5,7 +5,9 @@ import com.twitter.finagle.{Name, Address}
 import com.twitter.finagle.builder.ClientBuilder
 import com.twitter.finagle.memcached.protocol.ClientError
 import com.twitter.finagle.Memcached
-import com.twitter.finagle.memcached.{KetamaClientBuilder, Client, PartitionedClient}
+import com.twitter.finagle.memcached.{
+  KetamaClientBuilder, Client, PartitionedClient
+}
 import com.twitter.finagle.param
 import com.twitter.finagle.Service
 import com.twitter.finagle.service.FailureAccrualFactory

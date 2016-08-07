@@ -7,7 +7,6 @@ object consistencyError {
       case (l #:: ls, rs) => None
                               ^
   scala.tools.nsc.symtab.Types$TypeError: too many arguments for method body%1: (val rs: scala.collection.immutable.Stream[A])None.type
-
   two errors found
   vss(0) =
   args = List(tp2, temp6, temp5)

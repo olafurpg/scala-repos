@@ -5,7 +5,9 @@ package akka.persistence.serialization
 
 import java.util.UUID
 import akka.actor._
-import akka.persistence.AtLeastOnceDelivery.{AtLeastOnceDeliverySnapshot, UnconfirmedDelivery}
+import akka.persistence.AtLeastOnceDelivery.{
+  AtLeastOnceDeliverySnapshot, UnconfirmedDelivery
+}
 import akka.persistence._
 import akka.serialization._
 import akka.testkit._

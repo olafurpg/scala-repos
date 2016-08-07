@@ -32,8 +32,8 @@ trait Typeable[T] extends Serializable {
 }
 
 trait LowPriorityTypeable {
-  implicit def dfltTypeable[T]: Typeable[T] = macro TypeableMacros
-    .dfltTypeableImpl[T]
+  implicit def dfltTypeable[T]: Typeable[T] =
+    macro TypeableMacros.dfltTypeableImpl[T]
 }
 
 /**

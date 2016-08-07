@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.project
 
 import java.io.File
 
-import com.intellij.openapi.vfs.{VirtualFile, VirtualFileListener, VirtualFileSystem}
+import com.intellij.openapi.vfs.{
+  VirtualFile, VirtualFileListener, VirtualFileSystem
+}
 
 /**
   * @author Pavel Fatin

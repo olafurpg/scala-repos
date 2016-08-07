@@ -19,7 +19,9 @@ import com.intellij.openapi.components._
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiNamedElement
 import org.jetbrains.plugins.scala.lang.psi.api.macros.impl._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScMacroDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScMacroDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 /**

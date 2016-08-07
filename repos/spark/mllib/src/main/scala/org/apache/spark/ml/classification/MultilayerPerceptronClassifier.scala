@@ -22,7 +22,9 @@ import scala.collection.JavaConverters._
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.{PredictionModel, Predictor, PredictorParams}
 import org.apache.spark.ml.ann.{FeedForwardTopology, FeedForwardTrainer}
-import org.apache.spark.ml.param.{IntArrayParam, IntParam, ParamMap, ParamValidators}
+import org.apache.spark.ml.param.{
+  IntArrayParam, IntParam, ParamMap, ParamValidators
+}
 import org.apache.spark.ml.param.shared.{HasMaxIter, HasSeed, HasTol}
 import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.mllib.linalg.{Vector, Vectors}

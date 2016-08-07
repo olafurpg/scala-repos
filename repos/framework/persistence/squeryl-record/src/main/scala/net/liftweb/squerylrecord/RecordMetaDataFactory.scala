@@ -17,7 +17,9 @@ package squerylrecord
 import common.{Box, Full}
 import record.{BaseField, MetaRecord, Record, TypedField, OwnedField}
 import record.field._
-import org.squeryl.internals.{FieldMetaData, PosoMetaData, FieldMetaDataFactory}
+import org.squeryl.internals.{
+  FieldMetaData, PosoMetaData, FieldMetaDataFactory
+}
 import org.squeryl.annotations.Column
 import java.lang.reflect.{Method, Field}
 import java.lang.annotation.Annotation

@@ -57,7 +57,7 @@ class RowConstraints(
     this(new jfxsl.RowConstraints(minHeight, prefHeight, maxHeight))
 
   /**
-    * Creates a row constraint object with a fixed size range, vertical grow priority, vertical 
+    * Creates a row constraint object with a fixed size range, vertical grow priority, vertical
     * alignment, and vertical fill behavior.
     */
   def this(minHeight: Double,

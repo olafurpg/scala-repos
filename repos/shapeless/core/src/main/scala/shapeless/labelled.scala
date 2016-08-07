@@ -48,8 +48,8 @@ object DefaultSymbolicLabelling {
   def apply[T](implicit lab: DefaultSymbolicLabelling[T]): Aux[T, lab.Out] =
     lab
 
-  implicit def mkDefaultSymbolicLabelling[T]: DefaultSymbolicLabelling[T] = macro LabelledMacros
-    .mkDefaultSymbolicLabellingImpl[T]
+  implicit def mkDefaultSymbolicLabelling[T]: DefaultSymbolicLabelling[T] =
+    macro LabelledMacros.mkDefaultSymbolicLabellingImpl[T]
 }
 
 /**

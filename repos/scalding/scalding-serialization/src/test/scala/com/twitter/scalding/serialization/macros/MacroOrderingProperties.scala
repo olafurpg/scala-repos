@@ -1,12 +1,9 @@
 /*
 Copyright 2012 Twitter, Inc.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +16,10 @@ package com.twitter.scalding.serialization.macros
 import java.io.{ByteArrayOutputStream, InputStream}
 import java.nio.ByteBuffer
 
-import com.twitter.scalding.serialization.{JavaStreamEnrichments, Law, Law1, Law2, Law3, OrderedSerialization, Serialization}
+import com.twitter.scalding.serialization.{
+  JavaStreamEnrichments, Law, Law1, Law2, Law3, OrderedSerialization,
+  Serialization
+}
 import org.scalacheck.Arbitrary.{arbitrary => arb}
 import org.scalacheck.{Arbitrary, Gen, Prop}
 import org.scalatest.prop.{Checkers, PropertyChecks}
@@ -29,8 +29,8 @@ import scala.collection.immutable.Queue
 import scala.language.experimental.macros
 
 trait LowerPriorityImplicit {
-  implicit def primitiveOrderedBufferSupplier[T]: OrderedSerialization[T] = macro impl
-    .OrderedSerializationProviderImpl[T]
+  implicit def primitiveOrderedBufferSupplier[T]: OrderedSerialization[T] =
+    macro impl.OrderedSerializationProviderImpl[T]
 }
 
 object LawTester {
@@ -178,8 +178,8 @@ class MyData(override val _1: Int, override val _2: Option[Long])
 }
 
 object MacroOpaqueContainer {
-  def getOrdSer[T]: OrderedSerialization[T] = macro impl
-    .OrderedSerializationProviderImpl[T]
+  def getOrdSer[T]: OrderedSerialization[T] =
+    macro impl.OrderedSerializationProviderImpl[T]
   import java.io._
   implicit val myContainerOrderedSerializer =
     new OrderedSerialization[MacroOpaqueContainer] {

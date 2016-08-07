@@ -19,7 +19,9 @@ package org.apache.spark.rdd
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude, JsonPropertyOrder}
+import com.fasterxml.jackson.annotation.{
+  JsonIgnore, JsonInclude, JsonPropertyOrder
+}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule

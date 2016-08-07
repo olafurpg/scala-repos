@@ -1,5 +1,4 @@
-trait A {
-  this: B =>
+trait A { this: B =>
   trait X {
     class Y1 extends Y
   }

@@ -9,7 +9,9 @@ import mesosphere.marathon.core.task.Task.Terminated
 import mesosphere.marathon.core.task.update.TaskStatusUpdateStep
 import mesosphere.marathon.event.{EventModule, MesosStatusUpdateEvent}
 import mesosphere.marathon.state.Timestamp
-import org.apache.mesos.Protos.TaskState.{TASK_ERROR, TASK_FAILED, TASK_FINISHED, TASK_KILLED, TASK_LOST, TASK_RUNNING}
+import org.apache.mesos.Protos.TaskState.{
+  TASK_ERROR, TASK_FAILED, TASK_FINISHED, TASK_KILLED, TASK_LOST, TASK_RUNNING
+}
 import org.apache.mesos.Protos.{TaskState, TaskStatus}
 import org.slf4j.LoggerFactory
 import scala.collection.immutable.Seq

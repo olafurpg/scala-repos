@@ -1,12 +1,16 @@
 package com.twitter.finagle.http.compat
 
 import com.twitter.finagle.http.netty.Bijections
-import com.twitter.finagle.http.{Fields, Request, Response, Method, Status, Version}
+import com.twitter.finagle.http.{
+  Fields, Request, Response, Method, Status, Version
+}
 import com.twitter.finagle.netty3.BufChannelBuffer
 import com.twitter.io.{Buf, BufReader, Reader}
 import com.twitter.util.Await
 import java.net.{InetAddress, InetSocketAddress, URI}
-import org.jboss.netty.handler.codec.http.{HttpVersion, HttpRequest, HttpResponse}
+import org.jboss.netty.handler.codec.http.{
+  HttpVersion, HttpRequest, HttpResponse
+}
 import org.junit.runner.RunWith
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.FunSuite

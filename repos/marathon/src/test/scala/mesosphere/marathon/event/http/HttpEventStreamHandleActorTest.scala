@@ -7,7 +7,9 @@ import akka.actor.{ActorSystem, Props}
 import akka.event.EventStream
 import akka.testkit.{EventFilter, ImplicitSender, TestActorRef, TestKit}
 import mesosphere.marathon.MarathonSpec
-import mesosphere.marathon.event.{EventStreamAttached, EventStreamDetached, Subscribe}
+import mesosphere.marathon.event.{
+  EventStreamAttached, EventStreamDetached, Subscribe
+}
 import mesosphere.marathon.test.{MarathonActorSupport, Mockito}
 import org.scalatest.{BeforeAndAfter, GivenWhenThen, Matchers}
 

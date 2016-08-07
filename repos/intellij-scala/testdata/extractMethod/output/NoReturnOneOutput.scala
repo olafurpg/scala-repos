@@ -12,13 +12,10 @@ class NoReturnOneOutput {
 /*
 class NoReturnOneOutput {
   def foo(i: Int): Int = {
-
     val x: Int = testMethodName(i)
-
     println()
     x
   }
-
   def testMethodName(i: Int): Int = {
     if (true) {}
     val x = 0

@@ -12,7 +12,6 @@ package a {
     class NameAfterRename
   }
   import b.NameAfterRename
-
   class C extends /*caret*/NameAfterRename
 }
  */

@@ -3,7 +3,10 @@
   */
 package akka.util
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream,
+  ObjectOutputStream
+}
 import java.lang.Double.doubleToRawLongBits
 import java.lang.Float.floatToRawIntBits
 import java.nio.{ByteBuffer, ByteOrder}

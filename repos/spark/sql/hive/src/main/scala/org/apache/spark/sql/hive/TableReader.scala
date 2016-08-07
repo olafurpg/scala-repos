@@ -23,10 +23,14 @@ import org.apache.hadoop.fs.{Path, PathFilter}
 import org.apache.hadoop.hive.conf.HiveConf
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants._
 import org.apache.hadoop.hive.ql.exec.Utilities
-import org.apache.hadoop.hive.ql.metadata.{HiveUtils, Partition => HivePartition, Table => HiveTable}
+import org.apache.hadoop.hive.ql.metadata.{
+  HiveUtils, Partition => HivePartition, Table => HiveTable
+}
 import org.apache.hadoop.hive.ql.plan.TableDesc
 import org.apache.hadoop.hive.serde2.Deserializer
-import org.apache.hadoop.hive.serde2.objectinspector.{ObjectInspectorConverters, StructObjectInspector}
+import org.apache.hadoop.hive.serde2.objectinspector.{
+  ObjectInspectorConverters, StructObjectInspector
+}
 import org.apache.hadoop.hive.serde2.objectinspector.primitive._
 import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapred.{FileInputFormat, InputFormat, JobConf}
@@ -398,51 +402,51 @@ private[hive] object HadoopTableReader extends HiveInspectors with Logging {
         case oi: BooleanObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setBoolean(ordinal, oi.get(value))
-          case oi: ByteObjectInspector =>
+        case oi: ByteObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setByte(ordinal, oi.get(value))
-          case oi: ShortObjectInspector =>
+        case oi: ShortObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setShort(ordinal, oi.get(value))
-          case oi: IntObjectInspector =>
+        case oi: IntObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setInt(ordinal, oi.get(value))
-          case oi: LongObjectInspector =>
+        case oi: LongObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setLong(ordinal, oi.get(value))
-          case oi: FloatObjectInspector =>
+        case oi: FloatObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setFloat(ordinal, oi.get(value))
-          case oi: DoubleObjectInspector =>
+        case oi: DoubleObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setDouble(ordinal, oi.get(value))
-          case oi: HiveVarcharObjectInspector =>
+        case oi: HiveVarcharObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.update(ordinal,
                        UTF8String.fromString(
                            oi.getPrimitiveJavaObject(value).getValue))
-          case oi: HiveCharObjectInspector =>
+        case oi: HiveCharObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.update(ordinal,
                        UTF8String.fromString(
                            oi.getPrimitiveJavaObject(value).getValue))
-          case oi: HiveDecimalObjectInspector =>
+        case oi: HiveDecimalObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.update(ordinal, HiveShim.toCatalystDecimal(oi, value))
-          case oi: TimestampObjectInspector =>
+        case oi: TimestampObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setLong(ordinal,
                         DateTimeUtils.fromJavaTimestamp(
                             oi.getPrimitiveJavaObject(value)))
-          case oi: DateObjectInspector =>
+        case oi: DateObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setInt(
                 ordinal,
                 DateTimeUtils.fromJavaDate(oi.getPrimitiveJavaObject(value)))
-          case oi: BinaryObjectInspector =>
+        case oi: BinaryObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.update(ordinal, oi.getPrimitiveJavaObject(value))
-          case oi =>
+        case oi =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row(ordinal) = unwrap(value, oi)
       }

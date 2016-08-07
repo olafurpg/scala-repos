@@ -1136,14 +1136,14 @@ trait Printers extends api.Printers { self: SymbolTable =>
               case Some(_: PackageDef) => false
               case _ => true
             }) && (tr match {
-                  // check that Select contains package
-                  case Select(q, _) => checkRootPackage(q)
-                  case _: Ident | _: This =>
-                    val sym = tr.symbol
-                    tr.hasExistingSymbol && sym.hasPackageFlag &&
-                    sym.name != nme.ROOTPKG
-                  case _ => false
-                })
+              // check that Select contains package
+              case Select(q, _) => checkRootPackage(q)
+              case _: Ident | _: This =>
+                val sym = tr.symbol
+                tr.hasExistingSymbol && sym.hasPackageFlag &&
+                sym.name != nme.ROOTPKG
+              case _ => false
+            })
 
           if (printRootPkg && checkRootPackage(tree))
             print(s"${printedName(nme.ROOTPKG)}.")

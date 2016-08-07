@@ -3,7 +3,9 @@ package org.jetbrains.plugins.scala.testingSupport.test.structureView
 import java.util
 
 import com.intellij.ide.util.FileStructureNodeProvider
-import com.intellij.ide.util.treeView.smartTree.{ActionPresentation, ActionPresentationData, TreeElement}
+import com.intellij.ide.util.treeView.smartTree.{
+  ActionPresentation, ActionPresentationData, TreeElement
+}
 import com.intellij.openapi.actionSystem.Shortcut
 import com.intellij.openapi.project.{Project, IndexNotReadyException}
 import com.intellij.openapi.util.IconLoader
@@ -13,7 +15,9 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.{ScPatternList, ScLiteral}
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScTuplePattern, ScReferencePattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScTuplePattern, ScReferencePattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterClause
@@ -54,17 +58,14 @@ class TestNodeProvider extends FileStructureNodeProvider[TreeElement] {
               for (expr <- body.exprs) {
                 (expr match {
                   case expr: ScMethodCall =>
-                    TestNodeProvider.extractTestViewElement(expr,
-                                                            clazz,
-                                                            project)
+                    TestNodeProvider
+                      .extractTestViewElement(expr, clazz, project)
                   case expr: ScInfixExpr =>
-                    TestNodeProvider.extractTestViewElementInfix(expr,
-                                                                 clazz,
-                                                                 project)
+                    TestNodeProvider
+                      .extractTestViewElementInfix(expr, clazz, project)
                   case expr: ScPatternDefinition =>
-                    TestNodeProvider.extractTestViewElementPatternDef(expr,
-                                                                      clazz,
-                                                                      project)
+                    TestNodeProvider
+                      .extractTestViewElementPatternDef(expr, clazz, project)
                   case _ =>
                     None
                 }).map(children.add)
@@ -321,8 +322,7 @@ object TestNodeProvider {
         methodCall.getEffectiveInvokedExpr match {
           case ref: ScReferenceExpression => Some(ref)
           case otherExpr =>
-            Option(
-                otherExpr.findFirstChildByType(
+            Option(otherExpr.findFirstChildByType(
                     ScalaElementTypes.REFERENCE_EXPRESSION))
               .map(_.asInstanceOf[ScReferenceExpression])
         }

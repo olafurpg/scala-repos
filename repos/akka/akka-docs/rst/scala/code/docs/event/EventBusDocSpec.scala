@@ -25,7 +25,7 @@ object EventBusDocSpec {
     type Classifier = String
     type Subscriber = ActorRef
 
-    // is used for extracting the classifier from the incoming events  
+    // is used for extracting the classifier from the incoming events
     override protected def classify(event: Event): Classifier = event.topic
 
     // will be invoked for each event for all subscribers which registered themselves
@@ -75,7 +75,7 @@ object EventBusDocSpec {
     override protected val subclassification: Subclassification[Classifier] =
       new StartsWithSubclassification
 
-    // is used for extracting the classifier from the incoming events  
+    // is used for extracting the classifier from the incoming events
     override protected def classify(event: Event): Classifier = event.topic
 
     // will be invoked for each event for all subscribers which registered
@@ -105,7 +105,7 @@ object EventBusDocSpec {
                                               b: Classifier): Int =
       if (a < b) -1 else if (a == b) 0 else 1
 
-    // is needed for storing subscribers in an ordered collection  
+    // is needed for storing subscribers in an ordered collection
     override protected def compareSubscribers(a: Subscriber,
                                               b: Subscriber): Int =
       a.compareTo(b)

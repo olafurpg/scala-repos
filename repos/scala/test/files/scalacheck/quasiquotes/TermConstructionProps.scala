@@ -122,11 +122,11 @@ object TermConstructionProps
   def blockInvariant(quote: Tree, trees: List[Tree]) =
     quote ≈
       (trees match {
-            case Nil => q"{}"
-            case _ :+ last if !last.isTerm => Block(trees, q"()")
-            case head :: Nil => head
-            case init :+ last => Block(init, last)
-          })
+        case Nil => q"{}"
+        case _ :+ last if !last.isTerm => Block(trees, q"()")
+        case head :: Nil => head
+        case init :+ last => Block(init, last)
+      })
 
   property("unquote list of trees into block (1)") = forAll {
     (trees: List[Tree]) =>

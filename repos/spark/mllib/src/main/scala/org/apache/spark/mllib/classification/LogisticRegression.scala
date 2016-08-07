@@ -301,7 +301,6 @@ object LogisticRegressionWithSGD {
     * @param input RDD of (label, array of features) pairs.
     * @param numIterations Number of iterations of gradient descent to run.
     * @param stepSize Step size to be used for each iteration of gradient descent.
-
     * @param miniBatchFraction Fraction of data to be used per iteration.
     */
   @Since("1.0.0")
@@ -323,7 +322,6 @@ object LogisticRegressionWithSGD {
     *
     * @param input RDD of (label, array of features) pairs.
     * @param stepSize Step size to be used for each iteration of Gradient Descent.
-
     * @param numIterations Number of iterations of gradient descent to run.
     * @return a LogisticRegressionModel which has the weights and offset from training.
     */

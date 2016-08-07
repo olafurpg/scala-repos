@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -772,7 +772,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
              * (of 1 or 2 parameters) has IdentityPolicy.Product(_, _), then we correctly unify
              * the provenances of the LHS and RHS, and the notions of identities will be equivalent.
              * But if a morphism has IdentityPolicy.Cross, were the LHS and RHS share some provenances,
-             * then we have no notion of provenance that will capture this information. Just for the 
+             * then we have no notion of provenance that will capture this information. Just for the
              * sake of understanding the problem, we *could* have `CrossProvenance(_, _)`, but this
              * type would only serve to alert us to the fact that there are definitely identities
              * coming from both sides. And this is not the correct thing to do. Once we have record-
@@ -863,7 +863,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
 
                     (errors, consts, finalProv)
 
-                  /* TODO The `Cross` case is not currently correct! 
+                  /* TODO The `Cross` case is not currently correct!
                    * When we call `cardinality` on a morphism with this IdentityPolicy
                    * if left.provenance and right.provenance contain equivalent provenances,
                    * incorrect cardinality will be returned. For example, if we have Cross

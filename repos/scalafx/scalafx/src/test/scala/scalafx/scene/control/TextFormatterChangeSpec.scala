@@ -36,7 +36,9 @@ import org.scalatest.junit.JUnitRunner
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.testutil.{BootstrapApplication, RunOnApplicationThread, SimpleSFXDelegateSpec}
+import scalafx.testutil.{
+  BootstrapApplication, RunOnApplicationThread, SimpleSFXDelegateSpec
+}
 
 /**
   *

@@ -29,7 +29,9 @@ package scalafx.controls
 
 import scalafx.Includes._
 import scalafx.application.JFXApp
-import scalafx.controls.controls.{ControlControls, TextFieldControls, TextInputControlControls}
+import scalafx.controls.controls.{
+  ControlControls, TextFieldControls, TextInputControlControls
+}
 import scalafx.geometry.Pos
 import scalafx.scene.Scene
 import scalafx.scene.control.TextField

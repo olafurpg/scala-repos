@@ -18,22 +18,34 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScAccessModifier, ScConstructor, ScPrimaryConstructor, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScAccessModifier, ScConstructor, ScPrimaryConstructor, ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotation
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter, ScParameterClause}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter, ScParameter, ScParameterClause
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlock, ScTemplateBody, ScTemplateParents}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScExtendsBlock, ScTemplateBody, ScTemplateParents
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.light.ScFunctionWrapper
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.{PresentationUtil, ScalaPsiElement, ScalaPsiUtil}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.{
+  PresentationUtil, ScalaPsiElement, ScalaPsiUtil
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType
 import org.jetbrains.plugins.scala.lang.scaladoc.parser.parsing.MyScaladocParsing
-import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocComment, ScDocTag}
+import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{
+  ScDocComment, ScDocTag
+}
 import org.jetbrains.plugins.scala.lang.structureView.StructureViewUtil
 
 import scala.annotation.tailrec
@@ -190,9 +202,9 @@ class ScalaDocumentationProvider extends CodeDocumentationProvider {
           case _ => ""
         })
         buffer.append("<b>" + (element match {
-              case named: ScNamedElement => escapeHtml(named.name)
-              case _ => "unknown"
-            }) + "</b>")
+          case named: ScNamedElement => escapeHtml(named.name)
+          case _ => "unknown"
+        }) + "</b>")
         buffer.append(element match {
           case typed: ScTypedDefinition => parseType(typed, ScType.urlText)
           case _ => ": Nothing"
@@ -732,9 +744,9 @@ object ScalaDocumentationProvider {
             case clazz: PsiClass =>
               "[<a href=\"psi_element://" + escapeHtml(clazz.qualifiedName) +
                 "\"><code>" + (x.idText match {
-                    case Some(text) => text
-                    case None => ""
-                  }) + "</code></a>]"
+                case Some(text) => text
+                case None => ""
+              }) + "</code></a>]"
             case pack: PsiPackage =>
               "[" + escapeHtml(pack.getQualifiedName) + "]"
             case _ =>
@@ -853,12 +865,12 @@ object ScalaDocumentationProvider {
           case _ => ("", "")
         }
         s1 + (elem match {
-              case _: ScFunction | _: ScTypeAlias | _: PsiMethod |
-                  _: ScTypeDefinition | _: ScPatternDefinition =>
-                val i = javadoc.indexOf("</PRE>")
-                javadoc.substring(i + 6, javadoc.length - 14)
-              case _ => javadoc.substring(110, javadoc.length - 14)
-            }) + s2
+          case _: ScFunction | _: ScTypeAlias | _: PsiMethod |
+              _: ScTypeDefinition | _: ScPatternDefinition =>
+            val i = javadoc.indexOf("</PRE>")
+            javadoc.substring(i + 6, javadoc.length - 14)
+          case _ => javadoc.substring(110, javadoc.length - 14)
+        }) + s2
       case _ =>
         elem match {
           case fun: ScFunction =>

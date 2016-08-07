@@ -21,8 +21,12 @@ import scala.collection.JavaConverters._
 
 import org.apache.spark.annotation.Experimental
 import org.apache.spark.api.java.function._
-import org.apache.spark.sql.catalyst.encoders.{encoderFor, ExpressionEncoder, OuterScopes}
-import org.apache.spark.sql.catalyst.expressions.{Alias, Attribute, CreateStruct}
+import org.apache.spark.sql.catalyst.encoders.{
+  encoderFor, ExpressionEncoder, OuterScopes
+}
+import org.apache.spark.sql.catalyst.expressions.{
+  Alias, Attribute, CreateStruct
+}
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.execution.QueryExecution
 

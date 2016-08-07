@@ -42,7 +42,7 @@ object ListTTest extends SpecLite {
     (ListT.fromList(ass)
           .flatMap(number => ListT.fromList(List(List(number.toFloat))))
           .toList must_=== (ass.map(
-                _.flatMap(number => List(number.toFloat)))))
+            _.flatMap(number => List(number.toFloat)))))
   }
 
   // Exists to ensure that fromList and map don't stack overflow.

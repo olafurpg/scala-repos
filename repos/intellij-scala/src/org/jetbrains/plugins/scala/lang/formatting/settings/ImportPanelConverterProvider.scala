@@ -6,7 +6,9 @@ import java.util
 import java.util.Collections
 
 import com.intellij.conversion._
-import com.intellij.conversion.impl.{ComponentManagerSettingsImpl, ConversionContextImpl}
+import com.intellij.conversion.impl.{
+  ComponentManagerSettingsImpl, ConversionContextImpl
+}
 import com.intellij.openapi.util.JDOMUtil
 import com.intellij.util.SystemProperties
 import org.jdom.Document

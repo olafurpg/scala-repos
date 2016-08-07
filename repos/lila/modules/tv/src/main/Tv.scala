@@ -47,7 +47,7 @@ object Tv {
   sealed abstract class Channel(val name: String,
                                 val icon: String,
                                 filters: Seq[Game => Boolean]) {
-    def filter(g: Game) = filters forall { _ (g) }
+    def filter(g: Game) = filters forall { _(g) }
     val key = toString.head.toLower + toString.drop(1)
   }
   object Channel {

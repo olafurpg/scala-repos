@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.debugger.evaluateExpression
 
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase, ScalaVersion_2_11
+}
 
 /**
   * @author Nikolay.Tropin

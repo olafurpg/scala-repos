@@ -177,8 +177,8 @@ trait TreeAndTypeAnalysis extends Debugging {
                 // all of their children must be and they cannot otherwise be created.
                 sym.sealedDescendants.toList sortBy (_.sealedSortName) filterNot
                   (x =>
-                        x.isSealed && x.isAbstractClass &&
-                          !isPrimitiveValueClass(x))
+                     x.isSealed && x.isAbstractClass &&
+                       !isPrimitiveValueClass(x))
             )
 
             List(
@@ -908,12 +908,11 @@ trait MatchAnalysis extends MatchApproximation {
 
         private val uniques = new mutable.HashMap[Var, VariableAssignment]
         private def unique(variable: Var): VariableAssignment =
-          uniques.getOrElseUpdate(
-              variable, {
-                val (eqTo, neqTo) =
-                  varAssignment.getOrElse(variable, (Nil, Nil)) // TODO
-                VariableAssignment(variable, eqTo.toList, neqTo.toList)
-              })
+          uniques.getOrElseUpdate(variable, {
+            val (eqTo, neqTo) =
+              varAssignment.getOrElse(variable, (Nil, Nil)) // TODO
+            VariableAssignment(variable, eqTo.toList, neqTo.toList)
+          })
 
         def apply(variable: Var): VariableAssignment = {
           val path = chop(variable.path)
@@ -943,14 +942,14 @@ trait MatchAnalysis extends MatchApproximation {
         private lazy val uniqueEqualTo =
           equalTo filterNot
             (subsumed =>
-                  equalTo.exists(better =>
-                        (better ne subsumed) &&
-                          instanceOfTpImplies(better.tp, subsumed.tp)))
+               equalTo.exists(
+                   better =>
+                     (better ne subsumed) &&
+                       instanceOfTpImplies(better.tp, subsumed.tp)))
         private lazy val inSameDomain =
           uniqueEqualTo forall
             (const =>
-                  variable.domainSyms.exists(
-                      _.exists(_.const.tp =:= const.tp)))
+               variable.domainSyms.exists(_.exists(_.const.tp =:= const.tp)))
         private lazy val prunedEqualTo =
           uniqueEqualTo filterNot
             (subsumed => variable.staticTpCheckable <:< subsumed.tp)

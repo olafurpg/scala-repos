@@ -4,7 +4,9 @@ import com.twitter.conversions.time._
 import com.twitter.finagle._
 import com.twitter.finagle.addr.WeightedAddress
 import com.twitter.finagle.client.StringClient
-import com.twitter.finagle.loadbalancer.{DefaultBalancerFactory, ConcurrentLoadBalancerFactory}
+import com.twitter.finagle.loadbalancer.{
+  DefaultBalancerFactory, ConcurrentLoadBalancerFactory
+}
 import com.twitter.finagle.server.StringServer
 import com.twitter.finagle.stats._
 import com.twitter.finagle.util.Rng

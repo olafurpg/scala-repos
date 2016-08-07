@@ -11,7 +11,9 @@ import com.intellij.openapi.roots.{ProjectFileIndex, ProjectRootManager}
 import com.intellij.openapi.ui.Messages
 import com.intellij.psi._
 import com.intellij.refactoring.PackageWrapper
-import com.intellij.refactoring.move.moveClassesOrPackages.{MoveClassesOrPackagesProcessor, SingleSourceRootMoveDestination}
+import com.intellij.refactoring.move.moveClassesOrPackages.{
+  MoveClassesOrPackagesProcessor, SingleSourceRootMoveDestination
+}
 import com.intellij.refactoring.util.RefactoringMessageUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile

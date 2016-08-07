@@ -12,7 +12,9 @@ import com.intellij.psi._
 import org.apache.commons.lang.StringUtils
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScPattern, ScReferencePattern, ScWildcardPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScPattern, ScReferencePattern, ScWildcardPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.{ScTupleType, ScType}

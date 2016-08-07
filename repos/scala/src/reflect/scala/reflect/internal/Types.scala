@@ -45,9 +45,7 @@ import TypeConstants._
     // result forSome { tparams }
   case AnnotatedType(annots, tp) =>
     // tp @annots
-
   // the following are non-value types; you cannot write them down in Scala source.
-
   case TypeBounds(lo, hi) =>
     // >: lo <: hi
   case ClassInfoType(parents, defs, clazz) =>
@@ -60,7 +58,6 @@ import TypeConstants._
     // For instance def m: T is represented as NullaryMethodType(T)
   case PolyType(tparams, result) =>
     // [tparams]result where result is a (Nullary)MethodType or ClassInfoType
-
   // The remaining types are not used after phase `typer`.
   case OverloadedType(pre, tparams, alts) =>
     // all alternatives of an overloaded ident
@@ -83,8 +80,7 @@ trait Types
     with tpe.TypeMaps
     with tpe.TypeConstraints
     with tpe.FindMembers
-    with util.Collections {
-  self: SymbolTable =>
+    with util.Collections { self: SymbolTable =>
 
   import definitions._
   import TypesStats._
@@ -230,8 +226,7 @@ trait Types
     }
   }
 
-  abstract class TypeApiImpl extends TypeApi {
-    this: Type =>
+  abstract class TypeApiImpl extends TypeApi { this: Type =>
     def declaration(name: Name): Symbol = decl(name)
     def declarations = decls
     def typeArguments = typeArgs
@@ -837,21 +832,21 @@ trait Types
       */
     def matchesPattern(that: Type): Boolean =
       (this <:< that) || (that match {
-            case ArrayTypeRef(elem2) if elem2.typeConstructor.isHigherKinded =>
-              this match {
-                case ArrayTypeRef(elem1) => elem1 matchesPattern elem2
-                case _ => false
-              }
-            case TypeRef(_, sym, args) =>
-              val that1 = existentialAbstraction(args map (_.typeSymbol), that)
-              (that ne that1) && (this <:< that1) && {
-                debuglog(
-                    s"$this.matchesPattern($that) depended on discarding args and testing <:< $that1")
-                true
-              }
-            case _ =>
-              false
-          })
+        case ArrayTypeRef(elem2) if elem2.typeConstructor.isHigherKinded =>
+          this match {
+            case ArrayTypeRef(elem1) => elem1 matchesPattern elem2
+            case _ => false
+          }
+        case TypeRef(_, sym, args) =>
+          val that1 = existentialAbstraction(args map (_.typeSymbol), that)
+          (that ne that1) && (this <:< that1) && {
+            debuglog(
+                s"$this.matchesPattern($that) depended on discarding args and testing <:< $that1")
+            true
+          }
+        case _ =>
+          false
+      })
 
     def stat_<:<(that: Type): Boolean = {
       if (Statistics.canEnable) Statistics.incCounter(subtypeCount)
@@ -3840,7 +3835,6 @@ trait Types
   /**** This implementation to merge parents was checked in in commented-out
       form and has languished unaltered for five years.  I think we should
       use it or lose it.
-
       def merge(tps: List[Type]): List[Type] = tps match {
         case tp :: tps1 =>
           val tps1a = tps1 filter (_.typeSymbol.==(tp.typeSymbol))
@@ -4119,9 +4113,9 @@ trait Types
   //  as only typeParams forces the classfile to be read. See #400
   def isRawType(tp: Type) =
     !phase.erasedTypes && (tp match {
-          case TypeRef(_, sym, Nil) => isRawIfWithoutArgs(sym)
-          case _ => false
-        })
+      case TypeRef(_, sym, Nil) => isRawIfWithoutArgs(sym)
+      case _ => false
+    })
 
   @deprecated("Use isRawType", "2.10.1") // presently used by sbt
   def isRaw(sym: Symbol, args: List[Type]) =
@@ -4247,8 +4241,8 @@ trait Types
        else
          tp1.baseClasses forall
            (bc =>
-                 tp2.baseTypeIndex(bc) < 0 ||
-                   isConsistent(tp1.baseType(bc), tp2.baseType(bc))))
+              tp2.baseTypeIndex(bc) < 0 ||
+                isConsistent(tp1.baseType(bc), tp2.baseType(bc))))
 
     check(tp1, tp2) && check(tp2, tp1)
   }
@@ -4612,7 +4606,6 @@ trait Types
   }
 
   /** matchesType above is an optimized version of the following implementation:
-
   def matchesType2(tp1: Type, tp2: Type, alwaysMatchSimple: Boolean): Boolean = {
     def matchesQuantified(tparams1: List[Symbol], tparams2: List[Symbol], res1: Type, res2: Type): Boolean =
       tparams1.length == tparams2.length &&
@@ -4751,7 +4744,7 @@ trait Types
             if (args.tail forall (_ =:= args.head))
               typeRef(pre, sym, List(args.head))
             else if (args exists (arg =>
-                           isPrimitiveValueClass(arg.typeSymbol)))
+                                    isPrimitiveValueClass(arg.typeSymbol)))
               ObjectTpe
             else typeRef(pre, sym, List(lub(args)))
           }

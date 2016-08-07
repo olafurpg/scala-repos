@@ -5,10 +5,7 @@ class A {
 }
 /*
 package a
-
 import scala.collection.mutable.ArrayBuffer
-
-
 class A {
   val x: ArrayBuffer
 }

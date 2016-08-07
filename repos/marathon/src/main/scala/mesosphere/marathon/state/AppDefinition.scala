@@ -5,11 +5,15 @@ import mesosphere.marathon.Protos
 import mesosphere.marathon.Protos.Constraint
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon.api.v2.Validation._
-import mesosphere.marathon.api.serialization.{ContainerSerializer, PortDefinitionSerializer, ResidencySerializer}
+import mesosphere.marathon.api.serialization.{
+  ContainerSerializer, PortDefinitionSerializer, ResidencySerializer
+}
 import mesosphere.marathon.health.HealthCheck
 import mesosphere.marathon.plugin
 import mesosphere.marathon.state.AppDefinition.VersionInfo
-import mesosphere.marathon.state.AppDefinition.VersionInfo.{FullVersionInfo, OnlyVersion}
+import mesosphere.marathon.state.AppDefinition.VersionInfo.{
+  FullVersionInfo, OnlyVersion
+}
 import mesosphere.marathon.state.Container.Docker.PortMapping
 import mesosphere.mesos.TaskBuilder
 import mesosphere.mesos.protos.{Resource, ScalarResource}
@@ -541,10 +545,10 @@ object AppDefinition {
         "Health check port indices must address an element of the ports array or container port mappings.") {
       hc =>
         hc.protocol == Protocol.COMMAND || (hc.portIndex match {
-              case Some(idx) => hostPortsIndices contains idx
-              case None =>
-                hostPortsIndices.length == 1 && hostPortsIndices.head == 0
-            })
+          case Some(idx) => hostPortsIndices contains idx
+          case None =>
+            hostPortsIndices.length == 1 && hostPortsIndices.head == 0
+        })
     }
 
   def residentUpdateIsValid(from: AppDefinition): Validator[AppDefinition] = {

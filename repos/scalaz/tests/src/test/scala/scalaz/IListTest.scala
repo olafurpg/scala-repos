@@ -245,7 +245,7 @@ object IListTest extends SpecLite {
   "initOption" ! forAll { ns: IList[Int] =>
     ns.initOption.map(_.toList) must_===
       (try Some(ns.toList.init)
-          catch { case e: Exception => None })
+      catch { case e: Exception => None })
   }
 
   "inits" ! forAll { ns: IList[Int] =>
@@ -318,13 +318,13 @@ object IListTest extends SpecLite {
   "reduceLeftOption" ! forAll { (ns: IList[Int], f: (Int, Int) => Int) =>
     ns.reduceLeftOption(f) must_===
       (try Some(ns.toList.reduceLeft(f))
-          catch { case e: Exception => None })
+      catch { case e: Exception => None })
   }
 
   "reduceRightOption" ! forAll { (ns: IList[Int], f: (Int, Int) => Int) =>
     ns.reduceRightOption(f) must_===
       (try Some(ns.toList.reduceRight(f))
-          catch { case e: Exception => None })
+      catch { case e: Exception => None })
   }
 
   "reverse" ! forAll { ns: IList[Int] =>
@@ -384,7 +384,7 @@ object IListTest extends SpecLite {
   "tailOption" ! forAll { ns: IList[Int] =>
     ns.tailOption.map(_.toList) must_===
       (try Some(ns.toList.tail)
-          catch { case e: Exception => None })
+      catch { case e: Exception => None })
   }
 
   "take" ! forAll { (ns: IList[Int], n: Byte) =>

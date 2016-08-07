@@ -15,19 +15,30 @@ package net.liftweb
 package squerylrecord
 
 import record.{MandatoryTypedField, OptionalTypedField, TypedField, Record}
-import record.field.{EnumNameField, OptionalEnumNameField, EnumField, OptionalEnumField}
+import record.field.{
+  EnumNameField, OptionalEnumNameField, EnumField, OptionalEnumField
+}
 
 import org.squeryl.{PrimitiveTypeMode, Schema, Query}
-import org.squeryl.dsl.{BooleanExpression, DateExpression, EnumExpression, NumericalExpression, StringExpression, NonNumericalExpression}
-import org.squeryl.dsl.ast.{SelectElementReference, SelectElement, ConstantExpressionNode, RightHandSideOfIn}
-import org.squeryl.internals.{AttributeValidOnNonNumericalColumn, AttributeValidOnNumericalColumn, FieldReferenceLinker, OutMapper}
+import org.squeryl.dsl.{
+  BooleanExpression, DateExpression, EnumExpression, NumericalExpression,
+  StringExpression, NonNumericalExpression
+}
+import org.squeryl.dsl.ast.{
+  SelectElementReference, SelectElement, ConstantExpressionNode,
+  RightHandSideOfIn
+}
+import org.squeryl.internals.{
+  AttributeValidOnNonNumericalColumn, AttributeValidOnNumericalColumn,
+  FieldReferenceLinker, OutMapper
+}
 
 import java.util.{Calendar, Date}
 import java.sql.Timestamp
 
 /**
   * All methods from this object should be imported when creating queries using the Squeryl DSL with lift records.
-  * 
+  *
   * It provides implicit conversions for all record field types to the underlying primitive types. Thus, you can use
   * record fields in the Squeryl DSL as if they were primitive types.
   */
@@ -201,7 +212,7 @@ trait RecordTypeMode extends PrimitiveTypeMode {
       }
     }
 
-  /** Needed for inner selects. The cast is possible here because the type is not 
+  /** Needed for inner selects. The cast is possible here because the type is not
     * used in the in query. Only the AST of the query is needed. */
   //implicit def queryStringField2QueryString[T <: TypedField[String]](q: Query[T]): Query[String] = q.asInstanceOf[Query[String]]
 
@@ -378,8 +389,7 @@ trait RecordTypeMode extends PrimitiveTypeMode {
 /**
   * Record-Specific extensions to numerical Squeryl Expressions.
   */
-trait SquerylRecordNumericalExpression[T] {
-  this: NumericalExpression[T] =>
+trait SquerylRecordNumericalExpression[T] { this: NumericalExpression[T] =>
 
   /**
     * Can be used instead of the often conflicting "is" function.

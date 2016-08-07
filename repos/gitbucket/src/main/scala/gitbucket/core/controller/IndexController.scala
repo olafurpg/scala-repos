@@ -3,10 +3,15 @@ package gitbucket.core.controller
 import gitbucket.core.api._
 import gitbucket.core.helper.xml
 import gitbucket.core.model.Account
-import gitbucket.core.service.{RepositoryService, ActivityService, AccountService, RepositorySearchService, IssuesService}
+import gitbucket.core.service.{
+  RepositoryService, ActivityService, AccountService, RepositorySearchService,
+  IssuesService
+}
 import gitbucket.core.util.Implicits._
 import gitbucket.core.util.ControlUtil._
-import gitbucket.core.util.{LDAPUtil, Keys, UsersAuthenticator, ReferrerAuthenticator, StringUtil}
+import gitbucket.core.util.{
+  LDAPUtil, Keys, UsersAuthenticator, ReferrerAuthenticator, StringUtil
+}
 
 import io.github.gitbucket.scalatra.forms._
 
@@ -21,7 +26,12 @@ class IndexController
     with ReferrerAuthenticator
 
 trait IndexControllerBase extends ControllerBase {
-  self: RepositoryService with ActivityService with AccountService with RepositorySearchService with UsersAuthenticator with ReferrerAuthenticator =>
+  self: RepositoryService
+    with ActivityService
+    with AccountService
+    with RepositorySearchService
+    with UsersAuthenticator
+    with ReferrerAuthenticator =>
 
   case class SignInForm(userName: String, password: String)
 

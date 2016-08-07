@@ -4,7 +4,9 @@ package lang.psi.impl.statements
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi._
 import com.intellij.psi.impl.light.LightElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlockExpr, ScExpression
+}
 
 final class FakePsiCodeBlock(body: ScExpression)
     extends LightElement(body.getManager, body.getLanguage)

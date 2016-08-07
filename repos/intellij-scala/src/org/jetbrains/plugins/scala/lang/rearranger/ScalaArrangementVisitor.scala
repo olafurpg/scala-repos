@@ -11,14 +11,23 @@ import com.intellij.psi.codeStyle.arrangement.std.StdArrangementTokens.EntryType
 import com.intellij.psi.codeStyle.arrangement.std.StdArrangementTokens.Modifier._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScConstructor, ScModifierList, ScReferenceElement, ScStableCodeReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScConstructor, ScModifierList, ScReferenceElement,
+  ScStableCodeReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTrait, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.{ScalaElementVisitor, ScalaFile, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScTrait, ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaElementVisitor, ScalaFile, ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{Any, Boolean, ScType, Unit}
 
 import scala.collection.mutable
@@ -458,9 +467,9 @@ object ScalaArrangementVisitor {
   private def hasSetterSignature(method: ScFunction) =
     method.getParameterList.getParametersCount == 1 &&
       (method.returnType.getOrAny match {
-            case Any => true
-            case returnType: ScType => returnType == Unit
-          })
+        case Any => true
+        case returnType: ScType => returnType == Unit
+      })
 
   private def isJavaGetter(method: ScFunction) =
     hasJavaGetterName(method) &&

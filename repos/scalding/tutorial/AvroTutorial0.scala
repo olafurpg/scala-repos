@@ -1,12 +1,9 @@
 /**
 Scalding with Avro (and Json) tutorial part 0.
-
 To run this job:
   scripts/scald.rb --local --avro --json tutorial/AvroTutorial0.scala
-
 Check the output:
   java -jar avro-tools-1.7.6.jar tojson tutorial/data/avrooutput0.avro
-
   **/
 import com.twitter.scalding.{Job, Args, JsonLine}
 import com.twitter.scalding.avro.UnpackedAvroSource

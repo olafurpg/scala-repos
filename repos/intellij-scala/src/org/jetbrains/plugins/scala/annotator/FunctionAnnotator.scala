@@ -4,11 +4,17 @@ package annotator
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.annotator.quickfix.modifiers.AddModifierQuickFix
-import org.jetbrains.plugins.scala.annotator.quickfix.{AddReturnTypeFix, RemoveElementQuickFix, ReportHighlightingErrorQuickFix}
+import org.jetbrains.plugins.scala.annotator.quickfix.{
+  AddReturnTypeFix, RemoveElementQuickFix, ReportHighlightingErrorQuickFix
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{Any => AnyType, Bounds, ScType, ScTypePresentation, Unit => UnitType}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  Any => AnyType, Bounds, ScType, ScTypePresentation, Unit => UnitType
+}
 
 /**
   * Pavel.Fatin, 18.05.2010

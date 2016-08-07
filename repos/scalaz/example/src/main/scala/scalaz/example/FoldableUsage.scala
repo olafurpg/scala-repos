@@ -79,7 +79,7 @@ object FoldableUsage extends App {
   assert(deepFolder.foldLeft(deep, "")(_ + _.toString) === "123")
 
   // Monadic Folds: we can fold over a structure with a function
-  // which returns its value in a Monad, 
+  // which returns its value in a Monad,
   val sumEvens: (Int, Int) => Option[Int] = { (x, y) =>
     // if the right int is even, add it to the left
     // otherwise return None

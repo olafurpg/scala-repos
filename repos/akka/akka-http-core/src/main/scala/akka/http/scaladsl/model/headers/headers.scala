@@ -106,8 +106,7 @@ abstract class ModeledCustomHeaderCompanion[H <: ModeledCustomHeader[H]] {
   * the other way around as well.
   */
 abstract class ModeledCustomHeader[H <: ModeledCustomHeader[H]]
-    extends CustomHeader {
-  this: H ⇒
+    extends CustomHeader { this: H ⇒
   def companion: ModeledCustomHeaderCompanion[H]
 
   final override def name = companion.name

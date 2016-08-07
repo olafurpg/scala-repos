@@ -15,7 +15,9 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
-import org.jetbrains.plugins.scala.lang.lexer.{ScalaTokenTypes, ScalaTokenTypesEx, ScalaXmlTokenTypes}
+import org.jetbrains.plugins.scala.lang.lexer.{
+  ScalaTokenTypes, ScalaTokenTypesEx, ScalaXmlTokenTypes
+}
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
@@ -27,7 +29,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.xml.ScXmlPattern
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{ScImportSelectors, ScImportStmt}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{
+  ScImportSelectors, ScImportStmt
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
@@ -806,16 +810,16 @@ object ScalaSpacingProcessor extends ScalaTokenTypes {
           val spaceInsideClosure =
             scalaSettings.SPACE_INSIDE_CLOSURE_BRACES &&
               (leftNode.getElementType match {
-                    case ScalaElementTypes.FUNCTION_EXPR => true
-                    case ScalaElementTypes.CASE_CLAUSES =>
-                      block.getParent.isInstanceOf[ScArgumentExprList] ||
-                        block.getParent.isInstanceOf[ScInfixExpr]
-                    case _ =>
-                      scalaSettings.KEEP_ONE_LINE_LAMBDAS_IN_ARG_LIST &&
-                        (leftPsi.isInstanceOf[ScFunctionExpr] ||
-                              block.isInstanceOf[ScBlockExpr] ||
-                              leftPsi.isInstanceOf[ScCaseClauses])
-                  })
+                case ScalaElementTypes.FUNCTION_EXPR => true
+                case ScalaElementTypes.CASE_CLAUSES =>
+                  block.getParent.isInstanceOf[ScArgumentExprList] ||
+                    block.getParent.isInstanceOf[ScInfixExpr]
+                case _ =>
+                  scalaSettings.KEEP_ONE_LINE_LAMBDAS_IN_ARG_LIST &&
+                    (leftPsi.isInstanceOf[ScFunctionExpr] ||
+                          block.isInstanceOf[ScBlockExpr] ||
+                          leftPsi.isInstanceOf[ScCaseClauses])
+              })
           val needsSpace =
             (oneLineNonEmpty &&
                   (spaceInsideOneLineMethod || spaceInsideClosure ||
@@ -1578,22 +1582,22 @@ object ScalaSpacingProcessor extends ScalaTokenTypes {
       //Braces
       case (ScalaTokenTypes.tLBRACE, ScalaTokenTypes.tRBRACE, _, _) =>
         NO_SPACING
-      case (ScalaTokenTypes.tLBRACE,
-            _,
-            (ScalaElementTypes.TEMPLATE_BODY | ScalaElementTypes.MATCH_STMT |
-            ScalaElementTypes.REFINEMENT |
-            ScalaElementTypes.EXISTENTIAL_CLAUSE |
-            ScalaElementTypes.BLOCK_EXPR),
-            _) =>
+      case (
+          ScalaTokenTypes.tLBRACE,
+          _,
+          (ScalaElementTypes.TEMPLATE_BODY | ScalaElementTypes.MATCH_STMT |
+          ScalaElementTypes.REFINEMENT | ScalaElementTypes.EXISTENTIAL_CLAUSE |
+          ScalaElementTypes.BLOCK_EXPR),
+          _) =>
         IMPORT_BETWEEN_SPACING
       case (ScalaTokenTypes.tLBRACE, _, _, _) => NO_SPACING_WITH_NEWLINE
-      case (_,
-            ScalaTokenTypes.tRBRACE,
-            (ScalaElementTypes.TEMPLATE_BODY | ScalaElementTypes.MATCH_STMT |
-            ScalaElementTypes.REFINEMENT |
-            ScalaElementTypes.EXISTENTIAL_CLAUSE |
-            ScalaElementTypes.BLOCK_EXPR),
-            _) =>
+      case (
+          _,
+          ScalaTokenTypes.tRBRACE,
+          (ScalaElementTypes.TEMPLATE_BODY | ScalaElementTypes.MATCH_STMT |
+          ScalaElementTypes.REFINEMENT | ScalaElementTypes.EXISTENTIAL_CLAUSE |
+          ScalaElementTypes.BLOCK_EXPR),
+          _) =>
         IMPORT_BETWEEN_SPACING
       case (_, ScalaTokenTypes.tRBRACE, _, _) => NO_SPACING_WITH_NEWLINE
       //Semicolon

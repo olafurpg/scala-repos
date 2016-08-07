@@ -7,8 +7,12 @@ TODO:
 
 import sbt.librarymanagement.Configuration
 
-import sbt.internal.util.logic.{Atom, Clause, Clauses, Formula, Literal, Logic, Negated}
-import Logic.{CyclicNegation, InitialContradictions, InitialOverlap, LogicException}
+import sbt.internal.util.logic.{
+  Atom, Clause, Clauses, Formula, Literal, Logic, Negated
+}
+import Logic.{
+  CyclicNegation, InitialContradictions, InitialOverlap, LogicException
+}
 import Def.Setting
 import Plugins._
 import annotation.tailrec

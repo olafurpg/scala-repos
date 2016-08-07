@@ -12,19 +12,19 @@ object Auto {
     def rig[A](z: A, o: A): Rig[A] = macro ScalaAutoMacros.rigImpl[A]
     def rng[A](z: A): Rng[A] = macro ScalaAutoMacros.rngImpl[A]
     def ring[A](z: A, o: A): Ring[A] = macro ScalaAutoMacros.ringImpl[A]
-    def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] = macro ScalaAutoMacros
-      .euclideanRingImpl[A]
-    def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] = macro ScalaAutoMacros
-      .fieldImpl[A]
+    def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] =
+      macro ScalaAutoMacros.euclideanRingImpl[A]
+    def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] =
+      macro ScalaAutoMacros.fieldImpl[A]
     def eq[A]: Eq[A] = macro ScalaAutoMacros.eqImpl[A]
     // TODO: partialOrder ?
     def order[A]: Order[A] = macro ScalaAutoMacros.orderImpl[A]
 
     object collection {
-      def semigroup[A]: Semigroup[A] = macro ScalaAutoMacros
-        .collectionSemigroupImpl[A]
-      def monoid[A](z: A): Monoid[A] = macro ScalaAutoMacros
-        .collectionMonoidImpl[A]
+      def semigroup[A]: Semigroup[A] =
+        macro ScalaAutoMacros.collectionSemigroupImpl[A]
+      def monoid[A](z: A): Monoid[A] =
+        macro ScalaAutoMacros.collectionMonoidImpl[A]
     }
   }
 
@@ -33,17 +33,17 @@ object Auto {
     def rig[A](z: A, o: A): Rig[A] = macro JavaAutoMacros.rigImpl[A]
     def rng[A](z: A): Rng[A] = macro JavaAutoMacros.rngImpl[A]
     def ring[A](z: A, o: A): Ring[A] = macro JavaAutoMacros.ringImpl[A]
-    def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] = macro JavaAutoMacros
-      .euclideanRingImpl[A]
-    def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] = macro JavaAutoMacros
-      .fieldImpl[A]
+    def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] =
+      macro JavaAutoMacros.euclideanRingImpl[A]
+    def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] =
+      macro JavaAutoMacros.fieldImpl[A]
     def eq[A]: Eq[A] = macro JavaAutoMacros.eqImpl[A]
     // TODO: partialOrder ?
     def order[A]: Order[A] = macro JavaAutoMacros.orderImpl[A]
 
     object collection {
-      def monoid[A](empty: A): Monoid[A] = macro JavaAutoMacros
-        .collectionMonoidImpl[A]
+      def monoid[A](empty: A): Monoid[A] =
+        macro JavaAutoMacros.collectionMonoidImpl[A]
     }
   }
 }
@@ -79,9 +79,9 @@ abstract class AutoOps {
     tpeA.members exists { m =>
       m.isMethod && m.isPublic && m.name.encodedName.toString == name &&
       (m.typeSignature match {
-            case MethodType(Nil, ret) => ret =:= tpeB
-            case _ => false
-          })
+        case MethodType(Nil, ret) => ret =:= tpeB
+        case _ => false
+      })
     }
   }
 
@@ -93,11 +93,11 @@ abstract class AutoOps {
     tpeA.members exists { m =>
       m.isMethod && m.isPublic && m.name.encodedName.toString == name &&
       (m.typeSignature match {
-            case MethodType(List(param), ret) =>
-              param.typeSignature =:= tpeB && ret =:= tpeC
-            case _ =>
-              false
-          })
+        case MethodType(List(param), ret) =>
+          param.typeSignature =:= tpeB && ret =:= tpeC
+        case _ =>
+          false
+      })
     }
   }
 

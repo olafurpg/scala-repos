@@ -5,8 +5,12 @@ package play.api.libs.iteratee
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
-import play.api.libs.iteratee.Execution.Implicits.{defaultExecutionContext => dec}
-import play.api.libs.iteratee.internal.{eagerFuture, executeFuture, executeIteratee, prepared}
+import play.api.libs.iteratee.Execution.Implicits.{
+  defaultExecutionContext => dec
+}
+import play.api.libs.iteratee.internal.{
+  eagerFuture, executeFuture, executeIteratee, prepared
+}
 
 /**
   * Various helper methods to construct, compose and traverse Iteratees.

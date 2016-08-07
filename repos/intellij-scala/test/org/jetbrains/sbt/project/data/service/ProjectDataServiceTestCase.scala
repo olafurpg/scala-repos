@@ -5,7 +5,9 @@ import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProviderImpl
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager
-import com.intellij.openapi.externalSystem.util.{DisposeAwareProjectChange, ExternalSystemApiUtil}
+import com.intellij.openapi.externalSystem.util.{
+  DisposeAwareProjectChange, ExternalSystemApiUtil
+}
 import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.testFramework.PlatformTestCase
 

@@ -7,7 +7,9 @@ import javax.swing.SwingUtilities
 import com.intellij.execution.testframework.AbstractTestProxy
 import com.intellij.execution.{PsiLocation, RunnerAndConfigurationSettings}
 import com.intellij.ide.util.treeView.AbstractTreeNode
-import com.intellij.ide.util.treeView.smartTree.{TreeElement, TreeElementWrapper}
+import com.intellij.ide.util.treeView.smartTree.{
+  TreeElement, TreeElementWrapper
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
@@ -118,14 +120,14 @@ trait IntegrationTest {
                             testNames: Seq[String],
                             config: AbstractTestRunConfiguration): Boolean = {
     config.getTestClassPath == testClass && (config.getTestName match {
-          case "" => testNames.isEmpty
-          case configTestName =>
-            val configTests = parseTestName(configTestName)
-            configTests.size == testNames.size &&
-            ((configTests zip testNames) forall {
-                  case (actual, required) => actual == required
-                })
-        })
+      case "" => testNames.isEmpty
+      case configTestName =>
+        val configTests = parseTestName(configTestName)
+        configTests.size == testNames.size &&
+        ((configTests zip testNames) forall {
+              case (actual, required) => actual == required
+            })
+    })
   }
 
   protected def checkResultTreeHasExactNamedPath(root: AbstractTestProxy,

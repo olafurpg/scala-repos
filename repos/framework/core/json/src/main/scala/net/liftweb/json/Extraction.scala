@@ -18,7 +18,11 @@ package net.liftweb
 package json
 
 import java.lang.reflect.{Constructor => JConstructor, Type}
-import java.lang.{Integer => JavaInteger, Long => JavaLong, Short => JavaShort, Byte => JavaByte, Boolean => JavaBoolean, Double => JavaDouble, Float => JavaFloat}
+import java.lang.{
+  Integer => JavaInteger, Long => JavaLong, Short => JavaShort,
+  Byte => JavaByte, Boolean => JavaBoolean, Double => JavaDouble,
+  Float => JavaFloat
+}
 import java.util.Date
 import java.sql.Timestamp
 import scala.reflect.Manifest

@@ -7,8 +7,7 @@ class HashSet[E]
     extends AbstractSet[E]
     with Set[E]
     with Cloneable
-    with Serializable {
-  self =>
+    with Serializable { self =>
   def this(initialCapacity: Int, loadFactor: Float) =
     this()
 

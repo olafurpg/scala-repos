@@ -12,8 +12,8 @@ final case class PickleOps[T](picklee: T) {
     functions.pickleInto(picklee, builder)(pickler)
   // pickleTo remains a macro so further type-checking of [S <:< format.OutputType] occurs,
   // and any implicit conversions required for this.
-  def pickleTo[S](output: S)(implicit format: PickleFormat): Unit = macro Compat
-    .PickleMacros_pickleTo[T, S]
+  def pickleTo[S](output: S)(implicit format: PickleFormat): Unit =
+    macro Compat.PickleMacros_pickleTo[T, S]
   //def pickleTo[S](output: S)(implicit format: PickleFormat, pickler: Pickler[T]): Unit =
   //  functions.pickleTo(picklee, output)(pickler, format)
 }

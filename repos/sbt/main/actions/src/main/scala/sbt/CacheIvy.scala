@@ -3,9 +3,14 @@
  */
 package sbt
 
-import Predef.{Map, Set, implicitly} // excludes *both 2.10.x conforms and 2.11.x $conforms in source compatible manner.
+import Predef.{
+  Map, Set, implicitly
+} // excludes *both 2.10.x conforms and 2.11.x $conforms in source compatible manner.
 
-import sbt.internal.util.{Cache, HList, HNil, InputCache, LinePosition, LineRange, NoPosition, RangePosition, SourcePosition}
+import sbt.internal.util.{
+  Cache, HList, HNil, InputCache, LinePosition, LineRange, NoPosition,
+  RangePosition, SourcePosition
+}
 import sbt.internal.util.FileInfo.{exists, hash}
 import sbt.internal.util.Types.{:+:, idFun}
 import java.io.File

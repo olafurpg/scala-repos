@@ -1,6 +1,8 @@
 package mesosphere.marathon.core.launchqueue.impl
 
-import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, Cancellable, Props, Stash}
+import akka.actor.{
+  Actor, ActorContext, ActorLogging, ActorRef, Cancellable, Props, Stash
+}
 import akka.event.LoggingReceive
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.flow.OfferReviver
@@ -10,9 +12,13 @@ import mesosphere.marathon.core.launchqueue.LaunchQueueConfig
 import mesosphere.marathon.core.launchqueue.impl.AppTaskLauncherActor.RecheckIfBackOffUntilReached
 import mesosphere.marathon.core.matcher.base
 import mesosphere.marathon.core.matcher.base.OfferMatcher
-import mesosphere.marathon.core.matcher.base.OfferMatcher.{MatchedTaskOps, TaskOpWithSource}
+import mesosphere.marathon.core.matcher.base.OfferMatcher.{
+  MatchedTaskOps, TaskOpWithSource
+}
 import mesosphere.marathon.core.matcher.base.util.TaskOpSourceDelegate.TaskOpNotification
-import mesosphere.marathon.core.matcher.base.util.{ActorOfferMatcher, TaskOpSourceDelegate}
+import mesosphere.marathon.core.matcher.base.util.{
+  ActorOfferMatcher, TaskOpSourceDelegate
+}
 import mesosphere.marathon.core.matcher.manager.OfferMatcherManager
 import mesosphere.marathon.core.task.bus.TaskStatusObservables.TaskStatusUpdate
 import mesosphere.marathon.core.task.tracker.TaskTracker

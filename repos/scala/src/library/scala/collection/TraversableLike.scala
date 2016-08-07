@@ -72,8 +72,7 @@ trait TraversableLike[+A, +Repr]
     with FilterMonadic[A, Repr]
     with TraversableOnce[A]
     with GenTraversableLike[A, Repr]
-    with Parallelizable[A, ParIterable[A]] {
-  self =>
+    with Parallelizable[A, ParIterable[A]] { self =>
 
   import Traversable.breaks._
 

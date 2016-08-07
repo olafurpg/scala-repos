@@ -17,7 +17,9 @@
 
 package org.apache.spark.streaming.dstream
 
-import java.io.{NotSerializableException, ObjectInputStream, ObjectOutputStream}
+import java.io.{
+  NotSerializableException, ObjectInputStream, ObjectOutputStream
+}
 
 import scala.collection.mutable.{ArrayBuffer, Queue}
 import scala.reflect.ClassTag

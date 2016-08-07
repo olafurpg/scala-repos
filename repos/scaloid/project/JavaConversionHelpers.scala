@@ -1,4 +1,7 @@
-import java.beans.{Introspector, PropertyDescriptor, ParameterDescriptor, IndexedPropertyDescriptor}
+import java.beans.{
+  Introspector, PropertyDescriptor, ParameterDescriptor,
+  IndexedPropertyDescriptor
+}
 import java.lang.reflect.{Array => JavaArray, _}
 import org.reflections.ReflectionUtils._
 import scala.collection.JavaConversions._

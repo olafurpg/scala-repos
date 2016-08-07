@@ -133,7 +133,6 @@ class AlgebraicTest extends SpireProperties {
       roots <- Gen.nonEmptyListOf(genRational)
       i <- Gen.choose(0, roots.size)
     } yield (roots, i)
-
     // These tests can be a bit slow, so we bump down the # and size.
     forAll(Gen.nonEmptyListOf(genRational), minSuccessful(20), maxSize(8)) { roots =>
       val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct

@@ -18,7 +18,7 @@ class FriendRecommendationDataSource(
       readRelationship(dsp.userActionFilePath, userKeyword.size, userIdMap)
     // Originally for the purpose of training an acceptance threshold
     // Commented out here due to the high time and space complexity of training
-    // val trainingRecord = readTrainingRecord(dsp.trainingRecordFilePath, 
+    // val trainingRecord = readTrainingRecord(dsp.trainingRecordFilePath,
     //   userIdMap, itemIdMap)
     val trainingRecord = null
     new FriendRecommendationTrainingData(userIdMap,

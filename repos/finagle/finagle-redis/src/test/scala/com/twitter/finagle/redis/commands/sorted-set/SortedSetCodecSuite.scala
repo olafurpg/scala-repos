@@ -3,7 +3,9 @@ package com.twitter.finagle.redis.protocol
 import com.twitter.finagle.redis.ClientError
 import com.twitter.finagle.redis.naggati.RedisRequestTest
 import com.twitter.finagle.redis.tags.CodecTest
-import com.twitter.finagle.redis.util.{CBToString, BytesToString, StringToChannelBuffer}
+import com.twitter.finagle.redis.util.{
+  CBToString, BytesToString, StringToChannelBuffer
+}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

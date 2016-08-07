@@ -274,7 +274,7 @@ sealed abstract class Free[S[_], A] {
 
   /** Runs a trampoline all the way to the end, tail-recursively. */
   final def run(implicit ev: Free[S, A] =:= Trampoline[A]): A =
-    ev(this).go(_ ())
+    ev(this).go(_())
 
   /** Interleave this computation with another, combining the results with the given function. */
   final def zipWith[B, C](tb: Free[S, B])(f: (A, B) => C): Free[S, C] = {

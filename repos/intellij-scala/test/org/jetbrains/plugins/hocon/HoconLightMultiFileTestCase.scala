@@ -3,7 +3,9 @@ package org.jetbrains.plugins.hocon
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.testFramework.LightPlatformTestCase.getModule
-import com.intellij.testFramework.{LightPlatformCodeInsightTestCase, PsiTestUtil}
+import com.intellij.testFramework.{
+  LightPlatformCodeInsightTestCase, PsiTestUtil
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.util.TestUtils
 

@@ -14,7 +14,9 @@ import scala.language.existentials
 
 import play.api.libs.iteratee.Execution.trampoline
 import play.api.mvc._
-import play.mvc.{Action => JAction, Result => JResult, BodyParser => JBodyParser}
+import play.mvc.{
+  Action => JAction, Result => JResult, BodyParser => JBodyParser
+}
 import play.mvc.Http.{Context => JContext}
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef
 
-import com.intellij.psi.{ElementDescriptionLocation, ElementDescriptionProvider, PsiElement}
+import com.intellij.psi.{
+  ElementDescriptionLocation, ElementDescriptionProvider, PsiElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
 

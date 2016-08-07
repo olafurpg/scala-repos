@@ -8,7 +8,6 @@ import scala.tools.nsc._, reporters._, typechecker._
 {{{
 scalac -d . CustomGlobal.scala && scala -nc -Yglobal-class custom.CustomGlobal \
   -e 'class Bippy(x: Int) ; def f = new Bippy(5)'
-
 I'm typing a Bippy! It's a ClassDef.
 I'm typing a Bippy! It's a Ident.
 I'm typing a Bippy! It's a DefDef.

@@ -59,7 +59,7 @@ abstract class SFXDelegateSpec[J <: Object, S <: SFXDelegate[J]] protected (
     with AbstractComparator {
 
   /////////////////////////////
-  // PROTECTED METHODS - BEGIN 
+  // PROTECTED METHODS - BEGIN
   /////////////////////////////
 
   /**
@@ -82,13 +82,13 @@ abstract class SFXDelegateSpec[J <: Object, S <: SFXDelegate[J]] protected (
   protected def getJavaClassInstance: J = javaClass.newInstance
 
   /**
-    * Flag used to skip Java to Scala Conversion test. To Skip, it is necessary override it with a 
+    * Flag used to skip Java to Scala Conversion test. To Skip, it is necessary override it with a
     * non empty String explaining the cause.
     */
   protected val skipJfxToSfxCause: String = ""
 
   /**
-    * Flag used to skip Scala to Java Conversion test. To Skip, it is necessary override it with a 
+    * Flag used to skip Scala to Java Conversion test. To Skip, it is necessary override it with a
     * non empty String explaining the cause.
     */
   protected val skipSfxToJfxCause: String = ""
@@ -110,11 +110,11 @@ abstract class SFXDelegateSpec[J <: Object, S <: SFXDelegate[J]] protected (
   protected def expectedNullJFXToSFXValue: S = null.asInstanceOf[S]
 
   ///////////////////////////
-  // PROTECTED METHODS - END 
+  // PROTECTED METHODS - END
   ///////////////////////////
 
   /////////////////
-  // TESTS - BEGIN 
+  // TESTS - BEGIN
   /////////////////
 
   "A %s"
@@ -186,6 +186,6 @@ abstract class SFXDelegateSpec[J <: Object, S <: SFXDelegate[J]] protected (
   }
 
   ///////////////
-  // TESTS - END  
+  // TESTS - END
   ///////////////
 }

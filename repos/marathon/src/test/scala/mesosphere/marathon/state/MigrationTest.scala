@@ -9,7 +9,9 @@ import mesosphere.marathon.state.StorageVersions._
 import mesosphere.marathon.test.Mockito
 import mesosphere.marathon.{MarathonConf, MarathonSpec}
 import mesosphere.util.state.memory.InMemoryEntity
-import mesosphere.util.state.{PersistentEntity, PersistentStore, PersistentStoreManagement}
+import mesosphere.util.state.{
+  PersistentEntity, PersistentStore, PersistentStoreManagement
+}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{GivenWhenThen, Matchers}
 

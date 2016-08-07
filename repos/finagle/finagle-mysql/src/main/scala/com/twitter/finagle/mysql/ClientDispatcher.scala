@@ -1,11 +1,15 @@
 package com.twitter.finagle.exp.mysql
 
-import com.google.common.cache.{CacheBuilder, RemovalListener, RemovalNotification}
+import com.google.common.cache.{
+  CacheBuilder, RemovalListener, RemovalNotification
+}
 import com.twitter.cache.guava.GuavaCache
 import com.twitter.finagle.dispatch.GenSerialClientDispatcher
 import com.twitter.finagle.exp.mysql.transport.{BufferReader, Packet}
 import com.twitter.finagle.transport.Transport
-import com.twitter.finagle.{CancelledRequestException, Service, WriteException, ServiceProxy}
+import com.twitter.finagle.{
+  CancelledRequestException, Service, WriteException, ServiceProxy
+}
 import com.twitter.util.{Future, Promise, Return, Try, Throw}
 
 /**

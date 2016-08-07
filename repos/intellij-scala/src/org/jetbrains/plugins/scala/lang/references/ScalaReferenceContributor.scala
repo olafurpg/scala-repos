@@ -12,13 +12,17 @@ import com.intellij.openapi.util.{Condition, TextRange}
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi._
-import com.intellij.psi.impl.source.resolve.reference.impl.providers.{FileReference, FileReferenceSet}
+import com.intellij.psi.impl.source.resolve.reference.impl.providers.{
+  FileReference, FileReferenceSet
+}
 import com.intellij.util.ProcessingContext
 import com.intellij.util.containers.ContainerUtil
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScInterpolationPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScInterpolatedStringPartReference

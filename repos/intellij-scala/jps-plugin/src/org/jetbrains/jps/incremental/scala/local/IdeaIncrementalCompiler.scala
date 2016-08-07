@@ -4,7 +4,9 @@ package local
 import java.io.File
 
 import org.jetbrains.jps.incremental.scala.data.CompilationData
-import sbt.compiler.{AnalyzingCompiler, CompileOutput, CompilerArguments, CompilerCache}
+import sbt.compiler.{
+  AnalyzingCompiler, CompileOutput, CompilerArguments, CompilerCache
+}
 import xsbti.api.SourceAPI
 import xsbti.compile.DependencyChanges
 import xsbti.{DependencyContext, Position, Severity}

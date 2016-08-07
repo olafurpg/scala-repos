@@ -5,7 +5,9 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink, StubElement, StubInputStream, StubOutputStream
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportSelectors
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.imports.ScImportSelectorsImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScImportSelectorsStubImpl

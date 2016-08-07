@@ -13,7 +13,7 @@ case class User(id: Int, name: String) {}
 //#declaration
 object User {
 
-  // stubbed test 
+  // stubbed test
   // designed to be lightweight operation
   def findById(id: Int): Option[User] = {
     Logger.info("findById: " + id.toString)

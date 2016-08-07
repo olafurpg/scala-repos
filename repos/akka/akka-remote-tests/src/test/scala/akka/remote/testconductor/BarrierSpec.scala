@@ -6,7 +6,9 @@ package akka.remote.testconductor
 import language.postfixOps
 
 import akka.actor._
-import akka.testkit.{AkkaSpec, ImplicitSender, EventFilter, TestProbe, TimingTest}
+import akka.testkit.{
+  AkkaSpec, ImplicitSender, EventFilter, TestProbe, TimingTest
+}
 import scala.concurrent.duration._
 import java.net.{InetSocketAddress, InetAddress}
 

@@ -13,12 +13,16 @@ import com.intellij.psi.util._
 import org.jetbrains.plugins.scala.caches.CachesUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.convertMemberName
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScAccessModifier, ScFieldId, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScAccessModifier, ScFieldId, ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScExtendsBlock
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScModifierListOwner, ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScModifierListOwner, ScNamedElement, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScInterpolatedPrefixReference
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
@@ -266,9 +270,9 @@ object TypeDefinitionMembers {
       for ((sign, _) <- cp.signatureMap) {
         if (sign.paramLength.sum == 0 &&
             (ScalaPsiUtil.nameContext(sign.namedElement) match {
-                  case m: PsiMember => nonBridge(place, m)
-                  case _ => false
-                })) {
+              case m: PsiMember => nonBridge(place, m)
+              case _ => false
+            })) {
           map addToMap (sign, new Node(sign, sign.substitutor))
         }
       }
@@ -624,9 +628,15 @@ object TypeDefinitionMembers {
     }
   }
 
-  import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.ParameterlessNodes.{Map => PMap}
-  import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.SignatureNodes.{Map => SMap}
-  import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.TypeNodes.{Map => TMap}
+  import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.ParameterlessNodes.{
+    Map => PMap
+  }
+  import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.SignatureNodes.{
+    Map => SMap
+  }
+  import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.TypeNodes.{
+    Map => TMap
+  }
 
   def getParameterlessSignatures(clazz: PsiClass): PMap = {
     @CachedInsidePsiElement(clazz, CachesUtil.getDependentItem(clazz)())

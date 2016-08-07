@@ -346,10 +346,10 @@ trait GenSeqLike[+A, +Repr]
     *    {{{
     *       scala> val a = List(1)
     *       a: List[Int] = List(1)
-    *       
+    *
     *       scala> val b = a :+ 2
     *       b: List[Int] = List(1, 2)
-    *       
+    *
     *       scala> println(a)
     *       List(1)
     *    }}}

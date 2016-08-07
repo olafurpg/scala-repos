@@ -17,7 +17,10 @@ import scala.tools.nsc.reporters.Reporter
   */
 trait Contexts { self: Analyzer =>
   import global._
-  import definitions.{JavaLangPackage, ScalaPackage, PredefModule, ScalaXmlTopScope, ScalaXmlPackage}
+  import definitions.{
+    JavaLangPackage, ScalaPackage, PredefModule, ScalaXmlTopScope,
+    ScalaXmlPackage
+  }
   import ContextMode._
 
   protected def onTreeCheckerError(pos: Position, msg: String): Unit = ()
@@ -1051,25 +1054,25 @@ trait Contexts { self: Analyzer =>
       else if (!imp1Symbol.exists) Some(imp2)
       else
         (// The symbol names are checked rather than the symbols themselves because
-         // each time an overloaded member is looked up it receives a new symbol.
-         // So foo.member("x") != foo.member("x") if x is overloaded.  This seems
-         // likely to be the cause of other bugs too...
-         if (t1 =:= t2 && imp1Symbol.name == imp2Symbol.name) {
-           log(s"Suppressing ambiguous import: $t1 =:= $t2 && $imp1Symbol == $imp2Symbol")
-           Some(imp1)
-         }
-         // Monomorphism restriction on types is in part because type aliases could have the
-         // same target type but attach different variance to the parameters. Maybe it can be
-         // relaxed, but doesn't seem worth it at present.
-         else if (mt1 =:= mt2 && name.isTypeName &&
-                  imp1Symbol.isMonomorphicType &&
-                  imp2Symbol.isMonomorphicType) {
-           log(s"Suppressing ambiguous import: $mt1 =:= $mt2 && $imp1Symbol and $imp2Symbol are equivalent")
-           Some(imp1)
-         } else {
-           log(s"Import is genuinely ambiguous:\n  " + characterize)
-           None
-         })
+        // each time an overloaded member is looked up it receives a new symbol.
+        // So foo.member("x") != foo.member("x") if x is overloaded.  This seems
+        // likely to be the cause of other bugs too...
+        if (t1 =:= t2 && imp1Symbol.name == imp2Symbol.name) {
+          log(s"Suppressing ambiguous import: $t1 =:= $t2 && $imp1Symbol == $imp2Symbol")
+          Some(imp1)
+        }
+        // Monomorphism restriction on types is in part because type aliases could have the
+        // same target type but attach different variance to the parameters. Maybe it can be
+        // relaxed, but doesn't seem worth it at present.
+        else if (mt1 =:= mt2 && name.isTypeName &&
+                 imp1Symbol.isMonomorphicType &&
+                 imp2Symbol.isMonomorphicType) {
+          log(s"Suppressing ambiguous import: $mt1 =:= $mt2 && $imp1Symbol and $imp2Symbol are equivalent")
+          Some(imp1)
+        } else {
+          log(s"Import is genuinely ambiguous:\n  " + characterize)
+          None
+        })
     }
 
     /** The symbol with name `name` imported via the import in `imp`,
@@ -1142,7 +1145,7 @@ trait Contexts { self: Analyzer =>
 
       def lookupInScope(scope: Scope) =
         (scope lookupUnshadowedEntries name filter (e =>
-                  qualifies(e.sym))).toList
+                                                      qualifies(e.sym))).toList
 
       def newOverloaded(owner: Symbol, pre: Type, entries: List[ScopeEntry]) =
         logResult(s"overloaded symbol in $pre")(

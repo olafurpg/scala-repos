@@ -27,7 +27,10 @@ import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
 import org.scalatest.PrivateMethodTester._
 
 import org.apache.spark.{SparkConf, SparkContext, SparkFunSuite}
-import org.apache.spark.streaming.dstream.{DStream, InternalMapWithStateDStream, MapWithStateDStream, MapWithStateDStreamImpl}
+import org.apache.spark.streaming.dstream.{
+  DStream, InternalMapWithStateDStream, MapWithStateDStream,
+  MapWithStateDStreamImpl
+}
 import org.apache.spark.util.{ManualClock, Utils}
 
 class MapWithStateSuite

@@ -924,8 +924,7 @@ final case class TypeMapping(child: Node,
                              mapper: MappedScalaType.Mapper,
                              classTag: ClassTag[_])
     extends UnaryNode
-    with SimplyTypedNode {
-  self =>
+    with SimplyTypedNode { self =>
   type Self = TypeMapping
   def rebuild(ch: Node) = copy(child = ch)
   override def getDumpInfo = super.getDumpInfo.copy(mainInfo = "")
@@ -936,8 +935,7 @@ final case class TypeMapping(child: Node,
 /** Rebuild an Option type on the client side */
 final case class RebuildOption(discriminator: Node, data: Node)
     extends BinaryNode
-    with SimplyTypedNode {
-  self =>
+    with SimplyTypedNode { self =>
   type Self = RebuildOption
   def left = discriminator
   def right = data

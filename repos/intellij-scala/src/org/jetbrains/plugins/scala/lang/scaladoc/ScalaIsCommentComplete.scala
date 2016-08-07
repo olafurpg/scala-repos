@@ -1,7 +1,11 @@
 package org.jetbrains.plugins.scala.lang.scaladoc
 
-import com.intellij.codeInsight.editorActions.{CommentCompleteHandler, JavaLikeQuoteHandler, QuoteHandler, TypedHandler}
-import com.intellij.lang.{CodeDocumentationAwareCommenter, Language, LanguageParserDefinitions}
+import com.intellij.codeInsight.editorActions.{
+  CommentCompleteHandler, JavaLikeQuoteHandler, QuoteHandler, TypedHandler
+}
+import com.intellij.lang.{
+  CodeDocumentationAwareCommenter, Language, LanguageParserDefinitions
+}
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.tree.IElementType

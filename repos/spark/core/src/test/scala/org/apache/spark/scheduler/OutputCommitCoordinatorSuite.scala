@@ -24,7 +24,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-import org.apache.hadoop.mapred.{JobConf, OutputCommitter, TaskAttemptContext, TaskAttemptID}
+import org.apache.hadoop.mapred.{
+  JobConf, OutputCommitter, TaskAttemptContext, TaskAttemptID
+}
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock

@@ -1,13 +1,10 @@
 package breeze.optimize
 /*
  Copyright 2009 David Hall, Daniel Ramage
-
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +14,9 @@ package breeze.optimize
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.linalg._
-import breeze.optimize.FirstOrderMinimizer.{State, ProjectedStepConverged, ConvergenceCheck}
+import breeze.optimize.FirstOrderMinimizer.{
+  State, ProjectedStepConverged, ConvergenceCheck
+}
 import breeze.util.SerializableLogging
 import breeze.util.Implicits._
 
@@ -184,7 +183,7 @@ class LBFGSB(lowerBounds: DenseVector[Double],
         theta * g(b) * zb - (bRowOfW.t :* g(b)) * (M * c)
       fSecondDerivative += -1.0 * theta * g(b) * g(b) - 2.0 *
         (g(b) * (bRowOfW
-                  .dot(M * p))) - g(b) * g(b) * (bRowOfW.t * (M * bRowOfW))
+              .dot(M * p))) - g(b) * g(b) * (bRowOfW.t * (M * bRowOfW))
       p += (bRowOfW :* g(b));
       d(b) = 0.0
       dtMin = -fDerivative / fSecondDerivative

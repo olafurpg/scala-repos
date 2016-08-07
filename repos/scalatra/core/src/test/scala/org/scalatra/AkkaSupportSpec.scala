@@ -100,7 +100,6 @@ class AkkaSupportSpec extends MutableScalatraSpec {
   override lazy val server = {
     /*
      Min threads for Jetty is 6 because: acceptors=1 + selectors=4 + request=1
-
      so 16 max and 6 min -> 10 worker threads
      */
     val threadPool = new QueuedThreadPool(16, 6)

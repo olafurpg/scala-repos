@@ -168,7 +168,7 @@ class ScaloidCodeGenerator(cls: AndroidClass,
   def baseClassInstance = {
     val args = BaseClassArgs.toMap
       .get(cls.name)
-      .fold(cls.constructors.head.args.map(_.name).mkString(", "))(_ (cls))
+      .fold(cls.constructors.head.args.map(_.name).mkString(", "))(_(cls))
     s"${cls.tpe.name}${typeVar(cls.tpe)}($args)"
   }
 

@@ -1,6 +1,8 @@
 package org.scalatra.swagger
 
-import org.scalatra.swagger.AllowableValues.{AllowableRangeValues, AllowableValuesList}
+import org.scalatra.swagger.AllowableValues.{
+  AllowableRangeValues, AllowableValuesList
+}
 import org.scalatra.swagger.annotations._
 import org.scalatra.swagger.reflect.Reflector
 import org.specs2.mutable.Specification

@@ -146,7 +146,7 @@ object BackoffSupervisor {
 
   private[akka] final case object StartChild extends DeadLetterSuppression
 
-  // not final for binary compatibility with 2.4.1 
+  // not final for binary compatibility with 2.4.1
   private[akka] case class ResetRestartCount(current: Int)
       extends DeadLetterSuppression
 
@@ -243,8 +243,7 @@ final class BackoffSupervisor(val childProps: Props,
   def receive = onTerminated orElse handleBackoff
 }
 
-private[akka] trait HandleBackoff {
-  this: Actor ⇒
+private[akka] trait HandleBackoff { this: Actor ⇒
   def childProps: Props
   def childName: String
   def reset: BackoffReset

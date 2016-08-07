@@ -1,50 +1,38 @@
 /**
 Interesting aspects of Java reflection applied to scala classes. TL;DR: you should not use
 getSimpleName / getCanonicalName / isAnonymousClass / isLocalClass / isSynthetic.
-
   - Some methods in Java reflection assume a certain structure in the class names. Scalac
     can produce class files that don't respect this structure. Certain methods in reflection
     therefore give surprising answers or may even throw an exception.
-
     In particular, the method "getSimpleName" assumes that classes are named after the Java spec
       http://docs.oracle.com/javase/specs/jls/se8/html/jls-13.html#jls-13.1
-
     Consider the following Scala example:
       class A { object B { class C } }
-
     The classfile for C has the name "A$B$C", while the classfile for the module B has the
     name "A$B$".
-
     For "cClass.getSimpleName, the implementation first strips the name of the enclosing class,
     which produces "C". The implementation then expects a "$" character, which is missing, and
     throws an InternalError.
-
     Consider another example:
       trait T
       class A  { val x = new T {} }
       object B { val x = new T {} }
-
     The anonymous classes are named "A$$anon$1" and "B$$anon$2". If you call "getSimpleName",
     you get "$anon$1" (leading $) and "anon$2" (no leading $).
-
   - There are certain other methods in the Java reflection API that depend on getSimpleName.
     These should be avoided, they yield unexpected results:
-
     - isAnonymousClass is always false. Scala-defined classes are never anonymous for Java
       reflection. Java reflection inspects the class name to decide whether a class is
       anonymous, based on the name spec referenced above.
       Also, the implementation of "isAnonymousClass" calls "getSimpleName", which may throw.
-
     - isLocalClass: should be true true for local classes (nested classes that are not
       members), but not for anonymous classes. Since "isAnonymousClass" is always false,
       Java reflection thinks that all Scala-defined anonymous classes are local.
       The implementation may also throw, since it uses "isAnonymousClass":
         class A { object B { def f = { class KB; new KB } } }
         (new A).B.f.getClass.isLocalClass // boom
-
     - getCanonicalName: uses "getSimpleName" in the implementation. In the first example,
       cClass.getCanonicalName also fails with an InternalError.
-
   - Scala-defined classes are never synthetic for Java reflection. The implementation
     checks for the SYNTHETEIC flag, which does not seem to be added by scalac (maybe this
     will change some day).

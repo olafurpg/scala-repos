@@ -4,7 +4,9 @@ package unusedInspections
 
 import com.intellij.codeInsight.FileModificationService
 import com.intellij.codeInsight.daemon.QuickFixBundle
-import com.intellij.codeInsight.intention.{HighPriorityAction, IntentionAction, LowPriorityAction}
+import com.intellij.codeInsight.intention.{
+  HighPriorityAction, IntentionAction, LowPriorityAction
+}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile

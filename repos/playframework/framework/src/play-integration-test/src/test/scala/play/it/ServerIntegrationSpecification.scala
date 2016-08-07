@@ -22,8 +22,7 @@ import scala.concurrent.duration._
   */
 trait ServerIntegrationSpecification
     extends PendingUntilFixed
-    with AroundEach {
-  parent =>
+    with AroundEach { parent =>
   implicit def integrationServerProvider: ServerProvider
 
   /**

@@ -122,8 +122,8 @@ object Msg extends DispatchSnippet {
     }
   }
 
-  /** 
-    * This method produces and appends a script element to lift's page script 
+  /**
+    * This method produces and appends a script element to lift's page script
     * to render effects on a element with the given id.
     *
     * @see net.liftweb.builtin.snippet.Msgs#effects[T](Box[NoticeType.Value],String,T,Box[JsCmd => T])

@@ -49,9 +49,9 @@ object LispCaseClasses extends Lisp {
     override def toString() = "(" + elemsToString() + ")";
     override def elemsToString() =
       car.toString() + (cdr match {
-            case NIL() => ""
-            case _ => " " + cdr.elemsToString();
-          })
+        case NIL() => ""
+        case _ => " " + cdr.elemsToString();
+      })
   }
   case class NIL() extends Data {
     // !!! use case object

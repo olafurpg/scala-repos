@@ -6,7 +6,9 @@ import com.intellij.psi._
 import com.intellij.util.text.CharArrayUtil
 import org.jetbrains.plugins.scala.editor.smartEnter.ScalaSmartEnterProcessor
 import org.jetbrains.plugins.scala.extensions.ObjectExt
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScMethodCall}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScArgumentExprList, ScMethodCall
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterClause
 

@@ -6,7 +6,9 @@
 package scala.tools.nsc
 package typechecker
 
-import scala.reflect.internal.util.StringOps.{countElementsAsString, countAsString}
+import scala.reflect.internal.util.StringOps.{
+  countElementsAsString, countAsString
+}
 import scala.compat.Platform.EOL
 import scala.reflect.runtime.ReflectionUtils
 import scala.reflect.macros.runtime.AbortMacroException
@@ -1080,7 +1082,7 @@ trait ContextErrors { self: Analyzer =>
 
     /** This file will be the death of me. */
     protected def macroImplementationNotFoundMessage(name: Name): String =
-      ( s"""|macro implementation not found: $name
+      (s"""|macro implementation not found: $name
           |(the most common reason for that is that you cannot use macro implementations in the same compilation run that defines them)""".stripMargin)
   }
 
@@ -1574,12 +1576,12 @@ trait ContextErrors { self: Analyzer =>
             // involving Any, are further explained from foundReqMsg.
             if (AnyRefTpe <:< req)
               (if (sym == AnyClass || sym == UnitClass)
-                 ( sm"""|Note: ${sym.name} is not implicitly converted to AnyRef.  You can safely
+                 (sm"""|Note: ${sym.name} is not implicitly converted to AnyRef.  You can safely
                       |pattern match `x: AnyRef` or cast `x.asInstanceOf[AnyRef]` to do so.""")
                else
                  boxedClass get sym map
                    (boxed =>
-                         sm"""|Note: an implicit exists from ${sym.fullName} => ${boxed.fullName}, but
+                      sm"""|Note: an implicit exists from ${sym.fullName} => ${boxed.fullName}, but
                       |methods inherited from Object are rendered ambiguous.  This is to avoid
                       |a blanket implicit which would convert any ${sym.fullName} to any AnyRef.
                       |You may wish to use a type ascription: `x: ${boxed.fullName}`.""") getOrElse "")

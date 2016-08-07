@@ -15,8 +15,7 @@ import ir.{Definitions, Types}
   *
   *  @author Sébastien Doeraene
   */
-trait TypeKinds extends SubComponent {
-  this: GenJSCode =>
+trait TypeKinds extends SubComponent { this: GenJSCode =>
   import global._
   import jsAddons._
   import definitions._

@@ -306,7 +306,7 @@ private[http] trait LiftMerge { self: LiftSession =>
                         htmlKids.toList: _*)
 
       val ret: Node = if (Props.devMode) {
-        LiftRules.xhtmlValidator.toList.flatMap(_ (tmpRet)) match {
+        LiftRules.xhtmlValidator.toList.flatMap(_(tmpRet)) match {
           case Nil => tmpRet
           case xs =>
             import scala.xml.transform._

@@ -73,7 +73,7 @@ class ProxyTest extends WordSpec {
     }
 
     "must not throw UndeclaredThrowableException" in {
-      val pf = new ProxyFactory[TestImpl](_ ())
+      val pf = new ProxyFactory[TestImpl](_())
       val proxied = pf(new TestImpl)
 
       intercept[RuntimeException] {
@@ -121,7 +121,7 @@ class ProxyTest extends WordSpec {
     }
 
     "MethodCall throws an exception when invoked without a target" in {
-      val pf = new ProxyFactory[TestImpl](_ ())
+      val pf = new ProxyFactory[TestImpl](_())
       val targetless = pf()
 
       intercept[NonexistentTargetException] {
@@ -172,26 +172,22 @@ class ProxyTest extends WordSpec {
     }
 
     val reflectConstructor = { () =>
-      new ReferenceProxyFactory[TestInterface](_ ())
+      new ReferenceProxyFactory[TestInterface](_())
     }
     val cglibConstructor = { () =>
-      new ProxyFactory[TestInterface](_ ())
+      new ProxyFactory[TestInterface](_())
     }
     /*
     "maintains proxy creation speed" in {
       val repTimes = 40000
-
       val obj = new TestImpl
       val factory1 = reflectConstructor()
       val factory2 = cglibConstructor()
-
       val t1 = benchmark { for (i <- 1 to repTimes) factory1(obj) }
       val t2 = benchmark { for (i <- 1 to repTimes) factory2(obj) }
-
       // println("proxy creation")
       // println(t1)
       // println(t2)
-
       t2 should beLessThan(200L)
     }
      */

@@ -18,9 +18,13 @@ package kafka.controller
 
 import java.util
 
-import org.apache.kafka.common.errors.{BrokerNotAvailableException, ControllerMovedException}
+import org.apache.kafka.common.errors.{
+  BrokerNotAvailableException, ControllerMovedException
+}
 import org.apache.kafka.common.protocol.ApiKeys
-import org.apache.kafka.common.requests.{AbstractRequest, AbstractRequestResponse}
+import org.apache.kafka.common.requests.{
+  AbstractRequest, AbstractRequestResponse
+}
 
 import scala.collection._
 import com.yammer.metrics.core.Gauge
@@ -38,7 +42,9 @@ import kafka.utils.CoreUtils._
 import org.apache.zookeeper.Watcher.Event.KeeperState
 import org.apache.kafka.common.metrics.Metrics
 import org.apache.kafka.common.utils.Time
-import org.I0Itec.zkclient.{IZkChildListener, IZkDataListener, IZkStateListener, ZkClient, ZkConnection}
+import org.I0Itec.zkclient.{
+  IZkChildListener, IZkDataListener, IZkStateListener, ZkClient, ZkConnection
+}
 import org.I0Itec.zkclient.exception.{ZkNodeExistsException, ZkNoNodeException}
 import java.util.concurrent.locks.ReentrantLock
 import kafka.server._

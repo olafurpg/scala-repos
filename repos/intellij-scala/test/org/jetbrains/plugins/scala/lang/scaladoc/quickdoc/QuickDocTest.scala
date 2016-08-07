@@ -7,7 +7,9 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
 import org.jetbrains.plugins.scala.editor.documentationProvider.ScalaDocumentationProvider
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.light.ScFunctionWrapper
 import org.junit.Assert
 
@@ -170,7 +172,6 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       """
     val testText = "\n      <pre> <code> \n    class Clazzz {\n       def f[U](u: U) {}\n\n       val a = 1\n    }  " +
             "</code> </pre>  "
-
     generateSimpleByText(fileText, testText)
   }*/
 

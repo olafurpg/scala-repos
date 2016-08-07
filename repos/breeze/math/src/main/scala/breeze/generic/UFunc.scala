@@ -5,13 +5,10 @@ import breeze.linalg.support._
 
 /*
  Copyright 2012 David Hall
-
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -122,8 +119,7 @@ trait VariableUFunc[U <: UFunc, T <: VariableUFunc[U, T]] { self: T =>
   }
 }
 
-trait MappingUFunc extends MappingUFuncLowPrio {
-  this: UFunc =>
+trait MappingUFunc extends MappingUFuncLowPrio { this: UFunc =>
   implicit def fromLowOrderCanMapValues[T, V, V2, U](
       implicit handhold: ScalarOf[T, V],
       impl: Impl[V, V2],
@@ -143,8 +139,7 @@ trait MappingUFunc extends MappingUFuncLowPrio {
   }
 }
 
-sealed trait MappingUFuncLowPrio {
-  this: UFunc =>
+sealed trait MappingUFuncLowPrio { this: UFunc =>
   implicit def canMapV2Values[T, V1, V2, VR, U](
       implicit handhold: ScalarOf[T, V2],
       impl: Impl2[V1, V2, VR],
@@ -331,8 +326,7 @@ object WrappedUFunc extends UFunc with WrappedUFuncLowPrio {
   }
 }
 
-trait WrappedUFuncLowPrio {
-  this: WrappedUFunc.type =>
+trait WrappedUFuncLowPrio { this: WrappedUFunc.type =>
   implicit def apply2b[V, A1, A2, R, V2](
       implicit cmv: CanMapValues[V, A2, R, V2])
     : Impl3[WrappedUFunc2[A1, A2, R], A1, V, V2] = {

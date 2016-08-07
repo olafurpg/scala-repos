@@ -22,7 +22,9 @@ import scala.util.Random
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.expressions.UnsafeRow
-import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAggregateFunction}
+import org.apache.spark.sql.expressions.{
+  MutableAggregationBuffer, UserDefinedAggregateFunction
+}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.hive.aggregate.{MyDoubleAvg, MyDoubleSum}
 import org.apache.spark.sql.hive.test.TestHiveSingleton

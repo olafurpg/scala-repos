@@ -20,8 +20,8 @@ object CustomRoute {
         case msg: CamelMessage =>
           sender() !
             (msg.mapBody { body: String =>
-                  "received %s" format body
-                })
+              "received %s" format body
+            })
       }
     }
 

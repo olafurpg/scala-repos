@@ -1,7 +1,9 @@
 package lila.lobby
 
 import org.joda.time.DateTime
-import reactivemongo.bson.{BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean}
+import reactivemongo.bson.{
+  BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean
+}
 import reactivemongo.core.commands._
 import scala.concurrent.duration._
 

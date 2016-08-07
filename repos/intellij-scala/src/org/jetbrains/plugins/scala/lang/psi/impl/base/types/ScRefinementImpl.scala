@@ -10,7 +10,7 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.{PsiElement, ResolveState}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */

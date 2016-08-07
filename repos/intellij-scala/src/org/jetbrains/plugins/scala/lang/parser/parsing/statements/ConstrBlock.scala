@@ -6,7 +6,9 @@ package statements
 
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
-import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.{BlockStat, SelfInvocation}
+import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.{
+  BlockStat, SelfInvocation
+}
 
 /**
   * @author Alexander Podkhalyuzin

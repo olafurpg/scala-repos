@@ -30,7 +30,9 @@ import xml._
 import common._
 import json._
 import util.Helpers._
-import util.{SourceFieldMetadata, NamedPF, FieldError, Helpers, CssSel, PassThru}
+import util.{
+  SourceFieldMetadata, NamedPF, FieldError, Helpers, CssSel, PassThru
+}
 import http.{LiftRules, S, SHtml, RequestMemoize, Factory}
 import http.js._
 
@@ -533,11 +535,11 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
           case in: InRaw[A, _] =>
             updatedWhat =
               updatedWhat + whereOrAnd + (in.rawSql match {
-                    case null | "" => " 0 = 1 "
-                    case sql =>
-                      " " + MapperRules.quoteColumnName.vend(
-                          in.field._dbColumnNameLC) + " IN ( " + sql + " ) "
-                  })
+                case null | "" => " 0 = 1 "
+                case sql =>
+                  " " + MapperRules.quoteColumnName.vend(
+                      in.field._dbColumnNameLC) + " IN ( " + sql + " ) "
+              })
 
           case (in: InThing[A]) =>
             updatedWhat =
@@ -1198,7 +1200,7 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
                     val bsl = tField.buildSetDateValue(fieldInfo, colName)
                     (rs: ResultSet, pos: Int, objInst: A) =>
                       bsl(objInst, rs.getTimestamp(pos))
-                    case Types.BOOLEAN | Types.BIT => {
+                  case Types.BOOLEAN | Types.BIT => {
                     val bsl = tField.buildSetBooleanValue(fieldInfo, colName)
                     (rs: ResultSet, pos: Int, objInst: A) =>
                       bsl(objInst, rs.getBoolean(pos), rs.wasNull)
@@ -1649,7 +1651,7 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
         if (!inst.addedPostCommit) {
           DB.appendPostTransaction(
               inst.connectionIdentifier,
-              dontUse => (clearPCFunc :: pcf).foreach(_ (inst)))
+              dontUse => (clearPCFunc :: pcf).foreach(_(inst)))
           inst.addedPostCommit = true
         }
     }

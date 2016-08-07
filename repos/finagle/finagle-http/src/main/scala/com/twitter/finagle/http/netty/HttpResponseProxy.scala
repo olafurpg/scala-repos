@@ -1,6 +1,8 @@
 package com.twitter.finagle.http.netty
 
-import org.jboss.netty.handler.codec.http.{HttpMessage, HttpResponse, HttpResponseStatus}
+import org.jboss.netty.handler.codec.http.{
+  HttpMessage, HttpResponse, HttpResponseStatus
+}
 
 /** Proxy for HttpResponse.  Used by Response. */
 private[finagle] trait HttpResponseProxy extends HttpMessageProxy {

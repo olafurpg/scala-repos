@@ -21,8 +21,12 @@ import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.event.{EventModule, LocalLeadershipEvent}
 import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.metrics.Metrics
-import mesosphere.marathon.state.{AppDefinition, AppRepository, Migration, PathId, Timestamp}
-import mesosphere.marathon.upgrade.DeploymentManager.{CancelDeployment, DeploymentStepInfo}
+import mesosphere.marathon.state.{
+  AppDefinition, AppRepository, Migration, PathId, Timestamp
+}
+import mesosphere.marathon.upgrade.DeploymentManager.{
+  CancelDeployment, DeploymentStepInfo
+}
 import mesosphere.marathon.upgrade.DeploymentPlan
 import mesosphere.util.PromiseActor
 import mesosphere.util.state.FrameworkIdUtil

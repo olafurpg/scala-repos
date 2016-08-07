@@ -42,8 +42,7 @@ object AtLeastOnceDeliveryFailureSpec {
   case class MsgSent(i: Int) extends Evt
   case class MsgConfirmed(deliveryId: Long, i: Int) extends Evt
 
-  trait ChaosSupport {
-    this: Actor ⇒
+  trait ChaosSupport { this: Actor ⇒
     def random = ThreadLocalRandom.current
 
     def probe: ActorRef

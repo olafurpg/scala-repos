@@ -5,7 +5,9 @@ import com.twitter.finagle._
 import com.twitter.finagle.Address.failing
 import com.twitter.finagle.dispatch.SerialClientDispatcher
 import com.twitter.finagle.service.exp.FailureAccrualPolicy
-import com.twitter.finagle.service.{ResponseClassifier, Backoff, FailureAccrualFactory}
+import com.twitter.finagle.service.{
+  ResponseClassifier, Backoff, FailureAccrualFactory
+}
 import com.twitter.finagle.stats.{StatsReceiver, InMemoryStatsReceiver}
 import com.twitter.finagle.transport.{QueueTransport, Transport}
 import com.twitter.finagle.util.DefaultLogger

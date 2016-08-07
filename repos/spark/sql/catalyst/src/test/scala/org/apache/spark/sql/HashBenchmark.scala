@@ -18,7 +18,9 @@
 package org.apache.spark.sql
 
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
-import org.apache.spark.sql.catalyst.expressions.{Murmur3Hash, UnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.{
+  Murmur3Hash, UnsafeProjection
+}
 import org.apache.spark.sql.catalyst.expressions.codegen.GenerateSafeProjection
 import org.apache.spark.sql.types._
 import org.apache.spark.util.Benchmark

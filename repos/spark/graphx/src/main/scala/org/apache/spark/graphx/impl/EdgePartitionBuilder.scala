@@ -21,7 +21,9 @@ import scala.reflect.ClassTag
 
 import org.apache.spark.graphx._
 import org.apache.spark.graphx.util.collection.GraphXPrimitiveKeyOpenHashMap
-import org.apache.spark.util.collection.{PrimitiveVector, SortDataFormat, Sorter}
+import org.apache.spark.util.collection.{
+  PrimitiveVector, SortDataFormat, Sorter
+}
 
 /** Constructs an EdgePartition from scratch. */
 private[graphx] class EdgePartitionBuilder[

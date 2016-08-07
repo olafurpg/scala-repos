@@ -13,7 +13,9 @@ import org.jetbrains.plugins.hocon.HoconConstants
 import org.jetbrains.plugins.hocon.HoconConstants._
 import org.jetbrains.plugins.hocon.lexer.{HoconTokenSets, HoconTokenType}
 import org.jetbrains.plugins.hocon.parser.HoconElementType
-import org.jetbrains.plugins.hocon.ref.{HKeySelfReference, IncludedFileReferenceSet}
+import org.jetbrains.plugins.hocon.ref.{
+  HKeySelfReference, IncludedFileReferenceSet
+}
 import org.jetbrains.plugins.scala.extensions._
 
 import scala.reflect.{ClassTag, classTag}

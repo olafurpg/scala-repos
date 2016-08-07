@@ -15,7 +15,6 @@ object SameInterpolatedStringLiterals {
 }
 /*
 object SameInterpolatedStringLiterals {
-
   def log(message: String, level: Int) {
     level match {
       case 0 =>
@@ -25,7 +24,6 @@ object SameInterpolatedStringLiterals {
         testMethodName(level2, message)
     }
   }
-
   def testMethodName(level: Int, message: String): Unit = {
     println(s"info: $level")
     println(message)

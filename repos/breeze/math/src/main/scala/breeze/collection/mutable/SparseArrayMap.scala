@@ -6,7 +6,7 @@ import breeze.storage.Zero
 import scala.reflect.ClassTag
 
 /**
-  * 
+  *
   * @author dlwh
   */
 class SparseArrayMap[@specialized T: ClassTag: Zero](val length: Int,

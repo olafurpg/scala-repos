@@ -31,7 +31,10 @@ import javafx.{geometry => jfxg, scene => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyObjectProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyObjectProperty,
+  StringProperty
+}
 import scalafx.delegate.{AlignmentDelegate, SFXDelegate}
 import scalafx.scene.Node
 import scalafx.scene.Node.sfxNode2jfx

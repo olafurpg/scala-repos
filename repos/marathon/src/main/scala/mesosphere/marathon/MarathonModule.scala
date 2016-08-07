@@ -13,7 +13,9 @@ import com.codahale.metrics.Gauge
 import com.google.inject._
 import com.google.inject.name.Names
 import com.twitter.common.base.Supplier
-import com.twitter.common.zookeeper.{Candidate, CandidateImpl, Group => ZGroup, ZooKeeperClient}
+import com.twitter.common.zookeeper.{
+  Candidate, CandidateImpl, Group => ZGroup, ZooKeeperClient
+}
 import com.twitter.util.JavaTimer
 import com.twitter.zk.{NativeConnector, ZkClient}
 import mesosphere.chaos.http.HttpConf
@@ -25,7 +27,9 @@ import mesosphere.marathon.core.launchqueue.LaunchQueue
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.event.http._
 import mesosphere.marathon.event.{EventModule, HistoryActor}
-import mesosphere.marathon.health.{HealthCheckManager, MarathonHealthCheckManager}
+import mesosphere.marathon.health.{
+  HealthCheckManager, MarathonHealthCheckManager
+}
 import mesosphere.marathon.io.storage.StorageProvider
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state._
@@ -34,7 +38,9 @@ import mesosphere.util.state.memory.InMemoryStore
 import mesosphere.util.state.mesos.MesosStateStore
 import mesosphere.util.state.zk.{CompressionConf, ZKStore}
 import mesosphere.util.state.{FrameworkId, FrameworkIdUtil, PersistentStore, _}
-import mesosphere.util.{CapConcurrentExecutions, CapConcurrentExecutionsMetrics}
+import mesosphere.util.{
+  CapConcurrentExecutions, CapConcurrentExecutionsMetrics
+}
 import org.apache.mesos.state.ZooKeeperState
 import org.apache.zookeeper.ZooDefs
 import org.apache.zookeeper.ZooDefs.Ids

@@ -12,6 +12,5 @@ object X {
   def foo() = {
     1 + 1
   }
-
   val b = 1
 }*/

@@ -30,13 +30,19 @@ import java.io.{IOException, File}
 
 import kafka.security.auth.Authorizer
 import kafka.utils._
-import org.apache.kafka.clients.{ManualMetadataUpdater, ClientRequest, NetworkClient}
+import org.apache.kafka.clients.{
+  ManualMetadataUpdater, ClientRequest, NetworkClient
+}
 import org.apache.kafka.common.Node
 import org.apache.kafka.common.metrics._
-import org.apache.kafka.common.network.{LoginType, Selectable, ChannelBuilders, NetworkReceive, Selector, Mode}
+import org.apache.kafka.common.network.{
+  LoginType, Selectable, ChannelBuilders, NetworkReceive, Selector, Mode
+}
 import org.apache.kafka.common.protocol.{Errors, ApiKeys, SecurityProtocol}
 import org.apache.kafka.common.metrics.{JmxReporter, Metrics}
-import org.apache.kafka.common.requests.{ControlledShutdownResponse, ControlledShutdownRequest, RequestSend}
+import org.apache.kafka.common.requests.{
+  ControlledShutdownResponse, ControlledShutdownRequest, RequestSend
+}
 import org.apache.kafka.common.security.JaasUtils
 import org.apache.kafka.common.utils.AppInfoParser
 

@@ -25,7 +25,7 @@ trait IndexedSeq[+A]
   override def companion: GenericCompanion[IndexedSeq] = IndexedSeq
 
   /** Returns this $coll as an indexed sequence.
-    *  
+    *
     *  A new indexed sequence will not be built; lazy collections will stay lazy.
     */
   @deprecatedOverriding(

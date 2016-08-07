@@ -4,7 +4,7 @@ package parser
 package parsing
 package nl
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 05.02.2008
   */

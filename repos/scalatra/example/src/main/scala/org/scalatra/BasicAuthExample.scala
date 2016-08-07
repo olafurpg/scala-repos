@@ -29,8 +29,7 @@ object BasicAuthExample {
 
   trait AuthenticationSupport
       extends ScentrySupport[MyUser]
-      with BasicAuthSupport[MyUser] {
-    self: ScalatraBase =>
+      with BasicAuthSupport[MyUser] { self: ScalatraBase =>
 
     val realm = "Scalatra Basic Auth Example"
 

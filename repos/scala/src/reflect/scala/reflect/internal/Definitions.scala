@@ -16,7 +16,12 @@ import scala.reflect.api.{Universe => ApiUniverse}
 
 trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
-  import rootMirror.{getModuleByName, getPackage, getClassByName, getRequiredClass, getRequiredModule, getClassIfDefined, getModuleIfDefined, getPackageObject, getPackageIfDefined, getPackageObjectIfDefined, requiredClass, requiredModule}
+  import rootMirror.{
+    getModuleByName, getPackage, getClassByName, getRequiredClass,
+    getRequiredModule, getClassIfDefined, getModuleIfDefined, getPackageObject,
+    getPackageIfDefined, getPackageObjectIfDefined, requiredClass,
+    requiredModule
+  }
 
   object definitions extends DefinitionsClass
 
@@ -675,11 +680,11 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     // The given symbol is a method with the right name and signature to be a runnable java program.
     def isJavaMainMethod(sym: Symbol) =
       (sym.name == nme.main) && (sym.info match {
-            case MethodType(p :: Nil, restpe) =>
-              isArrayOfSymbol(p.tpe, StringClass) &&
-                restpe.typeSymbol == UnitClass
-            case _ => false
-          })
+        case MethodType(p :: Nil, restpe) =>
+          isArrayOfSymbol(p.tpe, StringClass) &&
+            restpe.typeSymbol == UnitClass
+        case _ => false
+      })
     // The given class has a main method.
     def hasJavaMainMethod(sym: Symbol): Boolean =
       (sym.tpe member nme.main).alternatives exists isJavaMainMethod
@@ -1015,8 +1020,8 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
                 (excludedFlags = BridgeAndPrivateFlags,
                     requiredFlags = METHOD) filter
                 (mem =>
-                      mem.isDeferredNotJavaDefault &&
-                        !isUniversalMember(mem)) // TODO: test
+                   mem.isDeferredNotJavaDefault &&
+                     !isUniversalMember(mem)) // TODO: test
               )
 
         // if there is only one, it's monomorphic and has a single argument list
@@ -1876,8 +1881,8 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       lazy val Scala_Java8_CompatPackage_JFunction =
         (0 to MaxFunctionArity).toArray map
           (i =>
-                getMemberIfDefined(Scala_Java8_CompatPackage.moduleClass,
-                                   TypeName("JFunction" + i)))
+             getMemberIfDefined(Scala_Java8_CompatPackage.moduleClass,
+                                TypeName("JFunction" + i)))
     }
   }
 }

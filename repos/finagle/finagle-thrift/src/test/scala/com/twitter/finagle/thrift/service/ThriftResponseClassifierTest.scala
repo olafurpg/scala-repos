@@ -86,7 +86,9 @@ class ThriftResponseClassifierTest extends FunSuite {
   }
 
   test("ThriftExceptionsAsFailures") {
-    import ThriftResponseClassifier.{ThriftExceptionsAsFailures, usingDeserializeCtx}
+    import ThriftResponseClassifier.{
+      ThriftExceptionsAsFailures, usingDeserializeCtx
+    }
 
     val classifier = usingDeserializeCtx(ThriftExceptionsAsFailures)
     assert(

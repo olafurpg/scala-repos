@@ -22,7 +22,9 @@ import java.util.{Locale, TimeZone}
 
 import org.apache.hadoop.hive.ql.udf.UDAFPercentile
 import org.apache.hadoop.hive.serde2.io.DoubleWritable
-import org.apache.hadoop.hive.serde2.objectinspector.{ObjectInspector, ObjectInspectorFactory, StructObjectInspector}
+import org.apache.hadoop.hive.serde2.objectinspector.{
+  ObjectInspector, ObjectInspectorFactory, StructObjectInspector
+}
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory.ObjectInspectorOptions
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory
 import org.apache.hadoop.io.LongWritable
@@ -30,7 +32,9 @@ import org.apache.hadoop.io.LongWritable
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.Literal
-import org.apache.spark.sql.catalyst.util.{ArrayBasedMapData, GenericArrayData, MapData}
+import org.apache.spark.sql.catalyst.util.{
+  ArrayBasedMapData, GenericArrayData, MapData
+}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.Row
 

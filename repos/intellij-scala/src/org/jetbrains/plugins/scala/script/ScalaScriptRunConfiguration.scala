@@ -11,7 +11,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.JDOMExternalizer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.{PsiElement, PsiManager}
-import com.intellij.refactoring.listeners.{RefactoringElementAdapter, RefactoringElementListener}
+import com.intellij.refactoring.listeners.{
+  RefactoringElementAdapter, RefactoringElementListener
+}
 import com.intellij.vcsUtil.VcsUtil
 import org.jdom.Element
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile

@@ -6,7 +6,9 @@
 package org.scalajs.core.compiler
 
 import scala.tools.nsc._
-import scala.tools.nsc.plugins.{Plugin => NscPlugin, PluginComponent => NscPluginComponent}
+import scala.tools.nsc.plugins.{
+  Plugin => NscPlugin, PluginComponent => NscPluginComponent
+}
 import scala.collection.{mutable, immutable}
 
 import java.net.{URI, URISyntaxException}

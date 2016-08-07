@@ -25,7 +25,9 @@ import org.jsoup.nodes.{Document, Element}
 import org.jsoup.Jsoup
 import java.io.File
 import utils.{ParsingCandidate, URLHelper, Logging}
-import com.gravity.goose.outputformatters.{StandardOutputFormatter, OutputFormatter}
+import com.gravity.goose.outputformatters.{
+  StandardOutputFormatter, OutputFormatter
+}
 
 /**
   * Created by Jim Plush

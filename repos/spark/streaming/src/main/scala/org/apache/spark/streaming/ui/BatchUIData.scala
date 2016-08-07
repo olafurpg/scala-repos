@@ -20,7 +20,9 @@ package org.apache.spark.streaming.ui
 import scala.collection.mutable
 
 import org.apache.spark.streaming.Time
-import org.apache.spark.streaming.scheduler.{BatchInfo, OutputOperationInfo, StreamInputInfo}
+import org.apache.spark.streaming.scheduler.{
+  BatchInfo, OutputOperationInfo, StreamInputInfo
+}
 import org.apache.spark.streaming.ui.StreamingJobProgressListener._
 
 private[ui] case class OutputOpIdAndSparkJobId(outputOpId: OutputOpId,

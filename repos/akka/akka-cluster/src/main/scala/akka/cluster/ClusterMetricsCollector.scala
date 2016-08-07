@@ -8,7 +8,9 @@ package akka.cluster
 
 import java.io.Closeable
 import java.lang.System.{currentTimeMillis ⇒ newTimestamp}
-import java.lang.management.{OperatingSystemMXBean, MemoryMXBean, ManagementFactory}
+import java.lang.management.{
+  OperatingSystemMXBean, MemoryMXBean, ManagementFactory
+}
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import scala.collection.immutable

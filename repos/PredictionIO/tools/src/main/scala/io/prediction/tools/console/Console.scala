@@ -695,8 +695,8 @@ object Console extends Logging {
       mainHelp
     } else {
       val stripped =
-        (if (commands.head == "help") commands.drop(1) else commands).mkString(
-            "-")
+        (if (commands.head == "help") commands.drop(1) else commands)
+          .mkString("-")
       helpText.getOrElse(stripped, s"Help is unavailable for ${stripped}.")
     }
   }

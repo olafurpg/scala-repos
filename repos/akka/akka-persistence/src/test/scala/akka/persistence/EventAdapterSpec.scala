@@ -205,8 +205,7 @@ class EventAdapterSpec(journalName: String,
   }
 }
 
-trait ReplayPassThrough {
-  this: EventAdapterSpec ⇒
+trait ReplayPassThrough { this: EventAdapterSpec ⇒
   "EventAdapter" must {
 
     "store events after applying adapter" in {
@@ -232,8 +231,7 @@ trait ReplayPassThrough {
   }
 }
 
-trait NoAdapters {
-  this: EventAdapterSpec ⇒
+trait NoAdapters { this: EventAdapterSpec ⇒
   "EventAdapter" must {
     "work when plugin defines no adapter" in {
       val p2 = persister("p2", journalId = "no-adapter")

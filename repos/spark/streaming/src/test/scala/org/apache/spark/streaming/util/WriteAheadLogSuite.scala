@@ -19,7 +19,9 @@ package org.apache.spark.streaming.util
 import java.io._
 import java.nio.ByteBuffer
 import java.util.{Iterator => JIterator}
-import java.util.concurrent.{CountDownLatch, RejectedExecutionException, ThreadPoolExecutor, TimeUnit}
+import java.util.concurrent.{
+  CountDownLatch, RejectedExecutionException, ThreadPoolExecutor, TimeUnit
+}
 import java.util.concurrent.atomic.AtomicInteger
 
 import scala.collection.JavaConverters._
@@ -40,7 +42,9 @@ import org.scalatest.mock.MockitoSugar
 
 import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.streaming.scheduler._
-import org.apache.spark.util.{CompletionIterator, ManualClock, ThreadUtils, Utils}
+import org.apache.spark.util.{
+  CompletionIterator, ManualClock, ThreadUtils, Utils
+}
 
 /** Common tests for WriteAheadLogs that we would like to test with different configurations. */
 abstract class CommonWriteAheadLogTests(allowBatching: Boolean,

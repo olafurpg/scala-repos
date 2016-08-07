@@ -9,7 +9,10 @@ import com.intellij.refactoring.listeners.RefactoringElementListener
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
 import com.intellij.usageView.UsageInfo
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiTypedDefinitionWrapper, ScFunctionWrapper, StaticPsiMethodWrapper, StaticPsiTypedDefinitionWrapper}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiTypedDefinitionWrapper, ScFunctionWrapper, StaticPsiMethodWrapper,
+  StaticPsiTypedDefinitionWrapper
+}
 
 /**
   * User: Alexander Podkhalyuzin

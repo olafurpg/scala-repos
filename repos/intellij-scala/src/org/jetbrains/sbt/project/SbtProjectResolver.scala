@@ -4,8 +4,13 @@ package project
 import java.io.File
 
 import com.intellij.openapi.externalSystem.model.project._
-import com.intellij.openapi.externalSystem.model.task.{ExternalSystemTaskId, ExternalSystemTaskNotificationEvent, ExternalSystemTaskNotificationListener}
-import com.intellij.openapi.externalSystem.model.{DataNode, ExternalSystemException}
+import com.intellij.openapi.externalSystem.model.task.{
+  ExternalSystemTaskId, ExternalSystemTaskNotificationEvent,
+  ExternalSystemTaskNotificationListener
+}
+import com.intellij.openapi.externalSystem.model.{
+  DataNode, ExternalSystemException
+}
 import com.intellij.openapi.externalSystem.service.project.ExternalSystemProjectResolver
 import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.roots.DependencyScope

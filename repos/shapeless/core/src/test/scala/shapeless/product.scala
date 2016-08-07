@@ -68,7 +68,7 @@ class ProductTests {
   def testToHList = {
     {
       // FIXME: should work (needs changes in GenericMacros?)
-      // Empty.toHList 
+      // Empty.toHList
     }
 
     {
@@ -115,7 +115,7 @@ class ProductTests {
   def testToRecord = {
     {
       // FIXME: should work (needs changes in GenericMacros?)
-      // Empty.toRecord 
+      // Empty.toRecord
     }
 
     {

@@ -90,7 +90,7 @@ object Cursor {
   val H_RESIZE = HResize
 
   /**
-    * The hand cursor type, resembling a pointing hand, often used to indicate that something 
+    * The hand cursor type, resembling a pointing hand, often used to indicate that something
     * can be clicked, such as a hyperlink.
     */
   val Hand = new Cursor(jfxs.Cursor.HAND) {}

@@ -87,15 +87,12 @@ object ToHeadSpec extends Specification with XmlMatchers {
    "lift head cleaner" should {
      "remove duplicate title tag" >> {
        val actual = (<title>hello</title><title>hello2</title><title>hello3</title>)
-
        val expected = (<title>hello</title>)
-
        HeadHelper.cleanHead(actual) must beEqualToIgnoringSpace(expected)
      }
      "remove script tag with same id as previous script tag" >> {
        val invariant = (<script type="text/javascript" id="sc1" src="foo1.js"></script><script type="text/javascript" id="sc2" src="foo2.js"></script>)
        HeadHelper.cleanHead(invariant) must beEqualToIgnoringSpace(invariant)
-
        val actual = (<script type="text/javascript" id="sc1" src="foo1.js"></script><script type="text/javascript" id="sc1" src="foo2.js"></script>)
        val expected = (<script type="text/javascript" id="sc1" src="foo1.js"></script>)
        HeadHelper.cleanHead(actual) must beEqualToIgnoringSpace(expected)
@@ -104,7 +101,6 @@ object ToHeadSpec extends Specification with XmlMatchers {
        val actual = (<script type="text/javascript" id="sc1" src="foo1.js"></script><script type="text/javascript" src="foo1.js"></script>)
        val expected = (<script type="text/javascript" id="sc1" src="foo1.js"></script>)
        HeadHelper.cleanHead(actual) must beEqualToIgnoringSpace(expected)
-
        val actual2 = (<script type="text/javascript" id="sc1" src="foo1.js"></script><script type="text/javascript" id="sc2" src="foo1.js"></script>)
        val expected2 = (<script type="text/javascript" id="sc1" src="foo1.js"></script>)
        HeadHelper.cleanHead(actual2) must beEqualToIgnoringSpace(expected2)
@@ -117,7 +113,6 @@ object ToHeadSpec extends Specification with XmlMatchers {
      "remove link to css with same id as previous link tag" >> {
        val invariant = (<link id="css1" rel="stylesheet" type="text/css" href="style1.css"/><link id="css2" rel="stylesheet" type="text/css" href="style2.css"/>)
        HeadHelper.cleanHead(invariant) must beEqualToIgnoringSpace(invariant)
-
        val actual = (<link id="css1" rel="stylesheet" type="text/css" href="style1.css"/><link id="css1" rel="stylesheet" type="text/css" href="style2.css"/>)
        val expected = (<link id="css1" rel="stylesheet" type="text/css" href="style1.css"/>)
        HeadHelper.cleanHead(actual) must beEqualToIgnoringSpace(expected)
@@ -125,7 +120,6 @@ object ToHeadSpec extends Specification with XmlMatchers {
      "remove link tag with href attributes if href attributes are equals to previous link" >> {
        val invariant = (<link rel="stylesheet" type="text/css" href="style1.css"/><link rel="stylesheet" type="text/css" href="style2.css"/>)
        HeadHelper.cleanHead(invariant) must beEqualToIgnoringSpace(invariant)
-
        val actual = (<link rel="stylesheet" type="text/css" href="style1.css"/><link rel="stylesheet" type="text/css" href="style1.css"/>)
        val expected = (<link rel="stylesheet" type="text/css" href="style1.css"/>)
        HeadHelper.cleanHead(actual) must beEqualToIgnoringSpace(expected)
@@ -133,7 +127,6 @@ object ToHeadSpec extends Specification with XmlMatchers {
      "remove style tag with same id as previous style tag" >> {
        val invariant = (<style id="st1">.foo{{...}}</style><style id="st2">.bar{{...}}</style>)
        HeadHelper.cleanHead(invariant) must beEqualToIgnoringSpace(invariant)
-
        val actual = (<style id="st1">.foo{{...}}</style><style id="st1">.bar{{...}}</style>)
        val expected = (<style id="st1">.foo{{...}}</style>)
        HeadHelper.cleanHead(actual) must beEqualToIgnoringSpace(expected)
@@ -141,7 +134,6 @@ object ToHeadSpec extends Specification with XmlMatchers {
      "remove style tag if content are equals to previous style (need to trim each line ?)" >> {
        val invariant = (<style>.foo{{...}}</style><style>.bar{{...}}</style>)
        HeadHelper.cleanHead(invariant) must beEqualToIgnoringSpace(invariant)
-
        val actual = (<style>.foo{{...}}</style><style>.foo{{...}}</style>)
        val expected = (<style>.foo{{...}}</style>)
        HeadHelper.cleanHead(actual) must beEqualToIgnoringSpace(expected)

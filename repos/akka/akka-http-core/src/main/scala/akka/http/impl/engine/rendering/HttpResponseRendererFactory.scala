@@ -277,13 +277,13 @@ private[http] class HttpResponseRendererFactory(
                       ((connHeader eq null) || !connHeader.hasKeepAlive)) ||
                   // if the application wants to close explicitly
                   (protocol match {
-                        case `HTTP/1.1` ⇒
-                          (connHeader ne null) && connHeader.hasClose
-                        case `HTTP/1.0` ⇒
-                          if (connHeader eq null)
-                            ctx.requestProtocol == `HTTP/1.1`
-                          else !connHeader.hasKeepAlive
-                      })
+                    case `HTTP/1.1` ⇒
+                      (connHeader ne null) && connHeader.hasClose
+                    case `HTTP/1.0` ⇒
+                      if (connHeader eq null)
+                        ctx.requestProtocol == `HTTP/1.1`
+                      else !connHeader.hasKeepAlive
+                  })
                 }
 
                 // Do we render an explicit Connection header?

@@ -17,7 +17,9 @@
 
 package org.apache.spark.ml.param
 
-import java.io.{ByteArrayOutputStream, NotSerializableException, ObjectOutputStream}
+import java.io.{
+  ByteArrayOutputStream, NotSerializableException, ObjectOutputStream
+}
 
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.util.MyParams

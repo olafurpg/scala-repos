@@ -5,7 +5,9 @@ import java.io.File
 
 import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.jps.incremental.scala.data._
-import org.jetbrains.jps.incremental.scala.model.{CompileOrder, IncrementalityType}
+import org.jetbrains.jps.incremental.scala.model.{
+  CompileOrder, IncrementalityType
+}
 import org.jetbrains.jps.incremental.scala.remote.Arguments._
 
 /**

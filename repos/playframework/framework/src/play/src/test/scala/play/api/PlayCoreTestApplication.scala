@@ -4,7 +4,9 @@
 package play.api
 
 import akka.stream.ActorMaterializer
-import play.api.http.{NotImplementedHttpRequestHandler, DefaultHttpErrorHandler}
+import play.api.http.{
+  NotImplementedHttpRequestHandler, DefaultHttpErrorHandler
+}
 import play.api.libs.concurrent.ActorSystemProvider
 import java.io.File
 

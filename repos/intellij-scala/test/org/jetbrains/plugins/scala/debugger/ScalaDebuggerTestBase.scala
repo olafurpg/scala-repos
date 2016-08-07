@@ -5,13 +5,17 @@ import java.io._
 import java.security.MessageDigest
 import java.util
 
-import com.intellij.execution.application.{ApplicationConfiguration, ApplicationConfigurationType}
+import com.intellij.execution.application.{
+  ApplicationConfiguration, ApplicationConfigurationType
+}
 import com.intellij.ide.highlighter.{ModuleFileType, ProjectFileType}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.openapi.vfs.{LocalFileSystem, VfsUtil}
-import com.intellij.testFramework.{PlatformTestCase, PsiTestUtil, UsefulTestCase}
+import com.intellij.testFramework.{
+  PlatformTestCase, PsiTestUtil, UsefulTestCase
+}
 import org.jetbrains.plugins.scala.extensions.inWriteAction
 import org.jetbrains.plugins.scala.util.TestUtils
 import org.junit.Assert

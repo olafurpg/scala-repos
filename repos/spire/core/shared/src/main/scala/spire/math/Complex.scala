@@ -8,7 +8,9 @@ import spire.syntax.isReal._
 import spire.syntax.nroot._
 import spire.syntax.order._
 
-import scala.math.{ScalaNumber, ScalaNumericConversions, ScalaNumericAnyConversions}
+import scala.math.{
+  ScalaNumber, ScalaNumericConversions, ScalaNumericAnyConversions
+}
 import java.lang.Math
 
 object Complex extends ComplexInstances {
@@ -98,8 +100,7 @@ object Complex extends ComplexInstances {
 final case class Complex[@sp(Float, Double) T](real: T, imag: T)
     extends ScalaNumber
     with ScalaNumericConversions
-    with Serializable {
-  lhs =>
+    with Serializable { lhs =>
 
   import spire.syntax.order._
 

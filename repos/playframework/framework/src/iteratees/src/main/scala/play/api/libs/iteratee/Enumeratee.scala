@@ -3,7 +3,9 @@
  */
 package play.api.libs.iteratee
 
-import play.api.libs.iteratee.Execution.Implicits.{defaultExecutionContext => dec}
+import play.api.libs.iteratee.Execution.Implicits.{
+  defaultExecutionContext => dec
+}
 import play.api.libs.iteratee.internal.{executeIteratee, executeFuture}
 import scala.language.reflectiveCalls
 import scala.util.control.NonFatal
@@ -145,7 +147,9 @@ object Enumeratee {
   def zipWith[E, A, B, C](inner1: Iteratee[E, A], inner2: Iteratee[E, B])(
       zipper: (A, B) => C)(implicit ec: ExecutionContext): Iteratee[E, C] = {
     val pec = ec.prepare()
-    import Execution.Implicits.{defaultExecutionContext => ec} // Shadow ec to make this the only implicit EC in scope
+    import Execution.Implicits.{
+      defaultExecutionContext => ec
+    } // Shadow ec to make this the only implicit EC in scope
 
     def getNext(it1: Iteratee[E, A], it2: Iteratee[E, B]): Iteratee[E, C] = {
       val eventuallyIter = for ((a1, it1_) <- getInside(it1);

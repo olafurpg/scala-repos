@@ -22,7 +22,9 @@ import com.twitter.conversions.time._
 import com.twitter.finagle.stats.InMemoryStatsReceiver
 import com.twitter.util.{RandomSocket, Time}
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.{ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadPoolExecutor}
+import java.util.concurrent.{
+  ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadPoolExecutor
+}
 import java.util.{logging => javalog}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

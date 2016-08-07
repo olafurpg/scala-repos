@@ -5,7 +5,9 @@ import java.io.File
 import com.intellij.openapi.module.Module
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 import org.jetbrains.jps.incremental.scala.Client
-import org.jetbrains.plugins.scala.compiler.{RemoteServerConnectorBase, RemoteServerRunner}
+import org.jetbrains.plugins.scala.compiler.{
+  RemoteServerConnectorBase, RemoteServerRunner
+}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer

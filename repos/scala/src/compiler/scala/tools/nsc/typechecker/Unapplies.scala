@@ -104,9 +104,9 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
     val params = constrParamss(cdef)
     def inheritFromFun =
       !cdef.mods.hasAbstractFlag && cdef.tparams.isEmpty && (params match {
-            case List(ps) if ps.length <= MaxFunctionArity => true
-            case _ => false
-          })
+        case List(ps) if ps.length <= MaxFunctionArity => true
+        case _ => false
+      })
     def createFun = {
       def primaries = params.head map (_.tpt)
       gen.scalaFunctionConstr(primaries, toIdent(cdef), abstractFun = true)

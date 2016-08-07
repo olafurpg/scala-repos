@@ -51,7 +51,7 @@ object Test extends Properties("concurrent.TrieMap") {
         for (i <- 0 until sz) yield chm.getOrElseUpdate(new Wrap(i), idx)
       }
 
-      val resultSets = for (i <- 0 until sz) yield results.map(_ (i)).toSet
+      val resultSets = for (i <- 0 until sz) yield results.map(_(i)).toSet
       val largerThanOne = resultSets.zipWithIndex.find(_._1.size != 1)
       val allThreadsAgreeOnWhoInserted = {
         largerThanOne == None

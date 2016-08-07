@@ -79,7 +79,7 @@ private[http] class PoolGateway(hcps: HostConnectionPoolSetup,
       case x @ NewIncarnation(newGatewayFuture) ⇒
         if (previousIncarnation != null)
           previousIncarnation.state.set(x) // collapse incarnation chain
-        newGatewayFuture.flatMap(_ (request, this))
+        newGatewayFuture.flatMap(_(request, this))
     }
 
   // triggers a shutdown of the current pool, even if it is already a later incarnation

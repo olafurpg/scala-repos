@@ -8,7 +8,10 @@ import com.intellij.ProjectTopics
 import com.intellij.compiler.CompilerTestUtil
 import com.intellij.compiler.server.BuildManager
 import com.intellij.openapi.application.ex.ApplicationManagerEx
-import com.intellij.openapi.compiler.{CompileContext, CompileStatusNotification, CompilerManager, CompilerMessageCategory}
+import com.intellij.openapi.compiler.{
+  CompileContext, CompileStatusNotification, CompilerManager,
+  CompilerMessageCategory
+}
 import com.intellij.openapi.projectRoots._
 import com.intellij.openapi.roots._
 import com.intellij.openapi.util.text.StringUtil

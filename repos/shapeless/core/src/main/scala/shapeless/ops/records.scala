@@ -46,8 +46,8 @@ package record {
     def apply[L <: HList, K](
         implicit selector: Selector[L, K]): Aux[L, K, selector.Out] = selector
 
-    implicit def mkSelector[L <: HList, K, O]: Aux[L, K, O] = macro SelectorMacros
-      .applyImpl[L, K]
+    implicit def mkSelector[L <: HList, K, O]: Aux[L, K, O] =
+      macro SelectorMacros.applyImpl[L, K]
   }
 
   class UnsafeSelector(i: Int) extends Selector[HList, Any] {
@@ -130,8 +130,8 @@ package record {
     def apply[L <: HList, F](
         implicit updater: Updater[L, F]): Aux[L, F, updater.Out] = updater
 
-    implicit def mkUpdater[L <: HList, F, O]: Aux[L, F, O] = macro UpdaterMacros
-      .applyImpl[L, F]
+    implicit def mkUpdater[L <: HList, F, O]: Aux[L, F, O] =
+      macro UpdaterMacros.applyImpl[L, F]
   }
 
   class UnsafeUpdater(i: Int) extends Updater[HList, Any] {

@@ -26,7 +26,9 @@ import org.scalatest.concurrent.Eventually._
 
 import org.apache.spark._
 import org.apache.spark.deploy.{ApplicationDescription, Command}
-import org.apache.spark.deploy.DeployMessages.{MasterStateResponse, RequestMasterState}
+import org.apache.spark.deploy.DeployMessages.{
+  MasterStateResponse, RequestMasterState
+}
 import org.apache.spark.deploy.master.{ApplicationInfo, Master}
 import org.apache.spark.deploy.worker.Worker
 import org.apache.spark.internal.Logging

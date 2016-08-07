@@ -1,6 +1,8 @@
 package com.twitter.finagle.netty3
 
-import java.net.{UnknownHostException, InetAddress, InetSocketAddress, SocketAddress}
+import java.net.{
+  UnknownHostException, InetAddress, InetSocketAddress, SocketAddress
+}
 
 import com.twitter.finagle.InconsistentStateException
 import org.jboss.netty.channel._

@@ -7,7 +7,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi._
 import com.intellij.psi.search.LocalSearchScope
-import com.intellij.refactoring.rename.inplace.{InplaceRefactoring, MemberInplaceRenameHandler, MemberInplaceRenamer}
+import com.intellij.refactoring.rename.inplace.{
+  InplaceRefactoring, MemberInplaceRenameHandler, MemberInplaceRenamer
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
 

@@ -10,7 +10,7 @@
 package scala
 
 /** A function of 2 parameters.
-  *  
+  *
   *  In the following example, the definition of max is a
   *  shorthand for the anonymous class definition anonfun2:
   *

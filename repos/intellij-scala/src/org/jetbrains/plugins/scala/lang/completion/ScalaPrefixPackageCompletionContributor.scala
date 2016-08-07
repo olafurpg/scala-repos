@@ -10,9 +10,13 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.{PsiElement, PsiPackage, JavaPsiFacade}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.{TypeAliasToImport, ClassTypeToImport}
+import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.{
+  TypeAliasToImport, ClassTypeToImport
+}
 import org.jetbrains.plugins.scala.extensions
-import org.jetbrains.plugins.scala.extensions.{ResolvesTo, PsiNamedElementExt, inReadAction}
+import org.jetbrains.plugins.scala.extensions.{
+  ResolvesTo, PsiNamedElementExt, inReadAction
+}
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
 import org.jetbrains.plugins.scala.lang.completion.lookups.LookupElementManager
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings

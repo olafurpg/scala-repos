@@ -22,7 +22,9 @@ import java.io.{IOException, ObjectOutputStream}
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
 
-import org.apache.spark.{Dependency, Partition, RangeDependency, SparkContext, TaskContext}
+import org.apache.spark.{
+  Dependency, Partition, RangeDependency, SparkContext, TaskContext
+}
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.util.Utils
 

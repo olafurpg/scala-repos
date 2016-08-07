@@ -6,7 +6,9 @@ import akka.actor.Address
 import akka.remote.transport.Transport._
 import akka.remote.transport.TestTransport._
 import akka.util.ByteString
-import akka.remote.transport.AssociationHandle.{ActorHandleEventListener, Disassociated, InboundPayload}
+import akka.remote.transport.AssociationHandle.{
+  ActorHandleEventListener, Disassociated, InboundPayload
+}
 
 class TestTransportSpec
     extends AkkaSpec

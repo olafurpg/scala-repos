@@ -27,7 +27,10 @@ import org.apache.hadoop.hive.ql.io.orc.OrcFile.OrcTableProperties
 import org.apache.hadoop.hive.serde2.objectinspector.SettableStructObjectInspector
 import org.apache.hadoop.hive.serde2.typeinfo.{StructTypeInfo, TypeInfoUtils}
 import org.apache.hadoop.io.{NullWritable, Writable}
-import org.apache.hadoop.mapred.{InputFormat => MapRedInputFormat, JobConf, OutputFormat => MapRedOutputFormat, RecordWriter, Reporter}
+import org.apache.hadoop.mapred.{
+  InputFormat => MapRedInputFormat, JobConf,
+  OutputFormat => MapRedOutputFormat, RecordWriter, Reporter
+}
 import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 

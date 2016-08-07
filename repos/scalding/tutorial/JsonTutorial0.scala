@@ -1,12 +1,9 @@
 /**
 Scalding with Json tutorial part 0.
-
 To run this job:
   scripts/scald.rb --local --json tutorial/JsonTutorial0.scala
-
 Check the output:
   cat tutorial/data/jsonoutput0.tsv
-
   **/
 import com.twitter.scalding.{Job, Args, JsonLine, Tsv}
 

@@ -6,14 +6,22 @@ import java.util.concurrent.atomic.AtomicReference
 import com.intellij.execution.configurations.RunnerSettings
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.impl.DefaultJavaProgramRunner
-import com.intellij.execution.process.{ProcessAdapter, ProcessEvent, ProcessHandler, ProcessListener}
-import com.intellij.execution.runners.{ExecutionEnvironmentBuilder, ProgramRunner}
+import com.intellij.execution.process.{
+  ProcessAdapter, ProcessEvent, ProcessHandler, ProcessListener
+}
+import com.intellij.execution.runners.{
+  ExecutionEnvironmentBuilder, ProgramRunner
+}
 import com.intellij.execution.testframework.AbstractTestProxy
 import com.intellij.execution.testframework.sm.runner.ui.SMTRunnerConsoleView
 import com.intellij.execution.ui.RunContentDescriptor
-import com.intellij.execution.{Executor, PsiLocation, RunnerAndConfigurationSettings}
+import com.intellij.execution.{
+  Executor, PsiLocation, RunnerAndConfigurationSettings
+}
 import com.intellij.ide.structureView.newStructureView.StructureViewComponent
-import com.intellij.ide.util.treeView.smartTree.{NodeProvider, TreeElement, TreeElementWrapper}
+import com.intellij.ide.util.treeView.smartTree.{
+  NodeProvider, TreeElement, TreeElementWrapper
+}
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.{Module, ModuleManager}
@@ -23,13 +31,17 @@ import com.intellij.psi.impl.file.PsiDirectoryFactory
 import com.intellij.psi.{PsiDirectory, PsiElement, PsiManager}
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.util.concurrency.Semaphore
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestBase, ScalaVersion_2_11}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestBase, ScalaVersion_2_11
+}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.structureView.ScalaStructureViewModel
 import org.jetbrains.plugins.scala.lang.structureView.elements.impl.TestStructureViewElement
 import org.jetbrains.plugins.scala.testingSupport.test.structureView.TestNodeProvider
-import org.jetbrains.plugins.scala.testingSupport.test.{AbstractTestConfigurationProducer, AbstractTestRunConfiguration}
+import org.jetbrains.plugins.scala.testingSupport.test.{
+  AbstractTestConfigurationProducer, AbstractTestRunConfiguration
+}
 
 /**
   * @author Roman.Shein

@@ -21,15 +21,16 @@ import akka.http.scaladsl.util.FastFuture
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.unmarshalling._
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{Upgrade, `Sec-WebSocket-Protocol`, Host}
+import akka.http.scaladsl.model.headers.{
+  Upgrade, `Sec-WebSocket-Protocol`, Host
+}
 import FastFuture._
 
 trait RouteTest
     extends RequestBuilding
     with WSTestRequestBuilding
     with RouteTestResultComponent
-    with MarshallingTestUtils {
-  this: TestFrameworkInterface ⇒
+    with MarshallingTestUtils { this: TestFrameworkInterface ⇒
 
   /** Override to supply a custom ActorSystem */
   protected def createActorSystem(): ActorSystem =

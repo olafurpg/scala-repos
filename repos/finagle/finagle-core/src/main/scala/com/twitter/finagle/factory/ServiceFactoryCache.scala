@@ -2,8 +2,13 @@ package com.twitter.finagle.factory
 
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.concurrent.atomic.AtomicInteger
-import com.twitter.finagle.{Status, Service, ServiceFactory, ClientConnection, ServiceProxy, ServiceFactoryProxy}
-import com.twitter.util.{Closable, Future, Stopwatch, Throw, Return, Time, Duration}
+import com.twitter.finagle.{
+  Status, Service, ServiceFactory, ClientConnection, ServiceProxy,
+  ServiceFactoryProxy
+}
+import com.twitter.util.{
+  Closable, Future, Stopwatch, Throw, Return, Time, Duration
+}
 import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver}
 import com.twitter.finagle.tracing.Trace
 import scala.collection.immutable

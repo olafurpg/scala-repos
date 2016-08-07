@@ -118,7 +118,7 @@ object Marshaller
     */
   def oneOf[A, B](marshallers: Marshaller[A, B]*): Marshaller[A, B] =
     Marshaller { implicit ec ⇒ a ⇒
-      FastFuture.sequence(marshallers.map(_ (a))).fast.map(_.flatten.toList)
+      FastFuture.sequence(marshallers.map(_(a))).fast.map(_.flatten.toList)
     }
 
   /**

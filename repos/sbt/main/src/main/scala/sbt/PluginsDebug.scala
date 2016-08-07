@@ -267,10 +267,8 @@ private[sbt] object PluginsDebug {
     C :- D, E
     initial: B, D, E
     propose: drop D or E
-
     initial: B, not A
     propose: drop 'not A'
-
     example 2
     A :- B, not C
     C :- B

@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -25,15 +25,15 @@ import org.apache.kafka.common.security.JaasUtils
 /**
   *  A utility that retrieve the offset of broker partitions in ZK and
   *  prints to an output file in the following format:
-  *  
+  *
   *  /consumers/group1/offsets/topic1/1-0:286894308
   *  /consumers/group1/offsets/topic1/2-0:284803985
-  *  
+  *
   *  This utility expects 3 arguments:
   *  1. Zk host:port string
   *  2. group name (all groups implied if omitted)
   *  3. output filename
-  *     
+  *
   *  To print debug message, add the following line to log4j.properties:
   *  log4j.logger.kafka.tools.ExportZkOffsets$=DEBUG
   *  (for eclipse debugging, copy log4j.properties to the binary directory in "core" such as core/bin)

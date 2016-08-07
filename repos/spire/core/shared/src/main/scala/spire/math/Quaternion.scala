@@ -87,8 +87,7 @@ trait QuaternionInstances {
 final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
     extends ScalaNumber
     with ScalaNumericConversions
-    with Serializable {
-  lhs =>
+    with Serializable { lhs =>
 
   // junky ScalaNumber stuff
   override def byteValue: Byte = longValue.toByte

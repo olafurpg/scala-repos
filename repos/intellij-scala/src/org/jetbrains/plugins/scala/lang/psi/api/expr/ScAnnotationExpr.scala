@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScConstructor
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScNameValuePairImpl
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */

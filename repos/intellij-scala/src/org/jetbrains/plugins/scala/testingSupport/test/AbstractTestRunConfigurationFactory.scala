@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala
 package testingSupport.test
 
-import com.intellij.execution.configurations.{ConfigurationFactory, ConfigurationType, RunConfiguration}
+import com.intellij.execution.configurations.{
+  ConfigurationFactory, ConfigurationType, RunConfiguration
+}
 import org.jetbrains.plugins.scala.project._
 
 /**

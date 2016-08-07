@@ -74,11 +74,11 @@ trait FastTypeTag[T] extends Equals {
 }
 
 object FastTypeTag {
-  implicit def materializeFastTypeTag[T]: FastTypeTag[T] = macro Compat
-    .FastTypeTagMacros_impl[T]
+  implicit def materializeFastTypeTag[T]: FastTypeTag[T] =
+    macro Compat.FastTypeTagMacros_impl[T]
 
-  implicit def materializeFastTypeTagOfClassTag[T]: FastTypeTag[ClassTag[T]] = macro Compat
-    .FastTypeTagMacros_implClassTag[T]
+  implicit def materializeFastTypeTagOfClassTag[T]: FastTypeTag[ClassTag[T]] =
+    macro Compat.FastTypeTagMacros_implClassTag[T]
 
   private def stdTag[T: ru.TypeTag]: FastTypeTag[T] =
     apply(scala.reflect.runtime.currentMirror, ru.typeOf[T], ru.typeOf[T].key)

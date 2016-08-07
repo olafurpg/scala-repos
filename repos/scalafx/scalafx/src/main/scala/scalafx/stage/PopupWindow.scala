@@ -31,7 +31,9 @@ import javafx.{event => jfxe, stage => jfxs}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 import scalafx.scene.Node
 import scalafx.scene.Node._
 import scalafx.stage.Window._

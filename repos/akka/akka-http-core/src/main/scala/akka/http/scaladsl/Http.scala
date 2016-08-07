@@ -17,8 +17,12 @@ import akka.http.impl.settings.{ConnectionPoolSetup, HostConnectionPoolSetup}
 import akka.http.impl.util.{MapError, StreamUtils}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.Host
-import akka.http.scaladsl.model.ws.{Message, WebSocketRequest, WebSocketUpgradeResponse}
-import akka.http.scaladsl.settings.{ServerSettings, ClientConnectionSettings, ConnectionPoolSettings}
+import akka.http.scaladsl.model.ws.{
+  Message, WebSocketRequest, WebSocketUpgradeResponse
+}
+import akka.http.scaladsl.settings.{
+  ServerSettings, ClientConnectionSettings, ConnectionPoolSettings
+}
 import akka.http.scaladsl.util.FastFuture
 import akka.{Done, NotUsed}
 import akka.stream._
@@ -529,7 +533,7 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     try {
       val gatewayFuture =
         cachedGateway(request, settings, connectionContext, log)
-      gatewayFuture.flatMap(_ (request))(fm.executionContext)
+      gatewayFuture.flatMap(_(request))(fm.executionContext)
     } catch {
       case e: IllegalUriException ⇒ FastFuture.failed(e)
     }
@@ -733,7 +737,7 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
         val (effectiveRequest, gatewayFuture) = f(request)
         val result = Promise[(Try[HttpResponse], T)]() // TODO: simplify to `transformWith` when on Scala 2.12
         gatewayFuture
-          .flatMap(_ (effectiveRequest))(fm.executionContext)
+          .flatMap(_(effectiveRequest))(fm.executionContext)
           .onComplete(responseTry ⇒
                 result.success(responseTry -> userContext))(
               fm.executionContext)

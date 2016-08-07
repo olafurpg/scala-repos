@@ -1,6 +1,8 @@
 package sbt
 
-import sbt.internal.util.{AttributeKey, complete, Relation, Settings, Show, Types, Util}
+import sbt.internal.util.{
+  AttributeKey, complete, Relation, Settings, Show, Types, Util
+}
 
 import sbt.librarymanagement.Configuration
 

@@ -1,22 +1,33 @@
 package org.jetbrains.plugins.scala.lang.completion
 
 import com.intellij.codeInsight.completion.{CompletionResultSet, InsertHandler}
-import com.intellij.codeInsight.lookup.{AutoCompletionPolicy, LookupElement, LookupElementPresentation, LookupElementRenderer}
+import com.intellij.codeInsight.lookup.{
+  AutoCompletionPolicy, LookupElement, LookupElementPresentation,
+  LookupElementRenderer
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.search.searches.ClassInheritorsSearch
 import com.intellij.psi.search.{GlobalSearchScope, LocalSearchScope}
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.{PsiClass, PsiDocCommentOwner, PsiElement, PsiNamedElement}
+import com.intellij.psi.{
+  PsiClass, PsiDocCommentOwner, PsiElement, PsiNamedElement
+}
 import com.intellij.util.{ProcessingContext, Processor}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.completion.handlers.ScalaConstructorInsertHandler
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSimpleTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScConstructor, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScConstructor, ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScClassParents, ScExtendsBlock}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScClassParents, ScExtendsBlock
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTrait
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.resolve.ResolveUtils
 
@@ -128,12 +139,12 @@ object ScalaAfterNewCompletionUtil {
       var tailText: String = ""
       val itemText: String =
         psiClass.name + (tp match {
-              case ScParameterizedType(_, tps) =>
-                tps
-                  .map(tp => ScType.presentableText(subst.subst(tp)))
-                  .mkString("[", ", ", "]")
-              case _ => ""
-            })
+          case ScParameterizedType(_, tps) =>
+            tps
+              .map(tp => ScType.presentableText(subst.subst(tp)))
+              .mkString("[", ", ", "]")
+          case _ => ""
+        })
       psiClass match {
         case clazz: PsiClass =>
           if (psiClass.isInterface || psiClass.isInstanceOf[ScTrait] ||

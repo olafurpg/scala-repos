@@ -7,12 +7,17 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScInfixExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScInfixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.testingSupport.test.TestRunConfigurationForm.TestKind
 import org.jetbrains.plugins.scala.testingSupport.test.structureView.TestNodeProvider
-import org.jetbrains.plugins.scala.testingSupport.test.{AbstractTestConfigurationProducer, TestConfigurationProducer, TestConfigurationUtil}
+import org.jetbrains.plugins.scala.testingSupport.test.{
+  AbstractTestConfigurationProducer, TestConfigurationProducer,
+  TestConfigurationUtil
+}
 
 /**
   * User: Alexander Podkhalyuzin

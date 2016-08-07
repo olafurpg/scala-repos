@@ -2,12 +2,18 @@ package org.jetbrains.plugins.scala.codeInspection.delayedInit
 
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.{PsiClass, PsiElement}
-import org.jetbrains.plugins.scala.codeInspection.{AbstractInspection, InspectionsUtil}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractInspection, InspectionsUtil
+}
 import org.jetbrains.plugins.scala.extensions.{LazyVal, Both, ContainingClass}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScPatternDefinition, ScVariableDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScPatternDefinition, ScVariableDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
 /**

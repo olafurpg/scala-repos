@@ -6,7 +6,9 @@ import com.twitter.finagle.mux.util.{TagMap, TagSet}
 import com.twitter.finagle.netty3.{BufChannelBuffer, ChannelBufferBuf}
 import com.twitter.finagle.tracing.Trace
 import com.twitter.finagle.transport.Transport
-import com.twitter.finagle.{Dtab, Filter, Failure, NoStacktrace, Service, Status}
+import com.twitter.finagle.{
+  Dtab, Filter, Failure, NoStacktrace, Service, Status
+}
 import com.twitter.util.{Future, Promise, Return, Throw, Time, Try, Updatable}
 
 /**

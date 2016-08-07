@@ -31,7 +31,9 @@ import javafx.scene.{image => jfxsi}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{ReadOnlyBooleanProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  ReadOnlyBooleanProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty
+}
 import scalafx.delegate.SFXDelegate
 
 object Image {

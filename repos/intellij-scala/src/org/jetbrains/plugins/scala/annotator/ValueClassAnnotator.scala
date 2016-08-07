@@ -3,8 +3,12 @@ package org.jetbrains.plugins.scala.annotator
 import com.intellij.lang.annotation.AnnotationHolder
 import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParamClause
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScPatternDefinition, ScValueDeclaration, ScVariableDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScPatternDefinition, ScValueDeclaration, ScVariableDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTemplateDefinition
+}
 
 import scala.annotation.tailrec
 

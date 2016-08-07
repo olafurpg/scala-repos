@@ -9,8 +9,7 @@ import org.scalatest.{Suite, BeforeAndAfterAll}
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 
-trait WithMaterializerSpec extends BeforeAndAfterAll {
-  _: Suite ⇒
+trait WithMaterializerSpec extends BeforeAndAfterAll { _: Suite ⇒
   lazy val testConf: Config = ConfigFactory.parseString(
       """
   akka.event-handlers = ["akka.testkit.TestEventListener"]

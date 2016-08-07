@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 import breeze.linalg._
 
 /**
-  * 
+  *
   * @author dlwh
   */
 @RunWith(classOf[JUnitRunner])

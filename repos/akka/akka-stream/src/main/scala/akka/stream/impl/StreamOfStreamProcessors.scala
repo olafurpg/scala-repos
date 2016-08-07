@@ -147,8 +147,7 @@ private[akka] object MultiStreamOutputProcessor {
   */
 private[akka] trait MultiStreamOutputProcessorLike
     extends Pump
-    with StreamSubscriptionTimeoutSupport {
-  this: Actor with ActorLogging ⇒
+    with StreamSubscriptionTimeoutSupport { this: Actor with ActorLogging ⇒
 
   import MultiStreamOutputProcessor._
   import StreamSubscriptionTimeoutSupport._

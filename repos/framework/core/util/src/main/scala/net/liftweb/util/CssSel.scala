@@ -62,7 +62,7 @@ private final case class AggregatedCssBindFunc(binds: List[CssBind])
 
   def apply(in: NodeSeq): NodeSeq = bad match {
     case Nil => selectorMap(in)
-    case bv => bad.flatMap(_ (in)) ++ selectorMap(in)
+    case bv => bad.flatMap(_(in)) ++ selectorMap(in)
   }
 }
 
@@ -492,8 +492,9 @@ private class SelectorMap(binds: List[CssBind])
                             ids.contains(id)
                           } getOrElse (false)
                         val newIds =
-                          targetId filter (_ => keepId) map (i =>
-                                ids - i) getOrElse
+                          targetId filter (_ =>
+                                             keepId) map (i =>
+                                                            ids - i) getOrElse
                             (ids)
                         val newElem =
                           new Elem(e.prefix,

@@ -66,9 +66,9 @@ class CompileTimingTest
 
           asyncHelper.receiveN(2) should contain theSameElementsAs
             (Seq(
-                    FullTypeCheckCompleteEvent,
-                    CompilerRestartedEvent
-                ))
+                FullTypeCheckCompleteEvent,
+                CompilerRestartedEvent
+            ))
 
           project ! SymbolDesignationsReq(Right(exampleDiskInfo),
                                           0,
@@ -81,9 +81,9 @@ class CompileTimingTest
 
           asyncHelper.receiveN(2) should contain theSameElementsAs
             (Seq(
-                    FullTypeCheckCompleteEvent,
-                    CompilerRestartedEvent
-                ))
+                FullTypeCheckCompleteEvent,
+                CompilerRestartedEvent
+            ))
 
           project ! SymbolDesignationsReq(Right(exampleDiskInfo),
                                           0,

@@ -25,8 +25,12 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.network.BlockDataManager
 import org.apache.spark.network.buffer.{ManagedBuffer, NioManagedBuffer}
 import org.apache.spark.network.client.{RpcResponseCallback, TransportClient}
-import org.apache.spark.network.server.{OneForOneStreamManager, RpcHandler, StreamManager}
-import org.apache.spark.network.shuffle.protocol.{BlockTransferMessage, OpenBlocks, StreamHandle, UploadBlock}
+import org.apache.spark.network.server.{
+  OneForOneStreamManager, RpcHandler, StreamManager
+}
+import org.apache.spark.network.shuffle.protocol.{
+  BlockTransferMessage, OpenBlocks, StreamHandle, UploadBlock
+}
 import org.apache.spark.serializer.Serializer
 import org.apache.spark.storage.{BlockId, StorageLevel}
 

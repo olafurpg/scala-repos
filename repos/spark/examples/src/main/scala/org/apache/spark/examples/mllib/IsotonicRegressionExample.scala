@@ -20,7 +20,9 @@ package org.apache.spark.examples.mllib
 
 import org.apache.spark.{SparkConf, SparkContext}
 // $example on$
-import org.apache.spark.mllib.regression.{IsotonicRegression, IsotonicRegressionModel}
+import org.apache.spark.mllib.regression.{
+  IsotonicRegression, IsotonicRegressionModel
+}
 // $example off$
 
 object IsotonicRegressionExample {

@@ -14,8 +14,7 @@ import spire.syntax.cfor._
 import scala.reflect.ClassTag
 import scalaxy.debug._
 
-trait DenseVectorOps extends DenseVector_GenericOps {
-  this: DenseVector.type =>
+trait DenseVectorOps extends DenseVector_GenericOps { this: DenseVector.type =>
 
   @expand
   @expand.valify
@@ -661,8 +660,7 @@ trait DenseVectorOps extends DenseVector_GenericOps {
   *
   * @author dlwh
   **/
-trait DenseVector_SpecialOps extends DenseVectorOps {
-  this: DenseVector.type =>
+trait DenseVector_SpecialOps extends DenseVectorOps { this: DenseVector.type =>
 
   implicit val canAddIntoF: OpAdd.InPlaceImpl2[DenseVector[Float],
                                                DenseVector[Float]] = {
@@ -870,8 +868,7 @@ trait DenseVector_OrderingOps extends DenseVectorOps {
   *
   * @author dlwh
   **/
-trait DenseVector_GenericOps {
-  this: DenseVector.type =>
+trait DenseVector_GenericOps { this: DenseVector.type =>
 
   def binaryOpFromUpdateOp[Op <: OpType, V, Other](
       implicit copy: CanCopy[DenseVector[V]],

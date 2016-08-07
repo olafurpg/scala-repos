@@ -27,6 +27,6 @@
 package scalafx.event
 
 /**
-  * 
+  *
   */
 package object subscriptions {}

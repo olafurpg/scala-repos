@@ -2,7 +2,9 @@ package com.twitter.finagle.service
 
 import com.twitter.finagle.Filter.TypeAgnostic
 import com.twitter.finagle._
-import com.twitter.finagle.stats.{MultiCategorizingExceptionStatsHandler, ExceptionStatsHandler, StatsReceiver}
+import com.twitter.finagle.stats.{
+  MultiCategorizingExceptionStatsHandler, ExceptionStatsHandler, StatsReceiver
+}
 import com.twitter.jsr166e.LongAdder
 import com.twitter.util.{Try, Future, Stopwatch, Throw}
 import java.util.concurrent.TimeUnit

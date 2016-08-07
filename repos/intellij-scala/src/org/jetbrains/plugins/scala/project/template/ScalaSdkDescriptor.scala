@@ -3,7 +3,9 @@ package project.template
 
 import java.io.File
 
-import com.intellij.openapi.roots.libraries.{LibraryType, NewLibraryConfiguration}
+import com.intellij.openapi.roots.libraries.{
+  LibraryType, NewLibraryConfiguration
+}
 import com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditor
 import com.intellij.openapi.roots.{JavadocOrderRootType, OrderRootType}
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_10

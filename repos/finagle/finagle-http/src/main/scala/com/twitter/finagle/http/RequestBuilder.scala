@@ -6,8 +6,12 @@ import com.twitter.util.Base64StringEncoder
 import com.twitter.io.Buf
 import java.net.URL
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
-import org.jboss.netty.handler.codec.http.multipart.{DefaultHttpDataFactory, HttpPostRequestEncoder, HttpDataFactory}
-import org.jboss.netty.handler.codec.http.{HttpRequest, HttpHeaders, HttpVersion, HttpMethod, DefaultHttpRequest}
+import org.jboss.netty.handler.codec.http.multipart.{
+  DefaultHttpDataFactory, HttpPostRequestEncoder, HttpDataFactory
+}
+import org.jboss.netty.handler.codec.http.{
+  HttpRequest, HttpHeaders, HttpVersion, HttpMethod, DefaultHttpRequest
+}
 import scala.annotation.implicitNotFound
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer

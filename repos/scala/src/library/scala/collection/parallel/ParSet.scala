@@ -25,8 +25,7 @@ trait ParSet[T]
     extends GenSet[T]
     with GenericParTemplate[T, ParSet]
     with ParIterable[T]
-    with ParSetLike[T, ParSet[T], Set[T]] {
-  self =>
+    with ParSetLike[T, ParSet[T], Set[T]] { self =>
 
   override def empty: ParSet[T] = mutable.ParHashSet[T]()
 

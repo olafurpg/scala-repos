@@ -4,7 +4,9 @@ import javax.swing.JComponent
 
 import com.intellij.util.ui.ListTableModel
 import org.jetbrains.plugins.dotty.project.DottyVersions
-import org.jetbrains.plugins.scala.project.template.{SdkTableModel, SdkChoice, SdkSelectionDialog}
+import org.jetbrains.plugins.scala.project.template.{
+  SdkTableModel, SdkChoice, SdkSelectionDialog
+}
 
 import scala.runtime.BoxedUnit
 

@@ -23,7 +23,7 @@ sealed trait Parsed[+T] {
   def index: Int
 
   /**
-    * Converts this instance of [[Parsed]] into a [[Parsed.Success]] or 
+    * Converts this instance of [[Parsed]] into a [[Parsed.Success]] or
     * throws an exception if it was a failure.
     */
   def get: Parsed.Success[T] = this match {
@@ -418,8 +418,7 @@ trait Parser[+T] extends ParserResults[T] with Precedence {
 /**
   * Convenience methods to be used internally inside [[Parser]]s
   */
-trait ParserResults[+T] {
-  this: Parser[T] =>
+trait ParserResults[+T] { this: Parser[T] =>
   def mergeTrace(traceIndex: Int,
                  lhs: Set[Parser[_]],
                  rhs: Set[Parser[_]]): Set[Parser[_]] = {

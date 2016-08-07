@@ -6,7 +6,9 @@ import java.util.concurrent.atomic.AtomicInteger
 import akka.event.EventStream
 import com.codahale.metrics.MetricRegistry
 import mesosphere.marathon._
-import mesosphere.marathon.api.{TestGroupManagerFixture, JsonTestHelper, TaskKiller, TestAuthFixture}
+import mesosphere.marathon.api.{
+  TestGroupManagerFixture, JsonTestHelper, TaskKiller, TestAuthFixture
+}
 import mesosphere.marathon.core.appinfo.AppInfo.Embed
 import mesosphere.marathon.core.appinfo._
 import mesosphere.marathon.core.base.ConstantClock
@@ -19,7 +21,9 @@ import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
 import mesosphere.marathon.test.{MarathonActorSupport, Mockito}
 import mesosphere.marathon.upgrade.DeploymentPlan
-import mesosphere.util.{CapConcurrentExecutions, CapConcurrentExecutionsMetrics}
+import mesosphere.util.{
+  CapConcurrentExecutions, CapConcurrentExecutionsMetrics
+}
 import org.scalatest.{GivenWhenThen, Matchers}
 import play.api.libs.json.{JsNumber, JsObject, Json}
 

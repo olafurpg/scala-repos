@@ -14,13 +14,10 @@ package testing.b {
 package testing.a {
 trait AAA {}
 }
-
 package testing.b {
 import testing.a.{AAA => BBB}
-
 class B {
   val aaa: BBB = null
 }
 }
-
  */

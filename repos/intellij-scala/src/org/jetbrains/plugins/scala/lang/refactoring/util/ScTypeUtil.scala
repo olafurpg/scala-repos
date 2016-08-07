@@ -7,8 +7,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{ScDesignatorType, ScParameterizedType, ScProjectionType, ScType}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScDesignatorType, ScParameterizedType, ScProjectionType, ScType
+}
 
 /**
   * User: Alexander Podkhalyuzin

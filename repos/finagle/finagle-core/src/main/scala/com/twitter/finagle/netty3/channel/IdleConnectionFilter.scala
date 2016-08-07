@@ -4,7 +4,9 @@ import com.twitter.collection.BucketGenerationalQueue
 import com.twitter.finagle.service.FailedService
 import com.twitter.finagle.{param, Stack, Stackable}
 import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
-import com.twitter.finagle.{ConnectionRefusedException, SimpleFilter, Service, ClientConnection}
+import com.twitter.finagle.{
+  ConnectionRefusedException, SimpleFilter, Service, ClientConnection
+}
 import com.twitter.finagle.{ServiceFactory, ServiceFactoryProxy}
 import com.twitter.util.{Future, Duration}
 import java.util.concurrent.atomic.AtomicInteger

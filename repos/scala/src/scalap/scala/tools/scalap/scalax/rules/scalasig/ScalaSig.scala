@@ -17,7 +17,9 @@ import ClassFileParser._
 import scala.reflect.internal.pickling.ByteCodecs
 
 object ScalaSigParser {
-  import Main.{BYTES_VALUE, SCALA_LONG_SIG_ANNOTATION, SCALA_SIG, SCALA_SIG_ANNOTATION}
+  import Main.{
+    BYTES_VALUE, SCALA_LONG_SIG_ANNOTATION, SCALA_SIG, SCALA_SIG_ANNOTATION
+  }
 
   // TODO SI-9296 duplicated code, refactor
   def scalaSigFromAnnotation(classFile: ClassFile): Option[ScalaSig] = {

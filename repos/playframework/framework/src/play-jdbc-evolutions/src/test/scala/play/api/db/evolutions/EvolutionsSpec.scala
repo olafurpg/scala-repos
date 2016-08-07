@@ -18,13 +18,11 @@ object EvolutionsSpec extends Specification {
 
   "Evolutions" should {
 
-    trait CreateSchema {
-      this: WithEvolutions =>
+    trait CreateSchema { this: WithEvolutions =>
       execute("create schema testschema")
     }
 
-    trait UpScripts {
-      this: WithEvolutions =>
+    trait UpScripts { this: WithEvolutions =>
       val scripts = evolutions.scripts(Seq(a1, a2, a3))
 
       scripts must have length (3)
@@ -40,8 +38,7 @@ object EvolutionsSpec extends Specification {
       resultSet.next must beFalse
     }
 
-    trait DownScripts {
-      this: WithEvolutions =>
+    trait DownScripts { this: WithEvolutions =>
       val original = evolutions.scripts(Seq(a1, a2, a3))
       evolutions.evolve(original, autocommit = true)
 
@@ -65,8 +62,7 @@ object EvolutionsSpec extends Specification {
       resultSet.next must beFalse
     }
 
-    trait ReportInconsistentStateAndResolve {
-      this: WithEvolutions =>
+    trait ReportInconsistentStateAndResolve { this: WithEvolutions =>
       val broken = evolutions.scripts(Seq(c1, a2, a3))
       val fixed = evolutions.scripts(Seq(a1, a2, a3))
 
@@ -82,8 +78,7 @@ object EvolutionsSpec extends Specification {
       evolutions.evolve(fixed, autocommit = true)
     }
 
-    trait ResetDatabase {
-      this: WithEvolutions =>
+    trait ResetDatabase { this: WithEvolutions =>
       val scripts = evolutions.scripts(Seq(a1, a2, a3))
       evolutions.evolve(scripts, autocommit = true)
       // Check that there's data in the database
@@ -98,8 +93,7 @@ object EvolutionsSpec extends Specification {
       executeQuery("select * from test") must throwA[SQLException]
     }
 
-    trait ProvideHelperForTesting {
-      this: WithEvolutions =>
+    trait ProvideHelperForTesting { this: WithEvolutions =>
       Evolutions.withEvolutions(
           database,
           SimpleEvolutionsReader.forDefault(a1, a2, a3)) {
@@ -113,8 +107,7 @@ object EvolutionsSpec extends Specification {
       executeQuery("select * from test") must throwA[SQLException]
     }
 
-    trait ProvideHelperForTestingSchema {
-      this: WithEvolutions =>
+    trait ProvideHelperForTestingSchema { this: WithEvolutions =>
       // Check if the play_evolutions table was created within the testschema
       val resultSet =
         executeQuery("select count(0) from testschema.play_evolutions")

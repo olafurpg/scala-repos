@@ -2,7 +2,6 @@
 This is a tricky issue which has to do with the fact that too much conflicting
 type information is propagated into a single implicit search, where the intended
 solution applies two implicit searches.
-
 Roughly, in x + x * y, the first x is first typed as Poly[A]. That
 means the x * y is then typed as Poly[A]. Then the second x is typed
 as Poly[A], then y is typed as Poly[Poly[A]]. The application x * y
@@ -13,7 +12,6 @@ type Poly[A] is propagated into the implicit search. Poly[A] comes as
 expected type from x+, because the lhs x is still typed as a Poly[A].
 This means that the argument of the implicit conversion is typechecked
 with expected type A with Poly[A]. And no solution is found.
-
 To solve this, I added a fallback scheme similar to implicit arguments:
 When an implicit view that adds a method matching given arguments and result
 type fails, try again without the result type.

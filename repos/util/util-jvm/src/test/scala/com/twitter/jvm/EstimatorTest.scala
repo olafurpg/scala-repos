@@ -89,39 +89,27 @@ object EstimatorApp extends App {
 }
 
 /*
-
 The following script is useful for plotting
 results from EstimatorApp:
-
 	% scala ... com.twitter.jvm.EstimatorApp [ARGS] > /tmp/out
-
 #!/usr/bin/env gnuplot
-
 set terminal png size 800,600
 set title "GC predictor"
-
 set macros
-
 set grid
 set timestamp "Generated on %Y-%m-%d by `whoami`" font "Helvetica-Oblique, 8pt"
 set noclip
 set xrange [0:1100]
-
 set key reverse left Left # box
-
 set ylabel "Time of GC" textcolor lt 3
 set yrange [0:1100]
 set mytics 5
 set y2tics
-
 set xlabel "Time" textcolor lt 4
 set mxtics 5
-
 set boxwidth 0.5
 set style fill transparent pattern 4 bo
-
 plot "< awk '{print $1 \" \" $2}' /tmp/out" title "Actual", \
 	"< awk '{print $1 \" \" $3}' /tmp/out" title "Predicted", \
 	"< awk '{print $1 \" \" $1}' /tmp/out" title "time" with lines
-
  */

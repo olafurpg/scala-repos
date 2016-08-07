@@ -6,7 +6,7 @@ package toplevel
 
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */

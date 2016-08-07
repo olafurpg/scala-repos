@@ -6,7 +6,9 @@ import org.junit.Assert._
 import org.ops4j.pax.exam
 import org.ops4j.pax.exam.Configuration
 import org.ops4j.pax.exam.junit.PaxExam
-import org.ops4j.pax.exam.spi.reactors.{AllConfinedStagedReactorFactory, ExamReactorStrategy}
+import org.ops4j.pax.exam.spi.reactors.{
+  AllConfinedStagedReactorFactory, ExamReactorStrategy
+}
 import slick.osgi.testutil._
 import slick.util.GlobalConfig
 

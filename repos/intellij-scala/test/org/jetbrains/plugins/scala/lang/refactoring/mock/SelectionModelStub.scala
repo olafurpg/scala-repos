@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.lang.refactoring.mock
 
 import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.markup.TextAttributes
-import com.intellij.openapi.editor.{LogicalPosition, RangeMarker, SelectionModel, VisualPosition}
+import com.intellij.openapi.editor.{
+  LogicalPosition, RangeMarker, SelectionModel, VisualPosition
+}
 
 /**
   * Pavel Fatin

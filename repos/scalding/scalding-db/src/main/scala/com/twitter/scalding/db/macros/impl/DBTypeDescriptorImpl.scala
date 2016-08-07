@@ -5,7 +5,9 @@ import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
 import com.twitter.bijection.macros.impl.IsCaseClassImpl
-import com.twitter.scalding.macros.impl.{FieldsProviderImpl, TupleConverterImpl, TupleSetterImpl}
+import com.twitter.scalding.macros.impl.{
+  FieldsProviderImpl, TupleConverterImpl, TupleSetterImpl
+}
 import com.twitter.scalding.db.DBTypeDescriptor
 import com.twitter.scalding.db.macros._
 

@@ -7,7 +7,9 @@ import akka.stream.Materializer
 import akka.stream.scaladsl._
 import org.reactivestreams._
 import play.api.libs.iteratee._
-import play.api.libs.streams.impl.{SubscriberPublisherProcessor, SubscriberIteratee}
+import play.api.libs.streams.impl.{
+  SubscriberPublisherProcessor, SubscriberIteratee
+}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 /**

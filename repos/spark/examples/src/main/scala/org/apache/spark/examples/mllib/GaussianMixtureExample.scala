@@ -20,7 +20,9 @@ package org.apache.spark.examples.mllib
 
 import org.apache.spark.{SparkConf, SparkContext}
 // $example on$
-import org.apache.spark.mllib.clustering.{GaussianMixture, GaussianMixtureModel}
+import org.apache.spark.mllib.clustering.{
+  GaussianMixture, GaussianMixtureModel
+}
 import org.apache.spark.mllib.linalg.Vectors
 // $example off$
 

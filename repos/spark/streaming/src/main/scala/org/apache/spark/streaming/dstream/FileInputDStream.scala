@@ -29,7 +29,9 @@ import org.apache.hadoop.mapreduce.{InputFormat => NewInputFormat}
 import org.apache.spark.rdd.{RDD, UnionRDD}
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.scheduler.StreamInputInfo
-import org.apache.spark.util.{SerializableConfiguration, TimeStampedHashMap, Utils}
+import org.apache.spark.util.{
+  SerializableConfiguration, TimeStampedHashMap, Utils
+}
 
 /**
   * This class represents an input stream that monitors a Hadoop-compatible filesystem for new

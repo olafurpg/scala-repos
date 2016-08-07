@@ -5,7 +5,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.impl.source.codeStyle.CodeEditUtil
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.{PsiComment, PsiDocumentManager, PsiElement, PsiWhiteSpace}
+import com.intellij.psi.{
+  PsiComment, PsiDocumentManager, PsiElement, PsiWhiteSpace
+}
 import org.jetbrains.plugins.scala.extensions.PsiElementExt
 
 object IntentionUtil {

@@ -32,7 +32,9 @@ import javafx.{animation => jfxa, scene => jfxs, util => jfxu}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 import scalafx.scene.Node
 import scalafx.scene.shape.Shape
 import scalafx.util.Duration

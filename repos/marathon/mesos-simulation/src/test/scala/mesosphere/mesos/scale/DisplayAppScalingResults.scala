@@ -96,7 +96,7 @@ object DisplayAppScalingResults {
                         units)
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(
@@ -136,7 +136,7 @@ object DisplayAppScalingResults {
                         d("stddev"))
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(
@@ -198,7 +198,7 @@ object DisplayAppScalingResults {
                         rateUnits)
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(

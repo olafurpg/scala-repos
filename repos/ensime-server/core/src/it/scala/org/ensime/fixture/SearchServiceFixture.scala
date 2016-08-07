@@ -28,8 +28,7 @@ trait IsolatedSearchServiceFixture extends IsolatedSourceResolverFixture {
 
 trait SharedSearchServiceFixture
     extends SharedEnsimeVFSFixture
-    with SharedSourceResolverFixture {
-  this: SharedTestKitFixture =>
+    with SharedSourceResolverFixture { this: SharedTestKitFixture =>
 
   private[fixture] var _search: SearchService = _
 

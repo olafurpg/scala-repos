@@ -362,14 +362,12 @@ object SnippetSpec extends Specification with XmlMatchers {
     "Check snippets as Function1[NodeSeq, NodeSeq]" in {
       /* FIXME SBT: Very very inconsistent in the build environment, pendingUntilFixed misreports
       val session = new LiftSession("", "hello", Empty)
-
       val ret = S.init(makeReq, session) {
         for {
           s <- S.session
         } yield s.processSurroundAndInclude("test",
                                             <lift:Meower>Moo</lift:Meower>)
       }
-
       ret.openOrThrowException("legacy code") must ==/ (<yak/>)
        */
       pending
@@ -378,14 +376,12 @@ object SnippetSpec extends Specification with XmlMatchers {
     "Check snippets via run" in {
       /* FIXME SBT: Very very inconsistent in the build environment, pendingUntilFixed misreports
       val session = new LiftSession("", "hello", Empty)
-
       val ret = S.init(makeReq, session) {
         for {
           s <- S.session
         } yield s.processSurroundAndInclude("test",
                                             <input class="lift:Splunker"/>)
       }
-
       (ret.openOrThrowException("legacy code") \ "@name").text.length must be > 0
        */
       pending

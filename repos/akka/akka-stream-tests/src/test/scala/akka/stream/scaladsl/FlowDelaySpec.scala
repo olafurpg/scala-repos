@@ -7,7 +7,9 @@ import akka.stream.Attributes._
 import akka.stream.testkit.Utils._
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.testkit.{TestPublisher, TestSubscriber}
-import akka.stream.{BufferOverflowException, DelayOverflowStrategy, ActorMaterializer}
+import akka.stream.{
+  BufferOverflowException, DelayOverflowStrategy, ActorMaterializer
+}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.control.NoStackTrace

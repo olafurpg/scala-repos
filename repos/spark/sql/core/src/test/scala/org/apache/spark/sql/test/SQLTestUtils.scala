@@ -46,8 +46,7 @@ import org.apache.spark.util.Utils
 private[sql] trait SQLTestUtils
     extends SparkFunSuite
     with BeforeAndAfterAll
-    with SQLTestData {
-  self =>
+    with SQLTestData { self =>
 
   protected def sparkContext = sqlContext.sparkContext
 

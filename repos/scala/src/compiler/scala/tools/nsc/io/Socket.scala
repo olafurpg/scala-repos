@@ -6,7 +6,9 @@
 package scala.tools.nsc
 package io
 
-import java.io.{IOException, InputStreamReader, BufferedReader, PrintWriter, Closeable}
+import java.io.{
+  IOException, InputStreamReader, BufferedReader, PrintWriter, Closeable
+}
 import java.io.{BufferedOutputStream, BufferedReader}
 import java.net.{InetAddress, Socket => JSocket}
 import scala.io.Codec

@@ -8,8 +8,8 @@ class ReflectiveClosure[A, B](val tree: Tree, fn: A => B) extends (A => B) {
 }
 
 object ReflectiveClosure {
-  implicit def reflectClosure[A, B](f: A => B): ReflectiveClosure[A, B] = macro Macros
-    .reflectiveClosureImpl[A, B]
+  implicit def reflectClosure[A, B](f: A => B): ReflectiveClosure[A, B] =
+    macro Macros.reflectiveClosureImpl[A, B]
 }
 
 object Macros {

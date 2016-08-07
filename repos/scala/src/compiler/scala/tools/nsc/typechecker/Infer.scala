@@ -147,8 +147,8 @@ trait Infer extends Checkable { self: Analyzer =>
     if (tvars.isEmpty) Nil
     else {
       printTyping(
-          "solving for " + parentheses((tparams, tvars).zipped map ((p, tv) =>
-                    s"${p.name}: $tv")))
+          "solving for " + parentheses(
+              (tparams, tvars).zipped map ((p, tv) => s"${p.name}: $tv")))
       // !!! What should be done with the return value of "solve", which is at present ignored?
       // The historical commentary says "no panic, it's good enough to just guess a solution,
       // we'll find out later whether it works", meaning don't issue an error here when types
@@ -293,8 +293,7 @@ trait Infer extends Checkable { self: Analyzer =>
       def accessible =
         sym filter
           (alt =>
-                context
-                  .isAccessible(alt, pre, site.isInstanceOf[Super])) match {
+             context.isAccessible(alt, pre, site.isInstanceOf[Super])) match {
           case NoSymbol if sym.isJavaDefined && context.unit.isJava =>
             sym // don't try to second guess Java; see #4402
           case sym1 => sym1
@@ -321,11 +320,11 @@ trait Infer extends Checkable { self: Analyzer =>
             })
             tree setSymbol sym1 setType
               (pre match {
-                    case _: SuperType =>
-                      owntype map
-                        (tp => if (tp eq pre) site.symbol.thisType else tp)
-                    case _ => owntype
-                  })
+                case _: SuperType =>
+                  owntype map
+                    (tp => if (tp eq pre) site.symbol.thisType else tp)
+                case _ => owntype
+              })
         }
     }
 
@@ -701,10 +700,10 @@ trait Infer extends Checkable { self: Analyzer =>
         // followApply may return an OverloadedType (tpe is a value type with multiple `apply` methods)
         alts exists
           (alt =>
-                isApplicableBasedOnArity(pre memberType alt,
-                                         argsCount,
-                                         varargsStar,
-                                         tuplingAllowed))
+             isApplicableBasedOnArity(pre memberType alt,
+                                      argsCount,
+                                      varargsStar,
+                                      tuplingAllowed))
       case _ =>
         val paramsCount = tpe.params.length
         // simpleMatch implies we're not using defaults
@@ -923,7 +922,7 @@ trait Infer extends Checkable { self: Analyzer =>
         case OverloadedType(pre, alts) =>
           alts exists
             (alt =>
-                  isApplicable(undetparams, pre memberType alt, argtpes0, pt))
+               isApplicable(undetparams, pre memberType alt, argtpes0, pt))
         case ExistentialType(_, qtpe) =>
           isApplicable(undetparams, qtpe, argtpes0, pt)
         case mt @ MethodType(_, _) =>
@@ -1309,9 +1308,9 @@ trait Infer extends Checkable { self: Analyzer =>
       def inferForApproxPt =
         if (isFullyDefined(pt)) {
           inferFor(
-              pt.instantiateTypeParams(ptparams,
-                                       ptparams map (x =>
-                                             WildcardType))) flatMap { targs =>
+              pt.instantiateTypeParams(
+                  ptparams,
+                  ptparams map (x => WildcardType))) flatMap { targs =>
             val ctorTpInst = tree.tpe.instantiateTypeParams(undetparams, targs)
             val resTpInst = skipImplicit(ctorTpInst.finalResultType)
             val ptvars =
@@ -1628,10 +1627,9 @@ trait Infer extends Checkable { self: Analyzer =>
         case names =>
           eligible filter
             (m =>
-                  names forall
-                    (name =>
-                          m.info.params exists (p =>
-                                paramMatchesName(p, name))))
+               names forall
+                 (name =>
+                    m.info.params exists (p => paramMatchesName(p, name))))
       }
       if (eligible.isEmpty || eligible.tail.isEmpty) eligible
       else
@@ -1645,10 +1643,10 @@ trait Infer extends Checkable { self: Analyzer =>
             // TODO: should we really allow tupling here?? (If we don't, this is the only call-site with `tuplingAllowed = true`)
             eligible filter
               (alt =>
-                    isApplicableBasedOnArity(alt.tpe,
-                                             argtpes.length,
-                                             varargsStar,
-                                             tuplingAllowed = true))
+                 isApplicableBasedOnArity(alt.tpe,
+                                          argtpes.length,
+                                          varargsStar,
+                                          tuplingAllowed = true))
         }
     }
 
@@ -1777,10 +1775,7 @@ trait Infer extends Checkable { self: Analyzer =>
           checkWithinBounds(
               matchingLength filter
                 (alt =>
-                      isWithinBounds(pre,
-                                     alt.owner,
-                                     alt.typeParams,
-                                     argtypes)))
+                   isWithinBounds(pre, alt.owner, alt.typeParams, argtypes)))
       }
     }
   }

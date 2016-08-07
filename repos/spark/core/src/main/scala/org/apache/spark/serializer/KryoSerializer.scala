@@ -25,9 +25,13 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
 
-import com.esotericsoftware.kryo.{Kryo, KryoException, Serializer => KryoClassSerializer}
+import com.esotericsoftware.kryo.{
+  Kryo, KryoException, Serializer => KryoClassSerializer
+}
 import com.esotericsoftware.kryo.io.{Input => KryoInput, Output => KryoOutput}
-import com.esotericsoftware.kryo.serializers.{JavaSerializer => KryoJavaSerializer}
+import com.esotericsoftware.kryo.serializers.{
+  JavaSerializer => KryoJavaSerializer
+}
 import com.twitter.chill.{AllScalaRegistrar, EmptyScalaKryoInstantiator}
 import org.apache.avro.generic.{GenericData, GenericRecord}
 import org.roaringbitmap.RoaringBitmap
@@ -36,9 +40,13 @@ import org.apache.spark._
 import org.apache.spark.api.python.PythonBroadcast
 import org.apache.spark.internal.Logging
 import org.apache.spark.network.util.ByteUnit
-import org.apache.spark.scheduler.{CompressedMapStatus, HighlyCompressedMapStatus}
+import org.apache.spark.scheduler.{
+  CompressedMapStatus, HighlyCompressedMapStatus
+}
 import org.apache.spark.storage._
-import org.apache.spark.util.{BoundedPriorityQueue, SerializableConfiguration, SerializableJobConf, Utils}
+import org.apache.spark.util.{
+  BoundedPriorityQueue, SerializableConfiguration, SerializableJobConf, Utils
+}
 import org.apache.spark.util.collection.CompactBuffer
 
 /**

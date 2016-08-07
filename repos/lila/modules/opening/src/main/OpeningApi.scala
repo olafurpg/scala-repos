@@ -4,7 +4,9 @@ import scala.util.{Try, Success, Failure}
 
 import org.joda.time.DateTime
 import play.api.libs.json.JsValue
-import reactivemongo.bson.{BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean}
+import reactivemongo.bson.{
+  BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean
+}
 import reactivemongo.core.commands._
 
 import lila.db.Types.Coll
@@ -63,7 +65,9 @@ private[opening] final class OpeningApi(openingColl: Coll,
 
     def playedIds(user: User, max: Int): Fu[BSONArray] = {
       val col = attemptColl
-      import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{Group, Limit, Match, Push}
+      import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+        Group, Limit, Match, Push
+      }
 
       val playedIdsGroup =
         Group(BSONBoolean(true))("ids" -> Push(Attempt.BSONFields.openingId))

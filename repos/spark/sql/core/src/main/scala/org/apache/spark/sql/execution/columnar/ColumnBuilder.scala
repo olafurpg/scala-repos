@@ -21,7 +21,9 @@ import java.nio.{ByteBuffer, ByteOrder}
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.execution.columnar.ColumnBuilder._
-import org.apache.spark.sql.execution.columnar.compression.{AllCompressionSchemes, CompressibleColumnBuilder}
+import org.apache.spark.sql.execution.columnar.compression.{
+  AllCompressionSchemes, CompressibleColumnBuilder
+}
 import org.apache.spark.sql.types._
 
 private[columnar] trait ColumnBuilder {

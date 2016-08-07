@@ -7,8 +7,13 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.Processor
 import org.jetbrains.jps.ModuleChunk
 import org.jetbrains.jps.builders.impl.TargetOutputIndexImpl
-import org.jetbrains.jps.builders.java.{JavaModuleBuildTargetType, JavaSourceRootDescriptor, ResourceRootDescriptor, ResourcesTargetType}
-import org.jetbrains.jps.builders.{BuildRootDescriptor, BuildTarget, DirtyFilesHolder}
+import org.jetbrains.jps.builders.java.{
+  JavaModuleBuildTargetType, JavaSourceRootDescriptor, ResourceRootDescriptor,
+  ResourcesTargetType
+}
+import org.jetbrains.jps.builders.{
+  BuildRootDescriptor, BuildTarget, DirtyFilesHolder
+}
 import org.jetbrains.jps.incremental.ModuleLevelBuilder.ExitCode
 import org.jetbrains.jps.incremental._
 import org.jetbrains.jps.incremental.java.JavaBuilder

@@ -27,7 +27,9 @@
 
 package scalafx.scene
 
-import javafx.scene.{effect => jfxse, input => jfxsi, layout => jfxsl, transform => jfxst}
+import javafx.scene.{
+  effect => jfxse, input => jfxsi, layout => jfxsl, transform => jfxst
+}
 import javafx.util.Callback
 import javafx.{event => jfxe, geometry => jfxg, scene => jfxs, util => jfxu}
 
@@ -492,7 +494,7 @@ abstract class Node protected (override val delegate: jfxs.Node)
   }
 
   /**
-    * Defines a function to be called when a full press-drag-release gesture ends (by releasing mouse button) within 
+    * Defines a function to be called when a full press-drag-release gesture ends (by releasing mouse button) within
     * this Node.
     */
   def onMouseDragReleased = delegate.onMouseDragReleasedProperty

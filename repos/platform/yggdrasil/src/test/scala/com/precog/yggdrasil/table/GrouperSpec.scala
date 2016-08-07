@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -38,42 +38,30 @@ import scalaz.syntax.comonad._
 import scalaz.syntax.monad._
 
 /*
-Here are a number of motivating examples that are not reflected in the tests below, but are representative of solves that need to be 
+Here are a number of motivating examples that are not reflected in the tests below, but are representative of solves that need to be
 evaluated by the merge algorithm.
-
 solve 'a = foo.a, 'b = foo.b
   bar' := bar where bar.b = 'b
-
   ['a, 'b, count(bar')]
-
-
 solve 'a, 'b, 'c
   foo' := foo where foo.a = 'a & foo.b = 'b
   bar' := bar where bar.b = 'b & bar.c = 'c
   baz' := baz where baz.a = 'a & baz.c = 'c
-
   ['a, 'b, 'c, count(foo'), sum(bar'.d), stddev(baz'.d)]
-
-
 solve 'a, 'b, 'c
   foo' := foo where foo.a = 'a & foo.b = 'b | foo.a = 'a & foo.c = 'c
   bar' := bar where bar.a = 'a | bar.b = 'b | bar.c = 'c
-
   [foo', bar', 'a, 'b, 'c]
-
-
 solve 'a, 'b
   foo' := foo where foo.a = 'a | foo.b = 'b | foo.a = 'a & foo.b = 'b
   bar' := bar wehre bar.a = 'a & bar.b = 'b
-  
   ...
  */
 
 trait GrouperSpec[M[+ _]]
     extends BlockStoreTestSupport[M]
     with Specification
-    with ScalaCheck {
-  self =>
+    with ScalaCheck { self =>
   def tic_a = CPathField("tic_a")
   def tic_b = CPathField("tic_b")
 
@@ -866,7 +854,7 @@ trait GrouperSpec[M[+ _]]
     //   foo where foo.a = 'a & foo.b = 'b
     //   bar where bar.a = 'a
     //   baz where baz.b = 'b
-    //   
+    //
     //   { a: 'a, b: 'b, foo: count(foo'), bar: count(bar'), baz: count(baz') }
     //
 

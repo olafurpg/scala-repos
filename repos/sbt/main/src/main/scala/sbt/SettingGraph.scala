@@ -89,9 +89,9 @@ object Graph {
     def insertBar(s: String, at: Int): String =
       if (at < s.length)
         s.slice(0, at) + (s(at).toString match {
-              case " " => "|"
-              case x => x
-            }) + s.slice(at + 1, s.length)
+          case " " => "|"
+          case x => x
+        }) + s.slice(at + 1, s.length)
       else s
     def toAsciiLines(node: A, level: Int): Vector[String] = {
       val line = limitLine(

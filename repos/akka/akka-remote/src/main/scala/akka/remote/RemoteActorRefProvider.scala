@@ -11,7 +11,9 @@ import akka.event.Logging.Error
 import akka.serialization.{Serialization, SerializationExtension}
 import akka.pattern.pipe
 import scala.util.control.NonFatal
-import akka.actor.SystemGuardian.{TerminationHookDone, TerminationHook, RegisterTerminationHook}
+import akka.actor.SystemGuardian.{
+  TerminationHookDone, TerminationHook, RegisterTerminationHook
+}
 import scala.util.control.Exception.Catcher
 import scala.concurrent.Future
 import akka.ConfigurationException

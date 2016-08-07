@@ -11,12 +11,13 @@ package org.scalajs.core.tools.linker
 import org.scalajs.core.tools.sem.Semantics
 
 import org.scalajs.core.tools.linker.frontend.LinkerFrontend
-import org.scalajs.core.tools.linker.frontend.optimizer.{ParIncOptimizer, IncOptimizer}
+import org.scalajs.core.tools.linker.frontend.optimizer.{
+  ParIncOptimizer, IncOptimizer
+}
 import org.scalajs.core.tools.linker.backend._
 import org.scalajs.core.tools.linker.backend.closure.ClosureLinkerBackend
 
-trait LinkerPlatformExtensions {
-  this: Linker.type =>
+trait LinkerPlatformExtensions { this: Linker.type =>
   def apply(
       semantics: Semantics = Semantics.Defaults,
       outputMode: OutputMode = OutputMode.Default,

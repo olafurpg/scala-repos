@@ -5,12 +5,17 @@ import com.twitter.finagle._
 import com.twitter.finagle.dispatch.GenSerialClientDispatcher
 import com.twitter.finagle.filter.PayloadSizeFilter
 import com.twitter.finagle.http.codec._
-import com.twitter.finagle.http.filter.{ClientContextFilter, DtabFilter, HttpNackFilter, ServerContextFilter}
+import com.twitter.finagle.http.filter.{
+  ClientContextFilter, DtabFilter, HttpNackFilter, ServerContextFilter
+}
 import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.finagle.tracing._
 import com.twitter.finagle.transport.Transport
 import com.twitter.util.{Closable, StorageUnit, Try}
-import org.jboss.netty.channel.{Channel, ChannelEvent, ChannelHandlerContext, ChannelPipelineFactory, Channels, UpstreamMessageEvent}
+import org.jboss.netty.channel.{
+  Channel, ChannelEvent, ChannelHandlerContext, ChannelPipelineFactory,
+  Channels, UpstreamMessageEvent
+}
 import org.jboss.netty.handler.codec.http._
 
 private[finagle] case class BadHttpRequest(httpVersion: HttpVersion,

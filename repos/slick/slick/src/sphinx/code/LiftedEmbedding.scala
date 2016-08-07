@@ -387,8 +387,8 @@ object LiftedEmbedding extends App {
           users2.schema.create,
           users2 forceInsertQuery
             (users.map { u =>
-                  (u.id, u.first ++ " " ++ u.last)
-                }),
+              (u.id, u.first ++ " " ++ u.last)
+            }),
           users2 forceInsertExpr (users.length + 1, "admin")
       )
       //#insert4

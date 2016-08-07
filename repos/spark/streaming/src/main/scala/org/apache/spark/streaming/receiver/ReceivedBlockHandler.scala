@@ -28,7 +28,9 @@ import org.apache.spark.{SparkConf, SparkException}
 import org.apache.spark.internal.Logging
 import org.apache.spark.storage._
 import org.apache.spark.streaming.receiver.WriteAheadLogBasedBlockHandler._
-import org.apache.spark.streaming.util.{WriteAheadLogRecordHandle, WriteAheadLogUtils}
+import org.apache.spark.streaming.util.{
+  WriteAheadLogRecordHandle, WriteAheadLogUtils
+}
 import org.apache.spark.util.{Clock, SystemClock, ThreadUtils}
 import org.apache.spark.util.io.ChunkedByteBuffer
 

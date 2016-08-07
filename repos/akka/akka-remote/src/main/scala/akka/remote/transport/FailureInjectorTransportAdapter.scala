@@ -7,7 +7,9 @@ import FailureInjectorTransportAdapter._
 import akka.AkkaException
 import akka.actor.{Address, ExtendedActorSystem}
 import akka.event.Logging
-import akka.remote.transport.AssociationHandle.{HandleEvent, HandleEventListener}
+import akka.remote.transport.AssociationHandle.{
+  HandleEvent, HandleEventListener
+}
 import akka.remote.transport.Transport._
 import akka.util.ByteString
 import java.util.concurrent.ConcurrentHashMap

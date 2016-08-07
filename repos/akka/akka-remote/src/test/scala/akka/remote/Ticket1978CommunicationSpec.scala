@@ -97,12 +97,12 @@ object Configuration {
       val gotAllEnabled =
         enabled.toSet diff engine.getEnabledCipherSuites.toSet
       gotAllSupported.isEmpty || (throw new IllegalArgumentException(
-              "Cipher Suite not supported: " + gotAllSupported))
+          "Cipher Suite not supported: " + gotAllSupported))
       gotAllEnabled.isEmpty || (throw new IllegalArgumentException(
-              "Cipher Suite not enabled: " + gotAllEnabled))
+          "Cipher Suite not enabled: " + gotAllEnabled))
       engine.getSupportedProtocols.contains(settings.SSLProtocol.get) ||
       (throw new IllegalArgumentException(
-              "Protocol not supported: " + settings.SSLProtocol.get))
+          "Protocol not supported: " + settings.SSLProtocol.get))
 
       CipherConfig(true, config, cipher, localPort, remotePort)
     } catch {
@@ -151,8 +151,7 @@ class Ticket1978AES256CounterInetRNGSpec
                         "TLS_RSA_WITH_AES_256_CBC_SHA"))
     with InetRNGSpec
 
-trait InetRNGSpec {
-  this: Ticket1978CommunicationSpec ⇒
+trait InetRNGSpec { this: Ticket1978CommunicationSpec ⇒
   override def preCondition =
     try {
       (new RandomDotOrgSeedGenerator).generateSeed(128)

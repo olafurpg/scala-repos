@@ -3,7 +3,9 @@ package mesosphere.marathon.state
 import com.codahale.metrics.MetricRegistry
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.PathId._
-import mesosphere.marathon.{MarathonConf, MarathonSpec, StoreCommandFailedException}
+import mesosphere.marathon.{
+  MarathonConf, MarathonSpec, StoreCommandFailedException
+}
 import mesosphere.util.ThreadPoolContext
 import mesosphere.util.state.memory.InMemoryStore
 import mesosphere.util.state.{PersistentEntity, PersistentStore}

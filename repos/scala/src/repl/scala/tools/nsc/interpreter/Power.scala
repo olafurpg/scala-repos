@@ -15,23 +15,18 @@ import scala.reflect.runtime.{universe => ru}
 import scala.reflect.ClassTag
 
 /** Collecting some power mode examples.
-
 scala> trait F[@specialized(Int) T] { def f: T = ??? }
 defined trait F
-
 scala> trait G[@specialized(Long, Int) T] extends F[T] { override def f: T = super.f }
 defined trait G
-
 scala> changesAfterEachPhase(intp("G").info.members filter (_.name.toString contains "super")) >
 Gained after  1/parser {
   method super$f
 }
-
 Gained after 12/specialize {
   method super$f$mcJ$sp
   method super$f$mcI$sp
 }
-
 Lost after 18/flatten {
   method super$f$mcJ$sp
   method super$f$mcI$sp
@@ -333,7 +328,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
       if (s.length == 0) Nil
       else
         s dropWhile (_.toChar.isControl) span (x =>
-              !x.toChar.isControl) match {
+                                                 !x.toChar.isControl) match {
           case (next, rest) => next.map(_.toChar).mkString :: strings(rest)
         }
     }

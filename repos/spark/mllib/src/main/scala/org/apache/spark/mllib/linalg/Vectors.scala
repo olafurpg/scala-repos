@@ -17,7 +17,9 @@
 
 package org.apache.spark.mllib.linalg
 
-import java.lang.{Double => JavaDouble, Integer => JavaInteger, Iterable => JavaIterable}
+import java.lang.{
+  Double => JavaDouble, Integer => JavaInteger, Iterable => JavaIterable
+}
 import java.util
 
 import scala.annotation.varargs

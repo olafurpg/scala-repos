@@ -36,7 +36,9 @@ class SparkJLineCompletion(val intp: SparkIMain)
   val global: intp.global.type = intp.global
 
   import global._
-  import definitions.{PredefModule, AnyClass, AnyRefClass, ScalaPackage, JavaLangPackage}
+  import definitions.{
+    PredefModule, AnyClass, AnyRefClass, ScalaPackage, JavaLangPackage
+  }
   import rootMirror.{RootClass, getModuleIfDefined}
   type ExecResult = Any
   import intp.{debugging}
@@ -168,8 +170,7 @@ class SparkJLineCompletion(val intp: SparkIMain)
     override def alternativesFor(id: String): List[String] =
       debugging(id + " alternatives ==> ") {
         val alts =
-          members filter (x =>
-                x.isMethod && tos(x) == id) map methodSignatureString
+          members filter (x => x.isMethod && tos(x) == id) map methodSignatureString
 
         if (alts.nonEmpty) "" :: alts else Nil
       }

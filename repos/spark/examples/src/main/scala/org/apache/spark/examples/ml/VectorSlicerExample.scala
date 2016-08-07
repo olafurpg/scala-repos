@@ -20,7 +20,9 @@ package org.apache.spark.examples.ml
 
 import org.apache.spark.{SparkConf, SparkContext}
 // $example on$
-import org.apache.spark.ml.attribute.{Attribute, AttributeGroup, NumericAttribute}
+import org.apache.spark.ml.attribute.{
+  Attribute, AttributeGroup, NumericAttribute
+}
 import org.apache.spark.ml.feature.VectorSlicer
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.sql.Row

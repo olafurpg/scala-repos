@@ -5,7 +5,9 @@ import com.twitter.finagle.context.Contexts
 import com.twitter.finagle.{Stack, Status}
 import com.twitter.finagle.ssl
 import com.twitter.io.{Buf, Reader, Writer}
-import com.twitter.util.{Closable, Future, Promise, Time, Throw, Return, Duration}
+import com.twitter.util.{
+  Closable, Future, Promise, Time, Throw, Return, Duration
+}
 import java.net.SocketAddress
 import java.security.cert.Certificate
 

@@ -26,9 +26,13 @@ import scopt.OptionParser
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.examples.mllib.AbstractParams
 import org.apache.spark.ml.{Pipeline, PipelineStage, Transformer}
-import org.apache.spark.ml.classification.{DecisionTreeClassificationModel, DecisionTreeClassifier}
+import org.apache.spark.ml.classification.{
+  DecisionTreeClassificationModel, DecisionTreeClassifier
+}
 import org.apache.spark.ml.feature.{StringIndexer, VectorIndexer}
-import org.apache.spark.ml.regression.{DecisionTreeRegressionModel, DecisionTreeRegressor}
+import org.apache.spark.ml.regression.{
+  DecisionTreeRegressionModel, DecisionTreeRegressor
+}
 import org.apache.spark.ml.util.MetadataUtils
 import org.apache.spark.mllib.evaluation.{MulticlassMetrics, RegressionMetrics}
 import org.apache.spark.mllib.linalg.Vector

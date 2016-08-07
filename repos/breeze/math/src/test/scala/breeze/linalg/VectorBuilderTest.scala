@@ -9,7 +9,7 @@ import org.scalatest.prop.Checkers
 import breeze.numerics.closeTo
 
 /**
-  * 
+  *
   * @author dlwh
   */
 @RunWith(classOf[JUnitRunner])

@@ -190,7 +190,6 @@ import scala.language.implicitConversions
   *  @since   2.8
   *  @see [[http://docs.scala-lang.org/overviews/collections/concrete-immutable-collection-classes.html#streams "Scala's Collection Library overview"]]
   *  section on `Streams` for more information.
-
   *  @define naturalsEx def naturalsFrom(i: Int): Stream[Int] = i #:: naturalsFrom(i + 1)
   *  @define Coll `Stream`
   *  @define coll stream
@@ -204,8 +203,7 @@ abstract class Stream[+A]
     with LinearSeq[A]
     with GenericTraversableTemplate[A, Stream]
     with LinearSeqOptimized[A, Stream[A]]
-    with Serializable {
-  self =>
+    with Serializable { self =>
 
   override def companion: GenericCompanion[Stream] = Stream
 
@@ -810,12 +808,12 @@ abstract class Stream[+A]
     */
   override def take(n: Int): Stream[A] =
     (// Note that the n == 1 condition appears redundant but is not.
-     // It prevents "tail" from being referenced (and its head being evaluated)
-     // when obtaining the last element of the result. Such are the challenges
-     // of working with a lazy-but-not-really sequence.
-     if (n <= 0 || isEmpty) Stream.empty
-     else if (n == 1) cons(head, Stream.empty)
-     else cons(head, tail take n - 1))
+    // It prevents "tail" from being referenced (and its head being evaluated)
+    // when obtaining the last element of the result. Such are the challenges
+    // of working with a lazy-but-not-really sequence.
+    if (n <= 0 || isEmpty) Stream.empty
+    else if (n == 1) cons(head, Stream.empty)
+    else cons(head, tail take n - 1))
 
   @tailrec final override def drop(n: Int): Stream[A] =
     if (n <= 0 || isEmpty) this

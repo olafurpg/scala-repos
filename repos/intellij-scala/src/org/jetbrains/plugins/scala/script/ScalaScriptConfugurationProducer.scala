@@ -6,7 +6,9 @@ import java.util
 import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl
-import com.intellij.execution.{Location, RunManager, RunnerAndConfigurationSettings}
+import com.intellij.execution.{
+  Location, RunManager, RunnerAndConfigurationSettings
+}
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.{PsiElement, PsiFile}
 import org.jetbrains.plugins.scala.extensions._

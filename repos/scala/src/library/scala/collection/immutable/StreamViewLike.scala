@@ -7,8 +7,7 @@ import generic._
 trait StreamViewLike[
     +A, +Coll, +This <: StreamView[A, Coll] with StreamViewLike[A, Coll, This]]
     extends SeqView[A, Coll]
-    with SeqViewLike[A, Coll, This] {
-  self =>
+    with SeqViewLike[A, Coll, This] { self =>
 
   override def force[B >: A, That](implicit bf: CanBuildFrom[Coll, B, That]) = {
     self.iterator.toStream.asInstanceOf[That]

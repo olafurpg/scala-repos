@@ -19,7 +19,9 @@ package org.apache.spark.rpc.netty
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
-import org.apache.spark.network.buffer.{FileSegmentManagedBuffer, ManagedBuffer}
+import org.apache.spark.network.buffer.{
+  FileSegmentManagedBuffer, ManagedBuffer
+}
 import org.apache.spark.network.server.StreamManager
 import org.apache.spark.rpc.RpcEnvFileServer
 import org.apache.spark.util.Utils

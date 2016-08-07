@@ -24,7 +24,9 @@ import scala.collection.JavaConversions._
 import java.util.concurrent.atomic.AtomicLong
 import java.nio.channels.ClosedByInterruptException
 import org.apache.log4j.Logger
-import org.apache.kafka.clients.consumer.{ConsumerRebalanceListener, KafkaConsumer}
+import org.apache.kafka.clients.consumer.{
+  ConsumerRebalanceListener, KafkaConsumer
+}
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.utils.Utils
 import org.apache.kafka.common.TopicPartition

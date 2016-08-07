@@ -1,7 +1,9 @@
 package breeze.io
 
 import java.io._
-import au.com.bytecode.opencsv.{CSVReader => OpenCSVReader, CSVWriter => OpenCSVWriter}
+import au.com.bytecode.opencsv.{
+  CSVReader => OpenCSVReader, CSVWriter => OpenCSVWriter
+}
 
 /**
   * Just a simple wrapper for OpenCSV's csvreader.

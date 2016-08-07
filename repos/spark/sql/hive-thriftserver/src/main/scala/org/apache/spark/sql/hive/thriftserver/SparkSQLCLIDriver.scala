@@ -27,12 +27,18 @@ import jline.console.history.FileHistory
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.logging.LogFactory
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.hive.cli.{CliDriver, CliSessionState, OptionsProcessor}
-import org.apache.hadoop.hive.common.{HiveInterruptCallback, HiveInterruptUtils}
+import org.apache.hadoop.hive.cli.{
+  CliDriver, CliSessionState, OptionsProcessor
+}
+import org.apache.hadoop.hive.common.{
+  HiveInterruptCallback, HiveInterruptUtils
+}
 import org.apache.hadoop.hive.conf.HiveConf
 import org.apache.hadoop.hive.ql.Driver
 import org.apache.hadoop.hive.ql.exec.Utilities
-import org.apache.hadoop.hive.ql.processors.{AddResourceProcessor, CommandProcessor, CommandProcessorFactory, SetProcessor}
+import org.apache.hadoop.hive.ql.processors.{
+  AddResourceProcessor, CommandProcessor, CommandProcessorFactory, SetProcessor
+}
 import org.apache.hadoop.hive.ql.session.SessionState
 import org.apache.thrift.transport.TSocket
 
@@ -217,7 +223,6 @@ private[hive] object SparkSQLCLIDriver extends Logging {
     /*
     val clientTransportTSocketField = classOf[CliSessionState].getDeclaredField("transport")
     clientTransportTSocketField.setAccessible(true)
-
     transport = clientTransportTSocketField.get(sessionState).asInstanceOf[TSocket]
      */
     transport = null

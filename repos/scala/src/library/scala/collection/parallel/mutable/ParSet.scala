@@ -21,8 +21,7 @@ trait ParSet[T]
     with ParIterable[T]
     with scala.collection.parallel.ParSet[T]
     with GenericParTemplate[T, ParSet]
-    with ParSetLike[T, ParSet[T], scala.collection.mutable.Set[T]] {
-  self =>
+    with ParSetLike[T, ParSet[T], scala.collection.mutable.Set[T]] { self =>
   override def companion: GenericCompanion[ParSet] with GenericParCompanion[
       ParSet] = ParSet
   override def empty: ParSet[T] = ParHashSet()

@@ -9,15 +9,22 @@ import com.intellij.openapi.util.{TextRange, Trinity}
 import com.intellij.psi._
 import org.intellij.plugins.intelliLang.Configuration
 import org.intellij.plugins.intelliLang.inject.config.BaseInjection
-import org.intellij.plugins.intelliLang.inject.{InjectedLanguage, InjectorUtils, LanguageInjectionSupport, TemporaryPlacesRegistry}
+import org.intellij.plugins.intelliLang.inject.{
+  InjectedLanguage, InjectorUtils, LanguageInjectionSupport,
+  TemporaryPlacesRegistry
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.injection.ScalaLanguageInjector.extractMultiLineStringRanges
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.readAttribute
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScReferencePattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral, ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScPatternDefinition, ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScInterpolatedPrefixReference
 import org.jetbrains.plugins.scala.settings._
 import org.jetbrains.plugins.scala.util.MultilineStringUtil
@@ -29,7 +36,7 @@ import scala.collection.mutable
 
 /**
   * @author Pavel Fatin
-  * @author Dmitry Naydanov        
+  * @author Dmitry Naydanov
   */
 class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
     extends MultiHostInjector {
@@ -99,7 +106,7 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
     val annotationOwner = expression match {
       case lit: ScLiteral => lit getAnnotationOwner (annotationOwnerFor(_))
       case _ =>
-        annotationOwnerFor(expression) //.orElse(implicitAnnotationOwnerFor(literal)) 
+        annotationOwnerFor(expression) //.orElse(implicitAnnotationOwnerFor(literal))
     }
 
     val annotation =
@@ -285,7 +292,7 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
 
           !allInjections.isEmpty
         } getOrElse false
-      case _ => false //something is wrong 
+      case _ => false //something is wrong
     }
   }
 
@@ -415,7 +422,7 @@ object ScalaLanguageInjector {
 
     literals foreach
       (ScalaLanguageInjector
-            .handleInjectionImpl(_, injectedLanguage, injection, list))
+        .handleInjectionImpl(_, injectedLanguage, injection, list))
 
     InjectorUtils.registerInjection(injectedLanguage.getLanguage,
                                     list,

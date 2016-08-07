@@ -3,7 +3,9 @@
   */
 package docs.io
 
-import java.net.{Inet6Address, InetSocketAddress, NetworkInterface, StandardProtocolFamily}
+import java.net.{
+  Inet6Address, InetSocketAddress, NetworkInterface, StandardProtocolFamily
+}
 import java.nio.channels.DatagramChannel
 import scala.util.Random
 

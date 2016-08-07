@@ -3,7 +3,9 @@ package akka.serialization
 /**
   * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
   */
-import java.io.{ObjectOutputStream, ByteArrayOutputStream, ByteArrayInputStream}
+import java.io.{
+  ObjectOutputStream, ByteArrayOutputStream, ByteArrayInputStream
+}
 import java.util.concurrent.Callable
 import akka.util.ClassLoaderObjectInputStream
 import akka.actor.ExtendedActorSystem

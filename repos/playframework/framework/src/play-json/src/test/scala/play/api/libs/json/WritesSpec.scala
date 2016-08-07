@@ -3,7 +3,9 @@
  */
 package play.api.libs.json
 
-import java.time.{Instant, LocalDateTime, LocalDate, OffsetDateTime, ZonedDateTime, ZoneOffset}
+import java.time.{
+  Instant, LocalDateTime, LocalDate, OffsetDateTime, ZonedDateTime, ZoneOffset
+}
 import java.time.format.DateTimeFormatter
 
 object WritesSpec extends org.specs2.mutable.Specification {

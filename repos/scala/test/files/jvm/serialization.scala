@@ -204,7 +204,10 @@ object Test1_scala {
 // Test classes in package "scala.collection.immutable"
 
 object Test2_immutable {
-  import scala.collection.immutable.{BitSet, HashMap, HashSet, ListMap, ListSet, Queue, Range, SortedMap, SortedSet, Stack, Stream, TreeMap, TreeSet, Vector}
+  import scala.collection.immutable.{
+    BitSet, HashMap, HashSet, ListMap, ListSet, Queue, Range, SortedMap,
+    SortedSet, Stack, Stream, TreeMap, TreeSet, Vector
+  }
 
   // in alphabetic order
   try {
@@ -308,7 +311,11 @@ object Test2_immutable {
 @deprecated("Suppress warnings", since = "2.11")
 object Test3_mutable {
   import scala.reflect.ClassManifest
-  import scala.collection.mutable.{ArrayBuffer, ArrayBuilder, ArraySeq, ArrayStack, BitSet, DoubleLinkedList, HashMap, HashSet, History, LinkedHashMap, LinkedHashSet, LinkedList, ListBuffer, Publisher, Queue, Stack, StringBuilder, WrappedArray, TreeSet}
+  import scala.collection.mutable.{
+    ArrayBuffer, ArrayBuilder, ArraySeq, ArrayStack, BitSet, DoubleLinkedList,
+    HashMap, HashSet, History, LinkedHashMap, LinkedHashSet, LinkedList,
+    ListBuffer, Publisher, Queue, Stack, StringBuilder, WrappedArray, TreeSet
+  }
   import scala.collection.concurrent.TrieMap
 
   // in alphabetic order

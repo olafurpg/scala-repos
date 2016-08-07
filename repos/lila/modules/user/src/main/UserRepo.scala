@@ -22,7 +22,9 @@ object UserRepo {
   import User.{BSONFields => F}
 
   private val coll = userTube.coll
-  import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{Match, Project, Group, GroupField, SumField, SumValue}
+  import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+    Match, Project, Group, GroupField, SumField, SumValue
+  }
 
   val normalize = User normalize _
 

@@ -39,10 +39,8 @@ object Workflow {
       evaluatorParams: Params,
       env: Map[String, String] = WorkflowUtils.pioEnvVars,
       params: WorkflowParams = WorkflowParams()) {
-
     implicit lazy val formats = Utils.json4sDefaultFormats +
       new NameParamsSerializer
-
     val engineInstance = EngineInstance(
       id = "",
       status = "INIT",
@@ -64,7 +62,6 @@ object Workflow {
       evaluatorResults = "",
       evaluatorResultsHTML = "",
       evaluatorResultsJSON = "")
-
     CoreWorkflow.runEval(
       engine = engine,
       engineParams = engineParams,

@@ -84,8 +84,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         val typed =
           expr filter
             (t =>
-                  t.tpe != null && t.tpe != NoType && !t
-                    .isInstanceOf[TypeTree])
+               t.tpe != null && t.tpe != NoType && !t.isInstanceOf[TypeTree])
         if (!typed.isEmpty)
           throw ToolBoxError(
               "reflective toolbox has failed: cannot operate on trees that are already typed")
@@ -93,7 +92,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         if (expr.freeTypes.nonEmpty) {
           val ft_s =
             expr.freeTypes map (ft =>
-                  s"  ${ft.name} ${ft.origin}") mkString "\n  "
+                                  s"  ${ft.name} ${ft.origin}") mkString "\n  "
           throw ToolBoxError(s"""
             |reflective toolbox failed due to unresolved free type variables:
             |$ft_s
@@ -116,15 +115,15 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
           scala.collection.mutable.LinkedHashMap[FreeTermSymbol, TermName]()
         freeTerms foreach
           (ft => {
-                var name = ft.name.toString
-                val namesakes =
-                  freeTerms takeWhile (_ != ft) filter
-                    (ft2 => ft != ft2 && ft.name == ft2.name)
-                if (namesakes.length > 0)
-                  name += ("$" + (namesakes.length + 1))
-                freeTermNames +=
-                  (ft -> newTermName(name + nme.REIFY_FREE_VALUE_SUFFIX))
-              })
+             var name = ft.name.toString
+             val namesakes =
+               freeTerms takeWhile (_ != ft) filter
+                 (ft2 => ft != ft2 && ft.name == ft2.name)
+             if (namesakes.length > 0)
+               name += ("$" + (namesakes.length + 1))
+             freeTermNames +=
+               (ft -> newTermName(name + nme.REIFY_FREE_VALUE_SUFFIX))
+           })
         val expr = new Transformer {
           override def transform(tree: Tree): Tree =
             if (tree.hasSymbolField && tree.symbol.isFreeTerm) {
@@ -220,8 +219,8 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
               dummies1 map (_.symbol),
               dummies1 map
                 (dummy =>
-                      SingleType(NoPrefix,
-                                 invertedIndex(dummy.symbol.name.toTermName))))
+                   SingleType(NoPrefix,
+                              invertedIndex(dummy.symbol.name.toTermName))))
             .traverse(result)
           result
         })
@@ -316,8 +315,8 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         val freeTerms = expr.freeTerms // need to calculate them here, because later on they will be erased
         val thunks =
           freeTerms map (fte =>
-                () =>
-                  fte.value) // need to be lazy in order not to distort evaluation order
+                           () =>
+                             fte.value) // need to be lazy in order not to distort evaluation order
         verify(expr)
 
         def wrapInModule(expr0: Tree): ModuleDef = {

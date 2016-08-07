@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 /**
-  * Surrounds block with try - catch: try { Block } catch { <Cursor> } 
+  * Surrounds block with try - catch: try { Block } catch { <Cursor> }
   */
 class ScalaWithTryCatchSurrounder extends ScalaExpressionSurrounder {
   override def getTemplateAsString(elements: Array[PsiElement]): String = {

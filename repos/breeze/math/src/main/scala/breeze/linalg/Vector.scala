@@ -1,13 +1,10 @@
 package breeze.linalg
 /*
  Copyright 2012 David Hall
-
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -340,8 +337,7 @@ object Vector extends VectorConstructors[Vector] with VectorOps {
   }
 }
 
-trait VectorOps {
-  this: Vector.type =>
+trait VectorOps { this: Vector.type =>
   import breeze.math.PowImplicits._
 
   @expand.valify
@@ -431,7 +427,6 @@ trait VectorOps {
 
   /*
   @expand
-
   implicit def cast_v_v_Op[V1, V2,
   @expand.args(Int, Double, Float, Long) T,
   @expand.args(OpAdd, OpSub, OpMulScalar,OpDiv, OpSet, OpMod, OpPow) Op <: OpType](implicit v1: V1<:<Vector[T], v2: V2<:<Vector[T]) = {

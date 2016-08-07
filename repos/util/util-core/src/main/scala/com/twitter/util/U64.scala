@@ -4,7 +4,10 @@
 
 package com.twitter.util
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, DataInputStream,
+  DataOutputStream
+}
 import scala.language.implicitConversions
 
 class RichU64Long(l64: Long) {

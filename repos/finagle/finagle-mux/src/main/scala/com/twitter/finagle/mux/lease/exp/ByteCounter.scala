@@ -49,9 +49,7 @@ private[lease] class WindowedByteCounter private[lease] (
   /*
    Should we be conservative wrt. count vs. usage?
    Count collections unobserved?
-
    Should the window size be in bytes?
-
    Should the "time" be monotonically increasing? With
    markers for when Gcs happen? (or rather, remaining just
    answers that..)

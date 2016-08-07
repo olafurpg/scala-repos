@@ -58,7 +58,6 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
   /* TODO
   def first: FirstLazyOption[A] =
     this.*-->[FirstLazyOption[A]]
-
   def last: LastLazyOption[A] =
     this.*-->[LastLazyOption[A]]
    */

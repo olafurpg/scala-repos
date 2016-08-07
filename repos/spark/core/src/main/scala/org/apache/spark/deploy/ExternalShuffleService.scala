@@ -26,7 +26,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.network.TransportContext
 import org.apache.spark.network.netty.SparkTransportConf
 import org.apache.spark.network.sasl.SaslServerBootstrap
-import org.apache.spark.network.server.{TransportServer, TransportServerBootstrap}
+import org.apache.spark.network.server.{
+  TransportServer, TransportServerBootstrap
+}
 import org.apache.spark.network.shuffle.ExternalShuffleBlockHandler
 import org.apache.spark.network.util.TransportConf
 import org.apache.spark.util.{ShutdownHookManager, Utils}

@@ -246,7 +246,6 @@ class LinearProgram {
     val id = variables.length
     variables += this
     variables += this
-
      def coefficients = {
       val v = SparseVector.zeros[Double](variables.length)
       v(id) = 1
@@ -345,32 +344,25 @@ object LinearProgram {
       val lpsol = LpSolve.makeLp(0, lp.variables.length)
       try {
         import lp._
-
         def relationToConstraintType(r: Relation) = r match {
           case LTE => LpSolve.LE
           case GTE => LpSolve.GE
           case EQ => LpSolve.EQ
         }
-
         lpsol.setVerbose(LpSolve.IMPORTANT)
-
         for( (v, i) <- variables.zipWithIndex) {
           v match  {
             case x: Real =>
             case x: Integer => lpsol.setInt(i+1, true)
             case x: Binary => lpsol.setBinary(i+1, true)
           }
-
         }
-
         for( c <- objective.constraints) yield {
           val cs = c.standardize
           lpsol.addConstraint(0.0 +: cs.lhs.coefficients.toDenseVector.data, relationToConstraintType(cs.relation), cs.rhs.scalarComponent)
         }
         lpsol.setObjFn(objective.objective.scalarComponent +: objective.objective.coefficients.toDenseVector.data)
         lpsol.setMaxim()
-
-
         val status = lpsol.solve()
         val result = status match {
           case 0 =>
@@ -387,9 +379,7 @@ object LinearProgram {
       } finally {
         lpsol.deleteLp()
       }
-
     }
-
     def lpStatusToString(status: Int) = status match {
       case -5 => "UnknownError"
       case -4 => "DataIgnored"

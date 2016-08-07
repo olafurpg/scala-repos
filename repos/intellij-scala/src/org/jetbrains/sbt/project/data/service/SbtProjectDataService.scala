@@ -7,10 +7,14 @@ import com.intellij.compiler.{CompilerConfiguration, CompilerConfigurationImpl}
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
-import com.intellij.openapi.externalSystem.util.{ExternalSystemApiUtil, ExternalSystemUtil}
+import com.intellij.openapi.externalSystem.util.{
+  ExternalSystemApiUtil, ExternalSystemUtil
+}
 import com.intellij.openapi.module.{ModuleManager, ModuleUtil}
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.{LanguageLevelProjectExtension, ProjectRootManager}
+import com.intellij.openapi.roots.{
+  LanguageLevelProjectExtension, ProjectRootManager
+}
 import org.jetbrains.plugins.scala.project.IncrementalityType
 import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings

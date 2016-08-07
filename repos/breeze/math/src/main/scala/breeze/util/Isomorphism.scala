@@ -31,6 +31,5 @@ object Isomorphism {
 
   /*
   // Scalala lenses:
-
  */
 }

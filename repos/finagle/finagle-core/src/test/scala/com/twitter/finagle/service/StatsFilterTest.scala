@@ -1,7 +1,10 @@
 package com.twitter.finagle.service
 
 import com.twitter.conversions.time._
-import com.twitter.finagle.stats.{CategorizingExceptionStatsHandler, ExceptionStatsHandler, InMemoryStatsReceiver}
+import com.twitter.finagle.stats.{
+  CategorizingExceptionStatsHandler, ExceptionStatsHandler,
+  InMemoryStatsReceiver
+}
 import com.twitter.finagle._
 import com.twitter.util._
 import java.util.concurrent.TimeUnit

@@ -15,7 +15,9 @@ import slick.dbio._
 import slick.jdbc.meta.{MColumn, MTable}
 import slick.lifted._
 import slick.model.{ForeignKeyAction, Model}
-import slick.relational.{RelationalCapabilities, ResultConverter, RelationalProfile}
+import slick.relational.{
+  RelationalCapabilities, ResultConverter, RelationalProfile
+}
 import slick.basic.Capability
 import slick.util.ConstArray
 import slick.util.MacroSupport.macroSupportInterpolation

@@ -6,7 +6,9 @@ import org.apache.zookeeper.{CreateMode, KeeperException}
 
 import com.twitter.concurrent.Permit
 import com.twitter.util.Future
-import com.twitter.zk.coordination.ZkAsyncSemaphore.{LackOfConsensusException, PermitMismatchException, PermitNodeException}
+import com.twitter.zk.coordination.ZkAsyncSemaphore.{
+  LackOfConsensusException, PermitMismatchException, PermitNodeException
+}
 import com.twitter.zk.{ZNode, ZkClient}
 
 object ShardCoordinator {

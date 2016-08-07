@@ -7,7 +7,9 @@ import java.util.Hashtable
 import scala.collection.mutable.ListBuffer
 import scala.util.DynamicVariable
 import scala.xml.{Elem, Node => XNode, XML}
-import testing.{Event => TEvent, Status => TStatus, OptionalThrowable, TestSelector}
+import testing.{
+  Event => TEvent, Status => TStatus, OptionalThrowable, TestSelector
+}
 
 /**
   * A tests listener that outputs the results it receives in junit xml

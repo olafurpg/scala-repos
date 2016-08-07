@@ -12,7 +12,9 @@ import javax.inject.{Singleton, Inject, Provider}
 import org.asynchttpclient.netty.ssl.JsseSslEngineFactory
 import org.slf4j.LoggerFactory
 
-import org.asynchttpclient.{DefaultAsyncHttpClientConfig, AsyncHttpClientConfig}
+import org.asynchttpclient.{
+  DefaultAsyncHttpClientConfig, AsyncHttpClientConfig
+}
 
 import javax.net.ssl._
 import play.api.{ConfigLoader, PlayConfig, Environment, Configuration}

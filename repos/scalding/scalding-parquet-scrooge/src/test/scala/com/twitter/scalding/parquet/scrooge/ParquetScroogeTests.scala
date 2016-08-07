@@ -1,6 +1,9 @@
 package com.twitter.scalding.parquet.scrooge
 
-import com.twitter.scalding.parquet.{StrictColumnProjectionString, DeprecatedColumnProjectionString, ParquetSourcesTestsBase}
+import com.twitter.scalding.parquet.{
+  StrictColumnProjectionString, DeprecatedColumnProjectionString,
+  ParquetSourcesTestsBase
+}
 import com.twitter.scrooge.ThriftStruct
 import org.apache.thrift.protocol.TProtocol
 import org.apache.parquet.filter2.predicate.FilterPredicate

@@ -45,7 +45,7 @@ import scalafx.util.StringConverter
   * @define FLVINITDEPREC Added to satisfy Spec tests.
   * @define ITEMSPARAM Zero or more items that will be shown to the user when the `ComboBox` menu is showing.
   * @define CONVPARAM A [[scalafx.util.StringConverter]] to convert the given item (of type T) to a String for displaying to the user.
-  * @define RET A function that will return a ListCell that is able to work on the type of element contained within the ListView. 
+  * @define RET A function that will return a ListCell that is able to work on the type of element contained within the ListView.
   */
 object ComboBoxListCell {
 
@@ -148,7 +148,7 @@ object ComboBoxListCell {
   * @define CONSTRCONVERTER Creates a $CBLC instance with the given items being used to populate the $CMBX when it is shown, and the $STCV being used to convert the item in to a user-readable form.
   * @define CONSTITEMS Creates a default $CBLC instance with the given items being used to populate the $CMBX when it is shown.
   * @define CONVPARAM A $STCV that can convert an item of type T into a user-readable string so that it may then be shown in the $CMBX popup menu.
-  * @define ITEMSPARAM The items to show in the $CMBX popup menu when selected by the user. 
+  * @define ITEMSPARAM The items to show in the $CMBX popup menu when selected by the user.
   */
 class ComboBoxListCell[T](
     override val delegate: jfxscc.ComboBoxListCell[T] =

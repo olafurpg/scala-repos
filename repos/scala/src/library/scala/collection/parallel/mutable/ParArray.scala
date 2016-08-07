@@ -53,8 +53,7 @@ class ParArray[T] private[mutable] (val arrayseq: ArraySeq[T])
     extends ParSeq[T]
     with GenericParTemplate[T, ParArray]
     with ParSeqLike[T, ParArray[T], ArraySeq[T]]
-    with Serializable {
-  self =>
+    with Serializable { self =>
 
   @transient private var array: Array[Any] =
     arrayseq.array.asInstanceOf[Array[Any]]

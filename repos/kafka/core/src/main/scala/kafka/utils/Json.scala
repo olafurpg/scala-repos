@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -49,8 +49,8 @@ object Json extends Logging {
     * Encode an object into a JSON string. This method accepts any type T where
     *   T => null | Boolean | String | Number | Map[String, T] | Array[T] | Iterable[T]
     * Any other type will result in an exception.
-    * 
-    * This method does not properly handle non-ascii characters. 
+    *
+    * This method does not properly handle non-ascii characters.
     */
   def encode(obj: Any): String = {
     obj match {

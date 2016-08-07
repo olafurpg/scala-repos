@@ -22,7 +22,9 @@ import java.util.Random
 import scala.collection.mutable
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.sql.catalyst.expressions.{BoundReference, MutableRow, SpecificMutableRow}
+import org.apache.spark.sql.catalyst.expressions.{
+  BoundReference, MutableRow, SpecificMutableRow
+}
 import org.apache.spark.sql.types.{DataType, IntegerType}
 
 class HyperLogLogPlusPlusSuite extends SparkFunSuite {

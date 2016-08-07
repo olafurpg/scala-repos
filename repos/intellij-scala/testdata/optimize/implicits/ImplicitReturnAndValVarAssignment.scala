@@ -37,7 +37,6 @@ trait Scratch {
   case object V
   case object W
   case object X
-
   object Implicits1 {
     implicit def TToInt(t: T.type): Int = 0
     implicit def UToInt(t: U.type): Int = 0
@@ -49,18 +48,13 @@ trait Scratch {
   }
   import Implicits1.{TToInt, UToInt, VToInt}
   import Implicits2.{WToInt, XToInt}
-
   def t: Int = {
     return T
   }
-
   def u: Int = {
     U
   }
-
   val v: Int = V
-
   var w: Int = W
-
   (X: Int)
 }*/

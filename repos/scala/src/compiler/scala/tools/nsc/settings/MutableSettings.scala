@@ -967,8 +967,8 @@ class MutableSettings(val errorFn: String => Unit)
     private def phaseIdTest(i: Int): Boolean =
       numericValues exists
         (_ match {
-              case (min, max) => min <= i && i <= max
-            })
+          case (min, max) => min <= i && i <= max
+        })
 
     def tryToSet(args: List[String]) =
       if (default == "") errorAndValue("missing phase", None)
@@ -1008,8 +1008,8 @@ class MutableSettings(val errorFn: String => Unit)
     def enablingIfNotSetByUser(toEnable: List[BooleanSetting]): s.type =
       s withPostSetHook
         (_ =>
-              toEnable foreach
-                (sett => if (!sett.isSetByUser) sett.value = s.value))
+           toEnable foreach
+             (sett => if (!sett.isSetByUser) sett.value = s.value))
     def enabling(toEnable: List[BooleanSetting]): s.type =
       s withPostSetHook (_ => toEnable foreach (_.value = s.value))
     def disabling(toDisable: List[BooleanSetting]): s.type =

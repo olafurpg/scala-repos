@@ -9,9 +9,14 @@ import scala.concurrent.duration.{FiniteDuration, Duration}
 import Def.ScopedKey
 import sbt.internal.util.complete._
 import sbt.internal.inc.Locate.DefinesClass
-import sbt.internal.inc.{ClasspathOptions, MixedAnalyzingCompiler, ScalaInstance}
+import sbt.internal.inc.{
+  ClasspathOptions, MixedAnalyzingCompiler, ScalaInstance
+}
 import std.TaskExtra._
-import xsbti.compile.{CompileAnalysis, CompileOptions, CompileOrder, Compilers, CompileResult, GlobalsCache, IncOptions, Inputs, PreviousResult, Setup}
+import xsbti.compile.{
+  CompileAnalysis, CompileOptions, CompileOrder, Compilers, CompileResult,
+  GlobalsCache, IncOptions, Inputs, PreviousResult, Setup
+}
 import scala.xml.{Node => XNode, NodeSeq}
 import org.apache.ivy.core.module.{descriptor, id}
 import descriptor.ModuleDescriptor, id.ModuleRevisionId
@@ -24,8 +29,18 @@ import sbt.internal.io.WatchState
 import sbt.internal.util.AttributeKey
 
 import sbt.librarymanagement.Configurations.CompilerPlugin
-import sbt.librarymanagement.{Artifact, Configuration, ConflictManager, ConflictWarning, Credentials, CrossVersion, Developer, EvictionWarning, EvictionWarningOptions, IvyScala, MavenRepository, ModuleConfiguration, ModuleID, ModuleInfo, Resolver, ScalaVersion, ScmInfo, UpdateOptions, UpdateReport}
-import sbt.internal.librarymanagement.{CompatibilityWarningOptions, DeliverConfiguration, GetClassifiersModule, IvyConfiguration, IvyPaths, IvySbt, MakePomConfiguration, ModuleSettings, PublishConfiguration, RetrieveConfiguration, SbtExclusionRule, UnresolvedWarningConfiguration, UpdateConfiguration, UpdateLogging}
+import sbt.librarymanagement.{
+  Artifact, Configuration, ConflictManager, ConflictWarning, Credentials,
+  CrossVersion, Developer, EvictionWarning, EvictionWarningOptions, IvyScala,
+  MavenRepository, ModuleConfiguration, ModuleID, ModuleInfo, Resolver,
+  ScalaVersion, ScmInfo, UpdateOptions, UpdateReport
+}
+import sbt.internal.librarymanagement.{
+  CompatibilityWarningOptions, DeliverConfiguration, GetClassifiersModule,
+  IvyConfiguration, IvyPaths, IvySbt, MakePomConfiguration, ModuleSettings,
+  PublishConfiguration, RetrieveConfiguration, SbtExclusionRule,
+  UnresolvedWarningConfiguration, UpdateConfiguration, UpdateLogging
+}
 import sbt.util.{AbstractLogger, Level, Logger}
 import sbt.internal.util.SourcePosition
 

@@ -135,33 +135,33 @@ object Template extends Logging {
     val newReposCache =
       reposCache ++
         (try {
-              repos.map { repo =>
-                val url = s"https://api.github.com/repos/$repo/$apiType"
-                val http = httpOptionalProxy(url)
-                val response =
-                  reposCache.get(repo).map { cache =>
-                    cache.headers.get("ETag").map { etag =>
-                      http.header("If-None-Match", etag).asString
-                    } getOrElse {
-                      http.asString
-                    }
-                  } getOrElse {
-                    http.asString
-                  }
-
-                val body = if (response.code == 304) {
-                  reposCache(repo).body
-                } else {
-                  response.body
+          repos.map { repo =>
+            val url = s"https://api.github.com/repos/$repo/$apiType"
+            val http = httpOptionalProxy(url)
+            val response =
+              reposCache.get(repo).map { cache =>
+                cache.headers.get("ETag").map { etag =>
+                  http.header("If-None-Match", etag).asString
+                } getOrElse {
+                  http.asString
                 }
+              } getOrElse {
+                http.asString
+              }
 
-                repo -> GitHubCache(headers = response.headers, body = body)
-              }.toMap
-            } catch {
-              case e: ConnectException =>
-                githubConnectErrorMessage(e)
-                Map()
-            })
+            val body = if (response.code == 304) {
+              reposCache(repo).body
+            } else {
+              response.body
+            }
+
+            repo -> GitHubCache(headers = response.headers, body = body)
+          }.toMap
+        } catch {
+          case e: ConnectException =>
+            githubConnectErrorMessage(e)
+            Map()
+        })
     FileUtils.writeStringToFile(new File(repoFilename),
                                 write(newReposCache),
                                 "ISO-8859-1")

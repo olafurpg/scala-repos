@@ -200,16 +200,17 @@ abstract class RefChecks
       // This has become noisy with implicit classes.
       if (settings.warnPolyImplicitOverload && settings.developer) {
         clazz.info.decls filter (x =>
-              x.isImplicit && x.typeParams.nonEmpty) foreach { sym =>
-          // implicit classes leave both a module symbol and a method symbol as residue
-          val alts =
-            clazz.info.decl(sym.name).alternatives filterNot (_.isModule)
-          if (alts.size > 1)
-            alts foreach
-              (x =>
-                    reporter.warning(
-                        x.pos,
-                        "parameterized overloaded implicit methods are not visible as view bounds"))
+                                   x.isImplicit && x.typeParams.nonEmpty) foreach {
+          sym =>
+            // implicit classes leave both a module symbol and a method symbol as residue
+            val alts =
+              clazz.info.decl(sym.name).alternatives filterNot (_.isModule)
+            if (alts.size > 1)
+              alts foreach
+                (x =>
+                   reporter.warning(
+                       x.pos,
+                       "parameterized overloaded implicit methods are not visible as view bounds"))
         }
       }
     }
@@ -268,8 +269,8 @@ abstract class RefChecks
               val inherited1 =
                 inherited filter
                   (sym =>
-                        !(sym hasFlag VBRIDGE) &&
-                          (self memberType sym matches jtpe))
+                     !(sym hasFlag VBRIDGE) &&
+                       (self memberType sym matches jtpe))
               if (inherited1.exists) bridges += varargBridge(member, jtpe)
             }
           }
@@ -830,7 +831,8 @@ abstract class RefChecks
                                             .format(pa)
                                         else if (pa.prefix =:= pc.prefix)
                                           ": their type parameters differ"
-                                        else ": their prefixes (i.e. enclosing instances) differ"
+                                        else
+                                          ": their prefixes (i.e. enclosing instances) differ"
                                       } else if (abstractSym isSubClass concreteSym)
                                         subclassMsg(abstractSym, concreteSym)
                                       else if (concreteSym isSubClass abstractSym)

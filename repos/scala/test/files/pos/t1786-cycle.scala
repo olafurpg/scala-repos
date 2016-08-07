@@ -18,10 +18,7 @@ test/files/pos/t1786-cycle.scala:11: error: illegal cyclic reference involving t
 trait LongTraversableLike[+Repr <: LongTraversableLike[Repr]] extends GenTraversableLike[Any, Repr]
                                                                       ^
 one error found
-
 Okay again after SI-1786 was reverted.
-
-
 |-- object O BYVALmode-EXPRmode (site: package <empty>)
 |    |-- super EXPRmode-POLYmode-QUALmode (silent: <init> in O)
 |    |    |-- this EXPRmode (silent: <init> in O)

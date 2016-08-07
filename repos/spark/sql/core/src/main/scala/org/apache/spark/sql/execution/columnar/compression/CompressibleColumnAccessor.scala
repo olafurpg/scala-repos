@@ -18,12 +18,13 @@
 package org.apache.spark.sql.execution.columnar.compression
 
 import org.apache.spark.sql.catalyst.expressions.MutableRow
-import org.apache.spark.sql.execution.columnar.{ColumnAccessor, NativeColumnAccessor}
+import org.apache.spark.sql.execution.columnar.{
+  ColumnAccessor, NativeColumnAccessor
+}
 import org.apache.spark.sql.types.AtomicType
 
 private[columnar] trait CompressibleColumnAccessor[T <: AtomicType]
-    extends ColumnAccessor {
-  this: NativeColumnAccessor[T] =>
+    extends ColumnAccessor { this: NativeColumnAccessor[T] =>
 
   private var decoder: Decoder[T] = _
 

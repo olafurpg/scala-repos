@@ -14,7 +14,8 @@ object MacroUtils {
     * Char predicates that are unfeasible at runtime, e.g. because they're too
     * slow or because they don't work in Scala.js
     */
-  def preCompute(pred: Char => Boolean): fastparse.Utils.CharBitSet = macro preComputeImpl
+  def preCompute(pred: Char => Boolean): fastparse.Utils.CharBitSet =
+    macro preComputeImpl
 
   def preComputeImpl(c: Compat.Context)(
       pred: c.Expr[Char => Boolean]): c.Expr[Utils.CharBitSet] = {
@@ -142,7 +143,7 @@ object Utils {
   final class TrieNode(strings: Seq[String]) {
 
     val (min, max, arr) = {
-      val children = strings.filter(!_.isEmpty).groupBy(_ (0)).map {
+      val children = strings.filter(!_.isEmpty).groupBy(_(0)).map {
         case (k, ss) => k -> new TrieNode(ss.map(_.tail))
       }
       if (children.size == 0) (0.toChar, 0.toChar, new Array[TrieNode](0))

@@ -26,7 +26,9 @@ import org.apache.hadoop.conf.{Configurable, Configuration}
 import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapreduce._
 import org.apache.hadoop.mapreduce.lib.input.{CombineFileSplit, FileSplit}
-import org.apache.hadoop.mapreduce.task.{JobContextImpl, TaskAttemptContextImpl}
+import org.apache.hadoop.mapreduce.task.{
+  JobContextImpl, TaskAttemptContextImpl
+}
 
 import org.apache.spark.{Partition => SparkPartition, _}
 import org.apache.spark.broadcast.Broadcast

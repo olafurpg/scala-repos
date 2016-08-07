@@ -5,7 +5,9 @@ package akka.actor.dungeon
 
 import akka.actor.PostRestartException
 import akka.actor.PreRestartException
-import akka.actor.{InternalActorRef, ActorRef, ActorInterruptedException, ActorCell, Actor}
+import akka.actor.{
+  InternalActorRef, ActorRef, ActorInterruptedException, ActorCell, Actor
+}
 import akka.dispatch._
 import akka.dispatch.sysmsg._
 import akka.event.Logging
@@ -17,8 +19,7 @@ import scala.util.control.Exception._
 import scala.util.control.NonFatal
 import akka.actor.ActorRefScope
 
-private[akka] trait FaultHandling {
-  this: ActorCell ⇒
+private[akka] trait FaultHandling { this: ActorCell ⇒
 
   /* =================
    * T H E   R U L E S
@@ -278,14 +279,14 @@ private[akka] trait FaultHandling {
       // only after parent is up and running again do restart the children which were not stopped
       survivors foreach
         (child ⇒
-              try child.asInstanceOf[InternalActorRef].restart(cause)
-              catch handleNonFatalOrInterruptedException { e ⇒
-                publish(
-                    Error(e,
-                          self.path.toString,
-                          clazz(freshActor),
-                          "restarting " + child))
-            })
+           try child.asInstanceOf[InternalActorRef].restart(cause)
+           catch handleNonFatalOrInterruptedException { e ⇒
+             publish(
+                 Error(e,
+                       self.path.toString,
+                       clazz(freshActor),
+                       "restarting " + child))
+           })
     } catch handleNonFatalOrInterruptedException { e ⇒
       clearActorFields(actor, recreate = false) // in order to prevent preRestart() from happening again
       handleInvokeFailure(survivors, new PostRestartException(self, e, cause))

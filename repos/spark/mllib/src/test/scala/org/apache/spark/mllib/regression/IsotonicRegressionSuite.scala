@@ -62,13 +62,11 @@ class IsotonicRegressionSuite
   test("increasing isotonic regression") {
     /*
      The following result could be re-produced with sklearn.
-
      > from sklearn.isotonic import IsotonicRegression
      > x = range(9)
      > y = [1, 2, 3, 1, 6, 17, 16, 17, 18]
      > ir = IsotonicRegression(x, y)
      > print ir.predict(x)
-
      array([  1. ,   2. ,   2. ,   2. ,   6. ,  16.5,  16.5,  17. ,  18. ])
      */
     val model = runIsotonicRegression(Seq(1, 2, 3, 1, 6, 17, 16, 17, 18), true)

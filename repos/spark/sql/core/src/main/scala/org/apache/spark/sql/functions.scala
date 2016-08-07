@@ -2691,7 +2691,6 @@ object functions {
       UserDefinedFunction(f, ScalaReflection.schemaFor(typeTag[RT]).dataType, inputTypes)
     }""")
   }
-
    */
   /**
     * Defines a user-defined function of 0 arguments as user-defined function (UDF).

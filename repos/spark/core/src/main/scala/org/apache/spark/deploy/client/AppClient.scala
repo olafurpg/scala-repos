@@ -18,7 +18,9 @@
 package org.apache.spark.deploy.client
 
 import java.util.concurrent._
-import java.util.concurrent.{Future => JFuture, ScheduledFuture => JScheduledFuture}
+import java.util.concurrent.{
+  Future => JFuture, ScheduledFuture => JScheduledFuture
+}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
 
 import scala.util.control.NonFatal

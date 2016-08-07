@@ -17,7 +17,9 @@ import scala.reflect.io.{File, Directory, Path, AbstractFile}
 import scala.reflect.runtime.ReflectionUtils
 import ClassPath.{JavaContext, DefaultJavaContext, split}
 import PartialFunction.condOpt
-import scala.tools.nsc.classpath.{AggregateFlatClassPath, ClassPathFactory, FlatClassPath, FlatClassPathFactory}
+import scala.tools.nsc.classpath.{
+  AggregateFlatClassPath, ClassPathFactory, FlatClassPath, FlatClassPathFactory
+}
 import scala.tools.nsc.settings.ClassPathRepresentationType
 
 // Loosely based on the draft specification at:

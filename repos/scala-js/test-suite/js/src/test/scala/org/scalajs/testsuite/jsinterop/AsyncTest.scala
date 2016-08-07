@@ -115,7 +115,7 @@ class AsyncTest {
         implicit val executor = QueueExecutionContext()
         queueExecOrderTests { () =>
           tick(1)
-          optProcessQueue.foreach(_ ())
+          optProcessQueue.foreach(_())
         }
       }
     }

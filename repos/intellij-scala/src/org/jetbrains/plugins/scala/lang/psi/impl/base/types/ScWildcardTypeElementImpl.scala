@@ -10,7 +10,9 @@ import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
-import org.jetbrains.plugins.scala.lang.psi.types.{ScExistentialArgument, ScExistentialType, ScTypeVariable}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScExistentialArgument, ScExistentialType, ScTypeVariable
+}
 
 /**
   * @author Alexander Podkhalyuzin

@@ -21,7 +21,9 @@ import java.nio.ByteBuffer
 
 import scala.collection.JavaConverters._
 
-import org.apache.mesos.{Executor => MesosExecutor, ExecutorDriver, MesosExecutorDriver}
+import org.apache.mesos.{
+  Executor => MesosExecutor, ExecutorDriver, MesosExecutorDriver
+}
 import org.apache.mesos.Protos.{TaskStatus => MesosTaskStatus, _}
 import org.apache.mesos.protobuf.ByteString
 

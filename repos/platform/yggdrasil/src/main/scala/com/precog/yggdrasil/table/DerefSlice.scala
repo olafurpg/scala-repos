@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -252,11 +252,10 @@ class DerefSlice(source: Slice, derefBy: PartialFunction[Int, CPathNode])
 /* A strict version
 derefBy.columns.headOption collect {
   case c: StrColumn =>
-    val transforms: Map[String, Map[ColumnRef, (Column, Column with ArrayColumn[_])]] = 
+    val transforms: Map[String, Map[ColumnRef, (Column, Column with ArrayColumn[_])]] =
       slice.columns.foldLeft(Map.empty[String, Map[ColumnRef, (Column, Column with ArrayColumn[_])]]) {
-        case (acc, (ColumnRef(CPath(CPathField(root), xs @ _*), ctype), col)) => 
+        case (acc, (ColumnRef(CPath(CPathField(root), xs @ _*), ctype), col)) =>
           val resultRef = ColumnRef(CPath(xs: _*), ctype)
-
           // find the result column if it exists, or else create a new one.
           val resultColumn = acc.get(root).flatMap(_.get(resultRef).map(_._2)).getOrElse(
             ctype match {
@@ -271,47 +270,35 @@ derefBy.columns.headOption collect {
               case CNull        => MutableNullColumn()
             }
           )
-
           val suffixes = acc.getOrElse(root, Map())
           // we know the combination of xs and ctype to be unique within root
           // the result column is shared between common occurrences of resultRef
           // across roots
           acc + (root -> (suffixes + (resultRef -> ((col, resultColumn)))))
       }
-
     for (i <- 0 until slice.size if c.isDefinedAt(i); cols <- transforms.get(c(i))) {
       cols foreach {
         case (_, (source: BoolColumn, target)) if source.isDefinedAt(i) =>
           target.asInstanceOf[ArrayColumn[Boolean]](i) = source(i)
-
         case (_, (source: LongColumn, target)) if source.isDefinedAt(i) =>
           target.asInstanceOf[ArrayColumn[Long]](i) = source(i)
-
         case (_, (source: DoubleColumn, target)) if source.isDefinedAt(i) =>
           target.asInstanceOf[ArrayColumn[Double]](i) = source(i)
-
         case (_, (source: NumColumn, target)) if source.isDefinedAt(i) =>
           target.asInstanceOf[ArrayColumn[BigDecimal]](i) = source(i)
-
         case (_, (source: StrColumn, target)) if source.isDefinedAt(i) =>
           target.asInstanceOf[ArrayColumn[String]](i) = source(i)
-
         case (_, (source: DateColumn, target)) if source.isDefinedAt(i) =>
           target.asInstanceOf[ArrayColumn[DateTime]](i) = source(i)
-
         case (_, (source: EmptyObjectColumn, target)) if source.isDefinedAt(i) =>
           target.asInstanceOf[ArrayColumn[Boolean]](i) = source.isDefinedAt(i)
-
         case (_, (source: EmptyArrayColumn, target)) if source.isDefinedAt(i) =>
           target.asInstanceOf[ArrayColumn[Boolean]](i) = source.isDefinedAt(i)
-
         case (_, (source: NullColumn, target)) if source.isDefinedAt(i) =>
           target.asInstanceOf[ArrayColumn[Boolean]](i) = source.isDefinedAt(i)
-
         case _ =>
       }
-    } 
-
+    }
     // we can safely throw out any duplicated keys, since the values for duplicated
     // keys are all shared
     transforms.values map { _.mapValues(_._2) } reduceOption { _ ++ _ } getOrElse { Map() }

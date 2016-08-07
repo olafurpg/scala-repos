@@ -173,7 +173,7 @@ trait ItemsList[T <: Mapper[T]] {
     case (Some(f), true) if f eq field =>
       () =>
         ascending = false
-      case _ | null =>
+    case _ | null =>
       () =>
         {
           sortField = Some(field)
@@ -269,7 +269,7 @@ trait ItemsListEditor[T <: Mapper[T]] {
   def customBind(item: T): NodeSeq => NodeSeq = (ns: NodeSeq) => ns
 
   def edit: (NodeSeq) => NodeSeq = {
-    def unsavedScript = ( <head>{Script(Run("""
+    def unsavedScript = (<head>{Script(Run("""
                            var safeToContinue = false
                            window.onbeforeunload = function(evt) {{  // thanks Tim!
                              if(!safeToContinue) {{

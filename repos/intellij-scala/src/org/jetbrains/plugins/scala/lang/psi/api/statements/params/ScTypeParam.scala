@@ -6,7 +6,9 @@ package statements
 package params
 
 import com.intellij.psi._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScPolymorphicElement, ScTypeParametersOwner}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScPolymorphicElement, ScTypeParametersOwner
+}
 
 /**
   * @author Alexander Podkhalyuzin

@@ -6,7 +6,9 @@ import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 
-import org.jboss.netty.channel.{Channels, Channel, ChannelHandlerContext, ChannelStateEvent, ChannelPipeline}
+import org.jboss.netty.channel.{
+  Channels, Channel, ChannelHandlerContext, ChannelStateEvent, ChannelPipeline
+}
 
 @RunWith(classOf[JUnitRunner])
 class ChannelClosingHandlerTest extends FunSuite with MockitoSugar {

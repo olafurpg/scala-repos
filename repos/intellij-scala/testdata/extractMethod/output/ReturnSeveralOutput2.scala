@@ -15,8 +15,6 @@ class ReturnSeveralOutput2 {
 /*
 class ReturnSeveralOutput2 {
   def foo(i: Int): Int = {
-
-
     val testMethodNameResult: (Int, String, Int, String) = testMethodName(i) match {
       case Left(toReturn) => return toReturn
       case Right(result) => result
@@ -25,12 +23,9 @@ class ReturnSeveralOutput2 {
     val y: String = testMethodNameResult._2
     var z: Int = testMethodNameResult._3
     val zz: String = testMethodNameResult._4
-
-
     println(x + y + z + zz)
     i
   }
-
   def testMethodName(i: Int): Either[Int, (Int, String, Int, String)] = {
     val x = i
     if (true) return Left(x)

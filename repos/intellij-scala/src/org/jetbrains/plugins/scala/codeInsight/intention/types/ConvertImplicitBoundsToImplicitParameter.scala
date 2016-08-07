@@ -11,10 +11,18 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.codeInsight.intention.types.ConvertImplicitBoundsToImplicitParameter._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScParameterClause}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScParameterOwner}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTrait}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScTypeBoundsOwner, ScTypeParametersOwner}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScParameterClause
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScParameterOwner
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScTrait
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScTypeBoundsOwner, ScTypeParametersOwner
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.refactoring.util.InplaceRenameHelper
 

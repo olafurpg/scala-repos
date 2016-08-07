@@ -6,7 +6,9 @@ import com.intellij.psi.{PsiMethod, PsiElement}
 import com.siyeh.ig.psiutils.MethodUtils
 import org.jetbrains.plugins.scala.codeInspection.collections.MethodRepr
 import org.jetbrains.plugins.scala.codeInspection.typeChecking.ComparingUnrelatedTypesInspection._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractInspection, InspectionBundle}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractInspection, InspectionBundle
+}
 import org.jetbrains.plugins.scala.extensions.{PsiClassExt, ResolvesTo}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction

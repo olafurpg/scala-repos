@@ -51,13 +51,11 @@ trait Zero {
 trait Functors {
   type M[+A] <: Functor[A]
 
-  trait Functor[+A] extends rules.Functor[A] {
-    this: M[A] =>
+  trait Functor[+A] extends rules.Functor[A] { this: M[A] =>
     type M[+A] = Functors.this.M[A]
   }
 
-  trait ZeroFunctor extends Functor[Nothing] {
-    this: M[Nothing] =>
+  trait ZeroFunctor extends Functor[Nothing] { this: M[Nothing] =>
     override def map[B](f: Nothing => B): M[B] = this
     def filter(f: Nothing => Boolean): M[Nothing] = this
     def plus[B](other: => M[B]): M[B] = other

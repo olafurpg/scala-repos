@@ -57,9 +57,15 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
     val _xml: NameType = "xml"
   }
 
-  import xmltypes.{_Comment, _Elem, _EntityRef, _Group, _MetaData, _NamespaceBinding, _NodeBuffer, _PCData, _PrefixedAttribute, _ProcInstr, _Text, _Unparsed, _UnprefixedAttribute}
+  import xmltypes.{
+    _Comment, _Elem, _EntityRef, _Group, _MetaData, _NamespaceBinding,
+    _NodeBuffer, _PCData, _PrefixedAttribute, _ProcInstr, _Text, _Unparsed,
+    _UnprefixedAttribute
+  }
 
-  import xmlterms.{_Null, __Elem, __Text, _buf, _md, _plus, _scope, _tmpscope, _xml}
+  import xmlterms.{
+    _Null, __Elem, __Text, _buf, _md, _plus, _scope, _tmpscope, _xml
+  }
 
   /** Attachment for trees deriving from text nodes (Text, CData, entities). Used for coalescing. */
   case class TextAttache(pos: Position, text: String)

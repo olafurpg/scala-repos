@@ -2,11 +2,15 @@ package org.scalatra
 package scalate
 
 import java.io.PrintWriter
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpSession}
+import javax.servlet.http.{
+  HttpServletRequest, HttpServletResponse, HttpSession
+}
 
 import org.fusesource.scalate.TemplateEngine
 import org.fusesource.scalate.servlet.ServletRenderContext
-import org.scalatra.servlet.{FileItem, FileMultiParams, FileUploadSupport, ServletBase}
+import org.scalatra.servlet.{
+  FileItem, FileMultiParams, FileUploadSupport, ServletBase
+}
 
 /**
   * A render context integrated with Scalatra.  Exposes a few extra

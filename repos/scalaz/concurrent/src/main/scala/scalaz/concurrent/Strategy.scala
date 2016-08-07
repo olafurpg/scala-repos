@@ -1,7 +1,9 @@
 package scalaz
 package concurrent
 
-import java.util.concurrent.{ScheduledExecutorService, ExecutorService, ThreadFactory, Executors}
+import java.util.concurrent.{
+  ScheduledExecutorService, ExecutorService, ThreadFactory, Executors
+}
 
 /**
   * Evaluate an expression in some specific manner. A typical strategy will schedule asynchronous

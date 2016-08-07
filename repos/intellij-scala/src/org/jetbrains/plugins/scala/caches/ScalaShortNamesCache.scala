@@ -9,7 +9,9 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.containers.HashSet
 import com.intellij.util.{ArrayUtil, Processor}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 
 import scala.collection.mutable.ArrayBuffer

@@ -4,7 +4,10 @@ package math
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
-import spire.algebra.{Eq, EuclideanRing, Field, IsReal, IsRational, NRoot, Order, Ring, Signed, Trig}
+import spire.algebra.{
+  Eq, EuclideanRing, Field, IsReal, IsRational, NRoot, Order, Ring, Signed,
+  Trig
+}
 import spire.std.bigDecimal._
 import spire.syntax.isReal._
 import spire.syntax.nroot._

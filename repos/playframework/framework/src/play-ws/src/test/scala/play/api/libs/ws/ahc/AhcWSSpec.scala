@@ -7,7 +7,10 @@ import akka.util.{ByteString, Timeout}
 import io.netty.handler.codec.http.{DefaultHttpHeaders, HttpHeaders}
 import org.asynchttpclient.Realm.AuthScheme
 import org.asynchttpclient.cookie.{Cookie => AHCCookie}
-import org.asynchttpclient.{AsyncHttpClient, DefaultAsyncHttpClientConfig, Param, Response => AHCResponse, Request => AHCRequest}
+import org.asynchttpclient.{
+  AsyncHttpClient, DefaultAsyncHttpClientConfig, Param,
+  Response => AHCResponse, Request => AHCRequest
+}
 import org.specs2.mock.Mockito
 import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.Await
@@ -92,14 +95,12 @@ object AhcWSSpec extends PlaySpecification with Mockito {
       val ahcRequest = request.setHeaders(headerMap).build
       ahcRequest.getHeaders.containsKey("key") must beTrue
     }
-
     "AhcWSRequest.setQueryString" in new WithApplication {
       val request = new AhcWSRequest(mock[AhcWSClient], "GET", None, None, Map.empty, EmptyBody, new RequestBuilder("GET"))
       val queryString: Map[String, Seq[String]] = Map("key" -> Seq("value"))
       val ahcRequest = request.setQueryString(queryString).build
       ahcRequest.getQueryParams().containsKey("key") must beTrue
     }
-
     "support several query string values for a parameter" in new WithApplication {
       val req = WS.url("http://playframework.com/")
         .withQueryString("foo" -> "foo1", "foo" -> "foo2").asInstanceOf[AhcWSRequestHolder]

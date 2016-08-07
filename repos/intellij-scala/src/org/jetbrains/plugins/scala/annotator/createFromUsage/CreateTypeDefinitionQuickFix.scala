@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala
 package annotator.createFromUsage
 
 import com.intellij.codeInsight.navigation.NavigationUtil
-import com.intellij.codeInsight.template.{TemplateBuilder, TemplateBuilderImpl, TemplateManager}
+import com.intellij.codeInsight.template.{
+  TemplateBuilder, TemplateBuilderImpl, TemplateManager
+}
 import com.intellij.codeInsight.{CodeInsightUtilCore, FileModificationService}
 import com.intellij.ide.util.PsiElementListCellRenderer
 import com.intellij.openapi.diagnostic.Logger
@@ -19,7 +21,9 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScParameterizedTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScTemplateDefinition, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaDirectoryService
 

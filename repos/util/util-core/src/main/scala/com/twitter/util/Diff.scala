@@ -15,7 +15,7 @@ trait Diff[CC[_], T] {
   def patch(coll: CC[T]): CC[T]
 
   /**
-    * Map the values present in the diff. The following 
+    * Map the values present in the diff. The following
     * invariant must hold:
     *
     * {{{
@@ -37,7 +37,7 @@ trait Diffable[CC[_]] {
   /**
     * Compute a [[Diff]] that may later be used to bring two
     * versions of a data structure into agreement; that is:
-    * 
+    *
     * {{{
     * Diffable.diff(a, b).patch(a) == b
     * }}}
@@ -119,7 +119,7 @@ object Diffable {
   /**
     * Compute a [[Diff]] that may later be used to bring two
     * versions of a data structure into agreement; that is:
-    * 
+    *
     * {{{
     * Diffable.diff(left, right).patch(left) == right
     * }}}

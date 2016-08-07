@@ -12,10 +12,14 @@ import com.intellij.psi._
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
-import com.intellij.refactoring.rename.inplace.{MemberInplaceRenamer, VariableInplaceRenamer}
+import com.intellij.refactoring.rename.inplace.{
+  MemberInplaceRenamer, VariableInplaceRenamer
+}
 import com.intellij.refactoring.{RefactoringActionHandler, RefactoringBundle}
 import org.jetbrains.plugins.scala.lang.refactoring.rename.ScalaRenameUtil
-import org.jetbrains.plugins.scala.lang.refactoring.util.{ScalaNamesUtil, ScalaRefactoringUtil}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  ScalaNamesUtil, ScalaRefactoringUtil
+}
 
 /**
   * Nikolay.Tropin

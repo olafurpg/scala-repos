@@ -21,7 +21,9 @@ import java.nio.{ByteBuffer, ByteOrder}
 
 import scala.annotation.tailrec
 
-import org.apache.spark.sql.catalyst.expressions.{MutableRow, UnsafeArrayData, UnsafeMapData, UnsafeRow}
+import org.apache.spark.sql.catalyst.expressions.{
+  MutableRow, UnsafeArrayData, UnsafeMapData, UnsafeRow
+}
 import org.apache.spark.sql.execution.columnar.compression.CompressibleColumnAccessor
 import org.apache.spark.sql.types._
 

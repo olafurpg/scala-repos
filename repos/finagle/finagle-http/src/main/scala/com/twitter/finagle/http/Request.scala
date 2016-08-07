@@ -8,7 +8,9 @@ import java.net.{InetAddress, InetSocketAddress}
 import java.util.{AbstractMap, List => JList, Map => JMap, Set => JSet}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.jboss.netty.channel.Channel
-import org.jboss.netty.handler.codec.embedder.{DecoderEmbedder, EncoderEmbedder}
+import org.jboss.netty.handler.codec.embedder.{
+  DecoderEmbedder, EncoderEmbedder
+}
 import org.jboss.netty.handler.codec.http._
 import scala.beans.BeanProperty
 import scala.annotation.varargs

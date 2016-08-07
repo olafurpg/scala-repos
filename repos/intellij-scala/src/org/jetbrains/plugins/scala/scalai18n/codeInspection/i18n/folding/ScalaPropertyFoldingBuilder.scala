@@ -10,8 +10,12 @@ import com.intellij.psi.impl.source.SourceTreeToPsiMap
 import com.intellij.util.ObjectUtils
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScExpression, ScMethodCall, ScReferenceExpression}
-import org.jetbrains.plugins.scala.lang.psi.api.{ScalaFile, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScArgumentExprList, ScExpression, ScMethodCall, ScReferenceExpression
+}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaFile, ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.util.ScalaConstantExpressionEvaluator
 import org.jetbrains.plugins.scala.scalai18n.codeInspection.i18n.ScalaI18nUtil
 

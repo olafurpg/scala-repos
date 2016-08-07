@@ -11,7 +11,9 @@ import mesosphere.marathon.api.v2.json.Formats
 import mesosphere.marathon.api.{AuthResource, MarathonMediaType}
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.launchqueue.LaunchQueue
-import mesosphere.marathon.plugin.auth.{Authenticator, Authorizer, UpdateApp, ViewApp}
+import mesosphere.marathon.plugin.auth.{
+  Authenticator, Authorizer, UpdateApp, ViewApp
+}
 import mesosphere.marathon.state.PathId._
 import play.api.libs.json.Json
 

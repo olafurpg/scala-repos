@@ -16,7 +16,9 @@ import com.intellij.openapi.util.{Ref, TextRange}
 import com.intellij.psi.codeStyle.{CodeStyleManager, CodeStyleSettingsManager}
 import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiFile, PsiJavaFile}
 import com.intellij.util.ExceptionUtil
-import org.jetbrains.plugins.scala.conversion.ast.{JavaCodeReferenceStatement, LiteralExpression, MainConstruction, TypedElement}
+import org.jetbrains.plugins.scala.conversion.ast.{
+  JavaCodeReferenceStatement, LiteralExpression, MainConstruction, TypedElement
+}
 import org.jetbrains.plugins.scala.conversion.visitors.SimplePrintVisitor
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile

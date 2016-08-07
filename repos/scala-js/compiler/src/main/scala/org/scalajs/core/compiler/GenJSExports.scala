@@ -29,8 +29,7 @@ trait GenJSExports extends SubComponent { self: GenJSCode =>
   import jsDefinitions._
   import jsInterop.jsNameOf
 
-  trait JSExportsPhase {
-    this: JSCodePhase =>
+  trait JSExportsPhase { this: JSCodePhase =>
 
     /**
       * Generate exporter methods for a class

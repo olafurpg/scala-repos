@@ -7,7 +7,10 @@ package scala
 package tools
 package nsc
 
-import java.io.{OutputStream, PrintStream, ByteArrayOutputStream, PrintWriter, StringWriter, Reader}
+import java.io.{
+  OutputStream, PrintStream, ByteArrayOutputStream, PrintWriter, StringWriter,
+  Reader
+}
 
 package object util {
   // forwarder for old code that builds against 2.9 and 2.10

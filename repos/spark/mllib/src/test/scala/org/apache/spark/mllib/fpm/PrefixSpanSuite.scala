@@ -148,7 +148,6 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
                              parameter = list(support = 0.5, maxlen = 5 ))
         resSeq = as(freqItemSeq, "data.frame")
         resSeq
-
                     sequence support
         1              <{1}>    1.00
         2              <{2}>    1.00
@@ -308,7 +307,6 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
                              parameter = 0.5, maxlen = 5 ))
         resSeq = as(freqItemSeq, "data.frame")
         resSeq
-
            sequence support
         1     <{1}>    0.75
         2     <{2}>    0.75

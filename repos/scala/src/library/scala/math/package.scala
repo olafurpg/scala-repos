@@ -68,7 +68,7 @@ package object math {
   def log(x: Double): Double = java.lang.Math.log(x)
 
   /** Returns the square root of a `double` value.
-    * 
+    *
     * @param  x the number to take the square root of
     * @return the value √x
     */

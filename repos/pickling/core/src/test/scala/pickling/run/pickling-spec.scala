@@ -282,7 +282,6 @@ object PicklingJsonSpec extends Properties("pickling-json") {
   })
 
   /* TODO: disabled because of spurious failures.
-
   property("Array[(Int, Double)]") = forAll((ia: Array[(Int, Double)]) => {
     val pickle: JSONPickle = ia.pickle
     val readArr = pickle.unpickle[Array[(Int, Double)]]
@@ -549,7 +548,6 @@ object PicklingBinarySpec extends Properties("pickling-binary") {
   })
 
   /* TODO: disabled because of spurious failures.
-
   property("Array[(Int, Double)]") = forAll((ia: Array[(Int, Double)]) => {
     val pickle: BinaryPickle = ia.pickle
     val readArr = pickle.unpickle[Array[(Int, Double)]]

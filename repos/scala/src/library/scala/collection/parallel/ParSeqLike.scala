@@ -44,8 +44,7 @@ import scala.collection.parallel.ParallelCollectionImplicits._
 trait ParSeqLike[
     +T, +Repr <: ParSeq[T], +Sequential <: Seq[T] with SeqLike[T, Sequential]]
     extends scala.collection.GenSeqLike[T, Repr]
-    with ParIterableLike[T, Repr, Sequential] {
-  self =>
+    with ParIterableLike[T, Repr, Sequential] { self =>
 
   protected[this] type SuperParIterator = IterableSplitter[T]
 

@@ -1,7 +1,10 @@
 package cats
 package tests
 
-import cats.laws.discipline.{CoflatMapTests, MonadCombineTests, SerializableTests, TraverseTests, CartesianTests}
+import cats.laws.discipline.{
+  CoflatMapTests, MonadCombineTests, SerializableTests, TraverseTests,
+  CartesianTests
+}
 import cats.laws.discipline.eq.tuple3Eq
 
 class StreamTests extends CatsSuite {

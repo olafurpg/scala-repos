@@ -161,7 +161,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         @group Basic customization overrides */
     def PlainSqlMapper: PlainSqlMapper
 
-    /** Plain SQL GetResult mapper generator definition 
+    /** Plain SQL GetResult mapper generator definition
         @group Basic customization overrides */
     trait PlainSqlMapperDef extends TermDef {
       def doc =
@@ -176,7 +176,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         @group Basic customization overrides */
     def TableClass: TableClass
 
-    /** Table class generator definition 
+    /** Table class generator definition
         @group Basic customization overrides */
     trait TableClassDef extends TypeDef {
 
@@ -250,7 +250,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         @group Basic customization overrides */
     def TableValue: TableValue
 
-    /** Table value generator definition (generates a collection-like value representing this database table). 
+    /** Table value generator definition (generates a collection-like value representing this database table).
         @group Basic customization overrides */
     trait TableValueDef extends TermDef {
       def doc =
@@ -268,7 +268,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /**
       * Column related generator definition
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
     abstract case class ColumnDef(val model: m.Column) extends TermDef {
@@ -337,7 +337,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
     /**
       * PrimaryKey related generator definition
       * (Currently only used for composite primary keys.)
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
     abstract case class PrimaryKeyDef(val model: m.PrimaryKey)
@@ -369,7 +369,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /**
       * ForeignKey related generator definition
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
     abstract case class ForeignKeyDef(val model: m.ForeignKey)
@@ -428,7 +428,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /**
       * Index related generator definition
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
     abstract case class IndexDef(val model: m.Index) extends TermDef {
@@ -632,7 +632,7 @@ trait GeneratorHelpers[Code, TermName, TypeName] {
     final def uncapitalize: String = str(0).toString.toLowerCase + str.tail
 
     /**
-      * Capitalizes the first (16 bit) character of each word separated by one or more '_'. Lower cases all other characters. 
+      * Capitalizes the first (16 bit) character of each word separated by one or more '_'. Lower cases all other characters.
       * Removes one '_' from each sequence of one or more subsequent '_' (to avoid collision).
       * (Warning: Not unicode-safe, uses String#apply)
       */

@@ -43,9 +43,9 @@ import scalafx.util.StringConverter
   * @define FLVINIT Creates a `ChoiceBox` cell factory for use in `ListView` controls.
   * @define TTYPE The type of the elements contained within the `ListView`.
   * @define CONVPARAM A `StringConverter` to convert the given item (of type T) to a String for displaying to the user.
-  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing. 
+  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing.
   * @define BUFITEMSPARAM A `ObservableBuffer` containing $ITEMSPARAM
-  * @define FTVRET A Function that will return a ListCell that is able to work on the type of element contained within 
+  * @define FTVRET A Function that will return a ListCell that is able to work on the type of element contained within
   *         the ListView.
   */
 object ChoiceBoxListCell {
@@ -152,7 +152,7 @@ object ChoiceBoxListCell {
   *
   * @define CBLC `ChoiceBoxListCell`
   * @define CONVPARAM A `StringConverter` to convert the given item (of type T) to a String for displaying to the user.
-  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing. 
+  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing.
   * @define BUFITEMSPARAM A `ObservableBuffer` containing $ITEMSPARAM
   */
 class ChoiceBoxListCell[T](

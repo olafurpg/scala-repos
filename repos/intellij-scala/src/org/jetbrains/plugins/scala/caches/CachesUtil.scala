@@ -13,10 +13,14 @@ import com.intellij.psi.util._
 import com.intellij.util.containers.{ContainerUtil, Stack}
 import org.jetbrains.plugins.scala.debugger.evaluation.ScalaCodeFragment
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScModifiableTypedDeclaration, ScModificationTrackerOwner}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScModifiableTypedDeclaration, ScModificationTrackerOwner
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScPackageImpl, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScPackageImpl, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 import scala.annotation.tailrec

@@ -8,19 +8,29 @@ import org.jetbrains.plugins.scala.caches.CachesUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.InferUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScMethodLike, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScMethodLike, ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember, ScObject, ScTemplateDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScTypeParametersOwner, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScMember, ScObject, ScTemplateDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScTypeParametersOwner, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScPackageImpl
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticFunction
 import org.jetbrains.plugins.scala.lang.psi.implicits.ScImplicitlyConvertible
-import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.{ConformanceExtResult, Expression}
+import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.{
+  ConformanceExtResult, Expression
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
 
 import scala.collection.Set
@@ -266,12 +276,12 @@ object MethodResolveProcessor {
     val typeParameters: Seq[TypeParameter] =
       prevTypeInfo ++
         (element match {
-              case fun: ScFunction =>
-                fun.typeParameters.map(new TypeParameter(_))
-              case fun: PsiMethod =>
-                fun.getTypeParameters.map(new TypeParameter(_)).toSeq
-              case _ => Seq.empty
-            })
+          case fun: ScFunction =>
+            fun.typeParameters.map(new TypeParameter(_))
+          case fun: PsiMethod =>
+            fun.getTypeParameters.map(new TypeParameter(_)).toSeq
+          case _ => Seq.empty
+        })
 
     def addExpectedTypeProblems(
         eOption: Option[ScType] = expectedOption()): Unit = {

@@ -232,7 +232,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       val Apply(fun @ Select(receiver, _), _) = tree
       val code = scalaPrimitives.getPrimitive(sym, receiver.tpe)
 
-      import scalaPrimitives.{isArithmeticOp, isArrayOp, isLogicalOp, isComparisonOp}
+      import scalaPrimitives.{
+        isArithmeticOp, isArrayOp, isLogicalOp, isComparisonOp
+      }
 
       if (isArithmeticOp(code)) genArithmeticOp(tree, code)
       else if (code == scalaPrimitives.CONCAT) genStringConcat(tree)

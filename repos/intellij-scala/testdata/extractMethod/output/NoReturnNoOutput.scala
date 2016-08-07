@@ -10,12 +10,9 @@ class NoReturnNoOutput {
 /*
 class NoReturnNoOutput {
   def foo(i: Int) {
-
     testMethodName(i)
-
     println()
   }
-
   def testMethodName(i: Int): Unit = {
     if (true) {}
     println(i)

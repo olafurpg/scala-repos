@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.debugger.ui
 
 import com.intellij.debugger.jdi.LocalVariableProxyImpl
 import com.intellij.debugger.ui.impl.watch.LocalVariableDescriptorImpl
-import com.intellij.debugger.ui.tree.{NodeDescriptor, NodeDescriptorNameAdjuster}
+import com.intellij.debugger.ui.tree.{
+  NodeDescriptor, NodeDescriptorNameAdjuster
+}
 import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil
 
 import scala.util.Try

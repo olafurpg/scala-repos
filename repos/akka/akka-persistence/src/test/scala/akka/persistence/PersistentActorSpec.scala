@@ -641,8 +641,7 @@ object PersistentActorSpec {
   }
 
   object StackableTestPersistentActor {
-    trait BaseActor extends Actor {
-      this: StackableTestPersistentActor ⇒
+    trait BaseActor extends Actor { this: StackableTestPersistentActor ⇒
       override protected[akka] def aroundPreStart() = {
         probe ! "base aroundPreStart"
         super.aroundPreStart()
@@ -673,8 +672,7 @@ object PersistentActorSpec {
       }
     }
 
-    trait MixinActor extends Actor {
-      this: StackableTestPersistentActor ⇒
+    trait MixinActor extends Actor { this: StackableTestPersistentActor ⇒
       override protected[akka] def aroundPreStart() = {
         probe ! "mixin aroundPreStart"
         super.aroundPreStart()

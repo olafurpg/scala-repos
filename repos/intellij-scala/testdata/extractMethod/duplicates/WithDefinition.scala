@@ -21,12 +21,8 @@ object WithDefinition {
 /*
 object WithDefinition {
   def foo(i: Int) {
-
-
     testMethodName(i)
-
   }
-
   def testMethodName(i: Int): Unit = {
     def bar = {
       val y = 0
@@ -34,7 +30,6 @@ object WithDefinition {
     }
     println(bar + i)
   }
-
   def foofoo() {
     testMethodName(1)
   }

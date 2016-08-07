@@ -7,8 +7,12 @@ import mesosphere.marathon.core.launcher.TaskOp
 import mesosphere.marathon.core.launcher.impl.TaskOpFactoryHelper
 import mesosphere.marathon.core.leadership.AlwaysElectedLeadershipModule
 import mesosphere.marathon.core.matcher.base.OfferMatcher
-import mesosphere.marathon.core.matcher.base.OfferMatcher.{MatchedTaskOps, TaskOpSource, TaskOpWithSource}
-import mesosphere.marathon.core.matcher.manager.{OfferMatcherManagerConfig, OfferMatcherManagerModule}
+import mesosphere.marathon.core.matcher.base.OfferMatcher.{
+  MatchedTaskOps, TaskOpSource, TaskOpWithSource
+}
+import mesosphere.marathon.core.matcher.manager.{
+  OfferMatcherManagerConfig, OfferMatcherManagerModule
+}
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.Timestamp

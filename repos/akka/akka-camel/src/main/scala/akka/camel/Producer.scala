@@ -164,8 +164,7 @@ trait ProducerSupport extends Actor with CamelSupport {
 /**
   * Mixed in by Actor implementations to produce messages to Camel endpoints.
   */
-trait Producer extends ProducerSupport {
-  this: Actor ⇒
+trait Producer extends ProducerSupport { this: Actor ⇒
 
   /**
     * Implementation of Actor.receive. Any messages received by this actor
@@ -192,7 +191,6 @@ private final case class FailureResult(cause: Throwable,
   *
   *
   */
-trait Oneway extends Producer {
-  this: Actor ⇒
+trait Oneway extends Producer { this: Actor ⇒
   override def oneway: Boolean = true
 }

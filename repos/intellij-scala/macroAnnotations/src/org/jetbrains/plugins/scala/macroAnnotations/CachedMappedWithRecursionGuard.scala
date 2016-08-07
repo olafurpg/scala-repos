@@ -18,7 +18,8 @@ class CachedMappedWithRecursionGuard(psiElement: Any,
                                      defaultValue: => Any,
                                      dependencyItem: Object)
     extends StaticAnnotation {
-  def macroTransform(annottees: Any*) = macro CachedMappedWithRecursionGuard.cachedMappedWithRecursionGuardImpl
+  def macroTransform(annottees: Any*) =
+    macro CachedMappedWithRecursionGuard.cachedMappedWithRecursionGuardImpl
 }
 
 object CachedMappedWithRecursionGuard {

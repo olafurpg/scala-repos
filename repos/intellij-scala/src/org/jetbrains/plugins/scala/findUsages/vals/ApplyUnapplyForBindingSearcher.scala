@@ -4,16 +4,24 @@ package findUsages.vals
 import com.intellij.openapi.project.{IndexNotReadyException, Project}
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.search.searches.ReferencesSearch.SearchParameters
-import com.intellij.psi.search.{PsiSearchHelper, SearchScope, TextOccurenceProcessor, UsageSearchContext}
+import com.intellij.psi.search.{
+  PsiSearchHelper, SearchScope, TextOccurenceProcessor, UsageSearchContext
+}
 import com.intellij.psi.{PsiElement, PsiReference}
 import com.intellij.util.{Processor, QueryExecutor}
 import org.jetbrains.plugins.scala.extensions.inReadAction
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScConstructorPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScMethodCall, ScNewTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern, ScConstructorPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScMethodCall, ScNewTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
-import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceElement, ResolvableReferenceExpression, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolvableReferenceElement, ResolvableReferenceExpression, ScalaResolveResult
+}
 
 /**
   * Nikolay.Tropin

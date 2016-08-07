@@ -72,19 +72,19 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     def isRecursive = typeSym.typeParams exists fbounds.contains
 
     isRecursive && (transposeSafe(tsElimSub map (_.normalize.typeArgs)) match {
-          case Some(arggsTransposed) =>
-            val mergedTypeArgs = (tp match {
-              case et: ExistentialType => et.underlying; case _ => tp
-            }).typeArgs
-            exists3(typeSym.typeParams, mergedTypeArgs, arggsTransposed) {
-              (param, arg, lubbedArgs) =>
-                val isExistential = arg.typeSymbol.isExistentiallyBound
-                val isInFBound = fbounds contains param
-                val wasLubbed = !lubbedArgs.exists(_ =:= arg)
-                (!isExistential && isInFBound && wasLubbed)
-            }
-          case None => false
-        })
+      case Some(arggsTransposed) =>
+        val mergedTypeArgs = (tp match {
+          case et: ExistentialType => et.underlying; case _ => tp
+        }).typeArgs
+        exists3(typeSym.typeParams, mergedTypeArgs, arggsTransposed) {
+          (param, arg, lubbedArgs) =>
+            val isExistential = arg.typeSymbol.isExistentiallyBound
+            val isInFBound = fbounds contains param
+            val wasLubbed = !lubbedArgs.exists(_ =:= arg)
+            (!isExistential && isInFBound && wasLubbed)
+        }
+      case None => false
+    })
   }
 
   /** Given a matrix `tsBts` whose columns are basetype sequences (and the symbols `tsParams` that should be interpreted as type parameters in this matrix),
@@ -266,7 +266,8 @@ private[internal] trait GlbLubs { self: SymbolTable =>
      else if (tps forall isNumericValueType)
        numericLub(tps)
      else if (tps exists typeHasAnnotations)
-       annotationsLub(lub(tps map
+       annotationsLub(lub(
+                          tps map
                             (_.withoutAnnotations)),
                       tps)
      else lub(tps))
@@ -274,9 +275,9 @@ private[internal] trait GlbLubs { self: SymbolTable =>
   def numericLub(ts: List[Type]) =
     ts reduceLeft
       ((t1, t2) =>
-            if (isNumericSubType(t1, t2)) t2
-            else if (isNumericSubType(t2, t1)) t1
-            else IntTpe)
+         if (isNumericSubType(t1, t2)) t2
+         else if (isNumericSubType(t2, t1)) t1
+         else IntTpe)
 
   private val _lubResults = new mutable.HashMap[(Depth, List[Type]), Type]
   def lubResults = _lubResults
@@ -364,12 +365,12 @@ private[internal] trait GlbLubs { self: SymbolTable =>
             val syms =
               narrowts map
                 (t =>
-                      // SI-7602 With erroneous code, we could end up with overloaded symbols after filtering
-                      //         so `suchThat` unsuitable.
-                      t.nonPrivateMember(proto.name)
-                        .filter(sym =>
-                              sym.tpe matches prototp
-                                .substThis(lubThisType.typeSymbol, t)))
+                   // SI-7602 With erroneous code, we could end up with overloaded symbols after filtering
+                   //         so `suchThat` unsuitable.
+                   t.nonPrivateMember(proto.name)
+                     .filter(sym =>
+                           sym.tpe matches prototp
+                             .substThis(lubThisType.typeSymbol, t)))
 
             if (syms contains NoSymbol) NoSymbol
             else {
@@ -397,10 +398,10 @@ private[internal] trait GlbLubs { self: SymbolTable =>
             val syms = tp.nonPrivateMember(sym.name).alternatives
             !syms.isEmpty && (syms forall
                   (alt =>
-                        // todo alt != sym is strictly speaking not correct, but without it we lose
-                        // efficiency.
-                        alt != sym &&
-                          !specializesSym(lubThisType, sym, tp, alt, depth)))
+                     // todo alt != sym is strictly speaking not correct, but without it we lose
+                     // efficiency.
+                     alt != sym &&
+                       !specializesSym(lubThisType, sym, tp, alt, depth)))
           }
           // add a refinement symbol for all non-class members of lubBase
           // which are refined by every type in ts.

@@ -7,7 +7,7 @@ final class MonadOps[F[_], A] private[syntax] (val self: F[A])(
     extends Ops[F[A]] {
   ////
 
-  def liftM[G[_ [_], _]](implicit G: MonadTrans[G]): G[F, A] = G.liftM(self)
+  def liftM[G[_[_], _]](implicit G: MonadTrans[G]): G[F, A] = G.liftM(self)
 
   def whileM[G[_]](p: F[Boolean])(implicit G: MonadPlus[G]): F[G[A]] =
     F.whileM(p, self)

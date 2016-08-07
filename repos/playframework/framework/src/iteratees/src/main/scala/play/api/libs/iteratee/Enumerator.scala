@@ -5,7 +5,9 @@ package play.api.libs.iteratee
 
 import java.nio.file.Files
 
-import play.api.libs.iteratee.Execution.Implicits.{defaultExecutionContext => dec}
+import play.api.libs.iteratee.Execution.Implicits.{
+  defaultExecutionContext => dec
+}
 import play.api.libs.iteratee.internal.{eagerFuture, executeFuture}
 import scala.concurrent.{ExecutionContext, Future, Promise, blocking}
 import scala.util.{Try, Success, Failure}
@@ -168,7 +170,9 @@ trait Enumerator[E] { parent =>
   def flatMap[U](f: E => Enumerator[U])(
       implicit ec: ExecutionContext): Enumerator[U] = {
     val pec = ec.prepare()
-    import Execution.Implicits.{defaultExecutionContext => ec} // Shadow ec to make this the only implicit EC in scope
+    import Execution.Implicits.{
+      defaultExecutionContext => ec
+    } // Shadow ec to make this the only implicit EC in scope
     new Enumerator[U] {
       def apply[A](iteratee: Iteratee[U, A]): Future[Iteratee[U, A]] = {
         val folder = Iteratee.fold2[E, Iteratee[U, A]](iteratee) { (it, e) =>

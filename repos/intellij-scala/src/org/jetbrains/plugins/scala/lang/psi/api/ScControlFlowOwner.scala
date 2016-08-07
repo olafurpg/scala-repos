@@ -3,8 +3,12 @@ package org.jetbrains.plugins.scala.lang.psi.api
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValueProvider.Result
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
-import org.jetbrains.plugins.scala.lang.psi.controlFlow.impl.{AllVariablesControlFlowPolicy, ScalaControlFlowBuilder}
-import org.jetbrains.plugins.scala.lang.psi.controlFlow.{Instruction, ScControlFlowPolicy}
+import org.jetbrains.plugins.scala.lang.psi.controlFlow.impl.{
+  AllVariablesControlFlowPolicy, ScalaControlFlowBuilder
+}
+import org.jetbrains.plugins.scala.lang.psi.controlFlow.{
+  Instruction, ScControlFlowPolicy
+}
 
 import scala.collection.mutable
 

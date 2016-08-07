@@ -1,7 +1,9 @@
 package com.twitter.finagle.service
 
 import com.twitter.conversions.time._
-import com.twitter.finagle.stats.{NullStatsReceiver, InMemoryStatsReceiver, Stat, StatsReceiver}
+import com.twitter.finagle.stats.{
+  NullStatsReceiver, InMemoryStatsReceiver, Stat, StatsReceiver
+}
 import com.twitter.finagle.{FailedFastException, Service, WriteException}
 import com.twitter.util._
 import org.junit.runner.RunWith

@@ -223,12 +223,12 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
 
         val canRewrite =
           keepBox || (copyOpsToEliminate match {
-                case Some(copyOps) =>
-                  toDelete ++= copyOps
-                  true
+            case Some(copyOps) =>
+              toDelete ++= copyOps
+              true
 
-                case _ => false
-              })
+            case _ => false
+          })
 
         if (canRewrite) {
           val localSlots: Vector[(Int, Type)] = boxKind.boxedTypes.map(tp =>

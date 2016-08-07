@@ -296,7 +296,7 @@ class RetriesTest extends FunSuite {
   test("budget gauge lifecycle") {
     val stats = new InMemoryStatsReceiver()
     def budgetGauge: Option[Float] =
-      stats.gauges.get(Seq("retries", "budget")).map(_ ())
+      stats.gauges.get(Seq("retries", "budget")).map(_())
 
     assert(budgetGauge.isEmpty)
 

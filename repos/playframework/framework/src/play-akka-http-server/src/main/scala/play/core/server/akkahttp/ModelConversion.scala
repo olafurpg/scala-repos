@@ -14,7 +14,9 @@ import play.api.Logger
 import play.api.http.HeaderNames._
 import play.api.http.{HttpChunk, HttpEntity => PlayHttpEntity}
 import play.api.mvc._
-import play.core.server.common.{ConnectionInfo, ForwardedHeaderHandler, ServerResultUtils}
+import play.core.server.common.{
+  ConnectionInfo, ForwardedHeaderHandler, ServerResultUtils
+}
 
 import scala.collection.immutable
 

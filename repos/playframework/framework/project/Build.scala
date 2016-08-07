@@ -6,7 +6,9 @@ import sbt.ScriptedPlugin._
 import sbt._
 import Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.{previousArtifacts, binaryIssueFilters, reportBinaryIssues}
+import com.typesafe.tools.mima.plugin.MimaKeys.{
+  previousArtifacts, binaryIssueFilters, reportBinaryIssues
+}
 import com.typesafe.tools.mima.core._
 
 import com.typesafe.sbt.SbtScalariform.scalariformSettings
@@ -108,9 +110,9 @@ object BuildSettings {
       .settings(playCommonSettings: _*)
       .settings(
           (javacOptions in compile) ~= (_.map {
-                case "1.8" => "1.6"
-                case other => other
-              })
+            case "1.8" => "1.6"
+            case other => other
+          })
       )
   }
 

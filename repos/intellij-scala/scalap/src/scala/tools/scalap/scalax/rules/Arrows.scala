@@ -17,8 +17,7 @@ trait Arrows extends UnitFunctors {
     b
   }
 
-  trait Arrow[-A, +B] extends Functor[B] {
-    this: Arr[A, B] =>
+  trait Arrow[-A, +B] extends Functor[B] { this: Arr[A, B] =>
 
     def map[C](f: B => C) = comp(arrow(f))
     def comp[C](bc: => Arr[B, C]): Arr[A, C]

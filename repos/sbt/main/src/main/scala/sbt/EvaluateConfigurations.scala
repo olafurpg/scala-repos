@@ -3,7 +3,10 @@
  */
 package sbt
 
-import sbt.internal.util.{complete, AttributeEntry, AttributeKey, LineRange, MessageOnlyException, RangePosition, Settings}
+import sbt.internal.util.{
+  complete, AttributeEntry, AttributeKey, LineRange, MessageOnlyException,
+  RangePosition, Settings
+}
 
 import java.io.File
 import compiler.{Eval, EvalImports}

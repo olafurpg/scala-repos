@@ -1,7 +1,10 @@
 package sbt
 
 import sbt.internal.util.{AttributeKey, FullReader}
-import sbt.internal.util.complete.{Completion, Completions, DefaultParsers, History => CHistory, HistoryCommands, Parser, TokenCompletions}
+import sbt.internal.util.complete.{
+  Completion, Completions, DefaultParsers, History => CHistory,
+  HistoryCommands, Parser, TokenCompletions
+}
 import sbt.internal.util.Types.{const, idFun}
 import sbt.internal.inc.classpath.ClasspathUtilities.toLoader
 import sbt.internal.inc.ModuleUtilities
@@ -57,7 +60,7 @@ object BasicCommands {
   def helpParser(s: State) = {
     val h = (Help.empty /: s.definedCommands) { (a, b) =>
       a ++ (try b.help(s)
-          catch { case NonFatal(ex) => Help.empty })
+      catch { case NonFatal(ex) => Help.empty })
     }
     val helpCommands = h.detail.keySet
     val spacedArg = singleArgument(helpCommands).?

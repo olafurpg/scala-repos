@@ -103,21 +103,25 @@ object Def extends Init[Scope] with TaskMacroExtra {
     p(_.parser)
 
   import language.experimental.macros
-  import std.TaskMacro.{inputTaskMacroImpl, inputTaskDynMacroImpl, taskDynMacroImpl, taskMacroImpl}
+  import std.TaskMacro.{
+    inputTaskMacroImpl, inputTaskDynMacroImpl, taskDynMacroImpl, taskMacroImpl
+  }
   import std.SettingMacro.{settingDynMacroImpl, settingMacroImpl}
-  import std.{InputEvaluated, MacroPrevious, MacroValue, MacroTaskValue, ParserInput}
+  import std.{
+    InputEvaluated, MacroPrevious, MacroValue, MacroTaskValue, ParserInput
+  }
 
   def task[T](t: T): Def.Initialize[Task[T]] = macro taskMacroImpl[T]
-  def taskDyn[T](t: Def.Initialize[Task[T]]): Def.Initialize[Task[T]] = macro taskDynMacroImpl[
-      T]
+  def taskDyn[T](t: Def.Initialize[Task[T]]): Def.Initialize[Task[T]] =
+    macro taskDynMacroImpl[T]
   def setting[T](t: T): Def.Initialize[T] = macro settingMacroImpl[T]
-  def settingDyn[T](t: Def.Initialize[T]): Def.Initialize[T] = macro settingDynMacroImpl[
-      T]
-  def inputTask[T](t: T): Def.Initialize[InputTask[T]] = macro inputTaskMacroImpl[
-      T]
+  def settingDyn[T](t: Def.Initialize[T]): Def.Initialize[T] =
+    macro settingDynMacroImpl[T]
+  def inputTask[T](t: T): Def.Initialize[InputTask[T]] =
+    macro inputTaskMacroImpl[T]
   def inputTaskDyn[T](
-      t: Def.Initialize[Task[T]]): Def.Initialize[InputTask[T]] = macro inputTaskDynMacroImpl[
-      T]
+      t: Def.Initialize[Task[T]]): Def.Initialize[InputTask[T]] =
+    macro inputTaskDynMacroImpl[T]
 
   // The following conversions enable the types Initialize[T], Initialize[Task[T]], and Task[T] to
   //  be used in task and setting macros as inputs with an ultimate result of type T
@@ -138,12 +142,12 @@ object Def extends Init[Scope] with TaskMacroExtra {
       p: Initialize[State => Parser[T]]): ParserInput[T] = ???
 
   import language.experimental.macros
-  def settingKey[T](description: String): SettingKey[T] = macro std.KeyMacro
-    .settingKeyImpl[T]
-  def taskKey[T](description: String): TaskKey[T] = macro std.KeyMacro
-    .taskKeyImpl[T]
-  def inputKey[T](description: String): InputKey[T] = macro std.KeyMacro
-    .inputKeyImpl[T]
+  def settingKey[T](description: String): SettingKey[T] =
+    macro std.KeyMacro.settingKeyImpl[T]
+  def taskKey[T](description: String): TaskKey[T] =
+    macro std.KeyMacro.taskKeyImpl[T]
+  def inputKey[T](description: String): InputKey[T] =
+    macro std.KeyMacro.inputKeyImpl[T]
 
   private[sbt] def dummy[T: Manifest](
       name: String,

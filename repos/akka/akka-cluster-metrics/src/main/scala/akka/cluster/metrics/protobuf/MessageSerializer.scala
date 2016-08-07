@@ -3,17 +3,23 @@
   */
 package akka.cluster.metrics.protobuf
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream
+}
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 import java.{lang ⇒ jl}
 import akka.actor.{Address, ExtendedActorSystem}
 import akka.cluster.metrics.protobuf.msg.{ClusterMetricsMessages ⇒ cm}
-import akka.cluster.metrics.{EWMA, Metric, MetricsGossip, MetricsGossipEnvelope, NodeMetrics}
+import akka.cluster.metrics.{
+  EWMA, Metric, MetricsGossip, MetricsGossipEnvelope, NodeMetrics
+}
 import akka.serialization.BaseSerializer
 import akka.util.ClassLoaderObjectInputStream
 import akka.protobuf.{ByteString, MessageLite}
 import scala.annotation.tailrec
-import scala.collection.JavaConverters.{asJavaIterableConverter, asScalaBufferConverter, setAsJavaSetConverter}
+import scala.collection.JavaConverters.{
+  asJavaIterableConverter, asScalaBufferConverter, setAsJavaSetConverter
+}
 import akka.serialization.SerializerWithStringManifest
 
 /**

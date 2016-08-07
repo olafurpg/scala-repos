@@ -47,7 +47,7 @@ sealed abstract class Tree[A] {
     Node(g(rootLabel, c), c)
   }
 
-  /** A 2D String representation of this Tree, separated into lines. 
+  /** A 2D String representation of this Tree, separated into lines.
     * Uses reversed StringBuilders for performance, because they are
     * prepended to.
     **/

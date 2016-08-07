@@ -9,8 +9,7 @@ import scala.collection.JavaConversions._
 class ConcurrentHashMap[K >: Null, V >: Null]
     extends AbstractMap[K, V]
     with ConcurrentMap[K, V]
-    with Serializable {
-  self =>
+    with Serializable { self =>
 
   def this(initialCapacity: Int) =
     this()

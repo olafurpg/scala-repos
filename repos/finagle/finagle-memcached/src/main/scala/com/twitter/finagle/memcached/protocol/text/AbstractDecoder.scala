@@ -3,7 +3,9 @@ package com.twitter.finagle.memcached.protocol.text
 import com.twitter.finagle.memcached.protocol.ClientError
 import com.twitter.finagle.memcached.util.ChannelBufferUtils._
 import com.twitter.io.Charsets
-import org.jboss.netty.buffer.{ChannelBuffer, ChannelBufferIndexFinder, ChannelBuffers}
+import org.jboss.netty.buffer.{
+  ChannelBuffer, ChannelBufferIndexFinder, ChannelBuffers
+}
 import org.jboss.netty.channel._
 import org.jboss.netty.handler.codec.frame.FrameDecoder
 

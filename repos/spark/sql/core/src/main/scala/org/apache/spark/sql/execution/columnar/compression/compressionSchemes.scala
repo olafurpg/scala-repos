@@ -22,7 +22,9 @@ import java.nio.ByteBuffer
 import scala.collection.mutable
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{MutableRow, SpecificMutableRow}
+import org.apache.spark.sql.catalyst.expressions.{
+  MutableRow, SpecificMutableRow
+}
 import org.apache.spark.sql.execution.columnar._
 import org.apache.spark.sql.types._
 

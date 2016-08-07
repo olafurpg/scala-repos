@@ -5,13 +5,19 @@ import java.awt.FlowLayout
 import java.io.File
 import javax.swing.{JPanel, JCheckBox}
 
-import com.intellij.ide.util.projectWizard.{ModuleWizardStep, SdkSettingsStep, SettingsStep}
+import com.intellij.ide.util.projectWizard.{
+  ModuleWizardStep, SdkSettingsStep, SettingsStep
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.service.project.wizard.AbstractExternalModuleBuilder
-import com.intellij.openapi.externalSystem.settings.{AbstractExternalSystemSettings, ExternalSystemSettingsListener}
-import com.intellij.openapi.externalSystem.util.{ExternalSystemApiUtil, ExternalSystemBundle, ExternalSystemUtil}
+import com.intellij.openapi.externalSystem.settings.{
+  AbstractExternalSystemSettings, ExternalSystemSettingsListener
+}
+import com.intellij.openapi.externalSystem.util.{
+  ExternalSystemApiUtil, ExternalSystemBundle, ExternalSystemUtil
+}
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.{JavaModuleType, ModifiableModuleModel}
 import com.intellij.openapi.projectRoots.{JavaSdk, SdkTypeId}

@@ -40,7 +40,6 @@ import scala.xml.{NodeSeq, Text, Elem, UnprefixedAttribute, Null, Node}
 object CalculatorApi extends XmlApiHelper {
   // Define our root tag
   def createTag(contents : NodeSeq) : Elem = &lt;api>{contents}&lt;/api>
-
   // The LiftResponses here will be converted to Box[LiftResponse]
   // via the putResponseInBox implicit conversion
   def calculator : LiftRules.DispatchPF = {
@@ -50,7 +49,6 @@ object CalculatorApi extends XmlApiHelper {
     case r @ Req(List("api","min"), _, GetRequest) => () => doMin(r)
     case Req("api" :: _, _, _) => () => BadResponse()
   }
-
   // Define a common handler
   def reduceOp (operation : (Int,Int) => Int)(r : Req) : Box[Elem] = tryo {
     (r.param("args").map {
@@ -61,7 +59,6 @@ object CalculatorApi extends XmlApiHelper {
     case f : Failure => f
     case Empty => Empty
   }
-
   // Using a return type of LiftResponse causes the canNodeToResponse
   // implicit to be invoked
   def doSum (r : Req) : LiftResponse = reduceOp(_ + _)(r)
@@ -76,7 +73,7 @@ object CalculatorApi extends XmlApiHelper {
 <pre name="code" class="xml">
 &lt;api operation="sum" success="true">&lt;result>15&lt;/result>&lt;/api>
 </pre>
-  * 
+  *
   */
 trait XMLApiHelper {
 

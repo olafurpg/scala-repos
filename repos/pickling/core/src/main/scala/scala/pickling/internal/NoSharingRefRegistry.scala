@@ -1,7 +1,9 @@
 package scala.pickling
 package internal
 
-import scala.pickling.spi.{RefRegistry, RefUnpicklingRegistry, RefPicklingRegistry}
+import scala.pickling.spi.{
+  RefRegistry, RefUnpicklingRegistry, RefPicklingRegistry
+}
 
 /**
   * An implementation of ref sharing that ensures no references are created while pickling and none are looked

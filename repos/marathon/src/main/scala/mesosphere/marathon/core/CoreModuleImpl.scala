@@ -18,8 +18,12 @@ import mesosphere.marathon.core.task.bus.TaskBusModule
 import mesosphere.marathon.core.task.jobs.TaskJobsModule
 import mesosphere.marathon.core.task.tracker.TaskTrackerModule
 import mesosphere.marathon.metrics.Metrics
-import mesosphere.marathon.state.{GroupRepository, AppRepository, TaskRepository}
-import mesosphere.marathon.{LeadershipAbdication, MarathonConf, MarathonSchedulerDriverHolder}
+import mesosphere.marathon.state.{
+  GroupRepository, AppRepository, TaskRepository
+}
+import mesosphere.marathon.{
+  LeadershipAbdication, MarathonConf, MarathonSchedulerDriverHolder
+}
 
 import scala.util.Random
 

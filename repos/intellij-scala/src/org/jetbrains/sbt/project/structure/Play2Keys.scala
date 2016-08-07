@@ -1,7 +1,9 @@
 package org.jetbrains.sbt
 package project.structure
 
-import org.jetbrains.sbt.project.structure.Play2Keys.AllKeys.{SeqStringParsedValue, StringParsedValue, ParsedValue}
+import org.jetbrains.sbt.project.structure.Play2Keys.AllKeys.{
+  SeqStringParsedValue, StringParsedValue, ParsedValue
+}
 
 import scala.collection.mutable
 import scala.xml.Text

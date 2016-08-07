@@ -69,10 +69,10 @@ trait LowerPriorityIncludes {
   /**
     * Converts a
     * [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/value/ObservableValue.html `javafx.beans.value.ObservableValue`]]
-    * instance to its ScalaFX counterpart ''which Java Type and Scala Type are the same''. 
+    * instance to its ScalaFX counterpart ''which Java Type and Scala Type are the same''.
     *
     * @param o JavaFX ObservableValue
-    * @return ScalaFX ObservableValue ''which Java Type and Scala Type are the same''. 
+    * @return ScalaFX ObservableValue ''which Java Type and Scala Type are the same''.
     */
   implicit def jfxObservableValue2sfx[T](
       ov: jfxbv.ObservableValue[T]): ObservableValue[T, T] =

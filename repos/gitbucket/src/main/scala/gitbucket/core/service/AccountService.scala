@@ -95,8 +95,8 @@ trait AccountService {
       implicit s: Session): Option[Account] =
     Accounts filter
       (t =>
-            (t.userName === userName.bind) &&
-              (t.removed === false.bind, !includeRemoved)) firstOption
+         (t.userName === userName.bind) &&
+           (t.removed === false.bind, !includeRemoved)) firstOption
 
   def getAccountsByUserNames(userNames: Set[String],
                              knowns: Set[Account],
@@ -122,8 +122,8 @@ trait AccountService {
       includeRemoved: Boolean = false)(implicit s: Session): Option[Account] =
     Accounts filter
       (t =>
-            (t.mailAddress.toLowerCase === mailAddress.toLowerCase.bind) &&
-              (t.removed === false.bind, !includeRemoved)) firstOption
+         (t.mailAddress.toLowerCase === mailAddress.toLowerCase.bind) &&
+           (t.removed === false.bind, !includeRemoved)) firstOption
 
   def getAllUsers(includeRemoved: Boolean = true)(
       implicit s: Session): List[Account] =

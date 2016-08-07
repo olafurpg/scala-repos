@@ -169,11 +169,9 @@ class TaskResultGetterSuite
   /**
     * Make sure we are using the context classloader when deserializing failed TaskResults instead
     * of the Spark classloader.
-
     * This test compiles a jar containing an exception and tests that when it is thrown on the
     * executor, enqueueFailedTask can correctly deserialize the failure and identify the thrown
     * exception as the cause.
-
     * Before this fix, enqueueFailedTask would throw a ClassNotFoundException when deserializing
     * the exception, resulting in an UnknownReason for the TaskEndResult.
     */

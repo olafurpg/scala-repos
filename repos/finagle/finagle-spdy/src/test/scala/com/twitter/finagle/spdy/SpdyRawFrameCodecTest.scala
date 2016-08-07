@@ -1,8 +1,12 @@
 package com.twitter.finagle.spdy
 
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
-import org.jboss.netty.handler.codec.embedder.{DecoderEmbedder, EncoderEmbedder}
-import org.jboss.netty.handler.codec.spdy.{DefaultSpdyHeadersFrame, SpdyHeadersFrame, SpdyVersion}
+import org.jboss.netty.handler.codec.embedder.{
+  DecoderEmbedder, EncoderEmbedder
+}
+import org.jboss.netty.handler.codec.spdy.{
+  DefaultSpdyHeadersFrame, SpdyHeadersFrame, SpdyVersion
+}
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner

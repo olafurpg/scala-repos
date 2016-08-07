@@ -5,7 +5,9 @@ import akka.util.Timeout
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.impl.TaskTrackerActor.ForwardTaskOp
-import mesosphere.marathon.core.task.tracker.{TaskCreationHandler, TaskTrackerConfig, TaskUpdater}
+import mesosphere.marathon.core.task.tracker.{
+  TaskCreationHandler, TaskTrackerConfig, TaskUpdater
+}
 import mesosphere.marathon.state.PathId
 import org.apache.mesos.Protos.TaskStatus
 

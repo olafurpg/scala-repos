@@ -6,7 +6,9 @@ import java.io.File
 import org.jetbrains.jps.ModuleChunk
 import org.jetbrains.jps.builders.java.JavaBuilderUtil
 import org.jetbrains.jps.incremental.CompileContext
-import org.jetbrains.jps.incremental.scala.model.{IncrementalityType, LibrarySettings}
+import org.jetbrains.jps.incremental.scala.model.{
+  IncrementalityType, LibrarySettings
+}
 import org.jetbrains.jps.model.java.JpsJavaSdkType
 import org.jetbrains.jps.model.module.JpsModule
 

@@ -9,7 +9,9 @@ import akka.stream.IOResult
 import akka.stream.impl.SinkModule
 import akka.stream.impl.StreamLayout.Module
 import akka.stream.impl.Stages.DefaultAttributes.IODispatcher
-import akka.stream.{ActorMaterializer, MaterializationContext, Attributes, SinkShape}
+import akka.stream.{
+  ActorMaterializer, MaterializationContext, Attributes, SinkShape
+}
 import akka.stream.ActorAttributes.Dispatcher
 import akka.util.ByteString
 import scala.concurrent.{Future, Promise}

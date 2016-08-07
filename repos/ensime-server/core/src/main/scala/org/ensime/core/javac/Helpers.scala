@@ -5,7 +5,9 @@ package org.ensime.core.javac
 import akka.event.slf4j.SLF4JLogging
 import com.sun.source.tree.{Tree, IdentifierTree}
 import com.sun.source.util.TreePath
-import javax.lang.model.`type`.{DeclaredType, PrimitiveType, TypeKind, TypeMirror}
+import javax.lang.model.`type`.{
+  DeclaredType, PrimitiveType, TypeKind, TypeMirror
+}
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.{Element, TypeElement}
 import org.ensime.core.{DocFqn, DocSig}

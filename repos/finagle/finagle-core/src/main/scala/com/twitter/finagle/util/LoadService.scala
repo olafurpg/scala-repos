@@ -196,7 +196,7 @@ object loadServiceIgnoredPaths
   * A deny list of implementations to ignore. Keys are the fully qualified class names.
   * Any other implementations that are found via `LoadService.apply` are eligible to be used.
   *
-  * As an example, here's how to filter out `OstrichStatsReceiver`, `OstrichExporter` and 
+  * As an example, here's how to filter out `OstrichStatsReceiver`, `OstrichExporter` and
   * `CommonsStatsReceiver` using a global flag:
   *
   * {{{

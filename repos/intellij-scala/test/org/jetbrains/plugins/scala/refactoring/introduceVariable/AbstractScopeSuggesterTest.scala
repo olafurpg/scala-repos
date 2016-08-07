@@ -12,12 +12,14 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.refactoring.introduceVariable.{ScopeItem, ScopeSuggester}
+import org.jetbrains.plugins.scala.lang.refactoring.introduceVariable.{
+  ScopeItem, ScopeSuggester
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.EmptyConflictsReporter
 import org.junit.Assert
 
 /**
-  * Created by user 
+  * Created by user
   * on 10/15/15
   */
 abstract class AbstractScopeSuggesterTest

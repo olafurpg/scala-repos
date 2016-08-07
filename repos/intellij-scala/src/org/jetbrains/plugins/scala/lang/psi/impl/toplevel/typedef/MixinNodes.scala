@@ -15,10 +15,14 @@ import com.intellij.psi.{PsiClass, PsiClassType, PsiElement}
 import org.jetbrains.plugins.scala.caches.CachesUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTemplateDefinition, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
 import org.jetbrains.plugins.scala.macroAnnotations.CachedWithRecursionGuard
 import org.jetbrains.plugins.scala.util.ScEquivalenceUtil
@@ -49,9 +53,8 @@ abstract class MixinNodes {
       mutable.HashMap.empty
     def addToMap(key: T, node: Node) {
       val name = ScalaPsiUtil.convertMemberName(elemName(key))
-      (if (!isPrivate(key)) this else privatesMap).getOrElseUpdate(
-          name,
-          new ArrayBuffer) += ((key, node))
+      (if (!isPrivate(key)) this else privatesMap)
+        .getOrElseUpdate(name, new ArrayBuffer) += ((key, node))
       if (isImplicit(key)) implicitNames.add(name)
     }
 

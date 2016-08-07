@@ -18,8 +18,12 @@
 package org.apache.spark.sql.catalyst
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.sql.catalyst.expressions.{InterpretedMutableProjection, Literal}
-import org.apache.spark.sql.catalyst.plans.physical.{ClusteredDistribution, HashPartitioning}
+import org.apache.spark.sql.catalyst.expressions.{
+  InterpretedMutableProjection, Literal
+}
+import org.apache.spark.sql.catalyst.plans.physical.{
+  ClusteredDistribution, HashPartitioning
+}
 
 class PartitioningSuite extends SparkFunSuite {
   test(

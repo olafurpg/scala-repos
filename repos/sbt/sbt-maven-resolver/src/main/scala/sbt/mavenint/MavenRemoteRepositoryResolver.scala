@@ -7,7 +7,14 @@ import org.apache.ivy.core.settings.IvySettings
 import org.eclipse.aether.artifact.{DefaultArtifact => AetherArtifact}
 import org.eclipse.aether.deployment.{DeployRequest => AetherDeployRequest}
 import org.eclipse.aether.metadata.{DefaultMetadata, Metadata}
-import org.eclipse.aether.resolution.{ArtifactDescriptorRequest => AetherDescriptorRequest, ArtifactDescriptorResult => AetherDescriptorResult, ArtifactRequest => AetherArtifactRequest, MetadataRequest => AetherMetadataRequest, VersionRequest => AetherVersionRequest, VersionRangeRequest => AetherVersionRangeRequest}
+import org.eclipse.aether.resolution.{
+  ArtifactDescriptorRequest => AetherDescriptorRequest,
+  ArtifactDescriptorResult => AetherDescriptorResult,
+  ArtifactRequest => AetherArtifactRequest,
+  MetadataRequest => AetherMetadataRequest,
+  VersionRequest => AetherVersionRequest,
+  VersionRangeRequest => AetherVersionRangeRequest
+}
 
 import sbt.internal.librarymanagement.ivyint.CustomRemoteMavenResolver
 import sbt.librarymanagement.MavenRepository

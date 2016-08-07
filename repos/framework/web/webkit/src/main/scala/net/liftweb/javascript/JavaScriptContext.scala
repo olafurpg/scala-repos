@@ -61,7 +61,7 @@ object JavaScriptContext {
                     session.runSourceContext(func(), rule, elem)
                   }
 
-                case x => session.runSourceContext(x, rule, elem)
+              case x => session.runSourceContext(x, rule, elem)
             }
 
           case _ => rule(elem)

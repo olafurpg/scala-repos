@@ -2,9 +2,13 @@ package org.jetbrains.plugins.scala.debugger.evaluation.evaluator
 
 import com.intellij.debugger.DebuggerBundle
 import com.intellij.debugger.engine.evaluation.expression.{Evaluator, Modifier}
-import com.intellij.debugger.engine.evaluation.{EvaluateException, EvaluationContextImpl}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluateException, EvaluationContextImpl
+}
 import com.intellij.debugger.jdi.{LocalVariableProxyImpl, StackFrameProxyImpl}
-import com.intellij.debugger.ui.impl.watch.{LocalVariableDescriptorImpl, NodeDescriptorImpl}
+import com.intellij.debugger.ui.impl.watch.{
+  LocalVariableDescriptorImpl, NodeDescriptorImpl
+}
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.sun.jdi._

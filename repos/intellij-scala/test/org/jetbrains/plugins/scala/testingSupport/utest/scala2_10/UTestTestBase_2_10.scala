@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.testingSupport.utest.scala2_10
 
-import org.jetbrains.plugins.scala.testingSupport.utest.{UTestSimpleTest, UTestTestCase}
+import org.jetbrains.plugins.scala.testingSupport.utest.{
+  UTestSimpleTest, UTestTestCase
+}
 import org.jetbrains.plugins.scala.util.TestUtils.ScalaSdkVersion
 
 /**

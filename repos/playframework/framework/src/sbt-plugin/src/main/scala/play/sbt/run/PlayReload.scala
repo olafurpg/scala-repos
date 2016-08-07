@@ -8,7 +8,9 @@ import sbt.Keys._
 
 import play.api.PlayException
 import play.sbt.PlayExceptions._
-import play.runsupport.Reloader.{CompileResult, CompileSuccess, CompileFailure, Source, SourceMap}
+import play.runsupport.Reloader.{
+  CompileResult, CompileSuccess, CompileFailure, Source, SourceMap
+}
 
 object PlayReload {
 

@@ -2,13 +2,10 @@ package breeze.linalg
 
 /*
  Copyright 2012 David Hall
-
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -227,29 +224,22 @@ class DenseMatrixTest
   /*
   test("Map Triples") {
     val a : DenseMatrix[Int] = DenseMatrix((1,0,0),(2,3,-1))
-
     val b1 : DenseMatrix[Int] = a.mapTriples((i,j,v) => i + v)
     assert(b1 === DenseMatrix((1,0,0),(3,4,0)))
-
     val b2 : DenseMatrix[Double] = a.mapTriples((i,j,v) => j + v.toDouble)
     assert(b2 === DenseMatrix((1.0,1.0,2.0),(2.0,4.0,1.0)))
   }
-
   test("Triples") {
     val a : DenseMatrix[Int] = DenseMatrix((1,0,0),(2,3,-1))
-
     var s = 0
-
     // foreach
     s = 0
     for ((i,j,v) <- a.triples) s += v
     assert(s === sum(a))
-
     // filter
     s = 0
     for ((i,j,v) <- a.triples; if i % 2 == 0 || j % 2 == 0) s += v
     assert(s === 1+2-1)
-
 //    // map
 //    val b1 : DenseMatrix[Double] = for ((i,j,v) <- a) yield v * 2.0
 //    assert(b1 === DenseMatrix((2.0,0.0,0.0),(4.0,6.0,-2.0)))
@@ -258,7 +248,6 @@ class DenseMatrixTest
 //    val b2 : DenseMatrix[Int] = for ((i,j,v) <- a; if j == 0) yield v * 2
 //    assert(b2 === DenseMatrix((2,0,0),(4,0,0)))
   }
-
    */
 
   test("set") {

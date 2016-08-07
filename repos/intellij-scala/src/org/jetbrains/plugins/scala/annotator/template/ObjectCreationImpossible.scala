@@ -4,8 +4,12 @@ import com.intellij.lang.annotation.AnnotationHolder
 import org.jetbrains.plugins.scala.annotator.AnnotatorPart
 import org.jetbrains.plugins.scala.annotator.quickfix.ImplementMethodsQuickFix
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition}
-import org.jetbrains.plugins.scala.overrideImplement.{ScAliasMember, ScalaOIUtil}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTemplateDefinition
+}
+import org.jetbrains.plugins.scala.overrideImplement.{
+  ScAliasMember, ScalaOIUtil
+}
 
 /**
   * Pavel Fatin

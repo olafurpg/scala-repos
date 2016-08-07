@@ -7,9 +7,14 @@ import com.intellij.openapi.util.{Pair, TextRange}
 import com.intellij.psi.PsiElement
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.codeStyle.arrangement.{ArrangementSettings, _}
-import com.intellij.psi.codeStyle.arrangement.`match`.{ArrangementSectionRule, StdArrangementEntryMatcher, StdArrangementMatchRule}
+import com.intellij.psi.codeStyle.arrangement.`match`.{
+  ArrangementSectionRule, StdArrangementEntryMatcher, StdArrangementMatchRule
+}
 import com.intellij.psi.codeStyle.arrangement.group.ArrangementGroupingRule
-import com.intellij.psi.codeStyle.arrangement.model.{ArrangementAtomMatchCondition, ArrangementCompositeMatchCondition, ArrangementMatchCondition}
+import com.intellij.psi.codeStyle.arrangement.model.{
+  ArrangementAtomMatchCondition, ArrangementCompositeMatchCondition,
+  ArrangementMatchCondition
+}
 import com.intellij.psi.codeStyle.arrangement.std.StdArrangementTokens.EntryType._
 import com.intellij.psi.codeStyle.arrangement.std.StdArrangementTokens.Grouping._
 import com.intellij.psi.codeStyle.arrangement.std.StdArrangementTokens.Modifier._

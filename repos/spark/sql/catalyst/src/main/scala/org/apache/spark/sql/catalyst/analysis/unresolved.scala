@@ -257,7 +257,6 @@ case class UnresolvedStar(target: Option[Seq[String]])
   * as follows:
   *  MultiAlias(stack_function, Seq(a, b))
   *
-
   * @param child the computation being performed
   * @param names the names to be associated with each output of computing [[child]].
   */

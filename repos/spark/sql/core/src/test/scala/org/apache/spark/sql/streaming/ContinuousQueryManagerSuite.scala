@@ -29,7 +29,9 @@ import org.scalatest.time.SpanSugar._
 
 import org.apache.spark.SparkException
 import org.apache.spark.sql.{ContinuousQuery, Dataset, StreamTest}
-import org.apache.spark.sql.execution.streaming.{MemorySink, MemoryStream, StreamExecution, StreamingRelation}
+import org.apache.spark.sql.execution.streaming.{
+  MemorySink, MemoryStream, StreamExecution, StreamingRelation
+}
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ContinuousQueryManagerSuite

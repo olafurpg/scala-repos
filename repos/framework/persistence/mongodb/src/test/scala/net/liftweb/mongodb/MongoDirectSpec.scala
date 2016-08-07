@@ -22,7 +22,9 @@ import net.liftweb.util.{Helpers, DefaultConnectionIdentifier}
 import java.util.UUID
 import java.util.regex.Pattern
 
-import com.mongodb.{WriteConcern, BasicDBObject, BasicDBObjectBuilder, MongoException}
+import com.mongodb.{
+  WriteConcern, BasicDBObject, BasicDBObjectBuilder, MongoException
+}
 
 import org.specs2.mutable.Specification
 

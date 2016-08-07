@@ -14,10 +14,12 @@ import org.jetbrains.plugins.scala.extensions.BooleanExt
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{ScImportExpr, ScImportSelector}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{
+  ScImportExpr, ScImportSelector
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScImportSelectorStub
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */

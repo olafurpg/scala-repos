@@ -3,7 +3,9 @@ package org.jetbrains.plugins.scala.codeInsight.intention.types
 import com.intellij.codeInsight.completion.{InsertHandler, InsertionContext}
 import com.intellij.codeInsight.lookup._
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
-import com.intellij.codeInsight.template.{Expression, ExpressionContext, Result, TextResult}
+import com.intellij.codeInsight.template.{
+  Expression, ExpressionContext, Result, TextResult
+}
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import org.jetbrains.plugins.scala.lang.psi.types.ScTypeText
 

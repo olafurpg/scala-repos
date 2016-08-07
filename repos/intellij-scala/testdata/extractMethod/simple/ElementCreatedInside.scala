@@ -11,14 +11,9 @@ class A {
 /*
 class A {
   def foo {
-
-
     val j: Int = testMethodName
-
-
     val i = j
   }
-
   def testMethodName: Int = {
     val j = 77
     j

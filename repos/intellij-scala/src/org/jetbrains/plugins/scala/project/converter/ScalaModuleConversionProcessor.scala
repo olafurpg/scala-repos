@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala
 package project.converter
 
 import java.io.File
-import com.intellij.conversion.{ConversionContext, ModuleSettings, ConversionProcessor}
+import com.intellij.conversion.{
+  ConversionContext, ModuleSettings, ConversionProcessor
+}
 import org.jetbrains.plugins.scala.project.converter.ScalaModuleConversionProcessor._
 
 /**

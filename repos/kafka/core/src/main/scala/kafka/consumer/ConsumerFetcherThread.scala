@@ -16,7 +16,9 @@
   */
 package kafka.consumer
 
-import kafka.api.{OffsetRequest, Request, FetchRequestBuilder, FetchResponsePartitionData}
+import kafka.api.{
+  OffsetRequest, Request, FetchRequestBuilder, FetchResponsePartitionData
+}
 import kafka.cluster.BrokerEndPoint
 import kafka.message.ByteBufferMessageSet
 import kafka.server.{PartitionFetchState, AbstractFetcherThread}

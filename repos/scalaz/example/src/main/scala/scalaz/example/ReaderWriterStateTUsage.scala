@@ -3,13 +3,10 @@ package scalaz.example
 /*
  A rather contrived example which shows how ReaderWriterStateT could be used.
  @author stew@vireo.org / stew@helloreverb.com
-
  We create a simple langauage named CAB
  Strings in the CAB language is a series of A, B, or C tokens followed by a EOF:
  <cab> ::= 'C' | 'A' | 'B'
  <string> ::= <cab> <string> | '.'
-
-
  So valid strings in the langauge would be:
  "."
  "A."
@@ -41,11 +38,9 @@ object Token {
 object CABRunLengthEncoder {
   /*
     A run-length encoder for CAB, a token T can be prefixed by a number N to stand for "N Ts in a row":
-
    <cab> ::= 'C' | 'A' | "B'
    <tok> ::= <cab> | <integer> <cab>
    <compressed> ::= <tok> <compressed> | "."
-
    so the string "CAAAAAB." could be "compressed" any of the following ways:
    "CAAAAAB."
    "C5AB."
@@ -109,7 +104,7 @@ object CABRunLengthEncoder {
     .rwstMonad[Trampoline, RunLengthConfig, Cord, RunLengthState]
   import rle._
 
-  /** 
+  /**
     * with the above syntax imported, we can perform the same
     * computation as above, but use a for comprehension
     */
@@ -162,7 +157,7 @@ object CABRunLengthEncoder {
       next <- readToken
       _ <- {
         if (state.lastToken.map(_ == next) getOrElse (false))
-          // Same token as last, so we just increment our counter 
+          // Same token as last, so we just increment our counter
           modify(_.incLength)
         else
           // its a new token, so emit the previous, then change

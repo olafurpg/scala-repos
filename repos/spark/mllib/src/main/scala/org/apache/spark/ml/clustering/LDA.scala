@@ -23,9 +23,16 @@ import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.internal.Logging
 import org.apache.spark.ml.{Estimator, Model}
 import org.apache.spark.ml.param._
-import org.apache.spark.ml.param.shared.{HasCheckpointInterval, HasFeaturesCol, HasMaxIter, HasSeed}
+import org.apache.spark.ml.param.shared.{
+  HasCheckpointInterval, HasFeaturesCol, HasMaxIter, HasSeed
+}
 import org.apache.spark.ml.util._
-import org.apache.spark.mllib.clustering.{DistributedLDAModel => OldDistributedLDAModel, EMLDAOptimizer => OldEMLDAOptimizer, LDA => OldLDA, LDAModel => OldLDAModel, LDAOptimizer => OldLDAOptimizer, LocalLDAModel => OldLocalLDAModel, OnlineLDAOptimizer => OldOnlineLDAOptimizer}
+import org.apache.spark.mllib.clustering.{
+  DistributedLDAModel => OldDistributedLDAModel,
+  EMLDAOptimizer => OldEMLDAOptimizer, LDA => OldLDA, LDAModel => OldLDAModel,
+  LDAOptimizer => OldLDAOptimizer, LocalLDAModel => OldLocalLDAModel,
+  OnlineLDAOptimizer => OldOnlineLDAOptimizer
+}
 import org.apache.spark.mllib.linalg.{Matrix, Vector, Vectors, VectorUDT}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}

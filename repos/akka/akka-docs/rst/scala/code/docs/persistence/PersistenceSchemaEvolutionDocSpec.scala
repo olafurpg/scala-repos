@@ -8,7 +8,9 @@ import scala.language.reflectiveCalls
 import java.nio.charset.Charset
 import akka.actor.ActorSystem
 import akka.persistence.journal.{EventAdapter, EventSeq}
-import akka.serialization.{SerializationExtension, SerializerWithStringManifest}
+import akka.serialization.{
+  SerializationExtension, SerializerWithStringManifest
+}
 import akka.testkit.TestKit
 import com.typesafe.config._
 import org.scalatest.WordSpec

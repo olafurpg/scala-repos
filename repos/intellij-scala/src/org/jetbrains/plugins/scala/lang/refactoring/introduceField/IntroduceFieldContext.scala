@@ -10,7 +10,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.refactoring.introduceField.ScalaIntroduceFieldHandlerBase._
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil.IntroduceException
-import org.jetbrains.plugins.scala.lang.refactoring.util.{DialogConflictsReporter, ScalaRefactoringUtil, ScalaVariableValidator}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  DialogConflictsReporter, ScalaRefactoringUtil, ScalaVariableValidator
+}
 
 /**
   * Nikolay.Tropin

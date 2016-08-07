@@ -4,7 +4,9 @@
 
 package akka.http.scaladsl.coding
 
-import java.io.{OutputStream, InputStream, ByteArrayInputStream, ByteArrayOutputStream}
+import java.io.{
+  OutputStream, InputStream, ByteArrayInputStream, ByteArrayOutputStream
+}
 import java.util
 import java.util.zip.DataFormatException
 import akka.NotUsed

@@ -26,7 +26,7 @@ class NamedTest extends ApplicabilityTestBase {
     assertProblems("(a: A, b: B)", "(A, b = B)") {
       case Nil =>
     }
-    //TODO compiler allows such calls, they seem to be OK 
+    //TODO compiler allows such calls, they seem to be OK
     //    assertProblems("(a: A, b: B)", "(a = A, b)") {
     //      case Nil =>
     //    }

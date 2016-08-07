@@ -2,8 +2,8 @@ trait Generic[T] { type Repr }
 object Generic {
   type Aux[T, Repr0] = Generic[T] { type Repr = Repr0 }
   import scala.language.experimental.macros
-  implicit def materializeGeneric[T, Repr]: Generic.Aux[T, Repr] = macro Macros
-    .impl[T]
+  implicit def materializeGeneric[T, Repr]: Generic.Aux[T, Repr] =
+    macro Macros.impl[T]
 }
 
 object Test extends App {

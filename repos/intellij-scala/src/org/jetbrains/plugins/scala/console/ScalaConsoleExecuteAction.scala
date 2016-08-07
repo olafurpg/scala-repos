@@ -3,7 +3,9 @@ package console
 
 import java.io.{IOException, OutputStream}
 
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent, CommonDataKeys}
+import com.intellij.openapi.actionSystem.{
+  AnAction, AnActionEvent, CommonDataKeys
+}
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.util.TextRange

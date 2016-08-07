@@ -2,7 +2,9 @@ package slick.sql
 
 import slick.basic.{BasicStreamingAction, BasicAction}
 import slick.compiler.QueryCompiler
-import slick.relational.{RelationalActionComponent, RelationalTableComponent, RelationalProfile}
+import slick.relational.{
+  RelationalActionComponent, RelationalTableComponent, RelationalProfile
+}
 
 import scala.language.higherKinds
 import slick.dbio._
@@ -147,8 +149,7 @@ trait SqlUtilsComponent { self: SqlProfile =>
   }
 }
 
-trait SqlTableComponent extends RelationalTableComponent {
-  this: SqlProfile =>
+trait SqlTableComponent extends RelationalTableComponent { this: SqlProfile =>
 
   trait ColumnOptions extends super.ColumnOptions {
     def SqlType(typeName: String) = SqlProfile.ColumnOption.SqlType(typeName)

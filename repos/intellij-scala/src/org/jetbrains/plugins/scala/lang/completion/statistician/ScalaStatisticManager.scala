@@ -3,9 +3,15 @@ package org.jetbrains.plugins.scala.lang.completion.statistician
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScClassParameter}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScVariable, ScValue, ScTypeAlias, ScFunction}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTrait, ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScClassParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScVariable, ScValue, ScTypeAlias, ScFunction
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTrait, ScClass, ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 object ScalaStatisticManager {

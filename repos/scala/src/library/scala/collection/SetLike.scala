@@ -59,8 +59,7 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     extends IterableLike[A, This]
     with GenSetLike[A, This]
     with Subtractable[A, This]
-    with Parallelizable[A, ParSet[A]] {
-  self =>
+    with Parallelizable[A, ParSet[A]] { self =>
 
   /** The empty set of the same type as this set
     * @return  an empty set of type `This`.

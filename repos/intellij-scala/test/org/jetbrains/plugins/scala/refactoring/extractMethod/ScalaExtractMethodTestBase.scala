@@ -3,7 +3,9 @@ package refactoring.extractMethod
 
 import java.io.File
 
-import _root_.com.intellij.openapi.fileEditor.{FileEditorManager, OpenFileDescriptor}
+import _root_.com.intellij.openapi.fileEditor.{
+  FileEditorManager, OpenFileDescriptor
+}
 import _root_.org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import _root_.org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import _root_.org.jetbrains.plugins.scala.lang.refactoring.extractMethod.ScalaExtractMethodHandler

@@ -3,7 +3,9 @@ package com.twitter.finagle.thrift
 import com.twitter.finagle._
 import com.twitter.finagle.filter.PayloadSizeFilter
 import com.twitter.util.{Future, Stopwatch}
-import org.apache.thrift.protocol.{TBinaryProtocol, TMessage, TMessageType, TProtocolFactory}
+import org.apache.thrift.protocol.{
+  TBinaryProtocol, TMessage, TMessageType, TProtocolFactory
+}
 import org.apache.thrift.transport.TMemoryInputTransport
 import org.jboss.netty.buffer.ChannelBuffers
 import org.jboss.netty.channel._

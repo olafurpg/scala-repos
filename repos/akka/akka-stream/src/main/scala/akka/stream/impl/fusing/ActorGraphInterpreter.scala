@@ -10,8 +10,12 @@ import akka.event.Logging
 import akka.stream._
 import akka.stream.impl._
 import akka.stream.impl.ReactiveStreamsCompliance._
-import akka.stream.impl.StreamLayout.{CompositeModule, CopiedModule, Module, AtomicModule}
-import akka.stream.impl.fusing.GraphInterpreter.{DownstreamBoundaryStageLogic, UpstreamBoundaryStageLogic, GraphAssembly}
+import akka.stream.impl.StreamLayout.{
+  CompositeModule, CopiedModule, Module, AtomicModule
+}
+import akka.stream.impl.fusing.GraphInterpreter.{
+  DownstreamBoundaryStageLogic, UpstreamBoundaryStageLogic, GraphAssembly
+}
 import akka.stream.stage.{GraphStageLogic, InHandler, OutHandler}
 import org.reactivestreams.{Subscriber, Subscription}
 import scala.concurrent.forkjoin.ThreadLocalRandom

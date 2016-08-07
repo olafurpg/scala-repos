@@ -7,7 +7,9 @@ import akka.actor._
 import akka.actor.{ActorRef, Props, ActorLogging, Actor}
 import akka.io.Tcp
 import akka.util.ByteString
-import org.ensime.api.{RpcRequestEnvelope, EnsimeServerError, RpcResponseEnvelope, EnsimeEvent}
+import org.ensime.api.{
+  RpcRequestEnvelope, EnsimeServerError, RpcResponseEnvelope, EnsimeEvent
+}
 import org.ensime.core.{Broadcaster, Canonised, Protocol}
 import org.ensime.server.RequestHandler
 

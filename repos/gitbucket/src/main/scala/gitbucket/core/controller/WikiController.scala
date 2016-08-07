@@ -1,7 +1,9 @@
 package gitbucket.core.controller
 
 import gitbucket.core.wiki.html
-import gitbucket.core.service.{RepositoryService, WikiService, ActivityService, AccountService}
+import gitbucket.core.service.{
+  RepositoryService, WikiService, ActivityService, AccountService
+}
 import gitbucket.core.util._
 import gitbucket.core.util.StringUtil._
 import gitbucket.core.util.ControlUtil._
@@ -21,7 +23,11 @@ class WikiController
     with ReferrerAuthenticator
 
 trait WikiControllerBase extends ControllerBase {
-  self: WikiService with RepositoryService with ActivityService with CollaboratorsAuthenticator with ReferrerAuthenticator =>
+  self: WikiService
+    with RepositoryService
+    with ActivityService
+    with CollaboratorsAuthenticator
+    with ReferrerAuthenticator =>
 
   case class WikiPageEditForm(pageName: String,
                               content: String,

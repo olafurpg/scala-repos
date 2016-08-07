@@ -6,7 +6,9 @@ import mesosphere.marathon.core.flow.ReviveOffersConfig
 import mesosphere.marathon.core.leadership.LeadershipModule
 import mesosphere.marathon.core.matcher.base.OfferMatcher
 import mesosphere.marathon.core.matcher.manager.OfferMatcherManager
-import mesosphere.marathon.core.matcher.reconcile.impl.{OffersWantedForReconciliationActor, OfferMatcherReconciler}
+import mesosphere.marathon.core.matcher.reconcile.impl.{
+  OffersWantedForReconciliationActor, OfferMatcherReconciler
+}
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.state.GroupRepository
 import rx.lang.scala.{Observable, Observer, Subject}

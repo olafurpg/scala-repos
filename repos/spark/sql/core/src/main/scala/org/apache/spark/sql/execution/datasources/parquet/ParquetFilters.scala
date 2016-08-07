@@ -47,16 +47,16 @@ private[sql] object ParquetFilters {
     case BooleanType =>
       (n: String, v: Any) =>
         FilterApi.eq(booleanColumn(n), v.asInstanceOf[java.lang.Boolean])
-      case IntegerType =>
+    case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.eq(intColumn(n), v.asInstanceOf[Integer])
-      case LongType =>
+    case LongType =>
       (n: String, v: Any) =>
         FilterApi.eq(longColumn(n), v.asInstanceOf[java.lang.Long])
-      case FloatType =>
+    case FloatType =>
       (n: String, v: Any) =>
         FilterApi.eq(floatColumn(n), v.asInstanceOf[java.lang.Float])
-      case DoubleType =>
+    case DoubleType =>
       (n: String, v: Any) =>
         FilterApi.eq(doubleColumn(n), v.asInstanceOf[java.lang.Double])
 
@@ -79,16 +79,16 @@ private[sql] object ParquetFilters {
     case BooleanType =>
       (n: String, v: Any) =>
         FilterApi.notEq(booleanColumn(n), v.asInstanceOf[java.lang.Boolean])
-      case IntegerType =>
+    case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.notEq(intColumn(n), v.asInstanceOf[Integer])
-      case LongType =>
+    case LongType =>
       (n: String, v: Any) =>
         FilterApi.notEq(longColumn(n), v.asInstanceOf[java.lang.Long])
-      case FloatType =>
+    case FloatType =>
       (n: String, v: Any) =>
         FilterApi.notEq(floatColumn(n), v.asInstanceOf[java.lang.Float])
-      case DoubleType =>
+    case DoubleType =>
       (n: String, v: Any) =>
         FilterApi.notEq(doubleColumn(n), v.asInstanceOf[java.lang.Double])
 
@@ -110,13 +110,13 @@ private[sql] object ParquetFilters {
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.lt(intColumn(n), v.asInstanceOf[Integer])
-      case LongType =>
+    case LongType =>
       (n: String, v: Any) =>
         FilterApi.lt(longColumn(n), v.asInstanceOf[java.lang.Long])
-      case FloatType =>
+    case FloatType =>
       (n: String, v: Any) =>
         FilterApi.lt(floatColumn(n), v.asInstanceOf[java.lang.Float])
-      case DoubleType =>
+    case DoubleType =>
       (n: String, v: Any) =>
         FilterApi.lt(doubleColumn(n), v.asInstanceOf[java.lang.Double])
 
@@ -137,13 +137,13 @@ private[sql] object ParquetFilters {
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.ltEq(intColumn(n), v.asInstanceOf[java.lang.Integer])
-      case LongType =>
+    case LongType =>
       (n: String, v: Any) =>
         FilterApi.ltEq(longColumn(n), v.asInstanceOf[java.lang.Long])
-      case FloatType =>
+    case FloatType =>
       (n: String, v: Any) =>
         FilterApi.ltEq(floatColumn(n), v.asInstanceOf[java.lang.Float])
-      case DoubleType =>
+    case DoubleType =>
       (n: String, v: Any) =>
         FilterApi.ltEq(doubleColumn(n), v.asInstanceOf[java.lang.Double])
 
@@ -164,13 +164,13 @@ private[sql] object ParquetFilters {
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.gt(intColumn(n), v.asInstanceOf[java.lang.Integer])
-      case LongType =>
+    case LongType =>
       (n: String, v: Any) =>
         FilterApi.gt(longColumn(n), v.asInstanceOf[java.lang.Long])
-      case FloatType =>
+    case FloatType =>
       (n: String, v: Any) =>
         FilterApi.gt(floatColumn(n), v.asInstanceOf[java.lang.Float])
-      case DoubleType =>
+    case DoubleType =>
       (n: String, v: Any) =>
         FilterApi.gt(doubleColumn(n), v.asInstanceOf[java.lang.Double])
 
@@ -191,13 +191,13 @@ private[sql] object ParquetFilters {
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.gtEq(intColumn(n), v.asInstanceOf[java.lang.Integer])
-      case LongType =>
+    case LongType =>
       (n: String, v: Any) =>
         FilterApi.gtEq(longColumn(n), v.asInstanceOf[java.lang.Long])
-      case FloatType =>
+    case FloatType =>
       (n: String, v: Any) =>
         FilterApi.gtEq(floatColumn(n), v.asInstanceOf[java.lang.Float])
-      case DoubleType =>
+    case DoubleType =>
       (n: String, v: Any) =>
         FilterApi.gtEq(doubleColumn(n), v.asInstanceOf[java.lang.Double])
 
@@ -221,16 +221,16 @@ private[sql] object ParquetFilters {
         FilterApi.userDefined(
             intColumn(n),
             SetInFilter(v.asInstanceOf[Set[java.lang.Integer]]))
-      case LongType =>
+    case LongType =>
       (n: String, v: Set[Any]) =>
         FilterApi.userDefined(longColumn(n),
                               SetInFilter(v.asInstanceOf[Set[java.lang.Long]]))
-      case FloatType =>
+    case FloatType =>
       (n: String, v: Set[Any]) =>
         FilterApi.userDefined(
             floatColumn(n),
             SetInFilter(v.asInstanceOf[Set[java.lang.Float]]))
-      case DoubleType =>
+    case DoubleType =>
       (n: String, v: Set[Any]) =>
         FilterApi.userDefined(
             doubleColumn(n),
@@ -293,35 +293,35 @@ private[sql] object ParquetFilters {
 
     predicate match {
       case sources.IsNull(name) if dataTypeOf.contains(name) =>
-        makeEq.lift(dataTypeOf(name)).map(_ (name, null))
+        makeEq.lift(dataTypeOf(name)).map(_(name, null))
       case sources.IsNotNull(name) if dataTypeOf.contains(name) =>
-        makeNotEq.lift(dataTypeOf(name)).map(_ (name, null))
+        makeNotEq.lift(dataTypeOf(name)).map(_(name, null))
 
       case sources.EqualTo(name, value) if dataTypeOf.contains(name) =>
-        makeEq.lift(dataTypeOf(name)).map(_ (name, value))
+        makeEq.lift(dataTypeOf(name)).map(_(name, value))
       case sources.Not(sources.EqualTo(name, value))
           if dataTypeOf.contains(name) =>
-        makeNotEq.lift(dataTypeOf(name)).map(_ (name, value))
+        makeNotEq.lift(dataTypeOf(name)).map(_(name, value))
 
       case sources.EqualNullSafe(name, value) if dataTypeOf.contains(name) =>
-        makeEq.lift(dataTypeOf(name)).map(_ (name, value))
+        makeEq.lift(dataTypeOf(name)).map(_(name, value))
       case sources.Not(sources.EqualNullSafe(name, value))
           if dataTypeOf.contains(name) =>
-        makeNotEq.lift(dataTypeOf(name)).map(_ (name, value))
+        makeNotEq.lift(dataTypeOf(name)).map(_(name, value))
 
       case sources.LessThan(name, value) if dataTypeOf.contains(name) =>
-        makeLt.lift(dataTypeOf(name)).map(_ (name, value))
+        makeLt.lift(dataTypeOf(name)).map(_(name, value))
       case sources.LessThanOrEqual(name, value) if dataTypeOf.contains(name) =>
-        makeLtEq.lift(dataTypeOf(name)).map(_ (name, value))
+        makeLtEq.lift(dataTypeOf(name)).map(_(name, value))
 
       case sources.GreaterThan(name, value) if dataTypeOf.contains(name) =>
-        makeGt.lift(dataTypeOf(name)).map(_ (name, value))
+        makeGt.lift(dataTypeOf(name)).map(_(name, value))
       case sources.GreaterThanOrEqual(name, value)
           if dataTypeOf.contains(name) =>
-        makeGtEq.lift(dataTypeOf(name)).map(_ (name, value))
+        makeGtEq.lift(dataTypeOf(name)).map(_(name, value))
 
       case sources.In(name, valueSet) =>
-        makeInSet.lift(dataTypeOf(name)).map(_ (name, valueSet.toSet))
+        makeInSet.lift(dataTypeOf(name)).map(_(name, valueSet.toSet))
 
       case sources.And(lhs, rhs) =>
         // At here, it is not safe to just convert one side if we do not understand the

@@ -45,7 +45,6 @@ class AdminAPISpec extends Specification {
       /*
       val probe = TestProbe()(system)
       probe.send(adminActor,Get("/cmd/app"))
-
       //TODO: Need to convert the response string to the corresponding case object to assert some properties on the object
       probe.expectMsg(
         HttpResponse(

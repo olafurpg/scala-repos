@@ -22,7 +22,9 @@ import org.junit.runners.Parameterized
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized.Parameters
 import org.junit.{After, Before, Test}
-import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer, ProducerConfig}
+import org.apache.kafka.clients.producer.{
+  ProducerRecord, KafkaProducer, ProducerConfig
+}
 import org.junit.Assert._
 
 import kafka.api.FetchRequestBuilder

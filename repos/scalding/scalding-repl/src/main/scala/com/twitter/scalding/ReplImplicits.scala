@@ -21,7 +21,9 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FsShell, FileSystem}
 import typed.KeyedListLike
 import scala.util.{Failure, Success}
-import scala.concurrent.{Future, ExecutionContext => ConcurrentExecutionContext}
+import scala.concurrent.{
+  Future, ExecutionContext => ConcurrentExecutionContext
+}
 
 /**
   * Object containing various implicit conversions required to create Scalding flows in the REPL.

@@ -4,7 +4,7 @@ package psi
 package api
 package expr
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   */
 trait ScTryStmt extends ScExpression {

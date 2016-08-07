@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala.debugger.smartStepInto
 
 import com.intellij.debugger.actions.SmartStepTarget
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12
+}
 import org.jetbrains.plugins.scala.extensions.inReadAction
 import org.junit.Assert
 

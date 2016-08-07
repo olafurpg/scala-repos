@@ -13,8 +13,7 @@ abstract class ManagedSeqStrict[+A]
 trait ManagedSeq[+A, +Coll]
     extends ManagedSeqStrict[A]
     with TraversableView[A, ManagedSeqStrict[A]]
-    with TraversableViewLike[A, ManagedSeqStrict[A], ManagedSeq[A]] {
-  self =>
+    with TraversableViewLike[A, ManagedSeqStrict[A], ManagedSeq[A]] { self =>
 
   override def underlying = throw new Exception("no underlying")
 

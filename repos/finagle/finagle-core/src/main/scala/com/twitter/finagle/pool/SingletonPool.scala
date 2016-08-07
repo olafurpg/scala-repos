@@ -156,7 +156,7 @@ class SingletonPool[Req, Rep](underlying: ServiceFactory[Req, Rep],
   /**
     * @inheritdoc
     *
-    * The status of a [[SingletonPool]] is the worse of the 
+    * The status of a [[SingletonPool]] is the worse of the
     * the underlying status and the status of the currently
     * cached service, if any.
     */

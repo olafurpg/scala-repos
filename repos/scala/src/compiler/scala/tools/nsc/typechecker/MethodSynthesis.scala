@@ -208,8 +208,8 @@ trait MethodSynthesis { self: Analyzer =>
         if (!mods.isParamAccessor)
           annotations foreach
             (ann =>
-                  if (!trees.exists(_.symbol hasAnnotation ann.symbol))
-                    issueAnnotationWarning(vd, ann, GetterTargetClass))
+               if (!trees.exists(_.symbol hasAnnotation ann.symbol))
+                 issueAnnotationWarning(vd, ann, GetterTargetClass))
 
         trees
       case vd: ValDef =>

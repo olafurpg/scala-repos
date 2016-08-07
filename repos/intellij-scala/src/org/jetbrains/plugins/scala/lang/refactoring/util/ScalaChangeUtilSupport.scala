@@ -6,7 +6,9 @@ import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.impl.source.SourceTreeToPsiMap
-import com.intellij.psi.impl.source.tree.{CompositeElement, TreeCopyHandler, TreeElement}
+import com.intellij.psi.impl.source.tree.{
+  CompositeElement, TreeCopyHandler, TreeElement
+}
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement

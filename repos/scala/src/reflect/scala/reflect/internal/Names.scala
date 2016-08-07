@@ -260,13 +260,11 @@ trait Names extends api.Names {
     /****
       *  This has been quite useful to find places where people are comparing
       *  a TermName and a TypeName, or a Name and a String.
-
     override def equals(other: Any) = paranoidEquals(other)
     private def paranoidEquals(other: Any): Boolean = {
       val cmp = this eq other.asInstanceOf[AnyRef]
       if (cmp || !nameDebug)
         return cmp
-
       other match {
         case x: String  =>
           Console.println(s"Compared $debugString and String '$x'")

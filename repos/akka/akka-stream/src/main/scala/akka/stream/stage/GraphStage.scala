@@ -10,7 +10,9 @@ import akka.actor._
 import akka.japi.function.{Effect, Procedure}
 import akka.stream._
 import akka.stream.impl.StreamLayout.Module
-import akka.stream.impl.fusing.{GraphInterpreter, GraphStageModule, SubSource, SubSink}
+import akka.stream.impl.fusing.{
+  GraphInterpreter, GraphStageModule, SubSource, SubSink
+}
 import akka.stream.impl.ReactiveStreamsCompliance
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.{immutable, mutable}

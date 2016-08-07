@@ -1,10 +1,14 @@
 package org.jetbrains.plugins.scala
 package codeInspection.relativeImports
 
-import com.intellij.codeInspection.{LocalQuickFix, ProblemDescriptor, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalQuickFix, ProblemDescriptor, ProblemsHolder
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiElement, PsiPackage}
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement, AbstractInspection
+}
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportExpr

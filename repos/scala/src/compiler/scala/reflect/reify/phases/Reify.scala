@@ -11,9 +11,7 @@ trait Reify
     with GenTrees
     with GenAnnotationInfos
     with GenPositions
-    with GenUtils {
-
-  self: Reifier =>
+    with GenUtils { self: Reifier =>
 
   import global._
 

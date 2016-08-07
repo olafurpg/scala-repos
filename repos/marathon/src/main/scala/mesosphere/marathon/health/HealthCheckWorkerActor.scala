@@ -6,7 +6,9 @@ import javax.net.ssl.{KeyManager, SSLContext, X509TrustManager}
 
 import akka.actor.{Actor, ActorLogging, PoisonPill}
 import akka.util.Timeout
-import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol.{COMMAND, HTTP, HTTPS, TCP}
+import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol.{
+  COMMAND, HTTP, HTTPS, TCP
+}
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.state.{AppDefinition, Timestamp}
 import mesosphere.util.ThreadPoolContext

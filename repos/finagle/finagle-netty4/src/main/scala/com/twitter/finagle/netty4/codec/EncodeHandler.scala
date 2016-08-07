@@ -5,7 +5,9 @@ import com.twitter.finagle.codec.FrameEncoder
 import com.twitter.finagle.netty4.BufAsByteBuf
 import com.twitter.io.Buf
 import com.twitter.util.NonFatal
-import io.netty.channel.{ChannelPromise, ChannelHandlerContext, ChannelOutboundHandlerAdapter}
+import io.netty.channel.{
+  ChannelPromise, ChannelHandlerContext, ChannelOutboundHandlerAdapter
+}
 import io.netty.channel.ChannelHandler.Sharable
 
 /**

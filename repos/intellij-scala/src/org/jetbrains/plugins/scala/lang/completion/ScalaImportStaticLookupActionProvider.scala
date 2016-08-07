@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.lang.completion
 
 import javax.swing.Icon
 
-import com.intellij.codeInsight.lookup.{Lookup, LookupActionProvider, LookupElement, LookupElementAction}
+import com.intellij.codeInsight.lookup.{
+  Lookup, LookupActionProvider, LookupElement, LookupElementAction
+}
 import com.intellij.psi.PsiClass
 import com.intellij.util.ui.EmptyIcon
 import com.intellij.util.{Consumer, PlatformIcons}

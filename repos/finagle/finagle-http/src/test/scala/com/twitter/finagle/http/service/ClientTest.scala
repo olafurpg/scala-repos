@@ -1,9 +1,13 @@
 package com.twitter.finagle.http.service
 
 import com.twitter.conversions.time._
-import com.twitter.finagle.{ChannelClosedException, ClientConnection, Http, ServiceFactory}
+import com.twitter.finagle.{
+  ChannelClosedException, ClientConnection, Http, ServiceFactory
+}
 import com.twitter.finagle.builder.ClientBuilder
-import com.twitter.finagle.http.{Http => HttpCodec, Request, Response, Version, Method}
+import com.twitter.finagle.http.{
+  Http => HttpCodec, Request, Response, Version, Method
+}
 import com.twitter.finagle.service.FailingFactory
 import com.twitter.util.{Await, Throw, Try}
 import java.net.InetSocketAddress

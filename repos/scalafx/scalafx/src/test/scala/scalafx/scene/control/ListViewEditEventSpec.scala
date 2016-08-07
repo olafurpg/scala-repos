@@ -49,8 +49,8 @@ class ListViewEditEventSpec[T <: Any]
 
   /*
    * In third argument, I it was used simply null compiler throws a error with message:
-   * "type mismatch;  found   : Null(null)  required: T". Solution found was make a cast from 
-   * null to type T. 
+   * "type mismatch;  found   : Null(null)  required: T". Solution found was make a cast from
+   * null to type T.
    */
   override def getJavaClassInstance =
     new jfxsc.ListView.EditEvent[T](new jfxsc.ListView[T],

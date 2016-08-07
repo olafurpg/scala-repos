@@ -133,7 +133,6 @@ trait Exprs { self: Universe =>
     *
     * Can be useful, when having a tree and wanting to splice it in reify call,
     * in which case the tree first needs to be wrapped in an expr.
-
     * The main source of information about exprs is the [[scala.reflect.api.Exprs]] page.
     *  @group Expressions
     */

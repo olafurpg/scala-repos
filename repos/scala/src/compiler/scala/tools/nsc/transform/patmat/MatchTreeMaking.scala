@@ -465,19 +465,15 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
           Note that the prefix of the class, if it is given, is relevant for determining class instances.
           For instance, the pattern p.C matches only instances of classes C which were created with the path p as prefix.
           The bottom types scala.Nothing and scala.Null cannot be used as type patterns, because they would match nothing in any case.
-
         - A singleton type p.type.
           This type pattern matches only the value denoted by the path p
           (that is, a pattern match involved a comparison of the matched value with p using method eq in class AnyRef). // TODO: the actual pattern matcher uses ==, so that's what I'm using for now
           // https://issues.scala-lang.org/browse/SI-4577 "pattern matcher, still disappointing us at equality time"
-
         - A compound type pattern T1 with ... with Tn where each Ti is a type pat- tern.
           This type pattern matches all values that are matched by each of the type patterns Ti.
-
         - A parameterized type pattern T[a1,...,an], where the ai are type variable patterns or wildcards _.
           This type pattern matches all values which match T for some arbitrary instantiation of the type variables and wildcards.
           The bounds or alias type of these type variable are determined as described in (§8.3).
-
         - A parameterized type pattern scala.Array[T1], where T1 is a type pattern. // TODO
           This type pattern matches any non-null instance of type scala.Array[U1], where U1 is a type matched by T1.
       **/
@@ -605,9 +601,9 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
           val combinedAlts =
             altss map
               (altTreeMakers =>
-                    ((casegen: Casegen) =>
-                       combineExtractors(altTreeMakers :+ TrivialTreeMaker(
-                               casegen.one(mkTRUE)))(casegen)))
+                 ((casegen: Casegen) =>
+                    combineExtractors(altTreeMakers :+ TrivialTreeMaker(
+                            casegen.one(mkTRUE)))(casegen)))
 
           val findAltMatcher =
             codegenAlt.matcher(EmptyTree, NoSymbol, BooleanTpe)(
@@ -682,8 +678,8 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
 
         debug.patmat(
             "combining cases: " + (casesNoSubstOnly
-                  .map(_.mkString(" >> "))
-                  .mkString("{", "\n", "}")))
+              .map(_.mkString(" >> "))
+              .mkString("{", "\n", "}")))
 
         val (suppression, requireSwitch): (Suppression, Boolean) =
           if (settings.XnoPatmatAnalysis) (Suppression.FullSuppression, false)

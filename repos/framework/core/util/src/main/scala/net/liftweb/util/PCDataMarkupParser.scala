@@ -19,7 +19,9 @@ package util
 
 import common._
 
-import scala.xml.parsing.{MarkupParser, MarkupHandler, FatalError, ConstructingHandler, ExternalSources}
+import scala.xml.parsing.{
+  MarkupParser, MarkupHandler, FatalError, ConstructingHandler, ExternalSources
+}
 import scala.xml.dtd._
 import scala.xml._
 import java.io.InputStream

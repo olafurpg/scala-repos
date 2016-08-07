@@ -80,7 +80,7 @@ class PromiseTests extends MinimalScalaTest {
       val result = "test value"
       val promise = Promise[String]().complete(Success(result))
       promise.isCompleted mustBe (true)
-      futureWithResult(_ (promise.future, result))
+      futureWithResult(_(promise.future, result))
     }
 
     "not be completable with a completed Promise" in {
@@ -103,7 +103,7 @@ class PromiseTests extends MinimalScalaTest {
       val promise =
         Promise[String]().complete(Failure(new RuntimeException(message)))
       promise.isCompleted mustBe (true)
-      futureWithException[RuntimeException](_ (promise.future, message))
+      futureWithException[RuntimeException](_(promise.future, message))
     }
     "not be completable with a completed Promise" in {
       {
@@ -130,7 +130,7 @@ class PromiseTests extends MinimalScalaTest {
     val future = Promise[String]()
       .complete(Failure(new InterruptedException(message)))
       .future
-    futureWithException[ExecutionException](_ (future, message))
+    futureWithException[ExecutionException](_(future, message))
   }
 
   "A NonLocalReturnControl failed Promise" should {
@@ -138,7 +138,7 @@ class PromiseTests extends MinimalScalaTest {
     val future = Promise[String]()
       .complete(Failure(new NonLocalReturnControl[String]("test", result)))
       .future
-    futureWithResult(_ (future, result))
+    futureWithResult(_(future, result))
   }
 
   def futureWithResult(f: ((Future[Any], Any) => Unit) => Unit) {

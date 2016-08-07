@@ -5,7 +5,10 @@ import chess.format.Uci
 import chess.Pos.piotr, chess.Role.forsyth
 import chess.variant.{Variant, Crazyhouse}
 import chess.opening.{FullOpening, FullOpeningDB}
-import chess.{History => ChessHistory, CheckCount, Castles, Role, Board, MoveOrDrop, Pos, Game => ChessGame, Clock, Status, Color, Piece, Mode, PositionHash}
+import chess.{
+  History => ChessHistory, CheckCount, Castles, Role, Board, MoveOrDrop, Pos,
+  Game => ChessGame, Clock, Status, Color, Piece, Mode, PositionHash
+}
 import org.joda.time.DateTime
 import scala.concurrent.duration.FiniteDuration
 

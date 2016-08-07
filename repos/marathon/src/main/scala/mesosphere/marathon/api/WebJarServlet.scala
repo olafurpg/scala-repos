@@ -1,7 +1,9 @@
 package mesosphere.marathon.api
 
 import java.net.URI
-import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
+import javax.servlet.http.{
+  HttpServlet, HttpServletRequest, HttpServletResponse
+}
 
 import mesosphere.marathon.io.IO
 import org.slf4j.LoggerFactory

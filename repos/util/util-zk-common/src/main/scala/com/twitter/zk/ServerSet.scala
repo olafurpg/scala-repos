@@ -8,7 +8,9 @@ import scala.collection.{Map, Set}
 import com.google.common.collect.ImmutableSet
 
 import com.twitter.common.net.pool.DynamicHostSet.HostChangeMonitor
-import com.twitter.common.zookeeper.{ServerSetImpl, ZooKeeperClient, ServerSet => CommonServerSet}
+import com.twitter.common.zookeeper.{
+  ServerSetImpl, ZooKeeperClient, ServerSet => CommonServerSet
+}
 import com.twitter.concurrent.{Broker, Offer}
 import com.twitter.thrift.{ServiceInstance, Status => CommonStatus}
 import com.twitter.util.{Future, FuturePool}

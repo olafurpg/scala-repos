@@ -5,7 +5,9 @@
 package akka.http.scaladsl.testkit
 
 import akka.http.impl.engine.ws.InternalCustomHeader
-import akka.http.scaladsl.model.headers.{UpgradeProtocol, Upgrade, `Sec-WebSocket-Protocol`}
+import akka.http.scaladsl.model.headers.{
+  UpgradeProtocol, Upgrade, `Sec-WebSocket-Protocol`
+}
 import akka.http.scaladsl.model.{StatusCodes, HttpResponse, HttpRequest, Uri}
 import akka.http.scaladsl.model.ws.{UpgradeToWebSocket, Message}
 import scala.collection.immutable

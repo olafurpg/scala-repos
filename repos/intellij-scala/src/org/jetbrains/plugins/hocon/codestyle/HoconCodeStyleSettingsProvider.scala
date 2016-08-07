@@ -1,7 +1,11 @@
 package org.jetbrains.plugins.hocon.codestyle
 
-import com.intellij.application.options.{CodeStyleAbstractConfigurable, TabbedLanguageCodeStylePanel}
-import com.intellij.psi.codeStyle.{CodeStyleSettings, CodeStyleSettingsProvider, DisplayPriority}
+import com.intellij.application.options.{
+  CodeStyleAbstractConfigurable, TabbedLanguageCodeStylePanel
+}
+import com.intellij.psi.codeStyle.{
+  CodeStyleSettings, CodeStyleSettingsProvider, DisplayPriority
+}
 import org.jetbrains.plugins.hocon.lang.HoconLanguage
 
 class HoconCodeStyleSettingsProvider extends CodeStyleSettingsProvider {

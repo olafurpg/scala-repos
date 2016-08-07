@@ -22,11 +22,15 @@ import kafka.server.KafkaConfig
 import kafka.utils.TestUtils
 import org.apache.kafka.clients.consumer._
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer, ByteArraySerializer}
+import org.apache.kafka.common.serialization.{
+  StringDeserializer, StringSerializer, ByteArraySerializer
+}
 import org.apache.kafka.test.{MockProducerInterceptor, MockConsumerInterceptor}
 import org.apache.kafka.clients.producer.{ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.TopicPartition
-import org.apache.kafka.common.errors.{InvalidTopicException, RecordTooLargeException}
+import org.apache.kafka.common.errors.{
+  InvalidTopicException, RecordTooLargeException
+}
 import org.apache.kafka.common.record.{CompressionType, TimestampType}
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.junit.Assert._

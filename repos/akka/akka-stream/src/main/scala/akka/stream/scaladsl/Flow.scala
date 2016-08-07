@@ -10,7 +10,9 @@ import akka.stream.impl.Stages.{DirectProcessor, StageModule}
 import akka.stream.impl.StreamLayout.{Module}
 import akka.stream.impl._
 import akka.stream.impl.fusing._
-import akka.stream.stage.AbstractStage.{PushPullGraphStage, PushPullGraphStageWithMaterializedValue}
+import akka.stream.stage.AbstractStage.{
+  PushPullGraphStage, PushPullGraphStageWithMaterializedValue
+}
 import akka.stream.stage._
 import org.reactivestreams.{Processor, Publisher, Subscriber, Subscription}
 import scala.annotation.unchecked.uncheckedVariance
@@ -51,7 +53,10 @@ final class Flow[-In, +Out, +Mat](private[stream] override val module: Module)
       combine: (Mat, Mat2) ⇒ Mat3): Flow[In, T, Mat3] =
     if (this.isIdentity) {
       import Predef.Map.empty
-      import StreamLayout.{CompositeModule, Ignore, IgnorableMatValComp, Transform, Atomic, Combine}
+      import StreamLayout.{
+        CompositeModule, Ignore, IgnorableMatValComp, Transform, Atomic,
+        Combine
+      }
       val m = flow.module
       val mat = if (combine == Keep.left) {
         if (IgnorableMatValComp(m)) Ignore

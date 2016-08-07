@@ -6,7 +6,9 @@ package elements
 
 import _root_.org.jetbrains.plugins.scala.lang.psi.impl.base.ScModifierListImpl
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink, StubElement, StubInputStream, StubOutputStream
+}
 import com.intellij.util.ArrayUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScModifierList
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScModifiersStubImpl

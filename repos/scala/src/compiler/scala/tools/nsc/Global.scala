@@ -9,13 +9,20 @@ package nsc
 
 import java.io.{File, IOException, FileNotFoundException}
 import java.net.URL
-import java.nio.charset.{Charset, CharsetDecoder, IllegalCharsetNameException, UnsupportedCharsetException}
+import java.nio.charset.{
+  Charset, CharsetDecoder, IllegalCharsetNameException,
+  UnsupportedCharsetException
+}
 import scala.collection.{mutable, immutable}
 import io.{SourceReader, AbstractFile, Path}
 import reporters.Reporter
-import util.{ClassFileLookup, ClassPath, MergedClassPath, StatisticsInfo, returning}
+import util.{
+  ClassFileLookup, ClassPath, MergedClassPath, StatisticsInfo, returning
+}
 import scala.reflect.ClassTag
-import scala.reflect.internal.util.{ScalaClassLoader, SourceFile, NoSourceFile, BatchSourceFile, ScriptSourceFile}
+import scala.reflect.internal.util.{
+  ScalaClassLoader, SourceFile, NoSourceFile, BatchSourceFile, ScriptSourceFile
+}
 import scala.reflect.internal.pickling.PickleBuffer
 import symtab.{Flags, SymbolTable, SymbolTrackers}
 import symtab.classfile.Pickler
@@ -42,8 +49,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     with DocComments
     with Positions
     with Reporting
-    with Parsing {
-  self =>
+    with Parsing { self =>
 
   // the mirror --------------------------------------------------
 
@@ -690,8 +696,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         enabled partition (_.requires forall isEnabled)
       unhappy foreach
         (u =>
-              globalError(
-                  s"Phase '${u.phaseName}' requires: ${u.requires filterNot isEnabled}"))
+           globalError(
+               s"Phase '${u.phaseName}' requires: ${u.requires filterNot isEnabled}"))
       satisfied // they're happy now, but they may need an unhappy phase that was booted
     }
     computeInternalPhases() // Global.scala
@@ -1655,8 +1661,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         val maxId = math.max(globalPhase.id, typerPhase.id)
         firstPhase.iterator takeWhile (_.id < maxId) foreach
           (ph =>
-                enteringPhase(ph)(
-                    ph.asInstanceOf[GlobalPhase] applyPhase unit))
+             enteringPhase(ph)(ph.asInstanceOf[GlobalPhase] applyPhase unit))
         refreshProgress()
       }
     }
@@ -1703,7 +1708,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       case NoSymbol =>
         phased(
             currentRun.symSource.keys map
-              (sym => findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
+              (sym =>
+                 findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
       // The name as given matched, so show only that.
       case sym => List(sym)
     }

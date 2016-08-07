@@ -17,7 +17,10 @@
 package net.liftweb
 package util
 
-import java.io.{InputStream, ByteArrayOutputStream, ByteArrayInputStream, Reader, File, FileInputStream, BufferedReader}
+import java.io.{
+  InputStream, ByteArrayOutputStream, ByteArrayInputStream, Reader, File,
+  FileInputStream, BufferedReader
+}
 import scala.util.Try
 import scala.xml._
 import common._

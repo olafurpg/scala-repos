@@ -30,7 +30,10 @@ import ops.nat._
 import ops.traversable._
 import poly.{~>>}
 import record._
-import syntax.{CoproductOps, GenericZipperOps, HListOps, HListZipperOps, NatOps, RecordOps, TypeableOps, UnionOps}
+import syntax.{
+  CoproductOps, GenericZipperOps, HListOps, HListZipperOps, NatOps, RecordOps,
+  TypeableOps, UnionOps
+}
 import syntax.std.TupleOps
 import syntax.singleton._
 import syntax.zipper._
@@ -1091,9 +1094,9 @@ class SerializationTests {
 
     assertSerializableBeforeAfter(
         implicitly[Everything[gsize.type, plus.type, Wibble]])(
-        _ (Wibble(2, "a")))
+        _(Wibble(2, "a")))
     assertSerializableBeforeAfter(
-        implicitly[Everywhere[poly.identity.type, Wibble]])(_ (Wibble(2, "a")))
+        implicitly[Everywhere[poly.identity.type, Wibble]])(_(Wibble(2, "a")))
   }
 
   @Test

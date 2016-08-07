@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.lang.completion.statistician
 
-import com.intellij.codeInsight.completion.{CompletionLocation, CompletionStatistician}
+import com.intellij.codeInsight.completion.{
+  CompletionLocation, CompletionStatistician
+}
 import com.intellij.codeInsight.lookup.{LookupElement, LookupItem}
 import com.intellij.psi.statistics.StatisticsInfo
 import com.intellij.psi.{PsiClass, PsiMember, PsiNamedElement}

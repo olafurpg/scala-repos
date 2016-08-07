@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-13 Miles Sabin 
+ * Copyright (c) 2012-13 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ import poly._
 
 /*
  * Examples of Scrap Your Boilerplate in action
- * 
+ *
  * @author Miles Sabin
  */
 object SybClassExamples {
 
-  // Example taken from the original SYB paper: 
+  // Example taken from the original SYB paper:
   // "Scrap your boilerplate: a practical approach to generic programming", Ralf Laemmel, Simon Peyton Jones
   //   http://research.microsoft.com/en-us/um/people/simonpj/papers/hmap/
   case class Company(depts: List[Dept])

@@ -114,8 +114,7 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     * A ScalatraTemplateEngine looks for layouts in `/WEB-INF/templates/layouts` before
     * searching in `/WEB-INF/layouts` and `/WEB-INF/scalate/layouts`.
     */
-  trait ScalatraTemplateEngine {
-    this: TemplateEngine =>
+  trait ScalatraTemplateEngine { this: TemplateEngine =>
 
     /**
       * Delegates to the ServletBase's isDevelopmentMode flag.
@@ -287,7 +286,7 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     val attrs =
       templateAttributes ++
         (defaultLayoutPath map (p =>
-                  Map("layout" -> p) ++ Map(attributes: _*)) getOrElse Map(
+                                  Map("layout" -> p) ++ Map(attributes: _*)) getOrElse Map(
                 attributes: _*))
 
     attrs foreach {

@@ -5,7 +5,11 @@ package akka.remote
 
 import scala.annotation.tailrec
 import scala.util.control.NonFatal
-import akka.actor.{VirtualPathContainer, Deploy, Props, Nobody, InternalActorRef, ActorSystemImpl, ActorRef, ActorPathExtractor, ActorPath, Actor, AddressTerminated}
+import akka.actor.{
+  VirtualPathContainer, Deploy, Props, Nobody, InternalActorRef,
+  ActorSystemImpl, ActorRef, ActorPathExtractor, ActorPath, Actor,
+  AddressTerminated
+}
 import akka.event.LoggingAdapter
 import akka.dispatch.sysmsg.{DeathWatchNotification, SystemMessage, Watch}
 import akka.actor.ActorRefWithCell

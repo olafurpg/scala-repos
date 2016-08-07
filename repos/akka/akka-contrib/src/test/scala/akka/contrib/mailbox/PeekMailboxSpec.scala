@@ -5,7 +5,9 @@ package akka.contrib.mailbox
 
 import com.typesafe.config.ConfigFactory
 
-import akka.actor.{Actor, ActorSystem, DeadLetter, PoisonPill, Props, actorRef2Scala}
+import akka.actor.{
+  Actor, ActorSystem, DeadLetter, PoisonPill, Props, actorRef2Scala
+}
 import akka.testkit.{AkkaSpec, EventFilter, ImplicitSender}
 
 object PeekMailboxSpec {

@@ -20,7 +20,9 @@ package org.apache.spark.sql.execution
 import org.apache.spark.SparkContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.execution.datasources.{DataSourceStrategy, FileSourceStrategy}
+import org.apache.spark.sql.execution.datasources.{
+  DataSourceStrategy, FileSourceStrategy
+}
 import org.apache.spark.sql.internal.SQLConf
 
 class SparkPlanner(val sparkContext: SparkContext,

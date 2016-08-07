@@ -174,7 +174,7 @@ object JqJE {
     * Calls the jQuery attr function with the given key.
     *
     * Used to get the value of the given attribute.
-    * 
+    *
     * See http://api.jquery.com/attr/ .
     */
   case class JqGetAttr(key: String) extends JsExp with JsMember {
@@ -615,7 +615,7 @@ object JqJsCmds {
       (After(duration,
              JqJE.JqId(id) ~>
                (new JsRaw("fadeOut(" + fadeTime.millis + ")")
-                   with JsMember))).toJsCmd
+               with JsMember))).toJsCmd
   }
 
   /**
@@ -641,7 +641,7 @@ object JqJsCmds {
       (After(duration,
              JqJE.JqId(id) ~>
                (new JsRaw("fadeIn(" + fadeTime.millis + ")")
-                   with JsMember))).toJsCmd
+               with JsMember))).toJsCmd
   }
 
   /**
@@ -672,7 +672,6 @@ object JqJsCmds {
     /*
     private def contentAsJsStr = {
     val w = new java.io.StringWriter
-    
     S.htmlProperties.
     htmlWriter(Group(S.session.
                      map(s =>

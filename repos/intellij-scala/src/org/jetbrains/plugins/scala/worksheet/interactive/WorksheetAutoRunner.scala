@@ -3,7 +3,9 @@ package worksheet.interactive
 
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.editor.Document
-import com.intellij.openapi.editor.event.{DocumentAdapter, DocumentEvent, DocumentListener}
+import com.intellij.openapi.editor.event.{
+  DocumentAdapter, DocumentEvent, DocumentListener
+}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.newvfs.FileAttribute
 import com.intellij.problems.WolfTheProblemSolver
@@ -12,7 +14,9 @@ import com.intellij.util.Alarm
 import com.intellij.util.containers.ContainerUtil
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
 import org.jetbrains.plugins.scala.worksheet.actions.RunWorksheetAction
-import org.jetbrains.plugins.scala.worksheet.processor.{FileAttributeUtilCache, WorksheetPerFileConfig}
+import org.jetbrains.plugins.scala.worksheet.processor.{
+  FileAttributeUtilCache, WorksheetPerFileConfig
+}
 import org.jetbrains.plugins.scala.worksheet.server.WorksheetProcessManager
 
 /**

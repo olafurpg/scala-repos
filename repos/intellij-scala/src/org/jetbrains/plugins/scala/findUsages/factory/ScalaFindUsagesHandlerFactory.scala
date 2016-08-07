@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.findUsages.factory
 
 import javax.swing.SwingUtilities
 
-import com.intellij.find.findUsages.{FindUsagesHandler, FindUsagesHandlerFactory}
+import com.intellij.find.findUsages.{
+  FindUsagesHandler, FindUsagesHandlerFactory
+}
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
@@ -11,7 +13,9 @@ import com.intellij.util.containers.ContainerUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScNamedElement, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
 import org.jetbrains.plugins.scala.lang.psi.light._
 import org.jetbrains.plugins.scala.lang.refactoring.rename.RenameSuperMembersUtil

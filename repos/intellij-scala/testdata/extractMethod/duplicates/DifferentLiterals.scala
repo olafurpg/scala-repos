@@ -14,7 +14,6 @@ object DifferentLiterals {
 }
 /*
 object DifferentLiterals {
-
   def log(message: String, level: Int) {
     level match {
       case 0 =>
@@ -24,7 +23,6 @@ object DifferentLiterals {
         println(message)
     }
   }
-
   def testMethodName(message: String): Unit = {
     println("info: ")
     println(message)

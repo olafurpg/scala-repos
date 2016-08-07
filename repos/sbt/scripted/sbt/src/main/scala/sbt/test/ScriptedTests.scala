@@ -9,7 +9,9 @@ import java.io.File
 import java.nio.charset.Charset
 
 import xsbt.IPC
-import sbt.internal.scripted.{CommentHandler, FileCommands, ScriptRunner, TestScriptParser, TestException}
+import sbt.internal.scripted.{
+  CommentHandler, FileCommands, ScriptRunner, TestScriptParser, TestException
+}
 import sbt.io.{DirectoryFilter, GlobFilter, HiddenFileFilter, Path}
 import sbt.io.IO.wrapNull
 import sbt.internal.io.Resources

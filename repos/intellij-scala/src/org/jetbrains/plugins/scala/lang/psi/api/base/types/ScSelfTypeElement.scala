@@ -5,7 +5,9 @@ package api
 package base
 package types
 
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScNamedElement, ScTypedDefinition
+}
 
 /**
   * @author ilyas, Alexander Podkhalyuzin

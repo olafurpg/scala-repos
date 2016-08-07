@@ -4,8 +4,14 @@
 package akka.cluster
 
 import akka.ConfigurationException
-import akka.actor.{ActorRef, ActorSystem, ActorSystemImpl, Deploy, DynamicAccess, NoScopeGiven, Scope}
-import akka.cluster.routing.{ClusterRouterGroup, ClusterRouterGroupSettings, ClusterRouterPool, ClusterRouterPoolSettings}
+import akka.actor.{
+  ActorRef, ActorSystem, ActorSystemImpl, Deploy, DynamicAccess, NoScopeGiven,
+  Scope
+}
+import akka.cluster.routing.{
+  ClusterRouterGroup, ClusterRouterGroupSettings, ClusterRouterPool,
+  ClusterRouterPoolSettings
+}
 import akka.event.EventStream
 import akka.remote.{RemoteActorRefProvider, RemoteDeployer}
 import akka.remote.routing.RemoteRouterConfig

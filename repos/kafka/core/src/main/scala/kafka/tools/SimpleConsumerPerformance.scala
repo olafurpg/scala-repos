@@ -18,7 +18,9 @@ package kafka.tools
 
 import java.net.URI
 import java.text.SimpleDateFormat
-import kafka.api.{PartitionOffsetRequestInfo, FetchRequestBuilder, OffsetRequest}
+import kafka.api.{
+  PartitionOffsetRequestInfo, FetchRequestBuilder, OffsetRequest
+}
 import kafka.consumer.SimpleConsumer
 import kafka.utils._
 import org.apache.log4j.Logger

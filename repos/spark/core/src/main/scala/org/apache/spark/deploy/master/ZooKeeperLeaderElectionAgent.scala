@@ -18,7 +18,9 @@
 package org.apache.spark.deploy.master
 
 import org.apache.curator.framework.CuratorFramework
-import org.apache.curator.framework.recipes.leader.{LeaderLatch, LeaderLatchListener}
+import org.apache.curator.framework.recipes.leader.{
+  LeaderLatch, LeaderLatchListener
+}
 
 import org.apache.spark.SparkConf
 import org.apache.spark.deploy.SparkCuratorUtil

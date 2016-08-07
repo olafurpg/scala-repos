@@ -17,7 +17,7 @@ package scala.test.scaladoc.links {
     def foo(i: Int) = 2
     def foo(s: String) = 3
     def foo[A[_]](x: A[String]) = 5
-    def foo[A[_ [_]]](x: A[List]) = 6
+    def foo[A[_[_]]](x: A[List]) = 6
     val bar: Boolean
     def baz(c: scala.test.scaladoc.links.C) = 7
   }
@@ -30,7 +30,7 @@ package scala.test.scaladoc.links {
     def foo(i: Int) = 2
     def foo(z: String) = 3
     def foo[A[_]](x: A[String]) = 5
-    def foo[A[_ [_]]](x: A[List]) = 6
+    def foo[A[_[_]]](x: A[List]) = 6
     val bar: Boolean = false
     val onlyInObject = 1
     def baz(c: scala.test.scaladoc.links.C) = 7

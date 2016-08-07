@@ -30,7 +30,9 @@ import java.{util => ju}
 import javafx.{collections => jfxc}
 
 import scala.collection.JavaConversions._
-import scala.collection.generic.{GenericCompanion, GenericSetTemplate, MutableSetFactory}
+import scala.collection.generic.{
+  GenericCompanion, GenericSetTemplate, MutableSetFactory
+}
 import scala.collection.mutable.{Builder, Set, SetLike}
 import scala.language.implicitConversions
 import scalafx.beans.Observable

@@ -24,7 +24,9 @@ import org.apache.hadoop.io.compress.CompressionCodecFactory
 import org.apache.hadoop.mapreduce.InputSplit
 import org.apache.hadoop.mapreduce.RecordReader
 import org.apache.hadoop.mapreduce.TaskAttemptContext
-import org.apache.hadoop.mapreduce.lib.input.{CombineFileRecordReader, CombineFileSplit}
+import org.apache.hadoop.mapreduce.lib.input.{
+  CombineFileRecordReader, CombineFileSplit
+}
 
 /**
   * A trait to implement [[org.apache.hadoop.conf.Configurable Configurable]] interface.

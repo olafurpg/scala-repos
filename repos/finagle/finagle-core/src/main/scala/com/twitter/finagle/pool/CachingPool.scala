@@ -2,7 +2,10 @@ package com.twitter.finagle.pool
 
 import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.finagle.util.Cache
-import com.twitter.finagle.{ClientConnection, Service, ServiceClosedException, ServiceFactory, ServiceProxy, Status}
+import com.twitter.finagle.{
+  ClientConnection, Service, ServiceClosedException, ServiceFactory,
+  ServiceProxy, Status
+}
 import com.twitter.util.{Future, Time, Duration, Timer}
 import scala.annotation.tailrec
 

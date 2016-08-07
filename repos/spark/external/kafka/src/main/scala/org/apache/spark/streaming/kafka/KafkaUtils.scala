@@ -38,7 +38,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.api.java._
-import org.apache.spark.streaming.dstream.{DStream, InputDStream, ReceiverInputDStream}
+import org.apache.spark.streaming.dstream.{
+  DStream, InputDStream, ReceiverInputDStream
+}
 import org.apache.spark.streaming.util.WriteAheadLogUtils
 
 object KafkaUtils {

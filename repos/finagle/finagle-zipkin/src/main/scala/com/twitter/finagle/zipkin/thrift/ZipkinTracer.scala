@@ -1,9 +1,13 @@
 package com.twitter.finagle.zipkin.thrift
 
 import com.twitter.finagle.NoStacktrace
-import com.twitter.finagle.stats.{DefaultStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  DefaultStatsReceiver, NullStatsReceiver, StatsReceiver
+}
 import com.twitter.finagle.tracing.{TraceId, Record, Tracer, Annotation, Trace}
-import com.twitter.finagle.zipkin.{host => Host, initialSampleRate => sampleRateFlag}
+import com.twitter.finagle.zipkin.{
+  host => Host, initialSampleRate => sampleRateFlag
+}
 import com.twitter.io.Buf
 import com.twitter.util.events.{Event, Sink}
 import com.twitter.util.{Time, Throw, Try}

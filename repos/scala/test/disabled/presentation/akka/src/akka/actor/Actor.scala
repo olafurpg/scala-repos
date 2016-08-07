@@ -132,7 +132,7 @@ object Actor extends ListenerManagement {
 
   lazy val remote: RemoteSupport = {
     ReflectiveAccess.Remote.defaultRemoteSupport
-      .map(_ ())
+      .map(_())
       .getOrElse(throw new UnsupportedOperationException(
               "You need to have akka-remote.jar on classpath"))
   }

@@ -7,7 +7,11 @@ import java.util.Collection
 import scala.concurrent.{BlockContext, CanAwait}
 import scala.concurrent.duration.Duration
 import scala.concurrent.forkjoin._
-import java.util.concurrent.{ArrayBlockingQueue, BlockingQueue, Callable, ExecutorService, LinkedBlockingQueue, RejectedExecutionHandler, RejectedExecutionException, SynchronousQueue, TimeUnit, ThreadFactory, ThreadPoolExecutor}
+import java.util.concurrent.{
+  ArrayBlockingQueue, BlockingQueue, Callable, ExecutorService,
+  LinkedBlockingQueue, RejectedExecutionHandler, RejectedExecutionException,
+  SynchronousQueue, TimeUnit, ThreadFactory, ThreadPoolExecutor
+}
 import java.util.concurrent.atomic.{AtomicReference, AtomicLong}
 
 object ThreadPoolConfig {
@@ -174,7 +178,7 @@ final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
   def configure(
       fs: Option[Function[ThreadPoolConfigBuilder, ThreadPoolConfigBuilder]]*)
     : ThreadPoolConfigBuilder =
-    fs.foldLeft(this)((c, f) ⇒ f.map(_ (c)).getOrElse(c))
+    fs.foldLeft(this)((c, f) ⇒ f.map(_(c)).getOrElse(c))
 }
 
 object MonitorableThreadFactory {

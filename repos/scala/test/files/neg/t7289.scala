@@ -14,14 +14,11 @@ info2 = {scala.tools.nsc.typechecker.Implicits$ImplicitInfo@3469}"schtroumpf: [T
 isStrictlyMoreSpecific(info1, info2)
   isSubType(Test.Schtroumpf[Int], Test.Schtroumpf[U] forSome { T; U <: Coll[T]; Coll[_] <: Traversable[_] })
     isAsSpecificValueType(Test.Schtroumpf[Int], Test.Schtroumpf[U], undef2 = List(type T, type U, type Coll))
-
       val et: ExistentialType = Test.Schtroumpf[U] forSome { T; U <: Coll[T]; Coll[_] <: Traversable[_] }
       val tp1 = Test.Schtroumpf[Int]
       et.withTypeVars(isSubType(tp1, _, depth))
         solve()
         tvars = tList(=?Nothing, =?Int, =?=?Int)
-
-
 [    create] ?T                       ( In Test#schtroumpf[T,U <: Coll[T],Coll[_] <: Traversable[_]] )
 [    create] ?U                       ( In Test#schtroumpf[T,U <: Coll[T],Coll[_] <: Traversable[_]] )
 [    create] ?Coll                    ( In Test#schtroumpf[T,U <: Coll[T],Coll[_] <: Traversable[_]] )

@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports._
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScImportSelectorsStub
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */

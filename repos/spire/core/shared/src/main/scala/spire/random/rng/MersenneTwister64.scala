@@ -40,7 +40,9 @@ final class MersenneTwister64 protected[random] (mt: Array[Long],
     extends LongBasedGenerator {
   // N + 1 = 313
 
-  import MersenneTwister64.{UpperMask, LowerMask, N, M, N_M, N_1, M_N, M_1, BYTES, mag01}
+  import MersenneTwister64.{
+    UpperMask, LowerMask, N, M, N_M, N_1, M_N, M_1, BYTES, mag01
+  }
 
   private var mti = mti0
 

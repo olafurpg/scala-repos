@@ -3,14 +3,16 @@ package com.twitter.scalding.benchmarks
 import com.twitter.chill.KryoPool
 import com.twitter.scalding.serialization._
 import java.io.ByteArrayInputStream
-import org.scalacheck.{Gen => scGen, Arbitrary} // We use scalacheck Gens to generate random scalameter gens.
+import org.scalacheck.{
+  Gen => scGen, Arbitrary
+} // We use scalacheck Gens to generate random scalameter gens.
 import org.scalameter.api._
 import scala.collection.generic.CanBuildFrom
 import scala.language.experimental.macros
 
 trait LowerPriorityImplicit {
-  implicit def ordBuf[T]: OrderedSerialization[T] = macro com.twitter.scalding.macros.impl
-    .OrderedSerializationProviderImpl[T]
+  implicit def ordBuf[T]: OrderedSerialization[T] =
+    macro com.twitter.scalding.macros.impl.OrderedSerializationProviderImpl[T]
 }
 
 object SerializationBenchmark

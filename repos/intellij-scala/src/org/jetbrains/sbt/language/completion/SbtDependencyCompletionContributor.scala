@@ -9,7 +9,9 @@ import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionContributor
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScInfixExpr
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScLiteralImpl
-import org.jetbrains.sbt.resolvers.{SbtResolverIndexesManager, SbtResolverUtils}
+import org.jetbrains.sbt.resolvers.{
+  SbtResolverIndexesManager, SbtResolverUtils
+}
 
 /**
   * @author Nikolay Obedin

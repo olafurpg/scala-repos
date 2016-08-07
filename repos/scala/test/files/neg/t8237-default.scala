@@ -17,9 +17,7 @@ argument expression's type is not compatible with formal parameter type;
  required: ?T
   test4(test4$default$1)
   ^
-
 NEW:
-
 no type parameters for method test4: (x: T[T[List[T[X forSome { type X }]]]])Nothing exist so that it can be applied to arguments (List[Int])
  --- because ---
 argument expression's type is not compatible with formal parameter type;

@@ -18,7 +18,9 @@ package kafka.javaapi.consumer
 
 import kafka.serializer._
 import kafka.consumer._
-import kafka.common.{OffsetAndMetadata, TopicAndPartition, MessageStreamsExistException}
+import kafka.common.{
+  OffsetAndMetadata, TopicAndPartition, MessageStreamsExistException
+}
 import scala.collection.{immutable, mutable, JavaConversions}
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.collection.JavaConverters._
@@ -85,8 +87,7 @@ private[kafka] class ZookeeperConsumerConnector(
       import JavaConversions._
       Map.empty[String, Int] ++
         (topicCountMap
-              .asInstanceOf[java.util.Map[String, Int]]: mutable.Map[String,
-                                                                     Int])
+          .asInstanceOf[java.util.Map[String, Int]]: mutable.Map[String, Int])
     }
     val scalaReturn =
       underlying.consume(scalaTopicCountMap, keyDecoder, valueDecoder)

@@ -19,7 +19,9 @@ package org.apache.spark.sql.expressions
 
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, TypedColumn}
 import org.apache.spark.sql.catalyst.encoders.encoderFor
-import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateExpression, Complete}
+import org.apache.spark.sql.catalyst.expressions.aggregate.{
+  AggregateExpression, Complete
+}
 import org.apache.spark.sql.execution.aggregate.TypedAggregateExpression
 
 /**

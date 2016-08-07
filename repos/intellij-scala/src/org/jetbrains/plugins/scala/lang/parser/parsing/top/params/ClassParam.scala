@@ -4,7 +4,9 @@ package parser
 package parsing
 package top.params
 
-import _root_.org.jetbrains.plugins.scala.lang.parser.parsing.expressions.{Annotation, Expr}
+import _root_.org.jetbrains.plugins.scala.lang.parser.parsing.expressions.{
+  Annotation, Expr
+}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.base.Modifier
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder

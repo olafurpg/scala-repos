@@ -4,7 +4,9 @@ import com.intellij.debugger.SourcePosition
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.{PsiFile, PsiManager}
 import com.sun.jdi.Location
-import org.jetbrains.plugins.scala.debugger.{Loc, ScalaDebuggerTestCase, ScalaPositionManager}
+import org.jetbrains.plugins.scala.debugger.{
+  Loc, ScalaDebuggerTestCase, ScalaPositionManager
+}
 import org.jetbrains.plugins.scala.extensions
 import org.junit.Assert
 

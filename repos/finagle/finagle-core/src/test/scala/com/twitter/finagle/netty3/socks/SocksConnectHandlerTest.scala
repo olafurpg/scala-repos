@@ -2,7 +2,9 @@ package com.twitter.finagle.netty3.socks
 
 import com.twitter.finagle.ConnectionFailedException
 import com.twitter.finagle.netty3.SocketAddressResolveHandler
-import com.twitter.finagle.socks.{Unauthenticated, UsernamePassAuthenticationSetting}
+import com.twitter.finagle.socks.{
+  Unauthenticated, UsernamePassAuthenticationSetting
+}
 import java.net.{SocketAddress, InetAddress, InetSocketAddress}
 import java.util.Arrays
 import org.jboss.netty.buffer.{ChannelBuffers, ChannelBuffer}

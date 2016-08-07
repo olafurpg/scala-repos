@@ -44,13 +44,11 @@ private[akka] object Inbox {
   private case object Kick
 }
 
-trait Inbox {
-  this: ActorDSL.type ⇒
+trait Inbox { this: ActorDSL.type ⇒
 
   import Inbox._
 
-  protected trait InboxExtension {
-    this: Extension ⇒
+  protected trait InboxExtension { this: Extension ⇒
     val DSLInboxQueueSize = config.getInt("inbox-size")
 
     val inboxNr = new AtomicInteger

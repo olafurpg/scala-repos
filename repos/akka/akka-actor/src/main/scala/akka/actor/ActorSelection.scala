@@ -222,7 +222,7 @@ object ActorSelection {
                 } else {
                   val matchingChildren =
                     chldr.filter(c ⇒ p.pattern.matcher(c.path.name).matches)
-                  // don't send to emptyRef after wildcard fan-out 
+                  // don't send to emptyRef after wildcard fan-out
                   if (matchingChildren.isEmpty && !sel.wildcardFanOut)
                     emptyRef.tell(sel, sender)
                   else {
@@ -253,8 +253,7 @@ object ActorSelection {
   * Contains the Scala API (!-method) for ActorSelections) which provides automatic tracking of the sender,
   * as per the usual implicit ActorRef pattern.
   */
-trait ScalaActorSelection {
-  this: ActorSelection ⇒
+trait ScalaActorSelection { this: ActorSelection ⇒
 
   def !(msg: Any)(implicit sender: ActorRef = Actor.noSender) =
     tell(msg, sender)

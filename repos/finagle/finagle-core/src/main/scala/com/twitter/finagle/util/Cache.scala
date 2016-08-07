@@ -82,7 +82,7 @@ private[finagle] class Cache[A](cacheSize: Int,
     evicted foreach { evict(_) }
   }
 
-  private[this] def evict(item: A) = evictor foreach { _ (item) }
+  private[this] def evict(item: A) = evictor foreach { _(item) }
 
   /**
     * Retrieve an item from the cache.  Items are retrieved in LIFO

@@ -4,7 +4,9 @@
 package play.forkrun.protocol
 
 import play.api.PlayException
-import play.runsupport.Reloader.{Source, CompileSuccess, CompileFailure, CompileResult}
+import play.runsupport.Reloader.{
+  Source, CompileSuccess, CompileFailure, CompileResult
+}
 import sbt.protocol._
 import sbt.serialization._
 

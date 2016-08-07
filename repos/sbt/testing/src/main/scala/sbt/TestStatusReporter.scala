@@ -27,7 +27,9 @@ private[sbt] class TestStatusReporter(f: File) extends TestsListener {
 private[sbt] object TestStatus {
   import java.util.Properties
   def read(f: File): Map[String, Long] = {
-    import scala.collection.JavaConversions.{enumerationAsScalaIterator, propertiesAsScalaMap}
+    import scala.collection.JavaConversions.{
+      enumerationAsScalaIterator, propertiesAsScalaMap
+    }
     val properties = new Properties
     IO.load(properties, f)
     properties map { case (k, v) => (k, v.toLong) }

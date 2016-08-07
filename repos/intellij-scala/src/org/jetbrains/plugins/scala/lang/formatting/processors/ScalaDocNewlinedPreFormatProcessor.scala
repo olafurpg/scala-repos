@@ -11,7 +11,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType
 import org.jetbrains.plugins.scala.lang.scaladoc.parser.ScalaDocElementTypes
-import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocTag, ScDocComment}
+import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{
+  ScDocTag, ScDocComment
+}
 
 /**
   * @author Roman.Shein

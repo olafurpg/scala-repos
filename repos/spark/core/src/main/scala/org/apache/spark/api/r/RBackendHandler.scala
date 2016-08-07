@@ -17,7 +17,10 @@
 
 package org.apache.spark.api.r
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, DataInputStream,
+  DataOutputStream
+}
 
 import scala.collection.mutable.HashMap
 import scala.language.existentials

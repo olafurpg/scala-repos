@@ -13,8 +13,7 @@ object I18nSupport {
   val MessagesKey: String = "messages"
 }
 
-trait I18nSupport {
-  this: ScalatraBase =>
+trait I18nSupport { this: ScalatraBase =>
 
   import org.scalatra.i18n.I18nSupport._
 
@@ -68,7 +67,7 @@ trait I18nSupport {
 
   /*
    * Get locale either from HTTP param, Cookie or Accept-Language header.
-   * 
+   *
    * If locale string is found in HTTP param, it will be set
    * in cookie. Later requests will read locale string directly from this
    *

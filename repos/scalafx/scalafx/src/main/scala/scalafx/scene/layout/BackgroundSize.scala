@@ -49,7 +49,7 @@ object BackgroundSize {
 }
 
 /**
-  * @author Jarek Sacha 
+  * @author Jarek Sacha
   */
 class BackgroundSize(override val delegate: jfxsl.BackgroundSize)
     extends SFXDelegate[jfxsl.BackgroundSize] {

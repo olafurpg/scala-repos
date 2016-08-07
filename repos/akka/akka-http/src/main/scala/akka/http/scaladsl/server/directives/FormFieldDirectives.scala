@@ -134,7 +134,9 @@ object FormFieldDirectives extends FormFieldDirectives {
     import BasicDirectives._
     import FutureDirectives._
     import RouteDirectives._
-    import akka.http.scaladsl.unmarshalling.{FromStrictFormFieldUnmarshaller ⇒ FSFFU, _}
+    import akka.http.scaladsl.unmarshalling.{
+      FromStrictFormFieldUnmarshaller ⇒ FSFFU, _
+    }
     type SFU = FromEntityUnmarshaller[StrictForm]
     type FSFFOU[T] = Unmarshaller[Option[StrictForm.Field], T]
 

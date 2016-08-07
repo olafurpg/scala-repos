@@ -11,8 +11,7 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 trait GenericRoutingSpec
     extends Matchers
     with Directives
-    with ScalatestRouteTest {
-  this: Suite ⇒
+    with ScalatestRouteTest { this: Suite ⇒
   val Ok = HttpResponse()
   val completeOk = complete(Ok)
 

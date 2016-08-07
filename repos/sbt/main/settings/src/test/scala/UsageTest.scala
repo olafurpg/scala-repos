@@ -7,10 +7,8 @@ import sbt.internal.util.complete.{DefaultParsers, Parsers}
 /*object UseTask
 {
 		import Def._
-
 	val set = setting { 23 }
 	val plain = PlainTaskMacro task { 19 }
-
 	val x = task { set.value }
 	val y = task { true }
 	val z = task { if(y.value) x.value else plain.value }
@@ -43,9 +41,7 @@ object Assign {
   val listSetting = settingKey[List[String]]("listSetting")
 
   /*	def azy = sk.value
-
 	def azy2 = appmacro.Debug.checkWild(Def.task{ sk.value.size })
-
 	val settings = Seq(
 		ak += z.value + (if(y.value) set.value else plain.value),
 		ck := new File(ck.value, "asdf"),

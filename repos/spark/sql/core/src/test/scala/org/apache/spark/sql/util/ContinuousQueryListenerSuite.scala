@@ -31,7 +31,9 @@ import org.scalatest.time.SpanSugar._
 import org.apache.spark.sql._
 import org.apache.spark.sql.execution.streaming._
 import org.apache.spark.sql.test.SharedSQLContext
-import org.apache.spark.sql.util.ContinuousQueryListener.{QueryProgress, QueryStarted, QueryTerminated}
+import org.apache.spark.sql.util.ContinuousQueryListener.{
+  QueryProgress, QueryStarted, QueryTerminated
+}
 
 class ContinuousQueryListenerSuite
     extends StreamTest

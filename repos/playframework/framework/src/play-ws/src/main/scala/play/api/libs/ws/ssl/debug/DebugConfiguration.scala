@@ -5,7 +5,9 @@
  */
 package play.api.libs.ws.ssl.debug
 
-import play.api.libs.ws.ssl.{JavaxNetDebugBuilder, JavaSecurityDebugBuilder, SSLDebugConfig}
+import play.api.libs.ws.ssl.{
+  JavaxNetDebugBuilder, JavaSecurityDebugBuilder, SSLDebugConfig
+}
 
 class DebugConfiguration {
 

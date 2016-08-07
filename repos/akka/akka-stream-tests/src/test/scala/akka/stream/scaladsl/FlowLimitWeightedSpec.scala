@@ -3,7 +3,9 @@
   */
 package akka.stream.scaladsl
 
-import akka.stream.{StreamLimitReachedException, ActorMaterializer, ActorMaterializerSettings}
+import akka.stream.{
+  StreamLimitReachedException, ActorMaterializer, ActorMaterializerSettings
+}
 import akka.testkit.AkkaSpec
 import scala.concurrent.Await
 import scala.concurrent.duration._

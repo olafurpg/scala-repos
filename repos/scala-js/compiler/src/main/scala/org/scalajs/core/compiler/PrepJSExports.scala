@@ -12,8 +12,7 @@ import scala.collection.mutable
   *
   *  Helpers for transformation of @JSExport annotations
   */
-trait PrepJSExports {
-  this: PrepJSInterop =>
+trait PrepJSExports { this: PrepJSInterop =>
 
   import global._
   import jsAddons._

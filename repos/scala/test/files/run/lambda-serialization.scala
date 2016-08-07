@@ -1,4 +1,7 @@
-import java.io.{ByteArrayInputStream, ObjectInputStream, ObjectOutputStream, ByteArrayOutputStream}
+import java.io.{
+  ByteArrayInputStream, ObjectInputStream, ObjectOutputStream,
+  ByteArrayOutputStream
+}
 
 object Test {
   def main(args: Array[String]): Unit = {

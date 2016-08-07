@@ -3,10 +3,17 @@
   */
 package akka.remote.testconductor
 
-import org.jboss.netty.channel.{Channel, ChannelPipeline, ChannelPipelineFactory, ChannelUpstreamHandler, DefaultChannelPipeline}
-import org.jboss.netty.channel.socket.nio.{NioClientSocketChannelFactory, NioServerSocketChannelFactory}
+import org.jboss.netty.channel.{
+  Channel, ChannelPipeline, ChannelPipelineFactory, ChannelUpstreamHandler,
+  DefaultChannelPipeline
+}
+import org.jboss.netty.channel.socket.nio.{
+  NioClientSocketChannelFactory, NioServerSocketChannelFactory
+}
 import org.jboss.netty.bootstrap.{ClientBootstrap, ServerBootstrap}
-import org.jboss.netty.handler.codec.frame.{LengthFieldBasedFrameDecoder, LengthFieldPrepender}
+import org.jboss.netty.handler.codec.frame.{
+  LengthFieldBasedFrameDecoder, LengthFieldPrepender
+}
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors
 import akka.event.Logging

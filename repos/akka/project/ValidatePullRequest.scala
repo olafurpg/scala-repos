@@ -267,10 +267,10 @@ object ValidatePullRequest extends AutoPlugin {
           val validationTasks =
             buildMode.task.toSeq ++
               (buildMode match {
-                    case BuildSkip =>
-                      Seq.empty // do not run the additional task if project is skipped during pr validation
-                    case _ => (additionalTasks in ValidatePR).value
-                  })
+                case BuildSkip =>
+                  Seq.empty // do not run the additional task if project is skipped during pr validation
+                case _ => (additionalTasks in ValidatePR).value
+              })
 
           // Create a task for every validation task key and
           // then zip all of the tasks together discarding outputs.

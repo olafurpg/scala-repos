@@ -32,13 +32,13 @@ case class BitCount(key: ChannelBuffer,
     RedisCodec.toUnifiedFormat(
         Seq(CommandBytes.BITCOUNT, key) ++
           (start match {
-            case Some(i) => Seq(StringToChannelBuffer(i.toString))
-            case None => Seq.empty
-          }) ++
+        case Some(i) => Seq(StringToChannelBuffer(i.toString))
+        case None => Seq.empty
+      }) ++
           (end match {
-            case Some(i) => Seq(StringToChannelBuffer(i.toString))
-            case None => Seq.empty
-          }))
+        case Some(i) => Seq(StringToChannelBuffer(i.toString))
+        case None => Seq.empty
+      }))
   }
 }
 object BitCount {
@@ -316,12 +316,12 @@ case class Set(key: ChannelBuffer,
   def toChannelBuffer = RedisCodec.toUnifiedFormat(
       Seq(CommandBytes.SET, key, value) ++
         (ttl match {
-              case Some(InSeconds(seconds)) =>
-                Seq(Set.ExBytes, StringToChannelBuffer(seconds.toString))
-              case Some(InMilliseconds(millis)) =>
-                Seq(Set.PxBytes, StringToChannelBuffer(millis.toString))
-              case _ => Seq()
-            }) ++ (if (nx) Seq(Set.NxBytes) else Seq()) ++
+          case Some(InSeconds(seconds)) =>
+            Seq(Set.ExBytes, StringToChannelBuffer(seconds.toString))
+          case Some(InMilliseconds(millis)) =>
+            Seq(Set.PxBytes, StringToChannelBuffer(millis.toString))
+          case _ => Seq()
+        }) ++ (if (nx) Seq(Set.NxBytes) else Seq()) ++
         (if (xx) Seq(Set.XxBytes) else Seq())
   )
 }

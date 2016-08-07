@@ -7,7 +7,9 @@ import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.{PsiElement, _}
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScStableReferenceElementPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause, ScStableReferenceElementPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 /**

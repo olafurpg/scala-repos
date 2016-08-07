@@ -82,8 +82,8 @@ trait SymbolTestMacros extends Macro {
 }
 
 object Compat {
-  def constructorParamTypes[T]: Seq[String] = macro constructorParamTypes_impl[
-      T]
+  def constructorParamTypes[T]: Seq[String] =
+    macro constructorParamTypes_impl[T]
   def constructorParamTypes_impl[T: c.WeakTypeTag](
       c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c
@@ -114,8 +114,8 @@ object Compat {
     )
   }
 
-  def getTransientFieldNames[T]: Seq[String] = macro getTransientFieldNames_Impl[
-      T]
+  def getTransientFieldNames[T]: Seq[String] =
+    macro getTransientFieldNames_Impl[T]
   def getTransientFieldNames_Impl[T: c.WeakTypeTag](
       c: Context): c.Expr[Seq[String]] = {
     val c0: c.type = c

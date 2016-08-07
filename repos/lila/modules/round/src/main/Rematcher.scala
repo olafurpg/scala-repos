@@ -8,7 +8,9 @@ import chess.{Game => ChessGame, Board, Clock, Color => ChessColor, Castles}
 import ChessColor.{White, Black}
 
 import lila.db.api._
-import lila.game.{GameRepo, Game, Event, Progress, Pov, Source, AnonCookie, PerfPicker}
+import lila.game.{
+  GameRepo, Game, Event, Progress, Pov, Source, AnonCookie, PerfPicker
+}
 import lila.memo.ExpireSetMemo
 import lila.user.{User, UserRepo}
 import makeTimeout.short

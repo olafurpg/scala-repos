@@ -63,7 +63,7 @@ class InteractiveStatusDisplay extends TopComponentDisplayable {
       })
   }
 
-  private def isBorderEnabled = false //right now we don't need it (?) 
+  private def isBorderEnabled = false //right now we don't need it (?)
 
   private def setCurrentIcon(icon: AnimatedIcon) {
     if (current == icon) return

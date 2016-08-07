@@ -132,7 +132,7 @@ trait Imports { self: IMain =>
           case x if generousImports =>
             x.definesImplicit ||
               (x.definedNames exists (d =>
-                        wanted.exists(w => d.startsWith(w))))
+                                        wanted.exists(w => d.startsWith(w))))
           case x => x.definesImplicit || (x.definedNames exists wanted)
         }
 

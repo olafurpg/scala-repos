@@ -323,7 +323,6 @@ object Assert {
       runnable: ThrowingRunnable): Unit = {
     expectThrows(expectedThrowable, runnable)
   }
-
   def expectThrows[T <: Throwable](expectedThrowable: Class[T], runnable: ThrowingRunnable): T = {
     try {
       runnable.run()
@@ -338,14 +337,12 @@ object Assert {
         } else {
           val mismatchMessage = format("unexpected exception type thrown;",
             expectedThrowable.getSimpleName, actualThrown.getClass.getSimpleName)
-
           val assertionError = new AssertionError(mismatchMessage)
           assertionError.initCause(actualThrown)
           throw assertionError
         }
     }
   }
-
   trait ThrowingRunnable {
     def run(): Unit
   }

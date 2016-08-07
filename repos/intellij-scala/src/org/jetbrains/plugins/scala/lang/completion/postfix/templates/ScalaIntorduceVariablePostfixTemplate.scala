@@ -4,7 +4,9 @@ import com.intellij.codeInsight.template.postfix.templates.PostfixTemplateWithEx
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.SelectorType._
-import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{AncestorSelector, SelectorConditions}
+import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{
+  AncestorSelector, SelectorConditions
+}
 import org.jetbrains.plugins.scala.lang.refactoring.introduceVariable.ScalaIntroduceVariableHandler
 
 /**

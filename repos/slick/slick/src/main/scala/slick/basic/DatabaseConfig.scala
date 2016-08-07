@@ -147,14 +147,14 @@ object DatabaseConfig {
     * annotation in the static scope of the caller. */
   def forAnnotation[P <: BasicProfile](classLoader: ClassLoader =
                                          ClassLoaderUtil.defaultClassLoader)(
-      implicit ct: ClassTag[P]): DatabaseConfig[P] = macro StaticDatabaseConfigMacros
-    .getWithClassLoaderImpl[P]
+      implicit ct: ClassTag[P]): DatabaseConfig[P] =
+    macro StaticDatabaseConfigMacros.getWithClassLoaderImpl[P]
 
   /** Load a profile and database configuration from the URI specified in a [[StaticDatabaseConfig]]
     * annotation in the static scope of the caller. */
   def forAnnotation[P <: BasicProfile](
-      implicit ct: ClassTag[P]): DatabaseConfig[P] = macro StaticDatabaseConfigMacros
-    .getImpl[P]
+      implicit ct: ClassTag[P]): DatabaseConfig[P] =
+    macro StaticDatabaseConfigMacros.getImpl[P]
 }
 
 /** An annotation for injecting a DatabaseConfig at compile time. The URI parameter must be a

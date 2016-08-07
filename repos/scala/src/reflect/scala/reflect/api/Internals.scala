@@ -1110,8 +1110,7 @@ trait Internals { self: Universe =>
   /** The API that all references support
     *  @group Internal
     */
-  trait ReferenceToBoxedApi extends TermTreeApi {
-    this: ReferenceToBoxed =>
+  trait ReferenceToBoxedApi extends TermTreeApi { this: ReferenceToBoxed =>
 
     /** The underlying reference. */
     def ident: Tree
@@ -1135,8 +1134,7 @@ trait Internals { self: Universe =>
     *  $SYMACCESSORS
     *  @group Internal
     */
-  trait FreeTermSymbolApi extends TermSymbolApi {
-    this: FreeTermSymbol =>
+  trait FreeTermSymbolApi extends TermSymbolApi { this: FreeTermSymbol =>
 
     /** The place where this symbol has been spawned
       *
@@ -1169,8 +1167,7 @@ trait Internals { self: Universe =>
     *  $SYMACCESSORS
     *  @group Internal
     */
-  trait FreeTypeSymbolApi extends TypeSymbolApi {
-    this: FreeTypeSymbol =>
+  trait FreeTypeSymbolApi extends TypeSymbolApi { this: FreeTypeSymbol =>
 
     /** The place where this symbol has been spawned
       *

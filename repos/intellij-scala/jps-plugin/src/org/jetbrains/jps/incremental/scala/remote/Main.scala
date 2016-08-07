@@ -7,11 +7,13 @@ import java.util.{Timer, TimerTask}
 import com.intellij.util.Base64Converter
 import com.martiansoftware.nailgun.NGContext
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
-import org.jetbrains.jps.incremental.scala.local.{LocalServer, WorksheetInProcessRunnerFactory}
+import org.jetbrains.jps.incremental.scala.local.{
+  LocalServer, WorksheetInProcessRunnerFactory
+}
 
 /**
   * @author Pavel Fatin
-  * @author Dmitry Naydanov         
+  * @author Dmitry Naydanov
   */
 object Main {
   private val Server = new LocalServer()

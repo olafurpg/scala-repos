@@ -8,7 +8,9 @@ import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 import akka.actor._
-import akka.testkit.{EventFilter, filterException, AkkaSpec, DefaultTimeout, TestLatch}
+import akka.testkit.{
+  EventFilter, filterException, AkkaSpec, DefaultTimeout, TestLatch
+}
 import scala.concurrent.{Await, Awaitable, Future, Promise}
 import scala.util.control.NonFatal
 import scala.concurrent.duration._
@@ -103,7 +105,7 @@ class FutureSpec
   implicit val ec: ExecutionContext = system.dispatcher
   "A Promise" when {
     "never completed" must {
-      behave like emptyFuture(_ (Promise().future))
+      behave like emptyFuture(_(Promise().future))
       "return supplied value on timeout" in {
         val failure =
           Promise.failed[String](new RuntimeException("br0ken")).future
@@ -126,28 +128,28 @@ class FutureSpec
     "completed with a result" must {
       val result = "test value"
       val future = Promise[String]().complete(Success(result)).future
-      behave like futureWithResult(_ (future, result))
+      behave like futureWithResult(_(future, result))
     }
     "completed with an exception" must {
       val message = "Expected Exception"
       val future = Promise[String]()
         .complete(Failure(new RuntimeException(message)))
         .future
-      behave like futureWithException[RuntimeException](_ (future, message))
+      behave like futureWithException[RuntimeException](_(future, message))
     }
     "completed with an InterruptedException" must {
       val message = "Boxed InterruptedException"
       val future = Promise[String]()
         .complete(Failure(new InterruptedException(message)))
         .future
-      behave like futureWithException[RuntimeException](_ (future, message))
+      behave like futureWithException[RuntimeException](_(future, message))
     }
     "completed with a NonLocalReturnControl" must {
       val result = "test value"
       val future = Promise[String]()
         .complete(Failure(new NonLocalReturnControl[String]("test", result)))
         .future
-      behave like futureWithResult(_ (future, result))
+      behave like futureWithResult(_(future, result))
     }
 
     "have different ECs" in {

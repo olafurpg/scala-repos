@@ -4,7 +4,9 @@
 package akka.persistence
 
 import akka.actor._
-import akka.persistence.AtLeastOnceDelivery.{AtLeastOnceDeliverySnapshot, UnconfirmedWarning}
+import akka.persistence.AtLeastOnceDelivery.{
+  AtLeastOnceDeliverySnapshot, UnconfirmedWarning
+}
 import akka.testkit._
 import com.typesafe.config._
 

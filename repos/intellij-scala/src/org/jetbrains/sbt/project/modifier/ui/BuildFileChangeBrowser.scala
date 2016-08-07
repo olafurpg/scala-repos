@@ -3,7 +3,9 @@ package org.jetbrains.sbt.project.modifier.ui
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.changes.Change
-import com.intellij.openapi.vcs.changes.actions.{ShowDiffAction, ShowDiffUIContext}
+import com.intellij.openapi.vcs.changes.actions.{
+  ShowDiffAction, ShowDiffUIContext
+}
 import com.intellij.openapi.vcs.changes.ui.ChangesBrowser
 import com.intellij.openapi.vfs.VirtualFile
 import scala.collection.JavaConversions._

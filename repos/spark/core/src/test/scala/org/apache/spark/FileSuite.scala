@@ -23,10 +23,17 @@ import scala.io.Source
 
 import org.apache.hadoop.io._
 import org.apache.hadoop.io.compress.DefaultCodec
-import org.apache.hadoop.mapred.{FileAlreadyExistsException, FileSplit, JobConf, TextInputFormat, TextOutputFormat}
+import org.apache.hadoop.mapred.{
+  FileAlreadyExistsException, FileSplit, JobConf, TextInputFormat,
+  TextOutputFormat
+}
 import org.apache.hadoop.mapreduce.Job
-import org.apache.hadoop.mapreduce.lib.input.{FileSplit => NewFileSplit, TextInputFormat => NewTextInputFormat}
-import org.apache.hadoop.mapreduce.lib.output.{TextOutputFormat => NewTextOutputFormat}
+import org.apache.hadoop.mapreduce.lib.input.{
+  FileSplit => NewFileSplit, TextInputFormat => NewTextInputFormat
+}
+import org.apache.hadoop.mapreduce.lib.output.{
+  TextOutputFormat => NewTextOutputFormat
+}
 
 import org.apache.spark.input.PortableDataStream
 import org.apache.spark.rdd.{HadoopRDD, NewHadoopRDD}

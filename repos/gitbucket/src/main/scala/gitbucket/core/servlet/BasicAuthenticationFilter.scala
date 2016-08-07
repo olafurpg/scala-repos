@@ -2,9 +2,13 @@ package gitbucket.core.servlet
 
 import javax.servlet._
 import javax.servlet.http._
-import gitbucket.core.plugin.{GitRepositoryFilter, GitRepositoryRouting, PluginRegistry}
+import gitbucket.core.plugin.{
+  GitRepositoryFilter, GitRepositoryRouting, PluginRegistry
+}
 import gitbucket.core.service.SystemSettingsService.SystemSettings
-import gitbucket.core.service.{RepositoryService, AccountService, SystemSettingsService}
+import gitbucket.core.service.{
+  RepositoryService, AccountService, SystemSettingsService
+}
 import gitbucket.core.util.{Keys, Implicits}
 import org.slf4j.LoggerFactory
 import Implicits._

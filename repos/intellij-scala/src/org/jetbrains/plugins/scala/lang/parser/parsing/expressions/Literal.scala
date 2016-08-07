@@ -21,7 +21,7 @@ Literal ::= ['-']integerLiteral
             | true
             | false
             | null
-            | javaId"StringLiteral" 
+            | javaId"StringLiteral"
  */
 object Literal {
   def parse(builder: ScalaPsiBuilder): Boolean = {

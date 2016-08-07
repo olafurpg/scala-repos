@@ -14,8 +14,7 @@ import breeze.generic.UFunc.{UImpl2, UImpl}
 import scala.{specialized => spec}
 import scalaxy.debug._
 
-trait SparseVector_DenseVector_Ops {
-  this: SparseVector.type =>
+trait SparseVector_DenseVector_Ops { this: SparseVector.type =>
   import breeze.math.PowImplicits._
 
   @expand
@@ -180,8 +179,7 @@ trait SparseVector_DenseVector_Ops {
     }
 }
 
-trait DenseVector_SparseVector_Ops {
-  this: SparseVector.type =>
+trait DenseVector_SparseVector_Ops { this: SparseVector.type =>
   import breeze.math.PowImplicits._
 
   @expand
@@ -415,8 +413,7 @@ trait DenseVector_SparseVector_Ops {
   }
 }
 
-trait SparseVectorOps {
-  this: SparseVector.type =>
+trait SparseVectorOps { this: SparseVector.type =>
   import breeze.math.PowImplicits._
 
   implicit def liftCSCOpToSVTransposeOp[Tag, V, LHS, R](
@@ -1446,8 +1443,7 @@ trait SparseVectorOps {
   }
 }
 
-trait SparseVector_DenseMatrixOps {
-  this: SparseVector.type =>
+trait SparseVector_DenseMatrixOps { this: SparseVector.type =>
   @expand
   @expand.valify
   implicit def implOpMulMatrix_DM_SV_eq_DV[

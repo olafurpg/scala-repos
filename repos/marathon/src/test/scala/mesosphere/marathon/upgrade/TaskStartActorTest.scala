@@ -14,7 +14,9 @@ import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state.{AppDefinition, Timestamp}
 import mesosphere.marathon.test.MarathonActorSupport
-import mesosphere.marathon.{MarathonTestHelper, SchedulerActions, TaskUpgradeCanceledException}
+import mesosphere.marathon.{
+  MarathonTestHelper, SchedulerActions, TaskUpgradeCanceledException
+}
 import mesosphere.util.state.memory.InMemoryStore
 import org.apache.mesos.SchedulerDriver
 import org.mockito.Mockito

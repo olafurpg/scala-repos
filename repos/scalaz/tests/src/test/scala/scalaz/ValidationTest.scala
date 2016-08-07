@@ -127,12 +127,12 @@ object ValidationTest extends SpecLite {
     import syntax.std.string._
     import syntax.validation._
     List("1", "2") map (_.parseInt
-          .leftMap(_.toString)
-          .ensure("Fail")(_ >= 0)) must_===
+      .leftMap(_.toString)
+      .ensure("Fail")(_ >= 0)) must_===
       (List(1.success[String], 2.success[String]))
     List("1", "-2") map (_.parseInt
-          .leftMap(_.toString)
-          .ensure("Fail")(_ >= 0)) must_===
+      .leftMap(_.toString)
+      .ensure("Fail")(_ >= 0)) must_===
       (List(1.success[String], "Fail".failure[Int]))
   }
 

@@ -78,8 +78,7 @@ class ListSet[A]
     with Set[A]
     with GenericSetTemplate[A, ListSet]
     with SetLike[A, ListSet[A]]
-    with Serializable {
-  self =>
+    with Serializable { self =>
   override def companion: GenericCompanion[ListSet] = ListSet
 
   /** Returns the number of elements in this set.

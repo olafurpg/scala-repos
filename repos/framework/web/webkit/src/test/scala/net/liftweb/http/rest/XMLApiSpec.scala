@@ -47,10 +47,10 @@ object XmlApiSpec extends Specification {
       // Tests pairToResponse
       case i: Int if i == 42 => (true, "But what is the question?")
       // These test the listElemToResponse conversion
-      case f: Float if f == 42f => ( <float>perfect</float>: Elem)
-      case f: Float if f == 0f => ( <float>zero</float>: Node)
-      case f: Float if f > 0f => ( <float>positive</float>: NodeSeq)
-      case f: Float if f < 0f => ( <float>negative</float>: Seq[Node])
+      case f: Float if f == 42f => (<float>perfect</float>: Elem)
+      case f: Float if f == 0f => (<float>zero</float>: Node)
+      case f: Float if f > 0f => (<float>positive</float>: NodeSeq)
+      case f: Float if f < 0f => (<float>negative</float>: Seq[Node])
     }
 
     // This method tests the XML implicit conversions on XMLApiHelper
@@ -58,17 +58,17 @@ object XmlApiSpec extends Specification {
       case r @ Req(List("api", "sum"), _, GetRequest) =>
         () =>
           doSum(r)
-        case r @ Req(List("api", "product"), _, GetRequest) =>
+      case r @ Req(List("api", "product"), _, GetRequest) =>
         () =>
           doProduct(r)
-        case r @ Req(List("api", "max"), _, GetRequest) =>
+      case r @ Req(List("api", "max"), _, GetRequest) =>
         () =>
           doMax(r)
-        case r @ Req(List("api", "min"), _, GetRequest) =>
+      case r @ Req(List("api", "min"), _, GetRequest) =>
         () =>
           doMin(r)
-        // Tests putResponseInBox
-        case Req("api" :: _, _, _) =>
+      // Tests putResponseInBox
+      case Req("api" :: _, _, _) =>
         () =>
           BadRequestResponse()
     }

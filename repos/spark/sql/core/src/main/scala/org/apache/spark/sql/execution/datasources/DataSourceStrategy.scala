@@ -34,10 +34,14 @@ import org.apache.spark.sql.catalyst.plans.logical
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.catalyst.plans.physical.HashPartitioning
 import org.apache.spark.sql.catalyst.rules.Rule
-import org.apache.spark.sql.execution.DataSourceScan.{INPUT_PATHS, PUSHED_FILTERS}
+import org.apache.spark.sql.execution.DataSourceScan.{
+  INPUT_PATHS, PUSHED_FILTERS
+}
 import org.apache.spark.sql.execution.SparkPlan
 import org.apache.spark.sql.execution.command.ExecutedCommand
-import org.apache.spark.sql.execution.vectorized.{ColumnarBatch, ColumnVectorUtils}
+import org.apache.spark.sql.execution.vectorized.{
+  ColumnarBatch, ColumnVectorUtils
+}
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String

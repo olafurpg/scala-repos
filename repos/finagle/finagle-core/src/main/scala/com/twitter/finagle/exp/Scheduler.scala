@@ -1,11 +1,15 @@
 package com.twitter.finagle.exp
 
 import com.twitter.app.GlobalFlag
-import com.twitter.concurrent.{BridgedThreadPoolScheduler, Scheduler, LocalScheduler}
+import com.twitter.concurrent.{
+  BridgedThreadPoolScheduler, Scheduler, LocalScheduler
+}
 import com.twitter.finagle.stats.DefaultStatsReceiver
 import com.twitter.finagle.util.DefaultLogger
 import com.twitter.jvm.numProcs
-import java.util.concurrent.{BlockingQueue, ThreadFactory, ThreadPoolExecutor, TimeUnit}
+import java.util.concurrent.{
+  BlockingQueue, ThreadFactory, ThreadPoolExecutor, TimeUnit
+}
 import java.util.logging.{Level, Logger}
 
 object scheduler

@@ -4,7 +4,9 @@ import org.apache.zookeeper.ZooKeeper
 
 import com.twitter.concurrent.{Broker, Offer, Serialized}
 import com.twitter.logging.Logger
-import com.twitter.util.{Await, Duration, Future, Promise, Return, TimeoutException, Timer}
+import com.twitter.util.{
+  Await, Duration, Future, Promise, Return, TimeoutException, Timer
+}
 
 /**
   * An Asynchronous ZooKeeper Client.

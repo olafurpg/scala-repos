@@ -13,7 +13,6 @@ class LinearProgramTest extends FunSuite {
   /*
   test("ILP Test") {
     // http://www.cs.ucf.edu/~shzhang/Combio/lec16.pdf
-
     val lp = new LinearProgram
     import lp._
     val x1,x2 = Integer()
@@ -21,7 +20,6 @@ class LinearProgramTest extends FunSuite {
       (x1 * 355.0 + x2 * 300.0)
       subjectTo(x1 + x2 <= 200.5, x1 * 9 + x2 * 6 <= 1566, x1 * 12 + x2 * 16 <= 2880, x1 * -1 <= 0, x2 * -1 <= 0)
     )
-
     assert(result.valueOf(x1) === 122)
     assert(result.valueOf(x2) === 78)
   }*/
@@ -65,7 +63,6 @@ class LinearProgramTest extends FunSuite {
   /*
   test("Binary ILP Test") {
     // http://www.cs.ucf.edu/~shzhang/Combio/lec16.pdf
-
     val lp = new LinearProgram
     import lp._
     val x1,x2 = Binary()
@@ -73,7 +70,6 @@ class LinearProgramTest extends FunSuite {
       (x1 * 355.0 + x2 * 300.0)
         subjectTo(x1 + x2 <= 200.5, x1 * 9 + x2 * 6 <= 1566, x1 * 12 + x2 * 16 <= 2880, x1 * -1 <= 0, x2 * -1 <= 0)
     )
-
     assert(result.valueOf(x1) === 1)
     assert(result.valueOf(x2) === 1)
   }

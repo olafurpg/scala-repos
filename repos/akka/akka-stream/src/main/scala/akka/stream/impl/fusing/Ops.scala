@@ -412,26 +412,26 @@ private[akka] final case class Buffer[T](size: Int,
           if (buffer.isFull) buffer.dropHead()
           buffer.enqueue(elem)
           ctx.pull()
-        case DropTail ⇒
+      case DropTail ⇒
         (ctx, elem) ⇒
           if (buffer.isFull) buffer.dropTail()
           buffer.enqueue(elem)
           ctx.pull()
-        case DropBuffer ⇒
+      case DropBuffer ⇒
         (ctx, elem) ⇒
           if (buffer.isFull) buffer.clear()
           buffer.enqueue(elem)
           ctx.pull()
-        case DropNew ⇒
+      case DropNew ⇒
         (ctx, elem) ⇒
           if (!buffer.isFull) buffer.enqueue(elem)
           ctx.pull()
-        case Backpressure ⇒
+      case Backpressure ⇒
         (ctx, elem) ⇒
           buffer.enqueue(elem)
           if (buffer.isFull) ctx.holdUpstream()
           else ctx.pull()
-        case Fail ⇒
+      case Fail ⇒
         (ctx, elem) ⇒
           if (buffer.isFull)
             ctx.fail(

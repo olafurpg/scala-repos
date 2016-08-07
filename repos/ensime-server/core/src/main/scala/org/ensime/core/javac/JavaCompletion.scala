@@ -7,7 +7,9 @@ import akka.event.slf4j.SLF4JLogging
 import com.sun.source.tree.{MemberSelectTree, Tree, IdentifierTree}
 import com.sun.source.util.TreePath
 import javax.lang.model.`type`.TypeMirror
-import javax.lang.model.element.{Element, ExecutableElement, PackageElement, TypeElement, VariableElement}
+import javax.lang.model.element.{
+  Element, ExecutableElement, PackageElement, TypeElement, VariableElement
+}
 import javax.lang.model.util.{ElementFilter, Elements}
 import org.ensime.core.CompletionUtil
 import org.ensime.util.file._
@@ -104,9 +106,10 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
          // Kick off an index search if the name looks like a type.
          val typeSearch =
            if (TypeNameRegex.findFirstMatchIn(defaultPrefix).isDefined) {
-             Some(fetchTypeSearchCompletions(defaultPrefix,
-                                             maxResults,
-                                             indexer))
+             Some(
+                 fetchTypeSearchCompletions(defaultPrefix,
+                                            maxResults,
+                                            indexer))
            } else None
 
          (scopeForPoint(info, indexAfterTarget) map {

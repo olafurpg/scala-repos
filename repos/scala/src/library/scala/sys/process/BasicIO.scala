@@ -11,7 +11,9 @@ package sys
 package process
 
 import processInternal._
-import java.io.{BufferedReader, InputStreamReader, FilterInputStream, FilterOutputStream}
+import java.io.{
+  BufferedReader, InputStreamReader, FilterInputStream, FilterOutputStream
+}
 import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.immutable.Stream
 import scala.annotation.tailrec

@@ -12,7 +12,9 @@ import com.intellij.ide.highlighter.{JavaClassFileType, JavaFileType}
 import com.intellij.openapi.extensions.{ExtensionPointName, Extensions}
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.{LibraryOrderEntry, OrderEntry, ProjectRootManager}
+import com.intellij.openapi.roots.{
+  LibraryOrderEntry, OrderEntry, ProjectRootManager
+}
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.util.{ActionCallback, Comparing}

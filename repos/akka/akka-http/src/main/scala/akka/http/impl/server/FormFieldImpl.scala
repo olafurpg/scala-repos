@@ -8,7 +8,9 @@ import java.util.Optional
 
 import akka.http.javadsl.server.RequestVal
 import akka.http.javadsl.server.values.FormField
-import akka.http.scaladsl.common.{StrictForm, NameUnmarshallerReceptacle, NameReceptacle}
+import akka.http.scaladsl.common.{
+  StrictForm, NameUnmarshallerReceptacle, NameReceptacle
+}
 import akka.http.scaladsl.unmarshalling._
 
 import scala.reflect.ClassTag

@@ -7,7 +7,9 @@ import _root_.com.intellij.testFramework.PsiTestCase
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.roots.libraries.Library.ModifiableModel
-import com.intellij.openapi.roots.{ModifiableRootModel, ModuleRootManager, OrderRootType}
+import com.intellij.openapi.roots.{
+  ModifiableRootModel, ModuleRootManager, OrderRootType
+}
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.{LocalFileSystem, VfsUtil}
 import org.jetbrains.plugins.scala.util.TestUtils

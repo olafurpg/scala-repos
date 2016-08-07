@@ -5,7 +5,9 @@ import java.util.UUID
 
 import com.intellij.compiler.server.BuildManagerListener
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.compiler.{CompileContext, CompileTask, CompilerManager}
+import com.intellij.openapi.compiler.{
+  CompileContext, CompileTask, CompilerManager
+}
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.module.{Module, ModuleManager}
 import com.intellij.openapi.project.Project

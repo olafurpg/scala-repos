@@ -1,12 +1,9 @@
 /*
  Copyright 2013 Twitter, Inc.
-
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +47,6 @@ object MergeableStoreFactoryAlgebra {
       but in our store we only store ((K, BatchID), V). That is we don't include the timestamp.
       We need these timestamps to continue processing downstream however, so we use a Right timestamp to say
       the last value is taken. (Which may not be the max(TS)).
-
       The merge operation here takes the inbound value of (Timestamp, V), performs the inner merge from the store.
       Then looks back up the timestamp handed from the stream and outputs with that.
    */

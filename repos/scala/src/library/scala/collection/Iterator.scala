@@ -131,7 +131,6 @@ object Iterator {
   }
 
   /** Creates an infinite-length iterator which returns successive values from some start value.
-
     *  @param start the start value of the iterator
     *  @return      the iterator producing the infinite sequence of values `start, start + 1, start + 2, ...`
     */

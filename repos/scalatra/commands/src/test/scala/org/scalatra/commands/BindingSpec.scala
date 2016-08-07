@@ -178,60 +178,46 @@ class BindingSpec extends Specification {
   }
 
   /*"JacksonBindingImplicits" should {
-
     import JacksonBindingImplicits._
     "provide FieldDescriptor[Boolean]" in {
       testJacksonBinding[Boolean](true)
     }
-
     "provide FieldDescriptor[Float]" in {
       testJacksonBinding[Float]((random * 100).toFloat)
     }
-
     "provide FieldDescriptor[Double]" in {
       testJacksonBinding[Double](random * 100)
     }
-
     "provide FieldDescriptor[Int]" in {
       testJacksonBinding[Int]((random * 100).toInt)
     }
-
     "provide FieldDescriptor[Byte]" in {
       testJacksonBinding[Byte]((random * 100).toByte)
     }
-
     "provide FieldDescriptor[Short]" in {
       testJacksonBinding[Short]((random * 100).toShort)
     }
-
     "provide FieldDescriptor[Long]" in {
       testJacksonBinding[Long]((random * 100).toLong)
     }
-
     "provide FieldDescriptor[DateTime] for a ISO8601 date" in {
       testJacksonDateTimeBinding(JodaDateFormats.Iso8601)
     }
-
     "provide FieldDescriptor[DateTime] for a ISO8601 date without millis" in {
       testJacksonDateTimeBinding(JodaDateFormats.Iso8601NoMillis, _.withMillis(0))
     }
-
     "provide FieldDescriptor[DateTime] for a HTTP date" in {
       testJacksonDateTimeBinding(JodaDateFormats.HttpDate, _.withMillis(0))
     }
-
     "provide FieldDescriptor[Date] for a ISO8601 date" in {
       testJacksonDateBinding(JodaDateFormats.Iso8601)
     }
-
     "provide FieldDescriptor[Date] for a ISO8601 date without millis" in {
       testJacksonDateBinding(JodaDateFormats.Iso8601NoMillis, _.withMillis(0))
     }
-
     "provide FieldDescriptor[Date] for a HTTP date" in {
       testJacksonDateBinding(JodaDateFormats.HttpDate, _.withMillis(0))
     }
-
   }*/
 
   "JsonBindingImplicits" should {

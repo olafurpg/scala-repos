@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -59,7 +59,7 @@ case class OffsetFetchResponse(
       writeShortString(buffer, t1._1) // topic
       buffer.putInt(t1._2.size) // number of partitions for this topic
       t1._2.foreach(t2 => {
-        // TopicAndPartition -> OffsetMetadataAndError 
+        // TopicAndPartition -> OffsetMetadataAndError
         buffer.putInt(t2._1.partition)
         buffer.putLong(t2._2.offset)
         writeShortString(buffer, t2._2.metadata)

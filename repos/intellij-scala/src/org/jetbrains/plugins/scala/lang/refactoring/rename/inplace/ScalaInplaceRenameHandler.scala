@@ -9,15 +9,21 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.psi.util.PsiUtilBase
 import com.intellij.psi.{PsiElement, PsiNamedElement}
 import com.intellij.refactoring.rename.inplace.InplaceRefactoring
-import com.intellij.refactoring.rename.{PsiElementRenameHandler, RenamePsiElementProcessor}
+import com.intellij.refactoring.rename.{
+  PsiElementRenameHandler, RenamePsiElementProcessor
+}
 import org.jetbrains.plugins.scala.extensions.Both
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait}
-import org.jetbrains.plugins.scala.lang.psi.light.{LightScalaMethod, PsiClassWrapper}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTrait
+}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  LightScalaMethod, PsiClassWrapper
+}
 import org.jetbrains.plugins.scala.lang.refactoring.rename.ScalaRenameUtil
 import org.jetbrains.plugins.scala.util.JListCompatibility
 

@@ -15,7 +15,6 @@ class GenericFunInput {
 class GenericFunInput {
   def foo {
     def goo[T](x: T) = x
-
     def testMethodName: (Int, String, Long) = {
       val x = goo(3)
       val y = goo("")
@@ -26,7 +25,6 @@ class GenericFunInput {
     val x: Int = r._1
     val y: String = r._2
     val z: Long = r._3
-
     val f = x
     val h = y
     val u = z

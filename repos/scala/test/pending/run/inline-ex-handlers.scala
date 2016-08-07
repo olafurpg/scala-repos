@@ -237,15 +237,12 @@ object TestInlineHandlersSynchronizedWithStack {
 
 /** This test should trigger a bug in the dead code elimination phase - it actually crashes ICodeCheckers
 object TestInlineHandlersSynchronizedWithStackDoubleThrow {
-
   def main(args: Array[String]): Unit = {
     println("TestInlineHandlersSynchronizedWithStackDoubleThrow")
     var result = "a"
-
     // any exception thrown here will be caught by a default handler that does MONTIOR_EXIT on result :)
     result += result.synchronized { throw MyException(result) }
     result += result.synchronized { throw MyException(result) }
-
     result.length
   }
 }

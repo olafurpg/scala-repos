@@ -18,7 +18,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.SignatureNodes
 import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScTemplateDefinitionStub
-import org.jetbrains.plugins.scala.lang.psi.types.{PhysicalSignature, ScSubstitutor}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  PhysicalSignature, ScSubstitutor
+}
 
 import scala.collection.mutable.ArrayBuffer
 

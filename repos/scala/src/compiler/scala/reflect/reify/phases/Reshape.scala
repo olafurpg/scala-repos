@@ -293,38 +293,37 @@ trait Reshape { self: Reifier =>
       val accessors = scala.collection.mutable.Map[ValDef, List[DefDef]]()
       stats collect { case ddef: DefDef => ddef } foreach
         (defdef => {
-              val valdef =
-                symdefs get defdef.symbol.accessedOrSelf collect {
-                  case vdef: ValDef => vdef
-                } getOrElse null
-              if (valdef != null)
-                accessors(valdef) = accessors.getOrElse(valdef, Nil) :+ defdef
+           val valdef =
+             symdefs get defdef.symbol.accessedOrSelf collect {
+               case vdef: ValDef => vdef
+             } getOrElse null
+           if (valdef != null)
+             accessors(valdef) = accessors.getOrElse(valdef, Nil) :+ defdef
 
-              def detectBeanAccessors(prefix: String): Unit = {
-                if (defdef.name.startsWith(prefix)) {
-                  val name = defdef.name.toString.substring(prefix.length)
-                  def uncapitalize(s: String) =
-                    if (s.length == 0) ""
-                    else {
-                      val chars = s.toCharArray; chars(0) = chars(0).toLower;
-                      new String(chars)
-                    }
-                  def findValDef(name: String) = symdefs.values collectFirst {
-                    case vdef: ValDef if vdef.name.dropLocal string_== name =>
-                      vdef
-                  }
-                  val valdef = findValDef(name)
-                    .orElse(findValDef(uncapitalize(name)))
-                    .orNull
-                  if (valdef != null)
-                    accessors(valdef) =
-                      accessors.getOrElse(valdef, Nil) :+ defdef
-                }
-              }
-              detectBeanAccessors("get")
-              detectBeanAccessors("set")
-              detectBeanAccessors("is")
-            })
+           def detectBeanAccessors(prefix: String): Unit = {
+             if (defdef.name.startsWith(prefix)) {
+               val name = defdef.name.toString.substring(prefix.length)
+               def uncapitalize(s: String) =
+                 if (s.length == 0) ""
+                 else {
+                   val chars = s.toCharArray; chars(0) = chars(0).toLower;
+                   new String(chars)
+                 }
+               def findValDef(name: String) = symdefs.values collectFirst {
+                 case vdef: ValDef if vdef.name.dropLocal string_== name =>
+                   vdef
+               }
+               val valdef =
+                 findValDef(name).orElse(findValDef(uncapitalize(name))).orNull
+               if (valdef != null)
+                 accessors(valdef) =
+                   accessors.getOrElse(valdef, Nil) :+ defdef
+             }
+           }
+           detectBeanAccessors("get")
+           detectBeanAccessors("set")
+           detectBeanAccessors("is")
+         })
 
       val stats1 =
         stats flatMap {
@@ -376,61 +375,60 @@ trait Reshape { self: Reifier =>
       // only that valdef needs to have its rhs rebuilt from defdef
       stats flatMap
         (stat =>
-              stat match {
-                case vdef: ValDef if vdef.symbol.isLazy =>
-                  if (reifyDebug)
-                    println(s"reconstructing original lazy value for $vdef")
-                  val ddefSym = vdef.symbol.lazyAccessor
-                  val vdef1 = lazyvaldefs.get(ddefSym) match {
-                    case Some(ddef) =>
-                      toPreTyperLazyVal(ddef)
-                    case None =>
-                      if (reifyDebug)
-                        println(
-                            "couldn't find corresponding lazy val accessor")
-                      vdef
-                  }
-                  if (reifyDebug) println(s"reconstructed lazy val is $vdef1")
-                  vdef1 :: Nil
-                case ddef: DefDef if ddef.symbol.isLazy =>
-                  if (isUnitType(ddef.symbol.info)) {
-                    // since lazy values of type Unit don't have val's
-                    // we need to create them from scratch
-                    toPreTyperLazyVal(ddef) :: Nil
-                  } else Nil
-                case _ => stat :: Nil
-            })
+           stat match {
+             case vdef: ValDef if vdef.symbol.isLazy =>
+               if (reifyDebug)
+                 println(s"reconstructing original lazy value for $vdef")
+               val ddefSym = vdef.symbol.lazyAccessor
+               val vdef1 = lazyvaldefs.get(ddefSym) match {
+                 case Some(ddef) =>
+                   toPreTyperLazyVal(ddef)
+                 case None =>
+                   if (reifyDebug)
+                     println("couldn't find corresponding lazy val accessor")
+                   vdef
+               }
+               if (reifyDebug) println(s"reconstructed lazy val is $vdef1")
+               vdef1 :: Nil
+             case ddef: DefDef if ddef.symbol.isLazy =>
+               if (isUnitType(ddef.symbol.info)) {
+                 // since lazy values of type Unit don't have val's
+                 // we need to create them from scratch
+                 toPreTyperLazyVal(ddef) :: Nil
+               } else Nil
+             case _ => stat :: Nil
+           })
     }
 
     private def trimSyntheticCaseClassMembers(deff: Tree,
                                               stats: List[Tree]): List[Tree] =
       stats filterNot
         (memberDef =>
-              memberDef.isDef && {
-                val isSynthetic = memberDef.symbol.isSynthetic
-                // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
-                // that's why I replace the check with an assumption that all synthetic members are, in fact, generated of case classes
-                // val isCaseMember = deff.symbol.isCaseClass || deff.symbol.companionClass.isCaseClass
-                val isCaseMember = true
-                if (isSynthetic && isCaseMember && reifyDebug)
-                  println("discarding case class synthetic def: " + memberDef)
-                isSynthetic && isCaseMember
-            })
+           memberDef.isDef && {
+             val isSynthetic = memberDef.symbol.isSynthetic
+             // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
+             // that's why I replace the check with an assumption that all synthetic members are, in fact, generated of case classes
+             // val isCaseMember = deff.symbol.isCaseClass || deff.symbol.companionClass.isCaseClass
+             val isCaseMember = true
+             if (isSynthetic && isCaseMember && reifyDebug)
+               println("discarding case class synthetic def: " + memberDef)
+             isSynthetic && isCaseMember
+           })
 
     private def trimSyntheticCaseClassCompanions(
         stats: List[Tree]): List[Tree] =
       stats diff
         (stats collect { case moddef: ModuleDef => moddef } filter
               (moddef => {
-                    val isSynthetic = moddef.symbol.isSynthetic
-                    // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
-                    // that's why I replace the check with an assumption that all synthetic modules are, in fact, companions of case classes
-                    // val isCaseCompanion = moddef.symbol.companionClass.isCaseClass
-                    val isCaseCompanion = true
-                    if (isSynthetic && isCaseCompanion && reifyDebug)
-                      println(
-                          "discarding synthetic case class companion: " + moddef)
-                    isSynthetic && isCaseCompanion
-                  }))
+                 val isSynthetic = moddef.symbol.isSynthetic
+                 // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
+                 // that's why I replace the check with an assumption that all synthetic modules are, in fact, companions of case classes
+                 // val isCaseCompanion = moddef.symbol.companionClass.isCaseClass
+                 val isCaseCompanion = true
+                 if (isSynthetic && isCaseCompanion && reifyDebug)
+                   println(
+                       "discarding synthetic case class companion: " + moddef)
+                 isSynthetic && isCaseCompanion
+               }))
   }
 }

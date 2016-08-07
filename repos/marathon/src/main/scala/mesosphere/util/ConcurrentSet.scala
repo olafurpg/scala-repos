@@ -1,7 +1,9 @@
 package mesosphere.util
 
 import scala.collection.concurrent.TrieMap
-import scala.collection.generic.{CanBuildFrom, GenericSetTemplate, MutableSetFactory}
+import scala.collection.generic.{
+  CanBuildFrom, GenericSetTemplate, MutableSetFactory
+}
 import scala.collection.mutable
 
 final class ConcurrentSet[A](elems: A*)

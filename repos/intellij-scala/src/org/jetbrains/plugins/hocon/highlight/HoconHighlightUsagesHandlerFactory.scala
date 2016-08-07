@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.hocon.highlight
 
-import com.intellij.codeInsight.highlighting.{HighlightUsagesHandlerBase, HighlightUsagesHandlerFactoryBase}
+import com.intellij.codeInsight.highlighting.{
+  HighlightUsagesHandlerBase, HighlightUsagesHandlerFactoryBase
+}
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.{PsiElement, PsiFile}
 import com.intellij.util.Consumer

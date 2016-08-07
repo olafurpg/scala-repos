@@ -23,20 +23,20 @@ import scala.reflect.macros.whitebox
 case class Orphan[F[_], D, T](instance: F[T])
 
 object Orphan {
-  implicit def materializeOrphan[F[_], D, T]: Orphan[F, D, T] = macro OrphanMacros
-    .materializeOrphanImpl[F, D, T]
+  implicit def materializeOrphan[F[_], D, T]: Orphan[F, D, T] =
+    macro OrphanMacros.materializeOrphanImpl[F, D, T]
 }
 
 case class WrappedOrphan[T](instance: T)
 
 object WrappedOrphan {
-  implicit def apply[T]: WrappedOrphan[T] = macro OrphanMacros
-    .materializeWrapped[T]
+  implicit def apply[T]: WrappedOrphan[T] =
+    macro OrphanMacros.materializeWrapped[T]
 }
 
 trait OrphanDeriver[F[_], D] {
-  implicit def materialize[T]: F[T] = macro OrphanMacros
-    .materializeImpl[F, D, T]
+  implicit def materialize[T]: F[T] =
+    macro OrphanMacros.materializeImpl[F, D, T]
 }
 
 @macrocompat.bundle

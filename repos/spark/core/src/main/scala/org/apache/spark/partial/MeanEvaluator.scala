@@ -17,7 +17,9 @@
 
 package org.apache.spark.partial
 
-import org.apache.commons.math3.distribution.{NormalDistribution, TDistribution}
+import org.apache.commons.math3.distribution.{
+  NormalDistribution, TDistribution
+}
 
 import org.apache.spark.util.StatCounter
 

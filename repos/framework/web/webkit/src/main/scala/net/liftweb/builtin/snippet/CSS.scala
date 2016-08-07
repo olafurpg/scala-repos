@@ -29,7 +29,7 @@ object CSS extends DispatchSnippet {
     case "blueprint" =>
       _ =>
         blueprint
-      case "fancyType" =>
+    case "fancyType" =>
       _ =>
         fancyType
   }

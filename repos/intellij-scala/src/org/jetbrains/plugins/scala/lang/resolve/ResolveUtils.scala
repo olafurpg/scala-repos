@@ -11,24 +11,42 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScSelfTypeElement, ScTypeElement, ScTypeVariableTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScAccessModifier, ScFieldId, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScSuperReference, ScThisReference}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScSelfTypeElement, ScTypeElement, ScTypeVariableTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScAccessModifier, ScFieldId, ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScSuperReference, ScThisReference
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter, ScParameter, ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
-import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{ScSyntheticClass, ScSyntheticValue}
+import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{
+  ScSyntheticClass, ScSyntheticValue
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScPackageImpl, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScPackageImpl, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil, types}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.{
+  ScalaPsiElement, ScalaPsiUtil, types
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 import org.jetbrains.plugins.scala.lang.resolve.ResolveTargets._
-import org.jetbrains.plugins.scala.lang.resolve.processor.{BaseProcessor, ResolveProcessor, ResolverEnv}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  BaseProcessor, ResolveProcessor, ResolverEnv
+}
 
 import _root_.scala.collection.Set
 
@@ -39,52 +57,52 @@ object ResolveUtils {
   def kindMatches(element: PsiElement,
                   kinds: Set[ResolveTargets.Value]): Boolean =
     kinds == null || (element match {
-          case _: PsiPackage | _: ScPackaging => kinds contains PACKAGE
-          case obj: ScObject if obj.isPackageObject => kinds contains PACKAGE
-          case obj: ScObject =>
-            (kinds contains OBJECT) || (kinds contains METHOD)
-          case _: ScTypeVariableTypeElement => kinds contains CLASS
-          case _: ScTypeParam => kinds contains CLASS
-          case _: ScTypeAlias => kinds contains CLASS
-          case _: ScTypeDefinition => kinds contains CLASS
-          case _: ScSyntheticClass => kinds contains CLASS
-          case c: PsiClass =>
-            if (kinds contains CLASS) true
-            else {
-              def isStaticCorrect(clazz: PsiClass): Boolean = {
-                val cclazz = clazz.getContainingClass
-                cclazz == null ||
-                (clazz.hasModifierProperty(PsiModifier.STATIC) &&
-                    isStaticCorrect(cclazz))
-              }
-              (kinds contains OBJECT) && isStaticCorrect(c)
-            }
-          case patt: ScBindingPattern =>
-            val parent = ScalaPsiUtil
-              .getParentOfType(patt, classOf[ScVariable], classOf[ScValue])
-            parent match {
-              case x: ScVariable => kinds contains VAR
-              case _ => kinds contains VAL
-            }
-          case patt: ScFieldId =>
-            if (patt.getParent /*list of ids*/ .getParent
-                  .isInstanceOf[ScVariable]) kinds contains VAR
-            else kinds contains VAL
-          case classParam: ScClassParameter =>
-            if (classParam.isVar) kinds.contains(VAR) else kinds.contains(VAL)
-          case param: ScParameter => kinds contains VAL
-          case _: ScSelfTypeElement => kinds contains VAL
-          case _: PsiMethod => kinds contains METHOD
-          case _: ScFun => kinds contains METHOD
-          case _: ScSyntheticValue => kinds contains VAL
-          case f: PsiField =>
-            (kinds contains VAR) ||
-              (f.hasModifierPropertyScala(PsiModifier.FINAL) &&
-                    kinds.contains(VAL))
-          case _: PsiParameter =>
-            kinds contains VAL //to enable named Parameters resolve in Play 2.0 routing file for java methods
-          case _ => false
-        })
+      case _: PsiPackage | _: ScPackaging => kinds contains PACKAGE
+      case obj: ScObject if obj.isPackageObject => kinds contains PACKAGE
+      case obj: ScObject =>
+        (kinds contains OBJECT) || (kinds contains METHOD)
+      case _: ScTypeVariableTypeElement => kinds contains CLASS
+      case _: ScTypeParam => kinds contains CLASS
+      case _: ScTypeAlias => kinds contains CLASS
+      case _: ScTypeDefinition => kinds contains CLASS
+      case _: ScSyntheticClass => kinds contains CLASS
+      case c: PsiClass =>
+        if (kinds contains CLASS) true
+        else {
+          def isStaticCorrect(clazz: PsiClass): Boolean = {
+            val cclazz = clazz.getContainingClass
+            cclazz == null ||
+            (clazz.hasModifierProperty(PsiModifier.STATIC) &&
+                isStaticCorrect(cclazz))
+          }
+          (kinds contains OBJECT) && isStaticCorrect(c)
+        }
+      case patt: ScBindingPattern =>
+        val parent = ScalaPsiUtil
+          .getParentOfType(patt, classOf[ScVariable], classOf[ScValue])
+        parent match {
+          case x: ScVariable => kinds contains VAR
+          case _ => kinds contains VAL
+        }
+      case patt: ScFieldId =>
+        if (patt.getParent /*list of ids*/ .getParent.isInstanceOf[ScVariable])
+          kinds contains VAR
+        else kinds contains VAL
+      case classParam: ScClassParameter =>
+        if (classParam.isVar) kinds.contains(VAR) else kinds.contains(VAL)
+      case param: ScParameter => kinds contains VAL
+      case _: ScSelfTypeElement => kinds contains VAL
+      case _: PsiMethod => kinds contains METHOD
+      case _: ScFun => kinds contains METHOD
+      case _: ScSyntheticValue => kinds contains VAL
+      case f: PsiField =>
+        (kinds contains VAR) ||
+          (f.hasModifierPropertyScala(PsiModifier.FINAL) &&
+                kinds.contains(VAL))
+      case _: PsiParameter =>
+        kinds contains VAL //to enable named Parameters resolve in Play 2.0 routing file for java methods
+      case _ => false
+    })
 
   def methodType(m: PsiMethod, s: ScSubstitutor, scope: GlobalSearchScope) =
     ScFunctionType(

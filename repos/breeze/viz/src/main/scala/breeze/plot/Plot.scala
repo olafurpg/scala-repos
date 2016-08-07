@@ -1,12 +1,16 @@
 package breeze.plot
 
 import org.jfree.chart.JFreeChart
-import org.jfree.chart.plot.{CrosshairState, PlotRenderingInfo, DefaultDrawingSupplier}
+import org.jfree.chart.plot.{
+  CrosshairState, PlotRenderingInfo, DefaultDrawingSupplier
+}
 import org.jfree.chart.axis._
 import java.awt._
 import collection.mutable.ArrayBuffer
 import collection.mutable
-import org.jfree.chart.renderer.xy.{XYItemRendererState, XYItemRenderer, AbstractXYItemRenderer}
+import org.jfree.chart.renderer.xy.{
+  XYItemRendererState, XYItemRenderer, AbstractXYItemRenderer
+}
 import java.awt.geom.Rectangle2D
 import org.jfree.data.xy
 import java.lang
@@ -160,9 +164,9 @@ class Plot() {
   // set integer tick units by default
   Array(xaxis, yaxis) foreach
     (axis => {
-          axis.setAutoRangeIncludesZero(false)
-          axis.setStandardTickUnits(Plot.integerTickUnits)
-        })
+       axis.setAutoRangeIncludesZero(false)
+       axis.setStandardTickUnits(Plot.integerTickUnits)
+     })
 
   /** The JFreeChart plot object. */
   lazy val plot = {

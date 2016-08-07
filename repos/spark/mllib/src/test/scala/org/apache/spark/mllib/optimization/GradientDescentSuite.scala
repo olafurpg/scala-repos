@@ -25,7 +25,9 @@ import org.scalatest.Matchers
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression._
-import org.apache.spark.mllib.util.{LocalClusterSparkContext, MLlibTestSparkContext, MLUtils}
+import org.apache.spark.mllib.util.{
+  LocalClusterSparkContext, MLlibTestSparkContext, MLUtils
+}
 import org.apache.spark.mllib.util.TestingUtils._
 
 object GradientDescentSuite {

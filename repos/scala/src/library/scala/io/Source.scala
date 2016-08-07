@@ -10,7 +10,9 @@ package scala
 package io
 
 import scala.collection.AbstractIterator
-import java.io.{FileInputStream, InputStream, PrintStream, File => JFile, Closeable}
+import java.io.{
+  FileInputStream, InputStream, PrintStream, File => JFile, Closeable
+}
 import java.net.{URI, URL}
 
 /** This object provides convenience methods to create an iterable

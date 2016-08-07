@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.runner
 
 import com.intellij.execution._
 import com.intellij.execution.actions.ConfigurationContext
-import com.intellij.execution.application.{ApplicationConfiguration, ApplicationConfigurationType}
+import com.intellij.execution.application.{
+  ApplicationConfiguration, ApplicationConfigurationType
+}
 import com.intellij.execution.configurations.ConfigurationUtil
 import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.openapi.module.Module
@@ -13,7 +15,9 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiClassWrapper, ScFunctionWrapper}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiClassWrapper, ScFunctionWrapper
+}
 
 /**
   * @author Alefas

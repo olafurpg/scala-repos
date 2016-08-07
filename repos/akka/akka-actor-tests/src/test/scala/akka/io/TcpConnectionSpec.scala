@@ -968,8 +968,7 @@ class TcpConnectionSpec extends AkkaSpec("""
       })
   }
 
-  trait SmallRcvBuffer {
-    _: LocalServerTest ⇒
+  trait SmallRcvBuffer { _: LocalServerTest ⇒
     override def setServerSocketOptions(): Unit =
       localServerChannel.socket.setReceiveBufferSize(1024)
   }

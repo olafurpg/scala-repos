@@ -2,19 +2,30 @@ package org.jetbrains.plugins.scala.debugger.ui
 
 import java.util
 
-import com.intellij.debugger.engine.evaluation.expression.{Evaluator, ExpressionEvaluator, ExpressionEvaluatorImpl, TypeEvaluator}
-import com.intellij.debugger.engine.evaluation.{CodeFragmentKind, EvaluateException, EvaluationContext, TextWithImportsImpl}
-import com.intellij.debugger.engine.{DebugProcessImpl, DebuggerUtils, JVMNameUtil}
+import com.intellij.debugger.engine.evaluation.expression.{
+  Evaluator, ExpressionEvaluator, ExpressionEvaluatorImpl, TypeEvaluator
+}
+import com.intellij.debugger.engine.evaluation.{
+  CodeFragmentKind, EvaluateException, EvaluationContext, TextWithImportsImpl
+}
+import com.intellij.debugger.engine.{
+  DebugProcessImpl, DebuggerUtils, JVMNameUtil
+}
 import com.intellij.debugger.impl.DebuggerUtilsEx
 import com.intellij.debugger.settings.NodeRendererSettings
 import com.intellij.debugger.ui.tree.render._
-import com.intellij.debugger.ui.tree.{DebuggerTreeNode, NodeDescriptor, NodeManager, ValueDescriptor}
+import com.intellij.debugger.ui.tree.{
+  DebuggerTreeNode, NodeDescriptor, NodeManager, ValueDescriptor
+}
 import com.intellij.debugger.{DebuggerBundle, DebuggerContext}
 import com.intellij.openapi.fileTypes.StdFileTypes
 import com.intellij.psi.{PsiElement, PsiManager}
 import com.sun.jdi._
 import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException
-import org.jetbrains.plugins.scala.debugger.evaluation.evaluator.{ScalaDuplexEvaluator, ScalaFieldEvaluator, ScalaMethodEvaluator, ScalaThisEvaluator}
+import org.jetbrains.plugins.scala.debugger.evaluation.evaluator.{
+  ScalaDuplexEvaluator, ScalaFieldEvaluator, ScalaMethodEvaluator,
+  ScalaThisEvaluator
+}
 import org.jetbrains.plugins.scala.debugger.filters.ScalaDebuggerSettings
 import org.jetbrains.plugins.scala.debugger.ui.ScalaCollectionRenderer._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory

@@ -12,8 +12,7 @@ import slick.util.{DumpInfo, CloseableIterator, ignoreFollowOnError}
   */
 trait StreamingInvokerAction[R, T, -E <: Effect]
     extends SynchronousDatabaseAction[R, Streaming[T], JdbcBackend, E]
-    with FixedSqlStreamingAction[R, T, E] {
-  self =>
+    with FixedSqlStreamingAction[R, T, E] { self =>
 
   protected[this] def createInvoker(sql: Iterable[String]): Invoker[T]
   protected[this] def createBuilder: Builder[T, R]

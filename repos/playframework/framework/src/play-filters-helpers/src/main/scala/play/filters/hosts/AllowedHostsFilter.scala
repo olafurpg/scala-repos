@@ -29,7 +29,7 @@ case class AllowedHostsFilter @Inject()(config: AllowedHostsConfig,
     config.allowed map HostMatcher.apply
 
   override def apply(next: EssentialAction) = EssentialAction { req =>
-    if (hostMatchers.exists(_ (req.host))) {
+    if (hostMatchers.exists(_(req.host))) {
       next(req)
     } else {
       Accumulator.done(

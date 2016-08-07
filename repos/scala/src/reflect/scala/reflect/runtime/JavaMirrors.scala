@@ -8,7 +8,12 @@ import scala.ref.WeakReference
 import scala.collection.mutable.WeakHashMap
 
 import java.lang.{Class => jClass, Package => jPackage}
-import java.lang.reflect.{Method => jMethod, Constructor => jConstructor, Field => jField, Member => jMember, Type => jType, TypeVariable => jTypeVariable, GenericDeclaration, GenericArrayType, ParameterizedType, WildcardType, AnnotatedElement}
+import java.lang.reflect.{
+  Method => jMethod, Constructor => jConstructor, Field => jField,
+  Member => jMember, Type => jType, TypeVariable => jTypeVariable,
+  GenericDeclaration, GenericArrayType, ParameterizedType, WildcardType,
+  AnnotatedElement
+}
 import java.lang.annotation.{Annotation => jAnnotation}
 import java.io.IOException
 import scala.reflect.internal.{MissingRequirementError, JavaAccFlags}
@@ -22,8 +27,7 @@ import scala.runtime.{ScalaRunTime, BoxesRunTime}
 private[scala] trait JavaMirrors
     extends internal.SymbolTable
     with api.JavaUniverse
-    with TwoWayCaches {
-  thisUniverse: SymbolTable =>
+    with TwoWayCaches { thisUniverse: SymbolTable =>
 
   private lazy val mirrors =
     new WeakHashMap[ClassLoader, WeakReference[JavaMirror]]()
@@ -59,8 +63,7 @@ private[scala] trait JavaMirrors
                    /* Class loader that is a mastermind behind the reflexive mirror */
                    val classLoader: ClassLoader)
       extends Roots(owner)
-      with super.JavaMirror {
-    thisMirror =>
+      with super.JavaMirror { thisMirror =>
 
     val universe: thisUniverse.type = thisUniverse
 
@@ -222,8 +225,8 @@ private[scala] trait JavaMirrors
       override lazy val assocs: List[(Name, ClassfileAnnotArg)] =
         (jann.annotationType.getDeclaredMethods.sortBy(_.getName).toList map
               (m =>
-                    TermName(m.getName) -> toAnnotArg(
-                        m.getReturnType -> m.invoke(jann))))
+                 TermName(m.getName) -> toAnnotArg(
+                     m.getReturnType -> m.invoke(jann))))
     }
 
     def reflect[T: ClassTag](obj: T): InstanceMirror =

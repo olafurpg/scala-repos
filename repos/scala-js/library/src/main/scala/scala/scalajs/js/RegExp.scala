@@ -59,7 +59,6 @@ class RegExp(pattern: String, flags: String = "") extends Object {
     * should be treated as multiple lines. For example, if "m" is used, "^" and
     * "$" change from matching at only the start or end of the entire string to
     * the start or end of any line within the string.
-
     * MDN
     */
   val multiline: Boolean = native

@@ -25,7 +25,7 @@ package common
   *
   * {{{
   * import net.liftweb.common.HLists._
-  * 
+  *
   * trait Base
   * case class Type1(value: String) extends Base
   * case class Type2(otherValue: String) extends Base

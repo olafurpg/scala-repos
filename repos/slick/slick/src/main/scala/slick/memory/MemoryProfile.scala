@@ -10,7 +10,9 @@ import slick.ast.TypeUtil._
 import slick.basic.{FixedBasicAction, FixedBasicStreamingAction}
 import slick.compiler._
 import slick.dbio._
-import slick.relational.{RelationalProfile, ResultConverterCompiler, ResultConverter, CompiledMapping}
+import slick.relational.{
+  RelationalProfile, ResultConverterCompiler, ResultConverter, CompiledMapping
+}
 import slick.util.{DumpInfo, ??}
 
 /** A profile for interpreted queries on top of the in-memory database. */

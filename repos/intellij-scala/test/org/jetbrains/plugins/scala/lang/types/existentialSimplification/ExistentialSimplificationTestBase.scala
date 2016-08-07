@@ -11,7 +11,9 @@ import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAda
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScExistentialType, ScType}
 
 /**
@@ -78,9 +80,9 @@ abstract class ExistentialSimplificationTestBase
         assert(assertion = false,
                message =
                  msg + " :: " + (elem match {
-                       case Some(x) => x.getText
-                       case None => "empty element"
-                     }))
+                   case Some(x) => x.getText
+                   case None => "empty element"
+                 }))
     }
   }
 }

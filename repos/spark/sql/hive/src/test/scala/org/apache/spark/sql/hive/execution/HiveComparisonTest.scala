@@ -30,7 +30,9 @@ import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.execution.command.{ExplainCommand, SetCommand}
 import org.apache.spark.sql.execution.datasources.DescribeCommand
-import org.apache.spark.sql.hive.{InsertIntoHiveTable => LogicalInsertIntoHiveTable, SQLBuilder}
+import org.apache.spark.sql.hive.{
+  InsertIntoHiveTable => LogicalInsertIntoHiveTable, SQLBuilder
+}
 import org.apache.spark.sql.hive.test.TestHive
 
 /**

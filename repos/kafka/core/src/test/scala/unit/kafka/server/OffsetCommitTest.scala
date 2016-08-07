@@ -16,9 +16,13 @@
   */
 package kafka.server
 
-import kafka.api.{GroupCoordinatorRequest, OffsetCommitRequest, OffsetFetchRequest}
+import kafka.api.{
+  GroupCoordinatorRequest, OffsetCommitRequest, OffsetFetchRequest
+}
 import kafka.consumer.SimpleConsumer
-import kafka.common.{OffsetMetadata, OffsetMetadataAndError, OffsetAndMetadata, TopicAndPartition}
+import kafka.common.{
+  OffsetMetadata, OffsetMetadataAndError, OffsetAndMetadata, TopicAndPartition
+}
 import kafka.utils._
 import kafka.utils.TestUtils._
 import kafka.zk.ZooKeeperTestHarness

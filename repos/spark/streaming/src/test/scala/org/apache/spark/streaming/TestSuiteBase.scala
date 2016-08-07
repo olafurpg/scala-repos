@@ -32,7 +32,9 @@ import org.scalatest.time.{Seconds => ScalaTestSeconds, Span}
 import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
-import org.apache.spark.streaming.dstream.{DStream, ForEachDStream, InputDStream}
+import org.apache.spark.streaming.dstream.{
+  DStream, ForEachDStream, InputDStream
+}
 import org.apache.spark.streaming.scheduler._
 import org.apache.spark.util.{ManualClock, Utils}
 

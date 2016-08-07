@@ -27,9 +27,13 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.light.ScFunctionWrapper
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
-import org.jetbrains.plugins.scala.macroAnnotations.{CachedInsidePsiElement, ModCount}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  CachedInsidePsiElement, ModCount
+}
 
 /**
   * @author ven
@@ -241,13 +245,13 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
           case (_, x) =>
             !x.info.isInstanceOf[PhysicalSignature] &&
               (x.info.namedElement match {
-                    case v =>
-                      ScalaPsiUtil.nameContext(v) match {
-                        case _: ScVariable => v.name == x.info.name
-                        case _: ScValue => v.name == x.info.name
-                        case _ => true
-                      }
-                  })
+                case v =>
+                  ScalaPsiUtil.nameContext(v) match {
+                    case _: ScVariable => v.name == x.info.name
+                    case _: ScValue => v.name == x.info.name
+                    case _ => true
+                  }
+              })
       })
       .map { case (_, n) => (n.info.namedElement, n.substitutor) }
 
@@ -265,13 +269,13 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
                   case (_, x) =>
                     !x.info.isInstanceOf[PhysicalSignature] &&
                       (x.info.namedElement match {
-                            case v =>
-                              ScalaPsiUtil.nameContext(v) match {
-                                case _: ScVariable => v.name == x.info.name
-                                case _: ScValue => v.name == x.info.name
-                                case _ => true
-                              }
-                          })
+                        case v =>
+                          ScalaPsiUtil.nameContext(v) match {
+                            case _: ScVariable => v.name == x.info.name
+                            case _: ScValue => v.name == x.info.name
+                            case _ => true
+                          }
+                      })
               })
               .map { case (_, n) => (n.info.namedElement, n.substitutor) }
           case _ =>

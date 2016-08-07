@@ -21,8 +21,7 @@ import Scalaz._
 import net.liftweb.json._
 import scala.collection.breakOut
 
-trait Base {
-  this: Types =>
+trait Base { this: Types =>
   implicit def boolJSON: JSON[Boolean] = new JSON[Boolean] {
     def read(json: JValue) = json match {
       case JBool(b) => success(b)

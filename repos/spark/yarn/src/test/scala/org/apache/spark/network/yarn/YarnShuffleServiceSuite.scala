@@ -23,7 +23,9 @@ import scala.annotation.tailrec
 import org.apache.commons.io.FileUtils
 import org.apache.hadoop.yarn.api.records.ApplicationId
 import org.apache.hadoop.yarn.conf.YarnConfiguration
-import org.apache.hadoop.yarn.server.api.{ApplicationInitializationContext, ApplicationTerminationContext}
+import org.apache.hadoop.yarn.server.api.{
+  ApplicationInitializationContext, ApplicationTerminationContext
+}
 import org.scalatest.{BeforeAndAfterEach, Matchers}
 
 import org.apache.spark.SparkFunSuite

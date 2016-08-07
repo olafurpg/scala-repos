@@ -32,7 +32,9 @@ import javafx.{collections => jfxc, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 import scalafx.util.StringConverter

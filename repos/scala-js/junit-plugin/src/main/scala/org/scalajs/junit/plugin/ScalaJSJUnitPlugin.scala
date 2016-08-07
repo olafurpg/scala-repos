@@ -4,7 +4,9 @@ import scala.language.reflectiveCalls
 
 import scala.reflect.internal.Flags
 import scala.tools.nsc._
-import scala.tools.nsc.plugins.{Plugin => NscPlugin, PluginComponent => NscPluginComponent}
+import scala.tools.nsc.plugins.{
+  Plugin => NscPlugin, PluginComponent => NscPluginComponent
+}
 
 /** The Scala.js jUnit plugin is a way to overcome the lack of annotation
   *  information of any test class (usually accessed through reflection).

@@ -7,7 +7,9 @@ import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.core.task.tracker.TaskTracker.TasksByApp
 import mesosphere.marathon.state.{PathId, Timestamp}
-import mesosphere.marathon.{MarathonSchedulerDriverHolder, MarathonSpec, MarathonTestHelper}
+import mesosphere.marathon.{
+  MarathonSchedulerDriverHolder, MarathonSpec, MarathonTestHelper
+}
 import mesosphere.mesos.protos.TaskID
 import org.apache.mesos.Protos.{TaskState, TaskStatus}
 import org.apache.mesos.{Protos => MesosProtos, SchedulerDriver}

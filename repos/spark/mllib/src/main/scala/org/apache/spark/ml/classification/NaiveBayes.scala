@@ -22,10 +22,14 @@ import org.apache.hadoop.fs.Path
 import org.apache.spark.SparkException
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.PredictorParams
-import org.apache.spark.ml.param.{DoubleParam, Param, ParamMap, ParamValidators}
+import org.apache.spark.ml.param.{
+  DoubleParam, Param, ParamMap, ParamValidators
+}
 import org.apache.spark.ml.util._
 import org.apache.spark.mllib.classification.{NaiveBayes => OldNaiveBayes}
-import org.apache.spark.mllib.classification.{NaiveBayesModel => OldNaiveBayesModel}
+import org.apache.spark.mllib.classification.{
+  NaiveBayesModel => OldNaiveBayesModel
+}
 import org.apache.spark.mllib.linalg._
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.rdd.RDD

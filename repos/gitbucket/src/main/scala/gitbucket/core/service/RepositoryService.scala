@@ -306,7 +306,7 @@ trait RepositoryService { self: AccountService =>
 
   /**
     * Returns the specified repository information.
-    * 
+    *
     * @param userName the user name of the repository owner
     * @param repositoryName the repository name
     * @return the repository information
@@ -349,9 +349,9 @@ trait RepositoryService { self: AccountService =>
     Repositories.filter { t1 =>
       (t1.isPrivate === false.bind) || (t1.userName === userName.bind) ||
       (Collaborators.filter { t2 =>
-            t2.byRepository(t1.userName, t1.repositoryName) &&
-            (t2.collaboratorName === userName.bind)
-          } exists)
+        t2.byRepository(t1.userName, t1.repositoryName) &&
+        (t2.collaboratorName === userName.bind)
+      } exists)
     }.sortBy(_.lastActivityDate desc)
       .map { t =>
         (t.userName, t.repositoryName)
@@ -364,9 +364,9 @@ trait RepositoryService { self: AccountService =>
       implicit s: Session): List[RepositoryInfo] = {
     Repositories.filter { t1 =>
       (t1.userName === userName.bind) || (Collaborators.filter { t2 =>
-            t2.byRepository(t1.userName, t1.repositoryName) &&
-            (t2.collaboratorName === userName.bind)
-          } exists)
+        t2.byRepository(t1.userName, t1.repositoryName) &&
+        (t2.collaboratorName === userName.bind)
+      } exists)
     }.sortBy(_.lastActivityDate desc).list.map { repository =>
       new RepositoryInfo(
           if (withoutPhysicalInfo) {
@@ -408,9 +408,9 @@ trait RepositoryService { self: AccountService =>
         Repositories filter { t =>
           (t.isPrivate === false.bind) || (t.userName === x.userName) ||
           (Collaborators.filter { t2 =>
-                t2.byRepository(t.userName, t.repositoryName) &&
-                (t2.collaboratorName === x.userName.bind)
-              } exists)
+            t2.byRepository(t.userName, t.repositoryName) &&
+            (t2.collaboratorName === x.userName.bind)
+          } exists)
         }
       // for Guests
       case None => Repositories filter (_.isPrivate === false.bind)
@@ -498,7 +498,7 @@ trait RepositoryService { self: AccountService =>
 
   /**
     * Remove collaborator from the repository.
-    * 
+    *
     * @param userName the user name of the repository owner
     * @param repositoryName the repository name
     * @param collaboratorName the collaborator name
@@ -522,7 +522,7 @@ trait RepositoryService { self: AccountService =>
 
   /**
     * Returns the list of collaborators name which is sorted with ascending order.
-    * 
+    *
     * @param userName the user name of the repository owner
     * @param repositoryName the repository name
     * @return the list of collaborators name

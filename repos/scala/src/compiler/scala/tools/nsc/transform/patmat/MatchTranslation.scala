@@ -145,9 +145,9 @@ trait MatchTranslation { self: PatternMatching =>
         // TODO: paramType may contain unbound type params (run/t2800, run/t3530)
         val makers =
           (// Statically conforms to paramType
-           if (this ensureConformsTo paramType)
-             treeMaker(binder, false, pos) :: Nil
-           else typeTest :: extraction :: Nil)
+          if (this ensureConformsTo paramType)
+            treeMaker(binder, false, pos) :: Nil
+          else typeTest :: extraction :: Nil)
         step(makers: _*)(extractor.subBoundTrees: _*)
       }
 
@@ -388,16 +388,13 @@ trait MatchTranslation { self: PatternMatching =>
     /*A constructor pattern is of the form c(p1, ..., pn) where n ≥ 0.
       It consists of a stable identifier c, followed by element patterns p1, ..., pn.
       The constructor c is a simple or qualified name which denotes a case class (§5.3.2).
-
       If the case class is monomorphic, then it must conform to the expected type of the pattern,
       and the formal parameter types of x’s primary constructor (§5.3) are taken as the expected
       types of the element patterns p1, ..., pn.
-
       If the case class is polymorphic, then its type parameters are instantiated so that the
       instantiation of c conforms to the expected type of the pattern.
       The instantiated formal parameter types of c’s primary constructor are then taken as the
       expected types of the component patterns p1, ..., pn.
-
       The pattern matches all objects created from constructor invocations c(v1, ..., vn)
       where each element pattern pi matches the corresponding value vi .
       A special case arises when c’s formal parameter types end in a repeated parameter.
@@ -419,7 +416,6 @@ trait MatchTranslation { self: PatternMatching =>
     /* 8.1.4 Literal Patterns
          A literal pattern L matches any value that is equal (in terms of ==) to the literal L.
          The type of L must conform to the expected type of the pattern.
-
        8.1.5 Stable Identifier Patterns  (a stable identifier r (see §3.1))
          The pattern matches any value v such that r == v (§12.1).
          The type of r must conform to the expected type of the pattern.

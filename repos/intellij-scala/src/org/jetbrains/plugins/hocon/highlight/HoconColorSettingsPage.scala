@@ -2,7 +2,9 @@ package org.jetbrains.plugins.hocon.highlight
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
-import com.intellij.openapi.options.colors.{AttributesDescriptor, ColorSettingsPage}
+import com.intellij.openapi.options.colors.{
+  AttributesDescriptor, ColorSettingsPage
+}
 import org.jetbrains.plugins.hocon.highlight.{HoconHighlighterColors => HHC}
 import org.jetbrains.plugins.hocon.lang.HoconLanguage
 

@@ -4,7 +4,9 @@ import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.codeInsight.intention.types.AddOnlyStrategy
 import org.jetbrains.plugins.scala.codeInspection.AbstractFixOnPsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScReferencePattern, ScWildcardPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause, ScReferencePattern, ScWildcardPattern
+}
 
 /**
   * @author Ksenia.Sautina

@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala
 
 import java.io.File
 
-import com.intellij.openapi.projectRoots.{JavaSdkType, ProjectJdkTable, SdkType}
+import com.intellij.openapi.projectRoots.{
+  JavaSdkType, ProjectJdkTable, SdkType
+}
 import com.intellij.openapi.util.io.FileUtil
 
 /**

@@ -5,7 +5,10 @@ package akka
 
 import sbt._
 import sbtunidoc.Plugin.UnidocKeys._
-import sbtunidoc.Plugin.{ScalaUnidoc, JavaUnidoc, Genjavadoc, scalaJavaUnidocSettings, genjavadocExtraSettings, scalaUnidocSettings}
+import sbtunidoc.Plugin.{
+  ScalaUnidoc, JavaUnidoc, Genjavadoc, scalaJavaUnidocSettings,
+  genjavadocExtraSettings, scalaUnidocSettings
+}
 import sbt.Keys._
 import sbt.File
 import scala.annotation.tailrec
@@ -117,7 +120,7 @@ object UnidocRoot extends AutoPlugin {
             scalacOptions += "-P:genjavadoc:suppressSynthetic=false",
             // FIXME: see #18056
             sources in (JavaUnidoc, unidoc) ~= (_.filterNot(_.getPath.contains(
-                        "Access$minusControl$minusAllow$minusOrigin")))
+                    "Access$minusControl$minusAllow$minusOrigin")))
         ))
     .getOrElse(Nil)
 
@@ -165,7 +168,7 @@ object Unidoc extends AutoPlugin {
             unidocGenjavadocVersion in Global := "0.9",
             // FIXME: see #18056
             sources in (Genjavadoc, doc) ~= (_.filterNot(_.getPath.contains(
-                        "Access$minusControl$minusAllow$minusOrigin")))
+                    "Access$minusControl$minusAllow$minusOrigin")))
         )
     )
     .getOrElse(Seq.empty)

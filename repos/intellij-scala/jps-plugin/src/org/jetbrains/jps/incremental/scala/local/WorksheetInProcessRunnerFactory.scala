@@ -8,7 +8,9 @@ import java.nio.ByteBuffer
 import com.intellij.util.Base64Converter
 import com.martiansoftware.nailgun.ThreadLocalPrintStream
 import org.jetbrains.jps.incremental.scala.data.CompilerJars
-import org.jetbrains.jps.incremental.scala.remote.{EventGeneratingClient, Arguments, WorksheetOutputEvent}
+import org.jetbrains.jps.incremental.scala.remote.{
+  EventGeneratingClient, Arguments, WorksheetOutputEvent
+}
 
 /**
   * User: Dmitry.Naydanov

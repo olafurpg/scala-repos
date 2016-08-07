@@ -38,7 +38,7 @@ object JsCommands {
   * also read and included in the response. Also in this process, all of the
   * `JsCmd` instances have their `toJsCmd` methods called to convert them to a
   * string.
-  * 
+  *
   * @note The contents of `jsToAppend` are cleared in this process!
   */
 class JsCommands(val reverseList: List[JsCmd]) {

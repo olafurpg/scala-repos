@@ -47,8 +47,7 @@ object Test extends InteractiveTest {
   override lazy val compiler = {
     prepareSettings(settings)
     new Global(settings, compilerReporter) with MemberLookupBase
-    with CommentFactoryBase with doc.ScaladocGlobalTrait {
-      outer =>
+    with CommentFactoryBase with doc.ScaladocGlobalTrait { outer =>
 
       val global: this.type = this
 

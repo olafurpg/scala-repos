@@ -15,7 +15,10 @@ import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.plugin.auth._
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state.{GroupManager, PathId}
-import mesosphere.marathon.{UnknownGroupException, MarathonConf, MarathonSchedulerService, UnknownAppException}
+import mesosphere.marathon.{
+  UnknownGroupException, MarathonConf, MarathonSchedulerService,
+  UnknownAppException
+}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.Future

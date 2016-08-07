@@ -14,9 +14,7 @@ class UsedNameClash {
 
 /*
 import java.util.{Date, Enumeration, Random, Timer, UUID}
-
 import scala.util._
-
 class UsedNameClash {
   def foo(): Unit = {
     val d: Date = null

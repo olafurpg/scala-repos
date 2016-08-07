@@ -118,8 +118,7 @@ private[akka] class ActorSubscriptionWithCursor[T](
 /**
   * INTERNAL API
   */
-private[akka] trait SoftShutdown {
-  this: Actor ⇒
+private[akka] trait SoftShutdown { this: Actor ⇒
   def softShutdown(): Unit = {
     val children = context.children
     if (children.isEmpty) {

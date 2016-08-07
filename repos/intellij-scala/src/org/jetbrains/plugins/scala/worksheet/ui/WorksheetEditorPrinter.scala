@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala
 package worksheet.ui
 
-import java.awt.event.{ActionEvent, ActionListener, AdjustmentEvent, AdjustmentListener}
+import java.awt.event.{
+  ActionEvent, ActionListener, AdjustmentEvent, AdjustmentListener
+}
 import java.awt.{BorderLayout, Color, Dimension}
 import java.util
 import javax.swing.{JComponent, JLayeredPane, Timer}
@@ -31,7 +33,9 @@ import com.intellij.ui.JBSplitter
 import org.jetbrains.plugins.scala
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
-import org.jetbrains.plugins.scala.worksheet.processor.{FileAttributeUtilCache, WorksheetSourceProcessor}
+import org.jetbrains.plugins.scala.worksheet.processor.{
+  FileAttributeUtilCache, WorksheetSourceProcessor
+}
 import org.jetbrains.plugins.scala.worksheet.runconfiguration.WorksheetViewerInfo
 
 import _root_.scala.collection.mutable.ArrayBuffer

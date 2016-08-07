@@ -131,8 +131,7 @@ trait Positions extends api.Positions { self: SymbolTable =>
             inform("%15s %s".format("enclosing", treeStatus(encltree)))
             encltree.children foreach
               (t =>
-                    inform(
-                        "%15s %s".format("sibling", treeStatus(t, encltree))))
+                 inform("%15s %s".format("sibling", treeStatus(t, encltree))))
           }
         if (tree.pos.isRange) {
           if (!encltree.pos.isRange)

@@ -2,7 +2,9 @@ package mesosphere.marathon.api
 
 import java.io.ByteArrayOutputStream
 import java.util
-import javax.servlet.{WriteListener, ServletOutputStream, ServletConfig, ServletContext}
+import javax.servlet.{
+  WriteListener, ServletOutputStream, ServletConfig, ServletContext
+}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 import mesosphere.marathon.MarathonSpec

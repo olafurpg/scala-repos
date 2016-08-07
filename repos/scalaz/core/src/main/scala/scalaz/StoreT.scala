@@ -31,7 +31,7 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
     imap(f)
 
   def put(a: A)(implicit F: Functor[F]): F[B] =
-    F.map(run._1)(_ (a))
+    F.map(run._1)(_(a))
 
   def puts(f: I => A)(implicit F: Functor[F]): F[B] =
     put(f(pos))

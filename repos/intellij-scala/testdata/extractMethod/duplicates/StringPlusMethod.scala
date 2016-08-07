@@ -15,13 +15,10 @@ object StringPlusMethod {
     val kind = "error: "
     /*start*/testMethodName(kind, message)/*end*/
   }
-
   def testMethodName(kind: String, message: String): Unit = {
     println(kind + message)
   }
-
   def warning(message: String) = testMethodName("warning: ", message)
-
   def info(message: String) = testMethodName("info: ", message)
 }
  */

@@ -2,7 +2,6 @@
  * http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/dft/
    Modification of Paul Bourkes FFT code by Peter Cusack
    to utilise the Microsoft complex type.
-
    This computes an in-place complex-to-complex FFT
    x and y are the real and imaginary arrays of 2^m points.
    dir =  1 gives forward transform

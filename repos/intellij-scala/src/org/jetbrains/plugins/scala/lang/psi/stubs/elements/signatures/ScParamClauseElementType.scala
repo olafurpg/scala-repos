@@ -7,7 +7,9 @@ package signatures
 
 import _root_.org.jetbrains.plugins.scala.lang.psi.impl.statements.params.ScParameterClauseImpl
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink, StubElement, StubInputStream, StubOutputStream
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterClause
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScParamClauseStubImpl
 

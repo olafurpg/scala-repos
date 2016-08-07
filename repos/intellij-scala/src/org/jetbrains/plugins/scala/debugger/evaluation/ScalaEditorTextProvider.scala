@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.debugger.evaluation
 
-import com.intellij.debugger.engine.evaluation.{CodeFragmentKind, TextWithImports, TextWithImportsImpl}
+import com.intellij.debugger.engine.evaluation.{
+  CodeFragmentKind, TextWithImports, TextWithImportsImpl
+}
 import com.intellij.debugger.impl.EditorTextProvider
 import com.intellij.openapi.util.{Pair, TextRange}
 import com.intellij.psi.PsiElement

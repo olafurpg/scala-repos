@@ -22,7 +22,7 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScAccessModifierStub
 
 import scala.collection.mutable.ArrayBuffer
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */

@@ -24,7 +24,9 @@ import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.classification.DecisionTreeClassifier
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
+import org.apache.spark.ml.feature.{
+  IndexToString, StringIndexer, VectorIndexer
+}
 // $example off$
 import org.apache.spark.sql.SQLContext
 

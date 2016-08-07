@@ -22,8 +22,7 @@ import akka.parboiled2._
 /**
   * Rules for parsing Base-64 encoded strings.
   */
-private[parser] trait Base64Parsing {
-  this: Parser ⇒
+private[parser] trait Base64Parsing { this: Parser ⇒
   import Base64Parsing._
 
   /**

@@ -14,13 +14,19 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl._
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScReferenceExpressionImpl
-import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{ScSyntheticClass, SyntheticClasses}
+import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{
+  ScSyntheticClass, SyntheticClasses
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.psi.types.{Any, ScType}
-import org.jetbrains.plugins.scala.lang.psi.{ScDeclarationSequenceHolder, ScImportsHolder, ScalaPsiUtil}
+import org.jetbrains.plugins.scala.lang.psi.{
+  ScDeclarationSequenceHolder, ScImportsHolder, ScalaPsiUtil
+}
 import org.jetbrains.plugins.scala.lang.resolve.ResolveUtils
 import org.jetbrains.plugins.scala.lang.resolve.processor.PrecedenceHelper.PrecedenceTypes
-import org.jetbrains.plugins.scala.lang.resolve.processor.{BaseProcessor, ResolveProcessor, ResolverEnv}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  BaseProcessor, ResolveProcessor, ResolverEnv
+}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

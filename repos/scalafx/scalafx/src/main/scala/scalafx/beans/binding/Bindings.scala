@@ -80,7 +80,7 @@ trait Bindings {
     *
     * @param condition Function that returns a $JFX
     *                  [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/value/ObservableBooleanValue.html `ObservableBooleanValue`]]
-    * @return A ConditionBuilder wrapping `condition`. 
+    * @return A ConditionBuilder wrapping `condition`.
     */
   def when(condition: => jfxbv.ObservableBooleanValue) =
     new ConditionBuilder(new jfxbb.When(condition))

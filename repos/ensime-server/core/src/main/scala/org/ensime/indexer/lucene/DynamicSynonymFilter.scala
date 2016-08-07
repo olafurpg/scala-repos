@@ -7,7 +7,9 @@ import java.io.Reader
 import org.apache.lucene.analysis.Analyzer.TokenStreamComponents
 import org.apache.lucene.analysis.{Analyzer, TokenFilter, TokenStream}
 import org.apache.lucene.analysis.core.KeywordTokenizer
-import org.apache.lucene.analysis.tokenattributes.{CharTermAttribute, PositionIncrementAttribute}
+import org.apache.lucene.analysis.tokenattributes.{
+  CharTermAttribute, PositionIncrementAttribute
+}
 import org.apache.lucene.util.AttributeSource.State
 import org.ensime.indexer.lucene.DynamicSynonymFilter._
 

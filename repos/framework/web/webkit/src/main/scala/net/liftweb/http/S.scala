@@ -668,7 +668,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   def highLevelSessionDispatchList: List[DispatchHolder] =
     session map
       (_.highLevelSessionDispatcher.toList.map(t =>
-                DispatchHolder(t._1, t._2))) openOr Nil
+            DispatchHolder(t._1, t._2))) openOr Nil
 
   /**
     * Adds a dispatch function for the current session, as opposed to a global
@@ -753,7 +753,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def sessionRewriter: List[RewriteHolder] =
     session map (_.sessionRewriter.toList
-          .map(t => RewriteHolder(t._1, t._2))) openOr Nil
+      .map(t => RewriteHolder(t._1, t._2))) openOr Nil
 
   /**
     * Adds a per-session rewrite function. This can be used if you only want a particular rewrite
@@ -1062,7 +1062,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       .flatMap(r =>
             tryo(r.getObject(str) match {
           case null =>
-            LiftRules.localizationLookupFailureNotice.foreach(_ (str, locale));
+            LiftRules.localizationLookupFailureNotice.foreach(_(str, locale));
             Empty
           case s: String => Full(LiftRules.localizeStringToXml(s))
           case g: Group => Full(g)
@@ -1234,7 +1234,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
           case _ => Empty
         }).flatMap(s => s))
       .find(s => true) getOrElse {
-      LiftRules.localizationLookupFailureNotice.foreach(_ (str, locale));
+      LiftRules.localizationLookupFailureNotice.foreach(_(str, locale));
       str
     }
 
@@ -1648,7 +1648,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       f()
     } finally {
       val time = millis - begin
-      _queryAnalyzer.foreach(_ (request, time, queryLog))
+      _queryAnalyzer.foreach(_(request, time, queryLog))
     }
   }
 
@@ -1817,10 +1817,10 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
             val req = this.request
             session match {
               case Full(s) if s.stateful_? =>
-                LiftRules.earlyInStateful.toList.foreach(_ (req))
+                LiftRules.earlyInStateful.toList.foreach(_(req))
 
               case Full(s) =>
-                LiftRules.earlyInStateless.toList.foreach(_ (req))
+                LiftRules.earlyInStateless.toList.foreach(_(req))
 
               case _ =>
             }
@@ -2207,13 +2207,10 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * <pre name="code" class="scala">
   // Get a Box for the attribute:
   val myAttr = S.attr("test") openOr "Not found"
-
   // Get an attribute or return a default value:
   val myAttr = S.attr("name", "Fred")
-
   // Apply a transform function on the attribute value, or return an Empty:
   val pageSize = S.attr("count", _.toInt) openOr 20
-
   // There are also prefixed versions:
   val prefixedAttr = S.attr("prefix", "name") openOr "Not found"
     * </pre>
@@ -2347,13 +2344,10 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * <pre name="code" class="scala">
   // Get a Box for the attribute:
   val myAttr = S.currentAttr("test") openOr "Not found"
-
   // Get an attribute or return a default value:
   val myAttr = S.currentAttr("name", "Fred")
-
   // Apply a transform function on the attribute value, or return an Empty:
   val pageSize = S.currentAttr("count", _.toInt) openOr 20
-
   // There are also prefixed versions:
   val prefixedAttr = S.currentAttr("prefix", "name") openOr "Not found"
     * </pre>
@@ -2630,10 +2624,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   } else  {
   S.mapSnippet("listing",  { ignore => Text("") } )
   }
-
   ...
   }
-
   def listing(xhtml : NodeSeq) : NodeSeq =  {
   ...
   }
@@ -2786,7 +2778,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * it appends general purpose parameters defined by LiftRules.urlDecorate
     */
   def encodeURL(url: String) = {
-    URLRewriter.rewriteFunc map (_ (url)) openOr url
+    URLRewriter.rewriteFunc map (_(url)) openOr url
   }
 
   private[http] object _formGroup extends TransientRequestVar[Box[Int]](Empty)

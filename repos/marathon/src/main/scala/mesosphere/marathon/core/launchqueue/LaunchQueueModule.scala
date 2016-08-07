@@ -4,7 +4,10 @@ import akka.actor.{ActorRef, Props}
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.flow.OfferReviver
 import mesosphere.marathon.core.launcher.TaskOpFactory
-import mesosphere.marathon.core.launchqueue.impl.{AppTaskLauncherActor, LaunchQueueActor, LaunchQueueDelegate, RateLimiter, RateLimiterActor}
+import mesosphere.marathon.core.launchqueue.impl.{
+  AppTaskLauncherActor, LaunchQueueActor, LaunchQueueDelegate, RateLimiter,
+  RateLimiterActor
+}
 import mesosphere.marathon.core.leadership.LeadershipModule
 import mesosphere.marathon.core.matcher.manager.OfferMatcherManager
 import mesosphere.marathon.core.task.tracker.TaskTracker

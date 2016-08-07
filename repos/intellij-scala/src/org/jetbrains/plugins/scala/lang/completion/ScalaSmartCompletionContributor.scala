@@ -4,7 +4,9 @@ import com.intellij.codeInsight.completion._
 import com.intellij.codeInsight.lookup._
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.patterns.PsiElementPattern.Capture
-import com.intellij.patterns.{ElementPattern, PlatformPatterns, StandardPatterns}
+import com.intellij.patterns.{
+  ElementPattern, PlatformPatterns, StandardPatterns
+}
 import com.intellij.psi._
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
@@ -12,8 +14,12 @@ import com.intellij.util.ProcessingContext
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.completion.ScalaAfterNewCompletionUtil._
-import org.jetbrains.plugins.scala.lang.completion.handlers.{ScalaConstructorInsertHandler, ScalaGenerateAnonymousFunctionInsertHandler}
-import org.jetbrains.plugins.scala.lang.completion.lookups.{LookupElementManager, ScalaChainLookupElement, ScalaLookupItem}
+import org.jetbrains.plugins.scala.lang.completion.handlers.{
+  ScalaConstructorInsertHandler, ScalaGenerateAnonymousFunctionInsertHandler
+}
+import org.jetbrains.plugins.scala.lang.completion.lookups.{
+  LookupElementManager, ScalaChainLookupElement, ScalaLookupItem
+}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
@@ -24,9 +30,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticFunction
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.processor.CompletionProcessor
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult, StdKinds}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils, ScalaResolveResult, StdKinds
+}
 
 import scala.annotation.tailrec
 import scala.collection.mutable

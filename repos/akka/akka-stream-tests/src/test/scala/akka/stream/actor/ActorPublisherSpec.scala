@@ -4,7 +4,9 @@
 package akka.stream.actor
 
 import akka.actor.{ActorRef, PoisonPill, Props}
-import akka.stream.{ClosedShape, ActorMaterializer, ActorMaterializerSettings, ActorAttributes}
+import akka.stream.{
+  ClosedShape, ActorMaterializer, ActorMaterializerSettings, ActorAttributes
+}
 import akka.stream.scaladsl._
 import akka.stream.testkit._
 import akka.stream.testkit.Utils._

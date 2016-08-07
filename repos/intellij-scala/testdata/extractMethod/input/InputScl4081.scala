@@ -14,7 +14,6 @@ class InputScl4081 {
     val as = /*start*/testMethodName(bar, validations)/*end*/
     as
   }
-
   def testMethodName(bar: Int, validations: List[Int]): Int = {
     validations.size + bar
   }

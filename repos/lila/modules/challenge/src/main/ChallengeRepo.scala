@@ -1,7 +1,9 @@
 package lila.challenge
 
 import org.joda.time.DateTime
-import reactivemongo.bson.{BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean}
+import reactivemongo.bson.{
+  BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean
+}
 import scala.concurrent.duration._
 
 import lila.db.BSON.BSONJodaDateTimeHandler
@@ -127,7 +129,7 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
               "$set" -> BSONDocument(
                   "status" -> status.id,
                   "expiresAt" -> expiresAt.fold(inTwoWeeks) {
-                _ (DateTime.now)
+                _(DateTime.now)
               }
               ))
       )

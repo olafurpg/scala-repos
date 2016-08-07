@@ -43,7 +43,7 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0 {
   }
 
   /**Isomorphism for arrows of kind (* -> *) -> (* -> *) -> * */
-  trait Iso2[Arr[_ [_], _ [_]], F[_], G[_]] { self =>
+  trait Iso2[Arr[_[_], _[_]], F[_], G[_]] { self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
     def flip: Iso2[Arr, G, F] = new Iso2[Arr, G, F] {
@@ -69,7 +69,7 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0 {
   }
 
   /**Isomorphism for arrows of kind (* -> * -> *) -> (* -> * -> *) -> * */
-  trait Iso3[Arr[_ [_, _], _ [_, _]], F[_, _], G[_, _]] { self =>
+  trait Iso3[Arr[_[_, _], _[_, _]], F[_, _], G[_, _]] { self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
     def flip: Iso3[Arr, G, F] = new Iso3[Arr, G, F] {

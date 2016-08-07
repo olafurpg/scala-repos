@@ -2,7 +2,9 @@ package mesosphere.marathon.api.v2.json
 
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.api.JsonTestHelper
-import mesosphere.marathon.core.appinfo.{TaskLifeTime, TaskCounts, TaskStats, TaskStatsByVersion}
+import mesosphere.marathon.core.appinfo.{
+  TaskLifeTime, TaskCounts, TaskStats, TaskStatsByVersion
+}
 import org.scalatest.{Matchers, GivenWhenThen}
 import play.api.libs.json.Json
 

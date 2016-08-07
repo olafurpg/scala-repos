@@ -14,7 +14,9 @@ import scala.reflect.macros.{blackbox, whitebox}
 import scala.collection.mutable.ArrayBuffer
 
 import slick.SlickException
-import slick.basic.{DatabaseConfig, StaticDatabaseConfigMacros, StaticDatabaseConfig}
+import slick.basic.{
+  DatabaseConfig, StaticDatabaseConfigMacros, StaticDatabaseConfig
+}
 import slick.dbio.{NoStream, Effect}
 import slick.sql.{SqlAction, SqlStreamingAction}
 import slick.util.ClassLoaderUtil
@@ -29,7 +31,8 @@ class ActionBasedSQLInterpolation(val s: StringContext) extends AnyVal {
   def sqlu(param: Any*): SqlAction[Int, NoStream, Effect] = macro sqluImpl
 
   /** Build an Invoker for a statement with computed types via string interpolation */
-  def tsql(param: Any*): SqlStreamingAction[Vector[Any], Any, Effect] = macro tsqlImpl
+  def tsql(param: Any*): SqlStreamingAction[Vector[Any], Any, Effect] =
+    macro tsqlImpl
 }
 
 object ActionBasedSQLInterpolation {

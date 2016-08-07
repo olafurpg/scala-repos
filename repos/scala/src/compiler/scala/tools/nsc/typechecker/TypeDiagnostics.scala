@@ -315,15 +315,14 @@ trait TypeDiagnostics { self: Analyzer =>
     val clazz = if (sym.isModuleClass) sym.companionClass else sym
     val caseString =
       if (clazz.isCaseClass && (clazz isSubClass ptSym))
-        (clazz.caseFieldAccessors map (_ =>
-                  "_") // could use the actual param names here
+        (clazz.caseFieldAccessors map (_ => "_") // could use the actual param names here
               mkString (s"`case ${clazz.name}(", ",", ")`"))
       else
         "`case _: " + (clazz.typeParams match {
-              case Nil => "" + clazz.name
-              case xs =>
-                xs map (_ => "_") mkString (clazz.name + "[", ",", "]")
-            }) + "`"
+          case Nil => "" + clazz.name
+          case xs =>
+            xs map (_ => "_") mkString (clazz.name + "[", ",", "]")
+        }) + "`"
 
     if (!clazz.exists) ""
     else

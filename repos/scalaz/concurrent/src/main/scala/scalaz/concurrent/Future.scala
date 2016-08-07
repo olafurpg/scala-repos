@@ -1,7 +1,12 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{Callable, ConcurrentLinkedQueue, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit}
-import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
+import java.util.concurrent.{
+  Callable, ConcurrentLinkedQueue, ExecutorService, TimeoutException,
+  ScheduledExecutorService, TimeUnit
+}
+import java.util.concurrent.atomic.{
+  AtomicInteger, AtomicBoolean, AtomicReference
+}
 
 import collection.JavaConversions._
 import scalaz.Tags.Parallel
@@ -138,10 +143,10 @@ sealed abstract class Future[+A] {
 
   /**
     * Begins running this `Future` and returns a new future that blocks
-    * waiting for the result. Note that this will start executing side effects 
-    * immediately, and is thus morally equivalent to `unsafePerformIO`. The 
+    * waiting for the result. Note that this will start executing side effects
+    * immediately, and is thus morally equivalent to `unsafePerformIO`. The
     * resulting `Future` cannot be rerun to repeat the effects.
-    * 
+    *
     * Use with care.
     */
   def unsafeStart: Future[A] = {
@@ -224,7 +229,7 @@ sealed abstract class Future[+A] {
   def runFor(timeout: Duration): A =
     unsafePerformSyncFor(timeout)
 
-  /** Like `unsafePerformSyncFor`, but returns `TimeoutException` as left value. 
+  /** Like `unsafePerformSyncFor`, but returns `TimeoutException` as left value.
     * Will not report any other exceptions that may be raised during computation of `A`*/
   def unsafePerformSyncAttemptFor(timeoutInMillis: Long): Throwable \/ A = {
     val sync = new SyncVar[Throwable \/ A]
@@ -255,7 +260,7 @@ sealed abstract class Future[+A] {
     */
   def unsafePerformTimed(timeoutInMillis: Long)(
       implicit scheduler: ScheduledExecutorService): Future[Throwable \/ A] =
-    //instead of run this though chooseAny, it is run through simple primitive, 
+    //instead of run this though chooseAny, it is run through simple primitive,
     //as we are never interested in results of timeout callback, and this is more resource savvy
     async[Throwable \/ A] { cb =>
       val cancel = new AtomicBoolean(false)

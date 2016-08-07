@@ -1,6 +1,8 @@
 package akka.stream.scaladsl
 
-import akka.stream.{ClosedShape, ActorMaterializer, ActorMaterializerSettings, FlowShape}
+import akka.stream.{
+  ClosedShape, ActorMaterializer, ActorMaterializerSettings, FlowShape
+}
 import akka.testkit.AkkaSpec
 
 import scala.concurrent.{Await}

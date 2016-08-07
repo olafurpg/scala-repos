@@ -51,7 +51,7 @@ case class SimplePrunedScan(from: Int, to: Int)(
       case "a" =>
         (i: Int) =>
           Seq(i)
-        case "b" =>
+      case "b" =>
         (i: Int) =>
           Seq(i * 2)
     }
@@ -62,7 +62,7 @@ case class SimplePrunedScan(from: Int, to: Int)(
           i =>
             Row.fromSeq(
                 rowBuilders
-                  .map(_ (i))
+                  .map(_(i))
                   .reduceOption(_ ++ _)
                   .getOrElse(Seq.empty)))
   }

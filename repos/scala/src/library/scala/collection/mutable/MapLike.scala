@@ -49,8 +49,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     with Growable[(A, B)]
     with Shrinkable[A]
     with Cloneable[This]
-    with Parallelizable[(A, B), ParMap[A, B]] {
-  self =>
+    with Parallelizable[(A, B), ParMap[A, B]] { self =>
 
   /** A common implementation of `newBuilder` for all mutable maps
     *    in terms of `empty`.
@@ -203,7 +202,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *
     *  Concurrent map implementations may evaluate the expression `op`
     *  multiple times, or may evaluate `op` without inserting the result.
-    *  
+    *
     *  @param  key the key to test
     *  @param  op  the computation yielding the value to associate with `key`, if
     *              `key` is previously unbound.

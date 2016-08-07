@@ -1,7 +1,9 @@
 package breeze.linalg
 
 import breeze.generic.UFunc
-import breeze.linalg.support.{ScalarOf, CanTransformValues, CanMapValues, CanTraverseValues}
+import breeze.linalg.support.{
+  ScalarOf, CanTransformValues, CanMapValues, CanTraverseValues
+}
 import breeze.linalg.support.CanTraverseValues.ValuesVisitor
 import breeze.macros.expand
 import spire.syntax.cfor._
@@ -108,7 +110,6 @@ object max
       r := init
       r
     }
-
     override def combine(x: T, y: T): T = java.lang.Math.max(x, y)
   }
    */

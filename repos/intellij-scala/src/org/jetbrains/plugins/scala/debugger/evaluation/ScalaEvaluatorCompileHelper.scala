@@ -12,7 +12,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 import org.jetbrains.jps.incremental.scala.Client
-import org.jetbrains.plugins.scala.compiler.{CompileServerLauncher, RemoteServerConnectorBase, RemoteServerRunner, ScalaCompileServerSettings}
+import org.jetbrains.plugins.scala.compiler.{
+  CompileServerLauncher, RemoteServerConnectorBase, RemoteServerRunner,
+  ScalaCompileServerSettings
+}
 import org.jetbrains.plugins.scala.project.ProjectExt
 
 import scala.annotation.tailrec

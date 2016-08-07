@@ -357,14 +357,12 @@ object ParquetReadBenchmark {
         SQL Parquet Vectorized                   1229 / 1648          8.5         117.2       1.0X
         PR Vectorized                             833 /  846         12.6          79.4       1.5X
         PR Vectorized (Null Filtering)            732 /  782         14.3          69.8       1.7X
-
         Intel(R) Core(TM) i7-4960HQ CPU @ 2.60GHz
         String with Nulls Scan (50%):       Best/Avg Time(ms)    Rate(M/s)   Per Row(ns)   Relative
         -------------------------------------------------------------------------------------------
         SQL Parquet Vectorized                    995 / 1053         10.5          94.9       1.0X
         PR Vectorized                             732 /  772         14.3          69.8       1.4X
         PR Vectorized (Null Filtering)            725 /  790         14.5          69.1       1.4X
-
         Intel(R) Core(TM) i7-4960HQ CPU @ 2.60GHz
         String with Nulls Scan (95%):       Best/Avg Time(ms)    Rate(M/s)   Per Row(ns)   Relative
         -------------------------------------------------------------------------------------------

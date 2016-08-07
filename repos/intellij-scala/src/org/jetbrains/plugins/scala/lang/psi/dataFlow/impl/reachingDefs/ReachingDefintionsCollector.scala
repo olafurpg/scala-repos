@@ -8,10 +8,17 @@ import com.intellij.psi.{PsiElement, PsiMethod, PsiNamedElement, PsiPackage}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSimpleTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFun, ScFunction, ScTypeAlias, ScValueDeclaration}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFun, ScFunction, ScTypeAlias, ScValueDeclaration
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.controlFlow.Instruction
-import org.jetbrains.plugins.scala.lang.psi.controlFlow.impl.{DefinitionInstruction, ExtractMethodControlFlowPolicy, ReadWriteVariableInstruction}
+import org.jetbrains.plugins.scala.lang.psi.controlFlow.impl.{
+  DefinitionInstruction, ExtractMethodControlFlowPolicy,
+  ReadWriteVariableInstruction
+}
 import org.jetbrains.plugins.scala.lang.psi.dataFlow.DfaEngine
 import org.jetbrains.plugins.scala.lang.psi.dataFlow.impl.reachingDefs.ReachingDefinitions._
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.SyntheticNamedElement
@@ -73,7 +80,9 @@ object ReachingDefintionsCollector {
       case fun: ScFunction => fun.isSynthetic
       case _ => false
     }
-    import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory.{createDeclarationFromText, createExpressionWithContextFromText}
+    import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory.{
+      createDeclarationFromText, createExpressionWithContextFromText
+    }
     val resolvesAtNewPlace = element match {
       case _: PsiMethod | _: ScFun =>
         checkResolve(

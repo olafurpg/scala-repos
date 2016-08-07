@@ -16,7 +16,9 @@ import com.intellij.openapi.wm.{ToolWindowId, ToolWindowManager}
 import com.intellij.psi.{PsiErrorElement, PsiFile}
 import com.intellij.ui.content.{Content, ContentFactory, MessageView}
 import com.intellij.util.ui.MessageCategory
-import org.jetbrains.plugins.scala.compiler.{CompileServerLauncher, ScalaCompileServerSettings}
+import org.jetbrains.plugins.scala.compiler.{
+  CompileServerLauncher, ScalaCompileServerSettings
+}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
 import org.jetbrains.plugins.scala.util.NotificationUtil

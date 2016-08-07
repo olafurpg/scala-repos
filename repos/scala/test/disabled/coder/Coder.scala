@@ -17,11 +17,11 @@ class SeqCoder(words: List[String]) {
                                                letter <- letters)
     yield letter -> digit
 
-  /** Maps a word to the digit string it represents, 
+  /** Maps a word to the digit string it represents,
     * e.g. `Java` -> `5282`  */
   private def wordCode(word: String): String = word.toUpperCase map charCode
 
-  /** A map from digit strings to the words that represent 
+  /** A map from digit strings to the words that represent
     *  them e.g. `5282` -> List(`Java`, `Kata`, `Lava`, ...)
     */
   val wordsForNum: Map[String, List[String]] =
@@ -57,7 +57,7 @@ class SeqCoder(words: List[String]) {
       r
     }
 
-  /** Maps a number to a list of all word phrases that can 
+  /** Maps a number to a list of all word phrases that can
     *  represent it */
   def translate(number: String): Set[String] =
     encode(number) map (_ mkString " ")
@@ -81,11 +81,11 @@ class ParCoder(words: List[String]) {
                                                letter <- letters)
     yield letter -> digit
 
-  /** Maps a word to the digit string it represents, 
+  /** Maps a word to the digit string it represents,
     * e.g. `Java` -> `5282`  */
   private def wordCode(word: String): String = word.toUpperCase map charCode
 
-  /** A map from digit strings to the words that represent 
+  /** A map from digit strings to the words that represent
     *  them e.g. `5282` -> List(`Java`, `Kata`, `Lava`, ...)
     */
   val wordsForNum: Map[String, List[String]] =
@@ -170,7 +170,7 @@ class ParCoder(words: List[String]) {
     }
   }
 
-  /** Maps a number to a list of all word phrases that can 
+  /** Maps a number to a list of all word phrases that can
     *  represent it */
   def translate(number: String): ParSet[String] = {
     comparison.translate(number)

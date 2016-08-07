@@ -4,10 +4,10 @@ object Test extends AnyRef with App {
   def try1 = {
     Console.print("1 + 1 = ");
     Console.println(1 + (try {
-          x;
-        } catch {
-          case _: Error => 1;
-        }));
+      x;
+    } catch {
+      case _: Error => 1;
+    }));
   }
 
   def try2 = {
@@ -16,8 +16,8 @@ object Test extends AnyRef with App {
         (try { x } catch {
           case _: Error => 1;
         }) + (try { x } catch {
-              case _: Error => 1;
-            })
+          case _: Error => 1;
+        })
     );
   }
 
@@ -109,7 +109,6 @@ object Test extends AnyRef with App {
       }
     ));
   }
-
    */
 
   try1;

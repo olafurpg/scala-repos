@@ -99,8 +99,7 @@ abstract class AnyVar[T, MyType <: AnyVar[T, MyType]](dflt: => T)
   */
 trait AnyVarTrait[T, MyType <: AnyVarTrait[T, MyType]]
     extends PSettableValueHolder[T]
-    with HasCalcDefaultValue[T] {
-  self: MyType =>
+    with HasCalcDefaultValue[T] { self: MyType =>
   protected lazy val name =
     VarConstants.varPrefix + getClass.getName + "_" + __nameSalt
   private lazy val initedKey = name + VarConstants.initedSuffix

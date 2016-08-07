@@ -8,7 +8,9 @@ import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.jps.incremental.CompileContext
 import org.jetbrains.jps.incremental.ModuleLevelBuilder.OutputConsumer
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
-import org.jetbrains.jps.incremental.messages.{CompilerMessage, FileDeletedEvent, ProgressMessage}
+import org.jetbrains.jps.incremental.messages.{
+  CompilerMessage, FileDeletedEvent, ProgressMessage
+}
 
 /**
   * Nikolay.Tropin

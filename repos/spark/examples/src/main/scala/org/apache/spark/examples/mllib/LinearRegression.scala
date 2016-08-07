@@ -22,7 +22,9 @@ import org.apache.log4j.{Level, Logger}
 import scopt.OptionParser
 
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.optimization.{L1Updater, SimpleUpdater, SquaredL2Updater}
+import org.apache.spark.mllib.optimization.{
+  L1Updater, SimpleUpdater, SquaredL2Updater
+}
 import org.apache.spark.mllib.regression.LinearRegressionWithSGD
 import org.apache.spark.mllib.util.MLUtils
 

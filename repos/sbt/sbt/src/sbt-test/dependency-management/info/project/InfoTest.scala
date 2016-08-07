@@ -22,7 +22,7 @@ object InfoTest extends Build {
                 moduleID: String,
                 version: String): NodeSeq =
     if (addInfo)
-      ( <info organisation={organization} module={moduleID} revision={version}>
+      (<info organisation={organization} module={moduleID} revision={version}>
 				<license name="Two-clause BSD-style" url="http://github.com/szeiger/scala-query/blob/master/LICENSE.txt" />
 				<description homepage="http://github.com/szeiger/scala-query/">
 					ScalaQuery is a type-safe database query API for Scala.

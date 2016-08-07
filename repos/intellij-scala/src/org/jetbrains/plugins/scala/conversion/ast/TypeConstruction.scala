@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.conversion.ast
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiType
-import org.jetbrains.plugins.scala.lang.psi.types.{JavaArrayType, ScParameterizedType, ScType}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  JavaArrayType, ScParameterizedType, ScType
+}
 
 import scala.collection.mutable.ArrayBuffer
 

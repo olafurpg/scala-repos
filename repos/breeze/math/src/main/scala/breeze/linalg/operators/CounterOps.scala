@@ -2,7 +2,9 @@ package breeze.linalg.operators
 
 import breeze.storage.Zero
 import breeze.math.{Field, Ring, Semiring}
-import breeze.linalg.support.{CanZipMapKeyValues, CanTransformValues, CanZipMapValues, CanCopy}
+import breeze.linalg.support.{
+  CanZipMapKeyValues, CanTransformValues, CanZipMapValues, CanCopy
+}
 import breeze.generic.UFunc
 import breeze.linalg._
 

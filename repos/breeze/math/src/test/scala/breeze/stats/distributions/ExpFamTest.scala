@@ -6,7 +6,7 @@ import org.scalacheck.{Prop, Arbitrary}
 import scala.reflect.ClassTag
 
 /**
-  * 
+  *
   * @author dlwh
   */
 trait ExpFamTest[D <: Density[T] with Rand[T], T]

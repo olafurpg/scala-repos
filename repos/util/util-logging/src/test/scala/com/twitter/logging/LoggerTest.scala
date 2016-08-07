@@ -19,7 +19,9 @@ package com.twitter.logging
 import com.twitter.conversions.time._
 import com.twitter.util.TempFolder
 import java.net.InetSocketAddress
-import java.util.concurrent.{Callable, CountDownLatch, Executors, Future, TimeUnit}
+import java.util.concurrent.{
+  Callable, CountDownLatch, Executors, Future, TimeUnit
+}
 import java.util.{logging => javalog}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

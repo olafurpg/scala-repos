@@ -111,7 +111,7 @@ trait AbstractScreen extends Factory with Loggable {
 
   def validations: List[() => List[FieldError]] = Nil
 
-  def screenValidate: List[FieldError] = validations.flatMap(_ ())
+  def screenValidate: List[FieldError] = validations.flatMap(_())
 
   protected def vendForm[T](
       implicit man: Manifest[T]): Box[(T, T => Any) => NodeSeq] = Empty
@@ -355,7 +355,7 @@ trait AbstractScreen extends Factory with Loggable {
 
         override def transforms = newTransforms
 
-        override def show_? = newShow map (_ (this)) openOr (super.show_?)
+        override def show_? = newShow map (_(this)) openOr (super.show_?)
       }
     }
   }
@@ -498,7 +498,7 @@ trait AbstractScreen extends Factory with Loggable {
       /**
         * Given the current state of things, should this field be shown
         */
-      override def show_? = newShow map (_ (this)) openOr underlying.show_?
+      override def show_? = newShow map (_(this)) openOr underlying.show_?
 
       /**
         * What form elements are we going to add to this field?
@@ -611,7 +611,7 @@ trait AbstractScreen extends Factory with Loggable {
         * Given the current state of things, should this field be shown
         */
       override def show_? =
-        newShow map (_ (this)) openOr (underlying.map(_.show_?) openOr false)
+        newShow map (_(this)) openOr (underlying.map(_.show_?) openOr false)
 
       /**
         * What form elements are we going to add to this field?
@@ -871,7 +871,7 @@ trait AbstractScreen extends Factory with Loggable {
 
           override def transforms = newTransforms
 
-          override def show_? = newShow map (_ (this)) openOr (super.show_?)
+          override def show_? = newShow map (_(this)) openOr (super.show_?)
         }
       }
 
@@ -910,7 +910,7 @@ trait AbstractScreen extends Factory with Loggable {
 
           override def transforms = newTransforms
 
-          override def show_? = newShow map (_ (this)) openOr (super.show_?)
+          override def show_? = newShow map (_(this)) openOr (super.show_?)
         }
       }
     }
@@ -1208,8 +1208,8 @@ trait ScreenWizardRendered extends Loggable {
                      .format(style, includeMissing),
                    fields filter
                      (field =>
-                           field.binding map (_.bindingStyle == style) openOr
-                             (includeMissing)))
+                        field.binding map (_.bindingStyle == style) openOr
+                          (includeMissing)))
 
     def bindingInfoWithFields(style: BindingStyle) =
       logger.trace("Looking for fields with style %s".format(style), (for {
@@ -1306,7 +1306,7 @@ trait ScreenWizardRendered extends Loggable {
           case _ =>
             val maxN = myNotices.map(_._1).sortWith { _.id > _.id }.head // get the maximum type of notice (Error > Warning > Notice)
             val metaData: MetaData =
-              noticeTypeToAttr(theScreen).map(_ (maxN)) openOr Null
+              noticeTypeToAttr(theScreen).map(_(maxN)) openOr Null
             basicLabel & update(_.label, metaData)
         }
       }
@@ -1328,7 +1328,7 @@ trait ScreenWizardRendered extends Loggable {
             replaceChildren(_.errors) #> xs.map {
               case (noticeType, msg, _) =>
                 val metaData: MetaData =
-                  noticeTypeToAttr(theScreen).map(_ (noticeType)) openOr Null
+                  noticeTypeToAttr(theScreen).map(_(noticeType)) openOr Null
                 nsSetChildren(_.error, msg) & update(_.error, metaData)
             }
         }
@@ -1351,7 +1351,7 @@ trait ScreenWizardRendered extends Loggable {
         replaceChildren(_.globalErrors) #> xs.map {
           case (noticeType, msg, _) =>
             val metaData: MetaData =
-              noticeTypeToAttr(theScreen).map(_ (noticeType)) openOr Null
+              noticeTypeToAttr(theScreen).map(_(noticeType)) openOr Null
             nsSetChildren(_.error, msg) & update(_.error, metaData)
         }
     }
@@ -1884,8 +1884,8 @@ trait LiftScreen
               Empty,
               cancelId ->
                 (() => {
-                      redirectBack()
-                    }), //cancelId: (String, () => Unit),
+                   redirectBack()
+                 }), //cancelId: (String, () => Unit),
               theScreen,
               ajaxForms_?)
   }
@@ -1911,9 +1911,9 @@ trait LiftScreen
   protected def doFinish(): JsCmd = {
     val fMap: Map[String, () => JsCmd] = LocalActions.get.get
     if (!LocalAction.get.isEmpty)
-      fMap.get(LocalAction.get) map (_ ()) getOrElse
+      fMap.get(LocalAction.get) map (_()) getOrElse
         (throw new IllegalArgumentException(
-                "No local action available with that binding"))
+            "No local action available with that binding"))
     else {
       validate match {
         case Nil =>

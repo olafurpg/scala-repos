@@ -69,8 +69,7 @@ import scala.language.{implicitConversions, higherKinds}
 trait Ordering[T]
     extends Comparator[T]
     with PartialOrdering[T]
-    with Serializable {
-  outer =>
+    with Serializable { outer =>
 
   /** Returns whether a comparison between `x` and `y` is defined, and if so
     * the result of `compare(x, y)`.

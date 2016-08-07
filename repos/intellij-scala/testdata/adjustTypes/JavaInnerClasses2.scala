@@ -7,7 +7,6 @@ object A {
 
 /*
 import java.util.AbstractMap.SimpleEntry
-
 object A {
   val immutEntry: SIE = null
 }

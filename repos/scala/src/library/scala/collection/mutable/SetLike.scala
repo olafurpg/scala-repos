@@ -61,8 +61,7 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     with Growable[A]
     with Shrinkable[A]
     with Cloneable[mutable.Set[A]]
-    with Parallelizable[A, ParSet[A]] {
-  self =>
+    with Parallelizable[A, ParSet[A]] { self =>
 
   /** A common implementation of `newBuilder` for all mutable sets
     *  in terms of `empty`. Overrides the implementation in `collection.SetLike`

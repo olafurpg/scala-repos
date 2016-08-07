@@ -56,7 +56,7 @@ object ButtonType {
 
   /**
     * A pre-defined [[scalafx.scene.control.ButtonType]] that displays "OK" and has a
-    * [[scalafx.scene.control.ButtonBar.ButtonData]] of 
+    * [[scalafx.scene.control.ButtonBar.ButtonData]] of
     * [[scalafx.scene.control.ButtonBar.ButtonData.OKDone]].
     */
   val OK: ButtonType = jfxsc.ButtonType.OK

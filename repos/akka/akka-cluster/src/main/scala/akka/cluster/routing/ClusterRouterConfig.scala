@@ -412,8 +412,7 @@ private[akka] class ClusterRouterGroupActor(
   * The router actor, subscribes to cluster events and
   * adjusts the routees.
   */
-private[akka] trait ClusterRouterActor {
-  this: RouterActor ⇒
+private[akka] trait ClusterRouterActor { this: RouterActor ⇒
 
   def settings: ClusterRouterSettingsBase
 

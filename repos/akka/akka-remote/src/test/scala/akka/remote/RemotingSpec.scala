@@ -6,7 +6,9 @@ package akka.remote
 import akka.actor._
 import akka.event.AddressTerminatedTopic
 import akka.pattern.ask
-import akka.remote.transport.AssociationHandle.{HandleEventListener, HandleEvent}
+import akka.remote.transport.AssociationHandle.{
+  HandleEventListener, HandleEvent
+}
 import akka.remote.transport._
 import akka.remote.transport.Transport.InvalidAssociationException
 import akka.testkit._
@@ -68,8 +70,8 @@ object RemotingSpec {
     common-ssl-settings {
       key-store = "${getClass.getClassLoader.getResource("keystore").getPath}"
       trust-store = "${getClass.getClassLoader
-            .getResource("truststore")
-            .getPath}"
+        .getResource("truststore")
+        .getPath}"
       key-store-password = "changeme"
       key-password = "changeme"
       trust-store-password = "changeme"
@@ -280,8 +282,8 @@ class RemotingSpec
       val moreRefs =
         moreSystems map
           (sys ⇒
-                system.actorSelection(
-                    RootActorPath(addr(sys, "tcp")) / "user" / "echo"))
+             system.actorSelection(
+                 RootActorPath(addr(sys, "tcp")) / "user" / "echo"))
       val aliveEcho = system.actorSelection(
           RootActorPath(addr(remoteSystem, "tcp")) / "user" / "echo")
       val n = 100

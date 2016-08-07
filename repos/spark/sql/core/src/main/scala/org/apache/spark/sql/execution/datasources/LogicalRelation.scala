@@ -18,8 +18,12 @@ package org.apache.spark.sql.execution.datasources
 
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis.MultiInstanceRelation
-import org.apache.spark.sql.catalyst.expressions.{Attribute, AttributeMap, AttributeReference}
-import org.apache.spark.sql.catalyst.plans.logical.{LeafNode, LogicalPlan, Statistics}
+import org.apache.spark.sql.catalyst.expressions.{
+  Attribute, AttributeMap, AttributeReference
+}
+import org.apache.spark.sql.catalyst.plans.logical.{
+  LeafNode, LogicalPlan, Statistics
+}
 import org.apache.spark.sql.sources.BaseRelation
 
 /**

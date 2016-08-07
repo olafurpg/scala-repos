@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala
 package debugger.evaluation
 
 import com.intellij.codeInsight.PsiEquivalenceUtil
-import com.intellij.debugger.engine.evaluation.expression.{Evaluator, ExpressionEvaluator}
+import com.intellij.debugger.engine.evaluation.expression.{
+  Evaluator, ExpressionEvaluator
+}
 import com.intellij.debugger.impl.{DebuggerManagerAdapter, DebuggerSession}
 import com.intellij.debugger.{DebuggerManagerEx, SourcePosition}
 import com.intellij.openapi.components.AbstractProjectComponent

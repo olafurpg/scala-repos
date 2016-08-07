@@ -1,6 +1,8 @@
 package com.twitter.finagle.thrift
 
-import com.twitter.finagle.{Status, ServiceProxy, Service, WriteException, ServiceException}
+import com.twitter.finagle.{
+  Status, ServiceProxy, Service, WriteException, ServiceException
+}
 import java.util.logging.{Logger, Level}
 import org.apache.thrift.TApplicationException
 import org.apache.thrift.protocol.{TProtocolFactory, TMessageType}

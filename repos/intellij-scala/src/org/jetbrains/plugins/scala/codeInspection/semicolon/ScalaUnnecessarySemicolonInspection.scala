@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.codeInspection.semicolon
 
-import com.intellij.codeInspection.{LocalInspectionTool, ProblemHighlightType, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalInspectionTool, ProblemHighlightType, ProblemsHolder
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiElement, PsiElementVisitor, PsiWhiteSpace}
 import org.jetbrains.plugins.scala.codeInspection.AbstractFixOnPsiElement

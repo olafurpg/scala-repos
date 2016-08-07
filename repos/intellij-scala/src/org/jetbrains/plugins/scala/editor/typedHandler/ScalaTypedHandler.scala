@@ -8,19 +8,29 @@ import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Condition
 import com.intellij.psi.codeStyle.{CodeStyleSettingsManager, CodeStyleManager}
-import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiFile, PsiWhiteSpace}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScVariable, ScFunction, ScValue}
+import com.intellij.psi.{
+  PsiDocumentManager, PsiElement, PsiFile, PsiWhiteSpace
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias, ScVariable, ScFunction, ScValue
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterClause
 import org.jetbrains.plugins.scala.{ScalaLanguage, extensions}
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
-import org.jetbrains.plugins.scala.lang.lexer.{ScalaTokenTypes, ScalaXmlTokenTypes}
+import org.jetbrains.plugins.scala.lang.lexer.{
+  ScalaTokenTypes, ScalaXmlTokenTypes
+}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes.PatchedXmlLexer
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClause
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScIfStmt, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScArgumentExprList, ScIfStmt, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.extensions.PsiElementExt
 import org.jetbrains.plugins.scala.lang.psi.api.expr.xml._
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
@@ -89,9 +99,9 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         chooseXmlTask(withAttr = false)
       }
     } else if (c == '{' && (element.getParent match {
-                     case l: ScInterpolatedStringLiteral =>
-                       !l.isMultiLineString; case _ => false
-                   })) {
+                 case l: ScInterpolatedStringLiteral =>
+                   !l.isMultiLineString; case _ => false
+               })) {
       myTask = completeInterpolatedStringBraces
     } else if (c == '>' || c == '-') {
       myTask = replaceArrowTask(file, editor)

@@ -30,7 +30,9 @@ import javafx.scene.{input => jfxsi}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 import scalafx.event.EventType
 
 object ScrollEvent {

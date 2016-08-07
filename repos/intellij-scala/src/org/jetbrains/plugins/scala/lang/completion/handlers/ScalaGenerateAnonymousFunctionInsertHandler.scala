@@ -10,10 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScTypedPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause, ScTypedPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScFunctionExpr
-import org.jetbrains.plugins.scala.lang.psi.types.{ScAbstractType, ScType, ScTypePresentation}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScAbstractType, ScType, ScTypePresentation
+}
 
 import scala.collection.mutable
 
@@ -75,7 +79,9 @@ class ScalaGenerateAnonymousFunctionInsertHandler(params: Seq[ScType],
                       ScTypePresentation.ABSTRACT_TYPE_PREFIX +
                         a.tpt.name == refName) match {
                   case Some(abstr) =>
-                    import org.jetbrains.plugins.scala.lang.psi.types.{Any, Nothing}
+                    import org.jetbrains.plugins.scala.lang.psi.types.{
+                      Any, Nothing
+                    }
                     abstr.simplifyType match {
                       case Any | Nothing =>
                         new ConstantNode(refName.substring(prefixLength))

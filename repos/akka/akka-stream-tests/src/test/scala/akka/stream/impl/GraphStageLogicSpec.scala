@@ -3,7 +3,9 @@
   */
 package akka.stream.impl
 
-import akka.stream.stage.GraphStageLogic.{EagerTerminateOutput, EagerTerminateInput}
+import akka.stream.stage.GraphStageLogic.{
+  EagerTerminateOutput, EagerTerminateInput
+}
 import akka.testkit.AkkaSpec
 import akka.stream._
 import akka.stream.Fusing.aggressive

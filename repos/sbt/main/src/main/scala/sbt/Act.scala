@@ -12,7 +12,9 @@ import DefaultParsers._
 import sbt.internal.util.Types.idFun
 import java.net.URI
 import CommandStrings.{MultiTaskCommand, ShowCommand}
-import sbt.internal.util.{AttributeEntry, AttributeKey, AttributeMap, IMap, Settings, Show, Util}
+import sbt.internal.util.{
+  AttributeEntry, AttributeKey, AttributeMap, IMap, Settings, Show, Util
+}
 
 final class ParsedKey(val key: ScopedKey[_], val mask: ScopeMask)
 

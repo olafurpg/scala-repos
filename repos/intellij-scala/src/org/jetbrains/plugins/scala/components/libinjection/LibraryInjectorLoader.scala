@@ -13,9 +13,13 @@ import com.intellij.openapi.module._
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.util.ProgressIndicatorBase
 import com.intellij.openapi.project.{DumbService, Project}
-import com.intellij.openapi.roots.libraries.{Library, LibraryTable, LibraryTablesRegistrar}
+import com.intellij.openapi.roots.libraries.{
+  Library, LibraryTable, LibraryTablesRegistrar
+}
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.vfs.{JarFileSystem, VirtualFile, VirtualFileManager}
+import com.intellij.openapi.vfs.{
+  JarFileSystem, VirtualFile, VirtualFileManager
+}
 import com.intellij.psi.search.{FilenameIndex, GlobalSearchScope}
 import org.jetbrains.plugins.scala.compiler.CompileServerLauncher
 import org.jetbrains.plugins.scala.components.ScalaPluginVersionVerifier

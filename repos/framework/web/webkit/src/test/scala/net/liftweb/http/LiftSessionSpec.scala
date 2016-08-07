@@ -48,9 +48,9 @@ object LiftSessionSpec extends Specification {
         val sendingMessages = 1 to 20
         sendingMessages foreach
           (message =>
-                session.sendCometActorMessage(cometName,
-                                              Full(cometName),
-                                              message))
+             session.sendCometActorMessage(cometName,
+                                           Full(cometName),
+                                           message))
         session
           .findOrCreateComet[TestCometActor](Full(cometName),
                                              NodeSeq.Empty,

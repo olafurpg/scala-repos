@@ -23,7 +23,9 @@ import scala.collection.mutable.ArrayBuffer
 import org.apache.hadoop.fs.Path
 
 import org.apache.spark.annotation.{Experimental, Since}
-import org.apache.spark.ml.{Estimator, Model, Pipeline, PipelineModel, PipelineStage, Transformer}
+import org.apache.spark.ml.{
+  Estimator, Model, Pipeline, PipelineModel, PipelineStage, Transformer
+}
 import org.apache.spark.ml.attribute.AttributeGroup
 import org.apache.spark.ml.param.{Param, ParamMap}
 import org.apache.spark.ml.param.shared.{HasFeaturesCol, HasLabelCol}

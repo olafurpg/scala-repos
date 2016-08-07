@@ -5,7 +5,10 @@ import java.io._
 import java.util.Properties
 
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.util.io.{PersistentEnumeratorBase, DataExternalizer, EnumeratorStringDescriptor, PersistentHashMap}
+import com.intellij.util.io.{
+  PersistentEnumeratorBase, DataExternalizer, EnumeratorStringDescriptor,
+  PersistentHashMap
+}
 import org.apache.maven.index.ArtifactInfo
 
 import scala.collection.JavaConversions._

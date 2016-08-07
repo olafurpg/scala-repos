@@ -4,7 +4,9 @@
 package akka.stream.scaladsl
 
 import akka.stream.testkit.scaladsl.TestSink
-import akka.stream.{ActorMaterializer, ActorAttributes, Supervision, ActorMaterializerSettings}
+import akka.stream.{
+  ActorMaterializer, ActorAttributes, Supervision, ActorMaterializerSettings
+}
 import akka.stream.testkit._
 import scala.util.control.NoStackTrace
 import akka.testkit.AkkaSpec
@@ -25,18 +27,18 @@ class FlowStatefulMapConcatSpec extends AkkaSpec with ScriptedTest {
                           Seq(6) -> Seq(6, 6, 6))
       TestConfig.RandomTestRange foreach
         (_ ⇒
-              runScript(script, settings)(_.statefulMapConcat(() ⇒ {
-                var prev: Option[Int] = None
-                x ⇒
-                  prev match {
-                    case Some(e) ⇒
-                      prev = Some(x)
-                      (1 to e) map (_ ⇒ x)
-                    case None ⇒
-                      prev = Some(x)
-                      List.empty[Int]
-                  }
-              })))
+           runScript(script, settings)(_.statefulMapConcat(() ⇒ {
+             var prev: Option[Int] = None
+             x ⇒
+               prev match {
+                 case Some(e) ⇒
+                   prev = Some(x)
+                   (1 to e) map (_ ⇒ x)
+                 case None ⇒
+                   prev = Some(x)
+                   List.empty[Int]
+               }
+           })))
     }
 
     "be able to restart" in {

@@ -9,10 +9,14 @@ import com.twitter.finagle.context.Contexts
 import com.twitter.finagle.http.service.HttpResponseClassifier
 import com.twitter.finagle.param.Stats
 import com.twitter.finagle.service.{ResponseClass, FailureAccrualFactory}
-import com.twitter.finagle.stats.{NullStatsReceiver, InMemoryStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  NullStatsReceiver, InMemoryStatsReceiver, StatsReceiver
+}
 import com.twitter.finagle.tracing.Trace
 import com.twitter.io.{Buf, Reader, Writer}
-import com.twitter.util.{Await, Closable, Future, JavaTimer, Promise, Return, Throw, Time}
+import com.twitter.util.{
+  Await, Closable, Future, JavaTimer, Promise, Return, Throw, Time
+}
 import java.io.{PrintWriter, StringWriter}
 import java.net.{InetAddress, InetSocketAddress}
 import org.junit.runner.RunWith

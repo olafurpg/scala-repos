@@ -16,7 +16,9 @@
 package org.saddle.locator
 
 import org.saddle.ST
-import it.unimi.dsi.fastutil.objects.{Object2IntLinkedOpenHashMap, Object2IntOpenHashMap}
+import it.unimi.dsi.fastutil.objects.{
+  Object2IntLinkedOpenHashMap, Object2IntOpenHashMap
+}
 
 /**
   * An object-to-integer hash map, backed by fastutil implementation

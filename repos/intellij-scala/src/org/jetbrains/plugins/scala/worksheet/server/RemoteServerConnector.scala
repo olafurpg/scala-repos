@@ -6,7 +6,9 @@ import java.net._
 
 import com.intellij.compiler.CompilerMessageImpl
 import com.intellij.compiler.progress.CompilerTask
-import com.intellij.notification.{Notification, NotificationType, Notifications}
+import com.intellij.notification.{
+  Notification, NotificationType, Notifications
+}
 import com.intellij.openapi.compiler.{CompilerMessageCategory, CompilerPaths}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.{ProgressIndicator, ProgressManager}
@@ -19,10 +21,16 @@ import org.jetbrains.jps.incremental.messages.BuildMessage
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 import org.jetbrains.jps.incremental.scala.DummyClient
 import org.jetbrains.jps.incremental.scala.remote._
-import org.jetbrains.plugins.scala.compiler.{ErrorHandler, NonServerRunner, RemoteServerConnectorBase, RemoteServerRunner}
+import org.jetbrains.plugins.scala.compiler.{
+  ErrorHandler, NonServerRunner, RemoteServerConnectorBase, RemoteServerRunner
+}
 import org.jetbrains.plugins.scala.worksheet.actions.WorksheetFileHook
-import org.jetbrains.plugins.scala.worksheet.processor.{WorksheetCompiler, WorksheetSourceProcessor}
-import org.jetbrains.plugins.scala.worksheet.server.RemoteServerConnector.{MyTranslatingClient, OuterCompilerInterface}
+import org.jetbrains.plugins.scala.worksheet.processor.{
+  WorksheetCompiler, WorksheetSourceProcessor
+}
+import org.jetbrains.plugins.scala.worksheet.server.RemoteServerConnector.{
+  MyTranslatingClient, OuterCompilerInterface
+}
 import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**

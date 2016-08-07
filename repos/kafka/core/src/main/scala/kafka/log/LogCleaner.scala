@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -32,31 +32,31 @@ import scala.collection._
 /**
   * The cleaner is responsible for removing obsolete records from logs which have the dedupe retention strategy.
   * A message with key K and offset O is obsolete if there exists a message with key K and offset O' such that O < O'.
-  * 
+  *
   * Each log can be thought of being split into two sections of segments: a "clean" section which has previously been cleaned followed by a
   * "dirty" section that has not yet been cleaned. The active log segment is always excluded from cleaning.
   *
-  * The cleaning is carried out by a pool of background threads. Each thread chooses the dirtiest log that has the "dedupe" retention policy 
-  * and cleans that. The dirtiness of the log is guessed by taking the ratio of bytes in the dirty section of the log to the total bytes in the log. 
-  * 
+  * The cleaning is carried out by a pool of background threads. Each thread chooses the dirtiest log that has the "dedupe" retention policy
+  * and cleans that. The dirtiness of the log is guessed by taking the ratio of bytes in the dirty section of the log to the total bytes in the log.
+  *
   * To clean a log the cleaner first builds a mapping of key=>last_offset for the dirty section of the log. See kafka.log.OffsetMap for details of
-  * the implementation of the mapping. 
-  * 
-  * Once the key=>offset map is built, the log is cleaned by recopying each log segment but omitting any key that appears in the offset map with a 
+  * the implementation of the mapping.
+  *
+  * Once the key=>offset map is built, the log is cleaned by recopying each log segment but omitting any key that appears in the offset map with a
   * higher offset than what is found in the segment (i.e. messages with a key that appears in the dirty section of the log).
-  * 
+  *
   * To avoid segments shrinking to very small sizes with repeated cleanings we implement a rule by which if we will merge successive segments when
   * doing a cleaning if their log and index size are less than the maximum log and index size prior to the clean beginning.
-  * 
+  *
   * Cleaned segments are swapped into the log as they become available.
-  * 
+  *
   * One nuance that the cleaner must handle is log truncation. If a log is truncated while it is being cleaned the cleaning of that log is aborted.
-  * 
-  * Messages with null payload are treated as deletes for the purpose of log compaction. This means that they receive special treatment by the cleaner. 
+  *
+  * Messages with null payload are treated as deletes for the purpose of log compaction. This means that they receive special treatment by the cleaner.
   * The cleaner will only retain delete records for a period of time to avoid accumulating space indefinitely. This period of time is configurable on a per-topic
   * basis and is measured from the time the segment enters the clean portion of the log (at which point any prior message with that key has been removed).
   * Delete markers in the clean section of the log that are older than this time will not be retained when log segments are being recopied as part of cleaning.
-  * 
+  *
   * @param config Configuration parameters for the cleaner
   * @param logDirs The directories where offset checkpoints reside
   * @param logs The pool of logs

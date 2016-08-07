@@ -95,7 +95,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
         () =>
           resp
 
-        case _ =>
+      case _ =>
         S.init(Box !! in, curSession.is) {
           val resp =
             dispatch.find(_.isDefinedAt(path)).get.apply(path).toResponse
@@ -113,7 +113,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
     * NodeSeq (run the template),
     * LiftResponse (send the response back),
     * or Box or Option of any of the above.
-    * 
+    *
     */
   protected sealed trait MVCResponse {
     def toResponse: Box[LiftResponse]
@@ -185,7 +185,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
     * Turn a Box[T] into the return type expected by
     * DispatchPF.  Note that this method will return
     * messages from Failure() and return codes and messages
-    * from ParamFailure[Int[(msg, _, _, code) 
+    * from ParamFailure[Int[(msg, _, _, code)
     */
   protected implicit def boxToResp[T](in: Box[T])(
       implicit c: T => MVCResponse): Box[LiftResponse] =

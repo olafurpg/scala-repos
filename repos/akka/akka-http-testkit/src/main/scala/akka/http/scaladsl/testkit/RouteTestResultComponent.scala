@@ -91,7 +91,7 @@ trait RouteTestResultComponent {
           () ⇒
             s
 
-          case HttpEntity.Default(contentType, contentLength, data) ⇒
+        case HttpEntity.Default(contentType, contentLength, data) ⇒
           val dataChunks = awaitAllElements(data);
           { () ⇒
             HttpEntity.Default(contentType, contentLength, Source(dataChunks))

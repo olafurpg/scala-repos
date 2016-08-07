@@ -13,7 +13,9 @@ import scala.concurrent.duration._
 import scala.collection.immutable
 import akka.util.Timeout
 import de.kalpatec.pojosr.framework.launch.BundleDescriptor
-import test.{RuntimeNameActorSystemActivator, TestActivators, PingPongActorSystemActivator}
+import test.{
+  RuntimeNameActorSystemActivator, TestActivators, PingPongActorSystemActivator
+}
 import test.PingPong._
 import PojoSRTestSupport.bundle
 import org.scalatest.Matchers

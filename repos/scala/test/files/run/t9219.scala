@@ -7,5 +7,5 @@ object Test extends App {
 
   check(_.tail)
   check(_.take(4).force)
-  check(_ (5))
+  check(_(5))
 }

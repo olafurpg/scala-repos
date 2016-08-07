@@ -4,7 +4,9 @@ import java.io.File
 
 import com.intellij.ide.util.projectWizard.ModuleBuilder
 import com.intellij.openapi.module.{Module, ModuleType, StdModuleTypes}
-import com.intellij.openapi.roots.{ContentEntry, ModifiableRootModel, OrderRootType}
+import com.intellij.openapi.roots.{
+  ContentEntry, ModifiableRootModel, OrderRootType
+}
 import com.intellij.openapi.vfs.{JarFileSystem, VfsUtil}
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import com.intellij.testFramework.{IdeaTestUtil, LightProjectDescriptor}

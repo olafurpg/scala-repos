@@ -28,11 +28,16 @@
 package scalafx.scene
 
 import javafx.scene.{input => jfxsi, layout => jfxsl, paint => jfxsp}
-import javafx.{collections => jfxc, event => jfxe, geometry => jfxg, scene => jfxs, util => jfxu}
+import javafx.{
+  collections => jfxc, event => jfxe, geometry => jfxg, scene => jfxs,
+  util => jfxu
+}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty
+}
 import scalafx.collections._
 import scalafx.delegate.SFXDelegate
 import scalafx.geometry.NodeOrientation

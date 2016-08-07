@@ -18,7 +18,9 @@
 package org.apache.spark.deploy.rest
 
 import java.net.InetSocketAddress
-import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
+import javax.servlet.http.{
+  HttpServlet, HttpServletRequest, HttpServletResponse
+}
 
 import scala.io.Source
 

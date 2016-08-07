@@ -2,16 +2,22 @@ package org.jetbrains.plugins.scala
 package findUsages.vals
 
 import com.intellij.psi.search.searches.ReferencesSearch
-import com.intellij.psi.search.{PsiSearchHelper, TextOccurenceProcessor, UsageSearchContext}
+import com.intellij.psi.search.{
+  PsiSearchHelper, TextOccurenceProcessor, UsageSearchContext
+}
 import com.intellij.psi.{PsiElement, PsiReference, PsiReferenceExpression}
 import com.intellij.util.{Processor, QueryExecutor}
 import org.jetbrains.plugins.scala.extensions.inReadAction
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScValue, ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiTypedDefinitionWrapper, StaticPsiTypedDefinitionWrapper}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiTypedDefinitionWrapper, StaticPsiTypedDefinitionWrapper
+}
 
 /**
   * User: Alexander Podkhalyuzin

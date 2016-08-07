@@ -40,16 +40,14 @@ object ReceivePipelineSpec {
     override def toString: String = s"IntList(${l.mkString(", ")})"
   }
 
-  trait ListBuilderInterceptor {
-    this: ReceivePipeline ⇒
+  trait ListBuilderInterceptor { this: ReceivePipeline ⇒
 
     pipelineOuter {
       case n: Int ⇒ Inner(IntList((n until n + 3).toList))
     }
   }
 
-  trait AdderInterceptor {
-    this: ReceivePipeline ⇒
+  trait AdderInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case n: Int ⇒ Inner(n + 10)
@@ -58,8 +56,7 @@ object ReceivePipelineSpec {
     }
   }
 
-  trait ToStringInterceptor {
-    this: ReceivePipeline ⇒
+  trait ToStringInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case i: Int ⇒ Inner(i.toString)
@@ -68,24 +65,21 @@ object ReceivePipelineSpec {
     }
   }
 
-  trait OddDoublerInterceptor {
-    this: ReceivePipeline ⇒
+  trait OddDoublerInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case i: Int if (i % 2 != 0) ⇒ Inner(i * 2)
     }
   }
 
-  trait EvenHalverInterceptor {
-    this: ReceivePipeline ⇒
+  trait EvenHalverInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case i: Int if (i % 2 == 0) ⇒ Inner(i / 2)
     }
   }
 
-  trait Timer {
-    this: ReceivePipeline ⇒
+  trait Timer { this: ReceivePipeline ⇒
 
     def notifyDuration(duration: Long): Unit
 
@@ -251,7 +245,7 @@ class PersistentReceivePipelineSpec(config: Config)
         override def unhandled(message: Any) = probeRef ! message
       }))
 
-      // 11 ( -> not handled by EvenHalverInterceptor) -> 22 but > 10 so not handled in main receive: 
+      // 11 ( -> not handled by EvenHalverInterceptor) -> 22 but > 10 so not handled in main receive:
       // original message falls back to unhandled implementation...
       replier ! 11
       probe.expectMsg(11)
@@ -421,8 +415,7 @@ object MixinSample extends App {
   //#mixin-model
 
   //#mixin-interceptors
-  trait I18nInterceptor {
-    this: ReceivePipeline ⇒
+  trait I18nInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case m @ Message(_, I18nText(loc, key)) ⇒
@@ -430,8 +423,7 @@ object MixinSample extends App {
     }
   }
 
-  trait AuditInterceptor {
-    this: ReceivePipeline ⇒
+  trait AuditInterceptor { this: ReceivePipeline ⇒
 
     pipelineOuter {
       case m @ Message(Some(author), text) ⇒
@@ -476,8 +468,7 @@ object UnhandledSample extends App {
   //#unhandled
   case class PrivateMessage(userId: Option[Long], msg: Any)
 
-  trait PrivateInterceptor {
-    this: ReceivePipeline ⇒
+  trait PrivateInterceptor { this: ReceivePipeline ⇒
 
     pipelineInner {
       case PrivateMessage(Some(userId), msg) ⇒
@@ -492,8 +483,7 @@ object AfterSamples {
   import ReceivePipeline._
 
   //#interceptor-after
-  trait TimerInterceptor extends ActorLogging {
-    this: ReceivePipeline ⇒
+  trait TimerInterceptor extends ActorLogging { this: ReceivePipeline ⇒
 
     def logTimeTaken(time: Long) = log.debug(s"Time taken: $time ns")
 

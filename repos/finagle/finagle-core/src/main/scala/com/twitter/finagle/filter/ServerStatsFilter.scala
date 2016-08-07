@@ -3,7 +3,9 @@ package com.twitter.finagle.filter
 import com.twitter.finagle.Deadline
 import com.twitter.finagle.context.Contexts
 import com.twitter.finagle.stats.StatsReceiver
-import com.twitter.finagle.{param, Service, ServiceFactory, SimpleFilter, Stack, Stackable}
+import com.twitter.finagle.{
+  param, Service, ServiceFactory, SimpleFilter, Stack, Stackable
+}
 import com.twitter.util.{Future, Stopwatch, Time, Duration}
 import java.util.concurrent.TimeUnit
 

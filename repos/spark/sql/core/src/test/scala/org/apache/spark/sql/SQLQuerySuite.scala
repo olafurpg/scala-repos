@@ -24,7 +24,9 @@ import org.apache.spark.AccumulatorSuite
 import org.apache.spark.sql.catalyst.analysis.UnresolvedException
 import org.apache.spark.sql.catalyst.expressions.SortOrder
 import org.apache.spark.sql.execution.aggregate
-import org.apache.spark.sql.execution.joins.{BroadcastHashJoin, CartesianProduct, SortMergeJoin}
+import org.apache.spark.sql.execution.joins.{
+  BroadcastHashJoin, CartesianProduct, SortMergeJoin
+}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.{SharedSQLContext, TestSQLContext}
@@ -187,11 +189,11 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     // Since the ID is only materialized once, then all of the records
     // should come from the cache, not by re-computing. Otherwise, the ID
     // will be different
-    assert(d0.map(_ (0)) === d2.map(_ (0)))
-    assert(d0.map(_ (1)) === d2.map(_ (1)))
+    assert(d0.map(_(0)) === d2.map(_(0)))
+    assert(d0.map(_(1)) === d2.map(_(1)))
 
-    assert(d1.map(_ (0)) === d2.map(_ (0)))
-    assert(d1.map(_ (1)) === d2.map(_ (1)))
+    assert(d1.map(_(0)) === d2.map(_(0)))
+    assert(d1.map(_(1)) === d2.map(_(1)))
   }
 
   test("grouping on nested fields") {

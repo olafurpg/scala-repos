@@ -17,7 +17,9 @@
 
 package org.apache.spark.sql.execution.datasources.jdbc
 
-import java.sql.{Connection, Date, ResultSet, ResultSetMetaData, SQLException, Timestamp}
+import java.sql.{
+  Connection, Date, ResultSet, ResultSetMetaData, SQLException, Timestamp
+}
 import java.util.Properties
 
 import scala.util.control.NonFatal

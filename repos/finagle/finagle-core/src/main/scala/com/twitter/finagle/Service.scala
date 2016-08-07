@@ -131,8 +131,7 @@ abstract class ServiceProxy[-Req, +Rep](val self: Service[Req, Rep])
 
 abstract class ServiceFactory[-Req, +Rep]
     extends (ClientConnection => Future[Service[Req, Rep]])
-    with Closable {
-  self =>
+    with Closable { self =>
 
   /**
     * Reserve the use of a given service instance. This pins the

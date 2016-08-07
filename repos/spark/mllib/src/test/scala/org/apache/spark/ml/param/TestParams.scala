@@ -17,7 +17,9 @@
 
 package org.apache.spark.ml.param
 
-import org.apache.spark.ml.param.shared.{HasHandleInvalid, HasInputCol, HasMaxIter}
+import org.apache.spark.ml.param.shared.{
+  HasHandleInvalid, HasInputCol, HasMaxIter
+}
 import org.apache.spark.ml.util.Identifiable
 
 /** A subclass of Params for testing. */

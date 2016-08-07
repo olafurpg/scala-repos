@@ -27,8 +27,7 @@ trait ParSeq[T]
     with ParIterable[T]
     with scala.collection.parallel.ParSeq[T]
     with GenericParTemplate[T, ParSeq]
-    with ParSeqLike[T, ParSeq[T], scala.collection.mutable.Seq[T]] {
-  self =>
+    with ParSeqLike[T, ParSeq[T], scala.collection.mutable.Seq[T]] { self =>
   override def companion: GenericCompanion[ParSeq] with GenericParCompanion[
       ParSeq] = ParSeq
   //protected[this] override def newBuilder = ParSeq.newBuilder[T]

@@ -9,16 +9,13 @@ import java.lang.System; // to avoid name clash with .NET's library
 
 /*
 class Test0Foo[X];
-
 object Test0Test {
   type Gen[A] = Test0Foo[A];
   class Tic(g: Test0Test.Gen[Int]);
   class Tac(g:           Gen[Int]);
 }
-
 //############################################################################
 // Test 1 - Single types in lambda lift
-
 object Test1 {
   def main(args: Array[String]): Unit = {
     List[args.type](args);
@@ -28,10 +25,8 @@ object Test1 {
     0
   }
 }
-
 //############################################################################
 // Test 2 - Local variables owned by other local variables
-
 class Test2_1(i: Int) {
   val t = {
     val x = {
@@ -53,7 +48,6 @@ class Test2_1(i: Int) {
   };
   val z2_1 = i;
 }
-
 class Test2_2(i: Int) {
   {
     val t = {
@@ -78,9 +72,7 @@ class Test2_2(i: Int) {
     0
   }
 }
-
 class Test2_3() {
-
   def this(i: Int) = {
     this();
     val t = {
@@ -103,7 +95,6 @@ class Test2_3() {
     };
     val z2_3 = i;
   }
-
   def test(i: Int): Int = {
     val t = {
       val x = {
@@ -126,7 +117,6 @@ class Test2_3() {
     val z_test = i;
     0
   }
-
 }
  */
 //############################################################################

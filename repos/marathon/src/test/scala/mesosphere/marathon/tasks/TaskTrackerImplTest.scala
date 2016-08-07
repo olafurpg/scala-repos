@@ -7,7 +7,9 @@ import mesosphere.marathon.core.task.tracker.impl.TaskSerializer
 import mesosphere.marathon.{MarathonTestHelper, MarathonSpec}
 import mesosphere.marathon.Protos.MarathonTask
 import mesosphere.marathon.core.leadership.AlwaysElectedLeadershipModule
-import mesosphere.marathon.core.task.tracker.{TaskTracker, TaskCreationHandler, TaskUpdater}
+import mesosphere.marathon.core.task.tracker.{
+  TaskTracker, TaskCreationHandler, TaskUpdater
+}
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.PathId.StringPathId
 import mesosphere.marathon.state.{PathId, TaskRepository}

@@ -9,7 +9,6 @@ class Test {
 /*initInDeclaration*/
 class Test {
   var i: Int = 1
-
   def foo() {
     i
   }

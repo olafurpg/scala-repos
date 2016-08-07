@@ -458,7 +458,9 @@ object GameRepo {
   def activePlayersSinceNOPENOPENOPE(since: DateTime,
                                      max: Int): Fu[List[UidNb]] = {
     import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework,
-    AggregationFramework.{Descending, GroupField, Limit, Match, Sort, SumValue, Unwind}
+    AggregationFramework.{
+      Descending, GroupField, Limit, Match, Sort, SumValue, Unwind
+    }
 
     gameTube.coll
       .aggregate(

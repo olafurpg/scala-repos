@@ -22,7 +22,9 @@ import kafka.api.FetchResponsePartitionData
 import kafka.api.PartitionFetchInfo
 import kafka.common.TopicAndPartition
 import kafka.metrics.KafkaMetricsGroup
-import org.apache.kafka.common.errors.{NotLeaderForPartitionException, UnknownTopicOrPartitionException}
+import org.apache.kafka.common.errors.{
+  NotLeaderForPartitionException, UnknownTopicOrPartitionException
+}
 
 import scala.collection._
 

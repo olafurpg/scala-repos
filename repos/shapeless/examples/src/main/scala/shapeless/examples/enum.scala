@@ -69,7 +69,7 @@ object ShapelessEnumDemo extends App {
       false // compile time non-exhaustive match warning/error without this case
   }
 
-  assert(!isWeekend(Mon)) // 
+  assert(!isWeekend(Mon)) //
 }
 
 // Infrastructure for the above. Original version due to Travis Brown,

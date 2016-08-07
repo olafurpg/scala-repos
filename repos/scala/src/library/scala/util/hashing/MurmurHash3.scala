@@ -267,7 +267,6 @@ object MurmurHash3 extends MurmurHash3 {
     }
     finalizeHash(h, n)
   }
-
   def indexedSeqHash(xs: scala.collection.IndexedSeq[_], seed: Int): Int = {
     var n = 0
     var h = seed

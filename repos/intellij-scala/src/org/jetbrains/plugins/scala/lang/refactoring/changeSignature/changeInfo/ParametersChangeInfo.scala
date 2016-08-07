@@ -9,8 +9,7 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
   * Nikolay.Tropin
   * 2014-08-29
   */
-private[changeInfo] trait ParametersChangeInfo {
-  this: ScalaChangeInfo =>
+private[changeInfo] trait ParametersChangeInfo { this: ScalaChangeInfo =>
 
   private val oldParameters = ScalaParameterInfo.allForMethod(function)
   private val oldParametersArray = oldParameters.flatten.toArray

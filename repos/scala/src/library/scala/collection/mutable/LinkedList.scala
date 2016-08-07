@@ -38,7 +38,6 @@ import generic._
   *  @tparam A     the type of the elements contained in this linked list.
   *
   *  @constructor Creates an "empty" list, defined as a single node with no data element and next pointing to itself.
-
   *  @define Coll `LinkedList`
   *  @define coll linked list
   *  @define thatinfo the class of the returned collection. In the standard library configuration,

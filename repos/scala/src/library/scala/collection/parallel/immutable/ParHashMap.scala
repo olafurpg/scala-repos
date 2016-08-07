@@ -45,8 +45,7 @@ class ParHashMap[K, +V] private[immutable] (
     extends ParMap[K, V]
     with GenericParMapTemplate[K, V, ParHashMap]
     with ParMapLike[K, V, ParHashMap[K, V], HashMap[K, V]]
-    with Serializable {
-  self =>
+    with Serializable { self =>
 
   def this() = this(HashMap.empty[K, V])
 

@@ -77,10 +77,10 @@ case class SimpleFilteredScan(from: Int, to: Int)(
       case "a" =>
         (i: Int) =>
           Seq(i)
-        case "b" =>
+      case "b" =>
         (i: Int) =>
           Seq(i * 2)
-        case "c" =>
+      case "c" =>
         (i: Int) =>
           val c = (i - 1 + 'a').toChar.toString
           Seq(c * 5 + c.toUpperCase * 5)
@@ -94,40 +94,40 @@ case class SimpleFilteredScan(from: Int, to: Int)(
       case EqualTo("a", v) =>
         (a: Int) =>
           a == v
-        case EqualNullSafe("a", v) =>
+      case EqualNullSafe("a", v) =>
         (a: Int) =>
           a == v
-        case LessThan("a", v: Int) =>
+      case LessThan("a", v: Int) =>
         (a: Int) =>
           a < v
-        case LessThanOrEqual("a", v: Int) =>
+      case LessThanOrEqual("a", v: Int) =>
         (a: Int) =>
           a <= v
-        case GreaterThan("a", v: Int) =>
+      case GreaterThan("a", v: Int) =>
         (a: Int) =>
           a > v
-        case GreaterThanOrEqual("a", v: Int) =>
+      case GreaterThanOrEqual("a", v: Int) =>
         (a: Int) =>
           a >= v
-        case In("a", values) =>
+      case In("a", values) =>
         (a: Int) =>
           values.map(_.asInstanceOf[Int]).toSet.contains(a)
-        case IsNull("a") =>
+      case IsNull("a") =>
         (a: Int) =>
           false // Int can't be null
-        case IsNotNull("a") =>
+      case IsNotNull("a") =>
         (a: Int) =>
           true
-        case Not(pred) =>
+      case Not(pred) =>
         (a: Int) =>
           !translateFilterOnA(pred)(a)
-        case And(left, right) =>
+      case And(left, right) =>
         (a: Int) =>
           translateFilterOnA(left)(a) && translateFilterOnA(right)(a)
-        case Or(left, right) =>
+      case Or(left, right) =>
         (a: Int) =>
           translateFilterOnA(left)(a) || translateFilterOnA(right)(a)
-        case _ =>
+      case _ =>
         (a: Int) =>
           true
     }
@@ -143,7 +143,7 @@ case class SimpleFilteredScan(from: Int, to: Int)(
       case In("c", values) =>
         (s: String) =>
           values.map(_.asInstanceOf[String]).toSet.contains(s)
-        case _ =>
+      case _ =>
         (c: String) =>
           true
     }
@@ -163,7 +163,7 @@ case class SimpleFilteredScan(from: Int, to: Int)(
           i =>
             Row.fromSeq(
                 rowBuilders
-                  .map(_ (i))
+                  .map(_(i))
                   .reduceOption(_ ++ _)
                   .getOrElse(Seq.empty)))
   }

@@ -92,7 +92,7 @@ object Stopwatch extends Stopwatch {
       val startAt: Time = local()
       () =>
         local() - startAt
-      case None =>
+    case None =>
       val startAt: Long = systemNanos()
       () =>
         Duration.fromNanoseconds(systemNanos() - startAt)

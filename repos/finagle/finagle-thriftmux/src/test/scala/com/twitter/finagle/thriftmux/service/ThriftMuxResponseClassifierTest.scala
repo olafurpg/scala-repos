@@ -5,7 +5,9 @@ import com.twitter.finagle.mux
 import com.twitter.finagle.service.{ReqRep, ResponseClassifier, ResponseClass}
 import com.twitter.finagle.service.ResponseClass._
 import com.twitter.finagle.thrift.DeserializeCtx
-import com.twitter.finagle.thriftmux.thriftscala.{InvalidQueryException, TestService}
+import com.twitter.finagle.thriftmux.thriftscala.{
+  InvalidQueryException, TestService
+}
 import com.twitter.io.{Buf, Charsets}
 import com.twitter.util.{Throw, Return}
 import org.junit.runner.RunWith
@@ -88,7 +90,9 @@ class ThriftMuxResponseClassifierTest extends FunSuite {
   }
 
   test("ThriftExceptionsAsFailures") {
-    import ThriftMuxResponseClassifier.{ThriftExceptionsAsFailures, usingDeserializeCtx}
+    import ThriftMuxResponseClassifier.{
+      ThriftExceptionsAsFailures, usingDeserializeCtx
+    }
 
     val classifier = usingDeserializeCtx(ThriftExceptionsAsFailures)
     assert(

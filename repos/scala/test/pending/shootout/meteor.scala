@@ -136,8 +136,8 @@ final class Board {
     new String(
         cells map
           (c =>
-                if (c.piece == null) '-'.toByte
-                else (c.piece.number + 48).toByte))
+             if (c.piece == null) '-'.toByte
+             else (c.piece.number + 48).toByte))
 
   def firstEmptyCellIndex() = cells.findIndexOf(c => c.isEmpty)
 
@@ -201,7 +201,6 @@ final class Board {
   /*
 // Printing all the board cells and their neighbours
 // helps check that they are connected properly
-
    def printBoardCellsAndNeighbours() = {
       Console.println("cell\tNW NE W  E  SW SE")
       for (i <- Iterator.range(0,Board.size)){

@@ -7,7 +7,11 @@ import java.net.URISyntaxException
 import java.util.concurrent.TimeoutException
 
 import akka.actor._
-import akka.persistence.{AtomicWrite, DeleteMessagesFailure, DeleteSnapshotFailure, DeleteSnapshotsFailure, JournalProtocol, NonPersistentRepr, Persistence, SaveSnapshotFailure, SnapshotProtocol}
+import akka.persistence.{
+  AtomicWrite, DeleteMessagesFailure, DeleteSnapshotFailure,
+  DeleteSnapshotsFailure, JournalProtocol, NonPersistentRepr, Persistence,
+  SaveSnapshotFailure, SnapshotProtocol
+}
 import akka.util.Helpers.Requiring
 import com.typesafe.config.Config
 

@@ -18,9 +18,15 @@ package org.jetbrains.plugins.scala.lang.psi.api.macros.impl
 import com.intellij.psi.PsiNamedElement
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScPattern
-import org.jetbrains.plugins.scala.lang.psi.api.macros.{MacroContext, ScalaMacroTypeable}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScFunction}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.macros.{
+  MacroContext, ScalaMacroTypeable
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias, ScFunction
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager.ClassCategory
 import org.jetbrains.plugins.scala.lang.psi.types._

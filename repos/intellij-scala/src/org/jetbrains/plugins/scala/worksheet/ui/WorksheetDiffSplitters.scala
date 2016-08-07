@@ -11,7 +11,9 @@ import com.intellij.openapi.diff.impl._
 import com.intellij.openapi.diff.impl.highlighting.FragmentSide
 import com.intellij.openapi.diff.impl.incrementalMerge.ChangeList
 import com.intellij.openapi.diff.impl.splitter._
-import com.intellij.openapi.editor.event.{VisibleAreaEvent, VisibleAreaListener}
+import com.intellij.openapi.editor.event.{
+  VisibleAreaEvent, VisibleAreaListener
+}
 import com.intellij.openapi.editor.{Document, Editor}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Splitter

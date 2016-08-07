@@ -31,7 +31,9 @@ import javafx.{collections => jfxc, scene => jfxs, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{IntegerProperty, ObjectProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  IntegerProperty, ObjectProperty, ReadOnlyObjectProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.collections.ObservableBuffer._
 import scalafx.delegate.SFXDelegate

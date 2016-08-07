@@ -20,7 +20,9 @@ package org.apache.spark.sql.catalyst.expressions
 import java.{lang => jl}
 
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
-import org.apache.spark.sql.catalyst.analysis.TypeCheckResult.{TypeCheckFailure, TypeCheckSuccess}
+import org.apache.spark.sql.catalyst.analysis.TypeCheckResult.{
+  TypeCheckFailure, TypeCheckSuccess
+}
 import org.apache.spark.sql.catalyst.expressions.codegen._
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util.NumberConverter
@@ -528,9 +530,9 @@ case class Hex(child: Expression)
     nullSafeCodeGen(ctx, ev, (c) => {
       val hex = Hex.getClass.getName.stripSuffix("$")
       s"${ev.value} = " + (child.dataType match {
-            case StringType => s"""$hex.hex($c.getBytes());"""
-            case _ => s"""$hex.hex($c);"""
-          })
+        case StringType => s"""$hex.hex($c.getBytes());"""
+        case _ => s"""$hex.hex($c);"""
+      })
     })
   }
 }

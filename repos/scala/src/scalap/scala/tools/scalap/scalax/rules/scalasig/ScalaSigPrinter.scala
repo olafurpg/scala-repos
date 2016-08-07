@@ -73,10 +73,10 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
   def isCaseClassObject(o: ObjectSymbol): Boolean = {
     val TypeRefType(_, classSymbol: ClassSymbol, _) = o.infoType
     o.isFinal && (classSymbol.children.find(x =>
-              x.isCase && x.isInstanceOf[MethodSymbol]) match {
-          case Some(_) => true
-          case None => false
-        })
+          x.isCase && x.isInstanceOf[MethodSymbol]) match {
+      case Some(_) => true
+      case None => false
+    })
   }
 
   private def underCaseClass(m: MethodSymbol) = m.parent match {
@@ -347,36 +347,35 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
         sep + processName(symbol.path) + ".type"
       case ConstantType(constant) =>
         sep + (constant match {
-              case null => "scala.Null"
-              case _: Unit => "scala.Unit"
-              case _: Boolean => "scala.Boolean"
-              case _: Byte => "scala.Byte"
-              case _: Char => "scala.Char"
-              case _: Short => "scala.Short"
-              case _: Int => "scala.Int"
-              case _: Long => "scala.Long"
-              case _: Float => "scala.Float"
-              case _: Double => "scala.Double"
-              case _: String => "java.lang.String"
-              case c: Class[_] =>
-                "java.lang.Class[" +
-                  c.getComponentType.getCanonicalName.replace("$", ".") + "]"
-            })
+          case null => "scala.Null"
+          case _: Unit => "scala.Unit"
+          case _: Boolean => "scala.Boolean"
+          case _: Byte => "scala.Byte"
+          case _: Char => "scala.Char"
+          case _: Short => "scala.Short"
+          case _: Int => "scala.Int"
+          case _: Long => "scala.Long"
+          case _: Float => "scala.Float"
+          case _: Double => "scala.Double"
+          case _: String => "java.lang.String"
+          case c: Class[_] =>
+            "java.lang.Class[" +
+              c.getComponentType.getCanonicalName.replace("$", ".") + "]"
+        })
       case TypeRefType(prefix, symbol, typeArgs) =>
         sep + (symbol.path match {
-              case "scala.<repeated>" =>
-                flags match {
-                  case TypeFlags(true) => toString(typeArgs.head) + "*"
-                  case _ => "scala.Seq" + typeArgString(typeArgs)
-                }
-              case "scala.<byname>" => "=> " + toString(typeArgs.head)
-              case _ => {
-                val path = StringUtil.cutSubstring(symbol.path)(".package") //remove package object reference
-                StringUtil.trimStart(
-                    processName(path) + typeArgString(typeArgs),
-                    "<empty>.")
-              }
-            })
+          case "scala.<repeated>" =>
+            flags match {
+              case TypeFlags(true) => toString(typeArgs.head) + "*"
+              case _ => "scala.Seq" + typeArgString(typeArgs)
+            }
+          case "scala.<byname>" => "=> " + toString(typeArgs.head)
+          case _ => {
+            val path = StringUtil.cutSubstring(symbol.path)(".package") //remove package object reference
+            StringUtil.trimStart(processName(path) + typeArgString(typeArgs),
+                                 "<empty>.")
+          }
+        })
       case TypeBoundsType(lower, upper) => {
         val lb = toString(lower)
         val ub = toString(upper)

@@ -1,7 +1,9 @@
 package org.template.recommendeduser
 
 import grizzled.slf4j.Logger
-import io.prediction.controller.{EmptyActualResult, EmptyEvaluationInfo, PDataSource, Params}
+import io.prediction.controller.{
+  EmptyActualResult, EmptyEvaluationInfo, PDataSource, Params
+}
 import io.prediction.data.storage.Storage
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD

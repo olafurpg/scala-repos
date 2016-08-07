@@ -50,8 +50,8 @@ object LowPriority {
   sealed trait Ignoring[T] extends Serializable
 
   object Ignoring {
-    implicit def materialize[T]: Ignoring[T] = macro LowPriorityMacros
-      .mkLowPriorityIgnoring[T]
+    implicit def materialize[T]: Ignoring[T] =
+      macro LowPriorityMacros.mkLowPriorityIgnoring[T]
   }
 
   /** For internal use by `LowPriority` */

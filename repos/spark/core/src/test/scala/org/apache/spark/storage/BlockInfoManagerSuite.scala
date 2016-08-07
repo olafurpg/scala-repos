@@ -23,7 +23,9 @@ import scala.language.implicitConversions
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.time.SpanSugar._
 
-import org.apache.spark.{SparkException, SparkFunSuite, TaskContext, TaskContextImpl}
+import org.apache.spark.{
+  SparkException, SparkFunSuite, TaskContext, TaskContextImpl
+}
 
 class BlockInfoManagerSuite extends SparkFunSuite with BeforeAndAfterEach {
 

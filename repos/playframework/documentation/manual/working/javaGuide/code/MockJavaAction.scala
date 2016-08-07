@@ -7,7 +7,10 @@ package javaguide.testhelpers {
 
   import akka.stream.Materializer
   import play.api.mvc.{Action, Request}
-  import play.core.j.{DefaultJavaHandlerComponents, JavaHelpers, JavaActionAnnotations, JavaAction}
+  import play.core.j.{
+    DefaultJavaHandlerComponents, JavaHelpers, JavaActionAnnotations,
+    JavaAction
+  }
   import play.http.DefaultActionCreator
   import play.mvc.{Controller, Http, Result}
   import play.api.test.Helpers
@@ -15,8 +18,7 @@ package javaguide.testhelpers {
 
   abstract class MockJavaAction
       extends Controller
-      with Action[Http.RequestBody] {
-    self =>
+      with Action[Http.RequestBody] { self =>
 
     private lazy val components = new DefaultJavaHandlerComponents(
         play.api.Play.current.injector,

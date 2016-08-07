@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.debugger.stepOver
 
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaPositionManager}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase, ScalaPositionManager
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.junit.Assert
 

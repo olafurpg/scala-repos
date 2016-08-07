@@ -23,7 +23,7 @@ import scala.collection.generic.{CanBuildFrom, IsTraversableLike}
   * Wrapper for a collection type witnessing that it has the statically specified length. Can be
   * applied to any type which can be viewed as a `GenTraversableLike`, ie. standard collections,
   * `Array`s, `String`s etc.
-  * 
+  *
   * @author Miles Sabin
   */
 final class Sized[+Repr, L <: Nat] private (val unsized: Repr) {
@@ -33,10 +33,10 @@ final class Sized[+Repr, L <: Nat] private (val unsized: Repr) {
 
 /**
   * Carrier for `Sized` operations.
-  * 
+  *
   * These operations are implemented here as extension methods of the minimal `Sized` type to avoid issues that would
   * otherwise be caused by its covariance.
-  * 
+  *
   * @author Miles Sabin
   */
 class SizedOps[A0, Repr: AdditiveCollection, L <: Nat](
@@ -109,7 +109,7 @@ class SizedOps[A0, Repr: AdditiveCollection, L <: Nat](
 
   /**
     * Returns all but the  first ''m'' elements of this collection. An explicit type argument must be provided. Available
-    * only if there is evidence that this collection has at least ''m'' elements. The resulting collection will be 
+    * only if there is evidence that this collection has at least ''m'' elements. The resulting collection will be
     * statically known to have ''m'' less elements than this collection.
     */
   def drop[M <: Nat](implicit diff: Diff[L, M], ev: ToInt[M]) =
@@ -181,7 +181,7 @@ class SizedOps[A0, Repr: AdditiveCollection, L <: Nat](
     wrap[That, L](s.unsized map f)
 
   /**
-    * Converts this `Sized` to an `HList` whose elements have the same type as in `Repr`. 
+    * Converts this `Sized` to an `HList` whose elements have the same type as in `Repr`.
     */
   def toHList(implicit hl: ToHList[Repr, L]): hl.Out = hl(s)
 

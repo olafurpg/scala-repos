@@ -17,8 +17,7 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetUiConstructor
   * User: Dmitry Naydanov
   * Date: 2/17/14
   */
-trait TopComponentAction extends TopComponentDisplayable {
-  this: AnAction =>
+trait TopComponentAction extends TopComponentDisplayable { this: AnAction =>
 
   def shortcutId: Option[String] = None
 

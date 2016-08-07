@@ -65,8 +65,7 @@ trait Trees { self: Universe =>
     *  The main source of information about trees is the [[scala.reflect.api.Trees]] page.
     *  @group API
     */
-  trait TreeApi extends Product {
-    this: Tree =>
+  trait TreeApi extends Product { this: Tree =>
 
     /** Does this tree represent a definition? (of a method, of a class, etc) */
     def isDef: Boolean
@@ -200,7 +199,8 @@ trait Trees { self: Universe =>
   /** The API that all term trees support
     *  @group API
     */
-  trait TermTreeApi extends TreeApi { this: TermTree => }
+  trait TermTreeApi extends TreeApi { this: TermTree =>
+  }
 
   /** A tree for a type. Not all trees representing types are TypTrees; use isType
     *  to reliably identify types.
@@ -212,7 +212,8 @@ trait Trees { self: Universe =>
   /** The API that all typ trees support
     *  @group API
     */
-  trait TypTreeApi extends TreeApi { this: TypTree => }
+  trait TypTreeApi extends TreeApi { this: TypTree =>
+  }
 
   /** A tree that carries a symbol, e.g. by defining it (`DefTree`) or by referring to it (`RefTree`).
     *  Such trees start their life naked, returning `NoSymbol`, but after being typechecked without errors
@@ -226,8 +227,7 @@ trait Trees { self: Universe =>
   /** The API that all sym trees support
     *  @group API
     */
-  trait SymTreeApi extends TreeApi {
-    this: SymTree =>
+  trait SymTreeApi extends TreeApi { this: SymTree =>
 
     /** @inheritdoc */
     def symbol: Symbol
@@ -242,8 +242,7 @@ trait Trees { self: Universe =>
   /** The API that all name trees support
     *  @group API
     */
-  trait NameTreeApi extends TreeApi {
-    this: NameTree =>
+  trait NameTreeApi extends TreeApi { this: NameTree =>
 
     /** The underlying name.
       *  For example, the `List` part of `Ident(TermName("List"))`.
@@ -262,8 +261,7 @@ trait Trees { self: Universe =>
   /** The API that all ref trees support
     *  @group API
     */
-  trait RefTreeApi extends SymTreeApi with NameTreeApi {
-    this: RefTree =>
+  trait RefTreeApi extends SymTreeApi with NameTreeApi { this: RefTree =>
 
     /** The qualifier of the reference.
       *  For example, the `Ident(TermName("scala"))` part of `Select(Ident(TermName("scala")), TermName("List"))`.
@@ -301,8 +299,7 @@ trait Trees { self: Universe =>
   /** The API that all def trees support
     *  @group API
     */
-  trait DefTreeApi extends SymTreeApi with NameTreeApi {
-    this: DefTree =>
+  trait DefTreeApi extends SymTreeApi with NameTreeApi { this: DefTree =>
 
     /** @inheritdoc */
     def name: Name
@@ -318,8 +315,7 @@ trait Trees { self: Universe =>
   /** The API that all member defs support
     *  @group API
     */
-  trait MemberDefApi extends DefTreeApi {
-    this: MemberDef =>
+  trait MemberDefApi extends DefTreeApi { this: MemberDef =>
 
     /** Modifiers of the declared member. */
     def mods: Modifiers
@@ -350,8 +346,7 @@ trait Trees { self: Universe =>
   /** The API that all package defs support
     *  @group API
     */
-  trait PackageDefApi extends MemberDefApi {
-    this: PackageDef =>
+  trait PackageDefApi extends MemberDefApi { this: PackageDef =>
 
     /** The (possibly, fully-qualified) name of the package. */
     def pid: RefTree
@@ -369,8 +364,7 @@ trait Trees { self: Universe =>
   /** The API that all impl defs support
     *  @group API
     */
-  trait ImplDefApi extends MemberDefApi {
-    this: ImplDef =>
+  trait ImplDefApi extends MemberDefApi { this: ImplDef =>
 
     /** The body of the definition. */
     def impl: Template
@@ -414,8 +408,7 @@ trait Trees { self: Universe =>
   /** The API that all class defs support
     *  @group API
     */
-  trait ClassDefApi extends ImplDefApi {
-    this: ClassDef =>
+  trait ClassDefApi extends ImplDefApi { this: ClassDef =>
 
     /** @inheritdoc */
     def mods: Modifiers
@@ -466,8 +459,7 @@ trait Trees { self: Universe =>
   /** The API that all module defs support
     *  @group API
     */
-  trait ModuleDefApi extends ImplDefApi {
-    this: ModuleDef =>
+  trait ModuleDefApi extends ImplDefApi { this: ModuleDef =>
 
     /** @inheritdoc */
     def mods: Modifiers
@@ -488,8 +480,7 @@ trait Trees { self: Universe =>
   /** The API that all val defs and def defs support
     *  @group API
     */
-  trait ValOrDefDefApi extends MemberDefApi {
-    this: ValOrDefDef =>
+  trait ValOrDefDefApi extends MemberDefApi { this: ValOrDefDef =>
 
     /** @inheritdoc */
     def name: TermName
@@ -556,8 +547,7 @@ trait Trees { self: Universe =>
   /** The API that all val defs support
     *  @group API
     */
-  trait ValDefApi extends ValOrDefDefApi {
-    this: ValDef =>
+  trait ValDefApi extends ValOrDefDefApi { this: ValDef =>
 
     /** @inheritdoc */
     def mods: Modifiers
@@ -636,8 +626,7 @@ trait Trees { self: Universe =>
   /** The API that all def defs support
     *  @group API
     */
-  trait DefDefApi extends ValOrDefDefApi {
-    this: DefDef =>
+  trait DefDefApi extends ValOrDefDefApi { this: DefDef =>
 
     /** @inheritdoc */
     def mods: Modifiers
@@ -704,8 +693,7 @@ trait Trees { self: Universe =>
   /** The API that all type defs support
     *  @group API
     */
-  trait TypeDefApi extends MemberDefApi {
-    this: TypeDef =>
+  trait TypeDefApi extends MemberDefApi { this: TypeDef =>
 
     /** @inheritdoc */
     def mods: Modifiers
@@ -772,8 +760,7 @@ trait Trees { self: Universe =>
   /** The API that all label defs support
     *  @group API
     */
-  trait LabelDefApi extends DefTreeApi with TermTreeApi {
-    this: LabelDef =>
+  trait LabelDefApi extends DefTreeApi with TermTreeApi { this: LabelDef =>
 
     /** @inheritdoc */
     def name: TermName
@@ -824,8 +811,7 @@ trait Trees { self: Universe =>
   /** The API that all import selectors support
     *  @group API
     */
-  trait ImportSelectorApi {
-    this: ImportSelector =>
+  trait ImportSelectorApi { this: ImportSelector =>
 
     /** The imported name. */
     def name: Name
@@ -886,8 +872,7 @@ trait Trees { self: Universe =>
   /** The API that all imports support
     *  @group API
     */
-  trait ImportApi extends SymTreeApi {
-    this: Import =>
+  trait ImportApi extends SymTreeApi { this: Import =>
 
     /** The qualifier of the import.
       *  See the example for [[scala.reflect.api.Trees#ImportExtractor]].
@@ -941,8 +926,7 @@ trait Trees { self: Universe =>
   /** The API that all templates support
     *  @group API
     */
-  trait TemplateApi extends SymTreeApi {
-    this: Template =>
+  trait TemplateApi extends SymTreeApi { this: Template =>
 
     /** Superclasses of the template. */
     def parents: List[Tree]
@@ -984,8 +968,7 @@ trait Trees { self: Universe =>
   /** The API that all blocks support
     *  @group API
     */
-  trait BlockApi extends TermTreeApi {
-    this: Block =>
+  trait BlockApi extends TermTreeApi { this: Block =>
 
     /** All, but the last, expressions in the block.
       *  Can very well be an empty list.
@@ -1026,8 +1009,7 @@ trait Trees { self: Universe =>
   /** The API that all case defs support
     *  @group API
     */
-  trait CaseDefApi extends TreeApi {
-    this: CaseDef =>
+  trait CaseDefApi extends TreeApi { this: CaseDef =>
 
     /** The pattern of the pattern matching clause. */
     def pat: Tree
@@ -1072,8 +1054,7 @@ trait Trees { self: Universe =>
   /** The API that all alternatives support
     *  @group API
     */
-  trait AlternativeApi extends TermTreeApi {
-    this: Alternative =>
+  trait AlternativeApi extends TermTreeApi { this: Alternative =>
 
     /** Alternatives of the pattern matching clause. */
     def trees: List[Tree]
@@ -1106,8 +1087,7 @@ trait Trees { self: Universe =>
   /** The API that all stars support
     *  @group API
     */
-  trait StarApi extends TermTreeApi {
-    this: Star =>
+  trait StarApi extends TermTreeApi { this: Star =>
 
     /** The quantified pattern. */
     def elem: Tree
@@ -1143,8 +1123,7 @@ trait Trees { self: Universe =>
   /** The API that all binds support
     *  @group API
     */
-  trait BindApi extends DefTreeApi {
-    this: Bind =>
+  trait BindApi extends DefTreeApi { this: Bind =>
 
     /** The name that can be used to refer to this fragment of the matched expression.
       *  The `list` part of the `list @ List(x, y)`.
@@ -1207,8 +1186,7 @@ trait Trees { self: Universe =>
   /** The API that all unapplies support
     *  @group API
     */
-  trait UnApplyApi extends TermTreeApi {
-    this: UnApply =>
+  trait UnApplyApi extends TermTreeApi { this: UnApply =>
 
     /** A dummy node that carries the type of unapplication.
       *  See the example for [[scala.reflect.api.Trees#UnApplyExtractor]].
@@ -1249,8 +1227,7 @@ trait Trees { self: Universe =>
   /** The API that all functions support
     *  @group API
     */
-  trait FunctionApi extends TermTreeApi with SymTreeApi {
-    this: Function =>
+  trait FunctionApi extends TermTreeApi with SymTreeApi { this: Function =>
 
     /** The list of parameters of the function.
       */
@@ -1286,8 +1263,7 @@ trait Trees { self: Universe =>
   /** The API that all assigns support
     *  @group API
     */
-  trait AssignApi extends TermTreeApi {
-    this: Assign =>
+  trait AssignApi extends TermTreeApi { this: Assign =>
 
     /** The left-hand side of the assignment.
       */
@@ -1330,8 +1306,7 @@ trait Trees { self: Universe =>
   /** The API that all assigns support
     *  @group API
     */
-  trait AssignOrNamedArgApi extends TermTreeApi {
-    this: AssignOrNamedArg =>
+  trait AssignOrNamedArgApi extends TermTreeApi { this: AssignOrNamedArg =>
 
     /** The left-hand side of the expression.
       */
@@ -1369,8 +1344,7 @@ trait Trees { self: Universe =>
   /** The API that all ifs support
     *  @group API
     */
-  trait IfApi extends TermTreeApi {
-    this: If =>
+  trait IfApi extends TermTreeApi { this: If =>
 
     /** The condition of the if.
       */
@@ -1422,8 +1396,7 @@ trait Trees { self: Universe =>
   /** The API that all matches support
     *  @group API
     */
-  trait MatchApi extends TermTreeApi {
-    this: Match =>
+  trait MatchApi extends TermTreeApi { this: Match =>
 
     /** The scrutinee of the pattern match. */
     def selector: Tree
@@ -1459,8 +1432,7 @@ trait Trees { self: Universe =>
   /** The API that all returns support
     *  @group API
     */
-  trait ReturnApi extends TermTreeApi {
-    this: Return =>
+  trait ReturnApi extends TermTreeApi { this: Return =>
 
     /** The returned expression. */
     def expr: Tree
@@ -1493,8 +1465,7 @@ trait Trees { self: Universe =>
   /** The API that all tries support
     *  @group API
     */
-  trait TryApi extends TermTreeApi {
-    this: Try =>
+  trait TryApi extends TermTreeApi { this: Try =>
 
     /** The protected block. */
     def block: Tree
@@ -1531,8 +1502,7 @@ trait Trees { self: Universe =>
   /** The API that all tries support
     *  @group API
     */
-  trait ThrowApi extends TermTreeApi {
-    this: Throw =>
+  trait ThrowApi extends TermTreeApi { this: Throw =>
 
     /** The thrown expression. */
     def expr: Tree
@@ -1581,8 +1551,7 @@ trait Trees { self: Universe =>
   /** The API that all news support
     *  @group API
     */
-  trait NewApi extends TermTreeApi {
-    this: New =>
+  trait NewApi extends TermTreeApi { this: New =>
 
     /** The tree that represents the type being instantiated.
       *  See the example for [[scala.reflect.api.Trees#NewExtractor]].
@@ -1615,8 +1584,7 @@ trait Trees { self: Universe =>
   /** The API that all typeds support
     *  @group API
     */
-  trait TypedApi extends TermTreeApi {
-    this: Typed =>
+  trait TypedApi extends TermTreeApi { this: Typed =>
 
     /** The expression being ascribed with the type. */
     def expr: Tree
@@ -1634,8 +1602,7 @@ trait Trees { self: Universe =>
   /** The API that all applies support
     *  @group API
     */
-  trait GenericApplyApi extends TermTreeApi {
-    this: GenericApply =>
+  trait GenericApplyApi extends TermTreeApi { this: GenericApply =>
 
     /** The target of the application. */
     def fun: Tree
@@ -1683,7 +1650,8 @@ trait Trees { self: Universe =>
   /** The API that all type applies support
     *  @group API
     */
-  trait TypeApplyApi extends GenericApplyApi { this: TypeApply => }
+  trait TypeApplyApi extends GenericApplyApi { this: TypeApply =>
+  }
 
   /** Value application
     *  @group Trees
@@ -1718,7 +1686,8 @@ trait Trees { self: Universe =>
   /** The API that all applies support
     *  @group API
     */
-  trait ApplyApi extends GenericApplyApi { this: Apply => }
+  trait ApplyApi extends GenericApplyApi { this: Apply =>
+  }
 
   /** Super reference, where `qual` is the corresponding `this` reference.
     *  A super reference `C.super[M]` is represented as `Super(This(C), M)`.
@@ -1755,8 +1724,7 @@ trait Trees { self: Universe =>
   /** The API that all supers support
     *  @group API
     */
-  trait SuperApi extends TermTreeApi {
-    this: Super =>
+  trait SuperApi extends TermTreeApi { this: Super =>
 
     /** The qualifier of the `super` expression.
       *  See the example for [[scala.reflect.api.Trees#SuperExtractor]].
@@ -1797,8 +1765,7 @@ trait Trees { self: Universe =>
   /** The API that all thises support
     *  @group API
     */
-  trait ThisApi extends TermTreeApi with SymTreeApi {
-    this: This =>
+  trait ThisApi extends TermTreeApi with SymTreeApi { this: This =>
 
     /** The qualifier of the `this` expression.
       *  For an unqualified `this` refers to the enclosing class.
@@ -1837,8 +1804,7 @@ trait Trees { self: Universe =>
   /** The API that all selects support
     *  @group API
     */
-  trait SelectApi extends RefTreeApi {
-    this: Select =>
+  trait SelectApi extends RefTreeApi { this: Select =>
 
     /** @inheritdoc */
     def qualifier: Tree
@@ -1875,8 +1841,7 @@ trait Trees { self: Universe =>
   /** The API that all idents support
     *  @group API
     */
-  trait IdentApi extends RefTreeApi {
-    this: Ident =>
+  trait IdentApi extends RefTreeApi { this: Ident =>
 
     /** Was this ident created from a backquoted identifier? */
     def isBackquoted: Boolean
@@ -1910,8 +1875,7 @@ trait Trees { self: Universe =>
   /** The API that all literals support
     *  @group API
     */
-  trait LiteralApi extends TermTreeApi {
-    this: Literal =>
+  trait LiteralApi extends TermTreeApi { this: Literal =>
 
     /** The compile-time constant underlying the literal. */
     def value: Constant
@@ -1946,8 +1910,7 @@ trait Trees { self: Universe =>
   /** The API that all annotateds support
     *  @group API
     */
-  trait AnnotatedApi extends TreeApi {
-    this: Annotated =>
+  trait AnnotatedApi extends TreeApi { this: Annotated =>
 
     /** The annotation. */
     def annot: Tree
@@ -1981,8 +1944,7 @@ trait Trees { self: Universe =>
   /** The API that all singleton type trees support
     *  @group API
     */
-  trait SingletonTypeTreeApi extends TypTreeApi {
-    this: SingletonTypeTree =>
+  trait SingletonTypeTreeApi extends TypTreeApi { this: SingletonTypeTree =>
 
     /** The underlying reference. */
     def ref: Tree
@@ -2057,8 +2019,7 @@ trait Trees { self: Universe =>
   /** The API that all compound type trees support
     *  @group API
     */
-  trait CompoundTypeTreeApi extends TypTreeApi {
-    this: CompoundTypeTree =>
+  trait CompoundTypeTreeApi extends TypTreeApi { this: CompoundTypeTree =>
 
     /** The template of the compound type - represents the parents, the optional self-type and the optional definitions. */
     def templ: Template
@@ -2098,8 +2059,7 @@ trait Trees { self: Universe =>
   /** The API that all applied type trees support
     *  @group API
     */
-  trait AppliedTypeTreeApi extends TypTreeApi {
-    this: AppliedTypeTree =>
+  trait AppliedTypeTreeApi extends TypTreeApi { this: AppliedTypeTree =>
 
     /** The target of the application. */
     def tpt: Tree
@@ -2133,8 +2093,7 @@ trait Trees { self: Universe =>
   /** The API that all type bound trees support
     *  @group API
     */
-  trait TypeBoundsTreeApi extends TypTreeApi {
-    this: TypeBoundsTree =>
+  trait TypeBoundsTreeApi extends TypTreeApi { this: TypeBoundsTree =>
 
     /** The lower bound.
       *  Is equal to `Ident(<scala.Nothing>)` if not specified explicitly.
@@ -2215,8 +2174,7 @@ trait Trees { self: Universe =>
   /** The API that all type trees support
     *  @group API
     */
-  trait TypeTreeApi extends TypTreeApi {
-    this: TypeTree =>
+  trait TypeTreeApi extends TypTreeApi { this: TypeTree =>
 
     /** The precursor of this tree.
       *  Is equal to `EmptyTree` if this type tree doesn't have precursors.
@@ -2671,8 +2629,8 @@ trait Trees { self: Universe =>
     def traverseStats(stats: List[Tree], exprOwner: Symbol) {
       stats foreach
         (stat =>
-              if (exprOwner != currentOwner) atOwner(exprOwner)(traverse(stat))
-              else traverse(stat))
+           if (exprOwner != currentOwner) atOwner(exprOwner)(traverse(stat))
+           else traverse(stat))
     }
 
     /** Performs a traversal with a given owner symbol. */
@@ -2772,9 +2730,9 @@ trait Trees { self: Universe =>
     def transformStats(stats: List[Tree], exprOwner: Symbol): List[Tree] =
       stats mapConserve
         (stat =>
-              if (exprOwner != currentOwner && stat.isTerm)
-                atOwner(exprOwner)(transform(stat))
-              else transform(stat)) filter (EmptyTree != _)
+           if (exprOwner != currentOwner && stat.isTerm)
+             atOwner(exprOwner)(transform(stat))
+           else transform(stat)) filter (EmptyTree != _)
 
     /** Transforms `Modifiers`. */
     def transformModifiers(mods: Modifiers): Modifiers = {

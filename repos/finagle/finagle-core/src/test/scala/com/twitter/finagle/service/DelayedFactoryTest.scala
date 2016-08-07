@@ -1,6 +1,8 @@
 package com.twitter.finagle.service
 
-import com.twitter.finagle.{Status, ClientConnection, Service, ServiceFactory, Failure}
+import com.twitter.finagle.{
+  Status, ClientConnection, Service, ServiceFactory, Failure
+}
 import com.twitter.util._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite

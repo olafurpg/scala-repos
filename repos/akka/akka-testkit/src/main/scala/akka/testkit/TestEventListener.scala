@@ -10,7 +10,9 @@ import scala.concurrent.duration.Duration
 import scala.reflect.ClassTag
 import akka.actor.{DeadLetter, ActorSystem, UnhandledMessage}
 import akka.dispatch.sysmsg.{SystemMessage, Terminate}
-import akka.event.Logging.{Warning, LogEvent, InitializeLogger, Info, Error, Debug, LoggerInitialized}
+import akka.event.Logging.{
+  Warning, LogEvent, InitializeLogger, Info, Error, Debug, LoggerInitialized
+}
 import akka.event.Logging
 import akka.actor.NoSerializationVerificationNeeded
 import akka.japi.Util.immutableSeq
@@ -142,9 +144,9 @@ abstract class EventFilter(occurrences: Int) {
     val msgstr = if (msg != null) msg.toString else "null"
     (source.isDefined && source.get == src || source.isEmpty) &&
     (message match {
-          case Left(s) ⇒ if (complete) msgstr == s else msgstr.startsWith(s)
-          case Right(p) ⇒ p.findFirstIn(msgstr).isDefined
-        })
+      case Left(s) ⇒ if (complete) msgstr == s else msgstr.startsWith(s)
+      case Right(p) ⇒ p.findFirstIn(msgstr).isDefined
+    })
   }
 }
 

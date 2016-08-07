@@ -2,7 +2,9 @@ package com.twitter.finagle.netty3.channel
 
 import com.twitter.finagle.stats.StatsReceiver
 import java.util.concurrent.atomic.AtomicInteger
-import org.jboss.netty.channel.{ChannelHandlerContext, ChannelStateEvent, MessageEvent, SimpleChannelHandler}
+import org.jboss.netty.channel.{
+  ChannelHandlerContext, ChannelStateEvent, MessageEvent, SimpleChannelHandler
+}
 
 /**
   * A channel stats handler that keeps per-connection request

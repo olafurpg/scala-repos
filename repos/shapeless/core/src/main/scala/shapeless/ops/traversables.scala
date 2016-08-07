@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-15 Miles Sabin 
+ * Copyright (c) 2011-15 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import scala.collection.{GenTraversable, GenTraversableLike}
 object traversable {
 
   /**
-    * Type class supporting type safe conversion of `Traversables` to `HLists`. 
-    * 
+    * Type class supporting type safe conversion of `Traversables` to `HLists`.
+    *
     * @author Miles Sabin
     */
   trait FromTraversable[Out <: HList] extends Serializable {
@@ -32,7 +32,7 @@ object traversable {
 
   /**
     * `FromTraversable` type class instances.
-    * 
+    *
     * @author Miles Sabin
     */
   object FromTraversable {
@@ -57,7 +57,7 @@ object traversable {
 
   /**
     * Type class supporting type safe conversion of `Traversables` to `HLists` of a specific length.
-    * 
+    *
     * @author Rob Norris
     */
   trait ToSizedHList[CC[T] <: GenTraversable[T], A, N <: Nat]
@@ -68,7 +68,7 @@ object traversable {
 
   /**
     * `ToSizedHList` type class instances.
-    * 
+    *
     * @author Rob Norris
     */
   object ToSizedHList {

@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala
 package overrideImplement
 
-import com.intellij.codeInsight.generation.{GenerateMembersUtil, ClassMember => JClassMember}
+import com.intellij.codeInsight.generation.{
+  GenerateMembersUtil, ClassMember => JClassMember
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -12,7 +14,9 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScTemplateDefinition, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.resolve.ResolveUtils
 import org.jetbrains.plugins.scala.util.ScalaUtils
@@ -161,9 +165,9 @@ object ScalaOIUtil {
         val clazz = m.containingClass
         clazz != null && clazz.qualifiedName == "scala.Product" &&
         (m.name match {
-              case "productArity" | "productElement" => true
-              case _ => false
-            })
+          case "productArity" | "productElement" => true
+          case _ => false
+        })
       case x: ScTemplateDefinition =>
         x.superTypes.map(t => ScType.extractClass(t)).find {
           case Some(c) => isProductAbstractMethod(m, c, visited + clazz)

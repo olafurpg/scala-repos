@@ -301,7 +301,7 @@ object LAFuture {
   private def notifyObservers(future: LAFuture[_]) {
     val observers = threadInfo.get()
     if (null eq observers) {} else {
-      observers.foreach(_ (future))
+      observers.foreach(_(future))
     }
   }
 

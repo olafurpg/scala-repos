@@ -23,8 +23,7 @@ import generic._
 trait SortedMapLike[
     A, +B, +This <: SortedMapLike[A, B, This] with SortedMap[A, B]]
     extends Sorted[A, This]
-    with MapLike[A, B, This] {
-  self =>
+    with MapLike[A, B, This] { self =>
 
   def firstKey: A = head._1
   def lastKey: A = last._1

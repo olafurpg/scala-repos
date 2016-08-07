@@ -13,44 +13,36 @@ import scala.collection.GenTraversable
 /**
   * Support for anything with a `CanBuildFrom`.
   */
-trait CollectionFormats {
-  this: BasicFormats =>
+trait CollectionFormats { this: BasicFormats =>
 
   import scala.language.higherKinds
 
   /*
    Implementation note. Ideally, and intuitively, we'd like to be able
    to write the type signature of this implicit method as
-
      getTraversableformat[E, T <: GenTraversable[E]](implicit
        cbf: CanBuildFrom[T, E, T],
        ef:  SexpFormat[E]
      )
-
    but due to limitations of the Scala compiler, the "kindedness" of a
    type parameter restricts what it can be equated to. A no-param type
    such as `T` (of `*` kind) cannot be equated to a one-param type
    such as `T[E]` (of `* -> *` kind), which cannot be equated to a
    two-param type such as `T[K, V]` (of `* -> * -> *` kind).
-
    This deficiency is tracked under
    [SI-2712](https://issues.scala-lang.org/browse/SI-2712)
    "implement higher-order unification for type constructor inference".
-
    The workaround is to define the types with the correct kindedness
    (using free type parameters) and then introducing implicit evidence
    to restrict the free type parameters (note that `<:<` is defined in
    Predef).
-
    SIDENOTE: An alternative way of implementing genTraversableFormat
    would be to define it using a refinement:
-
      genTraversbaleFormat[E, T](implicit
        itl: IsTraversableLike[T] { type A = E },
        cbf: CanBuildFrom[T, E, T],
        ef: SexpFormat[E]
      )
-
    but this only works because `IsTraversableLike` is using the evidence
    trick under the hood.
    */

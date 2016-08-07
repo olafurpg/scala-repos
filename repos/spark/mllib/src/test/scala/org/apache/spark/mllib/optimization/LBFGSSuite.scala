@@ -24,7 +24,9 @@ import org.scalatest.Matchers
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.util.{LocalClusterSparkContext, MLlibTestSparkContext}
+import org.apache.spark.mllib.util.{
+  LocalClusterSparkContext, MLlibTestSparkContext
+}
 import org.apache.spark.mllib.util.TestingUtils._
 
 class LBFGSSuite

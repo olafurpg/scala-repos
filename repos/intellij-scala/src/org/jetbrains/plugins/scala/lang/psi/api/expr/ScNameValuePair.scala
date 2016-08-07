@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */

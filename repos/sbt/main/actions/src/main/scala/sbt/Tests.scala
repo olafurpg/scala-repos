@@ -13,7 +13,10 @@ import xsbti.api.Definition
 import xsbti.compile.CompileAnalysis
 import ConcurrentRestrictions.Tag
 
-import testing.{AnnotatedFingerprint, Fingerprint, Framework, SubclassFingerprint, Runner, TaskDef, SuiteSelector, Task => TestTask}
+import testing.{
+  AnnotatedFingerprint, Fingerprint, Framework, SubclassFingerprint, Runner,
+  TaskDef, SuiteSelector, Task => TestTask
+}
 import scala.annotation.tailrec
 
 import java.io.File
@@ -221,7 +224,7 @@ object Tests {
                testListeners: Seq[TestReportListener],
                config: Execution): Task[Output] = {
     def fj(actions: Iterable[() => Unit]): Task[Unit] =
-      nop.dependsOn(actions.toSeq.fork(_ ()): _*)
+      nop.dependsOn(actions.toSeq.fork(_()): _*)
     def partApp(actions: Iterable[ClassLoader => Unit]) = actions.toSeq map {
       a => () =>
         a(loader)

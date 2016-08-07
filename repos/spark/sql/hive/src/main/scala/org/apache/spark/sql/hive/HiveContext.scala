@@ -51,7 +51,9 @@ import org.apache.spark.sql.execution._
 import org.apache.spark.sql.execution.command.{ExecutedCommand, SetCommand}
 import org.apache.spark.sql.execution.ui.SQLListener
 import org.apache.spark.sql.hive.client._
-import org.apache.spark.sql.hive.execution.{DescribeHiveTableCommand, HiveNativeCommand}
+import org.apache.spark.sql.hive.execution.{
+  DescribeHiveTableCommand, HiveNativeCommand
+}
 import org.apache.spark.sql.internal.SQLConf.SQLConfEntry
 import org.apache.spark.sql.internal.SQLConf.SQLConfEntry._
 import org.apache.spark.sql.types._
@@ -86,8 +88,7 @@ class HiveContext private[hive] (
     @transient private val metaHive: HiveClient,
     isRootContext: Boolean)
     extends SQLContext(sc, cacheManager, listener, isRootContext)
-    with Logging {
-  self =>
+    with Logging { self =>
 
   def this(sc: SparkContext) = {
     this(sc,

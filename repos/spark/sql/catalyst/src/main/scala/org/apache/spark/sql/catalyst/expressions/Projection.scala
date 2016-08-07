@@ -18,7 +18,9 @@
 package org.apache.spark.sql.catalyst.expressions
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.codegen.{GenerateSafeProjection, GenerateUnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  GenerateSafeProjection, GenerateUnsafeProjection
+}
 import org.apache.spark.sql.types.{DataType, StructType}
 
 /**

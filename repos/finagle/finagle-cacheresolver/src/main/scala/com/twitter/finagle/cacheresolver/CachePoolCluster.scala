@@ -10,8 +10,12 @@ import com.twitter.concurrent.Spool.*::
 import com.twitter.conversions.time._
 import com.twitter.finagle.{Group, Resolver, Addr, Address}
 import com.twitter.finagle.builder.Cluster
-import com.twitter.finagle.stats.{ClientStatsReceiver, StatsReceiver, NullStatsReceiver}
-import com.twitter.finagle.zookeeper.{ZkGroup, DefaultZkClientFactory, ZookeeperServerSetCluster}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver, StatsReceiver, NullStatsReceiver
+}
+import com.twitter.finagle.zookeeper.{
+  ZkGroup, DefaultZkClientFactory, ZookeeperServerSetCluster
+}
 import com.twitter.finagle.{Group, Resolver}
 import com.twitter.thrift.ServiceInstance
 import com.twitter.thrift.Status.ALIVE

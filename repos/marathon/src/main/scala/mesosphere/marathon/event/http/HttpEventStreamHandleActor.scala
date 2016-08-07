@@ -7,7 +7,9 @@ import akka.event.EventStream
 import akka.pattern.pipe
 import mesosphere.marathon.api.v2.json.Formats._
 import mesosphere.marathon.event.http.HttpEventStreamHandleActor.WorkDone
-import mesosphere.marathon.event.{EventStreamAttached, EventStreamDetached, MarathonEvent}
+import mesosphere.marathon.event.{
+  EventStreamAttached, EventStreamDetached, MarathonEvent
+}
 import mesosphere.util.ThreadPoolContext
 import play.api.libs.json.Json
 

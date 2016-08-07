@@ -7,7 +7,7 @@ import org.scalacheck._;
 import org.junit.runner.RunWith
 
 /**
-  * 
+  *
   * @author dlwh
   */
 @RunWith(classOf[JUnitRunner])

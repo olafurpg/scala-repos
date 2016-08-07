@@ -11,7 +11,9 @@ import akka.japi.{Option ⇒ JOption}
 import akka.pattern.ask
 import akka.routing.RoundRobinGroup
 import akka.serialization.JavaSerializer
-import akka.testkit.{AkkaSpec, DefaultTimeout, EventFilter, TimingTest, filterEvents}
+import akka.testkit.{
+  AkkaSpec, DefaultTimeout, EventFilter, TimingTest, filterEvents
+}
 import akka.util.Timeout
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 

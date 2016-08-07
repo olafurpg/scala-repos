@@ -134,10 +134,15 @@ private[akka] class Shard(typeName: String,
     extends Actor
     with ActorLogging {
 
-  import ShardRegion.{handOffStopperProps, EntityId, Msg, Passivate, ShardInitialized}
+  import ShardRegion.{
+    handOffStopperProps, EntityId, Msg, Passivate, ShardInitialized
+  }
   import ShardCoordinator.Internal.{HandOff, ShardStopped}
   import Shard.{State, RestartEntity, EntityStopped, EntityStarted}
-  import Shard.{ShardQuery, GetCurrentShardState, CurrentShardState, GetShardStats, ShardStats}
+  import Shard.{
+    ShardQuery, GetCurrentShardState, CurrentShardState, GetShardStats,
+    ShardStats
+  }
   import akka.cluster.sharding.ShardCoordinator.Internal.CoordinatorMessage
   import akka.cluster.sharding.ShardRegion.ShardRegionCommand
   import settings.tuningParameters._

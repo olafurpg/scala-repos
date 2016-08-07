@@ -102,7 +102,9 @@ class OAuthCalculator(consumerKey: ConsumerKey, requestToken: RequestToken)
     extends WSSignatureCalculator
     with SignatureCalculator {
 
-  import org.asynchttpclient.oauth.{ConsumerKey => AHCConsumerKey, RequestToken => AHCRequestToken}
+  import org.asynchttpclient.oauth.{
+    ConsumerKey => AHCConsumerKey, RequestToken => AHCRequestToken
+  }
 
   private val ahcConsumerKey =
     new AHCConsumerKey(consumerKey.key, consumerKey.secret)

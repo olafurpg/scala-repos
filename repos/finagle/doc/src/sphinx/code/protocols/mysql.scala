@@ -1,5 +1,7 @@
 import com.twitter.finagle.exp.Mysql
-import com.twitter.finagle.exp.mysql.{ResultSet, Row, QueryRequest, LongValue, IntValue}
+import com.twitter.finagle.exp.mysql.{
+  ResultSet, Row, QueryRequest, LongValue, IntValue
+}
 import com.twitter.util.Await
 import com.twitter.finagle.client.DefaultPool
 import com.twitter.conversions.time._

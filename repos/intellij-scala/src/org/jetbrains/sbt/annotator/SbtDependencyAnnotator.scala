@@ -5,12 +5,18 @@ import com.intellij.lang.annotation.{AnnotationHolder, Annotator}
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScInfixExpr, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScInfixExpr, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScLiteralImpl
 import org.jetbrains.plugins.scala.project.ProjectPsiElementExt
 import org.jetbrains.plugins.scala.util.NotificationUtil
-import org.jetbrains.sbt.annotator.quickfix.{SbtRefreshProjectQuickFix, SbtUpdateResolverIndexesQuickFix}
-import org.jetbrains.sbt.resolvers.{ResolverException, SbtResolverIndexesManager, SbtResolverUtils}
+import org.jetbrains.sbt.annotator.quickfix.{
+  SbtRefreshProjectQuickFix, SbtUpdateResolverIndexesQuickFix
+}
+import org.jetbrains.sbt.resolvers.{
+  ResolverException, SbtResolverIndexesManager, SbtResolverUtils
+}
 
 /**
   * @author Nikolay Obedin

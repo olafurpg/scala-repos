@@ -32,8 +32,8 @@ final class Messenger(socketHub: akka.actor.ActorRef,
   def owner(gameId: String, member: Member, text: String, socket: ActorRef) =
     chat !
       (member.userId match {
-            case Some(userId) =>
-              UserTalk(gameId, userId, text, socket, public = false)
-            case None => PlayerTalk(gameId, member.color.white, text, socket)
-          })
+        case Some(userId) =>
+          UserTalk(gameId, userId, text, socket, public = false)
+        case None => PlayerTalk(gameId, member.color.white, text, socket)
+      })
 }

@@ -4,7 +4,9 @@
 
 package akka.http.scaladsl.coding
 
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, ResponseEntity, RequestEntity}
+import akka.http.scaladsl.model.{
+  HttpRequest, HttpResponse, ResponseEntity, RequestEntity
+}
 import akka.util.ByteString
 import akka.stream.scaladsl.Flow
 

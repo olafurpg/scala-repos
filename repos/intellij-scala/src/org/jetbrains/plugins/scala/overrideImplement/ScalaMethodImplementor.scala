@@ -8,10 +8,14 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, PsiElement, PsiMember, PsiMethod}
 import com.intellij.util.Consumer
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.light.ScFunctionWrapper
-import org.jetbrains.plugins.scala.lang.psi.types.{PhysicalSignature, ScSubstitutor}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  PhysicalSignature, ScSubstitutor
+}
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 
 import scala.collection.mutable

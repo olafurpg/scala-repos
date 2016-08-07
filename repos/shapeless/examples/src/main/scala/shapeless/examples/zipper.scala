@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-14 Miles Sabin 
+ * Copyright (c) 2012-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package shapeless.examples
 
 /*
  * Examples of Zipper usage.
- * 
+ *
  * For some background see "Scrap Your Zippers: A Generic Zipper for
  * Heterogeneous Types", Michael D. Adams, School of Informatics and Computing,
  * Indiana University, http://www.cs.indiana.edu/~adamsmd/, presented at the
  * 2010 Workshop on Generic Programming.
- * 
+ *
  * The example below is taken from that paper, but the implementation is based
  * on HLists and so is probably more closely related to the one hypothesized in
  * section 6.1, Related Work, Generic Programming. Adams remarks "... it seems
@@ -33,7 +33,7 @@ package shapeless.examples
  * expressible". The implementation here can be taken as a demonstration that
  * in Scala at least the constraints are relatively straightforwardly
  * expressible.
- * 
+ *
  * @author Miles Sabin
  */
 object ZipperExamples extends App {

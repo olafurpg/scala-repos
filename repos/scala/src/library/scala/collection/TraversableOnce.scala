@@ -408,7 +408,6 @@ trait TraversableOnce[+A] extends Any with GenTraversableOnce[A] { self =>
     *      scala> val h = a.addString(b)
     *      h: StringBuilder = 1234
     * }}}
-
     *  @param  b    the string builder to which elements are appended.
     *  @return      the string builder `b` to which elements were appended.
     */

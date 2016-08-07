@@ -33,15 +33,11 @@ class ThisType {
 
 /*
 object ThisType extends ThisType
-
 class ThisType {
   type Ambig = scala.AbstractMethodError
-
   object InnerObj
-
   class Inner {
     type Ambig = ArrayIndexOutOfBoundsException
-
     val ambig1: Ambig = ???
     val ambig2: Ambig = ???
     val ambig3: ThisType.this.Ambig = ???
@@ -50,17 +46,13 @@ class ThisType {
     val ambig6: ThisType.Ambig = ???
     val ambig7: Inner#Ambig = ???
     val ambig8: ThisType.Inner#Ambig = ???
-
     val inner1: Inner = new Inner
     val inner2: Inner = new Inner
     val inner3: ThisType#Inner = new Inner
-
     val other = new ThisType
     val inner4: other.Inner = new other.Inner
     val inner5: other.Inner = new other.Inner
-
     val innerObj: InnerObj.type = InnerObj
-
     val outerthis: ThisType.this.type = ThisType.this
   }
 }

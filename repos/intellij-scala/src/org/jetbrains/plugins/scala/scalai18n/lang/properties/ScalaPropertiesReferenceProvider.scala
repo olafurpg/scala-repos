@@ -4,7 +4,9 @@ import com.intellij.lang.properties.IProperty
 import com.intellij.lang.properties.references.PropertyReference
 import com.intellij.psi._
 import com.intellij.util.ProcessingContext
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral
+}
 
 /**
   * @author Ksenia.Sautina

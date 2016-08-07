@@ -24,7 +24,9 @@ import net.liftweb.http.provider._
 import js._
 import net.liftweb.util.Helpers._
 import net.liftweb.json.JsonAST
-import java.io.{OutputStream, OutputStreamWriter, Writer, ByteArrayOutputStream}
+import java.io.{
+  OutputStream, OutputStreamWriter, Writer, ByteArrayOutputStream
+}
 
 /**
   * 200 response but without body.
@@ -394,8 +396,8 @@ sealed trait BasicResponse extends LiftResponse {
 
 /**
   * Wraps a LiftResponse along with a HTTP reason-phrase. The
-  * reason-phrase will be set in the HTTP status line after 
-  * the status code as per HTTP specifications. 
+  * reason-phrase will be set in the HTTP status line after
+  * the status code as per HTTP specifications.
   *
   * @param response - the response to be wrapped
   * @param reason - the reason-phrase

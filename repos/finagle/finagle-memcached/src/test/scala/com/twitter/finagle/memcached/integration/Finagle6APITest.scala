@@ -4,7 +4,9 @@ import _root_.java.io.ByteArrayOutputStream
 import _root_.java.lang.{Boolean => JBoolean}
 import com.twitter.common.application.ShutdownRegistry.ShutdownRegistryImpl
 import com.twitter.common.zookeeper.testing.ZooKeeperTestServer
-import com.twitter.common.zookeeper.{ServerSets, ZooKeeperClient, ZooKeeperUtils}
+import com.twitter.common.zookeeper.{
+  ServerSets, ZooKeeperClient, ZooKeeperUtils
+}
 import com.twitter.finagle.Memcached
 import com.twitter.finagle.cacheresolver.CachePoolConfig
 import com.twitter.finagle.memcached.PartitionedClient

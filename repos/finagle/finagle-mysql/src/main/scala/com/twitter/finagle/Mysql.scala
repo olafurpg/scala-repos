@@ -4,7 +4,10 @@ import com.twitter.finagle._
 import com.twitter.finagle.client.{StackClient, StdStackClient, DefaultPool}
 import com.twitter.finagle.exp.mysql._
 import com.twitter.finagle.exp.mysql.transport.{MysqlTransporter, Packet}
-import com.twitter.finagle.param.{Monitor => _, ResponseClassifier => _, ExceptionStatsHandler => _, Tracer => _, _}
+import com.twitter.finagle.param.{
+  Monitor => _, ResponseClassifier => _, ExceptionStatsHandler => _,
+  Tracer => _, _
+}
 import com.twitter.finagle.service.{ResponseClassifier, RetryBudget}
 import com.twitter.finagle.stats.{ExceptionStatsHandler, StatsReceiver}
 import com.twitter.finagle.tracing._

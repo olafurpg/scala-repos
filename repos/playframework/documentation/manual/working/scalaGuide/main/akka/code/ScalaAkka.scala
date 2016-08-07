@@ -64,8 +64,7 @@ package scalaguide.akka {
 
       "allow binding actor factories" in new WithApplication(
           _.bindings(new factorymodules.MyModule)
-            .configure("my.config" -> "foo")) {
-        _ =>
+            .configure("my.config" -> "foo")) { _ =>
         import play.api.inject.bind
         import akka.actor._
         import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -128,7 +127,7 @@ package scalaguide.akka {
 
       //...
     }
-//#controller  
+//#controller
   }
 
   package injection {

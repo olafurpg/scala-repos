@@ -5,7 +5,9 @@
 package akka.http.impl.server
 
 import akka.http.impl.util.JavaMapping
-import akka.http.javadsl.server.values.{PathMatcher, BasicCredentials, OAuth2Credentials}
+import akka.http.javadsl.server.values.{
+  PathMatcher, BasicCredentials, OAuth2Credentials
+}
 import akka.http.scaladsl.model.StatusCodes.Redirection
 import akka.http.scaladsl.server.util.TupleOps.Join
 import scala.language.implicitConversions
@@ -16,7 +18,11 @@ import akka.http.scaladsl.server.directives.{Credentials, ContentTypeResolver}
 import akka.http.scaladsl.server.directives.FileAndResourceDirectives.DirectoryRenderer
 import akka.http.scaladsl.model.HttpHeader
 import akka.http.scaladsl.model.headers.{HttpCookie, CustomHeader}
-import akka.http.scaladsl.server.{Route ⇒ ScalaRoute, Directive ⇒ ScalaDirective, PathMatcher ⇒ ScalaPathMatcher, PathMatcher1, Directive0, Directive1, Directives}
+import akka.http.scaladsl.server.{
+  Route ⇒ ScalaRoute, Directive ⇒ ScalaDirective,
+  PathMatcher ⇒ ScalaPathMatcher, PathMatcher1, Directive0, Directive1,
+  Directives
+}
 import akka.http.impl.util.JavaMapping.Implicits._
 import akka.http.scaladsl.server
 import akka.http.javadsl.server._

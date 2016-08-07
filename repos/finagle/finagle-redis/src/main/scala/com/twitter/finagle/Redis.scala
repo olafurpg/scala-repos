@@ -2,9 +2,14 @@ package com.twitter.finagle
 
 import com.twitter.finagle
 import com.twitter.finagle.client._
-import com.twitter.finagle.dispatch.{GenSerialClientDispatcher, PipeliningDispatcher}
+import com.twitter.finagle.dispatch.{
+  GenSerialClientDispatcher, PipeliningDispatcher
+}
 import com.twitter.finagle.netty3.Netty3Transporter
-import com.twitter.finagle.param.{Monitor => _, ResponseClassifier => _, ExceptionStatsHandler => _, Tracer => _, _}
+import com.twitter.finagle.param.{
+  Monitor => _, ResponseClassifier => _, ExceptionStatsHandler => _,
+  Tracer => _, _
+}
 import com.twitter.finagle.pool.SingletonPool
 import com.twitter.finagle.redis.protocol.{Command, Reply}
 import com.twitter.finagle.service.{ResponseClassifier, RetryBudget}

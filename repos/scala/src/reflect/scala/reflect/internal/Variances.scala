@@ -81,13 +81,13 @@ trait Variances { self: SymbolTable =>
            else if (isLocalOnly(sym)) Bivariant
            else if (sym.isAliasType)
              (// Unsound pre-2.11 behavior preserved under -Xsource:2.10
-              if (settings.isScala211 || sym.isOverridingSymbol) Invariant
-              else {
-                currentRun.reporting.deprecationWarning(
-                    sym.pos,
-                    s"Construct depends on unsound variance analysis and will not compile in scala 2.11 and beyond")
-                Bivariant
-              })
+             if (settings.isScala211 || sym.isOverridingSymbol) Invariant
+             else {
+               currentRun.reporting.deprecationWarning(
+                   sym.pos,
+                   s"Construct depends on unsound variance analysis and will not compile in scala 2.11 and beyond")
+               Bivariant
+             })
            else v)
         def loop(sym: Symbol, v: Variance): Variance =
           (if (sym == tvar.owner || v.isBivariant) v
@@ -115,8 +115,8 @@ trait Variances { self: SymbolTable =>
       override def mapOver(decls: Scope): Scope = {
         decls foreach
           (sym =>
-                withVariance(if (sym.isAliasType) Invariant else variance)(
-                    this(sym.info)))
+             withVariance(if (sym.isAliasType) Invariant else variance)(
+                 this(sym.info)))
         decls
       }
       private def resultTypeOnly(tp: Type) = tp match {

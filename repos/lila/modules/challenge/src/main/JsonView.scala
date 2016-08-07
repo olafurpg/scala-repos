@@ -32,15 +32,15 @@ final class JsonView(getLightUser: String => Option[lila.common.LightUser]) {
         "rated" -> c.mode.rated,
         "timeControl" ->
           (c.timeControl match {
-                case c @ TimeControl.Clock(l, i) =>
-                  Json.obj("type" -> "clock",
-                           "limit" -> l,
-                           "increment" -> i,
-                           "show" -> c.show)
-                case TimeControl.Correspondence(d) =>
-                  Json.obj("type" -> "correspondence", "daysPerTurn" -> d)
-                case TimeControl.Unlimited => Json.obj("type" -> "unlimited")
-              }),
+            case c @ TimeControl.Clock(l, i) =>
+              Json.obj("type" -> "clock",
+                       "limit" -> l,
+                       "increment" -> i,
+                       "show" -> c.show)
+            case TimeControl.Correspondence(d) =>
+              Json.obj("type" -> "correspondence", "daysPerTurn" -> d)
+            case TimeControl.Unlimited => Json.obj("type" -> "unlimited")
+          }),
         "color" -> c.colorChoice.toString.toLowerCase,
         "perf" -> Json.obj("icon" -> iconChar(c).toString,
                            "name" -> c.perfType.name)

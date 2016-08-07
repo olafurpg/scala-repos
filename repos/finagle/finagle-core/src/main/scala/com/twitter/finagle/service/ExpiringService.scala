@@ -2,7 +2,9 @@ package com.twitter.finagle.service
 
 import com.twitter.finagle.stats.{Counter, StatsReceiver}
 import com.twitter.finagle.util.AsyncLatch
-import com.twitter.finagle.{param, Service, ServiceFactory, ServiceProxy, Stack, Stackable}
+import com.twitter.finagle.{
+  param, Service, ServiceFactory, ServiceProxy, Stack, Stackable
+}
 import com.twitter.util.{Duration, Promise, Future, NullTimerTask, Timer, Time}
 import java.util.concurrent.atomic.AtomicBoolean
 

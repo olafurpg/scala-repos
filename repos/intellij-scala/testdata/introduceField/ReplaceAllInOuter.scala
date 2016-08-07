@@ -18,15 +18,12 @@ class Test {
 /*replaceAll*/
 class Test {
   var i: Int = 1
-
   object A {
     i
   }
-
   def foo() {
     i
   }
-
   i
 }
  */

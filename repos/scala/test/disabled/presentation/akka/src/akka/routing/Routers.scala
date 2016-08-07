@@ -8,8 +8,7 @@ import akka.actor.{UntypedActor, Actor, ActorRef}
 /**
   * A Dispatcher is a trait whose purpose is to route incoming messages to actors.
   */
-trait Dispatcher {
-  this: Actor =>
+trait Dispatcher { this: Actor =>
 
   protected def transform(msg: Any): Any = msg
 

@@ -429,7 +429,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     // If we don't exclude the "all AnyRef" specialization, we will
     // incur duplicate members and crash during mixin.
     loop(keys map concreteTypes) filterNot (_ forall (_ <:< AnyRefTpe)) map (xss =>
-          Map(keys zip xss: _*))
+                                                                               Map(keys zip xss: _*))
   }
 
   /** Does the given 'sym' need to be specialized in the environment 'env'?
@@ -522,7 +522,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
               sClass,
               tparam.flags,
               tparam.name append tpnme.SPECIALIZED_SUFFIX) modifyInfo (info =>
-                TypeBounds(info.bounds.lo, AnyRefTpe)))
+                                                                         TypeBounds(
+                                                                             info.bounds.lo,
+                                                                             AnyRefTpe)))
       .tpe
   }
 
@@ -698,9 +700,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
        */
       def enterMember(sym: Symbol): Symbol = {
         typeEnv(sym) = fullEnv ++ typeEnv(sym) // append the full environment
-        sym modifyInfo (_.substThis(clazz, sClass).instantiateTypeParams(
-                oldClassTParams,
-                newClassTParams map (_.tpe)))
+        sym modifyInfo (_.substThis(clazz, sClass)
+          .instantiateTypeParams(oldClassTParams, newClassTParams map (_.tpe)))
         // we remove any default parameters. At this point, they have been all
         // resolved by the type checker. Later on, erasure re-typechecks everything and
         // chokes if it finds default parameters for specialized members, even though
@@ -1069,7 +1070,12 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     // this method properly duplicates the symbol's info
     val specname = specializedName(nameSymbol orElse sym, env)
     (sym.cloneSymbol(owner, newFlags, newName = specname) modifyInfo (info =>
-              subst(env, info.asSeenFrom(owner.thisType, sym.owner))))
+                                                                        subst(
+                                                                            env,
+                                                                            info
+                                                                              .asSeenFrom(
+                                                                                  owner.thisType,
+                                                                                  sym.owner))))
   }
 
   /** For each method m that overrides an inherited method m', add a special
@@ -1329,9 +1335,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
 
   private def subst(env: TypeEnv)(decl: Symbol): Symbol =
     decl modifyInfo (info =>
-          if (decl.isConstructor)
-            MethodType(subst(env, info).params, decl.owner.tpe_*)
-          else subst(env, info))
+                       if (decl.isConstructor)
+                         MethodType(subst(env, info).params, decl.owner.tpe_*)
+                       else subst(env, info))
 
   private def unspecializableClass(tp: Type) = (
       isRepeatedParamType(tp) // ???

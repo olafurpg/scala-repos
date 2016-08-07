@@ -10,10 +10,8 @@ class Foo extends TestJava {
       case Some(error) =>
         ()
    }
-
   // THIS IS OK
   def foomethod2 : String = repeatParam("s","a");
-
   // THIS IS OK
   val aVal = repeatParam("1","2","3") */
 

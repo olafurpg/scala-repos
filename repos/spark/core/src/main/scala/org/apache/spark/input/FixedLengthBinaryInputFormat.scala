@@ -19,7 +19,9 @@ package org.apache.spark.input
 
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io.{BytesWritable, LongWritable}
-import org.apache.hadoop.mapreduce.{InputSplit, JobContext, RecordReader, TaskAttemptContext}
+import org.apache.hadoop.mapreduce.{
+  InputSplit, JobContext, RecordReader, TaskAttemptContext
+}
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 
 import org.apache.spark.internal.Logging

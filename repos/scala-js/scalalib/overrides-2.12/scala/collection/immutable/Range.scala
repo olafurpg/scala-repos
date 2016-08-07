@@ -32,7 +32,7 @@ import scala.collection.parallel.immutable.ParRange
   *  `init`) are also permitted on overfull ranges.
   *
   *  @param start      the start of this range.
-  *  @param end        the end of the range.  For exclusive ranges, e.g. 
+  *  @param end        the end of the range.  For exclusive ranges, e.g.
   *                    `Range(0,3)` or `(0 until 3)`, this is one
   *                    step past the last one in the range.  For inclusive
   *                    ranges, e.g. `Range.inclusive(0,3)` or `(0 to 3)`,

@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala.debugger.evaluation.evaluator
 
 import com.intellij.debugger.engine.evaluation.EvaluationContextImpl
-import com.intellij.debugger.engine.evaluation.expression.{DisableGC, Evaluator, Modifier}
+import com.intellij.debugger.engine.evaluation.expression.{
+  DisableGC, Evaluator, Modifier
+}
 import com.intellij.debugger.engine.{DebugProcess, DebugProcessImpl, JVMName}
 import com.intellij.debugger.impl.DebuggerUtilsEx
 import com.intellij.debugger.{DebuggerBundle, SourcePosition}

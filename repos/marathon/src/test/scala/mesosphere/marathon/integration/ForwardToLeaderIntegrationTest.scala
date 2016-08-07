@@ -4,7 +4,9 @@ import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
 import akka.actor.ActorSystem
-import mesosphere.marathon.api.{LeaderProxyFilter, JavaUrlConnectionRequestForwarder}
+import mesosphere.marathon.api.{
+  LeaderProxyFilter, JavaUrlConnectionRequestForwarder
+}
 import mesosphere.marathon.integration.setup._
 import org.apache.commons.httpclient.HttpStatus
 import org.scalatest.BeforeAndAfter

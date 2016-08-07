@@ -295,13 +295,11 @@ class BlockManagerReplicationSuite
     /*
       Create a system of three block managers / stores. One of them (say, failableStore)
       cannot receive blocks. So attempts to use that as replication target fails.
-
             +-----------/fails/-----------> failableStore
             |
         normalStore
             |
             +-----------/works/-----------> anotherNormalStore
-
         We are first going to add a normal block manager (i.e. normalStore) and the failable block
         manager (i.e. failableStore), and test whether 2x replication fails to create two
         copies of a block. Then we are going to add another normal block manager

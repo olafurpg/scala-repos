@@ -13,7 +13,6 @@ class Simple {
     testMethodName
     /*end*/
   }
-
   def testMethodName: Int = {
     1 + 1
     2 + 3

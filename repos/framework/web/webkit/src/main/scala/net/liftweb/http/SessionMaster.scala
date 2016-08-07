@@ -191,7 +191,7 @@ object SessionMaster extends LiftActor with Loggable {
     }
     S.init(Box !! req, liftSession) {
       liftSession.startSession()
-      LiftSession.afterSessionCreate.foreach(_ (liftSession, req))
+      LiftSession.afterSessionCreate.foreach(_(liftSession, req))
     }
 
     liftSession.httpSession.foreach(_.link(liftSession))

@@ -34,10 +34,11 @@ object Witness extends Dynamic {
   type Aux[T0] = Witness { type T = T0 }
   type Lt[Lub] = Witness { type T <: Lub }
 
-  implicit def apply[T]: Witness.Aux[T] = macro SingletonTypeMacros
-    .materializeImpl[T]
+  implicit def apply[T]: Witness.Aux[T] =
+    macro SingletonTypeMacros.materializeImpl[T]
 
-  implicit def apply[T](t: T): Witness.Lt[T] = macro SingletonTypeMacros.convertImpl
+  implicit def apply[T](t: T): Witness.Lt[T] =
+    macro SingletonTypeMacros.convertImpl
 
   def mkWitness[T0](value0: T0): Aux[T0] =
     new Witness {
@@ -56,7 +57,8 @@ object Witness extends Dynamic {
       val value = new Succ[P]()
     }
 
-  def selectDynamic(tpeSelector: String): Any = macro SingletonTypeMacros.witnessTypeImpl
+  def selectDynamic(tpeSelector: String): Any =
+    macro SingletonTypeMacros.witnessTypeImpl
 }
 
 trait WitnessWith[TC[_]] extends Witness {
@@ -64,17 +66,17 @@ trait WitnessWith[TC[_]] extends Witness {
 }
 
 trait LowPriorityWitnessWith {
-  implicit def apply2[H, TC2[_ <: H, _], S <: H, T](t: T): WitnessWith.Lt[
-      ({ type λ[X] = TC2[S, X] })#λ,
-      T] = macro SingletonTypeMacros.convertInstanceImpl2[H, TC2, S]
+  implicit def apply2[H, TC2[_ <: H, _], S <: H, T](
+      t: T): WitnessWith.Lt[({ type λ[X] = TC2[S, X] })#λ, T] =
+    macro SingletonTypeMacros.convertInstanceImpl2[H, TC2, S]
 }
 
 object WitnessWith extends LowPriorityWitnessWith {
   type Aux[TC[_], T0] = WitnessWith[TC] { type T = T0 }
   type Lt[TC[_], Lub] = WitnessWith[TC] { type T <: Lub }
 
-  implicit def apply1[TC[_], T](t: T): WitnessWith.Lt[TC, T] = macro SingletonTypeMacros
-    .convertInstanceImpl1[TC]
+  implicit def apply1[TC[_], T](t: T): WitnessWith.Lt[TC, T] =
+    macro SingletonTypeMacros.convertInstanceImpl1[TC]
 }
 
 trait NatWith[TC[_ <: Nat]] {
@@ -86,8 +88,8 @@ trait NatWith[TC[_ <: Nat]] {
 object NatWith {
   type Aux[TC[_ <: Nat], N0 <: Nat] = NatWith[TC] { type N = N0 }
 
-  implicit def apply[TC[_ <: Nat]](i: Any): NatWith[TC] = macro SingletonTypeMacros
-    .convertInstanceImplNat[TC]
+  implicit def apply[TC[_ <: Nat]](i: Any): NatWith[TC] =
+    macro SingletonTypeMacros.convertInstanceImplNat[TC]
 
   implicit def apply2[B, T <: B, TC[_ <: B, _ <: Nat]](i: Int): NatWith[({
         type λ[t <: Nat] = TC[T, t]
@@ -126,11 +128,11 @@ object Widen {
       def apply(t: T) = f(t)
     }
 
-  implicit def apply1[TC[_], T](t: T): WitnessWith.Lt[TC, T] = macro SingletonTypeMacros
-    .convertInstanceImpl1[TC]
+  implicit def apply1[TC[_], T](t: T): WitnessWith.Lt[TC, T] =
+    macro SingletonTypeMacros.convertInstanceImpl1[TC]
 
-  implicit def materialize[T, Out]: Aux[T, Out] = macro SingletonTypeMacros
-    .materializeWiden[T, Out]
+  implicit def materialize[T, Out]: Aux[T, Out] =
+    macro SingletonTypeMacros.materializeWiden[T, Out]
 }
 
 @macrocompat.bundle

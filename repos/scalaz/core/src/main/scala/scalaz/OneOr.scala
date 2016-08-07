@@ -12,7 +12,7 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
           case -\/(h) =>
             -\/(F.ap(h)(g))
           case \/-(h) =>
-            -\/(F.map(g)(_ (h)))
+            -\/(F.map(g)(_(h)))
         }
       case \/-(g) =>
         run match {

@@ -5,7 +5,9 @@ package akka.remote.transport.netty
 
 import akka.actor.Address
 import akka.remote.transport.AssociationHandle
-import akka.remote.transport.AssociationHandle.{HandleEventListener, InboundPayload}
+import akka.remote.transport.AssociationHandle.{
+  HandleEventListener, InboundPayload
+}
 import akka.remote.transport.Transport.AssociationEventListener
 import akka.util.ByteString
 import java.net.{SocketAddress, InetAddress, InetSocketAddress}

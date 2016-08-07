@@ -8,7 +8,9 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.annotator.quickfix.ReportHighlightingErrorQuickFix
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlockExpr, ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScTypePresentation
 
 /**

@@ -33,7 +33,6 @@ final case class ValueClass3(val value: Int) extends AnyVal
 class AnyThing
 case class SomeThing extends AnyThing // deprecation
 class OtherThing extends AnyThing
-
 // how you inherit caseness doesn't matter
 trait InThing extends SomeThing
 class MyThing extends InThing

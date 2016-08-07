@@ -7,9 +7,13 @@ import javax.ws.rs.core.{Context, Response}
 
 import mesosphere.marathon.MarathonConf
 import mesosphere.marathon.api.v2.json.Formats._
-import mesosphere.marathon.api.{MarathonMediaType, RequestFacade, ResponseFacade, RestResource}
+import mesosphere.marathon.api.{
+  MarathonMediaType, RequestFacade, ResponseFacade, RestResource
+}
 import mesosphere.marathon.core.plugin.PluginDefinitions
-import mesosphere.marathon.plugin.http.{HttpRequest, HttpRequestHandler, HttpResponse}
+import mesosphere.marathon.plugin.http.{
+  HttpRequest, HttpRequestHandler, HttpResponse
+}
 
 @Path("v2/plugins")
 class PluginsResource @Inject()(val config: MarathonConf,

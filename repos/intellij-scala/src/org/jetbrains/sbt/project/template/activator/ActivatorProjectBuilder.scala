@@ -3,11 +3,17 @@ package org.jetbrains.sbt.project.template.activator
 import java.io.File
 import javax.swing.Icon
 
-import com.intellij.ide.util.projectWizard.{ModuleBuilder, ModuleWizardStep, SdkSettingsStep, SettingsStep}
+import com.intellij.ide.util.projectWizard.{
+  ModuleBuilder, ModuleWizardStep, SdkSettingsStep, SettingsStep
+}
 import com.intellij.openapi.externalSystem.service.project.wizard.AbstractExternalModuleBuilder
-import com.intellij.openapi.externalSystem.settings.{AbstractExternalSystemSettings, ExternalSystemSettingsListener}
+import com.intellij.openapi.externalSystem.settings.{
+  AbstractExternalSystemSettings, ExternalSystemSettingsListener
+}
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
-import com.intellij.openapi.module.{JavaModuleType, ModifiableModuleModel, Module, ModuleType}
+import com.intellij.openapi.module.{
+  JavaModuleType, ModifiableModuleModel, Module, ModuleType
+}
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.projectRoots.{JavaSdk, SdkTypeId}

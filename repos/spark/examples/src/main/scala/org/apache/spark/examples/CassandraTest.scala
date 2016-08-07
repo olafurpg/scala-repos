@@ -144,19 +144,15 @@ object CassandraTest {
 /*
 create keyspace casDemo;
 use casDemo;
-
 create column family WordCount with comparator = UTF8Type;
 update column family WordCount with column_metadata =
   [{column_name: word, validation_class: UTF8Type},
     {column_name: wcount, validation_class: LongType}];
-
 create column family Words with comparator = UTF8Type;
 update column family Words with column_metadata =
   [{column_name: book, validation_class: UTF8Type},
     {column_name: para, validation_class: UTF8Type}];
-
 assume Words keys as utf8;
-
 set Words['3musk001']['book'] = 'The Three Musketeers';
 set Words['3musk001']['para'] = 'On the first Monday of the month of April, 1625, the market
   town of Meung, in which the author of ROMANCE OF THE ROSE was born, appeared to
@@ -167,7 +163,6 @@ set Words['3musk001']['para'] = 'On the first Monday of the month of April, 1625
  courage with a musket or a partisan, directed their steps toward the
  hostelry of the Jolly Miller, before which was gathered, increasing
  every minute, a compact group, vociferous and full of curiosity.';
-
 set Words['3musk002']['book'] = 'The Three Musketeers';
 set Words['3musk002']['para'] = 'In those times panics were common, and few days passed without
   some city or other registering in its archives an event of this kind. There were
@@ -183,7 +178,6 @@ set Words['3musk002']['para'] = 'In those times panics were common, and few days
   the red-and-yellow standard nor the livery of the Duc de Richelieu,
   rushed toward the hostel of the Jolly Miller. When arrived there, the
   cause of the hubbub was apparent to all';
-
 set Words['3musk003']['book'] = 'The Three Musketeers';
 set Words['3musk003']['para'] = 'You ought, I say, then, to husband the means you have, however
   large the sum may be; but you ought also to endeavor to perfect yourself in
@@ -195,8 +189,6 @@ set Words['3musk003']['para'] = 'You ought, I say, then, to husband the means yo
   branches, and dancing. You will make some desirable acquaintances; and
   from time to time you can call upon me, just to tell me how you are
   getting on, and to say whether I can be of further service to you.';
-
-
 set Words['thelostworld001']['book'] = 'The Lost World';
 set Words['thelostworld001']['para'] = 'She sat with that proud, delicate profile of hers outlined
   against the red curtain.  How beautiful she was!  And yet how aloof!  We had been
@@ -211,7 +203,6 @@ set Words['thelostworld001']['para'] = 'She sat with that proud, delicate profil
   figure--these, and not the unshrinking gaze and frank reply, are the
   true signals of passion.  Even in my short life I had learned as much
   as that--or had inherited it in that race memory which we call instinct.';
-
 set Words['thelostworld002']['book'] = 'The Lost World';
 set Words['thelostworld002']['para'] = 'I always liked McArdle, the crabbed, old, round-backed,
   red-headed news editor, and I rather hoped that he liked me.  Of course, Beaumont was
@@ -223,5 +214,4 @@ set Words['thelostworld002']['para'] = 'I always liked McArdle, the crabbed, old
   was above and beyond us.  But McArdle was his first lieutenant, and it
   was he that we knew.  The old man nodded as I entered the room, and he
   pushed his spectacles far up on his bald forehead.';
-
  */

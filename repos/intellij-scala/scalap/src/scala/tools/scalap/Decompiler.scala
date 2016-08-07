@@ -3,7 +3,9 @@ package scala.tools.scalap
 import java.io.{ByteArrayOutputStream, PrintStream}
 
 import scala.reflect.internal.pickling.ByteCodecs
-import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{Annotation, ArrayValue, ConstValueIndex}
+import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{
+  Annotation, ArrayValue, ConstValueIndex
+}
 import scala.tools.scalap.scalax.rules.scalasig._
 
 /**

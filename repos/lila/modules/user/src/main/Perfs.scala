@@ -170,13 +170,13 @@ case object Perfs {
     case Speed.Bullet =>
       perfs =>
         perfs.bullet
-      case Speed.Blitz =>
+    case Speed.Blitz =>
       perfs =>
         perfs.blitz
-      case Speed.Classical =>
+    case Speed.Classical =>
       perfs =>
         perfs.classical
-      case Speed.Correspondence =>
+    case Speed.Correspondence =>
       perfs =>
         perfs.correspondence
   }

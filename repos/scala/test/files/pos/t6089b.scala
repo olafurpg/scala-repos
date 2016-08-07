@@ -7,10 +7,10 @@ class BKTree {
     case BKTreeNode(v) => {
       val d = 1
       d == 0 || (Map(1 -> this, 2 -> this, 3 -> this) get d match {
-            case None => false
-            case Some(w) =>
-              w -?- a // can tail call here (since || is shortcutting)
-          })
+        case None => false
+        case Some(w) =>
+          w -?- a // can tail call here (since || is shortcutting)
+      })
     }
   }
 }

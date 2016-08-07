@@ -26,7 +26,10 @@ import kafka.utils.ZkUtils._
 import java.util.Random
 import java.util.Properties
 import org.apache.kafka.common.Node
-import org.apache.kafka.common.errors.{ReplicaNotAvailableException, InvalidTopicException, LeaderNotAvailableException}
+import org.apache.kafka.common.errors.{
+  ReplicaNotAvailableException, InvalidTopicException,
+  LeaderNotAvailableException
+}
 import org.apache.kafka.common.protocol.{Errors, SecurityProtocol}
 import org.apache.kafka.common.requests.MetadataResponse
 

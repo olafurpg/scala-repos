@@ -8,7 +8,9 @@ import language.postfixOps
 import akka.serialization.SerializationExtension
 import com.typesafe.config.ConfigFactory
 import akka.testkit.AkkaSpec
-import akka.actor.{Actor, Address, Props, Deploy, OneForOneStrategy, SupervisorStrategy}
+import akka.actor.{
+  Actor, Address, Props, Deploy, OneForOneStrategy, SupervisorStrategy
+}
 import akka.remote.{DaemonMsgCreate, RemoteScope}
 import akka.routing.{RoundRobinPool, FromConfig}
 import scala.concurrent.duration._

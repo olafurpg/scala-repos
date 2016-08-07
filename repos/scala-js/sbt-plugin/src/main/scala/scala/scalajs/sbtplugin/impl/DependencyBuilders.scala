@@ -57,7 +57,8 @@ trait DependencyBuilders {
 }
 
 final class ScalaJSGroupID private[sbtplugin] (private val groupID: String) {
-  def %%%(artifactID: String): CrossGroupArtifactID = macro ScalaJSGroupID.auto_impl
+  def %%%(artifactID: String): CrossGroupArtifactID =
+    macro ScalaJSGroupID.auto_impl
 
   def %%%!(artifactID: String): CrossGroupArtifactID =
     ScalaJSGroupID.withCross(this, artifactID, ScalaJSCrossVersion.binary)

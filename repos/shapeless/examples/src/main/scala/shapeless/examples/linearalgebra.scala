@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-14 Miles Sabin 
+ * Copyright (c) 2012-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package shapeless.examples
 
 /*
  * Proof of concept implementation of typesafe vectors of arbitrary dimension.
- * 
+ *
  * @author Miles Sabin
  */
 object LinearAlgebraExamples extends App {

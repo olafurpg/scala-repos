@@ -5,7 +5,9 @@ import com.intellij.codeInsight.editorActions.moveUpDown.{LineMover, LineRange}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.intellij.psi.{PsiElement, PsiFile}
-import org.jetbrains.plugins.hocon.editor.HoconObjectEntryMover.{PrefixModKey, PrefixModification}
+import org.jetbrains.plugins.hocon.editor.HoconObjectEntryMover.{
+  PrefixModKey, PrefixModification
+}
 import org.jetbrains.plugins.hocon.psi._
 
 import scala.annotation.tailrec
@@ -50,11 +52,11 @@ class HoconObjectEntryMover extends LineMover {
                               down: Boolean): Boolean =
     super.checkAvailable(editor, file, info, down) &&
       !editor.getSelectionModel.hasSelection && (file match {
-          case hoconFile: HoconPsiFile =>
-            checkAvailableHocon(editor, hoconFile, info, down)
-          case _ =>
-            false
-        })
+      case hoconFile: HoconPsiFile =>
+        checkAvailableHocon(editor, hoconFile, info, down)
+      case _ =>
+        false
+    })
 
   private def checkAvailableHocon(editor: Editor,
                                   file: HoconPsiFile,

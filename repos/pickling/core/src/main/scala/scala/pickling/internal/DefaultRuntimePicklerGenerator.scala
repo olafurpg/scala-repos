@@ -2,7 +2,10 @@ package scala.pickling
 package internal
 
 import java.util.concurrent.locks.ReentrantLock
-import scala.pickling.runtime.{InterpretedUnpicklerRuntime, ShareNothingInterpretedUnpicklerRuntime, RuntimePickler}
+import scala.pickling.runtime.{
+  InterpretedUnpicklerRuntime, ShareNothingInterpretedUnpicklerRuntime,
+  RuntimePickler
+}
 import scala.pickling.runtime.CustomRuntime._
 import scala.reflect.runtime.universe.Mirror
 import scala.reflect.runtime.{universe => ru}

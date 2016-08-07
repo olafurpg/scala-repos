@@ -63,7 +63,7 @@ class StringConverterSpec extends FlatSpec {
     }
   }
 
-  // Getting decimal and group separator from current Locale 
+  // Getting decimal and group separator from current Locale
   private val symbols = DecimalFormatSymbols.getInstance()
   val decimalSeparator = symbols.getDecimalSeparator
   val groupSeparator = symbols.getGroupingSeparator

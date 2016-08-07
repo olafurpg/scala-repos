@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.lang.completion.weighter
 
-import com.intellij.codeInsight.completion.{CompletionLocation, CompletionWeigher}
+import com.intellij.codeInsight.completion.{
+  CompletionLocation, CompletionWeigher
+}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil

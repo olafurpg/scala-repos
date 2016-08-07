@@ -1,6 +1,8 @@
 package com.twitter.finagle.util
 
-import java.net.{InetAddress, InetSocketAddress, SocketAddress, UnknownHostException}
+import java.net.{
+  InetAddress, InetSocketAddress, SocketAddress, UnknownHostException
+}
 
 object InetSocketAddressUtil {
 

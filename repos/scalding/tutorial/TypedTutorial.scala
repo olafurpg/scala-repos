@@ -5,17 +5,14 @@ import com.twitter.scalding._
 Scalding Tutorial ported to use the Type-safe API (TDsl)
 (rather than Cascading's Fields API). The examples here roughly correspond
 to those in `tutorial/Tutorial{0..5}.scala`.
-
 These tutorials are all run from this single file; which one is run can
 be chosen with a command-line flag "--tutorial". For instance, to run the
 first tutorial example:
-
 > ./scripts/scald.rb --local tutorial/TypedTutorial.scala \
       --tutorial 0 \
       --input tutorial/data/hello.txt \
       --output tutorial/data/output0.txt \
       --words tutorial/data/word_scores.tsv
-
 (Note: only tutorial 5 uses "word_scores.tsv")
   **/
 class TypedTutorial(args: Args) extends Job(args) {
@@ -90,16 +87,16 @@ class TypedTutorial(args: Args) extends Job(args) {
       // To count the words, we use TypedPipe's `groupBy` method.
       // However, this no longer returns a `TypedPipe[T]`, but rather
       // a `Grouped[K,T]` based on the type of the key used to group by.
-      // 
-      // groupBy accepts a function to determine the key for grouping. 
-      // In the case of word count, let's imagine we want to make sure 
-      // capitalization doesn't matter, so to come up with the key, 
+      //
+      // groupBy accepts a function to determine the key for grouping.
+      // In the case of word count, let's imagine we want to make sure
+      // capitalization doesn't matter, so to come up with the key,
       // we normalize it to lower case.
       val groups: Grouped[String, String] = words.groupBy(_.toLowerCase)
 
       // Next we specify what to do with each aggregation. In the case
       // of word count, we simply want the size of each group. This
-      // operation results in a new `Grouped` that has the key (String, 
+      // operation results in a new `Grouped` that has the key (String,
       // the lower case words), and the counts (Long).
       //
       // Note: To do more interesting aggregations, Scalding supports
@@ -110,7 +107,7 @@ class TypedTutorial(args: Args) extends Job(args) {
       // https://github.com/twitter/scalding/wiki/Type-safe-api-reference
       val counts = groups.size
 
-      // And finally, we dump these results to a TypedTsv with the 
+      // And finally, we dump these results to a TypedTsv with the
       // correct Tuple type.
       counts.write(TypedTsv[(String, Long)](args("output")))
     }
@@ -119,7 +116,6 @@ class TypedTutorial(args: Args) extends Job(args) {
     Tutorial 5: Demonstrate joins
     -----------------------------
     Associate a score with each word and compute a score for each line.
-    
     Note: this example is a bit contrived, but serves to demonstrate
     how to combine multiple input sources.
       **/
@@ -183,10 +179,9 @@ class TypedTutorial(args: Args) extends Job(args) {
     /**
     Interoperability with Fields API
     --------------------------------
-    Scalding also provides a thinner, un-type-safe wrapper over Cascading 
-    which is known as the Fields API because each record has a number of 
+    Scalding also provides a thinner, un-type-safe wrapper over Cascading
+    which is known as the Fields API because each record has a number of
     named "fields".
-    
     Most jobs can be done completely in the Typed API, but for compatibility,
     there are ways to go back and forth between the two schemes, which the
     next couple cases demonstrate.
@@ -201,12 +196,12 @@ class TypedTutorial(args: Args) extends Job(args) {
       // TextLine, by default, contains two fields: 'offset, and 'line.
       val rawPipe: Pipe = TextLine(args("input")).read
 
-      // To convert to a typed pipe, we must specify the fields we want 
+      // To convert to a typed pipe, we must specify the fields we want
       // and their types:
       val lines: TypedPipe[(Long, String)] =
         TypedPipe.from[(Long, String)](rawPipe, ('offset, 'line))
 
-      // We can operate on this typed pipe as above, and come up with a 
+      // We can operate on this typed pipe as above, and come up with a
       // different set of fields
       val lineSizes: TypedPipe[Long] = lines.map {
         case (offset, line) => line.length
@@ -224,7 +219,7 @@ class TypedTutorial(args: Args) extends Job(args) {
     -------------------
     An alternative to working completely in typed mode is to use
     `typed` blocks, which create a TypedPipe within the scope, and then
-    map the output back into an untyped Pipe. You specify the fields to 
+    map the output back into an untyped Pipe. You specify the fields to
     map in and out using the `->` pair passed to `typed()`.
       **/
     case "block" => {

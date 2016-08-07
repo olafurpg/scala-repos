@@ -17,7 +17,10 @@
 
 package org.apache.spark.serializer
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, FileInputStream, FileOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, FileInputStream,
+  FileOutputStream
+}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable

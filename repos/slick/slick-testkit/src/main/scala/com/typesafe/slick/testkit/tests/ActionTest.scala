@@ -1,6 +1,8 @@
 package com.typesafe.slick.testkit.tests
 
-import com.typesafe.slick.testkit.util.{StandardTestDBs, RelationalTestDB, AsyncTest}
+import com.typesafe.slick.testkit.util.{
+  StandardTestDBs, RelationalTestDB, AsyncTest
+}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future

@@ -5,7 +5,9 @@ import com.twitter.finagle.dispatch.GenSerialServerDispatcher
 import com.twitter.finagle.http._
 import com.twitter.finagle.http.netty.Bijections._
 import com.twitter.finagle.netty3.ChannelBufferBuf
-import com.twitter.finagle.stats.{StatsReceiver, DefaultStatsReceiver, RollupStatsReceiver}
+import com.twitter.finagle.stats.{
+  StatsReceiver, DefaultStatsReceiver, RollupStatsReceiver
+}
 import com.twitter.finagle.transport.Transport
 import com.twitter.io.{Reader, BufReader}
 import com.twitter.logging.Logger

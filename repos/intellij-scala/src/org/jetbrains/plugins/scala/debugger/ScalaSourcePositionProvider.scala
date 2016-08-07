@@ -3,7 +3,9 @@ package org.jetbrains.plugins.scala.debugger
 import com.intellij.debugger.SourcePosition
 import com.intellij.debugger.engine.SourcePositionProvider
 import com.intellij.debugger.impl.{DebuggerContextImpl, PositionUtil}
-import com.intellij.debugger.ui.tree.{FieldDescriptor, LocalVariableDescriptor, NodeDescriptor}
+import com.intellij.debugger.ui.tree.{
+  FieldDescriptor, LocalVariableDescriptor, NodeDescriptor
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.ScalaLanguage

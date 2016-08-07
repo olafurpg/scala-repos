@@ -1,7 +1,9 @@
 package org.scalatra
 package servlet
 
-import javax.servlet.{ServletContext, ServletContextEvent, ServletContextListener}
+import javax.servlet.{
+  ServletContext, ServletContextEvent, ServletContextListener
+}
 
 import grizzled.slf4j.Logger
 import org.scalatra.util.RicherString._

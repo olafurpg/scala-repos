@@ -56,7 +56,9 @@ class SwaggerWithAuth(val swaggerVersion: String,
 import org.scalatra.util.RicherString._
 
 object SwaggerAuthSerializers {
-  import org.scalatra.swagger.SwaggerSerializers.{dontAddOnEmpty, readDataType, writeDataType}
+  import org.scalatra.swagger.SwaggerSerializers.{
+    dontAddOnEmpty, readDataType, writeDataType
+  }
 
   def authFormats[T <: AnyRef](userOption: Option[T])(
       implicit mf: Manifest[T]): SwaggerFormats =
@@ -152,34 +154,34 @@ object SwaggerAuthSerializers {
               ("resourcePath" -> x.resourcePath) ~
               ("produces" ->
                     (x.produces match {
-                          case Nil => JNothing
-                          case e => Extraction.decompose(e)
-                        })) ~
+                      case Nil => JNothing
+                      case e => Extraction.decompose(e)
+                    })) ~
               ("consumes" ->
                     (x.consumes match {
-                          case Nil => JNothing
-                          case e => Extraction.decompose(e)
-                        })) ~
+                      case Nil => JNothing
+                      case e => Extraction.decompose(e)
+                    })) ~
               ("protocols" ->
                     (x.protocols match {
-                          case Nil => JNothing
-                          case e => Extraction.decompose(e)
-                        })) ~
+                      case Nil => JNothing
+                      case e => Extraction.decompose(e)
+                    })) ~
               ("authorizations" ->
                     (x.authorizations match {
-                          case Nil => JNothing
-                          case e => Extraction.decompose(e)
-                        })) ~
+                      case Nil => JNothing
+                      case e => Extraction.decompose(e)
+                    })) ~
               ("apis" ->
                     (x.apis match {
-                          case Nil => JNothing
-                          case e => Extraction.decompose(e)
-                        })) ~
+                      case Nil => JNothing
+                      case e => Extraction.decompose(e)
+                    })) ~
               ("models" ->
                     (x.models match {
-                          case x if x.isEmpty => JNothing
-                          case e => Extraction.decompose(e)
-                        }))
+                      case x if x.isEmpty => JNothing
+                      case e => Extraction.decompose(e)
+                    }))
         }))
 }
 

@@ -17,7 +17,9 @@
 package kafka.consumer
 
 import org.I0Itec.zkclient.ZkClient
-import kafka.server.{BrokerAndInitialOffset, AbstractFetcherThread, AbstractFetcherManager}
+import kafka.server.{
+  BrokerAndInitialOffset, AbstractFetcherThread, AbstractFetcherManager
+}
 import kafka.cluster.{BrokerEndPoint, Cluster}
 import org.apache.kafka.common.protocol.SecurityProtocol
 import scala.collection.immutable

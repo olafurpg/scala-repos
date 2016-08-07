@@ -8,7 +8,9 @@ import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.{VirtualFile, VirtualFileAdapter, VirtualFileEvent}
+import com.intellij.openapi.vfs.{
+  VirtualFile, VirtualFileAdapter, VirtualFileEvent
+}
 import org.jetbrains.sbt.project.SbtProjectSystem
 import org.jetbrains.sbt.settings.SbtSystemSettings
 

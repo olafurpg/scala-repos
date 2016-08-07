@@ -3,7 +3,9 @@ package com.twitter.finagle.loadbalancer
 import com.twitter.app.App
 import com.twitter.conversions.time._
 import com.twitter.finagle._
-import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver, InMemoryStatsReceiver}
+import com.twitter.finagle.stats.{
+  StatsReceiver, NullStatsReceiver, InMemoryStatsReceiver
+}
 import com.twitter.finagle.util.Rng
 import com.twitter.util.{Function => _, _}
 import org.junit.runner.RunWith

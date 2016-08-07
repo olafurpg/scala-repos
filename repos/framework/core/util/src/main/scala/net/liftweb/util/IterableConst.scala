@@ -35,7 +35,7 @@ final case class NodeSeqFuncIterableConst(it: Iterable[NodeSeq => NodeSeq])
     this(it: Iterable[NodeSeq => NodeSeq])
 
   def constList(nodeSeq: NodeSeq): Seq[NodeSeq] =
-    Helpers.ensureUniqueId(it.map(_ (nodeSeq)).toSeq)
+    Helpers.ensureUniqueId(it.map(_(nodeSeq)).toSeq)
 }
 
 /**
@@ -44,7 +44,7 @@ final case class NodeSeqFuncIterableConst(it: Iterable[NodeSeq => NodeSeq])
 final case class BoxNodeSeqFuncIterableConst(it: Box[NodeSeq => NodeSeq])
     extends IterableConst {
 
-  def constList(nodeSeq: NodeSeq): Seq[NodeSeq] = it.toList.map(_ (nodeSeq))
+  def constList(nodeSeq: NodeSeq): Seq[NodeSeq] = it.toList.map(_(nodeSeq))
 }
 
 /**
@@ -53,7 +53,7 @@ final case class BoxNodeSeqFuncIterableConst(it: Box[NodeSeq => NodeSeq])
 final case class OptionNodeSeqFuncIterableConst(it: Option[NodeSeq => NodeSeq])
     extends IterableConst {
 
-  def constList(nodeSeq: NodeSeq): Seq[NodeSeq] = it.toList.map(_ (nodeSeq))
+  def constList(nodeSeq: NodeSeq): Seq[NodeSeq] = it.toList.map(_(nodeSeq))
 }
 
 /**

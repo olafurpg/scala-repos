@@ -5,7 +5,10 @@ package akka
 
 import sbt._
 import com.typesafe.sbt.site.SphinxSupport
-import com.typesafe.sbt.site.SphinxSupport.{enableOutput, generatePdf, generatedPdf, generateEpub, generatedEpub, sphinxInputs, sphinxPackages, Sphinx}
+import com.typesafe.sbt.site.SphinxSupport.{
+  enableOutput, generatePdf, generatedPdf, generateEpub, generatedEpub,
+  sphinxInputs, sphinxPackages, Sphinx
+}
 import sbt.Keys._
 import com.typesafe.sbt.preprocess.Preprocess._
 import sbt.LocalProject
@@ -75,19 +78,19 @@ object SphinxDoc {
               "scalaVersion" -> s,
               "crossString" ->
                 (s match {
-                      case BinVer(_) => ""
-                      case _ => "cross CrossVersion.full"
-                    }),
+                  case BinVer(_) => ""
+                  case _ => "cross CrossVersion.full"
+                }),
               "jarName" ->
                 (s match {
-                      case BinVer(bv) => "akka-actor_" + bv + "-" + v + ".jar"
-                      case _ => "akka-actor_" + s + "-" + v + ".jar"
-                    }),
+                  case BinVer(bv) => "akka-actor_" + bv + "-" + v + ".jar"
+                  case _ => "akka-actor_" + s + "-" + v + ".jar"
+                }),
               "binVersion" ->
                 (s match {
-                      case BinVer(bv) => bv
-                      case _ => s
-                    }),
+                  case BinVer(bv) => bv
+                  case _ => s
+                }),
               "sigarVersion" -> Dependencies.Compile.sigar.revision,
               "sigarLoaderVersion" -> Dependencies.Compile.Provided.sigarLoader.revision,
               "github" -> GitHub.url(v)

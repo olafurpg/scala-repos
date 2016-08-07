@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -473,19 +473,19 @@ trait ValueRowFormat extends RowFormat with RowFormatSupport {
     def encodedSize(xs: List[CValue]) =
       xs.foldLeft(rawBitSetCodec.encodedSize(undefineds(xs))) { (acc, x) =>
         acc + (x match {
-              case x: CWrappedValue[_] =>
-                codecForCValueType(x.cType).encodedSize(x.value)
-              case _ => 0
-            })
+          case x: CWrappedValue[_] =>
+            codecForCValueType(x.cType).encodedSize(x.value)
+          case _ => 0
+        })
       }
 
     override def maxSize(xs: List[CValue]) =
       xs.foldLeft(rawBitSetCodec.maxSize(undefineds(xs))) { (acc, x) =>
         acc + (x match {
-              case x: CWrappedValue[_] =>
-                codecForCValueType(x.cType).maxSize(x.value)
-              case _ => 0
-            })
+          case x: CWrappedValue[_] =>
+            codecForCValueType(x.cType).maxSize(x.value)
+          case _ => 0
+        })
       }
 
     def writeUnsafe(xs: List[CValue], sink: ByteBuffer) {
@@ -529,8 +529,10 @@ trait ValueRowFormat extends RowFormat with RowFormatSupport {
 
     def writeMore(more: S, sink: ByteBuffer) = more match {
       case (Left(s), xs) =>
-        rawBitSetCodec.writeMore(s, sink) map (s =>
-              (Left(s), xs)) orElse writeCValues(xs, sink)
+        rawBitSetCodec
+          .writeMore(s, sink) map (s => (Left(s), xs)) orElse writeCValues(
+            xs,
+            sink)
       case (Right(s), xs) =>
         s.more(sink) map (s => (Right(s), xs)) orElse writeCValues(xs, sink)
     }

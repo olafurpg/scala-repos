@@ -6,7 +6,9 @@ import javax.swing.Icon
 import com.intellij.ide.IdeView
 import com.intellij.ide.actions.CreateTemplateInPackageAction
 import com.intellij.ide.fileTemplates.{FileTemplateManager, JavaTemplateUtil}
-import com.intellij.openapi.actionSystem.{CommonDataKeys, DataContext, LangDataKeys}
+import com.intellij.openapi.actionSystem.{
+  CommonDataKeys, DataContext, LangDataKeys
+}
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project

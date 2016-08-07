@@ -18,9 +18,7 @@ object crashing {
   }
 }
 /*
-
 Infinite loop in Typer.addLocals. Printing all calls to it:
-
 addLocals: Unit
 addLocals: this.T[A]
 addLocals: java.lang.Object with crashing.C{ ... }
@@ -31,5 +29,4 @@ addLocals: >: Nothing <: java.lang.Object with ScalaObject{def f[Z](this.T[Z]): 
 [...]
  *
   C { type T[A] <: { def f[Z]: T[Z] => T[A] } }
-
  */

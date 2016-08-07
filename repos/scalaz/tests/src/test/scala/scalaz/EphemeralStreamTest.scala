@@ -100,7 +100,7 @@ object EphemeralStreamTest extends SpecLite {
       .tails
       .map(t => Foldable[EphemeralStream].toStream(t.take(n)))
       .take(n) must_=== (EphemeralStream.fromStream(
-            Stream.iterate(0)(_ + 1).tails.map(_ take n).toStream.take(n)))
+        Stream.iterate(0)(_ + 1).tails.map(_ take n).toStream.take(n)))
   }
 
   "foldMap evaluates lazily" in {
@@ -123,8 +123,8 @@ object EphemeralStreamTest extends SpecLite {
     F.zipL(infinite, infinite)
     F.zipL(finite, infinite).length must_=== (size)
     F.zipL(finite, infinite) must_=== ((finite zip infinite).map { x =>
-          (x._1, Option(x._2))
-        })
+      (x._1, Option(x._2))
+    })
     F.zipL(infinite, finite).take(1000).length must_=== (1000)
     F.zipL(infinite, finite).takeWhile(_._2.isDefined).length must_=== (size)
   }
@@ -138,6 +138,6 @@ object EphemeralStreamTest extends SpecLite {
     val n = util.Random.nextInt(1000)
     EphemeralStream.iterate(0)(_ + 1).zipWithIndex.take(n) must_===
       (EphemeralStream.fromStream(
-              Stream.iterate(0)(_ + 1).zipWithIndex.take(n)))
+          Stream.iterate(0)(_ + 1).zipWithIndex.take(n)))
   }
 }

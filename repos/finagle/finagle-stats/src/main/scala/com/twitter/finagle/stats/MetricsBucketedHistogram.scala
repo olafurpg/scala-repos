@@ -1,6 +1,8 @@
 package com.twitter.finagle.stats
 
-import com.twitter.common.metrics.{Histogram, HistogramInterface, Percentile, Snapshot}
+import com.twitter.common.metrics.{
+  Histogram, HistogramInterface, Percentile, Snapshot
+}
 import com.twitter.conversions.time._
 import com.twitter.util.{Duration, Time}
 import java.util.concurrent.atomic.AtomicReference

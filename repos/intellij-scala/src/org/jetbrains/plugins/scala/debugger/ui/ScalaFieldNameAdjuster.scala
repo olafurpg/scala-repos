@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.debugger.ui
 
-import com.intellij.debugger.ui.tree.{FieldDescriptor, NodeDescriptor, NodeDescriptorNameAdjuster}
+import com.intellij.debugger.ui.tree.{
+  FieldDescriptor, NodeDescriptor, NodeDescriptorNameAdjuster
+}
 import com.sun.jdi.{ClassType, ReferenceType}
 import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil
 import org.jetbrains.plugins.scala.debugger.ui.ScalaFieldNameAdjuster.objectSuffix

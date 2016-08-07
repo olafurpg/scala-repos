@@ -130,7 +130,7 @@ abstract class TreeCheckers extends Analyzer {
         else
           movedMsgs +=
             ("\n** %s moved:\n** Previously:\n%s\n** Currently:\n%s"
-                  .format(ownerstr(sym), s1 mkString ", ", s2))
+              .format(ownerstr(sym), s1 mkString ", ", s2))
       }
     }
 
@@ -465,10 +465,10 @@ abstract class TreeCheckers extends Analyzer {
 
         referencedSymbols foreach
           (sym =>
-                if (!reportedAlready((tree, sym))) {
-                  errorFn("\n" + mkErrorMsg(sym))
-                  reportedAlready += ((tree, sym))
-              })
+             if (!reportedAlready((tree, sym))) {
+               errorFn("\n" + mkErrorMsg(sym))
+               reportedAlready += ((tree, sym))
+             })
       }
 
       private def checkReturnReferencesDirectlyEnclosingDef(tree: Tree): Unit =

@@ -14,7 +14,9 @@ import scala.reflect.internal.pickling.ByteCodecs
 import scala.reflect.internal.util.ScalaClassLoader
 import scala.reflect.internal.util.ScalaClassLoader.appLoader
 import scala.tools.scalap.Main.{BYTES_VALUE, SCALA_SIG_ANNOTATION}
-import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{Annotation, ConstValueIndex}
+import scala.tools.scalap.scalax.rules.scalasig.ClassFileParser.{
+  Annotation, ConstValueIndex
+}
 import scala.tools.scalap.scalax.rules.scalasig._
 
 /** Temporary decoder.  This would be better off in the scala.tools.nsc

@@ -108,7 +108,7 @@ abstract class SFXEnumDelegateSpec[E <: java.lang.Enum[E],
   override protected def getJavaClassInstance = javaEnumConstants.iterator.next
 
   /////////////////
-  // TESTS - BEGIN 
+  // TESTS - BEGIN
   /////////////////
 
   it should "declare all public declared methods of " + javaClass.getName in {
@@ -148,6 +148,6 @@ abstract class SFXEnumDelegateSpec[E <: java.lang.Enum[E],
   }
 
   ///////////////
-  // TESTS - END 
+  // TESTS - END
   ///////////////
 }
