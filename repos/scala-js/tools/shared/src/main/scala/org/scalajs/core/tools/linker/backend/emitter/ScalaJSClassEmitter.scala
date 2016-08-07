@@ -774,7 +774,7 @@ private[scalajs] final class ScalaJSClassEmitter(
     assert(tree.kind.isClass)
 
     encodeClassVar(tree.name.name).prototype DOT "$classData" :=
-    envField("d", tree.name.name)
+      envField("d", tree.name.name)
   }
 
   def genModuleAccessor(tree: LinkedClass): js.Tree = {
@@ -963,8 +963,8 @@ private[scalajs] final class ScalaJSClassEmitter(
     for (i <- 0 until parts.length - 1) {
       namespace = genBracketSelect(namespace, js.StringLiteral(parts(i)))
       statements +=
-      js.Assign(namespace,
-                js.BinaryOp(JSBinaryOp.||, namespace, js.ObjectConstr(Nil)))
+        js.Assign(namespace,
+                  js.BinaryOp(JSBinaryOp.||, namespace, js.ObjectConstr(Nil)))
     }
     val lhs = genBracketSelect(namespace, js.StringLiteral(parts.last))
     (js.Block(statements.result()), lhs)
@@ -974,6 +974,6 @@ private[scalajs] final class ScalaJSClassEmitter(
 private object ScalaJSClassEmitter {
   private val ClassesWhoseDataReferToTheirInstanceTests = {
     Definitions.AncestorsOfHijackedClasses + Definitions.ObjectClass +
-    Definitions.StringClass
+      Definitions.StringClass
   }
 }

@@ -174,17 +174,17 @@ class Tools[C <: Context](val c: C) {
             // NOTE: only looking for top-level classes!
             val pkgMembers = pkg.typeSignature.members
             pkgMembers foreach
-            (m => {
-                  def analyze(m: Symbol): Unit = {
-                    if (m.name.decoded.contains("$")) () // SI-7251
-                    else if (m.isClass)
-                      m.asClass.baseClasses foreach
-                      (bc => updateCache(bc, m))
-                    else if (m.isModule) analyze(m.asModule.moduleClass)
-                    else ()
-                  }
-                  analyze(m)
-                })
+              (m => {
+                    def analyze(m: Symbol): Unit = {
+                      if (m.name.decoded.contains("$")) () // SI-7251
+                      else if (m.isClass)
+                        m.asClass.baseClasses foreach
+                          (bc => updateCache(bc, m))
+                      else if (m.isModule) analyze(m.asModule.moduleClass)
+                      else ()
+                    }
+                    analyze(m)
+                  })
             def recurIntoPackage(pkg: Symbol) = {
               pkg.name.toString != "_root_" &&
               pkg.name.toString != "quicktime" &&

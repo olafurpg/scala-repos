@@ -882,7 +882,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
     val lastPow = BigTenPows.length - 1
     val (integralValue, varScale) = {
       if ((divisor.approxPrecision() + newScale > this.approxPrecision() +
-              1L) || this.isZero) {
+                1L) || this.isZero) {
         // If the divisor's integer part is greater than this's integer part,
         // the result must be zero with the appropriate scale
         (BigInteger.ZERO, 0L)
@@ -1406,7 +1406,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
         } else {
           delta = begin - delta
           result +=
-          intStr.substring(begin, delta) + "." + intStr.substring(delta)
+            intStr.substring(begin, delta) + "." + intStr.substring(delta)
         }
       } else {
         // (scale <= 0)

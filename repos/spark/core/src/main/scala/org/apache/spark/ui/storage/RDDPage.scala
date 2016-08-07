@@ -270,8 +270,8 @@ private[ui] class BlockPagedTable(basePath: String,
   override def pageLink(page: Int): String = {
     val encodedSortColumn = URLEncoder.encode(sortColumn, "UTF-8")
     basePath + s"&$pageNumberFormField=$page" +
-    s"&block.sort=$encodedSortColumn" + s"&block.desc=$desc" +
-    s"&$pageSizeFormField=$pageSize"
+      s"&block.sort=$encodedSortColumn" + s"&block.desc=$desc" +
+      s"&$pageSizeFormField=$pageSize"
   }
 
   override def goButtonFormPath: String = {

@@ -348,10 +348,10 @@ trait IssuesService { self: AccountService =>
       (IssueLabels filter { t2 =>
             (t2.byIssue(t1.userName, t1.repositoryName, t1.issueId)) &&
             (t2.labelId in
-                (Labels filter { t3 =>
-                      (t3.byRepository(t1.userName, t1.repositoryName)) &&
-                      (t3.labelName inSetBind condition.labels)
-                    } map (_.labelId)))
+                  (Labels filter { t3 =>
+                        (t3.byRepository(t1.userName, t1.repositoryName)) &&
+                        (t3.labelName inSetBind condition.labels)
+                      } map (_.labelId)))
           } exists, condition.labels.nonEmpty) && // Visibility filter
       (Repositories filter { t2 =>
             (t2.byRepository(t1.userName, t1.repositoryName)) &&

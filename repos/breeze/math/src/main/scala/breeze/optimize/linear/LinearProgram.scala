@@ -48,7 +48,7 @@ class LinearProgram {
       ("maximize    " + objective + {
             if (constraints.nonEmpty) {
               "\nsubject to  " +
-              constraints.mkString("\n" + " " * "subject to  ".length)
+                constraints.mkString("\n" + " " * "subject to  ".length)
             } else ""
           })
   }

@@ -190,7 +190,7 @@ private[testutil] trait AbstractComparator extends Assertions {
     }
 
     classParameterToString(m.getReturnType) + " " + m.getName + "(" +
-    strParameters + ")"
+      strParameters + ")"
   }
 
   private val nameComparator: (Method, Method) => Boolean = (m1, m2) =>

@@ -55,11 +55,11 @@ abstract class NodeLeavingAndExitingAndBeingRemovedSpec
           // verify that the 'second' node is no longer part of the 'members'/'unreachable' set
           awaitAssert {
             clusterView.members.map(_.address) should not contain
-            (address(second))
+              (address(second))
           }
           awaitAssert {
             clusterView.unreachableMembers.map(_.address) should not contain
-            (address(second))
+              (address(second))
           }
         }
 

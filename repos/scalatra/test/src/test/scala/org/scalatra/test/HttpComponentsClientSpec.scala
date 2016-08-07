@@ -53,19 +53,19 @@ class HttpComponentsClientSpec
   "client" should {
     "support all HTTP methods" in {
       (doVerbGetActual("PUT") must equalTo("PUT")) and
-      (doVerbGetActual("POST") must equalTo("POST")) and
-      (doVerbGetActual("TRACE") must equalTo("TRACE")) and
-      (doVerbGetActual("GET") must equalTo("GET")) and
-      (doVerbGetActual("HEAD") must equalTo("HEAD")) and
-      (doVerbGetActual("OPTIONS") must equalTo("OPTIONS")) and
-      (doVerbGetActual("DELETE") must equalTo("DELETE")) and
-      (doVerbGetActual("PATCH") must equalTo("PATCH"))
+        (doVerbGetActual("POST") must equalTo("POST")) and
+        (doVerbGetActual("TRACE") must equalTo("TRACE")) and
+        (doVerbGetActual("GET") must equalTo("GET")) and
+        (doVerbGetActual("HEAD") must equalTo("HEAD")) and
+        (doVerbGetActual("OPTIONS") must equalTo("OPTIONS")) and
+        (doVerbGetActual("DELETE") must equalTo("DELETE")) and
+        (doVerbGetActual("PATCH") must equalTo("PATCH"))
     }
 
     "submit query string parameters" in {
       get("/", Map("param1" -> "value1", "param2" -> "value2")) {
         (header("Request-Param-param1") must equalTo("value1")) and
-        (header("Request-Param-param2") must equalTo("value2"))
+          (header("Request-Param-param2") must equalTo("value2"))
       }
     }
 
@@ -77,9 +77,9 @@ class HttpComponentsClientSpec
 
     "submit body for POST/PUT/PATCH requests" in {
       (doReqWithBody("POST", "post test") must equalTo("received: post test")) and
-      (doReqWithBody("PUT", "put test") must equalTo("received: put test")) and
-      (doReqWithBody("PATCH", "patch test") must equalTo(
-              "received: patch test"))
+        (doReqWithBody("PUT", "put test") must equalTo("received: put test")) and
+        (doReqWithBody("PATCH", "patch test") must equalTo(
+                "received: patch test"))
     }
   }
 

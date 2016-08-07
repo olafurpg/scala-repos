@@ -48,6 +48,6 @@ case class StructField(name: String,
 
   private[sql] def jsonValue: JValue = {
     ("name" -> name) ~ ("type" -> dataType.jsonValue) ~
-    ("nullable" -> nullable) ~ ("metadata" -> metadata.jsonValue)
+      ("nullable" -> nullable) ~ ("metadata" -> metadata.jsonValue)
   }
 }

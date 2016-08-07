@@ -51,7 +51,7 @@ class ContentSecurityPolicySpec extends Specification {
   "ContentSecurityPolicy" should {
     "default to accepting images from everywhere" in {
       ContentSecurityPolicy().imageSources must_==
-      List(ContentSourceRestriction.All)
+        List(ContentSourceRestriction.All)
     }
 
     "default to allowing script eval and script sources only from self" in {
@@ -63,7 +63,7 @@ class ContentSecurityPolicySpec extends Specification {
 
     "default to allowing everything else only from self" in {
       ContentSecurityPolicy().defaultSources must_==
-      List(ContentSourceRestriction.Self)
+        List(ContentSourceRestriction.Self)
       ContentSecurityPolicy().connectSources must_== Nil
       ContentSecurityPolicy().fontSources must_== Nil
       ContentSecurityPolicy().frameSources must_== Nil
@@ -74,7 +74,7 @@ class ContentSecurityPolicySpec extends Specification {
 
     "provide a secure setting that drops image sources to the default restrictions" in {
       ContentSecurityPolicy.secure.defaultSources must_==
-      List(ContentSourceRestriction.Self)
+        List(ContentSourceRestriction.Self)
       ContentSecurityPolicy.secure.imageSources must_== Nil
       ContentSecurityPolicy.secure.connectSources must_== Nil
       ContentSecurityPolicy.secure.fontSources must_== Nil
@@ -86,7 +86,7 @@ class ContentSecurityPolicySpec extends Specification {
 
     "default to reporting to the CSP default report URI" in {
       ContentSecurityPolicy().reportUri must_==
-      Some(ContentSecurityPolicy.defaultReportUri)
+        Some(ContentSecurityPolicy.defaultReportUri)
     }
 
     "provide [X-]Content-Security-Policy if enforcement is enabled" in {
@@ -210,7 +210,7 @@ class FrameRestrictionsSpec extends Specification {
   "FrameRestrictions" should {
     "provide the correct X-Frame-Options setting for SameOrigin restrictions" in {
       FrameRestrictions.SameOrigin.headers must_==
-      List("X-Frame-Options" -> "SAMEORIGIN")
+        List("X-Frame-Options" -> "SAMEORIGIN")
     }
 
     "provide the correct X-Frame-Options setting for Deny restrictions" in {
@@ -231,7 +231,7 @@ class SecurityRulesSpec extends Specification {
 
     "default to same-origin frame restrictions" in {
       SecurityRules().frameRestrictions must_==
-      Some(FrameRestrictions.SameOrigin)
+        Some(FrameRestrictions.SameOrigin)
     }
 
     "default to enforcing in no modes and logging in all modes" in {

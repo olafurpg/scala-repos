@@ -46,62 +46,61 @@ abstract class Optimizer extends RuleExecutor[LogicalPlan] {
         EliminateSubqueryAliases,
         ComputeCurrentTime,
         DistinctAggregationRewriter) :: //////////////////////////////////////////////////////////////////////////////////////////
-    // Optimizer rules start here
-    //////////////////////////////////////////////////////////////////////////////////////////
-    // - Do the first call of CombineUnions before starting the major Optimizer rules,
-    //   since it can reduce the number of iteration and the other rules could add/move
-    //   extra operators between two adjacent Union operators.
-    // - Call CombineUnions again in Batch("Operator Optimizations"),
-    //   since the other rules might make two separate Unions operators adjacent.
-    Batch("Union", Once, CombineUnions) :: Batch(
-        "Replace Operators",
-        FixedPoint(100),
-        ReplaceIntersectWithSemiJoin,
-        ReplaceDistinctWithAggregate) :: Batch(
-        "Aggregate",
-        FixedPoint(100),
-        RemoveLiteralFromGroupExpressions) :: Batch(
-        "Operator Optimizations",
-        FixedPoint(100),
-        // Operator push down
-        SetOperationPushDown,
-        SamplePushDown,
-        ReorderJoin,
-        OuterJoinElimination,
-        PushPredicateThroughJoin,
-        PushPredicateThroughProject,
-        PushPredicateThroughGenerate,
-        PushPredicateThroughAggregate,
-        LimitPushDown,
-        ColumnPruning,
-        InferFiltersFromConstraints,
-        // Operator combine
-        CollapseRepartition,
-        CollapseProject,
-        CombineFilters,
-        CombineLimits,
-        CombineUnions,
-        // Constant folding and strength reduction
-        NullPropagation,
-        OptimizeIn,
-        ConstantFolding,
-        LikeSimplification,
-        BooleanSimplification,
-        SimplifyConditionals,
-        RemoveDispensableExpressions,
-        PruneFilters,
-        EliminateSorts,
-        SimplifyCasts,
-        SimplifyCaseConversionExpressions,
-        EliminateSerialization) :: Batch(
-        "Decimal Optimizations",
-        FixedPoint(100),
-        DecimalAggregates) :: Batch("LocalRelation",
-                                    FixedPoint(100),
-                                    ConvertToLocalRelation) :: Batch(
-        "Subquery",
-        Once,
-        OptimizeSubqueries) :: Nil
+      // Optimizer rules start here
+      //////////////////////////////////////////////////////////////////////////////////////////
+      // - Do the first call of CombineUnions before starting the major Optimizer rules,
+      //   since it can reduce the number of iteration and the other rules could add/move
+      //   extra operators between two adjacent Union operators.
+      // - Call CombineUnions again in Batch("Operator Optimizations"),
+      //   since the other rules might make two separate Unions operators adjacent.
+      Batch("Union", Once, CombineUnions) :: Batch(
+          "Replace Operators",
+          FixedPoint(100),
+          ReplaceIntersectWithSemiJoin,
+          ReplaceDistinctWithAggregate) :: Batch(
+          "Aggregate",
+          FixedPoint(100),
+          RemoveLiteralFromGroupExpressions) :: Batch(
+          "Operator Optimizations",
+          FixedPoint(100),
+          // Operator push down
+          SetOperationPushDown,
+          SamplePushDown,
+          ReorderJoin,
+          OuterJoinElimination,
+          PushPredicateThroughJoin,
+          PushPredicateThroughProject,
+          PushPredicateThroughGenerate,
+          PushPredicateThroughAggregate,
+          LimitPushDown,
+          ColumnPruning,
+          InferFiltersFromConstraints,
+          // Operator combine
+          CollapseRepartition,
+          CollapseProject,
+          CombineFilters,
+          CombineLimits,
+          CombineUnions,
+          // Constant folding and strength reduction
+          NullPropagation,
+          OptimizeIn,
+          ConstantFolding,
+          LikeSimplification,
+          BooleanSimplification,
+          SimplifyConditionals,
+          RemoveDispensableExpressions,
+          PruneFilters,
+          EliminateSorts,
+          SimplifyCasts,
+          SimplifyCaseConversionExpressions,
+          EliminateSerialization) :: Batch("Decimal Optimizations",
+                                           FixedPoint(100),
+                                           DecimalAggregates) :: Batch(
+          "LocalRelation",
+          FixedPoint(100),
+          ConvertToLocalRelation) :: Batch("Subquery",
+                                           Once,
+                                           OptimizeSubqueries) :: Nil
   }
 
   /**

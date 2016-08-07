@@ -101,7 +101,7 @@ class FlowExpandSpec extends AkkaSpec {
       }.expand(Iterator.continually(_)).runFold(Set.empty[Int])(_ + _)
 
       Await.result(future, 10.seconds) should contain theSameElementsAs
-      (1 to 100).toSet
+        (1 to 100).toSet
     }
 
     "backpressure publisher when subscriber is slower" in {

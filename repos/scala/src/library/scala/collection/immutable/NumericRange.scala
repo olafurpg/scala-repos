@@ -221,10 +221,10 @@ abstract class NumericRange[T](
         val nre = num fromInt numRangeElements
         if (a > 1e38 || b > 1e38)
           nre * ((head / two) +
-              (last / two)) // Compute in parts to avoid Infinity if possible
+                (last / two)) // Compute in parts to avoid Infinity if possible
         else
           (nre / two) * (head +
-              last) // Don't need to worry about infinity; this will be more accurate and avoid underflow
+                last) // Don't need to worry about infinity; this will be more accurate and avoid underflow
       } else if ((num eq scala.math.Numeric.BigIntIsIntegral) ||
                  (num eq scala.math.Numeric.BigDecimalIsFractional)) {
         // No overflow, so we can use arithmetic series formula directly

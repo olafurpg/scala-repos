@@ -81,7 +81,7 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     check(Prop.forAll { (a: Double, b: Double, c: Double) =>
       Seq(a, b, c).exists(x => x > 1E300 || x < -1E300) ||
       (a + softmax(b, c)) =~=
-      (softmax(a + b, a + c))
+        (softmax(a + b, a + c))
     })
   }
 

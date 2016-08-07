@@ -40,7 +40,7 @@ object ISetTest extends SpecLite {
   "findRight" ! forAll { a: ISet[Int] =>
     val f = (_: Int) % 3 == 0
     Foldable[ISet].findRight(a)(f) must_===
-    Foldable[List].findRight(a.toList)(f)
+      Foldable[List].findRight(a.toList)(f)
   }
 
   "index" ! forAll { (a: ISet[Int], i: Byte) =>

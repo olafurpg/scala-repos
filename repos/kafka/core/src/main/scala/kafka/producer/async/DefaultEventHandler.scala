@@ -79,7 +79,7 @@ class DefaultEventHandler[K, V](
     while (remainingRetries > 0 && outstandingProduceRequests.size > 0) {
       topicMetadataToRefresh ++= outstandingProduceRequests.map(_.topic)
       if (topicMetadataRefreshInterval >= 0 && SystemTime.milliseconds -
-          lastTopicMetadataRefreshTime > topicMetadataRefreshInterval) {
+            lastTopicMetadataRefreshTime > topicMetadataRefreshInterval) {
         CoreUtils.swallowError(
             brokerPartitionInfo.updateInfo(topicMetadataToRefresh.toSet,
                                            correlationId.getAndIncrement))

@@ -213,9 +213,10 @@ private[akka] object GraphInterpreter {
           s"${stage.module}    [${attr.attributeList.mkString(", ")}]"
       }
       "GraphAssembly\n  " + stageList.mkString("[ ", "\n    ", "\n  ]") +
-      "\n  " + ins.mkString("[", ",", "]") + "\n  " +
-      inOwners.mkString("[", ",", "]") + "\n  " +
-      outs.mkString("[", ",", "]") + "\n  " + outOwners.mkString("[", ",", "]")
+        "\n  " + ins.mkString("[", ",", "]") + "\n  " +
+        inOwners.mkString("[", ",", "]") + "\n  " +
+        outs.mkString("[", ",", "]") + "\n  " + outOwners
+        .mkString("[", ",", "]")
     }
   }
 

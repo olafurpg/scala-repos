@@ -31,8 +31,8 @@ class SplitInfo(val inputFormatClazz: Class[_],
                 val underlyingSplit: Any) {
   override def toString(): String = {
     "SplitInfo " + super.toString + " .. inputFormatClazz " +
-    inputFormatClazz + ", hostLocation : " + hostLocation + ", path : " +
-    path + ", length : " + length + ", underlyingSplit " + underlyingSplit
+      inputFormatClazz + ", hostLocation : " + hostLocation + ", path : " +
+      path + ", length : " + length + ", underlyingSplit " + underlyingSplit
   }
 
   override def hashCode(): Int = {
@@ -69,7 +69,7 @@ object SplitInfo {
     val length = mapredSplit.getLength
     for (host <- mapredSplit.getLocations) {
       retval +=
-      new SplitInfo(inputFormatClazz, host, path, length, mapredSplit)
+        new SplitInfo(inputFormatClazz, host, path, length, mapredSplit)
     }
     retval
   }
@@ -82,7 +82,7 @@ object SplitInfo {
     val length = mapreduceSplit.getLength
     for (host <- mapreduceSplit.getLocations) {
       retval +=
-      new SplitInfo(inputFormatClazz, host, path, length, mapreduceSplit)
+        new SplitInfo(inputFormatClazz, host, path, length, mapreduceSplit)
     }
     retval
   }

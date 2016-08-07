@@ -116,7 +116,7 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
       ) {
     override def toString(): String = {
       s"TestAwaitTermination($expectedBehavior, timeoutMs = $timeoutMs, " +
-      s"expectedReturnValue = $expectedReturnValue)"
+        s"expectedReturnValue = $expectedReturnValue)"
     }
   }
 

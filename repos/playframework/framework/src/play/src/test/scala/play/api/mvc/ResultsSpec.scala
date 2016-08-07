@@ -182,8 +182,8 @@ object ResultsSpec extends Specification {
       val rh = Ok.sendFile(file).header
 
       (rh.status aka "status" must_== OK) and
-      (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-              s"""attachment; filename="${fileName}""""))
+        (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+                s"""attachment; filename="${fileName}""""))
     }
 
     "support sending a file with Unauthorized status" in withFile {
@@ -191,8 +191,8 @@ object ResultsSpec extends Specification {
         val rh = Unauthorized.sendFile(file).header
 
         (rh.status aka "status" must_== UNAUTHORIZED) and
-        (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                s"""attachment; filename="${fileName}""""))
+          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+                  s"""attachment; filename="${fileName}""""))
     }
 
     "support sending a file inline with Unauthorized status" in withFile {
@@ -200,8 +200,8 @@ object ResultsSpec extends Specification {
         val rh = Unauthorized.sendFile(file, inline = true).header
 
         (rh.status aka "status" must_== UNAUTHORIZED) and
-        (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                s"""inline; filename="${fileName}""""))
+          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+                  s"""inline; filename="${fileName}""""))
     }
 
     "support sending a file with PaymentRequired status" in withFile {
@@ -209,8 +209,8 @@ object ResultsSpec extends Specification {
         val rh = PaymentRequired.sendFile(file).header
 
         (rh.status aka "status" must_== PAYMENT_REQUIRED) and
-        (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                s"""attachment; filename="${fileName}""""))
+          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+                  s"""attachment; filename="${fileName}""""))
     }
 
     "support sending a file inline with PaymentRequired status" in withFile {
@@ -218,16 +218,16 @@ object ResultsSpec extends Specification {
         val rh = PaymentRequired.sendFile(file, inline = true).header
 
         (rh.status aka "status" must_== PAYMENT_REQUIRED) and
-        (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                s"""inline; filename="${fileName}""""))
+          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+                  s"""inline; filename="${fileName}""""))
     }
 
     "support sending a path with Ok status" in withPath { (file, fileName) =>
       val rh = Ok.sendPath(file).header
 
       (rh.status aka "status" must_== OK) and
-      (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-              s"""attachment; filename="${fileName}""""))
+        (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+                s"""attachment; filename="${fileName}""""))
     }
 
     "support sending a path with Unauthorized status" in withPath {
@@ -235,8 +235,8 @@ object ResultsSpec extends Specification {
         val rh = Unauthorized.sendPath(file).header
 
         (rh.status aka "status" must_== UNAUTHORIZED) and
-        (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                s"""attachment; filename="${fileName}""""))
+          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+                  s"""attachment; filename="${fileName}""""))
     }
 
     "support sending a path inline with Unauthorized status" in withPath {
@@ -244,8 +244,8 @@ object ResultsSpec extends Specification {
         val rh = Unauthorized.sendPath(file, inline = true).header
 
         (rh.status aka "status" must_== UNAUTHORIZED) and
-        (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                s"""inline; filename="${fileName}""""))
+          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+                  s"""inline; filename="${fileName}""""))
     }
 
     "allow checking content length" in withPath { (file, fileName) =>
@@ -258,12 +258,12 @@ object ResultsSpec extends Specification {
 
     "support redirects for reverse routed calls" in {
       Results.Redirect(Call("GET", "/path")).header must_==
-      Status(303).withHeaders(LOCATION -> "/path").header
+        Status(303).withHeaders(LOCATION -> "/path").header
     }
 
     "support redirects for reverse routed calls with custom statuses" in {
       Results.Redirect(Call("GET", "/path"), TEMPORARY_REDIRECT).header must_==
-      Status(TEMPORARY_REDIRECT).withHeaders(LOCATION -> "/path").header
+        Status(TEMPORARY_REDIRECT).withHeaders(LOCATION -> "/path").header
     }
   }
 }

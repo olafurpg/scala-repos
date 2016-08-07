@@ -124,9 +124,9 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       if (inTpl == null) docTemplatesCache(RootPackage) :: Nil
       else
         makeTemplate(sym.owner) ::
-        (sym.allOverriddenSymbols map { inhSym =>
-              makeTemplate(inhSym.owner)
-            })
+          (sym.allOverriddenSymbols map { inhSym =>
+                makeTemplate(inhSym.owner)
+              })
     def visibility = {
       if (sym.isPrivateLocal) PrivateInInstance()
       else if (sym.isProtectedLocal) ProtectedInInstance()
@@ -225,7 +225,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
             if (d.valueParams.isEmpty) Nil
             else
               d.valueParams map
-              (ps => ps map (_.resultType.name) mkString ("(", ",", ")"))
+                (ps => ps map (_.resultType.name) mkString ("(", ",", ")"))
           paramLists.mkString
         case _ => ""
       }
@@ -435,7 +435,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
         }
 
       members :::=
-      memberSymsLazy.map(modelCreation.createLazyTemplateMember(_, this))
+        memberSymsLazy.map(modelCreation.createLazyTemplateMember(_, this))
 
       outgoingImplicitlyConvertedClasses
 

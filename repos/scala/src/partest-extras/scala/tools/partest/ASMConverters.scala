@@ -78,9 +78,9 @@ object ASMConverters {
     final override def toString() = {
       val printOpcode = opcode != -1
       productPrefix +
-      (if (printOpcode)
-         Iterator(opcodeToString(opcode)) ++ productIterator.drop(1)
-       else productIterator).mkString("(", ", ", ")")
+        (if (printOpcode)
+           Iterator(opcodeToString(opcode)) ++ productIterator.drop(1)
+         else productIterator).mkString("(", ", ", ")")
     }
   }
 

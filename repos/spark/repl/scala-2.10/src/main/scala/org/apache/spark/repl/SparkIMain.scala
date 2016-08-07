@@ -709,11 +709,11 @@ class SparkIMain(initialSettings: Settings,
   private def removeComments(line: String): String = {
     showCodeIfDebugging(line) // as we're about to lose our // show
     line.lines map
-    (s =>
-          s indexOf "//" match {
-            case -1 => s
-            case idx => s take idx
-        }) mkString "\n"
+      (s =>
+            s indexOf "//" match {
+              case -1 => s
+              case idx => s take idx
+          }) mkString "\n"
   }
 
   private def safePos(t: Tree, alt: Int): Int =
@@ -751,9 +751,9 @@ class SparkIMain(initialSettings: Settings,
                 // so I had to rewrite this a bit
                 val subs = t collect { case sub => sub }
                 subs map
-                (t0 =>
-                      "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                      "\n") mkString ""
+                  (t0 =>
+                        "  " + safePos(t0, -1) + ": " + t0.shortClass +
+                        "\n") mkString ""
               }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
@@ -1539,7 +1539,7 @@ class SparkIMain(initialSettings: Settings,
   def runtimeClassAndTypeOfTerm(id: String): Option[(JClass, Type)] = {
     classOfTerm(id) flatMap { clazz =>
       new RichClass(clazz).supers find
-      (c => !(new RichClass(c).isScalaAnonymous)) map { nonAnon =>
+        (c => !(new RichClass(c).isScalaAnonymous)) map { nonAnon =>
         (nonAnon, runtimeTypeOfTerm(id))
       }
     }

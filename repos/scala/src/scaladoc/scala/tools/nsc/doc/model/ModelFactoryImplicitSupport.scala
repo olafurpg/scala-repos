@@ -433,7 +433,7 @@ trait ModelFactoryImplicitSupport {
       }
       debug("   -> members:")
       memberSyms foreach
-      (sym => debug("      - " + sym.decodedName + " : " + sym.info))
+        (sym => debug("      - " + sym.decodedName + " : " + sym.info))
       debug("")
 
       memberSyms.flatMap({ aSym =>

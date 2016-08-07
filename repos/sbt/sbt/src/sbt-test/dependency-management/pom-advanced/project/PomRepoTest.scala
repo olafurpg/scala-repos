@@ -46,8 +46,8 @@ object PomRepoTest extends Build {
     extracted.find { e =>
       !expected.exists(_.accept(e.root))
     } map { "Repository should not be exported: " + _ } orElse
-    (expected.find { e =>
-          !extracted.exists(r => e.accept(r.root))
-        } map { "Repository should be exported: " + _ }) foreach error
+      (expected.find { e =>
+            !extracted.exists(r => e.accept(r.root))
+          } map { "Repository should be exported: " + _ }) foreach error
   }
 }

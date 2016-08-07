@@ -87,7 +87,7 @@ package object financial {
         ((1.0 + rate * when.t) / rate) *
           (math.pow(1.0 + rate, numPeriods) - 1.0)
       -1 * (futureValue +
-          presentValue * math.pow(1.0 + rate, numPeriods)) / denominator
+            presentValue * math.pow(1.0 + rate, numPeriods)) / denominator
     }
   }
 

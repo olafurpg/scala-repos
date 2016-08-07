@@ -202,9 +202,9 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
               })
 
         stringBuilder append
-        (if (tpe != null)
-           ScalaCollectionRenderer.transformName(tpe.name) + sizeString
-         else "{...}")
+          (if (tpe != null)
+             ScalaCollectionRenderer.transformName(tpe.name) + sizeString
+           else "{...}")
       case _ => stringBuilder append "{...}"
     }
 

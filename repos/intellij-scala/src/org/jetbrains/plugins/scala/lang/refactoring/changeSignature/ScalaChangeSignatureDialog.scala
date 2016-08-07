@@ -232,8 +232,8 @@ class ScalaChangeSignatureDialog(val project: Project,
         problems += RefactoringBundle.message("changeSignature.no.return.type")
       else if (returnTypeText.isEmpty)
         problems +=
-        RefactoringBundle.message("changeSignature.wrong.return.type",
-                                  myReturnTypeCodeFragment.getText)
+          RefactoringBundle.message("changeSignature.wrong.return.type",
+                                    myReturnTypeCodeFragment.getText)
     }
 
     val paramNames = paramItems.map(_.parameter.name)
@@ -250,7 +250,7 @@ class ScalaChangeSignatureDialog(val project: Project,
       (name2, idx2) <- namesWithIndices if name == name2 && idx < idx2
     } {
       problems +=
-      ScalaBundle.message("change.signature.parameters.same.name.{0}", name)
+        ScalaBundle.message("change.signature.parameters.same.name.{0}", name)
     }
     paramItems.foreach(_.updateType(problems))
 

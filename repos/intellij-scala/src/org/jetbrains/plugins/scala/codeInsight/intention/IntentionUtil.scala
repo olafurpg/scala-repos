@@ -38,7 +38,7 @@ object IntentionUtil {
     val allComments =
       PsiTreeUtil.getChildrenOfTypeAsList(element, classOf[PsiComment])
     allComments.size() > commentsAroundElement.before.size +
-    commentsAroundElement.after.size
+      commentsAroundElement.after.size
   }
 
   def addComments(commentsAroundElement: CommentsAroundElement,

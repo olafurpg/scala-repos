@@ -580,8 +580,8 @@ private[spark] object MapOutputTracker extends Logging {
       } else {
         for (part <- startPartition until endPartition) {
           splitsByAddress.getOrElseUpdate(status.location, ArrayBuffer()) +=
-          ((ShuffleBlockId(shuffleId, mapId, part),
-            status.getSizeForBlock(part)))
+            ((ShuffleBlockId(shuffleId, mapId, part),
+              status.getSizeForBlock(part)))
         }
       }
     }

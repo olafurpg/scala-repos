@@ -125,14 +125,14 @@ private[streaming] class DStreamCheckpointData[T: ClassTag](
             "Restoring checkpointed RDD for time " + time +
               " from file '" + file + "'")
         dstream.generatedRDDs +=
-        ((time, dstream.context.sparkContext.checkpointFile[T](file)))
+          ((time, dstream.context.sparkContext.checkpointFile[T](file)))
       }
     }
   }
 
   override def toString: String = {
     "[\n" + currentCheckpointFiles.size + " checkpoint files \n" +
-    currentCheckpointFiles.mkString("\n") + "\n]"
+      currentCheckpointFiles.mkString("\n") + "\n]"
   }
 
   @throws(classOf[IOException])

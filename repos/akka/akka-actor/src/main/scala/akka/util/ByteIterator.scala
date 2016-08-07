@@ -559,10 +559,10 @@ abstract class ByteIterator extends BufferedIterator[Byte] {
   def getInt(implicit byteOrder: ByteOrder): Int = {
     if (byteOrder == ByteOrder.BIG_ENDIAN)
       ((next() & 0xff) << 24 | (next() & 0xff) << 16 | (next() & 0xff) << 8 |
-          (next() & 0xff) << 0)
+            (next() & 0xff) << 0)
     else if (byteOrder == ByteOrder.LITTLE_ENDIAN)
       ((next() & 0xff) << 0 | (next() & 0xff) << 8 | (next() & 0xff) << 16 |
-          (next() & 0xff) << 24)
+            (next() & 0xff) << 24)
     else throw new IllegalArgumentException("Unknown byte order " + byteOrder)
   }
 
@@ -572,14 +572,14 @@ abstract class ByteIterator extends BufferedIterator[Byte] {
   def getLong(implicit byteOrder: ByteOrder): Long = {
     if (byteOrder == ByteOrder.BIG_ENDIAN)
       ((next().toLong & 0xff) << 56 | (next().toLong & 0xff) << 48 |
-          (next().toLong & 0xff) << 40 | (next().toLong & 0xff) << 32 |
-          (next().toLong & 0xff) << 24 | (next().toLong & 0xff) << 16 |
-          (next().toLong & 0xff) << 8 | (next().toLong & 0xff) << 0)
+            (next().toLong & 0xff) << 40 | (next().toLong & 0xff) << 32 |
+            (next().toLong & 0xff) << 24 | (next().toLong & 0xff) << 16 |
+            (next().toLong & 0xff) << 8 | (next().toLong & 0xff) << 0)
     else if (byteOrder == ByteOrder.LITTLE_ENDIAN)
       ((next().toLong & 0xff) << 0 | (next().toLong & 0xff) << 8 |
-          (next().toLong & 0xff) << 16 | (next().toLong & 0xff) << 24 |
-          (next().toLong & 0xff) << 32 | (next().toLong & 0xff) << 40 |
-          (next().toLong & 0xff) << 48 | (next().toLong & 0xff) << 56)
+            (next().toLong & 0xff) << 16 | (next().toLong & 0xff) << 24 |
+            (next().toLong & 0xff) << 32 | (next().toLong & 0xff) << 40 |
+            (next().toLong & 0xff) << 48 | (next().toLong & 0xff) << 56)
     else throw new IllegalArgumentException("Unknown byte order " + byteOrder)
   }
 

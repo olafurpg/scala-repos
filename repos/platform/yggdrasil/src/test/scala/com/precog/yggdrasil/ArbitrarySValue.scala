@@ -277,10 +277,10 @@ trait ArbitraryBigDecimal {
       exponent <- Gen.chooseNum(-MAX_EXPONENT, MAX_EXPONENT)
 
       adjusted = if (exponent.toLong +
-                     mantissa.toString.length >= Int.MaxValue.toLong)
+                       mantissa.toString.length >= Int.MaxValue.toLong)
         exponent - mantissa.toString.length
       else if (exponent.toLong -
-               mantissa.toString.length <= Int.MinValue.toLong)
+                 mantissa.toString.length <= Int.MinValue.toLong)
         exponent + mantissa.toString.length
       else exponent
     } yield BigDecimal(mantissa, adjusted, java.math.MathContext.UNLIMITED))

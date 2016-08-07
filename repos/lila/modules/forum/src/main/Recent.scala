@@ -32,9 +32,9 @@ private[forum] final class Recent(postApi: PostApi,
   private def userCacheKey(user: Option[User], getTeams: GetTeams): String =
     user.fold("en")(_.langs.mkString(",")) :: {
       (user.??(_.troll) ?? List("[troll]")) :::
-      (user ?? MasterGranter(Permission.StaffForum)).fold(staffCategIds,
-                                                          publicCategIds) :::
-      ((user.map(_.id) ?? getTeams) map teamSlug).toList
+        (user ?? MasterGranter(Permission.StaffForum)).fold(staffCategIds,
+                                                            publicCategIds) :::
+          ((user.map(_.id) ?? getTeams) map teamSlug).toList
     } mkString ";"
 
   private lazy val staffCategIds = "staff" :: publicCategIds

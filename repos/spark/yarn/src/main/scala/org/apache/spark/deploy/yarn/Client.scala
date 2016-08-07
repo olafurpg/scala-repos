@@ -751,15 +751,15 @@ private[spark] class Client(val args: ClientArguments,
     val (pyFiles, pyArchives) = args.pyFiles.partition(_.endsWith(".py"))
     if (pyFiles.nonEmpty) {
       pythonPath +=
-      buildPath(YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
-                LOCALIZED_PYTHON_DIR)
+        buildPath(YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
+                  LOCALIZED_PYTHON_DIR)
     }
     (pySparkArchives ++ pyArchives).foreach { path =>
       val uri = Utils.resolveURI(path)
       if (uri.getScheme != LOCAL_SCHEME) {
         pythonPath +=
-        buildPath(YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
-                  new Path(uri).getName())
+          buildPath(YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
+                    new Path(uri).getName())
       } else {
         pythonPath += uri.getPath()
       }
@@ -924,7 +924,7 @@ private[spark] class Client(val args: ClientArguments,
 
     // For log4j configuration to reference
     javaOpts += ("-Dspark.yarn.app.container.log.dir=" +
-        ApplicationConstants.LOG_DIR_EXPANSION_VAR)
+          ApplicationConstants.LOG_DIR_EXPANSION_VAR)
     YarnCommandBuilderUtils.addPermGenSizeOpt(javaOpts)
 
     val userClass = if (isClusterMode) {

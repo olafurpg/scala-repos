@@ -45,9 +45,9 @@ final class Scheduler(scheduler: akka.actor.Scheduler,
         doDebug ! logger.info(tagged)
         val start = nowMillis
         op effectFold
-        (e => logger.error("(%s) %s".format(tagged, e.getMessage), e), _ =>
-              doDebug ! logger.info(
-                  tagged + " - %d ms".format(nowMillis - start)))
+          (e => logger.error("(%s) %s".format(tagged, e.getMessage), e), _ =>
+                doDebug ! logger.info(
+                    tagged + " - %d ms".format(nowMillis - start)))
       }
     }
   }

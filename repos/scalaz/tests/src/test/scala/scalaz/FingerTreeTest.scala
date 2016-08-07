@@ -60,38 +60,38 @@ object FingerTreeTest extends SpecLite {
       val asStream = tree.toStream
       val splitTree = tree.split(_ > index)
       (splitTree._1.toStream, splitTree._2.toStream) must_===
-      (asStream.splitAt(index))
+        (asStream.splitAt(index))
   }
 
   "replacing last element works correctly" ! forAll {
     (tree: SequenceTree[Int], x: Int) =>
       !tree.isEmpty ==>
-      ((tree :-| x).toStream must_=== (tree.toStream.init :+ x))
+        ((tree :-| x).toStream must_=== (tree.toStream.init :+ x))
   }
 
   "replacing first element works correctly" ! forAll {
     (tree: SequenceTree[Int], x: Int) =>
       !tree.isEmpty ==>
-      ((x |-: tree).toStream must_=== (x +: tree.toStream.tail))
+        ((x |-: tree).toStream must_=== (x +: tree.toStream.tail))
   }
 
   "head and tail work correctly" ! forAll { (tree: SequenceTree[Int]) =>
     val asStream = tree.toStream
     !tree.isEmpty ==>
-    ((tree.head === tree.toStream.head) &&
-        (tree.tail.toStream === tree.toStream.tail))
+      ((tree.head === tree.toStream.head) &&
+          (tree.tail.toStream === tree.toStream.tail))
   }
 
   "last and init work correctly" ! forAll { (tree: SequenceTree[Int]) =>
     val asStream = tree.toStream
     !tree.isEmpty ==>
-    ((tree.last === tree.toStream.last) &&
-        (tree.init.toStream === tree.toStream.init))
+      ((tree.last === tree.toStream.last) &&
+          (tree.init.toStream === tree.toStream.init))
   }
 
   "foldLeft snoc is identity" ! forAll { (tree: SequenceTree[Int]) =>
     tree.foldLeft(FingerTree.empty(SizeReducer[Int]))(_ :+ _).toStream must_==
-    (tree.toStream)
+      (tree.toStream)
   }
 
   "foldLeft cons is reverse" ! forAll { (tree: SequenceTree[Int]) =>
@@ -114,7 +114,7 @@ object FingerTreeTest extends SpecLite {
         streamToTree(intStream.take(20)).traverseTree[Option, Int, Int](i =>
               Some(i * 2))
       tree.map(_.toStream) getOrElse (Stream.empty) must_===
-      (streamToTree(intStream.take(20).map(_ * 2)).toStream)
+        (streamToTree(intStream.take(20).map(_ * 2)).toStream)
     }
 
     "traverseTree through the option effect yielding none" in {
@@ -129,7 +129,7 @@ object FingerTreeTest extends SpecLite {
         streamToTree(intStream.take(32 * 1024))
           .traverseTree[Option, Int, Int](x => Some(x))
       tree.map(_.toStream.take(100)) getOrElse Stream.empty must_===
-      (intStream.take(100))
+        (intStream.take(100))
     }
   }
 

@@ -44,29 +44,31 @@ object WithResourceId extends DispatchSnippet {
 
   def render(xhtml: NodeSeq): NodeSeq = {
     xhtml flatMap
-    (_ match {
-          case e: Elem if e.label == "link" =>
-            attrStr(e.attributes, "href").map { href =>
-              e.copy(
-                  attributes = MetaData.update(
-                      e.attributes,
-                      e.scope,
-                      new UnprefixedAttribute("href",
-                                              LiftRules.attachResourceId(href),
-                                              Null)))
-            } openOr e
-          case e: Elem if e.label == "script" =>
-            attrStr(e.attributes, "src") map { src =>
-              e.copy(
-                  attributes = MetaData.update(
-                      e.attributes,
-                      e.scope,
-                      new UnprefixedAttribute("src",
-                                              LiftRules.attachResourceId(src),
-                                              Null)))
-            } openOr e
-          case e => e
-        })
+      (_ match {
+            case e: Elem if e.label == "link" =>
+              attrStr(e.attributes, "href").map { href =>
+                e.copy(
+                    attributes =
+                      MetaData.update(e.attributes,
+                                      e.scope,
+                                      new UnprefixedAttribute(
+                                          "href",
+                                          LiftRules.attachResourceId(href),
+                                          Null)))
+              } openOr e
+            case e: Elem if e.label == "script" =>
+              attrStr(e.attributes, "src") map { src =>
+                e.copy(
+                    attributes =
+                      MetaData.update(e.attributes,
+                                      e.scope,
+                                      new UnprefixedAttribute(
+                                          "src",
+                                          LiftRules.attachResourceId(src),
+                                          Null)))
+              } openOr e
+            case e => e
+          })
   }
 
   private def attrStr(attrs: MetaData, attr: String): Box[String] =

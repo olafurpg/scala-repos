@@ -30,7 +30,7 @@ package object util {
     // As long as there are non-daemon, live threads (the latter
     // condition should exclude shutdown hooks) we will wait.
     while (threads exists (_.isAlive)) threads filter (_.isAlive) foreach
-    (_.join())
+      (_.join())
 
     result
   }

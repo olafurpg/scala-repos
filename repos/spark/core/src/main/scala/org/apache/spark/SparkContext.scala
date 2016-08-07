@@ -769,7 +769,7 @@ class SparkContext(config: SparkConf)
       val safeStart = BigInt(start)
       val safeEnd = BigInt(end)
       if ((safeEnd - safeStart) % step == 0 || (safeEnd > safeStart) !=
-          (step > 0)) {
+            (step > 0)) {
         (safeEnd - safeStart) / step
       } else {
         // the remainder has the same sign with range, could add 1 more

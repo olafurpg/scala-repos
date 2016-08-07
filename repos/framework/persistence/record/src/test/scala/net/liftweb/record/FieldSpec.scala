@@ -600,7 +600,7 @@ object FieldSpec extends Specification {
       val rec = PasswordTestRecord.createRecord.password("")
 
       rec.validate must_==
-      (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
+        (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
     }
 
     "correctly validate the unencrypted value" in S.initIfUninitted(session) {
@@ -609,7 +609,7 @@ object FieldSpec extends Specification {
 
       rec.password("1234")
       rec.validate must_==
-      (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
+        (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
     }
 
     "match with encrypted value" in {

@@ -388,7 +388,7 @@ class ExecutorAllocationManagerSuite
     manager.setClock(clock)
 
     executorIds(manager).asInstanceOf[mutable.Set[String]] ++=
-    List("1", "2", "3")
+      List("1", "2", "3")
 
     // Starting remove timer is idempotent for each executor
     assert(removeTimes(manager).isEmpty)

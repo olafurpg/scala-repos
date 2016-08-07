@@ -77,7 +77,7 @@ case class OffsetFetchResponse(
       4 + /* number of partitions */
       offsets.foldLeft(0)((innerCount, offsetsAndMetadata) => {
         innerCount + 4 /* partition */ + 8 /* offset */ +
-        shortStringLength(offsetsAndMetadata._2.metadata) + 2 /* error */
+          shortStringLength(offsetsAndMetadata._2.metadata) + 2 /* error */
       })
     })
 

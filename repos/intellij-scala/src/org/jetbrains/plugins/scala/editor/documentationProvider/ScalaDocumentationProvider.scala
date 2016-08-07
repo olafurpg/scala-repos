@@ -445,7 +445,7 @@ object ScalaDocumentationProvider {
     val clazz = elem.containingClass
     if (clazz == null) return ""
     "<a href=\"psi_element://" + escapeHtml(clazz.qualifiedName) +
-    "\"><code>" + escapeHtml(clazz.qualifiedName) + "</code></a>"
+      "\"><code>" + escapeHtml(clazz.qualifiedName) + "</code></a>"
   }
 
   private def parseParameters(elem: ScParameterOwner,
@@ -1102,7 +1102,7 @@ object ScalaDocumentationProvider {
     if (!member.getParent.getParent.getParent.isInstanceOf[ScTypeDefinition])
       return ""
     member.containingClass.name + " " +
-    member.containingClass.getPresentation.getLocationString + "\n"
+      member.containingClass.getPresentation.getLocationString + "\n"
   }
 
   private def getOneLine(s: String): String = {
@@ -1269,9 +1269,9 @@ object ScalaDocumentationProvider {
         if (clazz == null) defaultText
         else
           clazz.name + " " + clazz.getPresentation.getLocationString + "\n" +
-          (if (clParameter.isVal) "val "
-           else if (clParameter.isVar) "var "
-           else "") + clParameter.name + ": " + ScType.presentableText(
+            (if (clParameter.isVal) "val "
+             else if (clParameter.isVar) "var "
+             else "") + clParameter.name + ": " + ScType.presentableText(
               subst.subst(clParameter.getType(TypingContext.empty).getOrAny))
       case _ => defaultText
     }) + (if (parameter.isRepeatedParameter) "*" else "")

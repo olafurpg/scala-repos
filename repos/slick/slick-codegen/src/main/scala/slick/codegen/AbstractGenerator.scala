@@ -147,7 +147,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       def doc =
         if (classEnabled) {
           s"Entity class storing rows of table ${TableValue.name}\n" +
-          columns.map(c => "@param " + c.name + " " + c.doc).mkString("\n")
+            columns.map(c => "@param " + c.name + " " + c.doc).mkString("\n")
         } else {
           s"Row type of table ${TableValue.name}\n"
         }
@@ -200,14 +200,14 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
           val collidingTerms = columns.map(_.rawName) intersect scalaKeywords
           if (collidingTerms.nonEmpty)
             "\nNOTE: The following names collided with Scala keywords and were escaped: " +
-            collidingTerms.mkString(", ")
+              collidingTerms.mkString(", ")
           else ""
         } + {
           val collidingTerms =
             columns.map(_.rawName) intersect slickTableTermMembersNoArgs
           if (collidingTerms.nonEmpty)
             "\nNOTE: The following names collided with Scala method names and were disambiguated: " +
-            collidingTerms.mkString(", ")
+              collidingTerms.mkString(", ")
           else ""
         }
       def rawName: String = tableName(model.name.table)

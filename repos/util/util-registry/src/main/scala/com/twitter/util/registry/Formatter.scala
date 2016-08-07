@@ -20,19 +20,19 @@ object Formatter {
           case Nil => (Eponymous -> value)
           case head +: tail => {
             head ->
-            (old.get(head) match {
-                  case None =>
-                    if (tail.isEmpty) value
-                    else makeMap(tail, value)
+              (old.get(head) match {
+                    case None =>
+                      if (tail.isEmpty) value
+                      else makeMap(tail, value)
 
-                  // we can't prove that this is anything better than a Map[_, _], but that's OK
-                  case Some(map: Map[_, _]) =>
-                    add(map.asInstanceOf[Map[String, Object]], tail, value)
-                  case Some(string: String) =>
-                    if (tail.isEmpty) throw Collision
-                    else makeMap(tail, value) + (Eponymous -> string)
-                  case Some(_) => throw InvalidType
-                })
+                    // we can't prove that this is anything better than a Map[_, _], but that's OK
+                    case Some(map: Map[_, _]) =>
+                      add(map.asInstanceOf[Map[String, Object]], tail, value)
+                    case Some(string: String) =>
+                      if (tail.isEmpty) throw Collision
+                      else makeMap(tail, value) + (Eponymous -> string)
+                    case Some(_) => throw InvalidType
+                  })
           }
         })
 

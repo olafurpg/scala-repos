@@ -42,10 +42,10 @@ class ALSModel(
 
   override def toString = {
     s" productFeatures: [${productFeatures.count()}]" +
-    s"(${productFeatures.take(2).toList}...)" +
-    s" itemStringIntMap: [${itemStringIntMap.size}]" +
-    s"(${itemStringIntMap.take(2).toString}...)]" +
-    s" items: [${items.size}]" + s"(${items.take(2).toString}...)]"
+      s"(${productFeatures.take(2).toList}...)" +
+      s" itemStringIntMap: [${itemStringIntMap.size}]" +
+      s"(${itemStringIntMap.take(2).toString}...)]" +
+      s" items: [${items.size}]" + s"(${items.take(2).toString}...)]"
   }
 }
 

@@ -176,7 +176,7 @@ class StandardScalerModel @Since("1.3.0")(
           var i = 0
           while (i < nnz) {
             values(i) *=
-            (if (std(indices(i)) != 0.0) 1.0 / std(indices(i)) else 0.0)
+              (if (std(indices(i)) != 0.0) 1.0 / std(indices(i)) else 0.0)
             i += 1
           }
           Vectors.sparse(size, indices, values)

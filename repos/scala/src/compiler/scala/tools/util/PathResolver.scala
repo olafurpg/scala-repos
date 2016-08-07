@@ -167,7 +167,7 @@ object PathResolver {
       val install = Some(Path(javaHome))
 
       (home flatMap jarAt) orElse (install flatMap jarAt) orElse
-      (install map (_.parent) flatMap jarAt) orElse (jdkDir flatMap deeply)
+        (install map (_.parent) flatMap jarAt) orElse (jdkDir flatMap deeply)
     }
     override def toString = s"""
       |object SupplementalLocations {
@@ -317,9 +317,9 @@ abstract class PathResolverBase[BaseClassPathType <: ClassFileLookup[
 
       val xs = (Calculated.basis drop 2).flatten.distinct
       Console print
-      (xs mkLines
-          (s"After java boot/extdirs classpath has ${xs.size} entries:",
-              indented = true))
+        (xs mkLines
+              (s"After java boot/extdirs classpath has ${xs.size} entries:",
+                  indented = true))
     }
     cp
   }

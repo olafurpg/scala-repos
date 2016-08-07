@@ -283,14 +283,14 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
         // because Definitions.scala, which initializes and enters them, only affects rootMirror
         // therefore we need to enter them manually for non-root mirrors
         definitions.syntheticCoreClasses foreach
-        (theirSym => {
-              val theirOwner = theirSym.owner
-              assert(theirOwner.isPackageClass,
-                     s"theirSym = $theirSym, theirOwner = $theirOwner")
-              val ourOwner = staticPackage(theirOwner.fullName).moduleClass
-              val ourSym = theirSym // just copy the symbol into our branch of the symbol table
-              ourOwner.info.decls enterIfNew ourSym
-            })
+          (theirSym => {
+                val theirOwner = theirSym.owner
+                assert(theirOwner.isPackageClass,
+                       s"theirSym = $theirSym, theirOwner = $theirOwner")
+                val ourOwner = staticPackage(theirOwner.fullName).moduleClass
+                val ourSym = theirSym // just copy the symbol into our branch of the symbol table
+                ourOwner.info.decls enterIfNew ourSym
+              })
       }
 
       initialized = true

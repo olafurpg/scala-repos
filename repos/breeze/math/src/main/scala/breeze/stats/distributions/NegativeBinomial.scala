@@ -19,6 +19,6 @@ case class NegativeBinomial(r: Double, p: Double) extends DiscreteDistr[Int] {
 
   override def logProbabilityOf(k: Int) = {
     lgamma(r + k) - lgamma(k + 1) - lgamma(r) + r * math.log(1 - p) +
-    k * math.log(p)
+      k * math.log(p)
   }
 }

@@ -42,7 +42,7 @@ abstract class ClusterMetricsSpec
 
   "Cluster metrics" must {
     "periodically collect metrics on each node, publish ClusterMetricsChanged to the event stream, " +
-    "and gossip metrics around the node ring" taggedAs LongRunningTest in within(
+      "and gossip metrics around the node ring" taggedAs LongRunningTest in within(
         60 seconds) {
       awaitClusterUp(roles: _*)
       enterBarrier("cluster-started")

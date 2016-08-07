@@ -59,7 +59,7 @@ class ActorProducerTest
 
         "not expect response and not block" taggedAs TimingTest in {
           time(producer.processExchangeAdapter(exchange)) should be <
-          (200 millis)
+            (200 millis)
         }
       }
 
@@ -359,7 +359,7 @@ private[camel] trait ActorProducerFixture
       .asInstanceOf[ExtendedActorSystem]
       .dynamicAccess
     when(sys.settings) thenReturn
-    (new Settings(this.getClass.getClassLoader, config, "mocksystem"))
+      (new Settings(this.getClass.getClassLoader, config, "mocksystem"))
     when(sys.name) thenReturn ("mocksystem")
 
     def camelWithMocks = new DefaultCamel(sys) {

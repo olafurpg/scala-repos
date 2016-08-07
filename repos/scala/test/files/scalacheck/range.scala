@@ -257,7 +257,7 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
            else Range(r.start, x max r.last, r.step).inclusive)
         (t.start == r.start && t.size == t2.size &&
             t.step == r.step) :| str(r) + " / " + str(t) + " / " + str(t2) +
-        ": " + x
+          ": " + x
       }
     }
 

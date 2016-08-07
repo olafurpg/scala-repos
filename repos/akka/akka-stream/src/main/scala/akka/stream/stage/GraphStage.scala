@@ -452,7 +452,7 @@ abstract class GraphStageLogic private[stream] (val inCount: Int,
     else {
       // Slow path on failure
       if ((interpreter.portStates(conn(in)) & (InReady | InFailed)) ==
-          (InReady | InFailed)) {
+            (InReady | InFailed)) {
         interpreter.connectionSlots(connection) match {
           case Failed(_, elem) ⇒ elem.asInstanceOf[AnyRef] ne Empty
           case _ ⇒

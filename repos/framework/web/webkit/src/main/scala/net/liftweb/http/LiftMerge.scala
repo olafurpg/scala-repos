@@ -258,7 +258,7 @@ private[http] trait LiftMerge { self: LiftSession =>
       // Appends ajax script to body
       if (LiftRules.autoIncludeAjaxCalc.vend().apply(this)) {
         bodyChildren +=
-        <script src={S.encodeURL(contextPath + "/"+LiftRules.resourceServerPath+"/lift.js")}
+          <script src={S.encodeURL(contextPath + "/"+LiftRules.resourceServerPath+"/lift.js")}
                 type="text/javascript"/>
         bodyChildren += nl
       }
@@ -278,15 +278,15 @@ private[http] trait LiftMerge { self: LiftSession =>
       val bodyAttributes: List[(String, String)] =
         if (stateful_? && (autoIncludeComet || LiftRules.enableLiftGC)) {
           ("data-lift-gc" -> RenderVersion.get) ::
-          (if (autoIncludeComet) {
-             ("data-lift-session-id" -> (S.session
-                       .map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList.map {
-               case CometVersionPair(guid, version) =>
-                 (s"data-lift-comet-$guid" -> version.toString)
-             }
-           } else {
-             Nil
-           })
+            (if (autoIncludeComet) {
+               ("data-lift-session-id" -> (S.session
+                         .map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList.map {
+                 case CometVersionPair(guid, version) =>
+                   (s"data-lift-comet-$guid" -> version.toString)
+               }
+             } else {
+               Nil
+             })
         } else {
           Nil
         }

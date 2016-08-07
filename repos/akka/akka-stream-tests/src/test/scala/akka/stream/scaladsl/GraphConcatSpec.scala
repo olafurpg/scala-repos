@@ -107,16 +107,16 @@ class GraphConcatSpec extends TwoStreamsSetup {
       var errorSignalled = false
       if (!errorSignalled)
         errorSignalled ||=
-        subscriber2.expectNextOrError(1, TestException).isLeft
+          subscriber2.expectNextOrError(1, TestException).isLeft
       if (!errorSignalled)
         errorSignalled ||=
-        subscriber2.expectNextOrError(2, TestException).isLeft
+          subscriber2.expectNextOrError(2, TestException).isLeft
       if (!errorSignalled)
         errorSignalled ||=
-        subscriber2.expectNextOrError(3, TestException).isLeft
+          subscriber2.expectNextOrError(3, TestException).isLeft
       if (!errorSignalled)
         errorSignalled ||=
-        subscriber2.expectNextOrError(4, TestException).isLeft
+          subscriber2.expectNextOrError(4, TestException).isLeft
       if (!errorSignalled) subscriber2.expectError(TestException)
     }
 
@@ -127,16 +127,16 @@ class GraphConcatSpec extends TwoStreamsSetup {
       var errorSignalled = false
       if (!errorSignalled)
         errorSignalled ||=
-        subscriber.expectNextOrError(1, TestException).isLeft
+          subscriber.expectNextOrError(1, TestException).isLeft
       if (!errorSignalled)
         errorSignalled ||=
-        subscriber.expectNextOrError(2, TestException).isLeft
+          subscriber.expectNextOrError(2, TestException).isLeft
       if (!errorSignalled)
         errorSignalled ||=
-        subscriber.expectNextOrError(3, TestException).isLeft
+          subscriber.expectNextOrError(3, TestException).isLeft
       if (!errorSignalled)
         errorSignalled ||=
-        subscriber.expectNextOrError(4, TestException).isLeft
+          subscriber.expectNextOrError(4, TestException).isLeft
       if (!errorSignalled) subscriber.expectError(TestException)
     }
 

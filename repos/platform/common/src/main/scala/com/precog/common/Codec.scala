@@ -235,7 +235,7 @@ object Codec {
     def writeInit(c: C, buf: ByteBuffer): Option[S] = {
       val (a, b) = from(c)
       (codecA.writeInit(a, buf) map (s => Left((s, b)))) orElse
-      (codecB.writeInit(b, buf) map (Right(_)))
+        (codecB.writeInit(b, buf) map (Right(_)))
     }
 
     def writeMore(more: S, buf: ByteBuffer) = more match {

@@ -46,8 +46,8 @@ object Analyse extends LilaController {
         RedirectAtFen(pov, initialFen) {
           (env.analyser get pov.game.id) zip Env.fishnet.api
             .prioritaryAnalysisExists(pov.game.id) zip
-          (pov.game.simulId ?? Env.simul.repo.find) zip Env.game.crosstableApi(
-              pov.game) flatMap {
+            (pov.game.simulId ?? Env.simul.repo.find) zip Env.game
+            .crosstableApi(pov.game) flatMap {
             case (((analysis, analysisInProgress), simul), crosstable) =>
               val pgn = Env.api.pgnDump(pov.game, initialFen)
               Env.api.roundApi.watcher(pov,
@@ -104,7 +104,7 @@ object Analyse extends LilaController {
   private def replayBot(pov: Pov)(implicit ctx: Context) =
     GameRepo initialFen pov.game.id flatMap { initialFen =>
       (env.analyser get pov.game.id) zip
-      (pov.game.simulId ?? Env.simul.repo.find) zip Env.game.crosstableApi(
+        (pov.game.simulId ?? Env.simul.repo.find) zip Env.game.crosstableApi(
           pov.game) map {
         case ((analysis, simul), crosstable) =>
           val pgn = Env.api.pgnDump(pov.game, initialFen)

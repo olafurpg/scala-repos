@@ -242,7 +242,7 @@ trait PostgresProfile extends JdbcProfile {
       sb append quoteIdentifier(column.name) append ' '
       if (autoIncrement && !customSqlType) {
         sb append
-        (if (sqlType.toUpperCase == "BIGINT") "BIGSERIAL" else "SERIAL")
+          (if (sqlType.toUpperCase == "BIGINT") "BIGSERIAL" else "SERIAL")
       } else appendType(sb)
       autoIncrement = false
       appendOptions(sb)

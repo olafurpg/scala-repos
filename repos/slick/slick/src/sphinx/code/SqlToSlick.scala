@@ -413,7 +413,7 @@ object SqlToSlick extends App {
         val slickInsert = {
           //#slickQueryInsert
           people.map(p => (p.name, p.age, p.addressId)) +=
-          ("M Odersky", 12345, 1)
+            ("M Odersky", 12345, 1)
           //#slickQueryInsert
         }
         val slickUpdate = {

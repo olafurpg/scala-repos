@@ -485,7 +485,7 @@ class GroupMetadataManager(val brokerId: Int,
                               expireTimestamp = {
                                 if (value.expireTimestamp == org.apache.kafka.common.requests.OffsetCommitRequest.DEFAULT_TIMESTAMP)
                                   value.commitTimestamp +
-                                  config.offsetsRetentionMs
+                                    config.offsetsRetentionMs
                                 else value.expireTimestamp
                               }
                           ))

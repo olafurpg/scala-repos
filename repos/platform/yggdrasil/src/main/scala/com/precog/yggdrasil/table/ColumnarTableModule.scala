@@ -109,7 +109,7 @@ object ColumnarTableModule extends Logging {
         stream ++ (CharBuffer.wrap(suffix) :: StreamT.empty[M, CharBuffer])
       else
         CharBuffer.wrap(prefix) ::
-        (stream ++ (CharBuffer.wrap(suffix) :: StreamT.empty[M, CharBuffer]))
+          (stream ++ (CharBuffer.wrap(suffix) :: StreamT.empty[M, CharBuffer]))
     }
 
     def foldFlatMap(slices: StreamT[M, Slice],
@@ -1059,8 +1059,8 @@ trait ColumnarTableModule[M[+ _]]
 
         override def toString = {
           "left: " + lbuf.toArray.mkString("[", ",", "]") + "\n" + "right: " +
-          rbuf.toArray.mkString("[", ",", "]") + "\n" + "both: " +
-          (leqbuf.toArray zip reqbuf.toArray).mkString("[", ",", "]")
+            rbuf.toArray.mkString("[", ",", "]") + "\n" + "both: " +
+            (leqbuf.toArray zip reqbuf.toArray).mkString("[", ",", "]")
         }
       }
 

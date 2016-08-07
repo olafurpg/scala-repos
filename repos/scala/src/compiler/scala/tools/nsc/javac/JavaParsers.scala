@@ -587,7 +587,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
           } else if (in.token == COMMA) {
             // ... if there's a comma after the ident, it could be a real vardef or not.
             maybe +=
-            varDecl(in.currentPos, mods, tpt.duplicate, name.toTermName)
+              varDecl(in.currentPos, mods, tpt.duplicate, name.toTermName)
           } else {
             // ... if there's something else we were still in the initializer of the
             // previous var def; skip to next comma or semicolon.

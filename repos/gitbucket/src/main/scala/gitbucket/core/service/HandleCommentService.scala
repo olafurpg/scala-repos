@@ -65,7 +65,7 @@ trait HandleCommentService {
           (owner, name, userName, issue.issueId, _)
         }
         recordActivity foreach
-        (_ (owner, name, userName, issue.issueId, issue.title))
+          (_ (owner, name, userName, issue.issueId, issue.title))
 
         // extract references and create refer comment
         content.map { content =>

@@ -123,12 +123,12 @@ class ScalaLookupItem(val element: PsiNamedElement,
           tailText + (if (!isOverloadedForClassName)
                         presentationString(fun.paramClauses, substitutor)
                       else "(...)") +
-          (if (shouldImport && isClassName && containingClass != null)
-             " " + containingClass.getPresentation.getLocationString
-           else if (isClassName && containingClass != null)
-             " in " + containingClass.name + " " +
-             containingClass.getPresentation.getLocationString
-           else "")
+            (if (shouldImport && isClassName && containingClass != null)
+               " " + containingClass.getPresentation.getLocationString
+             else if (isClassName && containingClass != null)
+               " in " + containingClass.name + " " +
+                 containingClass.getPresentation.getLocationString
+             else "")
         }
         if (!etaExpanded) presentation.setTailText(tailText1)
         else presentation.setTailText(" _")
@@ -190,7 +190,7 @@ class ScalaLookupItem(val element: PsiNamedElement,
                  " " + containingClass.getPresentation.getLocationString
                else if (isClassName && containingClass != null)
                  " in " + containingClass.name + " " +
-                 containingClass.getPresentation.getLocationString
+                   containingClass.getPresentation.getLocationString
                else "")
           presentation.setTailText(tailText1)
         }

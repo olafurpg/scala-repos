@@ -132,7 +132,7 @@ trait ScTypePresentation {
       }
       param.contextBound foreach { (tp: ScType) =>
         buffer ++=
-        s" : ${typeText0(ScTypeUtil.stripTypeArgs(subst.subst(tp)))}"
+          s" : ${typeText0(ScTypeUtil.stripTypeArgs(subst.subst(tp)))}"
       }
       buffer.toString()
     }

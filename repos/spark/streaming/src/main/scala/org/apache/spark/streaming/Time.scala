@@ -78,12 +78,12 @@ case class Time(private val millis: Long) {
 
   def until(that: Time, interval: Duration): Seq[Time] = {
     (this.milliseconds) until (that.milliseconds) by (interval.milliseconds) map
-    (new Time(_))
+      (new Time(_))
   }
 
   def to(that: Time, interval: Duration): Seq[Time] = {
     (this.milliseconds) to (that.milliseconds) by (interval.milliseconds) map
-    (new Time(_))
+      (new Time(_))
   }
 
   override def toString: String = (millis.toString + " ms")

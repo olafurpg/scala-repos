@@ -53,6 +53,6 @@ class LevelColorizer extends ClassicConverter {
     import org.scalatra.slf4j.LevelColorizer._
     val c = colors.getOrElse(event.getLevel, "")
     "%s%s%s" format
-    (c, event.getLevel, c.blankOption map (_ ⇒ EndColor) getOrElse "")
+      (c, event.getLevel, c.blankOption map (_ ⇒ EndColor) getOrElse "")
   }
 }

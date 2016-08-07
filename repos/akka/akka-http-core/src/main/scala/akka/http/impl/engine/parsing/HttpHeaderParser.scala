@@ -460,9 +460,9 @@ private[engine] final class HttpHeaderParser private (
       (c >> 8).toString + (if ((c & 0xFF) > 0) "/" + (c & 0xFF).toChar
                            else "/Ω")
     s"nodes: ${nodes take nodeCount map char mkString ", "}\n" +
-    s"branchData: ${branchData take branchDataCount grouped 3 map {
-      case Array(a, b, c) ⇒ s"$a/$b/$c"
-    } mkString ", "}\n" + s"values: ${values take valueCount mkString ", "}"
+      s"branchData: ${branchData take branchDataCount grouped 3 map {
+        case Array(a, b, c) ⇒ s"$a/$b/$c"
+      } mkString ", "}\n" + s"values: ${values take valueCount mkString ", "}"
   }
 
   /**

@@ -194,7 +194,7 @@ class FastScalac extends Scalac {
       t map { s =>
         if (s.find(c => c <= ' ' || "\"'\\".contains(c)).isDefined)
           "\"" +
-          s.flatMap(c => (if (c == '"' || c == '\\') "\\" else "") + c) + "\""
+            s.flatMap(c => (if (c == '"' || c == '\\') "\\" else "") + c) + "\""
         else s
       } mkString "\n"
 

@@ -70,7 +70,7 @@ class BTypesFromClassfileTest {
       if (fromSym.nestedInfo.isEmpty) fromSym.flags == fromClassfile.flags
       else
         (fromSym.flags | ACC_PRIVATE | ACC_PUBLIC) ==
-        (fromClassfile.flags | ACC_PRIVATE | ACC_PUBLIC)
+          (fromClassfile.flags | ACC_PRIVATE | ACC_PUBLIC)
     }, s"class flags differ\n$fromSym\n$fromClassfile")
 
     // we don't compare InlineInfos in this test: in both cases (from symbol and from classfile) they

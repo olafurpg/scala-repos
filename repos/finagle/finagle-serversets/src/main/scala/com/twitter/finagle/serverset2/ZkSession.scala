@@ -67,9 +67,9 @@ private[serverset2] class ZkSession(
         // if there was no previous value, ensure we have a gauge
         synchronized {
           watchUpdateGauges ::=
-          statsReceiver.addGauge("last_watch_update", path) {
-            Time.now.inLongSeconds - lastGoodUpdate.getOrElse(path, 0L)
-          }
+            statsReceiver.addGauge("last_watch_update", path) {
+              Time.now.inLongSeconds - lastGoodUpdate.getOrElse(path, 0L)
+            }
         }
       case _ => //gauge is already there
     }

@@ -27,7 +27,7 @@ class FlowGroupedSpec extends AkkaSpec with ScriptedTest {
           randomTest(testLen)
         }: _*)
       TestConfig.RandomTestRange foreach
-      (_ ⇒ runScript(script, settings)(_.grouped(testLen)))
+        (_ ⇒ runScript(script, settings)(_.grouped(testLen)))
     }
 
     "group with rest" in {
@@ -37,7 +37,7 @@ class FlowGroupedSpec extends AkkaSpec with ScriptedTest {
           randomTest(testLen)
         } :+ randomTest(1): _*)
       TestConfig.RandomTestRange foreach
-      (_ ⇒ runScript(script, settings)(_.grouped(testLen)))
+        (_ ⇒ runScript(script, settings)(_.grouped(testLen)))
     }
   }
 }

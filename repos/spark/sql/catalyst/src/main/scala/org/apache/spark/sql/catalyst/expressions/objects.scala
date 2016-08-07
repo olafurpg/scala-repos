@@ -567,7 +567,7 @@ case class CreateExternalRow(children: Seq[Expression], schema: StructType)
           }
          """
     }.mkString("\n") +
-    s"final ${classOf[Row].getName} ${ev.value} = new $rowClass($values, this.$schemaField);"
+      s"final ${classOf[Row].getName} ${ev.value} = new $rowClass($values, this.$schemaField);"
   }
 }
 

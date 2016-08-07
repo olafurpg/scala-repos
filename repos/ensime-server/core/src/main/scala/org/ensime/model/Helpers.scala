@@ -126,8 +126,10 @@ trait Helpers { self: Global =>
     if (withTpeArgs) {
       withoutArgs + (if (tpe.typeArgs.size > 0) {
                        "[" +
-                       tpe.typeArgs.map(typeFullName(_, true)).mkString(", ") +
-                       "]"
+                         tpe.typeArgs
+                           .map(typeFullName(_, true))
+                           .mkString(", ") +
+                         "]"
                      } else { "" })
     } else withoutArgs
   }

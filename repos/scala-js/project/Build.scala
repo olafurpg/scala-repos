@@ -730,9 +730,9 @@ object Build extends sbt.Build {
              */
             scalacOptions += {
               "-P:scalajs:mapSourceURI:" +
-              (artifactPath in fetchScalaSource).value.toURI +
-              "->https://raw.githubusercontent.com/scala/scala/v" +
-              scalaVersion.value + "/src/library/"
+                (artifactPath in fetchScalaSource).value.toURI +
+                "->https://raw.githubusercontent.com/scala/scala/v" +
+                scalaVersion.value + "/src/library/"
             }
         ) ++ myScalaJSSettings ++ Seq(
             name := "Scala library for Scala.js",

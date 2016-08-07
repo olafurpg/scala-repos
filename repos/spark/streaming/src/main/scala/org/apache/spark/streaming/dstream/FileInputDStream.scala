@@ -373,7 +373,9 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
 
     override def toString: String = {
       "[\n" + hadoopFiles.size + " file sets\n" +
-      hadoopFiles.map(p => (p._1, p._2.mkString(", "))).mkString("\n") + "\n]"
+        hadoopFiles
+          .map(p => (p._1, p._2.mkString(", ")))
+          .mkString("\n") + "\n]"
     }
   }
 }

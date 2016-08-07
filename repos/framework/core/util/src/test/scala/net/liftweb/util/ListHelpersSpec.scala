@@ -104,7 +104,7 @@ object ListHelpersSpec extends Specification with ListHelpers {
     }
     "return a Full can with the first second value of a pair matching the key case-insensitively" in {
       List(("one", "1"), ("two", "2"), ("two", "3")).ciGet("two") must_==
-      Full("2")
+        Full("2")
     }
   }
 
@@ -150,7 +150,7 @@ object ListHelpersSpec extends Specification with ListHelpers {
   "The ListHelpers rotateList function (rotate method on a List object)" should {
     "create a List of all the circular permutations of a given list" in {
       List(1, 2, 3).rotate must_==
-      List(List(1, 2, 3), List(2, 3, 1), List(3, 1, 2))
+        List(List(1, 2, 3), List(2, 3, 1), List(3, 1, 2))
     }
   }
 
@@ -204,7 +204,7 @@ object ListHelpersSpec extends Specification with ListHelpers {
       List(1).? must beTrue
     }
     "provide a replace method to replace one element of the list at a given position (0-based index)." +
-    " If the position is negative, the first element is replaced" in {
+      " If the position is negative, the first element is replaced" in {
       List(1, 2, 3).replace(1, 4) must_== List(1, 4, 3)
       List(1, 2, 3).replace(4, 4) must_== List(1, 2, 3)
       List(1, 2, 3).replace(-1, 4) must_== List(4, 2, 3)

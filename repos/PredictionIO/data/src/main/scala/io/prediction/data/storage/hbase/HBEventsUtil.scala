@@ -140,7 +140,7 @@ object HBEventsUtil {
                            millis: Option[Long] = None) {
     val toBytes: Array[Byte] = {
       hash(entityType, entityId) ++
-      (millis.map(Bytes.toBytes(_)).getOrElse(Array[Byte]()))
+        (millis.map(Bytes.toBytes(_)).getOrElse(Array[Byte]()))
     }
   }
 

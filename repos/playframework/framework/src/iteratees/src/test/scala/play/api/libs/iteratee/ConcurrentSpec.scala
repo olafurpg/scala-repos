@@ -132,7 +132,7 @@ object ConcurrentSpec
           }(flatMapEC)
 
         Await.result(result, Duration.Inf) must not equalTo
-        (List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+          (List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
         flatMapEC.executionCount must beGreaterThan(0)
         mapEC.executionCount must equalTo(flatMapEC.executionCount)
       }

@@ -68,7 +68,7 @@ object SizeHintProps extends Properties("SizeHint") {
   property("Hadamard product does not increase sparsity fraction") = forAll {
     (a: SparseHint, b: SparseHint) =>
       (a #*# b).asInstanceOf[SparseHint].sparsity ==
-      (a.sparsity min b.sparsity)
+        (a.sparsity min b.sparsity)
   }
 
   property("transpose preserves size") = forAll { (a: SizeHint) =>
@@ -106,9 +106,9 @@ object SizeHintProps extends Properties("SizeHint") {
   property("diagonals are about as big as the min(rows,cols)") = forAll {
     (a: FiniteHint) =>
       SizeHint.asDiagonal(a).total.getOrElse(BigInt(-1L)) <=
-      (a.rows min a.cols)
+        (a.rows min a.cols)
       SizeHint.asDiagonal(a).total.getOrElse(BigInt(-1L)) >=
-      ((a.rows min a.cols) - 1L)
+        ((a.rows min a.cols) - 1L)
   }
 
   property("transpose law is obeyed in total") = forAll {

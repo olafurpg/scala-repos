@@ -214,11 +214,11 @@ class ScConstructorImpl(node: ASTNode)
                 case _ => Seq.empty
               }
               buffer +=
-              Success(ScMethodType(ScDesignatorType(clazz),
-                                   params,
-                                   isImplicit = false)(getProject,
-                                                       getResolveScope),
-                      Some(this))
+                Success(ScMethodType(ScDesignatorType(clazz),
+                                     params,
+                                     isImplicit = false)(getProject,
+                                                         getResolveScope),
+                        Some(this))
             case _ =>
           }
           buffer.toSeq

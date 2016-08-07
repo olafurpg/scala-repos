@@ -181,9 +181,9 @@ final class Formatter(private val dest: Appendable)
                 case formattable: Formattable =>
                   val flags = {
                     (if (hasFlag("-")) FormattableFlags.LEFT_JUSTIFY else 0) |
-                    (if (hasFlag("#")) FormattableFlags.ALTERNATE else 0) |
-                    (if (isConversionUpperCase) FormattableFlags.UPPERCASE
-                     else 0)
+                      (if (hasFlag("#")) FormattableFlags.ALTERNATE else 0) |
+                      (if (isConversionUpperCase) FormattableFlags.UPPERCASE
+                       else 0)
                   }
                   formattable.formatTo(this,
                                        flags,
@@ -241,7 +241,7 @@ final class Formatter(private val dest: Appendable)
               // JavaDoc: at least 2 digits
               if ('e' == exp.charAt(exp.length - 3)) {
                 exp.substring(0, exp.length - 1) + "0" +
-                exp.charAt(exp.length - 1)
+                  exp.charAt(exp.length - 1)
               } else exp
             }, numberArg.isNaN || numberArg.isInfinite)
           }

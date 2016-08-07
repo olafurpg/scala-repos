@@ -367,8 +367,8 @@ object JGitUtil {
               .map(_.url)
           } else None
           fileList +:=
-          (treeWalk.getObjectId(0), treeWalk.getFileMode(0),
-              treeWalk.getNameString, linkUrl)
+            (treeWalk.getObjectId(0), treeWalk.getFileMode(0),
+                treeWalk.getNameString, linkUrl)
         }
       }
       revWalk.markStart(revCommit)
@@ -1151,27 +1151,27 @@ object JGitUtil {
         val c = blame.getSourceCommit(i)
         if (!blameMap.contains(c.name)) {
           blameMap +=
-          c.name -> JGitUtil.BlameInfo(c.name,
-                                       c.getAuthorIdent.getName,
-                                       c.getAuthorIdent.getEmailAddress,
-                                       c.getAuthorIdent.getWhen,
-                                       Option(
-                                           git.log
-                                             .add(c)
-                                             .addPath(blame.getSourcePath(i))
-                                             .setSkip(1)
-                                             .setMaxCount(2)
-                                             .call
-                                             .iterator
-                                             .next).map(_.name),
-                                       if (blame.getSourcePath(i) == path) {
-                                         None
-                                       } else {
-                                         Some(blame.getSourcePath(i))
-                                       },
-                                       c.getCommitterIdent.getWhen,
-                                       c.getShortMessage,
-                                       Set.empty)
+            c.name -> JGitUtil.BlameInfo(c.name,
+                                         c.getAuthorIdent.getName,
+                                         c.getAuthorIdent.getEmailAddress,
+                                         c.getAuthorIdent.getWhen,
+                                         Option(
+                                             git.log
+                                               .add(c)
+                                               .addPath(blame.getSourcePath(i))
+                                               .setSkip(1)
+                                               .setMaxCount(2)
+                                               .call
+                                               .iterator
+                                               .next).map(_.name),
+                                         if (blame.getSourcePath(i) == path) {
+                                           None
+                                         } else {
+                                           Some(blame.getSourcePath(i))
+                                         },
+                                         c.getCommitterIdent.getWhen,
+                                         c.getShortMessage,
+                                         Set.empty)
         }
         idLine :+= (c.name, i)
       }

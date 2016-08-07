@@ -151,7 +151,7 @@ case class JxMatch(exp: JsExp, cases: JxCase*) extends Node with JxBase {
     val vn = "v" + Helpers.nextFuncName
     JsCrVar(vn, exp) & JsRaw("if (false) {\n} " + cases.map { c =>
       " else if (" + vn + " == " + c.toMatch.toJsCmd +
-      ") {" + addToDocFrag(parentName, c.toDo.toList).toJsCmd + "\n}"
+        ") {" + addToDocFrag(parentName, c.toDo.toList).toJsCmd + "\n}"
     }.mkString("") + " else {throw new Exception('Unmatched: '+" + vn + ");}")
   }
 }

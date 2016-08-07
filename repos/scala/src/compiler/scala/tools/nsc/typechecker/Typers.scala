@@ -1405,10 +1405,10 @@ trait Typers
       if (pt == WildcardType) doAdapt(pt)
       else
         silent(_ => doAdapt(pt)) filter (_ != qual) orElse
-        (_ =>
-              logResult(
-                  s"fallback on implicits in adaptToArguments: $qual.$name")(
-                  doAdapt(WildcardType)))
+          (_ =>
+                logResult(
+                    s"fallback on implicits in adaptToArguments: $qual.$name")(
+                    doAdapt(WildcardType)))
     }
 
     /** Try to apply an implicit conversion to `qual` so that it contains
@@ -1437,11 +1437,11 @@ trait Typers
       }
 
       silent(_.adaptToMember(qual, HasMember(name), reportAmbiguous = false)) orElse
-      (errs =>
-            onError {
-              if (reportAmbiguous) errs foreach (context issue _)
-              setError(tree)
-          })
+        (errs =>
+              onError {
+                if (reportAmbiguous) errs foreach (context issue _)
+                setError(tree)
+            })
     }
 
     /** Try to apply an implicit conversion to `qual` to that it contains a
@@ -1781,7 +1781,7 @@ trait Typers
             val typer1 = newTyper(cscope)
             // XXX: see about using the class's symbol....
             clazz.unsafeTypeParams foreach
-            (sym => typer1.context.scope.enter(sym))
+              (sym => typer1.context.scope.enter(sym))
             typer1.namer.enterValueParams(vparamss map (_.map(_.duplicate)))
             typer1.typed(cbody1)
           }
@@ -1872,7 +1872,7 @@ trait Typers
             typedPrimaryConstrBody(templ)(EmptyTree)
 
           supertpts mapConserve
-          (tpt => checkNoEscaping.privates(context.owner, tpt))
+            (tpt => checkNoEscaping.privates(context.owner, tpt))
         } catch {
           case ex: TypeError =>
             // fallback in case of cyclic errors
@@ -1955,7 +1955,7 @@ trait Typers
           }
 
           if (parents exists
-              (p => p != parent && p.tpe.typeSymbol == psym && !psym.isError))
+                (p => p != parent && p.tpe.typeSymbol == psym && !psym.isError))
             pending += ParentInheritedTwiceError(parent, psym)
 
           validateDynamicParent(psym, parent.pos)
@@ -2041,7 +2041,7 @@ trait Typers
       val linkedClass = companionSymbolOf(mdef.symbol, context)
       if (linkedClass != NoSymbol)
         linkedClass.info.decl(nme.CONSTRUCTOR).alternatives foreach
-        (_.initialize)
+          (_.initialize)
 
       val clazz = mdef.symbol.moduleClass
       val typedMods = typedModifiers(mdef.mods)
@@ -2052,11 +2052,11 @@ trait Typers
       val impl1 = newTyper(context.make(mdef.impl, clazz, newScope))
         .typedTemplate(mdef.impl, {
           typedParentTypes(mdef.impl) ++
-          (if (noSerializable) Nil
-           else {
-             clazz.makeSerializable()
-             List(TypeTree(SerializableTpe) setPos clazz.pos.focus)
-           })
+            (if (noSerializable) Nil
+             else {
+               clazz.makeSerializable()
+               List(TypeTree(SerializableTpe) setPos clazz.pos.focus)
+             })
         })
 
       val impl2 = finishMethodSynthesis(impl1, clazz, context)
@@ -5130,7 +5130,7 @@ trait Typers
             if (retry) "second try: " + funStr
             else
               "no second try: " + funStr + " because error not in result: " +
-              typeErrors.head.errPos + "!=" + tree.pos
+                typeErrors.head.errPos + "!=" + tree.pos
           })
           if (retry) {
             val Select(qual, name) = fun
@@ -5379,9 +5379,9 @@ trait Typers
           t.tpe match {
             case OverloadedType(pre, alts) =>
               if (alts forall
-                  (s =>
-                        (s.owner == ObjectClass) || (s.owner == AnyClass) ||
-                          isPrimitiveValueClass(s.owner))) ()
+                    (s =>
+                          (s.owner == ObjectClass) || (s.owner == AnyClass) ||
+                            isPrimitiveValueClass(s.owner))) ()
               else if (settings.debug)
                 printCaller(
                     s"""|Select received overloaded type during $phase, but typer is over.
@@ -5448,10 +5448,10 @@ trait Typers
             // 2) Try expanding according to Dynamic rules.
             // 3) Try looking up the name in the qualifier.
             asTypeSelection orElse asDynamicCall getOrElse
-            (lookupInQualifier(qual, name) match {
-                  case NoSymbol => setError(errorTree)
-                  case found => typed1(tree setSymbol found, mode, pt)
-                })
+              (lookupInQualifier(qual, name) match {
+                    case NoSymbol => setError(errorTree)
+                    case found => typed1(tree setSymbol found, mode, pt)
+                  })
           }
           handleMissing
         } else {
@@ -5788,9 +5788,9 @@ trait Typers
 
       def typedAlternative(alt: Alternative) = {
         context withinPatAlternative
-        (treeCopy.Alternative(tree,
-                              alt.trees mapConserve
-                                (alt => typed(alt, mode, pt))) setType pt)
+          (treeCopy.Alternative(tree,
+                                alt.trees mapConserve
+                                  (alt => typed(alt, mode, pt))) setType pt)
       }
       def typedStar(tree: Star) = {
         if (!context.starPatterns && !isPastTyper)
@@ -5950,11 +5950,12 @@ trait Typers
           //openMacros exists (_.macroApplication.pos includes lit.pos)
           // tests whether the lit belongs to the expandee of an open macro
           openMacros exists
-          (_.macroApplication.attachments.get[MacroExpansionAttachment] match {
-                case Some(MacroExpansionAttachment(_, t: Tree)) =>
-                  t exists (_ == lit)
-                case _ => false
-              })
+            (_.macroApplication.attachments
+                  .get[MacroExpansionAttachment] match {
+                  case Some(MacroExpansionAttachment(_, t: Tree)) =>
+                    t exists (_ == lit)
+                  case _ => false
+                })
         }
         // attempt to avoid warning about the special interpolated message string
         // for implicitNotFound or any standard interpolation (with embedded $$).
@@ -5994,7 +5995,8 @@ trait Typers
             warn("detected an interpolated expression") // "${...}"
           else
             suspiciousIdents find isPlausible foreach
-            (sym => warn(s"detected interpolated identifier `$$${sym.name}`")) // "$id"
+              (sym =>
+                    warn(s"detected interpolated identifier `$$${sym.name}`")) // "$id"
         }
         lit match {
           case Literal(Constant(s: String))
@@ -6008,7 +6010,8 @@ trait Typers
         if (settings.warnMissingInterpolator) warnMissingInterpolator(tree)
 
         tree setType
-        (if (tree.value.tag == UnitTag) UnitTpe else ConstantType(tree.value))
+          (if (tree.value.tag == UnitTag) UnitTpe
+           else ConstantType(tree.value))
       }
 
       def typedSingletonTypeTree(tree: SingletonTypeTree) = {

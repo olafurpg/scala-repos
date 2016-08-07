@@ -98,7 +98,7 @@ class UISeleniumSuite
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
         go to (sparkUI.appUIAddress.stripSuffix("/"))
         find(cssSelector("""ul li a[href*="streaming"]""")) should not be
-        (None)
+          (None)
       }
 
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
@@ -220,7 +220,8 @@ class UISeleniumSuite
 
         // Check a non-exist batch
         go to
-        (sparkUI.appUIAddress.stripSuffix("/") + "/streaming/batch/?id=12345")
+          (sparkUI.appUIAddress
+                .stripSuffix("/") + "/streaming/batch/?id=12345")
         webDriver.getPageSource should include("does not exist")
       }
 

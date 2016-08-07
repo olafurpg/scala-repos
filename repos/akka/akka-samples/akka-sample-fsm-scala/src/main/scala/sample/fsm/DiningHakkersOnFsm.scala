@@ -137,7 +137,7 @@ class FSMHakker(name: String, left: ActorRef, right: ActorRef)
         "%s has picked up %s and %s and starts to eat"
           .format(name, left.path.name, right.path.name))
     goto(Eating) using TakenChopsticks(Some(left), Some(right)) forMax
-    (5.seconds)
+      (5.seconds)
   }
 
   // When the results of the other grab comes back,

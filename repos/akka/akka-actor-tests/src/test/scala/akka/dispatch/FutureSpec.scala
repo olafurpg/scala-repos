@@ -226,7 +226,7 @@ class FutureSpec
                   a.getClass.toString == b.getClass.toString
                 case _ ⇒ false
               }) :| result.value.get.toString + " is expected to be " +
-              expected.toString
+                expected.toString
             }, minSuccessful(10000), workers(4))
           }
         }

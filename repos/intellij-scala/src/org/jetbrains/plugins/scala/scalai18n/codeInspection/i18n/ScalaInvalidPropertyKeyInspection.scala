@@ -181,7 +181,7 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
                         val parameters = method.getParameterList.getParameters
                         if (i + paramsCount >= args.length && method != null &&
                             method.getParameterList.getParametersCount == i +
-                            2 && parameters(i + 1).isVarArgs) {
+                              2 && parameters(i + 1).isVarArgs) {
                           myProblems.add(
                               myManager.createProblemDescriptor(
                                   methodCall,

@@ -34,22 +34,22 @@ class SwaggerWithAuth(val swaggerVersion: String,
     val endpoints: List[AuthEndpoint[AnyRef]] =
       s.endpoints(resourcePath) collect { case m: AuthEndpoint[AnyRef] => m }
     _docs +=
-    listingPath -> AuthApi(
-        apiVersion,
-        swaggerVersion,
-        resourcePath,
-        description,
-        (produces ::: endpoints
-              .flatMap(_.operations.flatMap(_.produces))).distinct,
-        (consumes ::: endpoints
-              .flatMap(_.operations.flatMap(_.consumes))).distinct,
-        (protocols ::: endpoints
-              .flatMap(_.operations.flatMap(_.protocols))).distinct,
-        endpoints,
-        s.models.toMap,
-        (authorizations ::: endpoints.flatMap(
-                _.operations.flatMap(_.authorizations))).distinct,
-        0)
+      listingPath -> AuthApi(
+          apiVersion,
+          swaggerVersion,
+          resourcePath,
+          description,
+          (produces ::: endpoints
+                .flatMap(_.operations.flatMap(_.produces))).distinct,
+          (consumes ::: endpoints
+                .flatMap(_.operations.flatMap(_.consumes))).distinct,
+          (protocols ::: endpoints
+                .flatMap(_.operations.flatMap(_.protocols))).distinct,
+          endpoints,
+          s.models.toMap,
+          (authorizations ::: endpoints.flatMap(
+                  _.operations.flatMap(_.authorizations))).distinct,
+          0)
   }
 }
 
@@ -219,27 +219,30 @@ trait SwaggerAuthBase[TypeForUser <: AnyRef] extends SwaggerBaseBase {
 
   protected override def renderIndex(docs: List[ApiType]): JValue = {
     ("apiVersion" -> swagger.apiVersion) ~
-    ("swaggerVersion" -> swagger.swaggerVersion) ~
-    ("apis" ->
-        (docs.filter(s =>
-                    s.apis.nonEmpty &&
-                      s.apis.exists(_.operations.exists(_.allows(userOption))))
-              .toList map { doc =>
-              ("path" ->
-                  (url(doc.resourcePath,
-                       includeServletPath = false,
-                       includeContextPath = false) +
-                      (if (includeFormatParameter) ".{format}" else ""))) ~
-              ("description" -> doc.description)
-            })) ~
-    ("authorizations" -> swagger.authorizations.foldLeft(JObject(Nil)) {
-          (acc, auth) =>
-            acc merge JObject(List(auth.`type` -> Extraction.decompose(auth)(
-                        SwaggerAuthSerializers.authFormats(userOption)(
-                            userManifest))))
-        }) ~
-    ("info" -> Option(swagger.apiInfo).map(Extraction.decompose(_)(
-                SwaggerAuthSerializers.authFormats(userOption)(userManifest))))
+      ("swaggerVersion" -> swagger.swaggerVersion) ~
+      ("apis" ->
+            (docs.filter(s =>
+                        s.apis.nonEmpty &&
+                          s.apis.exists(
+                              _.operations.exists(_.allows(userOption))))
+                  .toList map { doc =>
+                  ("path" ->
+                        (url(doc.resourcePath,
+                             includeServletPath = false,
+                             includeContextPath = false) +
+                              (if (includeFormatParameter) ".{format}"
+                               else ""))) ~
+                    ("description" -> doc.description)
+                })) ~
+      ("authorizations" -> swagger.authorizations.foldLeft(JObject(Nil)) {
+            (acc, auth) =>
+              acc merge JObject(List(auth.`type` -> Extraction.decompose(auth)(
+                          SwaggerAuthSerializers.authFormats(userOption)(
+                              userManifest))))
+          }) ~
+      ("info" -> Option(swagger.apiInfo).map(
+              Extraction.decompose(_)(SwaggerAuthSerializers.authFormats(
+                      userOption)(userManifest))))
   }
 }
 

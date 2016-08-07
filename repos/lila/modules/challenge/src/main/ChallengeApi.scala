@@ -104,7 +104,7 @@ final class ChallengeApi(repo: ChallengeRepo,
 
   private def uncacheAndNotify(c: Challenge) = {
     (c.destUserId ?? countInFor.remove) >>- (c.destUserId ?? notify) >>-
-    (c.challengerUserId ?? notify) >>- socketReload(c.id)
+      (c.challengerUserId ?? notify) >>- socketReload(c.id)
   }
 
   private def socketReload(id: Challenge.ID) {

@@ -1243,7 +1243,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       */
     def normalizedParents(parents: List[Type]): List[Type] = {
       if (parents exists
-          (t => (t.typeSymbol ne ObjectClass) && t.typeSymbol.isClass))
+            (t => (t.typeSymbol ne ObjectClass) && t.typeSymbol.isClass))
         parents filterNot (_.typeSymbol eq ObjectClass)
       else removeRedundantObjects(parents)
     }
@@ -1681,7 +1681,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         else if (sym.isTopLevel) sym.javaClassName
         else
           flatNameString(sym.owner, separator) + nme.NAME_JOIN_STRING +
-          sym.simpleName
+            sym.simpleName
       def signature1(etp: Type): String = {
         if (etp.typeSymbol == ArrayClass)
           "[" + signature1(erasure(etp.dealiasWiden.typeArgs.head))

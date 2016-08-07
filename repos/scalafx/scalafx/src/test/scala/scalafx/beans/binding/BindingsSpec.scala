@@ -82,7 +82,7 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
 
   "BindingIncludes" should "support min" in {
     doubleProperty1 <==
-    min(doubleProperty2, doubleProperty3, 25, 26l, 27f, 28d)
+      min(doubleProperty2, doubleProperty3, 25, 26l, 27f, 28d)
     doubleProperty1() should equal(0)
     doubleProperty2() = 50
     doubleProperty3() = 43
@@ -91,7 +91,7 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
 
   "BindingIncludes" should "support max" in {
     doubleProperty1 <==
-    max(doubleProperty2, doubleProperty3, 25, 26l, 27f, 28d)
+      max(doubleProperty2, doubleProperty3, 25, 26l, 27f, 28d)
     doubleProperty1() should equal(28)
     doubleProperty2() = 50
     doubleProperty3() = 43
@@ -104,16 +104,16 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
     floatProperty1() = 15
     doubleProperty1() = 30
     doubleProperty2 <==
-    when(booleanProperty1) choose 31 otherwise integerProperty1
+      when(booleanProperty1) choose 31 otherwise integerProperty1
     doubleProperty2() should equal(5)
     doubleProperty2 <==
-    when(booleanProperty1) choose 31 otherwise longProperty1
+      when(booleanProperty1) choose 31 otherwise longProperty1
     doubleProperty2() should equal(10)
     doubleProperty2 <==
-    when(booleanProperty1) choose 31 otherwise floatProperty1
+      when(booleanProperty1) choose 31 otherwise floatProperty1
     doubleProperty2() should equal(15)
     doubleProperty2 <==
-    when(booleanProperty1) choose 31 otherwise doubleProperty1
+      when(booleanProperty1) choose 31 otherwise doubleProperty1
     doubleProperty2() should equal(30)
   }
 
@@ -121,13 +121,13 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
     doubleProperty2() = 15
     doubleProperty3() = 30
     doubleProperty1 <==
-    when(booleanProperty1) choose doubleProperty2 otherwise doubleProperty3
+      when(booleanProperty1) choose doubleProperty2 otherwise doubleProperty3
     doubleProperty1() should equal(30)
     doubleProperty1 <==
-    when(booleanProperty1) choose doubleProperty2 otherwise 15d
+      when(booleanProperty1) choose doubleProperty2 otherwise 15d
     doubleProperty1() should equal(15)
     doubleProperty1 <==
-    when(booleanProperty1) choose 25d otherwise doubleProperty3
+      when(booleanProperty1) choose 25d otherwise doubleProperty3
     doubleProperty1() should equal(30)
   }
 
@@ -145,13 +145,13 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
   it should "support `when .. choose .. otherwise` with boolean types" in {
     booleanProperty3() = true
     booleanProperty1 <==
-    when(booleanProperty2) choose booleanProperty2 otherwise booleanProperty3
+      when(booleanProperty2) choose booleanProperty2 otherwise booleanProperty3
     booleanProperty1() should be(true)
     booleanProperty1 <==
-    when(booleanProperty2) choose booleanProperty2 otherwise false
+      when(booleanProperty2) choose booleanProperty2 otherwise false
     booleanProperty1() should be(false)
     booleanProperty1 <==
-    when(booleanProperty2) choose true otherwise booleanProperty3
+      when(booleanProperty2) choose true otherwise booleanProperty3
     booleanProperty1() should be(true)
   }
 
@@ -159,13 +159,13 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
     stringProperty2() = "Hello"
     stringProperty3() = "World"
     stringProperty1 <==
-    when(booleanProperty1) choose stringProperty3 otherwise stringProperty2
+      when(booleanProperty1) choose stringProperty3 otherwise stringProperty2
     stringProperty1() should equal("Hello")
     stringProperty1 <==
-    when(booleanProperty1) choose "string before" otherwise stringProperty3
+      when(booleanProperty1) choose "string before" otherwise stringProperty3
     stringProperty1() should equal("World")
     stringProperty1 <==
-    when(booleanProperty1) choose stringProperty2 otherwise "string after"
+      when(booleanProperty1) choose stringProperty2 otherwise "string after"
     stringProperty1() should equal("string after")
   }
 
@@ -176,13 +176,13 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
     objectProperty2() = obj2
     objectProperty3() = obj3
     objectProperty1 <==
-    when(booleanProperty1) choose objectProperty2 otherwise objectProperty3
+      when(booleanProperty1) choose objectProperty2 otherwise objectProperty3
     objectProperty1() should equal(obj3)
     objectProperty1 <==
-    when(booleanProperty1) choose obj1 otherwise objectProperty2
+      when(booleanProperty1) choose obj1 otherwise objectProperty2
     objectProperty1() should equal(obj2)
     objectProperty1 <==
-    when(booleanProperty1) choose objectProperty2 otherwise obj1
+      when(booleanProperty1) choose objectProperty2 otherwise obj1
     objectProperty1() should equal(obj1)
   }
 

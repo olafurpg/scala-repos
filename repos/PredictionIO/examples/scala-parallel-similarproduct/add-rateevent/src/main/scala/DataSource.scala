@@ -123,7 +123,7 @@ class TrainingData(
 ) extends Serializable {
   override def toString = {
     s"users: [${users.count()} (${users.take(2).toList}...)]" +
-    s"items: [${items.count()} (${items.take(2).toList}...)]" +
-    s"rateEvents: [${rateEvents.count()}] (${rateEvents.take(2).toList}...)"
+      s"items: [${items.count()} (${items.take(2).toList}...)]" +
+      s"rateEvents: [${rateEvents.count()}] (${rateEvents.take(2).toList}...)"
   }
 }

@@ -30,7 +30,7 @@ private[tests] trait CoreTestDefs
                   (member.sym.name string_== "getClass") ||
                     member.sym.isConstructor)
             reporter println
-            (filtered.map(_.forceInfoString).sorted mkString "\n")
+              (filtered.map(_.forceInfoString).sorted mkString "\n")
           }
         }
       }

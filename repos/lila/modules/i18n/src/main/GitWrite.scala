@@ -28,7 +28,7 @@ private[i18n] final class GitWrite(transRelPath: String,
     git.currentBranch flatMap { currentBranch =>
       logger.info("Current branch is " + currentBranch)
       (translations map gitActor.?).sequenceFu >>
-      (gitActor ? currentBranch mapTo manifest[Unit])
+        (gitActor ? currentBranch mapTo manifest[Unit])
     }
   }
 
@@ -48,15 +48,16 @@ private[i18n] final class GitWrite(transRelPath: String,
         val name = (LangList name code) err "Lang does not exist: " + code
         val commitMsg = commitMessage(translation, name)
         sender !
-        (git branchExists branch flatMap {
-              _.fold(
-                  fuccess(logger.warn("! Branch already exists: " + branch)),
-                  git.checkout(branch, true) >> writeMessages(translation) >>- logger
-                    .info("Add " + relFileOf(translation)) >>
-                    (git add relFileOf(translation)) >>- logger.info(
-                      "- " + commitMsg) >> (git commit commitMsg).void
-              )
-            }).await
+          (git branchExists branch flatMap {
+                _.fold(
+                    fuccess(logger.warn("! Branch already exists: " + branch)),
+                    git
+                      .checkout(branch, true) >> writeMessages(translation) >>- logger
+                      .info("Add " + relFileOf(translation)) >>
+                      (git add relFileOf(translation)) >>- logger.info(
+                        "- " + commitMsg) >> (git commit commitMsg).void
+                )
+              }).await
       }
     }
   }))

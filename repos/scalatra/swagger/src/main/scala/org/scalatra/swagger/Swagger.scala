@@ -283,22 +283,22 @@ class Swagger(val swaggerVersion: String,
     val endpoints: List[Endpoint] =
       s.endpoints(resourcePath) collect { case m: Endpoint => m }
     _docs +=
-    listingPath -> Api(
-        apiVersion,
-        swaggerVersion,
-        resourcePath,
-        description,
-        (produces ::: endpoints
-              .flatMap(_.operations.flatMap(_.produces))).distinct,
-        (consumes ::: endpoints
-              .flatMap(_.operations.flatMap(_.consumes))).distinct,
-        (protocols ::: endpoints
-              .flatMap(_.operations.flatMap(_.protocols))).distinct,
-        endpoints,
-        s.models.toMap,
-        (authorizations ::: endpoints.flatMap(
-                _.operations.flatMap(_.authorizations))).distinct,
-        0)
+      listingPath -> Api(
+          apiVersion,
+          swaggerVersion,
+          resourcePath,
+          description,
+          (produces ::: endpoints
+                .flatMap(_.operations.flatMap(_.produces))).distinct,
+          (consumes ::: endpoints
+                .flatMap(_.operations.flatMap(_.consumes))).distinct,
+          (protocols ::: endpoints
+                .flatMap(_.operations.flatMap(_.protocols))).distinct,
+          endpoints,
+          s.models.toMap,
+          (authorizations ::: endpoints.flatMap(
+                  _.operations.flatMap(_.authorizations))).distinct,
+          0)
   }
 }
 

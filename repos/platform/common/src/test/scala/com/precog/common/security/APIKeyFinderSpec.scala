@@ -59,7 +59,7 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
       } yield (key0.apiKey -> mgr)).copoint
       withAPIKeyFinder(mgr) { keyFinder =>
         keyFinder.findAPIKey(key, None).copoint map (_.apiKey) must_==
-        Some(key)
+          Some(key)
       }
     }
 

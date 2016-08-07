@@ -417,7 +417,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
 
     private def mkMsg(tree: Tree): String = {
       "Exception while translating Scala.js JS tree to GCC IR at tree:\n" +
-      tree.show
+        tree.show
     }
   }
 }

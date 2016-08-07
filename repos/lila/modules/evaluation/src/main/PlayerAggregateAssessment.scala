@@ -131,7 +131,7 @@ case class PlayerAggregateAssessment(user: User,
       .take(maxGames)
       .map { a =>
         a.assessment.emoticon + " http://lichess.org/" + a.gameId +
-        "/" + a.color.name
+          "/" + a.color.name
       })
       .mkString("\n")
 

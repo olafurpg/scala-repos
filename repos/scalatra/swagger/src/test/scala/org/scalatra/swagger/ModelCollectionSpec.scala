@@ -69,18 +69,18 @@ class ModelCollectionSpec extends Specification {
     "not return Options" in {
       Swagger.collectModels[Option[String]](Set.empty) must beEmpty
       Swagger.collectModels[Option[OnlyPrimitives]](Set.empty) must_==
-      Set(onlyPrimitivesModel)
+        Set(onlyPrimitivesModel)
     }
 
     "not return Lists" in {
       Swagger.collectModels[List[String]](Set.empty) must beEmpty
       Swagger.collectModels[List[OnlyPrimitives]](Set.empty) must_==
-      Set(onlyPrimitivesModel)
+        Set(onlyPrimitivesModel)
     }
 
     "only return the top level object for a case class with only primitives" in {
       Swagger.collectModels[OnlyPrimitives](Set.empty) must_==
-      Set(onlyPrimitivesModel)
+        Set(onlyPrimitivesModel)
     }
 
     "collect all the models in a nested structure" in {
@@ -102,7 +102,7 @@ class ModelCollectionSpec extends Specification {
     "collect models when provided as a list" in {
       val collected = Swagger.collectModels[List[Name]](Set.empty)
       collected.map(_.id) must_==
-      Set(Swagger.modelToSwagger[Name].get).map(_.id)
+        Set(Swagger.modelToSwagger[Name].get).map(_.id)
     }
 
     "collect models when provided as a list inside an option" in {

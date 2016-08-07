@@ -320,12 +320,12 @@ trait Infer extends Checkable { self: Analyzer =>
                 malformed(ex, pre memberType underlyingSymbol(sym))
             })
             tree setSymbol sym1 setType
-            (pre match {
-                  case _: SuperType =>
-                    owntype map
-                      (tp => if (tp eq pre) site.symbol.thisType else tp)
-                  case _ => owntype
-                })
+              (pre match {
+                    case _: SuperType =>
+                      owntype map
+                        (tp => if (tp eq pre) site.symbol.thisType else tp)
+                    case _ => owntype
+                  })
         }
     }
 

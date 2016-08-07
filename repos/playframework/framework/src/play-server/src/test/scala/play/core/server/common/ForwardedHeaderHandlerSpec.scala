@@ -35,7 +35,7 @@ class ForwardedHeaderHandlerSpec extends Specification {
       results(0)._2 must beLeft
       results(0)._3 must beNone
       results(1)._1 must_==
-      ForwardedEntry(Some("[2001:db8:cafe::17]:4711"), None)
+        ForwardedEntry(Some("[2001:db8:cafe::17]:4711"), None)
       results(1)._2 must beRight(
           ConnectionInfo(addr("2001:db8:cafe::17"), false))
       results(1)._3 must beSome(false)
@@ -76,7 +76,7 @@ class ForwardedHeaderHandlerSpec extends Specification {
       results(1)._2 must beRight(ConnectionInfo(addr("::1"), false))
       results(1)._3 must beSome(false)
       results(2)._1 must_==
-      ForwardedEntry(Some("[2001:db8:cafe::17]"), Some("https"))
+        ForwardedEntry(Some("[2001:db8:cafe::17]"), Some("https"))
       results(2)._2 must beRight(
           ConnectionInfo(addr("2001:db8:cafe::17"), true))
       results(2)._3 must beSome(true)

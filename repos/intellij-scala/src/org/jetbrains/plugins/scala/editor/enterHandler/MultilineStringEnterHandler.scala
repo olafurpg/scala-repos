@@ -245,7 +245,7 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
         val wsPrefix =
           if (isPrevLineFirst)
             prevLinePrefixAfterDelimiter(firstMLQuoteLength) +
-            firstMLQuoteLength
+              firstMLQuoteLength
           else prevLine.prefixLength(c => c == ' ' || c == '\t')
 
         val prefixStriped = prevLine.substring(wsPrefix)

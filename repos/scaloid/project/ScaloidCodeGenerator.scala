@@ -9,7 +9,7 @@ class ScaloidCodeGenerator(cls: AndroidClass,
   def implicitConversion = {
     val name = cls.name
     s"$deprecated@inline implicit def ${decapitalize(name)}2Rich$name[V <: ${genType(cls.tpe, erased = true)}]" +
-    s"(${decapitalize(name)}: V) = new Rich$name[V](${decapitalize(name)})"
+      s"(${decapitalize(name)}: V) = new Rich$name[V](${decapitalize(name)})"
   }
 
   def wholeClassDef =
@@ -212,7 +212,7 @@ class ScaloidCodeGenerator(cls: AndroidClass,
 
   def callbackMethod(m: AndroidCallbackMethod, isUnit: Boolean = false) = {
     s"def ${m.name}(${namedArgs(m.argTypes)}): ${genType(m.retType)} = " +
-    s"{ ${callbackBody(m, isUnit)} }"
+      s"{ ${callbackBody(m, isUnit)} }"
   }
 
   def commonListener(l: AndroidListener, args: String = "") = {
@@ -221,7 +221,7 @@ class ScaloidCodeGenerator(cls: AndroidClass,
                                       s"[U](f: $args => U): This = {"
                                     else
                                       s"(f: $args => ${genType(l.retType)}): This = {") +
-    s"\n  basis.${l.setter}(new ${l.callbackClassName} {"
+      s"\n  basis.${l.setter}(new ${l.callbackClassName} {"
   }
 
   def fullListener(l: AndroidListener) =
@@ -254,7 +254,7 @@ class ScaloidCodeGenerator(cls: AndroidClass,
     val da = if (l.zeroArgs) "" else s"(${namedArgs(l.argTypes)})"
     val ca = if (l.zeroArgs) "" else s", ${callArgs(l.argTypes)}"
     s"$dp@inline def ${l.name}[T: ClassTag]$da(implicit context: Context): " +
-    s"${genType(l.retType)} = basis.${l.name}(SIntent[T]$ca)"
+      s"${genType(l.retType)} = basis.${l.name}(SIntent[T]$ca)"
   }
 
   def intentMethods = cls.intentMethods.map(intentMethod).mkString("\n\n")
@@ -269,8 +269,8 @@ class ScaloidCodeGenerator(cls: AndroidClass,
       getter =>
         val dp = if (getter.isDeprecated) deprecatedDecl else ""
         methodScalaDoc(getter) +
-        s"\n$dp@inline${if (getter.isOverride) " override"
-        else ""} def ${safeIdent(prop.name)} = basis.${getter.name}\n"
+          s"\n$dp@inline${if (getter.isOverride) " override"
+          else ""} def ${safeIdent(prop.name)} = basis.${getter.name}\n"
     }
 
   def setter(prop: AndroidProperty, method: AndroidMethod) = {
@@ -279,8 +279,8 @@ class ScaloidCodeGenerator(cls: AndroidClass,
       else {
         val dp = if (method.isDeprecated) deprecatedDecl else ""
         methodScalaDoc(method) +
-        s"\n$dp@inline def ${safeIdent(prop.name + postFix)}${paramedTypes(
-            method.paramedTypes)}(${namedArgs(method.argTypes)}) = $body\n"
+          s"\n$dp@inline def ${safeIdent(prop.name + postFix)}${paramedTypes(
+              method.paramedTypes)}(${namedArgs(method.argTypes)}) = $body\n"
       }
 
     _setter("  ", s"            ${prop.name}_=(p)") + "\n" + _setter(
@@ -293,7 +293,7 @@ class ScaloidCodeGenerator(cls: AndroidClass,
       val dp = if (s.isDeprecated) deprecatedDecl else ""
       val spaces = " " * 13
       s"$dp@inline def  enable$name()$spaces= { basis.${s.name}(true ); basis }\n" +
-      s"$dp@inline def disable$name()$spaces= { basis.${s.name}(false); basis }\n"
+        s"$dp@inline def disable$name()$spaces= { basis.${s.name}(false); basis }\n"
     }
 
   def setters(prop: AndroidProperty) =

@@ -131,7 +131,7 @@ object FoldableTest extends SpecLite {
     "findMapM: finding the first element performs transform and only runs only necessary effects" ! forAll {
       (x: Int, xs: List[Int]) =>
         (x :: xs).findMapM[StateInt, Int](found).run(0) must_==
-        (1 -> Some(x * 2))
+          (1 -> Some(x * 2))
     }
 
     "findMapM: finding the last element performs transform and runs all effects (once only)" ! forAll {
@@ -146,7 +146,7 @@ object FoldableTest extends SpecLite {
     "findMapM: runs all effects but doesn't return a value for not found" ! forAll {
       (xs: List[Int]) =>
         xs.findMapM[StateInt, Int](_ => notfound).run(0) must_==
-        (xs.length -> None)
+          (xs.length -> None)
     }
 
     "findLeft" ! forAll { (x: Int, xs: List[Int]) =>
@@ -167,7 +167,7 @@ object FoldableTest extends SpecLite {
   "product foldLeft equivalence" ! forAll { (l: List[Int], l2: List[Int]) =>
     (L.product(L)
           .foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs) must_===
-        ((l ++ l2).reverse))
+          ((l ++ l2).reverse))
   }
 }
 

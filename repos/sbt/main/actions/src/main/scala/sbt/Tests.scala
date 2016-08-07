@@ -326,7 +326,7 @@ object Tests {
       }
 
     task { processRunnable(runnables.toList, List.empty) } dependsOn
-    (setupTasks)
+      (setupTasks)
   }
 
   def processResults(results: Iterable[(String, SuiteResult)]): Output =

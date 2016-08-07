@@ -332,23 +332,23 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
 
       if (shouldShowActiveStages) {
         content ++=
-        <h4 id="active">Active Stages ({activeStages.size})</h4> ++ activeStagesTable.toNodeSeq
+          <h4 id="active">Active Stages ({activeStages.size})</h4> ++ activeStagesTable.toNodeSeq
       }
       if (shouldShowPendingStages) {
         content ++=
-        <h4 id="pending">Pending Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
+          <h4 id="pending">Pending Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
       }
       if (shouldShowCompletedStages) {
         content ++=
-        <h4 id="completed">Completed Stages ({completedStages.size})</h4> ++ completedStagesTable.toNodeSeq
+          <h4 id="completed">Completed Stages ({completedStages.size})</h4> ++ completedStagesTable.toNodeSeq
       }
       if (shouldShowSkippedStages) {
         content ++=
-        <h4 id="skipped">Skipped Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
+          <h4 id="skipped">Skipped Stages ({pendingOrSkippedStages.size})</h4> ++ pendingOrSkippedStagesTable.toNodeSeq
       }
       if (shouldShowFailedStages) {
         content ++=
-        <h4 id ="failed">Failed Stages ({failedStages.size})</h4> ++ failedStagesTable.toNodeSeq
+          <h4 id ="failed">Failed Stages ({failedStages.size})</h4> ++ failedStagesTable.toNodeSeq
       }
       UIUtils.headerSparkPage(s"Details for Job $jobId",
                               content,

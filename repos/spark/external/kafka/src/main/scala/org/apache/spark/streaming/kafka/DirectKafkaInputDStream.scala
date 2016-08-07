@@ -110,9 +110,9 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
             case (tp, lag) =>
               val backpressureRate = Math.round(lag / totalLag.toFloat * rate)
               tp ->
-              (if (maxRateLimitPerPartition > 0) {
-                 Math.min(backpressureRate, maxRateLimitPerPartition)
-               } else backpressureRate)
+                (if (maxRateLimitPerPartition > 0) {
+                   Math.min(backpressureRate, maxRateLimitPerPartition)
+                 } else backpressureRate)
           }
         case None =>
           offsets.map { case (tp, offset) => tp -> maxRateLimitPerPartition }
@@ -184,7 +184,7 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
       offsetRange.fromOffset != offsetRange.untilOffset
     }.map { offsetRange =>
       s"topic: ${offsetRange.topic}\tpartition: ${offsetRange.partition}\t" +
-      s"offsets: ${offsetRange.fromOffset} to ${offsetRange.untilOffset}"
+        s"offsets: ${offsetRange.fromOffset} to ${offsetRange.untilOffset}"
     }.mkString("\n")
     // Copy offsetRanges to immutable.List to prevent from being modified by the user
     val metadata = Map("offsets" -> offsetRanges.toList,
@@ -231,11 +231,11 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
           logInfo(
               s"Restoring KafkaRDD for time $t ${b.mkString("[", ", ", "]")}")
           generatedRDDs +=
-          t -> new KafkaRDD[K, V, U, T, R](context.sparkContext,
-                                           kafkaParams,
-                                           b.map(OffsetRange(_)),
-                                           leaders,
-                                           messageHandler)
+            t -> new KafkaRDD[K, V, U, T, R](context.sparkContext,
+                                             kafkaParams,
+                                             b.map(OffsetRange(_)),
+                                             leaders,
+                                             messageHandler)
       }
     }
   }

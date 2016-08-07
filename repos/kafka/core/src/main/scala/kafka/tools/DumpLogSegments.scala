@@ -181,7 +181,7 @@ object DumpLogSegments {
         var misMatchesSeq = misMatchesForIndexFilesMap
           .getOrElse(file.getAbsolutePath, List[(Long, Long)]())
         misMatchesSeq ::=
-        (entry.offset + index.baseOffset, messageAndOffset.offset)
+          (entry.offset + index.baseOffset, messageAndOffset.offset)
         misMatchesForIndexFilesMap.put(file.getAbsolutePath, misMatchesSeq)
       }
       // since it is a sparse file, in the event of a crash there may be many zero entries, stop if we see one

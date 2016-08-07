@@ -105,10 +105,10 @@ class ThrowExceptionStrategyPersistentActorBoundedStashingSpec
       1 to (2 * capacity) foreach (persistentActor ! Cmd(_))
       //after PA stopped, all stashed messages forward to deadletters
       1 to capacity foreach
-      (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
+        (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
       //non-stashed messages
       (capacity + 2) to (2 * capacity) foreach
-      (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
+        (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
     }
   }
 }
@@ -134,7 +134,7 @@ class DiscardStrategyPersistentActorBoundedStashingSpec
       1 to (2 * capacity) foreach (persistentActor ! Cmd(_))
       //so, 11 to 20 discard to deadletter
       (1 + capacity) to (2 * capacity) foreach
-      (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
+        (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
       //allow "a" and 1 to 10 write complete
       1 to (1 + capacity) foreach (i ⇒ SteppingInmemJournal.step(journal))
 

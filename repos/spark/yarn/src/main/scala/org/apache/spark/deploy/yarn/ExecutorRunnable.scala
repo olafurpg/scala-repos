@@ -161,11 +161,11 @@ private[yarn] class ExecutorRunnable(container: Container,
     // Set extra Java options for the executor, if defined
     sparkConf.get(EXECUTOR_JAVA_OPTIONS).foreach { opts =>
       javaOpts ++=
-      Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
+        Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
     }
     sys.env.get("SPARK_JAVA_OPTS").foreach { opts =>
       javaOpts ++=
-      Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
+        Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
     }
     sparkConf.get(EXECUTOR_LIBRARY_PATH).foreach { p =>
       prefixEnv = Some(
@@ -215,7 +215,7 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     // For log4j configuration to reference
     javaOpts += ("-Dspark.yarn.app.container.log.dir=" +
-        ApplicationConstants.LOG_DIR_EXPANSION_VAR)
+          ApplicationConstants.LOG_DIR_EXPANSION_VAR)
     YarnCommandBuilderUtils.addPermGenSizeOpt(javaOpts)
 
     val userClassPath = Client

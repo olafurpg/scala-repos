@@ -336,11 +336,11 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
   /* The Object => String overload. */
   lazy val String_valueOf: Symbol = {
     getMember(StringModule, nme.valueOf) filter
-    (sym =>
-          sym.info.paramTypes match {
-            case List(pt) => pt.typeSymbol == ObjectClass
-            case _ => false
-        })
+      (sym =>
+            sym.info.paramTypes match {
+              case List(pt) => pt.typeSymbol == ObjectClass
+              case _ => false
+          })
   }
 
   lazy val lambdaMetaFactoryBootstrapHandle = new asm.Handle(

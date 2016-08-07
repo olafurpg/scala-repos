@@ -125,13 +125,13 @@ private[ui] class StageTableBase(stages: Seq[StageInfo],
     <td>{stageId}</td> ++ {
       if (isFairScheduler) { <td>-</td> } else Seq.empty
     } ++ <td>No data available for this stage</td> ++ // Description
-    <td></td> ++ // Submitted
-    <td></td> ++ // Duration
-    <td></td> ++ // Tasks: Succeeded/Total
-    <td></td> ++ // Input
-    <td></td> ++ // Output
-    <td></td> ++ // Shuffle Read
-    <td></td> // Shuffle Write
+      <td></td> ++ // Submitted
+      <td></td> ++ // Duration
+      <td></td> ++ // Tasks: Succeeded/Total
+      <td></td> ++ // Input
+      <td></td> ++ // Output
+      <td></td> ++ // Shuffle Read
+      <td></td> // Shuffle Write
   }
 
   protected def stageRow(s: StageInfo): Seq[Node] = {

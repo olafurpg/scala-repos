@@ -71,7 +71,7 @@ object ColumnarBatchBenchmark {
         i = 0
         while (i < count) {
           sum +=
-          Platform.getInt(data.array(), Platform.BYTE_ARRAY_OFFSET + i * 4)
+            Platform.getInt(data.array(), Platform.BYTE_ARRAY_OFFSET + i * 4)
           i += 1
         }
       }

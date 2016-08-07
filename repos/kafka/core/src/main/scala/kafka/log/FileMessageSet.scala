@@ -233,7 +233,7 @@ class FileMessageSet private[kafka] (@volatile var file: File,
         val deepIter = ByteBufferMessageSet.deepIterator(messageAndOffset)
         for (innerMessageAndOffset <- deepIter) {
           newMessages +=
-          innerMessageAndOffset.message.toFormatVersion(toMagicValue)
+            innerMessageAndOffset.message.toFormatVersion(toMagicValue)
           offsets += innerMessageAndOffset.offset
         }
       }

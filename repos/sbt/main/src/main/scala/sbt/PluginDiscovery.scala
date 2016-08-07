@@ -179,7 +179,7 @@ object PluginDiscovery {
       if (evictedStrings.isEmpty) ""
       else
         "\nNote that conflicts were resolved for some dependencies:\n\t" +
-        evictedStrings.mkString("\n\t")
+          evictedStrings.mkString("\n\t")
     throw new IncompatiblePluginsException(msgBase + msgExtra, t)
   }
 }

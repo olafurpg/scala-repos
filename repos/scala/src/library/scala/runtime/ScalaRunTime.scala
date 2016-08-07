@@ -325,10 +325,10 @@ object ScalaRunTime {
     def arrayToString(x: AnyRef) = {
       if (x.getClass.getComponentType == classOf[BoxedUnit])
         0 until (array_length(x) min maxElements) map (_ => "()") mkString
-        ("Array(", ", ", ")")
+          ("Array(", ", ", ")")
       else
         WrappedArray make x take maxElements map inner mkString
-        ("Array(", ", ", ")")
+          ("Array(", ", ", ")")
     }
 
     // The recursively applied attempt to prettify Array printing.

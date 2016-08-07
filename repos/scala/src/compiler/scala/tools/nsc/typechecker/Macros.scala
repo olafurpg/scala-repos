@@ -984,14 +984,14 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
       delayed.getOrElse(expandee, {
         val calculated = scala.collection.mutable.Set[Symbol]()
         expandee foreach
-        (sub => {
-              def traverse(sym: Symbol) =
-                if (sym != null && (undetparams contains sym.id))
-                  calculated += sym
-              if (sub.symbol != null) traverse(sub.symbol)
-              if (sub.tpe != null)
-                sub.tpe foreach (sub => traverse(sub.typeSymbol))
-            })
+          (sub => {
+                def traverse(sym: Symbol) =
+                  if (sym != null && (undetparams contains sym.id))
+                    calculated += sym
+                if (sub.symbol != null) traverse(sub.symbol)
+                if (sub.tpe != null)
+                  sub.tpe foreach (sub => traverse(sub.typeSymbol))
+              })
         macroLogVerbose("calculateUndetparams: %s".format(calculated))
         calculated map (_.id)
       })

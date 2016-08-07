@@ -693,7 +693,7 @@ class Log(val dir: File,
     val segment = activeSegment
     if (segment.size > config.segmentSize - messagesSize || segment.size > 0 &&
         time.milliseconds - segment.created > config.segmentMs -
-        segment.rollJitterMs || segment.index.isFull) {
+          segment.rollJitterMs || segment.index.isFull) {
       debug(
           "Rolling new log segment in %s (log_size = %d/%d, index_size = %d/%d, age_ms = %d/%d)."
             .format(name,

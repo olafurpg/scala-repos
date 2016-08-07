@@ -215,7 +215,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
               case ann if !ann.symbol.isInstanceOf[StubSymbol] => ann.symbol
             }
           categories exists
-          (category => metaSyms exists (_ isNonBottomSubClass category))
+            (category => metaSyms exists (_ isNonBottomSubClass category))
       }
   }
 

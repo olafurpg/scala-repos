@@ -159,8 +159,8 @@ private object PartitionAssignorTest extends Logging {
                               subscriptions: Map[String, SubscriptionInfo]) {
     override def toString = {
       "\n" + "Group                  : %s\n".format(group) +
-      "Topic partition counts : %s\n".format(topicPartitionCounts) +
-      "Consumer assignment : %s\n".format(subscriptions)
+        "Topic partition counts : %s\n".format(topicPartitionCounts) +
+        "Consumer assignment : %s\n".format(subscriptions)
     }
   }
 

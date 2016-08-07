@@ -26,7 +26,9 @@ class FlowMapConcatSpec extends AkkaSpec with ScriptedTest {
                           Seq(2) -> Seq(2, 2),
                           Seq(1) -> Seq(1))
       TestConfig.RandomTestRange foreach
-      (_ ⇒ runScript(script, settings)(_.mapConcat(x ⇒ (1 to x) map (_ ⇒ x))))
+        (_ ⇒
+              runScript(script, settings)(
+                  _.mapConcat(x ⇒ (1 to x) map (_ ⇒ x))))
     }
 
     "map and concat grouping with slow downstream" in assertAllStagesStopped {

@@ -19,7 +19,7 @@ private[parser] trait LinkHeader {
 
   def `link-value` = rule {
     ws('<') ~ UriReference('>') ~ ws('>') ~ oneOrMore(ws(';') ~ `link-param`) ~>
-    (sanitize(_)) ~> (LinkValue(_, _: _*))
+      (sanitize(_)) ~> (LinkValue(_, _: _*))
   }
 
   def `link-param` =
@@ -53,7 +53,7 @@ private[parser] trait LinkHeader {
 
   def UriReference(terminationChar: Char) = rule {
     capture(oneOrMore(!terminationChar ~ VCHAR)) ~>
-    (newUriParser(_).parseUriReference())
+      (newUriParser(_).parseUriReference())
   }
 
   def URI = rule {
@@ -70,7 +70,7 @@ private[parser] trait LinkHeader {
 
   def `link-media-type` = rule {
     `media-type` ~>
-    ((mt, st, pm) ⇒ getMediaType(mt, st, pm contains "charset", pm.toMap))
+      ((mt, st, pm) ⇒ getMediaType(mt, st, pm contains "charset", pm.toMap))
   }
 
   // filter out subsequent `rel`, `media`, `title`, `type` and `type*` params

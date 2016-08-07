@@ -1022,7 +1022,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
       var j = 0
       while (j < sz) {
         this.dstEncodedIndices +=
-        encoder.encode(dstBlockId, dstLocalIndices(j))
+          encoder.encode(dstBlockId, dstLocalIndices(j))
         j += 1
       }
       this

@@ -95,7 +95,7 @@ object CanHaarTr {
             v.slice(0, v.length / 2) := _fht(
                 new DenseVector(p.map(e => (e(0) + e(1)) * nFactor).toArray))
             v.slice(v.length / 2, v.length) :=
-            new DenseVector(p.map(e => (e(0) - e(1)) * nFactor).toArray)
+              new DenseVector(p.map(e => (e(0) - e(1)) * nFactor).toArray)
           }
           v
         }

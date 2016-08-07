@@ -188,7 +188,7 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
           if (f.isDirectory) computeForDir(f)
           else {
             result +=
-            (testDataBasePath.toURI.relativize(f.toURI).toString -> md5(f))
+              (testDataBasePath.toURI.relativize(f.toURI).toString -> md5(f))
           }
         }
     }

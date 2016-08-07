@@ -159,7 +159,7 @@ object SerializationExamples extends Specification {
   "Option serialization example" in {
     val ser = swrite(Some(List(1, 2)))
     (read[Option[List[Int]]](ser) mustEqual Some(List(1, 2))) and
-    (read[Option[List[Int]]]("") mustEqual None)
+      (read[Option[List[Int]]]("") mustEqual None)
   }
 
   "None Option of tuple serialization example" in {

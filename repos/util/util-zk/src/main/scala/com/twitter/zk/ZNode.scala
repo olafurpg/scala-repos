@@ -261,7 +261,7 @@ trait ZNode {
           // this deletion should be reflected in a watch on the parent node, if one exists.
           if (knownChildren.size > 0) {
             broker send (ZNode.TreeUpdate(this, removed = knownChildren)) sync
-            ()
+              ()
           } else {
             Future.Done
           } onSuccess { _ =>

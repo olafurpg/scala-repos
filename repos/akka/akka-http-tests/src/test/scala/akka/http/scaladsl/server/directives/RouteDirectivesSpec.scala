@@ -29,7 +29,7 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
       var i = 0
       Put() ~> {
         get { complete { i += 1; "get" } } ~ put { complete { i += 1; "put" } } ~
-        (post & complete { i += 1; "post" })
+          (post & complete { i += 1; "post" })
       } ~> check {
         responseAs[String] shouldEqual "put"
         i shouldEqual 1

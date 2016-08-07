@@ -144,7 +144,7 @@ object Tuple3Zipped {
       val it2 = x._2.toIterator
       val it3 = x._3.toIterator
       while (it1.hasNext && it2.hasNext && it3.hasNext) buf +=
-      ((it1.next(), it2.next(), it3.next()))
+        ((it1.next(), it2.next(), it3.next()))
 
       buf.result()
     }

@@ -20,6 +20,6 @@ final class DefaultEntry[A, B](val key: A, var value: B)
 
   def chainString = {
     "(kv: " + key + ", " + value + ")" +
-    (if (next != null) " -> " + next.toString else "")
+      (if (next != null) " -> " + next.toString else "")
   }
 }

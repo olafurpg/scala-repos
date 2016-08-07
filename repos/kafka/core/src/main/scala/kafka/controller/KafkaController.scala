@@ -1675,7 +1675,7 @@ class KafkaController(val config: KafkaConfig,
           // check ratio and if greater than desired ratio, trigger a rebalance for the topic partitions
           // that need to be on this broker
           if (imbalanceRatio >
-              (config.leaderImbalancePerBrokerPercentage.toDouble / 100)) {
+                (config.leaderImbalancePerBrokerPercentage.toDouble / 100)) {
             topicsNotInPreferredReplica.foreach {
               case (topicPartition, replicas) => {
                 inLock(controllerContext.controllerLock) {

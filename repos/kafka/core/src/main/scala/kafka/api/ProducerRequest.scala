@@ -122,13 +122,13 @@ case class ProducerRequest(
     4 + /* number of topics */
     dataGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) => {
       foldedTopics + shortStringLength(currTopic._1) + 4 +
-      /* the number of partitions */ {
-        currTopic._2.foldLeft(0)((foldedPartitions, currPartition) => {
-          foldedPartitions + 4 + /* partition id */
-          4 + /* byte-length of serialized messages */
-          currPartition._2.sizeInBytes
-        })
-      }
+        /* the number of partitions */ {
+          currTopic._2.foldLeft(0)((foldedPartitions, currPartition) => {
+            foldedPartitions + 4 + /* partition id */
+            4 + /* byte-length of serialized messages */
+            currPartition._2.sizeInBytes
+          })
+        }
     })
   }
 

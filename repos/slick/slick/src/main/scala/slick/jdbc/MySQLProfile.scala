@@ -284,10 +284,10 @@ trait MySQLProfile extends JdbcProfile { profile =>
       val incExpr = if (seq._cycle) {
         if (desc)
           "if(id-" + (-increment) + "<" + minValue + "," + maxValue +
-          ",id-" + (-increment) + ")"
+            ",id-" + (-increment) + ")"
         else
           "if(id+" + increment + ">" + maxValue + "," + minValue + ",id+" +
-          increment + ")"
+            increment + ")"
       } else {
         "id+(" + increment + ")"
       }

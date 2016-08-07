@@ -498,7 +498,7 @@ case class ScDesignatorType(element: PsiNamedElement) extends ValueType {
             ta.typeParameters.map(tp => {
               val name = tp.name + "$$"
               args +=
-              new ScExistentialArgument(name, Nil, types.Nothing, types.Any)
+                new ScExistentialArgument(name, Nil, types.Nothing, types.Any)
               ScTypeVariable(name)
             }))
         Some(

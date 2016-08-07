@@ -59,7 +59,7 @@ final class AssessApi(collAssessments: Coll,
     val relatedUsers = userIdsSharingIp(userId)
     UserRepo
       .byId(userId) zip getPlayerAssessmentsByUserId(userId, nb) zip relatedUsers zip
-    (relatedUsers flatMap UserRepo.filterByEngine) map {
+      (relatedUsers flatMap UserRepo.filterByEngine) map {
       case (((Some(user), assessedGamesHead :: assessedGamesTail), relatedUs),
             relatedCheaters) =>
         Some(
@@ -115,10 +115,10 @@ final class AssessApi(collAssessments: Coll,
       createPlayerAssessment(assessible playerAssessment chess.White) >> createPlayerAssessment(
           assessible playerAssessment chess.Black)
     } >>
-    ((shouldAssess && thenAssessUser) ?? {
-          game.whitePlayer.userId.??(assessUser) >> game.blackPlayer.userId
-            .??(assessUser)
-        })
+      ((shouldAssess && thenAssessUser) ?? {
+            game.whitePlayer.userId.??(assessUser) >> game.blackPlayer.userId
+              .??(assessUser)
+          })
   }
 
   def assessUser(userId: String): Funit =

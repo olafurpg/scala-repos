@@ -50,8 +50,8 @@ case class Event(
 ) {
   override def toString(): String = {
     s"Event(id=$eventId,event=$event,eType=$entityType,eId=$entityId," +
-    s"tType=$targetEntityType,tId=$targetEntityId,p=$properties,t=$eventTime," +
-    s"tags=$tags,pKey=$prId,ct=$creationTime)"
+      s"tType=$targetEntityType,tId=$targetEntityId,p=$properties,t=$eventTime," +
+      s"tags=$tags,pKey=$prId,ct=$creationTime)"
   }
 }
 

@@ -44,13 +44,13 @@ class StablePriorityDispatcherSpec
 
   "A StablePriorityDispatcher" must {
     "Order its messages according to the specified comparator while preserving FIFO for equal priority messages, " +
-    "using an unbounded mailbox" in {
+      "using an unbounded mailbox" in {
       val dispatcherKey = "unbounded-stable-prio-dispatcher"
       testOrdering(dispatcherKey)
     }
 
     "Order its messages according to the specified comparator while preserving FIFO for equal priority messages, " +
-    "using a bounded mailbox" in {
+      "using a bounded mailbox" in {
       val dispatcherKey = "bounded-stable-prio-dispatcher"
       testOrdering(dispatcherKey)
     }

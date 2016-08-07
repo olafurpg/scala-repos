@@ -129,7 +129,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
             if (isDelayedInit(td)) Seq(s"$qName$delayedInitBody") else Nil
           (qName +: delayedBodyName).foreach { name =>
             exactClasses ++=
-            debugProcess.getVirtualMachineProxy.classesByName(name).asScala
+              debugProcess.getVirtualMachineProxy.classesByName(name).asScala
           }
         case elem =>
           val namePattern = NamePattern.forElement(elem)

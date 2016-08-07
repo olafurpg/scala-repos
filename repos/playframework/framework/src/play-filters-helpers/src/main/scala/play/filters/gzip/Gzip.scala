@@ -458,6 +458,6 @@ object Gzip {
 
   private def littleEndianToInt(bytes: Bytes, offset: Int = 0): Int = {
     (bytes(offset + 3) & 0xff) << 24 | (bytes(offset + 2) & 0xff) << 16 |
-    (bytes(offset + 1) & 0xff) << 8 | (bytes(offset) & 0xff)
+      (bytes(offset + 1) & 0xff) << 8 | (bytes(offset) & 0xff)
   }
 }

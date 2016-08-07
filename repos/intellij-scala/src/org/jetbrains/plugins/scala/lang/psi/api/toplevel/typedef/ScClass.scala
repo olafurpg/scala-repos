@@ -109,7 +109,7 @@ trait ScClass extends ScTypeDefinition with ScParameterOwner {
                               " : " + p.typeElement.fold("Any")(_.getText) +
                               (if (p.isDefaultParam)
                                  " = " +
-                                 p.getDefaultExpression.fold("{}")(_.getText)
+                                   p.getDefaultExpression.fold("{}")(_.getText)
                                else if (p.isRepeatedParameter) "*"
                                else ""))
                       .mkString(if (c.isImplicit) "(implicit " else "(",

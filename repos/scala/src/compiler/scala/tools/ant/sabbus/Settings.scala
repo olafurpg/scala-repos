@@ -89,7 +89,7 @@ class Settings {
                                                                                                                                            else
                                                                                                                                              Nil) ::: (if (!targetBf.isEmpty)
                                                                                                                                                          "-target:" +
-                                                                                                                                                         target :: Nil
+                                                                                                                                                           target :: Nil
                                                                                                                                                        else
                                                                                                                                                          Nil) ::: (if (optimiseBf)
                                                                                                                                                                      "-optimise" :: Nil

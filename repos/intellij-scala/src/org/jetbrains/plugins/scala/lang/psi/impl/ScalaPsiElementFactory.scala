@@ -1096,7 +1096,7 @@ object ScalaPsiElementFactory {
                   val arrow = ScalaPsiUtil.functionArrow(param.getProject)
                   name + colon + (if (param.isCallByNameParameter) arrow
                                   else "") + typeText +
-                  (if (param.isRepeatedParameter) "*" else "")
+                    (if (param.isRepeatedParameter) "*" else "")
                 case _ => name
               }
             }

@@ -111,7 +111,7 @@ trait NodePrinters { self: Utils =>
       // printout mkString EOL
       val prefix = "// produced from " + reifier.defaultErrorPosition
       (prefix +: "object Test extends App {" +: (printout map ("  " +
-                  _)) :+ "}") mkString EOL
+                    _)) :+ "}") mkString EOL
     }
   }
 }

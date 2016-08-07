@@ -261,7 +261,7 @@ abstract class Erasure
       (if (tparams.isEmpty) ""
        else
          tparams map paramSig mkString
-         ("<", "", ">"))
+           ("<", "", ">"))
 
     // Anything which could conceivably be a module (i.e. isn't known to be
     // a type parameter or similar) must go through here or the signature is
@@ -347,9 +347,9 @@ abstract class Erasure
           params foreach (p => buf append jsig(p.tpe))
           buf append ")"
           buf append
-          (if (restpe.typeSymbol == UnitClass || sym0.isConstructor)
-             VOID_TAG.toString
-           else jsig(restpe))
+            (if (restpe.typeSymbol == UnitClass || sym0.isConstructor)
+               VOID_TAG.toString
+             else jsig(restpe))
           buf.toString
 
         case RefinedType(parents, decls) =>

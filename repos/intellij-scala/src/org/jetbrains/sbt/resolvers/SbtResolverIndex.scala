@@ -36,12 +36,12 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
     val gavMap = mutable.HashMap.empty[String, mutable.Set[String]]
     def processArtifact(artifact: ArtifactInfo) {
       agMap.getOrElseUpdate(artifact.getArtifactId, mutable.Set.empty) +=
-      artifact.getGroupId
+        artifact.getGroupId
       gaMap.getOrElseUpdate(artifact.getGroupId, mutable.Set.empty) +=
-      artifact.getArtifactId
+        artifact.getArtifactId
       gavMap.getOrElseUpdate(SbtResolverUtils.joinGroupArtifact(artifact),
                              mutable.Set.empty) +=
-      artifact.getVersion
+        artifact.getVersion
     }
 
     if (kind == SbtResolver.Kind.Maven)

@@ -193,7 +193,7 @@ trait ModelFactoryTypeSupport {
             else
               tps.map { tparam =>
                 tparam.varianceString + tparam.name +
-                typeParamsToString(tparam.typeParams)
+                  typeParamsToString(tparam.typeParams)
               }.mkString("[", ", ", "]")
           nameBuffer append typeParamsToString(tparams)
           appendType0(result)

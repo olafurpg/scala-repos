@@ -593,7 +593,7 @@ trait MatchTranslation { self: PatternMatching =>
         val mutableBinders =
           (if (!binder.info.typeSymbol.hasTransOwner(ScalaPackageClass) &&
                (paramAccessors exists
-                   (x => x.isMutable || definitions.isRepeated(x)))) {
+                     (x => x.isMutable || definitions.isRepeated(x)))) {
 
              subPatBinders.zipWithIndex.flatMap {
                case (binder, idx) =>

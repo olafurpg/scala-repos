@@ -197,9 +197,9 @@ class ReplicaManager(val config: KafkaConfig,
     val now = System.currentTimeMillis()
     isrChangeSet synchronized {
       if (isrChangeSet.nonEmpty && (lastIsrChangeMs.get() +
-              ReplicaManager.IsrChangePropagationBlackOut < now ||
+                ReplicaManager.IsrChangePropagationBlackOut < now ||
               lastIsrPropagationMs.get() +
-              ReplicaManager.IsrChangePropagationInterval < now)) {
+                ReplicaManager.IsrChangePropagationInterval < now)) {
         ReplicationUtils.propagateIsrChanges(zkUtils, isrChangeSet)
         isrChangeSet.clear()
         lastIsrPropagationMs.set(now)

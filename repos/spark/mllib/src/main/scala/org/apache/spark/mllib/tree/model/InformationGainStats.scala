@@ -42,7 +42,7 @@ class InformationGainStats(val gain: Double,
 
   override def toString: String = {
     s"gain = $gain, impurity = $impurity, left impurity = $leftImpurity, " +
-    s"right impurity = $rightImpurity"
+      s"right impurity = $rightImpurity"
   }
 
   override def equals(o: Any): Boolean = o match {
@@ -104,7 +104,7 @@ private[spark] class ImpurityStats(
 
   override def toString: String = {
     s"gain = $gain, impurity = $impurity, left impurity = $leftImpurity, " +
-    s"right impurity = $rightImpurity"
+      s"right impurity = $rightImpurity"
   }
 
   def leftImpurity: Double =

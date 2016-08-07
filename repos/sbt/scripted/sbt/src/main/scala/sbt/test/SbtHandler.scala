@@ -102,7 +102,7 @@ final class SbtHandler(directory: File,
   def escape(argument: String) =
     if (argument.contains(" "))
       "\"" +
-      argument.replaceAll(q("""\"""), """\\""").replaceAll(q("\""), "\\\"") +
-      "\""
+        argument.replaceAll(q("""\"""), """\\""").replaceAll(q("\""), "\\\"") +
+        "\""
     else argument
 }

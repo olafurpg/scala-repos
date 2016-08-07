@@ -436,7 +436,7 @@ case class StringInstr(str: Expression, substr: Expression)
 
   override def nullSafeEval(string: Any, sub: Any): Any = {
     string.asInstanceOf[UTF8String].indexOf(sub.asInstanceOf[UTF8String], 0) +
-    1
+      1
   }
 
   override def prettyName: String = "instr"
@@ -636,7 +636,7 @@ case class FormatString(children: Expression*)
       val nullSafeString = if (ctx.boxedType(v._1) != ctx.javaType(v._1)) {
         // Java primitives get boxed in order to allow null values.
         s"(${v._2.isNull}) ? (${ctx.boxedType(v._1)}) null : " +
-        s"new ${ctx.boxedType(v._1)}(${v._2.value})"
+          s"new ${ctx.boxedType(v._1)}(${v._2.value})"
       } else {
         s"(${v._2.isNull}) ? null : ${v._2.value}"
       }

@@ -149,7 +149,7 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     if ((c == '"' && Set(ScalaTokenTypes.tMULTILINE_STRING,
                          ScalaTokenTypes.tINTERPOLATED_STRING_END).contains(
                 elementType) && element.getTextOffset + element.getTextLength -
-            offset < 4) || isInDocComment(element) &&
+              offset < 4) || isInDocComment(element) &&
         (elementType.isInstanceOf[ScaladocSyntaxElementType] ||
             elementType == ScalaDocTokenType.DOC_INNER_CLOSE_CODE_TAG) &&
         element.getParent.getLastChild == element &&

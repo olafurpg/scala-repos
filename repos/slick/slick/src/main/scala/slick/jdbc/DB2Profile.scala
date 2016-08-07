@@ -152,7 +152,7 @@ trait DB2Profile extends JdbcProfile {
       appendOptions(sb)
       if (jdbcType.isInstanceOf[JdbcTypes#BooleanJdbcType]) {
         sb append " constraint " + quoteIdentifier(column.name + "__bool") +
-        " check (" append qname append " in (0, 1))"
+          " check (" append qname append " in (0, 1))"
       }
     }
   }

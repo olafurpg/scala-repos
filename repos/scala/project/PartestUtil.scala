@@ -25,7 +25,7 @@ object PartestUtil {
       if (f == null || !f.exists) Iterator()
       else
         Iterator(f) ++
-        (if (f.getParentFile == null) Nil else parentChain(f.getParentFile))
+          (if (f.getParentFile == null) Nil else parentChain(f.getParentFile))
     def isParentOf(parent: File, f2: File, maxDepth: Int) =
       parentChain(f2).take(maxDepth).exists(p1 => equiv(p1, parent))
     def isTestCase(f: File) = {

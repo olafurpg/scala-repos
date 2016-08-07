@@ -76,7 +76,7 @@ class AsyncQueryResultServiceHandler(jobManager: JobManager[Future])(
                           mimeType0 getOrElse
                             (MimeTypes.application / MimeTypes.json)
                         if (mimeType !=
-                            (MimeTypes.application / MimeTypes.json)) {
+                              (MimeTypes.application / MimeTypes.json)) {
                           HttpResponse[ByteChunk](HttpStatus(
                                   InternalServerError,
                                   "Incompatible mime-type of query results."))

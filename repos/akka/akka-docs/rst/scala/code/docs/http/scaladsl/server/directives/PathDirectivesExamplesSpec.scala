@@ -293,7 +293,7 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
       // in case the redirect can't be followed automatically:
       responseAs[String] shouldEqual {
         "This and all future requests should be directed to " +
-        "<a href=\"http://example.com/foo/\">this URI</a>."
+          "<a href=\"http://example.com/foo/\">this URI</a>."
       }
     }
 
@@ -342,7 +342,7 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
       // in case the redirect can't be followed automatically:
       responseAs[String] shouldEqual {
         "This and all future requests should be directed to " +
-        "<a href=\"http://example.com/foo\">this URI</a>."
+          "<a href=\"http://example.com/foo\">this URI</a>."
       }
     }
 

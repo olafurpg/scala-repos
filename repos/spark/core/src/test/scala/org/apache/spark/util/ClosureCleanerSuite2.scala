@@ -476,10 +476,10 @@ class ClosureCleanerSuite2
     }
     val closure3 = (k: Int, l: Int, m: Int) => {
       (1 to k).flatMap(closure2) ++ // 4 levels
-      (1 to l).flatMap(closure1) ++ // 3 levels
-      (1 to m).map { x =>
-        x + 1
-      } // 2 levels
+        (1 to l).flatMap(closure1) ++ // 3 levels
+        (1 to m).map { x =>
+          x + 1
+        } // 2 levels
     }
     val closure1r = closure1(1)
     val closure2r = closure2(2)

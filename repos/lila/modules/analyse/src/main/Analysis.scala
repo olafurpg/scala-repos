@@ -37,12 +37,12 @@ case class Analysis(id: String,
 
   def summary: List[(Color, List[(Nag, Int)])] = Color.all map { color =>
     color ->
-    (Nag.badOnes map { nag =>
-          nag ->
-          (advices count { adv =>
-                adv.color == color && adv.nag == nag
-              })
-        })
+      (Nag.badOnes map { nag =>
+            nag ->
+              (advices count { adv =>
+                    adv.color == color && adv.nag == nag
+                  })
+          })
   }
 
   def valid = infos.nonEmpty

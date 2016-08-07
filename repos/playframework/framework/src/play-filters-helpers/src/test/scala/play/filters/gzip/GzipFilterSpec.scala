@@ -44,11 +44,11 @@ object GzipFilterSpec extends PlaySpecification with DataTables {
 
       "Accept-Encoding of request" ||
       "Response" | //------------------------------------++------------+
-      "gzip" !! gzipped | "compress,gzip" !! gzipped | "compress, gzip" !! gzipped | "gzip,compress" !! gzipped | "deflate, gzip,compress" !! gzipped | "gzip, compress" !! gzipped | "identity, gzip, compress" !! gzipped | "GZip" !! gzipped | "*" !! gzipped | "*;q=0" !! plain | "*; q=0" !! plain | "*;q=0.000" !! plain | "gzip;q=0" !! plain | "gzip; q=0.00" !! plain | "*;q=0, gZIP" !! gzipped | "compress;q=0.1, *;q=0, gzip" !! gzipped | "compress;q=0.1, *;q=0, gzip;q=0.005" !! gzipped | "compress, gzip;q=0.001" !! gzipped | "compress, gzip;q=0.002" !! gzipped | "compress;q=1, *;q=0, gzip;q=0.000" !! plain | "compress;q=1, *;q=0" !! plain | "identity" !! plain | "gzip;q=0.5, identity" !! plain | "gzip;q=0.5, identity;q=1" !! plain | "gzip;q=0.6, identity;q=0.5" !! gzipped | "*;q=0.7, gzip;q=0.6, identity;q=0.4" !! gzipped | "" !! plain |> {
+        "gzip" !! gzipped | "compress,gzip" !! gzipped | "compress, gzip" !! gzipped | "gzip,compress" !! gzipped | "deflate, gzip,compress" !! gzipped | "gzip, compress" !! gzipped | "identity, gzip, compress" !! gzipped | "GZip" !! gzipped | "*" !! gzipped | "*;q=0" !! plain | "*; q=0" !! plain | "*;q=0.000" !! plain | "gzip;q=0" !! plain | "gzip; q=0.00" !! plain | "*;q=0, gZIP" !! gzipped | "compress;q=0.1, *;q=0, gzip" !! gzipped | "compress;q=0.1, *;q=0, gzip;q=0.005" !! gzipped | "compress, gzip;q=0.001" !! gzipped | "compress, gzip;q=0.002" !! gzipped | "compress;q=1, *;q=0, gzip;q=0.000" !! plain | "compress;q=1, *;q=0" !! plain | "identity" !! plain | "gzip;q=0.5, identity" !! plain | "gzip;q=0.5, identity;q=1" !! plain | "gzip;q=0.6, identity;q=0.5" !! gzipped | "*;q=0.7, gzip;q=0.6, identity;q=0.4" !! gzipped | "" !! plain |> {
 
         (codings, expectedEncoding) =>
           header(CONTENT_ENCODING, requestAccepting(codings)) must be equalTo
-          (expectedEncoding)
+            (expectedEncoding)
       }
     }
 

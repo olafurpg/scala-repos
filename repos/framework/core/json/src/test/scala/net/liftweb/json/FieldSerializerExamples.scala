@@ -35,7 +35,7 @@ object FieldSerializerExamples extends Specification {
     val ser = swrite(dog)
     val dog2 = read[WildDog](ser)
     (dog2.name mustEqual dog.name) and (dog2.color mustEqual dog.color) and
-    (dog2.owner mustEqual dog.owner) and (dog2.size mustEqual dog.size)
+      (dog2.owner mustEqual dog.owner) and (dog2.size mustEqual dog.size)
   }
 
   "Fields can be ignored and renamed" in {

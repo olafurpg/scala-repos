@@ -10,7 +10,7 @@ object TagTest extends SpecLite {
   "of.subst" should {
     "substitute" ! forAll { xs: List[Int] =>
       (Tag unwrap Foldable[List].fold(Tag.of[Mult].subst(xs)) must_===
-          (xs.foldLeft(1)(_ * _)))
+            (xs.foldLeft(1)(_ * _)))
     }
   }
 
@@ -18,7 +18,7 @@ object TagTest extends SpecLite {
     "substitute" ! forAll { xs: List[List[Unit]] =>
       (Tag unwrap (Foldable[List]
                 .foldMap(xs)(Tag.of[Mult].onF(_.length))) must_===
-          (xs.foldLeft(1)((n, l) => n * l.length)))
+            (xs.foldLeft(1)((n, l) => n * l.length)))
     }
   }
 

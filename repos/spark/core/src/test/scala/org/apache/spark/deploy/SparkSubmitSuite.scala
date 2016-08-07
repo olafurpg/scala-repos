@@ -234,10 +234,10 @@ class SparkSubmitSuite
     childArgsStr should include("--queue thequeue")
     childArgsStr should include regex ("--jar .*thejar.jar")
     childArgsStr should include regex
-    ("--addJars .*one.jar,.*two.jar,.*three.jar")
+      ("--addJars .*one.jar,.*two.jar,.*three.jar")
     childArgsStr should include regex ("--files .*file1.txt,.*file2.txt")
     childArgsStr should include regex
-    ("--archives .*archive1.txt,.*archive2.txt")
+      ("--archives .*archive1.txt,.*archive2.txt")
     mainClass should be("org.apache.spark.deploy.yarn.Client")
     classpath should have length (0)
     sysProps("spark.app.name") should be("beauty")
@@ -292,11 +292,11 @@ class SparkSubmitSuite
     sysProps("spark.yarn.queue") should be("thequeue")
     sysProps("spark.executor.instances") should be("6")
     sysProps("spark.yarn.dist.files") should include regex
-    (".*file1.txt,.*file2.txt")
+      (".*file1.txt,.*file2.txt")
     sysProps("spark.yarn.dist.archives") should include regex
-    (".*archive1.txt,.*archive2.txt")
+      (".*archive1.txt,.*archive2.txt")
     sysProps("spark.jars") should include regex
-    (".*one.jar,.*two.jar,.*three.jar,.*thejar.jar")
+      (".*one.jar,.*two.jar,.*three.jar,.*thejar.jar")
     sysProps("SPARK_SUBMIT") should be("true")
     sysProps("spark.ui.enabled") should be("false")
   }

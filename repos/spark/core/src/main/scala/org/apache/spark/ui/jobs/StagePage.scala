@@ -1384,8 +1384,8 @@ private[ui] class TaskPagedTable(conf: SparkConf,
   override def pageLink(page: Int): String = {
     val encodedSortColumn = URLEncoder.encode(sortColumn, "UTF-8")
     basePath + s"&$pageNumberFormField=$page" +
-    s"&task.sort=$encodedSortColumn" + s"&task.desc=$desc" +
-    s"&$pageSizeFormField=$pageSize"
+      s"&task.sort=$encodedSortColumn" + s"&task.desc=$desc" +
+      s"&$pageSizeFormField=$pageSize"
   }
 
   override def goButtonFormPath: String = {

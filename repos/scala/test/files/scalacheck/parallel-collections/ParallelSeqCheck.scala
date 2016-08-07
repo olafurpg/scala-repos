@@ -189,8 +189,8 @@ abstract class ParallelSeqCheck[T](collName: String)
         val pos = if (len < 0) 0 else len
         ("start with self" |: s.startsWith(s) == coll.startsWith(coll)) &&
         ("tails correspond" |:
-            (s.length == 0 ||
-                s.startsWith(s.tail, 1) == coll.startsWith(coll.tail, 1))) &&
+              (s.length == 0 ||
+                  s.startsWith(s.tail, 1) == coll.startsWith(coll.tail, 1))) &&
         ("with each other" |: coll.startsWith(s)) && ("modified" |: s
               .startsWith(collmodif) == coll.startsWith(collmodif)) &&
         ("modified2" |: s.startsWith(collmodif, pos) == coll

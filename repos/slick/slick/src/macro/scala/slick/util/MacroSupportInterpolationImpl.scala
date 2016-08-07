@@ -116,7 +116,7 @@ object MacroSupportInterpolationImpl {
         case '!' =>
           exprs ++= appendString(s.substring(0, len - 1))
           exprs +=
-          Apply(Ident(TermName("expr")), List(a, Literal(Constant(true))))
+            Apply(Ident(TermName("expr")), List(a, Literal(Constant(true))))
         case _ =>
           exprs ++= appendString(s)
           //println("### tpe: "+ae.actualType)

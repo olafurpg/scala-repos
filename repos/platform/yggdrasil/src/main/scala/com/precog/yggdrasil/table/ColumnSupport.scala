@@ -37,7 +37,7 @@ class BitsetColumn(definedAt: BitSet) {
     val limit = definedAt.max
     val repr = (row: Int) => if (definedAt(row)) 'x' else '_'
     getClass.getName + "(" +
-    (0 until limit).map(repr).mkString("[", ",", "]") + ", " + limit + ")"
+      (0 until limit).map(repr).mkString("[", ",", "]") + ", " + limit + ")"
   }
 }
 

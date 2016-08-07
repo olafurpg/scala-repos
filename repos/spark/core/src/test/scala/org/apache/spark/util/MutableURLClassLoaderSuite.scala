@@ -106,7 +106,7 @@ class MutableURLClassLoaderSuite extends SparkFunSuite with Matchers {
     assert(classLoader.getResources("resource2").asScala.size === 1)
 
     res1.map(scala.io.Source.fromURL(_).mkString) should contain inOrderOnly
-    ("resource1Contents-child", "resource1Contents-parent")
+      ("resource1Contents-child", "resource1Contents-parent")
   }
 
   test("driver sets context class loader in local mode") {

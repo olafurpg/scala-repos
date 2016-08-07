@@ -43,7 +43,7 @@ case class Binomial(n: Int, p: Double)(implicit rand: RandBasis = Rand)
     else if (p == 1) logI(k == n)
     else {
       lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1) + k * log(p) +
-      (n - k) * log(1 - p)
+        (n - k) * log(1 - p)
     }
   }
 

@@ -17,7 +17,7 @@ trait ScalateI18nSupport extends ScalateSupport with I18nSupport {
    */
   before() {
     templateEngine.bindings ::=
-    Binding("messages", classOf[Messages].getName, true, isImplicit = true)
+      Binding("messages", classOf[Messages].getName, true, isImplicit = true)
   }
 
   /**

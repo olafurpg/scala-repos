@@ -196,7 +196,7 @@ class ScalaSmartStepIntoHandler extends JvmSmartStepIntoHandler {
       expr match {
         case ScalaPsiUtil.MethodValue(m) =>
           result +=
-          new MethodSmartStepTarget(m, null, expr, true, noStopAtLines)
+            new MethodSmartStepTarget(m, null, expr, true, noStopAtLines)
           return
         case FunExpressionTarget(stmts, presentation) =>
           result += new ScalaFunExprSmartStepTarget(expr,

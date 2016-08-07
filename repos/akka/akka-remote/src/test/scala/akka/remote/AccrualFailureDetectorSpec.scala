@@ -79,7 +79,7 @@ class AccrualFailureDetectorSpec extends AkkaSpec("akka.loglevel = INFO") {
 
       // larger stdDeviation results => lower phi
       fd.phi(timeDiff = 1100, mean = 1000.0, stdDeviation = 500.0) should be <
-      (fd.phi(timeDiff = 1100, mean = 1000.0, stdDeviation = 100.0))
+        (fd.phi(timeDiff = 1100, mean = 1000.0, stdDeviation = 100.0))
     }
 
     "return phi value of 0.0 on startup for each address, when no heartbeats" in {

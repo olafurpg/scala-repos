@@ -131,7 +131,7 @@ object AssociationRules {
     require(antecedent.toSet.intersect(consequent.toSet).isEmpty, {
       val sharedItems = antecedent.toSet.intersect(consequent.toSet)
       s"A valid association rule must have disjoint antecedent and " +
-      s"consequent but ${sharedItems} is present in both."
+        s"consequent but ${sharedItems} is present in both."
     })
 
     /**
@@ -154,7 +154,7 @@ object AssociationRules {
 
     override def toString: String = {
       s"${antecedent.mkString("{", ",", "}")} => " +
-      s"${consequent.mkString("{", ",", "}")}: ${confidence}"
+        s"${consequent.mkString("{", ",", "}")}: ${confidence}"
     }
   }
 }

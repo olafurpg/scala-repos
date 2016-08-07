@@ -407,7 +407,7 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
         val refs =
           symbols.map(toString).filter(!_.startsWith("_")).map("type " + _)
         toString(typeRef, sep) +
-        (if (refs.size > 0) refs.mkString(" forSome {", "; ", "}") else "")
+          (if (refs.size > 0) refs.mkString(" forSome {", "; ", "}") else "")
       }
       case _ => sep + t.toString
     }

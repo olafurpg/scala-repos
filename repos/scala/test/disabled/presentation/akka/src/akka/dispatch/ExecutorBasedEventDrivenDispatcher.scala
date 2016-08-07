@@ -241,7 +241,8 @@ trait ExecutableMailbox extends Runnable { self: MessageQueue =>
           val deadlineNs =
             if (isDeadlineEnabled)
               System.nanoTime +
-              TimeUnit.MILLISECONDS.toNanos(dispatcher.throughputDeadlineTime)
+                TimeUnit.MILLISECONDS.toNanos(
+                    dispatcher.throughputDeadlineTime)
             else 0
           do {
             nextMessage.invoke

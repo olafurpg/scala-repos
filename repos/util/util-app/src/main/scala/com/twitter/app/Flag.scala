@@ -208,7 +208,7 @@ object Flaggable {
 
     override def show(out: Map[K, V]) = {
       out.toSeq map { case (k, v) => k.toString + "=" + v.toString } mkString
-      (",")
+        (",")
     }
   }
 
@@ -799,10 +799,10 @@ class Flags(argv0: String,
     val cmd = if (cmdUsage.nonEmpty) cmdUsage + "\n" else "usage: "
 
     cmd + argv0 + " [<flag>...]\n" + "flags:\n" + (lines mkString "\n") +
-    (if (globalLines.isEmpty) ""
-     else {
-       "\nglobal flags:\n" + (globalLines mkString "\n")
-     })
+      (if (globalLines.isEmpty) ""
+       else {
+         "\nglobal flags:\n" + (globalLines mkString "\n")
+       })
   }
 
   /**

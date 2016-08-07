@@ -77,7 +77,7 @@ class RecipeGlobalRateLimit extends RecipeSpec {
       override def postStop(): Unit = {
         replenishTimer.cancel()
         waitQueue foreach
-        (_ ! Status.Failure(new IllegalStateException("limiter stopped")))
+          (_ ! Status.Failure(new IllegalStateException("limiter stopped")))
       }
     }
     //#global-limiter-actor

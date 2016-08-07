@@ -1091,12 +1091,12 @@ class LiftSession(private[http] val _contextPath: String,
                           (request.location
                                 .flatMap(_.earlyResponse) or LiftRules.earlyResponse
                                 .firstFull(request)) or
-                          (processTemplate(locTemplate,
-                                           request,
-                                           request.path,
-                                           200) or request.createNotFound {
-                                processTemplate(Empty, request, _, 404)
-                              })
+                            (processTemplate(locTemplate,
+                                             request,
+                                             request.path,
+                                             200) or request.createNotFound {
+                                  processTemplate(Empty, request, _, 404)
+                                })
                         }
                       }
 

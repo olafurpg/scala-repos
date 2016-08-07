@@ -373,9 +373,9 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
               // Without a means to suppress this warning, I've thought better of it.
               if (settings.warnValueOverrides) {
                 (clazz.info nonPrivateMember m.name) filter
-                (m =>
-                      (m.owner != AnyClass) && (m.owner != clazz) &&
-                        !m.isDeferred) andAlso { m =>
+                  (m =>
+                        (m.owner != AnyClass) && (m.owner != clazz) &&
+                          !m.isDeferred) andAlso { m =>
                   typer.context.warning(
                       clazz.pos,
                       s"Implementation of ${m.name} inherited from ${m.owner} overridden in $clazz to enforce value class semantics")

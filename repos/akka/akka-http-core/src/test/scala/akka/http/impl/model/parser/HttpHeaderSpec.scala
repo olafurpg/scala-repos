@@ -933,9 +933,9 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     def apply(line: String) = {
       val Array(name, value) = line.split(": ", 2)
       HttpHeader.parse(name, value, settings) should
-      (equal(HttpHeader.ParsingResult.Ok(header, Nil)) and renderFromHeaderTo(
-              this,
-              line))
+        (equal(HttpHeader.ParsingResult.Ok(header, Nil)) and renderFromHeaderTo(
+                this,
+                line))
     }
     def rendering(line: String): String = line
     def settings: HeaderParser.Settings = HeaderParser.DefaultSettings

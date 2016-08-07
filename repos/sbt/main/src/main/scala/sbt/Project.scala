@@ -712,9 +712,12 @@ object Project extends ProjectExtra {
       }
 
     data + "\n" + description + providedBy + definedAt +
-    printDepScopes("Dependencies", "derived from", depends, derivedDepends) +
-    printDepScopes("Reverse dependencies", "derives", reverse, derivedReverse) +
-    printScopes("Delegates", delegates(structure, scope, key)) + printScopes(
+      printDepScopes("Dependencies", "derived from", depends, derivedDepends) +
+      printDepScopes("Reverse dependencies",
+                     "derives",
+                     reverse,
+                     derivedReverse) +
+      printScopes("Delegates", delegates(structure, scope, key)) + printScopes(
         "Related",
         related,
         10)

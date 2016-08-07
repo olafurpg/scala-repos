@@ -84,7 +84,7 @@ class ScalaClassFinder(project: Project) extends PsiElementFinder {
     for (clazzName <- otherClassNames) {
       val qualName = psiPackage.getQualifiedName + "." + clazzName
       result ++=
-      ScalaPsiManager.instance(project).getCachedClasses(scope, qualName)
+        ScalaPsiManager.instance(project).getCachedClasses(scope, qualName)
       result ++= findClasses(qualName, scope)
     }
     result.toArray

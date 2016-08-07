@@ -1022,9 +1022,9 @@ class MessageSpec extends FreeSpec with Matchers with WithMaterializerSpec {
         case 127 ⇒
           val length64Bytes = expectNetworkData(8)
           (length64Bytes(0) & 0xff).toLong << 56 | (length64Bytes(1) & 0xff).toLong << 48 |
-          (length64Bytes(2) & 0xff).toLong << 40 | (length64Bytes(3) & 0xff).toLong << 32 |
-          (length64Bytes(4) & 0xff).toLong << 24 | (length64Bytes(5) & 0xff).toLong << 16 |
-          (length64Bytes(6) & 0xff).toLong << 8 | (length64Bytes(7) & 0xff).toLong << 0
+            (length64Bytes(2) & 0xff).toLong << 40 | (length64Bytes(3) & 0xff).toLong << 32 |
+            (length64Bytes(4) & 0xff).toLong << 24 | (length64Bytes(5) & 0xff).toLong << 16 |
+            (length64Bytes(6) & 0xff).toLong << 8 | (length64Bytes(7) & 0xff).toLong << 0
         case x ⇒ x
       }
       val mask = if (hasMask) {

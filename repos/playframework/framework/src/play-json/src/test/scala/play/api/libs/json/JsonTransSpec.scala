@@ -196,7 +196,7 @@ object JsonTransSpec extends Specification {
           .left
           .get
           .head must_==
-        ((__ \ 'field42, Seq(ValidationError("error.path.missing"))))
+          ((__ \ 'field42, Seq(ValidationError("error.path.missing"))))
       }
 
       "when the reader is the wrong type" in {
@@ -207,7 +207,7 @@ object JsonTransSpec extends Specification {
           .left
           .get
           .head must_==
-        ((__ \ 'field2, Seq(ValidationError("error.expected.jsstring"))))
+          ((__ \ 'field2, Seq(ValidationError("error.expected.jsstring"))))
       }
     }
   }

@@ -229,7 +229,7 @@ trait InlineParsers extends BaseParsers {
       failure("Cannot nest a link in a link.")
     } else {
       '[' ~> linkInline(ctx.addTag("a")) ~ ("](" ~ ows) ~ url ~ ows ~ title <~
-      (ows ~ ')') ^^ {
+        (ows ~ ')') ^^ {
         case txt ~ _ ~ u ~ _ ~ ttl => deco.decorateLink(txt, u, ttl)
       }
     }

@@ -86,7 +86,7 @@ final class NIHDBPerfTestRunner[T](val timer: Timer[T],
     override val config =
       (Configuration parse {
             Option(System.getProperty("precog.storage.root")) map
-            ("precog.storage.root = " + _) getOrElse ""
+              ("precog.storage.root = " + _) getOrElse ""
           }) ++ commandLineConfig
     val cookThreshold = 10000
     val clock = blueeyes.util.Clock.System

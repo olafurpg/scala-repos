@@ -197,12 +197,12 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
               val names = new mutable.HashSet[String]()
               for (prefixImport <- prefixImports) {
                 names +=
-                prefixImport.substring(prefixImport.lastIndexOf('.') + 1)
+                  prefixImport.substring(prefixImport.lastIndexOf('.') + 1)
               }
               val excludeNames = new mutable.HashSet[String]()
               for (prefixImport <- excludeImports) {
                 excludeNames +=
-                prefixImport.substring(prefixImport.lastIndexOf('.') + 1)
+                  prefixImport.substring(prefixImport.lastIndexOf('.') + 1)
               }
               val wildcard = names.contains("_")
               def isOK(name: String): Boolean = {

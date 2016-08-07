@@ -129,8 +129,8 @@ abstract class TreeCheckers extends Analyzer {
         if (s1 contains s2) ()
         else
           movedMsgs +=
-          ("\n** %s moved:\n** Previously:\n%s\n** Currently:\n%s"
-                .format(ownerstr(sym), s1 mkString ", ", s2))
+            ("\n** %s moved:\n** Previously:\n%s\n** Currently:\n%s"
+                  .format(ownerstr(sym), s1 mkString ", ", s2))
       }
     }
 
@@ -357,7 +357,7 @@ abstract class TreeCheckers extends Analyzer {
             checkSym(tree)
             if (sym.isStatic && sym.hasModuleFlag) ()
             else if (currentOwner.ownerChain takeWhile (_ != sym) exists
-                     (_ == NoSymbol))
+                       (_ == NoSymbol))
               return fail(
                   "tree symbol " + sym +
                     " does not point to enclosing class; tree = ")
@@ -464,11 +464,11 @@ abstract class TreeCheckers extends Analyzer {
         }
 
         referencedSymbols foreach
-        (sym =>
-              if (!reportedAlready((tree, sym))) {
-                errorFn("\n" + mkErrorMsg(sym))
-                reportedAlready += ((tree, sym))
-            })
+          (sym =>
+                if (!reportedAlready((tree, sym))) {
+                  errorFn("\n" + mkErrorMsg(sym))
+                  reportedAlready += ((tree, sym))
+              })
       }
 
       private def checkReturnReferencesDirectlyEnclosingDef(tree: Tree): Unit =

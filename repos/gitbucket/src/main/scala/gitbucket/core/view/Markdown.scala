@@ -96,7 +96,7 @@ object Markdown {
                                     else "") + "\">" + (if (escaped) code
                                                         else
                                                           escape(code, true)) +
-      "</pre>"
+        "</pre>"
     }
 
     override def list(body: String, ordered: Boolean): String = {
@@ -108,7 +108,7 @@ object Markdown {
       }
       if (body.contains("""class="task-list-item-checkbox"""")) {
         "<" + listType + " class=\"task-list\">\n" + body + "</" + listType +
-        ">\n"
+          ">\n"
       } else {
         "<" + listType + ">\n" + body + "</" + listType + ">\n"
       }
@@ -182,18 +182,18 @@ object Markdown {
             if (paths.length > 3) paths.drop(4).mkString("/")
             else repository.repository.defaultBranch
           repository.httpUrl.replaceFirst("/git/", "/").stripSuffix(".git") +
-          "/blob/" + branch + "/" + url + (if (isImage) "?raw=true" else "")
+            "/blob/" + branch + "/" + url + (if (isImage) "?raw=true" else "")
         } else {
           val paths = context.currentPath.split("/")
           val branch =
             if (paths.length > 3) paths.last
             else repository.repository.defaultBranch
           repository.httpUrl.replaceFirst("/git/", "/").stripSuffix(".git") +
-          "/blob/" + branch + "/" + url + (if (isImage) "?raw=true" else "")
+            "/blob/" + branch + "/" + url + (if (isImage) "?raw=true" else "")
         }
       } else {
         repository.httpUrl.replaceFirst("/git/", "/").stripSuffix(".git") +
-        "/wiki/_blob/" + url
+          "/wiki/_blob/" + url
       }
     }
   }

@@ -204,7 +204,7 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
             r.getScalar.getValue > 0.0 && r.getName == resourceName) {
           val usage = Math.min(remain, r.getScalar.getValue)
           requestedResources +=
-          createResource(resourceName, usage, Some(r.getRole))
+            createResource(resourceName, usage, Some(r.getRole))
           remain -= usage
           createResource(resourceName,
                          r.getScalar.getValue - usage,

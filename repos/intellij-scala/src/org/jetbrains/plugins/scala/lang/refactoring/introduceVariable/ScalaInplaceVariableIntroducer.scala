@@ -92,8 +92,8 @@ class ScalaInplaceVariableIntroducer(project: Project,
           if (named.isDefined) {
             setDeclaration(declaration)
             if (nameIsValid !=
-                (named.isDefined &&
-                    isIdentifier(input.trim, myFile.getLanguage))) {
+                  (named.isDefined &&
+                      isIdentifier(input.trim, myFile.getLanguage))) {
               nameIsValid = !nameIsValid
             }
             resetBalloonPanel(nameIsValid)
@@ -334,7 +334,7 @@ class ScalaInplaceVariableIntroducer(project: Project,
       myBalloonPanel remove myLabelPanel
     }
     Seq(myVarCheckbox, mySpecifyTypeChb) filter (_ != null) foreach
-    (_.setEnabled(nameIsValid))
+      (_.setEnabled(nameIsValid))
     myBalloon.revalidate()
   }
 

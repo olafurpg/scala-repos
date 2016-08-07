@@ -156,7 +156,7 @@ class JobTest(cons: (Args) => Job) {
   // Used to check an assertion on all custom counters of a given scalding job.
   def counters(op: Map[String, Long] => Unit) = {
     statsCallbacks +=
-    ((stats: CascadingStats) => op(Stats.getAllCustomCounters()(stats)))
+      ((stats: CascadingStats) => op(Stats.getAllCustomCounters()(stats)))
     this
   }
 

@@ -744,7 +744,7 @@ trait GrouperSpec[M[+ _]]
           val JNum(v) = obj \ "value"
 
           v must_==
-          (grouped1ab(ka.toInt)(kb.toInt).size + grouped2(ka.toInt).size)
+            (grouped1ab(ka.toInt)(kb.toInt).size + grouped2(ka.toInt).size)
         }
       }
     }

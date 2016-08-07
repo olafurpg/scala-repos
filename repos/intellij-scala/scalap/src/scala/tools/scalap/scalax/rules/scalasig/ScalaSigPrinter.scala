@@ -677,7 +677,7 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
       case RefinedType(classSym: ClassSymbol, typeRefs) =>
         val classStr = getClassString(0, classSym)
         sep + typeRefs.map(toString).mkString("", " with ", "") +
-        (if (classStr == " {\n}") "" else classStr)
+          (if (classStr == " {\n}") "" else classStr)
       case RefinedType(classSym, typeRefs) =>
         sep + typeRefs.map(toString).mkString("", " with ", "")
       case ClassInfoType(symbol, typeRefs) =>
@@ -703,7 +703,7 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
         val refs =
           symbols.map(toString).filter(!_.startsWith("_")).map("type " + _)
         toString(typeRef, sep) +
-        (if (refs.nonEmpty) refs.mkString(" forSome {", "; ", "}") else "")
+          (if (refs.nonEmpty) refs.mkString(" forSome {", "; ", "}") else "")
       case _ => sep + t.toString
     }
   }

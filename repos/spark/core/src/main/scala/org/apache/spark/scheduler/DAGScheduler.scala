@@ -1226,7 +1226,7 @@ private[spark] class DAGScheduler(
         if (acc.name.isDefined && partialValue != acc.zero) {
           stage.latestInfo.accumulables(id) = acc.toInfo(None, Some(acc.value))
           event.taskInfo.accumulables +=
-          acc.toInfo(Some(partialValue), Some(acc.value))
+            acc.toInfo(Some(partialValue), Some(acc.value))
         }
       }
     } catch {

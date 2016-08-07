@@ -640,7 +640,8 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
                   "Concrete method has no definition: " + dd +
                     (if (settings.debug)
                        "(found: " +
-                       methSymbol.owner.info.decls.toList.mkString(", ") + ")"
+                         methSymbol.owner.info.decls.toList
+                           .mkString(", ") + ")"
                      else ""))
             case _ =>
               bc emitRETURN returnType

@@ -195,8 +195,8 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
           injectedLanguage =>
             ScalaLanguageInjector withInjectionSupport { support =>
               ScalaLanguageInjector performSimpleInjection
-              (literals, injectedLanguage, new BaseInjection(support.getId),
-                  host, registrar, support)
+                (literals, injectedLanguage, new BaseInjection(support.getId),
+                    host, registrar, support)
               true
             }
         } getOrElse false
@@ -265,8 +265,8 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
 
               if (injectedLanguage != null) {
                 ScalaLanguageInjector handleInjectionImpl
-                (literal, injectedLanguage, new BaseInjection(support.getId),
-                    list)
+                  (literal, injectedLanguage, new BaseInjection(support.getId),
+                      list)
                 allInjections put (injectedLanguage, list)
               }
           }
@@ -367,17 +367,17 @@ object ScalaLanguageInjector {
 
       if (wsPrefixLength != lineLength) {
         rangesCollected +=
-        (new TextRange(if (partOfMlLine.trim startsWith margin)
-                         count + 1 + wsPrefixLength
-                       else count,
-                       count + lineLength) shiftRight range.getStartOffset)
+          (new TextRange(if (partOfMlLine.trim startsWith margin)
+                           count + 1 + wsPrefixLength
+                         else count,
+                         count + lineLength) shiftRight range.getStartOffset)
       }
 
       count += lineLength + 1
     }
     if (rangesCollected.isEmpty)
       rangesCollected +=
-      new TextRange(range.getStartOffset, range.getStartOffset)
+        new TextRange(range.getStartOffset, range.getStartOffset)
 
     rangesCollected
   }
@@ -414,8 +414,8 @@ object ScalaLanguageInjector {
         Trinity[PsiLanguageInjectionHost, InjectedLanguage, TextRange]]
 
     literals foreach
-    (ScalaLanguageInjector
-          .handleInjectionImpl(_, injectedLanguage, injection, list))
+      (ScalaLanguageInjector
+            .handleInjectionImpl(_, injectedLanguage, injection, list))
 
     InjectorUtils.registerInjection(injectedLanguage.getLanguage,
                                     list,

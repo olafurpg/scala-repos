@@ -33,7 +33,7 @@ object GenProductTypes {
           } getOrElse "")
 
     "private[spire] trait %s[%s] extends %s {" format
-    (name, specTypes, parents)
+      (name, specTypes, parents)
   }
 
   val members: Block = { tpe =>
@@ -71,13 +71,13 @@ object GenProductTypes {
         val call =
           (1 to arity) map { j =>
             "%s%d.%s(%s)" format
-            (prefix, j, methodName, args.zipWithIndex map {
-                  case (DelegateArg, i) => "x%d._%d" format (i, j)
-                  case (FixedArg(_), i) => "x" + i
-                } mkString ", ")
+              (prefix, j, methodName, args.zipWithIndex map {
+                    case (DelegateArg, i) => "x%d._%d" format (i, j)
+                    case (FixedArg(_), i) => "x" + i
+                  } mkString ", ")
           } mkString ("(", ", ", ")")
         "  %sdef %s(%s): (%s) = { %s }" format
-        (over, methodName, arglist, types, call)
+          (over, methodName, arglist, types, call)
     }
   }
 
@@ -106,7 +106,7 @@ object GenProductTypes {
       |%s
       |    }
       |  }""".stripMargin format
-    (name, specTypes, implicits, structure, types, name, types, members)
+      (name, specTypes, implicits, structure, types, name, types, members)
   }
 
   def productTrait(blocks0: List[Block]): Block = { tpe =>
@@ -197,7 +197,7 @@ object ProductTypes {
   private val overrideEqv: Block = { tpe =>
     import tpe._
     "  override def eqv(x0: (%s), x1: (%s)): Boolean = compare(x0, x1) == 0" format
-    (types, types)
+      (types, types)
   }
 
   private val compare: Block = { tpe =>
@@ -210,7 +210,7 @@ object ProductTypes {
             |%s  if (cmp != 0) cmp else {
             |%s
             |%s  }""".stripMargin format
-        (indent, prefix, i, i, i, indent, gen(i + 1), indent)
+          (indent, prefix, i, i, i, indent, gen(i + 1), indent)
       } else {
         indent + "  0"
       }

@@ -56,14 +56,14 @@ class StartupWithOneThreadSpec(startTime: Long)
       // Note that the Cluster extension is started via ClusterActorRefProvider
       // before ActorSystem.apply returns, i.e. in the constructor of AkkaSpec.
       (System.nanoTime - startTime).nanos.toMillis should be <
-      (system.settings.CreationTimeout.duration - 2.second).toMillis
+        (system.settings.CreationTimeout.duration - 2.second).toMillis
       system.actorOf(testProps) ! "hello"
       system.actorOf(testProps) ! "hello"
       system.actorOf(testProps) ! "hello"
 
       val cluster = Cluster(system)
       (System.nanoTime - startTime).nanos.toMillis should be <
-      (system.settings.CreationTimeout.duration - 2.second).toMillis
+        (system.settings.CreationTimeout.duration - 2.second).toMillis
 
       expectMsg("hello")
       expectMsg("hello")

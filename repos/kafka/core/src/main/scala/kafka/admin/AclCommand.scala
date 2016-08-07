@@ -164,7 +164,7 @@ object AclCommand {
 
     //Write, Describe permission on topics, Create permission on cluster
     topics.map(_ -> acls).toMap[Resource, Set[Acl]] +
-    (Resource.ClusterResource -> getAcl(opts, Set(Create)))
+      (Resource.ClusterResource -> getAcl(opts, Set(Create)))
   }
 
   private def getConsumerResourceToAcls(

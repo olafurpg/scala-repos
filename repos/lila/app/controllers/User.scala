@@ -41,10 +41,10 @@ object User extends LilaController {
   def showMini(username: String) = Open { implicit ctx =>
     OptionFuResult(UserRepo named username) { user =>
       GameRepo lastPlayedPlaying user zip Env.donation.isDonor(user.id) zip
-      (ctx.userId ?? { relationApi.fetchBlocks(user.id, _) }) zip
-      (ctx.userId ?? { Env.game.crosstableApi(user.id, _) }) zip
-      (ctx.isAuth ?? { Env.pref.api.followable(user.id) }) zip
-      (ctx.userId ?? { relationApi.fetchRelation(_, user.id) }) map {
+        (ctx.userId ?? { relationApi.fetchBlocks(user.id, _) }) zip
+        (ctx.userId ?? { Env.game.crosstableApi(user.id, _) }) zip
+        (ctx.isAuth ?? { Env.pref.api.followable(user.id) }) zip
+        (ctx.userId ?? { relationApi.fetchRelation(_, user.id) }) map {
         case (((((pov, donor), blocked), crosstable), followable), relation) =>
           Ok(
               html.user.mini(user,
@@ -218,9 +218,9 @@ object User extends LilaController {
   def mod(username: String) = Secure(_.UserSpy) { implicit ctx => me =>
     OptionFuOk(UserRepo named username) { user =>
       (!isGranted(_.SetEmail, user) ?? UserRepo.email(user.id)) zip
-      (Env.security userSpy user.id) zip
-      (Env.mod.assessApi
-            .getPlayerAggregateAssessmentWithGames(user.id)) zip Env.mod.logApi
+        (Env.security userSpy user.id) zip
+        (Env.mod.assessApi
+              .getPlayerAggregateAssessmentWithGames(user.id)) zip Env.mod.logApi
         .userHistory(user.id) flatMap {
         case ((((email, spy), playerAggregateAssessment), history)) =>
           (Env.playban.api bans spy.usersSharingIp.map(_.id)) map { bans =>

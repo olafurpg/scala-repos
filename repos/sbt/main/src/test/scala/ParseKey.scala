@@ -42,10 +42,10 @@ object ParseKey extends Properties("Key parser test") {
       val string = displayMasked(key, mask)
 
       ("Key: " + displayFull(key)) |: ("Mask: " + mask) |:
-      ("Current: " + structure.current) |: parse(structure, string) {
-        case Left(err) => false
-        case Right(sk) => sk.scope.project == Select(structure.current)
-      }
+        ("Current: " + structure.current) |: parse(structure, string) {
+          case Left(err) => false
+          case Right(sk) => sk.scope.project == Select(structure.current)
+        }
     }
 
   property("An unspecified task axis resolves to Global") =
@@ -71,11 +71,11 @@ object ParseKey extends Properties("Key parser test") {
         Resolve.resolveConfig(structure.extra, key.key, mask)(key.scope).config
 
       ("Key: " + displayFull(key)) |: ("Mask: " + mask) |:
-      ("Expected configuration: " +
-          resolvedConfig.map(_.name)) |: parse(structure, string) {
-        case Right(sk) => sk.scope.config == resolvedConfig
-        case Left(err) => false
-      }
+        ("Expected configuration: " +
+              resolvedConfig.map(_.name)) |: parse(structure, string) {
+          case Right(sk) => sk.scope.config == resolvedConfig
+          case Left(err) => false
+        }
     }
 
   lazy val structureDefinedKey: Gen[StructureKeyMask] = structureKeyMask { s =>
@@ -117,7 +117,7 @@ object ParseKey extends Properties("Key parser test") {
     val parsed = DefaultParsers.result(parser, s).left.map(_ ().toString)
     val showParsed = parsed.right.map(displayFull)
     ("Key string: '" + s + "'") |: ("Parsed: " + showParsed) |:
-    ("Structure: " + structure) |: f(parsed)
+      ("Structure: " + structure) |: f(parsed)
   }
 
   // Here we're shadowing the in-scope implicit called `mkEnv` for this method

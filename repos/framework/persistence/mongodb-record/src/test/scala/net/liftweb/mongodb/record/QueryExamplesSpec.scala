@@ -104,7 +104,7 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
 
     pebblesParents.length must_== 2
     pebblesParents.map(_.id.get).filterNot(rubblesIds.contains(_)) must_==
-    List()
+      List()
 
     // query for Bamm-Bamm's and Pebbles' parents using List[UUID]
     val pebblesAndBammBammsParents =
@@ -117,7 +117,7 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
 
     dinosOwners.length must_== 2
     dinosOwners.map(_.id.get).filterNot(flinstonesIds.contains(_)) must_==
-    List()
+      List()
 
     // query for the Rubbles using a Regex
     val rubbles = Person.findAll(("name" -> "^Rubble".r))
@@ -139,7 +139,7 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
 
     flinstones2.length must_== 2
     flinstones2.map(_.id.get).filterNot(flinstonesIds.contains(_)) must_==
-    List()
+      List()
 
     // query using Dates
     implicit val formats = Person.formats // this is needed for Dates
@@ -151,7 +151,7 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
     people
       .map(_.id.get)
       .filterNot(List(wilma.id.get, barney.id.get, betty.id.get).contains(_)) must_==
-    List()
+      List()
 
     // you do not need to define the implicit formats val if you write your query in the MongoMetaRecord object.
     val people2 = Person.findAllBornAfter(qryDate.getTime)
@@ -160,19 +160,19 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
     people2
       .map(_.id.get)
       .filterNot(List(wilma.id.get, barney.id.get, betty.id.get).contains(_)) must_==
-    List()
+      List()
 
     // query with Sort
     val people3 = Person.findAll(JObject(Nil), ("birthDate" -> -1))
 
     people3.length must_== 4
     people3.map(_.id.get) must_==
-    List(betty.id.get, barney.id.get, wilma.id.get, fred.id.get)
+      List(betty.id.get, barney.id.get, wilma.id.get, fred.id.get)
 
     val people4 = Person.findAll(JObject(Nil), ("birthDate" -> 1))
 
     people4.length must_== 4
     people4.map(_.id.get) must_==
-    List(fred.id.get, wilma.id.get, barney.id.get, betty.id.get)
+      List(fred.id.get, wilma.id.get, barney.id.get, betty.id.get)
   }
 }

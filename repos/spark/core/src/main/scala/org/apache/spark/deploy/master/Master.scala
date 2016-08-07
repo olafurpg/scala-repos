@@ -1221,7 +1221,7 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
         removeWorker(worker)
       } else {
         if (worker.lastHeartbeat < currentTime -
-            ((REAPER_ITERATIONS + 1) * WORKER_TIMEOUT_MS)) {
+              ((REAPER_ITERATIONS + 1) * WORKER_TIMEOUT_MS)) {
           workers -= worker // we've seen this DEAD worker in the UI, etc. for long enough; cull it
         }
       }

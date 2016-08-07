@@ -935,7 +935,7 @@ private class LeastSquaresAggregator(coefficients: Vector,
           features.foreachActive { (index, value) =>
             if (featuresStd(index) != 0.0 && value != 0.0) {
               localGradientSumArray(index) +=
-              weight * diff * value / featuresStd(index)
+                weight * diff * value / featuresStd(index)
             }
           }
           lossSum += weight * diff * diff / 2.0

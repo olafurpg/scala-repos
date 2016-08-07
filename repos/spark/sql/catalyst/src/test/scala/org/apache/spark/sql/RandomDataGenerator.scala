@@ -104,7 +104,7 @@ object RandomDataGenerator {
         // Array
         val dt = acceptedTypes(rand.nextInt(acceptedTypes.size))
         fields +=
-        new StructField("col_" + i, ArrayType(dt), rand.nextBoolean())
+          new StructField("col_" + i, ArrayType(dt), rand.nextBoolean())
         numFields -= 1
       } else {
         // Struct

@@ -582,7 +582,7 @@ trait DocComments { self: Global =>
 
       for (defn <- defined) yield {
         defn.cloneSymbol(sym.owner, sym.flags | Flags.SYNTHETIC) modifyInfo
-        (info => substAliases(info).asSeenFrom(site.thisType, sym.owner))
+          (info => substAliases(info).asSeenFrom(site.thisType, sym.owner))
       }
     }
   }

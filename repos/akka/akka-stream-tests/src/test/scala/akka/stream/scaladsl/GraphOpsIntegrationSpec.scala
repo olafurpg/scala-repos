@@ -164,7 +164,7 @@ class GraphOpsIntegrationSpec extends AkkaSpec {
         .run()
 
       Await.result(resultFuture, 3.seconds) should contain theSameElementsAs
-      (Seq(2, 4, 6, 5, 7, 9))
+        (Seq(2, 4, 6, 5, 7, 9))
     }
 
     "be able to run plain flow" in {

@@ -65,10 +65,10 @@ class CompileTimingTest
           FileUtils.deleteDirectory(target)
 
           asyncHelper.receiveN(2) should contain theSameElementsAs
-          (Seq(
-                  FullTypeCheckCompleteEvent,
-                  CompilerRestartedEvent
-              ))
+            (Seq(
+                    FullTypeCheckCompleteEvent,
+                    CompilerRestartedEvent
+                ))
 
           project ! SymbolDesignationsReq(Right(exampleDiskInfo),
                                           0,
@@ -80,10 +80,10 @@ class CompileTimingTest
           FileUtils.copyDirectory(targetBak, target)
 
           asyncHelper.receiveN(2) should contain theSameElementsAs
-          (Seq(
-                  FullTypeCheckCompleteEvent,
-                  CompilerRestartedEvent
-              ))
+            (Seq(
+                    FullTypeCheckCompleteEvent,
+                    CompilerRestartedEvent
+                ))
 
           project ! SymbolDesignationsReq(Right(exampleDiskInfo),
                                           0,

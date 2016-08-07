@@ -156,7 +156,7 @@ abstract class ControllerBase
                       defining(request.getQueryString) { queryString =>
                 request.getRequestURI
                   .substring(request.getContextPath.length) +
-                (if (queryString != null) "?" + queryString else "")
+                  (if (queryString != null) "?" + queryString else "")
               }
                   )))
         }

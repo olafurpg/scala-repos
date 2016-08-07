@@ -213,11 +213,11 @@ trait EventService
       dataPath("/fs") {
         post(state.ingestHandler) ~ delete(state.archiveHandler)
       } ~ //legacy handler
-      path("/(?<sync>a?sync)") {
-        dataPath("/fs") {
-          post(state.ingestHandler) ~ delete(state.archiveHandler)
+        path("/(?<sync>a?sync)") {
+          dataPath("/fs") {
+            post(state.ingestHandler) ~ delete(state.archiveHandler)
+          }
         }
-      }
     }
   }
 

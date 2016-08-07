@@ -181,7 +181,8 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
           value
         case Cancelled =>
           M.jobId map
-          (jobManager.abort(_, "Query was cancelled.", yggConfig.clock.now()))
+            (jobManager
+                  .abort(_, "Query was cancelled.", yggConfig.clock.now()))
           throw QueryCancelledException(
               "Query was cancelled before it was completed.")
         case Expired =>

@@ -92,7 +92,7 @@ class SquerylRecordSpec extends Specification with AroundExample {
         // ids must containInOrder(
         //   td.allCompanies.sortBy(_.name.get).map(_.id))
         ids.mkString("(", ",", ")") must_==
-        td.allCompanies.sortBy(_.name.get).map(_.id).mkString("(", ",", ")")
+          td.allCompanies.sortBy(_.name.get).map(_.id).mkString("(", ",", ")")
       }
     }
 

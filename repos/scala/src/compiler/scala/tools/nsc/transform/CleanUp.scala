@@ -343,11 +343,11 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
             IF((qual1() GETCLASS ()) DOT nme.isArray) THEN genArrayCall ELSE genDefaultCall
 
           localTyper typed
-          (if (isMaybeBoxed && isJavaValueMethod) genValueCallWithTest
-           else if (isArrayMethodSignature && isDefinitelyArray) genArrayCall
-           else if (isArrayMethodSignature && isMaybeArray)
-             genArrayCallWithTest
-           else genDefaultCall)
+            (if (isMaybeBoxed && isJavaValueMethod) genValueCallWithTest
+             else if (isArrayMethodSignature && isDefinitelyArray) genArrayCall
+             else if (isArrayMethodSignature && isMaybeArray)
+               genArrayCallWithTest
+             else genDefaultCall)
         }
       }
 

@@ -36,12 +36,12 @@ object EitherTTest extends SpecLite {
     }
 
     Bifoldable[EitherTList].bifoldMap(a)(_ :: Nil)(_ :: Nil) must_===
-    F.bifoldMap(a)(_ :: Nil)(_ :: Nil)
+      F.bifoldMap(a)(_ :: Nil)(_ :: Nil)
   }
 
   "show" ! forAll { a: EitherTList[Int, Int] =>
     Show[EitherTList[Int, Int]].show(a) must_===
-    Show[List[Int \/ Int]].show(a.run)
+      Show[List[Int \/ Int]].show(a.run)
   }
 
   "fromDisjunction" ! forAll { (a: String \/ Int) =>

@@ -148,8 +148,8 @@ private class SelectorMap(binds: List[CssBind])
       case i @ CssBind(AttrSelector(name, value, _)) => {
         val oldMap = attrMap.getOrElse(name, Map())
         attrMap += (name ->
-            (oldMap +
-                (value -> sortBinds(i :: oldMap.getOrElse(value, Nil)))))
+              (oldMap +
+                    (value -> sortBinds(i :: oldMap.getOrElse(value, Nil)))))
       }
     }
 

@@ -1374,10 +1374,10 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         res = atPos(res.pos)(Function(placeholderParams.reverse, res))
         if (isAny)
           placeholderParams foreach
-          (_.tpt match {
-                case tpt @ TypeTree() => tpt setType definitions.AnyTpe
-                case _ => // some ascription
-              })
+            (_.tpt match {
+                  case tpt @ TypeTree() => tpt setType definitions.AnyTpe
+                  case _ => // some ascription
+                })
         placeholderParams = List()
       }
       placeholderParams = placeholderParams ::: savedPlaceholderParams

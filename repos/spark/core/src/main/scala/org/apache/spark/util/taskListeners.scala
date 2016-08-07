@@ -59,7 +59,7 @@ private[spark] class TaskCompletionListenerException(
         .mkString("\n")
     } + previousError.map { e =>
       "\n\nPrevious exception in task: " + e.getMessage + "\n" +
-      e.getStackTrace.mkString("\t", "\n\t", "")
+        e.getStackTrace.mkString("\t", "\n\t", "")
     }.getOrElse("")
   }
 }

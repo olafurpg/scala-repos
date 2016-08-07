@@ -46,8 +46,8 @@ class SwaggerApiLookupSpec extends ScalatraSpec with JsonMatchers {
     val json = jackson.parseJson(body)
     json \ "resourcePath" must_== JString("/api/unnamed")
     json \ "apis" \\ "path" must_==
-    JObject("path" -> JString("/api/unnamed/"),
-            "path" -> JString("/api/unnamed/{id}"))
+      JObject("path" -> JString("/api/unnamed/"),
+              "path" -> JString("/api/unnamed/{id}"))
   }
 
   def listBarOperations = get("/api-docs/api/custom-name") {
@@ -55,8 +55,8 @@ class SwaggerApiLookupSpec extends ScalatraSpec with JsonMatchers {
     val json = jackson.parseJson(body)
     json \ "resourcePath" must_== JString("/api/custom-name")
     json \ "apis" \\ "path" must_==
-    JObject("path" -> JString("/api/custom-name/"),
-            "path" -> JString("/api/custom-name/{id}"))
+      JObject("path" -> JString("/api/custom-name/"),
+              "path" -> JString("/api/custom-name/{id}"))
   }
 }
 

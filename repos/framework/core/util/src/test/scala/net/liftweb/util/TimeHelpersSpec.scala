@@ -152,9 +152,9 @@ object TimeHelpersSpec
 
     "make sure noTime does not change the day" in forAllTimeZones {
       dateFormatter.format(0.days.ago.noTime.toDate) must_==
-      dateFormatter.format(new DateTime().toDate)
+        dateFormatter.format(new DateTime().toDate)
       dateFormatter.format(3.days.ago.noTime.toDate) must_==
-      dateFormatter.format(new Date(millis - (3 * 24 * 60 * 60 * 1000)))
+        dateFormatter.format(new Date(millis - (3 * 24 * 60 * 60 * 1000)))
     }
 
     "provide a day function returning the day of month corresponding to a given date (relative to UTC)" in forAllTimeZones {

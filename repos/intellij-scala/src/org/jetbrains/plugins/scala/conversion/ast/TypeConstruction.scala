@@ -54,8 +54,8 @@ object TypeConstruction {
         val typeConstruction: IntermediateNode = TypeConstruction(
             des.presentableText)
         buffer +=
-        ((typeConstruction,
-          ScType.extractClass(p).flatMap(el => Option(el.getQualifiedName))))
+          ((typeConstruction,
+            ScType.extractClass(p).flatMap(el => Option(el.getQualifiedName))))
         val argsOnLevel = args.map(getParts(_, buffer))
         ParametrizedConstruction(typeConstruction, argsOnLevel)
       case JavaArrayType(arg) =>

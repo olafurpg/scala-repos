@@ -117,8 +117,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
         }
         override def completions(verbosity: Int) = {
           super.completions(verbosity) ++
-          (if (verbosity == 0) Nil
-           else upgrade.completions(verbosity))
+            (if (verbosity == 0) Nil
+             else upgrade.completions(verbosity))
         }
         override def follow(s: String) = super.follow(s) orElse {
           if (upgraded) upgrade.follow(s)

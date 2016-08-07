@@ -151,9 +151,9 @@ RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax
       encodingFor("£0.25", "UTF-8") must_== PercentEncoded("%C2%A30.25")
       encodingFor("€100", "UTF-8") must_== PercentEncoded("%E2%82%AC100")
       encodingFor("«küßî»", "UTF-8") must_==
-      PercentEncoded("%C2%ABk%C3%BC%C3%9F%C3%AE%C2%BB")
+        PercentEncoded("%C2%ABk%C3%BC%C3%9F%C3%AE%C2%BB")
       encodingFor("“ЌύБЇ”", "UTF-8") must_==
-      PercentEncoded("%E2%80%9C%D0%8C%CF%8D%D0%91%D0%87%E2%80%9D")
+        PercentEncoded("%E2%80%9C%D0%8C%CF%8D%D0%91%D0%87%E2%80%9D")
     }
 
     /*
@@ -191,9 +191,9 @@ RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax
 
     "handle strings needing partial percent-encoding" in {
       encodingFor("Hello world", "US-ASCII") must_==
-      PercentEncoded("Hello%20world")
+        PercentEncoded("Hello%20world")
       encodingFor("/home/foo", "US-ASCII") must_==
-      PercentEncoded("%2Fhome%2Ffoo")
+        PercentEncoded("%2Fhome%2Ffoo")
     }
 
     // Path segment encoding differs from query string encoding, which is
@@ -205,7 +205,7 @@ RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax
       encodingFor(" +", "US-ASCII") must_== PercentEncoded("%20+") // vs "+%2B" for query strings
       encodingFor("1+2=3", "US-ASCII") must_== NotEncoded
       encodingFor("1 + 2 = 3", "US-ASCII") must_==
-      PercentEncoded("1%20+%202%20=%203")
+        PercentEncoded("1%20+%202%20=%203")
     }
 
     "decode characters percent-encoded with upper and lowercase hex digits" in {

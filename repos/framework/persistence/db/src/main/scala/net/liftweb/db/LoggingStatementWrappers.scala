@@ -211,7 +211,7 @@ object DBLog {
         case "executeBatch" => {
           logStatement({ result: Object =>
             "Exec batch, counts = " +
-            result.asInstanceOf[Array[Int]].mkString("(", ", ", ")")
+              result.asInstanceOf[Array[Int]].mkString("(", ", ", ")")
           }) {
             chain(method, Array())
           }
@@ -564,66 +564,66 @@ object DBLog {
 
         case "setAsciiStream" if args.length == 2 => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Ascii Stream: %s)".format(args(1))
+            args(0).asInstanceOf[Int] -> "(Ascii Stream: %s)".format(args(1))
           chain(method, args)
         }
 
         case "setAsciiStream" => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Ascii Stream: %s (%d bytes))"
-            .format(args(1), args(2))
+            args(0).asInstanceOf[Int] -> "(Ascii Stream: %s (%d bytes))"
+              .format(args(1), args(2))
           chain(method, args)
         }
 
         case "setBinaryStream" if args.length == 2 => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Binary Stream: %s)".format(args(1))
+            args(0).asInstanceOf[Int] -> "(Binary Stream: %s)".format(args(1))
           chain(method, args)
         }
 
         case "setBinaryStream" => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Binary Stream: %s (%d bytes))"
-            .format(args(1), args(2))
+            args(0).asInstanceOf[Int] -> "(Binary Stream: %s (%d bytes))"
+              .format(args(1), args(2))
           chain(method, args)
         }
 
         case "setBlob" if args.length == 2 => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Blob : %s)".format(args(1))
+            args(0).asInstanceOf[Int] -> "(Blob : %s)".format(args(1))
           chain(method, args)
         }
 
         case "setBlob" => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Blob : %s (%d bytes))".format(args(1),
-                                                                       args(2))
+            args(0).asInstanceOf[Int] -> "(Blob : %s (%d bytes))"
+              .format(args(1), args(2))
           chain(method, args)
         }
 
         case "setCharacterStream" if args.length == 2 => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Char stream : %s)".format(args(1))
+            args(0).asInstanceOf[Int] -> "(Char stream : %s)".format(args(1))
           chain(method, args)
         }
 
         case "setCharacterStream" => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Char stream : %s (%d bytes))"
-            .format(args(1), args(2))
+            args(0).asInstanceOf[Int] -> "(Char stream : %s (%d bytes))"
+              .format(args(1), args(2))
           chain(method, args)
         }
 
         case "setClob" if args.length == 2 => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Clob : %s)".format(args(1))
+            args(0).asInstanceOf[Int] -> "(Clob : %s)".format(args(1))
           chain(method, args)
         }
 
         case "setClob" => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Clob : %s (%d bytes))".format(args(1),
-                                                                       args(2))
+            args(0).asInstanceOf[Int] -> "(Clob : %s (%d bytes))"
+              .format(args(1), args(2))
           chain(method, args)
         }
 
@@ -639,27 +639,27 @@ object DBLog {
 
         case "setNCharacterStream" if args.length == 2 => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(NChar Stream : %s)".format(args(1))
+            args(0).asInstanceOf[Int] -> "(NChar Stream : %s)".format(args(1))
           chain(method, args)
         }
 
         case "setNCharacterStream" => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(NChar Stream : %s (%d bytes))"
-            .format(args(1), args(2))
+            args(0).asInstanceOf[Int] -> "(NChar Stream : %s (%d bytes))"
+              .format(args(1), args(2))
           chain(method, args)
         }
 
         case "setNClob" if args.length == 2 => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(NClob : %s)".format(args(1))
+            args(0).asInstanceOf[Int] -> "(NClob : %s)".format(args(1))
           chain(method, args)
         }
 
         case "setNClob" => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(NClob : %s (%d bytes))"
-            .format(args(1), args(2))
+            args(0).asInstanceOf[Int] -> "(NClob : %s (%d bytes))"
+              .format(args(1), args(2))
           chain(method, args)
         }
 
@@ -706,8 +706,8 @@ object DBLog {
 
         case "setUnicodeStream" => {
           paramMap +=
-          args(0).asInstanceOf[Int] -> "(Unicode Stream : %s (%d bytes))"
-            .format(args(1), args(2))
+            args(0).asInstanceOf[Int] -> "(Unicode Stream : %s (%d bytes))"
+              .format(args(1), args(2))
           chain(method, args)
         }
 

@@ -148,7 +148,7 @@ class MultivariateOnlineSummarizer
           currMean(i) += deltaMean * otherNnz / totalNnz
           // merge m2n together
           currM2n(i) += other.currM2n(i) +
-          deltaMean * deltaMean * thisNnz * otherNnz / totalNnz
+            deltaMean * deltaMean * thisNnz * otherNnz / totalNnz
           // merge m2 together
           currM2(i) += other.currM2(i)
           // merge l1 together

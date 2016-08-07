@@ -102,11 +102,11 @@ class BalancingDispatcherSpec
         .actor
         .asInstanceOf[DelayableActor]
         .invocationCount should be >
-      (slow.underlying
-            .asInstanceOf[ActorCell]
-            .actor
-            .asInstanceOf[DelayableActor]
-            .invocationCount)
+        (slow.underlying
+              .asInstanceOf[ActorCell]
+              .actor
+              .asInstanceOf[DelayableActor]
+              .invocationCount)
       system.stop(slow)
       system.stop(fast)
     }

@@ -1222,9 +1222,9 @@ abstract class ClassfileParser {
 
     def add(entry: InnerClassEntry): Unit = {
       inners get entry.externalName foreach
-      (existing =>
-            devWarning(
-                s"Overwriting inner class entry! Was $existing, now $entry"))
+        (existing =>
+              devWarning(
+                  s"Overwriting inner class entry! Was $existing, now $entry"))
       inners(entry.externalName) = entry
     }
     def innerSymbol(externalName: Name): Symbol =

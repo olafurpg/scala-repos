@@ -43,13 +43,13 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
           Seq(x) -> Seq(x)
         }: _*)
       testRuns foreach
-      (_ ⇒
-            runScript(script, settings) { flow ⇒
-              flow
-                .map(identity)
-                .timedIntervalBetween(_ % measureBetweenEvery == 0,
-                                      onInterval = printInfo)
-          })
+        (_ ⇒
+              runScript(script, settings) { flow ⇒
+                flow
+                  .map(identity)
+                  .timedIntervalBetween(_ % measureBetweenEvery == 0,
+                                        onInterval = printInfo)
+            })
 
       val expectedNrOfOnIntervalCalls =
         testRuns.size * ((n / measureBetweenEvery) -
@@ -75,10 +75,10 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
           Seq(x) -> Seq(x)
         }: _*)
       testRuns foreach
-      (_ ⇒
-            runScript(script, settings) { flow ⇒
-              flow.timed(_.map(identity), onComplete = printInfo)
-          })
+        (_ ⇒
+              runScript(script, settings) { flow ⇒
+                flow.timed(_.map(identity), onComplete = printInfo)
+            })
 
       testRuns foreach { _ ⇒
         testActor.expectMsgType[Duration]

@@ -93,9 +93,9 @@ trait AST extends Phases {
         val paramStr = params map { indent + "  - " + _ } mkString "\n"
 
         indent + "type: let\n" + indent + "id: " + id + "\n" + indent +
-        "params:\n" + paramStr + "\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          "params:\n" + paramStr + "\n" + indent + "left:\n" +
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Solve(loc, constraints, child) => {
@@ -103,8 +103,8 @@ trait AST extends Phases {
           constraints map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
 
         indent + "type: solve\n" + indent + "constraints:\n" +
-        constraintsStr + "\n" + indent + "child:\n" + prettyPrint(child,
-                                                                  level + 2)
+          constraintsStr + "\n" + indent + "child:\n" + prettyPrint(child,
+                                                                    level + 2)
       }
 
       case Import(loc, spec, child) => {
@@ -114,19 +114,19 @@ trait AST extends Phases {
         }
 
         indent + "type: import\n" + indent + "spec: " + specStr + indent +
-        "child: \n" + prettyPrint(child, level + 2)
+          "child: \n" + prettyPrint(child, level + 2)
       }
 
       case Assert(loc, pred, child) => {
         indent + "type: assert\n" + indent + "pred: " +
-        prettyPrint(pred, level + 2) + indent + "child: \n" + prettyPrint(
+          prettyPrint(pred, level + 2) + indent + "child: \n" + prettyPrint(
             child,
             level + 2)
       }
 
       case Observe(loc, data, samples) => {
         indent + "type: observe\n" + indent + "data: " +
-        prettyPrint(data, level + 2) + indent + "samples: \n" + prettyPrint(
+          prettyPrint(data, level + 2) + indent + "samples: \n" + prettyPrint(
             samples,
             level + 2)
       }
@@ -138,15 +138,15 @@ trait AST extends Phases {
 
       case Relate(loc, from: Expr, to: Expr, in: Expr) => {
         indent + "type: \n" + indent + "from:\n" +
-        prettyPrint(from, level + 2) + "\n" + indent + "to:\n" +
-        prettyPrint(to, level + 2) + "\n" + indent + "in:\n" + prettyPrint(
+          prettyPrint(from, level + 2) + "\n" + indent + "to:\n" +
+          prettyPrint(to, level + 2) + "\n" + indent + "in:\n" + prettyPrint(
             in,
             level + 2)
       }
 
       case t @ TicVar(loc, id) => {
         indent + "type: ticvar\n" + indent + "id: " + id + "\n" + indent +
-        "binding: " + t.binding.toString
+          "binding: " + t.binding.toString
       }
 
       case StrLit(loc, value) => {
@@ -174,7 +174,7 @@ trait AST extends Phases {
           props map {
             case (name, value) => {
               indent + "  - \n" + indent + "    name: " + name + "\n" +
-              indent + "    value:\n" + prettyPrint(value, level + 6)
+                indent + "    value:\n" + prettyPrint(value, level + 6)
             }
           } mkString "\n"
 
@@ -190,14 +190,14 @@ trait AST extends Phases {
 
       case Descent(loc, child, property) => {
         indent + "type: descent\n" + indent + "child:\n" +
-        prettyPrint(child, level + 2) + "\n" + indent + "property: " +
-        property
+          prettyPrint(child, level + 2) + "\n" + indent + "property: " +
+          property
       }
 
       case MetaDescent(loc, child, property) => {
         indent + "type: meta-descent\n" + indent + "child:\n" +
-        prettyPrint(child, level + 2) + "\n" + indent + "property: " +
-        property
+          prettyPrint(child, level + 2) + "\n" + indent + "property: " +
+          property
       }
 
       case Deref(loc, left, right) => {
@@ -212,8 +212,8 @@ trait AST extends Phases {
           actuals map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
 
         indent + "type: dispatch\n" + indent + "name: " + name + "\n" +
-        indent + "actuals:\n" + actualsStr + "\n" + indent + "binding: " +
-        d.binding.toString + "\n" + indent + "is-reduction: " + d.isReduction
+          indent + "actuals:\n" + actualsStr + "\n" + indent + "binding: " +
+          d.binding.toString + "\n" + indent + "is-reduction: " + d.isReduction
       }
 
       case Cond(loc, pred, left, right) =>
@@ -224,116 +224,116 @@ trait AST extends Phases {
 
       case Where(loc, left, right) => {
         indent + "type: where\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case With(loc, left, right) => {
         indent + "type: with\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Union(loc, left, right) => {
         indent + "type: union\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Intersect(loc, left, right) => {
         indent + "type: intersect\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Difference(loc, left, right) => {
         indent + "type: without\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Add(loc, left, right) => {
         indent + "type: add\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Sub(loc, left, right) => {
         indent + "type: sub\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Mul(loc, left, right) => {
         indent + "type: mul\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Div(loc, left, right) => {
         indent + "type: div\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Mod(loc, left, right) => {
         indent + "type: mod\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Pow(loc, left, right) => {
         indent + "type: pow\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Lt(loc, left, right) => {
         indent + "type: lt\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case LtEq(loc, left, right) => {
         indent + "type: LtEq\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Gt(loc, left, right) => {
         indent + "type: gt\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case GtEq(loc, left, right) => {
         indent + "type: GtEq\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Eq(loc, left, right) => {
         indent + "type: eq\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case NotEq(loc, left, right) => {
         indent + "type: noteq\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Or(loc, left, right) => {
         indent + "type: or\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case And(loc, left, right) => {
         indent + "type: and\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
       }
 
       case Comp(loc, child) => {
@@ -358,8 +358,8 @@ trait AST extends Phases {
       } getOrElse ""
 
     indent + "nodeId: " + e.nodeId + "\n" + indent + "line: " + e.loc.lineNum +
-    "\n" + indent + "col: " + e.loc.colNum + "\n" + back + "\n" + indent +
-    "provenance: " + e.provenance.toString + constraintStr
+      "\n" + indent + "col: " + e.loc.colNum + "\n" + back + "\n" + indent +
+      "provenance: " + e.provenance.toString + constraintStr
   }
 
   protected def bindRoot(root: Expr, e: Expr) {

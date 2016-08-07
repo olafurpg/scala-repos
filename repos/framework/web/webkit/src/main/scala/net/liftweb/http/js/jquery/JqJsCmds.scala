@@ -686,7 +686,7 @@ object JqJsCmds {
 
     val toJsCmd = fixHtmlCmdFunc("inline", html) { str =>
       "jQuery.blockUI({ message: " + str +
-      (css.map(",  css: " + _.toJsCmd + " ").openOr("")) + "});"
+        (css.map(",  css: " + _.toJsCmd + " ").openOr("")) + "});"
     }
   }
 

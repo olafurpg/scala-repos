@@ -26,7 +26,7 @@ object DriverRegistrationSpec extends Specification {
       }
 
       DriverManager.getDriver(jdbcUrl) aka "Acolyte driver" must
-      (throwA[SQLException](message = "No suitable driver"))
+        (throwA[SQLException](message = "No suitable driver"))
     }
 
     "be registered for both Acolyte & H2 when databases are connected" in {

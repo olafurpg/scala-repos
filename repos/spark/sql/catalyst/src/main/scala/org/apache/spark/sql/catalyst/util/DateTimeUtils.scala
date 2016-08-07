@@ -444,7 +444,7 @@ object DateTimeUtils {
 
   private def localTimestamp(microsec: SQLTimestamp): SQLTimestamp = {
     absoluteMicroSecond(microsec) +
-    defaultTimeZone.getOffset(microsec / 1000) * 1000L
+      defaultTimeZone.getOffset(microsec / 1000) * 1000L
   }
 
   /**
@@ -747,7 +747,7 @@ object DateTimeUtils {
     val days = millisToDays(start / 1000L)
     val newDays = dateAddMonths(days, months)
     daysToMillis(newDays) * 1000L + start - daysToMillis(days) * 1000L +
-    microseconds
+      microseconds
   }
 
   /**

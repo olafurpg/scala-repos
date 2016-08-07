@@ -106,7 +106,7 @@ class IdeClientIdea(compilerName: String,
                                   reader: ClassReader): Any = {
     if (outputFile.getName == s"$packageObjectClassName.class") {
       packageObjectsBaseClasses ++=
-      collectPackageObjectBaseClasses(source, reader)
+        collectPackageObjectBaseClasses(source, reader)
     }
   }
 

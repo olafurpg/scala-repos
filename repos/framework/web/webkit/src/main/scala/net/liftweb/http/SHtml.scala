@@ -745,17 +745,17 @@ trait SHtml extends Loggable {
 
     fmapFunc((func)) { funcName =>
       (attrs.foldLeft(<input type="text" value={value}/>)(_ % _)) %
-      ("onkeypress" -> """liftUtils.lift_blurIfReturn(event)""") %
-      (if (ignoreBlur) Null
-       else
-         ("onblur" ->
-             (jsFunc match {
-                   case Full(f) =>
-                     JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName,
-                                                                 key),
-                                                             f)
-                   case _ => makeAjaxCall(raw(funcName, "this"))
-                 })))
+        ("onkeypress" -> """liftUtils.lift_blurIfReturn(event)""") %
+        (if (ignoreBlur) Null
+         else
+           ("onblur" ->
+                 (jsFunc match {
+                       case Full(f) =>
+                         JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName,
+                                                                     key),
+                                                                 f)
+                       case _ => makeAjaxCall(raw(funcName, "this"))
+                     })))
     }
   }
 
@@ -813,13 +813,14 @@ trait SHtml extends Loggable {
 
     fmapFunc((func)) { funcName =>
       (attrs.foldLeft(<textarea>{value}</textarea>)(_ % _)) %
-      ("onblur" ->
-          (jsFunc match {
-                case Full(f) =>
-                  JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key),
-                                                          f)
-                case _ => makeAjaxCall(raw(funcName, "this"))
-              }))
+        ("onblur" ->
+              (jsFunc match {
+                    case Full(f) =>
+                      JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName,
+                                                                  key),
+                                                              f)
+                    case _ => makeAjaxCall(raw(funcName, "this"))
+                  }))
     }
   }
 
@@ -937,13 +938,14 @@ trait SHtml extends Loggable {
 
     fmapFunc((func)) { funcName =>
       (attrs.foldLeft(<input type="checkbox"/>)(_ % _)) % checked(value) %
-      ("onclick" ->
-          (jsFunc match {
-                case Full(f) =>
-                  JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key),
-                                                          f)
-                case _ => makeAjaxCall(raw(funcName, "this"))
-              }))
+        ("onclick" ->
+              (jsFunc match {
+                    case Full(f) =>
+                      JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName,
+                                                                  key),
+                                                              f)
+                    case _ => makeAjaxCall(raw(funcName, "this"))
+                  }))
     }
   }
 
@@ -1162,13 +1164,14 @@ trait SHtml extends Loggable {
         case option =>
           optionToElem(option) % selected(deflt.exists(_ == option.value))
       }}</select>)(_ % _)) %
-      ("onchange" ->
-          (jsFunc match {
-                case Full(f) =>
-                  JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key),
-                                                          f)
-                case _ => makeAjaxCall(raw(funcName, "this"))
-              }))
+        ("onchange" ->
+              (jsFunc match {
+                    case Full(f) =>
+                      JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName,
+                                                                  key),
+                                                              f)
+                    case _ => makeAjaxCall(raw(funcName, "this"))
+                  }))
     }
   }
 
@@ -1638,7 +1641,7 @@ trait SHtml extends Loggable {
     import Helpers._
 
     makeFormElement("number", func, attrs: _*) % ("value" -> value.toString) %
-    ("min" -> min.toString) % ("max" -> max.toString)
+      ("min" -> min.toString) % ("max" -> max.toString)
   }
 
   /**
@@ -1686,8 +1689,8 @@ trait SHtml extends Loggable {
     import common.Full
 
     makeFormElement("number", func, attrs: _*) % ("value" -> value.toString) %
-    ("min" -> min.toString) % ("min" -> min.toString) %
-    ("step" -> step.toString)
+      ("min" -> min.toString) % ("min" -> min.toString) %
+      ("step" -> step.toString)
   }
 
   /**
@@ -1725,7 +1728,7 @@ trait SHtml extends Loggable {
     import Helpers._
 
     makeFormElement("range", func, attrs: _*) % ("value" -> value.toString) %
-    ("min" -> min.toString) % ("max" -> max.toString)
+      ("min" -> min.toString) % ("max" -> max.toString)
   }
 
   def textAjaxTest(value: String,
@@ -1829,7 +1832,7 @@ trait SHtml extends Loggable {
         "value",
         Text(value),
         Null) %
-    ("onclick" -> ("lift.setUriSuffix('" + funcName + "=_'); return true;"))
+      ("onclick" -> ("lift.setUriSuffix('" + funcName + "=_'); return true;"))
   }
 
   /**
@@ -1942,10 +1945,11 @@ trait SHtml extends Loggable {
                 }
 
                 e.copy(attributes = newMeta) % ("id" -> id) %
-                ("action" -> "javascript://") %
-                ("onsubmit" ->
-                    (SHtml.makeAjaxCall(LiftRules.jsArtifacts.serialize(id))
-                          .toJsCmd + "; return false;"))
+                  ("action" -> "javascript://") %
+                  ("onsubmit" ->
+                        (SHtml.makeAjaxCall(
+                                  LiftRules.jsArtifacts.serialize(id))
+                              .toJsCmd + "; return false;"))
               }
               case x => x
             }): NodeSeq)
@@ -2276,13 +2280,14 @@ trait SHtml extends Loggable {
             case option =>
               optionToElem(option) % selected(deflt.exists(_ == option.value))
           } }</select>)(_ % _)) %
-        ("onchange" ->
-            (jsFunc match {
-                  case Full(f) =>
-                    JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key),
-                                                            f)
-                  case _ => makeAjaxCall(raw(funcName, "this"))
-                }))
+          ("onchange" ->
+                (jsFunc match {
+                      case Full(f) =>
+                        JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName,
+                                                                    key),
+                                                                f)
+                      case _ => makeAjaxCall(raw(funcName, "this"))
+                    }))
     }
   }
 

@@ -610,9 +610,9 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
           table.transform(independentSpec).schemas map { _.toList }
 
         schemas flatMap
-        (_ traverse { tpe =>
-              makeForest(table, tpe) map (tpe -> _)
-            })
+          (_ traverse { tpe =>
+                makeForest(table, tpe) map (tpe -> _)
+              })
       }
 
       def makeForest(table: Table,

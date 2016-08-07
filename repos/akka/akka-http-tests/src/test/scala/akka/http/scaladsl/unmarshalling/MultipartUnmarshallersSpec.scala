@@ -135,23 +135,23 @@ class MultipartUnmarshallersSpec
                 List(RawHeader("Content-Transfer-Encoding", "binary"))))
       }
       "illegal headers" in
-      (Unmarshal(
-              HttpEntity(
-                  `multipart/form-data` withBoundary "XYZABC" withCharset `UTF-8`,
-                  """--XYZABC
+        (Unmarshal(
+                HttpEntity(
+                    `multipart/form-data` withBoundary "XYZABC" withCharset `UTF-8`,
+                    """--XYZABC
             |Date: unknown
             |content-disposition: form-data; name=email
             |
             |test@there.com
             |--XYZABC--""".stripMarginWithNewline("\r\n")))
-            .to[Multipart.General] should haveParts(
-              Multipart.General.BodyPart.Strict(
-                  HttpEntity(ContentTypes.`text/plain(UTF-8)`,
-                             "test@there.com"),
-                  List(RawHeader("date", "unknown"),
-                       `Content-Disposition`(
-                           ContentDispositionTypes.`form-data`,
-                           Map("name" -> "email"))))))
+              .to[Multipart.General] should haveParts(
+                Multipart.General.BodyPart.Strict(
+                    HttpEntity(ContentTypes.`text/plain(UTF-8)`,
+                               "test@there.com"),
+                    List(RawHeader("date", "unknown"),
+                         `Content-Disposition`(
+                             ContentDispositionTypes.`form-data`,
+                             Map("name" -> "email"))))))
       "a full example (Strict)" in {
         Unmarshal(
             HttpEntity(

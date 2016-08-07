@@ -45,7 +45,7 @@ object MultipartFormDataParserSpec extends PlaySpecification {
       case parts =>
         parts.dataParts.get("text1") must_== Some(Seq("the first text field"))
         parts.dataParts.get("text2:colon") must_==
-        Some(Seq("the second text field"))
+          Some(Seq("the second text field"))
         parts.files must haveLength(2)
         parts.file("file1") must beSome.like {
           case filePart =>

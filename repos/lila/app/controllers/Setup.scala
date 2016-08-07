@@ -103,7 +103,7 @@ object Setup extends LilaController with TheftPrevention {
                                                       destUser = destUser,
                                                       rematchOf = none)
                       env.processor.saveFriendConfig(config) >>
-                      (Env.challenge.api create challenge) >> negotiate(
+                        (Env.challenge.api create challenge) >> negotiate(
                           html =
                             fuccess(Redirect(routes.Round.watcher(challenge.id,
                                                                   "white"))),

@@ -61,15 +61,15 @@ object Finagle extends Build {
         "-encoding",
         "utf8"
     ) ++
-    (CrossVersion.partialVersion(sv) match {
-          case Some((2, x)) if x >= 11 =>
-            Seq(
-                "-Xlint:-missing-interpolator",
-                "-Ypatmat-exhaust-depth",
-                "40"
-            )
-          case _ => Seq("-Xlint")
-        })
+      (CrossVersion.partialVersion(sv) match {
+            case Some((2, x)) if x >= 11 =>
+              Seq(
+                  "-Xlint:-missing-interpolator",
+                  "-Ypatmat-exhaust-depth",
+                  "40"
+              )
+            case _ => Seq("-Xlint")
+          })
   }
 
   val sharedSettings = Seq(

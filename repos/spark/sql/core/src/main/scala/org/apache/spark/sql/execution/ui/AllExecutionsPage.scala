@@ -47,12 +47,12 @@ private[ui] class AllExecutionsPage(parent: SQLTab)
       }
       if (listener.getCompletedExecutions.nonEmpty) {
         _content ++=
-        new CompletedExecutionTable(parent,
-                                    "Completed Queries",
-                                    currentTime,
-                                    listener.getCompletedExecutions
-                                      .sortBy(_.submissionTime)
-                                      .reverse).toNodeSeq
+          new CompletedExecutionTable(parent,
+                                      "Completed Queries",
+                                      currentTime,
+                                      listener.getCompletedExecutions
+                                        .sortBy(_.submissionTime)
+                                        .reverse).toNodeSeq
       }
       if (listener.getFailedExecutions.nonEmpty) {
         _content ++= new FailedExecutionTable(parent,

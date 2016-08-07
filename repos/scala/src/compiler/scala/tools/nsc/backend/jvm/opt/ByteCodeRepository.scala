@@ -95,12 +95,12 @@ class ByteCodeRepository[BT <: BTypes](
   def classNodeAndSource(internalName: InternalName)
     : Either[ClassNotFound, (ClassNode, Source)] = {
     classNode(internalName) map
-    (n => {
-          val source =
-            if (compilingClasses contains internalName) CompilationUnit
-            else Classfile
-          (n, source)
-        })
+      (n => {
+            val source =
+              if (compilingClasses contains internalName) CompilationUnit
+              else Classfile
+            (n, source)
+          })
   }
 
   /**

@@ -432,7 +432,7 @@ private[json] object Meta {
             case _ => None
           })))
       fs :::
-      (if (clazz.getSuperclass == null) Nil else fields(clazz.getSuperclass))
+        (if (clazz.getSuperclass == null) Nil else fields(clazz.getSuperclass))
     }
 
     def setField(a: AnyRef, name: String, value: Any) = {

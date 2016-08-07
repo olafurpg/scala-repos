@@ -191,7 +191,7 @@ class RangeAssignor() extends PartitionAssignor with Logging {
             val assignmentForConsumer =
               partitionAssignment.getAndMaybePut(consumerThreadId.consumer)
             assignmentForConsumer +=
-            (TopicAndPartition(topic, partition) -> consumerThreadId)
+              (TopicAndPartition(topic, partition) -> consumerThreadId)
           }
         }
       }

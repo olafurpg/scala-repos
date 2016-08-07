@@ -300,9 +300,10 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
                   } getOrElse {
                     // start a new current version
                     acc +
-                    (currentKey -> JsonRecord(Vector(records.map(_.value): _*),
-                                              writeAs,
-                                              id))
+                      (currentKey -> JsonRecord(
+                              Vector(records.map(_.value): _*),
+                              writeAs,
+                              id))
                   }
 
                 case (acc,

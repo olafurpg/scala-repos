@@ -131,7 +131,7 @@ class PrepareRenameScalaMethodProcessor extends RenamePsiElementProcessor {
           val oldSuffix = ScalaRenameUtil.setterSuffix(oldName)
           if (newSuffix == "" && oldSuffix != "")
             newName +
-            oldSuffix //user typed name without suffix for setter and chose to rename getter too
+              oldSuffix //user typed name without suffix for setter and chose to rename getter too
           else if (newSuffix != "" && oldSuffix == "")
             newName.stripSuffix(newSuffix) //for renaming getters
           else newName

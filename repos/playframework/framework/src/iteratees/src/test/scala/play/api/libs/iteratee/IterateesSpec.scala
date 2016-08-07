@@ -763,7 +763,7 @@ object IterateesSpec
         Iterator.range(0, tooManyArrays).map(_ => new Array[Byte](arraySize))
       import play.api.libs.iteratee.Execution.Implicits.defaultExecutionContext
       await(Enumerator.enumerate(iterator) |>>> Iteratee.ignore[Array[Byte]]) must_==
-      (())
+        (())
     }
   }
 }

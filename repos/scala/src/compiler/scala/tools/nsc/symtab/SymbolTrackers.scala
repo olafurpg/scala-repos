@@ -150,7 +150,7 @@ trait SymbolTrackers {
                                                                 c.indentString(
                                                                     indent +
                                                                       "    ")) mkString
-                                                          ("\n", "\n", ""))
+                                                            ("\n", "\n", ""))
         }
       }
     }
@@ -205,7 +205,7 @@ trait SymbolTrackers {
       "" + hierarchy + (if (removed.isEmpty) ""
                         else
                           "\n\n!!! " + label + ", " + removed.size +
-                          " symbols vanished:\n" + removedString)
+                            " symbols vanished:\n" + removedString)
     }
   }
 }

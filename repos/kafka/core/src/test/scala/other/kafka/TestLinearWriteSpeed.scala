@@ -168,7 +168,7 @@ object TestLinearWriteSpeed {
       count += 1
       totalWritten += writeSize
       if ((start -
-              lastReport) / (1000.0 * 1000.0) > reportingInterval.doubleValue) {
+                lastReport) / (1000.0 * 1000.0) > reportingInterval.doubleValue) {
         val ellapsedSecs = (start - lastReport) / (1000.0 * 1000.0 * 1000.0)
         val mb = written / (1024.0 * 1024.0)
         println(

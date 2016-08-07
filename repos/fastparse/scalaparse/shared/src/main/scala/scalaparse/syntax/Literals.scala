@@ -105,9 +105,9 @@ trait Literals { l =>
       val String = {
         P {
           (Id ~ TQ ~/ TripleChars ~ TripleTail) |
-          (Id ~ "\"" ~/ SingleChars(true) ~ "\"") |
-          (TQ ~/ NoInterp.TripleChars ~ TripleTail) |
-          ("\"" ~/ NoInterp.SingleChars(false) ~ "\"")
+            (Id ~ "\"" ~/ SingleChars(true) ~ "\"") |
+            (TQ ~/ NoInterp.TripleChars ~ TripleTail) |
+            ("\"" ~/ NoInterp.SingleChars(false) ~ "\"")
         }
       }
     }

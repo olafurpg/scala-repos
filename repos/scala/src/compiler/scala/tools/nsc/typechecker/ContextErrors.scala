@@ -184,7 +184,7 @@ trait ContextErrors { self: Analyzer =>
       def UnstableTreeError(tree: Tree) = {
         def addendum = {
           "\n Note that " + tree.symbol + " is not stable because its type, " +
-          tree.tpe + ", is volatile."
+            tree.tpe + ", is volatile."
         }
         issueNormalTypeError(
             tree,
@@ -412,7 +412,7 @@ trait ContextErrors { self: Analyzer =>
             val semicolon =
               (if (linePrecedes(qual, sel))
                  "\npossible cause: maybe a semicolon is missing before `" +
-                 nameString + "'?"
+                   nameString + "'?"
                else "")
             val notAnyRef =
               (if (ObjectClass.info.member(name).exists)
@@ -1167,7 +1167,7 @@ trait ContextErrors { self: Analyzer =>
             else pre.widen.directObjectString
 
           underlyingSymbol(sym).fullLocationString +
-          " cannot be accessed in " + location + explanation
+            " cannot be accessed in " + location + explanation
         }
         AccessTypeError(tree, errMsg)
       }
@@ -1289,16 +1289,16 @@ trait ContextErrors { self: Analyzer =>
             tparams map
               (tp => tp.info.instantiateTypeParams(tparams, targs).bounds)
           (targs, bounds).zipped foreach
-          ((targ, bound) => explainTypes(bound.lo, targ))
+            ((targ, bound) => explainTypes(bound.lo, targ))
           (targs, bounds).zipped foreach
-          ((targ, bound) => explainTypes(targ, bound.hi))
+            ((targ, bound) => explainTypes(targ, bound.hi))
           ()
         }
 
         prefix + "type arguments " + targs.mkString("[", ",", "]") +
-        " do not conform to " + tparams.head.owner +
-        "'s type parameter bounds " +
-        (tparams map (_.defString)).mkString("[", ",", "]")
+          " do not conform to " + tparams.head.owner +
+          "'s type parameter bounds " +
+          (tparams map (_.defString)).mkString("[", ",", "]")
       }
 
       def NotWithinBounds(tree: Tree,
@@ -1578,8 +1578,8 @@ trait ContextErrors { self: Analyzer =>
                       |pattern match `x: AnyRef` or cast `x.asInstanceOf[AnyRef]` to do so.""")
                else
                  boxedClass get sym map
-                 (boxed =>
-                       sm"""|Note: an implicit exists from ${sym.fullName} => ${boxed.fullName}, but
+                   (boxed =>
+                         sm"""|Note: an implicit exists from ${sym.fullName} => ${boxed.fullName}, but
                       |methods inherited from Object are rendered ambiguous.  This is to avoid
                       |a blanket implicit which would convert any ${sym.fullName} to any AnyRef.
                       |You may wish to use a type ascription: `x: ${boxed.fullName}`.""") getOrElse "")

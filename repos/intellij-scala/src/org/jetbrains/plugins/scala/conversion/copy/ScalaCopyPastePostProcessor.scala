@@ -71,7 +71,7 @@ class ScalaCopyPastePostProcessor
                   break()
                 }
                 associations ::=
-                Association(dependency.kind, range, dependency.path)
+                  Association(dependency.kind, range, dependency.path)
               }
             }
           }

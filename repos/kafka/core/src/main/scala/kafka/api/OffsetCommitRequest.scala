@@ -166,7 +166,7 @@ case class OffsetCommitRequest(
                                                                8
                                                              else
                                                                0) /* timestamp */ +
-          shortStringLength(offsetAndMetadata._2.metadata)
+            shortStringLength(offsetAndMetadata._2.metadata)
         })
       })
 

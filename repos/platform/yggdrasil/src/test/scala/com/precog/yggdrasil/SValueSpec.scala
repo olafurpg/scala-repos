@@ -48,7 +48,7 @@ class SValueSpec extends Specification {
   "structure" should {
     "return correct sequence for an array" in {
       SArray(Vector(SBoolean(true))).structure must_==
-      Seq((JPath("[0]"), CBoolean))
+        Seq((JPath("[0]"), CBoolean))
     }
   }
 }

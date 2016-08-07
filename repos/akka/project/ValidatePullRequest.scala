@@ -130,7 +130,7 @@ object ValidatePullRequest extends AutoPlugin {
         sys.env.get(SourceBranchEnvVarName) orElse sys.env
           .get(SourcePullIdJenkinsEnvVarName)
           .map("pullreq/" + _) getOrElse // Set by "GitHub pull request builder plugin"
-        "HEAD"
+          "HEAD"
       },
       targetBranch in Global in ValidatePR := {
         (localTargetBranch, jenkinsTargetBranch) match {
