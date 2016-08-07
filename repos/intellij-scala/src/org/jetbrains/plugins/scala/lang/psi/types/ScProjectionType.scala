@@ -8,18 +8,28 @@ import com.intellij.psi._
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiModificationTracker
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScTypeParam}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScTypeAliasDefinition, ScValue}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter, ScTypeParam
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias, ScTypeAliasDefinition, ScValue
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.templates.ScTemplateBodyImpl
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
 import org.jetbrains.plugins.scala.lang.resolve.processor.ResolveProcessor
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveTargets, ScalaResolveResult}
-import org.jetbrains.plugins.scala.macroAnnotations.{ModCount, CachedMappedWithRecursionGuard}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveTargets, ScalaResolveResult
+}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  ModCount, CachedMappedWithRecursionGuard
+}
 import org.jetbrains.plugins.scala.util.ScEquivalenceUtil
 
 import scala.collection.immutable.HashSet

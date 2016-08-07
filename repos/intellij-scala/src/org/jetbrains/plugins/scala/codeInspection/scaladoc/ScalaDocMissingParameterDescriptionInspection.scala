@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala
 package codeInspection
 package scaladoc
 
-import com.intellij.codeInspection.{LocalInspectionTool, ProblemHighlightType, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalInspectionTool, ProblemHighlightType, ProblemsHolder
+}
 import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor

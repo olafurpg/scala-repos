@@ -3,7 +3,9 @@ package akka.remote.transport
 import akka.actor.{Address}
 import akka.remote.transport.AkkaPduCodec.{Disassociate, Associate, Heartbeat}
 import akka.remote.transport.AkkaProtocolSpec.TestFailureDetector
-import akka.remote.transport.AssociationHandle.{DisassociateInfo, ActorHandleEventListener, Disassociated, InboundPayload}
+import akka.remote.transport.AssociationHandle.{
+  DisassociateInfo, ActorHandleEventListener, Disassociated, InboundPayload
+}
 import akka.remote.transport.TestTransport._
 import akka.remote.transport.Transport._
 import akka.remote.{WireFormats, FailureDetector}

@@ -19,7 +19,9 @@ package org.apache.spark.sql.catalyst.expressions
 
 import org.apache.spark.rdd.SqlNewHadoopRDDState
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext, ExprCode
+}
 import org.apache.spark.sql.types.{DataType, StringType}
 import org.apache.spark.unsafe.types.UTF8String
 

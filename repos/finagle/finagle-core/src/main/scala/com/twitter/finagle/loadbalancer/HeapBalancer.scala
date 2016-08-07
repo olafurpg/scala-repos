@@ -3,7 +3,10 @@ package com.twitter.finagle.loadbalancer
 import com.twitter.finagle.service.FailingFactory
 import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver}
 import com.twitter.finagle.util.OnReady
-import com.twitter.finagle.{ClientConnection, Group, NoBrokersAvailableException, Service, ServiceFactory, ServiceProxy, Status}
+import com.twitter.finagle.{
+  ClientConnection, Group, NoBrokersAvailableException, Service,
+  ServiceFactory, ServiceProxy, Status
+}
 import com.twitter.util._
 import scala.annotation.tailrec
 import scala.util.Random

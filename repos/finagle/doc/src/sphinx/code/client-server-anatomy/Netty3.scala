@@ -1,6 +1,8 @@
 import org.jboss.netty.handler.codec.string.{StringEncoder, StringDecoder}
 import org.jboss.netty.channel._
-import org.jboss.netty.handler.codec.frame.{Delimiters, DelimiterBasedFrameDecoder}
+import org.jboss.netty.handler.codec.frame.{
+  Delimiters, DelimiterBasedFrameDecoder
+}
 import org.jboss.netty.util.CharsetUtil
 
 //#serverpipeline

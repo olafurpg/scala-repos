@@ -1,11 +1,15 @@
 package org.jetbrains.plugins.scala.util
 
 import com.intellij.psi.PsiMethod
-import org.jetbrains.plugins.scala.extensions.{Both, PsiClassExt, PsiMemberExt, PsiNamedElementExt, ResolvesTo}
+import org.jetbrains.plugins.scala.extensions.{
+  Both, PsiClassExt, PsiMemberExt, PsiNamedElementExt, ResolvesTo
+}
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
@@ -42,27 +46,25 @@ object SideEffectsUtil {
       if (hasImplicitConversion(ref)) false
       else {
         ref.qualifier.forall(hasNoSideEffects) && (ref.resolve() match {
-              case Both(b: ScBindingPattern,
-                        ScalaPsiUtil.inNameContext(pd: ScPatternDefinition))
-                  if pd.hasModifierProperty("lazy") =>
-                false
-              case bp: ScBindingPattern =>
-                val tp = bp.getType(TypingContext.empty)
-                !ScFunctionType.isFunctionType(tp.getOrAny)
-              case _: ScObject => true
-              case p: ScParameter
-                  if !p.isCallByNameParameter &&
-                    !ScFunctionType.isFunctionType(p
-                          .getRealParameterType(TypingContext.empty)
-                          .getOrAny) =>
-                true
-              case _: ScSyntheticFunction => true
-              case m: PsiMethod =>
-                methodHasNoSideEffects(
-                    m,
-                    ref.qualifier.flatMap(_.getType().toOption))
-              case _ => false
-            })
+          case Both(b: ScBindingPattern,
+                    ScalaPsiUtil.inNameContext(pd: ScPatternDefinition))
+              if pd.hasModifierProperty("lazy") =>
+            false
+          case bp: ScBindingPattern =>
+            val tp = bp.getType(TypingContext.empty)
+            !ScFunctionType.isFunctionType(tp.getOrAny)
+          case _: ScObject => true
+          case p: ScParameter
+              if !p.isCallByNameParameter &&
+                !ScFunctionType.isFunctionType(
+                    p.getRealParameterType(TypingContext.empty).getOrAny) =>
+            true
+          case _: ScSyntheticFunction => true
+          case m: PsiMethod =>
+            methodHasNoSideEffects(m,
+                                   ref.qualifier.flatMap(_.getType().toOption))
+          case _ => false
+        })
       }
     case t: ScTuple => t.exprs.forall(hasNoSideEffects)
     case inf: ScInfixExpr if inf.isAssignmentOperator => false

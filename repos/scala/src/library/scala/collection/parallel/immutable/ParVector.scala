@@ -10,7 +10,9 @@ package scala
 package collection
 package parallel.immutable
 
-import scala.collection.generic.{GenericParTemplate, CanCombineFrom, ParFactory}
+import scala.collection.generic.{
+  GenericParTemplate, CanCombineFrom, ParFactory
+}
 import scala.collection.parallel.ParSeqLike
 import scala.collection.parallel.Combiner
 import scala.collection.parallel.SeqSplitter

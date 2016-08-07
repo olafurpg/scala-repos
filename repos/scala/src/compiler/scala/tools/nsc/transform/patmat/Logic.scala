@@ -598,14 +598,11 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
  when type tests are involved, we reason (conservatively) under a closed world assumption,
  since we are really only trying to counter the effects of the symbols that we introduce to model type tests
  we don't aim to model the whole subtyping hierarchy, simply to encode enough about subtyping to do unreachability properly
-
  consider the following hierarchy:
-
     trait A
     trait B
     trait C
     trait AB extends B with A
-
   // two types are mutually exclusive if there is no equality symbol whose constant implies both
   object Test extends App {
     def foo(x: Any) = x match {
@@ -615,7 +612,6 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
       case _ : B  => println("B")
       case _ : A  => println("A")
     }
-
  of course this kind of reasoning is not true in general,
  but we can safely pretend types are mutually exclusive as long as there are no counter-examples in the match we're analyzing}
          */
@@ -638,8 +634,8 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
           val todo =
             equalitySyms filterNot
               (b =>
-                    (b.const == sym.const) ||
-                      excludedPair(ExcludedPair(b.const, sym.const)))
+                 (b.const == sym.const) ||
+                   excludedPair(ExcludedPair(b.const, sym.const)))
           val (excluded, notExcluded) =
             todo partition (b => excludes(sym.const, b.const))
           val implied = notExcluded filter (b => implies(sym.const, b.const))
@@ -680,7 +676,10 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
       override def toString = "V" + id
     }
 
-    import global.{ConstantType, SingletonType, Literal, Ident, singleType, TypeBounds, NoSymbol}
+    import global.{
+      ConstantType, SingletonType, Literal, Ident, singleType, TypeBounds,
+      NoSymbol
+    }
     import global.definitions._
 
     // all our variables range over types

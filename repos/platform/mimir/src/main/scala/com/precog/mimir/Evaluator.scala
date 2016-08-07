@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -466,7 +466,7 @@ trait EvaluatorModule[M[+ _]]
           def identityJoinSpec(ids: Vector[Int]): TransSpec1 = {
             if (ids.isEmpty) {
               trans
-                .ConstLiteral(CEmptyArray, SourceKey.Single) // join with undefined, probably 
+                .ConstLiteral(CEmptyArray, SourceKey.Single) // join with undefined, probably
             } else {
               val components = for (i <- ids)
                 yield
@@ -780,7 +780,7 @@ trait EvaluatorModule[M[+ _]]
                                                             IdentitySort)(
                             spec)).tupled
 
-                  // TODO: Remove and see if things break. Also, 
+                  // TODO: Remove and see if things break. Also,
                   case MorphismAlignment.Match(morph1) =>
                     val hint =
                       if (left.isSingleton || !right.isSingleton)

@@ -11,11 +11,15 @@ import mesosphere.marathon.api.v2.json.AppUpdate
 import mesosphere.marathon.core.launchqueue.LaunchQueue
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.event.{AppTerminatedEvent, DeploymentFailed, DeploymentSuccess, LocalLeadershipEvent}
+import mesosphere.marathon.event.{
+  AppTerminatedEvent, DeploymentFailed, DeploymentSuccess, LocalLeadershipEvent
+}
 import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.state._
 import mesosphere.marathon.upgrade.DeploymentManager._
-import mesosphere.marathon.upgrade.{DeploymentManager, DeploymentPlan, TaskKillActor}
+import mesosphere.marathon.upgrade.{
+  DeploymentManager, DeploymentPlan, TaskKillActor
+}
 import mesosphere.mesos.protos
 import org.apache.mesos.Protos.{Status, TaskID}
 import org.apache.mesos.SchedulerDriver

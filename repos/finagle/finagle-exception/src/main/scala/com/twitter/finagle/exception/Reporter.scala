@@ -3,8 +3,12 @@ package com.twitter.finagle.exception
 import com.twitter.app.GlobalFlag
 import com.twitter.conversions.time._
 import com.twitter.finagle.builder.ClientBuilder
-import com.twitter.finagle.exception.thriftscala.{LogEntry, ResultCode, Scribe, Scribe$FinagleClient}
-import com.twitter.finagle.stats.{ClientStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.exception.thriftscala.{
+  LogEntry, ResultCode, Scribe, Scribe$FinagleClient
+}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver, NullStatsReceiver, StatsReceiver
+}
 import com.twitter.finagle.thrift.{Protocols, ThriftClientFramedCodec}
 import com.twitter.finagle.tracing.Trace
 import com.twitter.finagle.util.ReporterFactory

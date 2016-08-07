@@ -1,12 +1,9 @@
 /*
  Copyright 2013 Twitter, Inc.
-
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +19,9 @@ import backtype.storm.metric.api.IMetric
 import backtype.storm.task.TopologyContext
 import backtype.storm.topology.{BoltDeclarer, TopologyBuilder}
 import backtype.storm.tuple.Fields
-import backtype.storm.{Config => BacktypeStormConfig, LocalCluster, StormSubmitter}
+import backtype.storm.{
+  Config => BacktypeStormConfig, LocalCluster, StormSubmitter
+}
 import com.twitter.algebird.{Monoid, Semigroup}
 import com.twitter.bijection.{Base64String, Injection}
 import com.twitter.chill.IKryoRegistrar
@@ -34,7 +33,9 @@ import com.twitter.summingbird.chill.SBChillRegistrar
 import com.twitter.summingbird.online._
 import com.twitter.summingbird.online.option._
 import com.twitter.summingbird.option.JobId
-import com.twitter.summingbird.planner.{Dag, DagOptimizer, OnlinePlan, SummerNode, FlatMapNode, SourceNode}
+import com.twitter.summingbird.planner.{
+  Dag, DagOptimizer, OnlinePlan, SummerNode, FlatMapNode, SourceNode
+}
 import com.twitter.summingbird.storm.StormMetric
 import com.twitter.summingbird.storm.option.{AckOnEntry, AnchorTuples}
 import com.twitter.summingbird.storm.planner.StormNode

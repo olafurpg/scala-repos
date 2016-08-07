@@ -9,8 +9,7 @@ import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
   * Nikolay.Tropin
   * 2014-03-27
   */
-trait ScalaRenameProcessor {
-  this: RenamePsiElementProcessor =>
+trait ScalaRenameProcessor { this: RenamePsiElementProcessor =>
 
   override def setToSearchForTextOccurrences(element: PsiElement,
                                              enabled: Boolean): Unit = {

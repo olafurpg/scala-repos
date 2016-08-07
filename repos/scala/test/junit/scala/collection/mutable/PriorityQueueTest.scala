@@ -4,7 +4,10 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.junit.Test
 import scala.collection.mutable
-import java.io.{ObjectInputStream, ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream}
+import java.io.{
+  ObjectInputStream, ByteArrayInputStream, ByteArrayOutputStream,
+  ObjectOutputStream
+}
 
 @RunWith(classOf[JUnit4])
 /* Test for SI-7568  */

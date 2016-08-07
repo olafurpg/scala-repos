@@ -58,19 +58,15 @@ private[scala] abstract class JSUniquenessCache[V] {
 /* DELETED for Scala.js
 private[scala] abstract class UniquenessCache[K >: js.String, V >: Null]
 {
-
   import java.lang.ref.WeakReference
   import java.util.WeakHashMap
   import java.util.concurrent.locks.ReentrantReadWriteLock
-
   private val rwl = new ReentrantReadWriteLock()
   private val rlock = rwl.readLock
   private val wlock = rwl.writeLock
   private val map = new WeakHashMap[K, WeakReference[V]]
-
   protected def valueFromKey(k: K): V
   protected def keyFromValue(v: V): Option[K]
-
   def apply(name: K): V = {
     def cached(): V = {
       rlock.lock
@@ -99,7 +95,6 @@ private[scala] abstract class UniquenessCache[K >: js.String, V >: Null]
       }
       finally wlock.unlock
     }
-
     val res = cached()
     if (res == null) updateCache()
     else res

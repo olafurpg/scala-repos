@@ -3,7 +3,9 @@ package lang
 package resolve
 package imports
 
-import com.intellij.psi.{PsiField, PsiMethod, PsiPolyVariantReference, PsiReference}
+import com.intellij.psi.{
+  PsiField, PsiMethod, PsiPolyVariantReference, PsiReference
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 
 /**

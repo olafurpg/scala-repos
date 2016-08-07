@@ -612,7 +612,7 @@ trait Mapping[T] { self =>
 
   protected def collectErrors(t: T): Seq[FormError] = {
     constraints
-      .map(_ (t))
+      .map(_(t))
       .collect {
         case Invalid(errors) => errors.toSeq
       }

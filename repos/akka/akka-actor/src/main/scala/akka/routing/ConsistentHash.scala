@@ -124,10 +124,10 @@ object ConsistentHash {
     new ConsistentHash(
         immutable.SortedMap.empty[Int, T] ++
           (for {
-                node ← nodes
-                nodeHash = hashFor(node.toString)
-                vnode ← 1 to virtualNodesFactor
-              } yield (concatenateNodeHash(nodeHash, vnode) -> node)),
+            node ← nodes
+            nodeHash = hashFor(node.toString)
+            vnode ← 1 to virtualNodesFactor
+          } yield (concatenateNodeHash(nodeHash, vnode) -> node)),
         virtualNodesFactor)
   }
 

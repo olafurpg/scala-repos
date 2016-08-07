@@ -23,8 +23,12 @@ import scopt.OptionParser
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.ml.Pipeline
-import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel, RegexTokenizer, StopWordsRemover}
-import org.apache.spark.mllib.clustering.{DistributedLDAModel, EMLDAOptimizer, LDA, OnlineLDAOptimizer}
+import org.apache.spark.ml.feature.{
+  CountVectorizer, CountVectorizerModel, RegexTokenizer, StopWordsRemover
+}
+import org.apache.spark.mllib.clustering.{
+  DistributedLDAModel, EMLDAOptimizer, LDA, OnlineLDAOptimizer
+}
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SQLContext}

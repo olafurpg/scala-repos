@@ -20,7 +20,9 @@ package org.apache.spark.deploy.rest
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
+import com.fasterxml.jackson.databind.{
+  DeserializationFeature, ObjectMapper, SerializationFeature
+}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods._

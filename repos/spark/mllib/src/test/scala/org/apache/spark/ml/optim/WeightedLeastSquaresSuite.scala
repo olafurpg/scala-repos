@@ -35,7 +35,6 @@ class WeightedLeastSquaresSuite
     super.beforeAll()
     /*
        R code:
-
        A <- matrix(c(0, 1, 2, 3, 5, 7, 11, 13), 4, 2)
        b <- c(17, 19, 23, 29)
        w <- c(1, 2, 3, 4)
@@ -51,7 +50,6 @@ class WeightedLeastSquaresSuite
 
     /*
        R code:
-
        A <- matrix(c(0, 1, 2, 3, 5, 7, 11, 13), 4, 2)
        b.const <- c(17, 17, 17, 17)
        w <- c(1, 2, 3, 4)
@@ -69,13 +67,11 @@ class WeightedLeastSquaresSuite
   test("WLS against lm") {
     /*
        R code:
-
        df <- as.data.frame(cbind(A, b))
        for (formula in c(b ~ . -1, b ~ .)) {
          model <- lm(formula, data=df, weights=w)
          print(as.vector(coef(model)))
        }
-
        [1] -3.727121  3.009983
        [1] 18.08  6.08 -0.60
      */
@@ -102,13 +98,11 @@ class WeightedLeastSquaresSuite
   test("WLS against lm when label is constant and no regularization") {
     /*
        R code:
-
        df.const.label <- as.data.frame(cbind(A, b.const))
        for (formula in c(b.const ~ . -1, b.const ~ .)) {
          model <- lm(formula, data=df.const.label, weights=w)
          print(as.vector(coef(model)))
        }
-
       [1] -9.221298  3.394343
       [1] 17  0  0
      */
@@ -147,9 +141,7 @@ class WeightedLeastSquaresSuite
   test("WLS against glmnet") {
     /*
        R code:
-
        library(glmnet)
-
        for (intercept in c(FALSE, TRUE)) {
          for (lambda in c(0.0, 0.1, 1.0)) {
            for (standardize in c(FALSE, TRUE)) {
@@ -159,7 +151,6 @@ class WeightedLeastSquaresSuite
            }
          }
        }
-
        [1]  0.000000 -3.727117  3.009982
        [1]  0.000000 -3.727117  3.009982
        [1]  0.000000 -3.307532  2.924206

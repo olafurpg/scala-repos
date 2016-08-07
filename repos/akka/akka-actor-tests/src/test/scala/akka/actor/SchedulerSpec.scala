@@ -32,8 +32,7 @@ object SchedulerSpec {
 trait SchedulerSpec
     extends BeforeAndAfterEach
     with DefaultTimeout
-    with ImplicitSender {
-  this: AkkaSpec ⇒
+    with ImplicitSender { this: AkkaSpec ⇒
   import system.dispatcher
 
   def collectCancellable(c: Cancellable): Cancellable
@@ -592,9 +591,9 @@ class LightArrayRevolverSchedulerSpec
         // println(s"waiting $ns")
         prb.ref ! ns
         try time += (lbq.get match {
-              case q: LinkedBlockingQueue[Long] ⇒ q.take()
-              case _ ⇒ 0L
-            })
+          case q: LinkedBlockingQueue[Long] ⇒ q.take()
+          case _ ⇒ 0L
+        })
         catch {
           case _: InterruptedException ⇒ Thread.currentThread.interrupt()
         }

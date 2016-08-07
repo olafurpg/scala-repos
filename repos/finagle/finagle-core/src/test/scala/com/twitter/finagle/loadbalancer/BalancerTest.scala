@@ -1,7 +1,9 @@
 package com.twitter.finagle.loadbalancer
 
 import com.twitter.finagle._
-import com.twitter.finagle.stats.{InMemoryStatsReceiver, StatsReceiver, NullStatsReceiver}
+import com.twitter.finagle.stats.{
+  InMemoryStatsReceiver, StatsReceiver, NullStatsReceiver
+}
 import com.twitter.util.{Future, Time}
 import java.util.concurrent.atomic.AtomicInteger
 import org.junit.runner.RunWith

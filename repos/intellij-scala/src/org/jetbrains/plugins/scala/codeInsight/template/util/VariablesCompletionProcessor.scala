@@ -3,7 +3,9 @@ package codeInsight.template.util
 
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveTargets, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveTargets, ScalaResolveResult
+}
 
 /**
   * User: Alexander Podkhalyuzin

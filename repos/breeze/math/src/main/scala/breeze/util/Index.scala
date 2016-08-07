@@ -2,18 +2,15 @@ package breeze.util
 
 /*
  Copyright 2009 David Hall, Daniel Ramage
- 
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
- You may obtain a copy of the License at 
- 
+ You may obtain a copy of the License at
  http://www.apache.org/licenses/LICENSE-2.0
- 
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
- limitations under the License. 
+ limitations under the License.
  */
 
 import collection.{mutable, IterableProxy}
@@ -29,7 +26,7 @@ import java.util
   * vector space mappings for strings.  The methods in this trait do not mutate
   * the underlying index.  Use either a MutableIndex or one of the companion
   * object constructor methods to build an index.
-  * 
+  *
   * @author dlwh, dramage
   */
 @SerialVersionUID(1L)
@@ -142,7 +139,7 @@ trait SynchronizedMutableIndex[T]
 /**
   * Class that builds a 1-to-1 mapping between Ints and T's, which
   * is very useful for efficiency concerns.
-  * 
+  *
   * Two extra views are provided: the index.synchronized view
   * enables threadsafe access and the index.immutable view keeps
   * prevents the (view) from being updated.

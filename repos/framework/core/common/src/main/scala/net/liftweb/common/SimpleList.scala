@@ -17,7 +17,10 @@
 package net.liftweb
 package common
 
-import java.util.{List => JavaList, Iterator => JavaIterator, ArrayList, ListIterator, Collection => JavaCollection}
+import java.util.{
+  List => JavaList, Iterator => JavaIterator, ArrayList, ListIterator,
+  Collection => JavaCollection
+}
 
 /**
   * An immutable singly linked list that uses the Scala List class as backing

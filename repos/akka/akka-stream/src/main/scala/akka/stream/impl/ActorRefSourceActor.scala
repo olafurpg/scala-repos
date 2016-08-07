@@ -7,7 +7,9 @@ import akka.actor.ActorLogging
 import akka.actor.Props
 import akka.actor.Status
 import akka.stream.OverflowStrategies._
-import akka.stream.{BufferOverflowException, OverflowStrategy, OverflowStrategies}
+import akka.stream.{
+  BufferOverflowException, OverflowStrategy, OverflowStrategies
+}
 import akka.stream.ActorMaterializerSettings
 
 /**

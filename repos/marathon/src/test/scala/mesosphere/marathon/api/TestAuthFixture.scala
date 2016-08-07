@@ -3,7 +3,9 @@ package mesosphere.marathon.api
 import java.util.Collections
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
-import mesosphere.marathon.plugin.auth.{Authenticator, AuthorizedAction, Authorizer, Identity}
+import mesosphere.marathon.plugin.auth.{
+  Authenticator, AuthorizedAction, Authorizer, Identity
+}
 import mesosphere.marathon.plugin.http.{HttpRequest, HttpResponse}
 import mesosphere.marathon.test.Mockito
 

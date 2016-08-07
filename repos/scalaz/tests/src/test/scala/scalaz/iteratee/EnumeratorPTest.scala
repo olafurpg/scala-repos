@@ -20,20 +20,20 @@ object EnumeratorPTest extends SpecLite {
       (consume[Either3[Int, (Int, Int), Int], Id, List] &= enumR
             .apply[Id]).run must_===
         (List(
-                left3(1),
-                right3(2),
-                middle3((3, 3)),
-                middle3((3, 3)),
-                right3(4),
-                middle3((5, 5)),
-                middle3((5, 5)),
-                right3(6),
-                left3(7),
-                middle3((8, 8)),
-                middle3((8, 8)),
-                middle3((8, 8)),
-                middle3((8, 8))
-            ))
+            left3(1),
+            right3(2),
+            middle3((3, 3)),
+            middle3((3, 3)),
+            right3(4),
+            middle3((5, 5)),
+            middle3((5, 5)),
+            right3(6),
+            left3(7),
+            middle3((8, 8)),
+            middle3((8, 8)),
+            middle3((8, 8)),
+            middle3((8, 8))
+        ))
     }
 
     "compose" in {
@@ -49,20 +49,20 @@ object EnumeratorPTest extends SpecLite {
       (consume[Either3[Int, (Int, Int), Int], Id, List] &= enumR
             .apply[Id]).run must_===
         (List(
-                left3(1),
-                left3(2),
-                middle3((3, 3)),
-                middle3((3, 3)),
-                left3(4),
-                middle3((5, 5)),
-                middle3((5, 5)),
-                left3(6),
-                left3(7),
-                middle3((8, 8)),
-                middle3((8, 8)),
-                middle3((8, 8)),
-                middle3((8, 8))
-            ))
+            left3(1),
+            left3(2),
+            middle3((3, 3)),
+            middle3((3, 3)),
+            left3(4),
+            middle3((5, 5)),
+            middle3((5, 5)),
+            left3(6),
+            left3(7),
+            middle3((8, 8)),
+            middle3((8, 8)),
+            middle3((8, 8)),
+            middle3((8, 8))
+        ))
     }
   }
 

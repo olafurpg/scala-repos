@@ -35,8 +35,12 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.ScrollPane.ScrollBarPolicy
 import scalafx.scene.control.SplitPane.Divider
 import scalafx.scene.control.TabPane.TabClosingPolicy
-import scalafx.scene.control.TableColumn.{CellDataFeatures, CellEditEvent, SortType}
-import scalafx.scene.control.TableView.{ResizeFeatures, TableViewFocusModel, TableViewSelectionModel}
+import scalafx.scene.control.TableColumn.{
+  CellDataFeatures, CellEditEvent, SortType
+}
+import scalafx.scene.control.TableView.{
+  ResizeFeatures, TableViewFocusModel, TableViewSelectionModel
+}
 import scalafx.scene.control.TreeItem.TreeModificationEvent
 import scalafx.scene.control.TreeView.EditEvent
 import scalafx.scene.control.cell.CellIncludes

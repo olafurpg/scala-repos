@@ -26,7 +26,9 @@ import org.apache.spark.TaskState.TaskState
 import org.apache.spark.executor.{Executor, ExecutorBackend}
 import org.apache.spark.internal.Logging
 import org.apache.spark.launcher.{LauncherBackend, SparkAppHandle}
-import org.apache.spark.rpc.{RpcCallContext, RpcEndpointRef, RpcEnv, ThreadSafeRpcEndpoint}
+import org.apache.spark.rpc.{
+  RpcCallContext, RpcEndpointRef, RpcEnv, ThreadSafeRpcEndpoint
+}
 import org.apache.spark.scheduler._
 import org.apache.spark.scheduler.cluster.ExecutorInfo
 

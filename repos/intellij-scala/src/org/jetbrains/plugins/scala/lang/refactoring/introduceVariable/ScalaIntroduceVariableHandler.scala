@@ -15,7 +15,9 @@ import com.intellij.refactoring.util.CommonRefactoringUtil
 import com.intellij.refactoring.{HelpID, RefactoringActionHandler}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.refactoring.util.{DialogConflictsReporter, ScalaRefactoringUtil}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  DialogConflictsReporter, ScalaRefactoringUtil
+}
 
 /**
   * User: Alexander Podkhalyuzin

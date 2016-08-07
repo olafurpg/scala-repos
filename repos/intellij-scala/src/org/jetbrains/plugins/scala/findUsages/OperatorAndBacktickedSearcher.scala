@@ -12,7 +12,10 @@ import com.intellij.psi.impl.PsiManagerEx
 import com.intellij.psi.impl.cache.impl.id.{IdIndex, IdIndexEntry}
 import com.intellij.psi.impl.search.PsiSearchHelperImpl
 import com.intellij.psi.search.searches.ReferencesSearch
-import com.intellij.psi.search.{GlobalSearchScope, PsiSearchHelper, TextOccurenceProcessor, UsageSearchContext}
+import com.intellij.psi.search.{
+  GlobalSearchScope, PsiSearchHelper, TextOccurenceProcessor,
+  UsageSearchContext
+}
 import com.intellij.psi.{PsiElement, PsiManager, PsiReference}
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.indexing.FileBasedIndex

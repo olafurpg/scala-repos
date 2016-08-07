@@ -4,8 +4,12 @@ package codeInspection.booleans
 import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScInfixExpr, ScParenthesisedExpr, ScPrefixExpr}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement, AbstractInspection
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScInfixExpr, ScParenthesisedExpr, ScPrefixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 import scala.annotation.tailrec

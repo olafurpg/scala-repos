@@ -13,7 +13,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.StdType
-import org.jetbrains.plugins.scala.lang.refactoring.introduceField.{IntroduceFieldContext, IntroduceFieldSettings, ScalaIntroduceFieldFromExpressionHandler}
+import org.jetbrains.plugins.scala.lang.refactoring.introduceField.{
+  IntroduceFieldContext, IntroduceFieldSettings,
+  ScalaIntroduceFieldFromExpressionHandler
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 import org.jetbrains.plugins.scala.util.ScalaUtils
 import org.junit.Assert._

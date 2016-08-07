@@ -5,7 +5,9 @@ import java.util
 
 import com.intellij.refactoring.classMembers.MemberInfoModel
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
-import org.jetbrains.plugins.scala.lang.refactoring.ui.{ScalaMemberSelectionPanelBase, ScalaMemberSelectionTableBase}
+import org.jetbrains.plugins.scala.lang.refactoring.ui.{
+  ScalaMemberSelectionPanelBase, ScalaMemberSelectionTableBase
+}
 
 /**
   * Nikolay.Tropin

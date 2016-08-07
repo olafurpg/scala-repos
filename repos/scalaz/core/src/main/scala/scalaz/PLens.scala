@@ -165,9 +165,9 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
         val (ac, a) = x.run
         run(a) map
           (y => {
-                val (ba, b) = y.run
-                IndexedStore(ac compose ba, b)
-              })
+             val (ba, b) = y.run
+             IndexedStore(ac compose ba, b)
+           })
       }))
 
   /** alias for `compose` */
@@ -631,16 +631,16 @@ abstract class PLensInstances {
                 x =>
                   a run x map
                     (c => {
-                      val (p, q) = c.pos
-                      IndexedStore(a => c.put((a, q)): R, p)
-                    })),
+                   val (p, q) = c.pos
+                   IndexedStore(a => c.put((a, q)): R, p)
+                 })),
             plensFamily(
                 x =>
                   a run x map
                     (c => {
-                      val (p, q) = c.pos
-                      IndexedStore(a => c.put((p, a)): R, q)
-                    }))
+                   val (p, q) = c.pos
+                   IndexedStore(a => c.put((p, a)): R, q)
+                 }))
         )
     }
 

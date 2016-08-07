@@ -22,32 +22,57 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.lexer.{ScalaLexer, ScalaTokenTypes}
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
-import org.jetbrains.plugins.scala.lang.parser.parsing.base.{Constructor, Import}
-import org.jetbrains.plugins.scala.lang.parser.parsing.builder.{ScalaPsiBuilder, ScalaPsiBuilderImpl}
-import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.{Block, Expr}
-import org.jetbrains.plugins.scala.lang.parser.parsing.params.{ImplicitParamClause, ParamClauses, TypeParamClause}
-import org.jetbrains.plugins.scala.lang.parser.parsing.statements.{ConstrExpr, Dcl, Def}
+import org.jetbrains.plugins.scala.lang.parser.parsing.base.{
+  Constructor, Import
+}
+import org.jetbrains.plugins.scala.lang.parser.parsing.builder.{
+  ScalaPsiBuilder, ScalaPsiBuilderImpl
+}
+import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.{
+  Block, Expr
+}
+import org.jetbrains.plugins.scala.lang.parser.parsing.params.{
+  ImplicitParamClause, ParamClauses, TypeParamClause
+}
+import org.jetbrains.plugins.scala.lang.parser.parsing.statements.{
+  ConstrExpr, Dcl, Def
+}
 import org.jetbrains.plugins.scala.lang.parser.parsing.top.TmplDef
-import org.jetbrains.plugins.scala.lang.parser.parsing.top.params.{ClassParamClause, ClassParamClauses, ImplicitClassParamClause}
+import org.jetbrains.plugins.scala.lang.parser.parsing.top.params.{
+  ClassParamClause, ClassParamClauses, ImplicitClassParamClause
+}
 import org.jetbrains.plugins.scala.lang.parser.parsing.types._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScConstructor, ScIdList, ScPatternList, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScConstructor, ScIdList, ScPatternList, ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.xml.{ScXmlEndTag, ScXmlStartTag}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.xml.{
+  ScXmlEndTag, ScXmlStartTag
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScTemplateBody, ScTemplateParents}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScTemplateBody, ScTemplateParents
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScModifierListOwner, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScModifierListOwner, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScBlockImpl
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
-import org.jetbrains.plugins.scala.lang.refactoring.util.{ScTypeUtil, ScalaNamesUtil}
-import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocComment, ScDocInnerCodeElement, ScDocResolvableCodeReference, ScDocSyntaxElement}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  ScTypeUtil, ScalaNamesUtil
+}
+import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{
+  ScDocComment, ScDocInnerCodeElement, ScDocResolvableCodeReference,
+  ScDocSyntaxElement
+}
 
 import scala.collection.mutable
 

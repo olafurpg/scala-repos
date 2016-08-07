@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.lang.resolve.testAllResolve
 
 import java.io.File
 
-import _root_.org.jetbrains.plugins.scala.lang.psi.api.{ScalaFile, ScalaRecursiveElementVisitor}
+import _root_.org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaFile, ScalaRecursiveElementVisitor
+}
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.{CharsetToolkit, LocalFileSystem}

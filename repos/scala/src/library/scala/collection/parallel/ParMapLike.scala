@@ -33,8 +33,7 @@ trait ParMapLike[K,
                  +Repr <: ParMapLike[K, V, Repr, Sequential] with ParMap[K, V],
                  +Sequential <: Map[K, V] with MapLike[K, V, Sequential]]
     extends GenMapLike[K, V, Repr]
-    with ParIterableLike[(K, V), Repr, Sequential] {
-  self =>
+    with ParIterableLike[(K, V), Repr, Sequential] { self =>
 
   def default(key: K): V =
     throw new NoSuchElementException("key not found: " + key)

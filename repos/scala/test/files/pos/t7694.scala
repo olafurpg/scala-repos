@@ -16,11 +16,9 @@ object Lub {
 
 /*
 The LUB ends up as:
-
 TypeRef(
   TypeSymbol(
     abstract trait L#7038[A2#7039, B2#7040 <: A2#7039] extends AnyRef#2197
-
   )
   args = List(
     AbstractTypeRef(
@@ -35,6 +33,5 @@ TypeRef(
     )
   )
 )
-
 Note that type _2#13681 is *not* bound by _1#13680
  */

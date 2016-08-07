@@ -3,7 +3,9 @@ package mesosphere.marathon.core.matcher.reconcile.impl
 import mesosphere.marathon.core.launcher.TaskOp
 import mesosphere.marathon.core.launcher.impl.TaskLabels
 import mesosphere.marathon.core.matcher.base.OfferMatcher
-import mesosphere.marathon.core.matcher.base.OfferMatcher.{MatchedTaskOps, TaskOpSource, TaskOpWithSource}
+import mesosphere.marathon.core.matcher.base.OfferMatcher.{
+  MatchedTaskOps, TaskOpSource, TaskOpWithSource
+}
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.Task.Id
 import mesosphere.marathon.core.task.tracker.TaskTracker

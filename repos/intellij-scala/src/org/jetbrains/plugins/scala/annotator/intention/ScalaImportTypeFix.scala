@@ -6,8 +6,12 @@ import javax.swing.Icon
 import com.intellij.codeInsight.completion.JavaCompletionUtil
 import com.intellij.codeInsight.daemon.QuickFixBundle
 import com.intellij.codeInsight.daemon.impl.actions.AddImportAction
-import com.intellij.codeInsight.hint.{HintManager, HintManagerImpl, QuestionAction}
-import com.intellij.codeInsight.{FileModificationService, JavaProjectCodeInsightSettings}
+import com.intellij.codeInsight.hint.{
+  HintManager, HintManagerImpl, QuestionAction
+}
+import com.intellij.codeInsight.{
+  FileModificationService, JavaProjectCodeInsightSettings
+}
 import com.intellij.codeInspection.HintAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
@@ -25,14 +29,20 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeProjection
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScInfixExpr, ScMethodCall, ScPostfixExpr, ScPrefixExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScInfixExpr, ScMethodCall, ScPostfixExpr, ScPrefixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTemplateDefinition, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.{ScPackage, ScalaFile}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.ScTypeDefinitionImpl
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScPackageImpl, ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScPackageImpl, ScalaPsiElementFactory, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.{ScImportsHolder, ScalaPsiUtil}
 import org.jetbrains.plugins.scala.lang.resolve.ResolveUtils
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocResolvableCodeReference

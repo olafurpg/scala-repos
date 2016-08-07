@@ -19,7 +19,9 @@ package org.apache.spark.sql.execution.datasources
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.io.SequenceFile.CompressionType
-import org.apache.hadoop.io.compress.{BZip2Codec, DeflateCodec, GzipCodec, Lz4Codec, SnappyCodec}
+import org.apache.hadoop.io.compress.{
+  BZip2Codec, DeflateCodec, GzipCodec, Lz4Codec, SnappyCodec
+}
 
 import org.apache.spark.util.Utils
 

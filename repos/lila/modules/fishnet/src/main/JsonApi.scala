@@ -134,13 +134,11 @@ object JsonApi {
       Json.obj(
           "work" ->
             (work match {
-                  case a: Analysis =>
-                    Json.obj("type" -> "analysis", "id" -> work.id)
-                  case m: Move =>
-                    Json.obj("type" -> "move",
-                             "id" -> work.id,
-                             "level" -> m.level)
-                })
+              case a: Analysis =>
+                Json.obj("type" -> "analysis", "id" -> work.id)
+              case m: Move =>
+                Json.obj("type" -> "move", "id" -> work.id, "level" -> m.level)
+            })
       ) ++ Json.toJson(work.game).as[JsObject]
     }
   }

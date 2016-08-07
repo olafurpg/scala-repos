@@ -153,7 +153,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       Range(0, k).map { topic =>
         val (doc, docWeights) =
           topicDistributions.sortBy(-_._2(topic)).take(n).unzip
-        (doc.toArray, docWeights.map(_ (topic)).toArray)
+        (doc.toArray, docWeights.map(_(topic)).toArray)
       }.toArray
     }
 
@@ -461,7 +461,6 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     }
 
     /* Verify results with Python:
-
        import numpy as np
        from gensim import models
        corpus = [
@@ -475,7 +474,6 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
        lda = models.ldamodel.LdaModel(
            corpus=corpus, alpha=np.array([0.00001, 0.1]), num_topics=2, update_every=0, passes=100)
        lda.print_topics()
-
        > ['0.167*0 + 0.167*1 + 0.167*2 + 0.167*3 + 0.167*4 + 0.167*5',
           '0.167*0 + 0.167*1 + 0.167*2 + 0.167*4 + 0.167*3 + 0.167*5']
      */

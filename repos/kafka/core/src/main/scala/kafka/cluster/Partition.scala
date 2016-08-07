@@ -29,7 +29,9 @@ import kafka.message.ByteBufferMessageSet
 
 import java.io.IOException
 import java.util.concurrent.locks.ReentrantReadWriteLock
-import org.apache.kafka.common.errors.{NotEnoughReplicasException, NotLeaderForPartitionException}
+import org.apache.kafka.common.errors.{
+  NotEnoughReplicasException, NotLeaderForPartitionException
+}
 import org.apache.kafka.common.protocol.Errors
 import org.apache.kafka.common.requests.LeaderAndIsrRequest
 

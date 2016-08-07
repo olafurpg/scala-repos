@@ -3,7 +3,9 @@
  */
 package play.core
 
-import play.api.{ApplicationLoader, BuiltInComponentsFromContext, Environment, Play}
+import play.api.{
+  ApplicationLoader, BuiltInComponentsFromContext, Environment, Play
+}
 
 package object test {
 

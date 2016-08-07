@@ -9,7 +9,9 @@ import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.plugin.auth.Identity
 import mesosphere.marathon.state.PathId.StringPathId
-import mesosphere.marathon.state.{AppDefinition, Group, GroupManager, Timestamp}
+import mesosphere.marathon.state.{
+  AppDefinition, Group, GroupManager, Timestamp
+}
 import mesosphere.marathon.test.Mockito
 import mesosphere.marathon.upgrade.{DeploymentPlan, DeploymentStep}
 import org.mockito.Mockito._

@@ -31,7 +31,10 @@ import javafx.{util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty, ReadOnlyDoubleProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty,
+  ReadOnlyDoubleProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.util.StringConverter
 

@@ -3,7 +3,10 @@
 object Test {
   import scala.tools.nsc._
   import interpreter._
-  import java.io.{OutputStream, BufferedReader, StringReader, PrintWriter, Writer, OutputStreamWriter}
+  import java.io.{
+    OutputStream, BufferedReader, StringReader, PrintWriter, Writer,
+    OutputStreamWriter
+  }
 
   val code = """
     def foo = {

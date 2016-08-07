@@ -10,7 +10,9 @@ import com.intellij.refactoring.ui.AbstractMemberSelectionTable
 import com.intellij.ui.RowIcon
 import com.intellij.util.{IconUtil, VisibilityIcons}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScObject
+}
 
 /**
   * Nikolay.Tropin

@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala.debugger.stepInto
 
 import com.intellij.debugger.settings.DebuggerSettings
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12
+}
 
 /**
   * @author Nikolay.Tropin

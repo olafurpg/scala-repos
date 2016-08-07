@@ -2,11 +2,15 @@ package org.jetbrains.plugins.scala
 package refactoring.changeSignature
 
 import com.intellij.psi.PsiMember
-import com.intellij.refactoring.changeSignature.{ChangeSignatureProcessorBase, ParameterInfo}
+import com.intellij.refactoring.changeSignature.{
+  ChangeSignatureProcessorBase, ParameterInfo
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
 import org.jetbrains.plugins.scala.lang.psi.types
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{ScalaChangeSignatureHandler, ScalaParameterInfo}
+import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{
+  ScalaChangeSignatureHandler, ScalaParameterInfo
+}
 import org.junit.Assert._
 
 /**

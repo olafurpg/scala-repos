@@ -37,7 +37,6 @@ class minkowskiDistanceTest extends FunSuite {
     assertClose(minkowskiDistance(v1, v1, 3.0), 0.0)
     val outBig = System.currentTimeMillis()
     assert((outBig - outSmall) <= 2 * (outSmall - in + 1), s"too slow! ${outBig - outSmall} ms vs ${outSmall - in} ms")
-
   }
  */
 }

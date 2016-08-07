@@ -79,9 +79,9 @@ trait PipeOperationsConversions {
   implicit val fromTwoRichPipeToPipeFunctionToOperation =
     (op: (Pipe, Pipe) => Pipe) => new TwoPipesOperation(op(_, _))
 
-  implicit val fromThreePipeFunctionToOperation = (op: (Pipe, Pipe,
-                                                        Pipe) => RichPipe) =>
-    new ThreePipesOperation(op(_, _, _).pipe)
+  implicit val fromThreePipeFunctionToOperation =
+    (op: (Pipe, Pipe, Pipe) => RichPipe) =>
+      new ThreePipesOperation(op(_, _, _).pipe)
   implicit val fromThreeRichPipeToPipeFunctionToOperation =
     (op: (Pipe, Pipe, Pipe) => Pipe) => new ThreePipesOperation(op(_, _, _))
 

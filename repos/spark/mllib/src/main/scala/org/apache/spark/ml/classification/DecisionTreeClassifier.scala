@@ -27,10 +27,16 @@ import org.apache.spark.ml.tree._
 import org.apache.spark.ml.tree.DecisionTreeModelReadWrite._
 import org.apache.spark.ml.tree.impl.RandomForest
 import org.apache.spark.ml.util._
-import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors}
+import org.apache.spark.mllib.linalg.{
+  DenseVector, SparseVector, Vector, Vectors
+}
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo, Strategy => OldStrategy}
-import org.apache.spark.mllib.tree.model.{DecisionTreeModel => OldDecisionTreeModel}
+import org.apache.spark.mllib.tree.configuration.{
+  Algo => OldAlgo, Strategy => OldStrategy
+}
+import org.apache.spark.mllib.tree.model.{
+  DecisionTreeModel => OldDecisionTreeModel
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 

@@ -40,10 +40,10 @@ import scalafx.util.StringConverter
   * Companion Object for [[scalafx.scene.control.cell.ChoiceBoxTreeCell]].
   *
   * @define CBTC `ChoiceBoxTreeCell`
-  * @define FTVINIT Creates a `ChoiceBox` cell factory for use in `TreeView` controls. 
+  * @define FTVINIT Creates a `ChoiceBox` cell factory for use in `TreeView` controls.
   * @define TTYPE  The type of the elements contained within the `TableColumn`.
   * @define CONVPARAM A `StringConverter` to convert the given item (of type T) to a String for displaying to the user.
-  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing. 
+  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing.
   * @define BUFITEMSPARAM A `ObservableBuffer` containing $ITEMSPARAM
   * @define FTVRET A Function  that will return a `TreeCell` that is able to work on the type of element contained within the `TreeView`.
   */
@@ -153,7 +153,7 @@ object ChoiceBoxTreeCell {
   *
   * @define CBTC `ChoiceBoxTreeCell`
   * @define CONVPARAM A `StringConverter` to convert the given item (of type T) to a String for displaying to the user.
-  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing. 
+  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing.
   * @define BUFITEMSPARAM A `ObservableBuffer` containing $ITEMSPARAM
   */
 class ChoiceBoxTreeCell[T](

@@ -1,4 +1,7 @@
-import java.io.{File, FileOutputStream, BufferedOutputStream, FileWriter, ByteArrayOutputStream, PrintStream}
+import java.io.{
+  File, FileOutputStream, BufferedOutputStream, FileWriter,
+  ByteArrayOutputStream, PrintStream
+}
 import tools.nsc.{CompileClient, CompileServer}
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 

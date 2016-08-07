@@ -4,26 +4,40 @@ import java.util
 
 import com.intellij.debugger.DebuggerContext
 import com.intellij.debugger.engine.DebuggerUtils
-import com.intellij.debugger.engine.evaluation.{EvaluateException, EvaluationContext, EvaluationContextImpl}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluateException, EvaluationContext, EvaluationContextImpl
+}
 import com.intellij.debugger.impl.PositionUtil
-import com.intellij.debugger.ui.impl.watch.{ValueDescriptorImpl, WatchItemDescriptor}
+import com.intellij.debugger.ui.impl.watch.{
+  ValueDescriptorImpl, WatchItemDescriptor
+}
 import com.intellij.debugger.ui.tree.render._
-import com.intellij.debugger.ui.tree.{DebuggerTreeNode, NodeDescriptor, ValueDescriptor}
+import com.intellij.debugger.ui.tree.{
+  DebuggerTreeNode, NodeDescriptor, ValueDescriptor
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.{JavaPsiFacade, PsiExpression}
-import com.intellij.util.{IncorrectOperationException, StringBuilderSpinAllocator}
+import com.intellij.util.{
+  IncorrectOperationException, StringBuilderSpinAllocator
+}
 import com.sun.jdi._
 import com.sun.tools.jdi.ObjectReferenceImpl
 import org.jetbrains.plugins.scala.debugger.filters.ScalaDebuggerSettings
-import org.jetbrains.plugins.scala.debugger.ui.NonStrictCollectionsRenderer.{CollectionElementNodeDescriptor, Fail, SimpleMethodInvocationResult}
+import org.jetbrains.plugins.scala.debugger.ui.NonStrictCollectionsRenderer.{
+  CollectionElementNodeDescriptor, Fail, SimpleMethodInvocationResult
+}
 
 /**
   * User: Dmitry Naydanov
   * Date: 9/3/12
   */
 class NonStrictCollectionsRenderer extends NodeRendererImpl {
-  import org.jetbrains.plugins.scala.debugger.ui.NonStrictCollectionsRenderer.{MethodNotFound, Success}
-  import org.jetbrains.plugins.scala.debugger.ui.{NonStrictCollectionsRenderer => companionObject}
+  import org.jetbrains.plugins.scala.debugger.ui.NonStrictCollectionsRenderer.{
+    MethodNotFound, Success
+  }
+  import org.jetbrains.plugins.scala.debugger.ui.{
+    NonStrictCollectionsRenderer => companionObject
+  }
 
   def getStartIndex =
     ScalaDebuggerSettings.getInstance().COLLECTION_START_INDEX.intValue()
@@ -197,9 +211,9 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
         val tpe = obj.referenceType()
         val sizeString =
           " size = " + (tryToGetSize(obj, context) match {
-                case Success(value: Int) => value
-                case _ => "?"
-              })
+            case Success(value: Int) => value
+            case _ => "?"
+          })
 
         stringBuilder append
           (if (tpe != null)
@@ -218,7 +232,7 @@ object NonStrictCollectionsRenderer {
   private val EMPTY_ARGS =
     util.Collections.unmodifiableList(new util.ArrayList[Value]())
 
-  //it considers only part of cases so it is not intended to be used outside 
+  //it considers only part of cases so it is not intended to be used outside
   private def invokeEmptyArgsMethod(
       obj: ObjectReference,
       method: Method,

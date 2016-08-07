@@ -6,7 +6,9 @@ import com.intellij.openapi.roots._
 import com.intellij.openapi.roots.impl.DirectoryIndex
 import com.intellij.openapi.util.{Condition, TextRange}
 import com.intellij.psi._
-import com.intellij.psi.impl.source.resolve.reference.impl.providers.{FileReference, FileReferenceSet}
+import com.intellij.psi.impl.source.resolve.reference.impl.providers.{
+  FileReference, FileReferenceSet
+}
 import org.jetbrains.plugins.hocon.CommonUtil._
 import org.jetbrains.plugins.hocon.HoconConstants._
 import org.jetbrains.plugins.scala.extensions._

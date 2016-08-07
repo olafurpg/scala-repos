@@ -39,12 +39,12 @@ class TestRunner(clearDB: Box[() => Any],
 
     def beforeAssert(name: String): Unit = synchronized {
       log += Tracker(name, true, true, true, Empty, Nil)
-      beforeAssertListeners.foreach(_ (name))
+      beforeAssertListeners.foreach(_(name))
     }
 
     def afterAssert(name: String, success: Boolean): Unit = synchronized {
       log += Tracker(name, true, false, success, Empty, Nil)
-      afterAssertListeners.foreach(_ (name, success))
+      afterAssertListeners.foreach(_(name, success))
     }
 
     def applyAssert(name: String, f: () => T): T = synchronized {
@@ -61,7 +61,7 @@ class TestRunner(clearDB: Box[() => Any],
 
     def beforeTest(name: String) {
       log += Tracker(name, false, true, true, Empty, Nil)
-      beforeTestListeners.foreach(_ (name))
+      beforeTestListeners.foreach(_(name))
     }
 
     def afterTest(name: String,
@@ -69,14 +69,14 @@ class TestRunner(clearDB: Box[() => Any],
                   excp: Box[Throwable],
                   trace: List[StackTraceElement]) {
       log += Tracker(name, false, false, success, excp, trace)
-      afterTestListeners.foreach(_ (name, success, excp, trace))
+      afterTestListeners.foreach(_(name, success, excp, trace))
     }
 
     def run: TestResults = {
 
       def doResetDB {
-        clearDB.foreach(_ ())
-        setupDB.foreach(_ ())
+        clearDB.foreach(_())
+        setupDB.foreach(_())
       }
 
       doResetDB
@@ -228,7 +228,7 @@ class Item(val name: String,
       case (_, Full(cf)) =>
         () =>
           cf(cnt)
-        case _ => () =>
+      case _ => () =>
       }
   }
 }

@@ -25,15 +25,23 @@ import java.util.{Collections, Properties}
 import com.yammer.metrics.core.Gauge
 import joptsimple.OptionParser
 import kafka.client.ClientUtils
-import kafka.consumer.{BaseConsumerRecord, ConsumerIterator, BaseConsumer, Blacklist, ConsumerConfig, ConsumerThreadId, ConsumerTimeoutException, TopicFilter, Whitelist, ZookeeperConsumerConnector}
+import kafka.consumer.{
+  BaseConsumerRecord, ConsumerIterator, BaseConsumer, Blacklist,
+  ConsumerConfig, ConsumerThreadId, ConsumerTimeoutException, TopicFilter,
+  Whitelist, ZookeeperConsumerConnector
+}
 import kafka.javaapi.consumer.ConsumerRebalanceListener
 import kafka.message.MessageAndMetadata
 import kafka.metrics.KafkaMetricsGroup
 import kafka.serializer.DefaultDecoder
 import kafka.utils.{CommandLineUtils, CoreUtils, Logging}
-import org.apache.kafka.clients.consumer.{OffsetAndMetadata, Consumer, ConsumerRecord, KafkaConsumer}
+import org.apache.kafka.clients.consumer.{
+  OffsetAndMetadata, Consumer, ConsumerRecord, KafkaConsumer
+}
 import org.apache.kafka.clients.producer.internals.ErrorLoggingCallback
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord, RecordMetadata}
+import org.apache.kafka.clients.producer.{
+  KafkaProducer, ProducerConfig, ProducerRecord, RecordMetadata
+}
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.utils.Utils

@@ -7,10 +7,10 @@ class A {
     }
   }
 }
-// 
+//
 // [Now checking: erasure]
 // [check: erasure] New symbols: BoxedUnit UNIT runtime scala
-// /tmp/fail.scala:4: error: 
+// /tmp/fail.scala:4: error:
 // **** ERROR DURING INTERNAL CHECKING ****
 // type mismatch;
 //  found   : scala.runtime.BoxedUnit

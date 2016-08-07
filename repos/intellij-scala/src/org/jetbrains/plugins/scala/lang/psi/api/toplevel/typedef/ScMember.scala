@@ -10,11 +10,15 @@ import com.intellij.psi.impl.source.PsiFileImpl
 import com.intellij.psi.search.{LocalSearchScope, PackageScope, SearchScope}
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.util._
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScAccessModifier, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScAccessModifier, ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScBlock
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlock, ScTemplateBody}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScExtendsBlock, ScTemplateBody
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaFileImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScMemberOrLocal
 
@@ -84,7 +88,7 @@ trait ScMember
       stub.getParentStubOfType(classOf[ScTemplateDefinition])
     } else {
       child match {
-        // TODO is all of this mess still necessary?! 
+        // TODO is all of this mess still necessary?!
         case c: ScClass if c.isCase =>
           this match {
             case fun: ScFunction

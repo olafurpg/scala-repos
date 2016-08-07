@@ -22,7 +22,10 @@ import net.liftweb.actor._
 import net.liftweb.util.Helpers._
 import net.liftweb.util._
 import net.liftweb.json._
-import scala.xml.{NodeSeq, Text, Elem, Node, Group, Null, PrefixedAttribute, UnprefixedAttribute}
+import scala.xml.{
+  NodeSeq, Text, Elem, Node, Group, Null, PrefixedAttribute,
+  UnprefixedAttribute
+}
 import scala.collection.mutable.ListBuffer
 import net.liftweb.http.js._
 import JsCmds._
@@ -980,7 +983,7 @@ trait BaseCometActor
           this.askingWho = Empty
           val aw = answerWith
           answerWith = Empty
-          aw.foreach(_ (what))
+          aw.foreach(_(what))
           performReRender(true)
           listenerTransition()
         }

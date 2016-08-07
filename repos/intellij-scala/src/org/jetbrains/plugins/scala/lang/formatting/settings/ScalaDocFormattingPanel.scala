@@ -7,7 +7,9 @@ import javax.swing.{JComponent, JPanel, JCheckBox}
 import com.intellij.application.options.codeStyle.OptionTreeWithPreviewPanel
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.ui.OnePixelDivider
-import com.intellij.psi.codeStyle.{LanguageCodeStyleSettingsProvider, CodeStyleSettings}
+import com.intellij.psi.codeStyle.{
+  LanguageCodeStyleSettingsProvider, CodeStyleSettings
+}
 import com.intellij.ui.border.CustomLineBorder
 import org.jetbrains.plugins.scala.{ScalaLanguage, ScalaFileType}
 

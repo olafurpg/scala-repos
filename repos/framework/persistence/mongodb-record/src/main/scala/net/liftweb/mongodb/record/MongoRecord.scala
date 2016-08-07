@@ -32,7 +32,6 @@ trait MongoRecord[MyType <: MongoRecord[MyType]] extends BsonRecord[MyType] {
   /*
    * Every MongoRecord must have an _id field. Use a MongoPkField to
    * satisfy this.
-
    * This may change to type MandatoryTypedField in the
    * future (once MongoId is removed.)
    */

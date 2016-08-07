@@ -3,14 +3,18 @@ package mesosphere.marathon.upgrade
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
 import akka.event.EventStream
-import mesosphere.marathon.MarathonSchedulerActor.{RetrieveRunningDeployments, RunningDeployments}
+import mesosphere.marathon.MarathonSchedulerActor.{
+  RetrieveRunningDeployments, RunningDeployments
+}
 import mesosphere.marathon.core.launchqueue.LaunchQueue
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.io.storage.StorageProvider
 import mesosphere.marathon.state.{AppRepository, Group, Timestamp}
 import mesosphere.marathon.upgrade.DeploymentActor.Cancel
-import mesosphere.marathon.{ConcurrentTaskUpgradeException, DeploymentCanceledException, SchedulerActions}
+import mesosphere.marathon.{
+  ConcurrentTaskUpgradeException, DeploymentCanceledException, SchedulerActions
+}
 import org.apache.mesos.SchedulerDriver
 
 import scala.collection.immutable.Seq

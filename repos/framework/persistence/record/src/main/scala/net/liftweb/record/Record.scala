@@ -118,7 +118,7 @@ trait Record[MyType <: Record[MyType]] extends FieldContainer { self: MyType =>
     */
   def toForm(button: Box[String])(f: MyType => Unit): NodeSeq = {
     meta.toForm(this) ++ (SHtml.hidden(() => f(this))) ++
-      ((button.map(b => ( <input type="submit" value={b}/>)) openOr scala.xml
+      ((button.map(b => (<input type="submit" value={b}/>)) openOr scala.xml
                 .Text("")))
   }
 

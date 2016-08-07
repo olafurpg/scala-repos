@@ -4,7 +4,7 @@
 
 package akka.cluster
 
-// TODO remove metrics 
+// TODO remove metrics
 
 import scala.language.postfixOps
 import scala.concurrent.duration._

@@ -17,7 +17,7 @@ object TagTest extends SpecLite {
   "of.onF" should {
     "substitute" ! forAll { xs: List[List[Unit]] =>
       (Tag unwrap (Foldable[List]
-                .foldMap(xs)(Tag.of[Mult].onF(_.length))) must_===
+            .foldMap(xs)(Tag.of[Mult].onF(_.length))) must_===
             (xs.foldLeft(1)((n, l) => n * l.length)))
     }
   }

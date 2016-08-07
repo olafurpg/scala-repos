@@ -465,7 +465,7 @@ class LiftSession(private[http] val _contextPath: String,
     }
 
     lastServiceTime = millis
-    LiftSession.onSetupSession.foreach(_ (this))
+    LiftSession.onSetupSession.foreach(_(this))
     sessionHtmlProperties // cause the properties to be calculated
   }
 
@@ -581,7 +581,7 @@ class LiftSession(private[http] val _contextPath: String,
       case bfh if bfh.supportsFileParams_? =>
         () =>
           state.uploadedFiles.filter(_.name == i.name).map(v => bfh(v))
-        case normal =>
+      case normal =>
         () =>
           normal(
               state.params.getOrElse(i.name,
@@ -654,7 +654,7 @@ class LiftSession(private[http] val _contextPath: String,
 
     val fullyRemovedOwners = removedOwners diff availableOwners
     if (fullyRemovedOwners.nonEmpty) {
-      functionOwnerRemovalListeners.foreach(_ (fullyRemovedOwners))
+      functionOwnerRemovalListeners.foreach(_(fullyRemovedOwners))
     }
   }
 
@@ -899,14 +899,14 @@ class LiftSession(private[http] val _contextPath: String,
     import scala.collection.JavaConversions._
     (0 /: nmessageCallback)((l, v) =>
           l + (v._2.owner match {
-            case Full(owner) if (owner == ownerName) =>
-              v._2.lastSeen = time
-              1
-            case Empty =>
-              v._2.lastSeen = time
-              1
-            case _ => 0
-          }))
+        case Full(owner) if (owner == ownerName) =>
+          v._2.lastSeen = time
+          1
+        case Empty =>
+          v._2.lastSeen = time
+          1
+        case _ => 0
+      }))
   }
 
   /**
@@ -924,9 +924,9 @@ class LiftSession(private[http] val _contextPath: String,
     var done: List[() => Unit] = Nil
 
     S.initIfUninitted(this) {
-      onSessionEnd.foreach(_ (this))
+      onSessionEnd.foreach(_(this))
       this.synchronized {
-        LiftSession.onAboutToShutdownSession.foreach(_ (this))
+        LiftSession.onAboutToShutdownSession.foreach(_(this))
 
         _running_? = false
 
@@ -1081,37 +1081,37 @@ class LiftSession(private[http] val _contextPath: String,
           val response: Box[LiftResponse] =
             early or
               (request.testLocation match {
-                    case Left(true) =>
-                      checkStatelessInSiteMap(request) {
-                        cleanUpBeforeRender
+                case Left(true) =>
+                  checkStatelessInSiteMap(request) {
+                    cleanUpBeforeRender
 
-                        PageName(request.uri + " -> " + request.path)
-                        LiftRules.allowParallelSnippets.doWith(() =>
-                              !Props.inGAE) {
-                          (request.location
-                                .flatMap(_.earlyResponse) or LiftRules.earlyResponse
-                                .firstFull(request)) or
-                            (processTemplate(locTemplate,
-                                             request,
-                                             request.path,
-                                             200) or request.createNotFound {
-                                  processTemplate(Empty, request, _, 404)
-                                })
-                        }
+                    PageName(request.uri + " -> " + request.path)
+                    LiftRules.allowParallelSnippets
+                      .doWith(() => !Props.inGAE) {
+                        (request.location
+                              .flatMap(_.earlyResponse) or LiftRules.earlyResponse
+                              .firstFull(request)) or
+                          (processTemplate(locTemplate,
+                                           request,
+                                           request.path,
+                                           200) or request.createNotFound {
+                                processTemplate(Empty, request, _, 404)
+                              })
                       }
+                  }
 
-                    case Right(Full(resp)) => Full(resp)
-                    case _ if (LiftRules.passNotFoundToChain) => Empty
-                    case _ if Props.mode == Props.RunModes.Development =>
-                      request.createNotFound {
-                        processTemplate(Empty, request, _, 404)
-                      } or Full(ForbiddenResponse(
-                              "The requested page was not defined in your SiteMap, so access was blocked.  (This message is displayed in development mode only)"))
-                    case _ =>
-                      request.createNotFound {
-                        processTemplate(Empty, request, _, 404)
-                      }
-                  })
+                case Right(Full(resp)) => Full(resp)
+                case _ if (LiftRules.passNotFoundToChain) => Empty
+                case _ if Props.mode == Props.RunModes.Development =>
+                  request.createNotFound {
+                    processTemplate(Empty, request, _, 404)
+                  } or Full(ForbiddenResponse(
+                          "The requested page was not defined in your SiteMap, so access was blocked.  (This message is displayed in development mode only)"))
+                case _ =>
+                  request.createNotFound {
+                    processTemplate(Empty, request, _, 404)
+                  }
+              })
 
           // Before returning the response check for redirect and set the appropriate state.
           response.map(checkRedirect)
@@ -1738,8 +1738,8 @@ class LiftSession(private[http] val _contextPath: String,
       snippetName.map { snippet =>
         val (cls, method) = splitColonPair(snippet)
         S.doSnippet(snippet)(runWhitelist(snippet, cls, method, kids) {
-          (S.locateMappedSnippet(snippet).map(_ (kids)) or locSnippet(snippet))
-            .openOr(S.locateSnippet(snippet).map(_ (kids)) openOr {
+          (S.locateMappedSnippet(snippet).map(_(kids)) or locSnippet(snippet))
+            .openOr(S.locateSnippet(snippet).map(_(kids)) openOr {
 
               (locateAndCacheSnippet(cls)) match {
                 // deal with a stateless request when a snippet has
@@ -2296,12 +2296,12 @@ class LiftSession(private[http] val _contextPath: String,
 
         override def localSetup(): Unit = {
           super.localSetup()
-          Helpers.tryo(setupFunc.foreach(_ (this)))
+          Helpers.tryo(setupFunc.foreach(_(this)))
         }
 
         override def localShutdown(): Unit = {
           super.localShutdown()
-          Helpers.tryo(shutdownFunc.foreach(_ (this)))
+          Helpers.tryo(shutdownFunc.foreach(_(this)))
         }
 
         override def lifespan =

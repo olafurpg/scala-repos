@@ -29,7 +29,6 @@ object SCL4389 {
   trait Init {
     /*trait KeyedInitialize[T] extends Init.this.Keyed[T, T] {
 }
-
 sealed trait Keyed[S, T] extends Init.this.Initialize[T]*/
     sealed trait Initialize[T] extends {
       def apply[S](g: T => S): Init.this.Initialize[S] = null

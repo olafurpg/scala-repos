@@ -11,7 +11,9 @@ import javax.net.ssl.SSLPeerUnverifiedException
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
-import com.typesafe.netty.http.{DefaultStreamedHttpResponse, StreamedHttpRequest}
+import com.typesafe.netty.http.{
+  DefaultStreamedHttpResponse, StreamedHttpRequest
+}
 import io.netty.buffer.{ByteBuf, Unpooled}
 import io.netty.handler.codec.http._
 import io.netty.handler.ssl.SslHandler
@@ -20,7 +22,9 @@ import play.api.Logger
 import play.api.http.HeaderNames._
 import play.api.http.{Status, HttpChunk, HttpEntity}
 import play.api.mvc._
-import play.core.server.common.{ConnectionInfo, ServerResultUtils, ForwardedHeaderHandler}
+import play.core.server.common.{
+  ConnectionInfo, ServerResultUtils, ForwardedHeaderHandler
+}
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Try}

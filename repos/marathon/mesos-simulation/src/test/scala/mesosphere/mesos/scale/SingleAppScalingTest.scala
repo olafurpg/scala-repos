@@ -3,7 +3,9 @@ package mesosphere.mesos.scale
 import java.io.File
 
 import mesosphere.marathon.api.v2.json.{AppUpdate}
-import mesosphere.marathon.integration.facades.{ITDeploymentResult, MarathonFacade}
+import mesosphere.marathon.integration.facades.{
+  ITDeploymentResult, MarathonFacade
+}
 import mesosphere.marathon.integration.setup._
 import MarathonFacade._
 import mesosphere.marathon.state.{AppDefinition, PathId}

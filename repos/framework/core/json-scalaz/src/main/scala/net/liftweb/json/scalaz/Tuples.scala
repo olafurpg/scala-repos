@@ -20,8 +20,7 @@ import scalaz._
 import Scalaz._
 import net.liftweb.json._
 
-trait Tuples {
-  this: Types =>
+trait Tuples { this: Types =>
   implicit def Tuple2JSON[A: JSON, B: JSON]: JSON[(A, B)] =
     new JSON[(A, B)] {
       def read(json: JValue) = json match {

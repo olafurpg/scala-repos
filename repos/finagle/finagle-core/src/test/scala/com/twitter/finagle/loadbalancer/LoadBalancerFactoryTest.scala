@@ -4,7 +4,9 @@ import com.twitter.finagle._
 import com.twitter.finagle.client.{StackClient, StringClient}
 import com.twitter.finagle.param.Stats
 import com.twitter.finagle.server.StringServer
-import com.twitter.finagle.stats.{InMemoryHostStatsReceiver, InMemoryStatsReceiver}
+import com.twitter.finagle.stats.{
+  InMemoryHostStatsReceiver, InMemoryStatsReceiver
+}
 import com.twitter.finagle.util.Rng
 import com.twitter.util.{Await, Future, Var}
 import java.net.{InetAddress, InetSocketAddress, SocketAddress}

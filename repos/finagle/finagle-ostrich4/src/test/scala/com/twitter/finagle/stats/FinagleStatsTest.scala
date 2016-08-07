@@ -7,7 +7,9 @@ import org.scalatest.mock.MockitoSugar
 import com.twitter.finagle.{Codec, CodecFactory, Service}
 import com.twitter.util.{Await, Future}
 import org.jboss.netty.channel.{Channels, ChannelPipelineFactory}
-import org.jboss.netty.handler.codec.frame.{Delimiters, DelimiterBasedFrameDecoder}
+import org.jboss.netty.handler.codec.frame.{
+  Delimiters, DelimiterBasedFrameDecoder
+}
 import org.jboss.netty.handler.codec.string.{StringEncoder, StringDecoder}
 import com.twitter.io.Charsets
 import com.twitter.finagle.builder.{ClientBuilder, ServerBuilder}

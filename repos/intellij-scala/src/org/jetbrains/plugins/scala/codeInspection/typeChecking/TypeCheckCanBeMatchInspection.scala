@@ -10,14 +10,22 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.plugins.scala.codeInspection.typeChecking.TypeCheckCanBeMatchInspection.{inspectionId, inspectionName}
+import org.jetbrains.plugins.scala.codeInspection.typeChecking.TypeCheckCanBeMatchInspection.{
+  inspectionId, inspectionName
+}
 import org.jetbrains.plugins.scala.codeInspection.typeChecking.TypeCheckToMatchUtil._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnTwoPsiElements, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnTwoPsiElements, AbstractInspection
+}
 import org.jetbrains.plugins.scala.extensions.inWriteAction
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScExistentialClause, ScTypeElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern, ScPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScExistentialClause, ScTypeElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
@@ -26,7 +34,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.SyntheticNamedElement
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
-import org.jetbrains.plugins.scala.lang.refactoring.util.{InplaceRenameHelper, ScalaVariableValidator}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  InplaceRenameHelper, ScalaVariableValidator
+}
 
 import scala.annotation.tailrec
 import scala.collection.mutable

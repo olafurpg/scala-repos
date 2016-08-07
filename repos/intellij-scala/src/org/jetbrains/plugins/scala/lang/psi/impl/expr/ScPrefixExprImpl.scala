@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 import scala.collection.Seq
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */

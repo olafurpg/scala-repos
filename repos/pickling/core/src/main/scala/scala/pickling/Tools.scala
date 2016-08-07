@@ -7,7 +7,9 @@ import scala.language.existentials
 import scala.reflect.macros.Context
 import scala.reflect.api.Universe
 
-import scala.collection.mutable.{Map => MutableMap, ListBuffer => MutableList, WeakHashMap, Set => MutableSet}
+import scala.collection.mutable.{
+  Map => MutableMap, ListBuffer => MutableList, WeakHashMap, Set => MutableSet
+}
 import scala.collection.mutable.{Stack => MutableStack, Queue => MutableQueue}
 
 import java.lang.ref.WeakReference
@@ -175,16 +177,16 @@ class Tools[C <: Context](val c: C) {
             val pkgMembers = pkg.typeSignature.members
             pkgMembers foreach
               (m => {
-                    def analyze(m: Symbol): Unit = {
-                      if (m.name.decoded.contains("$")) () // SI-7251
-                      else if (m.isClass)
-                        m.asClass.baseClasses foreach
-                          (bc => updateCache(bc, m))
-                      else if (m.isModule) analyze(m.asModule.moduleClass)
-                      else ()
-                    }
-                    analyze(m)
-                  })
+                 def analyze(m: Symbol): Unit = {
+                   if (m.name.decoded.contains("$")) () // SI-7251
+                   else if (m.isClass)
+                     m.asClass.baseClasses foreach
+                       (bc => updateCache(bc, m))
+                   else if (m.isModule) analyze(m.asModule.moduleClass)
+                   else ()
+                 }
+                 analyze(m)
+               })
             def recurIntoPackage(pkg: Symbol) = {
               pkg.name.toString != "_root_" &&
               pkg.name.toString != "quicktime" &&

@@ -7,7 +7,9 @@ package scala
 package reflect
 package internal
 
-import scala.reflect.internal.util.StringOps.{countAsString, countElementsAsString}
+import scala.reflect.internal.util.StringOps.{
+  countAsString, countElementsAsString
+}
 
 trait Kinds { self: SymbolTable =>
 

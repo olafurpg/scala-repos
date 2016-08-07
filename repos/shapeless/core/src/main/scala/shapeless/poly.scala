@@ -50,11 +50,11 @@ object PolyDefns extends Cases {
       val value = v
     }
 
-    implicit def materializeFromValue1[P, F[_], T]: Case[P, F[T] :: HNil] = macro PolyMacros
-      .materializeFromValueImpl[P, F[T], T]
+    implicit def materializeFromValue1[P, F[_], T]: Case[P, F[T] :: HNil] =
+      macro PolyMacros.materializeFromValueImpl[P, F[T], T]
 
-    implicit def materializeFromValue2[P, T]: Case[P, T :: HNil] = macro PolyMacros
-      .materializeFromValueImpl[P, T, T]
+    implicit def materializeFromValue2[P, T]: Case[P, T :: HNil] =
+      macro PolyMacros.materializeFromValueImpl[P, T, T]
   }
 
   type Case0[P] = Case[P, HNil]

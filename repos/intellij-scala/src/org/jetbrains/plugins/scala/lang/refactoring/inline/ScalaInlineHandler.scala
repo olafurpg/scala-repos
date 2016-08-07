@@ -16,20 +16,32 @@ import com.intellij.psi.impl.source.codeStyle.CodeEditUtil
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.HelpID
-import com.intellij.refactoring.util.{CommonRefactoringUtil, RefactoringMessageDialog}
+import com.intellij.refactoring.util.{
+  CommonRefactoringUtil, RefactoringMessageDialog
+}
 import com.intellij.usageView.UsageInfo
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScStableReferenceElementPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern, ScStableReferenceElementPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScStableCodeReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScMethodCall}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScStableCodeReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScMethodCall
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScNamedElement, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScProjectionType, ScTypeParameterType}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScFunctionType, ScProjectionType, ScTypeParameterType
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter

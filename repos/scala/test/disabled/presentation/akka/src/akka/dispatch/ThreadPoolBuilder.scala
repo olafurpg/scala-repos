@@ -194,7 +194,7 @@ case class ThreadPoolConfigDispatcherBuilder(
       fs: Option[Function[ThreadPoolConfigDispatcherBuilder,
                           ThreadPoolConfigDispatcherBuilder]]*)
     : ThreadPoolConfigDispatcherBuilder =
-    fs.foldLeft(this)((c, f) => f.map(_ (c)).getOrElse(c))
+    fs.foldLeft(this)((c, f) => f.map(_(c)).getOrElse(c))
 }
 
 /**

@@ -2,7 +2,9 @@ package com.twitter.finagle.kestrel.unit
 
 import _root_.java.net.{InetSocketAddress, SocketAddress}
 import _root_.java.nio.charset.Charset
-import _root_.java.util.concurrent.{BlockingDeque, ExecutorService, Executors, LinkedBlockingDeque}
+import _root_.java.util.concurrent.{
+  BlockingDeque, ExecutorService, Executors, LinkedBlockingDeque
+}
 
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.twitter.concurrent.{Broker, Spool}
@@ -10,7 +12,9 @@ import com.twitter.conversions.time._
 import com.twitter.finagle.builder.{ClientBuilder, ClientConfig, Cluster}
 import com.twitter.finagle.kestrel._
 import com.twitter.finagle.kestrel.protocol.{Command, Response, Set}
-import com.twitter.finagle.{Addr, Address, ClientConnection, Service, ServiceFactory}
+import com.twitter.finagle.{
+  Addr, Address, ClientConnection, Service, ServiceFactory
+}
 import com.twitter.io.Buf
 import com.twitter.util._
 import org.junit.runner.RunWith

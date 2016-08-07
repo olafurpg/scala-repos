@@ -21,7 +21,9 @@ import javax.ws.rs.{DefaultValue, GET, Produces, QueryParam}
 import javax.ws.rs.core.MediaType
 
 import org.apache.spark.deploy.history.ApplicationHistoryInfo
-import org.apache.spark.deploy.master.{ApplicationInfo => InternalApplicationInfo}
+import org.apache.spark.deploy.master.{
+  ApplicationInfo => InternalApplicationInfo
+}
 
 @Produces(Array(MediaType.APPLICATION_JSON))
 private[v1] class ApplicationListResource(uiRoot: UIRoot) {

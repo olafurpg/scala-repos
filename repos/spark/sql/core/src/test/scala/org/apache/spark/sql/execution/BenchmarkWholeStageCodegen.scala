@@ -98,7 +98,6 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     }
     /**
       Using ImperativeAggregate (as implemented in Spark 1.6):
-
       Intel(R) Core(TM) i7-4558U CPU @ 2.80GHz
       stddev:                            Avg Time(ms)    Avg Rate(M/s)  Relative Rate
       -------------------------------------------------------------------------------
@@ -106,15 +105,12 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       stddev w codegen                        2097.29            10.00         0.96 X
       kurtosis w/o codegen                    2108.99             9.94         0.96 X
       kurtosis w codegen                      2090.69            10.03         0.97 X
-
       Using DeclarativeAggregate:
-
       Intel(R) Core(TM) i7-4558U CPU @ 2.80GHz
       stddev:                             Best/Avg Time(ms)    Rate(M/s)   Per Row(ns)   Relative
       -------------------------------------------------------------------------------------------
       stddev codegen=false                     5630 / 5776         18.0          55.6       1.0X
       stddev codegen=true                      1259 / 1314         83.0          12.0       4.5X
-
       Intel(R) Core(TM) i7-4558U CPU @ 2.80GHz
       kurtosis:                           Best/Avg Time(ms)    Rate(M/s)   Per Row(ns)   Relative
       -------------------------------------------------------------------------------------------

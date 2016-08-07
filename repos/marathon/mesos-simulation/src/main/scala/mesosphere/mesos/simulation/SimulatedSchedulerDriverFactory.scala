@@ -2,7 +2,9 @@ package mesosphere.mesos.simulation
 
 import javax.inject.Inject
 
-import mesosphere.marathon.{MarathonScheduler, MarathonSchedulerDriverHolder, SchedulerDriverFactory}
+import mesosphere.marathon.{
+  MarathonScheduler, MarathonSchedulerDriverHolder, SchedulerDriverFactory
+}
 import org.apache.mesos.SchedulerDriver
 
 class SimulatedSchedulerDriverFactory @Inject()(

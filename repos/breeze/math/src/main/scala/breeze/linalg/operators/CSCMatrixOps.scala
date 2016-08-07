@@ -2,7 +2,9 @@ package breeze.linalg
 package operators
 
 import breeze.generic.UFunc
-import breeze.linalg.support.{CanTranspose, CanZipMapKeyValues, CanZipMapValues}
+import breeze.linalg.support.{
+  CanTranspose, CanZipMapKeyValues, CanZipMapValues
+}
 import breeze.macros.expand
 import breeze.linalg.{DenseMatrix, SparseVector}
 import breeze.math._
@@ -18,8 +20,7 @@ import scalaxy.debug._
   *
   * @author dlwh
   **/
-trait CSCMatrixOps extends CSCMatrixOps_Ring {
-  this: CSCMatrix.type =>
+trait CSCMatrixOps extends CSCMatrixOps_Ring { this: CSCMatrix.type =>
   // don't remove
   import breeze.math.PowImplicits._
 
@@ -1730,8 +1731,7 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
   *
   * @author dlwh
   **/
-trait CSCMatrixOpsLowPrio extends SerializableLogging {
-  this: CSCMatrixOps =>
+trait CSCMatrixOpsLowPrio extends SerializableLogging { this: CSCMatrixOps =>
   implicit def canMulM_V_def[T, A, B <: Vector[T]](
       implicit bb: B <:< Vector[T],
       op: OpMulMatrix.Impl2[CSCMatrix[T], Vector[T], Vector[T]]) =

@@ -5,7 +5,9 @@ import java.util
 import com.intellij.ide.IdeBundle
 import com.intellij.ide.structureView.impl.java.PsiMethodTreeElement
 import com.intellij.ide.util.FileStructureNodeProvider
-import com.intellij.ide.util.treeView.smartTree.{ActionPresentation, ActionPresentationData, TreeElement}
+import com.intellij.ide.util.treeView.smartTree.{
+  ActionPresentation, ActionPresentationData, TreeElement
+}
 import com.intellij.openapi.actionSystem.Shortcut
 import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.project.IndexNotReadyException
@@ -13,7 +15,9 @@ import com.intellij.openapi.util.IconLoader
 import com.intellij.psi.PsiMethod
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScTypeAlias, ScValue, ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import org.jetbrains.plugins.scala.lang.psi.types.PhysicalSignature
 import org.jetbrains.plugins.scala.lang.structureView.elements.impl._

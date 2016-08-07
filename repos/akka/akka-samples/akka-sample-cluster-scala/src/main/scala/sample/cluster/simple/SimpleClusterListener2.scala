@@ -9,7 +9,7 @@ class SimpleClusterListener2 extends Actor with ActorLogging {
 
   val cluster = Cluster(context.system)
 
-  // subscribe to cluster changes, re-subscribe when restart 
+  // subscribe to cluster changes, re-subscribe when restart
   override def preStart(): Unit = {
     //#subscribe
     cluster.subscribe(self, classOf[MemberEvent], classOf[UnreachableMember])

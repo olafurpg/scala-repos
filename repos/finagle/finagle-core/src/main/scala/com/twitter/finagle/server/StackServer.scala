@@ -141,8 +141,7 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
     with Stack.Parameterized[This]
     with CommonParams[This]
     with WithServerTransport[This]
-    with WithServerAdmissionControl[This] {
-  self =>
+    with WithServerAdmissionControl[This] { self =>
 
   /**
     * The type we write into the transport.

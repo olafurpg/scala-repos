@@ -6,9 +6,13 @@ import slick.SlickException
 import slick.ast._
 import slick.ast.Util.nodeToNodeOps
 import slick.ast.TypeUtil._
-import slick.compiler.{RewriteBooleans, CodeGen, Phase, CompilerState, QueryCompiler}
+import slick.compiler.{
+  RewriteBooleans, CodeGen, Phase, CompilerState, QueryCompiler
+}
 import slick.lifted._
-import slick.relational.{RelationalProfile, RelationalCapabilities, ResultConverter, CompiledMapping}
+import slick.relational.{
+  RelationalProfile, RelationalCapabilities, ResultConverter, CompiledMapping
+}
 import slick.sql.SqlProfile
 import slick.util._
 import slick.util.MacroSupport.macroSupportInterpolation

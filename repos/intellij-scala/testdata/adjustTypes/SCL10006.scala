@@ -15,9 +15,7 @@ trait SCL10006 {
 }
 /*
 trait SCL10006 {
-
   import cats._
-
   val x: Either[String, List[Int]]
 }
  */

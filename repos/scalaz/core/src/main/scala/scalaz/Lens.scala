@@ -443,8 +443,7 @@ trait LensFunctions extends LensFamilyFunctions {
     }
 }
 
-sealed abstract class LensInstances0 {
-  this: LensInstances =>
+sealed abstract class LensInstances0 { this: LensInstances =>
   import scala.collection.SeqLike
 
   implicit def seqLikeLensFamily[S1, S2, A, Repr <: SeqLike[A, Repr]](

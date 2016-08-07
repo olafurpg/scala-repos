@@ -26,7 +26,10 @@ import kafka.utils.{ShutdownableThread, TestUtils}
 import org.apache.kafka.clients.producer._
 import org.apache.kafka.clients.producer.internals.ErrorLoggingCallback
 import org.apache.kafka.common.KafkaException
-import org.apache.kafka.common.errors.{InvalidTopicException, NotEnoughReplicasAfterAppendException, NotEnoughReplicasException}
+import org.apache.kafka.common.errors.{
+  InvalidTopicException, NotEnoughReplicasAfterAppendException,
+  NotEnoughReplicasException
+}
 import org.junit.Assert._
 import org.junit.{After, Before, Test}
 import org.apache.kafka.common.internals.TopicConstants

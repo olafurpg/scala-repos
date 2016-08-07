@@ -25,7 +25,9 @@ import com.esotericsoftware.kryo.{Kryo, KryoSerializable}
 import com.esotericsoftware.kryo.io.{Input, Output}
 
 import org.apache.spark.SparkConf
-import org.apache.spark.serializer.{KryoInputObjectInputBridge, KryoOutputObjectOutputBridge}
+import org.apache.spark.serializer.{
+  KryoInputObjectInputBridge, KryoOutputObjectOutputBridge
+}
 import org.apache.spark.streaming.util.OpenHashMapBasedStateMap._
 import org.apache.spark.util.collection.OpenHashMap
 
@@ -91,8 +93,7 @@ private[streaming] class OpenHashMapBasedStateMap[K, S](
 )(implicit private var keyClassTag: ClassTag[K],
   private var stateClassTag: ClassTag[S])
     extends StateMap[K, S]
-    with KryoSerializable {
-  self =>
+    with KryoSerializable { self =>
 
   def this(initialCapacity: Int, deltaChainThreshold: Int)(
       implicit keyClassTag: ClassTag[K],

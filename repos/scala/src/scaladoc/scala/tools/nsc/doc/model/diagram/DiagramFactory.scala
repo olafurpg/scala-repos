@@ -16,7 +16,11 @@ import scala.collection.immutable.SortedMap
   *  @author Vlad Ureche
   */
 trait DiagramFactory extends DiagramDirectiveParser {
-  this: ModelFactory with ModelFactoryTypeSupport with DiagramFactory with CommentFactory with TreeFactory =>
+  this: ModelFactory
+    with ModelFactoryTypeSupport
+    with DiagramFactory
+    with CommentFactory
+    with TreeFactory =>
 
   import this.global.definitions._
   import this.global._

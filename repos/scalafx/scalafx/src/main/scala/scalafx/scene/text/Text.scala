@@ -32,7 +32,10 @@ import javafx.{scene => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty,
+  StringProperty
+}
 import scalafx.delegate.{PositionDelegate, SFXDelegate}
 import scalafx.scene.shape.Shape
 import scalafx.scene.text.Font.sfxFont2jfx

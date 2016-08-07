@@ -3,7 +3,9 @@ package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import java.math.{BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode}
+import java.math.{
+  BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode
+}
 
 import spire.algebra.{Field, IsRational, NRoot, Sign}
 import spire.algebra.Sign.{Positive, Zero, Negative}
@@ -16,8 +18,7 @@ import spire.syntax.nroot._
 sealed abstract class Rational
     extends ScalaNumber
     with ScalaNumericConversions
-    with Ordered[Rational] {
-  lhs =>
+    with Ordered[Rational] { lhs =>
 
   def numerator: SafeLong
   def denominator: SafeLong

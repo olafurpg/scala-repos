@@ -7,8 +7,7 @@ package akka.persistence.scalatest
 import akka.persistence.CapabilityFlag
 import org.scalatest.Informing
 
-trait OptionalTests {
-  this: Informing ⇒
+trait OptionalTests { this: Informing ⇒
 
   def optional(flag: CapabilityFlag)(test: ⇒ Unit) = {
     val msg =

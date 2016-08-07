@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala
 package runner
 
-import com.intellij.execution.configurations.{ConfigurationFactory, JavaParameters, ModuleBasedConfiguration, RunConfigurationModule}
+import com.intellij.execution.configurations.{
+  ConfigurationFactory, JavaParameters, ModuleBasedConfiguration,
+  RunConfigurationModule
+}
 import com.intellij.execution.{CantRunException, ExecutionException}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project

@@ -25,7 +25,9 @@ import scala.language.postfixOps
 import org.apache.spark.sql.catalyst.encoders.OuterScopes
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.test.SharedSQLContext
-import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{
+  IntegerType, StringType, StructField, StructType
+}
 
 case class OtherTuple(_1: String, _2: Int)
 

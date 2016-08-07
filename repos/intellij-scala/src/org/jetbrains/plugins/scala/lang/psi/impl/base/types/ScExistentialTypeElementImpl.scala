@@ -9,9 +9,13 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.{PsiElement, PsiElementVisitor, ResolveState}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAliasDeclaration, ScValueDeclaration}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAliasDeclaration, ScValueDeclaration
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypeResult, TypingContext
+}
 
 import _root_.scala.collection.mutable.ListBuffer
 

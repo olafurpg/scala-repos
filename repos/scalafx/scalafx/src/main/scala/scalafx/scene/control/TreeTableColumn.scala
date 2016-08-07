@@ -11,7 +11,9 @@ import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty}
 import scalafx.beans.value.ObservableValue
 import scalafx.collections.ObservableBuffer
 import scalafx.css.Styleable
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 import scalafx.event.Event
 
 /**

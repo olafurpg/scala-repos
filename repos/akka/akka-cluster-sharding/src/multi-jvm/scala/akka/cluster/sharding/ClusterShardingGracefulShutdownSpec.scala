@@ -10,7 +10,9 @@ import akka.actor._
 import akka.cluster.Cluster
 import akka.cluster.sharding.ShardRegion.GracefulShutdown
 import akka.persistence.Persistence
-import akka.persistence.journal.leveldb.{SharedLeveldbJournal, SharedLeveldbStore}
+import akka.persistence.journal.leveldb.{
+  SharedLeveldbJournal, SharedLeveldbStore
+}
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, STMultiNodeSpec}
 import akka.testkit._

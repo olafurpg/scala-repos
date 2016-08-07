@@ -25,7 +25,9 @@ import scala.util.Random
 import scala.util.control.NonFatal
 
 import kafka.api._
-import kafka.common.{ErrorMapping, OffsetAndMetadata, OffsetMetadataAndError, TopicAndPartition}
+import kafka.common.{
+  ErrorMapping, OffsetAndMetadata, OffsetMetadataAndError, TopicAndPartition
+}
 import kafka.consumer.{ConsumerConfig, SimpleConsumer}
 
 import org.apache.spark.SparkException

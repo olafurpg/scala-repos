@@ -3,9 +3,13 @@ package lang
 package formatting
 package settings
 
-import com.intellij.application.options.{CodeStyleAbstractConfigurable, CodeStyleAbstractPanel}
+import com.intellij.application.options.{
+  CodeStyleAbstractConfigurable, CodeStyleAbstractPanel
+}
 import com.intellij.openapi.options.Configurable
-import com.intellij.psi.codeStyle.{CodeStyleSettings, CodeStyleSettingsProvider, DisplayPriority}
+import com.intellij.psi.codeStyle.{
+  CodeStyleSettings, CodeStyleSettingsProvider, DisplayPriority
+}
 
 /**
   * User: Alexander Podkhalyuzin

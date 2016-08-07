@@ -149,8 +149,7 @@ object FSM {
   *   timerActive_? ("tock")
   * </pre>
   */
-trait FSM[S, D] extends ListenerManagement {
-  this: Actor =>
+trait FSM[S, D] extends ListenerManagement { this: Actor =>
 
   import FSM._
 

@@ -18,7 +18,10 @@ abstract class TreeInfo {
   val global: SymbolTable
 
   import global._
-  import definitions.{isVarArgsList, isCastSymbol, ThrowableClass, uncheckedStableClass, isBlackboxMacroBundleType, isWhiteboxContextType}
+  import definitions.{
+    isVarArgsList, isCastSymbol, ThrowableClass, uncheckedStableClass,
+    isBlackboxMacroBundleType, isWhiteboxContextType
+  }
 
   /* Does not seem to be used. Not sure what it does anyway.
   def isOwnerDefinition(tree: Tree): Boolean = tree match {
@@ -625,10 +628,10 @@ abstract class TreeInfo {
   /** Does this CaseDef catch Throwable? */
   def catchesThrowable(cdef: CaseDef) =
     (cdef.guard.isEmpty && (unbind(cdef.pat) match {
-              case Ident(nme.WILDCARD) => true
-              case i @ Ident(name) => hasNoSymbol(i)
-              case _ => false
-            }))
+          case Ident(nme.WILDCARD) => true
+          case i @ Ident(name) => hasNoSymbol(i)
+          case _ => false
+        }))
 
   /** Is this CaseDef synthetically generated, e.g. by `MatchTranslation.translateTry`? */
   def isSyntheticCase(cdef: CaseDef) = cdef.pat.exists {
@@ -656,7 +659,6 @@ abstract class TreeInfo {
 
   /* If we have run-time types, and these are used for pattern matching,
      we should replace this  by something like:
-
       tp match {
         case TypeRef(pre, sym, args) =>
           args.isEmpty && (sym.isTopLevel || isSimple(pre))
@@ -975,10 +977,10 @@ abstract class TreeInfo {
 
   def isNullaryInvocation(tree: Tree): Boolean =
     tree.symbol != null && tree.symbol.isMethod && (tree match {
-          case TypeApply(fun, _) => isNullaryInvocation(fun)
-          case tree: RefTree => true
-          case _ => false
-        })
+      case TypeApply(fun, _) => isNullaryInvocation(fun)
+      case tree: RefTree => true
+      case _ => false
+    })
 
   def isMacroApplication(tree: Tree): Boolean = !tree.isDef && {
     val sym = tree.symbol

@@ -1,7 +1,9 @@
 package gitbucket.core.util
 
 import gitbucket.core.model.{Session, Issue}
-import gitbucket.core.service.{RepositoryService, AccountService, IssuesService, SystemSettingsService}
+import gitbucket.core.service.{
+  RepositoryService, AccountService, IssuesService, SystemSettingsService
+}
 import gitbucket.core.servlet.Database
 import gitbucket.core.view.Markdown
 
@@ -35,7 +37,7 @@ trait Notifier
       .withFilter(_ != context.loginAccount.get.userName) // the operation in person is excluded
       .foreach(getAccountByUserName(_) filterNot (_.isGroupAccount) filterNot
             (LDAPUtil.isDummyMailAddress(_)) foreach (x =>
-                notify(x.mailAddress)))
+                                                        notify(x.mailAddress)))
 }
 
 object Notifier {

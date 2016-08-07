@@ -31,7 +31,9 @@ import javafx.scene.{input => jfxsi}
 import javafx.{event => jfxe}
 
 import scala.language.implicitConversions
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 
 object KeyCombination {
 

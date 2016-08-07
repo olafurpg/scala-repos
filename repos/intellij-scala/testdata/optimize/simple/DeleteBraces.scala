@@ -5,7 +5,6 @@ abstract class DeleteBraces {
 }
 /*
 import java.util.Date
-
 abstract class DeleteBraces {
   val x: Date
 }

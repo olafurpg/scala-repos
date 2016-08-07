@@ -21,7 +21,9 @@ import scala.collection.mutable.ArrayBuffer
 
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.catalog.ExternalCatalog.TablePartitionSpec
-import org.apache.spark.sql.catalyst.expressions.{Ascending, Descending, SortDirection}
+import org.apache.spark.sql.catalyst.expressions.{
+  Ascending, Descending, SortDirection
+}
 import org.apache.spark.sql.catalyst.parser._
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.execution.datasources._

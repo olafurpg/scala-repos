@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
 import org.jetbrains.plugins.scala.lang.lexer._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */

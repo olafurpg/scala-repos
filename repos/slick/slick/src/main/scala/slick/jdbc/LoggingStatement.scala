@@ -2,7 +2,9 @@ package slick.jdbc
 
 import scala.language.reflectiveCalls
 
-import java.sql.{PreparedStatement, Connection, SQLWarning, ResultSet, Statement}
+import java.sql.{
+  PreparedStatement, Connection, SQLWarning, ResultSet, Statement
+}
 
 /** A wrapper for `java.sql.Statement` that logs statements and benchmark results
   * to the appropriate [[JdbcBackend]] loggers. */

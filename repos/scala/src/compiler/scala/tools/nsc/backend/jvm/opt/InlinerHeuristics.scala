@@ -175,7 +175,6 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
 
   /*
   // using http://lihaoyi.github.io/Ammonite/
-
   load.ivy("com.google.guava" % "guava" % "18.0")
   val javaUtilFunctionClasses = {
     val rt = System.getProperty("sun.boot.class.path").split(":").find(_.endsWith("lib/rt.jar")).get
@@ -184,7 +183,6 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
     val cp = com.google.common.reflect.ClassPath.from(l)
     cp.getTopLevelClasses("java.util.function").toArray.map(_.toString).toList
   }
-
   // found using IntelliJ's "Find Usages" on the @FunctionalInterface annotation
   val otherClasses = List(
     "com.sun.javafx.css.parser.Recognizer",
@@ -213,9 +211,7 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
     "javafx.util.BuilderFactory",
     "javafx.util.Callback"
   )
-
   val allClasses = javaUtilFunctionClasses ::: otherClasses
-
   load.ivy("org.ow2.asm" % "asm" % "5.0.4")
   val classesAndSamNameDesc = allClasses.map(c => {
     val cls = Class.forName(c)

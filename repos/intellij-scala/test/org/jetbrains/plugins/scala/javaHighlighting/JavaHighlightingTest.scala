@@ -5,8 +5,12 @@ import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.{PsiDocumentManager, PsiFile}
-import org.jetbrains.plugins.scala.annotator.{AnnotatorHolderMock, ScalaAnnotator, _}
-import org.jetbrains.plugins.scala.base.{ScalaFixtureTestCase, ScalaLibraryLoader}
+import org.jetbrains.plugins.scala.annotator.{
+  AnnotatorHolderMock, ScalaAnnotator, _
+}
+import org.jetbrains.plugins.scala.base.{
+  ScalaFixtureTestCase, ScalaLibraryLoader
+}
 import org.jetbrains.plugins.scala.extensions.PsiElementExt
 import org.jetbrains.plugins.scala.util.TestUtils
 import org.junit.Assert

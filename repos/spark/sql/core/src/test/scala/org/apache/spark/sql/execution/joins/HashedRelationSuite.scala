@@ -17,7 +17,10 @@
 
 package org.apache.spark.sql.execution.joins
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream,
+  ObjectOutputStream
+}
 
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.InternalRow

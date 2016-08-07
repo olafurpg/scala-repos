@@ -23,7 +23,9 @@ import java.util.{Calendar, TimeZone}
 import scala.util.Try
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, CodegenFallback, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext, CodegenFallback, ExprCode
+}
 import org.apache.spark.sql.catalyst.util.DateTimeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.{CalendarInterval, UTF8String}

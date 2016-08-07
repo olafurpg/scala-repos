@@ -11,7 +11,10 @@ import com.twitter.finagle.stats.{InMemoryStatsReceiver, StatsReceiver}
 import com.twitter.finagle.tracing.TraceInitializerFilter
 import com.twitter.finagle.transport.Transport
 import java.net.InetSocketAddress
-import org.jboss.netty.channel.{Channel, ChannelFactory, ChannelPipeline, ChannelPipelineFactory, Channels, DefaultChannelConfig}
+import org.jboss.netty.channel.{
+  Channel, ChannelFactory, ChannelPipeline, ChannelPipelineFactory, Channels,
+  DefaultChannelConfig
+}
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.FunSuite

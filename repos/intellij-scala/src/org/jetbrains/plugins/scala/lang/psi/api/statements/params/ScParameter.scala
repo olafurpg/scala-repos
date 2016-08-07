@@ -15,12 +15,22 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScFunctionExpr, ScUnderScoreSectionUtil}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScImportableDeclarationsOwner, ScModifierListOwner, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScFunctionExpr, ScUnderScoreSectionUtil
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScMember
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScImportableDeclarationsOwner, ScModifierListOwner, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScParameterizedType, ScType}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScFunctionType, ScParameterizedType, ScType
+}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 import scala.annotation.tailrec

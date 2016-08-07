@@ -7,7 +7,9 @@ import com.intellij.openapi.actionSystem.{ActionManager, IdeActions}
 import com.intellij.openapi.project.{Project => IJProject}
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.util.Getter
-import com.intellij.openapi.vcs.changes.{Change, ShortDiffDetails, VcsChangeDetailsManager}
+import com.intellij.openapi.vcs.changes.{
+  Change, ShortDiffDetails, VcsChangeDetailsManager
+}
 import com.intellij.openapi.vfs.VirtualFile
 import scala.collection.JavaConversions._
 import scala.collection.mutable

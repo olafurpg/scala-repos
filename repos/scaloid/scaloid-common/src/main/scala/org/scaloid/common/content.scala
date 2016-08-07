@@ -49,7 +49,7 @@ class EventSource0[T] {
     events :+= (() => e)
   }
 
-  def run(): Unit = events.map(_ ())
+  def run(): Unit = events.map(_())
 
   def clear(): Unit = events = Vector()
 }
@@ -61,7 +61,7 @@ class EventSource1[Arg1, Ret] {
     events :+= e
   }
 
-  def run(arg: Arg1): Unit = events.map(_ (arg))
+  def run(arg: Arg1): Unit = events.map(_(arg))
 
   def clear(): Unit = events = Vector()
 }
@@ -73,7 +73,7 @@ class EventSource2[Arg1, Arg2, Ret] {
     events :+= e
   }
 
-  def run(arg1: Arg1, arg2: Arg2): Unit = events.map(_ (arg1, arg2))
+  def run(arg1: Arg1, arg2: Arg2): Unit = events.map(_(arg1, arg2))
 
   def clear(): Unit = events = Vector()
 }

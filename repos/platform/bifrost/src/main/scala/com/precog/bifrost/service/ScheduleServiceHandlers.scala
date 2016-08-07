@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -30,7 +30,9 @@ import blueeyes.core.http.HttpStatusCodes._
 import blueeyes.core.service._
 import blueeyes.json._
 import blueeyes.json.serialization._
-import blueeyes.json.serialization.DefaultSerialization.{DateTimeDecomposer => _, _}
+import blueeyes.json.serialization.DefaultSerialization.{
+  DateTimeDecomposer => _, _
+}
 import blueeyes.json.serialization.Versioned._
 import blueeyes.util.Clock
 
@@ -108,76 +110,77 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                                                               accountFinder,
                                                               clock.instant)
         request.content map { contentFuture =>
-          val responseVF = for {
-            sreq <- EitherT {
-                     contentFuture map { jv =>
-                       jv.validated[AddScheduledQueryRequest]
-                         .disjunction leftMap { err =>
-                         badRequest(
-                             "Request body %s is not a valid scheduling query request: %s"
-                               .format(jv.renderCompact, err.message))
+          val responseVF =
+            for {
+              sreq <- EitherT {
+                       contentFuture map { jv =>
+                         jv.validated[AddScheduledQueryRequest]
+                           .disjunction leftMap { err =>
+                           badRequest(
+                               "Request body %s is not a valid scheduling query request: %s"
+                                 .format(jv.renderCompact, err.message))
+                         }
                        }
                      }
-                   }
 
-            authorities <- EitherT {
-                            M point {
-                              (Authorities
-                                    .ifPresent(sreq.owners) \/> badRequest(
-                                      "You must provide an owner account for the task results!"))
+              authorities <- EitherT {
+                              M point {
+                                (Authorities
+                                      .ifPresent(sreq.owners) \/> badRequest(
+                                        "You must provide an owner account for the task results!"))
+                              }
+                            }
+
+              okToReads <- EitherT.right {
+                            authorities.accountIds.toStream traverse {
+                              acctId =>
+                                permissionsFinder.apiKeyFinder.hasCapability(
+                                    apiKey,
+                                    Set(ExecutePermission(sreq.source,
+                                                          WrittenBy(acctId))),
+                                    None)
                             }
                           }
+              okToRead = okToReads.exists(_ == true)
+              okToWrite <- EitherT.right(
+                              permissionsFinder.checkWriteAuthorities(
+                                  authorities,
+                                  apiKey,
+                                  sreq.sink,
+                                  clock.instant))
 
-            okToReads <- EitherT.right {
-                          authorities.accountIds.toStream traverse { acctId =>
-                            permissionsFinder.apiKeyFinder.hasCapability(
-                                apiKey,
-                                Set(ExecutePermission(sreq.source,
-                                                      WrittenBy(acctId))),
-                                None)
-                          }
-                        }
-            okToRead = okToReads.exists(_ == true)
-            okToWrite <- EitherT.right(
-                            permissionsFinder.checkWriteAuthorities(
-                                authorities,
-                                apiKey,
-                                sreq.sink,
-                                clock.instant))
+              readError = (!okToRead).option(
+                  nels("The API Key does not have permission to execute %s"
+                        .format(sreq.source.path)))
+              writeError = (!okToWrite).option(
+                  nels("The API Key does not have permission to write to %s as %s"
+                        .format(sreq.sink.path, authorities.render)))
 
-            readError = (!okToRead).option(
-                nels("The API Key does not have permission to execute %s"
-                      .format(sreq.source.path)))
-            writeError = (!okToWrite).option(
-                nels(
-                    "The API Key does not have permission to write to %s as %s"
-                      .format(sreq.sink.path, authorities.render)))
+              taskId <- (readError |+| writeError) match {
+                         case None =>
+                           scheduler.addTask(Some(sreq.schedule),
+                                             apiKey,
+                                             authorities,
+                                             sreq.context,
+                                             sreq.source,
+                                             sreq.sink,
+                                             sreq.timeout) leftMap { error =>
+                             logger.error(
+                                 "Failure adding scheduled execution: " +
+                                   error)
+                             HttpResponse(
+                                 status = HttpStatus(InternalServerError),
+                                 content = Some(
+                                     "An error occurred scheduling your query".serialize))
+                           }
 
-            taskId <- (readError |+| writeError) match {
-                       case None =>
-                         scheduler.addTask(Some(sreq.schedule),
-                                           apiKey,
-                                           authorities,
-                                           sreq.context,
-                                           sreq.source,
-                                           sreq.sink,
-                                           sreq.timeout) leftMap { error =>
-                           logger.error(
-                               "Failure adding scheduled execution: " +
-                                 error)
-                           HttpResponse(
-                               status = HttpStatus(InternalServerError),
-                               content = Some(
-                                   "An error occurred scheduling your query".serialize))
-                         }
-
-                       case Some(errors) =>
-                         EitherT.left(
-                             M point forbidden(errors.list.mkString(", ")))
-                     }
-          } yield {
-            HttpResponse(content = Some(taskId.serialize))
-          }
+                         case Some(errors) =>
+                           EitherT.left(
+                               M point forbidden(errors.list.mkString(", ")))
+                       }
+            } yield {
+              HttpResponse(content = Some(taskId.serialize))
+            }
 
           responseVF.fold(a => a, a => a)
         } getOrElse {

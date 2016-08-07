@@ -12,11 +12,16 @@ import scala.concurrent.duration._
 import scala.util.control.NoStackTrace
 import scala.reflect.classTag
 import akka.util.Timeout
-import org.jboss.netty.channel.{Channel, SimpleChannelUpstreamHandler, ChannelHandlerContext, ChannelStateEvent, MessageEvent, WriteCompletionEvent, ExceptionEvent}
+import org.jboss.netty.channel.{
+  Channel, SimpleChannelUpstreamHandler, ChannelHandlerContext,
+  ChannelStateEvent, MessageEvent, WriteCompletionEvent, ExceptionEvent
+}
 import akka.pattern.{ask, AskTimeoutException}
 import akka.event.{LoggingAdapter, Logging}
 import java.net.{InetSocketAddress, ConnectException}
-import akka.remote.transport.ThrottlerTransportAdapter.{SetThrottle, TokenBucket, Blackhole, Unthrottled}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  SetThrottle, TokenBucket, Blackhole, Unthrottled
+}
 import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
 
 /**
@@ -25,8 +30,7 @@ import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
   * the [[akka.remote.testconductor.Conductor]]’s [[akka.remote.testconductor.Controller]]
   * in order to participate in barriers and enable network failure injection.
   */
-trait Player {
-  this: TestConductorExt ⇒
+trait Player { this: TestConductorExt ⇒
 
   private var _client: ActorRef = _
   private def client = _client match {

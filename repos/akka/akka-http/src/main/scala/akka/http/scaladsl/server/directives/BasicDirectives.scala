@@ -95,7 +95,7 @@ trait BasicDirectives {
     * Injects the given values into a directive.
     */
   def tprovide[L: Tuple](values: L): Directive[L] =
-    Directive { _ (values) }
+    Directive { _(values) }
 
   /**
     * Extracts a single value using the given function.

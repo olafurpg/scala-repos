@@ -59,7 +59,6 @@ private object PoolConductor {
                     +-------------+  retry  |<-------- RawSlotEvent (from slotEventMerge)
                                   |  Split  |
                                   +---------+
-
    */
   def apply(slotCount: Int,
             pipeliningLimit: Int,

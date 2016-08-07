@@ -1,6 +1,9 @@
 package com.twitter.finagle.netty3.ssl
 
-import com.twitter.finagle.{ChannelClosedException, InconsistentStateException, SslHandshakeException, SslHostVerificationException}
+import com.twitter.finagle.{
+  ChannelClosedException, InconsistentStateException, SslHandshakeException,
+  SslHostVerificationException
+}
 import com.twitter.util.Try
 import java.net.SocketAddress
 import java.security.cert.X509Certificate

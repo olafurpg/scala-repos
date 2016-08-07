@@ -33,7 +33,10 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.Buffer
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyBooleanProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyBooleanProperty,
+  StringProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 import scalafx.scene.Node._

@@ -32,7 +32,9 @@ import javafx.{geometry => jfxg}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty}
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 import scalafx.geometry.Side
 
 object TabPane {

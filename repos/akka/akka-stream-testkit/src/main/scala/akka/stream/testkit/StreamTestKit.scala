@@ -3,7 +3,9 @@
   */
 package akka.stream.testkit
 
-import akka.actor.{ActorSystem, DeadLetterSuppression, NoSerializationVerificationNeeded}
+import akka.actor.{
+  ActorSystem, DeadLetterSuppression, NoSerializationVerificationNeeded
+}
 import akka.stream._
 import akka.stream.impl.StreamLayout.Module
 import akka.stream.impl._

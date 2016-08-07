@@ -281,7 +281,7 @@ trait BlockParsers extends Parsers {
     else Failure("Not a fitting line.", in)
   }
 
-  /** 
+  /**
     * Parses a line of any type *but* T
     */
   def notLine[T](c: Class[T]): Parser[MarkdownLine] = Parser { in =>
@@ -350,11 +350,11 @@ trait BlockParsers extends Parsers {
     }
 
   /**
-    * Parses a fenced code block: a line starting a fenced code block with 
+    * Parses a fenced code block: a line starting a fenced code block with
     * "```", followed by any lines that do not stop it, optionally followed
-    * by the ending line. Optionally parsing the stopping line causes the 
-    * code block to extend to the end of the document. (This is the github 
-    * behavior, where omitting the line closing the code block causes the 
+    * by the ending line. Optionally parsing the stopping line causes the
+    * code block to extend to the end of the document. (This is the github
+    * behavior, where omitting the line closing the code block causes the
     * block to extend to the end of the document as well)
     */
   def fencedCodeBlock: Parser[FencedCodeBlock] =
@@ -365,8 +365,8 @@ trait BlockParsers extends Parsers {
       case _ ~ lines ~ _ => new FencedCodeBlock("", lines)
     }
 
-  //line(classOf[FencedCodeStart]) ~ 
-  //((not(line(classOf[FencedCodeEnd]))*) ~ 
+  //line(classOf[FencedCodeStart]) ~
+  //((not(line(classOf[FencedCodeEnd]))*) ~
   //opt(line(classOf[FencedCodeEnd])) ^^ {
   //    case start ~ lines ~ end => new CodeBlock(lines.map(_.fullLine))
   //}
@@ -380,7 +380,7 @@ trait BlockParsers extends Parsers {
 
   /**
     * Parses a blockquote fragment: a block starting with a blockquote line followed
-    * by more blockquote or paragraph lines, ends optionally with empty lines 
+    * by more blockquote or paragraph lines, ends optionally with empty lines
     */
   def blockquoteFragment: Parser[List[MarkdownLine]] =
     line(classOf[BlockQuoteLine]) ~

@@ -4,11 +4,15 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.{JavaPsiFacade, PsiClass}
 import org.jetbrains.plugins.scala.codeInspection.prefixMutableCollections.ReferenceMustBePrefixedInspection._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnTwoPsiElements, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnTwoPsiElements, AbstractInspection
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScReferenceElement, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScReferenceElement, ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportSelector
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory

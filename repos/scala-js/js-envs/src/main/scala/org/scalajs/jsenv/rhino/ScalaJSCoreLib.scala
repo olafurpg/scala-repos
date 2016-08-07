@@ -86,7 +86,7 @@ private[rhino] class ScalaJSCoreLib(linkingUnit: LinkingUnit) {
       val fileName = Context.toString(elem.get("fileName", elem))
       val line = Context.toNumber(elem.get("lineNumber", elem)).toInt - 1
 
-      val pos = maps.get(fileName).fold(ir.Position.NoPosition)(_ (line))
+      val pos = maps.get(fileName).fold(ir.Position.NoPosition)(_(line))
 
       val newElem =
         if (pos.isDefined) newPosElem(scope, context, elem, pos)

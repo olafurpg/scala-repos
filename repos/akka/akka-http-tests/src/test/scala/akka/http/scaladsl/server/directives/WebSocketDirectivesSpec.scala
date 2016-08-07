@@ -14,7 +14,10 @@ import akka.http.scaladsl.testkit.WSProbe
 import akka.http.scaladsl.model.headers.`Sec-WebSocket-Protocol`
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.ws._
-import akka.http.scaladsl.server.{UnsupportedWebSocketSubprotocolRejection, ExpectedWebSocketRequestRejection, Route, RoutingSpec}
+import akka.http.scaladsl.server.{
+  UnsupportedWebSocketSubprotocolRejection, ExpectedWebSocketRequestRejection,
+  Route, RoutingSpec
+}
 
 class WebSocketDirectivesSpec extends RoutingSpec {
   "the handleWebSocketMessages directive" should {

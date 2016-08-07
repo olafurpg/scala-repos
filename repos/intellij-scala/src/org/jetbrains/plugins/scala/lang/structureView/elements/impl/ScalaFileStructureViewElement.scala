@@ -8,7 +8,9 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import org.jetbrains.plugins.scala.console.ScalaLanguageConsole
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScTypeAlias, ScValue, ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory

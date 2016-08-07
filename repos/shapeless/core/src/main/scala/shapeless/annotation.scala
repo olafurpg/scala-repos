@@ -30,7 +30,7 @@ import scala.reflect.macros.whitebox
   *   case class First(i: Int)
   *
   *   @First(3) trait Something
-  *   
+  *
   *
   *   val somethingFirst = Annotation[First, Something].apply()
   *   assert(somethingFirst == First(3))
@@ -54,8 +54,8 @@ object Annotation {
       def apply() = annotation
     }
 
-  implicit def materialize[A, T]: Annotation[A, T] = macro AnnotationMacros
-    .materializeAnnotation[A, T]
+  implicit def materialize[A, T]: Annotation[A, T] =
+    macro AnnotationMacros.materializeAnnotation[A, T]
 }
 
 /**
@@ -119,8 +119,8 @@ object Annotations {
       def apply() = annotations
     }
 
-  implicit def materialize[A, T, Out <: HList]: Aux[A, T, Out] = macro AnnotationMacros
-    .materializeAnnotations[A, T, Out]
+  implicit def materialize[A, T, Out <: HList]: Aux[A, T, Out] =
+    macro AnnotationMacros.materializeAnnotations[A, T, Out]
 }
 
 @macrocompat.bundle

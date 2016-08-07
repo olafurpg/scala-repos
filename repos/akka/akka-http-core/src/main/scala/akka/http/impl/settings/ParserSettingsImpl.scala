@@ -4,7 +4,9 @@
 package akka.http.impl.settings
 
 import akka.http.scaladsl.settings.ParserSettings
-import akka.http.scaladsl.settings.ParserSettings.{ErrorLoggingVerbosity, CookieParsingMode}
+import akka.http.scaladsl.settings.ParserSettings.{
+  ErrorLoggingVerbosity, CookieParsingMode
+}
 import com.typesafe.config.Config
 import scala.collection.JavaConverters._
 import akka.http.scaladsl.model.{StatusCode, HttpMethod, Uri}

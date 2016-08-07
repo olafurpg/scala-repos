@@ -5,8 +5,7 @@ package org.ensime.jerk
 import org.scalatest._
 import spray.json._
 
-trait SprayJsonTestSupport {
-  this: Matchers =>
+trait SprayJsonTestSupport { this: Matchers =>
 
   def roundtrip[T: JsonFormat](value: T, via: Option[String] = None): Unit = {
     val json = value.toJson

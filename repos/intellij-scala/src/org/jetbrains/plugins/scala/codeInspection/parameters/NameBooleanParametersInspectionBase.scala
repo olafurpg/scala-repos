@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala
 package codeInspection.parameters
 
-import com.intellij.codeInspection.{LocalInspectionTool, ProblemHighlightType, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalInspectionTool, ProblemHighlightType, ProblemsHolder
+}
 import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.extensions._

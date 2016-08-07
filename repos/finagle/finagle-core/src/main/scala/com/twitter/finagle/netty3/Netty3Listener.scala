@@ -10,7 +10,9 @@ import com.twitter.finagle.stats.{ServerStatsReceiver, StatsReceiver}
 import com.twitter.finagle.transport.Transport
 import com.twitter.finagle.util.{DefaultLogger, DefaultTimer}
 import com.twitter.logging.HasLogLevel
-import com.twitter.util.{CloseAwaitably, Duration, Future, NullMonitor, Promise, Time}
+import com.twitter.util.{
+  CloseAwaitably, Duration, Future, NullMonitor, Promise, Time
+}
 import java.net.SocketAddress
 import java.util.IdentityHashMap
 import java.util.logging.Level
@@ -19,7 +21,9 @@ import org.jboss.netty.channel._
 import org.jboss.netty.channel.group._
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory
 import org.jboss.netty.handler.ssl._
-import org.jboss.netty.handler.timeout.{ReadTimeoutException, ReadTimeoutHandler}
+import org.jboss.netty.handler.timeout.{
+  ReadTimeoutException, ReadTimeoutHandler
+}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 

@@ -99,7 +99,7 @@ class ModelView[T <: Mapper[T]](var entity: T, val snippet: ModelSnippet[T]) {
   var redirectOnSave: Option[String] = Some("list")
 
   /**
-    * Loads this entity into the snippet so it can be edited 
+    * Loads this entity into the snippet so it can be edited
     */
   def load = snippet.load(entity)
 

@@ -135,8 +135,7 @@ class NettyTransportSpec extends WordSpec with Matchers with BindBehaviour {
   }
 }
 
-trait BindBehaviour {
-  this: WordSpec with Matchers ⇒
+trait BindBehaviour { this: WordSpec with Matchers ⇒
   import akka.remote.transport.netty.NettyTransportSpec._
 
   def theOneWhoKnowsTheDifferenceBetweenBoundAndRemotingAddress(

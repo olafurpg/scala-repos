@@ -3,7 +3,9 @@
   */
 package docs.io
 
-import java.net.{InetAddress, InetSocketAddress, NetworkInterface, StandardProtocolFamily}
+import java.net.{
+  InetAddress, InetSocketAddress, NetworkInterface, StandardProtocolFamily
+}
 import java.net.DatagramSocket
 import java.nio.channels.DatagramChannel
 

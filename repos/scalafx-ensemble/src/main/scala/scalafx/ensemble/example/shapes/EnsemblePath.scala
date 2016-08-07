@@ -31,7 +31,10 @@ import scalafx.ensemble.commons.EnsembleExample
 import scalafx.geometry.Insets
 import scalafx.scene.layout.HBox
 import scalafx.scene.paint.Color
-import scalafx.scene.shape.{ArcTo, ClosePath, CubicCurveTo, HLineTo, LineTo, MoveTo, Path, QuadCurveTo, VLineTo}
+import scalafx.scene.shape.{
+  ArcTo, ClosePath, CubicCurveTo, HLineTo, LineTo, MoveTo, Path, QuadCurveTo,
+  VLineTo
+}
 
 class EnsemblePath extends EnsembleExample {
 

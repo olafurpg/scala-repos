@@ -14,7 +14,9 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.Conformance
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypingContext
+}
 
 /**
   * User: Alexander Podkhalyuzin

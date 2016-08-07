@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-14 Miles Sabin 
+ * Copyright (c) 2012-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package shapeless.examples
 
 /*
  * Examples of Lens usage.
- * 
+ *
  * @author Miles Sabin
  */
 object LenseExamples extends App {
@@ -76,7 +76,7 @@ object LenseExamples extends App {
   // Create a product lens spanning Person and Address
   val nameAgeCityLens = nameLens ~ ageLens ~ cityLens
 
-  val nac1 = nameAgeCityLens.get(person) // Inferred type is the expected tuple type 
+  val nac1 = nameAgeCityLens.get(person) // Inferred type is the expected tuple type
   typed[(String, Int, String)](nac1)
   assert(nac1 == ("Joe Grey", 37, "Brighton"))
   println(nac1)

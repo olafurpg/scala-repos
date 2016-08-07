@@ -31,12 +31,12 @@ class RequestSemaphoreFilterTest extends FunSuite {
 
     val factory = stk.make(params)
 
-    for (_ <- 0 to max) factory().flatMap(_ (1))
+    for (_ <- 0 to max) factory().flatMap(_(1))
 
     assert(sr.gauges(Seq("request_concurrency"))() == max)
     assert(sr.gauges(Seq("request_queue_size"))() == 0.0)
 
-    for (_ <- 0 to max) factory().flatMap(_ (1))
+    for (_ <- 0 to max) factory().flatMap(_(1))
 
     assert(sr.gauges(Seq("request_concurrency"))() == max)
     assert(sr.gauges(Seq("request_queue_size"))() == 0.0)

@@ -22,8 +22,7 @@ import spire.std.bigInteger._
 sealed abstract class SafeLong
     extends ScalaNumber
     with ScalaNumericConversions
-    with Ordered[SafeLong] {
-  lhs =>
+    with Ordered[SafeLong] { lhs =>
 
   def isZero: Boolean
 

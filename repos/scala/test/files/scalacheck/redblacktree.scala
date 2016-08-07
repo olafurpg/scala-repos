@@ -5,7 +5,6 @@ import Gen._
 
 /*
 Properties of a Red & Black Tree:
-
 A node is either red or black.
 The root is black. (This rule is used in some definitions and not others. Since the
 root can always be changed from red to black but not necessarily vice-versa this

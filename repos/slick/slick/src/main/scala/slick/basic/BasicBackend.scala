@@ -3,7 +3,9 @@ package slick.basic
 import scala.language.existentials
 
 import java.io.Closeable
-import java.util.concurrent.atomic.{AtomicReferenceArray, AtomicBoolean, AtomicLong}
+import java.util.concurrent.atomic.{
+  AtomicReferenceArray, AtomicBoolean, AtomicLong
+}
 
 import com.typesafe.config.Config
 
@@ -57,8 +59,7 @@ trait BasicBackend { self =>
   def createDatabase(config: Config, path: String): Database
 
   /** A database instance to which connections can be created. */
-  trait DatabaseDef extends Closeable {
-    this: Database =>
+  trait DatabaseDef extends Closeable { this: Database =>
 
     /** Create a new session. The session needs to be closed explicitly by calling its close() method. */
     def createSession(): Session

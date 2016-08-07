@@ -1,7 +1,10 @@
 package slick.lifted
 
 import annotation.implicitNotFound
-import slick.ast.{OptionType, FieldSymbol, OptionApply, FunctionSymbol, BaseTypedType, Node, TypedType}
+import slick.ast.{
+  OptionType, FieldSymbol, OptionApply, FunctionSymbol, BaseTypedType, Node,
+  TypedType
+}
 
 trait OptionMapper[BR, R] extends (Rep[BR] => Rep[R]) {
   def lift: Boolean

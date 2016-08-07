@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -25,7 +25,10 @@ import org.apache.log4j.{Level, Logger}
 import kafka.zk.ZooKeeperTestHarness
 import org.junit.Test
 import scala.collection._
-import kafka.common.{TopicAndPartition, ErrorMapping, UnknownTopicOrPartitionException, OffsetOutOfRangeException}
+import kafka.common.{
+  TopicAndPartition, ErrorMapping, UnknownTopicOrPartitionException,
+  OffsetOutOfRangeException
+}
 import kafka.utils.{StaticPartitioner, TestUtils, CoreUtils}
 import kafka.serializer.StringEncoder
 import java.util.Properties

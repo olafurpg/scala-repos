@@ -33,7 +33,7 @@ object TagsTest extends Properties("Tags") {
       val tm2: TagMap = tm
         .updated(etag, absSize)
         .updated(Tags.All, tm.getOrElse(Tags.All, 0) + absSize)
-      ( s"TagMap: $tm2") |: (excl(etag)(tm2) == (absSize <= 1))
+      (s"TagMap: $tm2") |: (excl(etag)(tm2) == (absSize <= 1))
     }
 
   property("exclusive always allows a group of size one") = forAll {

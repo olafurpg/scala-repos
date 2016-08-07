@@ -268,7 +268,7 @@ private[testutil] trait AbstractComparator extends Assertions {
   }
 
   //////////////////
-  // HELPER METHODS 
+  // HELPER METHODS
   //////////////////
 
   /**
@@ -286,7 +286,7 @@ private[testutil] trait AbstractComparator extends Assertions {
     Modifier.isPublic(method.getModifiers)
 
   ////////////////////
-  // ABSTRACT METHODS 
+  // ABSTRACT METHODS
   ////////////////////
 
   /**
@@ -304,7 +304,7 @@ private[testutil] trait AbstractComparator extends Assertions {
   protected def getDesirableMethodName(javaMethod: Method): String
 
   //////////////////
-  // PUBLIC METHODS 
+  // PUBLIC METHODS
   //////////////////
 
   /**

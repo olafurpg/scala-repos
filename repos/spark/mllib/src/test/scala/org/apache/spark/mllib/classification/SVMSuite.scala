@@ -25,7 +25,9 @@ import breeze.linalg.{DenseVector => BDV}
 import org.apache.spark.{SparkException, SparkFunSuite}
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression._
-import org.apache.spark.mllib.util.{LocalClusterSparkContext, MLlibTestSparkContext}
+import org.apache.spark.mllib.util.{
+  LocalClusterSparkContext, MLlibTestSparkContext
+}
 import org.apache.spark.util.Utils
 
 object SVMSuite {

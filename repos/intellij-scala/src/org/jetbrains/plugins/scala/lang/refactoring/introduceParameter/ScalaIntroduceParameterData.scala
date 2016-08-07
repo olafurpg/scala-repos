@@ -3,7 +3,9 @@ package org.jetbrains.plugins.scala.lang.refactoring.introduceParameter
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi._
-import com.intellij.refactoring.introduceParameter.{IntroduceParameterData, JavaExpressionWrapper}
+import com.intellij.refactoring.introduceParameter.{
+  IntroduceParameterData, JavaExpressionWrapper
+}
 import gnu.trove.TIntArrayList
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
 import org.jetbrains.plugins.scala.lang.psi.types.ScType

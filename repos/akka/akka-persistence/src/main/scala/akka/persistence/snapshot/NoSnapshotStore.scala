@@ -4,7 +4,9 @@
 
 package akka.persistence.snapshot
 
-import akka.persistence.{SelectedSnapshot, SnapshotMetadata, SnapshotSelectionCriteria}
+import akka.persistence.{
+  SelectedSnapshot, SnapshotMetadata, SnapshotSelectionCriteria
+}
 
 import scala.concurrent.Future
 

@@ -22,7 +22,10 @@ import akka.http.scaladsl.settings.ServerSettings
 import akka.http.impl.engine.HttpConnectionTimeoutException
 import akka.http.impl.engine.parsing.ParserOutput._
 import akka.http.impl.engine.parsing._
-import akka.http.impl.engine.rendering.{HttpResponseRendererFactory, ResponseRenderingContext, ResponseRenderingOutput}
+import akka.http.impl.engine.rendering.{
+  HttpResponseRendererFactory, ResponseRenderingContext,
+  ResponseRenderingOutput
+}
 import akka.http.impl.engine.ws._
 import akka.http.impl.util._
 import akka.http.scaladsl.util.FastFuture.EnhancedFuture
@@ -393,8 +396,7 @@ private[http] object HttpServerBluePrint {
       materializer: Materializer)
       extends AtomicReference[Future[TimeoutSetup]]
       with TimeoutAccess
-      with (HttpRequest ⇒ HttpResponse) {
-    self ⇒
+      with (HttpRequest ⇒ HttpResponse) { self ⇒
     import materializer.executionContext
 
     set {

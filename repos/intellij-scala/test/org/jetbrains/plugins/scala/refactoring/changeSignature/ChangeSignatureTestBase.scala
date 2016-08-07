@@ -17,7 +17,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types
 import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.changeInfo.ScalaChangeInfo
-import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{ScalaChangeSignatureProcessor, ScalaParameterInfo}
+import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{
+  ScalaChangeSignatureProcessor, ScalaParameterInfo
+}
 import org.junit.Assert._
 
 /**

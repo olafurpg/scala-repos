@@ -37,7 +37,10 @@ import scalafx.scene.input.MouseEvent
 import scalafx.scene.paint.{Color, PhongMaterial}
 import scalafx.scene.shape.{MeshView, TriangleMesh}
 import scalafx.scene.transform.Rotate
-import scalafx.scene.{AmbientLight, Group, Node, PerspectiveCamera, PointLight, Scene, SceneAntialiasing}
+import scalafx.scene.{
+  AmbientLight, Group, Node, PerspectiveCamera, PointLight, Scene,
+  SceneAntialiasing
+}
 
 /**
   * Demonstrates custom 3D shapes.

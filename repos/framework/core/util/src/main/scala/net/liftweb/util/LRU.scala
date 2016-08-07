@@ -31,22 +31,17 @@ class LRU[KeyType, ValueType](size: Int, loadFactor: Box[Float])
   def this(size: Int) = this(size, Empty)
 
   /*
-
   private val map = loadFactor match {
     case Full(lf) => new LRUMap(size, lf)
     case _ => new LRUMap(size)
   }
-
   def update(k: KeyType, v: ValueType) {
     map.put(k, v)
   }
-
   def remove(k: KeyType) = map.remove(k)
-
   def get(k: KeyType): Box[ValueType] =
   if (map.containsKey(k)) Full(this.apply(k))
   else Empty
-
   def apply(k: KeyType): ValueType = map.get(k).asInstanceOf[ValueType]
   def contains(k: KeyType): Boolean = map.containsKey(k)
   def keys: List[KeyType] = map.keySet().toList.map(_.asInstanceOf[KeyType])

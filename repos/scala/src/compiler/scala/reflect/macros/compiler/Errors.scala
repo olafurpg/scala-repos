@@ -99,8 +99,8 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
       def preprocess(tpe: Type) = if (untype) untypeMetalevel(tpe) else tpe
       var pssPart = (pss map
             (ps =>
-                  ps map (p => p.defStringSeenAs(preprocess(p.info))) mkString
-                    ("(", ", ", ")"))).mkString
+               ps map (p => p.defStringSeenAs(preprocess(p.info))) mkString
+                 ("(", ", ", ")"))).mkString
       if (abbreviate) pssPart = abbreviateCoreAliases(pssPart)
       var retPart = preprocess(restpe).toString
       if (abbreviate || macroDdef.tpt.tpe == null)

@@ -70,24 +70,24 @@ private[prediction] case class FakeEvalResult() extends BaseEvaluatorResult {
 }
 
 /** FakeRun allows user to implement custom function under the exact enviroment
-  * as other PredictionIO workflow. 
+  * as other PredictionIO workflow.
   *
-  * Useful for developing new features. Only need to extend this trait and 
-  * implement a function: (SparkContext => Unit). For example, the code below 
+  * Useful for developing new features. Only need to extend this trait and
+  * implement a function: (SparkContext => Unit). For example, the code below
   * can be run with `pio eval HelloWorld`.
   *
   * {{{
   * object HelloWorld extends FakeRun {
   *   // func defines the function pio runs, must have signature (SparkContext => Unit).
   *   func = f
-  * 
+  *
   *   def f(sc: SparkContext): Unit {
   *     val logger = Logger[this.type]
   *     logger.info("HelloWorld")
   *   }
   * }
-  * }}} 
-  * 
+  * }}}
+  *
   */
 @Experimental
 trait FakeRun extends Evaluation with EngineParamsGenerator {

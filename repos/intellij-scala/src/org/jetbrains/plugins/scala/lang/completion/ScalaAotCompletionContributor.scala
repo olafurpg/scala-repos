@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala.lang.completion
 
 import com.intellij.codeInsight.completion._
-import com.intellij.codeInsight.lookup.{LookupElement, LookupElementDecorator, LookupElementPresentation, LookupElementRenderer}
+import com.intellij.codeInsight.lookup.{
+  LookupElement, LookupElementDecorator, LookupElementPresentation,
+  LookupElementRenderer
+}
 import com.intellij.openapi.util.TextRange
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
@@ -13,7 +16,9 @@ import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypedDeclaration, ScValueDeclaration, ScVariableDeclaration}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypedDeclaration, ScValueDeclaration, ScVariableDeclaration
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings

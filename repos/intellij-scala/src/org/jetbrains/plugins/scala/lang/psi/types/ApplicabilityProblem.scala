@@ -2,14 +2,18 @@ package org.jetbrains.plugins.scala.lang.psi.types
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt, ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterClause
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, TypeParameter}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  Parameter, TypeParameter
+}
 
 /**
   * Pavel.Fatin, 02.06.2010
   */
-//TODO must be abstract with no description when completed 
+//TODO must be abstract with no description when completed
 sealed class ApplicabilityProblem(val description: String = "unknown")
 
 object ApplicabilityProblem {
@@ -33,7 +37,7 @@ case class ExpansionForNonRepeatedParameter(argument: ScExpression)
 case class ElementApplicabilityProblem(element: PsiElement,
                                        actual: ScType,
                                        found: ScType)
-    extends ApplicabilityProblem("42") //todo 
+    extends ApplicabilityProblem("42") //todo
 
 // applicability problem
 case class DoesNotTakeParameters() extends ApplicabilityProblem

@@ -2,7 +2,9 @@ package com.twitter.finagle.http.codec
 
 import org.jboss.netty.buffer.ChannelBuffer
 import org.jboss.netty.handler.codec.embedder.EncoderEmbedder
-import org.jboss.netty.handler.codec.http.{HttpContentCompressor, HttpHeaders, HttpMessage}
+import org.jboss.netty.handler.codec.http.{
+  HttpContentCompressor, HttpHeaders, HttpMessage
+}
 
 /**
   * Custom compressor that only handles text-like content-types with the default

@@ -1,7 +1,9 @@
 package mesosphere.marathon.core.appinfo.impl
 
 import mesosphere.marathon.MarathonSchedulerService
-import mesosphere.marathon.core.appinfo.{AppInfo, EnrichedTask, TaskCounts, TaskStatsByVersion}
+import mesosphere.marathon.core.appinfo.{
+  AppInfo, EnrichedTask, TaskCounts, TaskStatsByVersion
+}
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker

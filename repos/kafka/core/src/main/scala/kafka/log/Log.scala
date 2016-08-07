@@ -26,7 +26,10 @@ import java.util.concurrent.{ConcurrentNavigableMap, ConcurrentSkipListMap}
 import java.util.concurrent.atomic._
 import java.text.NumberFormat
 
-import org.apache.kafka.common.errors.{CorruptRecordException, OffsetOutOfRangeException, RecordBatchTooLargeException, RecordTooLargeException}
+import org.apache.kafka.common.errors.{
+  CorruptRecordException, OffsetOutOfRangeException,
+  RecordBatchTooLargeException, RecordTooLargeException
+}
 import org.apache.kafka.common.record.TimestampType
 
 import scala.collection.JavaConversions

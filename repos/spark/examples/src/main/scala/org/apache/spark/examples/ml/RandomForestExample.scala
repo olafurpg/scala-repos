@@ -26,9 +26,13 @@ import scopt.OptionParser
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.examples.mllib.AbstractParams
 import org.apache.spark.ml.{Pipeline, PipelineStage}
-import org.apache.spark.ml.classification.{RandomForestClassificationModel, RandomForestClassifier}
+import org.apache.spark.ml.classification.{
+  RandomForestClassificationModel, RandomForestClassifier
+}
 import org.apache.spark.ml.feature.{StringIndexer, VectorIndexer}
-import org.apache.spark.ml.regression.{RandomForestRegressionModel, RandomForestRegressor}
+import org.apache.spark.ml.regression.{
+  RandomForestRegressionModel, RandomForestRegressor
+}
 import org.apache.spark.sql.DataFrame
 
 /**

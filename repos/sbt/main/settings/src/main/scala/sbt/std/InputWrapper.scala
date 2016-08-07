@@ -159,18 +159,18 @@ sealed abstract class MacroTaskValue[T] {
 }
 sealed abstract class MacroValue[T] {
   @compileTimeOnly(
-      "`value` can only be used within a task or setting macro, such as :=, +=, ++=, Def.task, or Def.setting.") def value: T = macro InputWrapper
-    .valueMacroImpl[T]
+      "`value` can only be used within a task or setting macro, such as :=, +=, ++=, Def.task, or Def.setting.") def value: T =
+    macro InputWrapper.valueMacroImpl[T]
 }
 sealed abstract class ParserInput[T] {
   @compileTimeOnly(
-      "`parsed` can only be used within an input task macro, such as := or Def.inputTask.") def parsed: T = macro ParserInput
-    .parsedMacroImpl[T]
+      "`parsed` can only be used within an input task macro, such as := or Def.inputTask.") def parsed: T =
+    macro ParserInput.parsedMacroImpl[T]
 }
 sealed abstract class InputEvaluated[T] {
   @compileTimeOnly(
-      "`evaluated` can only be used within an input task macro, such as := or Def.inputTask.") def evaluated: T = macro InputWrapper
-    .valueMacroImpl[T]
+      "`evaluated` can only be used within an input task macro, such as := or Def.inputTask.") def evaluated: T =
+    macro InputWrapper.valueMacroImpl[T]
 }
 sealed abstract class ParserInputTask[T] {
   @compileTimeOnly(
@@ -180,8 +180,8 @@ sealed abstract class ParserInputTask[T] {
 sealed abstract class MacroPrevious[T] {
   @compileTimeOnly(
       "`previous` can only be used within a task macro, such as :=, +=, ++=, or Def.task.") def previous(
-      implicit format: sbinary.Format[T]): Option[T] = macro InputWrapper
-    .previousMacroImpl[T]
+      implicit format: sbinary.Format[T]): Option[T] =
+    macro InputWrapper.previousMacroImpl[T]
 }
 
 /** Implementation detail.  The wrap method temporarily holds the input parser (as a Tree, at compile time) until the input task macro processes it. */

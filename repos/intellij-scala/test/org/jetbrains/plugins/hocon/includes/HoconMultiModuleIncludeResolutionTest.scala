@@ -4,7 +4,9 @@ import java.io.File
 
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.{DependencyScope, LibraryOrderEntry, ModuleRootManager, OrderRootType}
+import com.intellij.openapi.roots.{
+  DependencyScope, LibraryOrderEntry, ModuleRootManager, OrderRootType
+}
 import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile}
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.builders.JavaModuleFixtureBuilder

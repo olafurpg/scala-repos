@@ -6,8 +6,7 @@ import org.ensime.sexp._
 import org.ensime.sexp.formats._
 import scalariform.formatter.preferences._
 
-trait ScalariformFormat {
-  this: BasicFormats =>
+trait ScalariformFormat { this: BasicFormats =>
 
   // TODO sexp formatting should live in server.protocol
 

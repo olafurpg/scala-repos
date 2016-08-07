@@ -27,7 +27,10 @@ import scala.reflect.ClassTag
 import org.apache.spark.api.java.{JavaPairRDD, JavaRDD, JavaRDDLike}
 import org.apache.spark.api.java.JavaPairRDD._
 import org.apache.spark.api.java.JavaSparkContext.fakeClassTag
-import org.apache.spark.api.java.function.{Function => JFunction, Function2 => JFunction2, Function3 => JFunction3, VoidFunction => JVoidFunction, VoidFunction2 => JVoidFunction2, _}
+import org.apache.spark.api.java.function.{
+  Function => JFunction, Function2 => JFunction2, Function3 => JFunction3,
+  VoidFunction => JVoidFunction, VoidFunction2 => JVoidFunction2, _
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.api.java.JavaDStream._

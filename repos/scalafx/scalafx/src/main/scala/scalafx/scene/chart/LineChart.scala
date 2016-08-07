@@ -33,7 +33,9 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty}
 import scalafx.collections.ObservableBuffer
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 
 object LineChart {
   implicit def sfxLineChart2jfx[X, Y](

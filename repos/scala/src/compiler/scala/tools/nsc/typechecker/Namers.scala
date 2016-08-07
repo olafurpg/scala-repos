@@ -54,8 +54,7 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
 
   abstract class Namer(val context: Context)
       extends MethodSynth
-      with NamerContextErrors {
-    thisNamer =>
+      with NamerContextErrors { thisNamer =>
     // overridden by the presentation compiler
     def saveDefaultGetter(meth: Symbol, default: Symbol) {}
 
@@ -573,9 +572,9 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
             val defSym =
               context.prefix.member(to) filter
                 (sym =>
-                      sym.exists && context.isAccessible(sym,
-                                                         context.prefix,
-                                                         superAccess = false))
+                   sym.exists && context.isAccessible(sym,
+                                                      context.prefix,
+                                                      superAccess = false))
 
             defSym andAlso (typer.permanentlyHiddenWarning(pos, to0, _))
           }

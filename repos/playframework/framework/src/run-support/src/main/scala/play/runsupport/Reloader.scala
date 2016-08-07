@@ -9,7 +9,9 @@ import java.security.{PrivilegedAction, AccessController}
 import java.util.jar.JarFile
 import play.api.PlayException
 import play.core.{Build, BuildLink, BuildDocHandler}
-import play.runsupport.classloader.{ApplicationClassLoaderProvider, DelegatingClassLoader}
+import play.runsupport.classloader.{
+  ApplicationClassLoaderProvider, DelegatingClassLoader
+}
 import sbt._
 
 object Reloader {

@@ -2,7 +2,10 @@ package sbt
 package compiler
 
 import scala.reflect.Manifest
-import scala.tools.nsc.{ast, interpreter, io, reporters, util, CompilerCommand, Global, Phase, Settings}
+import scala.tools.nsc.{
+  ast, interpreter, io, reporters, util, CompilerCommand, Global, Phase,
+  Settings
+}
 import interpreter.AbstractFileClassLoader
 import io.{AbstractFile, PlainFile, VirtualDirectory}
 import ast.parser.Tokens

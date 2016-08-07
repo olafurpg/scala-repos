@@ -36,7 +36,6 @@ package api
   *  Enumeration value references are represented as instances of [[scala.reflect.api.Symbols#Symbol]], which on JVM point to methods
   *  that return underlying enum values. To inspect an underlying enumeration or to get runtime value of a reference to an enum,
   *  one should use a [[scala.reflect.api.Mirrors#RuntimeMirror]] (the simplest way to get such a mirror is again [[scala.reflect.runtime.package#currentMirror]]).
-
   *  {{{
   *  enum JavaSimpleEnumeration { FOO, BAR }
   *

@@ -8,7 +8,9 @@ import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.finagle.transport.Transport
 import com.twitter.io.Buf
 import com.twitter.util.{Future, Promise, Return, Throw}
-import org.jboss.netty.handler.codec.http.{HttpRequest, HttpChunk, HttpResponse}
+import org.jboss.netty.handler.codec.http.{
+  HttpRequest, HttpChunk, HttpResponse
+}
 
 /**
   * Stream chunks into StreamResponses.

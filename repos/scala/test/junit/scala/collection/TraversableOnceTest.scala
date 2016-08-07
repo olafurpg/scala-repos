@@ -42,7 +42,7 @@ class TraversableOnceTest {
   }
 
   // Ensure that it always returns the first match if more than one element have the same largest/smallest f(x).
-  // Note that this behavior is not explicitly stated before. 
+  // Note that this behavior is not explicitly stated before.
   // To make it compatible with the previous implementation, I add this behavior to docs.
   @Test
   def testReturnTheFirstMatch() = {

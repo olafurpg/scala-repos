@@ -3,7 +3,9 @@ package akka.stream
 import akka.event._
 import akka.stream.impl.fusing.{GraphInterpreterSpecKit, GraphStages}
 import akka.stream.impl.fusing.GraphStages
-import akka.stream.impl.fusing.GraphInterpreter.{DownstreamBoundaryStageLogic, UpstreamBoundaryStageLogic}
+import akka.stream.impl.fusing.GraphInterpreter.{
+  DownstreamBoundaryStageLogic, UpstreamBoundaryStageLogic
+}
 import akka.stream.stage._
 import org.openjdk.jmh.annotations._
 

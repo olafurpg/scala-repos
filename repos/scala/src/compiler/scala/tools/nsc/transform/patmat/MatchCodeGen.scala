@@ -292,9 +292,9 @@ trait MatchCodeGen extends Interface {
                         next: Tree): Tree = {
           val rest =
             (// only emit a local val for `nextBinder` if it's actually referenced in `next`
-             if (next.exists(_.symbol eq nextBinder))
-               BLOCK(ValDef(nextBinder, res), next)
-             else next)
+            if (next.exists(_.symbol eq nextBinder))
+              BLOCK(ValDef(nextBinder, res), next)
+            else next)
           ifThenElseZero(cond, rest)
         }
 

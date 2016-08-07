@@ -54,8 +54,8 @@ import scala.reflect.macros.whitebox
 case class Cached[+T](value: T) extends AnyVal
 
 object Cached {
-  implicit def materialize[I]: Cached[I] = macro CachedMacros
-    .materializeCached[I]
+  implicit def materialize[I]: Cached[I] =
+    macro CachedMacros.materializeCached[I]
 
   def implicitly[T](implicit cached: Cached[T]): T = cached.value
 }

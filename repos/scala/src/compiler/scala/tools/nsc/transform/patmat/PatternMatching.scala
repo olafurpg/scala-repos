@@ -163,28 +163,21 @@ trait Interface extends ast.TreeDSL {
 
   /** Interface with user-defined match monad?
     * if there's a <code>__match</code> in scope, we use this as the match strategy, assuming it conforms to MatchStrategy as defined below:
-
        {{{
        type Matcher[P[_], M[+_], A] = {
          def flatMap[B](f: P[A] => M[B]): M[B]
          def orElse[B >: A](alternative: => M[B]): M[B]
        }
-
        abstract class MatchStrategy[P[_], M[+_]] {
          // runs the matcher on the given input
          def runOrElse[T, U](in: P[T])(matcher: P[T] => M[U]): P[U]
-
          def zero: M[Nothing]
          def one[T](x: P[T]): M[T]
          def guard[T](cond: P[Boolean], then: => P[T]): M[T]
        }
        }}}
-
     * P and M are derived from one's signature (`def one[T](x: P[T]): M[T]`)
-
-
     * if no <code>__match</code> is found, we assume the following implementation (and generate optimized code accordingly)
-
        {{{
        object __match extends MatchStrategy[({type Id[x] = x})#Id, Option] {
          def zero = None
@@ -194,7 +187,6 @@ trait Interface extends ast.TreeDSL {
          def runOrElse[T, U](x: T)(f: T => Option[U]): U = f(x) getOrElse (throw new MatchError(x))
        }
        }}}
-
     */
   trait MatchMonadInterface {
     val typer: Typer

@@ -4,7 +4,10 @@ package com.twitter.finagle.netty3.channel
   * A Netty channel handler that reliably closes its underlying
   * connection (when it exists).
   */
-import org.jboss.netty.channel.{SimpleChannelHandler, LifeCycleAwareChannelHandler, ChannelHandlerContext, ChannelStateEvent, Channel, ChannelFutureListener, ChannelFuture}
+import org.jboss.netty.channel.{
+  SimpleChannelHandler, LifeCycleAwareChannelHandler, ChannelHandlerContext,
+  ChannelStateEvent, Channel, ChannelFutureListener, ChannelFuture
+}
 
 import com.twitter.finagle.netty3.LatentChannelFuture
 

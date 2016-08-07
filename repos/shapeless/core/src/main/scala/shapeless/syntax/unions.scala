@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-15 Miles Sabin 
+ * Copyright (c) 2011-15 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import tag.@@
 
 /**
   * Discriminated union operations on `Coproducts`'s with field-like elements.
-  * 
+  *
   * @author Miles Sabin
   */
 final class UnionOps[C <: Coproduct](val c: C)
@@ -84,7 +84,7 @@ final class UnionOps[C <: Coproduct](val c: C)
 
 /**
   * Discriminated union wrapper providing `selectDynamic` access to fields.
-  * 
+  *
   * @author Cody Allen
   */
 final case class DynamicUnionOps[C <: Coproduct](c: C) extends Dynamic {

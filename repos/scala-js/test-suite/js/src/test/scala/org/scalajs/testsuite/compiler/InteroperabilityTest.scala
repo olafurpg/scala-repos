@@ -289,7 +289,9 @@ class InteroperabilityTest {
     val args3 = jsnew(ctor)(elems: _*).args
     assertArrayDynEquals(Array("plop", 42, 51), args3)
 
-    import org.scalajs.testsuite.compiler.{InteroperabilityTestVariadicCtor => C}
+    import org.scalajs.testsuite.compiler.{
+      InteroperabilityTestVariadicCtor => C
+    }
     assertArrayEquals(Array(), new C().args)
     assertArrayEquals(Array(3, 6), new C(3, 6).args)
     assertArrayEquals(Array("hello", false), new C("hello", false).args)

@@ -7,15 +7,23 @@ package search
 import com.intellij.psi._
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.OverridingMethodsSearch.SearchParameters
-import com.intellij.psi.search.searches.{ClassInheritorsSearch, OverridingMethodsSearch}
+import com.intellij.psi.search.searches.{
+  ClassInheritorsSearch, OverridingMethodsSearch
+}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.{Processor, QueryExecutor}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefinition, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScNamedElement}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTemplateDefinition, ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions, ScNamedElement
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.stubs.util.ScalaStubsUtil
 import org.jetbrains.plugins.scala.lang.psi.types._

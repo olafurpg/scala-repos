@@ -4,7 +4,9 @@ import com.twitter.finagle.tracing.{SpanId, TraceId, Flags}
 import com.twitter.finagle.{Dtab, Dentry, NameTree, Path}
 import com.twitter.io.Charsets
 import com.twitter.util.{Duration, Time, Updatable}
-import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers, ReadOnlyChannelBuffer}
+import org.jboss.netty.buffer.{
+  ChannelBuffer, ChannelBuffers, ReadOnlyChannelBuffer
+}
 import scala.collection.mutable.ArrayBuffer
 
 /**

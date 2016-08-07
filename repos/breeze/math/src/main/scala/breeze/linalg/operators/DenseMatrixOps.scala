@@ -22,8 +22,7 @@ import scalaxy.debug._
 trait DenseMatrixMultiplyStuff
     extends DenseMatrixOps
     with DenseMatrixMultOps
-    with LowPriorityDenseMatrix {
-  this: DenseMatrix.type =>
+    with LowPriorityDenseMatrix { this: DenseMatrix.type =>
 
   // <editor-fold defaultstate="collapsed" desc=" OpMulMatrix implementations ">
 
@@ -339,8 +338,7 @@ trait DenseMatrixMultiplyStuff
 // TODO: fix expand to allow us to remove this code duplication
 trait DenseMatrixFloatMultiplyStuff
     extends DenseMatrixOps
-    with DenseMatrixMultOps {
-  this: DenseMatrix.type =>
+    with DenseMatrixMultOps { this: DenseMatrix.type =>
 
   // <editor-fold defaultstate="collapsed" desc=" OpMulMatrix implementations ">
 
@@ -611,8 +609,7 @@ trait DenseMatrixFloatMultiplyStuff
   // </editor-fold>
 }
 
-trait DenseMatrixOps {
-  this: DenseMatrix.type =>
+trait DenseMatrixOps { this: DenseMatrix.type =>
 
   // <editor-fold defaultstate="collapsed" desc=" implicit implementations for OpXXX.InPlaceImpl2[DenseMatrix[T], DenseMatrix[T]] ">
   // don't remove
@@ -940,8 +937,7 @@ trait DenseMatrixOps {
   // </editor-fold>
 }
 
-trait DenseMatrixOpsLowPrio {
-  this: DenseMatrixOps =>
+trait DenseMatrixOpsLowPrio { this: DenseMatrixOps =>
   // LOL, if we explicitly annotate the type, then the implicit resolution thing will load this recursively.
   // If we don't, then everything works ok.
 

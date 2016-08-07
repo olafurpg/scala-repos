@@ -10,10 +10,7 @@ object OuterCircle {
 /*
 object OuterCircle {
   import java.awt.geom.Ellipse2D
-
   class NameAfterRename(x: Double, y: Double) extends Ellipse2D.Double(x, y, 1, 2)
-
-
   object foo {
     val c: /*caret*/ NameAfterRename = null
   }

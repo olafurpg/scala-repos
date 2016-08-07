@@ -15,7 +15,9 @@ import com.intellij.openapi.util.{Comparing, Ref}
 import com.intellij.psi.{util => _, _}
 import org.jetbrains.annotations.{NotNull, Nullable}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 import scala.collection.mutable

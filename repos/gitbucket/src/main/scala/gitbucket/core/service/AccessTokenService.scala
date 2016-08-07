@@ -60,8 +60,8 @@ trait AccessTokenService {
       implicit s: Session): Unit =
     AccessTokens filter
       (t =>
-            t.userName === userName.bind &&
-              t.accessTokenId === accessTokenId) delete
+         t.userName === userName.bind &&
+           t.accessTokenId === accessTokenId) delete
 }
 
 object AccessTokenService extends AccessTokenService

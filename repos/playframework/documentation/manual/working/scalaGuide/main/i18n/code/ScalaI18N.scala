@@ -8,7 +8,9 @@ package scalaguide.i18n.scalai18n {
 
   import play.api._
   import play.api.mvc._
-  import play.api.i18n.{DefaultLangs, DefaultMessagesApi, Messages, MessagesApi}
+  import play.api.i18n.{
+    DefaultLangs, DefaultMessagesApi, Messages, MessagesApi
+  }
 
   @RunWith(classOf[JUnitRunner])
   class ScalaI18nSpec extends PlaySpecification with Controller {

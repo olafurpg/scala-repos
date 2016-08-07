@@ -195,7 +195,7 @@ class HTTPRequestServlet(val req: HttpServletRequest,
   def snapshot: HTTPRequest = new OfflineRequestSnapshot(this, provider)
 
   private lazy val asyncProvider: Box[ServletAsyncProvider] =
-    LiftRules.theServletAsyncProvider.map(_ (this))
+    LiftRules.theServletAsyncProvider.map(_(this))
 
   def resumeInfo: Option[(Req, LiftResponse)] =
     asyncProvider.flatMap(_.resumeInfo)

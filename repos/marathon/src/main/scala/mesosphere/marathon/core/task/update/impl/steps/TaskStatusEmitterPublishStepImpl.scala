@@ -4,7 +4,9 @@ import javax.inject.Inject
 
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.bus.TaskStatusObservables.TaskStatusUpdate
-import mesosphere.marathon.core.task.bus.{MarathonTaskStatus, TaskStatusEmitter}
+import mesosphere.marathon.core.task.bus.{
+  MarathonTaskStatus, TaskStatusEmitter
+}
 import mesosphere.marathon.core.task.update.TaskStatusUpdateStep
 import mesosphere.marathon.state.Timestamp
 import org.apache.mesos.Protos.TaskStatus

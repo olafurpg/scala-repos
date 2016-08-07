@@ -12,10 +12,18 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTrait
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, ScMethodType, ScTypePolymorphicType, TypeParameter}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil, types}
-import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceExpression, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  Parameter, ScMethodType, ScTypePolymorphicType, TypeParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.{
+  ScalaPsiElement, ScalaPsiUtil, types
+}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolvableReferenceExpression, ScalaResolveResult
+}
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_10
 import org.jetbrains.plugins.scala.project._
 

@@ -6,12 +6,16 @@ import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.{Module => IJModule}
 import com.intellij.openapi.project.{Project => IJProject}
-import com.intellij.openapi.vcs.changes.{CurrentContentRevision, SimpleContentRevision}
+import com.intellij.openapi.vcs.changes.{
+  CurrentContentRevision, SimpleContentRevision
+}
 import com.intellij.openapi.vfs.{VfsUtil, VfsUtilCore, VirtualFile}
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.vcsUtil.VcsUtil
 import org.jetbrains.sbt.project.SbtProjectSystem
-import org.jetbrains.sbt.project.modifier.ui.{BuildFileChange, BuildFileModifiedStatus, ChangesConfirmationDialog}
+import org.jetbrains.sbt.project.modifier.ui.{
+  BuildFileChange, BuildFileModifiedStatus, ChangesConfirmationDialog
+}
 
 import scala.collection.mutable
 

@@ -6,7 +6,9 @@ package akka.stream.scaladsl
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.forkjoin.ThreadLocalRandom
-import akka.stream.{OverflowStrategy, ActorMaterializer, ActorMaterializerSettings}
+import akka.stream.{
+  OverflowStrategy, ActorMaterializer, ActorMaterializerSettings
+}
 import akka.stream.testkit._
 import akka.testkit.AkkaSpec
 

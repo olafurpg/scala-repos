@@ -9,7 +9,6 @@ object Bang {
   def unapply[a](x: ![a]): Option[{Channel[a], a}] =
     Some(x.chan, x.data)
 }
-
  */
 object Test extends App {
   object IC extends Channel[Int]

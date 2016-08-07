@@ -3,7 +3,10 @@ package mesosphere.marathon.state
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.Protos
 import mesosphere.marathon.api.JsonTestHelper
-import mesosphere.marathon.api.serialization.{PortMappingSerializer, VolumeSerializer, DockerSerializer, ContainerSerializer}
+import mesosphere.marathon.api.serialization.{
+  PortMappingSerializer, VolumeSerializer, DockerSerializer,
+  ContainerSerializer
+}
 import org.scalatest.Matchers
 import org.apache.mesos.{Protos => mesos}
 import play.api.libs.json.Json

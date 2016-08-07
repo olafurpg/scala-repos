@@ -58,7 +58,6 @@ object AccessibleAction
   /**
     * Request that the node be incremented by a large value.
     * A smaller increment is requested using {@link #INCREMENT}.
-
     * Used by Slider, ScrollBar, and others
     */
   val BlockIncrement = new AccessibleAction(

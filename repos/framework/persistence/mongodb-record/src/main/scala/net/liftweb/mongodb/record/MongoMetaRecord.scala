@@ -39,9 +39,7 @@ import org.bson.types.ObjectId
 
 trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
     extends BsonMetaRecord[BaseRecord]
-    with MongoMeta[BaseRecord] {
-
-  self: BaseRecord =>
+    with MongoMeta[BaseRecord] { self: BaseRecord =>
 
   /*
    * Utility method for determining the value of _id.

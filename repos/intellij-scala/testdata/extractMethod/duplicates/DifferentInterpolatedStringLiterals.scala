@@ -14,7 +14,6 @@ object DifferentInterpolatedStringLiterals {
 }
 /*
 object DifferentInterpolatedStringLiterals {
-
   def log(message: String, level: Int) {
     level match {
       case 0 =>
@@ -24,7 +23,6 @@ object DifferentInterpolatedStringLiterals {
         println(message)
     }
   }
-
   def testMethodName(level: Int, message: String): Unit = {
     println(s"info: $level")
     println(message)

@@ -24,7 +24,9 @@ import kafka.integration.KafkaServerTestHarness
 import kafka.security.auth._
 import kafka.server.KafkaConfig
 import kafka.utils.TestUtils
-import org.apache.kafka.clients.consumer.{OffsetAndMetadata, Consumer, ConsumerRecord, KafkaConsumer}
+import org.apache.kafka.clients.consumer.{
+  OffsetAndMetadata, Consumer, ConsumerRecord, KafkaConsumer
+}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.apache.kafka.common.errors._
 import org.apache.kafka.common.protocol.{ApiKeys, Errors, SecurityProtocol}
@@ -112,28 +114,28 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
   val RequestKeyToErrorCode = Map[Short, (Nothing) => Short](
       ApiKeys.METADATA.id ->
         ((resp: requests.MetadataResponse) =>
-              resp
-                .errors()
-                .asScala
-                .find(_._1 == topic)
-                .getOrElse(("test", Errors.NONE))
-                ._2
-                .code()),
+           resp
+             .errors()
+             .asScala
+             .find(_._1 == topic)
+             .getOrElse(("test", Errors.NONE))
+             ._2
+             .code()),
       ApiKeys.PRODUCE.id ->
         ((resp: requests.ProduceResponse) =>
-              resp.responses().asScala.find(_._1 == tp).get._2.errorCode),
+           resp.responses().asScala.find(_._1 == tp).get._2.errorCode),
       ApiKeys.FETCH.id ->
         ((resp: requests.FetchResponse) =>
-              resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
+           resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
       ApiKeys.LIST_OFFSETS.id ->
         ((resp: requests.ListOffsetResponse) =>
-              resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
+           resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
       ApiKeys.OFFSET_COMMIT.id ->
         ((resp: requests.OffsetCommitResponse) =>
-              resp.responseData().asScala.find(_._1 == tp).get._2),
+           resp.responseData().asScala.find(_._1 == tp).get._2),
       ApiKeys.OFFSET_FETCH.id ->
         ((resp: requests.OffsetFetchResponse) =>
-              resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
+           resp.responseData().asScala.find(_._1 == tp).get._2.errorCode),
       ApiKeys.GROUP_COORDINATOR.id ->
         ((resp: requests.GroupCoordinatorResponse) => resp.errorCode()),
       ApiKeys.UPDATE_METADATA_KEY.id ->
@@ -145,10 +147,10 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
         ((resp: LeaveGroupResponse) => resp.errorCode()),
       ApiKeys.LEADER_AND_ISR.id ->
         ((resp: requests.LeaderAndIsrResponse) =>
-              resp.responses().asScala.find(_._1 == tp).get._2),
+           resp.responses().asScala.find(_._1 == tp).get._2),
       ApiKeys.STOP_REPLICA.id ->
         ((resp: requests.StopReplicaResponse) =>
-              resp.responses().asScala.find(_._1 == tp).get._2),
+           resp.responses().asScala.find(_._1 == tp).get._2),
       ApiKeys.CONTROLLED_SHUTDOWN_KEY.id ->
         ((resp: requests.ControlledShutdownResponse) => resp.errorCode())
   )

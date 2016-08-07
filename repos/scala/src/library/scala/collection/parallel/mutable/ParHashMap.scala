@@ -42,8 +42,7 @@ class ParHashMap[K, V] private[collection] (
                     ParHashMap[K, V],
                     scala.collection.mutable.HashMap[K, V]]
     with ParHashTable[K, DefaultEntry[K, V]]
-    with Serializable {
-  self =>
+    with Serializable { self =>
   initWithContents(contents)
 
   type Entry = scala.collection.mutable.DefaultEntry[K, V]

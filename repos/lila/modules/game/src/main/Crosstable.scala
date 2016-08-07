@@ -35,17 +35,17 @@ case class Crosstable(user1: Crosstable.User,
     copy(user1 = user1.copy(
              score =
                user1.score + (userId match {
-                 case None => wins * 5
-                 case Some(u) if user1.id == u => wins * 10
-                 case _ => 0
-               })),
+             case None => wins * 5
+             case Some(u) if user1.id == u => wins * 10
+             case _ => 0
+           })),
          user2 = user2.copy(
              score =
                user2.score + (userId match {
-                 case None => wins * 5
-                 case Some(u) if user2.id == u => wins * 10
-                 case _ => 0
-               })))
+             case None => wins * 5
+             case Some(u) if user2.id == u => wins * 10
+             case _ => 0
+           })))
 
   def fromPov(userId: String) =
     if (userId == user2.id) copy(user1 = user2, user2 = user1)

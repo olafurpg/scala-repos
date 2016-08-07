@@ -430,7 +430,9 @@ private[tree] object TreeEnsembleModel extends Logging {
 
   object SaveLoadV1_0 {
 
-    import org.apache.spark.mllib.tree.model.DecisionTreeModel.SaveLoadV1_0.{NodeData, constructTrees}
+    import org.apache.spark.mllib.tree.model.DecisionTreeModel.SaveLoadV1_0.{
+      NodeData, constructTrees
+    }
 
     def thisFormatVersion: String = "1.0"
 

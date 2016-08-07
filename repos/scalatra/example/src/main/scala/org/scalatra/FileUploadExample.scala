@@ -1,6 +1,8 @@
 package org.scalatra
 
-import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
+import org.scalatra.servlet.{
+  FileUploadSupport, MultipartConfig, SizeConstraintExceededException
+}
 
 import scala.xml.Node
 

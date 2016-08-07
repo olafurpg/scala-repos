@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -541,7 +541,7 @@ trait DAG extends Instructions {
     /** The set of available value-sorted keys. */
     def valueKeys: Set[Int]
 
-    def isSingleton: Boolean //true implies that the node is a singleton; false doesn't imply anything 
+    def isSingleton: Boolean //true implies that the node is a singleton; false doesn't imply anything
 
     def containsSplitArg: Boolean
 
@@ -728,11 +728,11 @@ trait DAG extends Instructions {
 
     /**
       * Performs a scoped node substitution on this DepGraph.
-      * 
+      *
       * The substitution is represented as a pair from -> to both of type E. The replacement is performed everywhere in
       * the DAG below the scope node of type S. Both S and E are constained to be one of DepGraph or BucketSpec by
       * the availability of instances of the type classes EditUpdate[E] and ScopeUpdate[S] as defined above.
-      * 
+      *
       * @return A pair of the whole rewritten DAG and the rewritten scope node.
       */
     def substituteDown[S: ScopeUpdate, E: EditUpdate](

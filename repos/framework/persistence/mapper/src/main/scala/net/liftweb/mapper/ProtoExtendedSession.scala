@@ -73,7 +73,6 @@ trait MetaProtoExtendedSession[T <: ProtoExtendedSession[T]]
             case Full(es) => logUserIdIn(es.userId)
             case _ =>
           }
-
         case _ =>
       }
       f

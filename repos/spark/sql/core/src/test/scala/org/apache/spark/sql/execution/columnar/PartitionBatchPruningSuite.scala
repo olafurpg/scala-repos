@@ -157,7 +157,7 @@ class PartitionBatchPruningSuite
 
       assertResult(expectedQueryResult.toArray,
                    s"Wrong query result: $queryExecution") {
-        df.collect().map(_ (0)).toArray
+        df.collect().map(_(0)).toArray
       }
 
       val (readPartitions, readBatches) = df.queryExecution.sparkPlan.collect {

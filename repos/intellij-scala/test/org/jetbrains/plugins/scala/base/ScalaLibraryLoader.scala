@@ -12,7 +12,9 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.impl.VirtualFilePointerManagerImpl
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager
-import com.intellij.openapi.vfs.{JarFileSystem, LocalFileSystem, VfsUtil, VirtualFile}
+import com.intellij.openapi.vfs.{
+  JarFileSystem, LocalFileSystem, VfsUtil, VirtualFile
+}
 import com.intellij.testFramework.PsiTestUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.SyntheticClasses

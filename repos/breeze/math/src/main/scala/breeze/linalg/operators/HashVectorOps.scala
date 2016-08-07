@@ -11,8 +11,7 @@ import breeze.storage.Zero
 import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
-trait DenseVector_HashVector_Ops {
-  this: HashVector.type =>
+trait DenseVector_HashVector_Ops { this: HashVector.type =>
   import breeze.math.PowImplicits._
 
   @expand
@@ -147,8 +146,7 @@ trait HashVector_DenseVector_Ops extends DenseVector_HashVector_Ops {
   }
 }
 
-trait HashVectorOps extends HashVector_GenericOps {
-  this: HashVector.type =>
+trait HashVectorOps extends HashVector_GenericOps { this: HashVector.type =>
   import breeze.math.PowImplicits._
 
   @expand
@@ -529,8 +527,7 @@ trait HashVector_SparseVector_Ops extends HashVectorOps {
 
 trait SparseVector_HashVector_Ops
     extends HashVectorOps
-    with HashVector_SparseVector_Ops {
-  this: HashVector.type =>
+    with HashVector_SparseVector_Ops { this: HashVector.type =>
   import breeze.math.PowImplicits._
 
   @expand
@@ -634,8 +631,7 @@ trait SparseVector_HashVector_Ops
     : Op.InPlaceImpl2[SparseVector[T], HashVector[T]] = updateFromPureS
 }
 
-trait HashVector_GenericOps {
-  this: HashVector.type =>
+trait HashVector_GenericOps { this: HashVector.type =>
   import breeze.math.PowImplicits._
   @expand
   implicit def pureFromUpdate[@expand.args(Int, Double, Float, Long) T,

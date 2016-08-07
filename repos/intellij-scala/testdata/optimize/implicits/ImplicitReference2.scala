@@ -24,11 +24,9 @@ object Scratch {
   }
 }
 /*package scatch
-
 sealed trait Identity {
   def zero: Int = 0
 }
-
 object A {
   implicit def IdentityTo[A](x: A) = new Identity
 }
@@ -37,7 +35,6 @@ object B {
     val value = null
   }
 }
-
 object Scratch {
   {
     import A._

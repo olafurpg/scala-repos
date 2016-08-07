@@ -119,8 +119,8 @@ trait Validators { self: DefaultMacroCompiler =>
       private def paramss_s =
         paramss map
           (ps =>
-                ps.map(s => s"${s.name}: ${s.tpe_*}")
-                  .mkString("(", ", ", ")")) mkString ""
+             ps.map(s => s"${s.name}: ${s.tpe_*}")
+               .mkString("(", ", ", ")")) mkString ""
       override def toString =
         "MacroImplSig(" + tparams_s + paramss_s + ret + ")"
     }

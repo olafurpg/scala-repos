@@ -31,7 +31,9 @@ import javafx.{event => jfxe, geometry => jfxg, scene => jfxs, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyIntegerProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyIntegerProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 import scalafx.event.Event
@@ -129,7 +131,7 @@ class ListView[T](
     this(new jfxsc.ListView[T](ObservableBuffer(items)))
 
   /**
-    * Setting a custom cell factory has the effect of deferring all cell creation, allowing for 
+    * Setting a custom cell factory has the effect of deferring all cell creation, allowing for
     * total customization of the cell.
     */
   def cellFactory = delegate.cellFactoryProperty

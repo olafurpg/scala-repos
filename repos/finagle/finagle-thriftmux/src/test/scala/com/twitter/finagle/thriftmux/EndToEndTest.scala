@@ -7,11 +7,18 @@ import com.twitter.finagle.client.StackClient
 import com.twitter.finagle.context.Contexts
 import com.twitter.finagle.dispatch.PipeliningDispatcher
 import com.twitter.finagle.param.{Tracer => PTracer, Label, Stats}
-import com.twitter.finagle.service.{ReqRep, ResponseClass, ResponseClassifier, Retries, RetryBudget}
+import com.twitter.finagle.service.{
+  ReqRep, ResponseClass, ResponseClassifier, Retries, RetryBudget
+}
 import com.twitter.finagle.stats.{NullStatsReceiver, InMemoryStatsReceiver}
-import com.twitter.finagle.thrift.{ClientId, Protocols, ThriftClientFramedCodec, ThriftClientRequest}
+import com.twitter.finagle.thrift.{
+  ClientId, Protocols, ThriftClientFramedCodec, ThriftClientRequest
+}
 import com.twitter.finagle.thriftmux.service.ThriftMuxResponseClassifier
-import com.twitter.finagle.thriftmux.thriftscala.{InvalidQueryException, TestService, TestService$FinagleClient, TestService$FinagleService}
+import com.twitter.finagle.thriftmux.thriftscala.{
+  InvalidQueryException, TestService, TestService$FinagleClient,
+  TestService$FinagleService
+}
 import com.twitter.finagle.tracing._
 import com.twitter.finagle.tracing.Annotation.{ClientSend, ServerRecv}
 import com.twitter.finagle.transport.Transport
@@ -743,12 +750,10 @@ class EndToEndTest
   /* TODO: add back when sbt supports old-school thrift gen
   test("end-to-end finagle-thrift") {
     import com.twitter.finagle.thriftmux.thrift.TestService
-
     val server = ThriftMux.serveIface(
       new InetSocketAddress(InetAddress.getLoopbackAddress, 0), new TestService.ServiceIface {
         def query(x: String) = Future.value(x+x)
       })
-
     val client = ThriftMux.newIface[TestService.ServiceIface](server)
     assert(client.query("ok").get() == "okok")
   }

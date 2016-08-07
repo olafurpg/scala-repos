@@ -5,7 +5,9 @@ import org.jetbrains.plugins.scala.codeInspection.methodSignature.quickfix.AddCa
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScType}
 import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
 

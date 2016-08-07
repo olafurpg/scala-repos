@@ -12,8 +12,7 @@ import java.io.{File => JFile}
 
 import org.scalajs.core.tools.io.IRFileCache.IRContainer
 
-trait IRContainerPlatformExtensions {
-  this: IRContainer.type =>
+trait IRContainerPlatformExtensions { this: IRContainer.type =>
   def fromClasspath(classpath: Seq[JFile]): Seq[IRContainer] = {
     classpath flatMap { entry =>
       if (!entry.exists) Nil

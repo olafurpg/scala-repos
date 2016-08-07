@@ -1,12 +1,9 @@
 /*
 Copyright 2012 Twitter, Inc.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,20 +27,17 @@ class DistributedCacheFileSpec extends WordSpec with Matchers {
       with CascadingLocal
   /*
   val conf = smartMock[Configuration]
-
   lazy val hdfsMode = {
     val mode = smartMock[Hdfs]
     mode.conf returns conf
     mode.strict returns true
     mode
   }
-
   lazy val hadoopTestMode = {
     val mode = smartMock[HadoopTest]
     mode.conf returns conf
     mode
   }
-
   lazy val testMode = smartMock[Test]
   lazy val localMode = smartMock[Local]
    */
@@ -61,24 +55,19 @@ class DistributedCacheFileSpec extends WordSpec with Matchers {
   /*
   "UncachedFile.add" should {
     val dcf = new UncachedFile(Right(uri))
-
     def sharedLocalBehavior(implicit mode: Mode) = {
       "use the local file path" in {
         val cf = dcf.add()(mode)
-
         cf.path shouldBe (uri.getPath)
         cf.file shouldBe (new File(uri.getPath).getCanonicalFile)
       }
     }
-
     "with a Test mode" in {
       sharedLocalBehavior(testMode)
     }
-
     "with a Local mode" in {
       sharedLocalBehavior(localMode)
     }
-
     "throw RuntimeException when the current mode isn't recognized" in {
       val mode = smartMock[UnknownMode]
       an[RuntimeException] should be thrownBy (dcf.add()(mode))

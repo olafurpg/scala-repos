@@ -23,15 +23,23 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.control.NonFatal
 
-import com.amazonaws.auth.{AWSCredentials, AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
-import com.amazonaws.services.kinesis.clientlibrary.interfaces.{IRecordProcessor, IRecordProcessorCheckpointer, IRecordProcessorFactory}
-import com.amazonaws.services.kinesis.clientlibrary.lib.worker.{InitialPositionInStream, KinesisClientLibConfiguration, Worker}
+import com.amazonaws.auth.{
+  AWSCredentials, AWSCredentialsProvider, DefaultAWSCredentialsProviderChain
+}
+import com.amazonaws.services.kinesis.clientlibrary.interfaces.{
+  IRecordProcessor, IRecordProcessorCheckpointer, IRecordProcessorFactory
+}
+import com.amazonaws.services.kinesis.clientlibrary.lib.worker.{
+  InitialPositionInStream, KinesisClientLibConfiguration, Worker
+}
 import com.amazonaws.services.kinesis.model.Record
 
 import org.apache.spark.internal.Logging
 import org.apache.spark.storage.{StorageLevel, StreamBlockId}
 import org.apache.spark.streaming.Duration
-import org.apache.spark.streaming.receiver.{BlockGenerator, BlockGeneratorListener, Receiver}
+import org.apache.spark.streaming.receiver.{
+  BlockGenerator, BlockGeneratorListener, Receiver
+}
 import org.apache.spark.util.Utils
 
 private[kinesis] case class SerializableAWSCredentials(accessKeyId: String,
@@ -92,8 +100,7 @@ private[kinesis] class KinesisReceiver[T](
     messageHandler: Record => T,
     awsCredentialsOption: Option[SerializableAWSCredentials])
     extends Receiver[T](storageLevel)
-    with Logging {
-  receiver =>
+    with Logging { receiver =>
 
   /*
    * =================================================================================

@@ -23,18 +23,26 @@ import com.intellij.psi.util.PsiUtilCore
 import com.intellij.util.Processor
 import com.intellij.util.indexing.FileBasedIndex
 import org.jetbrains.annotations.Nullable
-import org.jetbrains.plugins.scala.decompiler.{CompiledFileAdjuster, DecompilerUtil}
+import org.jetbrains.plugins.scala.decompiler.{
+  CompiledFileAdjuster, DecompilerUtil
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScTypeAlias, ScValue, ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScToplevelElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait}
-import org.jetbrains.plugins.scala.lang.psi.api.{FileDeclarationsHolder, ScControlFlowOwner, ScalaFile}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTrait
+}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  FileDeclarationsHolder, ScControlFlowOwner, ScalaFile
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScFileStub
 import org.jetbrains.plugins.scala.macroAnnotations.CachedInsidePsiElement
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings

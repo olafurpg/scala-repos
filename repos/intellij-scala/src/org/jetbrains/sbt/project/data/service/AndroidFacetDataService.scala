@@ -11,7 +11,9 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.SystemProperties
-import org.jetbrains.android.facet.{AndroidFacet, AndroidFacetType, AndroidRootUtil}
+import org.jetbrains.android.facet.{
+  AndroidFacet, AndroidFacetType, AndroidRootUtil
+}
 import org.jetbrains.sbt.project.data.AndroidFacetData
 
 /**

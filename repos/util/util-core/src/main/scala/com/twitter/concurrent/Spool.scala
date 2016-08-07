@@ -104,10 +104,10 @@ sealed trait Spool[+A] {
 
   /**
     * Zips two [[Spool Spools]] returning a Spool of Tuple2s.
-    * 
+    *
     * If one Spool is shorter, excess elements of the longer
     * Spool are discarded.
-    * 
+    *
     * c.f. scala.collection.immutable.Stream#zip
     */
   def zip[B](that: Spool[B]): Spool[(A, B)] =

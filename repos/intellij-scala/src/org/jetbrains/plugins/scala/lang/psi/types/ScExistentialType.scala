@@ -8,7 +8,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScExistentialClause
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue._
 
@@ -355,7 +357,7 @@ case class ScExistentialType(quantified: ScType,
                            s.namedElement match {
                              case fun: ScFunction =>
                                ScFunction.getCompoundCopy(
-                                   pTypes.map(_.map(_ ()).toList),
+                                   pTypes.map(_.map(_()).toList),
                                    tParams.toList,
                                    rt,
                                    fun)

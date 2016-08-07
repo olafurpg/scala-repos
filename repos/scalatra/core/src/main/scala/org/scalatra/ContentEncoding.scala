@@ -2,9 +2,16 @@ package org.scalatra
 
 import java.io._
 import java.nio.charset.Charset
-import java.util.zip.{DeflaterOutputStream, GZIPInputStream, GZIPOutputStream, InflaterInputStream}
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse, HttpServletResponseWrapper}
-import javax.servlet.{ReadListener, ServletInputStream, ServletOutputStream, WriteListener}
+import java.util.zip.{
+  DeflaterOutputStream, GZIPInputStream, GZIPOutputStream, InflaterInputStream
+}
+import javax.servlet.http.{
+  HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse,
+  HttpServletResponseWrapper
+}
+import javax.servlet.{
+  ReadListener, ServletInputStream, ServletOutputStream, WriteListener
+}
 
 import scala.util.Try
 

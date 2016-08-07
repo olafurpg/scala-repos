@@ -15,7 +15,10 @@
 // ============================================================================
 package akka.remote.security.provider
 
-import org.uncommons.maths.random.{SeedGenerator, SeedException, SecureRandomSeedGenerator, RandomDotOrgSeedGenerator}
+import org.uncommons.maths.random.{
+  SeedGenerator, SeedException, SecureRandomSeedGenerator,
+  RandomDotOrgSeedGenerator
+}
 import scala.collection.immutable
 
 /**

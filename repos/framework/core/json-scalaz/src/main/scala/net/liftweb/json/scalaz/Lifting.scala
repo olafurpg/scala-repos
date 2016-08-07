@@ -20,8 +20,7 @@ import scalaz._
 import Scalaz._
 import net.liftweb.json._
 
-trait Lifting {
-  this: Types =>
+trait Lifting { this: Types =>
   implicit def Func2ToJSON[A: JSONR, B: JSONR, R](z: (A, B) => R) = new {
     def applyJSON(a: JValue => Result[A],
                   b: JValue => Result[B]): JValue => Result[R] =

@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala
 package codeInsight
 
-import com.intellij.codeInsight.completion.{CodeCompletionHandlerBase, CompletionType}
+import com.intellij.codeInsight.completion.{
+  CodeCompletionHandlerBase, CompletionType
+}
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.lookup.{LookupElement, LookupManager}
 import com.intellij.openapi.actionSystem.IdeActions

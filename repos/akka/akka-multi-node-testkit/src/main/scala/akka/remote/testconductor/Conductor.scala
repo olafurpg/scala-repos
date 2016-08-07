@@ -4,10 +4,15 @@
 package akka.remote.testconductor
 
 import language.postfixOps
-import akka.actor.{Actor, ActorRef, LoggingFSM, Props, NoSerializationVerificationNeeded}
+import akka.actor.{
+  Actor, ActorRef, LoggingFSM, Props, NoSerializationVerificationNeeded
+}
 import RemoteConnection.getAddrString
 import TestConductorProtocol._
-import org.jboss.netty.channel.{Channel, SimpleChannelUpstreamHandler, ChannelHandlerContext, ChannelStateEvent, MessageEvent}
+import org.jboss.netty.channel.{
+  Channel, SimpleChannelUpstreamHandler, ChannelHandlerContext,
+  ChannelStateEvent, MessageEvent
+}
 import scala.concurrent.duration._
 import akka.pattern.ask
 import scala.concurrent.Await
@@ -35,8 +40,7 @@ import akka.actor.DeadLetterSuppression
   * All of this is bundled inside the [[akka.remote.testconductor.TestConductorExt]]
   * extension.
   */
-trait Conductor {
-  this: TestConductorExt ⇒
+trait Conductor { this: TestConductorExt ⇒
 
   import Controller._
 
@@ -557,8 +561,7 @@ private[akka] object BarrierCoordinator {
                         arrived: List[ActorRef],
                         deadline: Deadline)
 
-  trait Printer {
-    this: Product with Throwable with NoStackTrace ⇒
+  trait Printer { this: Product with Throwable with NoStackTrace ⇒
     override def toString =
       productPrefix + productIterator.mkString("(", ", ", ")")
   }

@@ -8,7 +8,9 @@ import com.intellij.analysis.AnalysisScope
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations._
 import com.intellij.execution.filters.TextConsoleBuilderFactory
-import com.intellij.execution.process.{OSProcessHandler, ProcessAdapter, ProcessEvent}
+import com.intellij.execution.process.{
+  OSProcessHandler, ProcessAdapter, ProcessEvent
+}
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.module.{Module, ModuleManager}

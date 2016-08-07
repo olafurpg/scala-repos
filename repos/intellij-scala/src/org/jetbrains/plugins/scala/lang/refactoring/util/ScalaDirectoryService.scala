@@ -5,7 +5,9 @@ import java.util.Properties
 
 import com.intellij.ide.fileTemplates.impl.FileTemplateBase
 import com.intellij.ide.fileTemplates.ui.CreateFromTemplateDialog
-import com.intellij.ide.fileTemplates.{FileTemplate, FileTemplateManager, FileTemplateUtil}
+import com.intellij.ide.fileTemplates.{
+  FileTemplate, FileTemplateManager, FileTemplateUtil
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.{PsiBundle, PsiClass, PsiDirectory, PsiElement}

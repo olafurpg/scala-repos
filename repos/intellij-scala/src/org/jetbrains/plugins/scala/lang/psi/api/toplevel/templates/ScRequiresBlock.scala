@@ -5,7 +5,7 @@ package api
 package toplevel
 package templates
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */

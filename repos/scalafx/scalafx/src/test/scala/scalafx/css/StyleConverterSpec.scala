@@ -35,7 +35,7 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
-  * StyleConverter Spec tests. It is being used Conversion from String to String (stringConverter)  
+  * StyleConverter Spec tests. It is being used Conversion from String to String (stringConverter)
   */
 @RunWith(classOf[JUnitRunner])
 class StyleConverterSpec

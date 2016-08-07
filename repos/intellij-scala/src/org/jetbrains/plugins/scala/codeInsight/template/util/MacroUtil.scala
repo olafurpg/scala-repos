@@ -8,9 +8,13 @@ import com.intellij.psi._
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, JavaArrayType, ScType}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScParameterizedType, JavaArrayType, ScType
+}
 import org.jetbrains.plugins.scala.lang.resolve.{ScalaResolveResult, StdKinds}
 
 /**

@@ -203,7 +203,9 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
 
     private val max = 25
 
-    import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{Descending, GroupField, Match, Project, Unwind, Sort, SumValue}
+    import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+      Descending, GroupField, Match, Project, Unwind, Sort, SumValue
+    }
 
     private val pathsCache =
       AsyncCache[List[Tag], List[TagNb]](f = filterTags => {

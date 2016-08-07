@@ -44,10 +44,10 @@ case class LocalDataSource(val dsp: DataSourceParams)
       Source.fromFile(dsp.filepath).getLines.toSeq.map(_.split(" ", 2))
 
     // FIXME: Use different training / testing data.
-    val x = lines.map { _ (1).split(' ').map { _.toDouble } }.map { e =>
+    val x = lines.map { _(1).split(' ').map { _.toDouble } }.map { e =>
       Vector(e: _*)
     }
-    val y = lines.map { _ (0).toDouble }
+    val y = lines.map { _(0).toDouble }
 
     val td = TrainingData(Vector(x: _*), Vector(y: _*))
 

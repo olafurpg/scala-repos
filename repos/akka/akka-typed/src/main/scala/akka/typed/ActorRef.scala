@@ -62,8 +62,7 @@ abstract class ActorRef[-T] extends java.lang.Comparable[ActorRef[Any]] {
 /**
   * This trait is used to hide the `!` method from Java code.
   */
-trait ScalaActorRef[-T] {
-  this: ActorRef[T] ⇒
+trait ScalaActorRef[-T] { this: ActorRef[T] ⇒
   def !(msg: T): Unit = tell(msg)
 }
 

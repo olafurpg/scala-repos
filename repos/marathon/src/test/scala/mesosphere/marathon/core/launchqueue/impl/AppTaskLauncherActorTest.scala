@@ -1,6 +1,8 @@
 package mesosphere.marathon.core.launchqueue.impl
 
-import akka.actor.{ActorContext, ActorRef, ActorSystem, Cancellable, Props, Terminated}
+import akka.actor.{
+  ActorContext, ActorRef, ActorSystem, Cancellable, Props, Terminated
+}
 import akka.pattern.ask
 import akka.testkit.TestProbe
 import akka.util.Timeout
@@ -18,7 +20,9 @@ import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.bus.TaskStatusUpdateTestHelper
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.state.{AppDefinition, PathId, Timestamp}
-import mesosphere.marathon.{MarathonSpec, MarathonTestHelper, Protos, SameAsSeq}
+import mesosphere.marathon.{
+  MarathonSpec, MarathonTestHelper, Protos, SameAsSeq
+}
 import org.mockito
 import org.mockito.Mockito
 import org.scalatest.GivenWhenThen

@@ -3,7 +3,9 @@ package lang
 package completion
 
 import com.intellij.codeInsight.completion._
-import com.intellij.codeInsight.lookup.{InsertHandlerDecorator, LookupElement, LookupElementDecorator}
+import com.intellij.codeInsight.lookup.{
+  InsertHandlerDecorator, LookupElement, LookupElementDecorator
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.Computable
@@ -16,15 +18,27 @@ import org.jetbrains.plugins.scala.debugger.evaluation.ScalaRuntimeTypeEvaluator
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.completion.ScalaAfterNewCompletionUtil._
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
-import org.jetbrains.plugins.scala.lang.completion.lookups.{LookupElementManager, ScalaLookupItem}
+import org.jetbrains.plugins.scala.lang.completion.lookups.{
+  LookupElementManager, ScalaLookupItem
+}
 import org.jetbrains.plugins.scala.lang.lexer.{ScalaLexer, ScalaTokenTypes}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScCaseClause}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolated, ScReferenceElement, ScStableCodeReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScNewTemplateDefinition, ScReferenceExpression}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFun, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern, ScCaseClause
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolated, ScReferenceElement, ScStableCodeReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock, ScNewTemplateDefinition, ScReferenceExpression
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter, ScParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFun, ScValue, ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
@@ -34,7 +48,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.base.types.ScTypeProjectionImpl
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScReferenceExpressionImpl
 import org.jetbrains.plugins.scala.lang.psi.types.{ScDesignatorType, ScType}
 import org.jetbrains.plugins.scala.lang.resolve.processor.CompletionProcessor
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils, ScalaResolveResult
+}
 import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType
 
 import scala.annotation.tailrec

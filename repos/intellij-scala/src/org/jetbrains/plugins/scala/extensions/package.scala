@@ -16,15 +16,23 @@ import com.intellij.util.Processor
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.extensions.implementation._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScDeclaredElementsHolder, ScFunction}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter, ScParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScDeclaredElementsHolder, ScFunction
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScModifierListOwner, ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScModifierListOwner, ScNamedElement, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiParameter
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.MixinNodes
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.SignatureNodes
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiClassWrapper, PsiTypedDefinitionWrapper, StaticPsiMethodWrapper}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiClassWrapper, PsiTypedDefinitionWrapper, StaticPsiMethodWrapper
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}

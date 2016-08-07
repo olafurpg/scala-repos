@@ -296,31 +296,25 @@ class GeneralizedLinearRegressionSuite
        R code:
        f1 <- data$V1 ~ data$V2 + data$V3 - 1
        f2 <- data$V1 ~ data$V2 + data$V3
-
        data <- read.csv("path", header=FALSE)
        for (formula in c(f1, f2)) {
          model <- glm(formula, family="gaussian", data=data)
          print(as.vector(coef(model)))
        }
-
        [1] 2.2960999 0.8087933
        [1] 2.5002642 2.2000403 0.5999485
-
        data <- read.csv("path", header=FALSE)
        model1 <- glm(f1, family=gaussian(link=log), data=data, start=c(0,0))
        model2 <- glm(f2, family=gaussian(link=log), data=data, start=c(0,0,0))
        print(as.vector(coef(model1)))
        print(as.vector(coef(model2)))
-
        [1] 0.23069326 0.07993778
        [1] 0.25001858 0.22002452 0.05998789
-
        data <- read.csv("path", header=FALSE)
        for (formula in c(f1, f2)) {
          model <- glm(formula, family=gaussian(link=inverse), data=data)
          print(as.vector(coef(model)))
        }
-
        [1] 2.3010179 0.8198976
        [1] 2.4108902 2.2130248 0.6086152
      */
@@ -385,7 +379,6 @@ class GeneralizedLinearRegressionSuite
            print(as.vector(coef(model)))
          }
        }
-
        [1] 0.0000000 2.2961005 0.8087932
        [1] 0.0000000 2.2130368 0.8309556
        [1] 0.0000000 1.7176137 0.9610657
@@ -425,28 +418,22 @@ class GeneralizedLinearRegressionSuite
        f1 <- data$V1 ~ data$V2 + data$V3 + data$V4 + data$V5 - 1
        f2 <- data$V1 ~ data$V2 + data$V3 + data$V4 + data$V5
        data <- read.csv("path", header=FALSE)
-
        for (formula in c(f1, f2)) {
          model <- glm(formula, family="binomial", data=data)
          print(as.vector(coef(model)))
        }
-
        [1] -0.3560284  1.3010002 -0.3570805 -0.7406762
        [1]  2.8367406 -0.5896187  0.8931655 -0.3925169 -0.7996989
-
        for (formula in c(f1, f2)) {
          model <- glm(formula, family=binomial(link=probit), data=data)
          print(as.vector(coef(model)))
        }
-
        [1] -0.2134390  0.7800646 -0.2144267 -0.4438358
        [1]  1.6995366 -0.3524694  0.5332651 -0.2352985 -0.4780850
-
        for (formula in c(f1, f2)) {
          model <- glm(formula, family=binomial(link=cloglog), data=data)
          print(as.vector(coef(model)))
        }
-
        [1] -0.2832198  0.8434144 -0.2524727 -0.5293452
        [1]  1.5063590 -0.4038015  0.6133664 -0.2687882 -0.5541758
      */
@@ -508,31 +495,25 @@ class GeneralizedLinearRegressionSuite
        R code:
        f1 <- data$V1 ~ data$V2 + data$V3 - 1
        f2 <- data$V1 ~ data$V2 + data$V3
-
        data <- read.csv("path", header=FALSE)
        for (formula in c(f1, f2)) {
          model <- glm(formula, family="poisson", data=data)
          print(as.vector(coef(model)))
        }
-
        [1] 0.22999393 0.08047088
        [1] 0.25022353 0.21998599 0.05998621
-
        data <- read.csv("path", header=FALSE)
        for (formula in c(f1, f2)) {
          model <- glm(formula, family=poisson(link=identity), data=data)
          print(as.vector(coef(model)))
        }
-
        [1] 2.2929501 0.8119415
        [1] 2.5012730 2.1999407 0.5999107
-
        data <- read.csv("path", header=FALSE)
        for (formula in c(f1, f2)) {
          model <- glm(formula, family=poisson(link=sqrt), data=data)
          print(as.vector(coef(model)))
        }
-
        [1] 2.2958947 0.8090515
        [1] 2.5000480 2.1999972 0.5999968
      */
@@ -587,31 +568,25 @@ class GeneralizedLinearRegressionSuite
        R code:
        f1 <- data$V1 ~ data$V2 + data$V3 - 1
        f2 <- data$V1 ~ data$V2 + data$V3
-
        data <- read.csv("path", header=FALSE)
        for (formula in c(f1, f2)) {
          model <- glm(formula, family="Gamma", data=data)
          print(as.vector(coef(model)))
        }
-
        [1] 2.3392419 0.8058058
        [1] 2.3507700 2.2533574 0.6042991
-
        data <- read.csv("path", header=FALSE)
        for (formula in c(f1, f2)) {
          model <- glm(formula, family=Gamma(link=identity), data=data)
          print(as.vector(coef(model)))
        }
-
        [1] 2.2908883 0.8147796
        [1] 2.5002406 2.1998346 0.6000059
-
        data <- read.csv("path", header=FALSE)
        for (formula in c(f1, f2)) {
          model <- glm(formula, family=Gamma(link=log), data=data)
          print(as.vector(coef(model)))
        }
-
        [1] 0.22958970 0.08091066
        [1] 0.25003210 0.21996957 0.06000215
      */
@@ -664,7 +639,6 @@ class GeneralizedLinearRegressionSuite
   test("glm summary: gaussian family with weight") {
     /*
        R code:
-
        A <- matrix(c(0, 1, 2, 3, 5, 7, 11, 13), 4, 2)
        b <- c(17, 19, 23, 29)
        w <- c(1, 2, 3, 4)
@@ -681,36 +655,27 @@ class GeneralizedLinearRegressionSuite
             2))
     /*
        R code:
-
        model <- glm(formula = "b ~ .", family="gaussian", data = df, weights = w)
        summary(model)
-
        Deviance Residuals:
            1       2       3       4
        1.920  -1.358  -1.109   0.960
-
        Coefficients:
                    Estimate Std. Error t value Pr(>|t|)
        (Intercept)   18.080      9.608   1.882    0.311
        V1             6.080      5.556   1.094    0.471
        V2            -0.600      1.960  -0.306    0.811
-
        (Dispersion parameter for gaussian family taken to be 7.68)
-
            Null deviance: 202.00  on 3  degrees of freedom
        Residual deviance:   7.68  on 1  degrees of freedom
        AIC: 18.783
-
        Number of Fisher Scoring iterations: 2
-
        residuals(model, type="pearson")
               1         2         3         4
        1.920000 -1.357645 -1.108513  0.960000
-
        residuals(model, type="working")
           1     2     3     4
        1.92 -0.96 -0.64  0.48
-
        residuals(model, type="response")
           1     2     3     4
        1.92 -0.96 -0.64  0.48
@@ -793,7 +758,6 @@ class GeneralizedLinearRegressionSuite
   test("glm summary: binomial family with weight") {
     /*
        R code:
-
        A <- matrix(c(0, 1, 2, 3, 5, 2, 1, 3), 4, 2)
        b <- c(1, 0, 1, 0)
        w <- c(1, 2, 3, 4)
@@ -810,35 +774,26 @@ class GeneralizedLinearRegressionSuite
             2))
     /*
        R code:
-
        model <- glm(formula = "b ~ . -1", family="binomial", data = df, weights = w)
        summary(model)
-
        Deviance Residuals:
            1       2       3       4
        1.273  -1.437   2.533  -1.556
-
        Coefficients:
           Estimate Std. Error z value Pr(>|z|)
        V1 -0.30217    0.46242  -0.653    0.513
        V2 -0.04452    0.37124  -0.120    0.905
-
        (Dispersion parameter for binomial family taken to be 1)
-
            Null deviance: 13.863  on 4  degrees of freedom
        Residual deviance: 12.524  on 2  degrees of freedom
        AIC: 16.524
-
        Number of Fisher Scoring iterations: 5
-
        residuals(model, type="pearson")
               1         2         3         4
        1.117731 -1.162962  2.395838 -1.189005
-
        residuals(model, type="working")
               1         2         3         4
        2.249324 -1.676240  2.913346 -1.353433
-
        residuals(model, type="response")
                1          2          3          4
        0.5554219 -0.4034267  0.6567520 -0.2611382
@@ -924,7 +879,6 @@ class GeneralizedLinearRegressionSuite
   test("glm summary: poisson family with weight") {
     /*
        R code:
-
        A <- matrix(c(0, 1, 2, 3, 5, 7, 11, 13), 4, 2)
        b <- c(2, 8, 3, 9)
        w <- c(1, 2, 3, 4)
@@ -941,14 +895,11 @@ class GeneralizedLinearRegressionSuite
             2))
     /*
        R code:
-
        model <- glm(formula = "b ~ .", family="poisson", data = df, weights = w)
        summary(model)
-
        Deviance Residuals:
               1         2         3         4
        -0.28952   0.11048   0.14839  -0.07268
-
        Coefficients:
                    Estimate Std. Error z value Pr(>|z|)
        (Intercept)   6.2999     1.6086   3.916 8.99e-05 ***
@@ -956,23 +907,17 @@ class GeneralizedLinearRegressionSuite
        V2           -1.0818     0.3522  -3.071  0.00213 **
        ---
        Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
        (Dispersion parameter for poisson family taken to be 1)
-
            Null deviance: 15.38066  on 3  degrees of freedom
        Residual deviance:  0.12333  on 1  degrees of freedom
        AIC: 41.803
-
        Number of Fisher Scoring iterations: 3
-
        residuals(model, type="pearson")
                  1           2           3           4
        -0.28043145  0.11099310  0.14963714 -0.07253611
-
        residuals(model, type="working")
                  1           2           3           4
        -0.17960679  0.02813593  0.05113852 -0.01201650
-
        residuals(model, type="response")
                 1          2          3          4
        -0.4378554  0.2189277  0.1459518 -0.1094638
@@ -1060,7 +1005,6 @@ class GeneralizedLinearRegressionSuite
   test("glm summary: gamma family with weight") {
     /*
        R code:
-
        A <- matrix(c(0, 1, 2, 3, 5, 7, 11, 13), 4, 2)
        b <- c(2, 8, 3, 9)
        w <- c(1, 2, 3, 4)
@@ -1077,36 +1021,27 @@ class GeneralizedLinearRegressionSuite
             2))
     /*
        R code:
-
        model <- glm(formula = "b ~ .", family="Gamma", data = df, weights = w)
        summary(model)
-
        Deviance Residuals:
               1         2         3         4
        -0.26343   0.05761   0.12818  -0.03484
-
        Coefficients:
                    Estimate Std. Error t value Pr(>|t|)
        (Intercept) -0.81511    0.23449  -3.476    0.178
        V1          -0.72730    0.16137  -4.507    0.139
        V2           0.23894    0.05481   4.359    0.144
-
        (Dispersion parameter for Gamma family taken to be 0.07986091)
-
            Null deviance: 2.937462  on 3  degrees of freedom
        Residual deviance: 0.090358  on 1  degrees of freedom
        AIC: 23.202
-
        Number of Fisher Scoring iterations: 4
-
        residuals(model, type="pearson")
                  1           2           3           4
        -0.24082508  0.05839241  0.13135766 -0.03463621
-
        residuals(model, type="working")
                  1            2            3            4
        0.091414181 -0.005374314 -0.027196998  0.001890910
-
        residuals(model, type="response")
                 1          2          3          4
        -0.6344390  0.3172195  0.2114797 -0.1586097

@@ -7,7 +7,9 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Try, Failure, Success}
 import scala.util.control.NonFatal
 import java.util.concurrent.{TimeUnit}
-import play.api.libs.iteratee.Execution.Implicits.{defaultExecutionContext => dec}
+import play.api.libs.iteratee.Execution.Implicits.{
+  defaultExecutionContext => dec
+}
 
 /**
   * Utilities for concurrent usage of iteratees, enumerators and enumeratees.

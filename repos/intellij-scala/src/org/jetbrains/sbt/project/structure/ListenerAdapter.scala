@@ -1,7 +1,9 @@
 package org.jetbrains.sbt
 package project.structure
 
-import com.intellij.execution.process.{ProcessAdapter, ProcessEvent, ProcessOutputTypes}
+import com.intellij.execution.process.{
+  ProcessAdapter, ProcessEvent, ProcessOutputTypes
+}
 import com.intellij.openapi.util.Key
 
 /**

@@ -45,8 +45,12 @@ import kafka.admin.AdminUtils
 import kafka.log._
 import kafka.utils.ZkUtils._
 import org.junit.Assert._
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
-import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecord, KafkaConsumer, RangeAssignor}
+import org.apache.kafka.clients.producer.{
+  KafkaProducer, ProducerConfig, ProducerRecord
+}
+import org.apache.kafka.clients.consumer.{
+  Consumer, ConsumerRecord, KafkaConsumer, RangeAssignor
+}
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.common.network.Mode
 import org.apache.kafka.common.record.CompressionType

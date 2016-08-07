@@ -20,7 +20,9 @@ package org.apache.spark.ml.tuning
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.{Estimator, Model}
 import org.apache.spark.ml.classification.LogisticRegression
-import org.apache.spark.ml.evaluation.{BinaryClassificationEvaluator, Evaluator, RegressionEvaluator}
+import org.apache.spark.ml.evaluation.{
+  BinaryClassificationEvaluator, Evaluator, RegressionEvaluator
+}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.ml.param.shared.HasInputCol
 import org.apache.spark.ml.regression.LinearRegression

@@ -10,12 +10,14 @@ import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.{PsiElement, ResolveState}
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScPatternDefinition, ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScEarlyDefinitionsStub
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */

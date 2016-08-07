@@ -20,7 +20,9 @@ package org.apache.spark.mllib.pmml.export
 import org.dmg.pmml.RegressionModel
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.mllib.regression.{LassoModel, LinearRegressionModel, RidgeRegressionModel}
+import org.apache.spark.mllib.regression.{
+  LassoModel, LinearRegressionModel, RidgeRegressionModel
+}
 import org.apache.spark.mllib.util.LinearDataGenerator
 
 class GeneralizedLinearPMMLModelExportSuite extends SparkFunSuite {

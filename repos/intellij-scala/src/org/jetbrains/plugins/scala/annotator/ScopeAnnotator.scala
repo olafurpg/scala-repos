@@ -4,12 +4,20 @@ package annotator
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScForStatement, ScGenerator}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlockExpr, ScForStatement, ScGenerator
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScNamedElement, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 import scala.collection.mutable.ArrayBuffer

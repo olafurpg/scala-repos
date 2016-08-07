@@ -2,7 +2,9 @@ package com.twitter.finagle.service
 
 import com.twitter.util.{Future, Closable, Time}
 import com.twitter.hashing._
-import com.twitter.finagle.{Service, Status, NotShardableException, ShardNotAvailableException}
+import com.twitter.finagle.{
+  Service, Status, NotShardableException, ShardNotAvailableException
+}
 
 /**
   * ShardingService takes a `Distributor` where the handle is a service.

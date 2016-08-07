@@ -17,7 +17,10 @@
 
 package org.apache.spark.deploy.history
 
-import java.io.{BufferedOutputStream, ByteArrayInputStream, ByteArrayOutputStream, File, FileOutputStream, OutputStreamWriter}
+import java.io.{
+  BufferedOutputStream, ByteArrayInputStream, ByteArrayOutputStream, File,
+  FileOutputStream, OutputStreamWriter
+}
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit

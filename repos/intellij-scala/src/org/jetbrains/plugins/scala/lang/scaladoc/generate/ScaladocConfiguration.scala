@@ -4,7 +4,9 @@ import javax.swing.Icon
 
 import com.intellij.analysis.AnalysisScope
 import com.intellij.execution.Executor
-import com.intellij.execution.configurations.{ModuleRunProfile, RunProfileState}
+import com.intellij.execution.configurations.{
+  ModuleRunProfile, RunProfileState
+}
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project

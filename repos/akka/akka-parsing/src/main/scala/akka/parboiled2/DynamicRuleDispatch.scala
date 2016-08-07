@@ -50,13 +50,9 @@ object DynamicRuleDispatch {
     * Note that there is no reflection involved and compilation will fail, if one of the given rule names
     * does not constitute a method of parser type `P` or has a type different from `RuleN[L]`.
     */
-  def apply[P <: Parser, L <: HList](ruleNames: String*): (DynamicRuleDispatch[
-                                                               P,
-                                                               L],
-                                                           immutable.Seq[
-                                                               String]) = macro __create[
-      P,
-      L]
+  def apply[P <: Parser, L <: HList](
+      ruleNames: String*): (DynamicRuleDispatch[P, L], immutable.Seq[String]) =
+    macro __create[P, L]
 
   ///////////////////// INTERNAL ////////////////////////
 

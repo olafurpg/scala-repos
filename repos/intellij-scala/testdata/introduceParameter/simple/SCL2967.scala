@@ -9,9 +9,7 @@ object O {
 }
 /*
 package p
-
 class Test {}
-
 object O {
   def m(param: Test) {
     val test: Test = /*start*/param/*end*/

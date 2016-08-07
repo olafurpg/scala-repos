@@ -25,7 +25,9 @@ import org.apache.hadoop.hive.ql.udf.UDAFPercentile
 import org.apache.hadoop.hive.ql.udf.generic._
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredObject
 import org.apache.hadoop.hive.serde2.{AbstractSerDe, SerDeStats}
-import org.apache.hadoop.hive.serde2.objectinspector.{ObjectInspector, ObjectInspectorFactory}
+import org.apache.hadoop.hive.serde2.objectinspector.{
+  ObjectInspector, ObjectInspectorFactory
+}
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory
 import org.apache.hadoop.io.Writable
 

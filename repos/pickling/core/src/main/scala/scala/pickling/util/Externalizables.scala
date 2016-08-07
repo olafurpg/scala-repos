@@ -26,7 +26,10 @@ object Externalizables {
   def genInputImpl[T: c.WeakTypeTag](c: Context)(
       arg: c.Expr[T]): c.Expr[ObjectInput] = {
     import c.universe._
-    import definitions.{BooleanTpe, ByteTpe, CharTpe, DoubleTpe, FloatTpe, IntTpe, LongTpe, ShortTpe}
+    import definitions.{
+      BooleanTpe, ByteTpe, CharTpe, DoubleTpe, FloatTpe, IntTpe, LongTpe,
+      ShortTpe
+    }
 
     val tag = weakTypeTag[T]
 
@@ -42,7 +45,6 @@ object Externalizables {
 
     /* Int, Int, Array[Byte], Int, Long, Object
          0,   1,           2,   3,    4,      5
-
        def readInt(): Int = {
          state += 1
          if (state == 0) x0
@@ -139,7 +141,10 @@ object Externalizables {
 
   def genOutputImpl[T: c.WeakTypeTag](c: Context): c.Expr[ArrayObjectOutput] = {
     import c.universe._
-    import definitions.{BooleanTpe, ByteTpe, CharTpe, DoubleTpe, FloatTpe, IntTpe, LongTpe, ShortTpe}
+    import definitions.{
+      BooleanTpe, ByteTpe, CharTpe, DoubleTpe, FloatTpe, IntTpe, LongTpe,
+      ShortTpe
+    }
 
     val tag = weakTypeTag[T]
 
@@ -167,11 +172,9 @@ object Externalizables {
 
     /* Byte, Byte, Array[Byte], Byte, Long, Object
           0,    1,           2,    3,    4,      5
-
        val byteArr: Array[Int] = _  // <tpe>Arr: Array[<storage(tpe)>]
        val longArr: Array[Long] = _
        val arrByteArr: Array[Array[Byte]] = _
-
        def writeByte(x: Int): Unit = {
          state += 1
          if (state == 0) bytes(0) = x

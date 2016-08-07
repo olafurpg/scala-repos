@@ -18,8 +18,12 @@
 package org.apache.spark.sql.execution
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Ascending, Attribute, Expression, SortOrder}
-import org.apache.spark.sql.catalyst.expressions.codegen.{GenerateOrdering, GenerateUnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.{
+  Ascending, Attribute, Expression, SortOrder
+}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  GenerateOrdering, GenerateUnsafeProjection
+}
 
 object GroupedIterator {
   def apply(input: Iterator[InternalRow],

@@ -4,7 +4,9 @@ package compiler
 import java.io.{File, IOException}
 import javax.swing.event.HyperlinkEvent
 
-import com.intellij.notification.{Notification, NotificationListener, NotificationType, Notifications}
+import com.intellij.notification.{
+  Notification, NotificationListener, NotificationType, Notifications
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.project.Project
@@ -97,7 +99,9 @@ class CompileServerLauncher extends ApplicationComponent {
   }
 
   private def start(project: Project, jdk: JDK): Either[String, Process] = {
-    import org.jetbrains.plugins.scala.compiler.CompileServerLauncher.{compilerJars, jvmParameters}
+    import org.jetbrains.plugins.scala.compiler.CompileServerLauncher.{
+      compilerJars, jvmParameters
+    }
 
     compilerJars.partition(_.exists) match {
       case (presentFiles, Seq()) =>

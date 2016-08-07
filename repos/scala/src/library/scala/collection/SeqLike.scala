@@ -62,8 +62,7 @@ trait SeqLike[+A, +Repr]
     extends Any
     with IterableLike[A, Repr]
     with GenSeqLike[A, Repr]
-    with Parallelizable[A, ParSeq[A]] {
-  self =>
+    with Parallelizable[A, ParSeq[A]] { self =>
 
   override protected[this] def thisCollection: Seq[A] =
     this.asInstanceOf[Seq[A]]

@@ -1,12 +1,9 @@
 /*
 Copyright 2013 Twitter, Inc.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +21,9 @@ import com.twitter.summingbird.online.Externalizer
 
 import com.twitter.summingbird.online.FlatMapOperation
 
-import com.twitter.summingbird.online.option.{SummerBuilder, MaxWaitingFutures, MaxFutureWaitTime, MaxEmitPerExecute}
+import com.twitter.summingbird.online.option.{
+  SummerBuilder, MaxWaitingFutures, MaxFutureWaitTime, MaxEmitPerExecute
+}
 import scala.collection.mutable.{Map => MMap, ListBuffer}
 // These CMaps we generate in the FFM, we use it as an immutable wrapper around
 // a mutable map.

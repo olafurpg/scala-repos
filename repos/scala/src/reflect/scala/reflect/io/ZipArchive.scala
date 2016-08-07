@@ -8,7 +8,9 @@ package reflect
 package io
 
 import java.net.URL
-import java.io.{IOException, InputStream, ByteArrayInputStream, FilterInputStream}
+import java.io.{
+  IOException, InputStream, ByteArrayInputStream, FilterInputStream
+}
 import java.io.{File => JFile}
 import java.util.zip.{ZipEntry, ZipFile, ZipInputStream}
 import java.util.jar.Manifest
@@ -63,8 +65,7 @@ import ZipArchive._
 /** ''Note:  This library is considered experimental and should not be used unless you know what you are doing.'' */
 abstract class ZipArchive(override val file: JFile)
     extends AbstractFile
-    with Equals {
-  self =>
+    with Equals { self =>
 
   override def underlyingSource = Some(this)
   def isDirectory = true

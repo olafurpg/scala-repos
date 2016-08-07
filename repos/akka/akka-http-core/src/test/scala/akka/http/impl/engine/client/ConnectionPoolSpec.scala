@@ -16,7 +16,9 @@ import scala.util.{Failure, Success, Try}
 import akka.util.ByteString
 import akka.http.scaladsl.{TestUtils, Http}
 import akka.http.impl.util.{SingletonException, StreamUtils}
-import akka.http.scaladsl.settings.{ClientConnectionSettings, ConnectionPoolSettings, ServerSettings}
+import akka.http.scaladsl.settings.{
+  ClientConnectionSettings, ConnectionPoolSettings, ServerSettings
+}
 import akka.stream.{ActorMaterializer}
 import akka.stream.TLSProtocol._
 import akka.stream.testkit.{TestPublisher, TestSubscriber}

@@ -4,7 +4,9 @@ import java.net.{URL, URLClassLoader}
 import java.util.ServiceLoader
 
 import mesosphere.marathon.core.plugin.impl.PluginManagerImpl._
-import mesosphere.marathon.core.plugin.{PluginDefinition, PluginDefinitions, PluginManager}
+import mesosphere.marathon.core.plugin.{
+  PluginDefinition, PluginDefinitions, PluginManager
+}
 import mesosphere.marathon.io.IO
 import mesosphere.marathon.plugin.plugin.PluginConfiguration
 import mesosphere.marathon.{MarathonConf, WrongConfigurationException}

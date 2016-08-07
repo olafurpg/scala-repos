@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala.lang.completion3
 
 import com.intellij.codeInsight.CodeInsightSettings
-import com.intellij.codeInsight.completion.{CompletionLookupArranger, CompletionType, LightFixtureCompletionTestCase}
+import com.intellij.codeInsight.completion.{
+  CompletionLookupArranger, CompletionType, LightFixtureCompletionTestCase
+}
 import com.intellij.codeInsight.lookup.{LookupElement, LookupManager}
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.ide.ui.UISettings

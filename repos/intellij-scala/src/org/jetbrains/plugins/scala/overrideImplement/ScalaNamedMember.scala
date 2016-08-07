@@ -4,7 +4,9 @@ package overrideImplement
 import com.intellij.codeInsight.generation.PsiElementClassMember
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScTypeAlias, ScValue, ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext

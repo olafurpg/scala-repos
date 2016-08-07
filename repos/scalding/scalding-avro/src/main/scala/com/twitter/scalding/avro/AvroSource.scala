@@ -17,7 +17,9 @@ package com.twitter.scalding.avro
 
 import cascading.avro.AvroScheme
 import cascading.avro.PackedAvroScheme
-import cascading.avro.local.{AvroScheme => LAvroScheme, PackedAvroScheme => LPackedAvroScheme}
+import cascading.avro.local.{
+  AvroScheme => LAvroScheme, PackedAvroScheme => LPackedAvroScheme
+}
 import com.twitter.scalding._
 import org.apache.avro.Schema
 import cascading.scheme.Scheme

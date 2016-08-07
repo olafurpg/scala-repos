@@ -18,7 +18,9 @@ package net.liftweb
 package mongodb
 
 import BsonDSL._
-import net.liftweb.util.{Helpers, ConnectionIdentifier, DefaultConnectionIdentifier}
+import net.liftweb.util.{
+  Helpers, ConnectionIdentifier, DefaultConnectionIdentifier
+}
 
 import java.util.{Calendar, Date, UUID}
 import java.util.regex.Pattern

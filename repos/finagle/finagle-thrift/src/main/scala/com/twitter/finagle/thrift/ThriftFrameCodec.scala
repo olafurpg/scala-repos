@@ -1,7 +1,11 @@
 package com.twitter.finagle.thrift
 
-import org.jboss.netty.channel.{SimpleChannelHandler, ChannelEvent, ChannelHandlerContext}
-import org.jboss.netty.handler.codec.frame.{LengthFieldBasedFrameDecoder, LengthFieldPrepender}
+import org.jboss.netty.channel.{
+  SimpleChannelHandler, ChannelEvent, ChannelHandlerContext
+}
+import org.jboss.netty.handler.codec.frame.{
+  LengthFieldBasedFrameDecoder, LengthFieldPrepender
+}
 
 /**
   * Channel handler `ThriftFrameCodec` frames and unframes thrift

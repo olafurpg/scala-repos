@@ -2,7 +2,9 @@ package com.twitter.finagle.netty4
 
 import com.twitter.concurrent.NamedPoolThreadFactory
 import com.twitter.finagle._
-import com.twitter.finagle.netty4.channel.{ServerBridge, Netty4ChannelInitializer}
+import com.twitter.finagle.netty4.channel.{
+  ServerBridge, Netty4ChannelInitializer
+}
 import com.twitter.finagle.netty4.transport.ChannelTransport
 import com.twitter.finagle.server.Listener
 import com.twitter.finagle.ssl.Engine

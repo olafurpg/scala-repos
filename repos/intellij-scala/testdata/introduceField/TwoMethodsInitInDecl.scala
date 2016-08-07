@@ -15,11 +15,9 @@ class Test {
 /*replaceAll*/
 class Test {
   var i: Int = 1
-
   def foo() {
     i
   }
-
   def bar() {
     i
   }

@@ -102,8 +102,7 @@ object ActorRef {
   */
 abstract class ActorRef
     extends java.lang.Comparable[ActorRef]
-    with Serializable {
-  scalaRef: InternalActorRef ⇒
+    with Serializable { scalaRef: InternalActorRef ⇒
 
   /**
     * Returns the path for this actor (from this actor up to the root actor).
@@ -224,8 +223,7 @@ private[akka] trait RepointableRef extends ActorRefScope {
   */
 private[akka] abstract class InternalActorRef
     extends ActorRef
-    with ScalaActorRef {
-  this: ActorRefScope ⇒
+    with ScalaActorRef { this: ActorRefScope ⇒
   /*
    * Actor life-cycle management, invoked only internally (in response to user requests via ActorContext).
    */

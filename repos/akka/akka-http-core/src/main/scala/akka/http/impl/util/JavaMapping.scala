@@ -13,7 +13,9 @@ import scala.collection.immutable
 import scala.reflect.ClassTag
 import akka.NotUsed
 import akka.http.impl.model.{JavaQuery, JavaUri}
-import akka.http.javadsl.{model ⇒ jm, HttpConnectionContext, ConnectionContext, HttpsConnectionContext}
+import akka.http.javadsl.{
+  model ⇒ jm, HttpConnectionContext, ConnectionContext, HttpsConnectionContext
+}
 import akka.http.scaladsl.{model ⇒ sm}
 import akka.http.javadsl.{settings ⇒ js}
 

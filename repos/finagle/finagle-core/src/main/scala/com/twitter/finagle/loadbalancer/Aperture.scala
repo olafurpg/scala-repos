@@ -3,8 +3,13 @@ package com.twitter.finagle.loadbalancer
 import com.twitter.finagle.service.FailingFactory
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.util.{Rng, Ring, Ema}
-import com.twitter.finagle.{ClientConnection, NoBrokersAvailableException, ServiceFactory, ServiceFactoryProxy, ServiceProxy, Status}
-import com.twitter.util.{Activity, Return, Future, Throw, Time, Duration, Timer}
+import com.twitter.finagle.{
+  ClientConnection, NoBrokersAvailableException, ServiceFactory,
+  ServiceFactoryProxy, ServiceProxy, Status
+}
+import com.twitter.util.{
+  Activity, Return, Future, Throw, Time, Duration, Timer
+}
 import java.util.concurrent.atomic.AtomicInteger
 
 /**

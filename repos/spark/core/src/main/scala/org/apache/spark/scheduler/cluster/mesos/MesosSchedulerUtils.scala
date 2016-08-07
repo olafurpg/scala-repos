@@ -25,7 +25,9 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.control.NonFatal
 
 import com.google.common.base.Splitter
-import org.apache.mesos.{MesosSchedulerDriver, Protos, Scheduler, SchedulerDriver}
+import org.apache.mesos.{
+  MesosSchedulerDriver, Protos, Scheduler, SchedulerDriver
+}
 import org.apache.mesos.Protos._
 import org.apache.mesos.protobuf.{ByteString, GeneratedMessage}
 

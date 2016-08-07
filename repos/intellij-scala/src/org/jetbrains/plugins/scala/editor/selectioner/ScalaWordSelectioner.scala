@@ -8,7 +8,9 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScMethodCall
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScArguments, ScParameterClause}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScArguments, ScParameterClause
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScExtendsBlock
 
 /**

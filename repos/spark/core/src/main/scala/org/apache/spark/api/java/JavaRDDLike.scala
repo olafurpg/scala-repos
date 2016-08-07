@@ -31,7 +31,9 @@ import org.apache.spark.annotation.Since
 import org.apache.spark.api.java.JavaPairRDD._
 import org.apache.spark.api.java.JavaSparkContext.fakeClassTag
 import org.apache.spark.api.java.JavaUtils.mapAsSerializableJavaMap
-import org.apache.spark.api.java.function.{Function => JFunction, Function2 => JFunction2, _}
+import org.apache.spark.api.java.function.{
+  Function => JFunction, Function2 => JFunction2, _
+}
 import org.apache.spark.partial.{BoundedDouble, PartialResult}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel

@@ -1,6 +1,8 @@
 package mesosphere.marathon.integration
 
-import mesosphere.marathon.integration.setup.{IntegrationFunSuite, SingleMarathonIntegrationTest}
+import mesosphere.marathon.integration.setup.{
+  IntegrationFunSuite, SingleMarathonIntegrationTest
+}
 import org.scalatest._
 
 class EventSubscribersIntegrationTest

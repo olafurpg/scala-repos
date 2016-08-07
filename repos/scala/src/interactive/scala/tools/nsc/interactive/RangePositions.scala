@@ -10,8 +10,7 @@ package interactive
 trait RangePositions
     extends scala.reflect.internal.Positions
     with ast.Trees
-    with ast.Positions {
-  self: scala.tools.nsc.Global =>
+    with ast.Positions { self: scala.tools.nsc.Global =>
 
   override val useOffsetPositions = false
 }

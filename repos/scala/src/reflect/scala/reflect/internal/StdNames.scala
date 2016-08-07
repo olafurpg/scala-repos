@@ -470,9 +470,9 @@ trait StdNames { self: SymbolTable =>
       */
     def unspecializedName(name: Name): Name =
       (// DUPLICATED LOGIC WITH `splitSpecializedName`
-       if (name endsWith SPECIALIZED_SUFFIX)
-         name.subName(0, name.lastIndexOf('m') - 1)
-       else name)
+      if (name endsWith SPECIALIZED_SUFFIX)
+        name.subName(0, name.lastIndexOf('m') - 1)
+      else name)
 
     /** Return the original name and the types on which this name
       *  is specialized. For example,

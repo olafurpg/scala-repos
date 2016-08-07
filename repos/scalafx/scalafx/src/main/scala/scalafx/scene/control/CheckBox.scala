@@ -48,7 +48,7 @@ class CheckBox(override val delegate: jfxsc.CheckBox = new jfxsc.CheckBox)
   def this(text: String) = this(new jfxsc.CheckBox(text))
 
   /**
-    * Determines whether the user toggling the CheckBox should cycle through all three states: 
+    * Determines whether the user toggling the CheckBox should cycle through all three states:
     * checked, unchecked, and undefined.
     */
   def allowIndeterminate: BooleanProperty = delegate.allowIndeterminateProperty

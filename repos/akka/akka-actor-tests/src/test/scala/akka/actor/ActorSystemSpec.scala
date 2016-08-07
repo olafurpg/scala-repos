@@ -62,11 +62,11 @@ object ActorSystemSpec {
         terminaters =
           Set() ++
             (for (i ← 1 to n) yield {
-                  val man =
-                    context.watch(context.system.actorOf(Props[Terminater]))
-                  man ! "run"
-                  man
-                })
+              val man =
+                context.watch(context.system.actorOf(Props[Terminater]))
+              man ! "run"
+              man
+            })
       case Terminated(child) if terminaters contains child ⇒
         terminaters -= child
         if (terminaters.isEmpty) {
@@ -343,10 +343,10 @@ class ActorSystemSpec
 
       created filter
         (ref ⇒
-              !ref.isTerminated && !ref
-                .asInstanceOf[ActorRefWithCell]
-                .underlying
-                .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
+           !ref.isTerminated && !ref
+             .asInstanceOf[ActorRefWithCell]
+             .underlying
+             .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
     }
 
     "shut down when /user fails" in {

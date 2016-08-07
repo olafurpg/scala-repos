@@ -20,7 +20,9 @@ package org.apache.spark.ml.regression
 import scala.collection.mutable
 
 import breeze.linalg.{DenseVector => BDV}
-import breeze.optimize.{CachedDiffFunction, DiffFunction, LBFGS => BreezeLBFGS, OWLQN => BreezeOWLQN}
+import breeze.optimize.{
+  CachedDiffFunction, DiffFunction, LBFGS => BreezeLBFGS, OWLQN => BreezeOWLQN
+}
 import breeze.stats.distributions.StudentsT
 import org.apache.hadoop.fs.Path
 

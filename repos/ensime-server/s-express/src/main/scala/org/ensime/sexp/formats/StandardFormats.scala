@@ -113,8 +113,7 @@ trait StandardFormats extends ThreadLocalSupport {
   })
 }
 
-trait OptionAltFormat {
-  this: StandardFormats =>
+trait OptionAltFormat { this: StandardFormats =>
 
   override implicit def optionFormat[T: SexpFormat]: SexpFormat[Option[T]] =
     new SexpFormat[Option[T]] {

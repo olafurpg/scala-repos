@@ -7,9 +7,13 @@ import bintray.Plugin.bintrayPublishSettings
 import bintray.Keys.{repository, bintrayOrganization, bintray}
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.{previousArtifact, binaryIssueFilters}
+import com.typesafe.tools.mima.plugin.MimaKeys.{
+  previousArtifact, binaryIssueFilters
+}
 
-import java.io.{BufferedOutputStream, FileOutputStream, BufferedWriter, FileWriter}
+import java.io.{
+  BufferedOutputStream, FileOutputStream, BufferedWriter, FileWriter
+}
 
 import scala.collection.mutable
 import scala.util.Properties
@@ -741,7 +745,7 @@ object Build extends sbt.Build {
             noClassFilesSettings,
             // The Scala lib is full of warnings we don't want to see
             scalacOptions ~= (_.filterNot(
-                    Set("-deprecation", "-unchecked", "-feature") contains _)),
+                Set("-deprecation", "-unchecked", "-feature") contains _)),
             // Tell the plugin to hack-fix bad classOf trees
             scalacOptions += "-P:scalajs:fixClassOf",
             artifactPath in fetchScalaSource :=
@@ -1187,11 +1191,11 @@ object Build extends sbt.Build {
             jsDependencies +=
               ProvidedJS / "ScalaJSDefinedTestNatives.js" % "test",
             scalaJSSemantics ~= (_.withRuntimeClassName(_.fullName match {
-                  case "org.scalajs.testsuite.compiler.ReflectionTest$RenamedTestClass" =>
-                    "renamed.test.Class"
-                  case fullName =>
-                    fullName
-                })),
+              case "org.scalajs.testsuite.compiler.ReflectionTest$RenamedTestClass" =>
+                "renamed.test.Class"
+              case fullName =>
+                fullName
+            })),
             /* Generate a scala source file that throws exceptions in
              * various places (while attaching the source line to the
              * exception). When we catch the exception, we can then

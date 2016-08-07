@@ -14,13 +14,19 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.ImportUsed
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
-import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{ScSyntheticFunction, SyntheticClasses}
+import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{
+  ScSyntheticFunction, SyntheticClasses
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.processor.PrecedenceHelper.PrecedenceTypes
 
 import scala.collection.immutable.HashSet

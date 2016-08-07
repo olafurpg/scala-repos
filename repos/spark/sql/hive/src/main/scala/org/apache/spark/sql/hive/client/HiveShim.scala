@@ -20,7 +20,9 @@ package org.apache.spark.sql.hive.client
 import java.lang.{Boolean => JBoolean, Integer => JInteger, Long => JLong}
 import java.lang.reflect.{Method, Modifier}
 import java.net.URI
-import java.util.{ArrayList => JArrayList, List => JList, Map => JMap, Set => JSet}
+import java.util.{
+  ArrayList => JArrayList, List => JList, Map => JMap, Set => JSet
+}
 import java.util.concurrent.TimeUnit
 
 import scala.collection.JavaConverters._
@@ -29,7 +31,9 @@ import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.hadoop.hive.conf.HiveConf
 import org.apache.hadoop.hive.ql.Driver
 import org.apache.hadoop.hive.ql.metadata.{Hive, Partition, Table}
-import org.apache.hadoop.hive.ql.processors.{CommandProcessor, CommandProcessorFactory}
+import org.apache.hadoop.hive.ql.processors.{
+  CommandProcessor, CommandProcessorFactory
+}
 import org.apache.hadoop.hive.ql.session.SessionState
 import org.apache.hadoop.hive.serde.serdeConstants
 

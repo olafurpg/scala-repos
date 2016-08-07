@@ -1,4 +1,7 @@
-import scala.concurrent.{Future, Promise, TimeoutException, SyncVar, ExecutionException, ExecutionContext, CanAwait, Await}
+import scala.concurrent.{
+  Future, Promise, TimeoutException, SyncVar, ExecutionException,
+  ExecutionContext, CanAwait, Await
+}
 import scala.concurrent.blocking
 import scala.util.{Try, Success, Failure}
 import scala.concurrent.duration.Duration

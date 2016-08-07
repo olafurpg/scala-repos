@@ -1,6 +1,5 @@
 trait S {
-  trait T {
-    this: Any =>
+  trait T { this: Any =>
 
     trait U {
       trait V {

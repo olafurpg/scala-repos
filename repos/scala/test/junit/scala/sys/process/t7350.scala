@@ -3,7 +3,10 @@ package scala.sys.process
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.junit.Test
-import java.io.{InputStream, OutputStream, PipedInputStream, PipedOutputStream, ByteArrayInputStream, ByteArrayOutputStream, IOException, Closeable}
+import java.io.{
+  InputStream, OutputStream, PipedInputStream, PipedOutputStream,
+  ByteArrayInputStream, ByteArrayOutputStream, IOException, Closeable
+}
 import java.lang.reflect.InvocationTargetException
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.{Duration, SECONDS}

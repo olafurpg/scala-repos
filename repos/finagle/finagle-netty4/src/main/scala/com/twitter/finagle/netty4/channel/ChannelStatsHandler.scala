@@ -4,7 +4,9 @@ import com.twitter.finagle.Failure
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.util.{Duration, Monitor, Stopwatch}
 import io.netty.buffer.ByteBuf
-import io.netty.channel.{ChannelDuplexHandler, ChannelHandlerContext, ChannelPromise}
+import io.netty.channel.{
+  ChannelDuplexHandler, ChannelHandlerContext, ChannelPromise
+}
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.util.AttributeKey
 import java.io.IOException

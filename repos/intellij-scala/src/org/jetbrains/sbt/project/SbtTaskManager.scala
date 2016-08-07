@@ -3,7 +3,9 @@ package project
 
 import java.util
 
-import com.intellij.openapi.externalSystem.model.task.{ExternalSystemTaskId, ExternalSystemTaskNotificationListener}
+import com.intellij.openapi.externalSystem.model.task.{
+  ExternalSystemTaskId, ExternalSystemTaskNotificationListener
+}
 import com.intellij.openapi.externalSystem.task.ExternalSystemTaskManager
 import org.jetbrains.sbt.project.settings.SbtExecutionSettings
 

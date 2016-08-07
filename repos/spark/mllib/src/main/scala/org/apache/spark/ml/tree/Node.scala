@@ -20,7 +20,10 @@ package org.apache.spark.ml.tree
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.mllib.tree.impurity.ImpurityCalculator
-import org.apache.spark.mllib.tree.model.{ImpurityStats, InformationGainStats => OldInformationGainStats, Node => OldNode, Predict => OldPredict}
+import org.apache.spark.mllib.tree.model.{
+  ImpurityStats, InformationGainStats => OldInformationGainStats,
+  Node => OldNode, Predict => OldPredict
+}
 
 /**
   * :: DeveloperApi ::

@@ -6,7 +6,10 @@ package akka.actor
 import scala.collection.immutable
 
 import akka.AkkaException
-import akka.dispatch.{UnboundedDequeBasedMessageQueueSemantics, RequiresMessageQueue, Envelope, DequeBasedMessageQueueSemantics}
+import akka.dispatch.{
+  UnboundedDequeBasedMessageQueueSemantics, RequiresMessageQueue, Envelope,
+  DequeBasedMessageQueueSemantics
+}
 
 import scala.util.control.NoStackTrace
 
@@ -95,8 +98,7 @@ trait UnrestrictedStash extends Actor with StashSupport {
   *
   * @see [[StashSupport]]
   */
-private[akka] trait StashFactory {
-  this: Actor ⇒
+private[akka] trait StashFactory { this: Actor ⇒
   private[akka] def createStash(
       )(implicit ctx: ActorContext, ref: ActorRef): StashSupport =
     new StashSupport {

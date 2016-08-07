@@ -26,13 +26,19 @@ import scala.collection.mutable.ArrayBuffer
 import org.apache.commons.logging.LogFactory
 import org.apache.hadoop.hive.conf.HiveConf
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars
-import org.apache.hive.service.cli.thrift.{ThriftBinaryCLIService, ThriftHttpCLIService}
-import org.apache.hive.service.server.{HiveServer2, HiveServerServerOptionsProcessor}
+import org.apache.hive.service.cli.thrift.{
+  ThriftBinaryCLIService, ThriftHttpCLIService
+}
+import org.apache.hive.service.server.{
+  HiveServer2, HiveServerServerOptionsProcessor
+}
 
 import org.apache.spark.SparkContext
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.internal.Logging
-import org.apache.spark.scheduler.{SparkListener, SparkListenerApplicationEnd, SparkListenerJobStart}
+import org.apache.spark.scheduler.{
+  SparkListener, SparkListenerApplicationEnd, SparkListenerJobStart
+}
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.hive.thriftserver.ReflectionUtils._
 import org.apache.spark.sql.hive.thriftserver.ui.ThriftServerTab

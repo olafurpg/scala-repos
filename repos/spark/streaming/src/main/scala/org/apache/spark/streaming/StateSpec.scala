@@ -20,7 +20,9 @@ package org.apache.spark.streaming
 import org.apache.spark.{HashPartitioner, Partitioner}
 import org.apache.spark.annotation.Experimental
 import org.apache.spark.api.java.{JavaPairRDD, JavaUtils, Optional}
-import org.apache.spark.api.java.function.{Function3 => JFunction3, Function4 => JFunction4}
+import org.apache.spark.api.java.function.{
+  Function3 => JFunction3, Function4 => JFunction4
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.util.ClosureCleaner
 

@@ -6,7 +6,9 @@ import com.intellij.psi.impl.light.LightElement
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
 
 /**
   * @author Alefas

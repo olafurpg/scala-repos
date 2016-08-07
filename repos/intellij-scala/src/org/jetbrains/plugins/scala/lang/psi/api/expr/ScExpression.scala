@@ -15,14 +15,24 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.ImportUsed
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTrait
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
-import org.jetbrains.plugins.scala.lang.psi.implicits.{ImplicitCollector, ScImplicitlyConvertible}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory, ScalaPsiManager
+}
+import org.jetbrains.plugins.scala.lang.psi.implicits.{
+  ImplicitCollector, ScImplicitlyConvertible
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, ScMethodType, ScTypePolymorphicType}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  Parameter, ScMethodType, ScTypePolymorphicType
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.processor.MethodResolveProcessor
 import org.jetbrains.plugins.scala.lang.resolve.{ScalaResolveResult, StdKinds}
-import org.jetbrains.plugins.scala.macroAnnotations.{CachedMappedWithRecursionGuard, ModCount}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  CachedMappedWithRecursionGuard, ModCount
+}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer

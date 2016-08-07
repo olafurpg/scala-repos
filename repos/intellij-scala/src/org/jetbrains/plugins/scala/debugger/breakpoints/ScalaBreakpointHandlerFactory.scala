@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.debugger.breakpoints
 
-import com.intellij.debugger.engine.{DebugProcessImpl, JavaBreakpointHandler, JavaBreakpointHandlerFactory}
+import com.intellij.debugger.engine.{
+  DebugProcessImpl, JavaBreakpointHandler, JavaBreakpointHandlerFactory
+}
 
 /**
   * @author Nikolay.Tropin

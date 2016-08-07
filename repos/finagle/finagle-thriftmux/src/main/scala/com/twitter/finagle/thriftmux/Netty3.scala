@@ -1,11 +1,15 @@
 package com.twitter.finagle.thriftmux
 
 import com.twitter.finagle.{Path, Failure, Dtab, ThriftMuxUtil}
-import com.twitter.finagle.mux.transport.{BadMessageException, Message, Netty3Framer}
+import com.twitter.finagle.mux.transport.{
+  BadMessageException, Message, Netty3Framer
+}
 import com.twitter.finagle.netty3.BufChannelBuffer
 import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.finagle.thrift._
-import com.twitter.finagle.thrift.thrift.{RequestContext, RequestHeader, ResponseHeader, UpgradeReply}
+import com.twitter.finagle.thrift.thrift.{
+  RequestContext, RequestHeader, ResponseHeader, UpgradeReply
+}
 import com.twitter.finagle.tracing.Trace
 import com.twitter.logging.Level
 import com.twitter.util.{Try, Return, Throw, NonFatal}

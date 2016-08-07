@@ -8,11 +8,19 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.extensions.ResolvesTo
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScReferencePattern}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScReferenceElement, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern, ScReferencePattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScReferenceElement, ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScVariable}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition, ScVariable
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
 import org.jetbrains.plugins.scala.lang.psi.light.PsiTypedDefinitionWrapper
 import org.jetbrains.plugins.scala.lang.psi.light.scala._

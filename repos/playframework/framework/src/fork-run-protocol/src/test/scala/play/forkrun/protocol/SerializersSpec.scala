@@ -5,7 +5,9 @@ package play.forkrun.protocol
 
 import org.specs2.mutable._
 import play.forkrun.protocol.Serializers._
-import play.runsupport.Reloader.{Source, CompileSuccess, CompileFailure, CompileResult}
+import play.runsupport.Reloader.{
+  Source, CompileSuccess, CompileFailure, CompileResult
+}
 import sbt.serialization._
 
 object SerializersSpec extends Specification with PicklingTestUtils {

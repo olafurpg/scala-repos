@@ -23,7 +23,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
 import org.jetbrains.plugins.scala.lang.psi.types.result.Success
-import org.jetbrains.plugins.scala.lang.resolve.processor.{BaseProcessor, ImplicitProcessor, ResolveProcessor, ResolverEnv}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  BaseProcessor, ImplicitProcessor, ResolveProcessor, ResolverEnv
+}
 import org.jetbrains.plugins.scala.util.ScalaUtils
 
 import scala.collection.mutable.ArrayBuffer
@@ -107,7 +109,7 @@ class ScSyntheticClass(manager: PsiManager,
 
   def syntheticMethods(scope: GlobalSearchScope) =
     methods.values.flatMap(s => s).toList ++ specialMethods.values
-      .flatMap(s => s.map(_ (scope)))
+      .flatMap(s => s.map(_(scope)))
       .toList
 
   protected object methods

@@ -9,15 +9,27 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.jetbrains.plugins.scala.editor.documentationProvider.ScalaDocumentationProvider
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScReferencePattern}
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScCompoundTypeElement, ScRefinement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern, ScReferencePattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScCompoundTypeElement, ScRefinement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScObject, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.light.scala.ScLightTypeAliasDefinition
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{ScMethodType, ScTypePolymorphicType}
-import org.jetbrains.plugins.scala.lang.refactoring.util.{ScTypeUtil, ScalaNamesUtil}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  ScMethodType, ScTypePolymorphicType
+}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  ScTypeUtil, ScalaNamesUtil
+}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
@@ -202,7 +214,7 @@ trait ScTypePresentation {
             if s.namedElement.isInstanceOf[ScFunction] =>
           val fun = s.namedElement.asInstanceOf[ScFunction]
           val funCopy = ScFunction.getCompoundCopy(
-              s.substitutedTypes.map(_.map(_ ()).toList),
+              s.substitutedTypes.map(_.map(_()).toList),
               s.typeParams.toList,
               rt,
               fun)

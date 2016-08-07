@@ -12,11 +12,9 @@ class FixImport extends G {
 }
 /*
 package pin
-
 import bin.{bon => _, _}
 import tin._
 import bon.G
-
 class FixImport extends G {
   val x = new E
 }

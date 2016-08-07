@@ -821,13 +821,15 @@ private[internal] trait TypeMaps { self: SymbolTable =>
            case TypeRef(pre, sym, args) if pre ne NoPrefix =>
              val newSym = substFor(sym)
              // mapOver takes care of subst'ing in args
-             mapOver(if (sym eq newSym) tp
+             mapOver(
+                 if (sym eq newSym) tp
                  else
                    copyTypeRef(tp, pre, newSym, args))
            // assert(newSym.typeParams.length == sym.typeParams.length, "typars mismatch in SubstSymMap: "+(sym, sym.typeParams, newSym, newSym.typeParams))
            case SingleType(pre, sym) if pre ne NoPrefix =>
              val newSym = substFor(sym)
-             mapOver(if (sym eq newSym) tp
+             mapOver(
+                 if (sym eq newSym) tp
                  else
                    singleType(pre, newSym))
            case _ =>

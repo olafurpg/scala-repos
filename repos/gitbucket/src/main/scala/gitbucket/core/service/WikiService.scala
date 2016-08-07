@@ -20,7 +20,7 @@ object WikiService {
 
   /**
     * The model for wiki page.
-    * 
+    *
     * @param name the page name
     * @param content the page content
     * @param committer the last committer
@@ -35,7 +35,7 @@ object WikiService {
 
   /**
     * The model for wiki page history.
-    * 
+    *
     * @param name the page name
     * @param committer the committer the committer
     * @param message the commit message

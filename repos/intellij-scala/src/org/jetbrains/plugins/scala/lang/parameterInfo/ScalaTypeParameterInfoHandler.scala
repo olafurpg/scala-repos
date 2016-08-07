@@ -13,14 +13,18 @@ import com.intellij.psi.{PsiClass, PsiMethod, PsiType, PsiTypeParameter}
 import com.intellij.util.ArrayUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParameterizedTypeElement, ScSimpleTypeElement, ScTypeArgs, ScTypeElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScParameterizedTypeElement, ScSimpleTypeElement, ScTypeArgs, ScTypeElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScGenericCall
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScMacroDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.{ScSubstitutor, ScType}
-import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceExpression, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolvableReferenceExpression, ScalaResolveResult
+}
 
 import scala.collection.mutable.ArrayBuffer
 

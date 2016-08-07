@@ -19,8 +19,12 @@ package org.apache.spark.mllib.stat.test
 
 import scala.annotation.varargs
 
-import org.apache.commons.math3.distribution.{NormalDistribution, RealDistribution}
-import org.apache.commons.math3.stat.inference.{KolmogorovSmirnovTest => CommonMathKolmogorovSmirnovTest}
+import org.apache.commons.math3.distribution.{
+  NormalDistribution, RealDistribution
+}
+import org.apache.commons.math3.stat.inference.{
+  KolmogorovSmirnovTest => CommonMathKolmogorovSmirnovTest
+}
 
 import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD

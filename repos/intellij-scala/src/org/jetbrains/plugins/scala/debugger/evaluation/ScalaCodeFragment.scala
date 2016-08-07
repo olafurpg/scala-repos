@@ -14,7 +14,9 @@ import com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.plugins.scala.ScalaFileType
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaFileImpl, ScalaPsiElementFactory}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaFileImpl, ScalaPsiElementFactory
+}
 
 import scala.collection.mutable
 

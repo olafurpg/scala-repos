@@ -12,12 +12,20 @@ import java.net.{URI, URL}
 import compiler.{Eval, EvalImports}
 import scala.annotation.tailrec
 import collection.mutable
-import sbt.internal.inc.{Analysis, ClasspathOptions, FileValueCache, Locate, ModuleUtilities}
+import sbt.internal.inc.{
+  Analysis, ClasspathOptions, FileValueCache, Locate, ModuleUtilities
+}
 import sbt.internal.inc.classpath.ClasspathUtilities
 import Project.{inScope, makeSettings}
 import Def.{isDummy, ScopedKey, ScopeLocal, Setting}
-import Keys.{appConfiguration, baseDirectory, configuration, fullResolvers, fullClasspath, pluginData, streams, thisProject, thisProjectRef, update}
-import Keys.{exportedProducts, loadedBuild, onLoadMessage, resolvedScoped, sbtPlugin, scalacOptions, taskDefinitionKey}
+import Keys.{
+  appConfiguration, baseDirectory, configuration, fullResolvers, fullClasspath,
+  pluginData, streams, thisProject, thisProjectRef, update
+}
+import Keys.{
+  exportedProducts, loadedBuild, onLoadMessage, resolvedScoped, sbtPlugin,
+  scalacOptions, taskDefinitionKey
+}
 import tools.nsc.reporters.ConsoleReporter
 import sbt.internal.util.Attributed
 import sbt.internal.util.Attributed.data
@@ -1057,7 +1065,10 @@ object Load {
       merge(fs.sortBy(_.getName).map(memoLoadSettingsFile))
 
     // Finds all the build files associated with this project
-    import AddSettings.{User, SbtFiles, DefaultSbtFiles, Plugins, AutoPlugins, Sequence, BuildScalaFiles}
+    import AddSettings.{
+      User, SbtFiles, DefaultSbtFiles, Plugins, AutoPlugins, Sequence,
+      BuildScalaFiles
+    }
     def associatedFiles(auto: AddSettings): Seq[File] = auto match {
       case sf: SbtFiles =>
         sf.files.map(f => IO.resolve(projectBase, f)).filterNot(_.isHidden)

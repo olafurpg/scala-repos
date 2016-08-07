@@ -10,7 +10,10 @@ import com.intellij.openapi.application.{ApplicationManager, PathManager}
 import com.intellij.openapi.externalSystem.model.ExternalSystemException
 import com.intellij.openapi.externalSystem.service.project.autoimport.CachingExternalSystemAutoImportAware
 import com.intellij.openapi.externalSystem.util._
-import com.intellij.openapi.externalSystem.{ExternalSystemAutoImportAware, ExternalSystemConfigurableAware, ExternalSystemManager}
+import com.intellij.openapi.externalSystem.{
+  ExternalSystemAutoImportAware, ExternalSystemConfigurableAware,
+  ExternalSystemManager
+}
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.impl.JavaAwareProjectJdkTableImpl
@@ -20,7 +23,9 @@ import com.intellij.testFramework.IdeaTestUtil
 import com.intellij.util.net.HttpConfigurable
 import org.jetbrains.android.sdk.AndroidSdkType
 import org.jetbrains.sbt.project.settings._
-import org.jetbrains.sbt.settings.{SbtExternalSystemConfigurable, SbtSystemSettings}
+import org.jetbrains.sbt.settings.{
+  SbtExternalSystemConfigurable, SbtSystemSettings
+}
 
 import scala.collection.mutable
 

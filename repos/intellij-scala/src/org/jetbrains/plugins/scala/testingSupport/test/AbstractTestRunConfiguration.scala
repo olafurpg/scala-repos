@@ -8,7 +8,9 @@ import com.intellij.execution._
 import com.intellij.execution.configurations._
 import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
 import com.intellij.execution.testframework.TestFrameworkRunningModel
-import com.intellij.execution.testframework.sm.{CompositeTestLocationProvider, SMTestRunnerConnectionUtil}
+import com.intellij.execution.testframework.sm.{
+  CompositeTestLocationProvider, SMTestRunnerConnectionUtil
+}
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties
 import com.intellij.execution.testframework.sm.runner.ui.SMTRunnerConsoleView
 import com.intellij.openapi.application.ApplicationManager
@@ -27,14 +29,20 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScPackage
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScPackageImpl, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject
+}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScPackageImpl, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.project._
 import org.jetbrains.plugins.scala.project.maven.ScalaTestDefaultWorkingDirectoryProvider
 import org.jetbrains.plugins.scala.testingSupport.ScalaTestingConfiguration
 import org.jetbrains.plugins.scala.testingSupport.locationProvider.ScalaTestLocationProvider
 import org.jetbrains.plugins.scala.testingSupport.test.AbstractTestRunConfiguration.PropertiesExtension
-import org.jetbrains.plugins.scala.testingSupport.test.TestRunConfigurationForm.{SearchForTest, TestKind}
+import org.jetbrains.plugins.scala.testingSupport.test.TestRunConfigurationForm.{
+  SearchForTest, TestKind
+}
 import org.jetbrains.plugins.scala.util.ScalaUtil
 
 import scala.beans.BeanProperty

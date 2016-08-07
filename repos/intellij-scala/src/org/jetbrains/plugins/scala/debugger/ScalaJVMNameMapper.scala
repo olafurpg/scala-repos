@@ -6,7 +6,9 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiClass
 import org.jetbrains.annotations.NotNull
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTemplateDefinition, ScTrait
+}
 
 /**
   *@author ilyas

@@ -53,9 +53,9 @@ object SafeNodeSeq {
       Some(
           s flatMap
             (_ match {
-              case n: Node => n
-              case _ => NodeSeq.Empty
-            }))
+          case n: Node => n
+          case _ => NodeSeq.Empty
+        }))
     case _ => None
   }
 }

@@ -4,7 +4,9 @@ package atmosphere
 import java.io.IOException
 import java.util
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import javax.servlet.{FilterConfig, ServletConfig, ServletContext, ServletException}
+import javax.servlet.{
+  FilterConfig, ServletConfig, ServletContext, ServletException
+}
 
 import org.atmosphere.container.Tomcat7CometSupport
 import org.atmosphere.container.TomcatCometSupport
@@ -21,7 +23,9 @@ import grizzled.slf4j.Logger
 import org.apache.catalina.CometProcessor
 import org.atmosphere.cache.UUIDBroadcasterCache
 import org.atmosphere.client.TrackMessageSizeInterceptor
-import org.atmosphere.container.{JBossWebCometSupport, Tomcat7CometSupport, TomcatCometSupport}
+import org.atmosphere.container.{
+  JBossWebCometSupport, Tomcat7CometSupport, TomcatCometSupport
+}
 import org.atmosphere.cpr._
 import org.atmosphere.interceptor.SessionCreationInterceptor
 import org.jboss.servlet.http.{HttpEvent, HttpEventServlet}

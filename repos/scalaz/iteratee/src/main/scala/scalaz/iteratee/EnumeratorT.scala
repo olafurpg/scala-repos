@@ -16,7 +16,7 @@ trait EnumeratorT[E, F[_]] { self =>
 
   def #::(e: => E)(implicit F: Monad[F]): EnumeratorT[E, F] = {
     new EnumeratorT[E, F] {
-      def apply[A] = _.mapCont(_ (elInput(e))) &= self
+      def apply[A] = _.mapCont(_(elInput(e))) &= self
     }
   }
 
@@ -132,12 +132,12 @@ trait EnumeratorTFunctions {
       def apply[A] = _.pointI
     }
 
-  /** 
+  /**
     * An EnumeratorT that is at EOF
     */
   def enumEofT[E, F[_]: Applicative]: EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
-      def apply[A] = _.mapCont(_ (eofInput))
+      def apply[A] = _.mapCont(_(eofInput))
     }
 
   /**
@@ -154,7 +154,7 @@ trait EnumeratorTFunctions {
 
   def enumOne[E, F[_]: Applicative](e: E): EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
-      def apply[A] = _.mapCont(_ (elInput(e)))
+      def apply[A] = _.mapCont(_(elInput(e)))
     }
 
   def enumStream[E, F[_]: Monad](xs: Stream[E]): EnumeratorT[E, F] =
@@ -261,7 +261,7 @@ trait EnumeratorTFunctions {
   def repeat[E, F[_]: Monad](e: E): EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       def apply[A] =
-        (s: StepT[E, F, A]) => s.mapCont(_ (elInput(e)) >>== apply[A])
+        (s: StepT[E, F, A]) => s.mapCont(_(elInput(e)) >>== apply[A])
     }
 
   def iterate[E, F[_]: Monad](f: E => E, e: E): EnumeratorT[E, F] =

@@ -3,7 +3,9 @@ package com.twitter.finagle.netty4.transport
 import com.twitter.conversions.time._
 import com.twitter.finagle._
 import com.twitter.util.{Throw, Return, Await, Future}
-import io.netty.channel.{ChannelPromise, ChannelHandlerContext, ChannelOutboundHandlerAdapter}
+import io.netty.channel.{
+  ChannelPromise, ChannelHandlerContext, ChannelOutboundHandlerAdapter
+}
 import io.netty.channel.embedded.EmbeddedChannel
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

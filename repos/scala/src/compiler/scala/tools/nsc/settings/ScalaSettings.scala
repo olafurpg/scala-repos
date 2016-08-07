@@ -17,8 +17,7 @@ import scala.language.{implicitConversions, existentials}
 trait ScalaSettings
     extends AbsScalaSettings
     with StandardScalaSettings
-    with Warnings {
-  self: MutableSettings =>
+    with Warnings { self: MutableSettings =>
 
   /** Set of settings */
   protected[scala] lazy val allSettings = mutable.HashSet[Setting]()
@@ -716,7 +715,6 @@ trait ScalaSettings
 
     /*
     def checkSomeConflict: Option[String] = ...
-
     List(/* checkSomeConflict, ... */).flatten match {
       case Nil => None
       case warnings => Some("Conflicting compiler settings were detected. Some settings will be ignored.\n" + warnings.mkString("\n"))

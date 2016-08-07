@@ -3,7 +3,9 @@ package com.twitter.finagle.http.exp
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import com.twitter.finagle.http.{FileElement, Request, RequestBuilder, SimpleElement, Method}
+import com.twitter.finagle.http.{
+  FileElement, Request, RequestBuilder, SimpleElement, Method
+}
 import com.twitter.io.{Files, Buf}
 
 @RunWith(classOf[JUnitRunner])

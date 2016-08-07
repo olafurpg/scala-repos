@@ -9,10 +9,16 @@ import akka.util.Timeout
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.event.{AddHealthCheck, EventModule, RemoveHealthCheck}
+import mesosphere.marathon.event.{
+  AddHealthCheck, EventModule, RemoveHealthCheck
+}
 import mesosphere.marathon.health.HealthCheckActor.{AppHealth, GetAppHealth}
-import mesosphere.marathon.state.{AppDefinition, AppRepository, PathId, Timestamp}
-import mesosphere.marathon.{MarathonScheduler, MarathonSchedulerDriverHolder, ZookeeperConf}
+import mesosphere.marathon.state.{
+  AppDefinition, AppRepository, PathId, Timestamp
+}
+import mesosphere.marathon.{
+  MarathonScheduler, MarathonSchedulerDriverHolder, ZookeeperConf
+}
 import mesosphere.util.RWLock
 import org.apache.mesos.Protos.TaskStatus
 

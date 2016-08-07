@@ -7,7 +7,7 @@ package types
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */

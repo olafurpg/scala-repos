@@ -29,7 +29,9 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.configuration.Algo._
 import org.apache.spark.mllib.tree.configuration.QuantileStrategy._
 import org.apache.spark.mllib.tree.configuration.Strategy
-import org.apache.spark.mllib.tree.impl.{BaggedPoint, DecisionTreeMetadata, NodeIdCache, TimeTracker, TreePoint}
+import org.apache.spark.mllib.tree.impl.{
+  BaggedPoint, DecisionTreeMetadata, NodeIdCache, TimeTracker, TreePoint
+}
 import org.apache.spark.mllib.tree.impurity.Impurities
 import org.apache.spark.mllib.tree.model._
 import org.apache.spark.rdd.RDD
@@ -74,17 +76,14 @@ private class RandomForest(private val strategy: Strategy,
   /*
      ALGORITHM
      This is a sketch of the algorithm to help new developers.
-
      The algorithm partitions data by instances (rows).
      On each iteration, the algorithm splits a set of nodes.  In order to choose the best split
      for a given node, sufficient statistics are collected from the distributed data.
      For each node, the statistics are collected to some worker node, and that worker selects
      the best split.
-
      This setup requires discretization of continuous features.  This binning is done in the
      findSplitsBins() method during initialization, after which each continuous feature becomes
      an ordered discretized feature with at most maxBins possible values.
-
      The main loop in the algorithm operates on a queue of nodes (nodeQueue).  These nodes
      lie at the periphery of the tree being trained.  If multiple trees are being trained at once,
      then this queue contains nodes from all of them.  Each iteration works roughly as follows:
@@ -106,7 +105,6 @@ private class RandomForest(private val strategy: Strategy,
          - The master collects all decisions about splitting nodes and updates the model.
          - The updated model is passed to the workers on the next iteration.
      This process continues until the node queue is empty.
-
      Most of the methods in this implementation support the statistics aggregation, which is
      the heaviest part of the computation.  In general, this implementation is bound by either
      the cost of statistics computation on workers or by communicating the sufficient statistics.

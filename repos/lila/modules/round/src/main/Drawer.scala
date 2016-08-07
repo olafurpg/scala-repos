@@ -4,7 +4,9 @@ import akka.pattern.ask
 import chess.{Game => ChessGame, Board, Clock}
 
 import lila.db.api._
-import lila.game.{GameRepo, Game, Event, Progress, Pov, PlayerRef, Namer, Source}
+import lila.game.{
+  GameRepo, Game, Event, Progress, Pov, PlayerRef, Namer, Source
+}
 import lila.pref.{Pref, PrefApi}
 import makeTimeout.short
 

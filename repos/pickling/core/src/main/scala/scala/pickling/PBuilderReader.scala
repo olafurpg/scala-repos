@@ -176,7 +176,7 @@ abstract class AbtsractPBuilder extends PBuilder with PickleTools
   */
 trait PReader extends Hintable {
 
-  /** Start reading a pickled value.  
+  /** Start reading a pickled value.
     *  This will return any serialized type tag key string.   This string can be used
     *  to reconstitute a FastTypeTag w/ a mirror, but is intended for use as fast string-matching.
     */

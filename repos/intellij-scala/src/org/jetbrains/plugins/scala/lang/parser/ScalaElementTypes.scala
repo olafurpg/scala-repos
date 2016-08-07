@@ -7,13 +7,23 @@ import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.stubs.PsiFileStub
-import com.intellij.psi.tree.{ICompositeElementType, IElementType, IErrorCounterReparseableElementType, IStubFileElementType}
+import com.intellij.psi.tree.{
+  ICompositeElementType, IElementType, IErrorCounterReparseableElementType,
+  IStubFileElementType
+}
 import org.jetbrains.annotations.NotNull
-import org.jetbrains.plugins.scala.lang.lexer.{ScalaElementType, ScalaLexer, ScalaTokenTypes}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.lexer.{
+  ScalaElementType, ScalaLexer, ScalaTokenTypes
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScValue, ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScBlockExprImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.elements._
-import org.jetbrains.plugins.scala.lang.psi.stubs.elements.signatures.{ScClassParameterElementType, ScParamClauseElementType, ScParamClausesElementType, ScParameterElementType}
+import org.jetbrains.plugins.scala.lang.psi.stubs.elements.signatures.{
+  ScClassParameterElementType, ScParamClauseElementType,
+  ScParamClausesElementType, ScParameterElementType
+}
 
 /**
   * User: Dmitry.Krasilschikov

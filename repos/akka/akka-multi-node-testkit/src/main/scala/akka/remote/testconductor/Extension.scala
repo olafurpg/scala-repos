@@ -3,7 +3,10 @@
   */
 package akka.remote.testconductor
 
-import akka.actor.{Extension, ExtensionId, ExtensionIdProvider, ExtendedActorSystem, ActorContext, ActorSystem}
+import akka.actor.{
+  Extension, ExtensionId, ExtensionIdProvider, ExtendedActorSystem,
+  ActorContext, ActorSystem
+}
 import akka.remote.RemoteActorRefProvider
 import akka.util.Timeout
 import com.typesafe.config.Config

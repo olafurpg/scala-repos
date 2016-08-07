@@ -21,7 +21,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.tree.impl.TreeTests
 import org.apache.spark.ml.util.MLTestingUtils
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.{EnsembleTestHelper, RandomForest => OldRandomForest}
+import org.apache.spark.mllib.tree.{
+  EnsembleTestHelper, RandomForest => OldRandomForest
+}
 import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.rdd.RDD
@@ -107,11 +109,9 @@ class RandomForestRegressorSuite
   test("model save/load") {
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
-
     val trees = Range(0, 3).map(_ => OldDecisionTreeSuite.createModel(OldAlgo.Regression)).toArray
     val oldModel = new OldRandomForestModel(OldAlgo.Regression, trees)
     val newModel = RandomForestRegressionModel.fromOld(oldModel)
-
     // Save model, load it back, and compare.
     try {
       newModel.save(sc, path)

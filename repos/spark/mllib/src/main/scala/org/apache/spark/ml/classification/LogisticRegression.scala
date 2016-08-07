@@ -20,7 +20,9 @@ package org.apache.spark.ml.classification
 import scala.collection.mutable
 
 import breeze.linalg.{DenseVector => BDV}
-import breeze.optimize.{CachedDiffFunction, DiffFunction, LBFGS => BreezeLBFGS, OWLQN => BreezeOWLQN}
+import breeze.optimize.{
+  CachedDiffFunction, DiffFunction, LBFGS => BreezeLBFGS, OWLQN => BreezeOWLQN
+}
 import org.apache.hadoop.fs.Path
 
 import org.apache.spark.SparkException
@@ -429,7 +431,6 @@ class LogisticRegression @Since("1.2.0")(
              For binary logistic regression, when we initialize the coefficients as zeros,
              it will converge faster if we initialize the intercept such that
              it follows the distribution of the labels.
-
              {{{
                P(0) = 1 / (1 + \exp(b)), and
                P(1) = \exp(b) / (1 + \exp(b))

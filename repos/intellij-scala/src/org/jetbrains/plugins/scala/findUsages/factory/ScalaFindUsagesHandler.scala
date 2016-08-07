@@ -3,7 +3,9 @@ package findUsages.factory
 
 import java.util
 
-import com.intellij.find.findUsages.{AbstractFindUsagesDialog, FindUsagesHandler, FindUsagesOptions}
+import com.intellij.find.findUsages.{
+  AbstractFindUsagesDialog, FindUsagesHandler, FindUsagesOptions
+}
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi._
@@ -15,9 +17,15 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClause
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScEnumerator, ScGenerator}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScEnumerator, ScGenerator
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScTypeParam
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScTypeAlias, ScValue, ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.search.ScalaOverridingMemberSearcher

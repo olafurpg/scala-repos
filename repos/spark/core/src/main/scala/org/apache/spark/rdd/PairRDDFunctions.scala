@@ -32,8 +32,13 @@ import org.apache.hadoop.conf.{Configurable, Configuration}
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.io.SequenceFile.CompressionType
 import org.apache.hadoop.io.compress.CompressionCodec
-import org.apache.hadoop.mapred.{FileOutputCommitter, FileOutputFormat, JobConf, OutputFormat}
-import org.apache.hadoop.mapreduce.{Job => NewAPIHadoopJob, OutputFormat => NewOutputFormat, RecordWriter => NewRecordWriter, TaskAttemptID, TaskType}
+import org.apache.hadoop.mapred.{
+  FileOutputCommitter, FileOutputFormat, JobConf, OutputFormat
+}
+import org.apache.hadoop.mapreduce.{
+  Job => NewAPIHadoopJob, OutputFormat => NewOutputFormat,
+  RecordWriter => NewRecordWriter, TaskAttemptID, TaskType
+}
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl
 
 import org.apache.spark._

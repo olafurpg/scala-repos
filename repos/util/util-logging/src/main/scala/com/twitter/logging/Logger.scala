@@ -341,7 +341,7 @@ object Logger extends Iterable[Logger] {
     * handlers upon completion.
     */
   def withLoggers(loggerFactories: List[() => Logger])(f: => Unit): Unit =
-    withLazyLoggers(loggerFactories.map(_ ()))(f)
+    withLazyLoggers(loggerFactories.map(_()))(f)
 
   /**
     * Execute a block with a given set of handlers, reverting back to the original
@@ -358,7 +358,7 @@ object Logger extends Iterable[Logger] {
 
     reset()
     loggerFactoryCache = localLoggerFactoryCache
-    loggerFactoryCache.foreach { _ () }
+    loggerFactoryCache.foreach { _() }
   }
 
   /**
@@ -426,6 +426,6 @@ object Logger extends Iterable[Logger] {
     loggerFactoryCache = loggerFactories
 
     clearHandlers()
-    loggerFactories.foreach { _ () }
+    loggerFactories.foreach { _() }
   }
 }

@@ -7,7 +7,9 @@ import com.codahale.metrics.MetricRegistry
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.api.LeaderInfo
 import mesosphere.marathon.event.LocalLeadershipEvent
-import mesosphere.marathon.event.http.HttpEventStreamActor.{HttpEventStreamConnectionClosed, HttpEventStreamConnectionOpen}
+import mesosphere.marathon.event.http.HttpEventStreamActor.{
+  HttpEventStreamConnectionClosed, HttpEventStreamConnectionOpen
+}
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.test.MarathonActorSupport
 import org.mockito.Mockito.{when => call, verify, verifyNoMoreInteractions}

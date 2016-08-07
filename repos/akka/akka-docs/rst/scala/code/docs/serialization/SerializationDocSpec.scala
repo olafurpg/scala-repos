@@ -231,7 +231,7 @@ package docs.serialization {
         def addressFor(remoteAddr: Address): Address =
           system.provider.getExternalAddressFor(remoteAddr) getOrElse
             (throw new UnsupportedOperationException(
-                    "cannot send to " + remoteAddr))
+                "cannot send to " + remoteAddr))
       }
 
       def serializeTo(ref: ActorRef, remote: Address): String =

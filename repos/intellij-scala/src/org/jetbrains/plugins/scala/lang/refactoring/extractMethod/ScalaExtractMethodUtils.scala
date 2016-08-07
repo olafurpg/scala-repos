@@ -16,12 +16,18 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScNamedElement, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.dataFlow.impl.reachingDefs.VariableInfo
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
-import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScSubstitutor, ScType, Unit}
-import org.jetbrains.plugins.scala.lang.psi.{TypeAdjuster, ScalaPsiElement, ScalaPsiUtil}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScFunctionType, ScSubstitutor, ScType, Unit
+}
+import org.jetbrains.plugins.scala.lang.psi.{
+  TypeAdjuster, ScalaPsiElement, ScalaPsiUtil
+}
 import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.duplicates.DuplicateMatch
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 import org.jetbrains.plugins.scala.lang.resolve.processor.CompletionProcessor

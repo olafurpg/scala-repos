@@ -2,7 +2,9 @@ package com.twitter.finagle.loadbalancer
 
 import com.twitter.conversions.time._
 import com.twitter.finagle._
-import com.twitter.finagle.stats.{StatsReceiver, SummarizingStatsReceiver, Stat}
+import com.twitter.finagle.stats.{
+  StatsReceiver, SummarizingStatsReceiver, Stat
+}
 import com.twitter.finagle.util.{Drv, Rng, DefaultTimer}
 import com.twitter.util.{Function => _, _}
 import java.util.concurrent.atomic.AtomicInteger

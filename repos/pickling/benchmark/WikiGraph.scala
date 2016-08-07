@@ -8,7 +8,10 @@ import scala.io.Source
 import scala.util.Random
 
 // for Java Serialization:
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream, ObjectInputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream,
+  ObjectInputStream
+}
 
 import scala.pickling._
 import scala.pickling.Defaults._

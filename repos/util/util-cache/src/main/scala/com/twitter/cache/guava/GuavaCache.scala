@@ -27,7 +27,6 @@ class GuavaCache[K, V](cache: GCache[K, Future[V]])
 /**
   * A [[com.twitter.cache.FutureCache]] backed by a
   * [[com.google.common.cache.LoadingCache]].
-
   * Any correct implementation should make sure that you evict failed results,
   * and don't interrupt the underlying request that has been fired off.
   * [[EvictingCache]] and [[Future#interrupting]] are useful tools for building

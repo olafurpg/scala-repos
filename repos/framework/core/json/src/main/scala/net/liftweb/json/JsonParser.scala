@@ -133,7 +133,7 @@ object JsonParser {
     buf.substring
   }
 
-  // FIXME fail fast to prevent infinite loop, see 
+  // FIXME fail fast to prevent infinite loop, see
   // http://www.exploringbinary.com/java-hangs-when-converting-2-2250738585072012e-308/
   private val BrokenDouble = BigDecimal("2.2250738585072012e-308")
   private[json] def parseDouble(s: String) = {

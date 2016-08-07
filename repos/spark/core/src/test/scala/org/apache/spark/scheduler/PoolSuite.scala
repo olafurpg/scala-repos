@@ -19,7 +19,9 @@ package org.apache.spark.scheduler
 
 import java.util.Properties
 
-import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkFunSuite}
+import org.apache.spark.{
+  LocalSparkContext, SparkConf, SparkContext, SparkFunSuite
+}
 
 /**
   * Tests that pools and the associated scheduling algorithms for FIFO and fair scheduling work

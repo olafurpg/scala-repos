@@ -6,10 +6,16 @@ import java.util
 import javax.swing.Icon
 
 import com.intellij.codeHighlighting.Pass
-import com.intellij.codeInsight.daemon.{DaemonCodeAnalyzerSettings, LineMarkerInfo, LineMarkerProvider}
+import com.intellij.codeInsight.daemon.{
+  DaemonCodeAnalyzerSettings, LineMarkerInfo, LineMarkerProvider
+}
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.colors.{CodeInsightColors, EditorColorsManager}
-import com.intellij.openapi.editor.markup.{GutterIconRenderer, SeparatorPlacement}
+import com.intellij.openapi.editor.colors.{
+  CodeInsightColors, EditorColorsManager
+}
+import com.intellij.openapi.editor.markup.{
+  GutterIconRenderer, SeparatorPlacement
+}
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi._
 import com.intellij.psi.search.searches.ClassInheritorsSearch
@@ -23,7 +29,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.search.ScalaOverridingMemberSearcher
 import org.jetbrains.plugins.scala.lang.psi.types.Signature
 

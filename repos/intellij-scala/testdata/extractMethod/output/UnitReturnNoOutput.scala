@@ -10,12 +10,9 @@ class UnitReturnNoOutput {
 /*
 class UnitReturnNoOutput {
   def foo(i: Int) {
-
     if (testMethodName(i)) return
-
     println()
   }
-
   def testMethodName(i: Int): Boolean = {
     if (true) return true
     println(i)

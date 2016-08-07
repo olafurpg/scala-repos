@@ -130,36 +130,36 @@ private[parquet] class CatalystWriteSupport
         (row: SpecializedGetters, ordinal: Int) =>
           recordConsumer.addBoolean(row.getBoolean(ordinal))
 
-        case ByteType =>
+      case ByteType =>
         (row: SpecializedGetters, ordinal: Int) =>
           recordConsumer.addInteger(row.getByte(ordinal))
 
-        case ShortType =>
+      case ShortType =>
         (row: SpecializedGetters, ordinal: Int) =>
           recordConsumer.addInteger(row.getShort(ordinal))
 
-        case IntegerType | DateType =>
+      case IntegerType | DateType =>
         (row: SpecializedGetters, ordinal: Int) =>
           recordConsumer.addInteger(row.getInt(ordinal))
 
-        case LongType =>
+      case LongType =>
         (row: SpecializedGetters, ordinal: Int) =>
           recordConsumer.addLong(row.getLong(ordinal))
 
-        case FloatType =>
+      case FloatType =>
         (row: SpecializedGetters, ordinal: Int) =>
           recordConsumer.addFloat(row.getFloat(ordinal))
 
-        case DoubleType =>
+      case DoubleType =>
         (row: SpecializedGetters, ordinal: Int) =>
           recordConsumer.addDouble(row.getDouble(ordinal))
 
-        case StringType =>
+      case StringType =>
         (row: SpecializedGetters, ordinal: Int) =>
           recordConsumer.addBinary(
               Binary.fromByteArray(row.getUTF8String(ordinal).getBytes))
 
-        case TimestampType =>
+      case TimestampType =>
         (row: SpecializedGetters, ordinal: Int) =>
           {
             // TODO Writes `TimestampType` values as `TIMESTAMP_MICROS` once parquet-mr implements it
@@ -180,12 +180,12 @@ private[parquet] class CatalystWriteSupport
             recordConsumer.addBinary(Binary.fromByteArray(timestampBuffer))
           }
 
-        case BinaryType =>
+      case BinaryType =>
         (row: SpecializedGetters, ordinal: Int) =>
           recordConsumer.addBinary(
               Binary.fromByteArray(row.getBinary(ordinal)))
 
-        case DecimalType.Fixed(precision, scale) =>
+      case DecimalType.Fixed(precision, scale) =>
         makeDecimalWriter(precision, scale)
 
       case t: StructType =>
@@ -195,7 +195,7 @@ private[parquet] class CatalystWriteSupport
             writeFields(row.getStruct(ordinal, t.length), t, fieldWriters)
           }
 
-        case t: ArrayType => makeArrayWriter(t)
+      case t: ArrayType => makeArrayWriter(t)
 
       case t: MapType => makeMapWriter(t)
 

@@ -5,7 +5,9 @@ package play.api.libs.json
 
 import java.time.format.DateTimeFormatter
 import java.time.temporal.Temporal
-import java.time.{Instant, LocalDate, LocalDateTime, OffsetDateTime, ZoneOffset, ZonedDateTime}
+import java.time.{
+  Instant, LocalDate, LocalDateTime, OffsetDateTime, ZoneOffset, ZonedDateTime
+}
 
 import com.fasterxml.jackson.databind.JsonNode
 import play.api.libs.functional.ContravariantFunctor

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Miles Sabin 
+ * Copyright (c) 2012 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package shapeless.examples
 
 /**
   * Demonstration of automatic packaging of multiple type class instances at call sites and
-  * automatic unpackaging of them at call targets. 
-  * 
+  * automatic unpackaging of them at call targets.
+  *
   * @author Miles Sabin
   */
 object PackExamples extends App {

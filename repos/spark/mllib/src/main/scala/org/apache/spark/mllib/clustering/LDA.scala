@@ -352,7 +352,6 @@ private[clustering] object LDA {
 
   /*
     DEVELOPERS NOTE:
-
     This implementation uses GraphX, where the graph is bipartite with 2 types of vertices:
      - Document vertices
         - indexed with unique indices >= 0
@@ -363,7 +362,6 @@ private[clustering] object LDA {
      - Edges correspond to terms appearing in documents.
         - Edges are directed Document -> Term.
         - Edges are partitioned by documents.
-
     Info on EM implementation.
      - We follow Section 2.2 from Asuncion et al., 2009.  We use some of their notation.
      - In this implementation, there is one edge for every unique term appearing in a document,
@@ -393,7 +391,6 @@ private[clustering] object LDA {
            - Term update:
               - N_{wk} <- sum_j N_{wj} gamma_{wjk}
               - N_k <- sum_w N_{wk}
-
     TODO: Add simplex constraints to allow alpha in (0,1).
           See: Vorontsov and Potapenko. "Tutorial on Probabilistic Topic Modeling : Additive
                Regularization for Stochastic Matrix Factorization." 2014.

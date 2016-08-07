@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala
 package highlighter
 
-import _root_.org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScModifierListOwner}
+import _root_.org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions, ScModifierListOwner
+}
 import com.intellij.internal.statistic.UsageTrigger
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.openapi.editor.colors.TextAttributesKey
@@ -11,18 +13,26 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScConstructor, ScReferenceElement, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScConstructor, ScReferenceElement, ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportExpr
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScClass, ScObject, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScClass, ScObject, ScTrait
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager.ClassCategory
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScType}
-import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiUtil, ScalaStubBasedElementImpl}
+import org.jetbrains.plugins.scala.lang.psi.{
+  ScalaPsiUtil, ScalaStubBasedElementImpl
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
 

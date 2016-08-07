@@ -5,7 +5,9 @@ package akka.stream.actor
 
 import java.util.concurrent.ConcurrentHashMap
 import akka.actor._
-import akka.stream.impl.{ReactiveStreamsCompliance, StreamSubscriptionTimeoutSupport}
+import akka.stream.impl.{
+  ReactiveStreamsCompliance, StreamSubscriptionTimeoutSupport
+}
 import org.reactivestreams.{Publisher, Subscriber, Subscription}
 import concurrent.duration.Duration
 import concurrent.duration.FiniteDuration

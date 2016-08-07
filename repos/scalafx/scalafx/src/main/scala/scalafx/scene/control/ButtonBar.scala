@@ -34,7 +34,9 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property.{DoubleProperty, StringProperty}
 import scalafx.collections._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 import scalafx.scene.Node
 
 /**
@@ -288,7 +290,6 @@ object ButtonBar {
   * @define ORIGINALDOC Original Documentation]].
   * @constructor      Creates a default ButtonBar instance using the default properties for
   *                   the users operating system.
-
   */
 class ButtonBar(override val delegate: jfxsc.ButtonBar = new jfxsc.ButtonBar())
     extends Control(delegate)

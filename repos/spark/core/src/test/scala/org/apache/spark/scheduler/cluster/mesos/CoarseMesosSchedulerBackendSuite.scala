@@ -31,7 +31,9 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.BeforeAndAfter
 
-import org.apache.spark.{LocalSparkContext, SecurityManager, SparkConf, SparkContext, SparkFunSuite}
+import org.apache.spark.{
+  LocalSparkContext, SecurityManager, SparkConf, SparkContext, SparkFunSuite
+}
 import org.apache.spark.network.shuffle.mesos.MesosExternalShuffleClient
 import org.apache.spark.rpc.RpcEndpointRef
 import org.apache.spark.scheduler.TaskSchedulerImpl

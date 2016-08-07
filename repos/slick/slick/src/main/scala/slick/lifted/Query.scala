@@ -351,7 +351,7 @@ trait CanBeQueryCondition[-T] extends (T => Rep[_])
 
 object CanBeQueryCondition {
   // Using implicits with explicit type annotation here (instead of previously implicit objects)
-  // because otherwise they would not be found in this file above this line. 
+  // because otherwise they would not be found in this file above this line.
   // See https://github.com/slick/slick/pull/217
   implicit val BooleanColumnCanBeQueryCondition: CanBeQueryCondition[
       Rep[Boolean]] = new CanBeQueryCondition[Rep[Boolean]] {
@@ -422,8 +422,8 @@ object TableQuery {
     new TableQuery[E](cons)
 
   /** Create a TableQuery for a table row class which has a constructor of type (Tag). */
-  def apply[E <: AbstractTable[_]]: TableQuery[E] = macro TableQueryMacroImpl
-    .apply[E]
+  def apply[E <: AbstractTable[_]]: TableQuery[E] =
+    macro TableQueryMacroImpl.apply[E]
 }
 
 object TableQueryMacroImpl {

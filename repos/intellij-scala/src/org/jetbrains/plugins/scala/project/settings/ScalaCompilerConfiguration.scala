@@ -3,7 +3,9 @@ package org.jetbrains.plugins.scala.project.settings
 import com.intellij.openapi.components._
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
-import com.intellij.util.xmlb.{SkipDefaultValuesSerializationFilters, XmlSerializer}
+import com.intellij.util.xmlb.{
+  SkipDefaultValuesSerializationFilters, XmlSerializer
+}
 import org.jdom.Element
 import org.jetbrains.plugins.scala.project.IncrementalityType
 

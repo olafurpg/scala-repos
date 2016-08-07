@@ -9,11 +9,17 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElemen
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScCompoundTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.types.ComparingUtil._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{ScAbstractType, ScDesignatorType, ScTypeParameterType, _}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScAbstractType, ScDesignatorType, ScTypeParameterType, _
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
 import scala.annotation.tailrec
@@ -261,12 +267,12 @@ object PatternAnnotatorUtil {
     }
 
     matching.weakConforms(matched) || ((matching, matched) match {
-          case (arrayType(arg1), arrayType(arg2)) => matchesPattern(arg1, arg2)
-          case (_, parameterized: ScParameterizedType) =>
-            val newtp = abstraction(parameterized)
-            !matched.equiv(newtp) && matching.weakConforms(newtp)
-          case _ => false
-        })
+      case (arrayType(arg1), arrayType(arg2)) => matchesPattern(arg1, arg2)
+      case (_, parameterized: ScParameterizedType) =>
+        val newtp = abstraction(parameterized)
+        !matched.equiv(newtp) && matching.weakConforms(newtp)
+      case _ => false
+    })
   }
 
   def patternType(pattern: ScPattern): Option[ScType] = {

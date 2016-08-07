@@ -32,7 +32,7 @@ private case class Render(js: JsCmd)
   *  - The `CanBind` implicits in the `net.liftweb.http` package that allow using
   *    `LAFuture` and Scala `Future` objects as the right-hand-side of a CSS
   *    selector binding.
-  * 
+  *
   * None of these requires explicit use of `buildDeferredFunction`.
   */
 class AsyncRenderComet extends MessageCometActor {

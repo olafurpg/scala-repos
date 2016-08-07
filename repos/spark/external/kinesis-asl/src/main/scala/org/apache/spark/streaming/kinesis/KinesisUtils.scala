@@ -25,7 +25,9 @@ import com.amazonaws.services.kinesis.model.Record
 import org.apache.spark.api.java.function.{Function => JFunction}
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Duration, StreamingContext}
-import org.apache.spark.streaming.api.java.{JavaReceiverInputDStream, JavaStreamingContext}
+import org.apache.spark.streaming.api.java.{
+  JavaReceiverInputDStream, JavaStreamingContext
+}
 import org.apache.spark.streaming.dstream.ReceiverInputDStream
 
 object KinesisUtils {

@@ -10,7 +10,10 @@ package org.scalajs.core.tools.linker.backend.closure
 
 import scala.collection.JavaConverters._
 
-import com.google.javascript.jscomp.{SourceFile => ClosureSource, Compiler => ClosureCompiler, CompilerOptions => ClosureOptions, _}
+import com.google.javascript.jscomp.{
+  SourceFile => ClosureSource, Compiler => ClosureCompiler,
+  CompilerOptions => ClosureOptions, _
+}
 
 import org.scalajs.core.tools.io._
 import org.scalajs.core.tools.javascript.ESLevel

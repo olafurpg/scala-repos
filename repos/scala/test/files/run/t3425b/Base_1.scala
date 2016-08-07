@@ -15,7 +15,6 @@ class ABC extends A with B with C {
 /*** The source used to generate the second file
      Not otherwise used in the test except that compiling
      it helps make sure it still compiles.
-
   ****/
 object Gen {
   case class Tp(outer: String, elem: String) {

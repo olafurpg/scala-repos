@@ -7,7 +7,9 @@ import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.projectRoots.{ProjectJdkTable, Sdk}
-import com.intellij.openapi.roots.{LanguageLevelProjectExtension, ProjectRootManager}
+import com.intellij.openapi.roots.{
+  LanguageLevelProjectExtension, ProjectRootManager
+}
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.testFramework.{IdeaTestUtil, UsefulTestCase}
 import org.jetbrains.plugins.scala.project.IncrementalityType

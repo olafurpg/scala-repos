@@ -89,7 +89,6 @@ class LSMRTest extends FunSuite {
     *
     * cribbed from lsmrtest.m
     *
-
     *
     * @param m
     * @param n

@@ -17,7 +17,9 @@
 
 package org.apache.spark.sql.execution.datasources.jdbc
 
-import java.sql.{Connection, Driver, DriverPropertyInfo, SQLFeatureNotSupportedException}
+import java.sql.{
+  Connection, Driver, DriverPropertyInfo, SQLFeatureNotSupportedException
+}
 import java.util.Properties
 
 /**

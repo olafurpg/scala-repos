@@ -8,7 +8,7 @@ import com.twitter.util.Duration
   * {{{
   * scala> import com.twitter.finagle.util.parsers._
   * import com.twitter.finagle.util.parsers._
-  * 
+  *
   * scala> val list(duration(dur), str, double(dbl)) = "10.seconds:abc:123.32"
   * dur: com.twitter.util.Duration = 10.seconds
   * str: String = abc

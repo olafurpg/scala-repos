@@ -6,7 +6,9 @@ import com.intellij.psi.impl.light.LightElement
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScModifierList
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAnnotation, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAnnotation, ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.types.ScType

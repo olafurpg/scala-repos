@@ -6,15 +6,23 @@ import _root_.java.util
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.Processor
 import org.jetbrains.jps.ModuleChunk
-import org.jetbrains.jps.builders.java.{JavaBuilderUtil, JavaSourceRootDescriptor}
+import org.jetbrains.jps.builders.java.{
+  JavaBuilderUtil, JavaSourceRootDescriptor
+}
 import org.jetbrains.jps.builders.{DirtyFilesHolder, FileProcessor}
 import org.jetbrains.jps.incremental.ModuleLevelBuilder.ExitCode
 import org.jetbrains.jps.incremental.fs.CompilationRound
-import org.jetbrains.jps.incremental.messages.{BuildMessage, CompilerMessage, ProgressMessage}
+import org.jetbrains.jps.incremental.messages.{
+  BuildMessage, CompilerMessage, ProgressMessage
+}
 import org.jetbrains.jps.incremental.scala.ScalaBuilder._
 import org.jetbrains.jps.incremental.scala.data.CompilerData
-import org.jetbrains.jps.incremental.scala.local.{IdeClientIdea, PackageObjectsData, ScalaReflectMacroExpansionParser}
-import org.jetbrains.jps.incremental.scala.model.{CompileOrder, IncrementalityType}
+import org.jetbrains.jps.incremental.scala.local.{
+  IdeClientIdea, PackageObjectsData, ScalaReflectMacroExpansionParser
+}
+import org.jetbrains.jps.incremental.scala.model.{
+  CompileOrder, IncrementalityType
+}
 
 import _root_.scala.collection.JavaConverters._
 import scala.collection.mutable

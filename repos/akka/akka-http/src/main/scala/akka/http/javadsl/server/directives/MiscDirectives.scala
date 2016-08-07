@@ -7,7 +7,9 @@ package directives
 
 import java.lang.{Boolean ⇒ JBoolean}
 
-import akka.http.impl.server.RouteStructure.{DynamicDirectiveRoute2, Validated, DynamicDirectiveRoute1}
+import akka.http.impl.server.RouteStructure.{
+  DynamicDirectiveRoute2, Validated, DynamicDirectiveRoute1
+}
 
 import scala.annotation.varargs
 import akka.japi.function.{Function2, Function}

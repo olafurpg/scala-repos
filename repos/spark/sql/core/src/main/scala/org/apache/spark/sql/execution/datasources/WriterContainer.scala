@@ -21,7 +21,9 @@ import java.util.{Date, UUID}
 
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.mapreduce._
-import org.apache.hadoop.mapreduce.lib.output.{FileOutputCommitter => MapReduceFileOutputCommitter}
+import org.apache.hadoop.mapreduce.lib.output.{
+  FileOutputCommitter => MapReduceFileOutputCommitter
+}
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl
 
 import org.apache.spark._
@@ -33,8 +35,12 @@ import org.apache.spark.sql.catalyst.plans.physical.HashPartitioning
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.execution.UnsafeKVExternalSorter
 import org.apache.spark.sql.internal.SQLConf
-import org.apache.spark.sql.sources.{HadoopFsRelation, OutputWriter, OutputWriterFactory}
-import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.sources.{
+  HadoopFsRelation, OutputWriter, OutputWriterFactory
+}
+import org.apache.spark.sql.types.{
+  IntegerType, StringType, StructField, StructType
+}
 import org.apache.spark.util.SerializableConfiguration
 
 /** A container for all the details required when writing to a table. */

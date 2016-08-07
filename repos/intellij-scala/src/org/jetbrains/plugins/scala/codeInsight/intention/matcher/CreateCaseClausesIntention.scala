@@ -13,9 +13,15 @@ import com.intellij.psi.search.searches.ClassInheritorsSearch
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScPattern, ScWildcardPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScMatchStmt}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause, ScPattern, ScWildcardPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScMatchStmt
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.psi.types.{ScSubstitutor, ScType}

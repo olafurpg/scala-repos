@@ -1,12 +1,9 @@
 /*
  Copyright 2013 Twitter, Inc.
-
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,16 +15,24 @@ package com.twitter.summingbird.scalding.batch
 
 import com.twitter.algebird.bijection.BijectedSemigroup
 import com.twitter.algebird.{Monoid, Semigroup}
-import com.twitter.algebird.{Universe, Empty, Interval, Intersection, InclusiveLower, ExclusiveUpper, InclusiveUpper}
+import com.twitter.algebird.{
+  Universe, Empty, Interval, Intersection, InclusiveLower, ExclusiveUpper,
+  InclusiveUpper
+}
 import com.twitter.algebird.monad.{StateWithError, Reader}
 import com.twitter.bijection.{Bijection, ImplicitBijection}
-import com.twitter.scalding.{Dsl, Mode, TypedPipe, IterableSource, MapsideReduce, TupleSetter, TupleConverter}
+import com.twitter.scalding.{
+  Dsl, Mode, TypedPipe, IterableSource, MapsideReduce, TupleSetter,
+  TupleConverter
+}
 import com.twitter.scalding.typed.Grouped
 import com.twitter.summingbird.scalding._
 import com.twitter.summingbird.scalding
 import com.twitter.summingbird._
 import com.twitter.summingbird.option._
-import com.twitter.summingbird.batch.{BatchID, Batcher, Timestamp, IteratorSums, PrunedSpace}
+import com.twitter.summingbird.batch.{
+  BatchID, Batcher, Timestamp, IteratorSums, PrunedSpace
+}
 import cascading.flow.FlowDef
 
 import org.slf4j.LoggerFactory

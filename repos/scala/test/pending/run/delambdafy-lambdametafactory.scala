@@ -24,7 +24,7 @@ trait T {
   }
 }
 
-// A functional interface. Function1 contains abstract methods that are filled in by mixin 
+// A functional interface. Function1 contains abstract methods that are filled in by mixin
 trait Function1ish[A, B] {
   def apply(a: A): B
 }

@@ -8,7 +8,7 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.top.Qual_Id
 import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 05.02.2008
   */

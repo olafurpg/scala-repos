@@ -86,7 +86,6 @@ class SimpleUpdater extends Updater {
   * Updater for L1 regularized problems.
   *          R(w) = ||w||_1
   * Uses a step-size decreasing with the square root of the number of iterations.
-
   * Instead of subgradient of the regularizer, the proximal operator for the
   * L1 regularization is applied after the gradient step. This is known to
   * result in better sparsity of the intermediate solution.

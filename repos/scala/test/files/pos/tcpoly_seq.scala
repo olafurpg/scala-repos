@@ -143,14 +143,10 @@ trait HOSeq {
     final override def flatMap[b](f: Any => Iterable[b]): Array[b]
      def flatMap[b](f: a => Parser[b]) = new Parser[b]
      override def flatMap[b](f: a => Iterable[b]): List[b]
-
-
     MapResult[K] <: Seq[K]
     FilterResult <: Seq[T]
     Concat <: Seq[T]
     Subseq <: Seq[T]
-
-
     def map[K](f: T=>K): MapResult[K]
     def filter(f: T=>Boolean): FilterResult
     def subseq(from: Int, to: Int): Subseq
@@ -161,12 +157,9 @@ trait HOSeq {
 /*trait Iterator[t] {
   // @post hasAdvanced implies hasNext
   // model def hasAdvanced: Boolean
-
   def hasNext: Boolean // pure
-
   // @pre hasAdvanced
   def current: t       // pure
-
   // @pre hasNext
   // @post hasAdvanced
   def advance: Unit

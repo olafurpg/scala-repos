@@ -4,13 +4,21 @@ package codeInspection.typeAnnotation
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInsight.intention.types.{AddOnlyStrategy, ToggleTypeAnnotation}
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
-import org.jetbrains.plugins.scala.lang.formatting.settings.{ScalaCodeStyleSettings, TypeAnnotationPolicy, TypeAnnotationRequirement}
+import org.jetbrains.plugins.scala.codeInsight.intention.types.{
+  AddOnlyStrategy, ToggleTypeAnnotation
+}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement, AbstractInspection
+}
+import org.jetbrains.plugins.scala.lang.formatting.settings.{
+  ScalaCodeStyleSettings, TypeAnnotationPolicy, TypeAnnotationRequirement
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 
 /**

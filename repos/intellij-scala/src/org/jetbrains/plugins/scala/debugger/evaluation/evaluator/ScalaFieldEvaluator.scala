@@ -4,7 +4,9 @@ import com.intellij.debugger.DebuggerBundle
 import com.intellij.debugger.engine.evaluation.EvaluationContextImpl
 import com.intellij.debugger.engine.evaluation.expression.{Evaluator, Modifier}
 import com.intellij.debugger.impl.DebuggerUtilsEx
-import com.intellij.debugger.ui.impl.watch.{FieldDescriptorImpl, NodeDescriptorImpl}
+import com.intellij.debugger.ui.impl.watch.{
+  FieldDescriptorImpl, NodeDescriptorImpl
+}
 import com.intellij.openapi.project.Project
 import com.sun.jdi._
 import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException

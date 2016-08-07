@@ -24,7 +24,9 @@ package json
 // from being able to remove this, though.
 import scala.language.existentials
 
-import java.lang.reflect.{Constructor => JConstructor, Field, Type, ParameterizedType, GenericArrayType}
+import java.lang.reflect.{
+  Constructor => JConstructor, Field, Type, ParameterizedType, GenericArrayType
+}
 import java.util.Date
 import java.sql.Timestamp
 

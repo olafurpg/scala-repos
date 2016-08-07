@@ -7,7 +7,9 @@ import com.intellij.refactoring.classMembers.MemberInfoBase
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTemplateDefinition, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.structureView.ScalaElementPresentation
 
 /**

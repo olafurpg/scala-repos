@@ -1,11 +1,15 @@
 import com.twitter.conversions.time._
 import com.twitter.finagle._
 import com.twitter.finagle.client.{StackClient, Transporter, StdStackClient}
-import com.twitter.finagle.dispatch.{SerialClientDispatcher, SerialServerDispatcher}
+import com.twitter.finagle.dispatch.{
+  SerialClientDispatcher, SerialServerDispatcher
+}
 import com.twitter.finagle.filter.MaskCancelFilter
 import com.twitter.finagle.netty3.{Netty3Transporter, Netty3Listener}
 import com.twitter.finagle.server.{StackServer, Listener, StdStackServer}
-import com.twitter.finagle.service.{RetryExceptionsFilter, RetryPolicy, TimeoutFilter}
+import com.twitter.finagle.service.{
+  RetryExceptionsFilter, RetryPolicy, TimeoutFilter
+}
 import com.twitter.finagle.transport.Transport
 import com.twitter.finagle.util.DefaultTimer
 import com.twitter.util.{Future, Await}

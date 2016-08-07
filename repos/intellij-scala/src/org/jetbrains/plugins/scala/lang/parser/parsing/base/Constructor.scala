@@ -7,7 +7,9 @@ package base
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.ArgumentExprs
-import org.jetbrains.plugins.scala.lang.parser.parsing.types.{AnnotType, SimpleType}
+import org.jetbrains.plugins.scala.lang.parser.parsing.types.{
+  AnnotType, SimpleType
+}
 
 /**
   * @author AlexanderPodkhalyuzin

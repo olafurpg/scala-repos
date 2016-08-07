@@ -6,7 +6,10 @@
 package scala.tools.nsc
 package interpreter
 
-import Properties.{javaVersion, javaVmName, shellPromptString, shellWelcomeString, versionString, versionNumberString}
+import Properties.{
+  javaVersion, javaVmName, shellPromptString, shellWelcomeString,
+  versionString, versionNumberString
+}
 import scala.sys._
 import Prop._
 import java.util.{Formattable, FormattableFlags, Formatter}

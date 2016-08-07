@@ -10,14 +10,22 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScSuperReference, ScThisReference}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScSuperReference, ScThisReference
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias, ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScPackageImpl
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 
 import scala.collection.Set
 

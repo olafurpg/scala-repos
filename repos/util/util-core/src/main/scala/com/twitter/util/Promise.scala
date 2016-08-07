@@ -25,8 +25,7 @@ object Promise {
     * A template trait for [[com.twitter.util.Promise Promises]] that are derived
     * and capable of being detached from other Promises.
     */
-  trait Detachable {
-    _: Promise[_] =>
+  trait Detachable { _: Promise[_] =>
 
     /**
       * Returns true if successfully detached, will return true at most once.
@@ -176,8 +175,7 @@ object Promise {
     unsafe.objectFieldOffset(classOf[Promise[_]].getDeclaredField("state"))
   private val AlwaysUnit: Any => Unit = scala.Function.const(()) _
 
-  sealed trait Responder[A] {
-    this: Future[A] =>
+  sealed trait Responder[A] { this: Future[A] =>
     protected[util] def depth: Short
     protected def parent: Promise[A]
     protected[util] def continue(k: K[A])

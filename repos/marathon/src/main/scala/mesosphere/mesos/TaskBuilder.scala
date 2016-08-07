@@ -3,10 +3,14 @@ package mesosphere.mesos
 import com.google.protobuf.{ByteString, TextFormat}
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon._
-import mesosphere.marathon.api.serialization.{PortDefinitionSerializer, ContainerSerializer}
+import mesosphere.marathon.api.serialization.{
+  PortDefinitionSerializer, ContainerSerializer
+}
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.health.HealthCheck
-import mesosphere.marathon.state.{PersistentVolume, AppDefinition, DiscoveryInfo, IpAddress, PathId}
+import mesosphere.marathon.state.{
+  PersistentVolume, AppDefinition, DiscoveryInfo, IpAddress, PathId
+}
 import mesosphere.mesos.ResourceMatcher.{ResourceSelector, ResourceMatch}
 import mesosphere.mesos.protos.{RangesResource, Resource, ScalarResource}
 import org.apache.mesos.Protos.Environment._

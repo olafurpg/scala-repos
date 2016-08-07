@@ -6,7 +6,10 @@ import play.api.libs.json._
 import chess.Pos
 import chess.Pos.{piotr, allPiotrs}
 import chess.variant.Crazyhouse
-import chess.{PromotableRole, Pos, Color, Situation, Move => ChessMove, Drop => ChessDrop, Clock => ChessClock, Status}
+import chess.{
+  PromotableRole, Pos, Color, Situation, Move => ChessMove, Drop => ChessDrop,
+  Clock => ChessClock, Status
+}
 import JsonView._
 import lila.chat.{Line, UserLine, PlayerLine}
 import lila.common.Maths.truncateAt

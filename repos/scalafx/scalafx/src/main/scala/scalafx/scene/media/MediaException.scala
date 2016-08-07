@@ -31,7 +31,9 @@ import javafx.{event => jfxe}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 
 object MediaException {
   implicit def sfxMediaException2jfx(

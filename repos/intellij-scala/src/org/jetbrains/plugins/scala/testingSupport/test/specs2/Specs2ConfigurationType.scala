@@ -3,7 +3,9 @@ package testingSupport.test.specs2
 
 import javax.swing.Icon
 
-import com.intellij.execution.configurations.{ConfigurationFactory, ConfigurationType}
+import com.intellij.execution.configurations.{
+  ConfigurationFactory, ConfigurationType
+}
 import org.jetbrains.plugins.scala.icons.Icons
 
 /**

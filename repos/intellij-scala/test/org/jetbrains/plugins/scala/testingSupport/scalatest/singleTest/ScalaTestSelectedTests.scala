@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.testingSupport.scalatest.singleTest
 
-import org.jetbrains.plugins.scala.testingSupport.scalatest.scopeTest.{WordSpecScopeTest, FunSpecScopeTest, FreeSpecScopeTest, FeatureSpecScopeTest}
+import org.jetbrains.plugins.scala.testingSupport.scalatest.scopeTest.{
+  WordSpecScopeTest, FunSpecScopeTest, FreeSpecScopeTest, FeatureSpecScopeTest
+}
 
 /**
   * @author Roman.Shein

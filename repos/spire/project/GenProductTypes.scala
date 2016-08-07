@@ -111,7 +111,7 @@ object GenProductTypes {
 
   def productTrait(blocks0: List[Block]): Block = { tpe =>
     val blocks = beginTrait :: members :: (blocks0 :+ endTrait)
-    blocks map (_ (tpe)) mkString "\n"
+    blocks map (_(tpe)) mkString "\n"
   }
 
   def implicitsTrait(start: Int, end: Int): Definition => String = { defn =>

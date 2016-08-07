@@ -6,8 +6,13 @@ package akka.dispatch
 import java.lang.reflect.ParameterizedType
 import java.util.concurrent.ConcurrentHashMap
 import akka.ConfigurationException
-import akka.actor.{Actor, ActorRef, ActorSystem, DeadLetter, Deploy, DynamicAccess, Props}
-import akka.dispatch.sysmsg.{EarliestFirstSystemMessageList, LatestFirstSystemMessageList, SystemMessage, SystemMessageList}
+import akka.actor.{
+  Actor, ActorRef, ActorSystem, DeadLetter, Deploy, DynamicAccess, Props
+}
+import akka.dispatch.sysmsg.{
+  EarliestFirstSystemMessageList, LatestFirstSystemMessageList, SystemMessage,
+  SystemMessageList
+}
 import akka.event.EventStream
 import akka.event.Logging.Warning
 import akka.util.Reflect

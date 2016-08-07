@@ -126,7 +126,6 @@ object ContravariantCoyonedaUsage extends App {
                    (parseDate _, 1),
                    (parseCommaNum _, 2))
   } yield schwartzian(unstructuredData)(v => f(v(i)))
-
 …/example/src/main/scala/scalaz/example/ContravariantCoyonedaUsage.scala:125: could not find implicit value for parameter B: scalaz.Order[java.io.Serializable]
   } yield schwartzian(unstructuredData)(v => f(v(i)))
                                        ^

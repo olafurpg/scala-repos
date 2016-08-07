@@ -6,7 +6,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScExpression, ScIfStmt, ScInfixExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlockExpr, ScExpression, ScIfStmt, ScInfixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.util.IntentionUtils
 

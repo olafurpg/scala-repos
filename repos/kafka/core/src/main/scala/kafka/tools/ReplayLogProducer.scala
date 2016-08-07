@@ -22,7 +22,9 @@ import java.util.Properties
 import kafka.consumer._
 import kafka.utils.{ToolsUtils, CommandLineUtils, Logging, ZkUtils}
 import kafka.api.OffsetRequest
-import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer, ProducerConfig}
+import org.apache.kafka.clients.producer.{
+  ProducerRecord, KafkaProducer, ProducerConfig
+}
 
 object ReplayLogProducer extends Logging {
 

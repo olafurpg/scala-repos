@@ -18,9 +18,13 @@ import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypeResult, TypingContext
+}
 
 import scala.StringContext.InvalidEscapeException
 
@@ -243,8 +247,8 @@ class ScLiteralImpl(node: ASTNode)
 
   /*
    * This part caches literal related annotation owners
-   * todo: think about extracting this feature to a trait  
-   * 
+   * todo: think about extracting this feature to a trait
+   *
    * trait AnnotationBasedInjectionHost {
    *   private[this] var myAnnotationOwner: Option[PsiAnnotationOwner] = None
    *   ...

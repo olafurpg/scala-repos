@@ -25,8 +25,7 @@ import spray.http.StatusCodes
 import spray.http.ContentTypes
 
 // see also https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
-trait CORSSupport {
-  this: HttpService =>
+trait CORSSupport { this: HttpService =>
 
   private val allowOriginHeader = `Access-Control-Allow-Origin`(AllOrigins)
   private val optionsCorsHeaders = List(

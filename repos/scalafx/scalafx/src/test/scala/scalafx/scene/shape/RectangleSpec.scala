@@ -33,7 +33,9 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import scalafx.Includes._
-import scalafx.testutil.{DimensionDelegateSpec, PositionDelegateSpec, SimpleSFXDelegateSpec}
+import scalafx.testutil.{
+  DimensionDelegateSpec, PositionDelegateSpec, SimpleSFXDelegateSpec
+}
 
 /**
   * Rectangle Spec tests.

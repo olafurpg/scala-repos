@@ -62,7 +62,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
     assertMatches(messages("class C(var p: A) { p = A }")) {
       case Nil =>
     }
-    // TODO right expression "B" must have expected type    
+    // TODO right expression "B" must have expected type
 //    assertMatches(messages("class C(var p: A) { p = B }")) {
 //      case Error("B", TypeMismatch()) :: Nil =>
 //    }

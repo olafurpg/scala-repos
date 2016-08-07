@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.codeInspection.collections
 
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.project.{ProjectPsiElementExt, ScalaLanguageLevel}
+import org.jetbrains.plugins.scala.project.{
+  ProjectPsiElementExt, ScalaLanguageLevel
+}
 
 /**
   * @author Nikolay.Tropin

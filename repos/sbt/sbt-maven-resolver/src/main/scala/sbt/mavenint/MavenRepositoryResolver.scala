@@ -7,11 +7,18 @@ import org.apache.ivy.core.IvyContext
 import org.apache.ivy.core.cache.{ArtifactOrigin, ModuleDescriptorWriter}
 import org.apache.ivy.core.module.descriptor._
 import org.apache.ivy.core.module.id.{ArtifactId, ModuleId, ModuleRevisionId}
-import org.apache.ivy.core.report.{ArtifactDownloadReport, DownloadReport, DownloadStatus, MetadataArtifactDownloadReport}
-import org.apache.ivy.core.resolve.{DownloadOptions, ResolveData, ResolvedModuleRevision}
+import org.apache.ivy.core.report.{
+  ArtifactDownloadReport, DownloadReport, DownloadStatus,
+  MetadataArtifactDownloadReport
+}
+import org.apache.ivy.core.resolve.{
+  DownloadOptions, ResolveData, ResolvedModuleRevision
+}
 import org.apache.ivy.core.settings.IvySettings
 import org.apache.ivy.plugins.matcher.{PatternMatcher, ExactPatternMatcher}
-import org.apache.ivy.plugins.parser.m2.{PomModuleDescriptorBuilder, ReplaceMavenConfigurationMappings}
+import org.apache.ivy.plugins.parser.m2.{
+  PomModuleDescriptorBuilder, ReplaceMavenConfigurationMappings
+}
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter
 import org.apache.ivy.plugins.resolver.AbstractResolver
 import org.apache.ivy.plugins.resolver.util.ResolvedResource
@@ -20,11 +27,22 @@ import org.eclipse.aether.artifact.{DefaultArtifact => AetherArtifact}
 import org.eclipse.aether.deployment.{DeployRequest => AetherDeployRequest}
 import org.eclipse.aether.installation.{InstallRequest => AetherInstallRequest}
 import org.eclipse.aether.metadata.{DefaultMetadata, Metadata}
-import org.eclipse.aether.resolution.{ArtifactDescriptorRequest => AetherDescriptorRequest, ArtifactDescriptorResult => AetherDescriptorResult, ArtifactRequest => AetherArtifactRequest, ArtifactResolutionException, MetadataRequest => AetherMetadataRequest, VersionRequest => AetherVersionRequest, VersionRangeRequest => AetherVersionRangeRequest}
+import org.eclipse.aether.resolution.{
+  ArtifactDescriptorRequest => AetherDescriptorRequest,
+  ArtifactDescriptorResult => AetherDescriptorResult,
+  ArtifactRequest => AetherArtifactRequest, ArtifactResolutionException,
+  MetadataRequest => AetherMetadataRequest,
+  VersionRequest => AetherVersionRequest,
+  VersionRangeRequest => AetherVersionRangeRequest
+}
 import org.eclipse.aether.{RepositorySystem, RepositorySystemSession}
 
-import sbt.internal.librarymanagement.ivyint.{CustomMavenResolver, CustomRemoteMavenResolver}
-import sbt.internal.librarymanagement.mavenint.{PomExtraDependencyAttributes, SbtPomExtraProperties}
+import sbt.internal.librarymanagement.ivyint.{
+  CustomMavenResolver, CustomRemoteMavenResolver
+}
+import sbt.internal.librarymanagement.mavenint.{
+  PomExtraDependencyAttributes, SbtPomExtraProperties
+}
 import sbt.internal.librarymanagement.MakePom
 
 import sbt.mavenint.MavenRepositoryResolver.JarPackaging

@@ -2,7 +2,9 @@ package com.twitter.finagle.factory
 
 import com.twitter.finagle._
 import com.twitter.finagle.addr.WeightedAddress
-import com.twitter.finagle.service.{DelayedFactory, FailingFactory, ServiceFactoryRef}
+import com.twitter.finagle.service.{
+  DelayedFactory, FailingFactory, ServiceFactoryRef
+}
 import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver}
 import com.twitter.finagle.util.{Drv, Rng}
 import com.twitter.util._
@@ -108,7 +110,6 @@ private[finagle] object TrafficDistributor {
   * A traffic distributor groups the input `dest` into distinct weight classes and
   * allocates traffic to each class. Classes are encoded in the stream of [[Address]]
   * instances in `dest`. The class operates with the following regime:
-
   * 1. For every distinct [[Address]] observed in `dest`, it creates a `newEndpoint`.
   * Each resulting `newEndpoint` is paired with a weight extracted from the [[Address]].
   * Calls to `newEndpoint` are assumed to be expensive, so they are cached by input address.

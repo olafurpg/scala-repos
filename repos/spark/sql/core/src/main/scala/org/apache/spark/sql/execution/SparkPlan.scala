@@ -17,7 +17,10 @@
 
 package org.apache.spark.sql.execution
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, DataInputStream,
+  DataOutputStream
+}
 import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.collection.mutable.ArrayBuffer

@@ -1,7 +1,9 @@
 package com.twitter.scalding.parquet.tuple
 
 import com.twitter.scalding.parquet.tuple.macros.Macros._
-import com.twitter.scalding.platform.{HadoopPlatformJobTest, HadoopPlatformTest}
+import com.twitter.scalding.platform.{
+  HadoopPlatformJobTest, HadoopPlatformTest
+}
 import com.twitter.scalding.typed.TypedPipe
 import com.twitter.scalding.{Args, Job, TypedTsv}
 import org.scalatest.{Matchers, WordSpec}

@@ -18,9 +18,15 @@
 package org.apache.spark.sql.catalyst.expressions
 
 import org.apache.spark.sql.AnalysisException
-import org.apache.spark.sql.catalyst.analysis.{TypeCheckResult, UnresolvedException}
-import org.apache.spark.sql.catalyst.analysis.TypeCheckResult.{TypeCheckFailure, TypeCheckSuccess}
-import org.apache.spark.sql.catalyst.expressions.aggregate.{DeclarativeAggregate, NoOp}
+import org.apache.spark.sql.catalyst.analysis.{
+  TypeCheckResult, UnresolvedException
+}
+import org.apache.spark.sql.catalyst.analysis.TypeCheckResult.{
+  TypeCheckFailure, TypeCheckSuccess
+}
+import org.apache.spark.sql.catalyst.expressions.aggregate.{
+  DeclarativeAggregate, NoOp
+}
 import org.apache.spark.sql.types._
 
 /**
@@ -455,8 +461,7 @@ case class Lag(input: Expression, offset: Expression, default: Expression)
 
 abstract class AggregateWindowFunction
     extends DeclarativeAggregate
-    with WindowFunction {
-  self: Product =>
+    with WindowFunction { self: Product =>
   override val frame =
     SpecifiedWindowFrame(RowFrame, UnboundedPreceding, CurrentRow)
   override def dataType: DataType = IntegerType

@@ -21,7 +21,9 @@ import java.io.File
 
 import org.apache.spark.{SecurityManager, SparkConf}
 import org.apache.spark.rpc.RpcEnv
-import org.apache.spark.util.{ChildFirstURLClassLoader, MutableURLClassLoader, Utils}
+import org.apache.spark.util.{
+  ChildFirstURLClassLoader, MutableURLClassLoader, Utils
+}
 
 /**
   * Utility object for launching driver programs such that they share fate with the Worker process.

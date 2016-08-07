@@ -33,7 +33,9 @@ import org.scalatest.exceptions.TestFailedDueToTimeoutException
 import org.scalatest.time.Span
 import org.scalatest.time.SpanSugar._
 
-import org.apache.spark.sql.catalyst.encoders.{encoderFor, ExpressionEncoder, RowEncoder}
+import org.apache.spark.sql.catalyst.encoders.{
+  encoderFor, ExpressionEncoder, RowEncoder
+}
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.execution.streaming._
@@ -48,7 +50,6 @@ import org.apache.spark.sql.execution.streaming._
   * {{{
   *  val inputData = MemoryStream[Int]
     val mapped = inputData.toDS().map(_ + 1)
-
     testStream(mapped)(
       AddData(inputData, 1, 2, 3),
       CheckAnswer(2, 3, 4))

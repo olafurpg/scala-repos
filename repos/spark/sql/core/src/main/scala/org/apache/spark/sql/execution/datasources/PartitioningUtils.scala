@@ -283,7 +283,7 @@ private[sql] object PartitioningUtils {
       // Fills resolved literals back to each partition
       values.zipWithIndex.map {
         case (d, index) =>
-          d.copy(literals = resolvedValues.map(_ (index)))
+          d.copy(literals = resolvedValues.map(_(index)))
       }
     }
   }

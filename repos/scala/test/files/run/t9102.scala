@@ -30,9 +30,7 @@ object Test extends App {
 
 /* Session tests without special init code should reside in simple script files.
  * Also, provide filters such as for `(bound to C@74f7d1d2)`.
-
 import scala.tools.partest.SessionTest
-
 object Test extends SessionTest {
 //Welcome to Scala version 2.11.6 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_40).
   def session =

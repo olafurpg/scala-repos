@@ -2,24 +2,36 @@ package org.jetbrains.plugins.scala
 package lang.psi.api
 
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.psi.{PsiElement, PsiNamedElement, PsiTypeParameterListOwner}
+import com.intellij.psi.{
+  PsiElement, PsiNamedElement, PsiTypeParameterListOwner
+}
 import org.jetbrains.plugins.scala.caches.ScalaRecursionManager
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.base.{ScFieldId, ScLiteral}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.api.macros.{MacroContext, ScalaMacroEvaluator}
+import org.jetbrains.plugins.scala.lang.psi.api.macros.{
+  MacroContext, ScalaMacroEvaluator
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScNamedElement, ScTypeParametersOwner}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScNamedElement, ScTypeParametersOwner
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.implicits.ImplicitCollector
 import org.jetbrains.plugins.scala.lang.psi.implicits.ImplicitCollector.ImplicitState
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, ScMethodType, ScTypePolymorphicType, TypeParameter}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  Parameter, ScMethodType, ScTypePolymorphicType, TypeParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiUtil, types}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_10

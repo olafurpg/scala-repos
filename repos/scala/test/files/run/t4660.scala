@@ -5,8 +5,8 @@ object Test {
       case (k, v) => (k, v.toList)
     }
 
-    val groupedFromView = traversable.view.groupBy(_ (0))
-    val groupedFromStrict = traversable.groupBy(_ (0))
+    val groupedFromView = traversable.view.groupBy(_(0))
+    val groupedFromStrict = traversable.groupBy(_(0))
 
     assert(normalize(groupedFromView) == normalize(groupedFromStrict))
   }

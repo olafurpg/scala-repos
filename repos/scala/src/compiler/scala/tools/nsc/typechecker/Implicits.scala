@@ -382,7 +382,7 @@ trait Implicits { self: Analyzer =>
             sym.tpe match {
               case MethodType(params, restpe)
                   if (params forall (_.tpe
-                            .isInstanceOf[BoundedWildcardType])) =>
+                        .isInstanceOf[BoundedWildcardType])) =>
                 Some((sym.name, params map (_.tpe.bounds.lo), restpe))
               case _ => None
             }
@@ -957,8 +957,8 @@ trait Implicits { self: Analyzer =>
                                                   .pointOrElse(0) < ownerPos &&
                                                 !(owner.ownerChain exists
                                                       (o =>
-                                                            (o eq sym) ||
-                                                              (o eq symAcc))) // probably faster to iterate only once, don't feel like duplicating hasTransOwner for this case
+                                                         (o eq sym) ||
+                                                           (o eq symAcc))) // probably faster to iterate only once, don't feel like duplicating hasTransOwner for this case
                                               } else
                                                 !(owner hasTransOwner sym)) // faster than owner.ownerChain contains sym
       }
@@ -1103,12 +1103,12 @@ trait Implicits { self: Analyzer =>
         case firstPending :: otherPending =>
           def firstPendingImproves(alt: ImplicitInfo) =
             firstPending == alt || (try improves(firstPending, alt)
-                catch {
-                  case e: CyclicReference =>
-                    devWarning(
-                        s"Discarding $firstPending during implicit search due to cyclic reference.")
-                    true
-                })
+            catch {
+              case e: CyclicReference =>
+                devWarning(
+                    s"Discarding $firstPending during implicit search due to cyclic reference.")
+                true
+            })
 
           val typedFirstPending =
             typedImplicit(firstPending, ptChecked = true, isLocalToCallsite)
@@ -1395,27 +1395,27 @@ trait Implicits { self: Analyzer =>
 
       val prefix =
         (// ClassTags are not path-dependent, so their materializer doesn't care about prefixes
-         if (tagClass eq ClassTagClass) EmptyTree
-         else
-           pre match {
-             case SingleType(prePre, preSym) =>
-               gen.mkAttributedRef(prePre, preSym) setType pre
-             // necessary only to compile typetags used inside the Universe cake
-             case ThisType(thisSym) =>
-               gen.mkAttributedThis(thisSym)
-             case _ =>
-               // if `pre` is not a PDT, e.g. if someone wrote
-               //   implicitly[scala.reflect.macros.blackbox.Context#TypeTag[Int]]
-               // then we need to fail, because we don't know the prefix to use during type reification
-               // upd. we also need to fail silently, because this is a very common situation
-               // e.g. quite often we're searching for BaseUniverse#TypeTag, e.g. for a type tag in any universe
-               // so that if we find one, we could convert it to whatever universe we need by the means of the `in` method
-               // if no tag is found in scope, we end up here, where we ask someone to materialize the tag for us
-               // however, since the original search was about a tag with no particular prefix, we cannot proceed
-               // this situation happens very often, so emitting an error message here (even if only for -Xlog-implicits) would be too much
-               //return failure(tp, "tag error: unsupported prefix type %s (%s)".format(pre, pre.kind))
-               return SearchFailure
-           })
+        if (tagClass eq ClassTagClass) EmptyTree
+        else
+          pre match {
+            case SingleType(prePre, preSym) =>
+              gen.mkAttributedRef(prePre, preSym) setType pre
+            // necessary only to compile typetags used inside the Universe cake
+            case ThisType(thisSym) =>
+              gen.mkAttributedThis(thisSym)
+            case _ =>
+              // if `pre` is not a PDT, e.g. if someone wrote
+              //   implicitly[scala.reflect.macros.blackbox.Context#TypeTag[Int]]
+              // then we need to fail, because we don't know the prefix to use during type reification
+              // upd. we also need to fail silently, because this is a very common situation
+              // e.g. quite often we're searching for BaseUniverse#TypeTag, e.g. for a type tag in any universe
+              // so that if we find one, we could convert it to whatever universe we need by the means of the `in` method
+              // if no tag is found in scope, we end up here, where we ask someone to materialize the tag for us
+              // however, since the original search was about a tag with no particular prefix, we cannot proceed
+              // this situation happens very often, so emitting an error message here (even if only for -Xlog-implicits) would be too much
+              //return failure(tp, "tag error: unsupported prefix type %s (%s)".format(pre, pre.kind))
+              return SearchFailure
+          })
       // todo. migrate hardcoded materialization in Implicits to corresponding implicit macros
       val materializer = atPos(pos.focus)(
           gen.mkMethodCall(TagMaterializers(tagClass),

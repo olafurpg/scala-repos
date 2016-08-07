@@ -86,7 +86,7 @@ class TestActor(queue: BlockingDeque[TestActor.Message]) extends Actor {
       }
       val observe =
         ignore map (ignoreFunc ⇒
-              !ignoreFunc.applyOrElse(x, FALSE)) getOrElse true
+                      !ignoreFunc.applyOrElse(x, FALSE)) getOrElse true
       if (observe) queue.offerLast(RealMessage(x, sender()))
   }
 
@@ -930,13 +930,11 @@ object TestProbe {
     new TestProbe(system, name)
 }
 
-trait ImplicitSender {
-  this: TestKitBase ⇒
+trait ImplicitSender { this: TestKitBase ⇒
   implicit def self = testActor
 }
 
-trait DefaultTimeout {
-  this: TestKitBase ⇒
+trait DefaultTimeout { this: TestKitBase ⇒
   implicit val timeout: Timeout = testKitSettings.DefaultTimeout
 }
 

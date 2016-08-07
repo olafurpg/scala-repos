@@ -128,7 +128,7 @@ object MultiNodeSpec {
   val maxNodes: Int =
     Option(Integer.getInteger("multinode.max-nodes")) getOrElse
       (throw new IllegalStateException(
-              "need system property multinode.max-nodes to be set"))
+          "need system property multinode.max-nodes to be set"))
 
   require(maxNodes > 0, "multinode.max-nodes must be greater than 0")
 
@@ -176,7 +176,7 @@ object MultiNodeSpec {
   val serverName: String =
     Option(System.getProperty("multinode.server-host")) getOrElse
       (throw new IllegalStateException(
-              "need system property multinode.server-host to be set"))
+          "need system property multinode.server-host to be set"))
 
   require(serverName != "", "multinode.server-host must not be empty")
 
@@ -204,7 +204,7 @@ object MultiNodeSpec {
   val selfIndex =
     Option(Integer.getInteger("multinode.index")) getOrElse
       (throw new IllegalStateException(
-              "need system property multinode.index to be set"))
+          "need system property multinode.index to be set"))
 
   require(selfIndex >= 0 && selfIndex < maxNodes,
           "multinode.index is out of bounds: " + selfIndex)

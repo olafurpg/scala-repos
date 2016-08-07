@@ -8,7 +8,9 @@ import javax.swing.border.MatteBorder
 import javax.swing.event.ChangeEvent
 import javax.swing.table.TableCellEditor
 
-import com.intellij.codeInsight.daemon.impl.analysis.{FileHighlightingSetting, HighlightLevelUtil}
+import com.intellij.codeInsight.daemon.impl.analysis.{
+  FileHighlightingSetting, HighlightLevelUtil
+}
 import com.intellij.openapi.actionSystem.{AnActionEvent, CustomShortcutSet}
 import com.intellij.openapi.editor.event.{DocumentAdapter, DocumentEvent}
 import com.intellij.openapi.fileTypes.LanguageFileType
@@ -16,15 +18,21 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.{util => _, _}
-import com.intellij.refactoring.changeSignature.{CallerChooserBase, ChangeSignatureDialogBase, ParameterTableModelItemBase}
-import com.intellij.refactoring.ui.{CodeFragmentTableCellEditorBase, StringTableCellEditor, VisibilityPanelBase}
+import com.intellij.refactoring.changeSignature.{
+  CallerChooserBase, ChangeSignatureDialogBase, ParameterTableModelItemBase
+}
+import com.intellij.refactoring.ui.{
+  CodeFragmentTableCellEditorBase, StringTableCellEditor, VisibilityPanelBase
+}
 import com.intellij.refactoring.{BaseRefactoringProcessor, RefactoringBundle}
 import com.intellij.ui.table.{JBTable, TableView}
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{util => _, _}
 import com.intellij.util.Consumer
 import com.intellij.util.ui.UIUtil
-import com.intellij.util.ui.table.{JBListTable, JBTableRowEditor, JBTableRowRenderer}
+import com.intellij.util.ui.table.{
+  JBListTable, JBTableRowEditor, JBTableRowRenderer
+}
 import org.jetbrains.plugins.scala.debugger.evaluation.ScalaCodeFragment
 import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor

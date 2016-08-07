@@ -7,7 +7,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.{PsiElement, PsiFile, PsiNamedElement}
-import com.intellij.refactoring.rename.inplace.{InplaceRefactoring, VariableInplaceRenameHandler, VariableInplaceRenamer}
+import com.intellij.refactoring.rename.inplace.{
+  InplaceRefactoring, VariableInplaceRenameHandler, VariableInplaceRenamer
+}
 
 /**
   * Nikolay.Tropin

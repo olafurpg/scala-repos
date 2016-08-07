@@ -2,10 +2,14 @@ package org.jetbrains.plugins.scala.codeInspection.collections
 
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInspection.{ChangeReferenceNameQuickFix, InspectionBundle}
+import org.jetbrains.plugins.scala.codeInspection.{
+  ChangeReferenceNameQuickFix, InspectionBundle
+}
 import org.jetbrains.plugins.scala.extensions.ExpressionType
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScExpression, ScFunctionExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock, ScExpression, ScFunctionExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, Unit}

@@ -2,7 +2,9 @@ package cats.tests
 
 import cats.{Id, Monad, Cartesian, Show}
 import cats.data.{OptionT, Xor}
-import cats.laws.discipline.{FunctorTests, SerializableTests, CartesianTests, MonadTests}
+import cats.laws.discipline.{
+  FunctorTests, SerializableTests, CartesianTests, MonadTests
+}
 import cats.laws.discipline.arbitrary._
 import cats.laws.discipline.eq._
 

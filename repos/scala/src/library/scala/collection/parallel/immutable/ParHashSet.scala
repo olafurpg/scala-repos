@@ -43,8 +43,7 @@ class ParHashSet[T] private[immutable] (private[this] val trie: HashSet[T])
     extends ParSet[T]
     with GenericParTemplate[T, ParHashSet]
     with ParSetLike[T, ParHashSet[T], HashSet[T]]
-    with Serializable {
-  self =>
+    with Serializable { self =>
 
   def this() = this(HashSet.empty[T])
 

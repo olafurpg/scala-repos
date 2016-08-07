@@ -26,8 +26,7 @@ import net.liftweb.common._
   * Add this trait to a Mapper to add support for many-to-many relationships
   * @author nafg
   */
-trait ManyToMany extends BaseKeyedMapper {
-  this: KeyedMapper[_, _] =>
+trait ManyToMany extends BaseKeyedMapper { this: KeyedMapper[_, _] =>
 
   private[this] type K = TheKeyType
   private[this] type T = KeyedMapperType

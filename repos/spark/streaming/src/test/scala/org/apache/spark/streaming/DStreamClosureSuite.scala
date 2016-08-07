@@ -21,7 +21,9 @@ import java.io.NotSerializableException
 
 import org.scalatest.BeforeAndAfterAll
 
-import org.apache.spark.{HashPartitioner, SparkContext, SparkException, SparkFunSuite}
+import org.apache.spark.{
+  HashPartitioner, SparkContext, SparkException, SparkFunSuite
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.util.ReturnStatementInClosureException

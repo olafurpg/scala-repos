@@ -1,10 +1,14 @@
 package mesosphere.marathon.integration
 
 import mesosphere.marathon.api.v2.json.AppUpdate
-import mesosphere.marathon.integration.facades.MesosFacade.{ITResources, ITMesosState}
+import mesosphere.marathon.integration.facades.MesosFacade.{
+  ITResources, ITMesosState
+}
 import mesosphere.marathon.integration.facades.{ITEnrichedTask, MarathonFacade}
 import MarathonFacade._
-import mesosphere.marathon.integration.setup.{RestResult, IntegrationFunSuite, SingleMarathonIntegrationTest}
+import mesosphere.marathon.integration.setup.{
+  RestResult, IntegrationFunSuite, SingleMarathonIntegrationTest
+}
 import mesosphere.marathon.state._
 import org.apache.mesos.{Protos => Mesos}
 import org.scalatest.{Tag, BeforeAndAfter, GivenWhenThen, Matchers}

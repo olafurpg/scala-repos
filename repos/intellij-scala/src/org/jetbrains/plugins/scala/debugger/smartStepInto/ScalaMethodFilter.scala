@@ -9,7 +9,9 @@ import org.jetbrains.plugins.scala.debugger.ScalaPositionManager
 import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ValueClassType
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 

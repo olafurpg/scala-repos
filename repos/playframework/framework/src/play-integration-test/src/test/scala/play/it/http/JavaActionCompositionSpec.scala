@@ -7,7 +7,9 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSResponse
 import play.api.test.{PlaySpecification, TestServer, WsTestClient}
-import play.it.http.ActionCompositionOrderTest.{ActionAnnotation, ControllerAnnotation, WithUsername}
+import play.it.http.ActionCompositionOrderTest.{
+  ActionAnnotation, ControllerAnnotation, WithUsername
+}
 import play.mvc.{Result, Results}
 
 object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {

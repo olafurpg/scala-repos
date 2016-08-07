@@ -6,7 +6,7 @@ import org.jetbrains.plugins.scala.lang.TokenSets
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElementImpl
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */

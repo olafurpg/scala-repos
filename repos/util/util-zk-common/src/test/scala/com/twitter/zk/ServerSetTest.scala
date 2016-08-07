@@ -9,7 +9,6 @@ import com.twitter.common.zookeeper.{ServerSet => CommonServerSet}
     val address = new InetSocketAddress("localhost", port)
     val commonServerSet = mock[ServerSetImpl]
     val serverSet = ServerSet(commonServerSet, "/services", pool)
-
     "join" in {
       val commonEndpointStatus = mock[CommonServerSet.EndpointStatus]
       expect {
@@ -22,12 +21,10 @@ import com.twitter.common.zookeeper.{ServerSet => CommonServerSet}
       assert(endpointStatus == a[ServerSet.EndpointStatus])
       endpointStatus.update(ServerSet.Status.Dead).apply()
     }
-
     "monitor" in {
       val timeout = 2.seconds
       implicit val timer = new JavaTimer
       after { timer.stop() }
-
       val basePort = 20000
       val instances = 1 to 5 map { i =>
         0 until i map { p =>
@@ -49,11 +46,9 @@ import com.twitter.common.zookeeper.{ServerSet => CommonServerSet}
           null
         }
       }
-
       promises(0).setValue(instances(0))
       val offer = serverSet.monitor().apply(timeout)
       assert(offer().apply(timeout) == instances(0))
-
       val fin = Future.collect {
         assert(instances.tail map { i => offer() onSuccess { _ == i } })
       }

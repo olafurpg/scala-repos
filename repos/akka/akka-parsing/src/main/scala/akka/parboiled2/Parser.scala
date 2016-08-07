@@ -40,8 +40,8 @@ abstract class Parser(initialValueStackSize: Int = 16,
   /**
     * Converts a compile-time only rule definition into the corresponding rule method implementation.
     */
-  def rule[I <: HList, O <: HList](r: Rule[I, O]): Rule[I, O] = macro ParserMacros
-    .ruleImpl[I, O]
+  def rule[I <: HList, O <: HList](r: Rule[I, O]): Rule[I, O] =
+    macro ParserMacros.ruleImpl[I, O]
 
   /**
     * Converts a compile-time only rule definition into the corresponding rule method implementation

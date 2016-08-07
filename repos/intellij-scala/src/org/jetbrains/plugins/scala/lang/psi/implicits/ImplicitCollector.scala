@@ -14,19 +14,33 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScExistentialClause
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScTemplateParents, ScExtendsBlock, ScTemplateBody}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScObject}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScModifierListOwner, ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter, ScParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScTemplateParents, ScExtendsBlock, ScTemplateBody
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScObject
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScModifierListOwner, ScNamedElement, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.{InferUtil, MacroInferUtil}
 import org.jetbrains.plugins.scala.lang.psi.implicits.ImplicitCollector._
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{ScMethodType, ScTypePolymorphicType, TypeParameter}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  ScMethodType, ScTypePolymorphicType, TypeParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiUtil, types}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
 import org.jetbrains.plugins.scala.lang.resolve._
-import org.jetbrains.plugins.scala.lang.resolve.processor.{BaseProcessor, ImplicitProcessor, MostSpecificUtil}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  BaseProcessor, ImplicitProcessor, MostSpecificUtil
+}
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
 
 import scala.annotation.tailrec
@@ -548,8 +562,7 @@ class ImplicitCollector(
                                 results.foldLeft(result) {
                                   case (r1: ScalaResolveResult,
                                         r2: ScalaResolveResult) =>
-                                    r1.copy(
-                                        importsUsed =
+                                    r1.copy(importsUsed =
                                           r1.importsUsed ++ r2.importsUsed)
                                 }
                               }

@@ -1,6 +1,8 @@
 package com.twitter.finagle.stats
 
-import com.twitter.finagle.{CancelledConnectionException, CancelledRequestException}
+import com.twitter.finagle.{
+  CancelledConnectionException, CancelledRequestException
+}
 import com.twitter.util.Throwables.RootCause
 
 /**

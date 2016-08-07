@@ -56,10 +56,13 @@ object record {
     * }}}
     */
   object Record extends Dynamic {
-    def applyDynamic(method: String)(rec: Any*): HList = macro RecordMacros.mkRecordEmptyImpl
-    def applyDynamicNamed(method: String)(rec: Any*): HList = macro RecordMacros.mkRecordNamedImpl
+    def applyDynamic(method: String)(rec: Any*): HList =
+      macro RecordMacros.mkRecordEmptyImpl
+    def applyDynamicNamed(method: String)(rec: Any*): HList =
+      macro RecordMacros.mkRecordNamedImpl
 
-    def selectDynamic(tpeSelector: String): Any = macro LabelledMacros.recordTypeImpl
+    def selectDynamic(tpeSelector: String): Any =
+      macro LabelledMacros.recordTypeImpl
   }
 }
 
@@ -85,7 +88,8 @@ object record {
   */
 trait RecordArgs extends Dynamic {
   def applyDynamic(method: String)(): Any = macro RecordMacros.forwardImpl
-  def applyDynamicNamed(method: String)(rec: Any*): Any = macro RecordMacros.forwardNamedImpl
+  def applyDynamicNamed(method: String)(rec: Any*): Any =
+    macro RecordMacros.forwardNamedImpl
 }
 
 @macrocompat.bundle

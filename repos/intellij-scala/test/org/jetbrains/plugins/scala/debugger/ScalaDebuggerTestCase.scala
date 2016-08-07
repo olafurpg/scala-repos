@@ -11,11 +11,17 @@ import com.intellij.debugger.engine.evaluation.expression.EvaluatorBuilder
 import com.intellij.debugger.engine.events.DebuggerContextCommandImpl
 import com.intellij.debugger.impl._
 import com.intellij.execution.Executor
-import com.intellij.execution.application.{ApplicationConfiguration, ApplicationConfigurationType}
+import com.intellij.execution.application.{
+  ApplicationConfiguration, ApplicationConfigurationType
+}
 import com.intellij.execution.configurations.RunnerSettings
 import com.intellij.execution.executors.DefaultDebugExecutor
-import com.intellij.execution.process.{ProcessAdapter, ProcessEvent, ProcessHandler, ProcessListener}
-import com.intellij.execution.runners.{ExecutionEnvironmentBuilder, ProgramRunner}
+import com.intellij.execution.process.{
+  ProcessAdapter, ProcessEvent, ProcessHandler, ProcessListener
+}
+import com.intellij.execution.runners.{
+  ExecutionEnvironmentBuilder, ProgramRunner
+}
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.util.Key

@@ -8,7 +8,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleManager
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScEnumerator, ScGenerator}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScEnumerator, ScGenerator
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
 
 class RemoveValQuickFix(param: ScClassParameter)

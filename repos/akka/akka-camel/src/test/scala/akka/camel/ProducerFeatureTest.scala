@@ -403,8 +403,8 @@ object ProducerFeatureTest {
           case _ ⇒
             context.sender() !
               (msg.mapBody { body: String ⇒
-                    "received %s" format body
-                  })
+                "received %s" format body
+              })
         }
     }
   }

@@ -502,7 +502,7 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
   def forall(func: A => Boolean): Boolean = true
 
   /**
-    * 
+    *
     * If this `Box` contains a value and it does '''not''' satisfy the specified
     * `f`, return the `Box` unchanged. Otherwise, return an `Empty`.
     */
@@ -653,7 +653,7 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
     * This method calls the specified function with the specified `in` value and
     * the value contained in this `Box`. If this box is empty, returns the `in`
     * value directly.
-    * 
+    *
     * @return The result of the function or the `in` value.
     */
   def run[T](in: => T)(f: (T, A) => T) = in
@@ -1058,9 +1058,9 @@ final class ParamFailure[T](override val msg: String,
 
   override def hashCode(): Int =
     super.hashCode() + (param match {
-          case null => 0
-          case x => x.hashCode()
-        })
+      case null => 0
+      case x => x.hashCode()
+    })
 
   override def ~>[T](errorCode: => T): ParamFailure[T] =
     ParamFailure(msg, exception, Full(this), errorCode)

@@ -3,7 +3,9 @@ package com.typesafe.slick.testkit.util
 import scala.language.existentials
 
 import java.lang.reflect.Method
-import java.util.concurrent.{LinkedBlockingQueue, ThreadPoolExecutor, ExecutionException, TimeUnit}
+import java.util.concurrent.{
+  LinkedBlockingQueue, ThreadPoolExecutor, ExecutionException, TimeUnit
+}
 import java.util.concurrent.atomic.AtomicInteger
 
 import scala.concurrent.{Promise, ExecutionContext, Await, Future, blocking}

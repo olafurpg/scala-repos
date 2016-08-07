@@ -23,7 +23,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 import scala.collection.immutable.HashSet
 
-import com.mongodb.{DB, DBCollection, Mongo, MongoClient, MongoException, MongoOptions, ServerAddress}
+import com.mongodb.{
+  DB, DBCollection, Mongo, MongoClient, MongoException, MongoOptions,
+  ServerAddress
+}
 
 /**
   * Main Mongo object

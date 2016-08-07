@@ -30,7 +30,7 @@ package scalafx.ensemble.commons
 import scalafx.scene.Node
 
 /**
-  * @author Jarek Sacha 
+  * @author Jarek Sacha
   */
 trait EnsembleExample {
   def getContent: Node

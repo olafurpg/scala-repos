@@ -5,7 +5,9 @@ import java.util.concurrent.atomic.AtomicReference
 import com.intellij.openapi.util.{Key, TextRange, UserDataHolderEx}
 import com.intellij.psi._
 import com.intellij.util.containers.ContainerUtil
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{ImportUsed, ReadValueUsed, ValueUsed, WriteValueUsed}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{
+  ImportUsed, ReadValueUsed, ValueUsed, WriteValueUsed
+}
 import org.jetbrains.plugins.scala.util.ScalaLanguageDerivative
 
 /**

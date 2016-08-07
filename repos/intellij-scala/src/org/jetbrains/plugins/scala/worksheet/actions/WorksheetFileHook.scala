@@ -20,7 +20,9 @@ import org.jetbrains.plugins.scala.components.StopWorksheetAction
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.worksheet.interactive.WorksheetAutoRunner
 import org.jetbrains.plugins.scala.worksheet.runconfiguration.WorksheetViewerInfo
-import org.jetbrains.plugins.scala.worksheet.ui.{WorksheetEditorPrinter, WorksheetFoldGroup, WorksheetUiConstructor}
+import org.jetbrains.plugins.scala.worksheet.ui.{
+  WorksheetEditorPrinter, WorksheetFoldGroup, WorksheetUiConstructor
+}
 
 /**
   * User: Dmitry Naydanov

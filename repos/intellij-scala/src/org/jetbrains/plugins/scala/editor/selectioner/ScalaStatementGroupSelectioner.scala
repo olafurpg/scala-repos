@@ -12,7 +12,9 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScBlockStatement}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock, ScBlockStatement
+}
 
 /**
   * @author yole

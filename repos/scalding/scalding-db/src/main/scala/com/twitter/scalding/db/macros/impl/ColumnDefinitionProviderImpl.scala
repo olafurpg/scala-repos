@@ -6,7 +6,9 @@ import scala.reflect.macros.Context
 import scala.util.{Success, Failure}
 
 import com.twitter.bijection.macros.impl.IsCaseClassImpl
-import com.twitter.scalding.db.{ColumnDefinition, ColumnDefinitionProvider, ResultSetExtractor}
+import com.twitter.scalding.db.{
+  ColumnDefinition, ColumnDefinitionProvider, ResultSetExtractor
+}
 import com.twitter.scalding.db.macros._
 import com.twitter.scalding.db.macros.impl.handler._
 

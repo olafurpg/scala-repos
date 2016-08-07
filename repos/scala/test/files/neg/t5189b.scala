@@ -26,7 +26,6 @@ object TestNeg extends App {
     when inferring Wrapper's type parameter B from x's type AbsWrapperCov[T],
     we must take into account that x's actual type is AbsWrapperCov[Tactual] forSome {type Tactual <: T}
     as AbsWrapperCov is covariant in A -- in other words, we must not assume we know T exactly, all we know is its upper bound
-
     since method application is the only way to generate this slack between run-time and compile-time types,
     we'll simply replace the skolems that represent method type parameters as seen from the method's body by
     other skolems that are (upper/lower)-bounded by the type-parameter skolems

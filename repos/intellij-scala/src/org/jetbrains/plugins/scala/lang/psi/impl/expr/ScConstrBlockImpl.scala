@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 /**
-  * @author Alexander.Podkhalyuzin 
+  * @author Alexander.Podkhalyuzin
   */
 class ScConstrBlockImpl(node: ASTNode)
     extends ScalaPsiElementImpl(node)

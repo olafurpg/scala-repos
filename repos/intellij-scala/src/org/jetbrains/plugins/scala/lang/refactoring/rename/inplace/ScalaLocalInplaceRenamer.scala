@@ -7,7 +7,9 @@ import com.intellij.lang.Language
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.{Pair, TextRange}
-import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiFile, PsiNamedElement}
+import com.intellij.psi.{
+  PsiDocumentManager, PsiElement, PsiFile, PsiNamedElement
+}
 import com.intellij.refactoring.RefactoringActionHandler
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenamer
 import com.intellij.refactoring.util.TextOccurrencesUtil

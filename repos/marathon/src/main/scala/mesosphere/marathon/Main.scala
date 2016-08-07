@@ -10,7 +10,9 @@ import mesosphere.marathon.api.MarathonRestModule
 import mesosphere.marathon.core.CoreGuiceModule
 import mesosphere.marathon.event.EventModule
 import mesosphere.marathon.event.http.HttpEventModule
-import mesosphere.marathon.metrics.{MetricsReporterModule, MetricsReporterService}
+import mesosphere.marathon.metrics.{
+  MetricsReporterModule, MetricsReporterService
+}
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._

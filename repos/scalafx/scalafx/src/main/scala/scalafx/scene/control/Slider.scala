@@ -31,7 +31,9 @@ import javafx.{geometry => jfxg, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.geometry.Orientation
 import scalafx.util.StringConverter

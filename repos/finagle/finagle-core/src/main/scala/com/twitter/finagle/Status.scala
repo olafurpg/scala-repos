@@ -42,7 +42,7 @@ object Status {
     StatusOrdering.min(left, right)
 
   /**
-    * A composite status indicating the most healthy of the two.   
+    * A composite status indicating the most healthy of the two.
     */
   def best(left: Status, right: Status): Status =
     StatusOrdering.max(left, right)
@@ -83,7 +83,7 @@ object Status {
     * an exceptional [[com.twitter.util.Future]] should it be
     * [[Closed]].
     *
-    * `whenOpen` polls the underlying status, using 
+    * `whenOpen` polls the underlying status, using
     * exponential backoffs from 1ms to around 1s.
     */
   def whenOpen(get: => Status): Future[Unit] = {
@@ -98,7 +98,7 @@ object Status {
   }
 
   /**
-    * A blocking version of [[whenOpen]]; this method returns 
+    * A blocking version of [[whenOpen]]; this method returns
     * when the status has become [[Open]]. This call
     * blocks and should only be used outside of Finagle
     * threads to halt progress until the status is [[Open]].
@@ -117,7 +117,7 @@ object Status {
   /**
     * A busy [[Service]] or [[ServiceFactory]] is transiently
     * unavailable. A Busy [[Service]] or [[ServiceFactory]] can be
-    * used, but may not provide service immediately. 
+    * used, but may not provide service immediately.
     */
   case object Busy extends Status
 

@@ -1,8 +1,13 @@
 package com.twitter.finagle.service
 
 import com.twitter.conversions.time._
-import com.twitter.finagle.{ChannelClosedException, Failure, TimeoutException, WriteException}
-import com.twitter.util.{TimeoutException => UtilTimeoutException, Duration, JavaSingleton, Return, Throw, Try}
+import com.twitter.finagle.{
+  ChannelClosedException, Failure, TimeoutException, WriteException
+}
+import com.twitter.util.{
+  TimeoutException => UtilTimeoutException, Duration, JavaSingleton, Return,
+  Throw, Try
+}
 import java.util.{concurrent => juc}
 import java.{util => ju}
 import scala.collection.JavaConverters._

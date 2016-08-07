@@ -10,9 +10,14 @@ import std.Transform
 import Def.ScopedKey
 import Scope.GlobalScope
 import BasicKeys.explicitGlobalLogLevels
-import Keys.{logLevel, logManager, persistLogLevel, persistTraceLevel, sLog, state, traceLevel}
+import Keys.{
+  logLevel, logManager, persistLogLevel, persistTraceLevel, sLog, state,
+  traceLevel
+}
 import scala.Console.{BLUE, RESET}
-import sbt.internal.util.{AttributeKey, ConsoleOut, MultiLoggerConfig, Settings, SuppressedTraceContext}
+import sbt.internal.util.{
+  AttributeKey, ConsoleOut, MultiLoggerConfig, Settings, SuppressedTraceContext
+}
 import sbt.internal.util.MainLogging._
 import sbt.util.{AbstractLogger, Level, Logger}
 

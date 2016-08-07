@@ -2,13 +2,10 @@ package breeze.generic
 
 /*
  Copyright 2012 David Hall
-
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -81,8 +78,7 @@ trait MethodImpl[A, +R] {
 
 trait Multimethod2[Method[AA, BB, RR] <: Function2[AA, BB, RR], A, B, R]
     extends ((A, B) => R)
-    with MMRegistry2[Method[_ <: A, _ <: B, _ <: R]] {
-  this: Method[A, B, R] =>
+    with MMRegistry2[Method[_ <: A, _ <: B, _ <: R]] { this: Method[A, B, R] =>
   protected def bindingMissing(a: A, b: B): R =
     throw new UnsupportedOperationException(
         "Types not found!" + a + b + " " + ops)
@@ -141,8 +137,7 @@ trait Multimethod2[Method[AA, BB, RR] <: Function2[AA, BB, RR], A, B, R]
   */
 trait Multiproc2[Method[AA, BB] <: (AA, BB) => Unit, A <: AnyRef, B]
     extends ((A, B) => Unit)
-    with MMRegistry2[Method[_ <: A, _ <: B]] {
-  this: Method[A, B] =>
+    with MMRegistry2[Method[_ <: A, _ <: B]] { this: Method[A, B] =>
   protected def bindingMissing(a: A, b: B): Unit =
     throw new UnsupportedOperationException("Types not found!")
   protected def multipleOptions(

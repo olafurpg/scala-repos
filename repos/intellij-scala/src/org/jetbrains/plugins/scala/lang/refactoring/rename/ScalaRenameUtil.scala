@@ -13,11 +13,15 @@ import com.intellij.refactoring.rename.RenameUtil
 import com.intellij.usageView.UsageInfo
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScReferencePattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScPrimaryConstructor, ScReferenceElement, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScPrimaryConstructor, ScReferenceElement, ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
 import org.jetbrains.plugins.scala.lang.psi.light.PsiTypedDefinitionWrapper
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil

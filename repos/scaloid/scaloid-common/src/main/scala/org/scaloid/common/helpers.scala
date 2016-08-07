@@ -272,8 +272,8 @@ trait PreferenceHelpers {
 
   import scala.language.experimental.macros
 
-  def preferenceVar[T](defaultVal: T): PreferenceVar[T] = macro PreferenceHelpers
-    .preferenceVarImpl[T]
+  def preferenceVar[T](defaultVal: T): PreferenceVar[T] =
+    macro PreferenceHelpers.preferenceVarImpl[T]
 }
 
 object PreferenceHelpers extends PreferenceHelpers {

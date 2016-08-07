@@ -20,7 +20,9 @@ import java.io.{File, FileOutputStream, FilenameFilter, OutputStream}
 import java.nio.charset.Charset
 import java.util.{Calendar, Date, logging => javalog}
 
-import com.twitter.util.{TwitterDateFormat, HandleSignal, Return, StorageUnit, Time, Try}
+import com.twitter.util.{
+  TwitterDateFormat, HandleSignal, Return, StorageUnit, Time, Try
+}
 
 sealed abstract class Policy
 object Policy {

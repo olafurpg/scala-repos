@@ -29,8 +29,7 @@ trait Map[A, +B]
     extends Iterable[(A, B)]
 //                    with GenMap[A, B]
     with scala.collection.Map[A, B]
-    with MapLike[A, B, Map[A, B]] {
-  self =>
+    with MapLike[A, B, Map[A, B]] { self =>
 
   override def empty: Map[A, B] = Map.empty
 

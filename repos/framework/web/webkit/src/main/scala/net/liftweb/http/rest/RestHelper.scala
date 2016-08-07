@@ -248,7 +248,7 @@ trait RestHelper extends LiftRules.DispatchPF {
     * be used as:<br/>
     * <pre>case "api" :: id :: _ Get req => ...</pre><br/>
     * or<br/>
-    * <pre>case Get("api" :: id :: _, req) => ...</pre><br/>   * 
+    * <pre>case Get("api" :: id :: _, req) => ...</pre><br/>   *
     */
   protected object Get {
     def unapply(r: Req): Option[(List[String], Req)] =
@@ -586,7 +586,7 @@ trait RestHelper extends LiftRules.DispatchPF {
     * Turn a Box[T] into the return type expected by
     * DispatchPF.  Note that this method will return
     * messages from Failure() and return codes and messages
-    * from ParamFailure[Int[(msg, _, _, code) 
+    * from ParamFailure[Int[(msg, _, _, code)
     */
   protected implicit def boxToResp[T](in: Box[T])(
       implicit c: T => LiftResponse): () => Box[LiftResponse] =
@@ -594,7 +594,7 @@ trait RestHelper extends LiftRules.DispatchPF {
       case Full(v) =>
         () =>
           Full(c(v))
-        case e: EmptyBox =>
+      case e: EmptyBox =>
         () =>
           emptyToResp(e)
     }
@@ -625,7 +625,7 @@ trait RestHelper extends LiftRules.DispatchPF {
       case Some(v) =>
         () =>
           Full(c(v))
-        case _ =>
+      case _ =>
         () =>
           Empty
     }
@@ -634,7 +634,7 @@ trait RestHelper extends LiftRules.DispatchPF {
     * Turn a () => Box[T] into the return type expected by
     * DispatchPF.  Note that this method will return
     * messages from Failure() and return codes and messages
-    * from ParamFailure[Int[(msg, _, _, code) 
+    * from ParamFailure[Int[(msg, _, _, code)
     */
   protected implicit def boxFuncToResp[T](in: () => Box[T])(
       implicit c: T => LiftResponse): () => Box[LiftResponse] =
@@ -800,7 +800,7 @@ final class ListServeMagic(list: List[String]) {
 trait JsonXmlAble
 
 /**
-  * This trait is part of the ADT that allows the choice between 
+  * This trait is part of the ADT that allows the choice between
   */
 sealed trait JsonXmlSelect
 

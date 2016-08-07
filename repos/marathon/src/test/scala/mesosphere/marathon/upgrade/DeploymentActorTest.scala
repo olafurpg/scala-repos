@@ -10,7 +10,9 @@ import mesosphere.marathon.event.MesosStatusUpdateEvent
 import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.io.storage.StorageProvider
 import mesosphere.marathon.state._
-import mesosphere.marathon.upgrade.DeploymentManager.{DeploymentFinished, DeploymentStepInfo}
+import mesosphere.marathon.upgrade.DeploymentManager.{
+  DeploymentFinished, DeploymentStepInfo
+}
 import mesosphere.marathon.{MarathonSpec, MarathonTestHelper, SchedulerActions}
 import org.apache.mesos.Protos.Status
 import org.apache.mesos.SchedulerDriver

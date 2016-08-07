@@ -23,7 +23,10 @@ import org.specs2.mutable.Specification
 
 import common._
 
-import Mailer.{From, To, Subject, PlainMailBodyType, XHTMLMailBodyType, XHTMLPlusImages, PlusImageHolder}
+import Mailer.{
+  From, To, Subject, PlainMailBodyType, XHTMLMailBodyType, XHTMLPlusImages,
+  PlusImageHolder
+}
 
 import scala.io.Source
 

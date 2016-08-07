@@ -48,7 +48,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.HadoopRDD.HadoopMapPartitionsWithSplitRDD
 import org.apache.spark.scheduler.{HDFSCacheTaskLocation, HostTaskLocation}
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.util.{NextIterator, SerializableConfiguration, ShutdownHookManager, Utils}
+import org.apache.spark.util.{
+  NextIterator, SerializableConfiguration, ShutdownHookManager, Utils
+}
 
 /**
   * A Spark split class that wraps around a Hadoop InputSplit.

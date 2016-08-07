@@ -22,10 +22,10 @@ import common._
 
 /**
   * Function object that can be used in Logger.setup
-  * 
+  *
   * Tries to determine which logging backend is available and configures it
   * by using either defaults or a mode-dependent configuration file.
-  * 
+  *
   * To provide your own configuration, add either a log4j.props file or log4j.xml
   * file to your classpath. If using logback, name it logback.xml
   *
@@ -42,7 +42,7 @@ import common._
   * 'test', 'staging', 'production', 'pilot', 'profile', or 'default.
   * Thus, if you name your log4j config file 'default.log4j.xml' or
   * 'default.log4j.props' it will be picked up correctly.
-  * 
+  *
   */
 object LoggingAutoConfigurer {
   import ClassHelpers._

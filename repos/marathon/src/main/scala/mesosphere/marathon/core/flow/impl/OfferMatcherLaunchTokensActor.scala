@@ -4,7 +4,9 @@ import akka.actor.{Actor, ActorLogging, Cancellable, Props}
 import mesosphere.marathon.core.flow.LaunchTokenConfig
 import mesosphere.marathon.core.matcher.manager.OfferMatcherManager
 import mesosphere.marathon.core.task.bus.TaskStatusObservables.TaskStatusUpdate
-import mesosphere.marathon.core.task.bus.{MarathonTaskStatus, TaskStatusObservables}
+import mesosphere.marathon.core.task.bus.{
+  MarathonTaskStatus, TaskStatusObservables
+}
 import org.apache.mesos.Protos.TaskStatus
 import rx.lang.scala.{Observable, Subscription}
 

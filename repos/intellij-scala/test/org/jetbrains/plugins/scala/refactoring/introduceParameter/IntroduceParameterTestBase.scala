@@ -16,7 +16,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.types.StdType
 import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.changeInfo.ScalaChangeInfo
-import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{ScalaChangeSignatureProcessor, ScalaMethodDescriptor, ScalaParameterInfo}
+import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{
+  ScalaChangeSignatureProcessor, ScalaMethodDescriptor, ScalaParameterInfo
+}
 import org.jetbrains.plugins.scala.lang.refactoring.introduceParameter.ScalaIntroduceParameterHandler
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 import org.jetbrains.plugins.scala.util.ScalaUtils

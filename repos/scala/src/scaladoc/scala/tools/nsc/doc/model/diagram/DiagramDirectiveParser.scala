@@ -13,7 +13,10 @@ import scala.util.matching.Regex
   *  @author Vlad Ureche
   */
 trait DiagramDirectiveParser {
-  this: ModelFactory with DiagramFactory with CommentFactory with TreeFactory =>
+  this: ModelFactory
+    with DiagramFactory
+    with CommentFactory
+    with TreeFactory =>
 
   import this.global.definitions.AnyRefClass
 

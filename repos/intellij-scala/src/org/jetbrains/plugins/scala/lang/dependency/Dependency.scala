@@ -3,12 +3,20 @@ package lang.dependency
 
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScConstructorPattern, ScReferencePattern}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScPrimaryConstructor, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScInfixExpr, ScPostfixExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScConstructorPattern, ScReferencePattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScPrimaryConstructor, ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScInfixExpr, ScPostfixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScMember, ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 

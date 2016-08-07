@@ -3,7 +3,10 @@
  */
 package xsbt
 
-import java.io.{BufferedReader, BufferedWriter, InputStream, InputStreamReader, OutputStreamWriter, OutputStream}
+import java.io.{
+  BufferedReader, BufferedWriter, InputStream, InputStreamReader,
+  OutputStreamWriter, OutputStream
+}
 import java.net.{InetAddress, ServerSocket, Socket}
 
 object IPC {

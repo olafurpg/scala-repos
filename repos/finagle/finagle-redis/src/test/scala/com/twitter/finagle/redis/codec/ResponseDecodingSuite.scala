@@ -4,7 +4,9 @@ import com.twitter.finagle.redis.{ClientError, ServerError}
 import com.twitter.finagle.redis.util._
 import com.twitter.util.Time
 import org.jboss.netty.buffer.ChannelBuffer
-import com.twitter.finagle.redis.protocol.{BulkReply, ErrorReply, IntegerReply, MBulkReply, StatusReply, ReplyCodec}
+import com.twitter.finagle.redis.protocol.{
+  BulkReply, ErrorReply, IntegerReply, MBulkReply, StatusReply, ReplyCodec
+}
 import com.twitter.finagle.redis.util.StringToChannelBuffer
 import org.jboss.netty.buffer.ChannelBuffer
 import org.scalatest.FunSuite

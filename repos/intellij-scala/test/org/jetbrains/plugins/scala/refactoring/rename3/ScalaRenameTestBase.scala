@@ -13,8 +13,13 @@ import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager
 import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile}
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import com.intellij.psi.{PsiDocumentManager, PsiFile}
-import com.intellij.refactoring.rename.{RenameProcessor, RenamePsiElementProcessor}
-import com.intellij.testFramework.{LightPlatformCodeInsightTestCase, LightPlatformTestCase, PlatformTestUtil, PsiTestUtil}
+import com.intellij.refactoring.rename.{
+  RenameProcessor, RenamePsiElementProcessor
+}
+import com.intellij.testFramework.{
+  LightPlatformCodeInsightTestCase, LightPlatformTestCase, PlatformTestUtil,
+  PsiTestUtil
+}
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
 import org.jetbrains.plugins.scala.extensions.inWriteAction
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil

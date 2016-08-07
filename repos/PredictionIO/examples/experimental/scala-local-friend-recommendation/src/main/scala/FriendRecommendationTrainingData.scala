@@ -11,7 +11,7 @@ class FriendRecommendationTrainingData(
     // Keyword array, internal id index, term-weight map item
     val userKeyword: Array[HashMap[Int, Double]],
     val itemKeyword: Array[HashMap[Int, Double]],
-    // User relationship array, 
+    // User relationship array,
     // src internal id index, dest-internal-id-weight list item
     val socialAction: Array[List[(Int, Int)]],
     // Training record for training purpose

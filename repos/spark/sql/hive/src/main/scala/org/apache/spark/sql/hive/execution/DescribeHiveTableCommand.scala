@@ -25,7 +25,9 @@ import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.expressions.Attribute
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
-import org.apache.spark.sql.execution.command.{DescribeCommand, RunnableCommand}
+import org.apache.spark.sql.execution.command.{
+  DescribeCommand, RunnableCommand
+}
 import org.apache.spark.sql.hive.MetastoreRelation
 
 /**

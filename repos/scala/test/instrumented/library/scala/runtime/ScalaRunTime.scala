@@ -13,7 +13,9 @@ package runtime
 
 import scala.collection.{Seq, IndexedSeq, TraversableView, AbstractIterator}
 import scala.collection.mutable.WrappedArray
-import scala.collection.immutable.{StringLike, NumericRange, List, Stream, Nil, ::}
+import scala.collection.immutable.{
+  StringLike, NumericRange, List, Stream, Nil, ::
+}
 import scala.collection.generic.{Sorted}
 import scala.reflect.{ClassTag, classTag}
 import scala.util.control.ControlThrowable

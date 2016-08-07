@@ -69,8 +69,7 @@ final class Vector[+A] private[immutable] (
     with IndexedSeqLike[A, Vector[A]]
     with VectorPointer[A @uncheckedVariance]
     with Serializable
-    with CustomParallelizable[A, ParVector[A]] {
-  self =>
+    with CustomParallelizable[A, ParVector[A]] { self =>
 
   override def companion: GenericCompanion[Vector] = Vector
 

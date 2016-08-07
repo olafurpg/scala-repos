@@ -1,14 +1,20 @@
 package org.jetbrains.plugins.scala
 package codeInspection.xml
 
-import com.intellij.codeInspection.{LocalInspectionTool, LocalQuickFix, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalInspectionTool, LocalQuickFix, ProblemsHolder
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElementVisitor
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, InspectionsUtil}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement, InspectionsUtil
+}
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.expr.xml.{ScXmlEndTag, ScXmlStartTag}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.xml.{
+  ScXmlEndTag, ScXmlStartTag
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**

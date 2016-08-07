@@ -17,7 +17,9 @@
 
 package org.apache.spark.rdd
 
-import org.apache.spark.{Partition, SharedSparkContext, SparkFunSuite, TaskContext}
+import org.apache.spark.{
+  Partition, SharedSparkContext, SparkFunSuite, TaskContext
+}
 
 class PartitionPruningRDDSuite extends SparkFunSuite with SharedSparkContext {
 

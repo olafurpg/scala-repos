@@ -6,7 +6,9 @@ import akka.actor.{Actor, Props, Status}
 import akka.event.LoggingReceive
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.core.task.tracker.impl.TaskUpdateActor.{ActorMetrics, FinishedTaskOp, ProcessTaskOp}
+import mesosphere.marathon.core.task.tracker.impl.TaskUpdateActor.{
+  ActorMetrics, FinishedTaskOp, ProcessTaskOp
+}
 import mesosphere.marathon.metrics.Metrics.AtomicIntGauge
 import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
 import org.slf4j.LoggerFactory

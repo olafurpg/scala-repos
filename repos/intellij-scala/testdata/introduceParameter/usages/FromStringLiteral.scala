@@ -11,10 +11,8 @@ class FromStringLiteral {
 class FromStringLiteral {
   def aaa(x: Int, param: String): Unit = {
     param
-
     "/*start*/" + param + "/*end*/ " + param
   }
-
   aaa(1, "aa")
 }
  */

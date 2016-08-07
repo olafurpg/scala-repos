@@ -5,7 +5,7 @@ import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers
 
 /**
-  * 
+  *
   * @author dlwh
   */
 trait MutableModuleTestBase[V, S] extends FunSuite with Checkers {

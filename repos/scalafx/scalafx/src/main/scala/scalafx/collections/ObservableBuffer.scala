@@ -32,7 +32,9 @@ import javafx.collections.ObservableList
 import javafx.{collections => jfxc}
 
 import scala.collection.JavaConversions._
-import scala.collection.generic.{CanBuildFrom, GenericCompanion, GenericTraversableTemplate, SeqFactory}
+import scala.collection.generic.{
+  CanBuildFrom, GenericCompanion, GenericTraversableTemplate, SeqFactory
+}
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.{GenTraversableOnce, TraversableOnce, mutable}
 import scala.language.implicitConversions

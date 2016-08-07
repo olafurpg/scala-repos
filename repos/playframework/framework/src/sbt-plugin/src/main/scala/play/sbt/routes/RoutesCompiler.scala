@@ -5,7 +5,9 @@ package play.sbt.routes
 
 import play.core.PlayVersion
 import play.routes.compiler.{RoutesGenerator, RoutesCompilationError}
-import play.routes.compiler.RoutesCompiler.{RoutesCompilerTask, GeneratedSource}
+import play.routes.compiler.RoutesCompiler.{
+  RoutesCompilerTask, GeneratedSource
+}
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.web.incremental._

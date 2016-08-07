@@ -6,7 +6,9 @@ package types
 
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
-import org.jetbrains.plugins.scala.lang.parser.parsing.statements.{Dcl, EmptyDcl}
+import org.jetbrains.plugins.scala.lang.parser.parsing.statements.{
+  Dcl, EmptyDcl
+}
 
 /**
   * @author Alexander Podkhalyuzin

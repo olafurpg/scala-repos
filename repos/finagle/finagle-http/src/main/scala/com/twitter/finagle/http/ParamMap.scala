@@ -3,7 +3,9 @@ package com.twitter.finagle.http
 import com.twitter.finagle.http.util.StringUtil
 import java.nio.charset.Charset
 import java.util.{List => JList, Map => JMap}
-import org.jboss.netty.handler.codec.http.{QueryStringDecoder, QueryStringEncoder}
+import org.jboss.netty.handler.codec.http.{
+  QueryStringDecoder, QueryStringEncoder
+}
 import scala.collection.immutable
 import scala.collection.JavaConverters._
 

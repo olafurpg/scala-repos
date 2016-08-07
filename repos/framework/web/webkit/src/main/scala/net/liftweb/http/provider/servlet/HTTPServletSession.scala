@@ -60,13 +60,13 @@ case class SessionToServletBridge(uniqueId: String)
   def sessionDidActivate(se: HttpSessionEvent) = {
     SessionMaster
       .getSession(uniqueId, Empty)
-      .foreach(ls => LiftSession.onSessionActivate.foreach(_ (ls)))
+      .foreach(ls => LiftSession.onSessionActivate.foreach(_(ls)))
   }
 
   def sessionWillPassivate(se: HttpSessionEvent) = {
     SessionMaster
       .getSession(uniqueId, Empty)
-      .foreach(ls => LiftSession.onSessionPassivate.foreach(_ (ls)))
+      .foreach(ls => LiftSession.onSessionPassivate.foreach(_(ls)))
   }
 
   def valueBound(event: HttpSessionBindingEvent) {}

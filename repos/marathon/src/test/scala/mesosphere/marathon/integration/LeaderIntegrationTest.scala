@@ -1,6 +1,9 @@
 package mesosphere.marathon.integration
 
-import mesosphere.marathon.integration.setup.{ProcessKeeper, IntegrationFunSuite, MarathonClusterIntegrationTest, WaitTestSupport}
+import mesosphere.marathon.integration.setup.{
+  ProcessKeeper, IntegrationFunSuite, MarathonClusterIntegrationTest,
+  WaitTestSupport
+}
 import org.scalatest.{GivenWhenThen, Matchers}
 
 import scala.concurrent.duration._

@@ -33,7 +33,9 @@ import javafx.{geometry => jfxg, scene => jfxs}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 import scalafx.geometry.Bounds
 import scalafx.scene.Node
 
@@ -94,7 +96,7 @@ class ScrollPane(
   }
 
   /**
-    * If true and if the contained node is a Resizable, then the node will be kept resized to match the height of the 
+    * If true and if the contained node is a Resizable, then the node will be kept resized to match the height of the
     * ScrollPane's viewport.
     */
   def fitToHeight: BooleanProperty = delegate.fitToHeightProperty
@@ -103,7 +105,7 @@ class ScrollPane(
   }
 
   /**
-    * If true and if the contained node is a Resizable, then the node will be kept resized to match the width of the 
+    * If true and if the contained node is a Resizable, then the node will be kept resized to match the width of the
     * ScrollPane's viewport.
     */
   def fitToWidth: BooleanProperty = delegate.fitToWidthProperty

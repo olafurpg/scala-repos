@@ -278,7 +278,7 @@ class Range(val start: Int, val end: Int, val step: Int)
         (isEmpty || // all empty sequences are equal
               (start == x.start &&
                     last == x.last) // same length and same endpoints implies equality
-          )
+            )
     case _ =>
       super.equals(other)
   }

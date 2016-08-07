@@ -248,10 +248,10 @@ private[spark] class GapSamplingIterator[T: ClassTag](
       case `arrayClass` =>
         (n: Int) =>
           { data = data.drop(n) }
-        case `arrayBufferClass` =>
+      case `arrayBufferClass` =>
         (n: Int) =>
           { data = data.drop(n) }
-        case _ =>
+      case _ =>
         (n: Int) =>
           {
             var j = 0
@@ -305,10 +305,10 @@ private[spark] class GapSamplingReplacementIterator[T: ClassTag](
       case `arrayClass` =>
         (n: Int) =>
           { data = data.drop(n) }
-        case `arrayBufferClass` =>
+      case `arrayBufferClass` =>
         (n: Int) =>
           { data = data.drop(n) }
-        case _ =>
+      case _ =>
         (n: Int) =>
           {
             var j = 0

@@ -101,7 +101,7 @@ trait BinOpFrame {
       opv: BinOp[Op, Vec[Int], Int, Vec[Int]]) =
     new FrScEOp[Op, X, Y, Int, Int, Int](opv)
 
-  // comparisons                                                                                                                                                                                    
+  // comparisons
   implicit def FrScEOpDDB[Op <: ScalarOp, X, Y](
       implicit cm: ST[X],
       cmp: ORD[X],
@@ -168,7 +168,7 @@ trait BinOpFrame {
       opv: BinOp[Op, Vec[Int], Int, Vec[Boolean]]) =
     new FrScEOp[Op, X, Y, Int, Int, Boolean](opv)
 
-  // and, or ops                                                                                                               
+  // and, or ops
   implicit def FrScEOpBBB[Op <: ScalarOp, X, Y](
       implicit cm: ST[X],
       cmp: ORD[X],

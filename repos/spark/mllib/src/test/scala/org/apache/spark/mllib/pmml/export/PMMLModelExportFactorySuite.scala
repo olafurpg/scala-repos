@@ -18,10 +18,14 @@
 package org.apache.spark.mllib.pmml.export
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.mllib.classification.{LogisticRegressionModel, SVMModel}
+import org.apache.spark.mllib.classification.{
+  LogisticRegressionModel, SVMModel
+}
 import org.apache.spark.mllib.clustering.KMeansModel
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.regression.{LassoModel, LinearRegressionModel, RidgeRegressionModel}
+import org.apache.spark.mllib.regression.{
+  LassoModel, LinearRegressionModel, RidgeRegressionModel
+}
 import org.apache.spark.mllib.util.LinearDataGenerator
 
 class PMMLModelExportFactorySuite extends SparkFunSuite {

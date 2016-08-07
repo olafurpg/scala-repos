@@ -1,7 +1,9 @@
 package spire
 package math
 
-import spire.algebra.{Eq, EuclideanRing, Field, PartialOrder, Order, Ring, Signed}
+import spire.algebra.{
+  Eq, EuclideanRing, Field, PartialOrder, Order, Ring, Signed
+}
 
 private[spire] trait ScalaEquivWrapper[A] extends scala.math.Equiv[A] {
   def eq: Eq[A]

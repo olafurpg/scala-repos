@@ -547,8 +547,8 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
             val sym = tree.symbol
             !(sym.isDeferred && (newSyms exists
                       (nsym =>
-                            nsym.name == sym.name &&
-                              (nsym.tpe matches sym.tpe))))
+                         nsym.name == sym.name &&
+                           (nsym.tpe matches sym.tpe))))
           case _ =>
             true
         }

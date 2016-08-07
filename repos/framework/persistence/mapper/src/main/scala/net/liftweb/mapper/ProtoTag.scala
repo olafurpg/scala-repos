@@ -68,8 +68,7 @@ trait MetaProtoTag[ModelType <: ProtoTag[ModelType]]
 
 abstract class ProtoTag[MyType <: ProtoTag[MyType]]
     extends KeyedMapper[Long, MyType]
-    with Ordered[MyType] {
-  self: MyType =>
+    with Ordered[MyType] { self: MyType =>
 
   def getSingleton: MetaProtoTag[MyType]
 

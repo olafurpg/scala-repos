@@ -363,9 +363,9 @@ trait IssuesService { self: AccountService =>
       ((t1.openedUserName === condition.mentioned.get.bind) ||
           t1.assignedUserName === condition.mentioned.get.bind ||
           (IssueComments filter { t2 =>
-                (t2.byIssue(t1.userName, t1.repositoryName, t1.issueId)) &&
-                (t2.commentedUserName === condition.mentioned.get.bind)
-              } exists), condition.mentioned.isDefined)
+            (t2.byIssue(t1.userName, t1.repositoryName, t1.issueId)) &&
+            (t2.commentedUserName === condition.mentioned.get.bind)
+          } exists), condition.mentioned.isDefined)
     }
 
   def createIssue(owner: String,

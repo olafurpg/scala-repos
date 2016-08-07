@@ -8,13 +8,17 @@ import _root_.javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 import java.util
 
 import _root_.com.intellij.codeInsight.unwrap.ScopeHighlighter
-import _root_.com.intellij.openapi.ui.popup.{JBPopupAdapter, JBPopupFactory, LightweightWindowEvent}
+import _root_.com.intellij.openapi.ui.popup.{
+  JBPopupAdapter, JBPopupFactory, LightweightWindowEvent
+}
 import com.intellij.codeInsight.PsiEquivalenceUtil
 import com.intellij.codeInsight.highlighting.HighlightManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.colors.{EditorColors, EditorColorsManager}
-import com.intellij.openapi.editor.markup.{HighlighterLayer, HighlighterTargetArea, RangeHighlighter, TextAttributes}
+import com.intellij.openapi.editor.markup.{
+  HighlighterLayer, HighlighterTargetArea, RangeHighlighter, TextAttributes
+}
 import com.intellij.openapi.editor.{Editor, RangeMarker, VisualPosition}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
@@ -26,17 +30,29 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.util.CommonRefactoringUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScLiteralPattern, ScPattern, ScReferencePattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause, ScLiteralPattern, ScPattern, ScReferencePattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral, ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.xml.ScXmlExpr
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFunctionDefinition, ScTypeAlias}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlock, ScTemplateBody, ScTemplateParents}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScFunctionDefinition, ScTypeAlias
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScExtendsBlock, ScTemplateBody, ScTemplateParents
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScTypeParametersOwner}
-import org.jetbrains.plugins.scala.lang.psi.api.{ScControlFlowOwner, ScalaFile, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions, ScTypeParametersOwner
+}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScControlFlowOwner, ScalaFile, ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.stubs.util.ScalaStubsUtil
 import org.jetbrains.plugins.scala.lang.psi.types._
@@ -978,7 +994,7 @@ object ScalaRefactoringUtil {
       (for (occurence <- textRanges)
         yield file.findElementAt(occurence.getStartOffset)) ++
         (for (occurence <- textRanges)
-              yield file.findElementAt(occurence.getEndOffset - 1))
+          yield file.findElementAt(occurence.getEndOffset - 1))
     PsiTreeUtil.findCommonParent(elemSeq: _*)
   }
 

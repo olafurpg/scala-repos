@@ -15,20 +15,15 @@ object SeveralDuplicates {
 /*
 object SeveralDuplicates {
   def foo(i: Int) {
-
     testMethodName(i)
-
     testMethodName(2)
   }
-
   def testMethodName(i: Int): Unit = {
     println(i + 1)
   }
-
   def bar() {
     testMethodName(3)
   }
-
   testMethodName(4)
 }
  */

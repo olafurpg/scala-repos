@@ -38,7 +38,9 @@ class ScalaTypeDefinitionUsagesDialog(element: ScTypeDefinition,
     myCbUsages
   }
 
-  import com.intellij.find.findUsages.AbstractFindUsagesDialog.{isSelected, isToChange}
+  import com.intellij.find.findUsages.AbstractFindUsagesDialog.{
+    isSelected, isToChange
+  }
 
   override def calcFindUsagesOptions(
       options: ScalaTypeDefinitionFindUsagesOptions) {

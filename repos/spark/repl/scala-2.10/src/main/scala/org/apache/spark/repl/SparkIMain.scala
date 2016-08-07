@@ -14,7 +14,9 @@ import scala.tools.nsc.backend.JavaPlatform
 import scala.tools.nsc.interpreter._
 
 import Predef.{println => _, _}
-import scala.tools.nsc.util.{MergedClassPath, stringFromWriter, ScalaClassLoader, stackTraceString}
+import scala.tools.nsc.util.{
+  MergedClassPath, stringFromWriter, ScalaClassLoader, stackTraceString
+}
 import scala.reflect.internal.util._
 import java.net.URL
 import scala.sys.BooleanProp
@@ -91,8 +93,7 @@ class SparkIMain(initialSettings: Settings,
                  val out: JPrintWriter,
                  propagateExceptions: Boolean = false)
     extends SparkImports
-    with Logging {
-  imain =>
+    with Logging { imain =>
 
   private val conf = new SparkConf()
 
@@ -263,7 +264,10 @@ class SparkIMain(initialSettings: Settings,
 
   import global._
   import definitions.{ScalaPackage, JavaLangPackage, termMember, typeMember}
-  import rootMirror.{RootClass, getClassIfDefined, getModuleIfDefined, getRequiredModule, getRequiredClass}
+  import rootMirror.{
+    RootClass, getClassIfDefined, getModuleIfDefined, getRequiredModule,
+    getRequiredClass
+  }
 
   private implicit class ReplTypeOps(tp: Type) {
     def orElse(other: => Type): Type = if (tp ne NoType) tp else other
@@ -468,12 +472,9 @@ class SparkIMain(initialSettings: Settings,
   /* A single class loader is used for all commands interpreted by this Interpreter.
      It would also be possible to create a new class loader for each command
      to interpret.  The advantages of the current approach are:
-
     - Expressions are only evaluated one time.  This is especially
     significant for I/O, e.g. "val x = Console.readLine"
-
     The main disadvantage is:
-
     - Objects, classes, and methods cannot be rebound.  Instead, definitions
     shadow the old ones, and old code objects refer to the old
     definitions.
@@ -710,10 +711,10 @@ class SparkIMain(initialSettings: Settings,
     showCodeIfDebugging(line) // as we're about to lose our // show
     line.lines map
       (s =>
-            s indexOf "//" match {
-              case -1 => s
-              case idx => s take idx
-          }) mkString "\n"
+         s indexOf "//" match {
+           case -1 => s
+           case idx => s take idx
+         }) mkString "\n"
   }
 
   private def safePos(t: Tree, alt: Int): Int =
@@ -744,17 +745,17 @@ class SparkIMain(initialSettings: Settings,
     logDebug(
         trees map
           (t => {
-                // [Eugene to Paul] previously it just said `t map ...`
-                // because there was an implicit conversion from Tree to a list of Trees
-                // however Martin and I have removed the conversion
-                // (it was conflicting with the new reflection API),
-                // so I had to rewrite this a bit
-                val subs = t collect { case sub => sub }
-                subs map
-                  (t0 =>
-                        "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                        "\n") mkString ""
-              }) mkString "\n"
+             // [Eugene to Paul] previously it just said `t map ...`
+             // because there was an implicit conversion from Tree to a list of Trees
+             // however Martin and I have removed the conversion
+             // (it was conflicting with the new reflection API),
+             // so I had to rewrite this a bit
+             val subs = t collect { case sub => sub }
+             subs map
+               (t0 =>
+                  "  " + safePos(t0, -1) + ": " + t0.shortClass +
+                    "\n") mkString ""
+           }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
     // AST node position and snap the line off there.  Rewrite the code embodied
@@ -767,41 +768,42 @@ class SparkIMain(initialSettings: Settings,
           if (synthetic) freshInternalVarName() else freshUserVarName()
         val rewrittenLine =
           (// In theory this would come out the same without the 1-specific test, but
-           // it's a cushion against any more sneaky parse-tree position vs. code mismatches:
-           // this way such issues will only arise on multiple-statement repl input lines,
-           // which most people don't use.
-           if (trees.size == 1) "val " + varName + " =\n" + content
-           else {
-             // The position of the last tree
-             val lastpos0 = earliestPosition(trees.last)
-             // Oh boy, the parser throws away parens so "(2+2)" is mispositioned,
-             // with increasingly hard to decipher positions as we move on to "() => 5",
-             // (x: Int) => x + 1, and more.  So I abandon attempts to finesse and just
-             // look for semicolons and newlines, which I'm sure is also buggy.
-             val (raw1, raw2) = content splitAt lastpos0
-             logDebug("[raw] " + raw1 + "   <--->   " + raw2)
+          // it's a cushion against any more sneaky parse-tree position vs. code mismatches:
+          // this way such issues will only arise on multiple-statement repl input lines,
+          // which most people don't use.
+          if (trees.size == 1) "val " + varName + " =\n" + content
+          else {
+            // The position of the last tree
+            val lastpos0 = earliestPosition(trees.last)
+            // Oh boy, the parser throws away parens so "(2+2)" is mispositioned,
+            // with increasingly hard to decipher positions as we move on to "() => 5",
+            // (x: Int) => x + 1, and more.  So I abandon attempts to finesse and just
+            // look for semicolons and newlines, which I'm sure is also buggy.
+            val (raw1, raw2) = content splitAt lastpos0
+            logDebug("[raw] " + raw1 + "   <--->   " + raw2)
 
-             val adjustment = (raw1.reverse takeWhile
-                   (ch => (ch != ';') && (ch != '\n'))).size
-             val lastpos = lastpos0 - adjustment
+            val adjustment = (raw1.reverse takeWhile
+                  (ch => (ch != ';') && (ch != '\n'))).size
+            val lastpos = lastpos0 - adjustment
 
-             // the source code split at the laboriously determined position.
-             val (l1, l2) = content splitAt lastpos
-             logDebug("[adj] " + l1 + "   <--->   " + l2)
+            // the source code split at the laboriously determined position.
+            val (l1, l2) = content splitAt lastpos
+            logDebug("[adj] " + l1 + "   <--->   " + l2)
 
-             val prefix = if (l1.trim == "") "" else l1 + ";\n"
-             // Note to self: val source needs to have this precise structure so that
-             // error messages print the user-submitted part without the "val res0 = " part.
-             val combined = prefix + "val " + varName + " =\n" + l2
+            val prefix = if (l1.trim == "") "" else l1 + ";\n"
+            // Note to self: val source needs to have this precise structure so that
+            // error messages print the user-submitted part without the "val res0 = " part.
+            val combined = prefix + "val " + varName + " =\n" + l2
 
-             logDebug(List("    line" -> line,
-                           " content" -> content,
-                           "     was" -> l2,
-                           "combined" -> combined) map {
-               case (label, s) => label + ": '" + s + "'"
-             } mkString "\n")
-             combined
-           })
+            logDebug(
+                List("    line" -> line,
+                     " content" -> content,
+                     "     was" -> l2,
+                     "combined" -> combined) map {
+              case (label, s) => label + ": '" + s + "'"
+            } mkString "\n")
+            combined
+          })
         // Rewriting    "foo ; bar ; 123"
         // to           "foo ; bar ; val resXX = 123"
         requestFromLine(rewrittenLine, synthetic) match {
@@ -1425,11 +1427,11 @@ class SparkIMain(initialSettings: Settings,
     if (mostRecentlyHandledTree.isEmpty) ""
     else
       "" + (mostRecentlyHandledTree.get match {
-            case x: ValOrDefDef => x.name
-            case Assign(Ident(name), _) => name
-            case ModuleDef(_, name, _) => name
-            case _ => naming.mostRecentVar
-          })
+        case x: ValOrDefDef => x.name
+        case Assign(Ident(name), _) => name
+        case ModuleDef(_, name, _) => name
+        case _ => naming.mostRecentVar
+      })
 
   private var mostRecentWarnings: List[(global.Position, String)] = Nil
 
@@ -1840,8 +1842,7 @@ object SparkIMain {
   abstract class StrippingTruncatingWriter(out: JPrintWriter)
       extends JPrintWriter(out)
       with StrippingWriter
-      with TruncatingWriter {
-    self =>
+      with TruncatingWriter { self =>
 
     def clean(str: String): String = truncate(strip(str))
     override def write(str: String) = super.write(clean(str))

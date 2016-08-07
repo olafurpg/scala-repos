@@ -5,15 +5,28 @@ import com.twitter.concurrent.Broker
 import com.twitter.conversions.time._
 import com.twitter.finagle
 import com.twitter.finagle.cacheresolver.{CacheNode, CacheNodeGroup}
-import com.twitter.finagle.client.{ClientRegistry, DefaultPool, StackClient, StdStackClient, Transporter}
-import com.twitter.finagle.dispatch.{GenSerialClientDispatcher, SerialServerDispatcher, PipeliningDispatcher}
-import com.twitter.finagle.loadbalancer.{Balancers, ConcurrentLoadBalancerFactory, LoadBalancerFactory}
+import com.twitter.finagle.client.{
+  ClientRegistry, DefaultPool, StackClient, StdStackClient, Transporter
+}
+import com.twitter.finagle.dispatch.{
+  GenSerialClientDispatcher, SerialServerDispatcher, PipeliningDispatcher
+}
+import com.twitter.finagle.loadbalancer.{
+  Balancers, ConcurrentLoadBalancerFactory, LoadBalancerFactory
+}
 import com.twitter.finagle.memcached._
 import com.twitter.finagle.memcached.exp.LocalMemcached
-import com.twitter.finagle.memcached.protocol.text.{MemcachedClientPipelineFactory, MemcachedServerPipelineFactory}
-import com.twitter.finagle.memcached.protocol.{Command, Response, RetrievalCommand, Values}
+import com.twitter.finagle.memcached.protocol.text.{
+  MemcachedClientPipelineFactory, MemcachedServerPipelineFactory
+}
+import com.twitter.finagle.memcached.protocol.{
+  Command, Response, RetrievalCommand, Values
+}
 import com.twitter.finagle.netty3.{Netty3Listener, Netty3Transporter}
-import com.twitter.finagle.param.{Monitor => _, ResponseClassifier => _, ExceptionStatsHandler => _, Tracer => _, _}
+import com.twitter.finagle.param.{
+  Monitor => _, ResponseClassifier => _, ExceptionStatsHandler => _,
+  Tracer => _, _
+}
 import com.twitter.finagle.pool.SingletonPool
 import com.twitter.finagle.server.{Listener, StackServer, StdStackServer}
 import com.twitter.finagle.service._

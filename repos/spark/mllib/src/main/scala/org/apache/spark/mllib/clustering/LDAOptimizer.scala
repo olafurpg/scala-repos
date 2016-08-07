@@ -19,14 +19,18 @@ package org.apache.spark.mllib.clustering
 
 import java.util.Random
 
-import breeze.linalg.{all, normalize, sum, DenseMatrix => BDM, DenseVector => BDV}
+import breeze.linalg.{
+  all, normalize, sum, DenseMatrix => BDM, DenseVector => BDV
+}
 import breeze.numerics.{abs, exp, trigamma}
 import breeze.stats.distributions.{Gamma, RandBasis}
 
 import org.apache.spark.annotation.{DeveloperApi, Since}
 import org.apache.spark.graphx._
 import org.apache.spark.mllib.impl.PeriodicGraphCheckpointer
-import org.apache.spark.mllib.linalg.{DenseVector, Matrices, SparseVector, Vector, Vectors}
+import org.apache.spark.mllib.linalg.{
+  DenseVector, Matrices, SparseVector, Vector, Vectors
+}
 import org.apache.spark.rdd.RDD
 
 /**
@@ -41,7 +45,6 @@ sealed trait LDAOptimizer {
 
   /*
     DEVELOPERS NOTE:
-
     An LDAOptimizer contains an algorithm for LDA and performs the actual computation, which
     stores internal data structure (Graph or Matrix) and other parameters for the algorithm.
     The interface is isolated to improve the extensibility of LDA.

@@ -4,7 +4,9 @@ package psi
 package stubs
 package elements
 
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScClassParents, ScTemplateParents}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScClassParents, ScTemplateParents
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.templates.ScClassParentsImpl
 
 /**

@@ -207,9 +207,7 @@ class Hotspot extends Jvm {
 }
 
 /*
-
 A sample of counters available on hotspot:
-
 scala> res0 foreach { case (k, v) => printf("%s = %s\n", k, v) }
 java.ci.totalTime = 4453822466
 java.cls.loadedClasses = 3459
@@ -423,10 +421,7 @@ sun.rt.safepoints = 21
 sun.rt.threadInterruptSignaled = 0
 sun.rt.vmInitDoneTime = 1320946078941
 sun.threads.vmOperationTime = 76932327
-
-
 ## after a System.gc()
-
 sun.gc.cause = No GC
 sun.gc.collector.0.invocations = 13
 sun.gc.collector.0.lastEntryTime = 3235357990
@@ -515,5 +510,4 @@ sun.gc.tlab.maxSlowAlloc = 4
 sun.gc.tlab.maxSlowWaste = 116
 sun.gc.tlab.slowAlloc = 4
 sun.gc.tlab.slowWaste = 116
-
  */

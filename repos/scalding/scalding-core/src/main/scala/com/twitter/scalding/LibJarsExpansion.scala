@@ -1,12 +1,9 @@
 /*
 Copyright 2014 Twitter, Inc.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,9 +44,9 @@ object ExpandLibJarsGlobs {
     else
       root #::
         (root.listFiles match {
-              case null => Stream.empty
-              case files => files.toStream.flatMap(tree(_, skipHidden))
-            })
+          case null => Stream.empty
+          case files => files.toStream.flatMap(tree(_, skipHidden))
+        })
 
   def fromGlob(glob: String, filesOnly: Boolean = true): Stream[Path] = {
     import java.nio._

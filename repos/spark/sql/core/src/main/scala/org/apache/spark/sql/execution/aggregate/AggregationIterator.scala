@@ -179,7 +179,7 @@ abstract class AggregationIterator(
             case Partial | Complete =>
               (buffer: MutableRow, row: InternalRow) =>
                 ae.update(buffer, row)
-              case PartialMerge | Final =>
+            case PartialMerge | Final =>
               (buffer: MutableRow, row: InternalRow) =>
                 ae.merge(buffer, row)
           }

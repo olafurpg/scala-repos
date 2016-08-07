@@ -545,12 +545,12 @@ abstract class Erasure
       val shouldAdd =
         (!sigContainsValueClass ||
               (checkBridgeOverrides(member, other, bridge) match {
-                    case Nil => true
-                    case es if member.owner.isAnonymousClass =>
-                      resolveAnonymousBridgeClash(member, bridge); true
-                    case es =>
-                      for ((pos, msg) <- es) reporter.error(pos, msg); false
-                  }))
+                case Nil => true
+                case es if member.owner.isAnonymousClass =>
+                  resolveAnonymousBridgeClash(member, bridge); true
+                case es =>
+                  for ((pos, msg) <- es) reporter.error(pos, msg); false
+              }))
 
       if (shouldAdd) {
         exitingErasure(root.info.decls enter bridge)
@@ -910,7 +910,7 @@ abstract class Erasure
         if (bridges.isEmpty) stats
         else
           (stats filterNot (stat =>
-                    toBeRemoved contains stat.symbol)) ::: bridges
+                              toBeRemoved contains stat.symbol)) ::: bridges
       }
 
     /**  Transform tree at phase erasure before retyping it.

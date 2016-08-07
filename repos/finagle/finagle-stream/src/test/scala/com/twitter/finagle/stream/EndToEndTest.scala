@@ -3,7 +3,9 @@ package com.twitter.finagle.stream
 import com.twitter.concurrent._
 import com.twitter.conversions.time._
 import com.twitter.finagle.builder.{ClientBuilder, ServerBuilder}
-import com.twitter.finagle.{Service, ServiceProxy, TooManyConcurrentRequestsException}
+import com.twitter.finagle.{
+  Service, ServiceProxy, TooManyConcurrentRequestsException
+}
 import com.twitter.io.Buf
 import com.twitter.util._
 import java.net.{InetAddress, InetSocketAddress, SocketAddress}

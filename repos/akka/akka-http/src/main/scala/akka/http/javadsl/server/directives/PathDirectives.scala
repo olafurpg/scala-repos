@@ -6,7 +6,9 @@ package akka.http.javadsl.server
 package directives
 
 import akka.http.impl.server.RouteStructure
-import akka.http.impl.server.RouteStructure.{RedirectToNoTrailingSlashIfPresent, RedirectToTrailingSlashIfMissing}
+import akka.http.impl.server.RouteStructure.{
+  RedirectToNoTrailingSlashIfPresent, RedirectToTrailingSlashIfMissing
+}
 import akka.http.javadsl.model.StatusCode
 import akka.http.javadsl.server.values.{PathMatchers, PathMatcher}
 

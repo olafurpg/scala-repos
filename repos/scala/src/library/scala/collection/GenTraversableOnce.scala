@@ -176,7 +176,6 @@ trait GenTraversableOnce[+A] extends Any {
     *      scala> val c = (5 /: a)((x,y) => x + y)
     *      c: Int = 15
     *  }}}
-
     *  $willNotTerminateInf
     *  $orderDependentFold
     *

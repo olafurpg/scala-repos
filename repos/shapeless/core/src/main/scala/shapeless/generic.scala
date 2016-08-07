@@ -29,7 +29,6 @@ import ops.{hlist, coproduct}
   * For example:
   * {{{
   * scala> sealed trait Animal
-
   * defined trait Animal
   * scala> case class Cat(name: String, livesLeft: Int) extends Animal
   * defined class Cat
@@ -155,8 +154,8 @@ object Generic {
     */
   def apply[T](implicit gen: Generic[T]): Aux[T, gen.Repr] = gen
 
-  implicit def materialize[T, R]: Aux[T, R] = macro GenericMacros
-    .materialize[T, R]
+  implicit def materialize[T, R]: Aux[T, R] =
+    macro GenericMacros.materialize[T, R]
 }
 
 /**
@@ -257,15 +256,15 @@ object IsTuple {
 class HasProductGeneric[T] extends Serializable
 
 object HasProductGeneric {
-  implicit def apply[T]: HasProductGeneric[T] = macro GenericMacros
-    .mkHasProductGeneric[T]
+  implicit def apply[T]: HasProductGeneric[T] =
+    macro GenericMacros.mkHasProductGeneric[T]
 }
 
 class HasCoproductGeneric[T] extends Serializable
 
 object HasCoproductGeneric {
-  implicit def apply[T]: HasCoproductGeneric[T] = macro GenericMacros
-    .mkHasCoproductGeneric[T]
+  implicit def apply[T]: HasCoproductGeneric[T] =
+    macro GenericMacros.mkHasCoproductGeneric[T]
 }
 
 @macrocompat.bundle

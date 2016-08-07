@@ -25,20 +25,22 @@ import kafka.serializer._
 import kafka.utils._
 import kafka.log.FileMessageSet
 import kafka.log.Log
-import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer, ProducerConfig}
+import org.apache.kafka.clients.producer.{
+  ProducerRecord, KafkaProducer, ProducerConfig
+}
 
 /**
   * This is a torture test that runs against an existing broker. Here is how it works:
-  * 
+  *
   * It produces a series of specially formatted messages to one or more partitions. Each message it produces
   * it logs out to a text file. The messages have a limited set of keys, so there is duplication in the key space.
-  * 
+  *
   * The broker will clean its log as the test runs.
-  * 
+  *
   * When the specified number of messages have been produced we create a consumer and consume all the messages in the topic
   * and write that out to another text file.
-  * 
-  * Using a stable unix sort we sort both the producer log of what was sent and the consumer log of what was retrieved by the message key. 
+  *
+  * Using a stable unix sort we sort both the producer log of what was sent and the consumer log of what was retrieved by the message key.
   * Then we compare the final message in both logs for each key. If this final message is not the same for all keys we
   * print an error and exit with exit code 1, otherwise we print the size reduction and exit with exit code 0.
   */

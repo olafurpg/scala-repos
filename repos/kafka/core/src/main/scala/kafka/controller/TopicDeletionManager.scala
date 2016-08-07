@@ -18,7 +18,9 @@ package kafka.controller
 
 import kafka.server.ConfigType
 import org.apache.kafka.common.protocol.Errors
-import org.apache.kafka.common.requests.{StopReplicaResponse, AbstractRequestResponse}
+import org.apache.kafka.common.requests.{
+  StopReplicaResponse, AbstractRequestResponse
+}
 
 import collection.mutable
 import collection.JavaConverters._

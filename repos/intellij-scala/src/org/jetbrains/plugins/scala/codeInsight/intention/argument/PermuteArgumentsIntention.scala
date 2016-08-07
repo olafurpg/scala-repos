@@ -6,7 +6,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScArgumentExprList, ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
 
 /**

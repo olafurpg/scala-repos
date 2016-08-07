@@ -165,7 +165,7 @@ private[util] class BatchExecutor[In, Out](
 
       case Throw(e) =>
         val t = Throw(e)
-        promises foreach { _ () = t }
+        promises foreach { _() = t }
     }
   }
 }

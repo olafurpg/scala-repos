@@ -122,7 +122,9 @@ object PlayerRepo {
   private def aggregationUserIdList(res: Stream[BSONDocument]): List[String] =
     res.headOption flatMap { _.getAs[List[String]]("uids") } getOrElse Nil
 
-  import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{Descending, Group, Match, Push, Sort}
+  import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
+    Descending, Group, Match, Push, Sort
+  }
 
   def userIds(tourId: String): Fu[List[String]] =
     coll.distinct("uid", selectTour(tourId).some) map lila.db.BSON.asStrings

@@ -44,7 +44,7 @@ import scalafx.delegate.SFXDelegate
 object ObservableMap extends MutableMapFactory[ObservableMap] {
 
   /**
-    * Extracts a JavaFX's [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/ObservableMap.html $OM]] from a 
+    * Extracts a JavaFX's [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/ObservableMap.html $OM]] from a
     * ScalaFX's $OM.
     *
     * @param om ScalaFX's $OM.

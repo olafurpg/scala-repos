@@ -4,14 +4,20 @@ import com.intellij.codeInsight.PsiEquivalenceUtil
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral, ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticFunction
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success}
 import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.duplicates.DuplicatesUtil._
-import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.{ExtractMethodOutput, ExtractMethodParameter}
+import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.{
+  ExtractMethodOutput, ExtractMethodParameter
+}
 
 import scala.collection.mutable
 

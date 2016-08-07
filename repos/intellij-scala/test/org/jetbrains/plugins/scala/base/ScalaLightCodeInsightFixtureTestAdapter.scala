@@ -10,7 +10,9 @@ import com.intellij.lang.surroundWith.Surrounder
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.util.TextRange
-import com.intellij.testFramework.fixtures.{CodeInsightTestFixture, LightCodeInsightFixtureTestCase}
+import com.intellij.testFramework.fixtures.{
+  CodeInsightTestFixture, LightCodeInsightFixtureTestCase
+}
 import org.jetbrains.plugins.scala.util.TestUtils.ScalaSdkVersion
 import org.jetbrains.plugins.scala.util.{ScalaToolsFactory, TestUtils}
 
@@ -225,7 +227,7 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
                 checkCaret(info.getStartOffset, info.getEndOffset))
               actions ++=
                 (for (pair <- info.quickFixActionRanges if pair != null)
-                      yield pair.getFirst.getAction))
+                  yield pair.getFirst.getAction))
 
     assert(actions.nonEmpty, "There is no available fixes.")
 

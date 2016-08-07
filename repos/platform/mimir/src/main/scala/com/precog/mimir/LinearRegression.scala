@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -67,7 +67,7 @@ trait LinearRegressionLibModule[M[+ _]]
       type Beta = Array[Double]
 
       // `beta`: current weighted value for coefficients
-      // `count`: number of rows seen 
+      // `count`: number of rows seen
       // `removed`: indices of columns removed due to their dependence on other columns
       case class CoeffAcc(beta: Beta, count: Long, removed: Set[Int])
 
@@ -80,8 +80,8 @@ trait LinearRegressionLibModule[M[+ _]]
         * http://adrem.ua.ac.be/sites/adrem.ua.ac.be/files/StreamFitter.pdf
         *
         * First slice size is made consistent. Then the slices are fed to the reducer, one by one.
-        * The reducer calculates the Ordinary Least Squares regression for each Slice. 
-        * The results of each of these regressions are then combined incrementally using `monoid`. 
+        * The reducer calculates the Ordinary Least Squares regression for each Slice.
+        * The results of each of these regressions are then combined incrementally using `monoid`.
         * `alpha` (a value between 0 and 1) is the paramater which determines the weighting of the
         * data in the stream. A value of 0.5 means that current values and past values
         * are equally weighted. The paper above outlines how `alpha` relates to the half-life
@@ -92,15 +92,12 @@ trait LinearRegressionLibModule[M[+ _]]
         * The following code will necessary when we have online models and users want to weight
         * the most recent data with a higher (or lower) weight than the data already seen.
         * But since we don't have this capability yet, all data is weighted equally.
-
       val alpha = 0.5
-
       implicit def monoid = new Monoid[CoeffAcc] {
         def zero = Array.empty[Double]
         def append(r1: CoeffAcc, r2: => CoeffAcc) = {
           lazy val newr1 = r1 map { _ * alpha }
           lazy val newr2 = r2 map { _ * (1.0 - alpha) }
-
           if (r1.isEmpty) r2
           else if (r2.isEmpty) r1
           else arraySum(newr1, newr2)

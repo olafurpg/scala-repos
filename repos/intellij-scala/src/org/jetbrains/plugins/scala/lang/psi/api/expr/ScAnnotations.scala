@@ -9,7 +9,9 @@ import com.intellij.psi._
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSimpleTypeElement
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
 
 /**

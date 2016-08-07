@@ -67,8 +67,7 @@ trait RichCompilerControl
     extends CompilerControl
     with RefactoringControl
     with CompletionControl
-    with DocFinding {
-  self: RichPresentationCompiler =>
+    with DocFinding { self: RichPresentationCompiler =>
 
   def charset: Charset = Charset.forName(settings.encoding.value)
 

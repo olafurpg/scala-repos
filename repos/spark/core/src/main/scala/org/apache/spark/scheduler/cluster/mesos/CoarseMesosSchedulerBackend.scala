@@ -28,7 +28,9 @@ import scala.collection.mutable.{Buffer, HashMap, HashSet}
 import org.apache.mesos.{Scheduler => MScheduler, SchedulerDriver}
 import org.apache.mesos.Protos.{TaskInfo => MesosTaskInfo, _}
 
-import org.apache.spark.{SecurityManager, SparkContext, SparkException, TaskState}
+import org.apache.spark.{
+  SecurityManager, SparkContext, SparkException, TaskState
+}
 import org.apache.spark.network.netty.SparkTransportConf
 import org.apache.spark.network.shuffle.mesos.MesosExternalShuffleClient
 import org.apache.spark.rpc.{RpcEndpointAddress}

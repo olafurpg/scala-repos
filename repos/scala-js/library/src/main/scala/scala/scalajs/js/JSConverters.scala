@@ -17,8 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import scala.scalajs.runtime.genTraversableOnce2jsArray
 
-sealed abstract class JSConvertersLowPrioImplicits {
-  this: JSConverters.type =>
+sealed abstract class JSConvertersLowPrioImplicits { this: JSConverters.type =>
 
   @inline
   implicit def JSRichFutureNonThenable[A](f: Future[A]): JSRichFuture[A] =

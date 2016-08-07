@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.lang.psi
 
-import com.intellij.openapi.application.{ApplicationAdapter, ApplicationManager}
+import com.intellij.openapi.application.{
+  ApplicationAdapter, ApplicationManager
+}
 import com.intellij.openapi.util.Key
 import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
@@ -9,8 +11,13 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParameterizedTypeElement, ScSimpleTypeElement, ScTypeElement, ScTypeProjection}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScParameterizedTypeElement, ScSimpleTypeElement, ScTypeElement,
+  ScTypeProjection
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias, ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypePresentation}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil

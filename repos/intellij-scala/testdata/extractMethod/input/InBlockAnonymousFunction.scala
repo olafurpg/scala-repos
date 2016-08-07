@@ -14,11 +14,9 @@ class Test {
   def test(param: String): PartialFunction[String, String] = {
     case x: String => /*start*/testMethodName(x)/*end*/
   }
-
   def testMethodName(x: String): String = {
     test2(x) + " Goodbye"
   }
-
   def test2(param: String): Unit = {
     "Hello" + param
   }

@@ -5,7 +5,9 @@ import com.typesafe.config.Config
 
 import lila.common.PimpedConfig._
 import lila.hub.actorApi.slack.Event
-import lila.hub.actorApi.{DonationEvent, Deploy, RemindDeployPre, RemindDeployPost}
+import lila.hub.actorApi.{
+  DonationEvent, Deploy, RemindDeployPre, RemindDeployPost
+}
 
 final class Env(config: Config,
                 getLightUser: String => Option[lila.common.LightUser],

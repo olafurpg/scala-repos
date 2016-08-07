@@ -334,9 +334,9 @@ private[openid] object Discovery {
     private def findUriWithType(xml: Node)(typeId: String) =
       (xml \ "XRD" \ "Service" find
             (node =>
-                  (node \ "Type")
-                    .find(inner => inner.text == typeId)
-                    .isDefined)).map { node =>
+               (node \ "Type")
+                 .find(inner => inner.text == typeId)
+                 .isDefined)).map { node =>
         (typeId, (node \ "URI").text.trim)
       }
   }

@@ -5,7 +5,9 @@ import scala.util.{Try, Success, Failure}
 import org.joda.time.DateTime
 import play.api.libs.json.JsValue
 import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework._
-import reactivemongo.bson.{BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean}
+import reactivemongo.bson.{
+  BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean
+}
 
 import lila.db.Types.Coll
 import lila.user.{User, UserRepo}

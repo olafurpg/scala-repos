@@ -18,7 +18,6 @@ class InnerCompanionTraitRename {
     case object Create extends NameAfterRename
     case object None extends NameAfterRename
   }
-
   class Instance
   ( mode : /*caret*/NameAfterRename = NameAfterRename.None )
 }

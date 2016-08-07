@@ -2,7 +2,9 @@ package mesosphere.marathon.core.matcher.base.util
 
 import mesosphere.marathon.MarathonTestHelper
 import mesosphere.marathon.core.matcher.base.OfferMatcher
-import mesosphere.marathon.core.matcher.base.OfferMatcher.{TaskOpWithSource, MatchedTaskOps}
+import mesosphere.marathon.core.matcher.base.OfferMatcher.{
+  TaskOpWithSource, MatchedTaskOps
+}
 import mesosphere.marathon.state.Timestamp
 import mesosphere.marathon.test.Mockito
 import org.apache.mesos.Protos.Offer

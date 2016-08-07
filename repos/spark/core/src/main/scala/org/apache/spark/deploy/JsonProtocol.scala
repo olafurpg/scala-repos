@@ -20,7 +20,9 @@ package org.apache.spark.deploy
 import org.json4s.JsonAST.JObject
 import org.json4s.JsonDSL._
 
-import org.apache.spark.deploy.DeployMessages.{MasterStateResponse, WorkerStateResponse}
+import org.apache.spark.deploy.DeployMessages.{
+  MasterStateResponse, WorkerStateResponse
+}
 import org.apache.spark.deploy.master.{ApplicationInfo, DriverInfo, WorkerInfo}
 import org.apache.spark.deploy.worker.ExecutorRunner
 

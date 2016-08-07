@@ -8,9 +8,13 @@ import com.typesafe.config.ConfigFactory
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon.Protos.MarathonTask
 import mesosphere.marathon._
-import mesosphere.marathon.core.leadership.{AlwaysElectedLeadershipModule, LeadershipModule}
+import mesosphere.marathon.core.leadership.{
+  AlwaysElectedLeadershipModule, LeadershipModule
+}
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.core.task.tracker.{TaskCreationHandler, TaskTracker, TaskUpdater}
+import mesosphere.marathon.core.task.tracker.{
+  TaskCreationHandler, TaskTracker, TaskUpdater
+}
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.PathId.StringPathId
 import mesosphere.marathon.state._

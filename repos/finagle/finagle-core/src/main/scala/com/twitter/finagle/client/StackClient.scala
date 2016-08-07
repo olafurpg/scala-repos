@@ -2,8 +2,12 @@ package com.twitter.finagle.client
 
 import com.twitter.finagle._
 import com.twitter.finagle.context.Contexts
-import com.twitter.finagle.factory.{BindingFactory, RefcountedFactory, StatsFactoryWrapper, TimeoutFactory}
-import com.twitter.finagle.filter.{DtabStatsFilter, ExceptionSourceFilter, MonitorFilter}
+import com.twitter.finagle.factory.{
+  BindingFactory, RefcountedFactory, StatsFactoryWrapper, TimeoutFactory
+}
+import com.twitter.finagle.filter.{
+  DtabStatsFilter, ExceptionSourceFilter, MonitorFilter
+}
 import com.twitter.finagle.loadbalancer.LoadBalancerFactory
 import com.twitter.finagle.param._
 import com.twitter.finagle.service._
@@ -417,8 +421,7 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
     with WithClientAdmissionControl[This]
     with WithClientTransport[This]
     with WithSession[This]
-    with WithSessionQualifier[This] {
-  self =>
+    with WithSessionQualifier[This] { self =>
 
   /**
     * The type we write into the transport.

@@ -5,7 +5,10 @@ import java.io.ByteArrayInputStream
 import fr.brouillard.oss.security.xhub.XHub
 import fr.brouillard.oss.security.xhub.XHub.{XHubDigest, XHubConverter}
 import gitbucket.core.api._
-import gitbucket.core.model.{WebHook, Account, Issue, PullRequest, IssueComment, WebHookEvent, CommitComment}
+import gitbucket.core.model.{
+  WebHook, Account, Issue, PullRequest, IssueComment, WebHookEvent,
+  CommitComment
+}
 import gitbucket.core.model.Profile._
 import org.apache.http.client.utils.URLEncodedUtils
 import profile.simple._
@@ -194,7 +197,10 @@ trait WebHookService {
 }
 
 trait WebHookPullRequestService extends WebHookService {
-  self: AccountService with RepositoryService with PullRequestService with IssuesService =>
+  self: AccountService
+    with RepositoryService
+    with PullRequestService
+    with IssuesService =>
 
   import WebHookService._
   // https://developer.github.com/v3/activity/events/types/#issuesevent
@@ -314,7 +320,11 @@ trait WebHookPullRequestService extends WebHookService {
 }
 
 trait WebHookPullRequestReviewCommentService extends WebHookService {
-  self: AccountService with RepositoryService with PullRequestService with IssuesService with CommitsService =>
+  self: AccountService
+    with RepositoryService
+    with PullRequestService
+    with IssuesService
+    with CommitsService =>
   def callPullRequestReviewCommentWebHook(
       action: String,
       comment: CommitComment,
@@ -357,7 +367,10 @@ trait WebHookPullRequestReviewCommentService extends WebHookService {
 }
 
 trait WebHookIssueCommentService extends WebHookPullRequestService {
-  self: AccountService with RepositoryService with PullRequestService with IssuesService =>
+  self: AccountService
+    with RepositoryService
+    with PullRequestService
+    with IssuesService =>
 
   import WebHookService._
   def callIssueCommentWebHook(repository: RepositoryService.RepositoryInfo,

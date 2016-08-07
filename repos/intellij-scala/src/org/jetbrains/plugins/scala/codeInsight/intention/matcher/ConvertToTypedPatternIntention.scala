@@ -12,7 +12,9 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScConstructorPattern
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester

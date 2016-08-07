@@ -143,7 +143,7 @@ sealed abstract class IterateeT[E, F[_], A] {
   }
 
   /**
-    * Feeds input elements to this iteratee until it is done, feeds the produced value to the 
+    * Feeds input elements to this iteratee until it is done, feeds the produced value to the
     * inner iteratee.  Then this iteratee will start over, looping until the inner iteratee is done.
     */
   def sequenceI(implicit m: Monad[F]): EnumerateeT[E, A, F] =
@@ -214,7 +214,7 @@ sealed abstract class IterateeTInstances0 {
 
   implicit def IterateeMonad[E]: Monad[Iteratee[E, ?]] = IterateeTMonad[E, Id]
 
-  implicit def IterateeTMonadTransT[E, H[_ [_], _]](implicit T0: MonadTrans[H])
+  implicit def IterateeTMonadTransT[E, H[_[_], _]](implicit T0: MonadTrans[H])
     : MonadTrans[λ[(α[_], β) => IterateeT[E, H[α, ?], β]]] =
     new IterateeTMonadTransT[E, H] {
       implicit def T = T0
@@ -226,7 +226,7 @@ sealed abstract class IterateeTInstances extends IterateeTInstances0 {
     : Hoist[λ[(α[_], β) => IterateeT[E, α, β]]] =
     new IterateeTHoist[E] {}
 
-  implicit def IterateeTHoistT[E, H[_ [_], _]](
+  implicit def IterateeTHoistT[E, H[_[_], _]](
       implicit T0: Hoist[H]): Hoist[λ[(α[_], β) => IterateeT[E, H[α, ?], β]]] =
     new IterateeTHoistT[E, H] {
       implicit def T = T0
@@ -436,7 +436,7 @@ private trait IterateeTMonadIO[E, F[_]]
     MonadTrans[λ[(α[_], β) => IterateeT[E, α, β]]].liftM(F.liftIO(ioa))
 }
 
-private trait IterateeTMonadTransT[E, H[_ [_], _]]
+private trait IterateeTMonadTransT[E, H[_[_], _]]
     extends MonadTrans[λ[(α[_], β) => IterateeT[E, H[α, ?], β]]] {
   implicit def T: MonadTrans[H]
 
@@ -447,7 +447,7 @@ private trait IterateeTMonadTransT[E, H[_ [_], _]]
     IterateeT.IterateeTMonad[E, H[G, ?]](T[G])
 }
 
-private trait IterateeTHoistT[E, H[_ [_], _]]
+private trait IterateeTHoistT[E, H[_[_], _]]
     extends Hoist[λ[(α[_], β) => IterateeT[E, H[α, ?], β]]]
     with IterateeTMonadTransT[E, H] {
   implicit def T: Hoist[H]

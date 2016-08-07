@@ -11,21 +11,37 @@ import com.intellij.psi.util.{CachedValue, PsiTreeUtil}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.InferUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScMethodCall}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScMethodCall
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter, ScParameter
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.ImportUsed
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlock, ScTemplateBody}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScExtendsBlock, ScTemplateBody
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScModifierListOwner, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScModifierListOwner, ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{TypeParameter, Parameter}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  TypeParameter, Parameter
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
-import org.jetbrains.plugins.scala.lang.resolve.processor.{BaseProcessor, ImplicitProcessor}
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult, StdKinds}
-import org.jetbrains.plugins.scala.macroAnnotations.{CachedMappedWithRecursionGuard, ModCount}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  BaseProcessor, ImplicitProcessor
+}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils, ScalaResolveResult, StdKinds
+}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  CachedMappedWithRecursionGuard, ModCount
+}
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_10
 import org.jetbrains.plugins.scala.project._
 

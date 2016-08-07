@@ -10,8 +10,12 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiClassWrapper, StaticTraitScFunctionWrapper}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiClassWrapper, StaticTraitScFunctionWrapper
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 

@@ -37,7 +37,9 @@ import org.apache.spark.sql.catalyst.encoders.encoderFor
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.optimizer.Optimizer
 import org.apache.spark.sql.catalyst.parser.ParserInterface
-import org.apache.spark.sql.catalyst.plans.logical.{LocalRelation, LogicalPlan, Range}
+import org.apache.spark.sql.catalyst.plans.logical.{
+  LocalRelation, LogicalPlan, Range
+}
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
 import org.apache.spark.sql.execution._
 import org.apache.spark.sql.execution.command.ShowTablesCommand
@@ -71,8 +73,7 @@ class SQLContext private[sql] (
     @transient private[sql] val listener: SQLListener,
     val isRootContext: Boolean)
     extends Logging
-    with Serializable {
-  self =>
+    with Serializable { self =>
 
   def this(sparkContext: SparkContext) = {
     this(sparkContext,

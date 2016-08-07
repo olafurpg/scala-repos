@@ -11,7 +11,9 @@ import org.jboss.netty.buffer.ChannelBuffers
 import org.jboss.netty.handler.codec.http._
 import org.jboss.netty.handler.codec.http.HttpResponseStatus.OK
 import org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1
-import org.jboss.netty.handler.codec.http.{DefaultHttpChunk, DefaultHttpResponse, HttpChunk}
+import org.jboss.netty.handler.codec.http.{
+  DefaultHttpChunk, DefaultHttpResponse, HttpChunk
+}
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner

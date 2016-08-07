@@ -233,17 +233,13 @@ package scala.tools.nsc.backend.jvm
 /*
 object Test {
   val overwrite: Option[String] = null
-
   @noinline def serialize(o: AnyRef): String = null
-
   @noinline def deserialize(string: String): AnyRef = null
-
   @inline def checkRoundTrip[T <: AnyRef](instance: T)(f: T => AnyRef) {
     val result = serialize(instance)
     val reconstituted = deserialize(result).asInstanceOf[T]
     assert(f(instance) == f(reconstituted), (f(instance), f(reconstituted)))
   }
-
   @inline def check[T <: AnyRef](instance: => T)(prevResult: String, f: T => AnyRef = (x: T) => x) {
     // pattern match to introduce a lot of control flow, i.e., a lot of frame merges
     overwrite match {
@@ -254,21 +250,17 @@ object Test {
         assert(prevResult == "res", instance)
     }
   }
-
   // @inline def fun[T <: AnyRef](instance: => T) = (x: T) => x
-
   def testMain(): Unit = {
     // every call to check creates quite a number of locals, and also quite a number of aliases
     // of the same value (x1). First of all, the default argument call is expanded as below. Then
     // method check is inlined, and within the body of check, checkRoundTrip and assert have
     // already been inlined as well.
-
     // {
     //   val x1 = () => ""
     //   val x2 = fun(x1())  // the compiler optimizes this: instead of passing `() => x1()`, it just passes x1
     //   check(x1())("", x2) // same here for x1
     // }
-
     check("")("")
     check("")("")
     check("")("")
@@ -324,11 +316,9 @@ object Test {
     // check("")("")
     // check("")("")
     // check("")("") // 55
-
     // 1000 bytecode instructions, 0 locals
     // println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10)); println((1,2,3,4,5,6,7,8,9,10));
   }
-
   def timed[T](f: => T): T = {
     val start = System.nanoTime()
     val r = f
@@ -336,36 +326,26 @@ object Test {
     println(s"took ${nanos/1000000}ms")
     r
   }
-
   def main(args: Array[String]): Unit = {
     import scala.tools.nsc.backend.jvm._
     val cn = AsmUtils.readClass("/Users/luc/scala/scala/sandbox/Test$.class")
     import scala.collection.convert.decorateAsScala._
     val m = cn.methods.iterator.asScala.find(_.name == "testMain").head
-
     println(s"${m.instructions.size} instructions - ${m.maxLocals} locals")
-
     val a = new analysis.NullnessAnalyzer
     a.analyze(cn.name, m) // warm up
-
     analysis.AliasingFrame.reset()
     timed(a.analyze(cn.name, m))
     analysis.AliasingFrame.timers foreach println
-
     println("---")
-
     // NOTE: if we don't run nullness analysis above (comment it out), then the BasicValue
     // analysis runs 3.5x faster. Most likely because the call to Interpreter.merge inside
     // Frame.merge is no longer megamorphic.
-
     import scala.tools.asm.tree.analysis._
     val ba = new Analyzer(new BasicInterpreter)
     ba.analyze(cn.name, m) // warm up
-
     timed(ba.analyze(cn.name, m))
-
     println("---")
-
     timed(a.analyze(cn.name, m))
   }
 }

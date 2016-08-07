@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -25,15 +25,15 @@ import org.apache.kafka.common.security.JaasUtils
 
 /**
   *  A utility that updates the offset of broker partitions in ZK.
-  *  
+  *
   *  This utility expects 2 input files as arguments:
   *  1. consumer properties file
   *  2. a file contains partition offsets data such as:
   *     (This output data file can be obtained by running kafka.tools.ExportZkOffsets)
-  *  
+  *
   *     /consumers/group1/offsets/topic1/3-0:285038193
   *     /consumers/group1/offsets/topic1/1-0:286894308
-  *     
+  *
   *  To print debug message, add the following line to log4j.properties:
   *  log4j.logger.kafka.tools.ImportZkOffsets$=DEBUG
   *  (for eclipse debugging, copy log4j.properties to the binary directory in "core" such as core/bin)

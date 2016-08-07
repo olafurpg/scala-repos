@@ -7,7 +7,9 @@ import java.util.Collections
 import com.intellij.debugger.engine._
 import com.intellij.debugger.jdi.VirtualMachineProxyImpl
 import com.intellij.debugger.requests.ClassPrepareRequestor
-import com.intellij.debugger.{MultiRequestPositionManager, NoDataException, PositionManager, SourcePosition}
+import com.intellij.debugger.{
+  MultiRequestPositionManager, NoDataException, PositionManager, SourcePosition
+}
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.{DumbService, Project}
 import com.intellij.openapi.roots.impl.DirectoryIndex
@@ -16,7 +18,9 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi._
 import com.intellij.psi.search.{FilenameIndex, GlobalSearchScope}
 import com.intellij.psi.util.CachedValueProvider.Result
-import com.intellij.psi.util.{CachedValueProvider, CachedValuesManager, PsiTreeUtil}
+import com.intellij.psi.util.{
+  CachedValueProvider, CachedValuesManager, PsiTreeUtil
+}
 import com.intellij.util.{Processor, Query}
 import com.sun.jdi._
 import com.sun.jdi.request.ClassPrepareRequest
@@ -29,10 +33,14 @@ import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScConstructorPattern, ScInfixPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern, ScConstructorPattern, ScInfixPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScParameters}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScParameters
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.types.ValueClassType

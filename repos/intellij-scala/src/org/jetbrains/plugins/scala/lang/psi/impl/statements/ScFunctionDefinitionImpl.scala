@@ -19,7 +19,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScFunctionStub
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, Unit}
 
 /**

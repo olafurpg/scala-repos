@@ -12,9 +12,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSimpleTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.refactoring.extractTrait.ScalaExtractMemberInfo
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaChangeContextUtil
 

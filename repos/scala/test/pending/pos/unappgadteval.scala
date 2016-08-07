@@ -51,7 +51,7 @@ object Test {
     // Next one fails like:
     //
     // found   : (Int) => Int
-    // required: a    
+    // required: a
     case i @ Suc() => { (y: Int) =>
       y + 1
     } // a = Int => Int

@@ -19,7 +19,10 @@ package kafka.admin
 import java.util.Properties
 
 import joptsimple.{OptionParser, OptionSpec}
-import kafka.api.{OffsetFetchRequest, OffsetFetchResponse, OffsetRequest, PartitionOffsetRequestInfo}
+import kafka.api.{
+  OffsetFetchRequest, OffsetFetchResponse, OffsetRequest,
+  PartitionOffsetRequestInfo
+}
 import kafka.client.ClientUtils
 import kafka.common.{TopicAndPartition, _}
 import kafka.consumer.SimpleConsumer

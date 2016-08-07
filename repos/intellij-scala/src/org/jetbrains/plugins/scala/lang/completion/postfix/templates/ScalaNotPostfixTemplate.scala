@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala.lang.completion.postfix.templates
 
 import com.intellij.codeInsight.template.postfix.templates.NotPostfixTemplate
-import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{SelectorConditions, AncestorSelector, ScalaPostfixTemplatePsiInfo}
+import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{
+  SelectorConditions, AncestorSelector, ScalaPostfixTemplatePsiInfo
+}
 import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.SelectorType._
 
 /**

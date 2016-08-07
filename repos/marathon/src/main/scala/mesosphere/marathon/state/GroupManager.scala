@@ -7,7 +7,9 @@ import akka.event.EventStream
 import com.google.inject.Singleton
 import mesosphere.marathon.api.v2.Validation._
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.event.{EventModule, GroupChangeFailed, GroupChangeSuccess}
+import mesosphere.marathon.event.{
+  EventModule, GroupChangeFailed, GroupChangeSuccess
+}
 import mesosphere.marathon.io.PathFun
 import mesosphere.marathon.io.storage.StorageProvider
 import mesosphere.marathon.upgrade._

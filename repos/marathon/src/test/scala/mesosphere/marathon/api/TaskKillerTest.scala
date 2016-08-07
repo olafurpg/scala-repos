@@ -4,7 +4,9 @@ import mesosphere.marathon._
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.plugin.auth.{Identity, Authorizer, Authenticator}
-import mesosphere.marathon.state.{AppDefinition, Group, GroupManager, PathId, Timestamp}
+import mesosphere.marathon.state.{
+  AppDefinition, Group, GroupManager, PathId, Timestamp
+}
 import mesosphere.marathon.upgrade.DeploymentPlan
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.any

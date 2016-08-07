@@ -1,7 +1,9 @@
 package com.twitter.finagle.load
 
 import com.twitter.finagle.{Service, SimpleFilter}
-import com.twitter.util.{Duration, Future, MockTimer, Promise, Time, TimeControl, Try}
+import com.twitter.util.{
+  Duration, Future, MockTimer, Promise, Time, TimeControl, Try
+}
 import com.twitter.conversions.time.intToTimeableNumber
 import scala.collection.immutable.SortedSet
 

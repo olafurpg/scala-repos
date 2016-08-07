@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala
 package lang
 package completion
 
-import com.intellij.codeInsight.completion.{CompletionParameters, CompletionUtil, PrefixMatcher}
+import com.intellij.codeInsight.completion.{
+  CompletionParameters, CompletionUtil, PrefixMatcher
+}
 import com.intellij.openapi.util.Key
 import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil

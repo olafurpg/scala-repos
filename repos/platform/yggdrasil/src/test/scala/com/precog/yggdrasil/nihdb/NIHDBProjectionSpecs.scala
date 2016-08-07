@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -151,7 +151,7 @@ class NIHDBProjectionSpecs
             max mustEqual 0L
             data.size mustEqual 3
             data.toJsonElements
-              .map(_ ("value")) must containAllOf(expected).only.inOrder
+              .map(_("value")) must containAllOf(expected).only.inOrder
         })
     }
 
@@ -190,7 +190,7 @@ class NIHDBProjectionSpecs
               max mustEqual 0L
               data.size mustEqual 5
               data.toJsonElements
-                .map(_ ("value")) must containAllOf(expected).only.inOrder
+                .map(_("value")) must containAllOf(expected).only.inOrder
           }
         }
     }
@@ -235,13 +235,13 @@ class NIHDBProjectionSpecs
           min1 mustEqual 0L
           max1 mustEqual 0L
           data1.size mustEqual 1200
-          data1.toJsonElements.map(_ ("value")) must containAllOf(
+          data1.toJsonElements.map(_("value")) must containAllOf(
               expected.take(1200)).only.inOrder
 
           min2 mustEqual 1L
           max2 mustEqual 1L
           data2.size mustEqual 751
-          data2.toJsonElements.map(_ ("value")) must containAllOf(
+          data2.toJsonElements.map(_("value")) must containAllOf(
               expected.drop(1200)).only.inOrder
       })
     }

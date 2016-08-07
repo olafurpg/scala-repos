@@ -59,7 +59,7 @@ object MediaRange {
       case Some(x) ⇒
         (params - "q") ->
           (try x.toFloat
-              catch { case _: NumberFormatException ⇒ 1.0f })
+          catch { case _: NumberFormatException ⇒ 1.0f })
       case None ⇒ params -> defaultQ
     }
 

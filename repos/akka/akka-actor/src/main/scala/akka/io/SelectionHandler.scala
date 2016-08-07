@@ -5,7 +5,9 @@ package akka.io
 
 import java.util.{Iterator ⇒ JIterator}
 import java.util.concurrent.atomic.AtomicBoolean
-import java.nio.channels.{SelectableChannel, SelectionKey, CancelledKeyException}
+import java.nio.channels.{
+  SelectableChannel, SelectionKey, CancelledKeyException
+}
 import java.nio.channels.SelectionKey._
 import java.nio.channels.spi.SelectorProvider
 import com.typesafe.config.Config

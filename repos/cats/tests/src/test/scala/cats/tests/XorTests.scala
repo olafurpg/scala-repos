@@ -4,7 +4,10 @@ package tests
 import cats.data.{NonEmptyList, Xor, XorT}
 import cats.data.Xor._
 import cats.laws.discipline.arbitrary._
-import cats.laws.discipline.{BitraverseTests, TraverseTests, MonadErrorTests, SerializableTests, CartesianTests}
+import cats.laws.discipline.{
+  BitraverseTests, TraverseTests, MonadErrorTests, SerializableTests,
+  CartesianTests
+}
 import cats.laws.discipline.eq.tuple3Eq
 import algebra.laws.{GroupLaws, OrderLaws}
 import org.scalacheck.Arbitrary

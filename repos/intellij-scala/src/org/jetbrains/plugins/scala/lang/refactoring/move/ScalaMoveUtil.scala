@@ -7,11 +7,17 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, PsiDirectory, PsiElement, PsiFile}
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.actions.ScalaFileTemplateUtil
-import org.jetbrains.plugins.scala.conversion.copy.{Associations, ScalaCopyPastePostProcessor}
+import org.jetbrains.plugins.scala.conversion.copy.{
+  Associations, ScalaCopyPastePostProcessor
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.{ScPackage, ScalaFile}
-import org.jetbrains.plugins.scala.lang.refactoring.util.{ScalaDirectoryService, ScalaNamesUtil}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  ScalaDirectoryService, ScalaNamesUtil
+}
 
 import scala.collection.JavaConverters._
 

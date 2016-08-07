@@ -1,7 +1,9 @@
 package breeze.integrate
 
 import breeze.linalg._
-import org.apache.commons.math3.ode.nonstiff.{GraggBulirschStoerIntegrator => ApacheGraggBulirschStoerIntegrator}
+import org.apache.commons.math3.ode.nonstiff.{
+  GraggBulirschStoerIntegrator => ApacheGraggBulirschStoerIntegrator
+}
 
 class GraggBulirschStoerIntegrator(minStep: Double,
                                    maxStep: Double,

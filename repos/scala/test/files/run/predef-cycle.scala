@@ -27,7 +27,6 @@ object Test {
   at scala.Predef$.<init>(Predef.scala:90)
   at scala.Predef$.<clinit>(Predef.scala)
   at Force$$anon$2.run(predef-cycle.scala:10)
-
 "Thread-1" prio=5 tid=7f9637267800 nid=0x1194fe000 in Object.wait() [1194fb000]
    java.lang.Thread.State: RUNNABLE
   at scala.collection.immutable.Set$Set4.$plus(Set.scala:127)

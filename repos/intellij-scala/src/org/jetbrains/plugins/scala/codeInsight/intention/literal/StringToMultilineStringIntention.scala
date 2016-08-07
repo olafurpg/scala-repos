@@ -12,7 +12,9 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.format.{Text, _}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.util.MultilineStringUtil._
 

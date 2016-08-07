@@ -2,11 +2,15 @@ package org.jetbrains.plugins.scala.lang.completion.postfix.templates
 
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TextExpression
-import com.intellij.codeInsight.template.postfix.templates.{PostfixTemplatesUtils, PostfixTemplateWithExpressionSelector}
+import com.intellij.codeInsight.template.postfix.templates.{
+  PostfixTemplatesUtils, PostfixTemplateWithExpressionSelector
+}
 import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.SelectorType._
 import com.intellij.openapi.editor.{Document, Editor}
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{SelectorConditions, AncestorSelector}
+import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{
+  SelectorConditions, AncestorSelector
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 /**

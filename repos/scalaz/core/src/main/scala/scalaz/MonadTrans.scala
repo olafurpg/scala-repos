@@ -1,7 +1,7 @@
 package scalaz
 
 /** Class of monad transformers. */
-trait MonadTrans[F[_ [_], _]] {
+trait MonadTrans[F[_[_], _]] {
 
   /** A component of `Applicative.point` for the transformer stack. */
   def liftM[G[_]: Monad, A](a: G[A]): F[G, A]
@@ -15,20 +15,20 @@ trait MonadTrans[F[_ [_], _]] {
 }
 
 object MonadTrans {
-  def apply[F[_ [_], _]](implicit F: MonadTrans[F]): MonadTrans[F] = F
+  def apply[F[_[_], _]](implicit F: MonadTrans[F]): MonadTrans[F] = F
 }
 
-trait Hoist[F[_ [_], _]] extends MonadTrans[F] {
+trait Hoist[F[_[_], _]] extends MonadTrans[F] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N): F[M, ?] ~> F[N, ?]
 }
 
 object Hoist {
-  def apply[F[_ [_], _]](implicit F: Hoist[F]): Hoist[F] = F
+  def apply[F[_[_], _]](implicit F: Hoist[F]): Hoist[F] = F
 }
 
 /**
   * This trait establishes a partial order among monads. A "bigger" monad
-  * is one that does all of the effects of the "smaller" as part of its 
+  * is one that does all of the effects of the "smaller" as part of its
   * execution.
   */
 trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] {
@@ -46,7 +46,7 @@ trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] {
       def promote[A](m2: F[A]) = mo.promote(self.promote(m2))
     }
 
-  def transform[T[_ [_], _]: MonadTrans]: MonadPartialOrder[T[G, ?], F] =
+  def transform[T[_[_], _]: MonadTrans]: MonadPartialOrder[T[G, ?], F] =
     new MonadPartialOrder[T[G, ?], F] {
       val MG = MonadTrans[T].apply[G](self.MG)
       val MF = self.MF
@@ -71,7 +71,7 @@ sealed abstract class MonadPartialOrderFunctions
       def promote[A](m: M[A]) = m
     }
 
-  implicit def transformer[M[_]: Monad, F[_ [_], _]: MonadTrans]
+  implicit def transformer[M[_]: Monad, F[_[_], _]: MonadTrans]
     : MonadPartialOrder[F[M, ?], M] =
     id[M].transform[F]
 }

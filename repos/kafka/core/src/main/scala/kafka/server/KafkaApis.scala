@@ -30,12 +30,29 @@ import kafka.log._
 import kafka.message.{ByteBufferMessageSet, Message, MessageSet}
 import kafka.network._
 import kafka.network.RequestChannel.{Session, Response}
-import kafka.security.auth.{Authorizer, ClusterAction, Group, Create, Describe, Operation, Read, Resource, Topic, Write}
+import kafka.security.auth.{
+  Authorizer, ClusterAction, Group, Create, Describe, Operation, Read,
+  Resource, Topic, Write
+}
 import kafka.utils.{Logging, SystemTime, ZKGroupTopicDirs, ZkUtils}
-import org.apache.kafka.common.errors.{InvalidTopicException, NotLeaderForPartitionException, UnknownTopicOrPartitionException, ClusterAuthorizationException}
+import org.apache.kafka.common.errors.{
+  InvalidTopicException, NotLeaderForPartitionException,
+  UnknownTopicOrPartitionException, ClusterAuthorizationException
+}
 import org.apache.kafka.common.metrics.Metrics
 import org.apache.kafka.common.protocol.{ApiKeys, Errors, SecurityProtocol}
-import org.apache.kafka.common.requests.{ListOffsetRequest, ListOffsetResponse, GroupCoordinatorRequest, GroupCoordinatorResponse, ListGroupsResponse, DescribeGroupsRequest, DescribeGroupsResponse, HeartbeatRequest, HeartbeatResponse, JoinGroupRequest, JoinGroupResponse, LeaveGroupRequest, LeaveGroupResponse, ResponseHeader, ResponseSend, SyncGroupRequest, SyncGroupResponse, LeaderAndIsrRequest, LeaderAndIsrResponse, StopReplicaRequest, StopReplicaResponse, ProduceRequest, ProduceResponse, UpdateMetadataRequest, UpdateMetadataResponse, MetadataRequest, MetadataResponse, OffsetCommitRequest, OffsetCommitResponse, OffsetFetchRequest, OffsetFetchResponse}
+import org.apache.kafka.common.requests.{
+  ListOffsetRequest, ListOffsetResponse, GroupCoordinatorRequest,
+  GroupCoordinatorResponse, ListGroupsResponse, DescribeGroupsRequest,
+  DescribeGroupsResponse, HeartbeatRequest, HeartbeatResponse,
+  JoinGroupRequest, JoinGroupResponse, LeaveGroupRequest, LeaveGroupResponse,
+  ResponseHeader, ResponseSend, SyncGroupRequest, SyncGroupResponse,
+  LeaderAndIsrRequest, LeaderAndIsrResponse, StopReplicaRequest,
+  StopReplicaResponse, ProduceRequest, ProduceResponse, UpdateMetadataRequest,
+  UpdateMetadataResponse, MetadataRequest, MetadataResponse,
+  OffsetCommitRequest, OffsetCommitResponse, OffsetFetchRequest,
+  OffsetFetchResponse
+}
 import org.apache.kafka.common.requests.ProduceResponse.PartitionResponse
 import org.apache.kafka.common.utils.Utils
 import org.apache.kafka.common.{TopicPartition, Node}

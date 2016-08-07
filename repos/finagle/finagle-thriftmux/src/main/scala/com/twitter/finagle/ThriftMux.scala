@@ -3,11 +3,21 @@ package com.twitter.finagle
 import com.twitter.finagle.client.{StackClient, StackBasedClient}
 import com.twitter.finagle.mux.transport.Message
 import com.twitter.finagle.netty3.Netty3Listener
-import com.twitter.finagle.param.{Monitor => _, ResponseClassifier => _, ExceptionStatsHandler => _, Tracer => _, _}
-import com.twitter.finagle.server.{StackBasedServer, Listener, StackServer, StdStackServer}
+import com.twitter.finagle.param.{
+  Monitor => _, ResponseClassifier => _, ExceptionStatsHandler => _,
+  Tracer => _, _
+}
+import com.twitter.finagle.server.{
+  StackBasedServer, Listener, StackServer, StdStackServer
+}
 import com.twitter.finagle.service._
-import com.twitter.finagle.stats.{ClientStatsReceiver, ExceptionStatsHandler, ServerStatsReceiver, StatsReceiver}
-import com.twitter.finagle.thrift.{ClientId, ThriftClientRequest, UncaughtAppExceptionFilter}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver, ExceptionStatsHandler, ServerStatsReceiver,
+  StatsReceiver
+}
+import com.twitter.finagle.thrift.{
+  ClientId, ThriftClientRequest, UncaughtAppExceptionFilter
+}
 import com.twitter.finagle.thriftmux.service.ThriftMuxResponseClassifier
 import com.twitter.finagle.tracing.{Tracer, Trace}
 import com.twitter.finagle.transport.Transport

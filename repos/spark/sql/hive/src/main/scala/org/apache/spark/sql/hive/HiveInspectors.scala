@@ -20,11 +20,17 @@ package org.apache.spark.sql.hive
 import scala.collection.JavaConverters._
 
 import org.apache.hadoop.{io => hadoopIo}
-import org.apache.hadoop.hive.common.`type`.{HiveChar, HiveDecimal, HiveVarchar}
+import org.apache.hadoop.hive.common.`type`.{
+  HiveChar, HiveDecimal, HiveVarchar
+}
 import org.apache.hadoop.hive.serde2.{io => hiveIo}
-import org.apache.hadoop.hive.serde2.objectinspector.{StructField => HiveStructField, _}
+import org.apache.hadoop.hive.serde2.objectinspector.{
+  StructField => HiveStructField, _
+}
 import org.apache.hadoop.hive.serde2.objectinspector.primitive._
-import org.apache.hadoop.hive.serde2.typeinfo.{DecimalTypeInfo, TypeInfoFactory}
+import org.apache.hadoop.hive.serde2.typeinfo.{
+  DecimalTypeInfo, TypeInfoFactory
+}
 
 import org.apache.spark.sql.AnalysisException
 import org.apache.spark.sql.catalyst.InternalRow
@@ -119,7 +125,6 @@ import org.apache.spark.unsafe.types.UTF8String
      ...
    }
   }}}
-
   * 2) Complex Types:
   *   ListObjectInspector: inspects java array or [[java.util.List]]
   *   MapObjectInspector: inspects [[java.util.Map]]
@@ -411,7 +416,7 @@ private[hive] trait HiveInspectors {
           null
         }
 
-      case _: JavaHiveCharObjectInspector =>
+    case _: JavaHiveCharObjectInspector =>
       (o: Any) =>
         if (o != null) {
           val s = o.asInstanceOf[UTF8String].toString
@@ -420,7 +425,7 @@ private[hive] trait HiveInspectors {
           null
         }
 
-      case _: JavaHiveDecimalObjectInspector =>
+    case _: JavaHiveDecimalObjectInspector =>
       (o: Any) =>
         if (o != null) {
           HiveDecimal.create(o.asInstanceOf[Decimal].toJavaBigDecimal)
@@ -428,7 +433,7 @@ private[hive] trait HiveInspectors {
           null
         }
 
-      case _: JavaDateObjectInspector =>
+    case _: JavaDateObjectInspector =>
       (o: Any) =>
         if (o != null) {
           DateTimeUtils.toJavaDate(o.asInstanceOf[Int])
@@ -436,7 +441,7 @@ private[hive] trait HiveInspectors {
           null
         }
 
-      case _: JavaTimestampObjectInspector =>
+    case _: JavaTimestampObjectInspector =>
       (o: Any) =>
         if (o != null) {
           DateTimeUtils.toJavaTimestamp(o.asInstanceOf[Long])
@@ -444,7 +449,7 @@ private[hive] trait HiveInspectors {
           null
         }
 
-      case soi: StandardStructObjectInspector =>
+    case soi: StandardStructObjectInspector =>
       val schema = dataType.asInstanceOf[StructType]
       val wrappers = soi.getAllStructFieldRefs.asScala.zip(schema.fields).map {
         case (ref, field) =>
@@ -471,7 +476,7 @@ private[hive] trait HiveInspectors {
           }
         }
 
-      case loi: ListObjectInspector =>
+    case loi: ListObjectInspector =>
       val elementType = dataType.asInstanceOf[ArrayType].elementType
       val wrapper = wrapperFor(loi.getListElementObjectInspector, elementType)
       (o: Any) =>
@@ -488,7 +493,7 @@ private[hive] trait HiveInspectors {
           }
         }
 
-      case moi: MapObjectInspector =>
+    case moi: MapObjectInspector =>
       val mt = dataType.asInstanceOf[MapType]
       val keyWrapper = wrapperFor(moi.getMapKeyObjectInspector, mt.keyType)
       val valueWrapper =
@@ -508,7 +513,7 @@ private[hive] trait HiveInspectors {
           }
         }
 
-      case _ =>
+    case _ =>
       identity[Any]
   }
 
@@ -521,25 +526,25 @@ private[hive] trait HiveInspectors {
       case oi: BooleanObjectInspector =>
         (value: Any, row: MutableRow, ordinal: Int) =>
           row.setBoolean(ordinal, oi.get(value))
-        case oi: ByteObjectInspector =>
+      case oi: ByteObjectInspector =>
         (value: Any, row: MutableRow, ordinal: Int) =>
           row.setByte(ordinal, oi.get(value))
-        case oi: ShortObjectInspector =>
+      case oi: ShortObjectInspector =>
         (value: Any, row: MutableRow, ordinal: Int) =>
           row.setShort(ordinal, oi.get(value))
-        case oi: IntObjectInspector =>
+      case oi: IntObjectInspector =>
         (value: Any, row: MutableRow, ordinal: Int) =>
           row.setInt(ordinal, oi.get(value))
-        case oi: LongObjectInspector =>
+      case oi: LongObjectInspector =>
         (value: Any, row: MutableRow, ordinal: Int) =>
           row.setLong(ordinal, oi.get(value))
-        case oi: FloatObjectInspector =>
+      case oi: FloatObjectInspector =>
         (value: Any, row: MutableRow, ordinal: Int) =>
           row.setFloat(ordinal, oi.get(value))
-        case oi: DoubleObjectInspector =>
+      case oi: DoubleObjectInspector =>
         (value: Any, row: MutableRow, ordinal: Int) =>
           row.setDouble(ordinal, oi.get(value))
-        case oi =>
+      case oi =>
         (value: Any, row: MutableRow, ordinal: Int) =>
           row(ordinal) = unwrap(value, oi)
     }

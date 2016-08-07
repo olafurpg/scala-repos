@@ -36,8 +36,7 @@ trait ParSetLike[
     with scala.collection.parallel.ParSetLike[T, Repr, Sequential]
     with Growable[T]
     with Shrinkable[T]
-    with Cloneable[Repr] {
-  self =>
+    with Cloneable[Repr] { self =>
   override def empty: Repr
 
   def +=(elem: T): this.type

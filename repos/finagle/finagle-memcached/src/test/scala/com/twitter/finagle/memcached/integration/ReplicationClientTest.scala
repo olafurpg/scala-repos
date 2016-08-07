@@ -2,7 +2,9 @@ package com.twitter.finagle.memcached.integration
 
 import com.twitter.common.application.ShutdownRegistry.ShutdownRegistryImpl
 import com.twitter.common.zookeeper.testing.ZooKeeperTestServer
-import com.twitter.common.zookeeper.{ServerSets, ZooKeeperClient, ZooKeeperUtils}
+import com.twitter.common.zookeeper.{
+  ServerSets, ZooKeeperClient, ZooKeeperUtils
+}
 import com.twitter.conversions.time._
 import com.twitter.finagle.builder.ClientBuilder
 import com.twitter.finagle.cacheresolver.{CachePoolCluster, CachePoolConfig}

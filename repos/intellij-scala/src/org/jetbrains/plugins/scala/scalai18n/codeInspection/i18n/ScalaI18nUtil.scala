@@ -6,7 +6,9 @@ import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.lang.properties.parsing.PropertiesElementTypes
 import com.intellij.lang.properties.psi.impl.{PropertyImpl, PropertyStubImpl}
 import com.intellij.lang.properties.psi.{PropertiesFile, Property}
-import com.intellij.lang.properties.{IProperty, PropertiesImplUtil, PropertiesReferenceManager}
+import com.intellij.lang.properties.{
+  IProperty, PropertiesImplUtil, PropertiesReferenceManager
+}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
@@ -18,7 +20,9 @@ import com.intellij.psi._
 import com.intellij.psi.util._
 import org.jetbrains.annotations.{NotNull, Nullable}
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScExpression, ScMethodCall, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScArgumentExprList, ScExpression, ScMethodCall, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.util.ScalaConstantExpressionEvaluator
 import org.jetbrains.plugins.scala.settings.ScalaCodeFoldingSettings
 

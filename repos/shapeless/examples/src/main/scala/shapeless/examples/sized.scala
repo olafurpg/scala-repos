@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-13 Miles Sabin 
+ * Copyright (c) 2011-13 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package shapeless.examples
 
 /**
   * Sized collection examples.
-  * 
+  *
   * @author Miles Sabin
   */
 object SizedExamples extends App {
@@ -84,7 +84,7 @@ object SizedExamples extends App {
     val extendedHdrs = List("Title", "Author", "ISBN")
 
     for {
-      shdrs <- extendedHdrs.sized(2) // This will be empty ... 
+      shdrs <- extendedHdrs.sized(2) // This will be empty ...
       srows <- sequence(rows map (_.sized(2)))
     } {
       // ... hence, not reached

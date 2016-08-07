@@ -347,14 +347,12 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
        features = as.matrix(data.frame(data$V2, data$V3, data$V4, data$V5))
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 0, lambda = 0))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                            s0
        (Intercept)  2.8366423
@@ -386,7 +384,6 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
@@ -394,7 +391,6 @@ class LogisticRegressionSuite
        coefficients =
            coef(glmnet(features,label, family="binomial", alpha = 0, lambda = 0, intercept=FALSE))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                            s0
        (Intercept)   .
@@ -432,14 +428,12 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
        features = as.matrix(data.frame(data$V2, data$V3, data$V4, data$V5))
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 1, lambda = 0.12))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept) -0.05627428
@@ -456,7 +450,6 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
@@ -464,7 +457,6 @@ class LogisticRegressionSuite
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 1, lambda = 0.12,
            standardize=FALSE))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                            s0
        (Intercept)  0.3722152
@@ -497,7 +489,6 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
@@ -505,7 +496,6 @@ class LogisticRegressionSuite
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 1, lambda = 0.12,
            intercept=FALSE))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept)   .
@@ -522,7 +512,6 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
@@ -530,7 +519,6 @@ class LogisticRegressionSuite
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 1, lambda = 0.12,
            intercept=FALSE, standardize=FALSE))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept)   .
@@ -563,14 +551,12 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
        features = as.matrix(data.frame(data$V2, data$V3, data$V4, data$V5))
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 0, lambda = 1.37))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept)  0.15021751
@@ -588,7 +574,6 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
@@ -596,7 +581,6 @@ class LogisticRegressionSuite
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 0, lambda = 1.37,
            standardize=FALSE))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept)  0.48657516
@@ -630,7 +614,6 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
@@ -638,7 +621,6 @@ class LogisticRegressionSuite
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 0, lambda = 1.37,
            intercept=FALSE))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept)   .
@@ -656,7 +638,6 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
@@ -664,7 +645,6 @@ class LogisticRegressionSuite
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 0, lambda = 1.37,
            intercept=FALSE, standardize=FALSE))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                              s0
        (Intercept)   .
@@ -699,14 +679,12 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
        features = as.matrix(data.frame(data$V2, data$V3, data$V4, data$V5))
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 0.38, lambda = 0.21))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept)  0.57734851
@@ -724,7 +702,6 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
@@ -732,7 +709,6 @@ class LogisticRegressionSuite
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 0.38, lambda = 0.21,
            standardize=FALSE))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept)  0.51555993
@@ -766,7 +742,6 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
@@ -774,7 +749,6 @@ class LogisticRegressionSuite
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 0.38, lambda = 0.21,
            intercept=FALSE))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept)   .
@@ -792,7 +766,6 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
@@ -800,7 +773,6 @@ class LogisticRegressionSuite
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 0.38, lambda = 0.21,
            intercept=FALSE, standardize=FALSE))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept)   .
@@ -870,14 +842,12 @@ class LogisticRegressionSuite
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
-
        library("glmnet")
        data <- read.csv("path", header=FALSE)
        label = factor(data$V1)
        features = as.matrix(data.frame(data$V2, data$V3, data$V4, data$V5))
        coefficients = coef(glmnet(features,label, family="binomial", alpha = 1.0, lambda = 6.0))
        coefficients
-
        5 x 1 sparse Matrix of class "dgCMatrix"
                             s0
        (Intercept) -0.2480643

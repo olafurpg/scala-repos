@@ -1,6 +1,8 @@
 package com.twitter.finagle.http.netty
 
-import org.jboss.netty.handler.codec.http.{DefaultHttpResponse, HttpVersion, HttpResponseStatus}
+import org.jboss.netty.handler.codec.http.{
+  DefaultHttpResponse, HttpVersion, HttpResponseStatus
+}
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner

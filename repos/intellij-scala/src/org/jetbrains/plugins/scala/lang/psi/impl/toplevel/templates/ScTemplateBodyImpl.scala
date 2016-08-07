@@ -14,9 +14,13 @@ import com.intellij.psi.{PsiElement, ResolveState}
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSelfTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScDeclaredElementsHolder, ScFunction, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScDeclaredElementsHolder, ScFunction, ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScTemplateDefinition, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScTemplateBodyStub
 
 /**

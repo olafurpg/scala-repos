@@ -1,7 +1,7 @@
 package breeze.optimize.flow
 
 /**
-  * 
+  *
   * @author dlwh
   */
 trait FlowGraph[N] {

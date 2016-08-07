@@ -8,8 +8,13 @@ import mesosphere.marathon.io.storage.StorageProvider
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.test.MarathonActorSupport
-import mesosphere.util.{CapConcurrentExecutionsMetrics, CapConcurrentExecutions}
-import mesosphere.marathon.{MarathonConf, MarathonSchedulerService, MarathonSpec, PortRangeExhaustedException}
+import mesosphere.util.{
+  CapConcurrentExecutionsMetrics, CapConcurrentExecutions
+}
+import mesosphere.marathon.{
+  MarathonConf, MarathonSchedulerService, MarathonSpec,
+  PortRangeExhaustedException
+}
 import mesosphere.marathon._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{times, verify, when}

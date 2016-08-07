@@ -10,16 +10,27 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix
-import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.{ClassTypeToImport, TypeAliasToImport}
+import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.{
+  ClassTypeToImport, TypeAliasToImport
+}
 import org.jetbrains.plugins.scala.lang.completion.lookups.LookupElementManager
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base._
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScConstructorPattern, ScInfixPattern, ScInterpolationPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScInfixTypeElement, ScParameterizedTypeElement, ScSimpleTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScSuperReference, ScThisReference}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScMacroDefinition, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern, ScConstructorPattern, ScInfixPattern,
+  ScInterpolationPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScInfixTypeElement, ScParameterizedTypeElement, ScSimpleTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScSuperReference, ScThisReference
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScMacroDefinition, ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 import org.jetbrains.plugins.scala.lang.resolve._

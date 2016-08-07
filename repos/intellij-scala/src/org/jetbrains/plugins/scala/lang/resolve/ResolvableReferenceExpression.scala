@@ -8,24 +8,42 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.caches.CachesUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScSelfTypeElement, ScTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScConstructor, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScSelfTypeElement, ScTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScConstructor, ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScParameters}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScParameters
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.ImportUsed
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlock, ScTemplateBody}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScExtendsBlock, ScTemplateBody
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.implicits.ScImplicitlyConvertible
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{ScMethodType, ScTypePolymorphicType}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  ScMethodType, ScTypePolymorphicType
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.processor._
-import org.jetbrains.plugins.scala.macroAnnotations.{CachedMappedWithRecursionGuard, CachedWithRecursionGuard, ModCount}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  CachedMappedWithRecursionGuard, CachedWithRecursionGuard, ModCount
+}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer

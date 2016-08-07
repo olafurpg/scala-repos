@@ -12,7 +12,9 @@ import java.{util => ju}
 
 import org.junit.Assert._
 import org.junit.Test
-import org.scalajs.testsuite.javalib.util.{AbstractCollectionFactory, AbstractCollectionTest}
+import org.scalajs.testsuite.javalib.util.{
+  AbstractCollectionFactory, AbstractCollectionTest
+}
 
 import scala.collection.JavaConversions._
 import scala.language.implicitConversions

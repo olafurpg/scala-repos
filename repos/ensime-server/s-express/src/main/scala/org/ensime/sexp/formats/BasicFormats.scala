@@ -89,8 +89,7 @@ trait BasicFormats {
   implicit val BigDecimalFormat = SexpFormat[BigDecimal]
 }
 
-trait SymbolAltFormat {
-  this: BasicFormats =>
+trait SymbolAltFormat { this: BasicFormats =>
   override implicit val SymbolFormat = new SexpFormat[Symbol] {
     def write(x: Symbol): Sexp = SexpSymbol(x.name)
     def read(value: Sexp): Symbol = value match {

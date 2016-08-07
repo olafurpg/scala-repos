@@ -22,7 +22,9 @@ import javax.servlet.http.HttpServletRequest
 
 import scala.xml.{Node, Unparsed}
 
-import org.apache.spark.status.api.v1.{AllRDDResource, RDDDataDistribution, RDDPartitionInfo}
+import org.apache.spark.status.api.v1.{
+  AllRDDResource, RDDDataDistribution, RDDPartitionInfo
+}
 import org.apache.spark.ui.{PagedDataSource, PagedTable, UIUtils, WebUIPage}
 import org.apache.spark.util.Utils
 

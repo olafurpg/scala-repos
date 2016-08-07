@@ -5,7 +5,9 @@ package stubs
 package elements
 import _root_.org.jetbrains.plugins.scala.lang.psi.impl.toplevel.templates.ScExtendsBlockImpl
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink, StubElement, StubInputStream, StubOutputStream
+}
 import com.intellij.util.io.StringRef
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScExtendsBlock
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScExtendsBlockStubImpl

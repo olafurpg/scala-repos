@@ -262,8 +262,8 @@ trait Future[+T] extends Awaitable[T] {
     *  val g = f map { x: String => x + " is now!" }
     *  }}}
     *
-    *  Note that a for comprehension involving a `Future` 
-    *  may expand to include a call to `map` and or `flatMap` 
+    *  Note that a for comprehension involving a `Future`
+    *  may expand to include a call to `map` and or `flatMap`
     *  and `withFilter`.  See [[scala.concurrent.Future#flatMap]] for an example of such a comprehension.
     *
     *

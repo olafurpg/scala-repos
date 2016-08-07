@@ -13,12 +13,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.base.types.ScSimpleTypeElementImpl
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */

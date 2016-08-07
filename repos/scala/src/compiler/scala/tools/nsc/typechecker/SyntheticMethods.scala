@@ -61,7 +61,7 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
 
   /** Does not force the info of `caseclazz` */
   final def caseAccessorName(caseclazz: Symbol, paramName: TermName) =
-    (renamedCaseAccessors get caseclazz).fold(paramName)(_ (paramName))
+    (renamedCaseAccessors get caseclazz).fold(paramName)(_(paramName))
   final def clearRenamedCaseAccessors(caseclazz: Symbol): Unit = {
     renamedCaseAccessors -= caseclazz
   }
@@ -195,9 +195,9 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
       val pairwise =
         accessors map
           (acc =>
-                fn(Select(mkThis, acc),
-                   acc.tpe member nme.EQ,
-                   Select(Ident(otherSym), acc)))
+             fn(Select(mkThis, acc),
+                acc.tpe member nme.EQ,
+                Select(Ident(otherSym), acc)))
       val canEq = gen.mkMethodCall(otherSym, nme.canEqual_, Nil, List(mkThis))
       val tests =
         if (clazz.isDerivedValueClass || clazz.isFinal && syntheticCanEqual)
@@ -300,11 +300,11 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
         val mixes =
           accessors map
             (acc =>
-                  Assign(
-                      Ident(accumulator),
-                      callStaticsMethod("mix")(Ident(accumulator),
-                                               hashcodeImplementation(acc))
-                ))
+               Assign(
+                   Ident(accumulator),
+                   callStaticsMethod("mix")(Ident(accumulator),
+                                            hashcodeImplementation(acc))
+               ))
         val finish =
           callStaticsMethod("finalizeHash")(Ident(accumulator),
                                             Literal(Constant(arity)))
@@ -374,8 +374,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
               if (settings.warnValueOverrides) {
                 (clazz.info nonPrivateMember m.name) filter
                   (m =>
-                        (m.owner != AnyClass) && (m.owner != clazz) &&
-                          !m.isDeferred) andAlso { m =>
+                     (m.owner != AnyClass) && (m.owner != clazz) &&
+                       !m.isDeferred) andAlso { m =>
                   typer.context.warning(
                       clazz.pos,
                       s"Implementation of ${m.name} inherited from ${m.owner} overridden in $clazz to enforce value class semantics")

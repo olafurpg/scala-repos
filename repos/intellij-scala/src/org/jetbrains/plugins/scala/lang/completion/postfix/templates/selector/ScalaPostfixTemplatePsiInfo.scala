@@ -2,10 +2,14 @@ package org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector
 
 import com.intellij.codeInsight.template.postfix.templates.PostfixTemplatePsiInfo
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInspection.booleans.{SimplifyBooleanUtil, DoubleNegationUtil}
+import org.jetbrains.plugins.scala.codeInspection.booleans.{
+  SimplifyBooleanUtil, DoubleNegationUtil
+}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScReferenceExpression, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScReferenceExpression, ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.surroundWith.surrounders.expression.ScalaWithUnaryNotSurrounder
 

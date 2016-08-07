@@ -172,7 +172,7 @@ trait BaseParsers extends RegexParsers {
 
   /**
     * Succeeds if the given parsers succeeds and the given function is defined at the parse result.
-    * Returns the result of the method applied to the given parsers result. 
+    * Returns the result of the method applied to the given parsers result.
     */
   def acceptMatch[S, T](f: PartialFunction[S, T])(p: Parser[S]): Parser[T] =
     Parser { in =>

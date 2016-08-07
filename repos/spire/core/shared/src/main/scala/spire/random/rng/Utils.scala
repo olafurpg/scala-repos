@@ -42,7 +42,6 @@ object Utils {
       def apply(i: Int) = array(transform(i))
       def update(i: Int, v: Int) = array(transform(i)) = v
     }
-
     final class LongArrayWrapper(transform: Int => Int, array: Array[Long]) {
       def apply(i: Int) = array(transform(i))
       def update(i: Int, v: Int) = array(transform(i)) = v

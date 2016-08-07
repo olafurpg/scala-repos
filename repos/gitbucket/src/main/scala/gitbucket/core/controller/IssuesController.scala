@@ -28,7 +28,18 @@ class IssuesController
     with WebHookIssueCommentService
 
 trait IssuesControllerBase extends ControllerBase {
-  self: IssuesService with RepositoryService with AccountService with LabelsService with MilestonesService with ActivityService with HandleCommentService with ReadableUsersAuthenticator with ReferrerAuthenticator with CollaboratorsAuthenticator with PullRequestService with WebHookIssueCommentService =>
+  self: IssuesService
+    with RepositoryService
+    with AccountService
+    with LabelsService
+    with MilestonesService
+    with ActivityService
+    with HandleCommentService
+    with ReadableUsersAuthenticator
+    with ReferrerAuthenticator
+    with CollaboratorsAuthenticator
+    with PullRequestService
+    with WebHookIssueCommentService =>
 
   case class IssueCreateForm(title: String,
                              content: Option[String],

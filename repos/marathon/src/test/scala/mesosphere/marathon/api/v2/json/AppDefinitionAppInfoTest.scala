@@ -3,7 +3,9 @@ package mesosphere.marathon.api.v2.json
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.api.JsonTestHelper
 import mesosphere.marathon.core.appinfo.{AppInfo, TaskCounts}
-import mesosphere.marathon.state.{AppDefinition, Timestamp, TaskFailure, Identifiable, PathId}
+import mesosphere.marathon.state.{
+  AppDefinition, Timestamp, TaskFailure, Identifiable, PathId
+}
 import org.scalatest.GivenWhenThen
 import play.api.libs.json.{Writes, JsObject, Json}
 import scala.collection.immutable.Seq

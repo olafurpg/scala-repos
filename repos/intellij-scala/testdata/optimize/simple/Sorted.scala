@@ -8,7 +8,6 @@ abstract class Sorted {
 /*
 import java.sql.Connection
 import java.util.Date
-
 abstract class Sorted {
   val d: Date
   val s: Connection

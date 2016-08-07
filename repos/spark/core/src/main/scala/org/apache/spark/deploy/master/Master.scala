@@ -32,7 +32,9 @@ import scala.util.Random
 import org.apache.hadoop.fs.Path
 
 import org.apache.spark.{SecurityManager, SparkConf, SparkException}
-import org.apache.spark.deploy.{ApplicationDescription, DriverDescription, ExecutorState, SparkHadoopUtil}
+import org.apache.spark.deploy.{
+  ApplicationDescription, DriverDescription, ExecutorState, SparkHadoopUtil
+}
 import org.apache.spark.deploy.DeployMessages._
 import org.apache.spark.deploy.history.HistoryServer
 import org.apache.spark.deploy.master.DriverState.DriverState

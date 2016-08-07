@@ -10,7 +10,9 @@ import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.util.{IntentionAvailabilityChecker, IntentionUtils}
+import org.jetbrains.plugins.scala.util.{
+  IntentionAvailabilityChecker, IntentionUtils
+}
 
 /**
   * @author Ksenia.Sautina

@@ -40,26 +40,26 @@ final class FpFilter[A](val apx: Double,
                         exact0: => A) {
   def abs(implicit ev: Signed[A]): FpFilter[A] = macro FpFilter.absImpl[A]
   def unary_-(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter.negateImpl[A]
-  def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
-    .plusImpl[A]
-  def -(rhs: FpFilter[A])(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter
-    .minusImpl[A]
-  def *(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
-    .timesImpl[A]
-  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .divideImpl[A]
+  def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] =
+    macro FpFilter.plusImpl[A]
+  def -(rhs: FpFilter[A])(implicit ev: Rng[A]): FpFilter[A] =
+    macro FpFilter.minusImpl[A]
+  def *(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] =
+    macro FpFilter.timesImpl[A]
+  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.divideImpl[A]
   def sqrt(implicit ev: NRoot[A]): FpFilter[A] = macro FpFilter.sqrtImpl[A]
 
-  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltImpl[A]
-  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtImpl[A]
-  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltEqImpl[A]
-  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtEqImpl[A]
-  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .eqImpl[A]
+  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltImpl[A]
+  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtImpl[A]
+  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltEqImpl[A]
+  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtEqImpl[A]
+  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.eqImpl[A]
 
   def signum(implicit ev: Signed[A]): Int = macro FpFilter.signImpl[A]
 
@@ -83,25 +83,25 @@ final class FpFilter[A](val apx: Double,
 final class FpFilterApprox[A](val exact: A) extends AnyVal {
   def abs(implicit ev: Signed[A]): FpFilter[A] = macro FpFilter.absImpl[A]
   def unary_-(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter.negateImpl[A]
-  def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
-    .plusImpl[A]
-  def -(rhs: FpFilter[A])(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter
-    .minusImpl[A]
-  def *(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
-    .timesImpl[A]
-  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .divideImpl[A]
+  def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] =
+    macro FpFilter.plusImpl[A]
+  def -(rhs: FpFilter[A])(implicit ev: Rng[A]): FpFilter[A] =
+    macro FpFilter.minusImpl[A]
+  def *(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] =
+    macro FpFilter.timesImpl[A]
+  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.divideImpl[A]
   def sqrt(implicit ev: NRoot[A]): FpFilter[A] = macro FpFilter.sqrtImpl[A]
-  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltImpl[A]
-  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtImpl[A]
-  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltEqImpl[A]
-  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtEqImpl[A]
-  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .eqImpl[A]
+  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltImpl[A]
+  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtImpl[A]
+  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltEqImpl[A]
+  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtEqImpl[A]
+  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.eqImpl[A]
 }
 
 object FpFilterApprox {
@@ -114,25 +114,25 @@ object FpFilterApprox {
 final class FpFilterExact[A](val value: Double) extends AnyVal {
   def abs(implicit ev: Signed[A]): FpFilter[A] = macro FpFilter.absImpl[A]
   def unary_- : FpFilterExact[A] = new FpFilterExact[A](-value)
-  def +(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .plusImpl[A]
-  def -(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .minusImpl[A]
-  def *(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .timesImpl[A]
-  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
-    .divideImpl[A]
+  def +(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.plusImpl[A]
+  def -(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.minusImpl[A]
+  def *(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.timesImpl[A]
+  def /(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] =
+    macro FpFilter.divideImpl[A]
   def sqrt(implicit ev: NRoot[A]): FpFilter[A] = macro FpFilter.sqrtImpl[A]
-  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltImpl[A]
-  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtImpl[A]
-  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .ltEqImpl[A]
-  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .gtEqImpl[A]
-  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
-    .eqImpl[A]
+  def <(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltImpl[A]
+  def >(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtImpl[A]
+  def <=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.ltEqImpl[A]
+  def >=(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.gtEqImpl[A]
+  def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean =
+    macro FpFilter.eqImpl[A]
 }
 
 object FpFilterExact {

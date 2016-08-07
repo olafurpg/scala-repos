@@ -10,7 +10,9 @@ import java.net.{ServerSocket, InetSocketAddress, InetAddress}
 import java.util.concurrent.CyclicBarrier
 import org.apache.thrift.protocol.TBinaryProtocol
 import org.apache.thrift.server.TSimpleServer
-import org.apache.thrift.transport.{TFramedTransport, TServerSocket, TTransportFactory}
+import org.apache.thrift.transport.{
+  TFramedTransport, TServerSocket, TTransportFactory
+}
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner

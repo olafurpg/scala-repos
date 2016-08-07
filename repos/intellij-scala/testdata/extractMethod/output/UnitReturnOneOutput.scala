@@ -11,15 +11,12 @@ class UnitReturnOneOutput {
 /*
 class UnitReturnOneOutput {
   def foo(i: Int) {
-
     val x: Int = testMethodName(i) match {
       case Some(result) => result
       case None => return
     }
-
     println(x)
   }
-
   def testMethodName(i: Int): Option[Int] = {
     if (true) return None
     val x = 0

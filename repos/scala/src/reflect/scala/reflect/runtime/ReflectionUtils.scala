@@ -7,7 +7,9 @@ package scala
 package reflect.runtime
 
 import java.lang.{Class => jClass}
-import java.lang.reflect.{Method, InvocationTargetException, UndeclaredThrowableException}
+import java.lang.reflect.{
+  Method, InvocationTargetException, UndeclaredThrowableException
+}
 import scala.reflect.internal.util.AbstractFileClassLoader
 import scala.reflect.io._
 

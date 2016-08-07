@@ -20,7 +20,9 @@ package org.apache.spark.api.python
 import java.io._
 import java.net._
 import java.nio.charset.StandardCharsets
-import java.util.{ArrayList => JArrayList, Collections, List => JList, Map => JMap}
+import java.util.{
+  ArrayList => JArrayList, Collections, List => JList, Map => JMap
+}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -30,7 +32,9 @@ import scala.util.control.NonFatal
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.io.compress.CompressionCodec
 import org.apache.hadoop.mapred.{InputFormat, JobConf, OutputFormat}
-import org.apache.hadoop.mapreduce.{InputFormat => NewInputFormat, OutputFormat => NewOutputFormat}
+import org.apache.hadoop.mapreduce.{
+  InputFormat => NewInputFormat, OutputFormat => NewOutputFormat
+}
 
 import org.apache.spark._
 import org.apache.spark.api.java.{JavaPairRDD, JavaRDD, JavaSparkContext}

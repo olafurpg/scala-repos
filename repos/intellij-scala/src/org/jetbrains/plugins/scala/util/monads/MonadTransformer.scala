@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.util.monads
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypeResult
+}
 
 /**
   * @author ilyas

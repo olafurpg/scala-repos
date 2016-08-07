@@ -1,6 +1,8 @@
 package com.typesafe.slick.testkit.util
 
-import java.io.{PrintWriter, OutputStreamWriter, BufferedWriter, FileOutputStream, FileWriter}
+import java.io.{
+  PrintWriter, OutputStreamWriter, BufferedWriter, FileOutputStream, FileWriter
+}
 
 import slick.basic.BasicProfile
 import slick.jdbc.{JdbcCapabilities, JdbcProfile}

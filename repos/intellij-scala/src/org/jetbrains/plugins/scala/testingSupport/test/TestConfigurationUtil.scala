@@ -3,12 +3,17 @@ package testingSupport.test
 
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.junit.JavaRuntimeConfigurationProducerBase
-import com.intellij.execution.{JavaRunConfigurationExtensionManager, Location, RunManager, RunnerAndConfigurationSettings}
+import com.intellij.execution.{
+  JavaRunConfigurationExtensionManager, Location, RunManager,
+  RunnerAndConfigurationSettings
+}
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScReferencePattern
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScInfixExpr, ScMethodCall, ScParenthesisedExpr, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScInfixExpr, ScMethodCall, ScParenthesisedExpr, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager

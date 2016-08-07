@@ -9,7 +9,9 @@ import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.{AppRepository, GroupManager, GroupRepository}
 import mesosphere.marathon.test.{MarathonActorSupport, Mockito}
 import mesosphere.marathon.{MarathonConf, MarathonSchedulerService}
-import mesosphere.util.{CapConcurrentExecutions, CapConcurrentExecutionsMetrics}
+import mesosphere.util.{
+  CapConcurrentExecutions, CapConcurrentExecutionsMetrics
+}
 
 import scala.concurrent.duration._
 

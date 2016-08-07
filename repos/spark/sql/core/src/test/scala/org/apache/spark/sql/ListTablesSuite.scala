@@ -21,7 +21,9 @@ import org.scalatest.BeforeAndAfter
 
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.test.SharedSQLContext
-import org.apache.spark.sql.types.{BooleanType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{
+  BooleanType, StringType, StructField, StructType
+}
 
 class ListTablesSuite
     extends QueryTest

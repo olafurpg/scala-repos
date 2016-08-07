@@ -3,16 +3,22 @@ package org.jetbrains.plugins.scala.debugger
 import java.util
 
 import com.intellij.debugger.SourcePosition
-import com.intellij.debugger.engine.{DebugProcess, SyntheticTypeComponentProvider}
+import com.intellij.debugger.engine.{
+  DebugProcess, SyntheticTypeComponentProvider
+}
 import com.intellij.debugger.settings.DebuggerSettings
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
-import com.sun.jdi.{AbsentInformationException, Location, Method, ReferenceType}
+import com.sun.jdi.{
+  AbsentInformationException, Location, Method, ReferenceType
+}
 import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil
 import org.jetbrains.plugins.scala.decompiler.DecompilerUtil.Opcodes
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClauses
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScBlockStatement, ScMatchStmt, ScTryStmt}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock, ScBlockStatement, ScMatchStmt, ScTryStmt
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
 
 import scala.collection.JavaConverters._

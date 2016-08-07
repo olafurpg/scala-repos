@@ -422,7 +422,7 @@ trait ProtoUser {
     * Overwrite in order to add custom LocParams. Attention: Not calling super will change the default behavior!
     */
   protected def createUserMenuLocParams: List[LocParam[Unit]] =
-    Template(() => wrapIt(signupFunc.map(_ ()) openOr signup)) :: If(
+    Template(() => wrapIt(signupFunc.map(_()) openOr signup)) :: If(
         notLoggedIn_? _,
         S.?("logout.first")) :: Nil
 
@@ -481,7 +481,7 @@ trait ProtoUser {
     * Overwrite in order to add custom LocParams. Attention: Not calling super will change the default behavior!
     */
   protected def editUserMenuLocParams: List[LocParam[Unit]] =
-    Template(() => wrapIt(editFunc.map(_ ()) openOr edit)) :: testLogginIn :: Nil
+    Template(() => wrapIt(editFunc.map(_()) openOr edit)) :: testLogginIn :: Nil
 
   /**
     * The menu item for changing password (make this "Empty" to disable)
@@ -577,7 +577,7 @@ trait ProtoUser {
     val li = loggedIn_?
     ItemList
       .filter(i => i.display && i.loggedIn == li)
-      .map(i => ( <a href={i.pathStr}>{i.name}</a>))
+      .map(i => (<a href={i.pathStr}>{i.name}</a>))
   }
 
   protected def snarfLastItem: String =
@@ -632,13 +632,13 @@ trait ProtoUser {
     curUser.remove()
     curUserId(Full(who.userIdAsString))
     curUser(Full(who))
-    onLogIn.foreach(_ (who))
+    onLogIn.foreach(_(who))
   }
 
   def logoutCurrentUser = logUserOut()
 
   def logUserOut() {
-    onLogOut.foreach(_ (curUser))
+    onLogOut.foreach(_(curUser))
     curUserId.remove()
     curUser.remove()
     S.session.foreach(_.destroySession())
@@ -676,7 +676,7 @@ trait ProtoUser {
   def currentUser: Box[TheUserType] = curUser.get
 
   def signupXhtml(user: TheUserType) = {
-    ( <form method="post" action={S.uri}><table><tr><td
+    (<form method="post" action={S.uri}><table><tr><td
               colspan="2">{ S.?("sign.up") }</td></tr>
           {localForm(user, false, signupFields)}
           <tr><td>&nbsp;</td><td><input type="submit" /></td></tr>
@@ -684,7 +684,7 @@ trait ProtoUser {
   }
 
   def signupMailBody(user: TheUserType, validationLink: String): Elem = {
-    ( <html>
+    (<html>
         <head>
           <title>{S.?("sign.up.confirmation")}</title>
         </head>
@@ -839,7 +839,7 @@ trait ProtoUser {
   def userNameNotFoundString: String = S.?("email.address.not.found")
 
   def loginXhtml = {
-    ( <form method="post" action={S.uri}><table><tr><td
+    (<form method="post" action={S.uri}><table><tr><td
               colspan="2">{S.?("log.in")}</td></tr>
           <tr><td>{userNameFieldString}</td><td><input type="text" class="email" /></td></tr>
           <tr><td>{S.?("password")}</td><td><input type="password" class="password" /></td></tr>
@@ -923,7 +923,7 @@ trait ProtoUser {
   }
 
   def lostPasswordXhtml = {
-    ( <form method="post" action={S.uri}>
+    (<form method="post" action={S.uri}>
         <table><tr><td
               colspan="2">{S.?("enter.email")}</td></tr>
           <tr><td>{userNameFieldString}</td><td><input type="text" class="email" /></td></tr>
@@ -933,7 +933,7 @@ trait ProtoUser {
   }
 
   def passwordResetMailBody(user: TheUserType, resetLink: String): Elem = {
-    ( <html>
+    (<html>
         <head>
           <title>{S.?("reset.password.confirmation")}</title>
         </head>
@@ -1013,7 +1013,7 @@ trait ProtoUser {
   }
 
   def passwordResetXhtml = {
-    ( <form method="post" action={S.uri}>
+    (<form method="post" action={S.uri}>
         <table><tr><td colspan="2">{S.?("reset.your.password")}</td></tr>
           <tr><td>{S.?("enter.your.new.password")}</td><td><input type="password" /></td></tr>
           <tr><td>{S.?("repeat.your.new.password")}</td><td><input type="password" /></td></tr>
@@ -1056,7 +1056,7 @@ trait ProtoUser {
   }
 
   def changePasswordXhtml = {
-    ( <form method="post" action={S.uri}>
+    (<form method="post" action={S.uri}>
         <table><tr><td colspan="2">{S.?("change.password")}</td></tr>
           <tr><td>{S.?("old.password")}</td><td><input type="password" class="old-password" /></td></tr>
           <tr><td>{S.?("new.password")}</td><td><input type="password" class="new-password" /></td></tr>
@@ -1106,7 +1106,7 @@ trait ProtoUser {
   }
 
   def editXhtml(user: TheUserType) = {
-    ( <form method="post" action={S.uri}>
+    (<form method="post" action={S.uri}>
         <table><tr><td colspan="2">{S.?("edit")}</td></tr>
           {localForm(user, true, editFields)}
           <tr><td>&nbsp;</td><td><input type="submit" /></td></tr>

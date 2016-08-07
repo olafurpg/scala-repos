@@ -169,7 +169,7 @@ class WatermarkPool[Req, Rep](factory: ServiceFactory[Req, Rep],
     queue.clear()
 
     // Kill the existing waiters.
-    waiters.asScala foreach { _ () = Throw(new ServiceClosedException) }
+    waiters.asScala foreach { _() = Throw(new ServiceClosedException) }
     waiters.clear()
 
     // Close the underlying factory.

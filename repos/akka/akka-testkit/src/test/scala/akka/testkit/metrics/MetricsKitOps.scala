@@ -13,8 +13,7 @@ import com.codahale.metrics.jvm.MemoryUsageGaugeSet
   *
   * Extracted to give easy overview of user-API detached from MetricsKit internals.
   */
-private[akka] trait MetricsKitOps extends MetricKeyDSL {
-  this: MetricsKit ⇒
+private[akka] trait MetricsKitOps extends MetricKeyDSL { this: MetricsKit ⇒
 
   type MetricKey = MetricKeyDSL#MetricKey
 

@@ -114,7 +114,7 @@ object ParseKey extends Properties("Key parser test") {
   def parse(structure: Structure, s: String)(
       f: Either[String, ScopedKey[_]] => Prop): Prop = {
     val parser = makeParser(structure)
-    val parsed = DefaultParsers.result(parser, s).left.map(_ ().toString)
+    val parsed = DefaultParsers.result(parser, s).left.map(_().toString)
     val showParsed = parsed.right.map(displayFull)
     ("Key string: '" + s + "'") |: ("Parsed: " + showParsed) |:
       ("Structure: " + structure) |: f(parsed)

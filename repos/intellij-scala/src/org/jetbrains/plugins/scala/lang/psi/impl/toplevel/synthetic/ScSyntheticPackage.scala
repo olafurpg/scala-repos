@@ -15,7 +15,9 @@ import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackageContainer
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTypeDefinition, ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTypeDefinition, ScClass, ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 import org.jetbrains.plugins.scala.lang.resolve.ResolveTargets._
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor

@@ -29,7 +29,9 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
 import org.apache.spark.sql.catalyst.plans.physical._
 import org.apache.spark.sql.types.IntegerType
-import org.apache.spark.util.collection.unsafe.sort.{UnsafeExternalSorter, UnsafeSorterIterator}
+import org.apache.spark.util.collection.unsafe.sort.{
+  UnsafeExternalSorter, UnsafeSorterIterator
+}
 
 /**
   * This class calculates and outputs (windowed) aggregates over the rows in a single (sorted)
@@ -236,8 +238,8 @@ case class Window(windowExpression: Seq[NamedExpression],
                                          subexpressionEliminationEnabled),
                   offset)
 
-            // Growing Frame.
-            case ("AGGREGATE", frameType, None, Some(high)) =>
+          // Growing Frame.
+          case ("AGGREGATE", frameType, None, Some(high)) =>
             target: MutableRow =>
               {
                 new UnboundedPrecedingWindowFunctionFrame(
@@ -246,8 +248,8 @@ case class Window(windowExpression: Seq[NamedExpression],
                     createBoundOrdering(frameType, high))
               }
 
-            // Shrinking Frame.
-            case ("AGGREGATE", frameType, Some(low), None) =>
+          // Shrinking Frame.
+          case ("AGGREGATE", frameType, Some(low), None) =>
             target: MutableRow =>
               {
                 new UnboundedFollowingWindowFunctionFrame(
@@ -256,8 +258,8 @@ case class Window(windowExpression: Seq[NamedExpression],
                     createBoundOrdering(frameType, low))
               }
 
-            // Moving Frame.
-            case ("AGGREGATE", frameType, Some(low), Some(high)) =>
+          // Moving Frame.
+          case ("AGGREGATE", frameType, Some(low), Some(high)) =>
             target: MutableRow =>
               {
                 new SlidingWindowFunctionFrame(
@@ -267,8 +269,8 @@ case class Window(windowExpression: Seq[NamedExpression],
                     createBoundOrdering(frameType, high))
               }
 
-            // Entire Partition Frame.
-            case ("AGGREGATE", frameType, None, None) =>
+          // Entire Partition Frame.
+          case ("AGGREGATE", frameType, None, None) =>
             target: MutableRow =>
               {
                 new UnboundedWindowFunctionFrame(target, processor)
@@ -341,7 +343,7 @@ case class Window(windowExpression: Seq[NamedExpression],
         var rowBuffer: RowBuffer = null
         val windowFunctionResult =
           new SpecificMutableRow(expressions.map(_.dataType))
-        val frames = factories.map(_ (windowFunctionResult))
+        val frames = factories.map(_(windowFunctionResult))
         val numFrames = frames.length
         private[this] def fetchNextPartition() {
           // Collect all the rows in the current partition.

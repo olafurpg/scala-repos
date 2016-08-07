@@ -1,12 +1,9 @@
 /*
  Copyright 2013 Twitter, Inc.
-
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +14,9 @@
 package com.twitter.summingbird.scalding.batch
 
 import com.twitter.algebird.monad.{StateWithError, Reader}
-import com.twitter.algebird.{Interval, Intersection, InclusiveLower, ExclusiveUpper, InclusiveUpper}
+import com.twitter.algebird.{
+  Interval, Intersection, InclusiveLower, ExclusiveUpper, InclusiveUpper
+}
 import com.twitter.summingbird.batch.{BatchID, Batcher, Timestamp}
 import com.twitter.summingbird.scalding._
 import com.twitter.scalding.Mode
@@ -103,8 +102,8 @@ trait BatchedSink[T] extends Sink[T] {
         val batches =
           aBatches ++
             (optBuilt.map { pair =>
-                  BatchID.toIterable(pair._1)
-                }.getOrElse(Iterable.empty))
+              BatchID.toIterable(pair._1)
+            }.getOrElse(Iterable.empty))
 
         if (flows.isEmpty)
           Left(

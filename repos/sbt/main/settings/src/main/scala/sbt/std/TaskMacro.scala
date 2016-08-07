@@ -4,7 +4,9 @@ package std
 import Def.{Initialize, Setting}
 import sbt.internal.util.Types.{const, idFun, Id}
 import TaskExtra.allM
-import sbt.internal.util.appmacro.{ContextUtil, Convert, Converted, Instance, MixedBuilder, MonadInstance}
+import sbt.internal.util.appmacro.{
+  ContextUtil, Convert, Converted, Instance, MixedBuilder, MonadInstance
+}
 import Instance.Transform
 import sbt.internal.util.complete.{DefaultParsers, Parser}
 import sbt.internal.util.{AList, LinePosition, NoPosition, SourcePosition}
@@ -242,7 +244,9 @@ object TaskMacro {
 
   private[this] def appendMacroImpl(c: Context)(init: c.Tree, append: c.Tree)(
       newName: String): c.Tree = {
-    import c.universe.{Apply, ApplyTag, newTermName, Select, SelectTag, TypeApply, TypeApplyTag}
+    import c.universe.{
+      Apply, ApplyTag, newTermName, Select, SelectTag, TypeApply, TypeApplyTag
+    }
     c.macroApplication match {
       case Apply(Apply(TypeApply(Select(preT, nmeT), targs), _), a) =>
         Apply(Apply(TypeApply(Select(preT, newTermName(newName).encodedName),
@@ -254,7 +258,9 @@ object TaskMacro {
   }
   private[this] def removeMacroImpl(c: Context)(init: c.Tree, remove: c.Tree)(
       newName: String): c.Tree = {
-    import c.universe.{Apply, ApplyTag, newTermName, Select, SelectTag, TypeApply, TypeApplyTag}
+    import c.universe.{
+      Apply, ApplyTag, newTermName, Select, SelectTag, TypeApply, TypeApplyTag
+    }
     c.macroApplication match {
       case Apply(Apply(TypeApply(Select(preT, nmeT), targs), _), r) =>
         Apply(Apply(TypeApply(Select(preT, newTermName(newName).encodedName),

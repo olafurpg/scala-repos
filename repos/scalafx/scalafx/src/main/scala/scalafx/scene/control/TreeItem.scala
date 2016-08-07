@@ -34,7 +34,10 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty,
+  ReadOnlyObjectProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 import scalafx.event.{Event, EventHandlerDelegate, EventType}
@@ -189,7 +192,7 @@ object TreeItem {
   /** The general EventType used when the TreeItem receives a modification
     * that results in the number of children being visible changes.
     *
-    * @since 8.0  
+    * @since 8.0
     */
   def expandedItemCountChangeEvent =
     jfxsc.TreeItem.expandedItemCountChangeEvent

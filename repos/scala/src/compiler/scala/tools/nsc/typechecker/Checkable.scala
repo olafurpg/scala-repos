@@ -193,8 +193,8 @@ trait Checkable { self: Analyzer =>
             val derived =
               P map
                 (tp =>
-                      if (possibles(tp) && !(tp =:= targ)) WildcardType
-                      else tp)
+                   if (possibles(tp) && !(tp =:= targ)) WildcardType
+                   else tp)
             !(XR <:< derived)
           }
         opt getOrElse NoType
@@ -226,8 +226,8 @@ trait Checkable { self: Analyzer =>
     def allChildrenAreIrreconcilable(sym1: Symbol, sym2: Symbol) =
       (sym1.sealedChildren.toList forall
             (c1 =>
-                  sym2.sealedChildren.toList forall
-                    (c2 => areIrreconcilableAsParents(c1, c2))))
+               sym2.sealedChildren.toList forall
+                 (c2 => areIrreconcilableAsParents(c1, c2))))
 
     /** Is it impossible for the given symbols to be parents in the same class?
       *  This means given A and B, can there be an instance of A with B? This is the
@@ -256,7 +256,7 @@ trait Checkable { self: Analyzer =>
           sym.initialize.isEffectivelyFinalOrNotOverridden ||
             (settings.future &&
                   isTupleSymbol(sym) // SI-7294 step into the future and treat TupleN as final.
-              ))
+                ))
 
     def isNeverSubClass(sym1: Symbol, sym2: Symbol) =
       areIrreconcilableAsParents(sym1, sym2)
@@ -300,12 +300,12 @@ trait Checkable { self: Analyzer =>
 
     def isCheckable(P0: Type): Boolean =
       (uncheckedOk(P0) || (P0.widen match {
-                case TypeRef(_, NothingClass | NullClass | AnyValClass, _) =>
-                  false
-                case RefinedType(_, decls) if !decls.isEmpty => false
-                case RefinedType(parents, _) => parents forall isCheckable
-                case p => new CheckabilityChecker(AnyTpe, p) isCheckable
-              }))
+            case TypeRef(_, NothingClass | NullClass | AnyValClass, _) =>
+              false
+            case RefinedType(_, decls) if !decls.isEmpty => false
+            case RefinedType(parents, _) => parents forall isCheckable
+            case p => new CheckabilityChecker(AnyTpe, p) isCheckable
+          }))
 
     /** TODO: much better error positions.
       *  Kind of stuck right now because they just pass us the one tree.

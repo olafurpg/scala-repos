@@ -5,7 +5,9 @@ package redundantReturnInspection
 import com.intellij.codeInspection._
 import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReturnStmt
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFunctionDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScFunctionDefinition
+}
 
 class RemoveRedundantReturnInspection
     extends AbstractInspection("ScalaRedundantReturn", "Redundant Return") {

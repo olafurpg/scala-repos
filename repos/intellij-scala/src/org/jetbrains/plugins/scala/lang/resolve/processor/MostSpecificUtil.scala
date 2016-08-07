@@ -12,12 +12,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScReferencePattern
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterClause
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.implicits.ScImplicitlyConvertible.ImplicitResolveResult
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, ScMethodType, ScTypePolymorphicType, TypeParameter}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  Parameter, ScMethodType, ScTypePolymorphicType, TypeParameter
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiUtil, types}
 

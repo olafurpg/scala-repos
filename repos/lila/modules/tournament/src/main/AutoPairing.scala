@@ -5,7 +5,9 @@ import scala.concurrent.duration._
 import akka.actor.{ActorRef, ActorSystem, ActorSelection}
 
 import chess.Color
-import lila.game.{Game, Player => GamePlayer, GameRepo, Pov, PovRef, Source, PerfPicker}
+import lila.game.{
+  Game, Player => GamePlayer, GameRepo, Pov, PovRef, Source, PerfPicker
+}
 import lila.hub.actorApi.map.Tell
 import lila.round.actorApi.round.NoStartColor
 import lila.user.{User, UserRepo}

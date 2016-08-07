@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -26,12 +26,16 @@ import kafka.security.auth._
 import kafka.server._
 import kafka.utils._
 
-import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecord, ConsumerConfig}
+import org.apache.kafka.clients.consumer.{
+  Consumer, ConsumerRecord, ConsumerConfig
+}
 import org.apache.kafka.clients.producer.{ProducerRecord, ProducerConfig}
 import org.apache.kafka.common.security.auth.KafkaPrincipal
 import org.apache.kafka.common.{TopicPartition}
 import org.apache.kafka.common.protocol.SecurityProtocol
-import org.apache.kafka.common.errors.{GroupAuthorizationException, TopicAuthorizationException}
+import org.apache.kafka.common.errors.{
+  GroupAuthorizationException, TopicAuthorizationException
+}
 import org.junit.Assert._
 import org.junit.{Test, After, Before}
 

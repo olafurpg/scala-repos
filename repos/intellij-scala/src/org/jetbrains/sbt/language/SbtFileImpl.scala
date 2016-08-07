@@ -8,7 +8,9 @@ import com.intellij.psi.search.searches.ClassInheritorsSearch
 import com.intellij.psi.{FileViewProvider, PsiClass, PsiElement, ResolveState}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScDeclarationSequenceHolder
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaFileImpl, ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaFileImpl, ScalaPsiElementFactory, ScalaPsiManager
+}
 import org.jetbrains.sbt.project.module.SbtModule
 
 import scala.collection.JavaConverters._

@@ -1,6 +1,8 @@
 package com.twitter.finagle.loadbalancer
 
-import com.twitter.finagle.{ClientConnection, Service, ServiceFactory, ServiceFactoryProxy, ServiceProxy}
+import com.twitter.finagle.{
+  ClientConnection, Service, ServiceFactory, ServiceFactoryProxy, ServiceProxy
+}
 import com.twitter.finagle.service.FailingFactory
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.util.Rng

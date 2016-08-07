@@ -3,7 +3,9 @@ package mesosphere.marathon.api
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.core.Response
 
-import mesosphere.marathon.{UnknownGroupException, UnknownAppException, AccessDeniedException}
+import mesosphere.marathon.{
+  UnknownGroupException, UnknownAppException, AccessDeniedException
+}
 import mesosphere.marathon.plugin.auth._
 import mesosphere.marathon.plugin.http.HttpResponse
 

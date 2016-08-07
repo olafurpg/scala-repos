@@ -1,6 +1,9 @@
 package com.twitter.util
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream,
+  ObjectOutputStream
+}
 import java.util.{Locale, TimeZone}
 import java.util.concurrent.TimeUnit
 

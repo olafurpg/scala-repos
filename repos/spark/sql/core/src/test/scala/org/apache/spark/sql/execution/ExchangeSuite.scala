@@ -19,8 +19,12 @@ package org.apache.spark.sql.execution
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.expressions.{Alias, Literal}
-import org.apache.spark.sql.catalyst.plans.physical.{HashPartitioning, IdentityBroadcastMode, SinglePartition}
-import org.apache.spark.sql.execution.exchange.{BroadcastExchange, ReusedExchange, ShuffleExchange}
+import org.apache.spark.sql.catalyst.plans.physical.{
+  HashPartitioning, IdentityBroadcastMode, SinglePartition
+}
+import org.apache.spark.sql.execution.exchange.{
+  BroadcastExchange, ReusedExchange, ShuffleExchange
+}
 import org.apache.spark.sql.execution.joins.HashedRelationBroadcastMode
 import org.apache.spark.sql.test.SharedSQLContext
 

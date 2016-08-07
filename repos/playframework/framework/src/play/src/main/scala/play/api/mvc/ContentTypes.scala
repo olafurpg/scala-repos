@@ -17,7 +17,9 @@ import play.api.libs.Files.TemporaryFile
 import MultipartFormData._
 import java.util.Locale
 import scala.util.control.NonFatal
-import play.api.http.{LazyHttpErrorHandler, ParserConfiguration, HttpConfiguration, HttpVerbs}
+import play.api.http.{
+  LazyHttpErrorHandler, ParserConfiguration, HttpConfiguration, HttpVerbs
+}
 import play.utils.PlayIO
 import play.api.http.Status._
 import akka.stream._

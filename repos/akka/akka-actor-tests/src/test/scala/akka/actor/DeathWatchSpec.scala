@@ -41,8 +41,7 @@ object DeathWatchSpec {
       extends NoSerializationVerificationNeeded
 }
 
-trait DeathWatchSpec {
-  this: AkkaSpec with ImplicitSender with DefaultTimeout ⇒
+trait DeathWatchSpec { this: AkkaSpec with ImplicitSender with DefaultTimeout ⇒
 
   import DeathWatchSpec._
 

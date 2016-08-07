@@ -7,7 +7,6 @@ abstract class C[@specialized T](_f: T) {
   class Inner[@specialized B] {
     def foo(x: T): T = x
   }
-
   new Inner
  */
 }

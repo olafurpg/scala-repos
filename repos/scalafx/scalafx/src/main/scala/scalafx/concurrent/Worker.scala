@@ -31,7 +31,9 @@ import javafx.{concurrent => jfxc}
 import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.beans.property._
-import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
+import scalafx.delegate.{
+  SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion
+}
 
 object Worker {
   implicit def sfxWorker2jfx[T](w: Worker[T]): jfxc.Worker[T] =
@@ -40,7 +42,7 @@ object Worker {
   object State extends SFXEnumDelegateCompanion[jfxc.Worker.State, State] {
 
     /**
-      * Indicates that this Worker has been cancelled via the Worker.cancel() method. 
+      * Indicates that this Worker has been cancelled via the Worker.cancel() method.
       */
     val Cancelled = new State(jfxc.Worker.State.CANCELLED)
     @deprecated("Use Cancelled; CANCELLED will be removed in a future release",
@@ -48,7 +50,7 @@ object Worker {
     val CANCELLED = Cancelled
 
     /**
-      * Indicates that this Worker has failed, usually due to some unexpected condition having occurred. 
+      * Indicates that this Worker has failed, usually due to some unexpected condition having occurred.
       */
     val Failed = new State(jfxc.Worker.State.FAILED)
     @deprecated("Use Failed; FAILED will be removed in a future release",
@@ -56,7 +58,7 @@ object Worker {
     val FAILED = Failed
 
     /**
-      * Indicates that the Worker has not yet been executed and is ready to be executed, or that it has been reinitialized. 
+      * Indicates that the Worker has not yet been executed and is ready to be executed, or that it has been reinitialized.
       */
     val Ready = new State(jfxc.Worker.State.READY)
     @deprecated("Use Ready; READY will be removed in a future release",
@@ -64,7 +66,7 @@ object Worker {
     val READY = Ready
 
     /**
-      * Indicates that this Worker is running. 
+      * Indicates that this Worker is running.
       */
     val Running = new State(jfxc.Worker.State.RUNNING)
     @deprecated("Use Running; RUNNING will be removed in a future release",
@@ -72,7 +74,7 @@ object Worker {
     val RUNNING = Running
 
     /**
-      * Indicates that the Worker has been scheduled for execution, but that it is not currently running. 
+      * Indicates that the Worker has been scheduled for execution, but that it is not currently running.
       */
     val Scheduled = new State(jfxc.Worker.State.SCHEDULED)
     @deprecated("Use Scheduled; SCHEDULED will be removed in a future release",
@@ -80,8 +82,8 @@ object Worker {
     val SCHEDULED = Scheduled
 
     /**
-      * Indicates that this Worker has completed successfully, and that there is a valid result ready to be read from 
-      * the value property. 
+      * Indicates that this Worker has completed successfully, and that there is a valid result ready to be read from
+      * the value property.
       */
     val Succeeded = new State(jfxc.Worker.State.SUCCEEDED)
     @deprecated("Use Succeeded; SUCCEEDED will be removed in a future release",

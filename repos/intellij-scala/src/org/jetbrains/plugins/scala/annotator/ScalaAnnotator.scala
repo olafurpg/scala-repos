@@ -17,37 +17,59 @@ import org.jetbrains.plugins.scala.annotator.intention._
 import org.jetbrains.plugins.scala.annotator.modifiers.ModifierChecker
 import org.jetbrains.plugins.scala.annotator.quickfix._
 import org.jetbrains.plugins.scala.annotator.template._
-import org.jetbrains.plugins.scala.codeInspection.caseClassParamInspection.{RemoveValFromEnumeratorIntentionAction, RemoveValFromGeneratorIntentionAction}
+import org.jetbrains.plugins.scala.codeInspection.caseClassParamInspection.{
+  RemoveValFromEnumeratorIntentionAction, RemoveValFromGeneratorIntentionAction
+}
 import org.jetbrains.plugins.scala.components.HighlightingAdvisor
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.highlighter.{AnnotatorHighlighter, DefaultHighlighter}
+import org.jetbrains.plugins.scala.highlighter.{
+  AnnotatorHighlighter, DefaultHighlighter
+}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base._
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScConstructorPattern, ScInfixPattern, ScPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScConstructorPattern, ScInfixPattern, ScPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression.ExpressionTypeResult
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter, ScParameters, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter, ScParameter, ScParameters, ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{ImportUsed, ReadValueUsed, ValueUsed, WriteValueUsed}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{ScImportExpr, ScImportSelector}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.{
+  ImportUsed, ReadValueUsed, ValueUsed, WriteValueUsed
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{
+  ScImportExpr, ScImportSelector
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.{ScalaElementVisitor, ScalaFile}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaElementVisitor, ScalaFile
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScInterpolatedStringPartReference
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.light.scala.isLightScNamedElement
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext, TypingContextOwner}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext, TypingContextOwner
+}
 import org.jetbrains.plugins.scala.lang.resolve._
 import org.jetbrains.plugins.scala.lang.resolve.processor.MethodResolveProcessor
 import org.jetbrains.plugins.scala.lang.scaladoc.parser.parsing.MyScaladocParsing
-import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocResolvableCodeReference, ScDocTag}
+import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{
+  ScDocResolvableCodeReference, ScDocTag
+}
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.impl.ScDocResolvableCodeReferenceImpl
-import org.jetbrains.plugins.scala.project.{ProjectPsiElementExt, ScalaLanguageLevel}
+import org.jetbrains.plugins.scala.project.{
+  ProjectPsiElementExt, ScalaLanguageLevel
+}
 import org.jetbrains.plugins.scala.util.ScalaUtils
 
 import scala.collection.mutable.ArrayBuffer

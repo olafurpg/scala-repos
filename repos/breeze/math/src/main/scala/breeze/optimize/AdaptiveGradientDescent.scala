@@ -2,7 +2,9 @@ package breeze.optimize
 
 import breeze.linalg._
 import breeze.linalg.support.{CanMapValues, CanZipMapValues, CanTraverseValues}
-import breeze.math.{MutableFiniteCoordinateField, MutableVectorRing, MutableVectorField}
+import breeze.math.{
+  MutableFiniteCoordinateField, MutableVectorRing, MutableVectorField
+}
 import breeze.numerics._
 import breeze.stats.distributions.{Rand, RandBasis}
 

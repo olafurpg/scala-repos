@@ -8,8 +8,7 @@ import spire.syntax.cfor._
 import scala.reflect.ClassTag
 import breeze.linalg._
 
-trait VectorBuilderOps {
-  this: VectorBuilder.type =>
+trait VectorBuilderOps { this: VectorBuilder.type =>
   @expand
   @expand.valify
   implicit def canOpInto_V_S[@expand.args(OpMulScalar, OpDiv) Op,

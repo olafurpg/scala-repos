@@ -10,7 +10,9 @@ import java.security.cert.CertPathValidatorException
 import javax.net.ssl._
 
 import org.asynchttpclient.netty.ssl.JsseSslEngineFactory
-import org.asynchttpclient.{AsyncHttpClientConfig, DefaultAsyncHttpClientConfig}
+import org.asynchttpclient.{
+  AsyncHttpClientConfig, DefaultAsyncHttpClientConfig
+}
 import org.slf4j.LoggerFactory
 import play.api.libs.ws.WSClientConfig
 import play.api.libs.ws.ssl._
@@ -147,12 +149,12 @@ class NingAsyncHttpClientConfigBuilder(
     builder.setMaxRequestRetry(ningConfig.maxRequestRetry)
     builder.setDisableUrlEncodingForBoundRequests(
         ningConfig.disableUrlEncoding)
-    // forcing shutdown of the AHC event loop because otherwise the test suite fails with a 
-    // OutOfMemoryException: cannot create new native thread. This is because when executing 
-    // tests in parallel there can be many threads pool that are left around because AHC is 
+    // forcing shutdown of the AHC event loop because otherwise the test suite fails with a
+    // OutOfMemoryException: cannot create new native thread. This is because when executing
+    // tests in parallel there can be many threads pool that are left around because AHC is
     // shutting them down gracefully.
-    // The proper solution is to make these parameters configurable, so that they can be set 
-    // to 0 when running tests, and keep sensible defaults otherwise. AHC defaults are 
+    // The proper solution is to make these parameters configurable, so that they can be set
+    // to 0 when running tests, and keep sensible defaults otherwise. AHC defaults are
     // shutdownQuiet=2000 (milliseconds) and shutdownTimeout=15000 (milliseconds).
     builder.setShutdownQuietPeriod(0)
     builder.setShutdownTimeout(0)

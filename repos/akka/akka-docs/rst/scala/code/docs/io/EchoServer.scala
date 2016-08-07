@@ -9,7 +9,10 @@ import scala.concurrent.duration.DurationInt
 
 import com.typesafe.config.ConfigFactory
 
-import akka.actor.{Actor, ActorDSL, ActorLogging, ActorRef, ActorSystem, Props, SupervisorStrategy}
+import akka.actor.{
+  Actor, ActorDSL, ActorLogging, ActorRef, ActorSystem, Props,
+  SupervisorStrategy
+}
 import akka.actor.ActorDSL.inbox
 import akka.io.{IO, Tcp}
 import akka.util.ByteString

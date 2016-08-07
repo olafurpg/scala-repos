@@ -24,7 +24,6 @@ class Test {
 abstract class Foo[@specialized T] {
   def foo(x: T): T
   def foo$Int(x: Int): Int
-
   abstract class Bar[@specialized U] {
     def bar(x: U): T
     def bar$Int(x: Int): T
@@ -34,11 +33,9 @@ abstract class Foo[@specialized T] {
     def bar$Int(x: Int): T
   }
 }
-
 abstract class Foo$Int extends Foo[Int] {
   def foo(x: Int): Int = foo$Int(x)
   def foo$Int(x: Int): Int
-
   abstract class Bar[@specialized U] {
     def bar(x: U): Int
     def bar$Int(x: Int): Int

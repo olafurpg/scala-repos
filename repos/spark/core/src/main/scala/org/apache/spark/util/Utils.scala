@@ -52,7 +52,9 @@ import org.apache.spark._
 import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.internal.Logging
 import org.apache.spark.network.util.JavaUtils
-import org.apache.spark.serializer.{DeserializationStream, SerializationStream, SerializerInstance}
+import org.apache.spark.serializer.{
+  DeserializationStream, SerializationStream, SerializerInstance
+}
 
 /** CallSite represents a place in user code. It can have a short and a long form. */
 private[spark] case class CallSite(shortForm: String, longForm: String)
@@ -1478,9 +1480,7 @@ private[spark] object Utils extends Logging {
                                       ____________
        range 1:                      |            |
                                      |   case A   |
-
        files:   |==== file 1 ====|====== file 2 ======|===== file 3 =====|
-
                      |   case B  .       case C       .    case D    |
        range 2:      |___________.____________________.______________|
        */

@@ -14,8 +14,12 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembersInjector
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypePresentation, Unit}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScType, ScTypePresentation, Unit
+}
 import org.jetbrains.plugins.scala.util.TestUtils
 
 /**
@@ -119,9 +123,9 @@ abstract class TypeInferenceTestBase
         }
       case Failure(msg, elem) =>
         assert(assertion = false, msg + " :: " + (elem match {
-              case Some(x) => x.getText
-              case None => "empty element"
-            }))
+          case Some(x) => x.getText
+          case None => "empty element"
+        }))
     }
   }
 }

@@ -104,11 +104,8 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
         /* Implementation of the cache is as follows for method "def xyz(a: A, b: B)"
              (SoftReference so that it does not interfere with classloader garbage collection,
              see ticket #2365 for details):
-
             var reflParams$Cache: Array[Class[_]] = Array[JClass](classOf[A], classOf[B])
-
             var reflPoly$Cache: SoftReference[scala.runtime.MethodCache] = new SoftReference(new EmptyMethodCache())
-
             def reflMethod$Method(forReceiver: JClass[_]): JMethod = {
               var methodCache: StructuralCallSite = indy[StructuralCallSite.bootstrap, "(LA;LB;)Ljava/lang/Object;]
               if (methodCache eq null) {
@@ -124,7 +121,6 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
                 return method
               }
             }
-
             invokedynamic is used rather than a static field for the cache to support emitting bodies of methods
             in Java 8 interfaces, which don't support private static fields.
          */

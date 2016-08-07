@@ -4,7 +4,9 @@
 package akka.contrib.circuitbreaker.sample
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import akka.contrib.circuitbreaker.CircuitBreakerProxy.{CircuitBreakerPropsBuilder, CircuitOpenFailure}
+import akka.contrib.circuitbreaker.CircuitBreakerProxy.{
+  CircuitBreakerPropsBuilder, CircuitOpenFailure
+}
 import akka.contrib.circuitbreaker.sample.CircuitBreaker.AskFor
 import akka.util.Timeout
 

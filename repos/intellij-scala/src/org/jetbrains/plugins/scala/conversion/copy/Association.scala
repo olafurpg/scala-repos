@@ -4,7 +4,9 @@ package conversion.copy
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.conversion.ast.IntermediateNode
-import org.jetbrains.plugins.scala.lang.dependency.{Dependency, DependencyKind, Path}
+import org.jetbrains.plugins.scala.lang.dependency.{
+  Dependency, DependencyKind, Path
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 
 /**

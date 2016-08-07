@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -219,8 +219,7 @@ trait JDBCPlatformSpecs
     extends ParseEvalStackSpecs[Future]
     with JDBCColumnarTableModule
     with Logging
-    with StringIdMemoryDatasetConsumer[Future] {
-  self =>
+    with StringIdMemoryDatasetConsumer[Future] { self =>
 
   class YggConfig
       extends ParseEvalStackSpecConfig
@@ -311,19 +310,12 @@ trait JDBCPlatformSpecs
 // These are disabled for now because getting SQL tables to hold our JSON datasets
 // is too onerous at this point, and won't show us anything that the NIHDB and Mongo
 // specs don't already
-
 class JDBCBasicValidationSpecs extends BasicValidationSpecs with JDBCPlatformSpecs
-
 class JDBCHelloQuirrelSpecs extends HelloQuirrelSpecs with JDBCPlatformSpecs
-
 class JDBCLogisticRegressionSpecs extends LogisticRegressionSpecs with JDBCPlatformSpecs
-
 class JDBCMiscStackSpecs extends MiscStackSpecs with JDBCPlatformSpecs
-
 class JDBCRankSpecs extends RankSpecs with JDBCPlatformSpecs
-
 class JDBCRenderStackSpecs extends RenderStackSpecs with JDBCPlatformSpecs
-
 class JDBCUndefinedLiteralSpecs extends UndefinedLiteralSpecs with JDBCPlatformSpecs
  */
 

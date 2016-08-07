@@ -12,15 +12,10 @@ abstract class GenericParamInput[T] {
 /*
 abstract class GenericParamInput[T] {
   val x: T
-
   def foo {
-
     val y = x
-
     testMethodName(y)
-
   }
-
   def testMethodName(y: T): Unit = {
     println(y)
   }

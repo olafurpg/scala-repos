@@ -17,8 +17,12 @@ import akka.stream._
 import akka.stream.scaladsl._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers
-import akka.http.scaladsl.model.{IllegalResponseException, HttpRequest, HttpResponse, ResponseEntity}
-import akka.http.impl.engine.rendering.{RequestRenderingContext, HttpRequestRendererFactory}
+import akka.http.scaladsl.model.{
+  IllegalResponseException, HttpRequest, HttpResponse, ResponseEntity
+}
+import akka.http.impl.engine.rendering.{
+  RequestRenderingContext, HttpRequestRendererFactory
+}
 import akka.http.impl.engine.parsing._
 import akka.http.impl.util._
 import akka.stream.stage.GraphStage
@@ -35,7 +39,6 @@ private[http] object OutgoingConnectionBlueprint {
   /*
     Stream Setup
     ============
-
     requestIn                                            +----------+
     +-----------------------------------------------+--->|  Termi-  |   requestRendering
                                                     |    |  nation  +---------------------> |

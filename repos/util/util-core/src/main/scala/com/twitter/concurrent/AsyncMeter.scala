@@ -2,7 +2,9 @@ package com.twitter.concurrent
 
 import com.twitter.conversions.time._
 import com.twitter.util._
-import java.util.concurrent.{ArrayBlockingQueue, CancellationException, RejectedExecutionException}
+import java.util.concurrent.{
+  ArrayBlockingQueue, CancellationException, RejectedExecutionException
+}
 import scala.annotation.tailrec
 
 // implicitly a rate of 1 token / `interval`

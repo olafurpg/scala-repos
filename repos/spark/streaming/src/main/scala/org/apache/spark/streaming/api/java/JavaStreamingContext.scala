@@ -30,7 +30,9 @@ import org.apache.hadoop.mapreduce.{InputFormat => NewInputFormat}
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.api.java.{JavaPairRDD, JavaRDD, JavaSparkContext}
-import org.apache.spark.api.java.function.{Function => JFunction, Function2 => JFunction2}
+import org.apache.spark.api.java.function.{
+  Function => JFunction, Function2 => JFunction2
+}
 import org.apache.spark.api.java.function.{Function0 => JFunction0}
 import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.rdd.RDD

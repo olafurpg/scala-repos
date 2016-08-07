@@ -7,7 +7,9 @@ package expressions
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.patterns.CaseClauses
-import org.jetbrains.plugins.scala.lang.parser.util.{ParserPatcher, ParserUtils}
+import org.jetbrains.plugins.scala.lang.parser.util.{
+  ParserPatcher, ParserUtils
+}
 
 /**
   * @author Alexander Podkhalyuzin
@@ -20,7 +22,7 @@ import org.jetbrains.plugins.scala.lang.parser.util.{ParserPatcher, ParserUtils}
  *         | 'do' Expr [semi] 'while' '(' Expr ')'
  *         | 'for' ('(' Enumerators ')' | '{' Enumerators '}') {nl} ['yield'] Expr
  *         | 'throw' Expr
- * 
+ *
  *         | implicit Id => Expr  # Not in Scala Specification yet!
  *
  *         | 'return' [Expr]

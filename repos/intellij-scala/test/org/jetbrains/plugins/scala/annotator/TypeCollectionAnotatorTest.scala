@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala
 package annotator
 
-import org.jetbrains.plugins.scala.base.{TestScalaProjectSettings, ScalaLightPlatformCodeInsightTestCaseAdapter}
+import org.jetbrains.plugins.scala.base.{
+  TestScalaProjectSettings, ScalaLightPlatformCodeInsightTestCaseAdapter
+}
 import org.jetbrains.plugins.scala.highlighter.AnnotatorHighlighter
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement

@@ -1,5 +1,4 @@
 /*package test
-
 object B
 {
 }*/

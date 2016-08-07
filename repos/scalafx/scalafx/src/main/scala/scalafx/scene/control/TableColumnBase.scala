@@ -33,7 +33,10 @@ import javafx.{scene => jfxs}
 import scala.language.implicitConversions
 import scala.math.Ordering
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty,
+  ReadOnlyObjectProperty, StringProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.css.Styleable
 import scalafx.delegate.SFXDelegate

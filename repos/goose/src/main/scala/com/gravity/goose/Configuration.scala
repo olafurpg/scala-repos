@@ -21,7 +21,10 @@ import network.{HtmlFetcher, AbstractHtmlFetcher}
 import org.jsoup.nodes.Element
 import java.util.Date
 import scala.beans.BeanProperty
-import com.gravity.goose.extractors.{StandardContentExtractor, ContentExtractor, AdditionalDataExtractor, PublishDateExtractor}
+import com.gravity.goose.extractors.{
+  StandardContentExtractor, ContentExtractor, AdditionalDataExtractor,
+  PublishDateExtractor
+}
 
 /**
   * Created by Jim Plush

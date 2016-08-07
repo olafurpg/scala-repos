@@ -17,7 +17,9 @@
 
 package org.apache.spark.rpc.netty
 
-import java.util.concurrent.{ConcurrentHashMap, LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
+import java.util.concurrent.{
+  ConcurrentHashMap, LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit
+}
 import javax.annotation.concurrent.GuardedBy
 
 import scala.collection.JavaConverters._

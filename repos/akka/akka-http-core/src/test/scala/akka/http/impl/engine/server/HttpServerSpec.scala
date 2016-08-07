@@ -28,8 +28,7 @@ class HttpServerSpec
     extends AkkaSpec("""akka.loggers = []
      akka.loglevel = OFF
      akka.http.server.request-timeout = infinite""")
-    with Inside {
-  spec ⇒
+    with Inside { spec ⇒
   implicit val materializer = ActorMaterializer()
 
   "The server implementation" should {

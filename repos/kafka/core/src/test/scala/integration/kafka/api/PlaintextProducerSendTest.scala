@@ -18,7 +18,9 @@ package kafka.api
 
 import java.util.Properties
 
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.clients.producer.{
+  KafkaProducer, ProducerConfig, ProducerRecord
+}
 import org.apache.kafka.common.config.ConfigException
 import org.apache.kafka.common.errors.SerializationException
 import org.apache.kafka.common.serialization.ByteArraySerializer

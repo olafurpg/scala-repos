@@ -10,9 +10,13 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTemplateDefinition, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypeResult, TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin

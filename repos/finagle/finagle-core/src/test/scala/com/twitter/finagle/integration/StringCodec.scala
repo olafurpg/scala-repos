@@ -3,7 +3,9 @@ package com.twitter.finagle.integration
 import com.twitter.finagle._
 import com.twitter.io.Charsets
 import org.jboss.netty.channel.{ChannelPipelineFactory, Channels}
-import org.jboss.netty.handler.codec.frame.{DelimiterBasedFrameDecoder, Delimiters}
+import org.jboss.netty.handler.codec.frame.{
+  DelimiterBasedFrameDecoder, Delimiters
+}
 import org.jboss.netty.handler.codec.string.{StringDecoder, StringEncoder}
 
 object StringCodec extends StringCodec

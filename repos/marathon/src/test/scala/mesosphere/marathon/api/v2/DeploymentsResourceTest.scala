@@ -5,7 +5,9 @@ import mesosphere.marathon.state.{PathId, AppDefinition, Group, GroupManager}
 import mesosphere.marathon.test.Mockito
 import mesosphere.marathon.upgrade.DeploymentManager.DeploymentStepInfo
 import mesosphere.marathon.upgrade.{DeploymentStep, DeploymentPlan}
-import mesosphere.marathon.{MarathonConf, MarathonSchedulerService, MarathonSpec}
+import mesosphere.marathon.{
+  MarathonConf, MarathonSchedulerService, MarathonSpec
+}
 import org.scalatest.{Matchers, GivenWhenThen}
 
 import scala.concurrent.Future

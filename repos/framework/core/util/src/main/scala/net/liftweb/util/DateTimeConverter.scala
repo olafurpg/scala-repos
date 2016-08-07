@@ -17,13 +17,16 @@
 package net.liftweb
 package util
 
-import Helpers.{tryo, internetDateFormatter => internetDateFormat, dateFormatter => dateFormat, hourFormat, timeFormatter => timeFormat}
+import Helpers.{
+  tryo, internetDateFormatter => internetDateFormat,
+  dateFormatter => dateFormat, hourFormat, timeFormatter => timeFormat
+}
 import net.liftweb.common._
 import java.util.Date
 
 /**
   * Implement this trait to specify a set of rules to parse and format dates
-  * @author nafg 
+  * @author nafg
   */
 trait DateTimeConverter {
 

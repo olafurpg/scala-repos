@@ -3,7 +3,9 @@ package worksheet.actions
 
 import com.intellij.execution._
 import com.intellij.execution.configurations.JavaParameters
-import com.intellij.execution.process.{OSProcessHandler, ProcessAdapter, ProcessEvent}
+import com.intellij.execution.process.{
+  OSProcessHandler, ProcessAdapter, ProcessEvent
+}
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.icons.AllIcons
 import com.intellij.ide.scratch.{ScratchFileService, ScratchRootType}
@@ -11,7 +13,9 @@ import com.intellij.ide.util.EditorHelper
 import com.intellij.internal.statistic.UsageTrigger
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.application.{ApplicationManager, ModalityState}
-import com.intellij.openapi.compiler.{CompileContext, CompileStatusNotification, CompilerManager}
+import com.intellij.openapi.compiler.{
+  CompileContext, CompileStatusNotification, CompilerManager
+}
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.keymap.{KeymapManager, KeymapUtil}
 import com.intellij.openapi.module.{Module, ModuleManager}
@@ -35,7 +39,7 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**
   * @author Ksenia.Sautina
-  * @author Dmitry Naydanov        
+  * @author Dmitry Naydanov
   * @since 10/17/12
   */
 class RunWorksheetAction extends AnAction with TopComponentAction {

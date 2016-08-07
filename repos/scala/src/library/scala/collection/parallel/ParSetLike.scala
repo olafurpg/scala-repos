@@ -30,8 +30,7 @@ trait ParSetLike[T,
                  +Repr <: ParSetLike[T, Repr, Sequential] with ParSet[T],
                  +Sequential <: Set[T] with SetLike[T, Sequential]]
     extends GenSetLike[T, Repr]
-    with ParIterableLike[T, Repr, Sequential] {
-  self =>
+    with ParIterableLike[T, Repr, Sequential] { self =>
 
   def empty: Repr
 

@@ -177,8 +177,8 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   }
 
   /*
-   * IMPLEMENTATION NOTE ABOUT EFFECT: Although there is a "getter" and a setter for Effect, the getEffect in JavaFX 
-   * class has a parameter (in this case the Effect to be used) I decided not to use the Scala pattern for getters and 
+   * IMPLEMENTATION NOTE ABOUT EFFECT: Although there is a "getter" and a setter for Effect, the getEffect in JavaFX
+   * class has a parameter (in this case the Effect to be used) I decided not to use the Scala pattern for getters and
    * setters.
    */
 
@@ -195,8 +195,8 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   }
 
   /*
-   * IMPLEMENTATION NOTE ABOUT FILL: In original JavaFX class there is a getter and setter for fill. However, there 
-   * is a method called fill(). Then, in order to use Scala pattern for getter and setter, the fill() method in JavaFX 
+   * IMPLEMENTATION NOTE ABOUT FILL: In original JavaFX class there is a getter and setter for fill. However, there
+   * is a method called fill(). Then, in order to use Scala pattern for getter and setter, the fill() method in JavaFX
    * class was renamed to fillPath.
    */
 
@@ -543,8 +543,8 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
 
   /*
    * IMPLEMENTATION NOTE ABOUT TRANSFORM: Although there is more than a getter and setter for Transform. Besides, one
-   * of getters has parameter (in this case the Effect to be used). Furthermore, there is two transform methods in 
-   * original class. So I decided not to use the Scala pattern for getters and setters. 
+   * of getters has parameter (in this case the Effect to be used). Furthermore, there is two transform methods in
+   * original class. So I decided not to use the Scala pattern for getters and setters.
    */
 
   /**

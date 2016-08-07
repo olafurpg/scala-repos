@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala
 package project.notification.source
 
-import com.intellij.openapi.fileEditor.impl.{EditorFileSwapper, EditorWithProviderComposite}
+import com.intellij.openapi.fileEditor.impl.{
+  EditorFileSwapper, EditorWithProviderComposite
+}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Pair
 import com.intellij.openapi.vfs.VirtualFile

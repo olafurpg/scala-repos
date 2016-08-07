@@ -1,12 +1,9 @@
 /*
 Copyright 2012 Twitter, Inc.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +19,9 @@ package com.twitter.scalding {
   import com.twitter.chill.MeatLocker
   import scala.collection.JavaConverters._
 
-  import com.twitter.algebird.{Semigroup, StatefulSummer, SummingWithHitsCache, AdaptiveCache}
+  import com.twitter.algebird.{
+    Semigroup, StatefulSummer, SummingWithHitsCache, AdaptiveCache
+  }
   import com.twitter.scalding.mathematics.Poisson
   import serialization.Externalizer
   import scala.util.Try
@@ -96,7 +95,7 @@ package com.twitter.scalding {
     }
     override def cleanup(flowProcess: FlowProcess[_],
                          operationCall: OperationCall[Any]) {
-      Try.apply(lockedEf.get).foreach(_ ())
+      Try.apply(lockedEf.get).foreach(_())
     }
   }
 

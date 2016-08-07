@@ -5,12 +5,16 @@ import java.awt._
 import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing._
 
-import com.intellij.codeInsight.template.impl.{TemplateManagerImpl, TemplateState}
+import com.intellij.codeInsight.template.impl.{
+  TemplateManagerImpl, TemplateState
+}
 import com.intellij.openapi.application.{ApplicationManager, Result}
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.command.impl.StartMarkAction
 import com.intellij.openapi.command.undo.UndoManager
-import com.intellij.openapi.editor.event.{DocumentAdapter, DocumentEvent, DocumentListener}
+import com.intellij.openapi.editor.event.{
+  DocumentAdapter, DocumentEvent, DocumentListener
+}
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.{Editor, ScrollType}
 import com.intellij.openapi.project.Project
@@ -23,13 +27,17 @@ import com.intellij.refactoring.introduce.inplace.InplaceVariableIntroducer
 import com.intellij.ui.NonFocusableCheckBox
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScTypedPattern
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScEnumerator, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScEnumerator, ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
-import org.jetbrains.plugins.scala.lang.refactoring.util.{BalloonConflictsReporter, ScalaNamesUtil, ScalaVariableValidator}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  BalloonConflictsReporter, ScalaNamesUtil, ScalaVariableValidator
+}
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 
 import scala.collection.mutable

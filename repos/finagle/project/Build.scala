@@ -62,14 +62,14 @@ object Finagle extends Build {
         "utf8"
     ) ++
       (CrossVersion.partialVersion(sv) match {
-            case Some((2, x)) if x >= 11 =>
-              Seq(
-                  "-Xlint:-missing-interpolator",
-                  "-Ypatmat-exhaust-depth",
-                  "40"
-              )
-            case _ => Seq("-Xlint")
-          })
+        case Some((2, x)) if x >= 11 =>
+          Seq(
+              "-Xlint:-missing-interpolator",
+              "-Ypatmat-exhaust-depth",
+              "40"
+          )
+        case _ => Seq("-Xlint")
+      })
   }
 
   val sharedSettings = Seq(
@@ -86,9 +86,9 @@ object Finagle extends Build {
       resolvers += "twitter-repo" at "https://maven.twttr.com",
       ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting :=
         (CrossVersion.partialVersion(scalaVersion.value) match {
-              case Some((2, 10)) => false
-              case _ => true
-            }),
+          case Some((2, 10)) => false
+          case _ => true
+        }),
       javaOptions in Test := Seq("-DSKIP_FLAKY=1"),
       ivyXML := <dependencies>
         <exclude org="com.sun.jmx" module="jmxri" />

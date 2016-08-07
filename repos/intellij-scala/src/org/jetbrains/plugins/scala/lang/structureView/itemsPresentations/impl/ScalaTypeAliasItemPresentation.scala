@@ -4,7 +4,9 @@ package structureView
 package itemsPresentations
 package impl
 
-import com.intellij.openapi.editor.colors.{CodeInsightColors, TextAttributesKey}
+import com.intellij.openapi.editor.colors.{
+  CodeInsightColors, TextAttributesKey
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 
 /**

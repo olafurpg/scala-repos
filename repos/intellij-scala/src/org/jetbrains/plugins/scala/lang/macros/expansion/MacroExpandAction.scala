@@ -21,9 +21,13 @@ import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.extensions.inWriteCommandAction
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAnnotation, ScBlock, ScMethodCall}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAnnotation, ScBlock, ScMethodCall
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScAnnotationsHolder
-import org.jetbrains.plugins.scala.lang.psi.api.{ScalaFile, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaFile, ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 import scala.annotation.tailrec

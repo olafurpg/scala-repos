@@ -183,8 +183,7 @@ trait ProtoUser[T <: ProtoUser[T]] extends Record[T] { self: T =>
   */
 trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     extends MetaRecord[ModelType]
-    with GenProtoUser {
-  self: ModelType =>
+    with GenProtoUser { self: ModelType =>
 
   type TheUserType = ModelType
 

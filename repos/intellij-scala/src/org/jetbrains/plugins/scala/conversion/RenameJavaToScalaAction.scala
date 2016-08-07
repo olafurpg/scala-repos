@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala
 package conversion
 
 import com.intellij.notification.{NotificationDisplayType, NotificationType}
-import com.intellij.openapi.actionSystem.{CommonDataKeys, AnAction, AnActionEvent, LangDataKeys}
+import com.intellij.openapi.actionSystem.{
+  CommonDataKeys, AnAction, AnActionEvent, LangDataKeys
+}
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.codeStyle.{CodeStyleManager, CodeStyleSettingsManager}
 import com.intellij.psi.{PsiDocumentManager, PsiJavaFile}

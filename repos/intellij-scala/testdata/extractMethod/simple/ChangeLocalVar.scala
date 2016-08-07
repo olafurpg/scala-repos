@@ -11,12 +11,10 @@ class ChangeLocalVar {
 class ChangeLocalVar {
   def foo {
     var i = 23
-
     def testMethodName: Unit = {
       i = 24
     }
     testMethodName
-
     val j = i
   }
 }

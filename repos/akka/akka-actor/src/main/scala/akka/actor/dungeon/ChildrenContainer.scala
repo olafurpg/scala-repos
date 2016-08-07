@@ -5,8 +5,13 @@ package akka.actor.dungeon
 
 import scala.collection.immutable
 
-import akka.actor.{InvalidActorNameException, ChildStats, ChildRestartStats, ChildNameReserved, ActorRef}
-import akka.util.Collections.{EmptyImmutableSeq, PartialImmutableValuesIterable}
+import akka.actor.{
+  InvalidActorNameException, ChildStats, ChildRestartStats, ChildNameReserved,
+  ActorRef
+}
+import akka.util.Collections.{
+  EmptyImmutableSeq, PartialImmutableValuesIterable
+}
 
 /**
   * INTERNAL API

@@ -10,7 +10,10 @@ package scala
 package reflect
 package io
 
-import java.io.{FileInputStream, FileOutputStream, BufferedWriter, OutputStreamWriter, BufferedOutputStream, IOException, PrintWriter, File => JFile}
+import java.io.{
+  FileInputStream, FileOutputStream, BufferedWriter, OutputStreamWriter,
+  BufferedOutputStream, IOException, PrintWriter, File => JFile
+}
 
 import scala.io.Codec
 

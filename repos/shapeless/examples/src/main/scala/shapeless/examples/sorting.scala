@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-14 Miles Sabin 
+ * Copyright (c) 2011-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package shapeless.examples
 
 /**
   * Type level selection sort
-  * 
+  *
   * @author Miles Sabin
   */
 object Sorting {
@@ -48,7 +48,7 @@ object Sorting {
 
   // Apply at the value-level
   acceptNonDecreasing(_1 :: _2 :: _3 :: HNil) // OK
-  //acceptNonDecreasing(_1 :: _3 :: _2 :: HNil)         // Does not compile  
+  //acceptNonDecreasing(_1 :: _3 :: _2 :: HNil)         // Does not compile
 
   /**
     * Type class extracting the least element from an HList of Nats at both type and value level.
@@ -92,7 +92,7 @@ object Sorting {
   typed[_3 :: _1 :: _4 :: _2 :: HNil](r2)
 
   /**
-    * Type class performing selection sort on an HList of Nats at both the type and value level. 
+    * Type class performing selection sort on an HList of Nats at both the type and value level.
     */
   trait SelectionSort[L <: HList, S <: HList] {
     def apply(l: L): S
@@ -123,7 +123,7 @@ object Sorting {
       implicit sort: SelectionSort[L, S]) = sort(l)
 
   /**
-    * The punchline ... 
+    * The punchline ...
     */
   val unsorted = _3 :: _1 :: _4 :: _0 :: _2 :: HNil
   typed[_3 :: _1 :: _4 :: _0 :: _2 :: HNil](unsorted)
@@ -131,5 +131,5 @@ object Sorting {
 
   val sorted = selectionSort(unsorted)
   typed[_0 :: _1 :: _2 :: _3 :: _4 :: HNil](sorted)
-  acceptNonDecreasing(sorted) // Compiles!     
+  acceptNonDecreasing(sorted) // Compiles!
 }

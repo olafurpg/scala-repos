@@ -30,7 +30,9 @@ import javafx.scene.{chart => jfxsc}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ReadOnlyDoubleProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, ReadOnlyDoubleProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 

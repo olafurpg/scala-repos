@@ -7,7 +7,9 @@ import org.specs2.mutable.Specification
 
 import com.google.inject.AbstractModule
 
-import play.{Configuration => JavaConfiguration, Environment => JavaEnvironment}
+import play.{
+  Configuration => JavaConfiguration, Environment => JavaEnvironment
+}
 import play.api.{ApplicationLoader, Configuration, Environment}
 import play.api.inject.BuiltinModule
 

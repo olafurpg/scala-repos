@@ -1,6 +1,9 @@
 package slick.lifted
 
-import slick.relational.{ProductResultConverter, SimpleFastPathResultConverter, ResultConverterDomain, TypeMappingResultConverter}
+import slick.relational.{
+  ProductResultConverter, SimpleFastPathResultConverter, ResultConverterDomain,
+  TypeMappingResultConverter
+}
 
 import scala.language.{existentials, implicitConversions, higherKinds}
 import scala.language.experimental.macros
@@ -368,8 +371,8 @@ case class ShapedValue[T, U](value: T,
   @inline def shaped: ShapedValue[T, U] = this
 
   def mapTo[R <: Product with Serializable](
-      implicit rCT: ClassTag[R]): MappedProjection[R, U] = macro ShapedValue
-    .mapToImpl[R, U]
+      implicit rCT: ClassTag[R]): MappedProjection[R, U] =
+    macro ShapedValue.mapToImpl[R, U]
 }
 
 object ShapedValue {

@@ -46,69 +46,69 @@ class MessageTest extends FunSuite with AssertionsForJUnit {
     val ms = mutable.Buffer[Message]()
 
     ms ++= (for {
-          tag <- goodTags
-          version <- goodVersions
-          ctx <- goodContexts
-        } yield Tinit(tag, version, ctx))
+      tag <- goodTags
+      version <- goodVersions
+      ctx <- goodContexts
+    } yield Tinit(tag, version, ctx))
 
     ms ++= (for {
-          tag <- goodTags
-          version <- goodVersions
-          ctx <- goodContexts
-        } yield Rinit(tag, version, ctx))
+      tag <- goodTags
+      version <- goodVersions
+      ctx <- goodContexts
+    } yield Rinit(tag, version, ctx))
 
     ms ++= (for {
-          tag <- goodTags
-          traceId <- goodTraceIds
-          body <- goodBufs
-        } yield Treq(tag, traceId, body))
+      tag <- goodTags
+      traceId <- goodTraceIds
+      body <- goodBufs
+    } yield Treq(tag, traceId, body))
 
     ms ++= (for {
-          tag <- goodTags
-          body <- goodBufs
-        } yield RreqOk(tag, body))
+      tag <- goodTags
+      body <- goodBufs
+    } yield RreqOk(tag, body))
 
     ms ++= (for {
-          tag <- goodTags
-        } yield Tdrain(tag))
+      tag <- goodTags
+    } yield Tdrain(tag))
 
     ms ++= (for {
-          tag <- goodTags
-          reason <- goodStrings
-        } yield Tdiscarded(tag, reason))
+      tag <- goodTags
+      reason <- goodStrings
+    } yield Tdiscarded(tag, reason))
 
     ms ++= (for {
-          tag <- goodTags
-          ctx <- goodContexts
-          dest <- goodDests
-          dtab <- goodDtabs
-          body <- goodBufs
-        } yield Tdispatch(tag, ctx, dest, dtab, body))
+      tag <- goodTags
+      ctx <- goodContexts
+      dest <- goodDests
+      dtab <- goodDtabs
+      body <- goodBufs
+    } yield Tdispatch(tag, ctx, dest, dtab, body))
 
     ms ++= (for {
-          tag <- goodTags
-          ctx <- goodContexts
-          body <- goodBufs
-        } yield RdispatchOk(tag, ctx, body))
+      tag <- goodTags
+      ctx <- goodContexts
+      body <- goodBufs
+    } yield RdispatchOk(tag, ctx, body))
 
     ms ++= (for {
-          tag <- goodTags
-          ctx <- goodContexts
-          err <- goodStrings
-        } yield RdispatchError(tag, ctx, err))
+      tag <- goodTags
+      ctx <- goodContexts
+      err <- goodStrings
+    } yield RdispatchError(tag, ctx, err))
 
     ms ++= (for {
-          tag <- goodTags
-          ctx <- goodContexts
-        } yield RdispatchNack(tag, ctx))
+      tag <- goodTags
+      ctx <- goodContexts
+    } yield RdispatchNack(tag, ctx))
 
     ms ++= (for {
-          lease <- goodDurationLeases
-        } yield Tlease(lease))
+      lease <- goodDurationLeases
+    } yield Tlease(lease))
 
     ms ++= (for {
-          lease <- goodTimeLeases
-        } yield Tlease(lease))
+      lease <- goodTimeLeases
+    } yield Tlease(lease))
 
     def assertEquiv(a: Message, b: Message) = (a, b) match {
       case (Tdispatch(tag1, ctxs1, dst1, dtab1, req1),

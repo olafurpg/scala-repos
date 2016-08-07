@@ -4,7 +4,9 @@ import java.awt.Component
 import java.util
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
-import com.intellij.codeInsight.template.impl.{TemplateManagerImpl, TemplateState}
+import com.intellij.codeInsight.template.impl.{
+  TemplateManagerImpl, TemplateState
+}
 import com.intellij.codeInsight.unwrap.ScopeHighlighter
 import com.intellij.internal.statistic.UsageTrigger
 import com.intellij.openapi.application.ApplicationManager
@@ -12,9 +14,13 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.impl.StartMarkAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
-import com.intellij.openapi.editor.markup.{HighlighterLayer, HighlighterTargetArea, RangeHighlighter, TextAttributes}
+import com.intellij.openapi.editor.markup.{
+  HighlighterLayer, HighlighterTargetArea, RangeHighlighter, TextAttributes
+}
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.popup.{JBPopupAdapter, JBPopupFactory, LightweightWindowEvent}
+import com.intellij.openapi.ui.popup.{
+  JBPopupAdapter, JBPopupFactory, LightweightWindowEvent
+}
 import com.intellij.openapi.util.{Computable, Key}
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.psi._
@@ -24,21 +30,28 @@ import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias, ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlock, ScTemplateBody}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScExtendsBlock, ScTemplateBody
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil._
-import org.jetbrains.plugins.scala.lang.refactoring.util.{DefaultListCellRendererAdapter, ScalaDirectoryService, ScalaRefactoringUtil}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  DefaultListCellRendererAdapter, ScalaDirectoryService, ScalaRefactoringUtil
+}
 import org.jetbrains.plugins.scala.util.{JListCompatibility, ScalaUtils}
 
 /**
   * Created by Kate Ustyuzhanina
   * on 9/18/15
   */
-trait IntroduceTypeAlias {
-  this: ScalaIntroduceVariableHandler =>
+trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
 
   val INTRODUCE_TYPEALIAS_REFACTORING_NAME =
     ScalaBundle.message("introduce.type.alias.title")

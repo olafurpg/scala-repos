@@ -40,7 +40,20 @@ class PullRequestsController
     with ProtectedBranchService
 
 trait PullRequestsControllerBase extends ControllerBase {
-  self: RepositoryService with AccountService with IssuesService with MilestonesService with LabelsService with CommitsService with ActivityService with PullRequestService with WebHookPullRequestService with ReferrerAuthenticator with CollaboratorsAuthenticator with CommitStatusService with MergeService with ProtectedBranchService =>
+  self: RepositoryService
+    with AccountService
+    with IssuesService
+    with MilestonesService
+    with LabelsService
+    with CommitsService
+    with ActivityService
+    with PullRequestService
+    with WebHookPullRequestService
+    with ReferrerAuthenticator
+    with CollaboratorsAuthenticator
+    with CommitStatusService
+    with MergeService
+    with ProtectedBranchService =>
 
   private val logger =
     LoggerFactory.getLogger(classOf[PullRequestsControllerBase])

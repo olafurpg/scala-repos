@@ -55,7 +55,7 @@ object ExceptionHandler {
                 status)
             ctx.complete((status, info.format(settings.verboseErrorMessages)))
           }
-        case NonFatal(e) ⇒
+      case NonFatal(e) ⇒
         ctx ⇒
           {
             ctx.log

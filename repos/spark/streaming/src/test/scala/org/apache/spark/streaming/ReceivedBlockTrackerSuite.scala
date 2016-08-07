@@ -122,7 +122,7 @@ class ReceivedBlockTrackerSuite
     // Print the data present in the log ahead files in the log directory
     def printLogFiles(message: String) {
       val fileContents = getWriteAheadLogFiles().map { file =>
-        ( s"\n>>>>> $file: <<<<<\n${getWrittenLogData(file).mkString("\n")}")
+        (s"\n>>>>> $file: <<<<<\n${getWrittenLogData(file).mkString("\n")}")
       }.mkString("\n")
       logInfo(
           s"\n\n=====================\n$message\n$fileContents\n=====================\n")

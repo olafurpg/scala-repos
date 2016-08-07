@@ -69,7 +69,6 @@ class MongoSpec extends Specification {
     /* Requires a server other than localhost with auth setup.
     "Define and authenticate DB with Mongo instance" in {
       MongoDB.close
-
       // make sure mongo is running
       try {
         val pwd = "lift_pwd"

@@ -75,8 +75,7 @@ trait TraversableViewLike[
     +This <: TraversableView[A, Coll] with TraversableViewLike[A, Coll, This]]
     extends Traversable[A]
     with TraversableLike[A, This]
-    with ViewMkString[A] {
-  self =>
+    with ViewMkString[A] { self =>
 
   protected def underlying: Coll
   protected[this] def viewIdentifier: String = ""

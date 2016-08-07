@@ -4,8 +4,12 @@ package actions
 import java.util.Properties
 
 import com.intellij.ide.IdeView
-import com.intellij.ide.actions.{CreateFileFromTemplateDialog, CreateTemplateInPackageAction}
-import com.intellij.ide.fileTemplates.{FileTemplate, FileTemplateManager, JavaTemplateUtil}
+import com.intellij.ide.actions.{
+  CreateFileFromTemplateDialog, CreateTemplateInPackageAction
+}
+import com.intellij.ide.fileTemplates.{
+  FileTemplate, FileTemplateManager, JavaTemplateUtil
+}
 import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.ex.FileTypeManagerEx

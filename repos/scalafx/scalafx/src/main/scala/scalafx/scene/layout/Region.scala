@@ -31,7 +31,9 @@ import javafx.{geometry => jfxg}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.geometry.Insets
 import scalafx.scene.Parent

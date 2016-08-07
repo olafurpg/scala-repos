@@ -45,7 +45,7 @@ package net.liftweb {
       *   <li>statelessTest</li>
       *   <li>statefulRewrite</li>
       * </ul>
-      *   
+      *
       */
     object MockWeb {
 
@@ -90,7 +90,7 @@ package net.liftweb {
 
         withLiftRules {
           tryo {
-            LiftRules.early.toList.foreach(_ (req))
+            LiftRules.early.toList.foreach(_(req))
           }
         }
 
@@ -116,12 +116,11 @@ package net.liftweb {
         *
         * <pre name="code" class="scala">
         * object testVar extends SessionVar[String]("Empty")
-        * 
+        *
         * val testSession = testS("http://foo.com/test") {
        testVar("Foo!")
        S.session // returns the current session
      }
-
      // A second test
      testS("http://foo.com/test2", session = testSession) {
        testVar.is must_== "Foo!"
@@ -131,12 +130,12 @@ package net.liftweb {
         * @param url The url to use for this request. Can either be a
         * full URL, or just the path and queryString. See MockHttpServletRequest.processUrl
         * for more details
-        * 
+        *
         * @param session The LiftSession to use for this request. If you don't provide
         * one a new one will be created for you
-        * 
+        *
         * @param contextPath The servlet context path for this request
-        * 
+        *
         * @param testFunc The function to be executed in the scope of a new S
         */
       def testS[T](url: String,
@@ -200,7 +199,7 @@ package net.liftweb {
         * for more details
         *
         * @param f The function to execute in the context of the emulated snippet
-        * 
+        *
         */
       def withSnippet[T](name: String, attrs: MetaData = Null)(f: => T): T =
         S.withAttrs(attrs) {

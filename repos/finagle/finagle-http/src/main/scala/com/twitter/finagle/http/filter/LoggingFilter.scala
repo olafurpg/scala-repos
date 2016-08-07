@@ -1,7 +1,9 @@
 package com.twitter.finagle.http.filter
 
 import com.twitter.finagle.{Service, SimpleFilter}
-import com.twitter.finagle.filter.{LogFormatter => CoreLogFormatter, LoggingFilter => CoreLoggingFilter}
+import com.twitter.finagle.filter.{
+  LogFormatter => CoreLogFormatter, LoggingFilter => CoreLoggingFilter
+}
 import com.twitter.finagle.http.{Request, Response, Status}
 import com.twitter.logging.Logger
 import com.twitter.util.{Duration, Future, Return, Throw, Time, Stopwatch}

@@ -12,8 +12,8 @@ object QueryableMacros {
   }
 }
 class Queryable[T] {
-  def map[S](projection: T => S): Queryable[S] = macro QueryableMacros
-    .map[T, S]
+  def map[S](projection: T => S): Queryable[S] =
+    macro QueryableMacros.map[T, S]
 }
 object Queryable {
   def factory[S](projection: reflect.runtime.universe.Tree): Queryable[S] =

@@ -17,7 +17,9 @@
 
 package org.apache.spark.scheduler
 
-import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkException, SparkFunSuite}
+import org.apache.spark.{
+  LocalSparkContext, SparkConf, SparkContext, SparkException, SparkFunSuite
+}
 import org.apache.spark.util.{RpcUtils, SerializableBuffer}
 
 class CoarseGrainedSchedulerBackendSuite

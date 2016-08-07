@@ -48,9 +48,10 @@ class RangeConsistencyTest {
                                                      List(NR(sp1, end, step))
                                                    else
                                                      Nil) ::: (if (en1 < end)
-                                                                 List(NR(start,
-                                                                         en1,
-                                                                         step))
+                                                                 List(
+                                                                     NR(start,
+                                                                        en1,
+                                                                        step))
                                                                else Nil) :::
       (if (end < ep1) List(NR(start, ep1, step)) else Nil)
   }

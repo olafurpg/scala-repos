@@ -3,7 +3,9 @@
   */
 package akka.stream.scaladsl
 
-import akka.stream.{FlowShape, ActorMaterializer, ActorMaterializerSettings, OverflowStrategy}
+import akka.stream.{
+  FlowShape, ActorMaterializer, ActorMaterializerSettings, OverflowStrategy
+}
 import akka.stream.testkit._
 import akka.stream.testkit.Utils._
 import akka.stream.testkit.scaladsl._

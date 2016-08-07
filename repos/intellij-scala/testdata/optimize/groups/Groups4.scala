@@ -14,11 +14,8 @@ class Groups4 {
 package pack {
 class G
 }
-
 import java.util.ArrayList
-
 import pack.G
-
 class Groups4 {
   val c: ArrayList[Int] = null
   val d: G = null

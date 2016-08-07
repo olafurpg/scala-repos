@@ -7,7 +7,9 @@ import sbt.util.Logger
 import java.io.File
 import sbt.librarymanagement.Resolver
 import sbt.internal.librarymanagement.{InlineIvyConfiguration, IvyPaths}
-import sbt.internal.inc.{AnalyzingCompiler, ClasspathOptions, IncrementalCompilerImpl}
+import sbt.internal.inc.{
+  AnalyzingCompiler, ClasspathOptions, IncrementalCompilerImpl
+}
 
 object ConsoleProject {
   def apply(state: State,

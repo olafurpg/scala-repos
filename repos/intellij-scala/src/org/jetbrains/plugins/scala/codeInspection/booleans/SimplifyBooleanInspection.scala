@@ -4,7 +4,9 @@ package codeInspection.booleans
 import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement, AbstractInspection
+}
 import org.jetbrains.plugins.scala.lang.completion.ScalaKeyword
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.expr._

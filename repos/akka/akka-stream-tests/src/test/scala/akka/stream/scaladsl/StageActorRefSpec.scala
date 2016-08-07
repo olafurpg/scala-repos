@@ -3,11 +3,17 @@
  */
 package akka.stream.scaladsl
 
-import akka.actor.{Kill, PoisonPill, NoSerializationVerificationNeeded, ActorRef}
+import akka.actor.{
+  Kill, PoisonPill, NoSerializationVerificationNeeded, ActorRef
+}
 import akka.event.Logging
 import akka.stream._
-import akka.stream.stage.{GraphStageWithMaterializedValue, GraphStageLogic, InHandler}
-import akka.testkit.{AkkaSpec, TestProbe, TestEvent, EventFilter, ImplicitSender}
+import akka.stream.stage.{
+  GraphStageWithMaterializedValue, GraphStageLogic, InHandler
+}
+import akka.testkit.{
+  AkkaSpec, TestProbe, TestEvent, EventFilter, ImplicitSender
+}
 import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.{Future, Promise}

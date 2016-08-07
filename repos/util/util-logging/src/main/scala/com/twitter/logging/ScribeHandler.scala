@@ -20,7 +20,9 @@ import java.io.IOException
 import java.net._
 import java.nio.{ByteBuffer, ByteOrder}
 import java.util.concurrent.atomic.AtomicLong
-import java.util.concurrent.{ArrayBlockingQueue, LinkedBlockingQueue, TimeUnit, ThreadPoolExecutor}
+import java.util.concurrent.{
+  ArrayBlockingQueue, LinkedBlockingQueue, TimeUnit, ThreadPoolExecutor
+}
 import java.util.{Arrays, logging => javalog}
 
 import com.twitter.concurrent.NamedPoolThreadFactory

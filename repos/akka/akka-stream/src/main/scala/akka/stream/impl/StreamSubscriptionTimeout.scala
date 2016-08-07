@@ -4,7 +4,9 @@
 package akka.stream.impl
 
 import akka.actor._
-import akka.stream.StreamSubscriptionTimeoutTerminationMode.{CancelTermination, NoopTermination, WarnTermination}
+import akka.stream.StreamSubscriptionTimeoutTerminationMode.{
+  CancelTermination, NoopTermination, WarnTermination
+}
 import akka.stream.StreamSubscriptionTimeoutSettings
 import org.reactivestreams._
 import scala.concurrent.duration.FiniteDuration

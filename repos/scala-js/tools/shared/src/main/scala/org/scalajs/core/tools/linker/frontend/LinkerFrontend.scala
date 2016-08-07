@@ -16,7 +16,9 @@ import org.scalajs.core.tools.javascript.ESLevel
 
 import org.scalajs.core.tools.linker.LinkingUnit
 import org.scalajs.core.tools.linker.analyzer.SymbolRequirement
-import org.scalajs.core.tools.linker.frontend.optimizer.{GenIncOptimizer, IncOptimizer}
+import org.scalajs.core.tools.linker.frontend.optimizer.{
+  GenIncOptimizer, IncOptimizer
+}
 
 /** The frontend of the Scala.js linker. Produces a [[LinkingUnit]]
   *
@@ -37,7 +39,7 @@ final class LinkerFrontend(
     new BaseLinker(semantics, esLevel, withSourceMap)
 
   private[this] val optOptimizer: Option[GenIncOptimizer] =
-    optimizerFactory.map(_ (semantics, esLevel, withSourceMap))
+    optimizerFactory.map(_(semantics, esLevel, withSourceMap))
 
   private[this] val refiner: Refiner = new Refiner
 

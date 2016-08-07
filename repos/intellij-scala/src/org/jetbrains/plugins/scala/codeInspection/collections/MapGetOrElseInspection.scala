@@ -3,7 +3,9 @@ package codeInspection.collections
 
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.extensions.ExpressionType
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScMethodCall}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScMethodCall
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScFunctionType
 import org.jetbrains.plugins.scala.lang.psi.types.result.Success

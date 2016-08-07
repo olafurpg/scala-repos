@@ -18,14 +18,12 @@ class OpenHashMapTest {
 
     /* TODO Doesn't work, due to SI-9306.
     import scala.reflect.runtime.{universe => ru}
-
     val mirror = ru.runtimeMirror(m.getClass.getClassLoader)
     val mapType = ru.typeOf[OpenHashMap[Int, Int]]
     val termSym = mapType.decls
       .filterNot { s => s.isMethod }
       .filter { s => s.fullName.endsWith("deleted") }
       .head.asTerm
-
     val fieldMirror = mirror.reflect(m).reflectField(termSym)
 		*/
     // Use Java reflection instead for now.

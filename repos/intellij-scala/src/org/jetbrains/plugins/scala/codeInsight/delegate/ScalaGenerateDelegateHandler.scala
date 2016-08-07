@@ -17,13 +17,17 @@ import org.jetbrains.annotations.{NotNull, Nullable}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameterClause, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameterClause, ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.PhysicalSignature
 import org.jetbrains.plugins.scala.lang.psi.{TypeAdjuster, ScalaPsiUtil, types}
 import org.jetbrains.plugins.scala.lang.resolve.processor.CompletionProcessor
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult, StdKinds}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils, ScalaResolveResult, StdKinds
+}
 import org.jetbrains.plugins.scala.overrideImplement._
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 

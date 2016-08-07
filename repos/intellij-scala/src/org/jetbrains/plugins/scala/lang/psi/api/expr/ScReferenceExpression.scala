@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */

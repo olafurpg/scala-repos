@@ -11,7 +11,11 @@ import org.eclipse.jgit.lib.{FileMode, Constants}
 import profile.simple._
 
 trait RepositoryCreationService {
-  self: AccountService with RepositoryService with LabelsService with WikiService with ActivityService =>
+  self: AccountService
+    with RepositoryService
+    with LabelsService
+    with WikiService
+    with ActivityService =>
 
   def createRepository(loginAccount: Account,
                        owner: String,

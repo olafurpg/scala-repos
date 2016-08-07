@@ -20,7 +20,9 @@ import scala.util.{Success, Failure}
 import java.util.Date
 import java.util.regex.Pattern
 import play.api.libs.iteratee.Execution.Implicits
-import play.api.http.{HttpEntity, LazyHttpErrorHandler, HttpErrorHandler, ContentTypes}
+import play.api.http.{
+  HttpEntity, LazyHttpErrorHandler, HttpErrorHandler, ContentTypes
+}
 import scala.collection.concurrent.TrieMap
 import play.core.routing.ReverseRouteContext
 import scala.io.Source

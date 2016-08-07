@@ -4,7 +4,9 @@ import com.fasterxml.uuid.{EthernetAddress, Generators}
 import mesosphere.marathon.Protos.MarathonTask
 import mesosphere.marathon.core.task.bus.MarathonTaskStatus
 import mesosphere.marathon.core.task.tracker.impl.TaskSerializer
-import mesosphere.marathon.state.{AppDefinition, PathId, PersistentVolume, Timestamp}
+import mesosphere.marathon.state.{
+  AppDefinition, PathId, PersistentVolume, Timestamp
+}
 import org.apache.mesos.Protos.TaskState
 import org.apache.mesos.Protos.TaskState._
 import org.apache.mesos.{Protos => MesosProtos}

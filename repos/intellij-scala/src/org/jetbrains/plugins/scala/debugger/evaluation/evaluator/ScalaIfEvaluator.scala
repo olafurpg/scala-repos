@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala.debugger.evaluation.evaluator
 
 import com.intellij.debugger.engine.evaluation.expression.{Evaluator, Modifier}
-import com.intellij.debugger.engine.evaluation.{EvaluateExceptionUtil, EvaluationContextImpl}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluateExceptionUtil, EvaluationContextImpl
+}
 import com.sun.jdi.BooleanValue
 
 /**

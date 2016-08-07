@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala
 package project
 
 import com.intellij.openapi.roots.libraries.{LibraryProperties, LibraryType}
-import com.intellij.openapi.roots.libraries.ui.{LibraryPropertiesEditor, LibraryEditorComponent}
+import com.intellij.openapi.roots.libraries.ui.{
+  LibraryPropertiesEditor, LibraryEditorComponent
+}
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.scala.project.template.ScalaLibraryDescription

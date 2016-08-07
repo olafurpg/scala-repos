@@ -21,13 +21,18 @@ import java.util.Arrays
 
 import scala.collection.mutable.ListBuffer
 
-import breeze.linalg.{axpy => brzAxpy, inv, svd => brzSvd, DenseMatrix => BDM, DenseVector => BDV, MatrixSingularException, SparseVector => BSV}
+import breeze.linalg.{
+  axpy => brzAxpy, inv, svd => brzSvd, DenseMatrix => BDM, DenseVector => BDV,
+  MatrixSingularException, SparseVector => BSV
+}
 import breeze.numerics.{sqrt => brzSqrt}
 
 import org.apache.spark.annotation.Since
 import org.apache.spark.internal.Logging
 import org.apache.spark.mllib.linalg._
-import org.apache.spark.mllib.stat.{MultivariateOnlineSummarizer, MultivariateStatisticalSummary}
+import org.apache.spark.mllib.stat.{
+  MultivariateOnlineSummarizer, MultivariateStatisticalSummary
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.random.XORShiftRandom

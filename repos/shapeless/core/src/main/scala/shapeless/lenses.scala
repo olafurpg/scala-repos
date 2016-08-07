@@ -20,7 +20,9 @@ import scala.language.dynamics
 
 import labelled.{FieldType, field}
 import ops.coproduct.{Inject, Selector => CSelector}
-import ops.hlist.{At, Init, Last, Prepend, Selector, ReplaceAt, Replacer, Tupler}
+import ops.hlist.{
+  At, Init, Last, Prepend, Selector, ReplaceAt, Replacer, Tupler
+}
 import ops.record.{Selector => RSelector, Updater}
 import tag.@@
 

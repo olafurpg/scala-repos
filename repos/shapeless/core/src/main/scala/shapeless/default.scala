@@ -47,8 +47,8 @@ object Default {
 
   type Aux[T, Out0 <: HList] = Default[T] { type Out = Out0 }
 
-  implicit def materialize[T, L <: HList]: Aux[T, L] = macro DefaultMacros
-    .materialize[T, L]
+  implicit def materialize[T, L <: HList]: Aux[T, L] =
+    macro DefaultMacros.materialize[T, L]
 
   /**
     * Provides default values of case class-like types, as a record.

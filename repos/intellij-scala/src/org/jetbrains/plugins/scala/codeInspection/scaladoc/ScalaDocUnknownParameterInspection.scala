@@ -8,11 +8,19 @@ import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam, ScTypeParamClause}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScTypeParam, ScTypeParamClause
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScTypeAlias
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScTrait
+}
 import org.jetbrains.plugins.scala.lang.scaladoc.parser.parsing.MyScaladocParsing
-import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocComment, ScDocTag}
+import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{
+  ScDocComment, ScDocTag
+}
 
 import scala.collection.mutable
 

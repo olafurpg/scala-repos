@@ -11,8 +11,12 @@ import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScExistentialClause
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScPolymorphicElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScDocCommentOwner, ScMember, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.light.scala.{ScLightTypeAliasDeclaration, ScLightTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScDocCommentOwner, ScMember, ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.light.scala.{
+  ScLightTypeAliasDeclaration, ScLightTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.TypeAliasSignature
 
 import scala.annotation.tailrec

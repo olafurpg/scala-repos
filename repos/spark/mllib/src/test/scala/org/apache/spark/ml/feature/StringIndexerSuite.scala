@@ -24,7 +24,9 @@ import org.apache.spark.ml.util.{DefaultReadWriteTest, MLTestingUtils}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{
+  DoubleType, StringType, StructField, StructType
+}
 
 class StringIndexerSuite
     extends SparkFunSuite

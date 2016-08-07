@@ -2,7 +2,9 @@ package akka.camel.internal
 
 import org.scalatest.Matchers
 import scala.concurrent.duration._
-import org.scalatest.{GivenWhenThen, BeforeAndAfterEach, BeforeAndAfterAll, WordSpecLike}
+import org.scalatest.{
+  GivenWhenThen, BeforeAndAfterEach, BeforeAndAfterAll, WordSpecLike
+}
 import akka.actor.{Props, ActorSystem}
 import akka.testkit.{TimingTest, TestProbe, TestKit}
 import akka.camel.internal.ActivationProtocol._

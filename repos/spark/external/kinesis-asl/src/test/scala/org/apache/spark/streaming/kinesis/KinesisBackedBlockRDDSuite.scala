@@ -19,8 +19,12 @@ package org.apache.spark.streaming.kinesis
 
 import org.scalatest.BeforeAndAfterEach
 
-import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkException}
-import org.apache.spark.storage.{BlockId, BlockManager, StorageLevel, StreamBlockId}
+import org.apache.spark.{
+  LocalSparkContext, SparkConf, SparkContext, SparkException
+}
+import org.apache.spark.storage.{
+  BlockId, BlockManager, StorageLevel, StreamBlockId
+}
 
 abstract class KinesisBackedBlockRDDTests(aggregateTestData: Boolean)
     extends KinesisFunSuite

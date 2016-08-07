@@ -4,7 +4,9 @@ package project.converter
 import java.io.{File, StringReader}
 
 import com.google.common.io.Files
-import com.intellij.conversion.{CannotConvertException, ConversionContext, ModuleSettings}
+import com.intellij.conversion.{
+  CannotConvertException, ConversionContext, ModuleSettings
+}
 import com.intellij.openapi.components.StorageScheme
 import org.jdom.input.SAXBuilder
 import org.jdom.xpath.XPath

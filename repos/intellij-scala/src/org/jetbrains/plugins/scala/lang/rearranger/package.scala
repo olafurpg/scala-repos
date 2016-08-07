@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala
 package lang
 
-import com.intellij.psi.codeStyle.arrangement.std.{ArrangementSettingsToken, StdArrangementSettingsToken, StdArrangementTokenType, StdArrangementTokens}
+import com.intellij.psi.codeStyle.arrangement.std.{
+  ArrangementSettingsToken, StdArrangementSettingsToken,
+  StdArrangementTokenType, StdArrangementTokens
+}
 import com.intellij.psi.codeStyle.arrangement.std.StdArrangementTokens.EntryType._
 import com.intellij.psi.codeStyle.arrangement.std.StdArrangementTokens.Modifier._
 

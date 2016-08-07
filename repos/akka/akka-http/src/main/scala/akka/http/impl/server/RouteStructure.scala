@@ -6,7 +6,9 @@ package akka.http.impl.server
 
 import java.io.File
 import akka.http.javadsl.model.ws.Message
-import akka.http.javadsl.server.values.{PathMatcher, HttpBasicAuthenticator, OAuth2Authenticator}
+import akka.http.javadsl.server.values.{
+  PathMatcher, HttpBasicAuthenticator, OAuth2Authenticator
+}
 import akka.stream.javadsl.Flow
 
 import scala.language.existentials

@@ -21,7 +21,7 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**
   * @author Ksenia.Sautina
-  * @author Dmitry Naydanov        
+  * @author Dmitry Naydanov
   * @since 11/12/12
   */
 class CleanWorksheetAction() extends AnAction with TopComponentAction {

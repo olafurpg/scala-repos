@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.lang.completion.weighter
 
-import com.intellij.codeInsight.completion.{CompletionLocation, CompletionWeigher}
+import com.intellij.codeInsight.completion.{
+  CompletionLocation, CompletionWeigher
+}
 import com.intellij.codeInsight.lookup.LookupElement
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction

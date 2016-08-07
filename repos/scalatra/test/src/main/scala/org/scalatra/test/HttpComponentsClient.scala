@@ -8,7 +8,9 @@ import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods._
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.mime.content.{ContentBody, StringBody}
-import org.apache.http.entity.mime.{FormBodyPart, HttpMultipartMode, MultipartEntity}
+import org.apache.http.entity.mime.{
+  FormBodyPart, HttpMultipartMode, MultipartEntity
+}
 import org.apache.http.impl.client.{BasicCookieStore, HttpClientBuilder}
 
 import scala.util.DynamicVariable

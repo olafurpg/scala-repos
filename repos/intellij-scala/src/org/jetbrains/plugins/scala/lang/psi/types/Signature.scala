@@ -8,7 +8,9 @@ import com.intellij.psi._
 import com.intellij.psi.util.MethodSignatureUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameters
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScTypeAlias, ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
 
 import scala.collection.mutable.ArrayBuffer

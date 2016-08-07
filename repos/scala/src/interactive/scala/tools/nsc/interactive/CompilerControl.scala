@@ -25,7 +25,6 @@ import scala.tools.nsc.util.InterruptReq
   *  Each background compiler pass has its own typer run.
   *  The background compiler thread can be interrupted each time an AST node is
   *  completely typechecked in the following ways:
-
   *  1. by a new call to reloadSources. This starts a new background compiler pass with a new typer run.
   *  2. by a call to askTypeTree. This starts a new typer run if the forceReload parameter = true
   *  3. by a call to askTypeAt, askTypeCompletion, askScopeCompletion, askToDoFirst, askLinkPos, askLastType.

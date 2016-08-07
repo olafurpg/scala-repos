@@ -24,7 +24,9 @@ import org.apache.log4j.{Level, Logger}
 import scopt.OptionParser
 
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.recommendation.{ALS, MatrixFactorizationModel, Rating}
+import org.apache.spark.mllib.recommendation.{
+  ALS, MatrixFactorizationModel, Rating
+}
 import org.apache.spark.rdd.RDD
 
 /**

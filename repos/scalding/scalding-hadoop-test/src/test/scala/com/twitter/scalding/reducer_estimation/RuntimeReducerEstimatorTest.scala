@@ -1,8 +1,12 @@
 package com.twitter.scalding.reducer_estimation
 
 import com.twitter.scalding._
-import com.twitter.scalding.reducer_estimation.RuntimeReducerEstimator.{RuntimePerReducer, EstimationScheme, IgnoreInputSize}
-import com.twitter.scalding.platform.{HadoopPlatformJobTest, HadoopSharedPlatformTest}
+import com.twitter.scalding.reducer_estimation.RuntimeReducerEstimator.{
+  RuntimePerReducer, EstimationScheme, IgnoreInputSize
+}
+import com.twitter.scalding.platform.{
+  HadoopPlatformJobTest, HadoopSharedPlatformTest
+}
 import org.scalatest.{Matchers, WordSpec}
 import scala.collection.JavaConverters._
 import scala.util.{Success, Try}

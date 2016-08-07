@@ -6,7 +6,9 @@ package sbt
 import java.io.File
 import java.util.concurrent.Callable
 import sbt.util.Logger
-import sbt.internal.util.{AttributeKey, AttributeMap, ErrorHandling, ExitHook, ExitHooks, GlobalLogging}
+import sbt.internal.util.{
+  AttributeKey, AttributeMap, ErrorHandling, ExitHook, ExitHooks, GlobalLogging
+}
 import sbt.internal.util.complete.HistoryCommands
 import sbt.internal.inc.classpath.ClassLoaderCache
 

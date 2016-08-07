@@ -6,7 +6,9 @@ import java.util
 import com.intellij.psi.PsiElement
 import com.intellij.refactoring.changeSignature.MethodDescriptor
 import com.intellij.refactoring.changeSignature.MethodDescriptor.ReadWriteOption
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScMethodLike, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScMethodLike, ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 
 import scala.collection.JavaConverters._

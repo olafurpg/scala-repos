@@ -4,14 +4,20 @@ import _root_.java.io.ByteArrayOutputStream
 import com.twitter.common.application.ShutdownRegistry.ShutdownRegistryImpl
 import com.twitter.common.zookeeper.ServerSet.EndpointStatus
 import com.twitter.common.zookeeper.testing.ZooKeeperTestServer
-import com.twitter.common.zookeeper.{ServerSets, ZooKeeperClient, ZooKeeperUtils}
+import com.twitter.common.zookeeper.{
+  ServerSets, ZooKeeperClient, ZooKeeperUtils
+}
 import com.twitter.concurrent.Spool
 import com.twitter.concurrent.Spool.*::
 import com.twitter.conversions.time._
 import com.twitter.finagle.builder.{ClientBuilder, Cluster}
-import com.twitter.finagle.cacheresolver.{CachePoolConfig, CacheNode, CachePoolCluster}
+import com.twitter.finagle.cacheresolver.{
+  CachePoolConfig, CacheNode, CachePoolCluster
+}
 import com.twitter.finagle.memcached.protocol.text.Memcached
-import com.twitter.finagle.memcached.{Client, KetamaClientBuilder, PartitionedClient}
+import com.twitter.finagle.memcached.{
+  Client, KetamaClientBuilder, PartitionedClient
+}
 import com.twitter.finagle.zookeeper.ZookeeperServerSetCluster
 import com.twitter.finagle.{Name, Resolver}
 import com.twitter.io.Buf
@@ -658,6 +664,6 @@ class ClusterClientTest
   def trackCacheShards(client: PartitionedClient) =
     mutable.Set.empty[Client] ++
       ((0 until 100).map { n =>
-            client.clientOf("foo" + n)
-          })
+        client.clientOf("foo" + n)
+      })
 }

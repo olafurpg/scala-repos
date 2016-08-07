@@ -3,7 +3,9 @@ package commands
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
+import org.joda.time.format.{
+  DateTimeFormat, DateTimeFormatter, ISODateTimeFormat
+}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatra.util.RicherString._
 

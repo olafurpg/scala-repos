@@ -110,7 +110,7 @@ class TextFieldTreeCell[T](
     with SFXDelegate[jfxscc.TextFieldTreeCell[T]] {
 
   /**
-    * Creates a `TextFieldTreeCell` that provides a `TextField` when put into editing mode that allows editing of the 
+    * Creates a `TextFieldTreeCell` that provides a `TextField` when put into editing mode that allows editing of the
     * cell content.
     *
     * @param converter A `converter` that can convert the given String (from what the user typed in) into an instance of type T.

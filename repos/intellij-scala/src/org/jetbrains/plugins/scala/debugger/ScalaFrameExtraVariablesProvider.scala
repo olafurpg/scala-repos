@@ -4,28 +4,43 @@ import java.util
 import java.util.Collections
 
 import com.intellij.debugger.SourcePosition
-import com.intellij.debugger.engine.evaluation.{EvaluationContext, TextWithImports, TextWithImportsImpl}
-import com.intellij.debugger.engine.{DebuggerUtils, FrameExtraVariablesProvider}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluationContext, TextWithImports, TextWithImportsImpl
+}
+import com.intellij.debugger.engine.{
+  DebuggerUtils, FrameExtraVariablesProvider
+}
 import com.intellij.psi.impl.PsiManagerEx
 import com.intellij.psi.impl.search.PsiSearchHelperImpl
-import com.intellij.psi.search.{LocalSearchScope, TextOccurenceProcessor, UsageSearchContext}
+import com.intellij.psi.search.{
+  LocalSearchScope, TextOccurenceProcessor, UsageSearchContext
+}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiFile, PsiNamedElement, ResolveState}
 import com.intellij.xdebugger.impl.breakpoints.XExpressionImpl
 import org.jetbrains.plugins.scala.ScalaLanguage
 import org.jetbrains.plugins.scala.codeInsight.template.util.VariablesCompletionProcessor
-import org.jetbrains.plugins.scala.debugger.evaluation.evaluator.{ScalaCompilingExpressionEvaluator, ScalaCompilingEvaluator}
-import org.jetbrains.plugins.scala.debugger.evaluation.{EvaluationException, ScalaCodeFragmentFactory, ScalaEvaluatorBuilder, ScalaEvaluatorBuilderUtil}
+import org.jetbrains.plugins.scala.debugger.evaluation.evaluator.{
+  ScalaCompilingExpressionEvaluator, ScalaCompilingEvaluator
+}
+import org.jetbrains.plugins.scala.debugger.evaluation.{
+  EvaluationException, ScalaCodeFragmentFactory, ScalaEvaluatorBuilder,
+  ScalaEvaluatorBuilderUtil
+}
 import org.jetbrains.plugins.scala.debugger.filters.ScalaDebuggerSettings
 import org.jetbrains.plugins.scala.debugger.ui.ScalaParameterNameAdjuster
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.inNameContext
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScTypedPattern, ScWildcardPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause, ScTypedPattern, ScWildcardPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition, ScPatternDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.resolve.{ScalaResolveResult, StdKinds}
 

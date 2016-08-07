@@ -10,25 +10,37 @@ import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, _}
 import com.intellij.util.{Consumer, ProcessingContext}
-import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.{ClassTypeToImport, PrefixPackageToImport, TypeAliasToImport, TypeToImport}
+import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.{
+  ClassTypeToImport, PrefixPackageToImport, TypeAliasToImport, TypeToImport
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.completion.ScalaAfterNewCompletionUtil._
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
-import org.jetbrains.plugins.scala.lang.completion.lookups.{LookupElementManager, ScalaLookupItem}
+import org.jetbrains.plugins.scala.lang.completion.lookups.{
+  LookupElementManager, ScalaLookupItem
+}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScConstructorPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScReferenceElement, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScReferenceElement, ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTrait
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.SyntheticClasses
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
 import org.jetbrains.plugins.scala.lang.psi.types.{ScAbstractType, ScType}
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils, ScalaResolveResult
+}
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_9
 import org.jetbrains.plugins.scala.project._
 
@@ -167,11 +179,10 @@ object ScalaClassNameCompletionContributor {
 
       val isAccessible =
         invocationCount >= 2 || (typeToImport.element match {
-              case member: PsiMember =>
-                ResolveUtils
-                  .isAccessible(member, position, forCompletion = true)
-              case _ => true
-            })
+          case member: PsiMember =>
+            ResolveUtils.isAccessible(member, position, forCompletion = true)
+          case _ => true
+        })
       if (!isAccessible) return
 
       if (lookingForAnnotations && !typeToImport.isAnnotationType) return

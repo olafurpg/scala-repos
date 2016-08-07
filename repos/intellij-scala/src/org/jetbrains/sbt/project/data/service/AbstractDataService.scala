@@ -4,18 +4,25 @@ import java.io.File
 import java.util
 
 import com.intellij.facet.ModifiableFacetModel
-import com.intellij.openapi.externalSystem.model.project.{ModuleData, ProjectData}
+import com.intellij.openapi.externalSystem.model.project.{
+  ModuleData, ProjectData
+}
 import com.intellij.openapi.externalSystem.model.{DataNode, Key, ProjectKeys}
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
 import com.intellij.openapi.externalSystem.service.project.manage.AbstractProjectDataService
-import com.intellij.openapi.externalSystem.util.{DisposeAwareProjectChange, ExternalSystemApiUtil}
+import com.intellij.openapi.externalSystem.util.{
+  DisposeAwareProjectChange, ExternalSystemApiUtil
+}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.util.CommonProcessors.CollectProcessor
-import org.jetbrains.plugins.scala.project.{ScalaLibraryType, ScalaLanguageLevel, ScalaSdk, ScalaLibraryProperties, ScalaLibraryName}
+import org.jetbrains.plugins.scala.project.{
+  ScalaLibraryType, ScalaLanguageLevel, ScalaSdk, ScalaLibraryProperties,
+  ScalaLibraryName
+}
 
 import scala.collection.JavaConversions._
 

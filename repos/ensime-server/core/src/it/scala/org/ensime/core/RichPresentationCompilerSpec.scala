@@ -779,7 +779,8 @@ trait RichPresentationCompilerTestUtils {
 }
 
 trait ReallyRichPresentationCompilerFixture {
-  this: RichPresentationCompilerFixture with RichPresentationCompilerTestUtils =>
+  this: RichPresentationCompilerFixture
+    with RichPresentationCompilerTestUtils =>
 
   // conveniences for accessing the fixtures
   final def withPresCompiler(

@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
@@ -44,9 +44,9 @@ class ScEnumeratorsImpl(node: ASTNode)
       if (reverseChildren.contains(lastParent))
         reverseChildren.drop(
             reverseChildren.indexOf(lastParent) + (lastParent match {
-              case g: ScGenerator => 1
-              case _ => 0
-            }))
+          case g: ScGenerator => 1
+          case _ => 0
+        }))
       else reverseChildren
     for (c <- children) {
       c match {

@@ -37,8 +37,7 @@ trait BaseMapper extends FieldContainer {
 trait Mapper[A <: Mapper[A]]
     extends BaseMapper
     with Serializable
-    with SourceInfo {
-  self: A =>
+    with SourceInfo { self: A =>
   type MapperType = A
 
   private var was_deleted_? = false
@@ -235,7 +234,7 @@ trait Mapper[A <: Mapper[A]]
     getSingleton
       .toForm(this) ++ S.fmapFunc((ignore: List[String]) => f(this)) {
       (name: String) =>
-        ( <input type='hidden' name={name} value="n/a" />)
+        (<input type='hidden' name={name} value="n/a" />)
     } ++
       (button.map(
               b =>
@@ -357,8 +356,7 @@ trait Mapper[A <: Mapper[A]]
 
 trait LongKeyedMapper[OwnerType <: LongKeyedMapper[OwnerType]]
     extends KeyedMapper[Long, OwnerType]
-    with BaseLongKeyedMapper {
-  self: OwnerType =>
+    with BaseLongKeyedMapper { self: OwnerType =>
 }
 
 trait BaseKeyedMapper extends BaseMapper {
@@ -456,8 +454,7 @@ trait CreatedUpdated extends CreatedTrait with UpdatedTrait {
 
 trait KeyedMapper[KeyType, OwnerType <: KeyedMapper[KeyType, OwnerType]]
     extends Mapper[OwnerType]
-    with BaseKeyedMapper {
-  self: OwnerType =>
+    with BaseKeyedMapper { self: OwnerType =>
 
   type TheKeyType = KeyType
   type KeyedMapperType = OwnerType

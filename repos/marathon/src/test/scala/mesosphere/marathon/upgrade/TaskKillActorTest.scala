@@ -12,7 +12,9 @@ import mesosphere.marathon.{MarathonTestHelper, TaskUpgradeCanceledException}
 import org.apache.mesos.SchedulerDriver
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuiteLike, Matchers}
+import org.scalatest.{
+  BeforeAndAfter, BeforeAndAfterAll, FunSuiteLike, Matchers
+}
 
 import scala.collection.mutable
 import scala.concurrent.duration._

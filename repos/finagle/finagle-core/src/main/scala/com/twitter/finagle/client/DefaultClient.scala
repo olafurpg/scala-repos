@@ -2,9 +2,16 @@ package com.twitter.finagle.client
 
 import com.twitter.finagle._
 import com.twitter.finagle.factory.TimeoutFactory
-import com.twitter.finagle.loadbalancer.{DefaultBalancerFactory, LoadBalancerFactory}
-import com.twitter.finagle.service.{ExpiringService, FailFastFactory, FailureAccrualFactory, TimeoutFilter, ResponseClassifier}
-import com.twitter.finagle.stats.{ClientStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.loadbalancer.{
+  DefaultBalancerFactory, LoadBalancerFactory
+}
+import com.twitter.finagle.service.{
+  ExpiringService, FailFastFactory, FailureAccrualFactory, TimeoutFilter,
+  ResponseClassifier
+}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver, NullStatsReceiver, StatsReceiver
+}
 import com.twitter.finagle.tracing._
 import com.twitter.finagle.transport.Transport
 import com.twitter.finagle.util._
@@ -94,7 +101,7 @@ case class DefaultClient[Req, Rep](
               .defaultFailureAccrual(statsReceiver, classifier)
               .andThen(factory)
           }
-        case _ => failureAccrual
+      case _ => failureAccrual
     }
 
     val stk = stack

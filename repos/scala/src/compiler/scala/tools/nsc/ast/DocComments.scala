@@ -147,7 +147,7 @@ trait DocComments { self: Global =>
   /** The cooked doc comment of an overridden symbol */
   protected def superComment(sym: Symbol): Option[String] =
     allInheritedOverriddenSymbols(sym).iterator map (x =>
-          cookedDocComment(x)) find
+                                                       cookedDocComment(x)) find
       (_ != "")
 
   private def mapFind[A, B](xs: Iterable[A])(f: A => Option[B]): Option[B] =

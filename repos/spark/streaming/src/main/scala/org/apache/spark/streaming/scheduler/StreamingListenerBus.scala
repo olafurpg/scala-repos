@@ -17,7 +17,9 @@
 
 package org.apache.spark.streaming.scheduler
 
-import org.apache.spark.scheduler.{LiveListenerBus, SparkListener, SparkListenerEvent}
+import org.apache.spark.scheduler.{
+  LiveListenerBus, SparkListener, SparkListenerEvent
+}
 import org.apache.spark.util.ListenerBus
 
 /**

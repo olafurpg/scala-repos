@@ -11,7 +11,6 @@ class MayReplace {
 
 /*
 import java.awt._
-
 class MayReplace {
   def render(g: Graphics2D) {
     g.setColor(Color.red)

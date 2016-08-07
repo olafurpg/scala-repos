@@ -7,8 +7,12 @@ import com.intellij.psi.{PsiElement, PsiModifiableCodeBlock}
 import org.jetbrains.plugins.scala.caches.CachesUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScValue, ScVariable
+}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 import scala.annotation.tailrec

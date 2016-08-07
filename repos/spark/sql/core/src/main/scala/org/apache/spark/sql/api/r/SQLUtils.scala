@@ -17,7 +17,10 @@
 
 package org.apache.spark.sql.api.r
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, DataInputStream,
+  DataOutputStream
+}
 
 import scala.util.matching.Regex
 

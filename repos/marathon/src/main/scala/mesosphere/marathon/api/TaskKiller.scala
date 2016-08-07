@@ -4,10 +4,14 @@ import javax.inject.Inject
 
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.plugin.auth.{Identity, UpdateApp, Authenticator, Authorizer}
+import mesosphere.marathon.plugin.auth.{
+  Identity, UpdateApp, Authenticator, Authorizer
+}
 import mesosphere.marathon.state._
 import mesosphere.marathon.upgrade.DeploymentPlan
-import mesosphere.marathon.{MarathonConf, MarathonSchedulerService, UnknownAppException}
+import mesosphere.marathon.{
+  MarathonConf, MarathonSchedulerService, UnknownAppException
+}
 
 import scala.concurrent.Future
 

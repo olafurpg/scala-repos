@@ -154,7 +154,7 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
   }
 
   /**
-    * Tests that znodes cannot be deleted when the 
+    * Tests that znodes cannot be deleted when the
     * persistent paths have children.
     */
   @Test
@@ -255,7 +255,7 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
 
   /**
     * Verifies that this ACL is the secure one. The
-    * values are based on the constants used in the 
+    * values are based on the constants used in the
     * ZooKeeper code base.
     */
   private def isAclSecure(acl: ACL): Boolean = {

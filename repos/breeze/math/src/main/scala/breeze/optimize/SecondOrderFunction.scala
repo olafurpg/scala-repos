@@ -3,7 +3,9 @@ package breeze.optimize
 import breeze.linalg.operators.OpMulMatrix
 import breeze.linalg.support.CanCopy
 import breeze.linalg.{DenseMatrix, DenseVector}
-import breeze.math.{InnerProductVectorSpace, MutableInnerProductVectorSpace, VectorSpace}
+import breeze.math.{
+  InnerProductVectorSpace, MutableInnerProductVectorSpace, VectorSpace
+}
 import breeze.stats.distributions.Rand
 
 /**

@@ -10,7 +10,9 @@ import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult, TypingContext
+}
 
 /**
   * @author ilyas, Alexander Podkhalyuzin

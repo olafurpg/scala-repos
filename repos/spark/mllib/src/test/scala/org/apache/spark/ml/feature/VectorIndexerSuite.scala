@@ -179,7 +179,7 @@ class VectorIndexerSuite
         assert(featureAttrs.name === "indexed")
         assert(featureAttrs.attributes.get.length === model.numFeatures)
         categoricalFeatures.foreach { feature: Int =>
-          val origValueSet = collectedData.map(_ (feature)).toSet
+          val origValueSet = collectedData.map(_(feature)).toSet
           val targetValueIndexSet = Range(0, origValueSet.size).toSet
           val catMap = categoryMaps(feature)
           assert(catMap.keys.toSet === origValueSet) // Correct categories
@@ -190,7 +190,7 @@ class VectorIndexerSuite
           // Check transformed data
           assert(
               indexedRDD
-                .map(_ (feature))
+                .map(_(feature))
                 .collect()
                 .toSet === targetValueIndexSet)
           // Check metadata

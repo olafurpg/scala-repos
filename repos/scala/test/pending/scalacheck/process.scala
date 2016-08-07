@@ -1,6 +1,9 @@
-/** process tests. 
+/** process tests.
   */
-import java.io.{File, FileNotFoundException, IOException, InputStream, OutputStream, FileInputStream}
+import java.io.{
+  File, FileNotFoundException, IOException, InputStream, OutputStream,
+  FileInputStream
+}
 import java.net.{URI, URISyntaxException, URL}
 import org.scalacheck._
 import Prop._

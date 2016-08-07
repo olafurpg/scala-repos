@@ -11,7 +11,6 @@ object ParameterAsQualifier {
     val i = 0
     testMethodName(first, i) || testMethodName(second, 1)
   }
-
   def testMethodName(first: String, i: Int): Boolean = {
     first.charAt(i).isUpper
   }

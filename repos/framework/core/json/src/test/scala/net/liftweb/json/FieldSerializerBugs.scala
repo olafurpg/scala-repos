@@ -27,7 +27,6 @@ object FieldSerializerBugs extends Specification {
   /* FIXME: For some reason this fails on CI
   "AtomicInteger should not cause stack overflow" in {
     import java.util.concurrent.atomic.AtomicInteger
-
     val ser = swrite(new AtomicInteger(1))
     val atomic = read[AtomicInteger](ser)
     atomic.get mustEqual 1

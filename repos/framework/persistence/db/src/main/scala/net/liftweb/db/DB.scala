@@ -25,7 +25,9 @@ import net.liftweb.http.S
 
 import javax.sql.{DataSource}
 import java.sql.{ResultSetMetaData, SQLException}
-import java.sql.{Statement, ResultSet, Types, PreparedStatement, Connection, DriverManager}
+import java.sql.{
+  Statement, ResultSet, Types, PreparedStatement, Connection, DriverManager
+}
 import scala.collection.mutable.{HashMap, ListBuffer}
 import javax.naming.{Context, InitialContext}
 
@@ -410,7 +412,7 @@ trait DB extends Loggable {
     appendPostTransaction(DefaultConnectionIdentifier, func)
 
   private def runLogger(logged: Statement, time: Long) = logged match {
-    case st: DBLog => logFuncs.foreach(_ (st, time))
+    case st: DBLog => logFuncs.foreach(_(st, time))
     case _ => // NOP
   }
 

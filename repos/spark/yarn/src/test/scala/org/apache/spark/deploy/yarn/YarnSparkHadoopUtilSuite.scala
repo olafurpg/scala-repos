@@ -32,7 +32,9 @@ import org.apache.hadoop.yarn.api.records.ApplicationAccessType
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.scalatest.Matchers
 
-import org.apache.spark.{SecurityManager, SparkConf, SparkException, SparkFunSuite}
+import org.apache.spark.{
+  SecurityManager, SparkConf, SparkException, SparkFunSuite
+}
 import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.internal.Logging
 import org.apache.spark.util.{ResetSystemProperties, Utils}

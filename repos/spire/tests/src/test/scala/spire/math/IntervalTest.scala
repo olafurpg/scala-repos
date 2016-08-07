@@ -373,19 +373,19 @@ class IntervalCheck
                 case 9 => y
                 case _ => x + Rational(rng.nextDouble) * (y - x)
               }
-            case (ValueBound(x), _) =>
+          case (ValueBound(x), _) =>
             () =>
               rng.nextInt(5) match {
                 case 0 => x
                 case _ => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
               }
-            case (_, ValueBound(y)) =>
+          case (_, ValueBound(y)) =>
             () =>
               rng.nextInt(5) match {
                 case 4 => y
                 case _ => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
               }
-            case (_, _) =>
+          case (_, _) =>
             () =>
               Rational(rng.nextGaussian) * Long.MaxValue
         }

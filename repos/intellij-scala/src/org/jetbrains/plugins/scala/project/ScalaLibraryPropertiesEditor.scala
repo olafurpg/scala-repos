@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala
 package project
 
-import com.intellij.openapi.roots.libraries.ui.{LibraryPropertiesEditor, LibraryEditorComponent}
+import com.intellij.openapi.roots.libraries.ui.{
+  LibraryPropertiesEditor, LibraryEditorComponent
+}
 
 /**
   * @author Pavel Fatin

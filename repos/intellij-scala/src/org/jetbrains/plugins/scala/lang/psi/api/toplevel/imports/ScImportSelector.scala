@@ -7,7 +7,7 @@ package imports
 
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */

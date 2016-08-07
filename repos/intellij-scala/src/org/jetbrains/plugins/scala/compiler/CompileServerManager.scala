@@ -7,8 +7,12 @@ import javax.swing.Timer
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.DataManager
-import com.intellij.notification.{Notification, NotificationType, Notifications}
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent, DefaultActionGroup, Separator}
+import com.intellij.notification.{
+  Notification, NotificationType, Notifications
+}
+import com.intellij.openapi.actionSystem.{
+  AnAction, AnActionEvent, DefaultActionGroup, Separator
+}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.options.ShowSettingsUtil

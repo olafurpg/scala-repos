@@ -9,8 +9,7 @@ import Flags._
 import util.Statistics
 import TypesStats._
 
-trait FindMembers {
-  this: SymbolTable =>
+trait FindMembers { this: SymbolTable =>
 
   /** Implementation of `Type#{findMember, findMembers}` */
   private[internal] abstract class FindMemberBase[T](tpe: Type,
@@ -172,7 +171,7 @@ trait FindMembers {
                     (member.flags & PRIVATE) != 0 // (unqualified) private members never participate in overriding
                   || (other.flags & PRIVATE) != 0 // ... as overrider or overridee.
                   || !(memberTypeLow(member) matches memberTypeHi(other)) // do the member types match? If so, it's an override. Otherwise it's an overload.
-              ))
+                ))
 
     // Cache for the member type of a candidate member when comparing against multiple, already-found existing members
     //

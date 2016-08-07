@@ -29,7 +29,7 @@ class ScheduleJBridge {
 /**
   * The Schedule object schedules an actor to be ping-ed with a given message after a specified
   * delay. If you need recurrent scheduled pings you will need to reschedule.
-  * 
+  *
   * The schedule methods return a ScheduledFuture object which can be cancelled if necessary
   */
 object Schedule extends Schedule
@@ -37,7 +37,7 @@ object Schedule extends Schedule
 /**
   * The Schedule object schedules an actor to be ping-ed with a given message after a specified
   * delay. If you need recurrent scheduled pings you will need to reschedule.
-  * 
+  *
   * The schedule methods return a ScheduledFuture object which can be cancelled if necessary
   */
 sealed trait Schedule extends Loggable {

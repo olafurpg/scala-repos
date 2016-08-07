@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.codeInspection
 
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.util.CachedValueProvider.Result
-import com.intellij.psi.util.{CachedValueProvider, CachedValuesManager, PsiTreeUtil}
+import com.intellij.psi.util.{
+  CachedValueProvider, CachedValuesManager, PsiTreeUtil
+}
 import com.intellij.psi.{PsiElement, PsiMethod, PsiType}
 import org.jetbrains.plugins.scala.codeInspection.InspectionsUtil.isExpressionOfType
 import org.jetbrains.plugins.scala.debugger.evaluation.ScalaEvaluatorBuilderUtil
@@ -10,16 +12,26 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings.nameFitToPatterns
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClauses
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScLiteral, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScLiteral, ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFunctionDefinition, ScValue, ScVariable}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScObject}
-import org.jetbrains.plugins.scala.lang.psi.api.{InferUtil, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScFunctionDefinition, ScValue, ScVariable
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScObject
+}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  InferUtil, ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType.ExtractClass
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 import org.jetbrains.plugins.scala.project.ProjectPsiElementExt
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_9

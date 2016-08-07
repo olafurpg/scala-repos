@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.lang.macros.expansion
 
-import com.intellij.openapi.compiler.{CompileContext, CompilationStatusListener, CompilerManager}
+import com.intellij.openapi.compiler.{
+  CompileContext, CompilationStatusListener, CompilerManager
+}
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.project.Project
 

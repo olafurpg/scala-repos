@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-15 Miles Sabin 
+ * Copyright (c) 2011-15 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import ops.hlist.Selector
 import scala.annotation.implicitNotFound
 
 /**
-  * Type class witnessing that every element of `L` has `TC` as its outer type constructor. 
+  * Type class witnessing that every element of `L` has `TC` as its outer type constructor.
   */
 trait UnaryTCConstraint[L <: HList, TC[_]] extends Serializable
 

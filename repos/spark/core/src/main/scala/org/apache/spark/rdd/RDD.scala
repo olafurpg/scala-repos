@@ -41,7 +41,9 @@ import org.apache.spark.partial.PartialResult
 import org.apache.spark.storage.{RDDBlockId, StorageLevel}
 import org.apache.spark.util.{BoundedPriorityQueue, Utils}
 import org.apache.spark.util.collection.OpenHashMap
-import org.apache.spark.util.random.{BernoulliCellSampler, BernoulliSampler, PoissonSampler, SamplingUtils}
+import org.apache.spark.util.random.{
+  BernoulliCellSampler, BernoulliSampler, PoissonSampler, SamplingUtils
+}
 
 /**
   * A Resilient Distributed Dataset (RDD), the basic abstraction in Spark. Represents an immutable,

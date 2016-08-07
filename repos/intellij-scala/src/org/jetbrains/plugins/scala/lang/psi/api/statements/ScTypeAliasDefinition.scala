@@ -9,11 +9,19 @@ import com.intellij.psi.{PsiClass, PsiElement}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTrait
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScTypeAliasStub
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{Equivalence, ScParameterizedType, ScType, ScTypeParameterType}
-import org.jetbrains.plugins.scala.macroAnnotations.{CachedInsidePsiElement, ModCount}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, TypeResult, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  Equivalence, ScParameterizedType, ScType, ScTypeParameterType
+}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  CachedInsidePsiElement, ModCount
+}
 
 /**
   * @author Alexander Podkhalyuzin

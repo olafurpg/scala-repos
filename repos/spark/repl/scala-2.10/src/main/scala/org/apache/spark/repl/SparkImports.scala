@@ -134,7 +134,7 @@ private[repl] trait SparkImports { self: SparkIMain =>
         // try to finesse this, we will mimic all imports for now.
         def keepHandler(handler: MemberHandler) = handler match {
           /* This case clause tries to "precisely" import only what is required. And in this
-           * it may miss out on some implicits, because implicits are not known in `wanted`. Thus 
+           * it may miss out on some implicits, because implicits are not known in `wanted`. Thus
            * it is suitable for defining classes. AFAIK while defining classes implicits are not
            * needed.*/
           case h: ImportHandler if definedClass && !fallback =>

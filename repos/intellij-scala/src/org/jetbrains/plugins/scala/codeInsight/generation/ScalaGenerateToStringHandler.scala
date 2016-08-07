@@ -10,7 +10,9 @@ import com.intellij.psi.PsiFile
 import org.jetbrains.plugins.scala.codeInsight.generation.ui.ScalaGenerateToStringWizard
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.{ScalaFileType, extensions}
 

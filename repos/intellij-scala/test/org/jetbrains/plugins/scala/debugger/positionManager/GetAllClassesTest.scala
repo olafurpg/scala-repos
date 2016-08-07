@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.debugger.positionManager
 
-import org.jetbrains.plugins.scala.debugger.{ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaVersion_2_11, ScalaVersion_2_12
+}
 
 /**
   * @author Nikolay.Tropin

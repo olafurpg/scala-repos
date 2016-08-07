@@ -10,7 +10,9 @@ import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
 import akka.stream._
 import akka.stream.actor._
-import akka.stream.impl.{ActorProcessor, ExposedPublisher, SeqActorName, SubscribePending}
+import akka.stream.impl.{
+  ActorProcessor, ExposedPublisher, SeqActorName, SubscribePending
+}
 import akka.stream.scaladsl._
 
 import scala.collection.immutable
@@ -40,7 +42,6 @@ private object PoolSlot {
   /*
     Stream Setup
     ============
-
     Request-   +-----------+              +-------------+              +-------------+     +------------+
     Context    | Slot-     |  List[       |   flatten   |  Processor-  |   doubler   |     | SlotEvent- |  Response-
     +--------->| Processor +------------->| (MapConcat) +------------->| (MapConcat) +---->| Split      +------------->

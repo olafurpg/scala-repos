@@ -78,7 +78,7 @@ class ScalaLoggingSpec extends Specification with Mockito {
 //      object Logger extends LoggerLike {
 //        // Mock underlying logger implementation
 //        val logger = mock[org.slf4j.Logger].smart
-//        
+//
 //        def apply[T](clazz: Class[T]): play.api.Logger = new play.api.Logger(mock[org.slf4j.Logger].smart)
 //        def apply[T](name: String): play.api.Logger = new play.api.Logger(mock[org.slf4j.Logger].smart)
 //      }

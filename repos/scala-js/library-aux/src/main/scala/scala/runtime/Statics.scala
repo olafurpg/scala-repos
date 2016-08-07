@@ -47,15 +47,12 @@ object Statics {
     val iv = dv.toInt | 0
     if (iv == dv)
       return iv
-
     val fv = dv.toFloat
     if (fv == dv)
       return java.lang.Float.floatToIntBits(fv)
-
     val lv = dv.toLong
     if (lv == dv)
       return lv.toInt | 0
-
     val lv2 == java.lang.Double.doubleToLongBits(dv)
     return (lv2 ^ (lv2 >>> 32)).toInt | 0
    */
@@ -67,11 +64,9 @@ object Statics {
     val iv = fv.toInt
     if (iv == fv)
       return iv
-
     val lv = fv.toLong
     if (lv == fv)
       return (lv ^ (lv >>> 32)).toInt | 0
-
     return java.lang.Float.floatToIntBits(fv)
    */
   }

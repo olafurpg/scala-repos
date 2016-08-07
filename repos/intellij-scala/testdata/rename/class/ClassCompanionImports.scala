@@ -12,11 +12,9 @@ package a {
 package a {
   package b {
     class NameAfterRename
-
     object NameAfterRename
   }
   import b.NameAfterRename
-
   class C extends /*caret*/NameAfterRename
 }
  */

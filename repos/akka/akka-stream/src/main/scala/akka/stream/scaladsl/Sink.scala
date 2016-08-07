@@ -10,7 +10,9 @@ import akka.stream.actor.ActorSubscriber
 import akka.stream.impl.Stages.DefaultAttributes
 import akka.stream.impl.StreamLayout.Module
 import akka.stream.impl._
-import akka.stream.stage.{Context, PushStage, SyncDirective, TerminationDirective}
+import akka.stream.stage.{
+  Context, PushStage, SyncDirective, TerminationDirective
+}
 import akka.stream.{javadsl, _}
 import org.reactivestreams.{Publisher, Subscriber}
 import scala.annotation.tailrec

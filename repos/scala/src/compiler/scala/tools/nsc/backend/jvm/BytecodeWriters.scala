@@ -6,7 +6,9 @@
 package scala.tools.nsc
 package backend.jvm
 
-import java.io.{DataOutputStream, FileOutputStream, IOException, OutputStream, File => JFile}
+import java.io.{
+  DataOutputStream, FileOutputStream, IOException, OutputStream, File => JFile
+}
 import scala.tools.nsc.io._
 import java.util.jar.Attributes.Name
 import scala.language.postfixOps

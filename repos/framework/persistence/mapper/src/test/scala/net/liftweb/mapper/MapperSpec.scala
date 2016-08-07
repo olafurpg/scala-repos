@@ -52,7 +52,6 @@ class MapperSpec extends Specification with BeforeExample {
    case _ => println(log.allEntries)
    }
    }
-
    DB.addLogFunc(logDBStuff)
    */
 

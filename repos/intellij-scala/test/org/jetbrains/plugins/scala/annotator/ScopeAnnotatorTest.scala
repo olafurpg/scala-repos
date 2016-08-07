@@ -9,9 +9,9 @@ import org.junit.Assert
   * Pavel.Fatin, 18.05.2010
   */
 class ScopeAnnotatorTest extends SimpleTestCase {
-  // TODO List of explicit clash groups, report scope 
+  // TODO List of explicit clash groups, report scope
   // ("Foo is already defined as class Foo, object Foo in object Holder")
-  // TODO Suggest "rename" quick fix 
+  // TODO Suggest "rename" quick fix
 
   final val Header = "class Foo; class Bar; "
 
@@ -127,8 +127,8 @@ class ScopeAnnotatorTest extends SimpleTestCase {
 
   // TODO implement processing of distributed package declarations
 //  def testNameClashInPackage {
-//    assertMatches(messages("package p { class C }; package p { class C }")) { 
-//      case Error("C", _) :: Error("C", _) :: Nil => 
+//    assertMatches(messages("package p { class C }; package p { class C }")) {
+//      case Error("C", _) :: Error("C", _) :: Nil =>
 //    }
 //  }
 
@@ -497,10 +497,10 @@ class ScopeAnnotatorTest extends SimpleTestCase {
   // TODO implement function signatures comparison based on types (not on plain text representations)
 //  def testFunctionSignatureTypeConformanceAndErasure {
 //    assertMatches(messages("type Foo = Any; def f(p: Any) {}; def f(p: Foo) {}")) {
-//      case Error("f", _) :: Error("f", _) :: Nil =>  
+//      case Error("f", _) :: Error("f", _) :: Nil =>
 //    }
 //    assertMatches(messages("def f(p: Any) {}; def f(p: AnyVal) {}")) {
-//      case Error("f", _) :: Error("f", _) :: Nil =>  
+//      case Error("f", _) :: Error("f", _) :: Nil =>
 //    }
 //  }
 

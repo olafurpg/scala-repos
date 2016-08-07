@@ -35,7 +35,10 @@ import org.scalatest.Matchers.{be, convertToAnyShouldWrapper, equal}
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
-import scalafx.Includes.{jfxBooleanBinding2sfx, jfxBooleanProperty2sfx, jfxObjectProperty2sfx, sfxReadOnlyObjectWrapperWithSFXDelegate2jfxReadOnlyObjectWrapper}
+import scalafx.Includes.{
+  jfxBooleanBinding2sfx, jfxBooleanProperty2sfx, jfxObjectProperty2sfx,
+  sfxReadOnlyObjectWrapperWithSFXDelegate2jfxReadOnlyObjectWrapper
+}
 import scalafx.beans.property.BooleanProperty.sfxBooleanProperty2jfx
 import scalafx.beans.property.PropertyIncludes.jfxReadOnlyObjectWrapper2sfx
 import scalafx.scene.control.Button

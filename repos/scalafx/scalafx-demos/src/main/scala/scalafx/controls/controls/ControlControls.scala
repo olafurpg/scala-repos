@@ -101,8 +101,6 @@ class ControlControls(target: Control)
 /*
 ObjectProperty<ContextMenu>	contextMenu
 The ContextMenu to show for this control.
-
 ObjectProperty<Skin<?>>	skin
 Skin is responsible for rendering this Control.
-
  */

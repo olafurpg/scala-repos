@@ -3,7 +3,9 @@ package lang.completion
 
 import java.io.File
 
-import com.intellij.codeInsight.completion.{CodeCompletionHandlerBase, CompletionType}
+import com.intellij.codeInsight.completion.{
+  CodeCompletionHandlerBase, CompletionType
+}
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.lookup.{LookupElement, LookupManager}
 import com.intellij.openapi.fileEditor.{FileEditorManager, OpenFileDescriptor}

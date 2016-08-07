@@ -6,7 +6,7 @@ import Enumeratee2T._
 
 import scala.annotation.tailrec
 
-trait ForallM[P[_ [_]]] {
+trait ForallM[P[_[_]]] {
   def apply[F[_]: Monad]: P[F]
 }
 

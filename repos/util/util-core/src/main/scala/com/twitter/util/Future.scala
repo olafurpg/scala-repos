@@ -1,10 +1,17 @@
 package com.twitter.util
 
 import com.twitter.concurrent.{Offer, Scheduler, Tx}
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReferenceArray}
-import java.util.concurrent.{CancellationException, TimeUnit, Future => JavaFuture}
+import java.util.concurrent.atomic.{
+  AtomicBoolean, AtomicInteger, AtomicReferenceArray
+}
+import java.util.concurrent.{
+  CancellationException, TimeUnit, Future => JavaFuture
+}
 import java.util.{List => JList, Map => JMap}
-import scala.collection.JavaConverters.{asScalaBufferConverter, mapAsJavaMapConverter, mapAsScalaMapConverter, seqAsJavaListConverter}
+import scala.collection.JavaConverters.{
+  asScalaBufferConverter, mapAsJavaMapConverter, mapAsScalaMapConverter,
+  seqAsJavaListConverter
+}
 import scala.collection.mutable
 import scala.runtime.NonLocalReturnControl
 
@@ -241,7 +248,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
         ps mkString ",",
         ps map(p => "Await.result("+p+")") mkString ","
       )
-
   meths foreach println
   '
    */
@@ -2026,7 +2032,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
         ps mkString ",",
         ps map(p => "Await.result("+p+")") mkString ","
       )
-
   meths foreach println
   '
    */

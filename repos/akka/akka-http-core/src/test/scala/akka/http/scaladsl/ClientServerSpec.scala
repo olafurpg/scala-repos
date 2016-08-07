@@ -3,10 +3,14 @@
   */
 package akka.http.scaladsl
 
-import java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStreamWriter}
+import java.io.{
+  BufferedReader, BufferedWriter, InputStreamReader, OutputStreamWriter
+}
 import java.net.{BindException, Socket}
 import java.util.concurrent.TimeoutException
-import akka.http.scaladsl.settings.{ConnectionPoolSettings, ClientConnectionSettings, ServerSettings}
+import akka.http.scaladsl.settings.{
+  ConnectionPoolSettings, ClientConnectionSettings, ServerSettings
+}
 
 import scala.annotation.tailrec
 import scala.concurrent.duration._

@@ -47,7 +47,6 @@ class DenseAxpyBenchmark extends BreezeBenchmark {
     }
     dv2
   }
-
   def timeSmallDVInlineRange(reps: Int) = {
     cforRange(0 until reps) { rep =>
       val ad = dv.data
@@ -68,16 +67,13 @@ class DenseAxpyBenchmark extends BreezeBenchmark {
     }
     dv
   }
-
   val largeDV, largeDV2 = DenseVector.rand(400)
   val largeDM, largeDM2 = DenseMatrix.rand(20, 20)
-
   def timeLargeDMAddInPlace(reps: Int) = {
     cforRange(0 until reps) { rep =>
       largeDM += largeDM2
     }
   }
-
   def timeLargeDVAddInPlace(reps: Int) = {
     cforRange(0 until reps) { rep =>
       largeDV += largeDV2

@@ -7,7 +7,9 @@ package expr
 import com.intellij.psi.{PsiElement, PsiField}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScVariable
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceExpression, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolvableReferenceExpression, ScalaResolveResult
+}
 
 /**
   * @author Alexander Podkhalyuzin

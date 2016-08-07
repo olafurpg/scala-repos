@@ -10,7 +10,9 @@ import mesosphere.marathon.plugin.auth.Identity
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state.{Group, GroupManager, PathId, Timestamp, _}
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{MarathonConf, MarathonSchedulerService, MarathonSpec, MarathonTestHelper}
+import mesosphere.marathon.{
+  MarathonConf, MarathonSchedulerService, MarathonSpec, MarathonTestHelper
+}
 import mesosphere.mesos.protos.SlaveID
 import org.mockito.Matchers.{eq => equalTo}
 import org.mockito.Mockito._

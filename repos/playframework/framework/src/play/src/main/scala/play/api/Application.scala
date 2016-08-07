@@ -10,7 +10,9 @@ import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import com.google.inject.Singleton
 import play.api.http._
-import play.api.inject.{DefaultApplicationLifecycle, Injector, NewInstanceInjector, SimpleInjector}
+import play.api.inject.{
+  DefaultApplicationLifecycle, Injector, NewInstanceInjector, SimpleInjector
+}
 import play.api.libs.Crypto
 import play.api.libs.Files.{DefaultTemporaryFileCreator, TemporaryFileCreator}
 import play.api.libs.concurrent.ActorSystemProvider

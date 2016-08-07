@@ -15,7 +15,9 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScNewTemplateDefinition, ScSuperReference}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScNewTemplateDefinition, ScSuperReference
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._

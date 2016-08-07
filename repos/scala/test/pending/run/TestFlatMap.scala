@@ -1,5 +1,7 @@
 import scala.collection.parallel.{ParMap => PMap}
-import scala.collection.parallel.mutable.{ParHashSet => PMHashSet, ParHashMap => PMHashMap, ParArray}
+import scala.collection.parallel.mutable.{
+  ParHashSet => PMHashSet, ParHashMap => PMHashMap, ParArray
+}
 import scala.util.Random
 import scala.collection.parallel.CompositeThrowable
 

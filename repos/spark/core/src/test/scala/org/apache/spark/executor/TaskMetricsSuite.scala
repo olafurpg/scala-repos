@@ -21,7 +21,9 @@ import org.scalatest.Assertions
 
 import org.apache.spark._
 import org.apache.spark.scheduler.AccumulableInfo
-import org.apache.spark.storage.{BlockId, BlockStatus, StorageLevel, TestBlockId}
+import org.apache.spark.storage.{
+  BlockId, BlockStatus, StorageLevel, TestBlockId
+}
 
 class TaskMetricsSuite extends SparkFunSuite {
   import AccumulatorParam._

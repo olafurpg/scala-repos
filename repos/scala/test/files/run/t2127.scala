@@ -16,18 +16,11 @@ object Test extends Bar(new Test(_)) {
 //however the following is legal:
 /*
     class Foo private (val value : Int)
-
     abstract class Bar{
-
         var ctor : (Int) => Foo
-
     }
-
     object Foo extends Bar{
-
         ctor = new Foo(_) //<--- Legal access
-
     }
-
 The constructor invocation of Bar is done within the scope of object Foo's constructor, and therefore the private constructor of Foo should be visible and accessible.
  */

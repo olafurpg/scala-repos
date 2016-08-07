@@ -10,7 +10,9 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.codeInspection.typeChecking.IsInstanceOfCall
 import org.jetbrains.plugins.scala.codeInspection.typeChecking.TypeCheckToMatchUtil._
 import org.jetbrains.plugins.scala.extensions.inWriteAction
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScGenericCall, ScIfStmt, ScMatchStmt}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScGenericCall, ScIfStmt, ScMatchStmt
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.InplaceRenameHelper
 
 /**

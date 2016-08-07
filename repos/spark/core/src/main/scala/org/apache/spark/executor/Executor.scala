@@ -32,7 +32,9 @@ import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.internal.Logging
 import org.apache.spark.memory.TaskMemoryManager
 import org.apache.spark.rpc.RpcTimeout
-import org.apache.spark.scheduler.{AccumulableInfo, DirectTaskResult, IndirectTaskResult, Task}
+import org.apache.spark.scheduler.{
+  AccumulableInfo, DirectTaskResult, IndirectTaskResult, Task
+}
 import org.apache.spark.shuffle.FetchFailedException
 import org.apache.spark.storage.{StorageLevel, TaskResultBlockId}
 import org.apache.spark.util._

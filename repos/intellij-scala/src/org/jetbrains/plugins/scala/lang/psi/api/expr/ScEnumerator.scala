@@ -7,7 +7,7 @@ package expr
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */

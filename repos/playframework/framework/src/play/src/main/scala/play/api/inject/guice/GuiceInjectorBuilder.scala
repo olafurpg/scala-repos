@@ -4,11 +4,17 @@
 package play.api.inject
 package guice
 
-import com.google.inject.util.{Modules => GuiceModules, Providers => GuiceProviders}
-import com.google.inject.{Module => GuiceModule, Binder, Stage, CreationException, Guice}
+import com.google.inject.util.{
+  Modules => GuiceModules, Providers => GuiceProviders
+}
+import com.google.inject.{
+  Module => GuiceModule, Binder, Stage, CreationException, Guice
+}
 import java.io.File
 import javax.inject.Inject
-import play.api.inject.{Binding => PlayBinding, Injector => PlayInjector, Module => PlayModule}
+import play.api.inject.{
+  Binding => PlayBinding, Injector => PlayInjector, Module => PlayModule
+}
 import play.api.{Configuration, Environment, Mode, PlayException}
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
@@ -395,7 +401,7 @@ trait GuiceableModuleConversions {
             binderOptions: Set[BinderOption]): GuiceModule = {
     new com.google.inject.AbstractModule {
       def configure(): Unit = {
-        binderOptions.foreach(_ (binder))
+        binderOptions.foreach(_(binder))
         for (b <- bindings) {
           val binding = b.asInstanceOf[PlayBinding[Any]]
           val builder =

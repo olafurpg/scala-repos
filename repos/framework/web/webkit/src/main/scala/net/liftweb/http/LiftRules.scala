@@ -32,7 +32,9 @@ import json._
 
 import scala.xml._
 import java.util.{Locale, TimeZone, ResourceBundle, Date}
-import java.io.{InputStream, ByteArrayOutputStream, BufferedReader, StringReader}
+import java.io.{
+  InputStream, ByteArrayOutputStream, BufferedReader, StringReader
+}
 import java.util.concurrent.{ConcurrentHashMap => CHash}
 import scala.reflect.Manifest
 
@@ -188,7 +190,6 @@ object LiftRules extends LiftRulesMocker {
   /*
   private[this] var _doneBoot = false
   private[http] def doneBoot = _doneBoot
-
   private[http] def doneBoot_=(in: Boolean) {_doneBoot = in}
    */
 
@@ -740,7 +741,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * @see net.liftweb.builtin.snippet.Msgs
     */
   @volatile var noticesToJsCmd: () => JsCmd = () => {
-    import builtin.snippet.{Msg, Msgs, MsgErrorMeta, MsgNoticeMeta, MsgWarningMeta}
+    import builtin.snippet.{
+      Msg, Msgs, MsgErrorMeta, MsgNoticeMeta, MsgWarningMeta
+    }
 
     // A "wrapper" that simply returns the javascript
     val passJs = (in: JsCmd) => in
@@ -1676,7 +1679,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
                      r.uri.toString,
                    e)
       XhtmlResponse(
-          ( <html> <body>Exception occured while processing {r.uri}<pre>{showException(e)}</pre> </body> </html>),
+          (<html> <body>Exception occured while processing {r.uri}<pre>{showException(e)}</pre> </body> </html>),
           S.htmlProperties.docType,
           List("Content-Type" -> "text/html; charset=utf-8"),
           Nil,
@@ -1688,7 +1691,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
                      r.uri.toString,
                    e)
       XhtmlResponse(
-          ( <html> <body>Something unexpected happened while serving the page at {r.uri}</body> </html>),
+          (<html> <body>Something unexpected happened while serving the page at {r.uri}</body> </html>),
           S.htmlProperties.docType,
           List("Content-Type" -> "text/html; charset=utf-8"),
           Nil,

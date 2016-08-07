@@ -8,7 +8,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiMethod, PsiNamedElement}
+import com.intellij.psi.{
+  PsiDocumentManager, PsiElement, PsiMethod, PsiNamedElement
+}
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
@@ -16,7 +18,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScClassParents, ScTemplateBody}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScClassParents, ScTemplateBody
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 

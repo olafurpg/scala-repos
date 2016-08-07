@@ -12,17 +12,31 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.FakeCompanionClassOrCom
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeVariableTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.xml.ScXmlPattern
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter, ScTypeParam}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter, ScParameter, ScTypeParam
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScValue, ScVariable
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScStableCodeReferenceElementImpl
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.types
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve._
-import org.jetbrains.plugins.scala.lang.resolve.processor.{CompletionProcessor, ExpandedExtractorResolveProcessor}
-import org.jetbrains.plugins.scala.macroAnnotations.{CachedInsidePsiElement, ModCount}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  CompletionProcessor, ExpandedExtractorResolveProcessor
+}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  CachedInsidePsiElement, ModCount
+}
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_11
 import org.jetbrains.plugins.scala.project._
 

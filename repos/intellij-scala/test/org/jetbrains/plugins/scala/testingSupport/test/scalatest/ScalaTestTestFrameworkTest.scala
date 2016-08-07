@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.testingSupport.test.scalatest
 
-import org.jetbrains.plugins.scala.base.{ScalaLightPlatformCodeInsightTestCaseAdapter, TestScalaProjectSettings}
+import org.jetbrains.plugins.scala.base.{
+  ScalaLightPlatformCodeInsightTestCaseAdapter, TestScalaProjectSettings
+}
 import org.junit.Assert
 
 class ScalaTestTestFrameworkTest

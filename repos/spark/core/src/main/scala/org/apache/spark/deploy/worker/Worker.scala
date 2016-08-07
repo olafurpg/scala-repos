@@ -22,7 +22,9 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.{Date, UUID}
 import java.util.concurrent._
-import java.util.concurrent.{Future => JFuture, ScheduledFuture => JScheduledFuture}
+import java.util.concurrent.{
+  Future => JFuture, ScheduledFuture => JScheduledFuture
+}
 
 import scala.collection.mutable.{HashMap, HashSet, LinkedHashMap}
 import scala.concurrent.ExecutionContext

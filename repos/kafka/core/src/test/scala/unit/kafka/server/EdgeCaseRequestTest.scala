@@ -27,7 +27,9 @@ import kafka.utils._
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.protocol.types.Type
 import org.apache.kafka.common.protocol.{ApiKeys, SecurityProtocol}
-import org.apache.kafka.common.requests.{ProduceResponse, ResponseHeader, ProduceRequest}
+import org.apache.kafka.common.requests.{
+  ProduceResponse, ResponseHeader, ProduceRequest
+}
 import org.junit.Assert._
 import org.junit.Test
 

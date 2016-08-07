@@ -17,10 +17,8 @@ class Test {
   abstract class A {
     def foo()
   }
-
   new A() {
     var i: Int = 1
-
     def foo() {
       i
     }

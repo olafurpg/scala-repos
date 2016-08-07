@@ -6,9 +6,13 @@ import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.{PsiElement, PsiMethod}
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnTwoPsiElements, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnTwoPsiElements, AbstractInspection
+}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScPostfixExpr, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScPostfixExpr, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticFunction
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 

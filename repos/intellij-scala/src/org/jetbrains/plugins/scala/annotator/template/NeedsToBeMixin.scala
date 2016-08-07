@@ -6,8 +6,12 @@ import com.intellij.psi.{PsiElement, PsiMethod}
 import org.jetbrains.plugins.scala.annotator.AnnotatorPart
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefinition, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTemplateDefinition, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.types.PhysicalSignature
 

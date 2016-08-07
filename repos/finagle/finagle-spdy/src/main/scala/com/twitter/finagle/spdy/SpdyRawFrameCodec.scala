@@ -1,6 +1,9 @@
 package com.twitter.finagle.spdy
 
-import org.jboss.netty.handler.codec.spdy.{SpdyFrameCodec, SpdyHeaderBlockRawDecoder, SpdyHeaderBlockRawEncoder, SpdyVersion}
+import org.jboss.netty.handler.codec.spdy.{
+  SpdyFrameCodec, SpdyHeaderBlockRawDecoder, SpdyHeaderBlockRawEncoder,
+  SpdyVersion
+}
 
 private[finagle] class SpdyRawFrameCodec(version: SpdyVersion,
                                          maxChunkSize: Int,

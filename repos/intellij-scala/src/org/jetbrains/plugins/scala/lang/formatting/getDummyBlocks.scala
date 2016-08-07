@@ -21,17 +21,23 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.xml._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScModifierListOwner}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions, ScModifierListOwner
+}
 import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType
 import org.jetbrains.plugins.scala.lang.scaladoc.parser.ScalaDocElementTypes
-import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocComment, ScDocTag}
+import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{
+  ScDocComment, ScDocTag
+}
 import org.jetbrains.plugins.scala.util.MultilineStringUtil
 
 import scala.annotation.tailrec

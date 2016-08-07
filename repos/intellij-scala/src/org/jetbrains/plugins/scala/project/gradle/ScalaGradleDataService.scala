@@ -5,16 +5,25 @@ import java.io.File
 import java.util
 
 import com.intellij.openapi.externalSystem.model.project.ProjectData
-import com.intellij.openapi.externalSystem.model.{DataNode, ExternalSystemException, ProjectKeys}
-import com.intellij.openapi.externalSystem.service.notification.{ExternalSystemNotificationManager, NotificationSource, NotificationCategory, NotificationData}
-import com.intellij.openapi.externalSystem.service.project.{IdeModifiableModelsProvider, IdeModelsProvider}
+import com.intellij.openapi.externalSystem.model.{
+  DataNode, ExternalSystemException, ProjectKeys
+}
+import com.intellij.openapi.externalSystem.service.notification.{
+  ExternalSystemNotificationManager, NotificationSource, NotificationCategory,
+  NotificationData
+}
+import com.intellij.openapi.externalSystem.service.project.{
+  IdeModifiableModelsProvider, IdeModelsProvider
+}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.libraries.Library
 import org.jetbrains.plugins.gradle.model.data.ScalaModelData
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import org.jetbrains.plugins.scala.project._
-import org.jetbrains.sbt.project.data.service.{Importer, AbstractImporter, AbstractDataService}
+import org.jetbrains.sbt.project.data.service.{
+  Importer, AbstractImporter, AbstractDataService
+}
 
 import scala.collection.JavaConverters._
 

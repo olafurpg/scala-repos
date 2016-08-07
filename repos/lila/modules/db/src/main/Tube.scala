@@ -75,7 +75,7 @@ case class JsTube[Doc](reader: Reads[Doc],
   def inColl(c: Coll): JsTubeInColl[Doc] =
     new JsTube[Doc](reader, writer, flags) with InColl[Doc] { def coll = c }
 
-  private lazy val flagSet = flags.map(_ (JsTube.Flag)).toSet
+  private lazy val flagSet = flags.map(_(JsTube.Flag)).toSet
 
   private def flag[A](f: JsTube.Flag.type => JsTube.Flag)(x: => A, y: => A) =
     flagSet contains f(JsTube.Flag) fold (x, y)

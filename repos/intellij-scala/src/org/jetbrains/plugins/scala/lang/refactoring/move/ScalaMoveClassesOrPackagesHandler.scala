@@ -10,8 +10,12 @@ import com.intellij.openapi.ui.{DialogWrapper, Messages}
 import com.intellij.psi.{PsiClass, PsiDirectory, PsiElement}
 import com.intellij.refactoring.move.MoveCallback
 import com.intellij.refactoring.move.moveClassesOrPackages._
-import com.intellij.refactoring.util.{CommonRefactoringUtil, TextOccurrencesUtil}
-import com.intellij.refactoring.{HelpID, JavaRefactoringSettings, MoveDestination}
+import com.intellij.refactoring.util.{
+  CommonRefactoringUtil, TextOccurrencesUtil
+}
+import com.intellij.refactoring.{
+  HelpID, JavaRefactoringSettings, MoveDestination
+}
 import org.jetbrains.annotations.{NotNull, Nullable}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition

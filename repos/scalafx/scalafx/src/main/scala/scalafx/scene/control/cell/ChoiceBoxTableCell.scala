@@ -43,7 +43,7 @@ import scalafx.util.StringConverter
   * @define FTCINIT Creates a [[scalafx.scene.control.ChoiceBox]] cell factory for use in [[scalafx.scene.control.TableColumn]] controls.
   * @define TTYPE  The type of the elements contained within the `TableColumn`.
   * @define CONVPARAM A `StringConverter` to convert the given item (of type T) to a String for displaying to the user.
-  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing. 
+  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing.
   * @define BUFITEMSPARAM A `ObservableBuffer` containing $ITEMSPARAM
   * @define FTCRET A Function that will return a `TableCell` that is able to work on the type of element contained within the `TableColumn`.
   */
@@ -158,7 +158,7 @@ object ChoiceBoxTableCell {
   *
   * @define CBLC `ChoiceBoxListCell`
   * @define CONVPARAM A `StringConverter` to convert the given item (of type T) to a String for displaying to the user.
-  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing. 
+  * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing.
   * @define BUFITEMSPARAM A `ObservableBuffer` containing $ITEMSPARAM
   */
 class ChoiceBoxTableCell[S, T](

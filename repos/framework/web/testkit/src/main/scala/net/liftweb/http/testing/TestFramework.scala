@@ -27,7 +27,9 @@ import JsonDSL._
 import net.liftweb.common._
 import scala.xml._
 import scala.xml.Utility.trim
-import java.util.{Map => JavaMap, Set => JavaSet, Iterator => JavaIterator, List => JavaList}
+import java.util.{
+  Map => JavaMap, Set => JavaSet, Iterator => JavaIterator, List => JavaList
+}
 import java.util.regex.Pattern
 import java.io.IOException
 import org.apache.commons.httpclient._
@@ -141,10 +143,10 @@ trait BaseGetPoster {
     val params = faux_params.toList.map(x => (x._1, x._2.toString))
     val fullUrl =
       url + (params
-            .map(v => urlEncode(v._1) + "=" + urlEncode(v._2))
-            .mkString("&") match {
-            case s if s.length == 0 => ""; case s => "?" + s
-          })
+        .map(v => urlEncode(v._1) + "=" + urlEncode(v._2))
+        .mkString("&") match {
+        case s if s.length == 0 => ""; case s => "?" + s
+      })
     val getter = new GetMethod(baseUrl + fullUrl)
     getter.getParams().setCookiePolicy(CookiePolicy.RFC_2965)
     for ((name, value) <- headers) getter.setRequestHeader(name, value)
@@ -168,10 +170,10 @@ trait BaseGetPoster {
     val params = faux_params.toList.map(x => (x._1, x._2.toString))
     val fullUrl =
       url + (params
-            .map(v => urlEncode(v._1) + "=" + urlEncode(v._2))
-            .mkString("&") match {
-            case s if s.length == 0 => ""; case s => "?" + s
-          })
+        .map(v => urlEncode(v._1) + "=" + urlEncode(v._2))
+        .mkString("&") match {
+        case s if s.length == 0 => ""; case s => "?" + s
+      })
     val getter = new DeleteMethod(baseUrl + fullUrl)
     getter.getParams().setCookiePolicy(CookiePolicy.RFC_2965)
     for ((name, value) <- headers) getter.setRequestHeader(name, value)

@@ -4,7 +4,9 @@ package decompiler
 import java.io.IOException
 
 import com.intellij.lang.LanguageParserDefinitions
-import com.intellij.openapi.project.{DefaultProjectFactory, Project, ProjectManager}
+import com.intellij.openapi.project.{
+  DefaultProjectFactory, Project, ProjectManager
+}
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.compiled.ClsStubBuilder
 import com.intellij.psi.stubs.{PsiFileStub, PsiFileStubImpl}

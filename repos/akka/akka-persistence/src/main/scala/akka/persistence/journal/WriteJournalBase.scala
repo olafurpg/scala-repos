@@ -8,8 +8,7 @@ import akka.persistence.{Persistence, PersistentEnvelope, PersistentRepr}
 import scala.collection.immutable
 import akka.persistence.AtomicWrite
 
-private[akka] trait WriteJournalBase {
-  this: Actor ⇒
+private[akka] trait WriteJournalBase { this: Actor ⇒
 
   val persistence = Persistence(context.system)
   private val eventAdapters = persistence.adaptersFor(self)

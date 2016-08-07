@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScStableReferenceE
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */

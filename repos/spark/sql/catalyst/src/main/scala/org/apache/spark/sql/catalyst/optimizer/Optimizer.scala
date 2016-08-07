@@ -20,11 +20,17 @@ package org.apache.spark.sql.catalyst.optimizer
 import scala.annotation.tailrec
 import scala.collection.immutable.HashSet
 
-import org.apache.spark.sql.catalyst.analysis.{CleanupAliases, DistinctAggregationRewriter, EliminateSubqueryAliases}
+import org.apache.spark.sql.catalyst.analysis.{
+  CleanupAliases, DistinctAggregationRewriter, EliminateSubqueryAliases
+}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
-import org.apache.spark.sql.catalyst.expressions.Literal.{FalseLiteral, TrueLiteral}
-import org.apache.spark.sql.catalyst.planning.{ExtractFiltersAndInnerJoins, Unions}
+import org.apache.spark.sql.catalyst.expressions.Literal.{
+  FalseLiteral, TrueLiteral
+}
+import org.apache.spark.sql.catalyst.planning.{
+  ExtractFiltersAndInnerJoins, Unions
+}
 import org.apache.spark.sql.catalyst.plans._
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules._

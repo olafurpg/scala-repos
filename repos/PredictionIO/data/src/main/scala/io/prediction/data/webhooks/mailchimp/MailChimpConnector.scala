@@ -75,7 +75,7 @@ private[prediction] object MailChimpConnector extends FormConnector {
     "data[merges][LNAME]": "API",
     "data[merges][INTERESTS]": "Group1,Group2",
     "data[ip_opt]": "10.20.10.30",
-    "data[ip_signup]": "10.20.10.30"    
+    "data[ip_signup]": "10.20.10.30"
      */
 
     // convert to ISO8601 format
@@ -109,7 +109,6 @@ private[prediction] object MailChimpConnector extends FormConnector {
     /*
     "action" will either be "unsub" or "delete".
     The reason will be "manual" unless caused by a spam complaint - then it will be "abuse"
-
     "type": "unsubscribe",
     "fired_at": "2009-03-26 21:40:57",
     "data[action]": "unsub",
@@ -196,11 +195,11 @@ private[prediction] object MailChimpConnector extends FormConnector {
     import org.json4s.JsonDSL._
 
     /*
-    "type": "upemail", 
-    "fired_at": "2009-03-26 22:15:09", 
+    "type": "upemail",
+    "fired_at": "2009-03-26 22:15:09",
     "data[list_id]": "a6b5da1054",
-    "data[new_id]": "51da8c3259", 
-    "data[new_email]": "api+new@mailchimp.com", 
+    "data[new_id]": "51da8c3259",
+    "data[new_email]": "api+new@mailchimp.com",
     "data[old_email]": "api+old@mailchimp.com"
      */
 
@@ -225,8 +224,8 @@ private[prediction] object MailChimpConnector extends FormConnector {
 
     /*
     Reason will be one of "hard" (for hard bounces) or "abuse"
-    "type": "cleaned", 
-    "fired_at": "2009-03-26 22:01:00", 
+    "type": "cleaned",
+    "fired_at": "2009-03-26 22:01:00",
     "data[list_id]": "a6b5da1054",
     "data[campaign_id]": "4fjk2ma9xd",
     "data[reason]": "hard",
@@ -253,12 +252,12 @@ private[prediction] object MailChimpConnector extends FormConnector {
     import org.json4s.JsonDSL._
 
     /*
-    "type": "campaign", 
-    "fired_at": "2009-03-26 21:31:21", 
+    "type": "campaign",
+    "fired_at": "2009-03-26 21:31:21",
     "data[id]": "5aa2102003",
-    "data[subject]": "Test Campaign Subject", 
+    "data[subject]": "Test Campaign Subject",
     "data[status]": "sent",
-    "data[reason]": "", 
+    "data[reason]": "",
     "data[list_id]": "a6b5da1054"
      */
 

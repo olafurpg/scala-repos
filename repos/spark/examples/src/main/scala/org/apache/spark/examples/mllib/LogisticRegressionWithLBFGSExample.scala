@@ -20,7 +20,9 @@ package org.apache.spark.examples.mllib
 
 import org.apache.spark.{SparkConf, SparkContext}
 // $example on$
-import org.apache.spark.mllib.classification.{LogisticRegressionModel, LogisticRegressionWithLBFGS}
+import org.apache.spark.mllib.classification.{
+  LogisticRegressionModel, LogisticRegressionWithLBFGS
+}
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.util.MLUtils

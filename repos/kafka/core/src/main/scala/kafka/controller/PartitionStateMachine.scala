@@ -21,7 +21,10 @@ import collection.JavaConversions
 import collection.mutable.Buffer
 import java.util.concurrent.atomic.AtomicBoolean
 import kafka.api.LeaderAndIsr
-import kafka.common.{LeaderElectionNotNeededException, TopicAndPartition, StateChangeFailedException, NoReplicaOnlineException}
+import kafka.common.{
+  LeaderElectionNotNeededException, TopicAndPartition,
+  StateChangeFailedException, NoReplicaOnlineException
+}
 import kafka.utils.{Logging, ReplicationUtils}
 import kafka.utils.ZkUtils._
 import org.I0Itec.zkclient.{IZkDataListener, IZkChildListener}

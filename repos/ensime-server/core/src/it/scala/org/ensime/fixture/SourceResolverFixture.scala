@@ -37,8 +37,7 @@ trait IsolatedSourceResolverFixture
 
 trait SharedSourceResolverFixture
     extends SourceResolverFixture
-    with SharedEnsimeConfigFixture {
-  this: SharedEnsimeVFSFixture =>
+    with SharedEnsimeConfigFixture { this: SharedEnsimeVFSFixture =>
 
   private[fixture] var _resolver: SourceResolver = _
   override def beforeAll(): Unit = {

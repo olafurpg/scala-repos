@@ -44,9 +44,9 @@ sealed class InstructionImpl(override val num: Int,
 
   protected def getPresentation =
     "element: " + (element match {
-          case Some(x) => x
-          case z => z
-        })
+      case Some(x) => x
+      case z => z
+    })
 }
 
 case class DefinitionInstruction(override val num: Int,

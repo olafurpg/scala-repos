@@ -10,12 +10,16 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScBlockStatement, ScModifiableTypedDeclaration}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock, ScBlockStatement, ScModifiableTypedDeclaration
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScExtendsBlock
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin
@@ -27,8 +31,7 @@ trait ScValue
     with ScDeclaredElementsHolder
     with ScAnnotationsHolder
     with ScCommentOwner
-    with ScModifiableTypedDeclaration {
-  self =>
+    with ScModifiableTypedDeclaration { self =>
   def valKeyword = findChildrenByType(ScalaTokenTypes.kVAL).apply(0)
 
   def declaredElements: Seq[ScTypedDefinition]
@@ -42,9 +45,9 @@ trait ScValue
   def declaredType: Option[ScType] =
     typeElement flatMap
       (_.getType(TypingContext.empty) match {
-            case Success(t, _) => Some(t)
-            case _ => None
-          })
+        case Success(t, _) => Some(t)
+        case _ => None
+      })
 
   def getType(ctx: TypingContext): TypeResult[ScType]
 

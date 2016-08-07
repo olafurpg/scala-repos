@@ -14,9 +14,13 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScDeclaration, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScDeclaration, ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScObject, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil

@@ -4,7 +4,9 @@ import akka.actor.Status
 import akka.testkit.TestProbe
 import mesosphere.marathon.core.task.{Task, TaskStateChange, TaskStateOp}
 import mesosphere.marathon.state.{PathId, TaskRepository, Timestamp}
-import mesosphere.marathon.test.{CaptureLogEvents, MarathonActorSupport, Mockito}
+import mesosphere.marathon.test.{
+  CaptureLogEvents, MarathonActorSupport, Mockito
+}
 import mesosphere.marathon.{MarathonSpec, MarathonTestHelper}
 import org.apache.mesos.Protos.{TaskState, TaskStatus}
 import org.scalatest.concurrent.ScalaFutures

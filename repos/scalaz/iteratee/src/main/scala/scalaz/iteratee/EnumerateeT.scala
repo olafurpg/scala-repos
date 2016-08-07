@@ -169,8 +169,9 @@ trait EnumerateeTFunctions {
       G: Monad[G]): EnumerateeT[E, F[E], G] =
     new EnumerateeT[E, F[E], G] {
       def apply[A] = {
-        (takeWhile[E, F](p).up[G] flatMap (xs =>
-                  drop[E, G](1).map(_ => xs))).sequenceI.apply[A]
+        (takeWhile[E, F](p)
+              .up[G] flatMap (xs => drop[E, G](1).map(_ => xs))).sequenceI
+          .apply[A]
       }
     }
 

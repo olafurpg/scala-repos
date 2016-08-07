@@ -19,7 +19,9 @@ package org.apache.spark.ml.api.r
 
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.ml.attribute._
-import org.apache.spark.ml.classification.{LogisticRegression, LogisticRegressionModel}
+import org.apache.spark.ml.classification.{
+  LogisticRegression, LogisticRegressionModel
+}
 import org.apache.spark.ml.clustering.{KMeans, KMeansModel}
 import org.apache.spark.ml.feature.{RFormula, VectorAssembler}
 import org.apache.spark.ml.regression.{LinearRegression, LinearRegressionModel}

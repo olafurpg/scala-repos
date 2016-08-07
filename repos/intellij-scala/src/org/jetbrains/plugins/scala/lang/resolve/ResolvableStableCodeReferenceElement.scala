@@ -14,17 +14,29 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlock, ScTemplateBody}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScExtendsBlock, ScTemplateBody
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.{ScPackage, ScalaFile}
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.{ScImportsHolder, ScalaPsiUtil}
 import org.jetbrains.plugins.scala.lang.resolve.ResolvableStableCodeReferenceElement.EMPTY_ARRAY
-import org.jetbrains.plugins.scala.lang.resolve.processor.{BaseProcessor, ExtractorResolveProcessor}
+import org.jetbrains.plugins.scala.lang.resolve.processor.{
+  BaseProcessor, ExtractorResolveProcessor
+}
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocResolvableCodeReference
-import org.jetbrains.plugins.scala.macroAnnotations.{CachedMappedWithRecursionGuard, CachedWithRecursionGuard, ModCount}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  CachedMappedWithRecursionGuard, CachedWithRecursionGuard, ModCount
+}
 
 trait ResolvableStableCodeReferenceElement
     extends ScStableCodeReferenceElement {

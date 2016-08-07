@@ -18,7 +18,9 @@ package kafka.tools
 
 import kafka.metrics.KafkaMetricsReporter
 import kafka.producer.{OldProducer, NewShinyProducer}
-import kafka.utils.{ToolsUtils, VerifiableProperties, Logging, CommandLineUtils}
+import kafka.utils.{
+  ToolsUtils, VerifiableProperties, Logging, CommandLineUtils
+}
 import kafka.message.CompressionCodec
 import kafka.serializer._
 

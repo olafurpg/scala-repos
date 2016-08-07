@@ -63,10 +63,10 @@ private[round] object VersionedEvent {
                    "t" -> o.typ,
                    "d" ->
                      (o.encoded match {
-                           case Left(s) => s.some
-                           case Right(JsNull) => none
-                           case Right(js) => Json.stringify(js).some
-                         }),
+                       case Left(s) => s.some
+                       case Right(JsNull) => none
+                       case Right(js) => Json.stringify(js).some
+                     }),
                    "o" -> o.only.map(_.white),
                    "ow" -> w.boolO(o.owner),
                    "w" -> w.boolO(o.watcher),

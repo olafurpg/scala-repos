@@ -19,19 +19,16 @@ object Test {
 }
 /*
 compiler crash:
-
 object A1 {
  object A2 {
    class X { def unapply(v : Int) = Some(v + 1) }
  }
 }
-
 object B1 {
   object B2 {
     val q = new A1.A2.X
   }
 }
-
 object C {
   def main(args: Array[String]) {
     //import B1.B2.q
@@ -40,5 +37,4 @@ object C {
     println(res)
   }
 }
-
  */

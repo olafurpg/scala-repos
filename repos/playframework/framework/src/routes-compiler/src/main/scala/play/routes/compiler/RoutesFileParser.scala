@@ -258,9 +258,8 @@ private[routes] class RoutesFileParser extends JavaTokenParsers {
 
   def path: Parser[PathPattern] =
     "/" ~
-      ((positioned(singleComponentPathPart) | positioned(
-                  multipleComponentsPathPart) | positioned(
-                  regexComponentPathPart) | staticPathPart) *) ^^ {
+      ((positioned(singleComponentPathPart) | positioned(multipleComponentsPathPart) | positioned(
+              regexComponentPathPart) | staticPathPart) *) ^^ {
       case _ ~ parts => PathPattern(parts)
     }
 

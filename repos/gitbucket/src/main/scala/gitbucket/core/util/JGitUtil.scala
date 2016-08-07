@@ -16,7 +16,10 @@ import org.eclipse.jgit.diff.DiffEntry.ChangeType
 import org.eclipse.jgit.errors.{ConfigInvalidException, MissingObjectException}
 import org.eclipse.jgit.transport.RefSpec
 import java.util.Date
-import org.eclipse.jgit.api.errors.{JGitInternalException, InvalidRefNameException, RefAlreadyExistsException, NoHeadException}
+import org.eclipse.jgit.api.errors.{
+  JGitInternalException, InvalidRefNameException, RefAlreadyExistsException,
+  NoHeadException
+}
 import org.eclipse.jgit.dircache.DirCacheEntry
 import org.slf4j.LoggerFactory
 
@@ -191,7 +194,7 @@ object JGitUtil {
 
   /**
     * Returns RevCommit from the commit or tag id.
-    * 
+    *
     * @param git the Git object
     * @param objectId the ObjectId of the commit or tag
     * @return the RevCommit for the specified commit or tag
@@ -243,7 +246,7 @@ object JGitUtil {
 
   /**
     * Returns the file list of the specified path.
-    * 
+    *
     * @param git the Git object
     * @param revision the branch name or commit id
     * @param path the directory path (optional)
@@ -453,7 +456,7 @@ object JGitUtil {
 
   /**
     * Returns the commit list of the specified branch.
-    * 
+    *
     * @param git the Git object
     * @param revision the branch name or commit id
     * @param page the page number (1-)
@@ -529,7 +532,7 @@ object JGitUtil {
 
   /**
     * Returns the commit list between two revisions.
-    * 
+    *
     * @param git the Git object
     * @param from the from revision
     * @param to the to revision
@@ -541,7 +544,7 @@ object JGitUtil {
 
   /**
     * Returns the latest RevCommit of the specified path.
-    * 
+    *
     * @param git the Git object
     * @param path the path
     * @param revision the branch name or commit id

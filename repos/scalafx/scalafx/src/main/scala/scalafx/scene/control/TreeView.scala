@@ -32,7 +32,9 @@ import javafx.{event => jfxe, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyObjectProperty, _}
+import scalafx.beans.property.{
+  BooleanProperty, ObjectProperty, ReadOnlyObjectProperty, _
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.event.Event
 

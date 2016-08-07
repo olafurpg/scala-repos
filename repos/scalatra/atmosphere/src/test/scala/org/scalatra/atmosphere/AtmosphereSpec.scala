@@ -6,7 +6,9 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import _root_.akka.actor.ActorSystem
 import org.atmosphere.wasync._
-import org.atmosphere.wasync.impl.{DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder}
+import org.atmosphere.wasync.impl.{
+  DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder
+}
 import org.json4s.JsonDSL._
 import org.json4s.{DefaultFormats, Formats, _}
 import org.scalatra.json.JacksonJsonSupport

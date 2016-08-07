@@ -8,16 +8,24 @@ import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClause
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScSequenceArg, ScTupleTypeElement, ScTypeElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScSequenceArg, ScTupleTypeElement, ScTypeElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, ScMethodType, ScTypePolymorphicType}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceExpression, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  Parameter, ScMethodType, ScTypePolymorphicType
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolvableReferenceExpression, ScalaResolveResult
+}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
@@ -488,10 +496,10 @@ private[expr] object ExpectedTypes {
             p match {
               case (ScTupleType(comps), te) if comps.length == 2 =>
                 res += ((comps(1), te.map {
-                      case t: ScTupleTypeElement if t.components.length == 2 =>
-                        t.components(1)
-                      case t => t
-                    }))
+                  case t: ScTupleTypeElement if t.components.length == 2 =>
+                    t.components(1)
+                  case t => t
+                }))
               case _ => res += p
             }
           } else {

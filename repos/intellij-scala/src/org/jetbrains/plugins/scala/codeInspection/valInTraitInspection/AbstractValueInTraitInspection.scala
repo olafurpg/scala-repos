@@ -3,7 +3,9 @@ package codeInspection
 package valInTraitInspection
 
 import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValueDeclaration, ScVariableDeclaration}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScValueDeclaration, ScVariableDeclaration
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTrait
 

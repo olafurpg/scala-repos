@@ -1,7 +1,9 @@
 package mesosphere.marathon.core.leadership
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import mesosphere.marathon.core.base.{ActorsModule, ShutdownHooks, TestShutdownHooks}
+import mesosphere.marathon.core.base.{
+  ActorsModule, ShutdownHooks, TestShutdownHooks
+}
 import mesosphere.marathon.test.Mockito
 
 /**

@@ -12,7 +12,9 @@ package ast.parser
 import scala.collection.mutable
 import mutable.ListBuffer
 import scala.reflect.internal.{Precedence, ModifierFlags => Flags}
-import scala.reflect.internal.util.{SourceFile, Position, FreshNameCreator, ListOfNil}
+import scala.reflect.internal.util.{
+  SourceFile, Position, FreshNameCreator, ListOfNil
+}
 import Tokens._
 
 /** Historical note: JavaParsers started life as a direct copy of Parsers
@@ -705,22 +707,22 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
 
     def isSimpleExprIntroToken(token: Token): Boolean =
       isLiteralToken(token) || (token match {
-            case IDENTIFIER | BACKQUOTED_IDENT | THIS | SUPER | NEW | USCORE |
-                LPAREN | LBRACE | XMLSTART =>
-              true
-            case _ => false
-          })
+        case IDENTIFIER | BACKQUOTED_IDENT | THIS | SUPER | NEW | USCORE |
+            LPAREN | LBRACE | XMLSTART =>
+          true
+        case _ => false
+      })
 
     def isSimpleExprIntro: Boolean = isExprIntroToken(in.token)
 
     def isExprIntroToken(token: Token): Boolean =
       isLiteralToken(token) || (token match {
-            case IDENTIFIER | BACKQUOTED_IDENT | THIS | SUPER | IF | FOR |
-                NEW | USCORE | TRY | WHILE | DO | RETURN | THROW | LPAREN |
-                LBRACE | XMLSTART =>
-              true
-            case _ => false
-          })
+        case IDENTIFIER | BACKQUOTED_IDENT | THIS | SUPER | IF | FOR | NEW |
+            USCORE | TRY | WHILE | DO | RETURN | THROW | LPAREN | LBRACE |
+            XMLSTART =>
+          true
+        case _ => false
+      })
 
     def isExprIntro: Boolean = isExprIntroToken(in.token)
 
@@ -1375,9 +1377,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         if (isAny)
           placeholderParams foreach
             (_.tpt match {
-                  case tpt @ TypeTree() => tpt setType definitions.AnyTpe
-                  case _ => // some ascription
-                })
+              case tpt @ TypeTree() => tpt setType definitions.AnyTpe
+              case _ => // some ascription
+            })
         placeholderParams = List()
       }
       placeholderParams = placeholderParams ::: savedPlaceholderParams
@@ -3134,10 +3136,10 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         val start = in.offset
         val parent = startAnnotType()
         parents += (in.token match {
-              case LPAREN =>
-                atPos(start)((parent /: multipleArgumentExprs())(Apply.apply))
-              case _ => parent
-            })
+          case LPAREN =>
+            atPos(start)((parent /: multipleArgumentExprs())(Apply.apply))
+          case _ => parent
+        })
       }
       readAppliedParent()
       while (in.token == WITH) { in.nextToken(); readAppliedParent() }

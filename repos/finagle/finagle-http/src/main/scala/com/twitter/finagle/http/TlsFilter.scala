@@ -1,7 +1,9 @@
 package com.twitter.finagle.http
 
 import com.twitter.finagle.client.Transporter
-import com.twitter.finagle.{ServiceFactory, Service, Stack, Stackable, SimpleFilter}
+import com.twitter.finagle.{
+  ServiceFactory, Service, Stack, Stackable, SimpleFilter
+}
 import com.twitter.util.Future
 
 /**

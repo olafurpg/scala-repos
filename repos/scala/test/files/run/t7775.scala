@@ -44,7 +44,6 @@ object Test extends App {
 import scala.concurrent.{duration, Future, Await, ExecutionContext}
 import scala.tools.nsc.Settings
 import ExecutionContext.Implicits.global
-
 // Was failing pretty regularly with a ConcurrentModificationException as
 // WrappedProperties#systemProperties iterated directly over the mutable
 // global system properties map.

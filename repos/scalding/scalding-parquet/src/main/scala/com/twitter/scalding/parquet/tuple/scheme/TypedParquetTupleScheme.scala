@@ -15,7 +15,9 @@ import com.twitter.bijection.{Injection, GZippedBase64String}
 import com.twitter.chill.KryoInjection
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.mapred._
-import org.apache.parquet.hadoop.mapred.{Container, DeprecatedParquetOutputFormat, DeprecatedParquetInputFormat}
+import org.apache.parquet.hadoop.mapred.{
+  Container, DeprecatedParquetOutputFormat, DeprecatedParquetInputFormat
+}
 import org.apache.parquet.hadoop.{ParquetInputFormat, ParquetOutputFormat}
 import org.apache.parquet.schema._
 

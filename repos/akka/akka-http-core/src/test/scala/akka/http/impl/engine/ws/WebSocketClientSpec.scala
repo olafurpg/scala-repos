@@ -7,7 +7,9 @@ package akka.http.impl.engine.ws
 import java.util.Random
 
 import akka.NotUsed
-import akka.http.scaladsl.model.ws.{InvalidUpgradeResponse, WebSocketUpgradeResponse}
+import akka.http.scaladsl.model.ws.{
+  InvalidUpgradeResponse, WebSocketUpgradeResponse
+}
 import akka.stream.ClosedShape
 import akka.stream.TLSProtocol._
 

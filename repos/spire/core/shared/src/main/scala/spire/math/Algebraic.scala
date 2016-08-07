@@ -3,13 +3,17 @@ package math
 
 import java.lang.Long.numberOfLeadingZeros
 import java.lang.Double.{isInfinite, isNaN}
-import java.math.{MathContext, RoundingMode, BigInteger, BigDecimal => JBigDecimal}
+import java.math.{
+  MathContext, RoundingMode, BigInteger, BigDecimal => JBigDecimal
+}
 import java.util.concurrent.atomic.AtomicReference
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import spire.Platform
-import spire.algebra.{Eq, EuclideanRing, Field, IsAlgebraic, NRoot, Order, Ring, Sign, Signed}
+import spire.algebra.{
+  Eq, EuclideanRing, Field, IsAlgebraic, NRoot, Order, Ring, Sign, Signed
+}
 import spire.algebra.Sign.{Positive, Negative, Zero}
 import spire.macros.Checked.checked
 import spire.math.poly.{Term, BigDecimalRootRefinement, RootFinder, Roots}
@@ -43,7 +47,10 @@ final class Algebraic private (val expr: Algebraic.Expr)
     extends ScalaNumber
     with ScalaNumericConversions
     with Serializable {
-  import Algebraic.{Zero, One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, JBigDecimalOrder, roundExact, BFMSS, LiYap}
+  import Algebraic.{
+    Zero, One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue,
+    JBigDecimalOrder, roundExact, BFMSS, LiYap
+  }
 
   /**
     * Returns an `Int` with the same sign as this algebraic number. Algebraic
@@ -1238,7 +1245,9 @@ object Algebraic extends AlgebraicInstances {
                             approx: JBigDecimal,
                             scale: Int,
                             mode: RoundingMode): JBigDecimal = {
-    import RoundingMode.{CEILING, FLOOR, DOWN, UP, HALF_DOWN, HALF_UP, HALF_EVEN, UNNECESSARY}
+    import RoundingMode.{
+      CEILING, FLOOR, DOWN, UP, HALF_DOWN, HALF_UP, HALF_EVEN, UNNECESSARY
+    }
 
     val cutoff = approx.scale - scale
     if (cutoff == 0) {

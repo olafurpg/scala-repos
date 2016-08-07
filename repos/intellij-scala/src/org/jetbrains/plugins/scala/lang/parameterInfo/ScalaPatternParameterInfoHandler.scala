@@ -15,9 +15,13 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScConstructorPattern, ScPattern, ScPatternArgumentList}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScConstructorPattern, ScPattern, ScPatternArgumentList
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
@@ -119,10 +123,10 @@ class ScalaPatternParameterInfoHandler
                   val isSeq =
                     methodName == "unapplySeq" &&
                       (ScType.extractClass(param) match {
-                            case Some(clazz) =>
-                              clazz.qualifiedName == "scala.Seq"
-                            case _ => false
-                          })
+                        case Some(clazz) =>
+                          clazz.qualifiedName == "scala.Seq"
+                        case _ => false
+                      })
                   if (isSeq) {
                     buffer.delete(0, buffer.indexOf("[") + 1)
                     buffer.deleteCharAt(buffer.length - 1)

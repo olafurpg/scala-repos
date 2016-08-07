@@ -10,7 +10,7 @@ import com.intellij.psi.tree.TokenSet
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScGuard}
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */

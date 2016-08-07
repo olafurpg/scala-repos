@@ -3,13 +3,21 @@ package org.jetbrains.plugins.scala.lang.completion
 import com.intellij.codeInsight.completion._
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.filters.position.{FilterPattern, LeftNeighbour}
-import com.intellij.psi.filters.{AndFilter, ElementFilter, NotFilter, TextFilter}
+import com.intellij.psi.filters.{
+  AndFilter, ElementFilter, NotFilter, TextFilter
+}
 import com.intellij.util.ProcessingContext
-import org.jetbrains.plugins.scala.lang.completion.filters.definitions.{DefTypeFilter, DefinitionsFilter, ValueDefinitionFilter}
+import org.jetbrains.plugins.scala.lang.completion.filters.definitions.{
+  DefTypeFilter, DefinitionsFilter, ValueDefinitionFilter
+}
 import org.jetbrains.plugins.scala.lang.completion.filters.expression._
-import org.jetbrains.plugins.scala.lang.completion.filters.modifiers.{CaseFilter, ImplicitFilter, ModifiersFilter}
+import org.jetbrains.plugins.scala.lang.completion.filters.modifiers.{
+  CaseFilter, ImplicitFilter, ModifiersFilter
+}
 import org.jetbrains.plugins.scala.lang.completion.filters.other._
-import org.jetbrains.plugins.scala.lang.completion.filters.toplevel.{ImportFilter, PackageFilter, TemplateFilter, TraitFilter}
+import org.jetbrains.plugins.scala.lang.completion.filters.toplevel.{
+  ImportFilter, PackageFilter, TemplateFilter, TraitFilter
+}
 import org.jetbrains.plugins.scala.lang.completion.lookups.LookupElementManager
 
 /**

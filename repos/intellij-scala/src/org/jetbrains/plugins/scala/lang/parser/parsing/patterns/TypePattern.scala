@@ -6,7 +6,9 @@ package patterns
 
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
-import org.jetbrains.plugins.scala.lang.parser.parsing.types.{ExistentialClause, InfixType, Type}
+import org.jetbrains.plugins.scala.lang.parser.parsing.types.{
+  ExistentialClause, InfixType, Type
+}
 
 /**
   * @author Alexander Podkhalyuzin

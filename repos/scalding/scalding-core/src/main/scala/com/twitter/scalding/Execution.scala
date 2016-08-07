@@ -1,12 +1,9 @@
 /*
 Copyright 2014 Twitter, Inc.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +17,9 @@ import com.twitter.algebird.{Monoid, Monad, Semigroup}
 import com.twitter.scalding.cascading_interop.FlowListenerPromise
 import com.twitter.scalding.Dsl.flowDefToRichFlowDef
 import java.util.concurrent.LinkedBlockingQueue
-import scala.concurrent.{Await, Future, ExecutionContext => ConcurrentExecutionContext, Promise}
+import scala.concurrent.{
+  Await, Future, ExecutionContext => ConcurrentExecutionContext, Promise
+}
 import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 import cascading.flow.{FlowDef, Flow}
@@ -46,7 +45,10 @@ import scala.collection.mutable
   * zip to flatMap if you want to run two Executions in parallel.
   */
 sealed trait Execution[+T] extends java.io.Serializable {
-  import Execution.{EvalCache, FlatMapped, GetCounters, ResetCounters, Mapped, OnComplete, RecoverWith, Zipped}
+  import Execution.{
+    EvalCache, FlatMapped, GetCounters, ResetCounters, Mapped, OnComplete,
+    RecoverWith, Zipped
+  }
 
   /**
     * Lift an Execution into a Try

@@ -5,7 +5,9 @@ package play.core.parsers
 
 import akka.stream.Materializer
 import akka.stream.scaladsl._
-import akka.stream.stage.{TerminationDirective, SyncDirective, Context, PushPullStage}
+import akka.stream.stage.{
+  TerminationDirective, SyncDirective, Context, PushPullStage
+}
 import akka.util.ByteString
 import play.api.Play
 import play.api.libs.Files.TemporaryFile
@@ -517,7 +519,7 @@ object Multipart {
         case -1 ⇒
           more ⇒
             next(input ++ more, offset)
-          case 0 ⇒ next(_, 0)
+        case 0 ⇒ next(_, 0)
         case 1 ⇒ throw new IllegalStateException
       }
       done()

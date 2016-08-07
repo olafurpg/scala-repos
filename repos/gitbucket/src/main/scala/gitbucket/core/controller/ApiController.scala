@@ -38,7 +38,21 @@ class ApiController
     with CollaboratorsAuthenticator
 
 trait ApiControllerBase extends ControllerBase {
-  self: RepositoryService with AccountService with ProtectedBranchService with IssuesService with LabelsService with PullRequestService with CommitStatusService with RepositoryCreationService with HandleCommentService with OwnerAuthenticator with UsersAuthenticator with GroupManagerAuthenticator with ReferrerAuthenticator with ReadableUsersAuthenticator with CollaboratorsAuthenticator =>
+  self: RepositoryService
+    with AccountService
+    with ProtectedBranchService
+    with IssuesService
+    with LabelsService
+    with PullRequestService
+    with CommitStatusService
+    with RepositoryCreationService
+    with HandleCommentService
+    with OwnerAuthenticator
+    with UsersAuthenticator
+    with GroupManagerAuthenticator
+    with ReferrerAuthenticator
+    with ReadableUsersAuthenticator
+    with CollaboratorsAuthenticator =>
 
   /**
     * https://developer.github.com/v3/users/#get-a-single-user

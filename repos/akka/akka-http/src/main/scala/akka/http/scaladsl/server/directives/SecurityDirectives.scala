@@ -11,7 +11,9 @@ import akka.http.impl.util._
 import akka.http.scaladsl.util.FastFuture
 import akka.http.scaladsl.util.FastFuture._
 import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.server.AuthenticationFailedRejection.{CredentialsRejected, CredentialsMissing}
+import akka.http.scaladsl.server.AuthenticationFailedRejection.{
+  CredentialsRejected, CredentialsMissing
+}
 
 import scala.util.{Try, Success}
 

@@ -3,7 +3,9 @@ package random
 
 import spire.algebra._
 import spire.syntax.all._
-import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UShort, UInt, ULong}
+import spire.math.{
+  Complex, Interval, Natural, Rational, SafeLong, UByte, UShort, UInt, ULong
+}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.SeqLike
@@ -266,7 +268,7 @@ object Dist extends DistInstances8 {
     Gaussian[A].apply(mean, stdDev)
 
   def reduce[A](ns: Dist[A]*)(f: (A, A) => A): Dist[A] =
-    new DistFromGen(g => ns.map(_ (g)).reduceLeft(f))
+    new DistFromGen(g => ns.map(_(g)).reduceLeft(f))
 
   def fromBytes[A](n: Int)(f: Array[Byte] => A): Dist[A] =
     new DistFromGen(g => f(g.generateBytes(n)))

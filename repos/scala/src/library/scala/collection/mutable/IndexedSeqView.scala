@@ -30,8 +30,7 @@ trait IndexedSeqView[A, +Coll]
     extends IndexedSeq[A]
     with IndexedSeqOptimized[A, IndexedSeqView[A, Coll]]
     with SeqView[A, Coll]
-    with SeqViewLike[A, Coll, IndexedSeqView[A, Coll]] {
-  self =>
+    with SeqViewLike[A, Coll, IndexedSeqView[A, Coll]] { self =>
 
   private[this] type This = IndexedSeqView[A, Coll]
 

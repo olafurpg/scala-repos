@@ -16,7 +16,9 @@ import org.junit.Test
 import org.scalajs.testsuite.utils.JSAssert._
 
 class ScalaJSDefinedTest {
-  import org.scalajs.testsuite.jsinterop.{ScalaJSDefinedTestSeparateRun => SepRun}
+  import org.scalajs.testsuite.jsinterop.{
+    ScalaJSDefinedTestSeparateRun => SepRun
+  }
   import ScalaJSDefinedTest._
 
   @Test def minimal_definition(): Unit = {

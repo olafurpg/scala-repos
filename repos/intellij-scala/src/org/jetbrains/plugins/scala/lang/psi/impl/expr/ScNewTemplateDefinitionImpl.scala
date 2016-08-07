@@ -16,7 +16,9 @@ import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScDeclaredElementsHolder, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScDeclaredElementsHolder, ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
@@ -24,7 +26,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.PsiClassFake
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScTemplateDefinitionStub
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 
 import scala.collection.mutable.ArrayBuffer
 

@@ -15,18 +15,18 @@ import breeze.stats.distributions.Rand
 import spire.syntax.cfor._
 
 /**
-  * Proximal operators and ADMM based Primal-Dual QP Solver 
-  * 
+  * Proximal operators and ADMM based Primal-Dual QP Solver
+  *
   * Reference: http://www.stanford.edu/~boyd/papers/admm/quadprog/quadprog.html
-  * 
-  * 
+  *
+  *
   * It solves problem that has the following structure
-  * 
+  *
   * 1/2 x'Hx + f'x + g(x)
   * s.t Aeqx = b
   *
   * g(x) represents the following constraints which covers ALS based matrix factorization use-cases
-  * 
+  *
   * 1. x >= 0
   * 2. lb <= x <= ub
   * 3. L1(x)

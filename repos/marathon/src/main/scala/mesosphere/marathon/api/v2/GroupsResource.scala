@@ -16,7 +16,9 @@ import mesosphere.marathon.plugin.auth._
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
 import mesosphere.marathon.upgrade.DeploymentPlan
-import mesosphere.marathon.{UnknownGroupException, ConflictingChangeException, MarathonConf}
+import mesosphere.marathon.{
+  UnknownGroupException, ConflictingChangeException, MarathonConf
+}
 import play.api.libs.json.Json
 import scala.collection.JavaConverters._
 import scala.concurrent.Future

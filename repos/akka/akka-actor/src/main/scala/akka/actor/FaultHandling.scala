@@ -93,8 +93,7 @@ final class StoppingSupervisorStrategy extends SupervisorStrategyConfigurator {
     SupervisorStrategy.stoppingStrategy
 }
 
-trait SupervisorStrategyLowPriorityImplicits {
-  this: SupervisorStrategy.type ⇒
+trait SupervisorStrategyLowPriorityImplicits { this: SupervisorStrategy.type ⇒
 
   /**
     * Implicit conversion from `Seq` of Cause-Directive pairs to a `Decider`. See makeDecider(causeDirective).
@@ -506,9 +505,9 @@ case class AllForOneStrategy(maxNrOfRetries: Int = -1,
           children.forall(_.requestRestartPermission(retriesWindow)))
         children foreach
           (crs ⇒
-                restartChild(crs.child,
-                             cause,
-                             suspendFirst = (crs.child != child)))
+             restartChild(crs.child,
+                          cause,
+                          suspendFirst = (crs.child != child)))
       else for (c ← children) context.stop(c.child)
     }
   }

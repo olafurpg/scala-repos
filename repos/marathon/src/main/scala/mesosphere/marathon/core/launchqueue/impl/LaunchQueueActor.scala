@@ -1,7 +1,10 @@
 package mesosphere.marathon.core.launchqueue.impl
 
 import akka.actor.SupervisorStrategy.Stop
-import akka.actor.{PoisonPill, Terminated, Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, SupervisorStrategy}
+import akka.actor.{
+  PoisonPill, Terminated, Actor, ActorLogging, ActorRef, OneForOneStrategy,
+  Props, SupervisorStrategy
+}
 import akka.event.LoggingReceive
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout

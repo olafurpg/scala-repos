@@ -19,8 +19,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.templates.ScExtendsBlockImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.elements.ScTemplateDefinitionElementType
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScFileStubImpl
-import org.jetbrains.plugins.scala.lang.psi.stubs.index.{ScDirectInheritorsIndex, ScSelfTypeInheritorsIndex}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.stubs.index.{
+  ScDirectInheritorsIndex, ScSelfTypeInheritorsIndex
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScCompoundType, ScType}
 
 import scala.collection.mutable.ArrayBuffer

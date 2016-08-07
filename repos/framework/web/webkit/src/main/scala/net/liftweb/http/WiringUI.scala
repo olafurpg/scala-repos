@@ -70,14 +70,14 @@ object WiringUI {
     *
     * @param in the NodeSeq that contains the view markup
     * @param cell the cell to associate with
-    * 
+    *
     * @param jsEffect a function that wraps the SetHtml JsCmd so
     * you can, for example, fade out the old value, set the new value and
     * fade it in.  The first parameter is the id of the element, the
     * second is a flag that's true if this is the first time the element is
     * being rendered (you might want to skip effects for the inital page load),
     * and the third parameter is the SetHtml JavaScript code.
-    * 
+    *
     * @param f the function that performs the drawing
     *
     * @return the mutated NodeSeq (an id attribute may be added if
@@ -98,14 +98,14 @@ object WiringUI {
     * a new value.
     *
     * @param cell the cell to associate with
-    * 
+    *
     * @param jsEffect a function that wraps the SetHtml JsCmd so
     * you can, for example, fade out the old value, set the new value and
     * fade it in.  The first parameter is the id of the element, the
     * second is a flag that's true if this is the first time the element is
     * being rendered (you might want to skip effects for the inital page load),
     * and the third parameter is the SetHtml JavaScript code.
-    * 
+    *
     * @param f the function that performs the drawing
     *
     * @return the mutated NodeSeq (an id attribute may be added if
@@ -124,7 +124,7 @@ object WiringUI {
     * @param in the NodeSeq that contains the view markup
     * @param cell the cell to associate with
     * @param f the function that performs the drawing
-    * 
+    *
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
@@ -159,7 +159,7 @@ object WiringUI {
     * @param in the NodeSeq that contains the view markup
     * @param cell the cell to associate with
     * @param f the function that performs the drawing
-    * 
+    *
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
@@ -174,7 +174,7 @@ object WiringUI {
     *
     * @param in the NodeSeq that contains the view markup
     * @param cell the cell to associate with
-    * 
+    *
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
@@ -187,7 +187,7 @@ object WiringUI {
     * a new value.
     *
     * @param cell the cell to associate with
-    * 
+    *
     * @return a function that will mutate the NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
@@ -201,14 +201,14 @@ object WiringUI {
     *
     * @param in the NodeSeq that contains the view markup
     * @param cell the cell to associate with
-    * 
+    *
     * @param jsEffect a function that wraps the SetHtml JsCmd so
     * you can, for example, fade out the old value, set the new value and
     * fade it in.  The first parameter is the id of the element, the
     * second is a flag that's true if this is the first time the element is
     * being rendered (you might want to skip effects for the inital page load),
     * and the third parameter is the SetHtml JavaScript code.
-    * 
+    *
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
@@ -224,14 +224,14 @@ object WiringUI {
     *
     * @param in the NodeSeq that contains the view markup
     * @param cell the cell to associate with
-    * 
+    *
     * @param jsEffect a function that wraps the SetHtml JsCmd so
     * you can, for example, fade out the old value, set the new value and
     * fade it in.  The first parameter is the id of the element, the
     * second is a flag that's true if this is the first time the element is
     * being rendered (you might want to skip effects for the inital page load),
     * and the third parameter is the SetHtml JavaScript code.
-    * 
+    *
     * @return a function that will mutate the NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
@@ -248,16 +248,16 @@ object WiringUI {
     *
     * @param in the NodeSeq that contains the view markup
     * @param cell the cell to associate with
-    * 
+    *
     * @param jsEffect a function that wraps the SetHtml JsCmd so
     * you can, for example, fade out the old value, set the new value and
     * fade it in.  The first parameter is the id of the element, the
     * second is a flag that's true if this is the first time the element is
     * being rendered (you might want to skip effects for the inital page load),
     * and the third parameter is the SetHtml JavaScript code.
-    * 
+    *
     * @param f the function that performs the drawing
-    * 
+    *
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
@@ -286,16 +286,16 @@ object WiringUI {
     * a new value.
     *
     * @param cell the cell to associate with
-    * 
+    *
     * @param jsEffect a function that wraps the SetHtml JsCmd so
     * you can, for example, fade out the old value, set the new value and
     * fade it in.  The first parameter is the id of the element, the
     * second is a flag that's true if this is the first time the element is
     * being rendered (you might want to skip effects for the inital page load),
     * and the third parameter is the SetHtml JavaScript code.
-    * 
+    *
     * @param f the function that performs the drawing
-    * 
+    *
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
@@ -322,7 +322,7 @@ object WiringUI {
     *
     * @param cell the cell to associate the JavaScript to
     * @param f the function that takes the cell's value and a flag indicating
-    * if this is the first time 
+    * if this is the first time
     */
   def addJsFunc[T](cell: Cell[T], f: (T, Boolean) => JsCmd) {
     for {
@@ -352,7 +352,7 @@ object WiringUI {
     *
     * @param cell the cell to associate the JavaScript to
     * @param f the function that takes the cell's value and a flag indicating
-    * if this is the first time 
+    * if this is the first time
     */
   def addHistJsFunc[T](cell: Cell[T], f: (Box[T], T) => JsCmd) {
     for {

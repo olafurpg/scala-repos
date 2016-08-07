@@ -5,9 +5,13 @@ import com.intellij.codeInspection.ex.ProblemDescriptorImpl
 import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnTwoPsiElements, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnTwoPsiElements, AbstractInspection
+}
 import org.jetbrains.plugins.scala.extensions.ElementText
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScGenericCall}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScGenericCall
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 /**

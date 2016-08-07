@@ -19,7 +19,9 @@ package org.apache.spark.sql.execution.python
 
 import org.apache.spark.api.python.PythonFunction
 import org.apache.spark.internal.Logging
-import org.apache.spark.sql.catalyst.expressions.{Expression, NonSQLExpression, Unevaluable}
+import org.apache.spark.sql.catalyst.expressions.{
+  Expression, NonSQLExpression, Unevaluable
+}
 import org.apache.spark.sql.types.DataType
 
 /**

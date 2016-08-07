@@ -64,7 +64,7 @@ class OffsetIndexTest extends JUnitSuite {
                    OffsetPosition(logical, physical),
                    idx.lookup(logical))
 
-    // for non-present values we should find the offset of the largest value less than or equal to this 
+    // for non-present values we should find the offset of the largest value less than or equal to this
     val valMap =
       new immutable.TreeMap[Long, (Long, Int)]() ++ vals.map(p => (p._1, p))
     val offsets = (idx.baseOffset until vals.last._1.toInt).toArray
@@ -138,7 +138,7 @@ class OffsetIndexTest extends JUnitSuite {
     idx.truncate()
     for (i <- 1 until 10) idx.append(i, i)
 
-    // now check the last offset after various truncate points and validate that we can still append to the index.      
+    // now check the last offset after various truncate points and validate that we can still append to the index.
     idx.truncateTo(12)
     assertEquals("Index should be unchanged by truncate past the end",
                  OffsetPosition(9, 9),

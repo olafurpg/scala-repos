@@ -5,7 +5,9 @@
 package akka.http.javadsl.server
 
 import akka.http.javadsl.model._
-import akka.http.scaladsl.marshalling.{ToResponseMarshaller, Marshaller ⇒ ScalaMarshaller}
+import akka.http.scaladsl.marshalling.{
+  ToResponseMarshaller, Marshaller ⇒ ScalaMarshaller
+}
 import akka.http.impl.server.MarshallerImpl
 import akka.http.scaladsl
 import akka.japi.function

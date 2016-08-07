@@ -217,8 +217,7 @@ object SwapperApp extends App {
 
 //#receive-orElse
 
-trait ProducerBehavior {
-  this: Actor =>
+trait ProducerBehavior { this: Actor =>
 
   val producerBehavior: Receive = {
     case GiveMeThings =>
@@ -226,8 +225,7 @@ trait ProducerBehavior {
   }
 }
 
-trait ConsumerBehavior {
-  this: Actor with ActorLogging =>
+trait ConsumerBehavior { this: Actor with ActorLogging =>
 
   val consumerBehavior: Receive = {
     case ref: ActorRef =>

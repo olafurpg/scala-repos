@@ -16,7 +16,6 @@ import scala.concurrent.Await
   # OS:   OSX 10.9.3
   # CPU:  Intel(R) Core(TM) i7-4850HQ CPU @ 2.30GHz
   # Date: Mon Jun  9 13:22:42 CEST 2014
-
   [info] Benchmark                                                                            Mode   Samples         Mean   Mean error    Units
   [info] a.p.PersistentActorDeferBenchmark.tell_persistAsync_defer_persistAsync_reply        thrpt        10        6.858        0.515   ops/ms
   [info] a.p.PersistentActorDeferBenchmark.tell_persistAsync_defer_persistAsync_replyASAP    thrpt        10       20.256        2.941   ops/ms

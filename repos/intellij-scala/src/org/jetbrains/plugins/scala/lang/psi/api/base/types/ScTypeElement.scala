@@ -7,8 +7,12 @@ package types
 
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, TypingContext, TypingContextOwner}
-import org.jetbrains.plugins.scala.macroAnnotations.{CachedWithRecursionGuard, ModCount}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, TypeResult, TypingContext, TypingContextOwner
+}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  CachedWithRecursionGuard, ModCount
+}
 
 /**
   * @author Alexander Podkhalyuzin

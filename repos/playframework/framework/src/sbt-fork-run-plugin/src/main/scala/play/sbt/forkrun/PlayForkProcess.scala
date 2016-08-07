@@ -5,7 +5,9 @@ package play.sbt.forkrun
 
 import sbt._
 import java.io.File
-import java.lang.{Process => JProcess, ProcessBuilder => JProcessBuilder, Runtime => JRuntime}
+import java.lang.{
+  Process => JProcess, ProcessBuilder => JProcessBuilder, Runtime => JRuntime
+}
 import java.util.concurrent.CountDownLatch
 import scala.concurrent.duration.FiniteDuration
 

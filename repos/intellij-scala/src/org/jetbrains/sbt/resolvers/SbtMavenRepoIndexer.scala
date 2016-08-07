@@ -6,9 +6,13 @@ import java.io.{IOException, Closeable, File, FileNotFoundException}
 import com.intellij.openapi.progress.ProgressIndicator
 import org.apache.maven.index._
 import org.apache.maven.index.artifact.DefaultArtifactPackagingMapper
-import org.apache.maven.index.context.{IndexCreator, IndexUtils, IndexingContext}
+import org.apache.maven.index.context.{
+  IndexCreator, IndexUtils, IndexingContext
+}
 import org.apache.maven.index.incremental.DefaultIncrementalHandler
-import org.apache.maven.index.updater.{DefaultIndexUpdater, IndexUpdateRequest, WagonHelper}
+import org.apache.maven.index.updater.{
+  DefaultIndexUpdater, IndexUpdateRequest, WagonHelper
+}
 import org.apache.maven.wagon.events.TransferEvent
 import org.apache.maven.wagon.observers.AbstractTransferListener
 import org.apache.maven.wagon.{ResourceDoesNotExistException, Wagon}

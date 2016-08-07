@@ -19,10 +19,18 @@ import model.{RootPackage => RootPackageEntity}
 
 /** This trait extracts all required information for documentation from compilation units */
 class ModelFactory(val global: Global, val settings: doc.Settings) {
-  thisFactory: ModelFactory with ModelFactoryImplicitSupport with ModelFactoryTypeSupport with DiagramFactory with CommentFactory with TreeFactory with MemberLookup =>
+  thisFactory: ModelFactory
+    with ModelFactoryImplicitSupport
+    with ModelFactoryTypeSupport
+    with DiagramFactory
+    with CommentFactory
+    with TreeFactory
+    with MemberLookup =>
 
   import global._
-  import definitions.{ObjectClass, NothingClass, AnyClass, AnyValClass, AnyRefClass}
+  import definitions.{
+    ObjectClass, NothingClass, AnyClass, AnyValClass, AnyRefClass
+  }
   import rootMirror.{RootPackage, EmptyPackage}
 
   // Defaults for member grouping, that may be overridden by the template
@@ -456,16 +464,16 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
         (TemplateEntity, TypeEntity, ImplicitConversionImpl)] =
       conversions flatMap
         (conv =>
-              if (!implicitExcluded(conv.conversionQualifiedName))
-                conv.targetTypeComponents map {
-                  case (template, tpe) =>
-                    template match {
-                      case d: DocTemplateImpl if (d != this) =>
-                        d.registerImplicitlyConvertibleClass(this, conv)
-                      case _ => // nothing
-                    }
-                    (template, tpe, conv)
-                } else List())
+           if (!implicitExcluded(conv.conversionQualifiedName))
+             conv.targetTypeComponents map {
+               case (template, tpe) =>
+                 template match {
+                   case d: DocTemplateImpl if (d != this) =>
+                     d.registerImplicitlyConvertibleClass(this, conv)
+                   case _ => // nothing
+                 }
+                 (template, tpe, conv)
+             } else List())
 
     override def isDocTemplate = true
     private[this] lazy val companionSymbol =

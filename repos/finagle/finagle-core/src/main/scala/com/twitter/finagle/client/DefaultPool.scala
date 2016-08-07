@@ -1,7 +1,9 @@
 package com.twitter.finagle.client
 
 import com.twitter.conversions.time._
-import com.twitter.finagle.{param, ServiceFactory, Stack, Stackable, StackBuilder}
+import com.twitter.finagle.{
+  param, ServiceFactory, Stack, Stackable, StackBuilder
+}
 import com.twitter.finagle.pool.{WatermarkPool, CachingPool, BufferingPool}
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.util.DefaultTimer
@@ -59,7 +61,9 @@ object DefaultPool {
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module[ServiceFactory[Req, Rep]] {
-      import com.twitter.finagle.pool.{CachingPool, WatermarkPool, BufferingPool}
+      import com.twitter.finagle.pool.{
+        CachingPool, WatermarkPool, BufferingPool
+      }
       val role = DefaultPool.Role
       val description = "Control client connection pool"
       val parameters = Seq(implicitly[Stack.Param[Param]],

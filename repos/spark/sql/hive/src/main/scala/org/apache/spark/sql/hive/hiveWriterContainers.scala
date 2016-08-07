@@ -29,7 +29,9 @@ import org.apache.hadoop.hive.ql.exec.{FileSinkOperator, Utilities}
 import org.apache.hadoop.hive.ql.io.{HiveFileFormatUtils, HiveOutputFormat}
 import org.apache.hadoop.hive.ql.plan.TableDesc
 import org.apache.hadoop.hive.serde2.Serializer
-import org.apache.hadoop.hive.serde2.objectinspector.{ObjectInspectorUtils, StructObjectInspector}
+import org.apache.hadoop.hive.serde2.objectinspector.{
+  ObjectInspectorUtils, StructObjectInspector
+}
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.ObjectInspectorCopyOption
 import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapred._

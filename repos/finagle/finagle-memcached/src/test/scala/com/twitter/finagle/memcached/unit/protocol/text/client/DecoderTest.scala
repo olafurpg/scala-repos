@@ -6,7 +6,9 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 import com.twitter.finagle.memcached.protocol.text.client.Decoder
-import com.twitter.finagle.memcached.protocol.text.{TokensWithData, ValueLines, Tokens, StatLines}
+import com.twitter.finagle.memcached.protocol.text.{
+  TokensWithData, ValueLines, Tokens, StatLines
+}
 import com.twitter.finagle.memcached.util.ChannelBufferUtils._
 import com.twitter.io.Buf
 

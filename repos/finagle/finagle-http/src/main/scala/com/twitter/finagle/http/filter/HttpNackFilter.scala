@@ -16,7 +16,7 @@ import org.jboss.netty.handler.codec.http.HttpResponse
   * Clients who recognize the header convert the response to a
   * restartable failure, which can be retried. Clients who don't
   * recognize the header treats the response the same way as other
-  * 503 response. 
+  * 503 response.
   */
 private[finagle] object HttpNackFilter {
   val role: Stack.Role = Stack.Role("HttpNack")

@@ -9,7 +9,9 @@ import java.{lang ⇒ jl, util ⇒ ju}
 
 import akka.http.impl.server.PathMatcherImpl
 import akka.http.javadsl.server.RequestVal
-import akka.http.scaladsl.server.{PathMatcher0, PathMatcher1, PathMatchers ⇒ ScalaPathMatchers}
+import akka.http.scaladsl.server.{
+  PathMatcher0, PathMatcher1, PathMatchers ⇒ ScalaPathMatchers
+}
 import akka.japi.function.Function
 
 import scala.collection.JavaConverters._

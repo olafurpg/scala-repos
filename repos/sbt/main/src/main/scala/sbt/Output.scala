@@ -84,7 +84,7 @@ object Output {
       // Workaround for #1155 - Keys.streams are always scoped by the task they're included in
       // but are keyed by the Keys.streams key.  I think this isn't actually a workaround, but
       // is how things are expected to work now.
-      // You can see where streams are injected using their own key scope in 
+      // You can see where streams are injected using their own key scope in
       // EvaluateTask.injectStreams.
       val streamScopedKey: ScopedKey[_] =
         ScopedKey(Project.fillTaskAxis(key).scope, Keys.streams.key)

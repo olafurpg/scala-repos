@@ -67,17 +67,17 @@ trait NodePrinters { self: Utils =>
       var rtree =
         reification dropWhile
           (!_.trim.startsWith(
-                  s"val ${nme.UNIVERSE_SHORT}: U = ${nme.MIRROR_UNTYPED}.universe;"))
+              s"val ${nme.UNIVERSE_SHORT}: U = ${nme.MIRROR_UNTYPED}.universe;"))
       rtree = rtree drop 2
       rtree = rtree takeWhile (_ != "    }")
       rtree =
         rtree map
           (s0 => {
-                var s = s0
-                mirrorIsUsed |= s contains nme.MIRROR_PREFIX.toString
-                s = s.replace(nme.MIRROR_PREFIX.toString, "")
-                s.trim
-              })
+             var s = s0
+             mirrorIsUsed |= s contains nme.MIRROR_PREFIX.toString
+             s = s.replace(nme.MIRROR_PREFIX.toString, "")
+             s.trim
+           })
 
       val printout = scala.collection.mutable.ListBuffer[String]()
       printout += universe.trim

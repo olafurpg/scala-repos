@@ -16,13 +16,10 @@ abstract class SortedInPackage {
 /*
 package com.jetbrains
 package test
-
 import java.sql.Connection
 import java.util.Date
-
 abstract class SortedInPackage {
   import java.sql.{Blob, Clob}
-
   val d: Date
   val s: Connection
   val c: Clob

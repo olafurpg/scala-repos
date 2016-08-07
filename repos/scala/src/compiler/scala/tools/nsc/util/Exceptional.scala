@@ -2,7 +2,9 @@ package scala.tools.nsc
 package util
 
 import java.util.concurrent.ExecutionException
-import java.lang.reflect.{InvocationTargetException, UndeclaredThrowableException}
+import java.lang.reflect.{
+  InvocationTargetException, UndeclaredThrowableException
+}
 
 object Exceptional {
   def unwrap(x: Throwable): Throwable = x match {

@@ -11,7 +11,9 @@ import akka.remote.security.provider.AkkaProvider
 import com.typesafe.config.Config
 import java.io.{IOException, FileNotFoundException, FileInputStream}
 import java.security._
-import javax.net.ssl.{KeyManagerFactory, TrustManager, TrustManagerFactory, SSLContext}
+import javax.net.ssl.{
+  KeyManagerFactory, TrustManager, TrustManagerFactory, SSLContext
+}
 import org.jboss.netty.handler.ssl.SslHandler
 import scala.util.Try
 

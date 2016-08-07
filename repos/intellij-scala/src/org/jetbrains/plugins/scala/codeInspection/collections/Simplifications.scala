@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala
 package codeInspection.collections
 
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.{PsiElement, SmartPointerManager, SmartPsiElementPointer}
+import com.intellij.psi.{
+  PsiElement, SmartPointerManager, SmartPsiElementPointer
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 import scala.language.implicitConversions

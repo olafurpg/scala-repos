@@ -5,8 +5,12 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.codeInspection.collections.MethodRepr
 import org.jetbrains.plugins.scala.extensions.{Both, childOf}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScMethodCall, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral, ScLiteral
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScMethodCall, ScReferenceExpression
+}
 
 /**
   * Nikolay.Tropin

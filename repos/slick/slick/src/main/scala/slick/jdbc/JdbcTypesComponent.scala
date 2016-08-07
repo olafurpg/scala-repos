@@ -1,6 +1,8 @@
 package slick.jdbc
 
-import java.sql.{Blob, Clob, Date, Time, Timestamp, ResultSet, PreparedStatement}
+import java.sql.{
+  Blob, Clob, Date, Time, Timestamp, ResultSet, PreparedStatement
+}
 import java.util.UUID
 
 import scala.reflect.ClassTag
@@ -371,5 +373,5 @@ object JdbcTypesComponent {
   private[slick] lazy val typeNames =
     Map() ++
       (for (f <- classOf[java.sql.Types].getFields)
-            yield f.get(null).asInstanceOf[Int] -> f.getName)
+        yield f.get(null).asInstanceOf[Int] -> f.getName)
 }

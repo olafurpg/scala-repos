@@ -30,7 +30,10 @@ import javafx.{animation => jfxa, event => jfxe, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty,
+  ReadOnlyDoubleProperty, ReadOnlyObjectProperty
+}
 import scalafx.delegate._
 import scalafx.util.Duration
 import scalafx.util.Duration.sfxDuration2jfx

@@ -15,11 +15,15 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScLiteral, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScLiteral, ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.xml._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScValue
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
@@ -72,9 +76,9 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
     def isBlockOnlyScope(scope: PsiElement) =
       !isLeaf && Set(ScalaTokenTypes.tLBRACE, ScalaTokenTypes.tLPARENTHESIS)
         .contains(scope.getNode.getElementType) && (scope.getParent match {
-            case _: ScTryBlock | _: ScForStatement | _: ScPackaging => true
-            case _ => false
-          })
+        case _: ScTryBlock | _: ScForStatement | _: ScPackaging => true
+        case _ => false
+      })
     parent match {
       case m: ScMatchStmt =>
         if (m.caseClauses.length == 0) {

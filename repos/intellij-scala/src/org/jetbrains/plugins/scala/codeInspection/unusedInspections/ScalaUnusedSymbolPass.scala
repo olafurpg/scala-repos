@@ -11,7 +11,9 @@ import com.intellij.codeInsight.daemon.impl._
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightingLevelManager
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInspection._
-import com.intellij.lang.annotation.{Annotation, AnnotationSession, HighlightSeverity}
+import com.intellij.lang.annotation.{
+  Annotation, AnnotationSession, HighlightSeverity
+}
 import com.intellij.lang.findUsages.{FindUsagesProvider, LanguageFindUsages}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
@@ -25,10 +27,14 @@ import org.jetbrains.plugins.scala.codeInspection.suppression.ScalaInspectionSup
 import org.jetbrains.plugins.scala.codeInspection.varCouldBeValInspection.VarCouldBeValInspection
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScDeclaredElementsHolder, ScFunction, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScDeclaredElementsHolder, ScFunction, ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScNamedElement}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions, ScNamedElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.{ScPackageLike, ScalaFile}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 

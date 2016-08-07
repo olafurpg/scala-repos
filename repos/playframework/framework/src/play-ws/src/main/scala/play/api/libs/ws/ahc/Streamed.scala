@@ -6,12 +6,17 @@ package play.api.libs.ws.ahc
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import org.asynchttpclient.AsyncHandler.State
-import org.asynchttpclient.{AsyncHttpClient, HttpResponseBodyPart, HttpResponseHeaders, HttpResponseStatus, Request}
+import org.asynchttpclient.{
+  AsyncHttpClient, HttpResponseBodyPart, HttpResponseHeaders,
+  HttpResponseStatus, Request
+}
 import org.asynchttpclient.handler.StreamedAsyncHandler
 import org.reactivestreams.{Publisher, Subscriber, Subscription}
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.streams.Streams
-import play.api.libs.ws.{DefaultWSResponseHeaders, StreamedResponse, WSResponseHeaders}
+import play.api.libs.ws.{
+  DefaultWSResponseHeaders, StreamedResponse, WSResponseHeaders
+}
 
 import scala.concurrent.{Future, Promise}
 
@@ -25,9 +30,9 @@ private[play] object Streamed {
     import play.api.libs.iteratee.Execution.Implicits.trampoline
     promise.future.map {
       case (headers, publisher) =>
-        // this transformation is not part of `DefaultStreamedAsyncHandler.onCompleted` because 
-        // a reactive-streams `Publisher` needs to be returned to implement `execute2`. Though, 
-        // once `execute2` is removed, we should move the code here inside 
+        // this transformation is not part of `DefaultStreamedAsyncHandler.onCompleted` because
+        // a reactive-streams `Publisher` needs to be returned to implement `execute2`. Though,
+        // once `execute2` is removed, we should move the code here inside
         // `DefaultStreamedAsyncHandler.onCompleted`.
         val source = Source
           .fromPublisher(publisher)
@@ -36,10 +41,10 @@ private[play] object Streamed {
     }
   }
 
-  // This method was introduced because in Play we have utilities that makes it easy to convert a `Publisher` into an `Enumerator`, 
-  // while it's not as easy to convert an akka-stream Source to a reactive-streams `Publisher` (as it requires materialization of 
-  // the stream). This is why `DefaultStreamedAsyncHandler`'s constructor takes a `Promise[(WSResponseHeaders, Publisher[HttpResponseBodyPart])]` 
-  // and not a `Promise[(WSResponseHeaders, Source[ByteString])]`. In fact, the moment this method is removed, we should refactor the 
+  // This method was introduced because in Play we have utilities that makes it easy to convert a `Publisher` into an `Enumerator`,
+  // while it's not as easy to convert an akka-stream Source to a reactive-streams `Publisher` (as it requires materialization of
+  // the stream). This is why `DefaultStreamedAsyncHandler`'s constructor takes a `Promise[(WSResponseHeaders, Publisher[HttpResponseBodyPart])]`
+  // and not a `Promise[(WSResponseHeaders, Source[ByteString])]`. In fact, the moment this method is removed, we should refactor the
   // `DefaultStreamedAsyncHandler`' constructor parameter's type to the latter.
   // This method is `deprecated` because we should remember to remove it together with `AhcWSRequest.streamWithEnumerator`.
   @deprecated("2.5", "Use `execute()` instead.")
@@ -96,7 +101,7 @@ private[play] object Streamed {
       throw new IllegalStateException("Should not have received body part")
 
     override def onCompleted(): Unit = {
-      // EmptyPublisher can be replaces with `Source.empty` when we carry out the refactoring 
+      // EmptyPublisher can be replaces with `Source.empty` when we carry out the refactoring
       // mentioned in the `execute2` method.
       promise.trySuccess((responseHeaders, EmptyPublisher))
     }

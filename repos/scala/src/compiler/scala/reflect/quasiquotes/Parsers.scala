@@ -3,7 +3,9 @@ package quasiquotes
 
 import scala.tools.nsc.ast.parser.{Parsers => ScalaParser}
 import scala.tools.nsc.ast.parser.Tokens._
-import scala.reflect.internal.util.{BatchSourceFile, SourceFile, FreshNameCreator}
+import scala.reflect.internal.util.{
+  BatchSourceFile, SourceFile, FreshNameCreator
+}
 
 /** Builds upon the vanilla Scala parser and teams up together with Placeholders.scala to emulate holes.
   *  A principled solution to splicing into Scala syntax would be a parser that natively supports holes.
@@ -205,9 +207,9 @@ trait Parsers { self: Quasiquotes =>
 
       override def isTypedParam(tree: Tree) =
         super.isTypedParam(tree) || (tree match {
-              case Ident(name) if isHole(name) => true
-              case _ => false
-            })
+          case Ident(name) if isHole(name) => true
+          case _ => false
+        })
 
       override def topStat = super.topStat.orElse {
         case _ if isHole =>

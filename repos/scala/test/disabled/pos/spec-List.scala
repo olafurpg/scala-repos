@@ -65,7 +65,7 @@ sealed trait List[@specialized +A]
 
   /** <p>
     *    Returns a list resulting from the concatenation of the given
-    *    list <code>prefix</code> and this list. 
+    *    list <code>prefix</code> and this list.
     *  </p>
     *
     *  @param prefix the list to concatenate at the beginning of this list.
@@ -157,9 +157,8 @@ sealed trait List[@specialized +A]
     */
   override def toList: List[A] = this
 
-  /** Returns the <code>n</code> first elements of this list, or else the whole 
+  /** Returns the <code>n</code> first elements of this list, or else the whole
     *  list, if it has less than <code>n</code> elements.
-
     *  @param n the number of elements to take.
     *  @return the <code>n</code> first elements of this list.
     */
@@ -741,7 +740,7 @@ object List extends SeqFactory[List] {
   /** Returns the list resulting from applying the given function <code>f</code>
     *  to corresponding elements of the argument lists.
     *  @param f function to apply to each pair of elements.
-    *  @return <code>[f(a0,b0), ..., f(an,bn)]</code> if the lists are 
+    *  @return <code>[f(a0,b0), ..., f(an,bn)]</code> if the lists are
     *          <code>[a0, ..., ak]</code>, <code>[b0, ..., bl]</code> and
     *          <code>n = min(k,l)</code>
     */
@@ -785,7 +784,7 @@ object List extends SeqFactory[List] {
     b.toList
   }
 
-  /** Tests whether the given predicate <code>p</code> holds 
+  /** Tests whether the given predicate <code>p</code> holds
     *  for all corresponding elements of the argument lists.
     *
     *  @param p function to apply to each pair of elements.

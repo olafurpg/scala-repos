@@ -1,7 +1,9 @@
 package gitbucket.core.controller
 
 import gitbucket.core.issues.milestones.html
-import gitbucket.core.service.{RepositoryService, MilestonesService, AccountService}
+import gitbucket.core.service.{
+  RepositoryService, MilestonesService, AccountService
+}
 import gitbucket.core.util.{ReferrerAuthenticator, CollaboratorsAuthenticator}
 import gitbucket.core.util.Implicits._
 import io.github.gitbucket.scalatra.forms._
@@ -15,7 +17,10 @@ class MilestonesController
     with CollaboratorsAuthenticator
 
 trait MilestonesControllerBase extends ControllerBase {
-  self: MilestonesService with RepositoryService with ReferrerAuthenticator with CollaboratorsAuthenticator =>
+  self: MilestonesService
+    with RepositoryService
+    with ReferrerAuthenticator
+    with CollaboratorsAuthenticator =>
 
   case class MilestoneForm(title: String,
                            description: Option[String],

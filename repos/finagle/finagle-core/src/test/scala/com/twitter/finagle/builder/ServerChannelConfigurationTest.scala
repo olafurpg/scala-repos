@@ -8,7 +8,9 @@ import com.twitter.io.Charsets
 import com.twitter.util.{Await, Future}
 import java.net.{InetAddress, InetSocketAddress}
 import org.jboss.netty.channel.{Channels, ChannelPipelineFactory}
-import org.jboss.netty.handler.codec.frame.{Delimiters, DelimiterBasedFrameDecoder}
+import org.jboss.netty.handler.codec.frame.{
+  Delimiters, DelimiterBasedFrameDecoder
+}
 import org.jboss.netty.handler.codec.string.{StringEncoder, StringDecoder}
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite

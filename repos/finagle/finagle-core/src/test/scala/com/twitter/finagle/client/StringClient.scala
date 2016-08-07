@@ -6,7 +6,10 @@ import com.twitter.finagle.transport.Transport
 import com.twitter.finagle.{Name, Service, ServiceFactory, Stack}
 import com.twitter.io.Charsets
 import com.twitter.util.Future
-import org.jboss.netty.channel.{ChannelHandlerContext, ChannelPipelineFactory, Channels, MessageEvent, SimpleChannelHandler}
+import org.jboss.netty.channel.{
+  ChannelHandlerContext, ChannelPipelineFactory, Channels, MessageEvent,
+  SimpleChannelHandler
+}
 import org.jboss.netty.handler.codec.string.{StringEncoder, StringDecoder}
 
 private class DelimEncoder(delim: Char) extends SimpleChannelHandler {

@@ -24,8 +24,12 @@ import org.apache.spark.sql.catalyst.analysis.MultiInstanceRelation
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenContext
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Statistics}
-import org.apache.spark.sql.catalyst.plans.physical.{HashPartitioning, Partitioning, UnknownPartitioning}
-import org.apache.spark.sql.execution.datasources.parquet.{DefaultSource => ParquetSource}
+import org.apache.spark.sql.catalyst.plans.physical.{
+  HashPartitioning, Partitioning, UnknownPartitioning
+}
+import org.apache.spark.sql.execution.datasources.parquet.{
+  DefaultSource => ParquetSource
+}
 import org.apache.spark.sql.execution.metric.SQLMetrics
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.sources.{BaseRelation, HadoopFsRelation}

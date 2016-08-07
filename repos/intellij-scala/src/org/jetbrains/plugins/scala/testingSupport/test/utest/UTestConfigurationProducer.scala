@@ -2,7 +2,10 @@ package org.jetbrains.plugins.scala
 package testingSupport.test.utest
 
 import com.intellij.execution.configurations.RunConfiguration
-import com.intellij.execution.{JavaRunConfigurationExtensionManager, Location, RunManager, RunnerAndConfigurationSettings}
+import com.intellij.execution.{
+  JavaRunConfigurationExtensionManager, Location, RunManager,
+  RunnerAndConfigurationSettings
+}
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDirectory, PsiElement, PsiPackage}
@@ -12,10 +15,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScArguments
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.testingSupport.test.TestRunConfigurationForm.TestKind
 import org.jetbrains.plugins.scala.testingSupport.test.structureView.TestNodeProvider
-import org.jetbrains.plugins.scala.testingSupport.test.{AbstractTestConfigurationProducer, TestConfigurationProducer, TestConfigurationUtil}
+import org.jetbrains.plugins.scala.testingSupport.test.{
+  AbstractTestConfigurationProducer, TestConfigurationProducer,
+  TestConfigurationUtil
+}
 
 import scala.annotation.tailrec
 

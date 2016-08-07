@@ -22,8 +22,7 @@ import Natural._
 sealed abstract class Natural
     extends ScalaNumber
     with ScalaNumericConversions
-    with Serializable {
-  lhs =>
+    with Serializable { lhs =>
 
   def digit: UInt
 

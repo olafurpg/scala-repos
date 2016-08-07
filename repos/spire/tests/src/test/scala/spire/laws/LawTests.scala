@@ -10,7 +10,10 @@ import spire.math._
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
 
-import spire.implicits.{SeqOrder => _, SeqEq => _, ArrayOrder => _, ArrayEq => _, MapEq => _, MapGroup => _, _}
+import spire.implicits.{
+  SeqOrder => _, SeqEq => _, ArrayOrder => _, ArrayEq => _, MapEq => _,
+  MapGroup => _, _
+}
 
 import org.typelevel.discipline.scalatest.Discipline
 

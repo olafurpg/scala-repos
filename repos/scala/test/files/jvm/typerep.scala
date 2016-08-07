@@ -134,7 +134,6 @@ object testClasses {
   println(getType(foo2))
   println(getType(new foo2.Bar(1)))
   println
-
   println(getType(pkg1.c1))
   val c1 = new pkg1.C1
   println(getType(c1))

@@ -17,7 +17,9 @@
 
 package org.apache.spark.sql.execution.metric
 
-import org.apache.spark.{Accumulable, AccumulableParam, Accumulators, SparkContext}
+import org.apache.spark.{
+  Accumulable, AccumulableParam, Accumulators, SparkContext
+}
 import org.apache.spark.scheduler.AccumulableInfo
 import org.apache.spark.util.Utils
 

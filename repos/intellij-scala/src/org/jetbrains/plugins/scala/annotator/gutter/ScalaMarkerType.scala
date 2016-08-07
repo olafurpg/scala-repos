@@ -9,7 +9,9 @@ import javax.swing.Icon
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.impl.PsiElementListNavigator
 import com.intellij.codeInsight.navigation.NavigationUtil
-import com.intellij.ide.util.{PsiClassListCellRenderer, PsiElementListCellRenderer}
+import com.intellij.ide.util.{
+  PsiClassListCellRenderer, PsiElementListCellRenderer
+}
 import com.intellij.psi._
 import com.intellij.psi.presentation.java.ClassPresentationUtil
 import com.intellij.psi.search.searches.ClassInheritorsSearch
@@ -22,7 +24,9 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember, ScObject, ScTrait, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.search.ScalaOverridingMemberSearcher
 import org.jetbrains.plugins.scala.lang.psi.types.Signature
 

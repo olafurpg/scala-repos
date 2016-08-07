@@ -14,8 +14,7 @@ import breeze.macros.expand
 import scala.math.BigInt
 import breeze.linalg._
 
-trait MatrixGenericOps {
-  this: Matrix.type =>
+trait MatrixGenericOps { this: Matrix.type =>
   class SetMMOp[@specialized(Double, Int, Float, Long) V, MM](
       implicit subtype: MM <:< Matrix[V])
       extends OpSet.InPlaceImpl2[Matrix[V], MM] {
@@ -130,8 +129,7 @@ trait MatrixGenericOps {
   }
 }
 
-trait MatrixOps extends MatrixGenericOps {
-  this: Matrix.type =>
+trait MatrixOps extends MatrixGenericOps { this: Matrix.type =>
 
   import breeze.math.PowImplicits._
 

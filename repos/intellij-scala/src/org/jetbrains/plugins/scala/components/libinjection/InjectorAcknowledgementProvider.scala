@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.components.libinjection
 
 import javax.swing.event.HyperlinkEvent
 
-import com.intellij.notification.{Notification, NotificationGroup, NotificationListener, NotificationType}
+import com.intellij.notification.{
+  Notification, NotificationGroup, NotificationListener, NotificationType
+}
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project._
 

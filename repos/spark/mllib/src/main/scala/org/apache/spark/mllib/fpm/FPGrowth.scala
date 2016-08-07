@@ -29,7 +29,9 @@ import org.json4s.DefaultFormats
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods.{compact, render}
 
-import org.apache.spark.{HashPartitioner, Partitioner, SparkContext, SparkException}
+import org.apache.spark.{
+  HashPartitioner, Partitioner, SparkContext, SparkException
+}
 import org.apache.spark.annotation.Since
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.api.java.JavaSparkContext.fakeClassTag

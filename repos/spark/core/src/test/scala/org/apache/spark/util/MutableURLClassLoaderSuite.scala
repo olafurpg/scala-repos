@@ -24,7 +24,9 @@ import scala.collection.JavaConverters._
 import org.scalatest.Matchers
 import org.scalatest.Matchers._
 
-import org.apache.spark.{SparkContext, SparkException, SparkFunSuite, TestUtils}
+import org.apache.spark.{
+  SparkContext, SparkException, SparkFunSuite, TestUtils
+}
 
 class MutableURLClassLoaderSuite extends SparkFunSuite with Matchers {
 

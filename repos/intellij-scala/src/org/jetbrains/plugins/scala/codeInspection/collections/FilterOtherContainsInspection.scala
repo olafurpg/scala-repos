@@ -2,7 +2,9 @@ package org.jetbrains.plugins.scala.codeInspection.collections
 
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.extensions.ResolvesTo
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScFunctionExpr, ScUnderscoreSection}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScFunctionExpr, ScUnderscoreSection
+}
 
 /**
   * @author Nikolay.Tropin

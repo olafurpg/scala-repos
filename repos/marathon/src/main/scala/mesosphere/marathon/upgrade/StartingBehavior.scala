@@ -5,14 +5,15 @@ import akka.event.EventStream
 import mesosphere.marathon.SchedulerActions
 import mesosphere.marathon.core.launchqueue.LaunchQueue
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.event.{HealthStatusChanged, MarathonHealthCheckEvent, MesosStatusUpdateEvent}
+import mesosphere.marathon.event.{
+  HealthStatusChanged, MarathonHealthCheckEvent, MesosStatusUpdateEvent
+}
 import mesosphere.marathon.state.AppDefinition
 import org.apache.mesos.SchedulerDriver
 
 import scala.concurrent.duration._
 
-trait StartingBehavior {
-  this: Actor with ActorLogging =>
+trait StartingBehavior { this: Actor with ActorLogging =>
   import context.dispatcher
   import mesosphere.marathon.upgrade.StartingBehavior._
 

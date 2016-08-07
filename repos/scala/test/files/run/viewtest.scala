@@ -31,11 +31,9 @@ Priority: 	normal 	Component: 	Standard Library
 Keywords: 	collections, zip 	Cc:
 Fixed in version:
 Description
-
 Welcome to Scala version 2.8.0.r18784-b20090925021043 (Java HotSpot(TM) Client VM, Java 1.6.0_11).
 Type in expressions to have them evaluated.
 Type :help for more information.
-
 scala> List("x").view.zip(Stream.from(0))List("x").view.zip(Stream.from(0))
 java.lang.ClassCastException: scala.collection.generic.IterableViewTemplate$$anon$8 cannot be cast to scala.collection.generic.SequenceView
         at .<init>(<console>:5)

@@ -1,6 +1,9 @@
 package com.twitter.jvm
 
-import java.util.concurrent.{AbstractExecutorService, Callable, ScheduledExecutorService, ScheduledFuture, TimeUnit}
+import java.util.concurrent.{
+  AbstractExecutorService, Callable, ScheduledExecutorService, ScheduledFuture,
+  TimeUnit
+}
 
 import scala.collection.mutable
 

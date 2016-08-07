@@ -5,7 +5,9 @@ import java.{lang => jl, util => ju}
 
 import com.intellij.lang.PsiBuilder.Marker
 import com.intellij.lang.WhitespacesAndCommentsBinder.TokenTextGetter
-import com.intellij.lang.{PsiBuilder, PsiParser, WhitespacesAndCommentsBinder, WhitespacesBinders}
+import com.intellij.lang.{
+  PsiBuilder, PsiParser, WhitespacesAndCommentsBinder, WhitespacesBinders
+}
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.hocon.CommonUtil._
 import org.jetbrains.plugins.hocon.HoconConstants._

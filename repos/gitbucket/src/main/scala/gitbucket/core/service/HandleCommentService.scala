@@ -9,7 +9,12 @@ import gitbucket.core.util.Notifier
 import profile.simple._
 
 trait HandleCommentService {
-  self: RepositoryService with IssuesService with ActivityService with WebHookService with WebHookIssueCommentService with WebHookPullRequestService =>
+  self: RepositoryService
+    with IssuesService
+    with ActivityService
+    with WebHookService
+    with WebHookIssueCommentService
+    with WebHookPullRequestService =>
 
   /**
     * @see [[https://github.com/takezoe/gitbucket/wiki/CommentAction]]
@@ -65,7 +70,7 @@ trait HandleCommentService {
           (owner, name, userName, issue.issueId, _)
         }
         recordActivity foreach
-          (_ (owner, name, userName, issue.issueId, issue.title))
+          (_(owner, name, userName, issue.issueId, issue.title))
 
         // extract references and create refer comment
         content.map { content =>

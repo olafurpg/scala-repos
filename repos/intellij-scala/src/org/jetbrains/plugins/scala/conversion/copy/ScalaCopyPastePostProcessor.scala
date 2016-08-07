@@ -9,7 +9,9 @@ import com.intellij.diagnostic.LogMessageEx
 import com.intellij.openapi.diagnostic.{Attachment, Logger}
 import com.intellij.openapi.editor.{Editor, RangeMarker}
 import com.intellij.openapi.progress.util.AbstractProgressIndicatorBase
-import com.intellij.openapi.progress.{ProcessCanceledException, ProgressManager}
+import com.intellij.openapi.progress.{
+  ProcessCanceledException, ProgressManager
+}
 import com.intellij.openapi.project.{DumbService, Project}
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.util.{Ref, TextRange}

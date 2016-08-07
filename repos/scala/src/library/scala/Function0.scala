@@ -11,7 +11,7 @@
 package scala
 
 /** A function of 0 parameters.
-  *  
+  *
   *  In the following example, the definition of javaVersion is a
   *  shorthand for the anonymous class definition anonfun0:
   *

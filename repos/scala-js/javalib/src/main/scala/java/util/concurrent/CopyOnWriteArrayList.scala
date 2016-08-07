@@ -14,8 +14,7 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
     extends List[E]
     with RandomAccess
     with Cloneable
-    with Serializable {
-  self =>
+    with Serializable { self =>
 
   // requiresCopyOnWrite is false if and only if no other object
   // (like the iterator) may have a reference to inner

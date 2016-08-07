@@ -6,7 +6,9 @@ package base
 
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.{PsiAnnotationOwner, PsiElement, PsiLanguageInjectionHost, PsiLiteral}
+import com.intellij.psi.{
+  PsiAnnotationOwner, PsiElement, PsiLanguageInjectionHost, PsiLiteral
+}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes._
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.types.ScType

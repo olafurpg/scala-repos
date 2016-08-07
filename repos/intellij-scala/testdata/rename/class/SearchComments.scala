@@ -9,7 +9,6 @@ object Main {
 }
 /*
 object NameAfterRename
-
 /**
  * NameAfterRename
  */

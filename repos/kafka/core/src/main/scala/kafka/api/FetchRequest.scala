@@ -134,7 +134,7 @@ case class FetchRequest(
         (4 + /* partition id */
             8 + /* offset */
             4 /* fetch size */
-          )
+            )
     })
   }
 

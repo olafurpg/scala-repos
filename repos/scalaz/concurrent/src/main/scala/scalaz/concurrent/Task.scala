@@ -1,6 +1,8 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService}
+import java.util.concurrent.{
+  ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService
+}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
 import scalaz._

@@ -1,6 +1,8 @@
 package com.twitter.finagle.http.codec
 
-import com.twitter.finagle.http.{HttpTransport, Request, Version, Method, Response, Fields, Status}
+import com.twitter.finagle.http.{
+  HttpTransport, Request, Version, Method, Response, Fields, Status
+}
 import com.twitter.finagle.transport.Transport
 import com.twitter.util.{Promise, Return, Future, Time}
 import java.net.InetSocketAddress

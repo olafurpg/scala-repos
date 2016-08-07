@@ -7,7 +7,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScValue, ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 class VarToValQuickFix(varDef: ScVariableDefinition)

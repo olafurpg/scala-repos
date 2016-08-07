@@ -165,13 +165,11 @@ class LBatchView(val appId: Int,
     predicate: Event => Boolean,
     init: T,
     op: (T, Event) => T): Map[String, T] = {
-
     _events
       .filter( predicate(_) )
       .groupBy( _.entityId )
       .mapValues( _.sortBy(_.eventTime.getMillis).foldLeft[T](init)(op))
       .toMap
-
   }
    */
 
@@ -179,7 +177,6 @@ class LBatchView(val appId: Int,
   def groupByEntityOrdered[T](
     predicate: Event => Boolean,
     map: Event => T): Map[String, Seq[T]] = {
-
     _events
       .filter( predicate(_) )
       .groupBy( _.entityId )

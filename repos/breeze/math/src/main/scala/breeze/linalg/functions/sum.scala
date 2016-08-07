@@ -130,8 +130,7 @@ trait VectorizedReduceUFunc extends UFunc {
   }
 }
 
-sealed trait sumLowPrio {
-  this: sum.type =>
+sealed trait sumLowPrio { this: sum.type =>
   implicit def sumSummableThings[CC, T](
       implicit view: CC <:< TraversableOnce[T],
       tSum: OpAdd.Impl2[T, T, T]): Impl[CC, T] = {

@@ -10,7 +10,7 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */

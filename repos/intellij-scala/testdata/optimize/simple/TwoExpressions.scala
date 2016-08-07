@@ -5,7 +5,6 @@ class TwoExpressions {
 }
 /*
 import scala.collection.mutable.ArrayBuffer
-
 class TwoExpressions {
   val map: ArrayBuffer[String] = null
 }

@@ -14,8 +14,7 @@ import scala.collection.concurrent.{Map => ConcurrentMap}
   */
 trait CommandSupport
     extends ParamsValueReaderProperties
-    with CommandExecutors {
-  this: ScalatraBase =>
+    with CommandExecutors { this: ScalatraBase =>
 
   type CommandType <: Command
 
@@ -37,7 +36,7 @@ trait CommandSupport
     def createCommand =
       commandFactories
         .get(mf.erasure)
-        .map(_ ())
+        .map(_())
         .getOrElse(mf.erasure.newInstance())
         .asInstanceOf[T]
     commandOption[T] getOrElse bindCommand(createCommand)
@@ -85,7 +84,6 @@ trait CommandSupport
     new CommandRouteMatcher[T]
 }
 
-trait ParamsOnlyCommandSupport extends CommandSupport {
-  this: ScalatraBase =>
+trait ParamsOnlyCommandSupport extends CommandSupport { this: ScalatraBase =>
   type CommandType = ParamsOnlyCommand
 }

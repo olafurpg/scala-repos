@@ -8,11 +8,16 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
 import java.util.{Comparator, Deque, PriorityQueue, Queue}
 
-import akka.actor.{ActorCell, ActorRef, ActorSystem, DeadLetter, InternalActorRef}
+import akka.actor.{
+  ActorCell, ActorRef, ActorSystem, DeadLetter, InternalActorRef
+}
 import akka.dispatch.sysmsg._
 import akka.event.Logging.Error
 import akka.util.Helpers.ConfigOps
-import akka.util.{BoundedBlockingQueue, StablePriorityBlockingQueue, StablePriorityQueue, Unsafe}
+import akka.util.{
+  BoundedBlockingQueue, StablePriorityBlockingQueue, StablePriorityQueue,
+  Unsafe
+}
 import com.typesafe.config.Config
 
 import scala.annotation.tailrec

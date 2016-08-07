@@ -3,10 +3,14 @@ package lang.refactoring.changeSignature
 
 import javax.swing.table.TableCellEditor
 
-import com.intellij.codeInsight.daemon.impl.analysis.{FileHighlightingSetting, HighlightLevelUtil}
+import com.intellij.codeInsight.daemon.impl.analysis.{
+  FileHighlightingSetting, HighlightLevelUtil
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi._
-import com.intellij.refactoring.changeSignature.ParameterTableModelBase.{NameColumn, TypeColumn}
+import com.intellij.refactoring.changeSignature.ParameterTableModelBase.{
+  NameColumn, TypeColumn
+}
 import com.intellij.refactoring.changeSignature._
 import com.intellij.util.ui.ColumnInfo
 import org.jetbrains.plugins.scala.debugger.evaluation.ScalaCodeFragment

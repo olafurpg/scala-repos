@@ -29,8 +29,7 @@ trait SortedMap[A, +B]
     extends Map[A, B]
     with scala.collection.SortedMap[A, B]
     with MapLike[A, B, SortedMap[A, B]]
-    with SortedMapLike[A, B, SortedMap[A, B]] {
-  self =>
+    with SortedMapLike[A, B, SortedMap[A, B]] { self =>
 
   override protected[this] def newBuilder: Builder[(A, B), SortedMap[A, B]] =
     SortedMap.newBuilder[A, B]
@@ -134,8 +133,7 @@ object SortedMap extends ImmutableSortedMapFactory[SortedMap] {
 
   private[collection] trait Default[A, +B]
       extends SortedMap[A, B]
-      with scala.collection.SortedMap.Default[A, B] {
-    self =>
+      with scala.collection.SortedMap.Default[A, B] { self =>
     override def +[B1 >: B](kv: (A, B1)): SortedMap[A, B1] = {
       val b = SortedMap.newBuilder[A, B1]
       b ++= this

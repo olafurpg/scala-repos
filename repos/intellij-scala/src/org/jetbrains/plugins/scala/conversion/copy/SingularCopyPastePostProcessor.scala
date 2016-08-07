@@ -5,7 +5,9 @@ import java.awt.datatransfer.Transferable
 import java.util.Collections._
 import java.{lang, util}
 
-import com.intellij.codeInsight.editorActions.{CopyPastePostProcessor, TextBlockTransferableData}
+import com.intellij.codeInsight.editorActions.{
+  CopyPastePostProcessor, TextBlockTransferableData
+}
 import com.intellij.openapi.editor.{Editor, RangeMarker}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Ref

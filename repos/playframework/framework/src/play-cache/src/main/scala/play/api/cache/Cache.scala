@@ -9,7 +9,10 @@ import play.api.inject.{BindingKey, Injector, ApplicationLifecycle, Module}
 import scala.concurrent.Future
 import scala.reflect.ClassTag
 import scala.concurrent.duration._
-import play.cache.{CacheApi => JavaCacheApi, DefaultCacheApi => DefaultJavaCacheApi, NamedCacheImpl}
+import play.cache.{
+  CacheApi => JavaCacheApi, DefaultCacheApi => DefaultJavaCacheApi,
+  NamedCacheImpl
+}
 
 import net.sf.ehcache._
 import com.google.common.primitives.Primitives

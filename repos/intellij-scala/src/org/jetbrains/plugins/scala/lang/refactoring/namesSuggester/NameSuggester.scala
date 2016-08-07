@@ -11,13 +11,19 @@ import com.intellij.psi.{JavaPsiFacade, PsiClass, PsiNamedElement}
 import org.atteo.evo.inflector.English
 import org.jetbrains.plugins.scala.decompiler.DecompilerUtil
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScLiteral, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScLiteral, ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.ScType.ExtractClass
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.refactoring.util.{NameValidator, ScalaNamesUtil}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  NameValidator, ScalaNamesUtil
+}
 import org.jetbrains.plugins.scala.util.ScEquivalenceUtil
 
 import scala.annotation.tailrec

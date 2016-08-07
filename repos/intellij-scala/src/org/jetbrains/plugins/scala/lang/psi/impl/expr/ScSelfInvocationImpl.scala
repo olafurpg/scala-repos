@@ -12,11 +12,17 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{ScTypePolymorphicType, TypeParameter}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  ScTypePolymorphicType, TypeParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypeResult
+}
 import org.jetbrains.plugins.scala.lang.resolve.StdKinds
 import org.jetbrains.plugins.scala.lang.resolve.processor.MethodResolveProcessor
 

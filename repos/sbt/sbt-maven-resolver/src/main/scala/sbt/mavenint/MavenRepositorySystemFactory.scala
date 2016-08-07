@@ -6,10 +6,17 @@ import org.apache.ivy.plugins.repository.Resource
 import org.apache.ivy.plugins.repository.url.URLResource
 import org.apache.ivy.util.Message
 import org.apache.ivy.util.url.URLHandlerRegistry
-import org.apache.maven.repository.internal.{MavenRepositorySystemUtils, SbtArtifactDescriptorReader, SnapshotMetadataGeneratorFactory, VersionsMetadataGeneratorFactory, DefaultVersionResolver}
+import org.apache.maven.repository.internal.{
+  MavenRepositorySystemUtils, SbtArtifactDescriptorReader,
+  SnapshotMetadataGeneratorFactory, VersionsMetadataGeneratorFactory,
+  DefaultVersionResolver
+}
 import org.eclipse.aether.{RepositorySystem, RepositorySystemSession}
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory
-import org.eclipse.aether.impl.{ArtifactDescriptorReader, DefaultServiceLocator, MetadataGeneratorFactory, VersionResolver}
+import org.eclipse.aether.impl.{
+  ArtifactDescriptorReader, DefaultServiceLocator, MetadataGeneratorFactory,
+  VersionResolver
+}
 import org.eclipse.aether.repository.{LocalRepository, RemoteRepository}
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory
 import org.eclipse.aether.spi.connector.layout.RepositoryLayoutFactory

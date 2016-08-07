@@ -16,7 +16,9 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory
 import io.netty.handler.codec.http._
 import io.netty.handler.ssl.SslHandler
 import play.api.{Application, Logger}
-import play.api.http.{DefaultHttpErrorHandler, HttpErrorHandler, Status, HeaderNames}
+import play.api.http.{
+  DefaultHttpErrorHandler, HttpErrorHandler, Status, HeaderNames
+}
 import play.api.libs.streams.Accumulator
 import play.api.mvc.{RequestHeader, Results, WebSocket, EssentialAction}
 import play.core.server.NettyServer

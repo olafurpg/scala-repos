@@ -26,7 +26,9 @@ import org.apache.spark.mllib.tree.configuration.Algo._
 import org.apache.spark.mllib.tree.configuration.BoostingStrategy
 import org.apache.spark.mllib.tree.impl.TimeTracker
 import org.apache.spark.mllib.tree.impurity.Variance
-import org.apache.spark.mllib.tree.model.{DecisionTreeModel, GradientBoostedTreesModel}
+import org.apache.spark.mllib.tree.model.{
+  DecisionTreeModel, GradientBoostedTreesModel
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 

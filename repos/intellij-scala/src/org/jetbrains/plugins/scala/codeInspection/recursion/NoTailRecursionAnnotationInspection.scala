@@ -3,8 +3,12 @@ package codeInspection.recursion
 
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{RecursionType, ScAnnotationsHolder, ScFunctionDefinition}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement, AbstractInspection
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  RecursionType, ScAnnotationsHolder, ScFunctionDefinition
+}
 
 /**
   * Pavel Fatin

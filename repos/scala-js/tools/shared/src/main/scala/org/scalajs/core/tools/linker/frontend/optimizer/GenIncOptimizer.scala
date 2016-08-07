@@ -12,7 +12,9 @@ import language.higherKinds
 
 import scala.annotation.{switch, tailrec}
 
-import scala.collection.{GenMap, GenTraversableOnce, GenIterable, GenIterableLike}
+import scala.collection.{
+  GenMap, GenTraversableOnce, GenIterable, GenIterableLike
+}
 import scala.collection.mutable
 
 import org.scalajs.core.ir._

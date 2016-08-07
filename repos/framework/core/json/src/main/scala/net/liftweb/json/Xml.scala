@@ -43,11 +43,11 @@ object Xml {
     *         &lt;id&gt;2&lt;/id&gt;
     *         &lt;name&gt;David&lt;/name&gt;
     *       &lt;/user&gt;
-    *     &lt;/users&gt;   
+    *     &lt;/users&gt;
     *
     * scala> val json = toJson(xml)
     * scala> pretty(render(json))
-    * 
+    *
     * {
     *   "users":{
     *     "user":[{
@@ -72,7 +72,7 @@ object Xml {
     * json map {
     *   case JField("id", JString(s)) => JField("id", JInt(s.toInt))
     *   case JField("user", x: JObject) => JField("user", JArray(x :: Nil))
-    *   case x => x 
+    *   case x => x
     * }
     * </pre>
     */
@@ -128,7 +128,7 @@ object Xml {
         case (name, value) =>
           (value, toJValue(value)) match {
             // This special case is needed to flatten nested objects which resulted from
-            // XML attributes. Flattening keeps transformation more predicatable.  
+            // XML attributes. Flattening keeps transformation more predicatable.
             // <a><foo id="1">x</foo></a> -> {"a":{"foo":{"foo":"x","id":"1"}}} vs
             // <a><foo id="1">x</foo></a> -> {"a":{"foo":"x","id":"1"}}
             case (XLeaf(v, x :: xs), o: JObject) => o.obj

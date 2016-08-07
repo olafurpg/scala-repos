@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.scala
 package editor.documentationProvider
 
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent, CommonDataKeys}
+import com.intellij.openapi.actionSystem.{
+  AnAction, AnActionEvent, CommonDataKeys
+}
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
@@ -10,9 +12,13 @@ import com.intellij.psi.util.PsiUtilBase
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.actions.ScalaActionUtil
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition, ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScDocCommentOwner, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScDocCommentOwner, ScTrait
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
 

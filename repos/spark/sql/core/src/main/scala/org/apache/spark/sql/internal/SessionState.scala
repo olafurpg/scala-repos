@@ -17,14 +17,22 @@
 
 package org.apache.spark.sql.internal
 
-import org.apache.spark.sql.{ContinuousQueryManager, ExperimentalMethods, SQLContext, UDFRegistration}
-import org.apache.spark.sql.catalyst.analysis.{Analyzer, Catalog, FunctionRegistry, SimpleCatalog}
+import org.apache.spark.sql.{
+  ContinuousQueryManager, ExperimentalMethods, SQLContext, UDFRegistration
+}
+import org.apache.spark.sql.catalyst.analysis.{
+  Analyzer, Catalog, FunctionRegistry, SimpleCatalog
+}
 import org.apache.spark.sql.catalyst.optimizer.Optimizer
 import org.apache.spark.sql.catalyst.parser.ParserInterface
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
 import org.apache.spark.sql.execution._
-import org.apache.spark.sql.execution.datasources.{DataSourceAnalysis, PreInsertCastAndRename, ResolveDataSource}
-import org.apache.spark.sql.execution.exchange.{EnsureRequirements, ReuseExchange}
+import org.apache.spark.sql.execution.datasources.{
+  DataSourceAnalysis, PreInsertCastAndRename, ResolveDataSource
+}
+import org.apache.spark.sql.execution.exchange.{
+  EnsureRequirements, ReuseExchange
+}
 import org.apache.spark.sql.util.ExecutionListenerManager
 
 /**

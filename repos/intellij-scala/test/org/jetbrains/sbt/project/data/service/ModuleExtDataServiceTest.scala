@@ -10,7 +10,9 @@ import com.intellij.openapi.module.{Module, ModuleManager}
 import com.intellij.openapi.projectRoots
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable
-import com.intellij.openapi.roots.{LanguageLevelModuleExtensionImpl, ModuleRootManager}
+import com.intellij.openapi.roots.{
+  LanguageLevelModuleExtensionImpl, ModuleRootManager
+}
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.testFramework.{IdeaTestUtil, UsefulTestCase}
 import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration

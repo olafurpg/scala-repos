@@ -59,8 +59,7 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     with IterableLike[(A, B), This]
     with GenMapLike[A, B, This]
     with Subtractable[A, This]
-    with Parallelizable[(A, B), ParMap[A, B]] {
-  self =>
+    with Parallelizable[(A, B), ParMap[A, B]] { self =>
 
   /** The empty map of the same type as this map
     *   @return   an empty map of type `This`.

@@ -20,7 +20,9 @@ import akka.dispatch._
 import java.util.concurrent.atomic.{AtomicReference ⇒ AtomVar}
 import java.util.concurrent.TimeoutException
 import java.io.ObjectStreamException
-import java.lang.reflect.{InvocationTargetException, Method, InvocationHandler, Proxy}
+import java.lang.reflect.{
+  InvocationTargetException, Method, InvocationHandler, Proxy
+}
 import akka.pattern.AskTimeoutException
 
 /**

@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.parser._
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */

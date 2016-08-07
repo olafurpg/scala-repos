@@ -6,7 +6,10 @@ import javax.swing.{JComponent, JTree}
 
 import com.intellij.ide.hierarchy.CallHierarchyBrowserBase._
 import com.intellij.ide.hierarchy.call.CallHierarchyNodeDescriptor
-import com.intellij.ide.hierarchy.{CallHierarchyBrowserBase, HierarchyNodeDescriptor, HierarchyTreeStructure, JavaHierarchyUtil}
+import com.intellij.ide.hierarchy.{
+  CallHierarchyBrowserBase, HierarchyNodeDescriptor, HierarchyTreeStructure,
+  JavaHierarchyUtil
+}
 import com.intellij.ide.util.treeView.NodeDescriptor
 import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.project.Project

@@ -13,8 +13,7 @@ import org.junit.Assert._
 /**
   * @author ghik
   */
-trait HoconIncludeResolutionTest {
-  this: UsefulTestCase =>
+trait HoconIncludeResolutionTest { this: UsefulTestCase =>
 
   protected def project: Project
 

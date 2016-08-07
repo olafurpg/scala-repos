@@ -10,8 +10,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefinition, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, ScMethodType, ScTypePolymorphicType, TypeParameter}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTemplateDefinition, ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  Parameter, ScMethodType, ScTypePolymorphicType, TypeParameter
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 import scala.collection.immutable.{HashMap, HashSet, Map}
@@ -498,7 +502,7 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
                              s.namedElement match {
                                case fun: ScFunction =>
                                  ScFunction.getCompoundCopy(
-                                     pTypes.map(_.map(_ ()).toList),
+                                     pTypes.map(_.map(_()).toList),
                                      tParams.toList,
                                      rt,
                                      fun)

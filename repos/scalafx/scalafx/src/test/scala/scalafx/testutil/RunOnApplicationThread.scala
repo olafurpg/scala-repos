@@ -31,8 +31,7 @@ import javafx.application.Platform
 
 import org.scalatest.{Outcome, Suite, SuiteMixin}
 
-trait RunOnApplicationThread extends SuiteMixin {
-  this: Suite =>
+trait RunOnApplicationThread extends SuiteMixin { this: Suite =>
   abstract override def withFixture(test: NoArgTest): Outcome = {
     BootstrapApplication.launch()
     val appThreadLatch = new CountDownLatch(1)

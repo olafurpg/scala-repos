@@ -2,13 +2,10 @@ package breeze.stats.distributions
 
 /*
  Copyright 2009 David Hall, Daniel Ramage
-
  Licensed under the Apache License, Version 2.0 (the "License")
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
  http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -148,12 +145,10 @@ object VonMises extends ExponentialFamily[VonMises, Double] {
       }
     }
   /*
-
   /**
  * Returns the maximum likelihood estimate of this distribution
  * For the given observations with (possibly pseudo-)counts
  */
-
   def mle(obs: Counter[Double,Double]) = {
     val sufStats = for {
       (o,count) <- obs.pairs
@@ -168,10 +163,8 @@ object VonMises extends ExponentialFamily[VonMises, Double] {
       else if (cosineSum > 0 && sineSum < 0) 2 * Pi
       else 0.0
     } ) % (2 * Pi)
-
     val t = sqrt(pow(cosineSum/obs.sum,2) + pow(sineSum / obs.sum,2))
     val k = (1.28 - 0.53*pow(t,2)) * tan(Pi/2*t)
-
     /*
     val kx = {
       if(t < 0.53) t * (2 + t *t * (1 + 5 * t * t / 6))

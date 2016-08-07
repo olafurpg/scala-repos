@@ -10,7 +10,9 @@ import scala.annotation.tailrec
 import akka.parboiled2.CharUtils
 import akka.util.ByteString
 import akka.http.impl.util._
-import akka.http.scaladsl.model.{IllegalHeaderException, StatusCodes, HttpHeader, ErrorInfo}
+import akka.http.scaladsl.model.{
+  IllegalHeaderException, StatusCodes, HttpHeader, ErrorInfo
+}
 import akka.http.scaladsl.model.headers.{EmptyHeader, RawHeader}
 import akka.http.impl.model.parser.HeaderParser
 import akka.http.impl.model.parser.CharacterClasses._

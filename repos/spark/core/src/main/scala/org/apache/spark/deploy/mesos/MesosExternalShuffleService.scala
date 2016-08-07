@@ -28,7 +28,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.network.client.{RpcResponseCallback, TransportClient}
 import org.apache.spark.network.shuffle.ExternalShuffleBlockHandler
 import org.apache.spark.network.shuffle.protocol.BlockTransferMessage
-import org.apache.spark.network.shuffle.protocol.mesos.{RegisterDriver, ShuffleServiceHeartbeat}
+import org.apache.spark.network.shuffle.protocol.mesos.{
+  RegisterDriver, ShuffleServiceHeartbeat
+}
 import org.apache.spark.network.util.TransportConf
 import org.apache.spark.util.ThreadUtils
 

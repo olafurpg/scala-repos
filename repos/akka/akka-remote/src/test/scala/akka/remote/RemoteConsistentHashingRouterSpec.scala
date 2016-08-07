@@ -18,7 +18,7 @@ class RemoteConsistentHashingRouterSpec
   "ConsistentHashingGroup" must {
 
     "use same hash ring indepenent of self address" in {
-      // simulating running router on two different nodes (a1, a2) with target routees on 3 other nodes (s1, s2, s3) 
+      // simulating running router on two different nodes (a1, a2) with target routees on 3 other nodes (s1, s2, s3)
       val a1 = Address("akka.tcp", "Sys", "client1", 2552)
       val a2 = Address("akka.tcp", "Sys", "client2", 2552)
       val s1 = ActorSelectionRoutee(

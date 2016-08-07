@@ -31,11 +31,11 @@ class ExpandSums extends Phase {
       val discCandidates =
         oldDiscCandidates ++
           (tree match {
-                case Filter(_, _, p) => collectDiscriminatorCandidates(p)
-                case Bind(_, j: Join, _) =>
-                  collectDiscriminatorCandidates(j.on)
-                case _ => Set.empty
-              })
+            case Filter(_, _, p) => collectDiscriminatorCandidates(p)
+            case Bind(_, j: Join, _) =>
+              collectDiscriminatorCandidates(j.on)
+            case _ => Set.empty
+          })
       val tree2 = tree.mapChildren(tr(_, discCandidates), keepType = true)
       val tree3 = tree2 match {
         // Expand multi-column null values in ELSE branches (used by Rep[Option].filter) with correct type
@@ -185,10 +185,10 @@ class ExpandSums extends Phase {
       val local = find(t, Nil).sortBy { ss =>
         (if (global contains ss) 3 else 1) *
           (ss.head match {
-                case f: FieldSymbol =>
-                  if (f.options contains ColumnOption.PrimaryKey) -2 else -1
-                case _ => 0
-              })
+            case f: FieldSymbol =>
+              if (f.options contains ColumnOption.PrimaryKey) -2 else -1
+            case _ => 0
+          })
       }
       logger.debug(
           "Local candidates: " + local.map(Path.toString).mkString(", "))

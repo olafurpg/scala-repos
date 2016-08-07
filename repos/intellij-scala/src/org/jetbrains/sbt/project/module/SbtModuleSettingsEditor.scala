@@ -5,12 +5,16 @@ import java.awt.event.{ActionEvent, ActionListener}
 import java.util
 import javax.swing.table.AbstractTableModel
 
-import com.intellij.openapi.roots.ui.configuration.{ModuleConfigurationState, ModuleElementsEditor}
+import com.intellij.openapi.roots.ui.configuration.{
+  ModuleConfigurationState, ModuleElementsEditor
+}
 import com.intellij.ui.CollectionListModel
 import com.intellij.util.text.DateFormatUtil
 import org.jetbrains.plugins.scala.util.JListCompatibility
 import org.jetbrains.plugins.scala.util.JListCompatibility.CollectionListModelWrapper
-import org.jetbrains.sbt.resolvers.{SbtResolver, SbtResolverIndex, SbtResolverIndexesManager}
+import org.jetbrains.sbt.resolvers.{
+  SbtResolver, SbtResolverIndex, SbtResolverIndexesManager
+}
 import org.jetbrains.sbt.settings.SbtSystemSettings
 
 import scala.collection.JavaConverters._

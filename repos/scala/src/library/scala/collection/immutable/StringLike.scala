@@ -43,8 +43,7 @@ import StringLike._
 trait StringLike[+Repr]
     extends Any
     with scala.collection.IndexedSeqOptimized[Char, Repr]
-    with Ordered[String] {
-  self =>
+    with Ordered[String] { self =>
 
   /** Creates a string builder buffer as builder for this class */
   protected[this] def newBuilder: Builder[Char, Repr]

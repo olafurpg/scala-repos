@@ -6,7 +6,9 @@ import com.twitter.finagle.dispatch.SerialServerDispatcher
 import com.twitter.finagle.netty3.Netty3Listener
 import com.twitter.io.Charsets
 import org.jboss.netty.channel._
-import org.jboss.netty.handler.codec.frame.{Delimiters, DelimiterBasedFrameDecoder}
+import org.jboss.netty.handler.codec.frame.{
+  Delimiters, DelimiterBasedFrameDecoder
+}
 import org.jboss.netty.handler.codec.string.{StringEncoder, StringDecoder}
 
 private[finagle] object StringServerPipeline extends ChannelPipelineFactory {

@@ -442,19 +442,19 @@ final class DataFrameStatFunctions private[sql] (df: DataFrame) {
       case StringType =>
         (sketch, row) =>
           sketch.addBinary(row.getUTF8String(0).getBytes)
-        case ByteType =>
+      case ByteType =>
         (sketch, row) =>
           sketch.addLong(row.getByte(0))
-        case ShortType =>
+      case ShortType =>
         (sketch, row) =>
           sketch.addLong(row.getShort(0))
-        case IntegerType =>
+      case IntegerType =>
         (sketch, row) =>
           sketch.addLong(row.getInt(0))
-        case LongType =>
+      case LongType =>
         (sketch, row) =>
           sketch.addLong(row.getLong(0))
-        case _ =>
+      case _ =>
         throw new IllegalArgumentException(
             s"Count-min Sketch only supports string type and integral types, " +
               s"and does not support type $colType."
@@ -542,19 +542,19 @@ final class DataFrameStatFunctions private[sql] (df: DataFrame) {
       case StringType =>
         (filter, row) =>
           filter.putBinary(row.getUTF8String(0).getBytes)
-        case ByteType =>
+      case ByteType =>
         (filter, row) =>
           filter.putLong(row.getByte(0))
-        case ShortType =>
+      case ShortType =>
         (filter, row) =>
           filter.putLong(row.getShort(0))
-        case IntegerType =>
+      case IntegerType =>
         (filter, row) =>
           filter.putLong(row.getInt(0))
-        case LongType =>
+      case LongType =>
         (filter, row) =>
           filter.putLong(row.getLong(0))
-        case _ =>
+      case _ =>
         throw new IllegalArgumentException(
             s"Bloom filter only supports string type and integral types, " +
               s"and does not support type $colType."

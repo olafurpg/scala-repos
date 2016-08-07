@@ -10,7 +10,7 @@
 package scala
 
 /** A function of 1 parameter.
-  *  
+  *
   *  In the following example, the definition of succ is a
   *  shorthand for the anonymous class definition anonfun1:
   *

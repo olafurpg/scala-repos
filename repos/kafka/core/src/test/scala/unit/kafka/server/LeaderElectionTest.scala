@@ -21,7 +21,9 @@ import org.apache.kafka.common.requests.LeaderAndIsrRequest.PartitionState
 
 import scala.collection.JavaConverters._
 import kafka.api.LeaderAndIsr
-import org.apache.kafka.common.requests.{LeaderAndIsrResponse, LeaderAndIsrRequest, AbstractRequestResponse}
+import org.apache.kafka.common.requests.{
+  LeaderAndIsrResponse, LeaderAndIsrRequest, AbstractRequestResponse
+}
 import org.junit.Assert._
 import kafka.utils.{TestUtils, CoreUtils}
 import kafka.cluster.Broker

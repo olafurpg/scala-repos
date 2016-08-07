@@ -16,7 +16,6 @@ object A {
       class D
     }
   }
-
   import R._
   import C.D
   val x : D = new D

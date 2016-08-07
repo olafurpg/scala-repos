@@ -4,11 +4,17 @@ import javax.swing.JComponent
 import javax.swing.event.DocumentEvent
 
 import com.intellij.CommonBundle
-import com.intellij.analysis.{AnalysisScope, BaseAnalysisAction, BaseAnalysisActionDialog}
+import com.intellij.analysis.{
+  AnalysisScope, BaseAnalysisAction, BaseAnalysisActionDialog
+}
 import com.intellij.execution.configurations._
 import com.intellij.execution.executors.DefaultRunExecutor
-import com.intellij.execution.impl.{RunManagerImpl, RunnerAndConfigurationSettingsImpl}
-import com.intellij.execution.runners.{ExecutionEnvironment, ExecutionEnvironmentBuilder, ProgramRunner}
+import com.intellij.execution.impl.{
+  RunManagerImpl, RunnerAndConfigurationSettingsImpl
+}
+import com.intellij.execution.runners.{
+  ExecutionEnvironment, ExecutionEnvironmentBuilder, ProgramRunner
+}
 import com.intellij.execution.util.ExecutionErrorDialog
 import com.intellij.execution.{ExecutionException, Executor, RunnerRegistry}
 import com.intellij.ide.util.PropertiesComponent

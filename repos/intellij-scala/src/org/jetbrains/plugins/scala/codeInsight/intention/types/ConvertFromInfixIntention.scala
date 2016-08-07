@@ -11,7 +11,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScInfixTypeElement, ScParenthesisedTypeElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScInfixTypeElement, ScParenthesisedTypeElement
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /** Converts type element `(A @@ B)` to `@@[A, B]` */

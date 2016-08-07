@@ -24,7 +24,9 @@ import scala.reflect.ClassTag
 
 import org.apache.spark.SparkConf
 import org.apache.spark.annotation.DeveloperApi
-import org.apache.spark.util.{ByteBufferInputStream, ByteBufferOutputStream, Utils}
+import org.apache.spark.util.{
+  ByteBufferInputStream, ByteBufferOutputStream, Utils
+}
 
 private[spark] class JavaSerializationStream(out: OutputStream,
                                              counterReset: Int,

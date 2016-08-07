@@ -58,6 +58,6 @@ class KeepDotsMetricKeyGenerator(config: Config)
       case "keep-dots" =>
         (s: String) ⇒
           s.replace(": ", "-").replace(" ", "_").replace("/", ".")
-        case _ => super.createNormalizer(strategy)
+      case _ => super.createNormalizer(strategy)
     }
 }

@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.scala.debugger
 
-import com.intellij.debugger.engine.{DebugProcess, ExtraSteppingFilter, SuspendContext}
+import com.intellij.debugger.engine.{
+  DebugProcess, ExtraSteppingFilter, SuspendContext
+}
 import com.intellij.psi.PsiElement
 import com.sun.jdi.Location
 import com.sun.jdi.request.StepRequest

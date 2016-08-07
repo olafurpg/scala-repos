@@ -32,7 +32,7 @@ import scala.collection.JavaConversions._
 import scalafx.delegate.SFXDelegate
 
 /**
-  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/package-summary.html `javafx.collections`]] package, 
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/package-summary.html `javafx.collections`]] package,
   * adding Scala's collections features to original JavaFX collections.
   */
 package object collections {
@@ -58,7 +58,7 @@ package object collections {
   }
 
   /**
-    * Inserts all elements from a Iterable in a JavaFX ObservableList, replacing original content. If this iterable was 
+    * Inserts all elements from a Iterable in a JavaFX ObservableList, replacing original content. If this iterable was
     * `null`, the list will be cleaned.
     *
     * @tparam T Iterable and ObservableList type
@@ -71,7 +71,7 @@ package object collections {
   }
 
   /**
-    * Replaces all content in an ObservableList of type T for a single element. If this element was `null`, the list 
+    * Replaces all content in an ObservableList of type T for a single element. If this element was `null`, the list
     * will be cleaned.
     *
     * @tparam T Element and ObservableList type
@@ -84,7 +84,7 @@ package object collections {
   }
 
   /**
-    * Inserts all elements from a Iterable of type SFXDelegate[J] in a JavaFX ObservableList of type J, replacing its 
+    * Inserts all elements from a Iterable of type SFXDelegate[J] in a JavaFX ObservableList of type J, replacing its
     * original content. If this iterable was `null`, the list will be cleaned.
     *
     * @tparam J Iterable and ObservableList type
@@ -98,7 +98,7 @@ package object collections {
   }
 
   /**
-    * Replaces all content in an JavaFX ObservableList of type J for a single SFXDelegate[J] element. 
+    * Replaces all content in an JavaFX ObservableList of type J for a single SFXDelegate[J] element.
     * If this element was `null`, the list will be cleaned.
     *
     * @tparam J Iterable and ObservableList type

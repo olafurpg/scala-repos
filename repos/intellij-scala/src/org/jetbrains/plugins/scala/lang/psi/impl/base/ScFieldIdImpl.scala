@@ -11,7 +11,9 @@ import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypedDeclaration, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypedDeclaration, ScValue, ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScImportableDeclarationsOwner
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScFieldIdStub
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext

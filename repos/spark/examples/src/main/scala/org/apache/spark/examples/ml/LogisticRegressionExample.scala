@@ -26,7 +26,9 @@ import scopt.OptionParser
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.examples.mllib.AbstractParams
 import org.apache.spark.ml.{Pipeline, PipelineStage}
-import org.apache.spark.ml.classification.{LogisticRegression, LogisticRegressionModel}
+import org.apache.spark.ml.classification.{
+  LogisticRegression, LogisticRegressionModel
+}
 import org.apache.spark.ml.feature.StringIndexer
 import org.apache.spark.sql.DataFrame
 

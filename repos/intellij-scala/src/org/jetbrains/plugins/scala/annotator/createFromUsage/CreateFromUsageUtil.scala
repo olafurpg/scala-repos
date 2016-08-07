@@ -9,11 +9,19 @@ import com.intellij.psi.{PsiClass, PsiElement}
 import org.jetbrains.plugins.scala.codeInspection.collections.MethodRepr
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParameterizedTypeElement, ScSimpleTypeElement, ScTupleTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScConstructor, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScParameterizedTypeElement, ScSimpleTypeElement, ScTupleTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScConstructor, ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter, ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.psi.types.{Any => scTypeAny, ScType}

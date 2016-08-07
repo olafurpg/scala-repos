@@ -6,7 +6,10 @@ import java.io.IOException
 import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 import java.util.logging.{Level, Logger}
 import org.jboss.netty.buffer.ChannelBuffer
-import org.jboss.netty.channel.{ChannelHandlerContext, ChannelStateEvent, ExceptionEvent, MessageEvent, WriteCompletionEvent, SimpleChannelHandler}
+import org.jboss.netty.channel.{
+  ChannelHandlerContext, ChannelStateEvent, ExceptionEvent, MessageEvent,
+  WriteCompletionEvent, SimpleChannelHandler
+}
 
 /**
   * A [[org.jboss.netty.channel.ChannelHandler]] that tracks channel/connection

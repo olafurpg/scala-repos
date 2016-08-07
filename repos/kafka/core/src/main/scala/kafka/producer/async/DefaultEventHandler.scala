@@ -21,7 +21,9 @@ import kafka.message.{NoCompressionCodec, Message, ByteBufferMessageSet}
 import kafka.producer._
 import kafka.serializer.Encoder
 import kafka.utils._
-import org.apache.kafka.common.errors.{LeaderNotAvailableException, UnknownTopicOrPartitionException}
+import org.apache.kafka.common.errors.{
+  LeaderNotAvailableException, UnknownTopicOrPartitionException
+}
 import org.apache.kafka.common.protocol.Errors
 import scala.util.Random
 import scala.collection.{Seq, Map}

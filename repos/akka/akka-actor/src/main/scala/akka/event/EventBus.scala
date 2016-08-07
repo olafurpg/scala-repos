@@ -60,16 +60,14 @@ trait ActorEventBus extends EventBus {
 /**
   * Can be mixed into an EventBus to specify that the Classifier type is ActorRef
   */
-trait ActorClassifier {
-  this: EventBus ⇒
+trait ActorClassifier { this: EventBus ⇒
   type Classifier = ActorRef
 }
 
 /**
   * Can be mixed into an EventBus to specify that the Classifier type is a Function from Event to Boolean (predicate)
   */
-trait PredicateClassifier {
-  this: EventBus ⇒
+trait PredicateClassifier { this: EventBus ⇒
   type Classifier = Event ⇒ Boolean
 }
 
@@ -79,8 +77,7 @@ trait PredicateClassifier {
   *
   * The compareSubscribers need to provide a total ordering of the Subscribers
   */
-trait LookupClassification {
-  this: EventBus ⇒
+trait LookupClassification { this: EventBus ⇒
 
   protected final val subscribers =
     new Index[Classifier, Subscriber](mapSize(), new Comparator[Subscriber] {
@@ -126,8 +123,7 @@ trait LookupClassification {
   * Classification which respects relationships between channels: subscribing
   * to one channel automatically and idempotently subscribes to all sub-channels.
   */
-trait SubchannelClassification {
-  this: EventBus ⇒
+trait SubchannelClassification { this: EventBus ⇒
 
   /**
     * The logic to form sub-class hierarchy
@@ -277,8 +273,7 @@ trait ScanningClassification { self: EventBus ⇒
   * All subscribers will be watched by an `akka.event.ActorClassificationUnsubscriber` and unsubscribed when they terminate.
   * The unsubscriber actor will not be stopped automatically, and if you want to stop using the bus you should stop it yourself.
   */
-trait ManagedActorClassification {
-  this: ActorEventBus with ActorClassifier ⇒
+trait ManagedActorClassification { this: ActorEventBus with ActorClassifier ⇒
   import scala.annotation.tailrec
 
   protected def system: ActorSystem
@@ -459,8 +454,7 @@ trait ManagedActorClassification {
   * Maps ActorRefs to ActorRefs to form an EventBus where ActorRefs can listen to other ActorRefs
   */
 @deprecated("Use Managed ActorClassification instead", "2.4")
-trait ActorClassification {
-  this: ActorEventBus with ActorClassifier ⇒
+trait ActorClassification { this: ActorEventBus with ActorClassifier ⇒
   import java.util.concurrent.ConcurrentHashMap
   import scala.annotation.tailrec
   private val empty = immutable.TreeSet.empty[ActorRef]

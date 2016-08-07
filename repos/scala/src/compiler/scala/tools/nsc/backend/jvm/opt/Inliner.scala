@@ -379,7 +379,10 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     *         instruction in the callsite method.
     */
   def inlineCallsite(callsite: Callsite): Unit = {
-    import callsite.{callsiteClass, callsiteMethod, callsiteInstruction, receiverKnownNotNull, callsiteStackHeight}
+    import callsite.{
+      callsiteClass, callsiteMethod, callsiteInstruction, receiverKnownNotNull,
+      callsiteStackHeight
+    }
     val Right(callsiteCallee) = callsite.callee
     import callsiteCallee.{callee, calleeDeclarationClass}
 
@@ -648,7 +651,9 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     * @return `Some(message)` if inlining cannot be performed, `None` otherwise
     */
   def canInlineBody(callsite: Callsite): Option[CannotInlineWarning] = {
-    import callsite.{callsiteInstruction, callsiteMethod, callsiteClass, callsiteStackHeight}
+    import callsite.{
+      callsiteInstruction, callsiteMethod, callsiteClass, callsiteStackHeight
+    }
     val Right(callsiteCallee) = callsite.callee
     import callsiteCallee.{callee, calleeDeclarationClass}
 
@@ -677,12 +682,12 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       val expectedArgs =
         asm.Type.getArgumentTypes(callsiteInstruction.desc).length +
           (callsiteInstruction.getOpcode match {
-                case INVOKEVIRTUAL | INVOKESPECIAL | INVOKEINTERFACE => 1
-                case INVOKESTATIC => 0
-                case INVOKEDYNAMIC =>
-                  assertionError(
-                      s"Unexpected opcode, cannot inline ${textify(callsiteInstruction)}")
-              })
+            case INVOKEVIRTUAL | INVOKESPECIAL | INVOKEINTERFACE => 1
+            case INVOKESTATIC => 0
+            case INVOKEDYNAMIC =>
+              assertionError(
+                  s"Unexpected opcode, cannot inline ${textify(callsiteInstruction)}")
+          })
       callsiteStackHeight > expectedArgs
     }
 

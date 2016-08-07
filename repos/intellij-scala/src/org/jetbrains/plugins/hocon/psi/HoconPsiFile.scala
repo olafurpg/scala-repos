@@ -2,7 +2,9 @@ package org.jetbrains.plugins.hocon.psi
 
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.psi.impl.source.PsiFileImpl
-import com.intellij.psi.{FileViewProvider, PsiComment, PsiElement, PsiElementVisitor}
+import com.intellij.psi.{
+  FileViewProvider, PsiComment, PsiElement, PsiElementVisitor
+}
 import org.jetbrains.plugins.hocon.lang.HoconFileType
 import org.jetbrains.plugins.hocon.parser.HoconElementType.HoconFileElementType
 import org.jetbrains.plugins.scala.extensions.PsiElementExt

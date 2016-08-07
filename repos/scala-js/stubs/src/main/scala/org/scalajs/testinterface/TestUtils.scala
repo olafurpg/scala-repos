@@ -36,7 +36,8 @@ object TestUtils {
       ctor.newInstance(args.splice: _*).asInstanceOf[AnyRef]
     }
 
-  def loadModule(name: String, loader: ClassLoader): AnyRef = macro loadModule_impl
+  def loadModule(name: String, loader: ClassLoader): AnyRef =
+    macro loadModule_impl
 
   def loadModule_impl(c: Context)(
       name: c.Expr[String],

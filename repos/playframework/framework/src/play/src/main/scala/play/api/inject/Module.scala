@@ -4,7 +4,9 @@
 package play.api.inject
 
 import java.lang.reflect.Constructor
-import play.{Configuration => JavaConfiguration, Environment => JavaEnvironment}
+import play.{
+  Configuration => JavaConfiguration, Environment => JavaEnvironment
+}
 import play.api._
 import scala.annotation.varargs
 import scala.reflect.ClassTag

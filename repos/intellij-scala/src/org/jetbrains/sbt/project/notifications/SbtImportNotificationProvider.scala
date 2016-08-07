@@ -11,7 +11,9 @@ import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager
-import com.intellij.openapi.externalSystem.util.{DisposeAwareProjectChange, ExternalSystemApiUtil, ExternalSystemUtil}
+import com.intellij.openapi.externalSystem.util.{
+  DisposeAwareProjectChange, ExternalSystemApiUtil, ExternalSystemUtil
+}
 import com.intellij.openapi.fileEditor._
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ex.ProjectRootManagerEx

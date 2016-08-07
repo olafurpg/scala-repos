@@ -24,7 +24,9 @@ import scala.collection.JavaConverters._
 
 import org.scalatest.Matchers
 
-import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkException, SparkFunSuite}
+import org.apache.spark.{
+  LocalSparkContext, SparkConf, SparkContext, SparkException, SparkFunSuite
+}
 import org.apache.spark.executor.TaskMetrics
 import org.apache.spark.util.{ResetSystemProperties, RpcUtils}
 

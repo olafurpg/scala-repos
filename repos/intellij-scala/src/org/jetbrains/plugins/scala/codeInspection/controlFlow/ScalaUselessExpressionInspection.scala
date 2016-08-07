@@ -5,14 +5,22 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection, RemoveElementQuickFix}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement, AbstractInspection, RemoveElementQuickFix
+}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScCaseClauses}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause, ScCaseClauses
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types
-import org.jetbrains.plugins.scala.util.{IntentionAvailabilityChecker, SideEffectsUtil}
+import org.jetbrains.plugins.scala.util.{
+  IntentionAvailabilityChecker, SideEffectsUtil
+}
 
 /**
   * Nikolay.Tropin

@@ -21,7 +21,9 @@ import javax.servlet.http.HttpServletRequest
 
 import scala.xml.Node
 
-import org.apache.spark.deploy.DeployMessages.{MasterStateResponse, RequestMasterState}
+import org.apache.spark.deploy.DeployMessages.{
+  MasterStateResponse, RequestMasterState
+}
 import org.apache.spark.deploy.ExecutorState
 import org.apache.spark.deploy.master.ExecutorDesc
 import org.apache.spark.ui.{UIUtils, WebUIPage}

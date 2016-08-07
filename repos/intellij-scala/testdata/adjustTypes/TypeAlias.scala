@@ -9,11 +9,9 @@ class TypeAlias {
 
 /*
 import scala.collection.mutable.ArrayBuffer
-
 class TypeAlias {
   type AB[T] = ArrayBuffer[T]
   type JInt = java.lang.Integer
-
   val x: AB[JInt] = ArrayBuffer(1)
 }
  */

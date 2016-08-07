@@ -8,7 +8,9 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScMethodCall, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScMethodCall, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**

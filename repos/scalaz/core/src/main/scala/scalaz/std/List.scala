@@ -158,9 +158,9 @@ trait ListInstances extends ListInstances0 {
         }
       "[" +:
         (as match {
-              case Nil => Cord()
-              case x :: xs => commaSep(xs, Show[A].show(x))
-            }) :+ "]"
+          case Nil => Cord()
+          case x :: xs => commaSep(xs, Show[A].show(x))
+        }) :+ "]"
     }
   }
 

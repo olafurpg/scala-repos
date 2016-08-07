@@ -15,20 +15,14 @@ class NoReturnSeveralOutput {
 //inner class
 class NoReturnSeveralOutput {
   def foo(i: Int) {
-
-
     val testMethodNameResult: TestMethodNameResult = testMethodName
     val x: Int = testMethodNameResult.x
     val y: String = testMethodNameResult.y
     val z: Int = testMethodNameResult.z
     val zz: String = testMethodNameResult.zz
-
-
     println(x + y + z + zz)
   }
-
   class TestMethodNameResult(val x: Int, val y: String, val z: Int, val zz: String)
-
   def testMethodName: TestMethodNameResult = {
     val x = 0
     val y = "a"

@@ -25,7 +25,9 @@ import kafka.common._
 import java.io.File
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
-import org.apache.kafka.common.serialization.{IntegerSerializer, StringSerializer}
+import org.apache.kafka.common.serialization.{
+  IntegerSerializer, StringSerializer
+}
 import org.junit.{After, Before, Test}
 import org.junit.Assert._
 

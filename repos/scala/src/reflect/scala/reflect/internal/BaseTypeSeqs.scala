@@ -25,8 +25,7 @@ import util.Statistics
   *  @note base type sequences were called closures up to 2.7.1. The name has been changed
   *  to avoid confusion with function closures.
   */
-trait BaseTypeSeqs {
-  this: SymbolTable =>
+trait BaseTypeSeqs { this: SymbolTable =>
   import definitions._
   import BaseTypeSeqsStats._
 

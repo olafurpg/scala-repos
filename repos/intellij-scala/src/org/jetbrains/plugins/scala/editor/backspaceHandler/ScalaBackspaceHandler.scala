@@ -122,7 +122,7 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
   }
 
   /*
-    In some cases with nested braces (like '{()}' ) IDEA can't properly handle backspace action due to 
+    In some cases with nested braces (like '{()}' ) IDEA can't properly handle backspace action due to
     bag in BraceMatchingUtil (it looks for every lbrace/rbrace token regardless of they are a pair or not)
     So we have to fix it in our handler
    */

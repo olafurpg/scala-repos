@@ -61,19 +61,19 @@ trait Unpickler[T] {
   // TODO - we'd like  to call this method unpickeRaw and the unpickleEntry method `unpickle`,
   //        as there is some logic about how to use the reader encoded here.
   /** Unpickles an entry out of hte reader.
-    *  
+    *
     *  note:  This method ASSUMES beginEntry() has already been called and endEntry() will be
     *         called immediately afterwards.
     *
     * @param tag  The FastTypeTag[_].key that was serialized with the entry *or* the type hint
-    *             which was provided when reading.  This is generally used by abstract type 
+    *             which was provided when reading.  This is generally used by abstract type
     *             Unpicklers to delegate to the appropriate concrete unpickler.
     * @param reader  The reader we can grab fields, primitives or collection items out of.
     * @return Any an instance of the type we've unpickled.
     */
   def unpickle(tag: String, reader: PReader): Any
 
-  /** A mechanism of unpickling that also includes calling beginEntry()/endEntry(). 
+  /** A mechanism of unpickling that also includes calling beginEntry()/endEntry().
     *  Note: We assume anyone calling this will hint "staticallyElided" or "dynamicallyElided"
     *        if needed.   Each Unpickler should make no assumptions about its own type.
     */
@@ -99,8 +99,8 @@ object PicklerUnpickler {
   def apply[T](p: Pickler[T], u: Unpickler[T]): AbstractPicklerUnpickler[T] =
     new DelegatingPicklerUnpickler(p, u)
   //def generate[T]: Pickler[T] with Unpickler[T] = macro Compat.PicklerUnpicklerMacros_impl[T]
-  def generate[T]: AbstractPicklerUnpickler[T] = macro generator.Compat
-    .genPicklerUnpickler_impl[T]
+  def generate[T]: AbstractPicklerUnpickler[T] =
+    macro generator.Compat.genPicklerUnpickler_impl[T]
 
   /** This is a private implementation of PicklerUnpickler that delegates pickle and unpickle to underlying. */
   private class DelegatingPicklerUnpickler[T](p: Pickler[T], u: Unpickler[T])

@@ -1,7 +1,9 @@
 package gitbucket.core.controller
 
 import gitbucket.core.issues.labels.html
-import gitbucket.core.service.{RepositoryService, AccountService, IssuesService, LabelsService}
+import gitbucket.core.service.{
+  RepositoryService, AccountService, IssuesService, LabelsService
+}
 import gitbucket.core.util.{ReferrerAuthenticator, CollaboratorsAuthenticator}
 import gitbucket.core.util.Implicits._
 import io.github.gitbucket.scalatra.forms._
@@ -18,7 +20,11 @@ class LabelsController
     with CollaboratorsAuthenticator
 
 trait LabelsControllerBase extends ControllerBase {
-  self: LabelsService with IssuesService with RepositoryService with ReferrerAuthenticator with CollaboratorsAuthenticator =>
+  self: LabelsService
+    with IssuesService
+    with RepositoryService
+    with ReferrerAuthenticator
+    with CollaboratorsAuthenticator =>
 
   case class LabelForm(labelName: String, color: String)
 

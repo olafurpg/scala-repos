@@ -1,14 +1,18 @@
 package org.jetbrains.plugins.scala
 package testingSupport.test
 
-import com.intellij.execution.actions.{ConfigurationContext, RunConfigurationProducer}
+import com.intellij.execution.actions.{
+  ConfigurationContext, RunConfigurationProducer
+}
 import com.intellij.execution.configurations.ConfigurationType
 import com.intellij.execution.Location
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTemplateDefinition, ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 
 /**

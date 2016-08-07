@@ -42,7 +42,9 @@ import org.apache.spark.sql.execution._
 import org.apache.spark.sql.hive.{HiveContext, HiveInspectors}
 import org.apache.spark.sql.hive.HiveShim._
 import org.apache.spark.sql.types.DataType
-import org.apache.spark.util.{CircularBuffer, RedirectThread, SerializableConfiguration, Utils}
+import org.apache.spark.util.{
+  CircularBuffer, RedirectThread, SerializableConfiguration, Utils
+}
 
 /**
   * Transforms the input by forking and running the specified script.

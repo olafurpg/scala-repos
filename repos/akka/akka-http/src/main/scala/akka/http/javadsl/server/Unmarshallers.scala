@@ -6,7 +6,9 @@ package akka.http.javadsl.server
 
 import akka.http.impl.server.{Util, UnmarshallerImpl}
 import akka.http.javadsl.model.{HttpEntity, HttpMessage}
-import akka.http.scaladsl.unmarshalling.{Unmarshaller ⇒ ScalaUnmarshaller, FromMessageUnmarshaller}
+import akka.http.scaladsl.unmarshalling.{
+  Unmarshaller ⇒ ScalaUnmarshaller, FromMessageUnmarshaller
+}
 import akka.japi.function.Function
 import akka.util.ByteString
 

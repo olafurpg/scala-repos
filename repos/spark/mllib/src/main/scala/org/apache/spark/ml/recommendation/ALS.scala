@@ -42,10 +42,14 @@ import org.apache.spark.mllib.optimization.NNLS
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{DoubleType, FloatType, IntegerType, StructType}
+import org.apache.spark.sql.types.{
+  DoubleType, FloatType, IntegerType, StructType
+}
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.Utils
-import org.apache.spark.util.collection.{OpenHashMap, OpenHashSet, SortDataFormat, Sorter}
+import org.apache.spark.util.collection.{
+  OpenHashMap, OpenHashSet, SortDataFormat, Sorter
+}
 import org.apache.spark.util.random.XORShiftRandom
 
 /**
@@ -948,7 +952,6 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
       dstPart: Partitioner): RDD[((Int, Int), RatingBlock[ID])] = {
 
     /* The implementation produces the same result as the following but generates less objects.
-
      ratings.map { r =>
        ((srcPart.getPartition(r.user), dstPart.getPartition(r.item)), r)
      }.aggregateByKey(new RatingBlockBuilder)(

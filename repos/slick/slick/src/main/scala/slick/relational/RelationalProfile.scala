@@ -18,8 +18,7 @@ trait RelationalProfile
     with RelationalTableComponent
     with RelationalSequenceComponent
     with RelationalTypesComponent
-    with RelationalActionComponent {
-  self: RelationalProfile =>
+    with RelationalActionComponent { self: RelationalProfile =>
 
   @deprecated(
       "Use the Profile object directly instead of calling `.profile` on it",

@@ -5,7 +5,9 @@ package akka.camel.internal.component
 
 import java.util.{Map ⇒ JMap}
 import org.apache.camel._
-import org.apache.camel.impl.{DefaultProducer, DefaultEndpoint, DefaultComponent}
+import org.apache.camel.impl.{
+  DefaultProducer, DefaultEndpoint, DefaultComponent
+}
 import akka.actor._
 import akka.pattern._
 import scala.beans.BeanProperty
@@ -15,7 +17,9 @@ import scala.util.control.NonFatal
 import java.util.concurrent.{TimeoutException, CountDownLatch}
 import akka.util.Timeout
 import akka.camel.internal.CamelExchangeAdapter
-import akka.camel.{ActorNotRegisteredException, Camel, Ack, FailureResult, CamelMessage}
+import akka.camel.{
+  ActorNotRegisteredException, Camel, Ack, FailureResult, CamelMessage
+}
 import support.TypeConverterSupport
 import scala.util.{Failure, Success, Try}
 

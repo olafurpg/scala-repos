@@ -6,11 +6,15 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import org.jetbrains.plugins.scala.codeInspection.collections.MethodRepr
 import org.jetbrains.plugins.scala.extensions.ResolvesTo
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScForStatement, ScInfixExpr, ScMethodCall}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression, ScForStatement, ScInfixExpr, ScMethodCall
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 
 /**
   * @author Nikolay.Tropin

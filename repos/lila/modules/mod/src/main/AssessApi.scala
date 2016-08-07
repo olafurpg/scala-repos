@@ -5,7 +5,10 @@ import lila.analyse.{Analysis, AnalysisRepo}
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.Types.Coll
 import lila.evaluation.Statistics
-import lila.evaluation.{AccountAction, Analysed, GameAssessment, PlayerAssessment, PlayerAggregateAssessment, PlayerFlags, PlayerAssessments, Assessible}
+import lila.evaluation.{
+  AccountAction, Analysed, GameAssessment, PlayerAssessment,
+  PlayerAggregateAssessment, PlayerFlags, PlayerAssessments, Assessible
+}
 import lila.game.{Game, Player, GameRepo, Source, Pov}
 import lila.user.{User, UserRepo}
 

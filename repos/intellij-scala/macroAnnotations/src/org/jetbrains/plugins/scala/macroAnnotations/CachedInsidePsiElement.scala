@@ -16,7 +16,8 @@ import scala.reflect.macros.whitebox
   */
 class CachedInsidePsiElement(psiElement: Any, dependencyItem: Object)
     extends StaticAnnotation {
-  def macroTransform(annottees: Any*) = macro CachedInsidePsiElement.cachedInsidePsiElementImpl
+  def macroTransform(annottees: Any*) =
+    macro CachedInsidePsiElement.cachedInsidePsiElementImpl
 }
 
 object CachedInsidePsiElement {

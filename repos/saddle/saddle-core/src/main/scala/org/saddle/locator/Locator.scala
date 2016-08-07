@@ -24,7 +24,6 @@ import scala.{specialized => spec}
   *
   * As it provides a representative for a subset of keys in the index, in the language
   * of category theory, this mapping is a ''section'':
-
   * Given an array x of type T, which represents a mapping
   *
   * {{{

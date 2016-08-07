@@ -17,18 +17,12 @@ object DifferentType {
 object DifferentType {
   def foo(i: Int) {
     val q = i
-
-
     testMethodName(i)
-
-
   }
-
   def testMethodName(i: Int): Unit = {
     val x = i
     println(i)
   }
-
   def foofoo(y: Int) {
     val x = "i"
     println("i")

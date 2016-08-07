@@ -11,7 +11,13 @@ import scala.collection._
 
 /** This trait extracts all required information for documentation from compilation units */
 trait ModelFactoryTypeSupport {
-  thisFactory: ModelFactory with ModelFactoryImplicitSupport with ModelFactoryTypeSupport with DiagramFactory with CommentFactory with TreeFactory with MemberLookup =>
+  thisFactory: ModelFactory
+    with ModelFactoryImplicitSupport
+    with ModelFactoryTypeSupport
+    with DiagramFactory
+    with CommentFactory
+    with TreeFactory
+    with MemberLookup =>
 
   import global._
   import definitions.{ObjectClass, AnyClass, AnyRefClass}

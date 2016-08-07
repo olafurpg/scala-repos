@@ -4,7 +4,6 @@ object A {
 
 /*
 import java.util.AbstractMap.SimpleEntry
-
 object A {
   val simpleEntry: SimpleEntry = null
 }

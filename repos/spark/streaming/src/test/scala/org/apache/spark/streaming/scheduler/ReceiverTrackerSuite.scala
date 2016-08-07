@@ -22,7 +22,9 @@ import scala.collection.mutable.ArrayBuffer
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.time.SpanSugar._
 
-import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskStart, TaskLocality}
+import org.apache.spark.scheduler.{
+  SparkListener, SparkListenerTaskStart, TaskLocality
+}
 import org.apache.spark.scheduler.TaskLocality.TaskLocality
 import org.apache.spark.storage.{StorageLevel, StreamBlockId}
 import org.apache.spark.streaming._

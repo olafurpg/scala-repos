@@ -300,7 +300,7 @@ class StackClientTest
     val session = cl()
     val b = budget
     // failing request and Open load balancer => max requeues
-    Await.ready(session.map(_ ("hi")), 5.seconds)
+    Await.ready(session.map(_("hi")), 5.seconds)
     assert(requeues == Some(DefaultRequeues))
     assert(budget == b - DefaultRequeues)
   })
@@ -310,7 +310,7 @@ class StackClientTest
         new RequeueCtx {
       // failing request and Busy | Closed load balancer => zero requeues
       _status = status
-      Await.ready(cl().map(_ ("hi")), 5.seconds)
+      Await.ready(cl().map(_("hi")), 5.seconds)
       assert(requeues.isEmpty)
     })
   }
@@ -320,7 +320,7 @@ class StackClientTest
     _status = Status.Open
     runSideEffect = _ > DefaultRequeues
     sideEffect = () => _status = Status.Busy
-    Await.ready(cl().map(_ ("hi")), 5.seconds)
+    Await.ready(cl().map(_("hi")), 5.seconds)
     assert(requeues == Some(DefaultRequeues))
   })
 

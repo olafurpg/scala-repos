@@ -15,7 +15,9 @@ import play.api.mvc.{Handler, Results, WebSocket}
 import play.api.libs.iteratee._
 import play.core.routing.HandlerDef
 import play.it._
-import play.it.http.websocket.WebSocketClient.{ContinuationMessage, SimpleMessage, ExtendedMessage}
+import play.it.http.websocket.WebSocketClient.{
+  ContinuationMessage, SimpleMessage, ExtendedMessage
+}
 import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -492,7 +494,9 @@ trait WebSocketSpec
 
       import play.core.routing.HandlerInvokerFactory
       import play.core.routing.HandlerInvokerFactory._
-      import play.mvc.{LegacyWebSocket, WebSocket => JWebSocket, Results => JResults}
+      import play.mvc.{
+        LegacyWebSocket, WebSocket => JWebSocket, Results => JResults
+      }
       import JWebSocket.{In, Out}
 
       implicit def toHandler[J <: AnyRef](javaHandler: J)(

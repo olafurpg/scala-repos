@@ -18,7 +18,9 @@ import mesosphere.marathon.io.storage.StorageProvider
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
 import mesosphere.marathon.test.MarathonActorSupport
-import mesosphere.marathon.upgrade.{DeploymentManager, DeploymentPlan, DeploymentStep, StopApplication}
+import mesosphere.marathon.upgrade.{
+  DeploymentManager, DeploymentPlan, DeploymentStep, StopApplication
+}
 import mesosphere.mesos.protos.Implicits._
 import mesosphere.mesos.protos.TaskID
 import mesosphere.util.state.FrameworkIdUtil

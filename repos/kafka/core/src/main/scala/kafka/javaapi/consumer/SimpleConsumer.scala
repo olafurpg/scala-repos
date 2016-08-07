@@ -62,7 +62,7 @@ class SimpleConsumer(val host: String,
 
   /**
     *  Fetch metadata for a sequence of topics.
-    *  
+    *
     *  @param request specifies the versionId, clientId, sequence of topics.
     *  @return metadata for each topic in the request.
     */

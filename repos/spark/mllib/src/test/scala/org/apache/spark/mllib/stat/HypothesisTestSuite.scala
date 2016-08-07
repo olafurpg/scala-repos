@@ -19,7 +19,9 @@ package org.apache.spark.mllib.stat
 
 import java.util.Random
 
-import org.apache.commons.math3.distribution.{ExponentialDistribution, NormalDistribution, UniformRealDistribution}
+import org.apache.commons.math3.distribution.{
+  ExponentialDistribution, NormalDistribution, UniformRealDistribution
+}
 import org.apache.commons.math3.stat.inference.KolmogorovSmirnovTest
 
 import org.apache.spark.{SparkException, SparkFunSuite}
@@ -258,9 +260,7 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
       [13] -0.62812676  1.32322085 -1.52135057 -0.43742787  0.97057758  0.02822264
       [19] -0.08578219  0.38921440
       > ks.test(v, pnorm, alternative = "two.sided")
-
                One-sample Kolmogorov-Smirnov test
-
       data:  v
       D = 0.18874, p-value = 0.4223
       alternative hypothesis: two-sided

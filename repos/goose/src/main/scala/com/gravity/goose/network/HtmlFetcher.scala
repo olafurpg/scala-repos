@@ -47,7 +47,9 @@ import java.util.Date
 import java.util.List
 import com.gravity.goose.utils.Logging
 import com.gravity.goose.Configuration
-import org.apache.http.impl.client.{DefaultHttpRequestRetryHandler, AbstractHttpClient, DefaultHttpClient}
+import org.apache.http.impl.client.{
+  DefaultHttpRequestRetryHandler, AbstractHttpClient, DefaultHttpClient
+}
 
 /**
   * User: Jim Plush

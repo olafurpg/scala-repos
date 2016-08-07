@@ -17,7 +17,9 @@
 
 package org.apache.spark.repl
 
-import java.io.{ByteArrayOutputStream, FilterInputStream, InputStream, IOException}
+import java.io.{
+  ByteArrayOutputStream, FilterInputStream, InputStream, IOException
+}
 import java.net.{HttpURLConnection, URI, URL, URLEncoder}
 import java.nio.channels.Channels
 

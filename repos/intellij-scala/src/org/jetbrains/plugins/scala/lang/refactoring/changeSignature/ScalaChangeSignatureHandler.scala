@@ -8,12 +8,18 @@ import com.intellij.openapi.editor.{Editor, ScrollType}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiFile, PsiMethod}
-import com.intellij.refactoring.changeSignature.{ChangeSignatureHandler, ChangeSignatureUtil}
+import com.intellij.refactoring.changeSignature.{
+  ChangeSignatureHandler, ChangeSignatureUtil
+}
 import com.intellij.refactoring.util.CommonRefactoringUtil
 import com.intellij.refactoring.{HelpID, RefactoringBundle}
 import org.jetbrains.plugins.scala.extensions.ResolvesTo
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScMethodLike, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFunctionDeclaration, ScFunctionDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScMethodLike, ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScFunctionDeclaration, ScFunctionDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.light.isWrapper
 

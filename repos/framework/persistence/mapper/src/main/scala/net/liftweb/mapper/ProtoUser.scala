@@ -37,8 +37,7 @@ import net.liftweb.proto.{ProtoUser => GenProtoUser}
   */
 trait ProtoUser[T <: ProtoUser[T]]
     extends KeyedMapper[Long, T]
-    with UserIdAsString {
-  self: T =>
+    with UserIdAsString { self: T =>
 
   override def primaryKeyField: MappedLongIndex[T] = id
 
@@ -187,8 +186,7 @@ trait ProtoUser[T <: ProtoUser[T]]
   */
 trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     extends KeyedMetaMapper[Long, ModelType]
-    with GenProtoUser {
-  self: ModelType =>
+    with GenProtoUser { self: ModelType =>
 
   type TheUserType = ModelType
 

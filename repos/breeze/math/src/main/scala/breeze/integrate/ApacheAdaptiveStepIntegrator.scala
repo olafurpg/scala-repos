@@ -1,7 +1,9 @@
 package breeze.integrate
 
 import breeze.linalg._
-import org.apache.commons.math3.ode.{AbstractIntegrator, FirstOrderDifferentialEquations}
+import org.apache.commons.math3.ode.{
+  AbstractIntegrator, FirstOrderDifferentialEquations
+}
 import org.apache.commons.math3.ode.nonstiff.AdaptiveStepsizeIntegrator
 
 abstract class ApacheAdaptiveStepIntegrator(relTol: DenseVector[Double] = null,

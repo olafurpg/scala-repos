@@ -3,7 +3,9 @@ package lang.completion.lookups
 
 import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInsight.completion.InsertionContext
-import com.intellij.codeInsight.lookup.{LookupElement, LookupElementDecorator, LookupElementPresentation, LookupItem}
+import com.intellij.codeInsight.lookup.{
+  LookupElement, LookupElementDecorator, LookupElementPresentation, LookupItem
+}
 import com.intellij.openapi.util.Condition
 import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
@@ -18,15 +20,27 @@ import org.jetbrains.plugins.scala.lang.psi.PresentationUtil._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScFieldId, ScReferenceElement, ScStableCodeReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScFieldId, ScReferenceElement, ScStableCodeReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock, ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFun, ScFunction, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFun, ScFunction, ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{ScImportSelectors, ScImportStmt}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{
+  ScImportSelectors, ScImportStmt
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScSubstitutor, ScType}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 import org.jetbrains.plugins.scala.settings._
@@ -278,11 +292,11 @@ class ScalaLookupItem(val element: PsiNamedElement,
           while (ref.getParent != null &&
                  ref.getParent
                    .isInstanceOf[ScReferenceElement] && (ref.getParent
-                       .asInstanceOf[ScReferenceElement]
-                       .qualifier match {
-                       case Some(r) => r != ref
-                       case _ => true
-                     })) ref = ref.getParent.asInstanceOf[ScReferenceElement]
+                   .asInstanceOf[ScReferenceElement]
+                   .qualifier match {
+                   case Some(r) => r != ref
+                   case _ => true
+                 })) ref = ref.getParent.asInstanceOf[ScReferenceElement]
           val newRef = ref match {
             case ref: ScReferenceExpression if prefixCompletion =>
               val parts = cl.qualifiedName.split('.')

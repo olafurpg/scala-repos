@@ -15,7 +15,7 @@ object meteor {
   }
 }
 
-// Solver.scala 
+// Solver.scala
 // import scala.collection.mutable._
 
 final class Solver(n: Int) {
@@ -121,8 +121,8 @@ final class Solver(n: Int) {
   }
 
   /*
-   def printPieces() = 
-      for (i <- Iterator.range(0,Board.pieces)) pieces(i).print 
+   def printPieces() =
+      for (i <- Iterator.range(0,Board.pieces)) pieces(i).print
  */
 }
 
@@ -153,8 +153,8 @@ final class Board {
     new String(
         cells map
           (c =>
-                if (c.piece == null) '-'.toByte
-                else (c.piece.number + 48).toByte))
+             if (c.piece == null) '-'.toByte
+             else (c.piece.number + 48).toByte))
 
   def firstEmptyCellIndex() = cells.findIndexOf(c => c.isEmpty)
 
@@ -239,16 +239,15 @@ final class Board {
   /*
 // Printing all the board cells and their neighbours
 // helps check that they are connected properly
-
    def printBoardCellsAndNeighbours() = {
       Console.println("cell\tNW NE W  E  SW SE")
       for (i <- Iterator.range(0,Board.size)){
          Console.print(i + "\t")
          for (j <- Iterator.range(0,Cell.sides)){
             val c = cells(i).next(j)
-            if (c == null) 
-               Console.print("-- ") 
-            else 
+            if (c == null)
+               Console.print("-- ")
+            else
                Console.printf("{0,number,00} ")(c.number)
          }
          Console.println("")
@@ -443,12 +442,12 @@ final class Piece(_number: Int) {
          Console.print(i + "\t")
          for (j <- Iterator.range(0,Cell.sides)){
             val c = cells(i).next(j)
-            if (c == null) 
-               Console.print("-- ") 
-            else 
+            if (c == null)
+               Console.print("-- ")
+            else
                for (k <- Iterator.range(0,Piece.size)){
                   if (cells(k) == c) Console.printf(" {0,number,0} ")(k)
-               }       
+               }
          }
          Console.println("")
       }

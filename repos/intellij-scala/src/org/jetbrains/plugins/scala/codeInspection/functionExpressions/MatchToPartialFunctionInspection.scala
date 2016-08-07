@@ -11,7 +11,9 @@ import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{ResolveResult, PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.codeInspection.functionExpressions.MatchToPartialFunctionInspection._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnTwoPsiElements, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnTwoPsiElements, AbstractInspection
+}
 import org.jetbrains.plugins.scala.extensions.childOf
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._

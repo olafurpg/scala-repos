@@ -2,7 +2,9 @@ import java.io.{File, FileOutputStream}
 
 import scala.tools.partest._
 import scala.tools.asm
-import asm.{AnnotationVisitor, ClassWriter, FieldVisitor, Handle, MethodVisitor, Opcodes}
+import asm.{
+  AnnotationVisitor, ClassWriter, FieldVisitor, Handle, MethodVisitor, Opcodes
+}
 import Opcodes._
 
 // This test ensures that we can read JDK 7 (classfile format 51) files, including those

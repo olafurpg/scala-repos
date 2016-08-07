@@ -14,7 +14,10 @@ import org.jetbrains.plugins.scala.compiler.CompilationProcess
 import org.jetbrains.plugins.scala.components.StopWorksheetAction
 import org.jetbrains.plugins.scala.extensions
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
-import org.jetbrains.plugins.scala.worksheet.actions.{CleanWorksheetAction, CopyWorksheetAction, RunWorksheetAction, InteractiveStatusDisplay}
+import org.jetbrains.plugins.scala.worksheet.actions.{
+  CleanWorksheetAction, CopyWorksheetAction, RunWorksheetAction,
+  InteractiveStatusDisplay
+}
 import org.jetbrains.plugins.scala.worksheet.interactive.WorksheetAutoRunner
 import org.jetbrains.plugins.scala.worksheet.processor.WorksheetCompiler
 

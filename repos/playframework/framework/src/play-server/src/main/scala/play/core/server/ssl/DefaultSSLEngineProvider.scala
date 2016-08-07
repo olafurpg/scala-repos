@@ -6,7 +6,9 @@ package play.core.server.ssl
 import play.core.server.ServerConfig
 import play.server.api.SSLEngineProvider
 import play.core.ApplicationProvider
-import javax.net.ssl.{TrustManager, KeyManagerFactory, SSLEngine, SSLContext, X509TrustManager}
+import javax.net.ssl.{
+  TrustManager, KeyManagerFactory, SSLEngine, SSLContext, X509TrustManager
+}
 import java.security.KeyStore
 import java.security.cert.X509Certificate
 import java.io.{FileInputStream, File}

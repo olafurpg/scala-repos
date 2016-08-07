@@ -6,15 +6,21 @@ import java.net.URL
 import com.intellij.openapi.module.{Module, ModuleManager, ModuleUtilCore}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots._
-import com.intellij.openapi.roots.impl.libraries.{LibraryEx, ProjectLibraryTable}
+import com.intellij.openapi.roots.impl.libraries.{
+  LibraryEx, ProjectLibraryTable
+}
 import com.intellij.openapi.roots.libraries.Library
-import com.intellij.openapi.roots.ui.configuration.libraryEditor.{ExistingLibraryEditor, NewLibraryEditor}
+import com.intellij.openapi.roots.ui.configuration.libraryEditor.{
+  ExistingLibraryEditor, NewLibraryEditor
+}
 import com.intellij.openapi.vfs.{VfsUtil, VfsUtilCore}
 import com.intellij.psi.{PsiElement, PsiFile}
 import com.intellij.util.CommonProcessors.CollectProcessor
 import com.intellij.util.Processor
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.project.settings.{ScalaCompilerConfiguration, ScalaCompilerSettings}
+import org.jetbrains.plugins.scala.project.settings.{
+  ScalaCompilerConfiguration, ScalaCompilerSettings
+}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._

@@ -5,7 +5,9 @@ package psi
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.psi.impl.CheckUtil
-import com.intellij.psi.impl.source.tree.{LazyParseablePsiElement, SharedImplUtil}
+import com.intellij.psi.impl.source.tree.{
+  LazyParseablePsiElement, SharedImplUtil
+}
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.tree.{IElementType, TokenSet}
 import com.intellij.psi.{PsiElement, PsiElementVisitor}

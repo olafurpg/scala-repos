@@ -6,7 +6,9 @@ import com.twitter.common.zookeeper.ZooKeeperClient
 import com.twitter.finagle.Memcached
 import com.twitter.finagle.cacheresolver.ZookeeperStateMonitor
 import com.twitter.finagle.memcached._
-import com.twitter.finagle.stats.{ClientStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver, NullStatsReceiver, StatsReceiver
+}
 import com.twitter.finagle.zookeeper.DefaultZkClientFactory
 import com.twitter.io.Buf
 import com.twitter.util.{Future, Time}

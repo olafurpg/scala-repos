@@ -22,7 +22,9 @@ import breeze.linalg.{Vector => BV}
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.param.ParamsSuite
 import org.apache.spark.ml.util.DefaultReadWriteTest
-import org.apache.spark.mllib.classification.NaiveBayes.{Bernoulli, Multinomial}
+import org.apache.spark.mllib.classification.NaiveBayes.{
+  Bernoulli, Multinomial
+}
 import org.apache.spark.mllib.classification.NaiveBayesSuite._
 import org.apache.spark.mllib.linalg._
 import org.apache.spark.mllib.util.MLlibTestSparkContext

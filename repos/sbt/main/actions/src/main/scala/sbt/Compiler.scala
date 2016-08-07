@@ -4,9 +4,16 @@
 package sbt
 
 import sbt.internal.inc.javac.{IncrementalCompilerJavaTools, JavaTools}
-import sbt.internal.inc.{Analysis, AnalyzingCompiler, ClasspathOptions, CompileOutput, ComponentCompiler, IncrementalCompilerImpl, JavaTool, Locate, LoggerReporter, ScalaInstance}
+import sbt.internal.inc.{
+  Analysis, AnalyzingCompiler, ClasspathOptions, CompileOutput,
+  ComponentCompiler, IncrementalCompilerImpl, JavaTool, Locate, LoggerReporter,
+  ScalaInstance
+}
 import xsbti.{Logger => _, _}
-import xsbti.compile.{CompileOrder, Compilers, CompileResult, GlobalsCache, IncOptions, Inputs, MiniSetup}
+import xsbti.compile.{
+  CompileOrder, Compilers, CompileResult, GlobalsCache, IncOptions, Inputs,
+  MiniSetup
+}
 import CompileOrder.{JavaThenScala, Mixed, ScalaThenJava}
 import Locate.DefinesClass
 import java.io.File

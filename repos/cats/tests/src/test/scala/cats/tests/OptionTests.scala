@@ -2,7 +2,10 @@ package cats
 package tests
 
 import cats.laws.{ApplicativeLaws, CoflatMapLaws, FlatMapLaws, MonadLaws}
-import cats.laws.discipline.{TraverseTests, CoflatMapTests, MonadCombineTests, SerializableTests, CartesianTests}
+import cats.laws.discipline.{
+  TraverseTests, CoflatMapTests, MonadCombineTests, SerializableTests,
+  CartesianTests
+}
 import cats.laws.discipline.eq._
 
 class OptionTests extends CatsSuite {

@@ -15,9 +15,7 @@ class NotUsedNameClash {
 
 /*
 import java.util._
-
 import scala.util._
-
 class NotUsedNameClash { //Both packages have `Random` class
   def foo(): Unit = {
     val d: Date = null

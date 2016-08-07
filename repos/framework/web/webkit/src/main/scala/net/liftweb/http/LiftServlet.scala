@@ -440,7 +440,7 @@ class LiftServlet extends Loggable {
   def doService(req: Req, response: HTTPResponse): Boolean = {
 
     tryo {
-      LiftRules.onBeginServicing.toList.foreach(_ (req))
+      LiftRules.onBeginServicing.toList.foreach(_(req))
     }
 
     def stepThroughPipeline(steps: Seq[ProcessingStep]): Box[LiftResponse] = {
@@ -461,7 +461,7 @@ class LiftServlet extends Loggable {
     }
 
     tryo {
-      LiftRules.onEndServicing.toList.foreach(_ (req, resp))
+      LiftRules.onEndServicing.toList.foreach(_(req, resp))
     }
 
     resp match {
@@ -488,7 +488,7 @@ class LiftServlet extends Loggable {
     val dispatch: (Boolean, Box[LiftResponse]) =
       NamedPF.find(toMatch, LiftRules.dispatchTable(req.request)) match {
         case Full(pf) =>
-          LiftSession.onBeginServicing.foreach(_ (liftSession, req))
+          LiftSession.onBeginServicing.foreach(_(liftSession, req))
           val ret: (Boolean, Box[LiftResponse]) = try {
             try {
               // run the continuation in the new session
@@ -543,7 +543,7 @@ class LiftServlet extends Loggable {
             liftSession.notices = S.getNotices
           }
 
-          LiftSession.onEndServicing.foreach(_ (liftSession, req, ret._2))
+          LiftSession.onEndServicing.foreach(_(liftSession, req, ret._2))
           ret
 
         case _ => (false, Empty)
@@ -723,7 +723,7 @@ class LiftServlet extends Loggable {
       LiftRules.cometLogger.debug("AJAX Request: " + liftSession.underlyingId +
             " " + requestState.params)
       tryo {
-        LiftSession.onBeginServicing.foreach(_ (liftSession, requestState))
+        LiftSession.onBeginServicing.foreach(_(liftSession, requestState))
       }
 
       // Here, a Left[LAFuture] indicates a future that needs to be
@@ -820,7 +820,7 @@ class LiftServlet extends Loggable {
       }
 
       tryo {
-        LiftSession.onEndServicing.foreach(_ (liftSession, requestState, ret))
+        LiftSession.onEndServicing.foreach(_(liftSession, requestState, ret))
       }
 
       ret
@@ -1010,10 +1010,10 @@ class LiftServlet extends Loggable {
       val toDump =
         request.uri + "\n" + request.params + "\n" + response.headers + "\n" +
           (response match {
-                case InMemoryResponse(data, _, _, _) =>
-                  new String(data, "UTF-8")
-                case _ => "data"
-              })
+            case InMemoryResponse(data, _, _, _) =>
+              new String(data, "UTF-8")
+            case _ => "data"
+          })
 
       logger.trace(toDump)
     }
@@ -1029,18 +1029,18 @@ class LiftServlet extends Loggable {
     def fixHeaders(headers: List[(String, String)]) =
       headers map
         ((v) =>
-              v match {
-                case ("Location", uri) =>
-                  val u = request
-                  (v._1,
-                   ((for (updated <- Full((if (!LiftRules.excludePathFromContextPathRewriting
-                                                 .vend(uri)) u.contextPath
-                                           else "") + uri).filter(ignore =>
-                                          uri.startsWith("/"));
-                          rwf <- URLRewriter.rewriteFunc)
-                         yield rwf(updated)) openOr uri))
-                case _ => v
-            })
+           v match {
+             case ("Location", uri) =>
+               val u = request
+               (v._1,
+                ((for (updated <- Full((if (!LiftRules.excludePathFromContextPathRewriting
+                                              .vend(uri)) u.contextPath
+                                        else "") + uri).filter(ignore =>
+                                       uri.startsWith("/"));
+                       rwf <- URLRewriter.rewriteFunc)
+                      yield rwf(updated)) openOr uri))
+             case _ => v
+           })
 
     def pairFromRequest(req: Req): (Box[Req], Box[String]) = {
       val acceptHeader = for (innerReq <- Box.legacyNullTest(req.request);

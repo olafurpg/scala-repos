@@ -93,7 +93,7 @@ object DefaultRoutines {
     * @see S.locale
     * @see Templates.apply
     * @see BundleBuilder.convert
-    * 
+    *
     */
   def resourceForCurrentReq(): List[ResourceBundle] = {
     val loc = S.locale

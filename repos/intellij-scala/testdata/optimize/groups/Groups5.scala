@@ -15,14 +15,10 @@ class Groups1 {
 package pack {
 class G
 }
-
 class Groups1 {
   import java.util.ArrayList
-
   import pack.G
-
   import scala.collection.mutable.ArrayBuffer
-
   val b: ArrayBuffer[Int] = null
   val c: ArrayList[Int] = null
   val d: G = null

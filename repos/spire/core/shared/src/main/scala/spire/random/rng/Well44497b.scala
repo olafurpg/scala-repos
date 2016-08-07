@@ -37,7 +37,10 @@ import java.util
 final class Well44497b protected[random] (state: Array[Int], i0: Int)
     extends IntBasedGenerator {
 
-  import Well44497b.{UpperMask, LowerMask, R, BYTES, mat0pos, mat0neg, mat1, mat3neg, mat5, TemperB, TemperC}
+  import Well44497b.{
+    UpperMask, LowerMask, R, BYTES, mat0pos, mat0neg, mat1, mat3neg, mat5,
+    TemperB, TemperC
+  }
 
   private var i: Int = i0
 

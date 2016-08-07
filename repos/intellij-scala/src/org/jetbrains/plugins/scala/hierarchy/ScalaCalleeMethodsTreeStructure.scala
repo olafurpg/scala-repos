@@ -1,14 +1,18 @@
 package org.jetbrains.plugins.scala.hierarchy
 
 import com.intellij.ide.hierarchy.call.CallHierarchyNodeDescriptor
-import com.intellij.ide.hierarchy.{HierarchyNodeDescriptor, HierarchyTreeStructure}
+import com.intellij.ide.hierarchy.{
+  HierarchyNodeDescriptor, HierarchyTreeStructure
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.searches.OverridingMethodsSearch
 import com.intellij.psi.{PsiElement, PsiMethod, _}
 import com.intellij.util.ArrayUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFunctionDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScFunctionDefinition
+}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

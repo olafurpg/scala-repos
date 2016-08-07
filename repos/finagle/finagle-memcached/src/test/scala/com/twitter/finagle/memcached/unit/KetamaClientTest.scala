@@ -1,7 +1,10 @@
 package com.twitter.finagle.memcached.unit
 
 import com.twitter.concurrent.Broker
-import com.twitter.finagle.{CancelledRequestException, Group, MutableGroup, Service, ShardNotAvailableException}
+import com.twitter.finagle.{
+  CancelledRequestException, Group, MutableGroup, Service,
+  ShardNotAvailableException
+}
 import com.twitter.finagle.cacheresolver.CacheNode
 import com.twitter.finagle.memcached._
 import com.twitter.finagle.memcached.protocol._
@@ -12,7 +15,9 @@ import scala.collection.{immutable, mutable}
 import _root_.java.io.{BufferedReader, InputStreamReader}
 import org.junit.runner.RunWith
 import org.mockito.Matchers._
-import org.mockito.Mockito.{verify, verifyZeroInteractions, when, times, RETURNS_SMART_NULLS}
+import org.mockito.Mockito.{
+  verify, verifyZeroInteractions, when, times, RETURNS_SMART_NULLS
+}
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.FunSuite

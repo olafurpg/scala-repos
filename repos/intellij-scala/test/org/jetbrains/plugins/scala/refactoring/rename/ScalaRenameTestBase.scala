@@ -8,7 +8,9 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.CharsetToolkit
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
-import com.intellij.refactoring.rename.{RenameProcessor, RenamePsiElementProcessor}
+import com.intellij.refactoring.rename.{
+  RenameProcessor, RenamePsiElementProcessor
+}
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile

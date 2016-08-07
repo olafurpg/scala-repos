@@ -14,7 +14,9 @@ import org.scalajs.core.tools.sem.Semantics
 import org.scalajs.core.tools.linker.LinkingUnit
 import org.scalajs.core.tools.linker.analyzer.SymbolRequirement
 import org.scalajs.core.tools.linker.backend.emitter.Emitter
-import org.scalajs.core.tools.javascript.{JSFileBuilder, JSFileBuilderWithSourceMap}
+import org.scalajs.core.tools.javascript.{
+  JSFileBuilder, JSFileBuilderWithSourceMap
+}
 
 /** The basic backend for the Scala.js linker.
   *

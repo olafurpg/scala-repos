@@ -3,7 +3,9 @@ package codeInspection
 package unusedInspections
 
 import com.intellij.codeHighlighting._
-import com.intellij.codeInsight.daemon.impl.{DefaultHighlightInfoProcessor, FileStatusMap, HighlightInfoProcessor}
+import com.intellij.codeInsight.daemon.impl.{
+  DefaultHighlightInfoProcessor, FileStatusMap, HighlightInfoProcessor
+}
 import com.intellij.openapi.components.AbstractProjectComponent
 import com.intellij.openapi.editor.{Document, Editor}
 import com.intellij.openapi.project.Project

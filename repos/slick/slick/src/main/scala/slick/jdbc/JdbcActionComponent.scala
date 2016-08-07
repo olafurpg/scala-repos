@@ -18,7 +18,9 @@ import slick.ast.Util._
 import slick.ast.TypeUtil.:@
 import slick.lifted.{CompiledStreamingExecutable, Query, FlatShapeLevel, Shape}
 import slick.relational.{ResultConverter, CompiledMapping}
-import slick.util.{CloseableIterator, DumpInfo, SQLBuilder, ignoreFollowOnError}
+import slick.util.{
+  CloseableIterator, DumpInfo, SQLBuilder, ignoreFollowOnError
+}
 
 trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
@@ -30,8 +32,7 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
   abstract class SimpleJdbcProfileAction[+R](_name: String,
                                              val statements: Vector[String])
       extends SynchronousDatabaseAction[R, NoStream, Backend, Effect]
-      with ProfileAction[R, NoStream, Effect] {
-    self =>
+      with ProfileAction[R, NoStream, Effect] { self =>
     def run(ctx: Backend#Context, sql: Vector[String]): R
     final override def getDumpInfo = super.getDumpInfo.copy(name = _name)
     final def run(ctx: Backend#Context): R = run(ctx, statements)
@@ -564,8 +565,7 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
   /** An InsertActionComposer that returns generated keys or other columns. */
   trait ReturningInsertActionComposer[U, RU]
       extends InsertActionComposer[U]
-      with IntoInsertActionComposer[U, RU] {
-    self =>
+      with IntoInsertActionComposer[U, RU] { self =>
 
     /** Specifies a mapping from inserted values and generated keys to a desired value.
       * @param f Function that maps inserted values and generated keys to a desired value.

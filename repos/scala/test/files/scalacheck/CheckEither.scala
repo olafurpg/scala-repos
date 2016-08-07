@@ -33,9 +33,9 @@ object Test extends Properties("Either") {
         (e: Either[Int, Int], or: Int) =>
           e.left.getOrElse(or) ==
             (e match {
-              case Left(a) => a
-              case Right(_) => or
-            }))
+          case Left(a) => a
+          case Right(_) => or
+        }))
 
     val prop_forall = forAll((e: Either[Int, Int]) =>
           e.left.forall(_ % 2 == 0) == (e.isRight || e.left.get % 2 == 0))
@@ -77,17 +77,17 @@ object Test extends Properties("Either") {
         (e: Either[Int, Int]) =>
           e.left.toSeq ==
             (e match {
-              case Left(a) => Seq(a)
-              case Right(_) => Seq.empty
-            }))
+          case Left(a) => Seq(a)
+          case Right(_) => Seq.empty
+        }))
 
     val prop_option = forAll(
         (e: Either[Int, Int]) =>
           e.left.toOption ==
             (e match {
-              case Left(a) => Some(a)
-              case Right(_) => None
-            }))
+          case Left(a) => Some(a)
+          case Right(_) => None
+        }))
   }
 
   object CheckRightProjection {
@@ -97,9 +97,9 @@ object Test extends Properties("Either") {
         (e: Either[Int, Int], or: Int) =>
           e.right.getOrElse(or) ==
             (e match {
-              case Left(_) => or
-              case Right(b) => b
-            }))
+          case Left(_) => or
+          case Right(b) => b
+        }))
 
     val prop_forall = forAll((e: Either[Int, Int]) =>
           e.right.forall(_ % 2 == 0) == (e.isLeft || e.right.get % 2 == 0))
@@ -141,17 +141,17 @@ object Test extends Properties("Either") {
         (e: Either[Int, Int]) =>
           e.right.toSeq ==
             (e match {
-              case Left(_) => Seq.empty
-              case Right(b) => Seq(b)
-            }))
+          case Left(_) => Seq.empty
+          case Right(b) => Seq(b)
+        }))
 
     val prop_option = forAll(
         (e: Either[Int, Int]) =>
           e.right.toOption ==
             (e match {
-              case Left(_) => None
-              case Right(b) => Some(b)
-            }))
+          case Left(_) => None
+          case Right(b) => Some(b)
+        }))
   }
 
   val prop_Either_left = forAll((n: Int) => Left(n).left.get == n)
@@ -174,9 +174,9 @@ object Test extends Properties("Either") {
       (e: Either[Int, Int]) =>
         e.merge ==
           (e match {
-            case Left(a) => a
-            case Right(a) => a
-          }))
+        case Left(a) => a
+        case Right(a) => a
+      }))
 
   /** Hard to believe I'm "fixing" a test to reflect B before A ... */
   val prop_Either_cond = forAll((c: Boolean, a: Int, b: Int) =>

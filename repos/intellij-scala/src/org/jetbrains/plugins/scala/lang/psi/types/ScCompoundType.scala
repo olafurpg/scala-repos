@@ -83,7 +83,7 @@ case class ScCompoundType(components: Seq[ScType],
                        s.namedElement match {
                          case fun: ScFunction =>
                            ScFunction.getCompoundCopy(
-                               pTypes.map(_.map(_ ()).toList),
+                               pTypes.map(_.map(_()).toList),
                                tParams.toList,
                                rt,
                                fun)
@@ -142,7 +142,7 @@ case class ScCompoundType(components: Seq[ScType],
                      s.namedElement match {
                        case fun: ScFunction =>
                          ScFunction.getCompoundCopy(
-                             pTypes.map(_.map(_ ()).toList),
+                             pTypes.map(_.map(_()).toList),
                              tParams.toList,
                              rt,
                              fun)

@@ -195,7 +195,7 @@ abstract class OptionStdevMetric[EI, Q, P, A]
   }
 }
 
-/** Returns the sum of the score returned by the calculate method. 
+/** Returns the sum of the score returned by the calculate method.
   *
   * @tparam EI Evaluation information
   * @tparam Q Query

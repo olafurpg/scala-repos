@@ -90,8 +90,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
   def symbolOf[T: WeakTypeTag]: TypeSymbol =
     weakTypeOf[T].typeSymbolDirect.asType
 
-  abstract class SymbolContextApiImpl extends SymbolApi {
-    this: Symbol =>
+  abstract class SymbolContextApiImpl extends SymbolApi { this: Symbol =>
 
     def isFreeTerm: Boolean = false
     def asFreeTerm: FreeTermSymbol =
@@ -635,9 +634,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     private[scala] def lockOK: Boolean = {
       ((_rawflags & LOCKED) == 0L) ||
       ((settings.Yrecursion.value != 0) && (recursionTable get this match {
-                case Some(n) => (n <= settings.Yrecursion.value)
-                case None => true
-              }))
+            case Some(n) => (n <= settings.Yrecursion.value)
+            case None => true
+          }))
     }
 
     // Lock a symbol, using the handler if the recursion depth becomes too great.
@@ -1638,9 +1637,10 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       */
     def typeConstructor: Type =
       (// Avoiding a third override in NoSymbol to preserve bimorphism
-       if (this eq NoSymbol)
-         abort("no-symbol does not have a type constructor (this may indicate scalac cannot find fundamental classes)")
-       else abort("typeConstructor inapplicable for " + this))
+      if (this eq NoSymbol)
+        abort(
+            "no-symbol does not have a type constructor (this may indicate scalac cannot find fundamental classes)")
+      else abort("typeConstructor inapplicable for " + this))
 
     /** The type of this symbol, guaranteed to be of kind *.
       *  If there are unapplied type parameters, they will be

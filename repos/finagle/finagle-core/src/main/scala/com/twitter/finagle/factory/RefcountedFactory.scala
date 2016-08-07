@@ -1,6 +1,8 @@
 package com.twitter.finagle.factory
 
-import com.twitter.finagle.{ServiceFactory, ServiceFactoryProxy, ClientConnection}
+import com.twitter.finagle.{
+  ServiceFactory, ServiceFactoryProxy, ClientConnection
+}
 import com.twitter.finagle.service.RefcountedService
 
 /**

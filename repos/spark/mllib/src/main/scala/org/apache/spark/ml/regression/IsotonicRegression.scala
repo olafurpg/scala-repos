@@ -27,8 +27,12 @@ import org.apache.spark.ml.param.shared._
 import org.apache.spark.ml.regression.IsotonicRegressionModel.IsotonicRegressionModelWriter
 import org.apache.spark.ml.util._
 import org.apache.spark.mllib.linalg.{Vector, Vectors, VectorUDT}
-import org.apache.spark.mllib.regression.{IsotonicRegression => MLlibIsotonicRegression}
-import org.apache.spark.mllib.regression.{IsotonicRegressionModel => MLlibIsotonicRegressionModel}
+import org.apache.spark.mllib.regression.{
+  IsotonicRegression => MLlibIsotonicRegression
+}
+import org.apache.spark.mllib.regression.{
+  IsotonicRegressionModel => MLlibIsotonicRegressionModel
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.functions.{col, lit, udf}

@@ -8,7 +8,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScModifierList
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotation
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParamClause
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, TypeAliasSignature}
 
 /**

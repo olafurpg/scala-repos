@@ -32,7 +32,9 @@ import scalafx.ensemble.commons.EnsembleExample
 import scalafx.geometry.{HPos, Insets, Pos}
 import scalafx.scene.control.{Button, Label, Separator, TextField}
 import scalafx.scene.image.{Image, ImageView}
-import scalafx.scene.layout.{ColumnConstraints, GridPane, Priority, RowConstraints, VBox}
+import scalafx.scene.layout.{
+  ColumnConstraints, GridPane, Priority, RowConstraints, VBox
+}
 
 /**
   * An example of a GridPane layout. There is more than one approach to using a

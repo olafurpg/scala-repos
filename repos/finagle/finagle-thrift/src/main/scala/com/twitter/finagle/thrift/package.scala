@@ -22,7 +22,6 @@ package com.twitter.finagle
   * thrift messages (requests and replies) according to the protocol
   * chosen. This is why the client codecs need to have access to a
   * thrift `ProtocolFactory`.
-
   * These transports are used by the services produced by the
   * [[https://github.com/mariusaeriksen/thrift-0.5.0-finagle finagle thrift codegenerator]].
   *

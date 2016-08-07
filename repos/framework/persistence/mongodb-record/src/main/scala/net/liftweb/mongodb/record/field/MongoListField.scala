@@ -120,9 +120,9 @@ class MongoListField[OwnerType <: BsonRecord[OwnerType], ListType: Manifest](
 
     SHtml.hidden(() => set(Nil)) ++
       (uniqueFieldId match {
-            case Full(id) => (elem0 % ("id" -> id))
-            case _ => elem0
-          })
+        case Full(id) => (elem0 % ("id" -> id))
+        case _ => elem0
+      })
   }
 
   def toForm: Box[NodeSeq] =

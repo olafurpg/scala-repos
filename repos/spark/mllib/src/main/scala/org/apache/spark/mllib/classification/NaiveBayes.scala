@@ -27,7 +27,9 @@ import org.json4s.jackson.JsonMethods._
 import org.apache.spark.{SparkContext, SparkException}
 import org.apache.spark.annotation.Since
 import org.apache.spark.internal.Logging
-import org.apache.spark.mllib.linalg.{BLAS, DenseMatrix, DenseVector, SparseVector, Vector}
+import org.apache.spark.mllib.linalg.{
+  BLAS, DenseMatrix, DenseVector, SparseVector, Vector
+}
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.util.{Loader, Saveable}
 import org.apache.spark.rdd.RDD

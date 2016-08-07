@@ -23,7 +23,9 @@ import scala.collection.mutable.ArrayBuffer
 
 import org.apache.ivy.core.module.descriptor.MDArtifact
 import org.apache.ivy.core.settings.IvySettings
-import org.apache.ivy.plugins.resolver.{AbstractResolver, FileSystemResolver, IBiblioResolver}
+import org.apache.ivy.plugins.resolver.{
+  AbstractResolver, FileSystemResolver, IBiblioResolver
+}
 import org.scalatest.BeforeAndAfterAll
 
 import org.apache.spark.SparkFunSuite

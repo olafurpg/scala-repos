@@ -8,7 +8,9 @@ import com.typesafe.sbt.SbtScalariform.scalariformSettings
 import com.typesafe.tools.mima.core._
 import com.typesafe.tools.mima.core.ProblemFilters._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.{binaryIssueFilters, previousArtifacts}
+import com.typesafe.tools.mima.plugin.MimaKeys.{
+  binaryIssueFilters, previousArtifacts
+}
 
 object ScalatraBuild extends Build {
   import Dependencies._

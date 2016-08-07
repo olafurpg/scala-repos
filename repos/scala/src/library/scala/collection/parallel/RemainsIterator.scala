@@ -416,8 +416,7 @@ trait IterableSplitter[+T]
     extends AugmentedIterableIterator[T]
     with Splitter[T]
     with Signalling
-    with DelegatedSignalling {
-  self =>
+    with DelegatedSignalling { self =>
 
   var signalDelegate: Signalling = IdleSignalling
 
@@ -614,8 +613,7 @@ trait IterableSplitter[+T]
 trait SeqSplitter[+T]
     extends IterableSplitter[T]
     with AugmentedSeqIterator[T]
-    with PreciseSplitter[T] {
-  self =>
+    with PreciseSplitter[T] { self =>
   def dup: SeqSplitter[T]
   def split: Seq[SeqSplitter[T]]
   def psplit(sizes: Int*): Seq[SeqSplitter[T]]

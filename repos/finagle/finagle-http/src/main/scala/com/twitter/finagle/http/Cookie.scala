@@ -2,7 +2,9 @@ package com.twitter.finagle.http
 
 import com.twitter.conversions.time._
 import com.twitter.util.Duration
-import org.jboss.netty.handler.codec.http.{Cookie => NettyCookie, DefaultCookie}
+import org.jboss.netty.handler.codec.http.{
+  Cookie => NettyCookie, DefaultCookie
+}
 import scala.collection.JavaConverters._
 
 /** Scala wrapper around Netty cookies. */

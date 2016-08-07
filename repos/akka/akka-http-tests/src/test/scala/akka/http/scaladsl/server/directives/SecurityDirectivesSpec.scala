@@ -8,7 +8,9 @@ package directives
 import scala.concurrent.Future
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.server.AuthenticationFailedRejection.{CredentialsRejected, CredentialsMissing}
+import akka.http.scaladsl.server.AuthenticationFailedRejection.{
+  CredentialsRejected, CredentialsMissing
+}
 import akka.testkit.EventFilter
 
 class SecurityDirectivesSpec extends RoutingSpec {

@@ -1,11 +1,15 @@
 package org.jetbrains.plugins.scala
 package debugger.ui
 
-import com.intellij.debugger.engine.evaluation.{EvaluateException, EvaluationContext, EvaluationContextImpl}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluateException, EvaluationContext, EvaluationContextImpl
+}
 import com.intellij.debugger.engine.{DebugProcess, DebugProcessImpl}
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl
 import com.intellij.debugger.ui.tree.render._
-import com.intellij.debugger.ui.tree.{DebuggerTreeNode, NodeDescriptor, ValueDescriptor}
+import com.intellij.debugger.ui.tree.{
+  DebuggerTreeNode, NodeDescriptor, ValueDescriptor
+}
 import com.intellij.debugger.{DebuggerBundle, DebuggerContext}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil

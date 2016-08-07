@@ -27,7 +27,9 @@ import scala.concurrent.duration.Duration
 import com.google.common.io.Files
 import org.apache.hadoop.io.{BytesWritable, LongWritable, Text}
 import org.apache.hadoop.mapred.TextInputFormat
-import org.apache.hadoop.mapreduce.lib.input.{TextInputFormat => NewTextInputFormat}
+import org.apache.hadoop.mapreduce.lib.input.{
+  TextInputFormat => NewTextInputFormat
+}
 import org.scalatest.Matchers._
 
 import org.apache.spark.util.Utils

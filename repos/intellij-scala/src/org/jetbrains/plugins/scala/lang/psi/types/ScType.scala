@@ -8,14 +8,26 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.decompiler.DecompilerUtil
 import org.jetbrains.plugins.scala.extensions.ObjectExt
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScFieldId, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScFieldId, ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter, ScTypeParam}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter, ScParameter, ScTypeParam
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTemplateDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScNamedElement, ScTypeParametersOwner, ScTypedDefinition}
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{NonValueType, ScMethodType, TypeParameter}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass, ScObject, ScTemplateDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions, ScNamedElement, ScTypeParametersOwner, ScTypedDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  NonValueType, ScMethodType, TypeParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success, TypeResult, TypingContext
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
 
 import scala.annotation.tailrec

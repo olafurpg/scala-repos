@@ -11,16 +11,24 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, ResolveState}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScFieldId
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScCaseClause, ScCaseClauses}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern, ScCaseClause, ScCaseClauses
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScDeclaredElementsHolder, ScFunction, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScDeclaredElementsHolder, ScFunction, ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory, ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure, Success, TypeResult, TypingContext
+}
 
 import scala.collection.immutable.HashSet
 import scala.collection.mutable
@@ -167,7 +175,7 @@ trait ScBlock
                                      s.namedElement match {
                                        case fun: ScFunction =>
                                          ScFunction.getCompoundCopy(
-                                             pTypes.map(_.map(_ ()).toList),
+                                             pTypes.map(_.map(_()).toList),
                                              tParams.toList,
                                              rt,
                                              fun)

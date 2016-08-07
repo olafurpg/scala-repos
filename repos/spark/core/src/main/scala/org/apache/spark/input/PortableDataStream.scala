@@ -17,15 +17,22 @@
 
 package org.apache.spark.input
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream, ByteArrayOutputStream, DataInputStream,
+  DataOutputStream
+}
 
 import scala.collection.JavaConverters._
 
 import com.google.common.io.{ByteStreams, Closeables}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
-import org.apache.hadoop.mapreduce.{InputSplit, JobContext, RecordReader, TaskAttemptContext}
-import org.apache.hadoop.mapreduce.lib.input.{CombineFileInputFormat, CombineFileRecordReader, CombineFileSplit}
+import org.apache.hadoop.mapreduce.{
+  InputSplit, JobContext, RecordReader, TaskAttemptContext
+}
+import org.apache.hadoop.mapreduce.lib.input.{
+  CombineFileInputFormat, CombineFileRecordReader, CombineFileSplit
+}
 
 /**
   * A general format for reading whole files in as streams, byte arrays,

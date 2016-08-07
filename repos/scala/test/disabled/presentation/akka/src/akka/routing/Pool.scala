@@ -43,8 +43,7 @@ trait ActorPool {
   *      - checks the current capacity and adjusts accordingly if needed
   *      - routes the incoming message to a selection set of delegate actors
   */
-trait DefaultActorPool extends ActorPool {
-  this: Actor =>
+trait DefaultActorPool extends ActorPool { this: Actor =>
   import ActorPool._
   import collection.mutable.LinkedList
   import akka.actor.MaximumNumberOfRestartsWithinTimeRangeReached

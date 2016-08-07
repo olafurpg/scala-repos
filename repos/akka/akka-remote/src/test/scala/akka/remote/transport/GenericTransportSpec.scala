@@ -1,14 +1,18 @@
 package akka.remote.transport
 
 import akka.actor.{ExtendedActorSystem, Address}
-import akka.remote.transport.AssociationHandle.{ActorHandleEventListener, Disassociated, InboundPayload}
+import akka.remote.transport.AssociationHandle.{
+  ActorHandleEventListener, Disassociated, InboundPayload
+}
 import akka.remote.transport.TestTransport._
 import akka.remote.transport.Transport._
 import akka.testkit.{ImplicitSender, DefaultTimeout, AkkaSpec}
 import akka.util.ByteString
 import scala.concurrent.{Future, Await}
 import akka.remote.RemoteActorRefProvider
-import akka.remote.transport.TestTransport.{DisassociateAttempt, WriteAttempt, ListenAttempt, AssociateAttempt}
+import akka.remote.transport.TestTransport.{
+  DisassociateAttempt, WriteAttempt, ListenAttempt, AssociateAttempt
+}
 
 abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
     extends AkkaSpec(

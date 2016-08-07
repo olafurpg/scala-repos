@@ -20,18 +20,32 @@ import org.jetbrains.plugins.scala.codeInsight.intention.expression.IntroduceImp
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScMethodLike, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScMethodLike, ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFunctionDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction, ScFunctionDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
-import org.jetbrains.plugins.scala.lang.psi.dataFlow.impl.reachingDefs.{ReachingDefintionsCollector, VariableInfo}
+import org.jetbrains.plugins.scala.lang.psi.dataFlow.impl.reachingDefs.{
+  ReachingDefintionsCollector, VariableInfo
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScType, StdType, Any => scTypeAny, Unit => scTypeUnit}
-import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{ScalaMethodDescriptor, ScalaParameterInfo}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScFunctionType, ScType, StdType, Any => scTypeAny, Unit => scTypeUnit
+}
+import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{
+  ScalaMethodDescriptor, ScalaParameterInfo
+}
 import org.jetbrains.plugins.scala.lang.refactoring.introduceParameter.ScalaIntroduceParameterHandler._
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
-import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil.{IntroduceException, showErrorHint}
-import org.jetbrains.plugins.scala.lang.refactoring.util.{DialogConflictsReporter, ScalaRefactoringUtil, ScalaVariableValidator}
+import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil.{
+  IntroduceException, showErrorHint
+}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  DialogConflictsReporter, ScalaRefactoringUtil, ScalaVariableValidator
+}
 
 import scala.collection.mutable.ArrayBuffer
 

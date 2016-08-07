@@ -240,7 +240,7 @@ object ParameterValidator {
     optionalParam.flatMap {
       _.map { param =>
         constraints.flatMap {
-          _ (param) match {
+          _(param) match {
             case i: Invalid => Some(i)
             case _ => None
           }

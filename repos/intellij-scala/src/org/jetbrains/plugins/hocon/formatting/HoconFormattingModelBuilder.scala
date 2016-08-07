@@ -3,7 +3,9 @@ package org.jetbrains.plugins.hocon.formatting
 import com.intellij.formatting.FormattingModelBuilder
 import com.intellij.lang.ASTNode
 import com.intellij.psi.codeStyle.CodeStyleSettings
-import com.intellij.psi.formatter.{FormattingDocumentModelImpl, PsiBasedFormattingModel}
+import com.intellij.psi.formatter.{
+  FormattingDocumentModelImpl, PsiBasedFormattingModel
+}
 import com.intellij.psi.{PsiElement, PsiFile}
 
 class HoconFormattingModelBuilder extends FormattingModelBuilder {

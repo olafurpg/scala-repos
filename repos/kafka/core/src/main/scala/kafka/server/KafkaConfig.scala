@@ -23,7 +23,9 @@ import kafka.cluster.EndPoint
 import kafka.consumer.ConsumerConfig
 import kafka.coordinator.OffsetConfig
 import kafka.log.LogConfig
-import kafka.message.{BrokerCompressionCodec, CompressionCodec, Message, MessageSet}
+import kafka.message.{
+  BrokerCompressionCodec, CompressionCodec, Message, MessageSet
+}
 import kafka.utils.CoreUtils
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.common.config.SaslConfigs

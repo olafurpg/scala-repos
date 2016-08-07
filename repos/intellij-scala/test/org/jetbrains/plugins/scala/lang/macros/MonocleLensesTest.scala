@@ -8,12 +8,20 @@ import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.PsiTestUtil
-import com.intellij.testFramework.fixtures.{IdeaTestFixtureFactory, IdeaProjectTestFixture, TestFixtureBuilder, CodeInsightTestFixture}
+import com.intellij.testFramework.fixtures.{
+  IdeaTestFixtureFactory, IdeaProjectTestFixture, TestFixtureBuilder,
+  CodeInsightTestFixture
+}
 import org.jetbrains.plugins.scala.LightScalaTestCase
-import org.jetbrains.plugins.scala.base.{ScalaLightPlatformCodeInsightTestCaseAdapter, SimpleTestCase, ScalaLightCodeInsightFixtureTestAdapter}
+import org.jetbrains.plugins.scala.base.{
+  ScalaLightPlatformCodeInsightTestCaseAdapter, SimpleTestCase,
+  ScalaLightCodeInsightFixtureTestAdapter
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScClass}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject, ScClass
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.statements.ScFunctionDefinitionImpl
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success}
 import org.jetbrains.plugins.scala.util.TestUtils

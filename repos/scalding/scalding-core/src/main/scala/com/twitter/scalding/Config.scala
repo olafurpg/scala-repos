@@ -1,12 +1,9 @@
 /*
 Copyright 2014 Twitter, Inc.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,12 +15,16 @@ package com.twitter.scalding
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.mapred.JobConf
 import org.apache.hadoop.io.serializer.{Serialization => HSerialization}
-import com.twitter.chill.{ExternalizerCodec, ExternalizerInjection, Externalizer, KryoInstantiator}
+import com.twitter.chill.{
+  ExternalizerCodec, ExternalizerInjection, Externalizer, KryoInstantiator
+}
 import com.twitter.chill.config.{ScalaMapConfig, ConfiguredInstantiator}
 import com.twitter.bijection.{Base64String, Injection}
 
 import cascading.pipe.assembly.AggregateBy
-import cascading.flow.{FlowListener, FlowStepListener, FlowProps, FlowStepStrategy}
+import cascading.flow.{
+  FlowListener, FlowStepListener, FlowProps, FlowStepStrategy
+}
 import cascading.property.AppProps
 import cascading.tuple.collect.SpillableProps
 
@@ -466,10 +467,10 @@ object Config {
   def defaultFrom(mode: Mode): Config =
     default ++
       (mode match {
-            case m: HadoopMode =>
-              Config.fromHadoop(m.jobConf) - IoSerializationsKey
-            case _ => empty
-          })
+        case m: HadoopMode =>
+          Config.fromHadoop(m.jobConf) - IoSerializationsKey
+        case _ => empty
+      })
 
   def apply(m: Map[String, String]): Config = new Config { def toMap = m }
   /*

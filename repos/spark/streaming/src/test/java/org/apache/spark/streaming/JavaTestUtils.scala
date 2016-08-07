@@ -23,7 +23,9 @@ import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
 
 import org.apache.spark.api.java.JavaRDDLike
-import org.apache.spark.streaming.api.java.{JavaDStreamLike, JavaDStream, JavaStreamingContext}
+import org.apache.spark.streaming.api.java.{
+  JavaDStreamLike, JavaDStream, JavaStreamingContext
+}
 
 /** Exposes streaming test functionality in a Java-friendly way. */
 trait JavaTestBase extends TestSuiteBase {

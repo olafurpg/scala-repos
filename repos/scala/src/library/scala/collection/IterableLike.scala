@@ -29,12 +29,10 @@ import immutable.Stream
   *    method by stepping through all elements using `iterator`.
   *    Subclasses should re-implement `foreach` with something more efficient,
   *    if possible.
-
   *    This trait adds methods `iterator`, `sameElements`,
   *    `takeRight`, `dropRight` to the methods inherited
   *    from trait <a href="../Traversable.html" target="ContentFrame">
   *    `Traversable`</a>.
-
   *    Note: This trait replaces every method that uses `break` in
   *    `TraversableLike` by an iterator version.
   *
@@ -51,8 +49,7 @@ trait IterableLike[+A, +Repr]
     extends Any
     with Equals
     with TraversableLike[A, Repr]
-    with GenIterableLike[A, Repr] {
-  self =>
+    with GenIterableLike[A, Repr] { self =>
 
   override protected[this] def thisCollection: Iterable[A] =
     this.asInstanceOf[Iterable[A]]

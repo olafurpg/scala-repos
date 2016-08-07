@@ -7,19 +7,29 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Ref
 import com.intellij.psi._
 import com.intellij.psi.search.SearchScope
-import com.intellij.psi.search.searches.{OverridingMethodsSearch, ReferencesSearch}
-import com.intellij.refactoring.changeSignature.{MethodCallUsageInfo => JavaCallUsageInfo, _}
+import com.intellij.psi.search.searches.{
+  OverridingMethodsSearch, ReferencesSearch
+}
+import com.intellij.refactoring.changeSignature.{
+  MethodCallUsageInfo => JavaCallUsageInfo, _
+}
 import com.intellij.refactoring.rename.ResolveSnapshotProvider
 import com.intellij.refactoring.rename.ResolveSnapshotProvider.ResolveSnapshot
 import com.intellij.usageView.UsageInfo
 import com.intellij.util.containers.MultiMap
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScConstructorPattern, ScInfixPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScConstructor, ScPrimaryConstructor, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScConstructorPattern, ScInfixPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScConstructor, ScPrimaryConstructor, ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{ScImportExpr, ScImportSelector}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{
+  ScImportExpr, ScImportSelector
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.search.ScalaOverridingMemberSearcher
