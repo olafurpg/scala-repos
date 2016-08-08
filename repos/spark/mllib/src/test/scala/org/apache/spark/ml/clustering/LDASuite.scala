@@ -218,7 +218,7 @@ class LDASuite
       case r: Row =>
         val termWeights = r.getAs[Seq[Double]](0)
         assert(termWeights.length === 3 && termWeights.forall(w =>
-                  w >= 0.0 && w <= 1.0))
+          w >= 0.0 && w <= 1.0))
     }
   }
 

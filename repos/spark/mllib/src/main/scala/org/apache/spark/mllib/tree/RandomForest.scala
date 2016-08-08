@@ -230,7 +230,7 @@ private class RandomForest(private val strategy: Strategy,
     val topNodes: Array[Node] =
       Array.fill[Node](numTrees)(Node.emptyNode(nodeIndex = 1))
     Range(0, numTrees).foreach(treeIndex =>
-          nodeQueue.enqueue((treeIndex, topNodes(treeIndex))))
+      nodeQueue.enqueue((treeIndex, topNodes(treeIndex))))
 
     while (nodeQueue.nonEmpty) {
       // Collect some nodes to split, and choose features for each node (if subsampling).

@@ -155,7 +155,7 @@ private[server] object ForwardedHeaderHandler {
             fh <- fhs.split(",\\s*")
           } yield fh)
             .map(_.split(";")
-                  .flatMap(s => {
+              .flatMap(s => {
                 val splitted = s.split("=", 2)
                 if (splitted.length < 2) Seq.empty
                 else {
@@ -165,7 +165,7 @@ private[server] object ForwardedHeaderHandler {
                   Seq(name -> value)
                 }
               })
-                  .toMap)
+              .toMap)
             .map { paramMap: Map[String, String] =>
               ForwardedEntry(paramMap.get("for"), paramMap.get("proto"))
             }

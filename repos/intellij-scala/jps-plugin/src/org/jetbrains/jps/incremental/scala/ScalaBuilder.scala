@@ -62,7 +62,7 @@ object ScalaBuilder {
     def getPreviousIncrementalType: Option[IncrementalityType] = {
       storageFile.filter(_.exists).flatMap { file =>
         val result = using(new DataInputStream(
-                new BufferedInputStream(new FileInputStream(file)))) { in =>
+            new BufferedInputStream(new FileInputStream(file)))) { in =>
           try {
             Some(IncrementalityType.valueOf(in.readUTF()))
           } catch {
@@ -116,11 +116,10 @@ object ScalaBuilder {
                 context.getProjectDescriptor.getProject)) {
           cleanCaches()
           setPreviousIncrementalType(incrType)
-          context.processMessage(
-              new CompilerMessage(
-                  "scala",
-                  BuildMessage.Kind.WARNING,
-                  "type of incremental compiler has been changed, full rebuild..."))
+          context.processMessage(new CompilerMessage(
+              "scala",
+              BuildMessage.Kind.WARNING,
+              "type of incremental compiler has been changed, full rebuild..."))
         }
       case Some(_) =>
         if (ScalaBuilder.isScalaProject(

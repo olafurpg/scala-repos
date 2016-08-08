@@ -190,9 +190,8 @@ object LSMR extends SerializableLogging {
       val rtol = btol + atol * normA * normx / normb
 
       if (!quiet)
-        logger.info(
-            f"Residual: $normr%.2g $normAr%.2g " +
-              f":: convtest1: $test1%.2g <? $rtol%.2g :: convtest2: $test2%.2g <? $atol%.2g")
+        logger.info(f"Residual: $normr%.2g $normAr%.2g " +
+          f":: convtest1: $test1%.2g <? $rtol%.2g :: convtest2: $test2%.2g <? $atol%.2g")
 
       converged =
         normr == 0.0 || (iter >= maxIter) || (test1 < rtol) || (test2 < atol)

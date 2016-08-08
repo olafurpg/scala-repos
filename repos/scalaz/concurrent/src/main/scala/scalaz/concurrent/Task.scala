@@ -331,7 +331,7 @@ object Task {
       })
     override def gatherUnordered[A](fs: Seq[Task[A]]): Task[List[A]] = {
       new Task(F.map(F.gatherUnordered(fs.map(_ get)))(eithers =>
-                Traverse[List].sequenceU(eithers)))
+        Traverse[List].sequenceU(eithers)))
     }
     def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
     def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
@@ -437,47 +437,52 @@ object Task {
         case Seq() => Task.now(R.zero)
         case Seq(t) => t.map(R.unit)
         case _ =>
-          new Task(Future.Async { cb =>
-            val interrupt = new AtomicBoolean(false)
-            val results = new ConcurrentLinkedQueue[M]
-            val togo = new AtomicInteger(tasks.size)
+          new Task(
+              Future.Async {
+                cb =>
+                  val interrupt = new AtomicBoolean(false)
+                  val results = new ConcurrentLinkedQueue[M]
+                  val togo = new AtomicInteger(tasks.size)
 
-            tasks.foreach { t =>
-              val handle: (Throwable \/ A) => Trampoline[Unit] = {
-                case \/-(success) =>
-                  // Try to reduce number of values in the queue
-                  val front = results.poll()
-                  if (front == null) results.add(R.unit(success))
-                  else results.add(R.cons(success, front))
+                  tasks.foreach {
+                    t =>
+                      val handle: (Throwable \/ A) => Trampoline[Unit] = {
+                        case \/-(success) =>
+                          // Try to reduce number of values in the queue
+                          val front = results.poll()
+                          if (front == null) results.add(R.unit(success))
+                          else results.add(R.cons(success, front))
 
-                  // only last completed f will hit the 0 here.
-                  if (togo.decrementAndGet() == 0)
-                    cb(\/-(results.toList.foldLeft(R.zero)((a, b) =>
-                                  R.append(a, b))))
-                  else Trampoline.done(())
-                case e @ (-\/(failure)) =>
-                  // Only allow the first failure to invoke the callback, so we
-                  // race to set `togo` to 0 here.
-                  // If we win, invoke the callback with our error, otherwise, noop
-                  @annotation.tailrec
-                  def firstFailure: Boolean = {
-                    val current = togo.get
-                    if (current > 0) {
-                      if (togo.compareAndSet(current, 0)) true
-                      else firstFailure
-                    } else false
+                          // only last completed f will hit the 0 here.
+                          if (togo.decrementAndGet() == 0)
+                            cb(\/-(results.toList.foldLeft(R.zero)((a, b) =>
+                              R.append(a, b))))
+                          else Trampoline.done(())
+                        case e @ (-\/(failure)) =>
+                          // Only allow the first failure to invoke the callback, so we
+                          // race to set `togo` to 0 here.
+                          // If we win, invoke the callback with our error, otherwise, noop
+                          @annotation.tailrec
+                          def firstFailure: Boolean = {
+                            val current = togo.get
+                            if (current > 0) {
+                              if (togo.compareAndSet(current, 0)) true
+                              else firstFailure
+                            } else false
+                          }
+
+                          if (firstFailure) // invoke `cb`, then cancel any computation not running yet
+                            // food for thought - might be safe to set the interrupt first
+                            // but, this may also kill `cb(e)`
+                            // could have separate AtomicBooleans for each task
+                            cb(e) *> Trampoline.delay {
+                              interrupt.set(true); ()
+                            } else
+                            Trampoline.done(())
+                      }
+                      t.get.unsafePerformListenInterruptibly(handle, interrupt)
                   }
-
-                  if (firstFailure) // invoke `cb`, then cancel any computation not running yet
-                    // food for thought - might be safe to set the interrupt first
-                    // but, this may also kill `cb(e)`
-                    // could have separate AtomicBooleans for each task
-                    cb(e) *> Trampoline.delay { interrupt.set(true); () } else
-                    Trampoline.done(())
-              }
-              t.get.unsafePerformListenInterruptibly(handle, interrupt)
-            }
-          })
+              })
       }
 
   /** Utility function - evaluate `a` and catch and return any exceptions. */

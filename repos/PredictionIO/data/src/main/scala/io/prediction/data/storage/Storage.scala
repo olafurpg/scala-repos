@@ -168,7 +168,7 @@ object Storage extends Logging {
   private val repositoriesToDataObjectMeta: Map[String, DataObjectMeta] =
     repositoryKeys
       .map(r =>
-            try {
+        try {
           val keyedPath = repositoriesPrefixPath(r)
           val name = sys.env(prefixPath(keyedPath, "NAME"))
           val sourceName = sys.env(prefixPath(keyedPath, "SOURCE"))
@@ -338,21 +338,18 @@ object Storage extends Logging {
   }
 
   private[prediction] def verifyAllDataObjects(): Unit = {
-    info(
-        "Verifying Meta Data Backend (Source: " +
-          s"${repositoriesToDataObjectMeta(MetaDataRepository).sourceName})...")
+    info("Verifying Meta Data Backend (Source: " +
+      s"${repositoriesToDataObjectMeta(MetaDataRepository).sourceName})...")
     getMetaDataEngineManifests()
     getMetaDataEngineInstances()
     getMetaDataEvaluationInstances()
     getMetaDataApps()
     getMetaDataAccessKeys()
-    info(
-        "Verifying Model Data Backend (Source: " +
-          s"${repositoriesToDataObjectMeta(ModelDataRepository).sourceName})...")
+    info("Verifying Model Data Backend (Source: " +
+      s"${repositoriesToDataObjectMeta(ModelDataRepository).sourceName})...")
     getModelDataModels()
-    info(
-        "Verifying Event Data Backend (Source: " +
-          s"${repositoriesToDataObjectMeta(EventDataRepository).sourceName})...")
+    info("Verifying Event Data Backend (Source: " +
+      s"${repositoriesToDataObjectMeta(EventDataRepository).sourceName})...")
     val eventsDb = getLEvents(test = true)
     info("Test writing to Event Store (App Id 0)...")
     // use appId=0 for testing purpose

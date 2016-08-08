@@ -144,7 +144,7 @@ private[hive] class HiveFunctionRegistry(underlying: analysis.FunctionRegistry,
   /* List all of the registered function names. */
   override def listFunction(): Seq[String] = {
     (FunctionRegistry.getFunctionNames.asScala ++ underlying
-          .listFunction()).toList.sorted
+      .listFunction()).toList.sorted
   }
 
   /* Get the class of the registered function by specified name. */

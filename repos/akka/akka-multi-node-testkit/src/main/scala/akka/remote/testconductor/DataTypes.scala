@@ -136,7 +136,7 @@ private[akka] class MsgEncoder extends OneToOneEncoder {
                 TCP.InjectFailure.newBuilder
                   .setAddress(target)
                   .setFailure(if (abort) TCP.FailType.Abort
-                      else TCP.FailType.Disconnect))
+                  else TCP.FailType.Disconnect))
           case TerminateMsg(Right(exitValue)) ⇒
             w.setFailure(
                 TCP.InjectFailure.newBuilder

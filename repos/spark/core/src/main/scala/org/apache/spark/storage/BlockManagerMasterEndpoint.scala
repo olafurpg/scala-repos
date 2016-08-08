@@ -153,7 +153,7 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
     blocks.foreach { blockId =>
       val bms: mutable.HashSet[BlockManagerId] = blockLocations.get(blockId)
       bms.foreach(bm =>
-            blockManagerInfo.get(bm).foreach(_.removeBlock(blockId)))
+        blockManagerInfo.get(bm).foreach(_.removeBlock(blockId)))
       blockLocations.remove(blockId)
     }
 

@@ -56,7 +56,7 @@ object LiftSessionSpec extends Specification {
                                              NodeSeq.Empty,
                                              Map.empty)
           .map(comet =>
-                comet !? NoOp /* Block to allow time for all messages to be collected */ )
+            comet !? NoOp /* Block to allow time for all messages to be collected */ )
         receivedMessages mustEqual sendingMessages
       }
     }

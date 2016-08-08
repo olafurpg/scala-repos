@@ -116,16 +116,17 @@ object TimeHelpersSpec
             amount >= 1 && timeSpanToString.contains(amount.toString) || true
         }
       })
-      val timeSpanStringIsPluralized = forAll(timeAmounts)(
-          (t: TimeAmounts) => {
-        val (timeSpanToString, timeSpanAmounts) = t
-        timeSpanAmounts forall {
-          case (amount, unit) =>
-            amount > 1 && timeSpanToString.contains(unit + "s") ||
-              amount == 1 && timeSpanToString.contains(unit) || amount == 0 &&
-              !timeSpanToString.contains(unit)
-        }
-      })
+      val timeSpanStringIsPluralized =
+        forAll(timeAmounts)((t: TimeAmounts) => {
+          val (timeSpanToString, timeSpanAmounts) = t
+          timeSpanAmounts forall {
+            case (amount, unit) =>
+              amount > 1 && timeSpanToString.contains(unit + "s") ||
+                amount == 1 && timeSpanToString
+                  .contains(unit) || amount == 0 &&
+                !timeSpanToString.contains(unit)
+          }
+        })
       conversionIsOk && timeSpanStringIsPluralized
     }
   }

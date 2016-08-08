@@ -86,7 +86,7 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
     */
   def find(qry: DBObject): Box[BaseRecord] = {
     useColl(coll =>
-          coll.findOne(qry) match {
+      coll.findOne(qry) match {
         case null => Empty
         case dbo => Full(fromDBObject(dbo))
     })
@@ -370,7 +370,7 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
         .partition(pair => pair._2.isDefined)
 
       val fieldsToSet = fullFields.map(pair =>
-            (pair._1, pair._2.openOrThrowException("these are all Full")))
+        (pair._1, pair._2.openOrThrowException("these are all Full")))
 
       val fieldsToUnset: List[String] = otherFields
         .filter(

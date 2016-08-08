@@ -248,7 +248,7 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
       // Construct the second aggregate
       val transformations: Map[Expression, Expression] =
         (distinctAggOperatorMap.flatMap(_._2) ++ regularAggOperatorMap.map(e =>
-                  (e._1, e._3))).toMap
+          (e._1, e._3))).toMap
 
       val patchedAggExpressions = a.aggregateExpressions.map { e =>
         e.transformDown {

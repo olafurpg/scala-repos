@@ -59,9 +59,9 @@ object BinaryFormat {
       def enc(mt: MT) =
         encodeMap get mt orElse findClose(mt, encodeList) getOrElse (size - 1)
       (mts grouped 2 map {
-            case Vector(a, b) => (enc(a) << 4) + enc(b)
-            case Vector(a) => enc(a) << 4
-          }).map(_.toByte).toArray
+        case Vector(a, b) => (enc(a) << 4) + enc(b)
+        case Vector(a) => enc(a) << 4
+      }).map(_.toByte).toArray
     }
 
     def read(ba: ByteArray): Vector[MT] = {
@@ -232,8 +232,8 @@ object BinaryFormat {
         }
       val pieceInts = ba.value flatMap splitInts
       (Pos.all zip pieceInts flatMap {
-            case (pos, int) => intPiece(int) map (pos -> _)
-          }).toMap
+        case (pos, int) => intPiece(int) map (pos -> _)
+      }).toMap
     }
 
     // cache standard start position

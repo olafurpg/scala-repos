@@ -81,8 +81,8 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     val leaderIdOpt = zkUtils.getLeaderForPartition(topic, 0)
     val follower = servers
       .filter(s =>
-            s.config.brokerId != leaderIdOpt.get &&
-              s.config.brokerId != controllerId)
+        s.config.brokerId != leaderIdOpt.get &&
+          s.config.brokerId != controllerId)
       .last
     follower.shutdown()
 
@@ -114,7 +114,7 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     val allServers =
       brokerConfigs.map(b => TestUtils.createServer(KafkaConfig.fromProps(b)))
     val servers = allServers.filter(s =>
-          expectedReplicaAssignment(0).contains(s.config.brokerId))
+      expectedReplicaAssignment(0).contains(s.config.brokerId))
     // create the topic
     AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
         zkUtils,

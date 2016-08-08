@@ -427,7 +427,7 @@ object MethodResolveProcessor {
         javaConstructorCompatibility(method)
       case fun: ScFunction
           if (typeArgElements.isEmpty ||
-                typeArgElements.length == fun.typeParameters.length) &&
+            typeArgElements.length == fun.typeParameters.length) &&
             fun.paramClauses.clauses.length == 1 &&
             fun.paramClauses.clauses.head.isImplicit &&
             argumentClauses.isEmpty =>
@@ -436,7 +436,7 @@ object MethodResolveProcessor {
       //eta expansion
       case fun: ScTypeParametersOwner
           if (typeArgElements.isEmpty ||
-                typeArgElements.length == fun.typeParameters.length) &&
+            typeArgElements.length == fun.typeParameters.length) &&
             argumentClauses.isEmpty && fun.isInstanceOf[PsiNamedElement] =>
         fun match {
           case function: ScFunction if function.isConstructor =>
@@ -447,7 +447,7 @@ object MethodResolveProcessor {
         checkFunction(fun.asInstanceOf[PsiNamedElement])
       case fun: PsiTypeParameterListOwner
           if (typeArgElements.isEmpty ||
-                typeArgElements.length == fun.getTypeParameters.length) &&
+            typeArgElements.length == fun.getTypeParameters.length) &&
             argumentClauses.isEmpty && fun.isInstanceOf[PsiNamedElement] =>
         checkFunction(fun.asInstanceOf[PsiNamedElement])
       //simple application including empty application
@@ -584,19 +584,19 @@ object MethodResolveProcessor {
         s.followed(
             if (typeArgElements.nonEmpty &&
                 typeParameters.length == typeArgElements.length) {
-          ScalaPsiUtil.genericCallSubstitutor(
-              typeParameters.map(p =>
+              ScalaPsiUtil.genericCallSubstitutor(
+                  typeParameters.map(p =>
                     (p.name, ScalaPsiUtil.getPsiElementId(p))),
-              typeArgElements)
-        } else {
-          typeParameters.foldLeft(ScSubstitutor.empty) {
-            (subst: ScSubstitutor, tp: ScTypeParam) =>
-              subst.bindT(
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                  new ScUndefinedType(
-                      new ScTypeParameterType(tp, ScSubstitutor.empty)))
-          }
-        })
+                  typeArgElements)
+            } else {
+              typeParameters.foldLeft(ScSubstitutor.empty) {
+                (subst: ScSubstitutor, tp: ScTypeParam) =>
+                  subst.bindT(
+                      (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+                      new ScUndefinedType(
+                          new ScTypeParameterType(tp, ScSubstitutor.empty)))
+              }
+            })
       //todo: this case is impossible case for reasons mentioned above
       case (_, method: PsiMethod) if method.isConstructor =>
         // Java constructors
@@ -604,53 +604,53 @@ object MethodResolveProcessor {
         s.followed(
             if (typeArgElements.nonEmpty &&
                 typeParameters.length == typeArgElements.length) {
-          ScalaPsiUtil.genericCallSubstitutor(
-              typeParameters.map(p =>
+              ScalaPsiUtil.genericCallSubstitutor(
+                  typeParameters.map(p =>
                     (p.name, ScalaPsiUtil.getPsiElementId(p))),
-              typeArgElements)
-        } else {
-          typeParameters.foldLeft(ScSubstitutor.empty) {
-            (subst: ScSubstitutor, tp: PsiTypeParameter) =>
-              subst.bindT(
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                  new ScUndefinedType(
-                      new ScTypeParameterType(tp, ScSubstitutor.empty)))
-          }
-        })
+                  typeArgElements)
+            } else {
+              typeParameters.foldLeft(ScSubstitutor.empty) {
+                (subst: ScSubstitutor, tp: PsiTypeParameter) =>
+                  subst.bindT(
+                      (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+                      new ScUndefinedType(
+                          new ScTypeParameterType(tp, ScSubstitutor.empty)))
+              }
+            })
       case (None, t: ScTypeParametersOwner) =>
         s.followed(
             if (typeArgElements.nonEmpty &&
                 t.typeParameters.length == typeArgElements.length) {
-          ScalaPsiUtil.genericCallSubstitutor(
-              t.typeParameters.map(p =>
+              ScalaPsiUtil.genericCallSubstitutor(
+                  t.typeParameters.map(p =>
                     (p.name, ScalaPsiUtil.getPsiElementId(p))),
-              typeArgElements)
-        } else {
-          t.typeParameters.foldLeft(ScSubstitutor.empty) {
-            (subst: ScSubstitutor, tp: ScTypeParam) =>
-              subst.bindT(
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                  new ScUndefinedType(
-                      new ScTypeParameterType(tp, ScSubstitutor.empty)))
-          }
-        })
+                  typeArgElements)
+            } else {
+              t.typeParameters.foldLeft(ScSubstitutor.empty) {
+                (subst: ScSubstitutor, tp: ScTypeParam) =>
+                  subst.bindT(
+                      (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+                      new ScUndefinedType(
+                          new ScTypeParameterType(tp, ScSubstitutor.empty)))
+              }
+            })
       case (None, p: PsiTypeParameterListOwner) =>
         s.followed(
             if (typeArgElements.nonEmpty &&
                 p.getTypeParameters.length == typeArgElements.length) {
-          ScalaPsiUtil.genericCallSubstitutor(
-              p.getTypeParameters.map(p =>
+              ScalaPsiUtil.genericCallSubstitutor(
+                  p.getTypeParameters.map(p =>
                     (p.name, ScalaPsiUtil.getPsiElementId(p))),
-              typeArgElements)
-        } else {
-          p.getTypeParameters.foldLeft(ScSubstitutor.empty) {
-            (subst: ScSubstitutor, tp: PsiTypeParameter) =>
-              subst.bindT(
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                  new ScUndefinedType(
-                      new ScTypeParameterType(tp, ScSubstitutor.empty)))
-          }
-        })
+                  typeArgElements)
+            } else {
+              p.getTypeParameters.foldLeft(ScSubstitutor.empty) {
+                (subst: ScSubstitutor, tp: PsiTypeParameter) =>
+                  subst.bindT(
+                      (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+                      new ScUndefinedType(
+                          new ScTypeParameterType(tp, ScSubstitutor.empty)))
+              }
+            })
       case _ => s
     }
   }
@@ -726,9 +726,8 @@ object MethodResolveProcessor {
             val pr = problemsFor(r, applicationImplicits, proc)
             r.innerResolveResult match {
               case Some(rr) =>
-                r.copy(
-                    innerResolveResult = Some(rr.copy(
-                            problems = pr.problems,
+                r.copy(innerResolveResult = Some(
+                    rr.copy(problems = pr.problems,
                             defaultParameterUsed = pr.defaultParameterUsed)))
               case _ =>
                 r.copy(problems = pr.problems,
@@ -780,7 +779,7 @@ object MethodResolveProcessor {
     //remove default parameters alternatives
     if (filtered.size > 1 && !isShapeResolve)
       filtered = filtered.filter(r =>
-            r.innerResolveResult match {
+        r.innerResolveResult match {
           case Some(rr) => !rr.defaultParameterUsed
           case None => !r.defaultParameterUsed
       })

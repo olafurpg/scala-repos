@@ -161,13 +161,12 @@ class ScSyntheticClass(manager: PsiManager,
     t.tSuper match {
       case None => PsiClassType.EMPTY_ARRAY
       case Some(ts) =>
-        Array[PsiClassType](
-            JavaPsiFacade
-              .getInstance(project)
-              .getElementFactory
-              .createType(ts.asClass(project)
-                            .getOrElse(return PsiClassType.EMPTY_ARRAY),
-                          PsiSubstitutor.EMPTY))
+        Array[PsiClassType](JavaPsiFacade
+          .getInstance(project)
+          .getElementFactory
+          .createType(
+              ts.asClass(project).getOrElse(return PsiClassType.EMPTY_ARRAY),
+              PsiSubstitutor.EMPTY))
     }
   }
 }
@@ -281,8 +280,8 @@ class SyntheticClasses(project: Project)
                                 Any,
                                 Seq.empty,
                                 Seq(ScalaUtils.typeParameter)) {
-      override val retType = ScalaPsiManager.typeVariable(typeParams(0))
-    })
+          override val retType = ScalaPsiManager.typeVariable(typeParams(0))
+        })
 
     val anyRef = registerClass(AnyRef, "AnyRef")
     anyRef.addMethod(
@@ -295,18 +294,18 @@ class SyntheticClasses(project: Project)
                                 Any,
                                 Seq.empty,
                                 Seq(ScalaUtils.typeParameter)) {
-      override val paramClauses: Seq[Seq[Parameter]] = Seq(
-          Seq(
-              new Parameter("",
-                            None,
-                            ScalaPsiManager.typeVariable(typeParams(0)),
-                            false,
-                            false,
-                            false,
-                            0)))
-      override val retType: ScType =
-        ScalaPsiManager.typeVariable(typeParams(0))
-    })
+          override val paramClauses: Seq[Seq[Parameter]] = Seq(
+              Seq(
+                  new Parameter("",
+                                None,
+                                ScalaPsiManager.typeVariable(typeParams(0)),
+                                false,
+                                false,
+                                false,
+                                0)))
+          override val retType: ScType =
+            ScalaPsiManager.typeVariable(typeParams(0))
+        })
 
     registerClass(AnyVal, "AnyVal")
     registerClass(Nothing, "Nothing")
@@ -348,9 +347,9 @@ class SyntheticClasses(project: Project)
       for (un_op <- numeric_arith_unary_ops)
         nc.addMethod(
             new ScSyntheticFunction(manager, "unary_" + un_op, nc.t match {
-          case Long | Double | Float => nc.t
-          case _ => Int
-        }, Seq.empty))
+              case Long | Double | Float => nc.t
+              case _ => Int
+            }, Seq.empty))
     }
 
     for (ic <- integer) {

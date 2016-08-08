@@ -42,7 +42,7 @@ class DefaultWebCommands extends WebCommands {
                        buildLink: BuildLink,
                        path: File): Option[Result] = synchronized {
     (handlers.toStream flatMap {
-          _.handleWebCommand(request, buildLink, path).toSeq
-        }).headOption
+      _.handleWebCommand(request, buildLink, path).toSeq
+    }).headOption
   }
 }

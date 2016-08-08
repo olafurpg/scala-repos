@@ -82,8 +82,8 @@ class AppsResource @Inject()(clock: Clock,
           def createOrThrow(opt: Option[AppDefinition]) =
             opt
               .map(_ =>
-                    throw new ConflictingChangeException(
-                        s"An app with id [${app.id}] already exists."))
+                throw new ConflictingChangeException(
+                    s"An app with id [${app.id}] already exists."))
               .getOrElse(app)
 
           val plan = result(
@@ -199,9 +199,8 @@ class AppsResource @Inject()(clock: Clock,
               }
           }
 
-          deploymentResult(
-              result(groupManager
-                    .update(PathId.empty, updateGroup, version, force)))
+          deploymentResult(result(
+              groupManager.update(PathId.empty, updateGroup, version, force)))
       }
   }
 
@@ -223,7 +222,7 @@ class AppsResource @Inject()(clock: Clock,
 
       deploymentResult(
           result(groupManager
-                .update(appId.parent, deleteAppFromGroup, force = force)))
+            .update(appId.parent, deleteAppFromGroup, force = force)))
   }
 
   @Path("{appId:.+}/tasks")
@@ -310,7 +309,7 @@ class AppsResource @Inject()(clock: Clock,
     val selectors = Seq[Option[AppSelector]](
         cmd.map(c => AppSelector(_.cmd.exists(containCaseInsensitive(c, _)))),
         id.map(s =>
-              AppSelector(app => containCaseInsensitive(s, app.id.toString))),
+          AppSelector(app => containCaseInsensitive(s, app.id.toString))),
         label.map(new LabelSelectorParsers().parsed)
     ).flatten
     AppSelector.forall(selectors)

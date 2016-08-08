@@ -137,7 +137,7 @@ class HDFSStateLaws extends WordSpec {
           .foreach { t =>
             val totPath =
               (path + "/" + batcher.earliestTimeOf(t).milliSinceEpoch +
-                    ".version")
+                ".version")
             assert(new java.io.File(totPath).exists)
           }
       }

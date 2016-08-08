@@ -49,7 +49,7 @@ object Scalajsld {
       OutputMode.All
         .find(_.toString() == s)
         .getOrElse(throw new IllegalArgumentException(
-                s"$s is not a valid output mode"))
+            s"$s is not a valid output mode"))
     }
   }
 
@@ -120,8 +120,8 @@ object Scalajsld {
           c.copy(stdLib = Some(x))
         }
         .text("Location of Scala.js standard libarary. This is set by the " +
-              "runner script and automatically prepended to the classpath. " +
-              "Use -n to not include it.")
+          "runner script and automatically prepended to the classpath. " +
+          "Use -n to not include it.")
       opt[Unit]('d', "debug").action { (_, c) =>
         c.copy(logLevel = Level.Debug)
       }.text("Debug mode: Show full log")
@@ -155,9 +155,9 @@ object Scalajsld {
 
       // Warn if bypassing linking errors was requested.
       if (options.bypassLinkingErrors) {
-        Console.err.println(
-            "Support for bypassing linking errors with -b or " +
-              "--bypassLinkingErrors will be dropped in the next major version.")
+        Console.err
+          .println("Support for bypassing linking errors with -b or " +
+            "--bypassLinkingErrors will be dropped in the next major version.")
       }
 
       val semantics =

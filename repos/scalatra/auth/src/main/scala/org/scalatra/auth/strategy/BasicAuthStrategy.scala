@@ -74,8 +74,8 @@ object BasicAuthStrategy {
         _credentials =
           params map { p =>
             (null.asInstanceOf[(String, String)] /: new String(
-                    Base64.decode(p),
-                    Codec.UTF8.charSet).split(":", 2)) { (t, l) =>
+                Base64.decode(p),
+                Codec.UTF8.charSet).split(":", 2)) { (t, l) =>
               if (t == null) (l, null) else (t._1, l)
             }
           }

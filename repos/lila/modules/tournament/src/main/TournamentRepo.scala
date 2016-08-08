@@ -101,7 +101,7 @@ object TournamentRepo {
   def publicStarted: Fu[List[Tournament]] =
     coll
       .find(startedSelect ++ BSONDocument(
-              "private" -> BSONDocument("$exists" -> false)))
+          "private" -> BSONDocument("$exists" -> false)))
       .sort(BSONDocument("createdAt" -> -1))
       .cursor[Tournament]()
       .collect[List]()
@@ -117,9 +117,9 @@ object TournamentRepo {
     coll
       .find(
           finishedSelect ++ BSONDocument("$or" -> BSONArray(
-                  BSONDocument("nbPlayers" -> BSONDocument("$gte" -> 15)),
-                  scheduledSelect
-              )))
+              BSONDocument("nbPlayers" -> BSONDocument("$gte" -> 15)),
+              scheduledSelect
+          )))
       .sort(BSONDocument("startsAt" -> -1))
       .cursor[Tournament]()
       .collect[List](limit)
@@ -180,7 +180,7 @@ object TournamentRepo {
         "$or" -> BSONArray(
             BSONDocument("schedule" -> BSONDocument("$exists" -> false)),
             BSONDocument("startsAt" -> BSONDocument("$lt" ->
-                      (DateTime.now plusMinutes aheadMinutes)))
+              (DateTime.now plusMinutes aheadMinutes)))
         )
     )
 
@@ -203,8 +203,8 @@ object TournamentRepo {
   private def stillWorthEntering: Fu[List[Tournament]] =
     coll
       .find(startedSelect ++ BSONDocument(
-              "private" -> BSONDocument("$exists" -> false)
-          ))
+          "private" -> BSONDocument("$exists" -> false)
+      ))
       .sort(BSONDocument("startsAt" -> 1))
       .toList[Tournament](none) map {
       _.filter(_.isStillWorthEntering)
@@ -310,9 +310,9 @@ object TournamentRepo {
           enterableSelect ++ BSONDocument(
               "_id" -> BSONDocument("$ne" -> tourId),
               "schedule.freq" -> BSONDocument("$nin" -> List(
-                      Schedule.Freq.Marathon.name,
-                      Schedule.Freq.Unique.name
-                  ))
+                  Schedule.Freq.Marathon.name,
+                  Schedule.Freq.Unique.name
+              ))
           ) ++ nonEmptySelect)
       .cursor[Tournament]()
       .collect[List]()

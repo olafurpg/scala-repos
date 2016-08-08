@@ -190,7 +190,7 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
 
   private def withinBounds(range: TextRange) =
     ranges.foldLeft(false)((acc: Boolean, current: TextRange) =>
-          acc || current.intersects(range))
+      acc || current.intersects(range))
 
   private def getCurrentEntry =
     if (arrangementEntries.isEmpty) null else arrangementEntries.top
@@ -217,7 +217,7 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
           tokenType,
           name,
           canArrange && (parent.isInstanceOf[ScTemplateBody] ||
-                parent.isInstanceOf[PsiFile]))
+            parent.isInstanceOf[PsiFile]))
 
       if (currentEntry == null) {
         parseInfo.addEntry(newEntry)
@@ -317,8 +317,8 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
     var range =
       if (first != null && first.isInstanceOf[PsiComment] && prev != null &&
           (!prev.isInstanceOf[PsiWhiteSpace] ||
-              prev.isInstanceOf[PsiWhiteSpace] &&
-              !prev.getText.contains("\n") && prev.getPrevSibling != null)) {
+          prev.isInstanceOf[PsiWhiteSpace] &&
+          !prev.getText.contains("\n") && prev.getPrevSibling != null)) {
         new TextRange(node.getTextRange.getStartOffset +
                         first.getTextRange.getLength + 1,
                       node.getTextRange.getEndOffset)
@@ -378,7 +378,7 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
   private def parseProperties(method: ScFunction,
                               entry: ScalaArrangementEntry) {
     if (!(groupingRules.contains(JAVA_GETTERS_AND_SETTERS) ||
-              groupingRules.contains(SCALA_GETTERS_AND_SETTERS)) ||
+          groupingRules.contains(SCALA_GETTERS_AND_SETTERS)) ||
         entry == null) {
       return
     }
@@ -417,20 +417,18 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
       if (child.isInstanceOf[ScExpression]) {
         if (!unseparableRanges.contains(entry)) {
           unseparableRanges += (entry -> mutable
-                .Queue[ScalaArrangementEntry]())
+            .Queue[ScalaArrangementEntry]())
         }
         unseparableRanges
           .get(entry)
           .foreach(
               queue =>
-                queue.enqueue(
-                    createNewEntry(
-                        body,
-                        new TextRange(newOffset,
-                                      child.getTextRange.getEndOffset),
-                        UNSEPARABLE_RANGE,
-                        null,
-                        canArrange = true)))
+                queue.enqueue(createNewEntry(
+                    body,
+                    new TextRange(newOffset, child.getTextRange.getEndOffset),
+                    UNSEPARABLE_RANGE,
+                    null,
+                    canArrange = true)))
         None
       } else startOffset
     })
@@ -442,14 +440,14 @@ object ScalaArrangementVisitor {
     val length = name.length
     name.startsWith(start) && length > start.length &&
     !(Character.isLowerCase(name.charAt(start.length())) &&
-          (length == start.length() + 1 ||
-                Character.isLowerCase(name.charAt(start.length() + 1))))
+      (length == start.length() + 1 ||
+        Character.isLowerCase(name.charAt(start.length() + 1))))
   }
 
   private def hasJavaGetterName(method: ScFunction) = {
     val name = method.getName
     if (nameStartsWith(name, "get") && !(nameStartsWith(name, "getAnd") &&
-              name.charAt("getAnd".length).isUpper)) {
+          name.charAt("getAnd".length).isUpper)) {
       method.returnType.getOrAny != Unit
     } else if (nameStartsWith(name, "is")) {
       method.returnType.getOrAny == Boolean

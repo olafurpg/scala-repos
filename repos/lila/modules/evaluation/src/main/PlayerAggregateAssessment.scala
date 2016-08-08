@@ -33,24 +33,24 @@ case class PlayerAggregateAssessment(user: User,
     val markable: Boolean =
       !isGreatUser && isWorthLookingAt &&
         ((cheatingSum >= 3 || cheatingSum + likelyCheatingSum >= 6)
-            // more than 10 percent of games are cheating
-              && (cheatingSum.toDouble / assessmentsCount >= 0.1 - relationModifier
-                  // or more than 20 percent of games are likely cheating
-                    || (cheatingSum +
-                          likelyCheatingSum).toDouble / assessmentsCount >= 0.20 -
-                      relationModifier))
+        // more than 10 percent of games are cheating
+          && (cheatingSum.toDouble / assessmentsCount >= 0.1 - relationModifier
+          // or more than 20 percent of games are likely cheating
+            || (cheatingSum +
+              likelyCheatingSum).toDouble / assessmentsCount >= 0.20 -
+              relationModifier))
 
     val reportable: Boolean =
       isWorthLookingAt &&
         ((cheatingSum >= 2 || cheatingSum + likelyCheatingSum >=
-                  (isNewRatedUser.fold(2, 4)))
-            // more than 5 percent of games are cheating
-              &&
-                (cheatingSum.toDouble / assessmentsCount >= 0.05 - relationModifier
-                    // or more than 10 percent of games are likely cheating
-                      || (cheatingSum +
-                            likelyCheatingSum).toDouble / assessmentsCount >= 0.10 -
-                        relationModifier))
+          (isNewRatedUser.fold(2, 4)))
+        // more than 5 percent of games are cheating
+          &&
+            (cheatingSum.toDouble / assessmentsCount >= 0.05 - relationModifier
+            // or more than 10 percent of games are likely cheating
+              || (cheatingSum +
+                likelyCheatingSum).toDouble / assessmentsCount >= 0.10 -
+                relationModifier))
 
     val bannable: Boolean =
       (relatedCheatersCount == relatedUsersCount) && relatedUsersCount >= 1

@@ -54,16 +54,17 @@ trait WikiControllerBase extends ControllerBase {
   )(WikiPageEditForm.apply)
 
   get("/:owner/:repository/wiki")(referrersOnly { repository =>
-    getWikiPage(repository.owner, repository.name, "Home").map { page =>
-      html.page("Home",
-                page,
-                getWikiPageList(repository.owner, repository.name),
-                repository,
-                hasWritePermission(repository.owner,
-                                   repository.name,
-                                   context.loginAccount),
-                getWikiPage(repository.owner, repository.name, "_Sidebar"),
-                getWikiPage(repository.owner, repository.name, "_Footer"))
+    getWikiPage(repository.owner, repository.name, "Home").map {
+      page =>
+        html.page("Home",
+                  page,
+                  getWikiPageList(repository.owner, repository.name),
+                  repository,
+                  hasWritePermission(repository.owner,
+                                     repository.name,
+                                     context.loginAccount),
+                  getWikiPage(repository.owner, repository.name, "_Sidebar"),
+                  getWikiPage(repository.owner, repository.name, "_Footer"))
     } getOrElse redirect(
         s"/${repository.owner}/${repository.name}/wiki/Home/_edit")
   })
@@ -71,16 +72,17 @@ trait WikiControllerBase extends ControllerBase {
   get("/:owner/:repository/wiki/:page")(referrersOnly { repository =>
     val pageName = StringUtil.urlDecode(params("page"))
 
-    getWikiPage(repository.owner, repository.name, pageName).map { page =>
-      html.page(pageName,
-                page,
-                getWikiPageList(repository.owner, repository.name),
-                repository,
-                hasWritePermission(repository.owner,
-                                   repository.name,
-                                   context.loginAccount),
-                getWikiPage(repository.owner, repository.name, "_Sidebar"),
-                getWikiPage(repository.owner, repository.name, "_Footer"))
+    getWikiPage(repository.owner, repository.name, pageName).map {
+      page =>
+        html.page(pageName,
+                  page,
+                  getWikiPageList(repository.owner, repository.name),
+                  repository,
+                  hasWritePermission(repository.owner,
+                                     repository.name,
+                                     context.loginAccount),
+                  getWikiPage(repository.owner, repository.name, "_Sidebar"),
+                  getWikiPage(repository.owner, repository.name, "_Footer"))
     } getOrElse redirect(
         s"/${repository.owner}/${repository.name}/wiki/${StringUtil.urlEncode(pageName)}/_edit")
   })
@@ -100,79 +102,79 @@ trait WikiControllerBase extends ControllerBase {
 
   get("/:owner/:repository/wiki/:page/_compare/:commitId")(
       referrersOnly { repository =>
-    val pageName = StringUtil.urlDecode(params("page"))
-    val Array(from, to) = params("commitId").split("\\.\\.\\.")
+        val pageName = StringUtil.urlDecode(params("page"))
+        val Array(from, to) = params("commitId").split("\\.\\.\\.")
 
-    using(Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
-      git =>
-        html.compare(Some(pageName),
-                     from,
-                     to,
-                     JGitUtil
-                       .getDiffs(git, from, to, true)
-                       .filter(_.newPath == pageName + ".md"),
-                     repository,
-                     hasWritePermission(repository.owner,
-                                        repository.name,
-                                        context.loginAccount),
-                     flash.get("info"))
-    }
-  })
+        using(Git.open(
+            getWikiRepositoryDir(repository.owner, repository.name))) { git =>
+          html.compare(Some(pageName),
+                       from,
+                       to,
+                       JGitUtil
+                         .getDiffs(git, from, to, true)
+                         .filter(_.newPath == pageName + ".md"),
+                       repository,
+                       hasWritePermission(repository.owner,
+                                          repository.name,
+                                          context.loginAccount),
+                       flash.get("info"))
+        }
+      })
 
   get("/:owner/:repository/wiki/_compare/:commitId")(
       referrersOnly { repository =>
-    val Array(from, to) = params("commitId").split("\\.\\.\\.")
+        val Array(from, to) = params("commitId").split("\\.\\.\\.")
 
-    using(Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
-      git =>
-        html.compare(None,
-                     from,
-                     to,
-                     JGitUtil.getDiffs(git, from, to, true),
-                     repository,
-                     hasWritePermission(repository.owner,
-                                        repository.name,
-                                        context.loginAccount),
-                     flash.get("info"))
-    }
-  })
-
-  get("/:owner/:repository/wiki/:page/_revert/:commitId")(
-      collaboratorsOnly { repository =>
-    val pageName = StringUtil.urlDecode(params("page"))
-    val Array(from, to) = params("commitId").split("\\.\\.\\.")
-
-    if (revertWikiPage(repository.owner,
-                       repository.name,
+        using(Git.open(
+            getWikiRepositoryDir(repository.owner, repository.name))) { git =>
+          html.compare(None,
                        from,
                        to,
-                       context.loginAccount.get,
-                       Some(pageName))) {
-      redirect(
-          s"/${repository.owner}/${repository.name}/wiki/${StringUtil.urlEncode(pageName)}")
-    } else {
-      flash += "info" -> "This patch was not able to be reversed."
-      redirect(s"/${repository.owner}/${repository.name}/wiki/${StringUtil
-        .urlEncode(pageName)}/_compare/${from}...${to}")
-    }
+                       JGitUtil.getDiffs(git, from, to, true),
+                       repository,
+                       hasWritePermission(repository.owner,
+                                          repository.name,
+                                          context.loginAccount),
+                       flash.get("info"))
+        }
+      })
+
+  get("/:owner/:repository/wiki/:page/_revert/:commitId")(collaboratorsOnly {
+    repository =>
+      val pageName = StringUtil.urlDecode(params("page"))
+      val Array(from, to) = params("commitId").split("\\.\\.\\.")
+
+      if (revertWikiPage(repository.owner,
+                         repository.name,
+                         from,
+                         to,
+                         context.loginAccount.get,
+                         Some(pageName))) {
+        redirect(
+            s"/${repository.owner}/${repository.name}/wiki/${StringUtil.urlEncode(pageName)}")
+      } else {
+        flash += "info" -> "This patch was not able to be reversed."
+        redirect(s"/${repository.owner}/${repository.name}/wiki/${StringUtil
+          .urlEncode(pageName)}/_compare/${from}...${to}")
+      }
   })
 
-  get("/:owner/:repository/wiki/_revert/:commitId")(
-      collaboratorsOnly { repository =>
-    val Array(from, to) = params("commitId").split("\\.\\.\\.")
+  get("/:owner/:repository/wiki/_revert/:commitId")(collaboratorsOnly {
+    repository =>
+      val Array(from, to) = params("commitId").split("\\.\\.\\.")
 
-    if (revertWikiPage(repository.owner,
-                       repository.name,
-                       from,
-                       to,
-                       context.loginAccount.get,
-                       None)) {
-      redirect(s"/${repository.owner}/${repository.name}/wiki/")
-    } else {
-      flash += "info" -> "This patch was not able to be reversed."
-      redirect(
-          s"/${repository.owner}/${repository.name}/wiki/_compare/${from}...${to}")
-    }
+      if (revertWikiPage(repository.owner,
+                         repository.name,
+                         from,
+                         to,
+                         context.loginAccount.get,
+                         None)) {
+        redirect(s"/${repository.owner}/${repository.name}/wiki/")
+      } else {
+        flash += "info" -> "This patch was not able to be reversed."
+        redirect(
+            s"/${repository.owner}/${repository.name}/wiki/_compare/${from}...${to}")
+      }
   })
 
   get("/:owner/:repository/wiki/:page/_edit")(collaboratorsOnly { repository =>
@@ -206,7 +208,7 @@ trait WikiControllerBase extends ControllerBase {
           if (notReservedPageName(form.pageName)) {
             redirect(
                 s"/${repository.owner}/${repository.name}/wiki/${StringUtil
-              .urlEncode(form.pageName)}")
+                  .urlEncode(form.pageName)}")
           } else {
             redirect(s"/${repository.owner}/${repository.name}/wiki")
           }
@@ -239,7 +241,7 @@ trait WikiControllerBase extends ControllerBase {
           if (notReservedPageName(form.pageName)) {
             redirect(
                 s"/${repository.owner}/${repository.name}/wiki/${StringUtil
-              .urlEncode(form.pageName)}")
+                  .urlEncode(form.pageName)}")
           } else {
             redirect(s"/${repository.owner}/${repository.name}/wiki")
           }

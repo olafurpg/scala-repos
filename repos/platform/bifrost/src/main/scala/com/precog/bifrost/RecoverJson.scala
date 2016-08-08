@@ -116,25 +116,25 @@ object RecoverJson {
 
             buildState(
                 findEndString(buffers, next.bufferIndex, next.offset + 1) map {
-              case (bufferIndex, offset) =>
-                // Jump over the string
-                BalancedStackState(
-                    bufferIndex,
-                    offset + 1,
-                    next.stack
-                )
-            } getOrElse {
-              // String didn't end
-              val lastBuffer = buffers(buffers.length - 1)
-              val lastCharacter = lastBuffer.get(lastBuffer.length - 1)
-              val quoted = next.stack push Quote
-              BalancedStackState(
-                  buffers.length,
-                  0,
-                  if (lastCharacter == '\\') quoted push EscapeChar
-                  else quoted
-              )
-            })
+                  case (bufferIndex, offset) =>
+                    // Jump over the string
+                    BalancedStackState(
+                        bufferIndex,
+                        offset + 1,
+                        next.stack
+                    )
+                } getOrElse {
+                  // String didn't end
+                  val lastBuffer = buffers(buffers.length - 1)
+                  val lastCharacter = lastBuffer.get(lastBuffer.length - 1)
+                  val quoted = next.stack push Quote
+                  BalancedStackState(
+                      buffers.length,
+                      0,
+                      if (lastCharacter == '\\') quoted push EscapeChar
+                      else quoted
+                  )
+                })
 
           case _ => buildState(accum.skip)
         }

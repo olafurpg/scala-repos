@@ -129,7 +129,7 @@ object BuildDef extends Build {
   lazy val webkit = webProject("webkit")
     .dependsOn(util, testkit % "provided")
     .settings(libraryDependencies ++=
-          Seq(mockito_all, jquery, jasmineCore, jasmineAjax))
+      Seq(mockito_all, jquery, jasmineCore, jasmineAjax))
     .settings(yuiCompressor.Plugin.yuiSettings: _*)
     .settings(description := "Webkit Library",
               parallelExecution in Test := false,

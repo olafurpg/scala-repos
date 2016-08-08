@@ -347,7 +347,7 @@ class MultiReaderTest
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
           Await.result(services(i % services.size)
-                .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
+            .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
       }
 
       eventually {
@@ -372,7 +372,7 @@ class MultiReaderTest
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
           Await.result(services(i % services.size)
-                .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
+            .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
       }
 
       // 0, 3, 6 ...
@@ -410,7 +410,7 @@ class MultiReaderTest
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
           Await.result(services(i % services.size)
-                .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
+            .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
       }
 
       eventually {
@@ -426,7 +426,7 @@ class MultiReaderTest
           sentMessages.zipWithIndex foreach {
             case (m, i) =>
               Await.result(services(i % services.size)
-                    .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
+                .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
           }
 
           // expect fewer to be read on each pass
@@ -460,7 +460,7 @@ class MultiReaderTest
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
           Await.result(services(i % services.size)
-                .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
+            .apply(Set(queueNameBuf, Time.now, Buf.Utf8(m))))
       }
 
       assert(messages.size == 0) // cluster not ready
@@ -519,7 +519,7 @@ class MultiReaderTest
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
           Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+            .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
 
       eventually {
@@ -546,7 +546,7 @@ class MultiReaderTest
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
           Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+            .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
 
       // 0, 3, 6 ...
@@ -586,7 +586,7 @@ class MultiReaderTest
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
           Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+            .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
 
       eventually {
@@ -602,7 +602,7 @@ class MultiReaderTest
           sentMessages.zipWithIndex foreach {
             case (m, i) =>
               Await.result(services(i % services.size)
-                    .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
           }
 
           // expect fewer to be read on each pass
@@ -638,7 +638,7 @@ class MultiReaderTest
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
           Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+            .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
 
       assert(messages.size == 0) // cluster not ready
@@ -689,7 +689,7 @@ class MultiReaderTest
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
           Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+            .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
       eventually {
         assert(messages == sentMessages.toSet)
@@ -701,7 +701,7 @@ class MultiReaderTest
       sentMessages.zipWithIndex foreach {
         case (m, i) =>
           Await.result(services(i % services.size)
-                .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
+            .apply(Set(Buf.Utf8("the_queue"), Time.now, Buf.Utf8(m))))
       }
       eventually {
         assert(messages == sentMessages.toSet)

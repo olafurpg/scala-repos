@@ -514,8 +514,8 @@ abstract class ShardCoordinator(
   def isMember(region: ActorRef): Boolean = {
     val regionAddress = region.path.address
     (region.path.address == self.path.address ||
-        cluster.state.members.exists(m ⇒
-              m.address == regionAddress && m.status == MemberStatus.Up))
+    cluster.state.members.exists(m ⇒
+      m.address == regionAddress && m.status == MemberStatus.Up))
   }
 
   def active: Receive =

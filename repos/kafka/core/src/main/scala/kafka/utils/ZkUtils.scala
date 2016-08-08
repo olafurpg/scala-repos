@@ -782,7 +782,7 @@ class ZkUtils(val zkClient: ZkClient,
         val reassignedPartitions = parsePartitionReassignmentData(
             jsonPartitionMap)
         reassignedPartitions.map(p =>
-              (p._1 -> new ReassignedPartitionsContext(p._2)))
+          (p._1 -> new ReassignedPartitionsContext(p._2)))
       case None => Map.empty[TopicAndPartition, ReassignedPartitionsContext]
     }
   }
@@ -839,9 +839,9 @@ class ZkUtils(val zkClient: ZkClient,
     Json.encode(
         Map("version" -> 1,
             "partitions" -> partitionsToBeReassigned.map(e =>
-                  Map("topic" -> e._1.topic,
-                      "partition" -> e._1.partition,
-                      "replicas" -> e._2))))
+              Map("topic" -> e._1.topic,
+                  "partition" -> e._1.partition,
+                  "replicas" -> e._2))))
   }
 
   def updatePartitionReassignmentData(

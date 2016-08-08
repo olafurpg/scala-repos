@@ -130,11 +130,10 @@ class EventStream(sys: ActorSystem, private val debug: Boolean)
 
         case Right(presentUnsubscriber) ⇒
           if (debug)
-            publish(
-                Logging.Debug(
-                    simpleName(this),
-                    this.getClass,
-                    s"not using unsubscriber $unsubscriber, because already initialized with $presentUnsubscriber"))
+            publish(Logging.Debug(
+                simpleName(this),
+                this.getClass,
+                s"not using unsubscriber $unsubscriber, because already initialized with $presentUnsubscriber"))
           false
       }
   }

@@ -26,7 +26,7 @@ trait Bifoldable[F[_, _]] { self =>
     import Dual._, Endo._, syntax.std.all._
     Tag.unwrap(
         bifoldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))((b: B) =>
-              Dual(Endo.endo(g.flip.curried(b))))(dualMonoid[Endo[C]])) apply z
+          Dual(Endo.endo(g.flip.curried(b))))(dualMonoid[Endo[C]])) apply z
   }
 
   /**The composition of Bifoldables `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifoldable */
@@ -100,13 +100,13 @@ trait Bifoldable[F[_, _]] { self =>
     def leftFMConsistent[A: Equal, B: Equal](fa: F[A, B]): Boolean =
       Equal[Vector[B \/ A]].equal(
           bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(b =>
-                Vector(-\/(b))),
+            Vector(-\/(b))),
           bifoldLeft(fa, Vector.empty[B \/ A])(_ :+ \/-(_))(_ :+ -\/(_)))
 
     def rightFMConsistent[A: Equal, B: Equal](fa: F[A, B]): Boolean =
       Equal[Vector[B \/ A]].equal(
           bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(b =>
-                Vector(-\/(b))),
+            Vector(-\/(b))),
           bifoldRight(fa, Vector.empty[B \/ A])(\/-(_) +: _)(-\/(_) +: _))
   }
 
@@ -128,7 +128,7 @@ object Bifoldable {
     override def bifoldRight[A, B, C](fa: F[A, B], z: => C)(f: (A, => C) => C)(
         g: (B, => C) => C) =
       bifoldMap(fa)((a: A) => (Endo.endo(f(a, _: C))))((b: B) =>
-            (Endo.endo(g(b, _: C)))) apply z
+        (Endo.endo(g(b, _: C)))) apply z
   }
 
   /**
@@ -138,7 +138,7 @@ object Bifoldable {
     override def bifoldMap[A, B, M](fa: F[A, B])(f: A => M)(g: B => M)(
         implicit F: Monoid[M]) =
       bifoldR(fa, F.zero)(x => y => F.append(f(x), y))(x =>
-            y => F.append(g(x), y))
+        y => F.append(g(x), y))
   }
 
   ////

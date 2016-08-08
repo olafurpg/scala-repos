@@ -315,10 +315,8 @@ private[io] class SelectionHandler(settings: SelectionHandlerSettings)
               }
             case e ⇒ e.getMessage
           }
-          context.system.eventStream.publish(
-              Logging.Debug(child.path.toString,
-                            classOf[SelectionHandler],
-                            logMessage))
+          context.system.eventStream.publish(Logging
+            .Debug(child.path.toString, classOf[SelectionHandler], logMessage))
         } catch { case NonFatal(_) ⇒ }
     }
   }

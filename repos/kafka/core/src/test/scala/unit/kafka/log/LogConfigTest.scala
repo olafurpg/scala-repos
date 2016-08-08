@@ -53,7 +53,7 @@ class LogConfigTest {
   @Test
   def testFromPropsInvalid() {
     LogConfig.configNames.foreach(name =>
-          name match {
+      name match {
         case LogConfig.UncleanLeaderElectionEnableProp =>
           assertPropertyInvalid(name, "not a boolean")
         case LogConfig.RetentionBytesProp =>

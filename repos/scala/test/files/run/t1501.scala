@@ -42,7 +42,7 @@ object Test {
       def annotationsConform(tpe1: Type, tpe2: Type): Boolean = {
 
         tpe1.annotations.forall(a1 =>
-              tpe2.annotations.forall(a2 => a1.atp <:< a2.atp))
+          tpe2.annotations.forall(a2 => a1.atp <:< a2.atp))
       }
     }
 

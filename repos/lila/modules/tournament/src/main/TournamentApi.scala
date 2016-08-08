@@ -277,7 +277,7 @@ private[tournament] final class TournamentApi(
 
   private def updatePlayer(tour: Tournament)(userId: String): Funit =
     (tour.perfType
-          .ifTrue(tour.mode.rated) ?? { UserRepo.perfOf(userId, _) }) flatMap {
+      .ifTrue(tour.mode.rated) ?? { UserRepo.perfOf(userId, _) }) flatMap {
       perf =>
         PlayerRepo.update(tour.id, userId) { player =>
           PairingRepo.finishedByPlayerChronological(tour.id, userId) map {

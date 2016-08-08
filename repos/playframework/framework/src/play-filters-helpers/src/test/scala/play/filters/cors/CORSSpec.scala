@@ -27,12 +27,12 @@ object CORSFilterSpec extends CORSCommonSpec {
     running(
         _.configure(conf).overrides(
             bind[Router].to(Router.from {
-          case p"/error" =>
-            Action { req =>
-              throw sys.error("error")
-            }
-          case _ => Action(Results.Ok)
-        }),
+              case p"/error" =>
+                Action { req =>
+                  throw sys.error("error")
+                }
+              case _ => Action(Results.Ok)
+            }),
             bind[HttpFilters].to[Filters]
         ))(_ => block)
   }
@@ -45,7 +45,7 @@ object CORSFilterSpec extends CORSCommonSpec {
     "pass through a cors request that doesn't match the path prefixes" in withApplication(
         conf = restrictPaths) {
       val result = route(fakeRequest("GET", "/baz").withHeaders(
-              ORIGIN -> "http://localhost")).get
+          ORIGIN -> "http://localhost")).get
 
       status(result) must_== OK
       mustBeNoAccessControlResponseHeaders(result)
@@ -72,12 +72,12 @@ object CORSWithCSRFSpec extends CORSCommonSpec {
     running(
         _.configure(conf).overrides(
             bind[Router].to(Router.from {
-          case p"/error" =>
-            Action { req =>
-              throw sys.error("error")
-            }
-          case _ => CSRFCheck(Action(Results.Ok))
-        }),
+              case p"/error" =>
+                Action { req =>
+                  throw sys.error("error")
+                }
+              case _ => CSRFCheck(Action(Results.Ok))
+            }),
             bind[HttpFilters].to(filters)
         ))(block)
   }
@@ -120,16 +120,18 @@ object CORSActionBuilderSpec extends CORSCommonSpec {
 
   def withApplication[T](conf: Map[String, _ <: Any] = Map.empty)(
       block: => T): T = {
-    running(_.routes {
-      case (_, "/error") =>
-        CORSActionBuilder(Configuration.reference ++ Configuration.from(conf)) {
-          req =>
-            throw sys.error("error")
-        }
-      case _ =>
-        CORSActionBuilder(Configuration.reference ++ Configuration.from(conf))(
-            Results.Ok)
-    })(_ => block)
+    running(
+        _.routes {
+          case (_, "/error") =>
+            CORSActionBuilder(
+                Configuration.reference ++ Configuration.from(conf)) { req =>
+              throw sys.error("error")
+            }
+          case _ =>
+            CORSActionBuilder(
+                Configuration.reference ++ Configuration.from(conf))(
+                Results.Ok)
+        })(_ => block)
   }
 
   def withApplicationWithPathConfiguredAction[T](
@@ -295,7 +297,7 @@ trait CORSCommonSpec extends PlaySpecification {
 
     "handle a simple cross-origin request with default config" in withApplication() {
       val result = route(fakeRequest("GET", "/").withHeaders(
-              ORIGIN -> "http://localhost")).get
+          ORIGIN -> "http://localhost")).get
 
       status(result) must_== OK
       header(ACCESS_CONTROL_ALLOW_CREDENTIALS, result) must beSome("true")
@@ -362,7 +364,7 @@ trait CORSCommonSpec extends PlaySpecification {
 
     "handle an actual cross-origin request with default config" in withApplication() {
       val result = route(fakeRequest("PUT", "/").withHeaders(
-              ORIGIN -> "http://localhost")).get
+          ORIGIN -> "http://localhost")).get
 
       status(result) must_== OK
       header(ACCESS_CONTROL_ALLOW_CREDENTIALS, result) must beSome("true")
@@ -397,7 +399,7 @@ trait CORSCommonSpec extends PlaySpecification {
     "handle a simple cross-origin request with credentials support off" in withApplication(
         conf = noCredentialsConf) {
       val result = route(fakeRequest("GET", "/").withHeaders(
-              ORIGIN -> "http://localhost")).get
+          ORIGIN -> "http://localhost")).get
 
       status(result) must_== OK
       header(ACCESS_CONTROL_ALLOW_CREDENTIALS, result) must beNone

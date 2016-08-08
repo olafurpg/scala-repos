@@ -445,7 +445,7 @@ object ZipperTest extends SpecLite {
   "findBy should not blow the stack" ! prop { z: Zipper[Int] =>
     var limit = 10 * 1000
     z.findBy(z => if (limit > 0) { limit -= 1; some(z.nextC) } else none)(x =>
-          false)
+      false)
     true
   }
 

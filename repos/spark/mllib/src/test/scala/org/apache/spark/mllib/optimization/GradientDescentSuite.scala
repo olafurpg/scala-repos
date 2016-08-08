@@ -151,17 +151,15 @@ class GradientDescentSuite
 
     assert(
         loss1(0) ~= (loss0(0) + (math.pow(initialWeightsWithIntercept(0), 2) +
-                  math
-                    .pow(initialWeightsWithIntercept(1), 2)) / 2) absTol 1E-5,
+          math.pow(initialWeightsWithIntercept(1), 2)) / 2) absTol 1E-5,
         """For non-zero weights, the regVal should be \frac{1}{2}\sum_i w_i^2.""")
 
-    assert(
-        (newWeights1(0) ~=
-              (newWeights0(0) - initialWeightsWithIntercept(0)) absTol 1E-5) &&
-          (newWeights1(1) ~=
-                (newWeights0(1) - initialWeightsWithIntercept(1)) absTol 1E-5),
-        "The different between newWeights with/without regularization " +
-          "should be initialWeightsWithIntercept.")
+    assert((newWeights1(0) ~=
+             (newWeights0(0) - initialWeightsWithIntercept(0)) absTol 1E-5) &&
+             (newWeights1(1) ~=
+               (newWeights0(1) - initialWeightsWithIntercept(1)) absTol 1E-5),
+           "The different between newWeights with/without regularization " +
+             "should be initialWeightsWithIntercept.")
   }
 
   test("iteration should end with convergence tolerance") {

@@ -198,7 +198,7 @@ trait Picklers { self: Global =>
 
   implicit def askDocCommentItem: CondPickler[AskDocCommentItem] =
     (pkl[Symbol] ~ pkl[SourceFile] ~ pkl[Symbol] ~ pkl[
-            List[(Symbol, SourceFile)]]).wrapped {
+        List[(Symbol, SourceFile)]]).wrapped {
       case sym ~ source ~ site ~ fragments =>
         new AskDocCommentItem(sym, source, site, fragments, new Response)
     } { item =>

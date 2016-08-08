@@ -26,8 +26,8 @@ import org.saddle.scalar._
   * These methods scan over the Vec and compute values over a specified historical
   * window.
   */
-class VecRollingStats[
-    @spec(Int, Long, Double) A: ST: Vec2Stats: AddOp: SubOp: NUM](v: Vec[A]) {
+class VecRollingStats[@spec(Int, Long, Double) A: ST: Vec2Stats: AddOp: SubOp: NUM](
+    v: Vec[A]) {
 
   /**
     * Rolling count; compute count of number of elements in Vec over a sliding window, ignoring

@@ -50,7 +50,7 @@ object ClusterRoundRobinMultiJvmSpec extends MultiNodeConfig {
   commonConfig(
       debugConfig(on = false)
         .withFallback(ConfigFactory.parseString(
-                """
+            """
       akka.actor.deployment {
         /router1 {
           router = round-robin-pool
@@ -337,8 +337,8 @@ abstract class ClusterRoundRobinSpec
       def routees = currentRoutees(router4)
       def routeeAddresses =
         (routees map {
-              case ActorSelectionRoutee(sel) ⇒ fullAddress(sel.anchor)
-            }).toSet
+          case ActorSelectionRoutee(sel) ⇒ fullAddress(sel.anchor)
+        }).toSet
 
       runOn(first) {
         // 4 nodes, 2 routees on each node

@@ -80,8 +80,8 @@ object AnnotatorHighlighter {
 
     def annotateCollectionByType(resolvedType: ScType) {
       if (ScalaNamesUtil.isOperatorName(resolvedType.presentableText.substring(
-                  0,
-                  resolvedType.presentableText.prefixLength(_ != '.'))))
+              0,
+              resolvedType.presentableText.prefixLength(_ != '.'))))
         return
 
       val scalaProjectSettings: ScalaProjectSettings =
@@ -146,15 +146,15 @@ object AnnotatorHighlighter {
                   a =>
                     if (a.canonicalText.startsWith(
                             SCALA_COLLECTION_MUTABLE_BASE)) {
-                  simpleAnnotate(
-                      ScalaBundle.message("scala.mutable.collection"),
-                      DefaultHighlighter.MUTABLE_COLLECTION)
-                } else if (a.canonicalText.startsWith(
-                               SCALA_COLLECTION_IMMUTABLE_BASE)) {
-                  simpleAnnotate(
-                      ScalaBundle.message("scala.immutable.collection"),
-                      DefaultHighlighter.IMMUTABLE_COLLECTION)
-              })
+                      simpleAnnotate(
+                          ScalaBundle.message("scala.mutable.collection"),
+                          DefaultHighlighter.MUTABLE_COLLECTION)
+                    } else if (a.canonicalText.startsWith(
+                                   SCALA_COLLECTION_IMMUTABLE_BASE)) {
+                      simpleAnnotate(
+                          ScalaBundle.message("scala.immutable.collection"),
+                          DefaultHighlighter.IMMUTABLE_COLLECTION)
+                  })
             case _ =>
           }
       }
@@ -227,7 +227,7 @@ object AnnotatorHighlighter {
         parent match {
           case r @ (_: ScValue | _: ScVariable) =>
             Option(x.containingClass).foreach(a =>
-                  if (SCALA_PREDEFINED_OBJECTS.contains(a.qualifiedName)) {
+              if (SCALA_PREDEFINED_OBJECTS.contains(a.qualifiedName)) {
                 x.getType(TypingContext.empty)
                   .foreach(annotateCollectionByType)
             })

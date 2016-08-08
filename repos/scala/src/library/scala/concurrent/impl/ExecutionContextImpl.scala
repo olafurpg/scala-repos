@@ -118,8 +118,8 @@ private[concurrent] object ExecutionContextImpl {
       }) match {
         case s if s.charAt(0) == 'x' =>
           (Runtime.getRuntime.availableProcessors * s
-                .substring(1)
-                .toDouble).ceil.toInt
+            .substring(1)
+            .toDouble).ceil.toInt
         case other => other.toInt
       }
 

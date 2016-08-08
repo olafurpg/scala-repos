@@ -80,7 +80,7 @@ trait ScTypePsiTypeBridge {
                   ScParameterizedType(
                       res,
                       typeParameters.map(ptp =>
-                            new ScTypeParameterType(ptp, ScSubstitutor.empty)))
+                        new ScTypeParameterType(ptp, ScSubstitutor.empty)))
                 } else res
               } else res
             }
@@ -300,7 +300,7 @@ trait ScTypePsiTypeBridge {
           .getRealParameterType(TypingContext.empty) match {
           case Success(tp, _)
               if !(noPrimitives &&
-                    ScalaEvaluatorBuilderUtil.isPrimitiveScType(tp)) =>
+                ScalaEvaluatorBuilderUtil.isPrimitiveScType(tp)) =>
             toPsi(tp, project, scope, noPrimitives, skolemToWildcard)
           case _ => createType(valType)
         }

@@ -121,8 +121,8 @@ abstract class Task(settings: Settings) extends Specification {
                  contentType: String) {
     val req =
       ((ingest / "sync" / "fs" / path).POST <:< List(
-              "Content-Type" -> contentType) <<? List(
-              "apiKey" -> account.apiKey /*,
+          "Content-Type" -> contentType) <<? List(
+          "apiKey" -> account.apiKey /*,
                         "ownerAccountId" -> account.accountId*/ ) <<< file)
     Http(req OK as.String)()
   }
@@ -131,8 +131,8 @@ abstract class Task(settings: Settings) extends Specification {
       f: Req => Req) {
     val req =
       (f(ingest / "sync" / "fs").POST <:< List("Content-Type" -> contentType) <<? List(
-              "apiKey" -> account.apiKey,
-              "ownerAccountId" -> account.accountId) << data)
+          "apiKey" -> account.apiKey,
+          "ownerAccountId" -> account.accountId) << data)
     Http(req OK as.String)()
   }
 
@@ -140,8 +140,8 @@ abstract class Task(settings: Settings) extends Specification {
       f: Req => Req) {
     val req =
       (f(ingest / "async" / "fs").POST <:< List("Content-Type" -> contentType) <<? List(
-              "apiKey" -> account.apiKey,
-              "ownerAccountId" -> account.accountId) << data)
+          "apiKey" -> account.apiKey,
+          "ownerAccountId" -> account.accountId) << data)
     Http(req OK as.String)()
   }
 
@@ -151,8 +151,8 @@ abstract class Task(settings: Settings) extends Specification {
                    contentType: String)(f: Req => Req) = {
     val req =
       (f(ingest / "sync" / "fs").POST <:< List("Content-Type" -> contentType) <<? List(
-              "apiKey" -> authAPIKey,
-              "ownerAccountId" -> ownerAccount.accountId) << data)
+          "apiKey" -> authAPIKey,
+          "ownerAccountId" -> ownerAccount.accountId) << data)
 
     Http(req OK as.String).either()
   }

@@ -26,12 +26,10 @@ object HRavenClient {
   def apply(conf: JobConf): Try[HRavenRestClient] =
     conf
       .getFirstKey(apiHostnameKey)
-      .map(
-          new HRavenRestClient(
-              _,
-              conf.getInt(clientConnectTimeoutKey,
-                          clientConnectTimeoutDefault),
-              conf.getInt(clientReadTimeoutKey, clientReadTimeoutDefault)))
+      .map(new HRavenRestClient(
+          _,
+          conf.getInt(clientConnectTimeoutKey, clientConnectTimeoutDefault),
+          conf.getInt(clientReadTimeoutKey, clientReadTimeoutDefault)))
 }
 
 /**
@@ -115,7 +113,7 @@ object HRavenHistoryService extends HistoryService {
           flows.asScala.filter(_.getHdfsBytesRead > 0).take(max)
         if (successfulFlows.isEmpty) {
           LOG.warn("Unable to find any successful flows in the last " +
-                nFetch + " jobs.")
+            nFetch + " jobs.")
         }
         successfulFlows
       }

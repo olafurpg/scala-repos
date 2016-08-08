@@ -66,7 +66,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     */
   override def toString =
     ((getClass.getName stripSuffix MODULE_SUFFIX_STRING split '.').last split Regex
-          .quote(NAME_JOIN_STRING)).last
+      .quote(NAME_JOIN_STRING)).last
 
   /** The mapping from the integer used to identify values to the actual
     * values. */

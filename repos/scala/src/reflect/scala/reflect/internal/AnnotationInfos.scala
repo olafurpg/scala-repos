@@ -141,8 +141,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
   case class ScalaSigBytes(bytes: Array[Byte]) extends ClassfileAnnotArg {
     override def toString =
       (bytes map { byte =>
-            (byte & 0xff).toHexString
-          }).mkString("[ ", " ", " ]")
+        (byte & 0xff).toHexString
+      }).mkString("[ ", " ", " ]")
     lazy val sevenBitsMayBeZero: Array[Byte] = {
       mapToNextModSevenBits(
           scala.reflect.internal.pickling.ByteCodecs.encode8to7(bytes))
@@ -158,8 +158,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       // due to escaping, a zero byte in a classfile-annotation of string-type takes actually two characters.
       val numZeros =
         (sevenBitsMayBeZero count { b =>
-              b == 0
-            })
+          b == 0
+        })
 
       (sevenBitsMayBeZero.length + numZeros) <= 65535
     }

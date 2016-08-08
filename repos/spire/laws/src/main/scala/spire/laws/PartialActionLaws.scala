@@ -78,7 +78,7 @@ trait PartialActionLaws[G, A] extends Laws {
           (a: A, g: G) =>
             (a <|+|?? g) ==>
               ((g.inverse ??|+|> a) &&
-                  ((a <|+|? g).get === (g.inverse ?|+|> a).get))
+              ((a <|+|? g).get === (g.inverse ?|+|> a).get))
         }
     )
 

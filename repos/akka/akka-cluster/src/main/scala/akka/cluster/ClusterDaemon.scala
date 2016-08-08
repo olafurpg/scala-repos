@@ -325,11 +325,8 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
   val publishStatsTask: Option[Cancellable] = PublishStatsInterval match {
     case Duration.Zero | _: Duration.Infinite ⇒ None
     case d: FiniteDuration ⇒
-      Some(
-          scheduler.schedule(PeriodicTasksInitialDelay.max(d),
-                             d,
-                             self,
-                             PublishStatsTick))
+      Some(scheduler
+        .schedule(PeriodicTasksInitialDelay.max(d), d, self, PublishStatsTick))
   }
 
   override def preStart(): Unit = {
@@ -952,8 +949,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
               latestGossip.reachabilityExcludingDownedObservers,
               latestGossip.members
                 .map(m ⇒
-                      s"${m.address} ${m.status} seen=${latestGossip
-                    .seenByNode(m.uniqueAddress)}")
+                  s"${m.address} ${m.status} seen=${latestGossip.seenByNode(m.uniqueAddress)}")
                 .mkString(", "))
       }
     }
@@ -1216,7 +1212,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
   // needed for tests
   def sendGossipTo(address: Address): Unit = {
     latestGossip.members.foreach(m ⇒
-          if (m.address == address) gossipTo(m.uniqueAddress))
+      if (m.address == address) gossipTo(m.uniqueAddress))
   }
 
   /**
@@ -1243,7 +1239,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
 
   def validNodeForGossip(node: UniqueAddress): Boolean =
     (node != selfUniqueAddress && latestGossip.hasMember(node) &&
-          latestGossip.reachabilityExcludingDownedObservers.isReachable(node))
+      latestGossip.reachabilityExcludingDownedObservers.isReachable(node))
 
   def updateLatestGossip(newGossip: Gossip): Unit = {
     // Updating the vclock version for the changes
@@ -1270,7 +1266,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
     val vclockStats = VectorClockStats(
         versionSize = latestGossip.version.versions.size,
         seenLatest = latestGossip.members.count(m ⇒
-              latestGossip.seenByNode(m.uniqueAddress)))
+          latestGossip.seenByNode(m.uniqueAddress)))
     publisher ! CurrentInternalStats(gossipStats, vclockStats)
   }
 }

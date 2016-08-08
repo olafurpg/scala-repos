@@ -137,10 +137,8 @@ final class Emitter private (semantics: Semantics,
     for (m <- linkedClass.staticMethods) {
       val methodCache = classCache.getStaticCache(m.info.encodedName)
 
-      addTree(
-          methodCache.getOrElseUpdate(
-              m.version,
-              classEmitter.genMethod(className, m.tree)))
+      addTree(methodCache
+        .getOrElseUpdate(m.version, classEmitter.genMethod(className, m.tree)))
     }
 
     if (linkedClass.hasInstances && kind.isAnyScalaJSDefinedClass) {

@@ -103,7 +103,7 @@ object v1 {
 
     val schemaV1 =
       "name" :: "description" :: ("parentIds" ||| Set
-            .empty[GrantId]) :: "permissions" :: "expirationDate" :: HNil
+        .empty[GrantId]) :: "permissions" :: "expirationDate" :: HNil
 
     implicit val decomposerV1 =
       IsoSerialization.decomposer[NewGrantRequest](schemaV1)

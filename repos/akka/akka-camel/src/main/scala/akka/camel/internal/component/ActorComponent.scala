@@ -168,28 +168,22 @@ private[camel] class ActorProducer(val endpoint: ActorEndpoint, camel: Camel)
           case Success(msg) ⇒
             exchange.setResponse(CamelMessage.canonicalize(msg))
           case Failure(e: TimeoutException) ⇒
-            exchange.setFailure(
-                FailureResult(
-                    new TimeoutException(
-                        "Failed to get response from the actor [%s] within timeout [%s]. Check replyTimeout and blocking settings [%s]" format
-                          (endpoint.path, endpoint.replyTimeout, endpoint))))
+            exchange.setFailure(FailureResult(new TimeoutException(
+                "Failed to get response from the actor [%s] within timeout [%s]. Check replyTimeout and blocking settings [%s]" format
+                  (endpoint.path, endpoint.replyTimeout, endpoint))))
           case Failure(throwable) ⇒
             exchange.setFailure(FailureResult(throwable))
         } else {
           case Success(Ack) ⇒ () /* no response message to set */
           case Success(failure: FailureResult) ⇒ exchange.setFailure(failure)
           case Success(msg) ⇒
-            exchange.setFailure(
-                FailureResult(
-                    new IllegalArgumentException(
-                        "Expected Ack or Failure message, but got: [%s] from actor [%s]" format
-                          (msg, endpoint.path))))
+            exchange.setFailure(FailureResult(new IllegalArgumentException(
+                "Expected Ack or Failure message, but got: [%s] from actor [%s]" format
+                  (msg, endpoint.path))))
           case Failure(e: TimeoutException) ⇒
-            exchange.setFailure(
-                FailureResult(
-                    new TimeoutException(
-                        "Failed to get Ack or Failure response from the actor [%s] within timeout [%s]. Check replyTimeout and blocking settings [%s]" format
-                          (endpoint.path, endpoint.replyTimeout, endpoint))))
+            exchange.setFailure(FailureResult(new TimeoutException(
+                "Failed to get Ack or Failure response from the actor [%s] within timeout [%s]. Check replyTimeout and blocking settings [%s]" format
+                  (endpoint.path, endpoint.replyTimeout, endpoint))))
           case Failure(throwable) ⇒
             exchange.setFailure(FailureResult(throwable))
         }

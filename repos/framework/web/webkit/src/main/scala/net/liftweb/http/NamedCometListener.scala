@@ -62,7 +62,7 @@ object NamedCometListener extends Loggable {
               val ret = new NamedCometDispatcher(str)
               disptchers += name -> ret
               logger.debug("Our map of NamedCometDispatchers is: %s".format(
-                      disptchers));
+                  disptchers));
               ret
             }
           }

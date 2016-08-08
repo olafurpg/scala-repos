@@ -101,7 +101,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
       Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
     Kleisli[G, S, F[B]](s => {
       val kl = traverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B](fa)(z =>
-            Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
+        Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
       kl.run
     })
   }
@@ -137,7 +137,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def reverse[A](fa: F[A]): F[A] = {
     val (as, shape) = mapAccumL(fa, scala.List[A]())((t, h) => (h :: t, h))
     runTraverseS(shape, as)(_ =>
-          for {
+      for {
         e <- State.get
         _ <- State.put(e.tail)
       } yield e.head)._2
@@ -146,7 +146,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def zipWith[A, B, C](fa: F[A], fb: F[B])(
       f: (A, Option[B]) => C): (List[B], F[C]) =
     runTraverseS(fa, toList(fb))(a =>
-          for {
+      for {
         bs <- State.get
         _ <- State.put(if (bs.isEmpty) bs else bs.tail)
       } yield f(a, bs.headOption))
@@ -166,7 +166,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   def mapAccumL[S, A, B](fa: F[A], z: S)(f: (S, A) => (S, B)): (S, F[B]) =
     runTraverseS(fa, z)(a =>
-          for {
+      for {
         s1 <- State.init[S]
         (s2, b) = f(s1, a)
         _ <- State.put(s2)

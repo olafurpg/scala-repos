@@ -49,8 +49,8 @@ object Finagle extends Build {
   def util(which: String) =
     "com.twitter" %% ("util-" + which) % utilVersion excludeAll
       (ExclusionRule(organization = "junit"),
-          ExclusionRule(organization = "org.scala-tools.testing"),
-          ExclusionRule(organization = "org.mockito"))
+      ExclusionRule(organization = "org.scala-tools.testing"),
+      ExclusionRule(organization = "org.mockito"))
 
   def scalacOptionsVersion(sv: String): Seq[String] = {
     Seq(
@@ -178,20 +178,20 @@ object Finagle extends Build {
           )
     ) aggregate
       (// Core, support.
-          finagleCore, finagleStats, finagleNetty4, finagleZipkin,
-          finagleServersets, finagleCacheResolver, finagleException,
-          finagleIntegration, finagleCommonsStats, finagleExp, finagleMdns,
-          finagleTesters, finagleOstrich4, // Protocols
-          finagleHttp, finagleHttpCompat, finagleStream, finagleNative,
-          finagleThrift, finagleMemcached, finagleKestrel, finagleMux,
-          finagleThriftMux, finagleMySQL, finagleSpdy, finagleRedis,
-          finagleHttpNetty4
+      finagleCore, finagleStats, finagleNetty4, finagleZipkin,
+      finagleServersets, finagleCacheResolver, finagleException,
+      finagleIntegration, finagleCommonsStats, finagleExp, finagleMdns,
+      finagleTesters, finagleOstrich4, // Protocols
+      finagleHttp, finagleHttpCompat, finagleStream, finagleNative,
+      finagleThrift, finagleMemcached, finagleKestrel, finagleMux,
+      finagleThriftMux, finagleMySQL, finagleSpdy, finagleRedis,
+      finagleHttpNetty4
 
-        // finagleBenchmark
+    // finagleBenchmark
 
-        // Removing projects with specs tests and their dependencies
-        // finagleExample
-        )
+    // Removing projects with specs tests and their dependencies
+    // finagleExample
+    )
 
   lazy val finagleIntegration = Project(
       id = "finagle-integration",
@@ -614,7 +614,7 @@ object Finagle extends Build {
         Defaults.coreDefaultSettings ++ site.settings ++ site
           .sphinxSupport() ++ sharedSettings ++ Seq(
             scalacOptions in doc <++= version.map(v =>
-                  Seq("-doc-title", "Finagle", "-doc-version", v)),
+              Seq("-doc-title", "Finagle", "-doc-version", v)),
             includeFilter in Sphinx :=
               ("*.html" | "*.png" | "*.svg" | "*.js" | "*.css" | "*.gif" | "*.txt"),
             // Workaround for sbt bug: Without a testGrouping for all test configs,

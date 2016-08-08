@@ -79,8 +79,8 @@ object IO {
 class ProcessSpecification extends Properties("Process I/O") {
   implicit val exitCodeArb: Arbitrary[Array[Byte]] = Arbitrary(
       Gen.choose(0, 10) flatMap { size =>
-    Gen.resize(size, Arbitrary.arbArray[Byte].arbitrary)
-  })
+        Gen.resize(size, Arbitrary.arbArray[Byte].arbitrary)
+      })
 
   /*property("Correct exit code") = forAll( (exitCode: Byte) => checkExit(exitCode))
 	property("#&& correct") = forAll( (exitCodes: Array[Byte]) => checkBinary(exitCodes)(_ #&& _)(_ && _))

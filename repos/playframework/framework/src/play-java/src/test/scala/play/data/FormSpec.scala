@@ -268,8 +268,8 @@ object FormSpec extends Specification {
       val user5 = formFactory
         .form(classOf[AnotherUser])
         .bindFromRequest(dummyRequest(
-                Map("name" -> Array("Kiki"),
-                    "emails[]" -> Array("kiki@gmail.com", "kiki@zen.com"))))
+            Map("name" -> Array("Kiki"),
+                "emails[]" -> Array("kiki@gmail.com", "kiki@zen.com"))))
         .get
       user5.getName must beEqualTo("Kiki")
       user5.getEmails.size must beEqualTo(2)
@@ -300,7 +300,7 @@ object FormSpec extends Specification {
       val user2 = formFactory
         .form(classOf[AnotherUser])
         .bindFromRequest(dummyRequest(
-                Map("name" -> Array("Kiki"), "company" -> Array("Acme"))))
+            Map("name" -> Array("Kiki"), "company" -> Array("Acme"))))
         .get
       user2.getCompany.get must beEqualTo("Acme")
     }

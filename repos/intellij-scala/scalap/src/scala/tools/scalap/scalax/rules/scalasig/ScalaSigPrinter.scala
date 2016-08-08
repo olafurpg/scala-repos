@@ -128,7 +128,7 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
   def isCaseClassObject(o: ObjectSymbol): Boolean = {
     val TypeRefType(prefix, classSymbol: ClassSymbol, typeArgs) = o.infoType
     o.isFinal && (classSymbol.children.find(x =>
-          x.isCase && x.isInstanceOf[MethodSymbol]) match {
+      x.isCase && x.isInstanceOf[MethodSymbol]) match {
       case Some(_) => true
       case None => false
     })
@@ -411,8 +411,8 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
     printModifiers(m)
     if (m.isAccessor) {
       val indexOfSetter = m.parent.get.children.indexWhere(x =>
-            x.isInstanceOf[MethodSymbol] &&
-              x.asInstanceOf[MethodSymbol].name == n + "_$eq")
+        x.isInstanceOf[MethodSymbol] &&
+          x.asInstanceOf[MethodSymbol].name == n + "_$eq")
       print(if (indexOfSetter > 0) "var " else "val ")
     } else {
       print("def ")
@@ -590,13 +590,13 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
                     case t: TypeBoundsType => false
                     case RefinedType(symbol, refs) =>
                       symbol == parent || !refs.forall(tp =>
-                            !checkContainsSelf(Some(tp), parent))
+                        !checkContainsSelf(Some(tp), parent))
                     case ClassInfoType(symbol, refs) =>
                       symbol == parent || !refs.forall(tp =>
-                            !checkContainsSelf(Some(tp), parent))
+                        !checkContainsSelf(Some(tp), parent))
                     case ClassInfoTypeWithCons(symbol, refs, _) =>
                       symbol == parent || !refs.forall(tp =>
-                            !checkContainsSelf(Some(tp), parent))
+                        !checkContainsSelf(Some(tp), parent))
                     case ImplicitMethodType(resultType, _) => false
                     case MethodType(resultType, _) => false
                     case NullaryMethodType(resultType) => false
@@ -835,8 +835,8 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
         if (id.isEmpty) return false
         if (isIdentifierStart(id(0))) {
           if (id.indexWhere(c =>
-                    !isIdentifierPart(c) && !isOperatorPart(c) &&
-                      c != '_') >= 0) return false
+                !isIdentifierPart(c) && !isOperatorPart(c) &&
+                  c != '_') >= 0) return false
           val index = id.indexWhere(isOperatorPart)
           if (index < 0) return true
           if (id(index - 1) != '_') return false

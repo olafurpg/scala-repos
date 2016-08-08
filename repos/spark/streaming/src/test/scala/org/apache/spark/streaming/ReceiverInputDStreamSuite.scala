@@ -59,7 +59,7 @@ class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
 
       // Verify that there are some blocks that are present, and some that are not
       require(blockIds.forall(blockId =>
-                SparkEnv.get.blockManager.master.contains(blockId)))
+        SparkEnv.get.blockManager.master.contains(blockId)))
 
       val rdd = receiverStream.createBlockRDD(Time(0), blockInfos)
       assert(rdd.isInstanceOf[BlockRDD[_]])
@@ -80,9 +80,9 @@ class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
 
       // Verify that there are some blocks that are present, and some that are not
       require(blockIds.exists(blockId =>
-                SparkEnv.get.blockManager.master.contains(blockId)))
+        SparkEnv.get.blockManager.master.contains(blockId)))
       require(blockIds.exists(blockId =>
-                !SparkEnv.get.blockManager.master.contains(blockId)))
+        !SparkEnv.get.blockManager.master.contains(blockId)))
 
       val rdd = receiverStream.createBlockRDD(Time(0), blockInfos)
       assert(rdd.isInstanceOf[BlockRDD[_]])

@@ -75,20 +75,20 @@ class NIHDBFileStoreSpec
       val testPath = Path("/store/this/somewhere")
 
       (projectionsActor ? IngestData(
-              Seq(
-                  (0L,
-                   StoreFileMessage(testAPIKey,
-                                    testPath,
-                                    Authorities(testAccount),
-                                    None,
-                                    EventId.fromLong(42L),
-                                    FileContent(loremIpsum.getBytes("UTF-8"),
-                                                MimeType("text", "plain"),
-                                                RawUTF8Encoding),
-                                    Clock.System.instant,
-                                    StreamRef.Create(
-                                        UUID.randomUUID,
-                                        true)))))).copoint must beLike {
+          Seq(
+              (0L,
+               StoreFileMessage(
+                   testAPIKey,
+                   testPath,
+                   Authorities(testAccount),
+                   None,
+                   EventId.fromLong(42L),
+                   FileContent(loremIpsum.getBytes("UTF-8"),
+                               MimeType("text", "plain"),
+                               RawUTF8Encoding),
+                   Clock.System.instant,
+                   StreamRef
+                     .Create(UUID.randomUUID, true)))))).copoint must beLike {
         case UpdateSuccess(_) => ok
       }
 
@@ -107,18 +107,16 @@ class NIHDBFileStoreSpec
       val streamId = UUID.randomUUID
 
       (projectionsActor ? IngestData(
-              Seq(
-                  (0L,
-                   IngestMessage(
-                       testAPIKey,
-                       testPath,
-                       Authorities(testAccount),
-                       Seq(IngestRecord(EventId.fromLong(42L),
-                                        JString("Foo!"))),
-                       None,
-                       Clock.System.instant,
-                       StreamRef
-                         .Create(streamId, false)))))).copoint must beLike {
+          Seq(
+              (0L,
+               IngestMessage(
+                   testAPIKey,
+                   testPath,
+                   Authorities(testAccount),
+                   Seq(IngestRecord(EventId.fromLong(42L), JString("Foo!"))),
+                   None,
+                   Clock.System.instant,
+                   StreamRef.Create(streamId, false)))))).copoint must beLike {
         case UpdateSuccess(_) => ok
       }
 
@@ -130,18 +128,16 @@ class NIHDBFileStoreSpec
       }
 
       (projectionsActor ? IngestData(
-              Seq(
-                  (1L,
-                   IngestMessage(
-                       testAPIKey,
-                       testPath,
-                       Authorities(testAccount),
-                       Seq(IngestRecord(EventId.fromLong(42L),
-                                        JString("Foo!"))),
-                       None,
-                       Clock.System.instant,
-                       StreamRef
-                         .Create(streamId, true)))))).copoint must beLike {
+          Seq(
+              (1L,
+               IngestMessage(
+                   testAPIKey,
+                   testPath,
+                   Authorities(testAccount),
+                   Seq(IngestRecord(EventId.fromLong(42L), JString("Foo!"))),
+                   None,
+                   Clock.System.instant,
+                   StreamRef.Create(streamId, true)))))).copoint must beLike {
         case UpdateSuccess(_) => ok
       }
 

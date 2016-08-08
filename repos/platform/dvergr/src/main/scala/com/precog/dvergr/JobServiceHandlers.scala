@@ -107,11 +107,10 @@ class CreateJobHandler(jobs: JobManager[Future],
               }
 
             case (JUndefined, JUndefined, _) =>
-              Future(
-                  HttpResponse[JValue](
-                      BadRequest,
-                      content = Some(
-                          JString("Missing both `name` and `type` of job."))))
+              Future(HttpResponse[JValue](
+                  BadRequest,
+                  content =
+                    Some(JString("Missing both `name` and `type` of job."))))
 
             case (name, JUndefined, _) =>
               Future(
@@ -126,12 +125,11 @@ class CreateJobHandler(jobs: JobManager[Future],
                       content = Some(JString("Missing `name` of job."))))
 
             case (name, tpe, _) =>
-              Future(
-                  HttpResponse[JValue](
-                      BadRequest,
-                      content = Some(JString(
-                              "Expected `name` and `type` to be strings, but found '%s' and '%s'." format
-                                (name, tpe)))))
+              Future(HttpResponse[JValue](
+                  BadRequest,
+                  content = Some(JString(
+                      "Expected `name` and `type` to be strings, but found '%s' and '%s'." format
+                        (name, tpe)))))
           }
         })
       } getOrElse {
@@ -176,18 +174,17 @@ class GetJobStatusHandler(jobs: JobManager[Future])(
       Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) => {
       request.parameters.get('jobId) map { jobId =>
-        Success(
-            jobs.getStatus(jobId) map
-              (_ map { status =>
-                HttpResponse[JValue](
-                    OK,
-                    content = Some(Status.toMessage(status).serialize))
-              } getOrElse {
-                HttpResponse[JValue](
-                    NotFound,
-                    content = Some(JString(
-                            "No status has been created for this job yet.")))
-              }))
+        Success(jobs.getStatus(jobId) map
+          (_ map { status =>
+            HttpResponse[JValue](OK,
+                                 content =
+                                   Some(Status.toMessage(status).serialize))
+          } getOrElse {
+            HttpResponse[JValue](
+                NotFound,
+                content = Some(
+                    JString("No status has been created for this job yet.")))
+          }))
       } getOrElse {
         Failure(DispatchError(BadRequest, "Missing 'jobId paramter."))
       }
@@ -241,18 +238,16 @@ class UpdateJobStatusHandler(jobs: JobManager[Future])(
               }
 
             case (_, _, _) =>
-              Future(
-                  HttpResponse[JValue](
-                      BadRequest,
-                      content = Some(JString(
-                              "Status update requires fields 'message', 'progress', 'unit'."))))
+              Future(HttpResponse[JValue](
+                  BadRequest,
+                  content = Some(JString(
+                      "Status update requires fields 'message', 'progress', 'unit'."))))
           }
         })
       }) getOrElse {
-        Failure(
-            DispatchError(
-                BadRequest,
-                "Status updates require both a JSON content body and a 'jobId."))
+        Failure(DispatchError(
+            BadRequest,
+            "Status updates require both a JSON content body and a 'jobId."))
       }
     }
 
@@ -462,7 +457,7 @@ class PutJobStateHandler(jobs: JobManager[Future])(
                       (Validation.fromEither(_)) map (_ map (_.state))
                   case (_, _) =>
                     Future(Failure(
-                            "Missing required field 'reason' in request body."))
+                        "Missing required field 'reason' in request body."))
                 }
 
               case JString("finished") =>
@@ -478,7 +473,7 @@ class PutJobStateHandler(jobs: JobManager[Future])(
                       (Validation.fromEither(_)) map (_ map (_.state))
                   case (_, _) =>
                     Future(Failure(
-                            "Missing required field 'reason' in request body."))
+                        "Missing required field 'reason' in request body."))
                 }
 
               case JString("expired") =>
@@ -488,12 +483,11 @@ class PutJobStateHandler(jobs: JobManager[Future])(
                 }
 
               case JString(state) =>
-                Future(
-                    HttpResponse[JValue](
-                        BadRequest,
-                        content = Some(JString(
-                                "Invalid 'state '%s'. Expected one of 'started', 'cancelled', 'finished', 'aborted' or 'expired'." format state
-                            ))))
+                Future(HttpResponse[JValue](
+                    BadRequest,
+                    content = Some(JString(
+                        "Invalid 'state '%s'. Expected one of 'started', 'cancelled', 'finished', 'aborted' or 'expired'." format state
+                    ))))
 
               case JUndefined =>
                 Future(
@@ -506,17 +500,16 @@ class PutJobStateHandler(jobs: JobManager[Future])(
                     HttpResponse[JValue](
                         BadRequest,
                         content = Some(JString(
-                                "Invalid 'state given: %s is not a string."
-                                  .format(other.renderCompact)
-                            ))))
+                            "Invalid 'state given: %s is not a string.".format(
+                                other.renderCompact)
+                        ))))
             }
         }
       }) getOrElse {
-        Future(
-            HttpResponse[JValue](
-                BadRequest,
-                content = Some(JString(
-                        "Both 'jobId parameter and JSON request body are required."))))
+        Future(HttpResponse[JValue](
+            BadRequest,
+            content = Some(JString(
+                "Both 'jobId parameter and JSON request body are required."))))
       })
     }
 
@@ -554,8 +547,8 @@ class CreateResultHandler(jobs: JobManager[Future])(
           HttpResponse[ByteChunk](
               BadRequest,
               content = Some(ByteChunk(
-                      "Missing required 'jobId parameter or request body."
-                        .getBytes("UTF-8")))))
+                  "Missing required 'jobId parameter or request body."
+                    .getBytes("UTF-8")))))
     })
   }
 

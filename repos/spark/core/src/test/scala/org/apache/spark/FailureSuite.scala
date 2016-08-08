@@ -200,7 +200,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
           FailureSuiteState.tasksFailed += 1
           throw new UserException("oops",
                                   new IllegalArgumentException("failed=" +
-                                        FailureSuiteState.tasksFailed))
+                                    FailureSuiteState.tasksFailed))
         }
       }
       x * x

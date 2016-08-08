@@ -119,9 +119,9 @@ object JavaCSRFActionSpec extends CSRFCommonSpecs {
     def getToken(): Result = {
       Results.ok(
           Option(CSRF.getToken(Controller.request()).orElse(null)) match {
-        case Some(CSRF.Token(_, value)) => value
-        case None => ""
-      })
+            case Some(CSRF.Token(_, value)) => value
+            case None => ""
+          })
     }
     @RequireCSRFCheck
     def check(): Result = {

@@ -86,7 +86,7 @@ package object internal {
           val tycon = sym.asType.toTypeConstructor
           appliedType(tycon,
                       appliedTypeArgs.map(starg =>
-                            typeFromString(mirror, starg.toString)))
+                        typeFromString(mirror, starg.toString)))
         case None =>
           sys.error(s"fatal: cannot unpickle $stpe")
       }

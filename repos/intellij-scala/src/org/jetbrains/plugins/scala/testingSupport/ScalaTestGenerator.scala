@@ -468,7 +468,7 @@ object ScalaTestGenerator {
         testNames
           .map(testName => doubleIndent + testName + " $" + testName)
           .fold("\n" + normalIndentString + "Methods of " +
-                className + " should pass tests:")(_ + "\n" + _)
+            className + " should pass tests:")(_ + "\n" + _)
       else ""
     val closingBrace = templateBody.getLastChild
     templateBody.addBefore(ScalaPsiElementFactory.createMethodFromText(
@@ -509,7 +509,7 @@ object ScalaTestGenerator {
             testNames
               .map(doubleIndent + "+ " + _)
               .fold("\n" + normalIndentString + "Methods of " + className +
-                    " should pass tests:")(_ + "\n" + _)
+                " should pass tests:")(_ + "\n" + _)
           else ""
         templateBody.addBefore(ScalaPsiElementFactory.createMethodFromText(
                                    "def is = s2\"\"\"" + checkMethodsString +
@@ -561,7 +561,7 @@ object ScalaTestGenerator {
           ScalaPsiElementFactory.createElement(
               methods
                 .map(normalIndentString + "\"" +
-                      _.getMember.getName + "\" - {}\n")
+                  _.getMember.getName + "\" - {}\n")
                 .fold("val methodsTests = TestSuite{")(_ + "\n" + _) + "}",
               psiManager,
               Def.parse(_)),

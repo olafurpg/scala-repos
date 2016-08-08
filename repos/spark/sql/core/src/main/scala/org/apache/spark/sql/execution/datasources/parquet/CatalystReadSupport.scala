@@ -209,12 +209,10 @@ private[parquet] object CatalystReadSupport {
         Types
           .buildGroup(parquetList.getRepetition)
           .as(OriginalType.LIST)
-          .addField(
-              Types
-                .repeatedGroup()
-                .addField(
-                    clipParquetType(repeatedGroup.getType(0), elementType))
-                .named(repeatedGroup.getName))
+          .addField(Types
+            .repeatedGroup()
+            .addField(clipParquetType(repeatedGroup.getType(0), elementType))
+            .named(repeatedGroup.getName))
           .named(parquetList.getName)
       }
     }

@@ -349,9 +349,8 @@ trait JdbcBackend extends RelationalBackend {
                                  ResultSetHoldability.Default)
       : PreparedStatement = {
       JdbcBackend.logStatement("Preparing statement", sql)
-      val s = loggingPreparedStatement(
-          decorateStatement(
-              resultSetHoldability.withDefault(defaultHoldability) match {
+      val s = loggingPreparedStatement(decorateStatement(resultSetHoldability
+        .withDefault(defaultHoldability) match {
         case ResultSetHoldability.Default =>
           val rsType = resultSetType.withDefault(defaultType).intValue
           val rsConc =
@@ -404,19 +403,19 @@ trait JdbcBackend extends RelationalBackend {
                                 ResultSetConcurrency.ReadOnly,
                               defaultHoldability: ResultSetHoldability =
                                 ResultSetHoldability.Default): Statement = {
-      val s = loggingStatement(
-          decorateStatement(
-              resultSetHoldability.withDefault(defaultHoldability) match {
-        case ResultSetHoldability.Default =>
-          conn.createStatement(
-              resultSetType.withDefault(defaultType).intValue,
-              resultSetConcurrency.withDefault(defaultConcurrency).intValue)
-        case h =>
-          conn.createStatement(
-              resultSetType.withDefault(defaultType).intValue,
-              resultSetConcurrency.withDefault(defaultConcurrency).intValue,
-              h.intValue)
-      }))
+      val s =
+        loggingStatement(decorateStatement(resultSetHoldability.withDefault(
+            defaultHoldability) match {
+          case ResultSetHoldability.Default =>
+            conn.createStatement(
+                resultSetType.withDefault(defaultType).intValue,
+                resultSetConcurrency.withDefault(defaultConcurrency).intValue)
+          case h =>
+            conn.createStatement(
+                resultSetType.withDefault(defaultType).intValue,
+                resultSetConcurrency.withDefault(defaultConcurrency).intValue,
+                h.intValue)
+        }))
       if (fetchSize != 0) s.setFetchSize(fetchSize)
       s
     }

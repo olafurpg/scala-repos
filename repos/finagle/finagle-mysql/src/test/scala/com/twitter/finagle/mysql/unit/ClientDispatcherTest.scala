@@ -174,7 +174,7 @@ class ClientDispatcherTest extends FunSuite {
 
     val sizeOfField =
       (strLen(f.catalog) + strLen(f.db) + strLen(f.table) +
-            strLen(f.origTable) + strLen(f.name) + strLen(f.origName) + 12)
+        strLen(f.origTable) + strLen(f.name) + strLen(f.origName) + 12)
 
     val fieldData = new Array[Byte](sizeOfField)
     val bw = BufferWriter(fieldData)

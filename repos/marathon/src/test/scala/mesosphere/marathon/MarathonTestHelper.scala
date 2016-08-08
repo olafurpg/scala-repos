@@ -70,7 +70,7 @@ object MarathonTestHelper {
 
     mesosRole.foreach(args ++= Seq("--mesos_role", _))
     acceptedResourceRoles.foreach(v =>
-          args ++= Seq("--default_accepted_resource_roles", v.mkString(",")))
+      args ++= Seq("--default_accepted_resource_roles", v.mkString(",")))
     envVarsPrefix.foreach(args ++ Seq("--env_vars_prefix", _))
     makeConfig(args: _*)
   }
@@ -210,9 +210,9 @@ object MarathonTestHelper {
             .newBuilder()
             .setPersistence(DiskInfo.Persistence.newBuilder().setId(id))
             .setVolume(Mesos.Volume
-                  .newBuilder()
-                  .setMode(Mesos.Volume.Mode.RW)
-                  .setContainerPath(containerPath)))
+              .newBuilder()
+              .setMode(Mesos.Volume.Mode.RW)
+              .setContainerPath(containerPath)))
   }
 
   /**
@@ -581,12 +581,12 @@ object MarathonTestHelper {
             Mesos.Resource.DiskInfo
               .newBuilder()
               .setPersistence(Mesos.Resource.DiskInfo.Persistence
-                    .newBuilder()
-                    .setId(id.idString))
+                .newBuilder()
+                .setId(id.idString))
               .setVolume(Mesos.Volume
-                    .newBuilder()
-                    .setContainerPath(id.containerPath)
-                    .setMode(Mesos.Volume.Mode.RW)))
+                .newBuilder()
+                .setContainerPath(id.containerPath)
+                .setMode(Mesos.Volume.Mode.RW)))
         .build()
     }
 

@@ -196,7 +196,7 @@ class ByteCodeRepository[BT <: BTypes](
       parents match {
         case x :: xs =>
           methodNodeImpl(x).left.flatMap(failed =>
-                findInParents(xs, failed ::: failedClasses))
+            findInParents(xs, failed ::: failedClasses))
         case Nil => Left(failedClasses)
       }
 

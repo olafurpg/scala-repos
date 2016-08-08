@@ -908,8 +908,8 @@ object tuple {
       new ZipOne[HT, TT] {
         type Out = tp.Out
         def apply(h: HT, t: TT): Out =
-          ((genh.to(h) zipOne (gent
-                        .to(t) map productElements)) map tupled).tupled
+          ((genh
+            .to(h) zipOne (gent.to(t) map productElements)) map tupled).tupled
       }
   }
 

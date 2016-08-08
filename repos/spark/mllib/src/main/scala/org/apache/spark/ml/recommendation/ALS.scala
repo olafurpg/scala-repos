@@ -1238,7 +1238,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
           i += 1
         }
         logDebug("Converting to local indices took " +
-              (System.nanoTime() - start) / 1e9 + " seconds.")
+          (System.nanoTime() - start) / 1e9 + " seconds.")
         val dstLocalIndices = dstIds.map(dstIdToLocalIndex.apply)
         (srcBlockId, (dstBlockId, srcIds, dstLocalIndices, ratings))
     }.groupByKey(new ALSPartitioner(srcPart.numPartitions))

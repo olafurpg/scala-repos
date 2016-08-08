@@ -153,7 +153,7 @@ trait BlockParsers extends Parsers {
 
       val temp = new StringBuilder()
       lines.foreach(line =>
-            temp.append(indent(level)).append(line.payload).append('\n'))
+        temp.append(indent(level)).append(line.payload).append('\n'))
       val result = applyInline(temp.toString, lookup)
       out.append(result)
 

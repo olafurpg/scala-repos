@@ -64,11 +64,10 @@ class ArchiveServiceHandler[A](
           }
 
         case false =>
-          M.point(
-              HttpResponse[JValue](
-                  Unauthorized,
-                  content = Some(JString(
-                          "Your API key does not have permissions to archive this path."))))
+          M.point(HttpResponse[JValue](
+              Unauthorized,
+              content = Some(JString(
+                  "Your API key does not have permissions to archive this path."))))
       }
     }
   }

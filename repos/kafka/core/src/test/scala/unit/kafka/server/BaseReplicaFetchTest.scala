@@ -90,10 +90,10 @@ abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness {
         result =
           result && expectedOffset > 0 && brokers.forall { item =>
             (expectedOffset == item
-                  .getLogManager()
-                  .getLog(topicAndPart)
-                  .get
-                  .logEndOffset)
+              .getLogManager()
+              .getLog(topicAndPart)
+              .get
+              .logEndOffset)
           }
       }
       result

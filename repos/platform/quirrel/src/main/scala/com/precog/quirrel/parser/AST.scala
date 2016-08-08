@@ -901,8 +901,8 @@ trait AST extends Phases {
       def form =
         'solve ~
           (constraints.init map { _ ~ 'comma } reduceOption { _ ~ _ } map {
-                _ ~ constraints.last ~ child
-              } getOrElse (constraints.last ~ child))
+            _ ~ constraints.last ~ child
+          } getOrElse (constraints.last ~ child))
 
       def children = child +: constraints toList
 

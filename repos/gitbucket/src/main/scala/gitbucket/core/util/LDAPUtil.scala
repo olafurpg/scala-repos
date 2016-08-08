@@ -87,13 +87,13 @@ object LDAPUtil {
         Right(
             LDAPUserInfo(userName = userName,
                          fullName = ldapSettings.fullNameAttribute.flatMap {
-                       fullNameAttribute =>
-                         findFullName(conn,
-                                      userDN,
-                                      ldapSettings.userNameAttribute,
-                                      userName,
-                                      fullNameAttribute)
-                     }.getOrElse(userName),
+                           fullNameAttribute =>
+                             findFullName(conn,
+                                          userDN,
+                                          ldapSettings.userNameAttribute,
+                                          userName,
+                                          fullNameAttribute)
+                         }.getOrElse(userName),
                          mailAddress = createDummyMailAddress(userName)))
       } else {
         findMailAddress(conn,
@@ -106,13 +106,13 @@ object LDAPUtil {
                 LDAPUserInfo(userName = getUserNameFromMailAddress(userName),
                              fullName =
                                ldapSettings.fullNameAttribute.flatMap {
-                             fullNameAttribute =>
-                               findFullName(conn,
-                                            userDN,
-                                            ldapSettings.userNameAttribute,
-                                            userName,
-                                            fullNameAttribute)
-                           }.getOrElse(userName),
+                                 fullNameAttribute =>
+                                   findFullName(conn,
+                                                userDN,
+                                                ldapSettings.userNameAttribute,
+                                                userName,
+                                                fullNameAttribute)
+                               }.getOrElse(userName),
                              mailAddress = mailAddress))
           case None => Left("Can't find mail address.")
         }

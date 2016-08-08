@@ -65,7 +65,7 @@ trait MergeService {
         .setRemote(
             getRepositoryDir(requestUserName, requestRepositoryName).toURI.toString)
         .setRefSpecs(new RefSpec(
-                s"refs/heads/${requestBranch}:refs/pull/${issueId}/head"))
+            s"refs/heads/${requestBranch}:refs/pull/${issueId}/head"))
         .call
     }
   }

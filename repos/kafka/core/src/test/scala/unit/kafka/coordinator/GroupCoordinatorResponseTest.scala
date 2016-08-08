@@ -88,7 +88,7 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
     zkUtils = EasyMock.createNiceMock(classOf[ZkUtils])
     EasyMock
       .expect(zkUtils.getPartitionAssignmentForTopics(
-              Seq(TopicConstants.GROUP_METADATA_TOPIC_NAME)))
+          Seq(TopicConstants.GROUP_METADATA_TOPIC_NAME)))
       .andReturn(ret)
     EasyMock.replay(zkUtils)
 
@@ -1086,15 +1086,12 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
         Map[TopicPartition, PartitionResponse] => Unit] = EasyMock.newCapture()
 
     EasyMock
-      .expect(
-          replicaManager.appendMessages(
-              EasyMock.anyLong(),
-              EasyMock.anyShort(),
-              EasyMock.anyBoolean(),
-              EasyMock
-                .anyObject()
-                .asInstanceOf[Map[TopicPartition, MessageSet]],
-              EasyMock.capture(capturedArgument)))
+      .expect(replicaManager.appendMessages(
+          EasyMock.anyLong(),
+          EasyMock.anyShort(),
+          EasyMock.anyBoolean(),
+          EasyMock.anyObject().asInstanceOf[Map[TopicPartition, MessageSet]],
+          EasyMock.capture(capturedArgument)))
       .andAnswer(new IAnswer[Unit] {
         override def answer = capturedArgument.getValue.apply(
             Map(
@@ -1195,15 +1192,12 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
         Map[TopicPartition, PartitionResponse] => Unit] = EasyMock.newCapture()
 
     EasyMock
-      .expect(
-          replicaManager.appendMessages(
-              EasyMock.anyLong(),
-              EasyMock.anyShort(),
-              EasyMock.anyBoolean(),
-              EasyMock
-                .anyObject()
-                .asInstanceOf[Map[TopicPartition, MessageSet]],
-              EasyMock.capture(capturedArgument)))
+      .expect(replicaManager.appendMessages(
+          EasyMock.anyLong(),
+          EasyMock.anyShort(),
+          EasyMock.anyBoolean(),
+          EasyMock.anyObject().asInstanceOf[Map[TopicPartition, MessageSet]],
+          EasyMock.capture(capturedArgument)))
       .andAnswer(new IAnswer[Unit] {
         override def answer = capturedArgument.getValue.apply(
             Map(

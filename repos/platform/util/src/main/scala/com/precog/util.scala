@@ -91,10 +91,10 @@ package object util {
     def get(a: A): Option[C] = {
       m get a orElse
         (source get a map { b =>
-              val c = f(b)
-              m.putIfAbsent(a, c)
-              c
-            })
+          val c = f(b)
+          m.putIfAbsent(a, c)
+          c
+        })
     }
 
     def +[C1 >: C](kv: (A, C1)): Map[A, C1] = iterator.toMap + kv

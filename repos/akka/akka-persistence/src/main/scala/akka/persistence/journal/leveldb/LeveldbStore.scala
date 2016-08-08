@@ -64,7 +64,7 @@ private[persistence] trait LeveldbStore
 
     val result = Future.fromTry(Try {
       withBatch(batch ⇒
-            messages.map {
+        messages.map {
           a ⇒
             Try {
               a.payload.foreach {

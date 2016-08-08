@@ -644,7 +644,7 @@ class EndToEndTest
       .reportTo(sr)
       .responseClassifier(classifier)
       .dest(Name.bound(
-              Address(server.boundAddress.asInstanceOf[InetSocketAddress])))
+          Address(server.boundAddress.asInstanceOf[InetSocketAddress])))
       .build()
     val client = new TestService.FinagledClient(
         clientBuilder,
@@ -810,7 +810,7 @@ class EndToEndTest
           sr2,
           base(sr2).newIface[TestService.FutureIface](
               Name.bound(Address(
-                      server.boundAddress.asInstanceOf[InetSocketAddress])),
+                  server.boundAddress.asInstanceOf[InetSocketAddress])),
               "client"))
     }
   }
@@ -1034,7 +1034,7 @@ class EndToEndTest
       assert(serverSr.counters(Seq("thrift", "requests")) == 1)
       assert(serverSr.counters(Seq("thrift", "connects")) == 1)
       assert(serverSr.counters(
-              Seq("thrift", "thriftmux", "downgraded_connects")) == 1)
+          Seq("thrift", "thriftmux", "downgraded_connects")) == 1)
 
       assert(sr.counters(Seq("client", "requests")) == 1)
       assert(sr.counters(Seq("client", "failures")) == 1)

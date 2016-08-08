@@ -683,7 +683,7 @@ class TcpConnectionSpec extends AkkaSpec("""
       run {
         connectionActor.toString should not be ("")
         userHandler.expectMsg(CommandFailed(
-                Connect(UnboundAddress, timeout = Option(100.millis))))
+            Connect(UnboundAddress, timeout = Option(100.millis))))
         watch(connectionActor)
         expectTerminated(connectionActor)
       }
@@ -963,9 +963,9 @@ class TcpConnectionSpec extends AkkaSpec("""
                                             options = options,
                                             timeout = timeout,
                                             pullMode = pullMode)) {
-        override def postRestart(reason: Throwable): Unit =
-          context.stop(self) // ensure we never restart
-      })
+            override def postRestart(reason: Throwable): Unit =
+              context.stop(self) // ensure we never restart
+          })
   }
 
   trait SmallRcvBuffer { _: LocalServerTest ⇒

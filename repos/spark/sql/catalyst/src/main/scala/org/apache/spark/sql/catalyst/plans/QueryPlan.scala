@@ -36,8 +36,8 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       .union(inferAdditionalConstraints(constraints))
       .union(constructIsNotNullConstraints(constraints))
       .filter(constraint =>
-            constraint.references.nonEmpty &&
-              constraint.references.subsetOf(outputSet))
+        constraint.references.nonEmpty &&
+          constraint.references.subsetOf(outputSet))
   }
 
   /**

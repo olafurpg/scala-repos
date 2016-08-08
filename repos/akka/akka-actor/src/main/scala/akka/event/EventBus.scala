@@ -216,13 +216,13 @@ trait ScanningClassification { self: EventBus ⇒
   protected final val subscribers =
     new ConcurrentSkipListSet[(Classifier, Subscriber)](
         new Comparator[(Classifier, Subscriber)] {
-      def compare(a: (Classifier, Subscriber),
-                  b: (Classifier, Subscriber)): Int =
-        compareClassifiers(a._1, b._1) match {
-          case 0 ⇒ compareSubscribers(a._2, b._2)
-          case other ⇒ other
-        }
-    })
+          def compare(a: (Classifier, Subscriber),
+                      b: (Classifier, Subscriber)): Int =
+            compareClassifiers(a._1, b._1) match {
+              case 0 ⇒ compareSubscribers(a._2, b._2)
+              case other ⇒ other
+            }
+        })
 
   /**
     * Provides a total ordering of Classifiers (think java.util.Comparator.compare)

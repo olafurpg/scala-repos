@@ -17,8 +17,8 @@ case class ApiComment(id: Int,
                                         isPullRequest: Boolean) {
   val html_url = ApiPath(
       s"/${repositoryName.fullName}/${if (isPullRequest) { "pull" } else {
-    "issues"
-  }}/${issueId}#comment-${id}")
+        "issues"
+      }}/${issueId}#comment-${id}")
 }
 
 object ApiComment {

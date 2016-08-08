@@ -207,9 +207,8 @@ object CompilationData {
 
     if (errors.isEmpty) None
     else
-      Some(
-          errors.mkString("\n") +
-            "\nPlease configure separate output paths to proceed with the compilation." +
-            "\nTIP: you can use Project Artifacts to combine compiled classes if needed.")
+      Some(errors.mkString("\n") +
+        "\nPlease configure separate output paths to proceed with the compilation." +
+        "\nTIP: you can use Project Artifacts to combine compiled classes if needed.")
   }
 }

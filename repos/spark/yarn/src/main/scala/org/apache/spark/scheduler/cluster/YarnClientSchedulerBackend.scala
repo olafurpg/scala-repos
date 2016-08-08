@@ -130,9 +130,8 @@ private[spark] class YarnClientSchedulerBackend(scheduler: TaskSchedulerImpl,
     if (state == YarnApplicationState.FINISHED ||
         state == YarnApplicationState.FAILED ||
         state == YarnApplicationState.KILLED) {
-      throw new SparkException(
-          "Yarn application has already ended! " +
-            "It might have been killed or unable to launch application master.")
+      throw new SparkException("Yarn application has already ended! " +
+        "It might have been killed or unable to launch application master.")
     }
     if (state == YarnApplicationState.RUNNING) {
       logInfo(s"Application ${appId.get} has started running.")

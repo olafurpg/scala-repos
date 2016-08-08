@@ -163,9 +163,9 @@ object HelpersSpec extends Specification {
     val complexForm = Form(
         single(
             "foo" -> Forms.seq(tuple(
-                    "a" -> Forms.text,
-                    "b" -> Forms.text
-                ))))
+                "a" -> Forms.text,
+                "b" -> Forms.text
+            ))))
     def renderComplex(form: Form[_], min: Int = 1) =
       repeat
         .apply(form("foo"), min) { f =>

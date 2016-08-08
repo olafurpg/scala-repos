@@ -128,7 +128,7 @@ class SnapshotFailureRobustnessSpec
       sPersistentActor ! Cmd("kablama")
       expectMsg(2)
       system.eventStream.publish(TestEvent.Mute(
-              EventFilter.error(start = "Error loading snapshot [")))
+          EventFilter.error(start = "Error loading snapshot [")))
       system.eventStream.subscribe(testActor, classOf[Logging.Error])
       try {
         val lPersistentActor = system.actorOf(
@@ -144,7 +144,7 @@ class SnapshotFailureRobustnessSpec
       } finally {
         system.eventStream.unsubscribe(testActor, classOf[Logging.Error])
         system.eventStream.publish(TestEvent.UnMute(
-                EventFilter.error(start = "Error loading snapshot [")))
+            EventFilter.error(start = "Error loading snapshot [")))
       }
     }
 

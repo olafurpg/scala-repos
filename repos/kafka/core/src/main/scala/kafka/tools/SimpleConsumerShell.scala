@@ -169,10 +169,8 @@ object SimpleConsumerShell extends Logging {
                           maxWaitMs)
       .topicsMetadata
     if (topicsMetadata.size != 1 || !topicsMetadata(0).topic.equals(topic)) {
-      System.err.println(
-          ("Error: no valid topic metadata for topic: %s, " +
-                "what we get from server is only: %s")
-            .format(topic, topicsMetadata))
+      System.err.println(("Error: no valid topic metadata for topic: %s, " +
+        "what we get from server is only: %s").format(topic, topicsMetadata))
       System.exit(1)
     }
 

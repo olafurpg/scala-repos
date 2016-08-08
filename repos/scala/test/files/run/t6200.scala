@@ -52,7 +52,7 @@ object Test extends App {
 
     val s =
       HashMap.empty[HashCounter, Unit] ++ (0 until 100).map(k =>
-            HashCounter(k) -> (()))
+        HashCounter(k) -> (()))
     val hashCount0 = hashCount
     val equalsCount0 = equalsCount
     val t = s.filter(_._1 < HashCounter(50))

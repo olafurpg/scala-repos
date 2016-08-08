@@ -752,7 +752,7 @@ final class ClusterReceptionist(pubSubMediator: ActorRef,
       // load balances the client connections among the nodes in the cluster.
       if (numberOfContacts >= nodes.size) {
         val contacts = Contacts(nodes.map(a ⇒
-                  self.path.toStringWithAddress(a))(collection.breakOut))
+          self.path.toStringWithAddress(a))(collection.breakOut))
         if (log.isDebugEnabled)
           log.debug("Client [{}] gets contactPoints [{}] (all nodes)",
                     sender().path,
@@ -769,7 +769,7 @@ final class ClusterReceptionist(pubSubMediator: ActorRef,
           else first union nodes.take(numberOfContacts - first.size)
         }
         val contacts = Contacts(slice.map(a ⇒
-                  self.path.toStringWithAddress(a))(collection.breakOut))
+          self.path.toStringWithAddress(a))(collection.breakOut))
         if (log.isDebugEnabled)
           log.debug("Client [{}] gets contactPoints [{}]",
                     sender().path,

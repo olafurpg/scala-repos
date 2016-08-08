@@ -60,7 +60,7 @@ trait FileAndResourceDirectives {
                       FileIO
                         .fromFile(file)
                         .withAttributes(ActorAttributes.dispatcher(
-                                settings.fileIODispatcher)))
+                            settings.fileIODispatcher)))
                 }
             }
           } else complete(HttpEntity.Empty)
@@ -69,7 +69,7 @@ trait FileAndResourceDirectives {
 
   private def conditionalFor(length: Long, lastModified: Long): Directive0 =
     extractSettings.flatMap(settings ⇒
-          if (settings.fileGetConditional) {
+      if (settings.fileGetConditional) {
         val tag = java.lang.Long
           .toHexString(lastModified ^ java.lang.Long.reverse(length))
         val lastModifiedDateTime =
@@ -107,7 +107,7 @@ trait FileAndResourceDirectives {
                           StreamConverters
                             .fromInputStream(() ⇒ url.openStream())
                             .withAttributes(ActorAttributes.dispatcher(
-                                    settings.fileIODispatcher))) // TODO is this needed? It already uses `val inputStreamSource = name("inputStreamSource") and IODispatcher`
+                                settings.fileIODispatcher))) // TODO is this needed? It already uses `val inputStreamSource = name("inputStreamSource") and IODispatcher`
                     }
                 }
               } else complete(HttpEntity.Empty)

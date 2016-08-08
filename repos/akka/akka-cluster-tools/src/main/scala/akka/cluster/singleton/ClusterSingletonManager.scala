@@ -280,8 +280,8 @@ object ClusterSingletonManager {
       def handleInitial(state: CurrentClusterState): Unit = {
         membersByAge =
           immutable.SortedSet.empty(ageOrdering) union state.members.filter(m ⇒
-                (m.status == MemberStatus.Up ||
-                      m.status == MemberStatus.Leaving) && matchingRole(m))
+            (m.status == MemberStatus.Up ||
+              m.status == MemberStatus.Leaving) && matchingRole(m))
         val safeToBeOldest = !state.members.exists { m ⇒
           (m.status == MemberStatus.Down || m.status == MemberStatus.Exiting)
         }
@@ -317,7 +317,7 @@ object ClusterSingletonManager {
         case MemberUp(m) ⇒ add(m)
         case mEvent: MemberEvent
             if (mEvent.isInstanceOf[MemberExited] ||
-                  mEvent.isInstanceOf[MemberRemoved]) ⇒
+              mEvent.isInstanceOf[MemberRemoved]) ⇒
           remove(mEvent.member)
         case GetNext if changes.isEmpty ⇒
           context.become(deliverNext, discardOld = false)
@@ -339,7 +339,7 @@ object ClusterSingletonManager {
           }
         case mEvent: MemberEvent
             if (mEvent.isInstanceOf[MemberExited] ||
-                  mEvent.isInstanceOf[MemberRemoved]) ⇒
+              mEvent.isInstanceOf[MemberRemoved]) ⇒
           remove(mEvent.member)
           if (changes.nonEmpty) {
             sendFirstChange()

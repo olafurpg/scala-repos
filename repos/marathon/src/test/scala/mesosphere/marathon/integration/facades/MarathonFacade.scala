@@ -97,9 +97,9 @@ class MarathonFacade(
 
   implicit lazy val itEnrichedTaskFormat: Format[ITEnrichedTask] =
     ((__ \ "appId").format[String] ~ (__ \ "id").format[String] ~ (__ \ "host")
-          .format[String] ~ (__ \ "ports").formatNullable[Seq[Int]] ~
-          (__ \ "startedAt").formatNullable[Date] ~ (__ \ "stagedAt")
-          .formatNullable[Date] ~ (__ \ "version").formatNullable[String])(
+      .format[String] ~ (__ \ "ports").formatNullable[Seq[Int]] ~
+      (__ \ "startedAt").formatNullable[Date] ~ (__ \ "stagedAt")
+      .formatNullable[Date] ~ (__ \ "version").formatNullable[String])(
         ITEnrichedTask(_, _, _, _, _, _, _),
         unlift(ITEnrichedTask.unapply))
 

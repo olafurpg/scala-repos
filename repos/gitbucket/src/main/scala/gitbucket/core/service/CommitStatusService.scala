@@ -24,8 +24,8 @@ trait CommitStatusService {
                          creator: Account)(implicit s: Session): Int =
     CommitStatuses
       .filter(t =>
-            t.byCommit(userName, repositoryName, sha) &&
-              t.context === context.bind)
+        t.byCommit(userName, repositoryName, sha) &&
+          t.context === context.bind)
       .map(_.commitStatusId)
       .firstOption match {
       case Some(id: Int) => {
@@ -55,7 +55,7 @@ trait CommitStatusService {
       implicit s: Session): Option[CommitStatus] =
     CommitStatuses
       .filter(t =>
-            t.byPrimaryKey(id) && t.byRepository(userName, repositoryName))
+        t.byPrimaryKey(id) && t.byRepository(userName, repositoryName))
       .firstOption
 
   def getCommitStatus(
@@ -65,8 +65,8 @@ trait CommitStatusService {
       context: String)(implicit s: Session): Option[CommitStatus] =
     CommitStatuses
       .filter(t =>
-            t.byCommit(userName, repositoryName, sha) &&
-              t.context === context.bind)
+        t.byCommit(userName, repositoryName, sha) &&
+          t.context === context.bind)
       .firstOption
 
   def getCommitStatues(userName: String, repositoryName: String, sha: String)(

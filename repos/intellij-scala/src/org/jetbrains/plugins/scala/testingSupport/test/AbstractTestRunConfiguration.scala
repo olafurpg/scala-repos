@@ -260,29 +260,31 @@ abstract class AbstractTestRunConfiguration(
   override def getModules: Array[Module] = {
     ApplicationManager.getApplication.runReadAction(
         new Computable[Array[Module]] {
-      @SuppressWarnings(Array("ConstantConditions"))
-      def compute: Array[Module] = {
-        searchTest match {
-          case SearchForTest.ACCROSS_MODULE_DEPENDENCIES
-              if getModule != null =>
-            val buffer = new ArrayBuffer[Module]()
-            buffer += getModule
-            for (module <- ModuleManager.getInstance(getProject).getModules) {
-              if (ModuleManager
-                    .getInstance(getProject)
-                    .isModuleDependent(getModule, module)) {
-                buffer += module
-              }
+          @SuppressWarnings(Array("ConstantConditions"))
+          def compute: Array[Module] = {
+            searchTest match {
+              case SearchForTest.ACCROSS_MODULE_DEPENDENCIES
+                  if getModule != null =>
+                val buffer = new ArrayBuffer[Module]()
+                buffer += getModule
+                for (module <- ModuleManager
+                                .getInstance(getProject)
+                                .getModules) {
+                  if (ModuleManager
+                        .getInstance(getProject)
+                        .isModuleDependent(getModule, module)) {
+                    buffer += module
+                  }
+                }
+                buffer.toArray
+              case SearchForTest.IN_SINGLE_MODULE if getModule != null =>
+                Array(getModule)
+              case SearchForTest.IN_WHOLE_PROJECT =>
+                ModuleManager.getInstance(getProject).getModules
+              case _ => Array.empty
             }
-            buffer.toArray
-          case SearchForTest.IN_SINGLE_MODULE if getModule != null =>
-            Array(getModule)
-          case SearchForTest.IN_WHOLE_PROJECT =>
-            ModuleManager.getInstance(getProject).getModules
-          case _ => Array.empty
-        }
-      }
-    })
+          }
+        })
   }
 
   private def getSuiteClass = {
@@ -609,10 +611,10 @@ abstract class AbstractTestRunConfiguration(
         rerunFailedTestsAction.init(consoleView.getProperties)
         rerunFailedTestsAction.setModelProvider(
             new Getter[TestFrameworkRunningModel] {
-          def get: TestFrameworkRunningModel = {
-            consoleView.asInstanceOf[SMTRunnerConsoleView].getResultsViewer
-          }
-        })
+              def get: TestFrameworkRunningModel = {
+                consoleView.asInstanceOf[SMTRunnerConsoleView].getResultsViewer
+              }
+            })
         res.setRestartActions(rerunFailedTestsAction)
         res
       }

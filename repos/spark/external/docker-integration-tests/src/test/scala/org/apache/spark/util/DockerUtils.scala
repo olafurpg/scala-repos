@@ -59,7 +59,7 @@ private[spark] object DockerUtils {
         for (ni <- reOrderedNetworkIFs) {
           val addresses = ni.getInetAddresses.asScala
             .filterNot(addr =>
-                  addr.isLinkLocalAddress || addr.isLoopbackAddress)
+              addr.isLinkLocalAddress || addr.isLoopbackAddress)
             .toSeq
           if (addresses.nonEmpty) {
             val addr = addresses

@@ -109,7 +109,7 @@ class MongoCaseClassListField[OwnerType <: Record[OwnerType], CaseType](
   def setFromJValue(jvalue: JValue): Box[MyType] = jvalue match {
     case JArray(contents) =>
       setBox(Full(contents.flatMap(s =>
-                    Helpers.tryo[CaseType] { s.extract[CaseType] })))
+        Helpers.tryo[CaseType] { s.extract[CaseType] })))
     case _ => setBox(Empty)
   }
 
@@ -119,7 +119,7 @@ class MongoCaseClassListField[OwnerType <: Record[OwnerType], CaseType](
     asJValue match {
       case JArray(list) =>
         list.foreach(v =>
-              dbl.add(JObjectParser.parse(v.asInstanceOf[JObject])))
+          dbl.add(JObjectParser.parse(v.asInstanceOf[JObject])))
       case _ =>
     }
 

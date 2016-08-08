@@ -27,8 +27,8 @@ private[tests] trait CoreTestDefs
           reporter.println("retrieved %d members".format(members.size))
           compiler ask { () =>
             val filtered = members.filterNot(member =>
-                  (member.sym.name string_== "getClass") ||
-                    member.sym.isConstructor)
+              (member.sym.name string_== "getClass") ||
+                member.sym.isConstructor)
             reporter println
               (filtered.map(_.forceInfoString).sorted mkString "\n")
           }

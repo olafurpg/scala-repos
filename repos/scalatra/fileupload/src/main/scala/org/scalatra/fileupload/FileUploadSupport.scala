@@ -134,8 +134,8 @@ trait FileUploadSupport extends ServletBase {
       override def getParameterMap =
         new JHashMap[String, Array[String]] ++
           (formMap transform { (k, v) =>
-                v.toArray
-              })
+            v.toArray
+          })
     }
     wrapped
   }

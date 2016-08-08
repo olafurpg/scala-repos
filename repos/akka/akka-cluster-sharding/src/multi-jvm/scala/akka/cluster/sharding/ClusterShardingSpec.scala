@@ -220,19 +220,19 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
     List("akka.persistence.journal.leveldb.dir",
          "akka.persistence.journal.leveldb-shared.store.dir",
          "akka.persistence.snapshot-store.local.dir").map(s ⇒
-          new File(system.settings.config.getString(s)))
+      new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
     runOn(controller) {
       storageLocations.foreach(dir ⇒
-            if (dir.exists) FileUtils.deleteDirectory(dir))
+        if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
   override protected def afterTermination() {
     runOn(controller) {
       storageLocations.foreach(dir ⇒
-            if (dir.exists) FileUtils.deleteDirectory(dir))
+        if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
@@ -421,7 +421,7 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
 
         region ! GetCurrentRegions
         expectMsg(CurrentRegions(
-                Set(Cluster(system).selfAddress, node(first).address)))
+            Set(Cluster(system).selfAddress, node(first).address)))
       }
 
       enterBarrier("after-3")
@@ -924,7 +924,7 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
           for (n ← 2 to 12) {
             val entity =
               system.actorSelection(rebalancingPersistentRegion.path /
-                    (n % 12).toString / n.toString)
+                (n % 12).toString / n.toString)
             entity ! Identify(n)
             receiveOne(3 seconds) match {
               case ActorIdentity(id, Some(_)) if id == n ⇒ count = count + 1

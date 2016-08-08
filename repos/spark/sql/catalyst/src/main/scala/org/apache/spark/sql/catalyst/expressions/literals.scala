@@ -181,7 +181,7 @@ case class Literal protected (value: Any, dataType: DataType)
   override def equals(other: Any): Boolean = other match {
     case o: Literal =>
       dataType.equals(o.dataType) && (value == null && null == o.value ||
-            value != null && value.equals(o.value))
+        value != null && value.equals(o.value))
     case _ => false
   }
 

@@ -203,7 +203,7 @@ class BinaryClassificationMetricsSuite
     assert(
         // May have to add 1 if the sample factor didn't divide evenly
         2 + (numBins +
-              (if (scoreAndLabels.size % numBins == 0) 0 else 1)) == downsampledROC.size)
+          (if (scoreAndLabels.size % numBins == 0) 0 else 1)) == downsampledROC.size)
     assert(
         List(
             (0.0, 0.0),

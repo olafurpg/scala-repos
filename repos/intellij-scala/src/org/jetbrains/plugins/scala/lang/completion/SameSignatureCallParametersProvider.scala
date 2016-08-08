@@ -111,11 +111,9 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
                 case ScalaResolveResult(fun: ScMethodLike, subst) =>
                   val params = fun.effectiveParameterClauses
                   if (params.length > index)
-                    params(index).effectiveParameters.map(
-                        p =>
-                          (p.name,
-                           subst.subst(
-                               p.getType(TypingContext.empty).getOrAny)))
+                    params(index).effectiveParameters.map(p =>
+                      (p.name,
+                       subst.subst(p.getType(TypingContext.empty).getOrAny)))
                   else Seq.empty
                 case ScalaResolveResult(method: PsiMethod, subst) =>
                   if (index != 0) Seq.empty
@@ -161,7 +159,7 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
                 case Some((clazz: ScClass, subst))
                     if !clazz.hasTypeParameters ||
                       (clazz.hasTypeParameters && typeElement
-                            .isInstanceOf[ScParameterizedTypeElement]) =>
+                        .isInstanceOf[ScParameterizedTypeElement]) =>
                   clazz.constructors.toSeq.map {
                     case fun: ScMethodLike =>
                       val params = fun.effectiveParameterClauses
@@ -176,7 +174,7 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
                 case Some((clazz: PsiClass, subst))
                     if !clazz.hasTypeParameters ||
                       (clazz.hasTypeParameters && typeElement
-                            .isInstanceOf[ScParameterizedTypeElement]) =>
+                        .isInstanceOf[ScParameterizedTypeElement]) =>
                   clazz.getConstructors.toSeq.map {
                     case c: PsiMethod =>
                       if (index != 0) Seq.empty

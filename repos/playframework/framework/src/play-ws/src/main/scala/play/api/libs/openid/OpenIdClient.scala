@@ -200,7 +200,7 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
       server: OpenIDServer) = {
     val fields =
       (queryString - "openid.mode" +
-            ("openid.mode" -> Seq("check_authentication")))
+        ("openid.mode" -> Seq("check_authentication")))
     ws.url(server.url)
       .post(fields)
       .map(response => {
@@ -226,7 +226,7 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
           Seq("openid.ax.if_available" -> axOptional.map(_._1).mkString(","))
 
       val definitions = (axRequired ++ axOptional).map(attribute =>
-            ("openid.ax.type." + attribute._1 -> attribute._2))
+        ("openid.ax.type." + attribute._1 -> attribute._2))
 
       Seq("openid.ns.ax" -> "http://openid.net/srv/ax/1.0",
           "openid.ax.mode" -> "fetch_request") ++ axRequiredParams ++ axOptionalParams ++ definitions
@@ -333,10 +333,10 @@ private[openid] object Discovery {
 
     private def findUriWithType(xml: Node)(typeId: String) =
       (xml \ "XRD" \ "Service" find
-            (node =>
-               (node \ "Type")
-                 .find(inner => inner.text == typeId)
-                 .isDefined)).map { node =>
+        (node =>
+           (node \ "Type")
+             .find(inner => inner.text == typeId)
+             .isDefined)).map { node =>
         (typeId, (node \ "URI").text.trim)
       }
   }
@@ -373,8 +373,8 @@ private[openid] object Discovery {
         .findFirstMatchIn(link)
         .map(_.group(1).trim)
         .orElse(new Regex("""href='([^']*)'""")
-              .findFirstMatchIn(link)
-              .map(_.group(1).trim))
+          .findFirstMatchIn(link)
+          .map(_.group(1).trim))
   }
 }
 

@@ -219,8 +219,8 @@ trait ListFunctions {
     case Nil => Monad[M].point(Nil)
     case h :: t =>
       Monad[M].bind(p(h))(b =>
-            if (b) Monad[M].map(takeWhileM(t)(p))((tt: List[A]) => h :: tt)
-            else Monad[M].point(Nil))
+        if (b) Monad[M].map(takeWhileM(t)(p))((tt: List[A]) => h :: tt)
+        else Monad[M].point(Nil))
   }
 
   /** Run `p(a)`s and collect `as` while `p` yields false.  Don't run
@@ -242,7 +242,7 @@ trait ListFunctions {
     case Nil => Monad[M].point(None: Option[A])
     case h :: t =>
       Monad[M].bind(p(h))(b =>
-            if (b) Monad[M].point(Some(h): Option[A]) else findM(t)(p))
+        if (b) Monad[M].point(Some(h): Option[A]) else findM(t)(p))
   }
 
   final def powerset[A](as: List[A]): List[List[A]] = {
@@ -271,7 +271,7 @@ trait ListFunctions {
           b =>
             if (b)
               Monad[M].map(spanM(t)(p))((k: (List[A], List[A])) =>
-                    (h :: k._1, k._2))
+                (h :: k._1, k._2))
             else Monad[M].point(Nil, as))
   }
 
@@ -290,7 +290,7 @@ trait ListFunctions {
       Monad[M].bind(spanM[A, StateT[M, A, ?]](t)(stateP).eval(h)) {
         case (x, y) =>
           Monad[M].map(groupWhenM(y)(p))(g =>
-                NonEmptyList.nel(h, IList.fromList(x)) :: g)
+            NonEmptyList.nel(h, IList.fromList(x)) :: g)
       }
   }
 

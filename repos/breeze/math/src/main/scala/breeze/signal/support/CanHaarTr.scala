@@ -115,7 +115,7 @@ object CanHaarTr {
             val p = m(::, c).slice(0, limit).toArray.grouped(2).toArray
             val v =
               p.map(e => (e(0) + e(1)) * nFactor) ++ p.map(e =>
-                    (e(0) - e(1)) * nFactor)
+                (e(0) - e(1)) * nFactor)
             for (r <- 0 until limit) m(r, c) = v(r)
           }
           for (r <- 0 until limit) {
@@ -124,7 +124,7 @@ object CanHaarTr {
             val p = m.t(0 until limit, r).toArray.grouped(2).toArray
             val v =
               p.map(e => (e(0) + e(1)) * nFactor) ++ p.map(e =>
-                    (e(0) - e(1)) * nFactor)
+                (e(0) - e(1)) * nFactor)
             for (c <- 0 until limit) m(r, c) = v(c)
           }
           _fht(m, limit / 2)

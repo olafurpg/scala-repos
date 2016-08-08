@@ -96,8 +96,8 @@ class PermissionsFinder[M[+ _]: Monad](val apiKeyFinder: APIKeyFinder[M],
             left(accountWriter)
           case WritePermission(_, WriteAsAll(accountIds)) =>
             (Authorities
-                  .ifPresent(accountIds)
-                  .map(a => Some(a).point[M]) \/> accountWriter)
+              .ifPresent(accountIds)
+              .map(a => Some(a).point[M]) \/> accountWriter)
         })(collection.breakOut)
 
       // if it is possible to write as the account holder for the api key, then do so, otherwise,

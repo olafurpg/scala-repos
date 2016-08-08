@@ -69,9 +69,9 @@ trait Paginator[T] extends Loggable {
     */
   def zoomedPages =
     (List(curPage - 1020, curPage - 120, curPage - 20) ++
-          (curPage - 10 to curPage + 10) ++ List(curPage + 20,
-                                                 curPage + 120,
-                                                 curPage + 1020)) filter { n =>
+      (curPage - 10 to curPage + 10) ++ List(curPage + 20,
+                                             curPage + 120,
+                                             curPage + 1020)) filter { n =>
       n >= 0 && n < numPages
     }
 }

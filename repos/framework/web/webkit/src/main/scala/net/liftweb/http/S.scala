@@ -277,7 +277,7 @@ object S extends S {
 
     implicit def boolToAF(f: Boolean => Any): AFuncHolder =
       LFuncHolder(lst =>
-            f(lst.foldLeft(false)((v, str) => v || Helpers.toBoolean(str))))
+        f(lst.foldLeft(false)((v, str) => v || Helpers.toBoolean(str))))
   }
 }
 
@@ -493,8 +493,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     Box
       .legacyNullTest(_responseCookies.value)
       .flatMap(rc =>
-            Box(rc.inCookies.filter(_.name == name))
-              .map(_.clone().asInstanceOf[HTTPCookie]))
+        Box(rc.inCookies.filter(_.name == name))
+          .map(_.clone().asInstanceOf[HTTPCookie]))
 
   /**
     * Get the cookie value for the given cookie
@@ -668,7 +668,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   def highLevelSessionDispatchList: List[DispatchHolder] =
     session map
       (_.highLevelSessionDispatcher.toList.map(t =>
-            DispatchHolder(t._1, t._2))) openOr Nil
+        DispatchHolder(t._1, t._2))) openOr Nil
 
   /**
     * Adds a dispatch function for the current session, as opposed to a global
@@ -1060,7 +1060,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   def loc(str: String): Box[NodeSeq] =
     resourceBundles
       .flatMap(r =>
-            tryo(r.getObject(str) match {
+        tryo(r.getObject(str) match {
           case null =>
             LiftRules.localizationLookupFailureNotice.foreach(_(str, locale));
             Empty
@@ -1125,21 +1125,22 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       case Full(Nil) => {
         _resBundle.set(
             LiftRules.resourceForCurrentLoc.vend() ::: LiftRules.resourceNames
-              .flatMap(name =>
+              .flatMap(
+                  name =>
                     tryo {
-              if (Props.devMode) {
-                tryo {
-                  val clz = this.getClass.getClassLoader
-                    .loadClass("java.util.ResourceBundle")
-                  val meth = clz.getDeclaredMethods.filter { m =>
-                    m.getName == "clearCache" &&
-                    m.getParameterTypes.length == 0
-                  }.toList.head
-                  meth.invoke(null)
-                }
-              }
-              List(ResourceBundle.getBundle(name, loc))
-            }.openOr(
+                      if (Props.devMode) {
+                        tryo {
+                          val clz = this.getClass.getClassLoader
+                            .loadClass("java.util.ResourceBundle")
+                          val meth = clz.getDeclaredMethods.filter { m =>
+                            m.getName == "clearCache" &&
+                            m.getParameterTypes.length == 0
+                          }.toList.head
+                          meth.invoke(null)
+                        }
+                      }
+                      List(ResourceBundle.getBundle(name, loc))
+                    }.openOr(
                         NamedPF
                           .applyBox((name, loc),
                                     LiftRules.resourceBundleFactories.toList)
@@ -1149,17 +1150,15 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       }
       case Full(bundles) => bundles
       case _ =>
-        throw new IllegalStateException(
-            "Attempted to use resource bundles outside of an initialized S scope. " +
-              "S only usable when initialized, such as during request processing. " +
-              "Did you call S.? from Boot?")
+        throw new IllegalStateException("Attempted to use resource bundles outside of an initialized S scope. " +
+          "S only usable when initialized, such as during request processing. " +
+          "Did you call S.? from Boot?")
     }
   }
 
   private object _liftCoreResBundle
-      extends RequestVar[Box[ResourceBundle]](
-          tryo(ResourceBundle.getBundle(LiftRules.liftCoreResourceName,
-                                        locale)))
+      extends RequestVar[Box[ResourceBundle]](tryo(
+          ResourceBundle.getBundle(LiftRules.liftCoreResourceName, locale)))
 
   /**
     * Get the lift core resource bundle for the current locale as defined by the
@@ -1227,7 +1226,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   private def ?!(str: String, resBundle: List[ResourceBundle]): String =
     resBundle
       .flatMap(r =>
-            tryo(r.getObject(str) match {
+        tryo(r.getObject(str) match {
           case s: String => Full(s)
           case n: Node => Full(n.text)
           case ns: NodeSeq => Full(ns.text)
@@ -1318,10 +1317,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     } {
       NamedPF.applyBox((Props.mode, req, orig),
                        LiftRules.exceptionHandler.toList);
-    } openOr Full(
-        PlainTextResponse(
-            "An error has occurred while processing an error using the functions in LiftRules.exceptionHandler. Check the log for details.",
-            500))
+    } openOr Full(PlainTextResponse(
+        "An error has occurred while processing an error using the functions in LiftRules.exceptionHandler. Check the log for details.",
+        500))
   }
 
   private object _skipXmlHeader extends TransientRequestVar(false)
@@ -2891,7 +2889,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
 
       val onErrorFunc: String =
         onError.map(f =>
-              JsCmds.Run("function onError_" + key + "() {" + f.toJsCmd + """
+          JsCmds.Run("function onError_" + key + "() {" + f.toJsCmd + """
   }
 
    """).toJsCmd) openOr ""
@@ -2902,14 +2900,12 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       addFunctionMap(key, af)
 
       (JsonCall(key),
-       JsCmds.Run(
-           name
-             .map(n =>
-                   onErrorFunc + "/* JSON Func " + n + " $$ " + key + " */")
-             .openOr("") + "function " + key + "(obj) {lift.ajax(" +
-             "'" + key + "='+ encodeURIComponent(" +
-             LiftRules.jsArtifacts.jsonStringify(JE.JsRaw("obj")).toJsCmd +
-             "), null," + onErrorParam + ");}"))
+       JsCmds.Run(name
+         .map(n => onErrorFunc + "/* JSON Func " + n + " $$ " + key + " */")
+         .openOr("") + "function " + key + "(obj) {lift.ajax(" +
+         "'" + key + "='+ encodeURIComponent(" +
+         LiftRules.jsArtifacts.jsonStringify(JE.JsRaw("obj")).toJsCmd +
+         "), null," + onErrorParam + ");}"))
     }
   }
 
@@ -3009,7 +3005,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     val name = formFuncName
     addFunctionMap(name,
                    SFuncHolder((s: String) =>
-                         JsonParser.parseOpt(s).map(in) getOrElse JsCmds.Noop))
+                     JsonParser.parseOpt(s).map(in) getOrElse JsCmds.Noop))
     f(name)
   }
 
@@ -3025,7 +3021,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def param(n: String): Box[String] =
     paramsForComet.get.get(n).flatMap(_.headOption) orElse request.flatMap(r =>
-          Box(r.param(n)))
+      Box(r.param(n)))
 
   /**
     * Set the paramsForComet and run the function

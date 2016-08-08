@@ -205,16 +205,16 @@ object ToHeadUsages extends Specification {
         }
 
       ((first \\ "a")
-            .filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
+        .filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
           "/wombat/foo").when(jetty.running)
       ((first \\ "a")
-            .filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
+        .filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
           "/wombat/bar").when(jetty.running)
       ((second \\ "a")
-            .filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
+        .filter(e => (e \ "@id").text == "foo") \ "@href").text must be_==(
           "/wombat/foo").when(jetty.running)
       ((second \\ "a")
-            .filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
+        .filter(e => (e \ "@id").text == "bar") \ "@href").text must be_==(
           "/bar").when(jetty.running)
     }
   }

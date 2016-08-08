@@ -133,7 +133,7 @@ object JavaTypeInference {
       beanClass: Class[_]): Array[PropertyDescriptor] = {
     val beanInfo = Introspector.getBeanInfo(beanClass)
     beanInfo.getPropertyDescriptors.filter(p =>
-          p.getReadMethod != null && p.getWriteMethod != null)
+      p.getReadMethod != null && p.getWriteMethod != null)
   }
 
   private def elementType(typeToken: TypeToken[_]): TypeToken[_] = {

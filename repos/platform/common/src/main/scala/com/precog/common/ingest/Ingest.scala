@@ -114,7 +114,7 @@ object Ingest {
   val extractorV1a = new Extractor[Ingest] {
     def validated(obj: JValue): Validation[Error, Ingest] = {
       (obj.validated[APIKey]("apiKey") |@| obj.validated[Path]("path") |@| obj
-            .validated[Option[AccountId]]("ownerAccountId")) {
+        .validated[Option[AccountId]]("ownerAccountId")) {
         (apiKey, path, ownerAccountId) =>
           val jv = (obj \ "data")
           Ingest(apiKey,
@@ -252,14 +252,14 @@ object StreamRef {
       case JString("append") => Success(Append)
       case other =>
         ((other \? "create") map { jv =>
-              (jv, Create.apply _)
-            }) orElse
+          (jv, Create.apply _)
+        }) orElse
           ((other \? "replace") map { jv =>
-                (jv, Replace.apply _)
-              }) map {
+            (jv, Replace.apply _)
+          }) map {
           case (jv, f) =>
             (jv.validated[UUID]("uuid") |@| jv
-                  .validated[Boolean]("terminal")) {
+              .validated[Boolean]("terminal")) {
               f
             }
         } getOrElse {
@@ -285,8 +285,8 @@ case class StoreFile(apiKey: APIKey,
     content.data
       .grouped(splitSize)
       .map(d =>
-            this.copy(
-                content = FileContent(d, content.mimeType, content.encoding)))
+        this.copy(
+            content = FileContent(d, content.mimeType, content.encoding)))
       .toList
   }
 

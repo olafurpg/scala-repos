@@ -73,12 +73,13 @@ final class ChallengeApi(repo: ChallengeRepo,
                               initialFen = initialFen,
                               timeControl =
                                 (pov.game.clock, pov.game.daysPerTurn) match {
-                              case (Some(clock), _) =>
-                                TimeControl.Clock(clock.limit, clock.increment)
-                              case (_, Some(days)) =>
-                                TimeControl.Correspondence(days)
-                              case _ => TimeControl.Unlimited
-                            },
+                                  case (Some(clock), _) =>
+                                    TimeControl.Clock(clock.limit,
+                                                      clock.increment)
+                                  case (_, Some(days)) =>
+                                    TimeControl.Correspondence(days)
+                                  case _ => TimeControl.Unlimited
+                                },
                               mode = pov.game.mode,
                               color = (!pov.color).name,
                               challenger = Right(challenger),

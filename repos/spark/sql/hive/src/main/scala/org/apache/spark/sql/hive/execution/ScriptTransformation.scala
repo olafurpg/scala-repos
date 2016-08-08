@@ -185,18 +185,14 @@ private[hive] case class ScriptTransformation(
             val prevLine = curLine
             curLine = reader.readLine()
             if (!ioschema.schemaLess) {
-              new GenericInternalRow(
-                  prevLine
-                    .split(
-                        ioschema.outputRowFormatMap("TOK_TABLEROWFORMATFIELD"))
-                    .map(CatalystTypeConverters.convertToCatalyst))
+              new GenericInternalRow(prevLine
+                .split(ioschema.outputRowFormatMap("TOK_TABLEROWFORMATFIELD"))
+                .map(CatalystTypeConverters.convertToCatalyst))
             } else {
-              new GenericInternalRow(
-                  prevLine
-                    .split(
-                        ioschema.outputRowFormatMap("TOK_TABLEROWFORMATFIELD"),
-                        2)
-                    .map(CatalystTypeConverters.convertToCatalyst))
+              new GenericInternalRow(prevLine
+                .split(ioschema.outputRowFormatMap("TOK_TABLEROWFORMATFIELD"),
+                       2)
+                .map(CatalystTypeConverters.convertToCatalyst))
             }
           } else {
             val raw = outputSerde.deserialize(scriptOutputWritable)

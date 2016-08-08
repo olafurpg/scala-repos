@@ -174,11 +174,11 @@ case class Results(results: List[Result]) {
       copy(
           results =
             (Result(
-                    opInt,
-                    UserId(~pov.opponent.userId),
-                    pov.game.updatedAtOrCreatedAt,
-                    pov.game.id
-                ) :: results).sortBy(_.opInt * comp) take Results.nb)
+                opInt,
+                UserId(~pov.opponent.userId),
+                pov.game.updatedAtOrCreatedAt,
+                pov.game.id
+            ) :: results).sortBy(_.opInt * comp) take Results.nb)
     }
 }
 object Results {

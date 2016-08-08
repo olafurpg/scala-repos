@@ -246,7 +246,7 @@ case class ScExistentialType(quantified: ScType,
           signatureMap.foreach {
             case (s, rt) =>
               s.substitutedTypes.foreach(_.foreach(f =>
-                        checkRecursive(f(), newSet)))
+                checkRecursive(f(), newSet)))
               s.typeParams.foreach {
                 case tParam: TypeParameter =>
                   tParam.update {
@@ -262,7 +262,7 @@ case class ScExistentialType(quantified: ScType,
           elem match {
             case ta: ScTypeAlias if ta.isExistentialTypeAlias =>
               wildcards.foreach(arg =>
-                    if (arg.name == ta.name && !rejected.contains(arg.name)) {
+                if (arg.name == ta.name && !rejected.contains(arg.name)) {
                   res.update(arg,
                              res.getOrElse(arg, Seq.empty[ScType]) ++ Seq(tp))
               })
@@ -270,7 +270,7 @@ case class ScExistentialType(quantified: ScType,
           }
         case ScTypeVariable(name) =>
           wildcards.foreach(arg =>
-                if (arg.name == name && !rejected.contains(arg.name)) {
+            if (arg.name == name && !rejected.contains(arg.name)) {
               res.update(arg, res.getOrElse(arg, Seq.empty[ScType]) ++ Seq(tp))
           })
         case ex: ScExistentialType =>
@@ -421,8 +421,8 @@ case class ScExistentialType(quantified: ScType,
                   ScExistentialArgument(
                       arg.name,
                       arg.args.map(arg =>
-                            updateRecursive(arg, newSet, -variance)
-                              .asInstanceOf[ScTypeParameterType]),
+                        updateRecursive(arg, newSet, -variance)
+                          .asInstanceOf[ScTypeParameterType]),
                       updateRecursive(arg.lowerBound, newSet, -variance),
                       updateRecursive(arg.upperBound, newSet, variance))))
       case ScThisType(clazz) => tp
@@ -467,11 +467,9 @@ case class ScExistentialType(quantified: ScType,
       case m @ ScMethodType(returnType, params, isImplicit) =>
         ScMethodType(
             updateRecursive(returnType, rejected, variance),
-            params.map(
-                param =>
-                  param.copy(paramType = updateRecursive(param.paramType,
-                                                         rejected,
-                                                         -variance))),
+            params.map(param =>
+              param.copy(paramType =
+                updateRecursive(param.paramType, rejected, -variance))),
             isImplicit)(m.project, m.scope)
       case ScAbstractType(tpt, lower, upper) =>
         ScAbstractType(updateRecursive(tpt, rejected, variance)
@@ -481,16 +479,13 @@ case class ScExistentialType(quantified: ScType,
       case ScTypePolymorphicType(internalType, typeParameters) =>
         ScTypePolymorphicType(
             updateRecursive(internalType, rejected, variance),
-            typeParameters.map(
-                tp =>
-                  TypeParameter(
-                      tp.name,
-                      tp.typeParams /* todo: is it important here to update? */,
-                      () =>
-                        updateRecursive(tp.lowerType(), rejected, variance),
-                      () =>
-                        updateRecursive(tp.upperType(), rejected, variance),
-                      tp.ptp))
+            typeParameters.map(tp =>
+              TypeParameter(
+                  tp.name,
+                  tp.typeParams /* todo: is it important here to update? */,
+                  () => updateRecursive(tp.lowerType(), rejected, variance),
+                  () => updateRecursive(tp.upperType(), rejected, variance),
+                  tp.ptp))
         )
       case _ => tp
     }
@@ -589,12 +584,12 @@ case class ScExistentialType(quantified: ScType,
     val quantDepth = quantified.typeDepth
     if (wildcards.nonEmpty) {
       (wildcards.map { wildcard =>
-            val boundsDepth =
-              wildcard.lowerBound.typeDepth.max(wildcard.upperBound.typeDepth)
-            if (wildcard.args.nonEmpty) {
-              (typeParamsDepth(wildcard.args) + 1).max(boundsDepth)
-            } else boundsDepth
-          }.max + 1).max(quantDepth)
+        val boundsDepth =
+          wildcard.lowerBound.typeDepth.max(wildcard.upperBound.typeDepth)
+        if (wildcard.args.nonEmpty) {
+          (typeParamsDepth(wildcard.args) + 1).max(boundsDepth)
+        } else boundsDepth
+      }.max + 1).max(quantDepth)
     } else quantDepth
   }
 }

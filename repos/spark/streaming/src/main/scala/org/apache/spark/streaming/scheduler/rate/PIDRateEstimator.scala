@@ -81,9 +81,8 @@ private[streaming] class PIDRateEstimator(
       processingDelay: Long, // in milliseconds
       schedulingDelay: Long // in milliseconds
   ): Option[Double] = {
-    logTrace(
-        s"\ntime = $time, # records = $numElements, " +
-          s"processing time = $processingDelay, scheduling delay = $schedulingDelay")
+    logTrace(s"\ntime = $time, # records = $numElements, " +
+      s"processing time = $processingDelay, scheduling delay = $schedulingDelay")
     this.synchronized {
       if (time > latestTime && numElements > 0 && processingDelay > 0) {
 
@@ -116,7 +115,7 @@ private[streaming] class PIDRateEstimator(
         val dError = (error - latestError) / delaySinceUpdate
 
         val newRate = (latestRate - proportional * error -
-              integral * historicalError - derivative * dError).max(minRate)
+          integral * historicalError - derivative * dError).max(minRate)
         logTrace(s"""
             | latestRate = $latestRate, error = $error
             | latestError = $latestError, historicalError = $historicalError

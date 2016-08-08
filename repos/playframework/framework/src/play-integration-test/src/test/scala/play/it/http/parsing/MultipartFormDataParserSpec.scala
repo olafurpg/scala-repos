@@ -156,15 +156,15 @@ object MultipartFormDataParserSpec extends PlaySpecification {
     }
 
     "parse unquoted content disposition" in {
-      val result = FileInfoMatcher.unapply(
-          Map("content-disposition" -> """form-data; name=document; filename=hello.txt"""))
+      val result = FileInfoMatcher.unapply(Map(
+          "content-disposition" -> """form-data; name=document; filename=hello.txt"""))
       result must not(beEmpty)
       result.get must equalTo(("document", "hello.txt", None))
     }
 
     "ignore extended filename in content disposition" in {
-      val result = FileInfoMatcher.unapply(
-          Map("content-disposition" -> """form-data; name=document; filename=hello.txt; filename*=utf-8''ignored.txt"""))
+      val result = FileInfoMatcher.unapply(Map(
+          "content-disposition" -> """form-data; name=document; filename=hello.txt; filename*=utf-8''ignored.txt"""))
       result must not(beEmpty)
       result.get must equalTo(("document", "hello.txt", None))
     }

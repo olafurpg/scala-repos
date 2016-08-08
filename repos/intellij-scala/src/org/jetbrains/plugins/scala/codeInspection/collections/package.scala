@@ -529,7 +529,7 @@ package object collections {
       def isSideEffectCollectionMethod(ref: ScReferenceExpression): Boolean = {
         val refName = ref.refName
         (refName.endsWith("=") || refName.endsWith("=:") ||
-            sideEffectsCollectionMethods.contains(refName)) && checkResolve(
+        sideEffectsCollectionMethods.contains(refName)) && checkResolve(
             ref,
             Array("scala.collection.mutable._", "scala.collection.Iterator"))
       }

@@ -159,7 +159,7 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
 
     //now check if there is any allow acl that will allow this operation.
     val allowMatch = ops.exists(operation =>
-          aclMatch(session, operation, resource, principal, host, Allow, acls))
+      aclMatch(session, operation, resource, principal, host, Allow, acls))
 
     //we allow an operation if a user is a super user or if no acls are found and user has configured to allow all users
     //when no acls are found or if no deny acls are found and at least one allow acls matches.
@@ -207,7 +207,7 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
           acl =>
             acl.permissionType == permissionType &&
               (acl.principal == principal ||
-                    acl.principal == Acl.WildCardPrincipal) &&
+                acl.principal == Acl.WildCardPrincipal) &&
               (operations == acl.operation || acl.operation == All) &&
               (acl.host == host || acl.host == Acl.WildCardHost))
       .map { acl: Acl =>

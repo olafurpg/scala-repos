@@ -120,11 +120,9 @@ case class FakeRequest[A](
     * Constructs a new request with additional session.
     */
   def withSession(newSessions: (String, String)*): FakeRequest[A] = {
-    withHeaders(
-        play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
-            headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
-            Seq(Session.encodeAsCookie(
-                    new Session(session.data ++ newSessions)))))
+    withHeaders(play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
+        headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
+        Seq(Session.encodeAsCookie(new Session(session.data ++ newSessions)))))
   }
 
   /**

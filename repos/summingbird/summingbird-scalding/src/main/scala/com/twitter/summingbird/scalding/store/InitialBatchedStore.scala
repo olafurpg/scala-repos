@@ -48,7 +48,7 @@ class InitialBatchedStore[K, V](val firstNonZero: BatchID,
     else
       Left(
           List("Earliest batch set at :" + firstNonZero +
-                " but tried to read: " + exclusiveUB))
+            " but tried to read: " + exclusiveUB))
   }
 
   override def toString =

@@ -460,7 +460,7 @@ class RichPresentationCompiler(
         val nm = if (module) rawName.dropRight(1) else rawName
         val candidates = owner.info.members.filter { s =>
           s.nameString == nm && ((module && s.isModule) ||
-              (!module && (!s.isModule || s.hasPackageFlag)))
+          (!module && (!s.isModule || s.hasPackageFlag)))
         }
         val exact = signatureString.flatMap { s =>
           candidates.find(_.signatureString == s)
@@ -479,9 +479,9 @@ class RichPresentationCompiler(
       val sym = m.sym
       val ns = sym.nameString
       (((matchEntire && ns == prefix) || (!matchEntire && caseSens &&
-                  ns.startsWith(prefix)) || (!matchEntire && !caseSens &&
-                  ns.toUpperCase.startsWith(prefixUpper))) &&
-          !sym.nameString.contains("$"))
+      ns.startsWith(prefix)) || (!matchEntire && !caseSens &&
+      ns.toUpperCase.startsWith(prefixUpper))) &&
+      !sym.nameString.contains("$"))
     }
 
   private def noDefinitionFound(tree: Tree) = {

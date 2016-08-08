@@ -202,8 +202,8 @@ object BigDecimalRootRefinement {
                              MathContext.UNLIMITED)
           Term(coeff * a, k)
       }.compose(Polynomial.linear[BigDecimal](
-                BigDecimal(h.denominator.toBigInteger, MathContext.UNLIMITED),
-                BigDecimal(h.numerator.toBigInteger, MathContext.UNLIMITED)))
+            BigDecimal(h.denominator.toBigInteger, MathContext.UNLIMITED),
+            BigDecimal(h.numerator.toBigInteger, MathContext.UNLIMITED)))
         .removeZeroRoots
     }
 

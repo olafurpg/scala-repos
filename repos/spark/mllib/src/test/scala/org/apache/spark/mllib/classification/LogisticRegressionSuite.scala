@@ -57,7 +57,7 @@ object LogisticRegressionSuite {
     }
 
     val testData = (0 until nPoints).map(i =>
-          LabeledPoint(y(i), Vectors.dense(Array(x1(i)))))
+      LabeledPoint(y(i), Vectors.dense(Array(x1(i)))))
     testData
   }
 
@@ -229,7 +229,7 @@ class LogisticRegressionSuite
     }
     // At least 83% of the predictions should be on.
     ((input.length -
-              numOffPredictions).toDouble / input.length) should be > expectedAcc
+      numOffPredictions).toDouble / input.length) should be > expectedAcc
   }
 
   // Test if we can correctly learn A, B where Y = logistic(A + B*X)
@@ -448,14 +448,14 @@ class LogisticRegressionSuite
 
     val testRDD2 = sc.parallelize(
         testData.map(x =>
-              LabeledPoint(x.label,
-                           Vectors.fromBreeze(x.features.toBreeze * 1.0E3))),
+          LabeledPoint(x.label,
+                       Vectors.fromBreeze(x.features.toBreeze * 1.0E3))),
         2)
 
     val testRDD3 = sc.parallelize(
         testData.map(x =>
-              LabeledPoint(x.label,
-                           Vectors.fromBreeze(x.features.toBreeze * 1.0E6))),
+          LabeledPoint(x.label,
+                       Vectors.fromBreeze(x.features.toBreeze * 1.0E6))),
         2)
 
     testRDD1.cache()
@@ -998,8 +998,7 @@ class LogisticRegressionClusterSuite
       .mapPartitionsWithIndex { (idx, iter) =>
         val random = new Random(idx)
         iter.map(i =>
-              LabeledPoint(1.0,
-                           Vectors.dense(Array.fill(n)(random.nextDouble()))))
+          LabeledPoint(1.0, Vectors.dense(Array.fill(n)(random.nextDouble()))))
       }
       .cache()
     // If we serialize data directly in the task closure, the size of the serialized task would be
@@ -1021,8 +1020,7 @@ class LogisticRegressionClusterSuite
       .mapPartitionsWithIndex { (idx, iter) =>
         val random = new Random(idx)
         iter.map(i =>
-              LabeledPoint(1.0,
-                           Vectors.dense(Array.fill(n)(random.nextDouble()))))
+          LabeledPoint(1.0, Vectors.dense(Array.fill(n)(random.nextDouble()))))
       }
       .cache()
     // If we serialize data directly in the task closure, the size of the serialized task would be

@@ -112,29 +112,26 @@ object EventJson4sSupport {
   @DeveloperApi
   def writeJson: PartialFunction[Any, JValue] = {
     case d: Event => {
-      JObject(JField("eventId",
-                     d.eventId
-                       .map(eid => JString(eid))
-                       .getOrElse(JNothing)) :: JField(
-              "event",
-              JString(d.event)) :: JField("entityType", JString(d.entityType)) :: JField(
-              "entityId",
-              JString(d.entityId)) :: JField("targetEntityType",
-                                             d.targetEntityType
-                                               .map(JString(_))
-                                               .getOrElse(JNothing)) :: JField(
-              "targetEntityId",
-              d.targetEntityId.map(JString(_)).getOrElse(JNothing)) :: JField(
-              "properties",
-              d.properties.toJObject) :: JField(
-              "eventTime",
-              JString(DataUtils.dateTimeToString(d.eventTime))) :: // disable tags from API for now
-            // JField("tags", JArray(d.tags.toList.map(JString(_)))) ::
-            // disable tags from API for now
-            JField("prId", d.prId.map(JString(_)).getOrElse(JNothing)) :: // don't show creationTime for now
-              JField(
-                  "creationTime",
-                  JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
+      JObject(JField(
+          "eventId",
+          d.eventId.map(eid => JString(eid)).getOrElse(JNothing)) :: JField(
+          "event",
+          JString(d.event)) :: JField("entityType", JString(d.entityType)) :: JField(
+          "entityId",
+          JString(d.entityId)) :: JField(
+          "targetEntityType",
+          d.targetEntityType.map(JString(_)).getOrElse(JNothing)) :: JField(
+          "targetEntityId",
+          d.targetEntityId.map(JString(_)).getOrElse(JNothing)) :: JField(
+          "properties",
+          d.properties.toJObject) :: JField(
+          "eventTime",
+          JString(DataUtils.dateTimeToString(d.eventTime))) :: // disable tags from API for now
+        // JField("tags", JArray(d.tags.toList.map(JString(_)))) ::
+        // disable tags from API for now
+        JField("prId", d.prId.map(JString(_)).getOrElse(JNothing)) :: // don't show creationTime for now
+          JField("creationTime",
+                 JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
     }
   }
 
@@ -209,7 +206,7 @@ object EventJson4sSupport {
   @DeveloperApi
   class DBSerializer
       extends CustomSerializer[Event](format =>
-            (deserializeFromJValue, serializeToJValue))
+        (deserializeFromJValue, serializeToJValue))
 
   /** :: DeveloperApi ::
     * Custom JSON4S serializer for [[Event]] intended to be used by the Event
@@ -240,5 +237,5 @@ object BatchEventsJson4sSupport {
   @DeveloperApi
   class APISerializer
       extends CustomSerializer[Seq[Try[Event]]](format =>
-            (readJson, Map.empty))
+        (readJson, Map.empty))
 }

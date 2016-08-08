@@ -49,7 +49,7 @@ case class ScCompoundType(components: Seq[ScType],
             sign.lowerBound.typeDepth.max(sign.upperBound.typeDepth)
           if (sign.typeParams.nonEmpty) {
             (ScType.typeParamsDepth(sign.typeParams.toArray) +
-                  1).max(boundsDepth)
+              1).max(boundsDepth)
           } else boundsDepth
       }
     val ints = components.map(_.typeDepth)
@@ -128,7 +128,7 @@ case class ScCompoundType(components: Seq[ScType],
               case (s: Signature, tp) =>
                 val pTypes: List[Seq[() => ScType]] =
                   s.substitutedTypes.map(_.map(f =>
-                            () => f().recursiveUpdate(update, visited + this)))
+                    () => f().recursiveUpdate(update, visited + this)))
                 val tParams: Array[TypeParameter] =
                   if (s.typeParams.length == 0) TypeParameter.EMPTY_ARRAY
                   else s.typeParams.map(updateTypeParam)
@@ -199,10 +199,10 @@ case class ScCompoundType(components: Seq[ScType],
                      s.name,
                      s.substitutedTypes.map(
                          _.map(f =>
-                               () =>
-                                 f().recursiveVarianceUpdateModifiable(newData,
-                                                                       update,
-                                                                       1))),
+                           () =>
+                             f().recursiveVarianceUpdateModifiable(newData,
+                                                                   update,
+                                                                   1))),
                      s.paramLength,
                      tParams,
                      ScSubstitutor.empty,

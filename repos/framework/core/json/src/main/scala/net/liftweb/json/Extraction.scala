@@ -190,8 +190,8 @@ object Extraction {
       Map(
           map
             .filter(t =>
-                  t._1 == prefix || t._1.startsWith(prefix + ".") ||
-                    t._1.startsWith(prefix + "["))
+              t._1 == prefix || t._1.startsWith(prefix + ".") ||
+                t._1.startsWith(prefix + "["))
             .map(
                 t => (t._1.substring(prefix.length), t._2)
             )
@@ -261,7 +261,7 @@ object Extraction {
           constructor
             .bestMatching(argNames)
             .getOrElse(fail("No constructor for type " +
-                      constructor.targetType.clazz + ", " + json))
+              constructor.targetType.clazz + ", " + json))
         }
       }
 
@@ -290,17 +290,17 @@ object Extraction {
                 case (name, typeInfo) =>
                   jsonFields.get(name).foreach {
                     case (n, v) =>
-                      val typeArgs = typeInfo.parameterizedType.map(
-                          _.getActualTypeArguments
-                            .map(_.asInstanceOf[Class[_]])
-                            .toList
-                            .zipWithIndex
-                            .map {
-                          case (t, idx) =>
-                            if (t == classOf[java.lang.Object])
-                              ScalaSigReader.readField(name, a.getClass, idx)
-                            else t
-                        })
+                      val typeArgs =
+                        typeInfo.parameterizedType.map(_.getActualTypeArguments
+                          .map(_.asInstanceOf[Class[_]])
+                          .toList
+                          .zipWithIndex
+                          .map {
+                            case (t, idx) =>
+                              if (t == classOf[java.lang.Object])
+                                ScalaSigReader.readField(name, a.getClass, idx)
+                              else t
+                          })
                       val value =
                         extract0(v, typeInfo.clazz, typeArgs.getOrElse(Nil))
                       Reflection.setField(a, n, value)
@@ -328,8 +328,8 @@ object Extraction {
                 "Parsed JSON values do not match with class constructor\nargs=" +
                   args.mkString(",") + "\narg types=" + args
                   .map(a =>
-                        if (a != null) a.asInstanceOf[AnyRef].getClass.getName
-                        else "null")
+                    if (a != null) a.asInstanceOf[AnyRef].getClass.getName
+                    else "null")
                   .mkString(",") + "\nconstructor=" + jconstructor)
         }
       }

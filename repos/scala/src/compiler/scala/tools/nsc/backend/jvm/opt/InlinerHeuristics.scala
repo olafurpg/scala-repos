@@ -67,7 +67,7 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
               case Some(Right(req)) => requests += req
               case Some(Left(w)) =>
                 if ((calleeAnnotatedInline &&
-                        bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) ||
+                    bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) ||
                     w.emitWarning(compilerSettings)) {
                   val annotWarn =
                     if (calleeAnnotatedInline) " is annotated @inline but"
@@ -164,8 +164,8 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
             !callsite.annotatedNoInline) {
           def shouldInlineHO =
             callee.samParamTypes.nonEmpty && (callee.samParamTypes exists {
-                  case (index, _) => callsite.argInfos.contains(index)
-                })
+              case (index, _) => callsite.argInfos.contains(index)
+            })
           if (callee.annotatedInline || callsite.annotatedInline ||
               shouldInlineHO) Some(requestIfCanInline(callsite))
           else None

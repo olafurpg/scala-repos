@@ -354,7 +354,7 @@ object PlayDocsValidation {
                                introducedCodeSamples,
                                upstreamFile.codeSamples.size)
     }.partition(c =>
-          c.missingCodeSamples.nonEmpty || c.introducedCodeSamples.nonEmpty)
+      c.missingCodeSamples.nonEmpty || c.introducedCodeSamples.nonEmpty)
 
     val result = TranslationReport(
         untranslatedFiles,
@@ -496,7 +496,7 @@ object PlayDocsValidation {
     assertLinksNotMissing(
         "Missing source files test",
         nonExisting.map(sample =>
-              LinkRef(sample.source, sample.file, sample.sourcePosition)),
+          LinkRef(sample.source, sample.file, sample.sourcePosition)),
         "Could not find source file")
 
     def segmentExists(sample: CodeSampleRef) = {
@@ -504,7 +504,7 @@ object PlayDocsValidation {
         // Find the code segment
         val sourceCode = combinedRepo
           .loadFile(sample.source)(is =>
-                IO.readLines(new BufferedReader(new InputStreamReader(is))))
+            IO.readLines(new BufferedReader(new InputStreamReader(is))))
           .get
         val notLabel = (s: String) => !s.contains("#" + sample.segment)
         val segment =

@@ -195,9 +195,9 @@ class OrcSourceSuite extends OrcSuite {
             Array(
                 LessThan("a", 10),
                 Not(And(
-                        GreaterThan("a", 1),
-                        StringContains("b", "prefix")
-                    ))
+                    GreaterThan("a", 1),
+                    StringContains("b", "prefix")
+                ))
             ))
         .get
         .toString

@@ -188,9 +188,8 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
     val advertizedSig = (params.map(_.ptpe), resultType)
     val sigFromName = inferMethodType(name, static)
     if (advertizedSig != sigFromName) {
-      reportError(
-          s"The signature of ${classDef.name.name}.$name, which is " +
-            s"$advertizedSig, does not match its name (should be $sigFromName).")
+      reportError(s"The signature of ${classDef.name.name}.$name, which is " +
+        s"$advertizedSig, does not match its name (should be $sigFromName).")
     }
 
     if (body == EmptyTree) {
@@ -828,7 +827,7 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
           } { localDef =>
             if (tree.tpe != localDef.tpe)
               reportError(s"Variable $name of type ${localDef.tpe} " +
-                    s"typed as ${tree.tpe}")
+                s"typed as ${tree.tpe}")
           }
 
       case This() =>
@@ -837,9 +836,8 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
 
       case Closure(captureParams, params, body, captureValues) =>
         if (captureParams.size != captureValues.size)
-          reportError(
-              "Mismatched size for captures: " +
-                s"${captureParams.size} params vs ${captureValues.size} values")
+          reportError("Mismatched size for captures: " +
+            s"${captureParams.size} params vs ${captureValues.size} values")
 
         for ((ParamDef(name, ctpe, mutable, rest), value) <- captureParams zip captureValues) {
           if (mutable)

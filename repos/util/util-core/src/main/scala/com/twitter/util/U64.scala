@@ -68,7 +68,7 @@ class RichU64ByteArray(bytes: Array[Byte]) {
 class RichU64String(string: String) {
   private[this] def validateHexDigit(c: Char): Unit = {
     if (!(('0' <= c && c <= '9') || ('a' <= c && c <= 'f') ||
-              ('A' <= c && c <= 'F'))) {
+          ('A' <= c && c <= 'F'))) {
       throw new NumberFormatException("For input string: \"" + string + "\"")
     }
   }

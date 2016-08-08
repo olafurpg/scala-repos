@@ -55,11 +55,11 @@ class BalancingDispatcherSpec
 
       val slow = system
         .actorOf(Props(new DelayableActor(50, finishedCounter))
-              .withDispatcher(delayableActorDispatcher))
+          .withDispatcher(delayableActorDispatcher))
         .asInstanceOf[ActorRefWithCell]
       val fast = system
         .actorOf(Props(new DelayableActor(10, finishedCounter))
-              .withDispatcher(delayableActorDispatcher))
+          .withDispatcher(delayableActorDispatcher))
         .asInstanceOf[ActorRefWithCell]
 
       var sentToFast = 0

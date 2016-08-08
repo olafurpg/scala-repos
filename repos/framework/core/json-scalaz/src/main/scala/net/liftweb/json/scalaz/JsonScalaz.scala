@@ -77,8 +77,8 @@ trait Types {
       fs.find(_.name == name)
         .map(f => implicitly[JSONR[A]].read(f.value))
         .orElse(implicitly[JSONR[A]]
-              .read(JNothing)
-              .fold(_ => none, x => some(Success(x))))
+          .read(JNothing)
+          .fold(_ => none, x => some(Success(x))))
         .getOrElse(NoSuchFieldError(name, json).fail.liftFailNel)
     case x => UnexpectedJSONError(x, classOf[JObject]).fail.liftFailNel
   }

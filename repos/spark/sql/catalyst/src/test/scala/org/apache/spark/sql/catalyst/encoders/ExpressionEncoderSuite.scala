@@ -222,9 +222,8 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
       ExpressionEncoder.tuple(ExpressionEncoder[Int], ExpressionEncoder[Long]))
 
   encodeDecodeTest((PrimitiveData(1, 1, 1, 1, 1, 1, true), (3, 30L)),
-                   "tuple with 2 product encoders")(
-      ExpressionEncoder.tuple(ExpressionEncoder[PrimitiveData],
-                              ExpressionEncoder[(Int, Long)]))
+                   "tuple with 2 product encoders")(ExpressionEncoder
+    .tuple(ExpressionEncoder[PrimitiveData], ExpressionEncoder[(Int, Long)]))
 
   encodeDecodeTest((PrimitiveData(1, 1, 1, 1, 1, 1, true), 3),
                    "tuple with flat encoder and product encoder")(

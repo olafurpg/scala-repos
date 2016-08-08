@@ -367,14 +367,12 @@ trait AbstractScreen extends Factory with Loggable {
     List(FieldError(currentField.box openOr new FieldIdentifier {}, msg))
 
   implicit def boxStrToListFieldError(msg: Box[String]): List[FieldError] =
-    msg.toList.map(
-        msg =>
-          FieldError(currentField.box openOr new FieldIdentifier {},
-                     Text(msg)))
+    msg.toList.map(msg =>
+      FieldError(currentField.box openOr new FieldIdentifier {}, Text(msg)))
 
   implicit def boxXmlToListFieldError(msg: Box[NodeSeq]): List[FieldError] =
     msg.toList.map(msg =>
-          FieldError(currentField.box openOr new FieldIdentifier {}, msg))
+      FieldError(currentField.box openOr new FieldIdentifier {}, msg))
 
   /**
     * Create a FieldBuilder so you can add help screens, validations and filters.  Remember to invoke "make" on
@@ -493,7 +491,7 @@ trait AbstractScreen extends Factory with Loggable {
 
       override def toForm: Box[NodeSeq] =
         underlying.toForm.map(ns =>
-              SHtml.ElemAttr.applyToAllElems(ns, formElemAttrs))
+          SHtml.ElemAttr.applyToAllElems(ns, formElemAttrs))
 
       /**
         * Given the current state of things, should this field be shown
@@ -1103,13 +1101,9 @@ trait AbstractScreen extends Factory with Loggable {
         name,
         default,
         field =>
-          Full(
-              SHtml
-                .radio(field.otherValue,
-                       Full(field.is),
-                       field.set _,
-                       eAttr: _*)
-                .toForm),
+          Full(SHtml
+            .radio(field.otherValue, Full(field.is), field.set _, eAttr: _*)
+            .toForm),
         OtherValueInitializerImpl[Seq[String]](() => choices),
         stuff: _*)
   }
@@ -1762,7 +1756,7 @@ trait LiftScreen
         name =>
           selector #> (SHtml
             .makeAjaxCall(LiftRules.jsArtifacts.serialize(NextId.get) +
-                  ("&" + LocalActionRef.get + "=" + name))
+              ("&" + LocalActionRef.get + "=" + name))
             .cmd)
             .toJsCmd)
   }
@@ -1777,10 +1771,8 @@ trait LiftScreen
   }
 
   protected def setLocalAction(s: String) {
-    logger.trace(
-        "Setting LocalAction (%s) to %s".format(
-            Integer.toString(System.identityHashCode(LocalAction), 16),
-            s))
+    logger.trace("Setting LocalAction (%s) to %s"
+      .format(Integer.toString(System.identityHashCode(LocalAction), 16), s))
     LocalAction.set(s)
   }
 
@@ -1821,24 +1813,24 @@ trait LiftScreen
     val finishButton =
       theScreen.finishButton %
         ("onclick" ->
-              (if (ajaxForms_?) {
-                 SHtml
-                   .makeAjaxCall(LiftRules.jsArtifacts.serialize(finishId))
-                   .toJsCmd
-               } else {
-                 "document.getElementById(" + finishId.encJs + ").submit()"
-               }))
+          (if (ajaxForms_?) {
+             SHtml
+               .makeAjaxCall(LiftRules.jsArtifacts.serialize(finishId))
+               .toJsCmd
+           } else {
+             "document.getElementById(" + finishId.encJs + ").submit()"
+           }))
 
     val cancelButton: Elem =
       theScreen.cancelButton %
         ("onclick" ->
-              (if (ajaxForms_?) {
-                 SHtml
-                   .makeAjaxCall(LiftRules.jsArtifacts.serialize(cancelId))
-                   .toJsCmd
-               } else {
-                 "document.getElementById(" + cancelId.encJs + ").submit()"
-               }))
+          (if (ajaxForms_?) {
+             SHtml
+               .makeAjaxCall(LiftRules.jsArtifacts.serialize(cancelId))
+               .toJsCmd
+           } else {
+             "document.getElementById(" + cancelId.encJs + ").submit()"
+           }))
 
     val url = S.uri
 
@@ -1985,7 +1977,7 @@ object LiftScreenRules extends Factory with FormVendor {
 
   val allTemplatePath: FactoryMaker[List[String]] =
     new FactoryMaker[List[String]](() =>
-          List("templates-hidden", "wizard-all")) {}
+      List("templates-hidden", "wizard-all")) {}
   val messageStyles: FactoryMaker[NoticeType.Value => MetaData] =
     new FactoryMaker[NoticeType.Value => MetaData](() => {
       case NoticeType.Notice =>

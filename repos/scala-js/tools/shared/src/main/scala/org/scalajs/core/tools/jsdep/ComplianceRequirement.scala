@@ -15,7 +15,7 @@ object ComplianceRequirement {
   final def checkCompliance(requirements: Traversable[ComplianceRequirement],
                             semantics: Semantics): Unit = {
     val unmet = requirements.filterNot(compliance =>
-          semantics.isCompliant(compliance.semantics))
+      semantics.isCompliant(compliance.semantics))
 
     if (unmet.nonEmpty) throw new BadComplianceException(unmet.toList)
   }

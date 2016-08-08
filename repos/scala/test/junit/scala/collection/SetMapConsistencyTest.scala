@@ -320,8 +320,10 @@ class SetMapConsistencyTest {
         }
         throw new Exception(
             s"Disagreement after ${what.result} between ${map1.title} and ${map2.title} because ${map1.keys
-          .map(map2 has _)
-          .mkString(",")} ${map2.keys.map(map1 has _).mkString(",")} at step $i:\n$map1\n$map2\n$temp")
+              .map(map2 has _)
+              .mkString(",")} ${map2.keys
+              .map(map1 has _)
+              .mkString(",")} at step $i:\n$map1\n$map2\n$temp")
       }
       what ++= " (%d) ".format(i)
       if (rn.nextInt(10) == 0) {
@@ -379,7 +381,7 @@ class SetMapConsistencyTest {
         }
         throw new Exception(
             s"Disagreement after ${what.result} between ${map1.title} and ${map2.title} on get of ${keys(
-            j)} (#$j) on step $i: $g1 != $g2 using methods $gn1 and $gn2 resp.; in full\n$map1\n$map2\n$temp")
+                j)} (#$j) on step $i: $g1 != $g2 using methods $gn1 and $gn2 resp.; in full\n$map1\n$map2\n$temp")
       }
     }
     true
@@ -529,12 +531,10 @@ class SetMapConsistencyTest {
       val lm2 = new LongMap[String](_.toString)
       lm2 += (5L -> "fish", 0L -> "unicorn")
       val hm2 = (new HashMap[Long, String]) ++= lm2
-      List(Long.MinValue, 0L, 1L, 5L).forall(
-          i =>
-            lm2.get(i) == hm2.get(i) && lm2.getOrElse(i, "") == hm2.getOrElse(
-                i,
-                "") && lm2(i) == hm2.get(i).getOrElse(i.toString) &&
-              lm2.getOrNull(i) == hm2.get(i).orNull)
+      List(Long.MinValue, 0L, 1L, 5L).forall(i =>
+        lm2.get(i) == hm2.get(i) && lm2.getOrElse(i, "") == hm2
+          .getOrElse(i, "") && lm2(i) == hm2.get(i).getOrElse(i.toString) &&
+          lm2.getOrNull(i) == hm2.get(i).orNull)
     }
   }
 

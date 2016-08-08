@@ -4,7 +4,7 @@ object StringUtils {
   def simpleName(s: String) = s.split('.').last
   def toJavaConst(s: String) =
     (s.head +: "[A-Z]".r
-          .replaceAllIn(s.tail, m => "_" + m.group(0))).toUpperCase
+      .replaceAllIn(s.tail, m => "_" + m.group(0))).toUpperCase
   def managerToService(s: String) = {
     val jc = toJavaConst(s.replace("DropBox", "Dropbox"))
     (if (jc.endsWith("MANAGER")) jc.split('_').init.mkString("_")

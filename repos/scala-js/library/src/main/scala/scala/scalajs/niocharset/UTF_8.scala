@@ -394,7 +394,7 @@ private[niocharset] object UTF_8
       else {
         val codePoint =
           (((b1 & 0x7) << 18) | ((b2 & 0x3f) << 12) | ((b3 & 0x3f) << 6) |
-                (b4 & 0x3f))
+            (b4 & 0x3f))
         // By construction, 0 <= codePoint <= 0x1fffff
         if (codePoint < 0x10000 || codePoint > MAX_CODE_POINT) {
           // It should have been encoded with 1, 2, or 3 bytes

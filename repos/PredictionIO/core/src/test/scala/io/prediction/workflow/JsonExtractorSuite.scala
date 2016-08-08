@@ -344,9 +344,8 @@ class JsonExtractorSuite extends FunSuite with Matchers {
     val json =
       JsonExtractor.engineParamsToJson(JsonExtractorOption.Json4sNative, ep)
 
-    json should be(
-        """{"dataSourceParams":{"ds":{"a":"dsp"}},"preparatorParams":{"":{}},""" +
-          """"algorithmParamsList":[{"a0":{"a":"ap"}}],"servingParams":{"":{}}}""")
+    json should be("""{"dataSourceParams":{"ds":{"a":"dsp"}},"preparatorParams":{"":{}},""" +
+      """"algorithmParamsList":[{"a0":{"a":"ap"}}],"servingParams":{"":{}}}""")
   }
 
   test("Serializing Java EngineParams works using option Gson") {
@@ -386,7 +385,7 @@ private case class ScalaQuery(string: String,
 
 private class UpperCaseFormat
     extends CustomSerializer[ScalaQuery](format =>
-          ({
+      ({
         case JObject(
             JField("string", JString(string)) :: JField(
             "optional",

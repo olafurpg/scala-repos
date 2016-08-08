@@ -71,9 +71,10 @@ class GroupedIteratorSuite extends SparkFunSuite {
         result == (1, 2L, Seq(input(0), input(1))) :: (1, 3L, Seq(input(2))) :: (2,
                                                                                  1L,
                                                                                  Seq(input(
-                                                                                         3))) :: (3,
-                                                                                                  2L,
-                                                                                                  Seq(input(4))) :: Nil)
+                                                                                     3))) :: (3,
+                                                                                              2L,
+                                                                                              Seq(input(
+                                                                                                  4))) :: Nil)
   }
 
   test("do nothing to the value iterator") {

@@ -116,7 +116,7 @@ abstract class MappedCountry[T <: Mapper[T]](owner: T)
     val collator = java.text.Collator.getInstance(S.locale)
 
     super.buildDisplayList.sortWith((s1, s2) =>
-          collator.compare(s1._2, s2._2) < 0)
+      collator.compare(s1._2, s2._2) < 0)
   }
 }
 

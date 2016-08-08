@@ -29,7 +29,7 @@ sealed trait LowerPriorityGenericUnmarshallers {
   implicit def sourceOptionUnmarshaller[A, B](
       implicit um: Unmarshaller[A, B]): Unmarshaller[Option[A], B] =
     Unmarshaller.withMaterializer(implicit ec ⇒
-          implicit mat ⇒ {
+      implicit mat ⇒ {
         case Some(a) ⇒ um(a)
         case None ⇒ FastFuture.failed(Unmarshaller.NoContentException)
     })

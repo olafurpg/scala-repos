@@ -31,8 +31,8 @@ class FieldFromDelayedInitInspection
             case td: ScTemplateDefinition => td
           }
           if (!classContainers.exists(c =>
-                    c == delayedInitClass ||
-                      c.isInheritor(delayedInitClass, deep = true)))
+                c == delayedInitClass ||
+                  c.isInheritor(delayedInitClass, deep = true)))
             holder.registerProblem(
                 ref.nameId,
                 "Field defined in DelayedInit is likely to be null")

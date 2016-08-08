@@ -519,7 +519,7 @@ private[parquet] class CatalystSchemaConverter(
               Types
                 .repeatedGroup()
                 .addField(convertField(
-                        StructField("element", elementType, containsNull)))
+                    StructField("element", elementType, containsNull)))
                 .named("list"))
           .named(field.name)
 
@@ -537,9 +537,9 @@ private[parquet] class CatalystSchemaConverter(
               Types
                 .repeatedGroup()
                 .addField(convertField(
-                        StructField("key", keyType, nullable = false)))
+                    StructField("key", keyType, nullable = false)))
                 .addField(convertField(
-                        StructField("value", valueType, valueContainsNull)))
+                    StructField("value", valueType, valueContainsNull)))
                 .named("key_value"))
           .named(field.name)
 
@@ -603,8 +603,8 @@ private[parquet] object CatalystSchemaConverter {
     Math
       .round( // convert double to long
           Math.floor(Math.log10( // number of base-10 digits
-                  Math.pow(2, 8 * numBytes - 1) -
-                    1))) // max value stored in numBytes
+              Math.pow(2, 8 * numBytes - 1) -
+                1))) // max value stored in numBytes
       .asInstanceOf[Int]
   }
 }

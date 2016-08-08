@@ -307,10 +307,9 @@ private[spark] class Executor(executorId: String,
         // directSend = sending directly back to the driver
         val serializedResult: ByteBuffer = {
           if (maxResultSize > 0 && resultSize > maxResultSize) {
-            logWarning(
-                s"Finished $taskName (TID $taskId). Result is larger than maxResultSize " +
-                  s"(${Utils.bytesToString(resultSize)} > ${Utils.bytesToString(maxResultSize)}), " +
-                  s"dropping it.")
+            logWarning(s"Finished $taskName (TID $taskId). Result is larger than maxResultSize " +
+              s"(${Utils.bytesToString(resultSize)} > ${Utils.bytesToString(maxResultSize)}), " +
+              s"dropping it.")
             ser.serialize(
                 new IndirectTaskResult[Any](TaskResultBlockId(taskId),
                                             resultSize))

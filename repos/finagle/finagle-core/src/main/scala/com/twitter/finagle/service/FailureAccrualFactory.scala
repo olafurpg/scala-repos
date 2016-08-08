@@ -111,11 +111,9 @@ object FailureAccrualFactory {
     *      for more details.
     */
   def Param(numFailures: Int, markDeadFor: () => Duration): Param =
-    Param.Configured(
-        () =>
-          FailureAccrualPolicy.consecutiveFailures(
-              numFailures,
-              Backoff.fromFunction(markDeadFor)))
+    Param.Configured(() =>
+      FailureAccrualPolicy
+        .consecutiveFailures(numFailures, Backoff.fromFunction(markDeadFor)))
 
   /**
     * Configures the [[FailureAccrualFactory]].

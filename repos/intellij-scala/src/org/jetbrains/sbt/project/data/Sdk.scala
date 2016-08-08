@@ -83,8 +83,6 @@ object SdkUtils {
   }
 
   private def findJdkByHome(homeFile: File): Option[projectRoots.Sdk] =
-    allJdks.find(
-        jdk =>
-          FileUtil
-            .comparePaths(homeFile.getCanonicalPath, jdk.getHomePath) == 0)
+    allJdks.find(jdk =>
+      FileUtil.comparePaths(homeFile.getCanonicalPath, jdk.getHomePath) == 0)
 }

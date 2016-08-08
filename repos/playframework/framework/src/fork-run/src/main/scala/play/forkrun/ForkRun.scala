@@ -123,9 +123,8 @@ object ForkRun {
     )
 
     println()
-    println(
-        Colors.green(
-            "(Server started, use Ctrl+D to stop and go back to the console...)"))
+    println(Colors.green(
+        "(Server started, use Ctrl+D to stop and go back to the console...)"))
     println()
 
     server

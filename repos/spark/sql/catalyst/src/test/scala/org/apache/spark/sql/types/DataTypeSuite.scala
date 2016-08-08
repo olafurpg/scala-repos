@@ -157,8 +157,8 @@ class DataTypeSuite extends SparkFunSuite {
     val right = StructType(StructField("c", LongType) :: Nil)
 
     val expected = StructType(StructField("a", LongType) :: StructField(
-            "b",
-            FloatType) :: StructField("c", LongType) :: Nil)
+        "b",
+        FloatType) :: StructField("c", LongType) :: Nil)
 
     val merged = left.merge(right)
 

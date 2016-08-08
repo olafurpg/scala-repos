@@ -126,11 +126,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
         path.elements.toList match {
           case dbName :: collectionName :: Nil =>
             val db = Table.mongo.getDB(dbName)
-            success(
-                JNum(
-                    db.getCollection(collectionName)
-                      .getStats
-                      .getLong("count")))
+            success(JNum(
+                db.getCollection(collectionName).getStats.getLong("count")))
 
           case _ =>
             success(JNum(0))
@@ -167,8 +164,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
                 if (db == null) JArray(Nil)
                 else
                   db.getCollectionNames.asScala.map { d =>
-                d + "/"
-              }.toList.sorted.serialize.asInstanceOf[JArray])
+                    d + "/"
+                  }.toList.sorted.serialize.asInstanceOf[JArray])
 
           case dbName :: collectionName :: Nil =>
             Success(JArray(Nil))
@@ -181,12 +178,15 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
         case t => logger.error("Failure during browse", t)
       }
 
-    def structure(userUID: String, path: Path, cpath: CPath)
-      : Future[Validation[String, JObject]] = Promise.successful(
-        Success(JObject(Map(
-                    "children" -> JArray.empty,
-                    "types" -> JObject.empty))) // TODO: How to implement this?
-    )
+    def structure(userUID: String,
+                  path: Path,
+                  cpath: CPath): Future[Validation[String, JObject]] =
+      Promise.successful(
+          Success(
+              JObject(Map(
+                  "children" -> JArray.empty,
+                  "types" -> JObject.empty))) // TODO: How to implement this?
+      )
 
     def currentVersion(apiKey: APIKey, path: Path) = Promise.successful(None)
     def currentAuthorities(apiKey: APIKey, path: Path) =

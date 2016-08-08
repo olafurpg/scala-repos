@@ -477,7 +477,7 @@ object StreamLayout {
          |  Modules:
          |    ${subModules.iterator
            .map(m ⇒
-                 s"(${m.attributes.nameLifted.getOrElse("unnamed")}) ${m.toString
+             s"(${m.attributes.nameLifted.getOrElse("unnamed")}) ${m.toString
                .replaceAll("\n", "\n    ")}")
            .mkString("\n    ")}
          |  Downstreams: ${downstreams.iterator.map {
@@ -529,8 +529,8 @@ object StreamLayout {
          |  Modules:
          |    ${subModules.iterator
            .map(m ⇒
-                 m.attributes.nameLifted.getOrElse(
-                     m.toString.replaceAll("\n", "\n    ")))
+             m.attributes.nameLifted.getOrElse(
+                 m.toString.replaceAll("\n", "\n    ")))
            .mkString("\n    ")}
          |  Downstreams: ${downstreams.iterator.map {
            case (in, out) ⇒ s"\n    $in -> $out"

@@ -314,7 +314,7 @@ object BytecodeUtils {
     }
 
     (roughUpperBound(caller) +
-          roughUpperBound(callee) > maxMethodSizeAfterInline) &&
+      roughUpperBound(callee) > maxMethodSizeAfterInline) &&
     (maxSize(caller) + maxSize(callee) > maxMethodSizeAfterInline)
   }
 

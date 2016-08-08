@@ -69,7 +69,7 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
     val ignoreSettings = Set("-d", "-encoding", "-currentDir")
     def trim(s: Settings): Set[Settings#Setting] =
       (s.userSetSettings.toSet[Settings#Setting] filterNot
-            (ss => ignoreSettings exists (ss respondsTo _)))
+        (ss => ignoreSettings exists (ss respondsTo _)))
     val ss1 = trim(s1)
     val ss2 = trim(s2)
 

@@ -123,9 +123,8 @@ abstract class ReceiverInputDStream[T: ClassTag](_ssc: StreamingContext)
         // others then that is unexpected and log a warning accordingly.
         if (blockInfos.exists(_.walRecordHandleOption.nonEmpty)) {
           if (WriteAheadLogUtils.enableReceiverLog(ssc.conf)) {
-            logError(
-                "Some blocks do not have Write Ahead Log information; " +
-                  "this is unexpected and data may not be recoverable after driver failures")
+            logError("Some blocks do not have Write Ahead Log information; " +
+              "this is unexpected and data may not be recoverable after driver failures")
           } else {
             logWarning(
                 "Some blocks have Write Ahead Log information; this is unexpected")

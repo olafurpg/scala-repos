@@ -52,8 +52,8 @@ class TestService[K, V](
   val reducers = None
   // Needed to init the Test mode:
   val sourceToBuffer: Map[ScaldingSource, Buffer[Tuple]] = (lasts.map {
-        case (b, it) => lastMappable(b) -> toBuffer(it)
-      } ++ streams.map { case (b, it) => streamMappable(b) -> toBuffer(it) }).toMap
+    case (b, it) => lastMappable(b) -> toBuffer(it)
+  } ++ streams.map { case (b, it) => streamMappable(b) -> toBuffer(it) }).toMap
 
   /** The lasts are computed from the streams */
   lazy val lasts: Map[BatchID, Iterable[(Timestamp, (K, V))]] = {

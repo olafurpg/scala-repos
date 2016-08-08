@@ -557,7 +557,7 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
       lst2.size must_== 1
 
       val lstjobj2 = SessCollection.findAll(("name" ->
-                (("$regex" -> "^Mongo") ~ ("$flags" -> 0))) ~ ("count" -> 3))
+        (("$regex" -> "^Mongo") ~ ("$flags" -> 0))) ~ ("count" -> 3))
       lstjobj2.size must_== 1
 
       if (!debug) {

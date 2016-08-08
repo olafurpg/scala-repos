@@ -238,7 +238,7 @@ sealed abstract class Future[+A] {
     sync.get(timeoutInMillis).getOrElse {
       interrupt.set(true)
       -\/(new TimeoutException(
-              s"Timed out after $timeoutInMillis milliseconds"))
+          s"Timed out after $timeoutInMillis milliseconds"))
     }
   }
 
@@ -271,7 +271,7 @@ sealed abstract class Future[+A] {
             cancel.set(true)
             cb(
                 -\/(new TimeoutException(
-                        s"Timed out after $timeoutInMillis milliseconds")))
+                    s"Timed out after $timeoutInMillis milliseconds")))
           }
         }
       }, timeoutInMillis, TimeUnit.MILLISECONDS)
@@ -411,7 +411,7 @@ object Future {
                   // only last completed f will hit the 0 here.
                   if (c.decrementAndGet() == 0)
                     cb(results.toList.foldLeft(R.zero)((a, b) =>
-                              R.append(a, b)))
+                      R.append(a, b)))
                   else Trampoline.done(())
                 }
               }
@@ -467,7 +467,7 @@ object Future {
     */
   def async[A](listen: (A => Unit) => Unit): Future[A] =
     Async((cb: A => Trampoline[Unit]) =>
-          listen { a =>
+      listen { a =>
         cb(a).run
     })
 

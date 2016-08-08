@@ -46,13 +46,13 @@ object Foldable1Test extends SpecLite {
   "product foldRight1 equivalence" ! forAll {
     (l: NonEmptyList[IList[Int]], l2: NonEmptyList[IList[Int]]) =>
       (L.product(L).foldRight1((l, l2))(_ ++ _) must_===
-            ((l.list ++ l2.list).flatten))
+        ((l.list ++ l2.list).flatten))
   }
 
   "product foldLeft1 equivalence" ! forAll {
     (l: NonEmptyList[IList[Int]], l2: NonEmptyList[IList[Int]]) =>
       (L.product(L).foldLeft1((l, l2))((xs, x) => x ++ xs) must_===
-            ((l.list ++ l2.list).reverse.flatten))
+        ((l.list ++ l2.list).reverse.flatten))
   }
 
   "intercalate1" ! forAll { (l: NonEmptyList[IList[Int]], x: IList[Int]) =>

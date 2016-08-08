@@ -395,8 +395,8 @@ object getDummyBlocks {
 
     if (ScalaDocTokenType.ALL_SCALADOC_TOKENS.contains(node.getElementType) ||
         (node.getTreeParent != null &&
-            node.getTreeParent.getElementType == ScalaDocElementTypes.DOC_TAG &&
-            node.getPsi.isInstanceOf[PsiErrorElement])) {
+        node.getTreeParent.getElementType == ScalaDocElementTypes.DOC_TAG &&
+        node.getPsi.isInstanceOf[PsiErrorElement])) {
       val children = ArrayBuffer[ASTNode]()
       var scaladocNode = node.getElementType match {
         case ScalaDocTokenType.DOC_TAG_VALUE_TOKEN =>
@@ -958,7 +958,7 @@ object getDummyBlocks {
                                      classOf[ScInterpolatedStringLiteral]))
       .map(_.asInstanceOf[ScInterpolatedStringLiteral])
       .flatMap(literal =>
-            alignmentsMap.find {
+        alignmentsMap.find {
           case (pointer, _) =>
             pointer.getElement == literal
         }.map(_._2))

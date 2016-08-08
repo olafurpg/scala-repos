@@ -231,7 +231,7 @@ case class GzipFilterConfig(bufferSize: Int = 8192,
                              play.mvc.Result,
                              Boolean]): GzipFilterConfig =
     withShouldGzip((req, res) =>
-          shouldGzip.asScala(new j.RequestHeaderImpl(req), res.asJava))
+      shouldGzip.asScala(new j.RequestHeaderImpl(req), res.asJava))
 
   def withChunkedThreshold(threshold: Int): GzipFilterConfig =
     copy(chunkedThreshold = threshold)

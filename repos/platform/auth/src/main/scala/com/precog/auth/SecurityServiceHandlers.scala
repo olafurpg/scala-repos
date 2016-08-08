@@ -233,7 +233,7 @@ class SecurityServiceHandlers(
         for {
           contentV <- request.content
                        .toSuccess(badRequest(
-                               "Missing body content for grant creation."))
+                           "Missing body content for grant creation."))
                        .sequence[Future, JValue]
           response <- (for (apiKey <- apiKeyV; content <- contentV)
                        yield create(apiKey, content)).sequence[Future, R]
@@ -257,7 +257,7 @@ class SecurityServiceHandlers(
               else
                 badRequest("Invalid remove grant request.",
                            Some("Unable to remove grant " + grantId +
-                                 " from API key " + apiKey))
+                             " from API key " + apiKey))
             }
         } getOrElse {
           Promise successful badRequest(
@@ -385,7 +385,7 @@ class SecurityServiceHandlers(
         for {
           contentV <- request.content
                        .toSuccess(badRequest(
-                               "Missing body content for grant creation."))
+                           "Missing body content for grant creation."))
                        .sequence[Future, JValue]
           response <- (for (parentId <- parentIdV; content <- contentV)
                        yield create(authAPIKey, parentId, content))

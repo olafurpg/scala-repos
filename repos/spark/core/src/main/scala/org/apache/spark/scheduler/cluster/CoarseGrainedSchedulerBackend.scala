@@ -230,12 +230,11 @@ private[spark] class CoarseGrainedSchedulerBackend(
     override def onDisconnected(remoteAddress: RpcAddress): Unit = {
       addressToExecutorId
         .get(remoteAddress)
-        .foreach(
-            removeExecutor(
-                _,
-                SlaveLost("Remote RPC client disassociated. Likely due to " +
-                      "containers exceeding thresholds, or network issues. Check driver logs for WARN " +
-                      "messages.")))
+        .foreach(removeExecutor(
+            _,
+            SlaveLost("Remote RPC client disassociated. Likely due to " +
+              "containers exceeding thresholds, or network issues. Check driver logs for WARN " +
+              "messages.")))
     }
 
     // Make fake resource offers on just one executor
@@ -459,10 +458,9 @@ private[spark] class CoarseGrainedSchedulerBackend(
       return true
     }
     if ((System.currentTimeMillis() -
-              createTime) >= maxRegisteredWaitingTimeMs) {
-      logInfo(
-          "SchedulerBackend is ready for scheduling beginning after waiting " +
-            s"maxRegisteredResourcesWaitingTime: $maxRegisteredWaitingTimeMs(ms)")
+          createTime) >= maxRegisteredWaitingTimeMs) {
+      logInfo("SchedulerBackend is ready for scheduling beginning after waiting " +
+        s"maxRegisteredResourcesWaitingTime: $maxRegisteredWaitingTimeMs(ms)")
       return true
     }
     false

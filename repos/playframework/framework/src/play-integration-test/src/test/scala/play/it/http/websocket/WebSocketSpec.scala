@@ -58,9 +58,9 @@ trait WebSocketSpec
       await(
           client.connect(
               URI.create("ws://localhost:" + testServerPort + "/stream")) {
-        flow =>
-          innerResult.completeWith(handler(flow))
-      })
+            flow =>
+              innerResult.completeWith(handler(flow))
+          })
       await(innerResult.future)
     }
   }
@@ -209,7 +209,7 @@ trait WebSocketSpec
       "aggregate text frames" in {
         val consumed = Promise[List[String]]()
         withServer(app =>
-              WebSocket.accept[String, String] { req =>
+          WebSocket.accept[String, String] { req =>
             Flow.fromSinkAndSource(
                 onFramesConsumed[String](consumed.success(_)),
                 Source.maybe[String])
@@ -234,7 +234,7 @@ trait WebSocketSpec
         val consumed = Promise[List[ByteString]]()
 
         withServer(app =>
-              WebSocket.accept[ByteString, ByteString] { req =>
+          WebSocket.accept[ByteString, ByteString] { req =>
             Flow.fromSinkAndSource(
                 onFramesConsumed[ByteString](consumed.success(_)),
                 Source.maybe[ByteString])
@@ -257,17 +257,16 @@ trait WebSocketSpec
 
       "close the websocket when the buffer limit is exceeded" in {
         withServer(app =>
-              WebSocket.accept[String, String] { req =>
+          WebSocket.accept[String, String] { req =>
             Flow.fromSinkAndSource(Sink.ignore, Source.maybe[String])
         }) { app =>
           import app.materializer
           val frames = runWebSocket { flow =>
             sendFrames(
                 SimpleMessage(TextMessage("first frame"), false),
-                ContinuationMessage(
-                    ByteString(
-                        new String(Array.range(1, 65530).map(_ => 'a'))),
-                    true)
+                ContinuationMessage(ByteString(new String(
+                                        Array.range(1, 65530).map(_ => 'a'))),
+                                    true)
             ).via(flow).runWith(consumeFrames)
           }
           frames must contain(
@@ -279,7 +278,7 @@ trait WebSocketSpec
 
       "close the websocket when the wrong type of frame is received" in {
         withServer(app =>
-              WebSocket.accept[String, String] { req =>
+          WebSocket.accept[String, String] { req =>
             Flow.fromSinkAndSource(Sink.ignore, Source.maybe[String])
         }) { app =>
           import app.materializer
@@ -298,7 +297,7 @@ trait WebSocketSpec
 
       "respond to pings" in {
         withServer(app =>
-              WebSocket.accept[String, String] { req =>
+          WebSocket.accept[String, String] { req =>
             Flow.fromSinkAndSource(Sink.ignore, Source.maybe[String])
         }) { app =>
           import app.materializer
@@ -318,7 +317,7 @@ trait WebSocketSpec
 
       "not respond to pongs" in {
         withServer(app =>
-              WebSocket.accept[String, String] { req =>
+          WebSocket.accept[String, String] { req =>
             Flow.fromSinkAndSource(Sink.ignore, Source.maybe[String])
         }) { app =>
           import app.materializer

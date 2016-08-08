@@ -99,7 +99,7 @@ private[stat] object ChiSqTest extends Logging {
         val distinctLabels = mutable.HashSet.empty[Double]
         val allDistinctFeatures: Map[Int, mutable.HashSet[Double]] =
           Map((startCol until endCol).map(col =>
-                    (col, mutable.HashSet.empty[Double])): _*)
+            (col, mutable.HashSet.empty[Double])): _*)
         var i = 1
         iter.flatMap {
           case LabeledPoint(label, features) =>

@@ -52,7 +52,7 @@ class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
                       referredElement match {
                         case Some(QualifiedName(FunctionN(n)))
                             if te.typeArgList.typeArgs.length == (n.toInt +
-                                  1) =>
+                              1) =>
                           holder.registerProblem(
                               holder.getManager.createProblemDescriptor(
                                   te,

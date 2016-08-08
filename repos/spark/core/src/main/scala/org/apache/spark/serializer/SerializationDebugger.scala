@@ -73,7 +73,7 @@ private[spark] object SerializationDebugger extends Logging {
   private[serializer] var enableDebugging: Boolean = {
     !AccessController
       .doPrivileged(new sun.security.action.GetBooleanAction(
-              "sun.io.serialization.extendedDebugInfo"))
+          "sun.io.serialization.extendedDebugInfo"))
       .booleanValue()
   }
 

@@ -92,12 +92,12 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
       implicit F: Traverse[F],
       G: Applicative[G]): G[LazyEitherT[F, A, C]] = {
     G.map(F.traverse(run)(o =>
-              LazyEither.lazyEitherInstance[A].traverse(o)(f)))(LazyEitherT(_))
+      LazyEither.lazyEitherInstance[A].traverse(o)(f)))(LazyEitherT(_))
   }
 
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z)(implicit F: Foldable[F]): Z = {
     F.foldr[LazyEither[A, B], Z](run, z)(a =>
-          b => LazyEither.lazyEitherInstance[A].foldRight[B, Z](a, b)(f))
+      b => LazyEither.lazyEitherInstance[A].foldRight[B, Z](a, b)(f))
   }
 
   /** Apply a function in the environment of the right of this
@@ -474,7 +474,7 @@ private trait LazyEitherTBindRec[F[_], E]
       a: A): LazyEitherT[F, E, B] =
     LazyEitherT(
         B.tailrecM[A, LazyEither[E, B]](a =>
-              F.map(f(a).run) {
+          F.map(f(a).run) {
             _.fold(e => \/.right(LazyEither.lazyLeft(e)),
                    _.map(b => LazyEither.lazyRight(b)))
         })(a)

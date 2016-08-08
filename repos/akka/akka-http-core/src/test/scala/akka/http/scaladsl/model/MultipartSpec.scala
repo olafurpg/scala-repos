@@ -47,8 +47,8 @@ class MultipartSpec
     "support `toStrict` on the streamed model" in {
       val streamed = Multipart.FormData(
           Source(Multipart.FormData
-                .BodyPart("foo", defaultEntity("FOO")) :: Multipart.FormData
-                .BodyPart("bar", defaultEntity("BAR")) :: Nil))
+            .BodyPart("foo", defaultEntity("FOO")) :: Multipart.FormData
+            .BodyPart("bar", defaultEntity("BAR")) :: Nil))
       val strict = Await.result(streamed.toStrict(1.second), 1.second)
 
       strict shouldEqual Multipart.FormData(
@@ -59,14 +59,13 @@ class MultipartSpec
   "Multipart.ByteRanges" should {
     "support `toStrict` on the streamed model" in {
       val streamed = Multipart.ByteRanges(
-          Source(
-              Multipart.ByteRanges.BodyPart(
-                  ContentRange(0, 6),
-                  defaultEntity("snippet"),
-                  _additionalHeaders = List(ETag("abc"))) :: Multipart.ByteRanges
-                .BodyPart(ContentRange(8, 9),
-                          defaultEntity("PR"),
-                          _additionalHeaders = List(ETag("xzy"))) :: Nil))
+          Source(Multipart.ByteRanges.BodyPart(
+              ContentRange(0, 6),
+              defaultEntity("snippet"),
+              _additionalHeaders = List(ETag("abc"))) :: Multipart.ByteRanges
+            .BodyPart(ContentRange(8, 9),
+                      defaultEntity("PR"),
+                      _additionalHeaders = List(ETag("xzy"))) :: Nil))
       val strict = Await.result(streamed.toStrict(1.second), 1.second)
 
       strict shouldEqual Multipart.ByteRanges(

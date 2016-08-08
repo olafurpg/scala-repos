@@ -47,7 +47,7 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
     // Set these states back.
     originalActiveSQLContext.foreach(ctx => SQLContext.setActive(ctx))
     originalInstantiatedSQLContext.foreach(ctx =>
-          SQLContext.setInstantiatedContext(ctx))
+      SQLContext.setInstantiatedContext(ctx))
   }
 
   private def checkEstimation(
@@ -349,8 +349,8 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
           .range(0, 1000)
           .selectExpr("id % 500 as key", "id as value")
           .unionAll(sqlContext
-                .range(0, 1000)
-                .selectExpr("id % 500 as key", "id as value"))
+            .range(0, 1000)
+            .selectExpr("id % 500 as key", "id as value"))
         checkAnswer(join, expectedAnswer.collect())
 
         // Then, let's look at the number of post-shuffle partitions estimated

@@ -180,7 +180,7 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
         } else {
           // Check number of features.
           assert(treeToNodeToIndexInfo.values.forall(_.values.forall(
-                         _.featureSubset.get.size === numFeaturesPerNode)),
+                     _.featureSubset.get.size === numFeaturesPerNode)),
                  failString)
         }
       }

@@ -146,10 +146,9 @@ object WorkflowUtils extends Logging {
     val pClass = clazz.getConstructors.head.getParameterTypes
     if (pClass.size == 0) {
       if (json != "") {
-        warn(
-            s"Non-empty parameters supplied to ${clazz.getName}, but its " +
-              "constructor does not accept any arguments. Stubbing with empty " +
-              "parameters.")
+        warn(s"Non-empty parameters supplied to ${clazz.getName}, but its " +
+          "constructor does not accept any arguments. Stubbing with empty " +
+          "parameters.")
       }
       EmptyParams()
     } else {
@@ -191,7 +190,7 @@ object WorkflowUtils extends Logging {
         try {
           if (!classMap.contains(np.name)) {
             error(s"Unable to find $field class with name '${np.name}'" +
-                  " defined in Engine.")
+              " defined in Engine.")
             sys.exit(1)
           }
           WorkflowUtils.extractParams(engineLanguage,
@@ -338,7 +337,7 @@ object WorkflowUtils extends Logging {
     }
 
     flatten(root \ "sparkConf").map(x =>
-          (x._1.reduce((a, b) => s"$a.$b"), x._2))
+      (x._1.reduce((a, b) => s"$a.$b"), x._2))
   }
 }
 
@@ -346,7 +345,7 @@ case class NameParams(name: String, params: Option[JValue])
 
 class NameParamsSerializer
     extends CustomSerializer[NameParams](format =>
-          ({
+      ({
         case jv: JValue => WorkflowUtils.extractNameParams(jv)
       }, {
         case x: NameParams =>

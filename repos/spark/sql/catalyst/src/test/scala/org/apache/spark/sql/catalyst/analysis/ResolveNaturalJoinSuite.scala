@@ -124,8 +124,7 @@ class ResolveNaturalJoinSuite extends AnalysisTest {
     val error = intercept[AnalysisException] {
       SimpleAnalyzer.checkAnalysis(usingPlan)
     }
-    assert(
-        error.message.contains(
-            "using columns ['d] can not be resolved given input columns: [b, a, c]"))
+    assert(error.message.contains(
+        "using columns ['d] can not be resolved given input columns: [b, a, c]"))
   }
 }

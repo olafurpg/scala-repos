@@ -112,13 +112,8 @@ object TestOffsetManager {
         case e1: ClosedByInterruptException =>
           offsetsChannel.disconnect()
         case e2: IOException =>
-          println(
-              "Commit thread %d: Error while committing offsets to %s:%d for group %s due to %s."
-                .format(id,
-                        offsetsChannel.host,
-                        offsetsChannel.port,
-                        groupId,
-                        e2))
+          println("Commit thread %d: Error while committing offsets to %s:%d for group %s due to %s."
+            .format(id, offsetsChannel.host, offsetsChannel.port, groupId, e2))
           offsetsChannel.disconnect()
       } finally {
         Thread.sleep(commitIntervalMs)

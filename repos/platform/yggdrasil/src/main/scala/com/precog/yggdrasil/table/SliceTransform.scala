@@ -1428,10 +1428,9 @@ trait ArrayConcatHelpers extends ConcatHelpers {
     val newCols =
       (leftIndices map { case (_, _, ref, col) => ref -> col }) ++
         (rightIndices map {
-              case (i, xs, ref, col) =>
-                ColumnRef(CPath(CPathIndex(i + maxId + 1) :: xs.toList),
-                          ref.ctype) -> col
-            })
+          case (i, xs, ref, col) =>
+            ColumnRef(CPath(CPathIndex(i + maxId + 1) :: xs.toList), ref.ctype) -> col
+        })
 
     newCols.toMap
   }

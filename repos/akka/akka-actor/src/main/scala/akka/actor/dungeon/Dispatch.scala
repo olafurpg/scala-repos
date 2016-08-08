@@ -71,11 +71,9 @@ private[akka] trait Dispatch { this: ActorCell ⇒
           val gotType =
             if (mbox.messageQueue == null) "null"
             else mbox.messageQueue.getClass.getName
-          Create(
-              Some(
-                  ActorInitializationException(
-                      self,
-                      s"Actor [$self] requires mailbox type [$req] got [$gotType]")))
+          Create(Some(ActorInitializationException(
+              self,
+              s"Actor [$self] requires mailbox type [$req] got [$gotType]")))
         }
       case _ ⇒ Create(None)
     }

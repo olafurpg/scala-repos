@@ -69,11 +69,8 @@ class KMeansModel @Since("1.1.0")(
   def predict(points: RDD[Vector]): RDD[Int] = {
     val centersWithNorm = clusterCentersWithNorm
     val bcCentersWithNorm = points.context.broadcast(centersWithNorm)
-    points.map(
-        p =>
-          KMeans
-            .findClosest(bcCentersWithNorm.value, new VectorWithNorm(p))
-            ._1)
+    points.map(p =>
+      KMeans.findClosest(bcCentersWithNorm.value, new VectorWithNorm(p))._1)
   }
 
   /**
@@ -93,7 +90,7 @@ class KMeansModel @Since("1.1.0")(
     val bcCentersWithNorm = data.context.broadcast(centersWithNorm)
     data
       .map(p =>
-            KMeans.pointCost(bcCentersWithNorm.value, new VectorWithNorm(p)))
+        KMeans.pointCost(bcCentersWithNorm.value, new VectorWithNorm(p)))
       .sum()
   }
 
@@ -136,7 +133,7 @@ object KMeansModel extends Loader[KMeansModel] {
       import sqlContext.implicits._
       val metadata = compact(
           render(("class" -> thisClassName) ~
-                ("version" -> thisFormatVersion) ~ ("k" -> model.k)))
+            ("version" -> thisFormatVersion) ~ ("k" -> model.k)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
       val dataRDD = sc

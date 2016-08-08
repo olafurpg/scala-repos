@@ -84,18 +84,18 @@ class HiveInspectorSuite extends SparkFunSuite with HiveInspectors {
 
   val data =
     Literal(true) :: Literal(0.asInstanceOf[Byte]) :: Literal(0.asInstanceOf[
-            Short]) :: Literal(0) :: Literal(0.asInstanceOf[Long]) :: Literal(
+        Short]) :: Literal(0) :: Literal(0.asInstanceOf[Long]) :: Literal(
         0.asInstanceOf[Float]) :: Literal(0.asInstanceOf[Double]) :: Literal(
         "0") :: Literal(java.sql.Date.valueOf("2014-09-23")) :: Literal(
         Decimal(BigDecimal(123.123))) :: Literal(new java.sql.Timestamp(
-            123123)) :: Literal(Array[Byte](1, 2, 3)) :: Literal
+        123123)) :: Literal(Array[Byte](1, 2, 3)) :: Literal
       .create(Seq[Int](1, 2, 3), ArrayType(IntegerType)) :: Literal.create(
         Map[Int, Int](1 -> 2, 2 -> 1),
         MapType(IntegerType, IntegerType)) :: Literal.create(
         Row(1, 2.0d, 3.0f),
         StructType(StructField("c1", IntegerType) :: StructField(
-                "c2",
-                DoubleType) :: StructField("c3", FloatType) :: Nil)) :: Nil
+            "c2",
+            DoubleType) :: StructField("c3", FloatType) :: Nil)) :: Nil
 
   val row = data.map(_.eval(null))
   val dataTypes = data.map(_.dataType)
@@ -139,7 +139,7 @@ class HiveInspectorSuite extends SparkFunSuite with HiveInspectors {
         ObjectInspectorFactory.getStandardStructObjectInspector(
             java.util.Arrays.asList(fields.map(f => f.name): _*),
             java.util.Arrays.asList(fields.map(f =>
-                      toWritableInspector(f.dataType)): _*))
+              toWritableInspector(f.dataType)): _*))
     }
 
   def checkDataType(dt1: Seq[DataType], dt2: Seq[DataType]): Unit = {

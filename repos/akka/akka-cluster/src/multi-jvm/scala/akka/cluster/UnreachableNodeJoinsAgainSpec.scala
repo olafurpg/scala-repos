@@ -33,7 +33,7 @@ object UnreachableNodeJoinsAgainMultiNodeConfig extends MultiNodeConfig {
       akka.remote.log-remote-lifecycle-events = off
     """)
         .withFallback(debugConfig(on = false)
-              .withFallback(MultiNodeClusterSpec.clusterConfig)))
+          .withFallback(MultiNodeClusterSpec.clusterConfig)))
 
   testTransport(on = true)
 }
@@ -139,7 +139,7 @@ abstract class UnreachableNodeJoinsAgainSpec
         awaitAssert(clusterView.unreachableMembers should ===(Set.empty),
                     15 seconds)
         awaitAssert(clusterView.members.map(_.address) should ===(
-                (allButVictim map address).toSet))
+            (allButVictim map address).toSet))
       }
 
       endBarrier()
@@ -187,9 +187,9 @@ abstract class UnreachableNodeJoinsAgainSpec
           Cluster(freshSystem).join(masterAddress)
           within(15 seconds) {
             awaitAssert(Cluster(freshSystem).readView.members
-                  .map(_.address) should contain(victimAddress))
+              .map(_.address) should contain(victimAddress))
             awaitAssert(Cluster(freshSystem).readView.members.size should ===(
-                    expectedNumberOfMembers))
+                expectedNumberOfMembers))
             awaitAssert(
                 Cluster(freshSystem).readView.members.map(_.status) should ===(
                     Set(MemberStatus.Up)))

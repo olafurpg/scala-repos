@@ -163,13 +163,11 @@ final class Eval(optionsNoncp: Seq[String],
     // value on the classpath when compiling.
     val hash =
       Hash.toHex(
-          Hash(
-              bytes(stringSeqBytes(content) :: optBytes(backing)(
-                      fileExistsBytes) :: stringSeqBytes(options) :: seqBytes(
-                      classpath)(fileModifiedBytes) :: stringSeqBytes(
-                      imports.strings
-                        .map(_._1)) :: optBytes(tpeName)(bytes) :: bytes(
-                      ev.extraHash) :: Nil)))
+          Hash(bytes(stringSeqBytes(content) :: optBytes(backing)(
+              fileExistsBytes) :: stringSeqBytes(options) :: seqBytes(
+              classpath)(fileModifiedBytes) :: stringSeqBytes(
+              imports.strings.map(_._1)) :: optBytes(tpeName)(bytes) :: bytes(
+              ev.extraHash) :: Nil)))
     val moduleName = makeModuleName(hash)
 
     lazy val unit = {

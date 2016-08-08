@@ -26,9 +26,8 @@ object BalancingSpec {
   }
 
   class Parent extends Actor {
-    val pool = context.actorOf(
-        BalancingPool(2).props(routeeProps =
-              Props(classOf[Worker], TestLatch(0)(context.system))))
+    val pool = context.actorOf(BalancingPool(2).props(
+        routeeProps = Props(classOf[Worker], TestLatch(0)(context.system))))
 
     def receive = {
       case msg ⇒ pool.forward(msg)

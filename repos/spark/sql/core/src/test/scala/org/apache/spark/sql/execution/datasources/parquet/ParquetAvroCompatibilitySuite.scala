@@ -64,7 +64,7 @@ class ParquetAvroCompatibilitySuite
                   .setFloatColumn(i.toFloat + 0.1f)
                   .setDoubleColumn(i.toDouble + 0.2d)
                   .setBinaryColumn(ByteBuffer.wrap(
-                          s"val_$i".getBytes(StandardCharsets.UTF_8)))
+                      s"val_$i".getBytes(StandardCharsets.UTF_8)))
                   .setStringColumn(s"val_$i")
                   .build())
           }
@@ -112,7 +112,7 @@ class ParquetAvroCompatibilitySuite
               .setMaybeFloatColumn(i.toFloat + 0.1f)
               .setMaybeDoubleColumn(i.toDouble + 0.2d)
               .setMaybeBinaryColumn(ByteBuffer.wrap(
-                      s"val_$i".getBytes(StandardCharsets.UTF_8)))
+                  s"val_$i".getBytes(StandardCharsets.UTF_8)))
               .setMaybeStringColumn(s"val_$i")
               .build()
           }
@@ -189,9 +189,9 @@ class ParquetAvroCompatibilitySuite
                 AvroArrayOfArray
                   .newBuilder()
                   .setIntArraysColumn(Seq
-                        .tabulate(3, 3)((i, j) => i * 3 + j: Integer)
-                        .map(_.asJava)
-                        .asJava)
+                    .tabulate(3, 3)((i, j) => i * 3 + j: Integer)
+                    .map(_.asJava)
+                    .asJava)
                   .build())
           }
       }
@@ -215,11 +215,11 @@ class ParquetAvroCompatibilitySuite
                 AvroMapOfArray
                   .newBuilder()
                   .setStringToIntsColumn(Seq
-                        .tabulate(3) { i =>
-                  i.toString -> Seq.tabulate(3)(j => i + j: Integer).asJava
-                }
-                        .toMap
-                        .asJava)
+                    .tabulate(3) { i =>
+                      i.toString -> Seq.tabulate(3)(j => i + j: Integer).asJava
+                    }
+                    .toMap
+                    .asJava)
                   .build())
           }
       }

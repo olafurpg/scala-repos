@@ -49,7 +49,7 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
   private val eventBusListener: ActorRef = {
     cluster.system.systemActorOf(
         Props(new Actor
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+        with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
           override def preStart(): Unit =
             cluster.subscribe(self, classOf[ClusterDomainEvent])
           override def postStop(): Unit = cluster.unsubscribe(self)
@@ -104,7 +104,7 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
     state.members
       .find(_.uniqueAddress == selfUniqueAddress)
       .getOrElse(Member(selfUniqueAddress, cluster.selfRoles)
-            .copy(status = MemberStatus.Removed))
+        .copy(status = MemberStatus.Removed))
   }
 
   /**

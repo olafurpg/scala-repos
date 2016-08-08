@@ -1753,17 +1753,17 @@ trait StatsLibModule[M[+ _]]
               case col: LongColumn =>
                 val bs2 = col.definedAt(start, end)
                 Loop.range(0, len)(j =>
-                      if (bs2.get(j)) arr(j) = BigDecimal(col(j + start)))
+                  if (bs2.get(j)) arr(j) = BigDecimal(col(j + start)))
                 bs.or(bs2)
               case col: DoubleColumn =>
                 val bs2 = col.definedAt(start, end)
                 Loop.range(0, len)(j =>
-                      if (bs2.get(j)) arr(j) = BigDecimal(col(j + start)))
+                  if (bs2.get(j)) arr(j) = BigDecimal(col(j + start)))
                 bs.or(bs2)
               case col: NumColumn =>
                 val bs2 = col.definedAt(start, end)
                 Loop.range(0, r.size)(j =>
-                      if (bs2.get(j)) arr(j) = col(j + start))
+                  if (bs2.get(j)) arr(j) = col(j + start))
                 bs.or(bs2)
               case col =>
                 sys.error("unexpected column found: %s" format col)

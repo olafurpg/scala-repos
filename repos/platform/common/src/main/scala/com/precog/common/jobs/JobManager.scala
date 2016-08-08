@@ -303,18 +303,18 @@ trait JobResultManager[M[+ _]] { self: JobManager[M] =>
                 data: StreamT[M, Array[Byte]]): M[Either[String, Unit]] = {
     findJob(id) flatMap
       (_ map { job =>
-            fs.save(job.id, FileData(mimeType, data)) map (Right(_))
-          } getOrElse M.point(Left("Invalid job id: " + id)))
+        fs.save(job.id, FileData(mimeType, data)) map (Right(_))
+      } getOrElse M.point(Left("Invalid job id: " + id)))
   }
 
   def getResult(job: JobId)
     : M[Either[String, (Option[MimeType], StreamT[M, Array[Byte]])]] = {
     fs.load(job) map
       (_ map {
-            case FileData(mimeType, data) =>
-              Right((mimeType, data))
-          } getOrElse {
-            Left("No results exist for job " + job)
-          })
+        case FileData(mimeType, data) =>
+          Right((mimeType, data))
+      } getOrElse {
+        Left("No results exist for job " + job)
+      })
   }
 }

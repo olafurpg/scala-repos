@@ -164,7 +164,7 @@ object DataFlow {
 
         result.getOrElse(
             throw new DataFlowVariableException("Timed out (after " +
-                  timeoutMs + " milliseconds) while waiting for result"))
+              timeoutMs + " milliseconds) while waiting for result"))
       }
     }
 

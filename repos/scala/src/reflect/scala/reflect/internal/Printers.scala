@@ -577,11 +577,11 @@ trait Printers extends api.Printers { self: SymbolTable =>
 
       def addBackquotes(s: String) =
         if (decoded && (decName.exists(ch =>
-                      brackets.contains(ch) || isWhitespace(ch) ||
-                        isDot(ch)) ||
-                (name.isOperatorName && decName.exists(isOperatorPart) &&
-                    decName.exists(isScalaLetter) &&
-                    !decName.contains(bslash)))) s"`$s`"
+              brackets.contains(ch) || isWhitespace(ch) ||
+                isDot(ch)) ||
+            (name.isOperatorName && decName.exists(isOperatorPart) &&
+            decName.exists(isScalaLetter) &&
+            !decName.contains(bslash)))) s"`$s`"
         else s
 
       if (name == nme.CONSTRUCTOR) "this"
@@ -629,7 +629,7 @@ trait Printers extends api.Printers { self: SymbolTable =>
         // case for: 1) (if (a) b else c).meth1.meth2 or 2) 1 + 5 should be represented as (1).+(5)
         case Select(qual, name)
             if (name.isTermName &&
-                  needsParentheses(qual)(insideLabelDef = false)) ||
+              needsParentheses(qual)(insideLabelDef = false)) ||
               isIntLitWithDecodedOp(qual, name) =>
           s"(${resolveSelect(qual)}).${printedName(name)}"
         case Select(qual, name) if name.isTermName =>
@@ -730,11 +730,10 @@ trait Printers extends api.Printers { self: SymbolTable =>
       def modsAccepted =
         List(currentTree, currentParent) exists
           (_ map {
-                case _: ClassDef | _: ModuleDef | _: Template |
-                    _: PackageDef =>
-                  true
-                case _ => false
-              } getOrElse false)
+            case _: ClassDef | _: ModuleDef | _: Template | _: PackageDef =>
+              true
+            case _ => false
+          } getOrElse false)
 
       if (currentParent.isEmpty || modsAccepted)
         printFlags(mods, primaryCtorParam)

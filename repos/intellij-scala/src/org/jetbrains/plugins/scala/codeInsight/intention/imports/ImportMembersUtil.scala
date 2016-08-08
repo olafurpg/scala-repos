@@ -49,7 +49,7 @@ object ImportMembersUtil {
       case Both(member: PsiMember, named: PsiNamedElement) =>
         ScalaPsiUtil.hasStablePath(named) &&
           (member.hasModifierProperty(PsiModifier.STATIC) ||
-                member.containingClass == null)
+            member.containingClass == null)
       case named: PsiNamedElement => ScalaPsiUtil.hasStablePath(named)
       case _ => false
     }
@@ -79,12 +79,12 @@ object ImportMembersUtil {
       case expr: ScReferenceExpression =>
         oldRef
           .replace(ScalaPsiElementFactory
-                .createExpressionFromText(name, oldRef.getManager))
+            .createExpressionFromText(name, oldRef.getManager))
           .asInstanceOf[ScReferenceElement]
       case stCodeRef: ScStableCodeReferenceElement =>
         oldRef
           .replace(ScalaPsiElementFactory
-                .createReferenceFromText(name, oldRef.getManager))
+            .createReferenceFromText(name, oldRef.getManager))
           .asInstanceOf[ScReferenceElement]
       case _ => null
     }

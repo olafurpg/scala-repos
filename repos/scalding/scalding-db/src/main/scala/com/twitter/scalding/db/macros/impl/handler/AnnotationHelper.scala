@@ -40,7 +40,7 @@ private[handler] abstract class AnnotationHelper {
 
   def varcharAnnotation: scala.util.Try[(AnnotationHelper, VarcharAnno)] =
     consume(typeOf[com.twitter.scalding.db.macros.varchar])(_.map(_ =>
-              WithVarchar).getOrElse(WithoutVarchar))
+      WithVarchar).getOrElse(WithoutVarchar))
 
   def dateAnnotation: scala.util.Try[(AnnotationHelper, DateAnno)] =
     consume(typeOf[com.twitter.scalding.db.macros.date])(

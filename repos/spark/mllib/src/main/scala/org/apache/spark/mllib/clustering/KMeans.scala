@@ -388,8 +388,8 @@ class KMeans private (private var k: Int,
           sample
             .slice(r * k, (r + 1) * k)
             .map { v =>
-          new VectorWithNorm(Vectors.dense(v.vector.toArray), v.norm)
-        }
+              new VectorWithNorm(Vectors.dense(v.vector.toArray), v.norm)
+            }
             .toArray)
   }
 

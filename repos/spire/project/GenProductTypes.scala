@@ -29,8 +29,8 @@ object GenProductTypes {
 
     val parents =
       ("%s[(%s)]" format (structure, types)) + (parentStructure map { p =>
-            " with %sProduct%d[%s]" format (p, arity, types)
-          } getOrElse "")
+        " with %sProduct%d[%s]" format (p, arity, types)
+      } getOrElse "")
 
     "private[spire] trait %s[%s] extends %s {" format
       (name, specTypes, parents)
@@ -72,9 +72,9 @@ object GenProductTypes {
           (1 to arity) map { j =>
             "%s%d.%s(%s)" format
               (prefix, j, methodName, args.zipWithIndex map {
-                    case (DelegateArg, i) => "x%d._%d" format (i, j)
-                    case (FixedArg(_), i) => "x" + i
-                  } mkString ", ")
+                case (DelegateArg, i) => "x%d._%d" format (i, j)
+                case (FixedArg(_), i) => "x" + i
+              } mkString ", ")
           } mkString ("(", ", ", ")")
         "  %sdef %s(%s): (%s) = { %s }" format
           (over, methodName, arglist, types, call)
@@ -147,8 +147,8 @@ object GenProductTypes {
 
   def unifiedTrait(defns: Seq[Definition], start: Int, end: Int): String = {
     "trait ProductInstances extends " + (defns map { defn =>
-          defn.structure + "ProductInstances"
-        } mkString " with ")
+      defn.structure + "ProductInstances"
+    } mkString " with ")
   }
 
   def renderAll(pkg: String,

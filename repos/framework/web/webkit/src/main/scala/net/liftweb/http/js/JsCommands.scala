@@ -204,7 +204,7 @@ trait JsExp extends HtmlFixer with ToJsCmd {
     val ran = "v" + Helpers.nextFuncName
     JsCmds.JsCrVar(ran, this) & JE
       .JsRaw("if (" + ran + ".parentNode) " + ran + " = " + ran +
-            ".cloneNode(true)")
+        ".cloneNode(true)")
       .cmd & JE
       .JsRaw(
           "if (" + ran + ".nodeType) {" + parentName + ".appendChild(" +
@@ -335,12 +335,11 @@ object JE {
                       JsRaw("document.createDocumentFragment()")) & addToDocFrag(
                       "df",
                       visible.toList) & JE.JsRaw("return df").cmd
-              ).toJsCmd + "(), " + AnonFunc(
-                  JsCmds.JsCrVar(
-                      "df",
-                      JsRaw("document.createDocumentFragment()")) & addToDocFrag(
-                      "df",
-                      hidden.toList) & JE.JsRaw("return df").cmd).toJsCmd +
+              ).toJsCmd + "(), " + AnonFunc(JsCmds.JsCrVar(
+                  "df",
+                  JsRaw("document.createDocumentFragment()")) & addToDocFrag(
+                  "df",
+                  hidden.toList) & JE.JsRaw("return df").cmd).toJsCmd +
                 "()))").cmd
       }
     }
@@ -677,14 +676,14 @@ trait HtmlFixer {
     val lb = new ListBuffer[JsCmd]
 
     val revised = ("script" #> nsFunc(ns => {
-          ns match {
-            case FindScript(e) => {
-              lb += JE.JsRaw(ns.text).cmd
-              NodeSeq.Empty
-            }
-            case x => x
-          }
-        })).apply(xhtml)
+      ns match {
+        case FindScript(e) => {
+          lb += JE.JsRaw(ns.text).cmd
+          NodeSeq.Empty
+        }
+        case x => x
+      }
+    })).apply(xhtml)
 
     S.htmlProperties.htmlWriter(Group(revised), w)
 
@@ -781,7 +780,7 @@ object JsCmds {
       elem ++ Script(
           LiftRules.jsArtifacts.onLoad(
               Run("if (document.getElementById(" + id.encJs +
-                    ")) {document.getElementById(" + id.encJs + ").focus();};")))
+                ")) {document.getElementById(" + id.encJs + ").focus();};")))
     }
   }
 

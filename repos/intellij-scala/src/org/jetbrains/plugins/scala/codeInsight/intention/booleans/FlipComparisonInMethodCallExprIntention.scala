@@ -120,9 +120,9 @@ class FlipComparisonInMethodCallExprIntention
       .append(methodCallExpr.args.getText)
       .append(".")
       .append(replaceOper(methodCallExpr.getInvokedExpr
-                .asInstanceOf[ScReferenceExpression]
-                .nameId
-                .getText))
+        .asInstanceOf[ScReferenceExpression]
+        .nameId
+        .getText))
       .append(newArgs)
 
     val newMethodCallExpr = ScalaPsiElementFactory

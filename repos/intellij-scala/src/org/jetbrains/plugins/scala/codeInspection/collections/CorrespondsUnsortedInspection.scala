@@ -30,5 +30,5 @@ class CorrespondsUnsortedInspection extends OperationOnCollectionInspection {
 
   private def isUnsorted(expr: ScExpression): Boolean =
     !(isSeq(expr) || isSortedMap(expr) || isSortedSet(expr) || isArray(expr) ||
-          isIterator(expr))
+      isIterator(expr))
 }

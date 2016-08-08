@@ -115,12 +115,10 @@ class DistributedProfile(val profiles: RelationalProfile*)
         if (logger.isDebugEnabled) logDebug("Evaluating " + n)
         val fromV = run(from).asInstanceOf[TraversableOnce[Any]]
         val b = cons.createBuilder(el.classTag).asInstanceOf[Builder[Any, Any]]
-        b ++= fromV.map(
-            v =>
-              converter
-                .asInstanceOf[ResultConverter[MemoryResultConverterDomain,
-                                              Any]]
-                .read(v.asInstanceOf[QueryInterpreter.ProductValue]))
+        b ++= fromV.map(v =>
+          converter
+            .asInstanceOf[ResultConverter[MemoryResultConverterDomain, Any]]
+            .read(v.asInstanceOf[QueryInterpreter.ProductValue]))
         b.result()
       case n => super.run(n)
     }
@@ -128,10 +126,8 @@ class DistributedProfile(val profiles: RelationalProfile*)
     def wrapScalaValue(value: Any, tpe: Type): Any = tpe match {
       case ProductType(ts) =>
         val p = value.asInstanceOf[Product]
-        new ProductValue(
-            (0 until p.productArity).map(i =>
-                  wrapScalaValue(p.productElement(i), ts(i)))(
-                collection.breakOut))
+        new ProductValue((0 until p.productArity).map(i =>
+          wrapScalaValue(p.productElement(i), ts(i)))(collection.breakOut))
       case CollectionType(_, elType) =>
         val v = value.asInstanceOf[Traversable[_]]
         val b = v.companion.newBuilder[Any]

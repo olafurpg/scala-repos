@@ -100,7 +100,7 @@ private[std] sealed trait OptionInstances1 extends OptionInstances2 {
     new PartialOrder[Option[A]] {
       def partialCompare(x: Option[A], y: Option[A]): Double =
         x.fold(if (y.isDefined) -1.0 else 0.0)(a =>
-              y.fold(1.0)(ev.partialCompare(_, a)))
+          y.fold(1.0)(ev.partialCompare(_, a)))
     }
 }
 

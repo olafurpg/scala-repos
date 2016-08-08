@@ -161,7 +161,7 @@ private[kafka] class WildcardTopicCount(zkUtils: ZkUtils,
     val wildcardTopics = zkUtils
       .getChildrenParentMayNotExist(ZkUtils.BrokerTopicsPath)
       .filter(topic =>
-            topicFilter.isTopicAllowed(topic, excludeInternalTopics))
+        topicFilter.isTopicAllowed(topic, excludeInternalTopics))
     TopicCount.makeConsumerThreadIdsPerTopic(
         consumerIdString,
         Map(wildcardTopics.map((_, numStreams)): _*))

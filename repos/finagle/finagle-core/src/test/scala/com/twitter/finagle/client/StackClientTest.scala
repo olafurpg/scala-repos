@@ -50,7 +50,7 @@ private object StackClientTest {
         case Some(s) =>
           Service.constant(
               Future.exception(new IllegalStateException(
-                      "should not have a local context: " + s)))
+                  "should not have a local context: " + s)))
         case None =>
           new SerialClientDispatcher(transport)
       }
@@ -308,11 +308,11 @@ class StackClientTest
   for (status <- Seq(Status.Busy, Status.Closed)) {
     test(s"don't requeue failing requests when the stack is $status")(
         new RequeueCtx {
-      // failing request and Busy | Closed load balancer => zero requeues
-      _status = status
-      Await.ready(cl().map(_("hi")), 5.seconds)
-      assert(requeues.isEmpty)
-    })
+          // failing request and Busy | Closed load balancer => zero requeues
+          _status = status
+          Await.ready(cl().map(_("hi")), 5.seconds)
+          assert(requeues.isEmpty)
+        })
   }
 
   test("dynamically stop requeuing")(new RequeueCtx {
@@ -326,32 +326,32 @@ class StackClientTest
 
   test("service acquisition requeues use a separate fixed budget")(
       new RequeueCtx {
-    override val stubLB = new ServiceFactory[String, String] {
-      def apply(conn: ClientConnection) = Future.exception(
-          Failure.rejected("unable to establish session")
-      )
-      def close(deadline: Time) = Future.Done
-    }
+        override val stubLB = new ServiceFactory[String, String] {
+          def apply(conn: ClientConnection) = Future.exception(
+              Failure.rejected("unable to establish session")
+          )
+          def close(deadline: Time) = Future.Done
+        }
 
-    intercept[Failure] { Await.result(cl(), 5.seconds) }
-    assert(requeues.isDefined)
-    assert(budget > 0)
-  })
+        intercept[Failure] { Await.result(cl(), 5.seconds) }
+        assert(requeues.isDefined)
+        assert(budget > 0)
+      })
 
   test("service acquisition requeues respect Failure.Restartable")(
       new RequeueCtx {
-    override val stubLB = new ServiceFactory[String, String] {
-      def apply(conn: ClientConnection) = Future.exception(
-          Failure("don't restart this!")
-      )
-      def close(deadline: Time) = Future.Done
-    }
+        override val stubLB = new ServiceFactory[String, String] {
+          def apply(conn: ClientConnection) = Future.exception(
+              Failure("don't restart this!")
+          )
+          def close(deadline: Time) = Future.Done
+        }
 
-    intercept[Failure] { Await.result(cl(), 5.seconds) }
+        intercept[Failure] { Await.result(cl(), 5.seconds) }
 
-    assert(requeues.isEmpty)
-    assert(budget > 0)
-  })
+        assert(requeues.isEmpty)
+        assert(budget > 0)
+      })
 
   test("service acquisition requeues respect Status.Open")(new RequeueCtx {
     _status = Status.Closed
@@ -426,7 +426,7 @@ class StackClientTest
 
     val service = new FactoryToService(
         stack.make(Stack.Params.empty + FactoryToService.Enabled(true) +
-              param.Stats(sr) + BindingFactory.BaseDtab(() => baseDtab)))
+          param.Stats(sr) + BindingFactory.BaseDtab(() => baseDtab)))
 
     intercept[ChannelWriteException] {
       Await.result(service(()), 5.seconds)

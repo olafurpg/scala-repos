@@ -106,7 +106,7 @@ class ScalaArrangementParseInfo {
             methodToEntry
               .get(dependentMethod)
               .foreach(dependentEntry =>
-                    if (dependentEntry != null) {
+                if (dependentEntry != null) {
                   val dependentMethodInfo =
                     if (cache.contains(dependentMethod)) {
                       cache(dependentMethod)

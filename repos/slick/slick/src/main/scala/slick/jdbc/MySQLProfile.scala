@@ -61,8 +61,8 @@ trait MySQLProfile extends JdbcProfile { profile =>
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - JdbcCapabilities.returnInsertOther -
-          SqlCapabilities.sequenceLimited - RelationalCapabilities.joinFull -
-          JdbcCapabilities.nullableNoDefault)
+      SqlCapabilities.sequenceLimited - RelationalCapabilities.joinFull -
+      JdbcCapabilities.nullableNoDefault)
 
   override protected[this] def loadProfileConfig: Config = {
     if (!GlobalConfig.profileConfig("slick.driver.MySQL").entrySet().isEmpty)
@@ -143,7 +143,7 @@ trait MySQLProfile extends JdbcProfile { profile =>
               case None =>
                 if (sym
                       .flatMap(_.findColumnOption[
-                              RelationalProfile.ColumnOption.Default[_]])
+                          RelationalProfile.ColumnOption.Default[_]])
                       .isDefined || sym
                       .flatMap(
                           _.findColumnOption[ColumnOption.PrimaryKey.type])
@@ -176,9 +176,8 @@ trait MySQLProfile extends JdbcProfile { profile =>
           Bind(new AnonSymbol,
                Pure(StructNode(ConstArray.empty)),
                Pure(
-                   StructNode(
-                       ConstArray(new AnonSymbol -> RowNumGen(countSym,
-                                                              offset - 1))))),
+                   StructNode(ConstArray(
+                       new AnonSymbol -> RowNumGen(countSym, offset - 1))))),
           JoinType.Inner,
           LiteralNode(true))
       var first = true
@@ -278,7 +277,7 @@ trait MySQLProfile extends JdbcProfile { profile =>
       val start = seq._start.getOrElse(if (desc) maxValue else minValue)
       val beforeStart = start - increment
       if (!seq._cycle && (seq._minValue.isDefined && desc ||
-              seq._maxValue.isDefined && !desc))
+          seq._maxValue.isDefined && !desc))
         throw new SlickException(
             "Sequences with limited size and without CYCLE are not supported by MySQLProfile's sequence emulation")
       val incExpr = if (seq._cycle) {

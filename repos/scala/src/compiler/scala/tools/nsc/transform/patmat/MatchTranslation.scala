@@ -510,8 +510,8 @@ trait MatchTranslation { self: PatternMatching =>
         // [3] the last one -- if the last subpattern is a sequence wildcard:
         //       drop the prefix (indexed by the refs on the preceding line), return the remainder
         (productElemsToN(binder, firstIndexingBinder) ++ genTake(
-                binder,
-                expectedLength) ++ lastTrees).toList
+            binder,
+            expectedLength) ++ lastTrees).toList
       }
 
       // the trees that select the subpatterns on the extractor's result, referenced by `binder`
@@ -589,13 +589,13 @@ trait MatchTranslation { self: PatternMatching =>
         val mutableBinders =
           (if (!binder.info.typeSymbol.hasTransOwner(ScalaPackageClass) &&
                (paramAccessors exists
-                     (x => x.isMutable || definitions.isRepeated(x)))) {
+                 (x => x.isMutable || definitions.isRepeated(x)))) {
 
              subPatBinders.zipWithIndex.flatMap {
                case (binder, idx) =>
                  val param = paramAccessorAt(idx)
                  if (param.isMutable || (definitions.isRepeated(param) &&
-                         !aligner.isStar)) binder :: Nil
+                     !aligner.isStar)) binder :: Nil
                  else Nil
              }
            } else Nil)

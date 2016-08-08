@@ -235,7 +235,7 @@ private[spark] class TorrentBroadcast[T: ClassTag](obj: T, id: Long)
     Option(TaskContext.get()) match {
       case Some(taskContext) =>
         taskContext.addTaskCompletionListener(_ =>
-              blockManager.releaseLock(blockId))
+          blockManager.releaseLock(blockId))
       case None =>
         // This should only happen on the driver, where broadcast variables may be accessed
         // outside of running tasks (e.g. when computing rdd.partitions()). In order to allow

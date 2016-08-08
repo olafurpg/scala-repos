@@ -14,11 +14,11 @@ class MarathonTaskFormatTest extends MarathonSpec {
     val network = MesosProtos.NetworkInfo
       .newBuilder()
       .addIpAddresses(MesosProtos.NetworkInfo.IPAddress
-            .newBuilder()
-            .setIpAddress("123.123.123.123"))
+        .newBuilder()
+        .setIpAddress("123.123.123.123"))
       .addIpAddresses(MesosProtos.NetworkInfo.IPAddress
-            .newBuilder()
-            .setIpAddress("123.123.123.124"))
+        .newBuilder()
+        .setIpAddress("123.123.123.124"))
       .build()
 
     val taskWithoutIp = new Task.LaunchedEphemeral(

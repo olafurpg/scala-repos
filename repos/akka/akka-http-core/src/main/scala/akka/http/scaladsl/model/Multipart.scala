@@ -292,7 +292,7 @@ object Multipart {
       override def getStrictParts: java.lang.Iterable[
           jm.Multipart.General.BodyPart.Strict] =
         super.getStrictParts.asInstanceOf[java.lang.Iterable[
-                jm.Multipart.General.BodyPart.Strict]]
+            jm.Multipart.General.BodyPart.Strict]]
     }
 
     /**
@@ -328,9 +328,8 @@ object Multipart {
                   params - "name",
                   headers.filterNot(_ is "content-disposition")))
           case None ⇒
-            Failure(
-                IllegalHeaderException(
-                    "multipart/form-data part must contain `Content-Disposition` header with `name` parameter"))
+            Failure(IllegalHeaderException(
+                "multipart/form-data part must contain `Content-Disposition` header with `name` parameter"))
         }
       }
       private[BodyPart] def tryCreateByteRangesBodyPart[T](
@@ -340,9 +339,8 @@ object Multipart {
           case Some(`Content-Range`(unit, range)) ⇒
             Success(f(range, unit, headers.filterNot(_ is "content-range")))
           case None ⇒
-            Failure(
-                IllegalHeaderException(
-                    "multipart/byteranges part must contain `Content-Range` header"))
+            Failure(IllegalHeaderException(
+                "multipart/byteranges part must contain `Content-Range` header"))
         }
     }
     object BodyPart {
@@ -450,7 +448,7 @@ object Multipart {
                  chunkSize: Int = -1): Multipart.FormData =
       Multipart.FormData(
           Source.single(Multipart.FormData.BodyPart
-                .fromFile(name, contentType, file, chunkSize)))
+            .fromFile(name, contentType, file, chunkSize)))
 
     /**
       * Strict [[FormData]].
@@ -476,7 +474,7 @@ object Multipart {
       override def getStrictParts: java.lang.Iterable[
           jm.Multipart.FormData.BodyPart.Strict] =
         super.getStrictParts.asInstanceOf[java.lang.Iterable[
-                jm.Multipart.FormData.BodyPart.Strict]]
+            jm.Multipart.FormData.BodyPart.Strict]]
     }
 
     /**
@@ -519,11 +517,8 @@ object Multipart {
         import fm.executionContext
         entity
           .toStrict(timeout)
-          .map(
-              Multipart.FormData.BodyPart.Strict(name,
-                                                 _,
-                                                 additionalDispositionParams,
-                                                 additionalHeaders))
+          .map(Multipart.FormData.BodyPart
+            .Strict(name, _, additionalDispositionParams, additionalHeaders))
       }
 
       /** Java API */
@@ -669,7 +664,7 @@ object Multipart {
       override def getStrictParts: java.lang.Iterable[
           jm.Multipart.ByteRanges.BodyPart.Strict] =
         super.getStrictParts.asInstanceOf[java.lang.Iterable[
-                jm.Multipart.ByteRanges.BodyPart.Strict]]
+            jm.Multipart.ByteRanges.BodyPart.Strict]]
     }
 
     /**
@@ -706,7 +701,7 @@ object Multipart {
         entity
           .toStrict(timeout)
           .map(Multipart.ByteRanges.BodyPart
-                .Strict(contentRange, _, rangeUnit, additionalHeaders))
+            .Strict(contentRange, _, rangeUnit, additionalHeaders))
       }
 
       /** Java API */

@@ -152,19 +152,18 @@ object LookupJoin extends Serializable {
           * simulated "realtime store" described above.
           */
         .scanLeft(
-            /**
-              * In the simulated realtime store described above, this
-              * None is the value in the store at the current
-              * time. Because we sort by time and scan forward, this
-              * value will be updated with a new value every time a
-              * Right(delta) shows up in the iterator.
-              *
-              * The second entry in the pair will be None when the
-              * JoinedV is updated and Some(newValue) when a (K, V)
-              * shows up and a new join occurs.
-              */
-            (Option.empty[(T, JoinedV)],
-             Option.empty[(T, V, Option[JoinedV])])) {
+        /**
+          * In the simulated realtime store described above, this
+          * None is the value in the store at the current
+          * time. Because we sort by time and scan forward, this
+          * value will be updated with a new value every time a
+          * Right(delta) shows up in the iterator.
+          *
+          * The second entry in the pair will be None when the
+          * JoinedV is updated and Some(newValue) when a (K, V)
+          * shows up and a new join occurs.
+          */
+        (Option.empty[(T, JoinedV)], Option.empty[(T, V, Option[JoinedV])])) {
           case ((None, result), (time, Left(v))) => {
             // The was no value previously
             (None, Some((time, v, None)))

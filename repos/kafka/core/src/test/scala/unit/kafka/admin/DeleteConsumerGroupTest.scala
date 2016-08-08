@@ -187,14 +187,8 @@ class DeleteConsumerGroupTest extends KafkaServerTestHarness {
                                   0,
                                   10,
                                   false))
-    groupTopicDirsForOtherTopic.foreach(
-        dir =>
-          fillInConsumerGroupInfo(otherTopic,
-                                  dir.group,
-                                  "consumer",
-                                  0,
-                                  10,
-                                  false))
+    groupTopicDirsForOtherTopic.foreach(dir =>
+      fillInConsumerGroupInfo(otherTopic, dir.group, "consumer", 0, 10, false))
 
     AdminUtils.deleteAllConsumerGroupInfoForTopicInZK(zkUtils, topicToDelete)
 
@@ -288,7 +282,7 @@ class DeleteConsumerGroupTest extends KafkaServerTestHarness {
                             topic: String,
                             messages: List[String]) {
     messages.foreach(message =>
-          producer.send(new ProducerRecord(topic, message.getBytes)))
+      producer.send(new ProducerRecord(topic, message.getBytes)))
   }
 
   private def consumeEvents(

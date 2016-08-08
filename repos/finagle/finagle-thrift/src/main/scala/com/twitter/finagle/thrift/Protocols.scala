@@ -23,20 +23,20 @@ object Protocols {
     } catch {
       case NonFatal(_) => // try reflection instead
         try {
-          AccessController.doPrivileged(
-              new PrivilegedExceptionAction[sun.misc.Unsafe]() {
-            def run(): sun.misc.Unsafe = {
-              val k = classOf[sun.misc.Unsafe]
-              for (f <- k.getDeclaredFields) {
-                f.setAccessible(true)
-                val x = f.get(null)
-                if (k.isInstance(x)) {
-                  return k.cast(x)
+          AccessController
+            .doPrivileged(new PrivilegedExceptionAction[sun.misc.Unsafe]() {
+              def run(): sun.misc.Unsafe = {
+                val k = classOf[sun.misc.Unsafe]
+                for (f <- k.getDeclaredFields) {
+                  f.setAccessible(true)
+                  val x = f.get(null)
+                  if (k.isInstance(x)) {
+                    return k.cast(x)
+                  }
                 }
+                throw new NoSuchFieldException("the Unsafe") // fall through to the catch block below
               }
-              throw new NoSuchFieldException("the Unsafe") // fall through to the catch block below
-            }
-          })
+            })
         } catch {
           case NonFatal(t) =>
             Logger

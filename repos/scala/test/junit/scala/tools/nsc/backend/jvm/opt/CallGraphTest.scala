@@ -50,7 +50,7 @@ class CallGraphTest extends ClearAfterClass {
     : List[ClassNode] = {
     CallGraphTest.notPerRun.foreach(_.clear())
     compileClasses(compiler)(code, allowMessage = allowMessage).map(c =>
-          byteCodeRepository.classNode(c.name).get)
+      byteCodeRepository.classNode(c.name).get)
   }
 
   def callsInMethod(methodNode: MethodNode): List[MethodInsnNode] =

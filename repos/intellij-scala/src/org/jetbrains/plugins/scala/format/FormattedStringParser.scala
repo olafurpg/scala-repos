@@ -81,7 +81,7 @@ object FormattedStringParser extends StringParser {
 
   private def isFormattedMethod(holder: String, method: String) =
     (holder == "scala.runtime.StringFormat" ||
-          holder == "scala.runtime.StringAdd") && method == "formatted"
+      holder == "scala.runtime.StringAdd") && method == "formatted"
 
   private def isStringFormatMethod(holder: String, method: String) =
     holder == "java.lang.String" && method == "format"

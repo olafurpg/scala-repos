@@ -338,7 +338,7 @@ object Dist extends DistInstances8 {
                             na: Dist[A],
                             nb: Dist[B]): Dist[Either[A, B]] =
     new DistFromGen[Either[A, B]](g =>
-          if (no(g)) Right(nb(g)) else Left(na(g)))
+      if (no(g)) Right(nb(g)) else Left(na(g)))
 
   implicit def tuple2[A: Dist, B: Dist]: Dist[(A, B)] =
     Dist((_: A, _: B))

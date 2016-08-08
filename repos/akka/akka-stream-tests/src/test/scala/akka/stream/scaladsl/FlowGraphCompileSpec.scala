@@ -168,33 +168,37 @@ class FlowGraphCompileSpec extends AkkaSpec {
     "build wikipedia Topological_sorting" in {
       // see https://en.wikipedia.org/wiki/Topological_sorting#mediaviewer/File:Directed_acyclic_graph.png
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
-          val b3 = b.add(Broadcast[String](2))
-          val b7 = b.add(Broadcast[String](2))
-          val b11 = b.add(Broadcast[String](3))
-          val m8 = b.add(Merge[String](2))
-          val m9 = b.add(Merge[String](2))
-          val m10 = b.add(Merge[String](2))
-          val m11 = b.add(Merge[String](2))
-          val in3 = Source(List("b"))
-          val in5 = Source(List("b"))
-          val in7 = Source(List("a"))
-          val out2 = Sink.asPublisher[String](false)
-          val out9 = Sink.asPublisher[String](false)
-          val out10 = Sink.asPublisher[String](false)
-          def f(s: String) =
-            Flow[String].transform(op[String, String]).named(s)
-          import GraphDSL.Implicits._
+        .fromGraph(
+            GraphDSL
+              .create() {
+                implicit b ⇒
+                  val b3 = b.add(Broadcast[String](2))
+                  val b7 = b.add(Broadcast[String](2))
+                  val b11 = b.add(Broadcast[String](3))
+                  val m8 = b.add(Merge[String](2))
+                  val m9 = b.add(Merge[String](2))
+                  val m10 = b.add(Merge[String](2))
+                  val m11 = b.add(Merge[String](2))
+                  val in3 = Source(List("b"))
+                  val in5 = Source(List("b"))
+                  val in7 = Source(List("a"))
+                  val out2 = Sink.asPublisher[String](false)
+                  val out9 = Sink.asPublisher[String](false)
+                  val out10 = Sink.asPublisher[String](false)
+                  def f(s: String) =
+                    Flow[String].transform(op[String, String]).named(s)
+                  import GraphDSL.Implicits._
 
-          in7 ~> f("a") ~> b7 ~> f("b") ~> m11 ~> f("c") ~> b11 ~> f("d") ~> out2
-          b11 ~> f("e") ~> m9 ~> f("f") ~> out9
-          b7 ~> f("g") ~> m8 ~> f("h") ~> m9
-          b11 ~> f("i") ~> m10 ~> f("j") ~> out10
-          in5 ~> f("k") ~> m11
-          in3 ~> f("l") ~> b3 ~> f("m") ~> m8
-          b3 ~> f("n") ~> m10
-          ClosedShape
-        })
+                  in7 ~> f("a") ~> b7 ~> f("b") ~> m11 ~> f("c") ~> b11 ~> f(
+                      "d") ~> out2
+                  b11 ~> f("e") ~> m9 ~> f("f") ~> out9
+                  b7 ~> f("g") ~> m8 ~> f("h") ~> m9
+                  b11 ~> f("i") ~> m10 ~> f("j") ~> out10
+                  in5 ~> f("k") ~> m11
+                  in3 ~> f("l") ~> b3 ~> f("m") ~> m8
+                  b3 ~> f("n") ~> m10
+                  ClosedShape
+              })
         .run()
     }
 

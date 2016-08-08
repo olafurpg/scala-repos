@@ -24,9 +24,9 @@ object ConcurrentSpec
         val results = Future.sequence(
             Range(1, 20)
               .map(_ =>
-                    Iteratee.fold[String, String]("") { (s, e) =>
-              s + e
-            }(foldEC))
+                Iteratee.fold[String, String]("") { (s, e) =>
+                  s + e
+                }(foldEC))
               .map(broadcaster.apply)
               .map(_.flatMap(_.run)))
         pushHere.push("beep")
@@ -127,7 +127,7 @@ object ConcurrentSpec
         val preparedMapEC = mapEC.prepare()
         val result =
           fastEnumerator |>>> (Concurrent
-                .buffer(20) &>> slowIteratee).flatMap { l =>
+            .buffer(20) &>> slowIteratee).flatMap { l =>
             Iteratee.getChunks.map(l ++ (_: List[Long]))(preparedMapEC)
           }(flatMapEC)
 
@@ -156,7 +156,7 @@ object ConcurrentSpec
 
       val fastEnumerator = Enumerator((1 to 10): _*) >>> Enumerator.eof
       val result = Try(await(fastEnumerator &> Concurrent.lazyAndErrIfNotReady(
-                  50) |>>> slowIteratee))
+          50) |>>> slowIteratee))
       // We've got our result (hopefully a timeout), so let the iteratee
       // complete.
       gotResult.countDown()

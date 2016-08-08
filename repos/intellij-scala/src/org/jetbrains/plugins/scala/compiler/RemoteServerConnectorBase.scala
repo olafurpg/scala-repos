@@ -42,8 +42,8 @@ abstract class RemoteServerConnectorBase(module: Module,
       new URLClassLoader(
           Array(
               new URL("jar:file:" +
-                    (if (libCanonicalPath startsWith "/") "" else "/") +
-                    libCanonicalPath + "/jps/sbt-interface.jar!/")),
+                (if (libCanonicalPath startsWith "/") "" else "/") +
+                libCanonicalPath + "/jps/sbt-interface.jar!/")),
           getClass.getClassLoader),
       new File(libRoot, "jps"),
       System.getProperty("java.class.version")
@@ -165,8 +165,8 @@ abstract class RemoteServerConnectorBase(module: Module,
     files
       .find(!_.exists())
       .foreach(f =>
-            throw new IllegalArgumentException(
-                s"File ${f.getCanonicalPath} does not exists"))
+        throw new IllegalArgumentException(
+            s"File ${f.getCanonicalPath} does not exists"))
 
     if (files.map(_.getParent).distinct.size != 1)
       throw new IllegalArgumentException(

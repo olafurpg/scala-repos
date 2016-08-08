@@ -507,7 +507,7 @@ trait ColumnarTableModule[M[+ _]]
 
     def constNull: Table =
       Table(Slice(Map(ColumnRef(CPath.Identity, CNull) -> new InfiniteColumn
-                      with NullColumn),
+                  with NullColumn),
                   1) :: StreamT.empty[M, Slice],
             ExactSize(1))
 
@@ -515,7 +515,7 @@ trait ColumnarTableModule[M[+ _]]
       Table(
           Slice(
               Map(ColumnRef(CPath.Identity, CEmptyObject) -> new InfiniteColumn
-                  with EmptyObjectColumn),
+              with EmptyObjectColumn),
               1) :: StreamT.empty[M, Slice],
           ExactSize(1))
 
@@ -523,7 +523,7 @@ trait ColumnarTableModule[M[+ _]]
       Table(
           Slice(
               Map(ColumnRef(CPath.Identity, CEmptyArray) -> new InfiniteColumn
-                  with EmptyArrayColumn),
+              with EmptyArrayColumn),
               1) :: StreamT.empty[M, Slice],
           ExactSize(1))
 
@@ -649,8 +649,8 @@ trait ColumnarTableModule[M[+ _]]
             // key with their subset.
             keys0.flatMap { key0 =>
               keys1.flatMap(key1 =>
-                    if (consistent(key0, key1)) Some(merge(key0, key1))
-                    else None)
+                if (consistent(key0, key1)) Some(merge(key0, key1))
+                else None)
             }
           }
 
@@ -1737,11 +1737,11 @@ trait ColumnarTableModule[M[+ _]]
                     } else if (lempty) {
                       // left side is a small set, so restart it in memory
                       M.point(crossLeftSingle(lhead, rhead :: rtail)(
-                              transform.initial))
+                          transform.initial))
                     } else if (rempty) {
                       // right side is a small set, so restart it in memory
                       M.point(crossRightSingle(lhead :: ltail, rhead)(
-                              transform.initial))
+                          transform.initial))
                     } else {
                       // both large sets, so just walk the left restarting the right.
                       M.point(crossBoth(lhead :: ltail, rhead :: rtail))
@@ -2154,11 +2154,11 @@ trait ColumnarTableModule[M[+ _]]
       Table(StreamT(
                 StreamT
                   .Skip({
-                println(prelude);
-                slices map { s =>
-                  println(f(s)); s
-                }
-              })
+                    println(prelude);
+                    slices map { s =>
+                      println(f(s)); s
+                    }
+                  })
                   .point[M]),
             size)
     }
@@ -2170,14 +2170,14 @@ trait ColumnarTableModule[M[+ _]]
       val preludeEffect = StreamT(
           StreamT
             .Skip({
-          logger.debug(logPrefix + " " + prelude); StreamT.empty[M, Slice]
-        })
+              logger.debug(logPrefix + " " + prelude); StreamT.empty[M, Slice]
+            })
             .point[M])
       val appendixEffect = StreamT(
           StreamT
             .Skip({
-          logger.debug(logPrefix + " " + appendix); StreamT.empty[M, Slice]
-        })
+              logger.debug(logPrefix + " " + appendix); StreamT.empty[M, Slice]
+            })
             .point[M])
       val sliceEffect =
         if (logger.isTraceEnabled)

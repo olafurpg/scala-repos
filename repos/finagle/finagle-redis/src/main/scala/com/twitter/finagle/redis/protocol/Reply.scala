@@ -157,7 +157,7 @@ class ReplyCodec extends UnifiedProtocolCodec {
                   decodeMBulkLines(i - 1,
                                    stack,
                                    BulkReply(ChannelBuffers.wrappedBuffer(
-                                           byteArray)) :: lines)
+                                       byteArray)) :: lines)
                 }
               }
             }
@@ -173,7 +173,7 @@ class ReplyCodec extends UnifiedProtocolCodec {
                 i - 1,
                 stack,
                 IntegerReply(NumberFormat.toLong(
-                        BytesToString(line.drop(1).getBytes))) :: lines)
+                    BytesToString(line.drop(1).getBytes))) :: lines)
           case ERROR_REPLY =>
             decodeMBulkLines(
                 i - 1,

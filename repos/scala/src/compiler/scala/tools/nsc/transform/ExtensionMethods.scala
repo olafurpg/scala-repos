@@ -220,7 +220,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
             currentOwner.primaryConstructor.makeNotPrivate(NoSymbol)
             // SI-7859 make param accessors accessible so the erasure can generate unbox operations.
             val paramAccessors = currentOwner.info.decls.filter(sym =>
-                  sym.isParamAccessor && sym.isMethod)
+              sym.isParamAccessor && sym.isMethod)
             paramAccessors.foreach(_.makeNotPrivate(currentOwner))
             super.transform(tree)
           } else if (currentOwner.isStaticOwner) {
@@ -240,9 +240,9 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
             val extensionName = extensionNames(origMeth).head.toTermName
             val extensionMeth =
               (companion.moduleClass.newMethod(
-                      extensionName,
-                      tree.pos.focus,
-                      origMeth.flags & ~OVERRIDE & ~PROTECTED & ~PRIVATE & ~LOCAL | FINAL) setAnnotations origMeth.annotations)
+                  extensionName,
+                  tree.pos.focus,
+                  origMeth.flags & ~OVERRIDE & ~PROTECTED & ~PRIVATE & ~LOCAL | FINAL) setAnnotations origMeth.annotations)
             origMeth
               .removeAnnotation(TailrecClass) // it's on the extension method, now.
             companion.info.decls.enter(extensionMeth)

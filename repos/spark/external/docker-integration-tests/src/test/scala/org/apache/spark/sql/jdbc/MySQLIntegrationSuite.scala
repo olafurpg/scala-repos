@@ -50,10 +50,9 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
             "dbl DOUBLE)")
       .executeUpdate()
     conn
-      .prepareStatement(
-          "INSERT INTO numbers VALUES (b'0', b'1000100101', " +
-            "17, 77777, 123456789, 123456789012345, 123456789012345.123456789012345, " +
-            "42.75, 1.0000000000000002)")
+      .prepareStatement("INSERT INTO numbers VALUES (b'0', b'1000100101', " +
+        "17, 77777, 123456789, 123456789012345, 123456789012345.123456789012345, " +
+        "42.75, 1.0000000000000002)")
       .executeUpdate()
 
     conn

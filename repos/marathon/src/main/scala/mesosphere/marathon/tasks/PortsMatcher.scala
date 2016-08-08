@@ -76,10 +76,9 @@ class PortsMatcher(app: AppDefinition,
           PortWithRole(offeredRange.role, port, offeredRange.reservation)
         } orElse {
           if (failLog)
-            log.info(
-                s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
-                  s"Couldn't find host port $port (of ${requiredPorts.mkString(", ")}) " +
-                  s"in any offered range for app [${app.id}]")
+            log.info(s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
+              s"Couldn't find host port $port (of ${requiredPorts.mkString(", ")}) " +
+              s"in any offered range for app [${app.id}]")
           None
         }
       }
@@ -115,7 +114,7 @@ class PortsMatcher(app: AppDefinition,
       // available ports without the ports that have been preset in the port mappings
       val availablePortsWithoutStaticHostPorts: Iterator[PortWithRole] =
         shuffledAvailablePorts.filter(portWithRole =>
-              !hostPortsFromMappings(portWithRole.port))
+          !hostPortsFromMappings(portWithRole.port))
 
       mappings.iterator.map {
         case PortMapping(containerPort,
@@ -126,7 +125,7 @@ class PortsMatcher(app: AppDefinition,
                          labels) if hostPort == 0 =>
           if (!availablePortsWithoutStaticHostPorts.hasNext) {
             log.info(s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
-                  s"Insufficient ports in offer for app [${app.id}]")
+              s"Insufficient ports in offer for app [${app.id}]")
             None
           } else {
             Option(availablePortsWithoutStaticHostPorts.next())
@@ -136,9 +135,9 @@ class PortsMatcher(app: AppDefinition,
             case Some(PortRange(role, _, _, reservation)) =>
               Some(PortWithRole(role, pm.hostPort, reservation))
             case None =>
-              log.info(
-                  s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
-                    s"Cannot find range with host port ${pm.hostPort} for app [${app.id}]")
+              log
+                .info(s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
+                  s"Cannot find range with host port ${pm.hostPort} for app [${app.id}]")
               None
           }
       }

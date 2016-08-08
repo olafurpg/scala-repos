@@ -58,30 +58,30 @@ object Analyse extends LilaController {
                                        withMoveTimes = true,
                                        withOpening = true) map { data =>
                 Ok(
-                    html.analyse.replay(pov,
-                                        data,
-                                        initialFen,
-                                        Env.analyse
-                                          .annotator(pgn,
-                                                     analysis,
-                                                     pov.game.opening,
-                                                     pov.game.winnerColor,
-                                                     pov.game.status,
-                                                     pov.game.clock)
-                                          .toString,
-                                        analysis,
-                                        analysis map { a =>
-                                      AdvantageChart(a.infoAdvices,
-                                                     pov.game.pgnMoves,
-                                                     pov.game.startedAtTurn)
-                                    },
-                                        analysisInProgress,
-                                        simul,
-                                        new TimeChart(pov.game,
-                                                      pov.game.pgnMoves),
-                                        crosstable,
-                                        userTv,
-                                        divider(pov.game, initialFen)))
+                    html.analyse.replay(
+                        pov,
+                        data,
+                        initialFen,
+                        Env.analyse
+                          .annotator(pgn,
+                                     analysis,
+                                     pov.game.opening,
+                                     pov.game.winnerColor,
+                                     pov.game.status,
+                                     pov.game.clock)
+                          .toString,
+                        analysis,
+                        analysis map { a =>
+                          AdvantageChart(a.infoAdvices,
+                                         pov.game.pgnMoves,
+                                         pov.game.startedAtTurn)
+                        },
+                        analysisInProgress,
+                        simul,
+                        new TimeChart(pov.game, pov.game.pgnMoves),
+                        crosstable,
+                        userTv,
+                        divider(pov.game, initialFen)))
               }
           }
         }

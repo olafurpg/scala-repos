@@ -53,7 +53,7 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
 
       val expectedNrOfOnIntervalCalls =
         testRuns.size * ((n / measureBetweenEvery) -
-              1) // first time has no value to compare to, so skips calling onInterval
+          1) // first time has no value to compare to, so skips calling onInterval
       1 to expectedNrOfOnIntervalCalls foreach { _ ⇒
         testActor.expectMsgType[Duration]
       }

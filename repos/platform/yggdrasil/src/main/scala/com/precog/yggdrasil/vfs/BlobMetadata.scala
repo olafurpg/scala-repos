@@ -55,7 +55,7 @@ object BlobMetadata {
           .parseMimeTypes(ms)
           .headOption
           .toSuccess(Error.invalid(
-                  "Could not extract mime type from '%s'".format(ms)))
+              "Could not extract mime type from '%s'".format(ms)))
       }
     }
 

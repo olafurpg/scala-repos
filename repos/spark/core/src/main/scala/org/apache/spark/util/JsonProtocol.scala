@@ -152,7 +152,7 @@ private[spark] object JsonProtocol {
     ("Event" -> Utils.getFormattedClassName(jobStart)) ~
       ("Job ID" -> jobStart.jobId) ~ ("Submission Time" -> jobStart.time) ~
       ("Stage Infos" -> jobStart.stageInfos
-            .map(stageInfoToJson)) ~ // Added in Spark 1.2.0
+        .map(stageInfoToJson)) ~ // Added in Spark 1.2.0
       ("Stage IDs" -> jobStart.stageIds) ~ ("Properties" -> properties)
   }
 
@@ -208,16 +208,16 @@ private[spark] object JsonProtocol {
     ("Event" -> Utils.getFormattedClassName(applicationStart)) ~
       ("App Name" -> applicationStart.appName) ~
       ("App ID" -> applicationStart.appId
-            .map(JString(_))
-            .getOrElse(JNothing)) ~
+        .map(JString(_))
+        .getOrElse(JNothing)) ~
       ("Timestamp" -> applicationStart.time) ~
       ("User" -> applicationStart.sparkUser) ~
       ("App Attempt ID" -> applicationStart.appAttemptId
-            .map(JString(_))
-            .getOrElse(JNothing)) ~
+        .map(JString(_))
+        .getOrElse(JNothing)) ~
       ("Driver Logs" -> applicationStart.driverLogs
-            .map(mapToJson)
-            .getOrElse(JNothing))
+        .map(mapToJson)
+        .getOrElse(JNothing))
   }
 
   def applicationEndToJson(
@@ -253,12 +253,12 @@ private[spark] object JsonProtocol {
     ("Event" -> Utils.getFormattedClassName(metricsUpdate)) ~
       ("Executor ID" -> execId) ~
       ("Metrics Updated" -> accumUpdates.map {
-            case (taskId, stageId, stageAttemptId, updates) =>
-              ("Task ID" -> taskId) ~ ("Stage ID" -> stageId) ~
-                ("Stage Attempt ID" -> stageAttemptId) ~
-                ("Accumulator Updates" -> JArray(
-                        updates.map(accumulableInfoToJson).toList))
-          })
+        case (taskId, stageId, stageAttemptId, updates) =>
+          ("Task ID" -> taskId) ~ ("Stage ID" -> stageId) ~
+            ("Stage Attempt ID" -> stageAttemptId) ~
+            ("Accumulator Updates" -> JArray(
+                updates.map(accumulableInfoToJson).toList))
+      })
   }
 
   /** ------------------------------------------------------------------- *
@@ -281,7 +281,7 @@ private[spark] object JsonProtocol {
       ("Submission Time" -> submissionTime) ~
       ("Completion Time" -> completionTime) ~ ("Failure Reason" -> failureReason) ~
       ("Accumulables" -> JArray(
-              stageInfo.accumulables.values.map(accumulableInfoToJson).toList))
+          stageInfo.accumulables.values.map(accumulableInfoToJson).toList))
   }
 
   def taskInfoToJson(taskInfo: TaskInfo): JValue = {
@@ -294,18 +294,18 @@ private[spark] object JsonProtocol {
       ("Getting Result Time" -> taskInfo.gettingResultTime) ~
       ("Finish Time" -> taskInfo.finishTime) ~ ("Failed" -> taskInfo.failed) ~
       ("Accumulables" -> JArray(
-              taskInfo.accumulables.map(accumulableInfoToJson).toList))
+          taskInfo.accumulables.map(accumulableInfoToJson).toList))
   }
 
   def accumulableInfoToJson(accumulableInfo: AccumulableInfo): JValue = {
     val name = accumulableInfo.name
     ("ID" -> accumulableInfo.id) ~ ("Name" -> name) ~
       ("Update" -> accumulableInfo.update.map { v =>
-            accumValueToJson(name, v)
-          }) ~
+        accumValueToJson(name, v)
+      }) ~
       ("Value" -> accumulableInfo.value.map { v =>
-            accumValueToJson(name, v)
-          }) ~ ("Internal" -> accumulableInfo.internal) ~
+        accumValueToJson(name, v)
+      }) ~ ("Internal" -> accumulableInfo.internal) ~
       ("Count Failed Values" -> accumulableInfo.countFailedValues) ~
       ("Metadata" -> accumulableInfo.metadata)
   }
@@ -438,7 +438,7 @@ private[spark] object JsonProtocol {
     val parentIds = JArray(rddInfo.parentIds.map(JInt(_)).toList)
     ("RDD ID" -> rddInfo.id) ~ ("Name" -> rddInfo.name) ~
       ("Scope" -> rddInfo.scope
-            .map(_.toJson)) ~ ("Callsite" -> rddInfo.callSite) ~
+        .map(_.toJson)) ~ ("Callsite" -> rddInfo.callSite) ~
       ("Parent IDs" -> parentIds) ~ ("Storage Level" -> storageLevel) ~
       ("Number of Partitions" -> rddInfo.numPartitions) ~
       ("Number of Cached Partitions" -> rddInfo.numCachedPartitions) ~
@@ -609,15 +609,8 @@ private[spark] object JsonProtocol {
       .jsonOption(json \ "Stage Infos")
       .map(_.extract[Seq[JValue]].map(stageInfoFromJson))
       .getOrElse {
-        stageIds.map(
-            id =>
-              new StageInfo(id,
-                            0,
-                            "unknown",
-                            0,
-                            Seq.empty,
-                            Seq.empty,
-                            "unknown"))
+        stageIds.map(id =>
+          new StageInfo(id, 0, "unknown", 0, Seq.empty, Seq.empty, "unknown"))
       }
     SparkListenerJobStart(jobId, submissionTime, stageInfos, properties)
   }
@@ -841,9 +834,8 @@ private[spark] object JsonProtocol {
             (id, status)
           }
         case (v, p) =>
-          throw new IllegalArgumentException(
-              s"unexpected combination of accumulator " +
-                s"value in JSON ($v) and accumulator param (${p.getClass.getName}) in '${name.get}'")
+          throw new IllegalArgumentException(s"unexpected combination of accumulator " +
+            s"value in JSON ($v) and accumulator param (${p.getClass.getName}) in '${name.get}'")
       }
     } else {
       value.extract[String]

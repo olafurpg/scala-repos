@@ -15,7 +15,7 @@ class ScalaComboBoxVisibilityPanel(additional: String*)
 object ScalaComboBoxVisibilityPanel {
   private def modifiers(additional: Seq[String]) =
     (Seq("private[this]", "private", "protected[this]", "protected") ++ additional
-          .diff(Seq("", "public"))).sorted.distinct
+      .diff(Seq("", "public"))).sorted.distinct
 
   def options(additional: Seq[String]) = (modifiers(additional) :+ "").toArray
   def names(additional: Seq[String]) =

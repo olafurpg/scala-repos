@@ -123,8 +123,8 @@ object Thrift
 
   object Client {
     private val preparer: Stackable[ServiceFactory[
-            ThriftClientRequest,
-            Array[Byte]]] = new Stack.ModuleParams[
+        ThriftClientRequest,
+        Array[Byte]]] = new Stack.ModuleParams[
         ServiceFactory[ThriftClientRequest, Array[Byte]]] {
       override def parameters: Seq[Stack.Param[_]] = Nil
       override val role = StackClient.Role.prepConn

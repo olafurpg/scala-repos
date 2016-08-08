@@ -512,7 +512,7 @@ class BatchedWriteAheadLogSuite
     val deaggregate = BatchedWriteAheadLog
       .deaggregate(batched)
       .map(buffer =>
-            Utils.deserialize[ReceivedBlockTrackerLogEvent](buffer.array()))
+        Utils.deserialize[ReceivedBlockTrackerLogEvent](buffer.array()))
 
     assert(deaggregate.toSeq === events)
   }

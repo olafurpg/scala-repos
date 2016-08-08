@@ -45,8 +45,8 @@ object MacroUtil {
         .map(_.findElementAt(context.getStartOffset))
         .filter(_ != null)
         .map(ScalaPsiElementFactory
-              .createExpressionFromText(result.toString, _)
-              .asInstanceOf[ScExpression])
+          .createExpressionFromText(result.toString, _)
+          .asInstanceOf[ScExpression])
     } catch {
       case _: IncorrectOperationException => None
     }
@@ -93,7 +93,7 @@ object MacroUtil {
         .substring(1, params.length - 1)
         .split(",")
         .map(l =>
-              l.split(":").map(_.trim).toList match {
+          l.split(":").map(_.trim).toList match {
             case a :: b :: Nil => (a, b)
             case _ => ("", "")
         })

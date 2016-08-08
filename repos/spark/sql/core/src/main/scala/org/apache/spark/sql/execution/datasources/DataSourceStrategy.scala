@@ -185,8 +185,8 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
       partitionAndNormalColumnFilters
         .reduceLeftOption(expressions.And)
         .map(cf =>
-              if (projects.isEmpty ||
-                  projects == partitionAndNormalColumnProjs) {
+          if (projects.isEmpty ||
+              projects == partitionAndNormalColumnProjs) {
             // if the original projection is empty, no need for the additional Project either
             execution.Filter(cf, scan)
           } else {
@@ -307,7 +307,7 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
           relation.bucketSpec match {
             case Some(spec) if relation.sqlContext.conf.bucketingEnabled =>
               val requiredDataColumns = requiredColumns.filterNot(c =>
-                    partitionColumnNames.contains(c.name))
+                partitionColumnNames.contains(c.name))
 
               // Builds RDD[Row]s for each selected partition.
               val perPartitionRows: Seq[(Int, RDD[InternalRow])] =
@@ -361,7 +361,7 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
 
             case _ =>
               val requiredDataColumns = requiredColumns.filterNot(c =>
-                    partitionColumnNames.contains(c.name))
+                partitionColumnNames.contains(c.name))
 
               // Builds RDD[Row]s for each selected partition.
               val perPartitionRows = partitions.map {

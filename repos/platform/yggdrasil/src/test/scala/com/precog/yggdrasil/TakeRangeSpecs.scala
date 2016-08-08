@@ -69,10 +69,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack")) :: JField(
                      "key",
@@ -89,10 +89,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil))
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil))
 
     results.copoint must_== expected
   }
@@ -108,10 +108,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack")) :: JField(
                      "key",
@@ -136,10 +136,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack")) :: JField(
                      "key",
@@ -164,10 +164,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack")) :: JField(
                      "key",
@@ -192,10 +192,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack")) :: JField(
                      "key",
@@ -208,10 +208,10 @@ trait TakeRangeSpec[M[+ _]]
 
     val expected =
       Stream(JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack")) :: JField(
                      "key",
@@ -231,10 +231,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack")) :: JField(
                      "key",
@@ -261,10 +261,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack1")) :: JField(
                      "key",
@@ -297,10 +297,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack1")) :: JField(
                      "key",
@@ -332,10 +332,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack1")) :: JField(
                      "key",
@@ -385,10 +385,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack1")) :: JField(
                      "key",
@@ -425,10 +425,10 @@ trait TakeRangeSpec[M[+ _]]
                      "key",
                      JArray(JNum(2) :: Nil)) :: Nil),
              JObject(JField(
-                     "value",
-                     JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
-                     "key",
-                     JArray(JNum(3) :: Nil)) :: Nil),
+                 "value",
+                 JObject(JField("baz", JBool(true)) :: Nil)) :: JField(
+                 "key",
+                 JArray(JNum(3) :: Nil)) :: Nil),
              JObject(
                  JField("value", JString("ack1")) :: JField(
                      "key",

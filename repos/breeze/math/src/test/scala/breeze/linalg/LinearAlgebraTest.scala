@@ -458,8 +458,8 @@ class LinearAlgebraTest
     assert(w === DenseVector(1.0, 1.0))
     assert(wi === DenseVector(1.0, -1.0))
     assert(
-        max(abs(v - diag(DenseVector(0.7071067811865475,
-                                     -0.7071067811865475)))) < 1E-7)
+        max(abs(v - diag(
+            DenseVector(0.7071067811865475, -0.7071067811865475)))) < 1E-7)
     // TODO, we seem to throw out VI... these seems bad...
   }
 
@@ -860,9 +860,9 @@ class LinearAlgebraTest
   test("diag test") {
     val testDV = DenseVector(0.1, 1.1, 2.1, 3.1, 4.1)
     val testDM = DenseMatrix.tabulate[Double](5, 5)((r, c) =>
-          if (r == c) r.toDouble + 0.1 else 0.0)
+      if (r == c) r.toDouble + 0.1 else 0.0)
     val testCSC = CSCMatrix.tabulate[Double](5, 5)((r, c) =>
-          if (r == c) r.toDouble + 0.1 else 0.0)
+      if (r == c) r.toDouble + 0.1 else 0.0)
     val testSV = SparseVector(0.1, 1.1, 2.1, 3.1, 4.1)
 
     assert(diag(testDV) === testDM)

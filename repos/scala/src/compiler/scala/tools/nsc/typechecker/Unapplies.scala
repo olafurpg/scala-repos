@@ -62,10 +62,8 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
 
   private def constrTparamsInvariant(cdef: ClassDef): List[TypeDef] = {
     val ClassDef(_, _, tparams, _) = resetAttrs(cdef.duplicate)
-    val tparamsInvariant = tparams.map(
-        tparam =>
-          copyTypeDef(tparam)(
-              mods = tparam.mods &~ (COVARIANT | CONTRAVARIANT)))
+    val tparamsInvariant = tparams.map(tparam =>
+      copyTypeDef(tparam)(mods = tparam.mods &~ (COVARIANT | CONTRAVARIANT)))
     tparamsInvariant
   }
 

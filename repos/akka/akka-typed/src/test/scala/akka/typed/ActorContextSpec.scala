@@ -339,8 +339,8 @@ class ActorContextSpec
           .expectMultipleMessages(500.millis, 3) {
             case (msgs, (subj, child, log)) ⇒
               msgs should ===(GotSignal(Failed(`ex`, `child`)) :: ChildEvent(
-                      GotSignal(PreRestart(`ex`))) :: ChildEvent(
-                      GotSignal(PostRestart(`ex`))) :: Nil)
+                  GotSignal(PreRestart(`ex`))) :: ChildEvent(
+                  GotSignal(PostRestart(`ex`))) :: Nil)
               log.assertDone(500.millis)
               child ! BecomeInert(self) // necessary to avoid PostStop/Terminated interference
               (subj, child)

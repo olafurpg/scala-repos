@@ -115,8 +115,8 @@ final class GameSearchApi(client: ESClient)
 
     lila.game.tube.gameTube.coll
       .find(BSONDocument(
-              "ca" -> BSONDocument("$gt" -> since)
-          ))
+          "ca" -> BSONDocument("$gt" -> since)
+      ))
       .sort(BSONDocument("ca" -> 1))
       .cursor[Game](ReadPreference.secondaryPreferred)
       .enumerate(maxGames, stopOnError = true) &> Enumeratee.grouped(

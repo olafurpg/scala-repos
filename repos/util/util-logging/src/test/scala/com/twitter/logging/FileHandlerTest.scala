@@ -130,11 +130,11 @@ class FileHandlerTest extends WordSpec with TempFolder {
               formatter = BareFormatter
           ).apply()
           assert(handler.computeNextRollTime(1206769996722L) == Some(
-                  1206770400000L))
+              1206770400000L))
           assert(handler.computeNextRollTime(1206770400000L) == Some(
-                  1206774000000L))
+              1206774000000L))
           assert(handler.computeNextRollTime(1206774000001L) == Some(
-                  1206777600000L))
+              1206777600000L))
         }
       }
 
@@ -147,15 +147,15 @@ class FileHandlerTest extends WordSpec with TempFolder {
               formatter = new Formatter(timezone = Some("GMT-7:00"))
           ).apply()
           assert(handler.computeNextRollTime(1250354734000L) == Some(
-                  1250406000000L))
+              1250406000000L))
           assert(handler.computeNextRollTime(1250404734000L) == Some(
-                  1250406000000L))
+              1250406000000L))
           assert(handler.computeNextRollTime(1250406001000L) == Some(
-                  1251010800000L))
+              1251010800000L))
           assert(handler.computeNextRollTime(1250486000000L) == Some(
-                  1251010800000L))
+              1251010800000L))
           assert(handler.computeNextRollTime(1250496000000L) == Some(
-                  1251010800000L))
+              1251010800000L))
         }
       }
     }

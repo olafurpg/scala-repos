@@ -201,7 +201,7 @@ private class PartitionCoalescer(maxPartitions: Int,
     // initializes/resets to start iterating from the beginning
     def resetIterator(): Iterator[(String, Partition)] = {
       val iterators = (0 to 2).map(x =>
-            prev.partitions.iterator.flatMap(p => {
+        prev.partitions.iterator.flatMap(p => {
           if (currPrefLocs(p).size > x) Some((currPrefLocs(p)(x), p))
           else None
         }))

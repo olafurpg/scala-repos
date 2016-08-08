@@ -40,9 +40,8 @@ import scala.reflect.ClassTag
   * This will create an application using the current classloader.
   *
   */
-@implicitNotFound(
-    msg =
-      "You do not have an implicit Application in scope. If you want to bring the current running Application into context, please use dependency injection.")
+@implicitNotFound(msg =
+  "You do not have an implicit Application in scope. If you want to bring the current running Application into context, please use dependency injection.")
 trait Application {
 
   /**

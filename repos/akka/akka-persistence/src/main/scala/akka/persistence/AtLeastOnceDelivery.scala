@@ -190,10 +190,8 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
 
   private def startRedeliverTask(): Unit = {
     val interval = redeliverInterval / 2
-    redeliverTask = Some(
-        context.system.scheduler
-          .schedule(interval, interval, self, RedeliveryTick)(
-              context.dispatcher))
+    redeliverTask = Some(context.system.scheduler
+      .schedule(interval, interval, self, RedeliveryTick)(context.dispatcher))
   }
 
   private def nextDeliverySequenceNr(): Long = {
@@ -340,7 +338,7 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
     deliverySequenceNr = snapshot.currentDeliveryId
     val now = System.nanoTime()
     unconfirmed = snapshot.unconfirmedDeliveries.map(d ⇒
-          d.deliveryId -> Delivery(d.destination, d.message, now, 0))(breakOut)
+      d.deliveryId -> Delivery(d.destination, d.message, now, 0))(breakOut)
   }
 
   /**

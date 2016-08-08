@@ -271,7 +271,7 @@ object Load {
         }
     }
     ss.map(s =>
-          s mapConstant setResolved(s.key) mapReferenced mapSpecial(s.key) mapInit setDefining)
+      s mapConstant setResolved(s.key) mapReferenced mapSpecial(s.key) mapInit setDefining)
   }
   def setDefinitionKey[T](tk: Task[T], key: ScopedKey[_]): Task[T] =
     if (isDummy(tk)) tk
@@ -324,10 +324,10 @@ object Load {
                           rootProject: URI => String,
                           injectSettings: InjectSettings): Seq[Setting[_]] = {
     ((loadedBuild in GlobalScope :== loaded) +: transformProjectOnly(
-            loaded.root,
-            rootProject,
-            injectSettings.global)) ++ inScope(GlobalScope)(pluginGlobalSettings(
-            loaded) ++ loaded.autos.globalSettings) ++ loaded.units.toSeq.flatMap {
+        loaded.root,
+        rootProject,
+        injectSettings.global)) ++ inScope(GlobalScope)(pluginGlobalSettings(
+        loaded) ++ loaded.autos.globalSettings) ++ loaded.units.toSeq.flatMap {
       case (uri, build) =>
         val plugins = build.unit.plugins.detected.plugins.values
         val pluginBuildSettings =
@@ -558,7 +558,7 @@ object Load {
       case (uri, unit) =>
         (uri,
          unit.resolveRefs(ref =>
-               Scope.resolveProjectRef(uri, rootProject, ref)))
+           Scope.resolveProjectRef(uri, rootProject, ref)))
     }
   }
   def checkAll(referenced: Map[URI, List[ProjectReference]],
@@ -601,7 +601,7 @@ object Load {
                       rootProject: URI => String): sbt.LoadedBuildUnit = {
     IO.assertAbsolute(uri)
     val resolve = (_: Project).resolve(ref =>
-          Scope.resolveProjectRef(uri, rootProject, ref))
+      Scope.resolveProjectRef(uri, rootProject, ref))
     new sbt.LoadedBuildUnit(unit.unit,
                             unit.defined mapValues resolve,
                             unit.rootProjects,
@@ -611,7 +611,7 @@ object Load {
     // we don't have the complete build graph loaded, so we don't have the rootProject function yet.
     //  Therefore, we use resolveProjectBuild instead of resolveProjectRef.  After all builds are loaded, we can fully resolve ProjectReferences.
     val resolveBuild = (_: Project).resolveBuild(ref =>
-          Scope.resolveProjectBuild(unit.uri, ref))
+      Scope.resolveProjectBuild(unit.uri, ref))
     // although the default loader will resolve the project base directory, other loaders may not, so run resolveBase here as well
     unit.definitions.projects
       .map(resolveBuild compose resolveBase(unit.localBase))
@@ -981,7 +981,7 @@ object Load {
       def pluginSettings(f: Plugins) = {
         val included = loadedPlugins.detected.plugins.values.filter(f.include) // don't apply the filter to AutoPlugins, only Plugins
         included.flatMap(p =>
-              p.settings.filter(isProjectThis) ++ p.projectSettings)
+          p.settings.filter(isProjectThis) ++ p.projectSettings)
       }
       // Filter the AutoPlugin settings we included based on which ones are
       // intended in the AddSettings.AutoPlugins filter.
@@ -1104,15 +1104,15 @@ object Load {
         Seq(
             sbtPlugin :== true,
             pluginData := {
-          val prod = (exportedProducts in Configurations.Runtime).value
-          val cp = (fullClasspath in Configurations.Runtime).value
-          val opts = (scalacOptions in Configurations.Compile).value
-          PluginData(removeEntries(cp, prod),
-                     prod,
-                     Some(fullResolvers.value),
-                     Some(update.value),
-                     opts)
-        },
+              val prod = (exportedProducts in Configurations.Runtime).value
+              val cp = (fullClasspath in Configurations.Runtime).value
+              val opts = (scalacOptions in Configurations.Compile).value
+              PluginData(removeEntries(cp, prod),
+                         prod,
+                         Some(fullResolvers.value),
+                         Some(update.value),
+                         opts)
+            },
             onLoadMessage :=
               ("Loading project definition from " + baseDirectory.value)
         ))

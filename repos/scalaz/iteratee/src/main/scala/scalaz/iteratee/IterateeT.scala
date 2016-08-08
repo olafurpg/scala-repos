@@ -50,10 +50,10 @@ sealed abstract class IterateeT[E, F[_], A] {
                       if (i.isEmpty) f(a).value
                       else
                         F.bind(f(a).value)(_.fold(
-                                cont = kk => kk(i).value,
-                                done = (aa, _) =>
-                                  F.point(StepT.sdone[E, F, B](aa, i))
-                            ))
+                            cont = kk => kk(i).value,
+                            done = (aa, _) =>
+                              F.point(StepT.sdone[E, F, B](aa, i))
+                        ))
               )))
     through(this)
   }
@@ -392,7 +392,7 @@ trait IterateeTFunctions {
 
   def sum[E: Monoid, F[_]: Monad]: IterateeT[E, F, E] =
     foldM[E, F, E](Monoid[E].zero)((a, e) =>
-          Applicative[F].point(Monoid[E].append(a, e)))
+      Applicative[F].point(Monoid[E].append(a, e)))
 }
 
 //

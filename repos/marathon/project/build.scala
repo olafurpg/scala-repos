@@ -43,7 +43,7 @@ object MarathonBuild extends Build {
     .dependsOn(pluginInterface)
     // run mesos-simulation/test:test when running test
     .settings((test in Test) <<= (test in Test) dependsOn
-          (test in Test in LocalProject("mesos-simulation")))
+      (test in Test in LocalProject("mesos-simulation")))
 
   lazy val mesosSimulation: Project = Project(
       id = "mesos-simulation",

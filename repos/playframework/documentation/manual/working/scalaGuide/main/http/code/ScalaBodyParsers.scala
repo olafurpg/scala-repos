@@ -152,7 +152,7 @@ package scalaguide.http.scalabodyparsers {
             Flow[ByteString]
             // We split by the new line character, allowing a maximum of 1000 characters per line
               .via(Framing
-                    .delimiter(ByteString("\n"), 1000, allowTruncation = true))
+                .delimiter(ByteString("\n"), 1000, allowTruncation = true))
               // Turn each line to a String and split it by commas
               .map(_.utf8String.trim.split(",").toSeq)
               // Now we fold it into a list

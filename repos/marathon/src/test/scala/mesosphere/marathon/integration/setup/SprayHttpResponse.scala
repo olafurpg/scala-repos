@@ -15,7 +15,7 @@ object SprayHttpResponse {
         case JsError(errors) =>
           throw new IllegalArgumentException(
               s"could not parse as $classTag:\n${Json.prettyPrint(
-              result.entityJson)}\nErrors:\n${errors.mkString("\n")}")
+                  result.entityJson)}\nErrors:\n${errors.mkString("\n")}")
       }
     }
   def responseResult: HttpResponse => RestResult[HttpResponse] =

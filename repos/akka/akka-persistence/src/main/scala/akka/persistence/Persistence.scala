@@ -158,10 +158,9 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
     val configPath = config.getString("snapshot-store.plugin")
 
     if (isEmpty(configPath)) {
-      log.warning(
-          "No default snapshot store configured! " +
-            "To configure a default snapshot-store plugin set the `akka.persistence.snapshot-store.plugin` key. " +
-            "For details see 'reference.conf'")
+      log.warning("No default snapshot store configured! " +
+        "To configure a default snapshot-store plugin set the `akka.persistence.snapshot-store.plugin` key. " +
+        "For details see 'reference.conf'")
       NoSnapshotStorePluginId
     } else configPath
   }

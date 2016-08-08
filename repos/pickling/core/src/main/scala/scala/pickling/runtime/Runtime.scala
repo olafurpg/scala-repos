@@ -214,7 +214,7 @@ class InterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
               if (tagKey.contains("anonfun$")) List[FieldIR]()
               else
                 cir.fields.filter(fir =>
-                      fir.hasGetter || {
+                  fir.hasGetter || {
                     // exists as Java field
                     scala.util.Try(clazz.getDeclaredField(fir.name)).isSuccess
                 })
@@ -324,7 +324,7 @@ class ShareNothingInterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
               List[FieldIR]()
             } else {
               cir.fields.filter(fir =>
-                    fir.hasGetter || {
+                fir.hasGetter || {
                   // exists as Java field
                   scala.util.Try(clazz.getDeclaredField(fir.name)).isSuccess
               })

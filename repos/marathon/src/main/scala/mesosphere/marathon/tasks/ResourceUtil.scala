@@ -44,11 +44,9 @@ object ResourceUtil {
       if (leftOver <= 0) {
         None
       } else {
-        Some(
-            resource.toBuilder
-              .setScalar(
-                  MesosProtos.Value.Scalar.newBuilder().setValue(leftOver))
-              .build())
+        Some(resource.toBuilder
+          .setScalar(MesosProtos.Value.Scalar.newBuilder().setValue(leftOver))
+          .build())
       }
     }
 
@@ -110,8 +108,8 @@ object ResourceUtil {
         Some(
             resource.toBuilder
               .setSet(MesosProtos.Value.Set
-                    .newBuilder()
-                    .addAllItem(resultSet.asJava))
+                .newBuilder()
+                .addAllItem(resultSet.asJava))
               .build()
         )
       else None

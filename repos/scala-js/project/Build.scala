@@ -116,7 +116,7 @@ object Build extends sbt.Build {
         },
         homepage := Some(url("http://scala-js.org/")),
         licenses += ("BSD New",
-            url("https://github.com/scala-js/scala-js/blob/master/LICENSE")),
+        url("https://github.com/scala-js/scala-js/blob/master/LICENSE")),
         scmInfo :=
           Some(
               ScmInfo(url("https://github.com/scala-js/scala-js"),
@@ -233,9 +233,9 @@ object Build extends sbt.Build {
 
   val noClassFilesSettings: Setting[_] =
     (scalacOptions in (Compile, compile) ++= {
-          if (isGeneratingEclipse) Seq()
-          else Seq("-Yskip:cleanup,icode,jvm")
-        })
+      if (isGeneratingEclipse) Seq()
+      else Seq("-Yskip:cleanup,icode,jvm")
+    })
 
   val publishSettings = Seq(
       publishMavenStyle := true,
@@ -842,7 +842,7 @@ object Build extends sbt.Build {
               val ver = scalaVersion.value
               if (ver.startsWith("2.10."))
                 Seq(compilerPlugin(
-                        "org.scala-lang.plugins" % "continuations" % ver))
+                    "org.scala-lang.plugins" % "continuations" % ver))
               else Nil
             },
             scalacOptions ++= {
@@ -878,38 +878,37 @@ object Build extends sbt.Build {
             binaryIssueFilters ++= BinaryIncompatibilities.Library,
             libraryDependencies +=
               "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
-        ) ++ (scalaJSExternalCompileSettings) ++ inConfig(Compile)(
-            Seq(
-                /* Add the .sjsir files from other lib projects
-                 * (but not .class files)
-                 */
-                mappings in packageBin := {
+        ) ++ (scalaJSExternalCompileSettings) ++ inConfig(Compile)(Seq(
+            /* Add the .sjsir files from other lib projects
+             * (but not .class files)
+             */
+            mappings in packageBin := {
               /* From library, we must take everyting, except the
                * java.nio.TypedArrayBufferBridge object, whose actual
                * implementation is in javalib.
                */
               val superMappings = (mappings in packageBin).value
               val libraryMappings = superMappings.filter(_._2.replace(
-                      '\\',
-                      '/') != "scala/scalajs/js/typedarray/TypedArrayBufferBridge$.sjsir")
+                  '\\',
+                  '/') != "scala/scalajs/js/typedarray/TypedArrayBufferBridge$.sjsir")
 
               val filter = ("*.sjsir": NameFilter)
 
               val javalibProducts = (products in javalib).value
               val javalibMappings = javalibProducts.flatMap(base =>
-                    Path.selectSubpaths(base, filter))
+                Path.selectSubpaths(base, filter))
               val javalibFilteredMappings = javalibMappings.filter(
                   _._2.replace('\\', '/') != "java/lang/MathJDK8Bridge$.sjsir")
 
               val otherProducts =
                 ((products in javalanglib).value ++ (products in scalalib).value ++
-                      (products in libraryAux).value)
+                  (products in libraryAux).value)
               val otherMappings = otherProducts.flatMap(base =>
-                    Path.selectSubpaths(base, filter))
+                Path.selectSubpaths(base, filter))
 
               libraryMappings ++ otherMappings ++ javalibFilteredMappings
             }
-            ))
+        ))
   ).withScalaJSCompiler
 
   lazy val javalibEx: Project = Project(
@@ -1354,8 +1353,8 @@ object Build extends sbt.Build {
                   val scalaFilter: FileFilter = "*.scala"
                   val files =
                     ((jsenvBase * scalaFilter) +++
-                          (jsenvBase / "nodejs" ** scalaFilter) +++
-                          (jsenvBase / "rhino" ** scalaFilter))
+                      (jsenvBase / "nodejs" ** scalaFilter) +++
+                      (jsenvBase / "rhino" ** scalaFilter))
 
                   files.get
                 }
@@ -1391,9 +1390,9 @@ object Build extends sbt.Build {
                           // marker fingerprint since there are no test classes
                           // to be discovered by sbt:
                           new sbt.testing.AnnotatedFingerprint {
-                        def isModule = true
-                        def annotationName = "partest"
-                      },
+                            def isModule = true
+                            def annotationName = "partest"
+                          },
                           true,
                           Array()
                       ))

@@ -54,56 +54,58 @@ trait LabelsControllerBase extends ControllerBase {
 
   ajaxPost("/:owner/:repository/issues/labels/new", labelForm)(
       collaboratorsOnly { (form, repository) =>
-    val labelId = createLabel(repository.owner,
-                              repository.name,
-                              form.labelName,
-                              form.color.substring(1))
-    html.label(getLabel(repository.owner, repository.name, labelId).get,
-               // TODO futility
-               countIssueGroupByLabels(repository.owner,
-                                       repository.name,
-                                       IssuesService.IssueSearchCondition(),
-                                       Map.empty),
-               repository,
-               hasWritePermission(repository.owner,
+        val labelId = createLabel(repository.owner,
                                   repository.name,
-                                  context.loginAccount))
-  })
+                                  form.labelName,
+                                  form.color.substring(1))
+        html.label(
+            getLabel(repository.owner, repository.name, labelId).get,
+            // TODO futility
+            countIssueGroupByLabels(repository.owner,
+                                    repository.name,
+                                    IssuesService.IssueSearchCondition(),
+                                    Map.empty),
+            repository,
+            hasWritePermission(repository.owner,
+                               repository.name,
+                               context.loginAccount))
+      })
 
-  ajaxGet("/:owner/:repository/issues/labels/:labelId/edit")(
-      collaboratorsOnly { repository =>
-    getLabel(repository.owner, repository.name, params("labelId").toInt).map {
-      label =>
-        html.edit(Some(label), repository)
-    } getOrElse NotFound()
+  ajaxGet("/:owner/:repository/issues/labels/:labelId/edit")(collaboratorsOnly {
+    repository =>
+      getLabel(repository.owner, repository.name, params("labelId").toInt).map {
+        label =>
+          html.edit(Some(label), repository)
+      } getOrElse NotFound()
   })
 
   ajaxPost("/:owner/:repository/issues/labels/:labelId/edit", labelForm)(
       collaboratorsOnly { (form, repository) =>
-    updateLabel(repository.owner,
-                repository.name,
-                params("labelId").toInt,
-                form.labelName,
-                form.color.substring(1))
-    html.label(getLabel(repository.owner,
-                        repository.name,
-                        params("labelId").toInt).get,
-               // TODO futility
-               countIssueGroupByLabels(repository.owner,
-                                       repository.name,
-                                       IssuesService.IssueSearchCondition(),
-                                       Map.empty),
-               repository,
-               hasWritePermission(repository.owner,
-                                  repository.name,
-                                  context.loginAccount))
-  })
+        updateLabel(repository.owner,
+                    repository.name,
+                    params("labelId").toInt,
+                    form.labelName,
+                    form.color.substring(1))
+        html.label(
+            getLabel(repository.owner,
+                     repository.name,
+                     params("labelId").toInt).get,
+            // TODO futility
+            countIssueGroupByLabels(repository.owner,
+                                    repository.name,
+                                    IssuesService.IssueSearchCondition(),
+                                    Map.empty),
+            repository,
+            hasWritePermission(repository.owner,
+                               repository.name,
+                               context.loginAccount))
+      })
 
   ajaxPost("/:owner/:repository/issues/labels/:labelId/delete")(
       collaboratorsOnly { repository =>
-    deleteLabel(repository.owner, repository.name, params("labelId").toInt)
-    Ok()
-  })
+        deleteLabel(repository.owner, repository.name, params("labelId").toInt)
+        Ok()
+      })
 
   /**
     * Constraint for the identifier such as user name, repository name or page name.
@@ -129,7 +131,7 @@ trait LabelsControllerBase extends ControllerBase {
       val owner = params("owner")
       val repository = params("repository")
       getLabel(owner, repository, value).map(_ =>
-            "Name has already been taken.")
+        "Name has already been taken.")
     }
   }
 }

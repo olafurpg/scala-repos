@@ -287,7 +287,7 @@ abstract class SymbolTable
   final def isValidForBaseClasses(period: Period): Boolean = {
     def noChangeInBaseClasses(it: InfoTransformer, limit: Phase#Id): Boolean =
       (it.pid >= limit || !it.changesBaseClasses &&
-            noChangeInBaseClasses(it.next, limit))
+        noChangeInBaseClasses(it.next, limit))
     period != 0 && runId(period) == currentRunId && {
       val pid = phaseId(period)
       if (phase.id > pid)
@@ -331,7 +331,7 @@ abstract class SymbolTable
       val elemtp = formals.last.typeArgs.head match {
         case RefinedType(List(t1, t2), _)
             if (t1.typeSymbol.isAbstractType &&
-                  t2.typeSymbol == definitions.ObjectClass) =>
+              t2.typeSymbol == definitions.ObjectClass) =>
           t1 // drop intersection with Object for abstract types in varargs. UnCurry can handle them.
         case t =>
           t

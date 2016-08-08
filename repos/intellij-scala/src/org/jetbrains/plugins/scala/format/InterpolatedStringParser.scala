@@ -51,7 +51,7 @@ object InterpolatedStringParser extends StringParser {
                     FormatSpecifierPattern
                       .findFirstIn(textIn(e))
                       .map(format =>
-                            Specifier(Span(e, 0, format.length), format))
+                        Specifier(Span(e, 0, format.length), format))
                   case _ => None
                 }
             Injection(actualExpression, specifier)

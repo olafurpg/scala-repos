@@ -90,8 +90,8 @@ object KMeans {
            // There is no need to use more than k reducers
              .withReducers(k)
              .mapValueStream { vectors =>
-           Iterator(centroidOf(vectors))
-         }
+               Iterator(centroidOf(vectors))
+             }
              // Now collect them all into one big
              .groupAll
              .toList

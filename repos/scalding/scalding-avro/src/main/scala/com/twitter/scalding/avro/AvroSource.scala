@@ -94,7 +94,7 @@ case class UnpackedAvroSource[T](paths: Seq[String], schema: Option[Schema])(
     val outFields = schema.map { schema =>
       val schemaFields = schema.getFields
       schemaFields.asScala.foldLeft(new Fields())((cFields, sField) =>
-            cFields.append(new Fields(sField.name())))
+        cFields.append(new Fields(sField.name())))
     }
     outFields.getOrElse(Dsl.intFields(0 until setter.arity))
   }

@@ -151,12 +151,12 @@ class PromiseTests extends MinimalScalaTest {
 
     "return when ready with 'Await.ready'" in {
       f((future, result) =>
-            Await.ready(future, defaultTimeout).isCompleted mustBe (true))
+        Await.ready(future, defaultTimeout).isCompleted mustBe (true))
     }
 
     "return result with 'Await.result'" in {
       f((future, result) =>
-            Await.result(future, defaultTimeout) mustBe (result))
+        Await.result(future, defaultTimeout) mustBe (result))
     }
 
     "not timeout" in { f((future, _) => Await.ready(future, 0 millis)) }
@@ -172,11 +172,9 @@ class PromiseTests extends MinimalScalaTest {
     }
 
     "transform result with map" in {
-      f(
-          (future, result) =>
-            Await
-              .result((future map (_.toString.length)), defaultTimeout) mustBe
-              (result.toString.length))
+      f((future, result) =>
+        Await.result((future map (_.toString.length)), defaultTimeout) mustBe
+          (result.toString.length))
     }
 
     "compose result with flatMap" in {

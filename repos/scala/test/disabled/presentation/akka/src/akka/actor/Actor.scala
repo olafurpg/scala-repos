@@ -134,7 +134,7 @@ object Actor extends ListenerManagement {
     ReflectiveAccess.Remote.defaultRemoteSupport
       .map(_())
       .getOrElse(throw new UnsupportedOperationException(
-              "You need to have akka-remote.jar on classpath"))
+          "You need to have akka-remote.jar on classpath"))
   }
 
   private[akka] val TIMEOUT =

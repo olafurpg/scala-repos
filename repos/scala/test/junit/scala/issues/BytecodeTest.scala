@@ -78,8 +78,8 @@ class BytecodeTest extends ClearAfterClass {
 
     def check(classfile: String, annotName: String) = {
       val f = (outfiles collect {
-            case (`classfile`, bytes) => AsmUtils.readClass(bytes)
-          }).head
+        case (`classfile`, bytes) => AsmUtils.readClass(bytes)
+      }).head
       val descs = f.visibleAnnotations.asScala.map(_.desc).toList
       assertTrue(descs.toString, descs exists (_ contains annotName))
     }

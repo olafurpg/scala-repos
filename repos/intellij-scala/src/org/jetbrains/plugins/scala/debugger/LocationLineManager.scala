@@ -185,7 +185,7 @@ trait LocationLineManager { self: ScalaPositionManager =>
         }
 
         val iconst_0Locations = caseLineLocations.filter(l =>
-              BytecodeUtil.isIconst_0(l.codeIndex().toInt, bytecodes))
+          BytecodeUtil.isIconst_0(l.codeIndex().toInt, bytecodes))
 
         iconst_0Locations.foreach { l =>
           cacheCustomLine(l, -1)

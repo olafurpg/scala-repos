@@ -34,7 +34,7 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
                 case (progress, moveOrDrop) =>
                   (GameRepo save progress).mon(_.round.move.segment.save) >>-
                     (pov.game.hasAi ! uciMemo
-                          .add(pov.game, moveOrDrop)) >>- notifyMove(
+                      .add(pov.game, moveOrDrop)) >>- notifyMove(
                       moveOrDrop,
                       progress.game) >> progress.game.finished
                     .fold(moveFinish(progress.game, color) map {

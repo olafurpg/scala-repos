@@ -25,9 +25,9 @@ abstract class OverridingPairs extends SymbolPairs {
       */
     override protected def exclude(sym: Symbol) =
       (sym.isPrivateLocal || sym.isArtifact || sym.isConstructor ||
-            (sym.isPrivate &&
-                  sym.owner != base) // Privates aren't inherited. Needed for pos/t7475a.scala
-          )
+        (sym.isPrivate &&
+          sym.owner != base) // Privates aren't inherited. Needed for pos/t7475a.scala
+      )
 
     /** Types always match. Term symbols match if their member types
       *  relative to `self` match.
@@ -35,12 +35,12 @@ abstract class OverridingPairs extends SymbolPairs {
     override protected def matches(lo: Symbol, high: Symbol) =
       lo.isType ||
         ((lo.owner != high.owner) // don't try to form pairs from overloaded members
-              &&
-                !high.isPrivate // private or private[this] members never are overridden
-              &&
-                !exclude(lo) // this admits private, as one can't have a private member that matches a less-private member.
-              &&
-                relatively
-                  .matches(lo, high)) // TODO we don't call exclude(high), should we?
+          &&
+            !high.isPrivate // private or private[this] members never are overridden
+          &&
+            !exclude(lo) // this admits private, as one can't have a private member that matches a less-private member.
+          &&
+            relatively
+              .matches(lo, high)) // TODO we don't call exclude(high), should we?
   }
 }

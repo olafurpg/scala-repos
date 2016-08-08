@@ -42,8 +42,8 @@ class ModelValidationTest
     ValidationHelper
       .getAllRuleConstrains(failedResult)
       .find(v =>
-            v.message.contains(
-                "This Marathon instance may only handle up to 2 Apps!")) should be(
+        v.message.contains(
+            "This Marathon instance may only handle up to 2 Apps!")) should be(
         'defined)
 
     val successfulResult = Group.validGroupWithConfig(Some(10)).apply(group)
@@ -62,7 +62,7 @@ class ModelValidationTest
     ValidationHelper
       .getAllRuleConstrains(result)
       .exists(v =>
-            v.message == "Requested service port 3200 conflicts with a service port in app /app2") should be(
+        v.message == "Requested service port 3200 conflicts with a service port in app /app2") should be(
         true)
   }
 
@@ -90,7 +90,7 @@ class ModelValidationTest
     ValidationHelper
       .getAllRuleConstrains(result)
       .exists(v =>
-            v.message == "Requested service port 3200 conflicts with a service port in app /app2") should be(
+        v.message == "Requested service port 3200 conflicts with a service port in app /app2") should be(
         true)
   }
 

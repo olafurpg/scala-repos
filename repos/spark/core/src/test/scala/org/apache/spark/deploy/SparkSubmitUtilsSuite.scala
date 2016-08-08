@@ -123,7 +123,7 @@ class SparkSubmitUtilsSuite extends SparkFunSuite with BeforeAndAfterAll {
     val excludes = Seq("a:b", "c:d")
     excludes.foreach { e =>
       md.addExcludeRule(SparkSubmitUtils
-            .createExclusion(e + ":*", new IvySettings, "default"))
+        .createExclusion(e + ":*", new IvySettings, "default"))
     }
     val rules = md.getAllExcludeRules
     assert(rules.length === 2)

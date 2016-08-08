@@ -33,11 +33,10 @@ final class xMain extends xsbti.AppMain {
     import BasicCommandStrings.runEarly
     import BuiltinCommands.{initialize, defaults}
     import CommandStrings.{BootCommand, DefaultsCommand, InitCommand}
-    runManaged(
-        initialState(
-            configuration,
-            Seq(defaults, early),
-            runEarly(DefaultsCommand) :: runEarly(InitCommand) :: BootCommand :: Nil))
+    runManaged(initialState(
+        configuration,
+        Seq(defaults, early),
+        runEarly(DefaultsCommand) :: runEarly(InitCommand) :: BootCommand :: Nil))
   }
 }
 final class ScriptMain extends xsbti.AppMain {
@@ -503,7 +502,7 @@ object BuiltinCommands {
     }
   def export =
     Command(ExportCommand, exportBrief, exportDetailed)(exportParser)((s, f) =>
-          f())
+      f())
 
   private[this] def lastImpl(s: State,
                              sks: AnyKeys,
@@ -628,7 +627,7 @@ object BuiltinCommands {
   @tailrec
   private[this] def doLoadFailed(s: State, loadArg: String): State = {
     val result = (SimpleReader.readLine(
-            "Project loading failed: (r)etry, (q)uit, (l)ast, or (i)gnore? ") getOrElse Quit)
+        "Project loading failed: (r)etry, (q)uit, (l)ast, or (i)gnore? ") getOrElse Quit)
       .toLowerCase(Locale.ENGLISH)
     def matches(s: String) = !result.isEmpty && (s startsWith result)
 
@@ -652,7 +651,7 @@ object BuiltinCommands {
 
   def loadProjectCommands(arg: String) =
     StashOnFailure :: (OnFailure + " " +
-          loadProjectCommand(LoadFailed, arg)) :: loadProjectCommand(
+      loadProjectCommand(LoadFailed, arg)) :: loadProjectCommand(
         LoadProjectImpl,
         arg) :: PopOnFailure :: State.FailureWall :: Nil
   def loadProject =

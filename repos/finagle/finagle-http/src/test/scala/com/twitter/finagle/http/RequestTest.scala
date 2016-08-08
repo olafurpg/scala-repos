@@ -91,16 +91,13 @@ class RequestTest extends FunSuite {
     assert(Request.queryString() == "")
     assert(Request.queryString(Map.empty[String, String]) == "")
     assert(Request.queryString("/search.json") == "/search.json")
-    assert(
-        Request
-          .queryString("/search.json", Map.empty[String, String]) == "/search.json")
+    assert(Request
+      .queryString("/search.json", Map.empty[String, String]) == "/search.json")
 
-    assert(
-        Request
-          .queryString("/search.json", "q" -> "twitter") == "/search.json?q=twitter")
-    assert(
-        Request
-          .queryString("/search.json", Map("q" -> "twitter")) == "/search.json?q=twitter")
+    assert(Request
+      .queryString("/search.json", "q" -> "twitter") == "/search.json?q=twitter")
+    assert(Request
+      .queryString("/search.json", Map("q" -> "twitter")) == "/search.json?q=twitter")
     assert(Request.queryString("q" -> "twitter") == "?q=twitter")
     assert(Request.queryString(Map("q" -> "twitter")) == "?q=twitter")
 

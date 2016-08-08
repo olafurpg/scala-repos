@@ -44,10 +44,10 @@ object WebSocketClientBlueprint {
             settings: ClientConnectionSettings,
             log: LoggingAdapter): Http.WebSocketClientLayer =
     (simpleTls
-          .atopMat(handshake(request, settings, log))(Keep.right) atop WebSocket.framing atop WebSocket
-          .stack(serverSide = false,
-                 maskingRandomFactory = settings.websocketRandomFactory,
-                 log = log)).reversed
+      .atopMat(handshake(request, settings, log))(Keep.right) atop WebSocket.framing atop WebSocket
+      .stack(serverSide = false,
+             maskingRandomFactory = settings.websocketRandomFactory,
+             log = log)).reversed
 
   /**
     * A bidi flow that injects and inspects the WS handshake and then goes out of the way. This BidiFlow
@@ -133,9 +133,8 @@ object WebSocketClientBlueprint {
                       InvalidUpgradeResponse(
                           response,
                           s"WebSocket server at $uri returned $problem"))
-                  ctx.fail(
-                      new IllegalArgumentException(
-                          s"WebSocket upgrade did not finish because of '$problem'"))
+                  ctx.fail(new IllegalArgumentException(
+                      s"WebSocket upgrade did not finish because of '$problem'"))
               }
             case other ⇒
               throw new IllegalStateException(

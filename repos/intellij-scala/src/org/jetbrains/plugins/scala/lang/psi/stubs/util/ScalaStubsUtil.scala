@@ -53,7 +53,7 @@ object ScalaStubsUtil {
       if (stub != null) {
         if (stub.getParentStub.getStubType
               .isInstanceOf[ScTemplateDefinitionElementType[
-                      _ <: ScTemplateDefinition]]) {
+                  _ <: ScTemplateDefinition]]) {
           inheritors +=
             stub.getParentStub.getPsi.asInstanceOf[ScTemplateDefinition]
         }

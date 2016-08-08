@@ -93,8 +93,7 @@ trait VectorizedReduceUFunc extends UFunc {
   }
 
   @expand
-  implicit def vectorizeCols[
-      @expand.args(Double, Float, Int, Long) T: ClassTag: Zero](
+  implicit def vectorizeCols[@expand.args(Double, Float, Int, Long) T: ClassTag: Zero](
       implicit helper: VectorizeHelper[T])
     : Impl[BroadcastedColumns[DenseMatrix[T], DenseVector[T]],
            Transpose[DenseVector[T]]] = {

@@ -44,7 +44,7 @@ sealed trait diffLowPrio { this: diff.type =>
         if (v.length <= 1) DenseVector[T]()
         else
           DenseVector.tabulate(v.length - 1)(index =>
-                ring.-(v(index + 1), v(index)))
+            ring.-(v(index + 1), v(index)))
       }
     }
   }

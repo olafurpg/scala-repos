@@ -57,7 +57,7 @@ object LinearAlgebraExamples extends App {
           def +(other: Self): Self =
             newtype(
                 gen.from((gen.to(p) :: gen.to(other.tupled) :: HNil).transpose
-                      .map(sum)))
+                  .map(sum)))
       }
   }
 

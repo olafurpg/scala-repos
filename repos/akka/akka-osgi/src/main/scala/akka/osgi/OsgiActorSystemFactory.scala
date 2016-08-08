@@ -45,7 +45,7 @@ class OsgiActorSystemFactory(val context: BundleContext,
         ConfigFactory
           .load(classloader)
           .withFallback(ConfigFactory.defaultReference(
-                  OsgiActorSystemFactory.akkaActorClassLoader)))
+              OsgiActorSystemFactory.akkaActorClassLoader)))
   }
 
   /**

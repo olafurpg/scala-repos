@@ -192,23 +192,23 @@ class GraphOpsIntegrationSpec extends AkkaSpec {
         .fromGraph(
             GraphDSL.create(shuffler, shuffler, shuffler, Sink.head[Seq[Int]])(
                 (_, _, _, fut) ⇒ fut) { implicit b ⇒ (s1, s2, s3, sink) ⇒
-          val merge = b.add(Merge[Int](2))
+              val merge = b.add(Merge[Int](2))
 
-          Source(List(1, 2, 3)) ~> s1.in1
-          Source(List(10, 11, 12)) ~> s1.in2
+              Source(List(1, 2, 3)) ~> s1.in1
+              Source(List(10, 11, 12)) ~> s1.in2
 
-          s1.out1 ~> s2.in1
-          s1.out2 ~> s2.in2
+              s1.out1 ~> s2.in1
+              s1.out2 ~> s2.in2
 
-          s2.out1 ~> s3.in1
-          s2.out2 ~> s3.in2
+              s2.out1 ~> s3.in1
+              s2.out2 ~> s3.in2
 
-          s3.out1 ~> merge.in(0)
-          s3.out2 ~> merge.in(1)
+              s3.out1 ~> merge.in(0)
+              s3.out2 ~> merge.in(1)
 
-          merge.out.grouped(1000) ~> sink
-          ClosedShape
-        })
+              merge.out.grouped(1000) ~> sink
+              ClosedShape
+            })
         .run()
 
       val result = Await.result(f, 3.seconds)

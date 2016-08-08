@@ -827,17 +827,17 @@ class LowLevelOutgoingConnectionSpec
             GraphDSL.create(OutgoingConnectionBlueprint(Host("example.com"),
                                                         settings,
                                                         NoLogging)) {
-          implicit b ⇒ client ⇒
-            import GraphDSL.Implicits._
-            Source.fromPublisher(netIn) ~> Flow[ByteString].map(
-                SessionBytes(null, _)) ~> client.in2
-            client.out1 ~> Flow[SslTlsOutbound].collect {
-              case SendBytes(x) ⇒ x
-            } ~> Sink.fromSubscriber(netOut)
-            Source.fromPublisher(requests) ~> client.in1
-            client.out2 ~> Sink.fromSubscriber(responses)
-            ClosedShape
-        })
+              implicit b ⇒ client ⇒
+                import GraphDSL.Implicits._
+                Source.fromPublisher(netIn) ~> Flow[ByteString].map(
+                    SessionBytes(null, _)) ~> client.in2
+                client.out1 ~> Flow[SslTlsOutbound].collect {
+                  case SendBytes(x) ⇒ x
+                } ~> Sink.fromSubscriber(netOut)
+                Source.fromPublisher(requests) ~> client.in1
+                client.out2 ~> Sink.fromSubscriber(responses)
+                ClosedShape
+            })
         .run()
 
       netOut -> netIn

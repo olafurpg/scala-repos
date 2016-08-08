@@ -118,11 +118,11 @@ private[remote] class FailureInjectorTransportAdapter(
     else
       statusPromise.completeWith(
           wrappedTransport.associate(remoteAddress).map { handle ⇒
-        addressChaosTable.putIfAbsent(
-            handle.remoteAddress.copy(protocol = "", system = ""),
-            PassThru)
-        new FailureInjectorHandle(handle, this)
-      })
+            addressChaosTable.putIfAbsent(
+                handle.remoteAddress.copy(protocol = "", system = ""),
+                PassThru)
+            new FailureInjectorHandle(handle, this)
+          })
   }
 
   def notify(ev: AssociationEvent): Unit = ev match {

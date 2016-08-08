@@ -302,7 +302,7 @@ private[stream] object Fusing {
             log(s"dissolving graph module ${m.toString.replace("\n", "\n" + "  " * indent)}")
           val attributes = inheritedAttributes and m.attributes
           gm.matValIDs.flatMap(sub ⇒
-                descend(sub, attributes, struct, localGroup, indent + 1))(
+            descend(sub, attributes, struct, localGroup, indent + 1))(
               collection.breakOut)
         case gm @ GraphModule(_, oldShape, _, mvids) ⇒
           /*
@@ -412,13 +412,12 @@ private[stream] object Fusing {
           }
           val subMat = subMatBuilder.result()
           if (Debug)
-            log(
-                subMat
-                  .map(p ⇒
-                        s"${p._1.getClass.getName}[${struct.hash(p._1)}] -> ${p._2}")
-                  .mkString("subMat\n  " + "  " * indent,
-                            "\n  " + "  " * indent,
-                            ""))
+            log(subMat
+              .map(p ⇒
+                s"${p._1.getClass.getName}[${struct.hash(p._1)}] -> ${p._2}")
+              .mkString("subMat\n  " + "  " * indent,
+                        "\n  " + "  " * indent,
+                        ""))
           // we need to remove all wirings that this module copied from nested modules so that we
           // don’t do wirings twice
           val oldDownstreams = m match {
@@ -426,7 +425,7 @@ private[stream] object Fusing {
             case _ ⇒ m.downstreams.toSet
           }
           val down = m.subModules.foldLeft(oldDownstreams)((set, m) ⇒
-                set -- m.downstreams)
+            set -- m.downstreams)
           down.foreach {
             case (start, end) ⇒ struct.wire(start, end, indent)
           }
@@ -714,9 +713,8 @@ private[stream] object Fusing {
         else m
       val oldShape = if (_oldShape == null) m.shape else _oldShape
       if (Debug)
-        println(
-            "  " * indent +
-              s"adding copy ${hash(copy)} ${printShape(copy.shape)} of ${printShape(oldShape)}")
+        println("  " * indent +
+          s"adding copy ${hash(copy)} ${printShape(copy.shape)} of ${printShape(oldShape)}")
       group.add(copy)
       modules.add(copy)
       copy.shape.outlets.foreach(o ⇒ outGroup.put(o, group))

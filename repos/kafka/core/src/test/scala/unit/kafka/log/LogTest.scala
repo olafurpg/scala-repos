@@ -333,7 +333,7 @@ class LogTest extends JUnitSuite {
                       time = time)
     val numMessages = 100
     val messageSets = (0 until numMessages).map(i =>
-          TestUtils.singleMessageSet(i.toString.getBytes))
+      TestUtils.singleMessageSet(i.toString.getBytes))
     messageSets.foreach(log.append(_))
     log.flush
 

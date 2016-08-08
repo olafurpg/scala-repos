@@ -373,7 +373,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
         // to demonstrate that cancellation works.
         val f = Future {
           statement.executeQuery("SELECT COUNT(*) FROM test_map " +
-                List.fill(10)("join test_map").mkString(" "))
+            List.fill(10)("join test_map").mkString(" "))
         }
         // Note that this is slightly race-prone: if the cancel is issued before the statement
         // begins executing then we'll fail with a timeout. As a result, this fixed delay is set

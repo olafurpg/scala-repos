@@ -201,7 +201,7 @@ object PlayDocsPlugin extends AutoPlugin {
           val commonRoutes =
             (commonManualSourceDirectories.value * "*.routes").get
           (javaRoutes.map(_ -> Seq("play.libs.F")) ++ scalaRoutes
-                .map(_ -> Nil) ++ commonRoutes.map(_ -> Nil)).map {
+            .map(_ -> Nil) ++ commonRoutes.map(_ -> Nil)).map {
             case (file, imports) =>
               RoutesCompilerTask(file, imports, true, true, true)
           }
@@ -346,10 +346,9 @@ object PlayDocsPlugin extends AutoPlugin {
       .asInstanceOf[ServerWithStop]
 
     println()
-    println(
-        Colors.green(
-            "Documentation server started, you can now view the docs by going to http://" +
-              server.mainAddress()))
+    println(Colors.green(
+        "Documentation server started, you can now view the docs by going to http://" +
+          server.mainAddress()))
     println()
 
     waitForKey()

@@ -739,8 +739,8 @@ object Enumerator {
   private def enumerateSeq[E, A]
     : (Seq[E], Iteratee[E, A]) => Future[Iteratee[E, A]] = { (l, i) =>
     l.foldLeft(Future.successful(i))((i, e) =>
-          i.flatMap(it =>
-                it.pureFold {
+      i.flatMap(it =>
+        it.pureFold {
           case Step.Cont(k) => k(Input.El(e))
           case _ => it
         }(dec))(dec))

@@ -175,31 +175,10 @@ class KryoSerializer(conf: SparkConf)
     kryo.register(
         classOf[
             Array[Tuple10[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]])
-    kryo.register(
-        classOf[Array[Tuple11[Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any]]])
-    kryo.register(
-        classOf[Array[Tuple12[Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any,
-                              Any]]])
+    kryo.register(classOf[
+        Array[Tuple11[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]])
+    kryo.register(classOf[Array[
+        Tuple12[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]])
     kryo.register(
         classOf[Array[Tuple13[Any,
                               Any,

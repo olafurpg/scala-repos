@@ -84,14 +84,14 @@ object TravPickler {
         currentRuntime.picklers
           .lookupPickler(elementType.key)
           .getOrElse(throw new PicklingException(
-                  s"Cannnot generate a pickler/unpickler for $tpe, cannot find a pickler for $elementType"))
+              s"Cannnot generate a pickler/unpickler for $tpe, cannot find a pickler for $elementType"))
     val elemUnpickler =
       if (elementType.key == ANY_TAG.key) AnyUnpickler
       else
         currentRuntime.picklers
           .lookupUnpickler(elementType.key)
           .getOrElse(throw new PicklingException(
-                  s"Cannnot generate a pickler/unpickler for $tpe, cannot find an unpickler for $elementType"))
+              s"Cannnot generate a pickler/unpickler for $tpe, cannot find an unpickler for $elementType"))
     val colTag = FastTypeTag.apply(currentMirror, tpe.toString)
     apply[T, C](asTraversable,
                 elemPickler.asInstanceOf[Pickler[T]],

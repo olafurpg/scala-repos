@@ -186,7 +186,7 @@ private[spark] class BlockManagerMaster(var driverEndpoint: RpcEndpointRef,
                                       Iterable[Option[BlockStatus]]]]
     val blockStatus =
       timeout.awaitResult(Future.sequence[Option[BlockStatus], Iterable](
-              futures)(cbf, ThreadUtils.sameThread))
+          futures)(cbf, ThreadUtils.sameThread))
     if (blockStatus == null) {
       throw new SparkException(
           "BlockManager returned null for BlockStatus query: " + blockId)

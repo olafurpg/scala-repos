@@ -486,7 +486,7 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
       .reportTo(sr)
       .responseClassifier(classifier)
       .dest(Name.bound(
-              Address(server.boundAddress.asInstanceOf[InetSocketAddress])))
+          Address(server.boundAddress.asInstanceOf[InetSocketAddress])))
       .build()
     val client = new Echo.FinagledClient(clientBuilder)
 

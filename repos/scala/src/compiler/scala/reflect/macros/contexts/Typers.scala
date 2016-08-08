@@ -41,7 +41,7 @@ trait Typers { self: Context =>
           _.typed(universe.duplicateAndKeepPositions(tree), mode, pt),
           reportAmbiguousErrors = false)
     withWrapping(tree)(wrappedTree =>
-          withContext(typecheckInternal(wrappedTree) match {
+      withContext(typecheckInternal(wrappedTree) match {
         case universe.analyzer.SilentResultValue(result) =>
           macroLogVerbose(result)
           result

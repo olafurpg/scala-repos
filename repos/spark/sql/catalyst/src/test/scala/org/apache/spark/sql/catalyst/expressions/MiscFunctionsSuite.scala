@@ -126,18 +126,15 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
         .add("mapOfStructAndString", MapType(structOfString, StringType))
         .add("mapOfStruct", MapType(structOfString, structOfString)))
 
-  testMurmur3Hash(
-      new StructType()
-        .add("structOfString", structOfString)
-        .add("structOfStructOfString",
-             new StructType().add("struct", structOfString))
-        .add("structOfArray", new StructType().add("array", arrayOfString))
-        .add("structOfMap", new StructType().add("map", mapOfString))
-        .add("structOfArrayAndMap",
-             new StructType()
-               .add("array", arrayOfString)
-               .add("map", mapOfString))
-        .add("structOfUDT", structOfUDT))
+  testMurmur3Hash(new StructType()
+    .add("structOfString", structOfString)
+    .add("structOfStructOfString",
+         new StructType().add("struct", structOfString))
+    .add("structOfArray", new StructType().add("array", arrayOfString))
+    .add("structOfMap", new StructType().add("map", mapOfString))
+    .add("structOfArrayAndMap",
+         new StructType().add("array", arrayOfString).add("map", mapOfString))
+    .add("structOfUDT", structOfUDT))
 
   private def testMurmur3Hash(inputSchema: StructType): Unit = {
     val inputGenerator =

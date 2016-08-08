@@ -76,8 +76,8 @@ private[opening] final class OpeningApi(openingColl: Coll,
         .aggregate(Match(BSONDocument(Attempt.BSONFields.userId -> user.id)),
                    List(Limit(max), playedIdsGroup))
         .map(_.documents.headOption
-              .flatMap(_.getAs[BSONArray]("ids"))
-              .getOrElse(BSONArray()))
+          .flatMap(_.getAs[BSONArray]("ids"))
+          .getOrElse(BSONArray()))
     }
   }
 

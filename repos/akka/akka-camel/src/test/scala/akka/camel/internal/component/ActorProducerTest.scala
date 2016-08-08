@@ -217,12 +217,12 @@ class ActorProducerTest
             asyncCallback.awaitCalled(100 millis)
             verify(exchange).setFailure(
                 MMatchers.argThat(new ArgumentMatcher[FailureResult] {
-              def matches(failure: AnyRef) = {
-                failure.asInstanceOf[FailureResult].cause should be(
-                    anInstanceOf[TimeoutException])
-                true
-              }
-            }))
+                  def matches(failure: AnyRef) = {
+                    failure.asInstanceOf[FailureResult].cause should be(
+                        anInstanceOf[TimeoutException])
+                    true
+                  }
+                }))
           }
         }
       }

@@ -323,7 +323,7 @@ private[sbt] object PluginsDebug {
       // If A must be deactivated, but one if its (transitively) required plugins isn't present, it won't be activated.
       //   So, in either of these cases, A doesn't need to be considered further and won't be included in this set.
       val minDeactivate = minAbsentPlugins.filter(p =>
-            Plugins.satisfied(p.requires, incrementalModel))
+        Plugins.satisfied(p.requires, incrementalModel))
 
       val deactivate = for (d <- minDeactivate.toList) yield {
         // removing any one of these plugins will deactivate `d`.  TODO: This is not an especially efficient implementation.

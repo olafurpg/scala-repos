@@ -70,9 +70,9 @@ class UnnecessaryParenthesesQuickFix(parenthesized: ScParenthesisedExpr,
       parenthExpr.replaceExpression(newExpr, removeParenthesis = true)
 
     val comments = Option(parenthExpr.expr.get).map(expr =>
-          IntentionUtil.collectComments(expr))
+      IntentionUtil.collectComments(expr))
     comments.foreach(value =>
-          IntentionUtil.addComments(value, replaced.getParent, replaced))
+      IntentionUtil.addComments(value, replaced.getParent, replaced))
 
     ScalaPsiUtil.padWithWhitespaces(replaced)
   }

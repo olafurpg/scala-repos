@@ -17,6 +17,6 @@ class StartupRoutine extends ApplicationComponent.Adapter {
   private def setUpExternalSystemToPerformImportInIdeaProcess(): Unit =
     Registry
       .get(SbtProjectSystem.Id +
-            ExternalSystemConstants.USE_IN_PROCESS_COMMUNICATION_REGISTRY_KEY_SUFFIX)
+        ExternalSystemConstants.USE_IN_PROCESS_COMMUNICATION_REGISTRY_KEY_SUFFIX)
       .setValue(true)
 }

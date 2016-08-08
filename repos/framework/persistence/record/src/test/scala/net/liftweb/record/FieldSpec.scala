@@ -288,13 +288,12 @@ object FieldSpec extends Specification {
           formXml must beLike {
             case Full(fprime) =>
               val f = ("* [name]" #> ".*" & "select *" #>
-                    (((ns: NodeSeq) =>
-                        ns.filter {
-                          case e: Elem =>
-                            e.attribute("selected").map(_.text) == Some(
-                                "selected")
-                          case _ => false
-                        }) andThen "* [value]" #> ".*"))(fprime)
+                (((ns: NodeSeq) =>
+                    ns.filter {
+                      case e: Elem =>
+                        e.attribute("selected").map(_.text) == Some("selected")
+                      case _ => false
+                    }) andThen "* [value]" #> ".*"))(fprime)
               val ret: Boolean = Helpers.compareXml(f, fp)
               ret must_== true
           }
@@ -336,19 +335,19 @@ object FieldSpec extends Specification {
       rec.mandatoryBooleanField.setFromAny(java.lang.Boolean.TRUE)
       rec.optionalBooleanField.setFromAny(java.lang.Boolean.TRUE)
       (rec.mandatoryBooleanField.get &&
-          (rec.optionalBooleanField.get getOrElse false)) must_== true
+      (rec.optionalBooleanField.get getOrElse false)) must_== true
     }
     "support Full(java.lang.Boolean)" in {
       rec.mandatoryBooleanField.setFromAny(Full(java.lang.Boolean.TRUE))
       rec.optionalBooleanField.setFromAny(Full(java.lang.Boolean.TRUE))
       (rec.mandatoryBooleanField.get &&
-          (rec.optionalBooleanField.get getOrElse false)) must_== true
+      (rec.optionalBooleanField.get getOrElse false)) must_== true
     }
     "support Some(java.lang.Boolean)" in {
       rec.mandatoryBooleanField.setFromAny(Some(java.lang.Boolean.TRUE))
       rec.optionalBooleanField.setFromAny(Some(java.lang.Boolean.TRUE))
       (rec.mandatoryBooleanField.get &&
-          (rec.optionalBooleanField.get getOrElse false)) must_== true
+      (rec.optionalBooleanField.get getOrElse false)) must_== true
     }
   }
 
@@ -691,8 +690,8 @@ object FieldSpec extends Specification {
       val rec = StringTestRecord.createRecord
 
       rec.validate must_== (FieldError(
-              rec.string,
-              Text("String field name must be at least 3 characters.")) :: Nil)
+          rec.string,
+          Text("String field name must be at least 3 characters.")) :: Nil)
     }
 
     "honor harnessed validators" in {

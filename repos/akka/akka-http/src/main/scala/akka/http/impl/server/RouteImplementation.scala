@@ -223,7 +223,7 @@ private[http] object RouteImplementation
                 .route(dyn.innerRoute, dyn.moreInnerRoutes: _*))
 
         (requestValToDirective(dyn.value1) & requestValToDirective(
-                dyn.value2))(runToRoute)
+            dyn.value2))(runToRoute)
 
       case o: OpaqueRoute ⇒
         (ctx ⇒

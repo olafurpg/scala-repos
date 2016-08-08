@@ -132,9 +132,8 @@ final class PersistencePluginProxy(config: Config)
     context.system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
 
   private def timeoutException() =
-    new TimeoutException(
-        s"Target ${pluginType.qualifier} not initialized. " +
-          s"Use `PersistencePluginProxy.setTargetLocation` or set `target-${pluginType.qualifier}-address`")
+    new TimeoutException(s"Target ${pluginType.qualifier} not initialized. " +
+      s"Use `PersistencePluginProxy.setTargetLocation` or set `target-${pluginType.qualifier}-address`")
 
   def receive = init
 

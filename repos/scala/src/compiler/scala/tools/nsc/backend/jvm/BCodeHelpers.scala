@@ -705,7 +705,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         .getAnnotation(AnnotationRetentionAttr)
         .map(_.assocs)
         .flatMap(assoc =>
-              assoc.collectFirst {
+          assoc.collectFirst {
             case (`nme`.value, LiteralAnnotArg(Constant(value: Symbol))) =>
               value
         })
@@ -905,13 +905,13 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     // classes, as they are monomorphic (TODO: ok?)
     private def needsGenericSignature(sym: Symbol) =
       !(// PP: This condition used to include sym.hasExpandedName, but this leads
-          // to the total loss of generic information if a private member is
-          // accessed from a closure: both the field and the accessor were generated
-          // without it.  This is particularly bad because the availability of
-          // generic information could disappear as a consequence of a seemingly
-          // unrelated change.
-          settings.Ynogenericsig || sym.isArtifact || sym.isLiftedMethod ||
-            sym.isBridge)
+      // to the total loss of generic information if a private member is
+      // accessed from a closure: both the field and the accessor were generated
+      // without it.  This is particularly bad because the availability of
+      // generic information could disappear as a consequence of a seemingly
+      // unrelated change.
+      settings.Ynogenericsig || sym.isArtifact || sym.isLiftedMethod ||
+        sym.isBridge)
 
     /* @return
      *   - `null` if no Java signature is to be added (`null` is what ASM expects in these cases).
@@ -1121,8 +1121,8 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       val linkedClass = moduleClass.companionClass
       lazy val conflictingNames: Set[Name] = {
         (linkedClass.info.members collect {
-              case sym if sym.name.isTermName => sym.name
-            }).toSet
+          case sym if sym.name.isTermName => sym.name
+        }).toSet
       }
       debuglog(
           s"Potentially conflicting names for forwarders: $conflictingNames")

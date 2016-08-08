@@ -252,7 +252,7 @@ case class Form[T](mapping: Mapping[T],
     Json.toJson(
         errors.groupBy(_.key).mapValues { errors =>
           errors.map(e =>
-                messages(e.message, e.args.map(a => translateMsgArg(a)): _*))
+            messages(e.message, e.args.map(a => translateMsgArg(a)): _*))
         }
     )
   }
@@ -601,7 +601,7 @@ trait Mapping[T] { self =>
     Option(prefix)
       .filterNot(_.isEmpty)
       .map(p =>
-            p + Option(key).filterNot(_.isEmpty).map("." + _).getOrElse(""))
+        p + Option(key).filterNot(_.isEmpty).map("." + _).getOrElse(""))
   }
 
   protected def applyConstraints(t: T): Either[Seq[FormError], T] = {
@@ -868,7 +868,7 @@ case class OptionalMapping[T](
   def bind(data: Map[String, String]): Either[Seq[FormError], Option[T]] = {
     data.keys
       .filter(p =>
-            p == key || p.startsWith(key + ".") || p.startsWith(key + "["))
+        p == key || p.startsWith(key + ".") || p.startsWith(key + "["))
       .map(k => data.get(k).filterNot(_.isEmpty))
       .collect { case Some(v) => v }
       .headOption

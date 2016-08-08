@@ -108,7 +108,7 @@ object IterateesSpec
     "fold input with pureFold" in {
       mustExecute(1) { foldEC =>
         mustTranslate3To(9)(it =>
-              Iteratee.flatten(it.pureFold(_ => Done[Int, Int](9))(foldEC)))
+          Iteratee.flatten(it.pureFold(_ => Done[Int, Int](9))(foldEC)))
       }
     }
 
@@ -178,7 +178,7 @@ object IterateesSpec
     "flatMap result with flatMapM" in {
       mustExecute(1) { flatMapEC =>
         mustTranslate3To(6)(_.flatMapM((x: Int) =>
-                  Future.successful(Done[Int, Int](x * 2)))(flatMapEC))
+          Future.successful(Done[Int, Int](x * 2)))(flatMapEC))
       }
     }
 
@@ -193,10 +193,10 @@ object IterateesSpec
         await(
             Done(3, Input.El(List(1, 2)))
               .flatMapTraversable(_ =>
-                    Done[List[Int], Int](4, Input.El(List(3, 4))))(
+                Done[List[Int], Int](4, Input.El(List(3, 4))))(
                   implicitly[List[Int] => scala.collection.TraversableLike[
-                          Int,
-                          List[Int]]],
+                      Int,
+                      List[Int]]],
                   implicitly[scala.collection.generic.CanBuildFrom[List[Int],
                                                                    Int,
                                                                    List[Int]]],
@@ -233,8 +233,8 @@ object IterateesSpec
         await(
             Iteratee
               .flatten(Cont[Int, Int](_ => Done(3))
-                    .flatMap((x: Int) => Done[Int, Int](x * 2))(flatMapEC)
-                    .feed(Input.El(11)))
+                .flatMap((x: Int) => Done[Int, Int](x * 2))(flatMapEC)
+                .feed(Input.El(11)))
               .unflatten) must equalTo(Step.Done(6, Input.Empty))
       }
     }
@@ -322,7 +322,7 @@ object IterateesSpec
     "fold input" in {
       mustExecute(4) { foldEC =>
         await(Enumerator(1, 2, 3, 4) |>>> Iteratee.fold[Int, Int](0)(_ + _)(
-                foldEC)) must equalTo(10)
+            foldEC)) must equalTo(10)
       }
     }
   }
@@ -332,7 +332,7 @@ object IterateesSpec
     "fold input" in {
       mustExecute(4) { foldEC =>
         await(Enumerator(1, 2, 3, 4) |>>> Iteratee.foldM[Int, Int](0)((x, y) =>
-                  Future.successful(x + y))(foldEC)) must equalTo(10)
+          Future.successful(x + y))(foldEC)) must equalTo(10)
       }
     }
   }
@@ -343,7 +343,7 @@ object IterateesSpec
       mustExecute(4) { foldEC =>
         val folder = (x: Int, y: Int) => Future.successful((x + y, false))
         await(Enumerator(1, 2, 3, 4) |>>> Iteratee.fold2[Int, Int](0)(folder)(
-                foldEC)) must equalTo(10)
+            foldEC)) must equalTo(10)
       }
     }
 
@@ -351,7 +351,7 @@ object IterateesSpec
       mustExecute(3) { foldEC =>
         val folder = (x: Int, y: Int) => Future.successful((x + y, y > 2))
         await(Enumerator(1, 2, 3, 4) |>>> Iteratee.fold2[Int, Int](0)(folder)(
-                foldEC)) must equalTo(6)
+            foldEC)) must equalTo(6)
       }
     }
   }
@@ -361,8 +361,8 @@ object IterateesSpec
     "fold input" in {
       mustExecute(4) { foldEC =>
         await(Enumerator(1, 2, 3, 4) |>>> Iteratee
-              .fold1[Int, Int](Future.successful(0))((x, y) =>
-                    Future.successful(x + y))(foldEC)) must equalTo(10)
+          .fold1[Int, Int](Future.successful(0))((x, y) =>
+            Future.successful(x + y))(foldEC)) must equalTo(10)
       }
     }
   }
@@ -468,9 +468,9 @@ object IterateesSpec
                           input2 =>
                             delayed(
                                 cont(input3 =>
-                                      delayed(
-                                          done(input1 + input2 + input3)
-                                    ))
+                                  delayed(
+                                      done(input1 + input2 + input3)
+                                ))
                           ))
                 ))
         ).recover { case t: Throwable => unexpected }
@@ -489,9 +489,9 @@ object IterateesSpec
                           input2 =>
                             delayed(
                                 cont(input3 =>
-                                      delayed(
-                                          error(input1 + input2 + input3)
-                                    ))
+                                  delayed(
+                                      error(input1 + input2 + input3)
+                                ))
                           ))
                 ))
         ).recover { case t: Throwable => expected }

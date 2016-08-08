@@ -84,13 +84,13 @@ abstract class Duplicators extends Analyzer {
         case TypeRef(NoPrefix, sym, args) if sym.isTypeParameterOrSkolem =>
           val sym1 =
             (context.scope lookup sym.name orElse {
-                  // try harder (look in outer scopes)
-                  // with virtpatmat, this can happen when the sym is referenced in the scope of a LabelDef but
-                  // is defined in the scope of an outer DefDef (e.g., in AbstractPartialFunction's andThen)
-                  BodyDuplicator. super
-                    .silent(_ typedType Ident(sym.name))
-                    .fold(NoSymbol: Symbol)(_.symbol)
-                } filter (_ ne sym))
+              // try harder (look in outer scopes)
+              // with virtpatmat, this can happen when the sym is referenced in the scope of a LabelDef but
+              // is defined in the scope of an outer DefDef (e.g., in AbstractPartialFunction's andThen)
+              BodyDuplicator. super
+                .silent(_ typedType Ident(sym.name))
+                .fold(NoSymbol: Symbol)(_.symbol)
+            } filter (_ ne sym))
           if (sym1.exists) {
             debuglog(s"fixing $sym -> $sym1")
             typeRef(NoPrefix, sym1, mapOverArgs(args, sym1.typeParams))

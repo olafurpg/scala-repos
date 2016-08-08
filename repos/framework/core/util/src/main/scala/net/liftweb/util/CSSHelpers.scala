@@ -155,10 +155,10 @@ case class CssUrlPrefixer(prefix: String) extends Parsers {
 
   lazy val phrase =
     (((contentParser ~ singleQuotedPath) ||| (contentParser ~ doubleQuotedPath) |||
-              (contentParser ~ quotelessPath)).* ^^ {
-          case l =>
-            l.flatMap(f => f._1 + f._2).mkString("")
-        }) ~ contentParser ^^ {
+      (contentParser ~ quotelessPath)).* ^^ {
+      case l =>
+        l.flatMap(f => f._1 + f._2).mkString("")
+    }) ~ contentParser ^^ {
       case a ~ b =>
         a + b
     }

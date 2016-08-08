@@ -21,6 +21,6 @@ class Logger$ColoredLevel extends ColoredLevel {
       "https://www.playframework.com/documentation/2.5.x/Migration25#Change-to-Logback-configuration"
     addError(
         s"You are using the deprecated ${this.getClass.getName} in $configLocation, please use ${classOf[
-        ColoredLevel].getName} instead. See $migrationDocs for more information.")
+            ColoredLevel].getName} instead. See $migrationDocs for more information.")
   }
 }

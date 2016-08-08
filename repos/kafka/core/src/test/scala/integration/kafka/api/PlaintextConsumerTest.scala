@@ -723,7 +723,7 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     // commit sync and verify onCommit is called
     val commitCountBefore = MockConsumerInterceptor.ON_COMMIT_COUNT.intValue()
     testConsumer.commitSync(Map[TopicPartition, OffsetAndMetadata](
-            (tp, new OffsetAndMetadata(2L))).asJava)
+        (tp, new OffsetAndMetadata(2L))).asJava)
     assertEquals(2, testConsumer.committed(tp).offset)
     assertEquals(commitCountBefore + 1,
                  MockConsumerInterceptor.ON_COMMIT_COUNT.intValue())

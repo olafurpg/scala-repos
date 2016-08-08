@@ -100,7 +100,7 @@ private trait CompositionFoldable1[F[_], G[_]]
   override final def foldMapLeft1[A, B](fa: F[G[A]])(z: A => B)(f: (B,
                                                                     A) => B) =
     F.foldMapLeft1(fa)(G.foldMapLeft1(_)(z)(f))((b, ga) =>
-          G.foldLeft(ga, b)(f))
+      G.foldLeft(ga, b)(f))
 }
 
 private trait CompositionTraverse1[F[_], G[_]]
@@ -174,11 +174,11 @@ private trait CompositionBifoldable[F[_, _], G[_, _]]
   override def bifoldRight[A, B, C](fa: F[G[A, B], G[A, B]], z: => C)(
       f: (A, => C) => C)(g: (B, => C) => C): C =
     F.bifoldRight(fa, z)((a, b) => G.bifoldRight(a, b)(f)(g))((a, b) =>
-          G.bifoldRight(a, b)(f)(g))
+      G.bifoldRight(a, b)(f)(g))
   override def bifoldLeft[A, B, C](fa: F[G[A, B], G[A, B]], z: C)(
       f: (C, A) => C)(g: (C, B) => C): C =
     F.bifoldLeft(fa, z)((b, a) => G.bifoldLeft(a, b)(f)(g))((b, a) =>
-          G.bifoldLeft(a, b)(f)(g))
+      G.bifoldLeft(a, b)(f)(g))
 }
 
 private trait CompositionBitraverse[F[_, _], G[_, _]]
@@ -250,11 +250,11 @@ private trait CompositionBifoldableFoldables[F[_, _], G[_], H[_]]
   override def bifoldRight[A, B, C](fgahb: F[G[A], H[B]], z: => C)(
       f: (A, => C) => C)(g: (B, => C) => C) =
     F.bifoldRight(fgahb, z)((ga, c) => G.foldRight(ga, c)(f))((hb, c) =>
-          H.foldRight(hb, c)(g))
+      H.foldRight(hb, c)(g))
   override def bifoldLeft[A, B, C](fgahb: F[G[A], H[B]], z: C)(f: (C, A) => C)(
       g: (C, B) => C) =
     F.bifoldLeft(fgahb, z)((c, ga) => G.foldLeft(ga, c)(f))((c, hb) =>
-          H.foldLeft(hb, c)(g))
+      H.foldLeft(hb, c)(g))
 }
 
 private trait CompositionTraverseBitraverse[F[_], G[_, _]]

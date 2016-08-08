@@ -71,8 +71,8 @@ object KetamaClientStress extends App {
         PartitionedClient
           .parseHostPortWeights(hosts)
           .map {
-        case (host, port, weight) => new CacheNode(host, port, weight)
-      }
+            case (host, port, weight) => new CacheNode(host, port, weight)
+          }
           .toSet)
   }
 

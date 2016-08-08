@@ -292,17 +292,17 @@ abstract class Delambdafy
           newClass.newConstructor(originalFunction.pos, SYNTHETIC)
 
         val (paramSymbols, params, assigns) = (members map { member =>
-              val paramSymbol = newClass
-                .newVariable(member.symbol.name.toTermName, newClass.pos, 0)
-              paramSymbol.setInfo(member.symbol.info)
-              val paramVal = ValDef(paramSymbol)
-              val paramIdent = Ident(paramSymbol)
-              val assign =
-                Assign(Select(gen.mkAttributedThis(newClass), member.symbol),
-                       paramIdent)
+          val paramSymbol = newClass
+            .newVariable(member.symbol.name.toTermName, newClass.pos, 0)
+          paramSymbol.setInfo(member.symbol.info)
+          val paramVal = ValDef(paramSymbol)
+          val paramIdent = Ident(paramSymbol)
+          val assign =
+            Assign(Select(gen.mkAttributedThis(newClass), member.symbol),
+                   paramIdent)
 
-              (paramSymbol, paramVal, assign)
-            }).unzip3
+          (paramSymbol, paramVal, assign)
+        }).unzip3
 
         val constrType = MethodType(paramSymbols, newClass.thisType)
         constrSym setInfoAndEnter constrType
@@ -432,7 +432,7 @@ abstract class Delambdafy
             (gen.mkAttributedThis(oldClass) setPos originalFunction.pos) :: Nil
         val captureArgs = captures.iterator
           .map(capture =>
-                gen.mkAttributedRef(capture) setPos originalFunction.pos)
+            gen.mkAttributedRef(capture) setPos originalFunction.pos)
           .toList
         thisArg ::: captureArgs
       }
@@ -536,7 +536,7 @@ abstract class Delambdafy
         val (needsAdapt, adaptedTree) = adapt(tree, pt)
         val trans = postErasure.newTransformer(unit)
         val postErasedTree = trans.atOwner(currentOwner)(trans.transform(
-                adaptedTree)) // SI-8017 eliminates ErasedValueTypes
+            adaptedTree)) // SI-8017 eliminates ErasedValueTypes
         (needsAdapt, postErasedTree)
       }
 
@@ -555,9 +555,9 @@ abstract class Delambdafy
         }
         val (paramNeedsAdaptation, adaptedParams) =
           (bridgeSyms zip liftedBodyDefTpe.params map {
-                case (bridgeSym, param) =>
-                  adapt(Ident(bridgeSym) setType bridgeSym.tpe, param.tpe)
-              }).unzip
+            case (bridgeSym, param) =>
+              adapt(Ident(bridgeSym) setType bridgeSym.tpe, param.tpe)
+          }).unzip
         // SI-8017 Before, this code used `applyMethod.symbol.info.resultType`.
         //         But that symbol doesn't have a type history that goes back before `delambdafy`,
         //         so we just see a plain `Int`, rather than `ErasedValueType(C, Int)`.

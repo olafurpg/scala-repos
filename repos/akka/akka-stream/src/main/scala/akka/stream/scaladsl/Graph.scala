@@ -541,10 +541,9 @@ final class Partition[T](outputPorts: Int, partitioner: T ⇒ Int)
           val elem = grab(in)
           val idx = partitioner(elem)
           if (idx < 0 || idx >= outputPorts)
-            failStage(
-                PartitionOutOfBoundsException(
-                    s"partitioner must return an index in the range [0,${outputPorts -
-              1}]. returned: [$idx] for input [${elem.getClass.getName}]."))
+            failStage(PartitionOutOfBoundsException(
+                s"partitioner must return an index in the range [0,${outputPorts -
+                  1}]. returned: [$idx] for input [${elem.getClass.getName}]."))
           else if (!isClosed(out(idx))) {
             if (isAvailable(out(idx))) {
               push(out(idx), elem)

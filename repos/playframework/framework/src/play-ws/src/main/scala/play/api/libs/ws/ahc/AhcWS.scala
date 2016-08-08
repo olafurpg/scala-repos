@@ -134,8 +134,8 @@ case class AhcWSRequest(
 
   def withHeaders(hdrs: (String, String)*): WSRequest = {
     val headers = hdrs.foldLeft(this.headers)((m, hdr) =>
-          if (m.contains(hdr._1)) m.updated(hdr._1, m(hdr._1) :+ hdr._2)
-          else m + (hdr._1 -> Seq(hdr._2)))
+      if (m.contains(hdr._1)) m.updated(hdr._1, m(hdr._1) :+ hdr._2)
+      else m + (hdr._1 -> Seq(hdr._2)))
     copy(headers = headers)
   }
 
@@ -402,7 +402,7 @@ case class AhcWSRequest(
       }
       realmBuilder.setScheme(scheme)
       wsProxyServer.encoding.foreach(enc =>
-            realmBuilder.setCharset(Charset.forName(enc)))
+        realmBuilder.setCharset(Charset.forName(enc)))
       wsProxyServer.ntlmDomain.foreach(realmBuilder.setNtlmDomain)
       proxyBuilder.setRealm(realmBuilder)
     }

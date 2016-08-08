@@ -89,7 +89,7 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
       // If we can track all jobs, check the metric values
       val metricValues = sqlContext.listener.getExecutionMetrics(executionId)
       val actualMetrics = SparkPlanGraph(SparkPlanInfo.fromSparkPlan(
-              df.queryExecution.executedPlan)).allNodes.filter { node =>
+          df.queryExecution.executedPlan)).allNodes.filter { node =>
         expectedMetrics.contains(node.id)
       }.map { node =>
         val nodeMetrics = node.metrics.map { metric =>
@@ -179,8 +179,8 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
                            Map(
                                0L ->
                                  ("SortMergeJoin", Map(
-                                         // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
-                                         "number of output rows" -> 4L))))
+                                     // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
+                                     "number of output rows" -> 4L))))
     }
   }
 
@@ -199,8 +199,8 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
                            Map(
                                0L ->
                                  ("SortMergeJoin", Map(
-                                         // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
-                                         "number of output rows" -> 8L))))
+                                     // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
+                                     "number of output rows" -> 8L))))
 
       val df2 = sqlContext.sql(
           "SELECT * FROM testDataForJoin right JOIN testData2 ON testData2.a = testDataForJoin.a")
@@ -209,8 +209,8 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
                            Map(
                                0L ->
                                  ("SortMergeJoin", Map(
-                                         // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
-                                         "number of output rows" -> 8L))))
+                                     // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
+                                     "number of output rows" -> 8L))))
     }
   }
 
@@ -250,15 +250,15 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
     withTempTable("testDataForJoin") {
       // Assume the execution plan is
       // ... -> BroadcastNestedLoopJoin(nodeId = 1) -> TungstenProject(nodeId = 0)
-      val df = sqlContext.sql(
-          "SELECT * FROM testData2 left JOIN testDataForJoin ON " +
-            "testData2.a * testDataForJoin.a != testData2.a + testDataForJoin.a")
+      val df = sqlContext
+        .sql("SELECT * FROM testData2 left JOIN testDataForJoin ON " +
+          "testData2.a * testDataForJoin.a != testData2.a + testDataForJoin.a")
       testSparkPlanMetrics(df,
                            3,
                            Map(
                                1L ->
                                  ("BroadcastNestedLoopJoin",
-                                     Map("number of output rows" -> 12L))))
+                                 Map("number of output rows" -> 12L))))
     }
   }
 
@@ -268,12 +268,11 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
     // Assume the execution plan is
     // ... -> BroadcastLeftSemiJoinHash(nodeId = 0)
     val df = df1.join(broadcast(df2), $"key" === $"key2", "leftsemi")
-    testSparkPlanMetrics(df,
-                         2,
-                         Map(
-                             0L ->
-                               ("BroadcastLeftSemiJoinHash", Map(
-                                       "number of output rows" -> 2L))))
+    testSparkPlanMetrics(
+        df,
+        2,
+        Map(0L ->
+          ("BroadcastLeftSemiJoinHash", Map("number of output rows" -> 2L))))
   }
 
   test("ShuffledHashJoin metrics") {

@@ -40,10 +40,10 @@ class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
     assert(
         plan
           .find(p =>
-                p.isInstanceOf[WholeStageCodegen] && p
-                  .asInstanceOf[WholeStageCodegen]
-                  .child
-                  .isInstanceOf[TungstenAggregate])
+            p.isInstanceOf[WholeStageCodegen] && p
+              .asInstanceOf[WholeStageCodegen]
+              .child
+              .isInstanceOf[TungstenAggregate])
           .isDefined)
     assert(df.collect() === Array(Row(9, 4.5)))
   }
@@ -54,10 +54,10 @@ class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
     assert(
         plan
           .find(p =>
-                p.isInstanceOf[WholeStageCodegen] && p
-                  .asInstanceOf[WholeStageCodegen]
-                  .child
-                  .isInstanceOf[TungstenAggregate])
+            p.isInstanceOf[WholeStageCodegen] && p
+              .asInstanceOf[WholeStageCodegen]
+              .child
+              .isInstanceOf[TungstenAggregate])
           .isDefined)
     assert(df.collect() === Array(Row(0, 1), Row(1, 1), Row(2, 1)))
   }
@@ -72,10 +72,10 @@ class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
     assert(
         df.queryExecution.executedPlan
           .find(p =>
-                p.isInstanceOf[WholeStageCodegen] && p
-                  .asInstanceOf[WholeStageCodegen]
-                  .child
-                  .isInstanceOf[BroadcastHashJoin])
+            p.isInstanceOf[WholeStageCodegen] && p
+              .asInstanceOf[WholeStageCodegen]
+              .child
+              .isInstanceOf[BroadcastHashJoin])
           .isDefined)
     assert(
         df.collect() === Array(Row(1, 1, "1"), Row(1, 1, "1"), Row(2, 2, "2")))
@@ -87,8 +87,8 @@ class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
     assert(
         plan
           .find(p =>
-                p.isInstanceOf[WholeStageCodegen] &&
-                  p.asInstanceOf[WholeStageCodegen].child.isInstanceOf[Sort])
+            p.isInstanceOf[WholeStageCodegen] &&
+              p.asInstanceOf[WholeStageCodegen].child.isInstanceOf[Sort])
           .isDefined)
     assert(df.collect() === Array(Row(1), Row(2), Row(3)))
   }

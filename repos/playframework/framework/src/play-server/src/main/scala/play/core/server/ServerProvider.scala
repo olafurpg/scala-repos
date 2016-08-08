@@ -61,7 +61,7 @@ object ServerProvider {
     val className: String = configuration
       .getString(ClassNameConfigKey)
       .getOrElse(throw new ServerStartException(
-              s"No ServerProvider configured with key '$ClassNameConfigKey'"))
+          s"No ServerProvider configured with key '$ClassNameConfigKey'"))
     val clazz = try classLoader.loadClass(className)
     catch {
       case _: ClassNotFoundException =>

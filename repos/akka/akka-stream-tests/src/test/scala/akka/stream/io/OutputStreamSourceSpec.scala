@@ -211,9 +211,9 @@ class OutputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
           .dumpAllThreads(true, true)
           .toSeq
           .filter(t ⇒
-                t.getThreadName.startsWith("OutputStreamSourceSpec") &&
-                  t.getLockName != null && t.getLockName.startsWith(
-                    "java.util.concurrent.locks.AbstractQueuedSynchronizer"))
+            t.getThreadName.startsWith("OutputStreamSourceSpec") &&
+              t.getLockName != null && t.getLockName.startsWith(
+                "java.util.concurrent.locks.AbstractQueuedSynchronizer"))
 
       awaitAssert(threadsBlocked should ===(Seq()), 3.seconds)
     }

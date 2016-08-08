@@ -231,7 +231,7 @@ object JsMacroImpl {
             // If this is a list/set/seq/map, then we need to wrap the reads into that.
             def readsWritesHelper(methodName: String): List[Tree] =
               conditionalList(Reads, Writes).map(s =>
-                    q"$s.${TermName(methodName)}(this.lazyStuff)")
+                q"$s.${TermName(methodName)}(this.lazyStuff)")
 
             val arg =
               if (tpe.typeConstructor <:< typeOf[List[_]].typeConstructor)
@@ -255,10 +255,10 @@ object JsMacroImpl {
       if (hasVarArgs) {
 
         val applyParams = params.foldLeft(List[Tree]())((l, e) =>
-              l :+ Ident(TermName(e.name.encodedName.toString)))
+          l :+ Ident(TermName(e.name.encodedName.toString)))
         val vals = params.foldLeft(List[Tree]())((l, e) =>
-              // Let type inference infer the type by using the empty type, TypeTree()
-              l :+ q"val ${TermName(e.name.encodedName.toString)}: ${TypeTree()}")
+          // Let type inference infer the type by using the empty type, TypeTree()
+          l :+ q"val ${TermName(e.name.encodedName.toString)}: ${TypeTree()}")
 
         q"(..$vals) => $companionObject.apply(..${applyParams.init}, ${applyParams.last}: _*)"
       } else {

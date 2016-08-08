@@ -141,7 +141,7 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
       dynamicAccess,
       deployer,
       Some(deadLettersPath ⇒
-            new RemoteDeadLetterActorRef(this, deadLettersPath, eventStream)))
+        new RemoteDeadLetterActorRef(this, deadLettersPath, eventStream)))
 
   @volatile
   private var _log = local.log

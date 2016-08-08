@@ -592,7 +592,7 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       this
         .cogroup(other, partitioner)
         .flatMapValues(pair =>
-              for (v <- pair._1.iterator; w <- pair._2.iterator) yield (v, w))
+          for (v <- pair._1.iterator; w <- pair._2.iterator) yield (v, w))
     }
 
   /**

@@ -197,8 +197,8 @@ package Generic1TestsAux {
 
     // HACKING the fact that CNil can't be pointed
     implicit def isCPointedSimpleType: Pointed[({
-          type λ[A] = A :+: Const[CNil]#λ[A]
-        })#λ] =
+      type λ[A] = A :+: Const[CNil]#λ[A]
+    })#λ] =
       new Pointed[({ type λ[A] = A :+: Const[CNil]#λ[A] })#λ] {
         def point[A](a: A): A :+: Const[CNil]#λ[A] = Inl(a)
       }

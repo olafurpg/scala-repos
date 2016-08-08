@@ -266,11 +266,11 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   def -(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x - y))(SafeLongBigInteger(
-            BigInteger.valueOf(x) subtract BigInteger.valueOf(y)))
+        BigInteger.valueOf(x) subtract BigInteger.valueOf(y)))
 
   def *(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x * y))(SafeLongBigInteger(
-            BigInteger.valueOf(x) multiply BigInteger.valueOf(y)))
+        BigInteger.valueOf(x) multiply BigInteger.valueOf(y)))
 
   def /(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x / y))(SafeLong.safe64)

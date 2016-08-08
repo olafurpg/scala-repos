@@ -64,10 +64,8 @@ object TestUtil {
       println("producer extra keys: " + (produced.keySet -- inMemory.keySet))
       println("producer missing keys: " + (inMemory.keySet -- produced.keySet))
       println("written batches: " + testStore.writtenBatches)
-      println(
-          "earliest unwritten time: " +
-            testStore.batcher.earliestTimeOf(
-                testStore.writtenBatches.max.next))
+      println("earliest unwritten time: " +
+        testStore.batcher.earliestTimeOf(testStore.writtenBatches.max.next))
       println("Difference: " + diffMap)
     }
     !wrong

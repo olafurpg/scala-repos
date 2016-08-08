@@ -142,10 +142,10 @@ trait NIHDBIngestSupport
                        .run
       } yield {
         (projection valueOr { err =>
-              sys.error(
-                  "An error was encountered attempting to read projection at path %s: %s"
-                    .format(path, err.toString))
-            }).asInstanceOf[NIHDBResource]
+          sys.error(
+              "An error was encountered attempting to read projection at path %s: %s"
+                .format(path, err.toString))
+        }).asInstanceOf[NIHDBResource]
       }
     }.copoint
 

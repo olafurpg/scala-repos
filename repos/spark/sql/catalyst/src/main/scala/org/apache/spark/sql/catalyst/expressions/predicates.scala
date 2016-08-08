@@ -163,7 +163,7 @@ case class In(value: Expression, list: Seq[Expression])
     val listGen = list.map(_.gen(ctx))
     val listCode = listGen
       .map(x =>
-            s"""
+        s"""
         if (!${ev.value}) {
           ${x.code}
           if (${x.isNull}) {

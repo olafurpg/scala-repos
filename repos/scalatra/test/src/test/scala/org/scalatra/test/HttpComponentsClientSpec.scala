@@ -38,8 +38,8 @@ class HttpComponentsClientSpec
       resp.setHeader("Request-Method", req.getMethod.toUpperCase)
       resp.setHeader("Request-URI", req.getRequestURI)
       req.getHeaderNames.foreach(headerName =>
-            resp.setHeader("Request-Header-%s".format(headerName),
-                           req.getHeader(headerName)))
+        resp.setHeader("Request-Header-%s".format(headerName),
+                       req.getHeader(headerName)))
 
       req.getParameterMap.foreach {
         case (name, values) =>
@@ -81,7 +81,7 @@ class HttpComponentsClientSpec
       (doReqWithBody("POST", "post test") must equalTo("received: post test")) and
         (doReqWithBody("PUT", "put test") must equalTo("received: put test")) and
         (doReqWithBody("PATCH", "patch test") must equalTo(
-                "received: patch test"))
+            "received: patch test"))
     }
   }
 

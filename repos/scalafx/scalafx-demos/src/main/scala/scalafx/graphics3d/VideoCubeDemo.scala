@@ -124,7 +124,7 @@ object VideoCubeDemo extends JFXApp {
   val highY = 700
   val starryBackground = new Group {
     val stars = (1 to 500).map(x =>
-          new Rectangle {
+      new Rectangle {
         x = lowX + scala.math.random * (highX - lowX)
         y = lowY + scala.math.random * (highY - lowY)
         //      printf("x=%5.1f, y=%5.1f\n", x.get(), y.get() )

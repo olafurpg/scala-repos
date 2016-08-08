@@ -94,8 +94,8 @@ trait PredictionLibModule[M[+ _]]
                             val includedDoubles =
                               1.0 +:
                                 (scannerPrelims.cpaths map {
-                                      scannerPrelims.includedCols(_).apply(i)
-                                    })
+                                  scannerPrelims.includedCols(_).apply(i)
+                                })
                             val includedMatrix =
                               new Matrix(Array(includedDoubles.toArray))
 

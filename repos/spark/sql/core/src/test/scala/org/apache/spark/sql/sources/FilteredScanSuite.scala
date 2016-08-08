@@ -43,11 +43,10 @@ case class SimpleFilteredScan(from: Int, to: Int)(
     with PrunedFilteredScan {
 
   override def schema: StructType =
-    StructType(
-        StructField("a", IntegerType, nullable = false) :: StructField(
-            "b",
-            IntegerType,
-            nullable = false) :: StructField("c", StringType, nullable = false) :: Nil)
+    StructType(StructField("a", IntegerType, nullable = false) :: StructField(
+        "b",
+        IntegerType,
+        nullable = false) :: StructField("c", StringType, nullable = false) :: Nil)
 
   override def unhandledFilters(filters: Array[Filter]): Array[Filter] = {
     def unhandled(filter: Filter): Boolean = {
@@ -159,13 +158,9 @@ case class SimpleFilteredScan(from: Int, to: Int)(
     sqlContext.sparkContext
       .parallelize(from to to)
       .filter(eval)
-      .map(
-          i =>
-            Row.fromSeq(
-                rowBuilders
-                  .map(_(i))
-                  .reduceOption(_ ++ _)
-                  .getOrElse(Seq.empty)))
+      .map(i =>
+        Row.fromSeq(
+            rowBuilders.map(_(i)).reduceOption(_ ++ _).getOrElse(Seq.empty)))
   }
 }
 

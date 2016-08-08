@@ -104,7 +104,7 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
         fileName
           .toFailure(())
           .leftMap(_ =>
-                "X-File-Name header not respected for PUT requests; please specify the resource to update via the URL.") map {
+            "X-File-Name header not respected for PUT requests; please specify the resource to update via the URL.") map {
           _ => (resource: Path) =>
             resource
         }
@@ -164,7 +164,7 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
                                       "Rejecting excessive file upload of size %d"
                                         .format(b.length))
                                   -\/(badRequest(
-                                          "File uploads are currently limited to 600KB"))
+                                      "File uploads are currently limited to 600KB"))
 
                                 case b =>
                                   \/-(b)
@@ -181,7 +181,7 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
                     _ <- right(eventStore.save(storeFile, ingestTimeout))
                   } yield {
                     val resultsPath = (baseURI.path |+| Some("/data/fs/" +
-                              fullPath.path)).map(_.replaceAll("//", "/"))
+                      fullPath.path)).map(_.replaceAll("//", "/"))
                     val locationHeader =
                       Location(baseURI.copy(path = resultsPath))
                     HttpResponse[JValue](Accepted,
@@ -190,8 +190,8 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
                   }).fold(e => e, x => x)
                 } getOrElse {
                   Promise successful HttpResponse[JValue](HttpStatus(
-                          BadRequest,
-                          "Attempt to create a file without body content."))
+                      BadRequest,
+                      "Attempt to create a file without body content."))
                 }
             }
           }

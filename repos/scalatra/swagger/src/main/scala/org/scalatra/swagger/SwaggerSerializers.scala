@@ -201,7 +201,7 @@ object SwaggerSerializers {
 
   class HttpMethodSerializer
       extends CustomSerializer[HttpMethod](implicit formats =>
-            ({
+        ({
           case JString(method) => HttpMethod(method)
         }, {
           case method: HttpMethod => JString(method.toString)
@@ -259,7 +259,7 @@ object SwaggerSerializers {
 
   class AllowableValuesSerializer
       extends CustomSerializer[AllowableValues](implicit formats =>
-            ({
+        ({
           case value @ JObject(flds) if flds.exists(_._1 == "enum") =>
             value \ "enum" match {
               case JArray(entries) =>
@@ -294,7 +294,7 @@ object SwaggerSerializers {
 
   class ModelPropertySerializer
       extends CustomSerializer[ModelProperty](implicit formats =>
-            ({
+        ({
           case json: JObject =>
             ModelProperty(`type` = readDataType(json),
                           position = (json \ "position").getAsOrElse(0),
@@ -318,7 +318,7 @@ object SwaggerSerializers {
 
   class ModelSerializer
       extends CustomSerializer[Model](implicit formats =>
-            ({
+        ({
           case json: JObject =>
             val properties = json \ "properties" match {
               case JObject(entries) => {
@@ -345,17 +345,17 @@ object SwaggerSerializers {
               ("qualifiedType" -> x.qualifiedName) ~
               ("description" -> x.description) ~ ("required" -> required) ~
               ("extends" -> x.baseModel.filter(s =>
-                        s.nonBlank && !s.trim.equalsIgnoreCase("VOID"))) ~
+                s.nonBlank && !s.trim.equalsIgnoreCase("VOID"))) ~
               ("discriminator" -> x.discriminator) ~
               ("properties" ->
-                    (x.properties.sortBy { case (_, p) ⇒ p.position } map {
-                          case (k, v) => k -> Extraction.decompose(v)
-                        }))
+                (x.properties.sortBy { case (_, p) ⇒ p.position } map {
+                  case (k, v) => k -> Extraction.decompose(v)
+                }))
         }))
 
   class ResponseMessageSerializer
       extends CustomSerializer[ResponseMessage[_]](implicit formats =>
-            ({
+        ({
           case value: JObject =>
             StringResponseMessage((value \ "code").as[Int],
                                   (value \ "message").as[String])
@@ -366,7 +366,7 @@ object SwaggerSerializers {
 
   class ParameterSerializer
       extends CustomSerializer[Parameter](implicit formats =>
-            ({
+        ({
           case json: JObject =>
             val t = readDataType(json)
             Parameter(
@@ -409,7 +409,7 @@ object SwaggerSerializers {
 
   class OperationSerializer
       extends CustomSerializer[Operation](implicit formats =>
-            ({
+        ({
           case value =>
             Operation(
                 (value \ "method").extract[HttpMethod],
@@ -434,11 +434,11 @@ object SwaggerSerializers {
                 ("notes" -> obj.notes.flatMap(_.blankOption).getOrElse("")) ~
                 ("deprecated" -> obj.deprecated) ~ ("nickname" -> obj.nickname) ~
                 ("parameters" -> Extraction.decompose(
-                        obj.parameters.sortBy(_.position))) ~
+                    obj.parameters.sortBy(_.position))) ~
                 ("responseMessages" ->
-                      (if (obj.responseMessages.nonEmpty)
-                         Some(Extraction.decompose(obj.responseMessages))
-                       else None))
+                  (if (obj.responseMessages.nonEmpty)
+                     Some(Extraction.decompose(obj.responseMessages))
+                   else None))
 
             val consumes = dontAddOnEmpty("consumes", obj.consumes) _
             val produces = dontAddOnEmpty("produces", obj.produces) _
@@ -453,7 +453,7 @@ object SwaggerSerializers {
 
   class EndpointSerializer
       extends CustomSerializer[Endpoint](implicit formats =>
-            ({
+        ({
           case value =>
             Endpoint((value \ "path").extract[String],
                      (value \ "description")
@@ -468,7 +468,7 @@ object SwaggerSerializers {
 
   class ApiSerializer
       extends CustomSerializer[Api](implicit formats =>
-            ({
+        ({
           case json =>
             Api(
                 (json \ "apiVersion").extractOrElse(""),
@@ -493,40 +493,40 @@ object SwaggerSerializers {
               ("swaggerVersion" -> x.swaggerVersion) ~
               ("resourcePath" -> x.resourcePath) ~
               ("produces" ->
-                    (x.produces match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
+                (x.produces match {
+                  case Nil => JNothing
+                  case e => Extraction.decompose(e)
+                })) ~
               ("consumes" ->
-                    (x.consumes match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
+                (x.consumes match {
+                  case Nil => JNothing
+                  case e => Extraction.decompose(e)
+                })) ~
               ("protocols" ->
-                    (x.protocols match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
+                (x.protocols match {
+                  case Nil => JNothing
+                  case e => Extraction.decompose(e)
+                })) ~
               ("authorizations" ->
-                    (x.authorizations match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
+                (x.authorizations match {
+                  case Nil => JNothing
+                  case e => Extraction.decompose(e)
+                })) ~
               ("apis" ->
-                    (x.apis match {
-                      case Nil => JNothing
-                      case e => Extraction.decompose(e)
-                    })) ~
+                (x.apis match {
+                  case Nil => JNothing
+                  case e => Extraction.decompose(e)
+                })) ~
               ("models" ->
-                    (x.models match {
-                      case x if x.isEmpty => JNothing
-                      case e => Extraction.decompose(e)
-                    }))
+                (x.models match {
+                  case x if x.isEmpty => JNothing
+                  case e => Extraction.decompose(e)
+                }))
         }))
 
   class GrantTypeSerializer
       extends CustomSerializer[GrantType](implicit formats =>
-            ({
+        ({
           case value if value \ "type" == JString("implicit") =>
             ImplicitGrant(
                 LoginEndpoint((value \ "loginEndpoint" \ "url").as[String]),
@@ -551,17 +551,17 @@ object SwaggerSerializers {
           case AuthorizationCodeGrant(tokenRequest, tokenEndpoint) =>
             ("type" -> "authorization_code") ~
               ("tokenRequestEndpoint" ->
-                    (("url" -> tokenRequest.url) ~
-                          ("clientIdName" -> tokenRequest.clientIdName) ~
-                          ("clientSecretName" -> tokenRequest.clientSecretName))) ~
+                (("url" -> tokenRequest.url) ~
+                  ("clientIdName" -> tokenRequest.clientIdName) ~
+                  ("clientSecretName" -> tokenRequest.clientSecretName))) ~
               ("tokenEndpoint" ->
-                    (("url" -> tokenEndpoint.url) ~
-                          ("tokenName" -> tokenEndpoint.tokenName)))
+                (("url" -> tokenEndpoint.url) ~
+                  ("tokenName" -> tokenEndpoint.tokenName)))
         }))
 
   class AuthorizationTypeSerializer
       extends CustomSerializer[AuthorizationType](implicit formats =>
-            ({
+        ({
           case value if value \ "type" == JString("apiKey") =>
             ApiKey((value \ "keyname")
                      .extractOpt[String]
@@ -575,8 +575,8 @@ object SwaggerSerializers {
           case obj @ OAuth(scopes, grantTypes) =>
             ("type" -> obj.`type`) ~ ("scopes" -> scopes) ~
               ("grantTypes" -> (for (t <- grantTypes) yield {
-                    (t.`type`, Extraction.decompose(t))
-                  }).toMap)
+                (t.`type`, Extraction.decompose(t))
+              }).toMap)
           case obj @ ApiKey(keyname, passAs) =>
             ("type" -> obj.`type`) ~ ("passAs" -> passAs) ~
               ("keyname" -> keyname)

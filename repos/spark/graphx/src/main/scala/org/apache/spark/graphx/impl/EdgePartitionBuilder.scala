@@ -26,9 +26,8 @@ import org.apache.spark.util.collection.{
 }
 
 /** Constructs an EdgePartition from scratch. */
-private[graphx] class EdgePartitionBuilder[
-    @specialized(Long, Int, Double) ED: ClassTag,
-    VD: ClassTag](size: Int = 64) {
+private[graphx] class EdgePartitionBuilder[@specialized(Long, Int, Double) ED: ClassTag,
+VD: ClassTag](size: Int = 64) {
   private[this] val edges = new PrimitiveVector[Edge[ED]](size)
 
   /** Add a new edge to the partition. */

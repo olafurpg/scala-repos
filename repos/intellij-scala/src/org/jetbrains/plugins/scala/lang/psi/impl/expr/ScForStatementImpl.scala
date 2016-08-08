@@ -269,13 +269,13 @@ class ScForStatementImpl(node: ASTNode)
         enumerators
           .map(e => e.generators.map(g => g.pattern))
           .foreach(patts =>
-                patts.foreach(patt => {
+            patts.foreach(patt => {
               if (patt != null && patt.desugarizedPatternIndex != -1) {
                 var element = expr.findElementAt(patt.desugarizedPatternIndex)
                 while (element != null &&
                        (element.getTextLength < patt.getTextLength ||
-                           (!element.isInstanceOf[ScPattern] &&
-                               element.getTextLength == patt.getTextLength))) element =
+                       (!element.isInstanceOf[ScPattern] &&
+                       element.getTextLength == patt.getTextLength))) element =
                   element.getParent
                 if (element != null && element.getText == patt.getText) {
                   element match {

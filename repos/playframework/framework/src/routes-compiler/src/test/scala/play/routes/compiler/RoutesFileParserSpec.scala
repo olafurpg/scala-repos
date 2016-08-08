@@ -92,9 +92,8 @@ object RoutesFileParserSpec extends Specification {
     }
 
     "parse method with more than 22 arguments" in {
-      parseRoute(
-          "GET /s p.c.m(a: Int, b: Int, c: Int, d: Int, e: Int, f: Int, g: Int, h: Int, i: Int, j: Int, k: String, l: String, m: String, n: String, " +
-            "o: String, p: String, q: Option[Int], r: Option[Int], s: Option[Int], t: Option[Int], u: Option[String], v: Float, w: Float, x: Int)").call.parameters must_==
+      parseRoute("GET /s p.c.m(a: Int, b: Int, c: Int, d: Int, e: Int, f: Int, g: Int, h: Int, i: Int, j: Int, k: String, l: String, m: String, n: String, " +
+        "o: String, p: String, q: Option[Int], r: Option[Int], s: Option[Int], t: Option[Int], u: Option[String], v: Float, w: Float, x: Int)").call.parameters must_==
         Some(
             Seq(Parameter("a", "Int", None, None),
                 Parameter("b", "Int", None, None),

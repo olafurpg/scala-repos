@@ -224,12 +224,12 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
 
     vFile != null &&
     (vFile.getExtension == ScalaFileType.WORKSHEET_EXTENSION ||
-        ScratchFileService
-          .getInstance()
-          .getRootType(vFile)
-          .isInstanceOf[ScratchRootType] && ScalaProjectSettings
-          .getInstance(getProject)
-          .isTreatScratchFilesAsWorksheet)
+    ScratchFileService
+      .getInstance()
+      .getRootType(vFile)
+      .isInstanceOf[ScratchRootType] && ScalaProjectSettings
+      .getInstance(getProject)
+      .isTreatScratchFilesAsWorksheet)
   }
 
   def setPackageName(name: String) {
@@ -556,7 +556,7 @@ object ScalaFileImpl {
         val index =
           ProjectRootManager.getInstance(place.getProject).getFileIndex
         !(index.isInSourceContent(file) || index.isInLibraryClasses(file) ||
-              index.isInLibrarySource(file))
+          index.isInLibrarySource(file))
       case _ => false
     }
   }

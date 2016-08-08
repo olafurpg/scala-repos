@@ -402,7 +402,7 @@ class ScalaAnnotator
       override def visitVariable(varr: ScVariable) {
         if (typeAware && !compiled &&
             (varr.getParent.isInstanceOf[ScTemplateBody] ||
-                varr.getParent.isInstanceOf[ScEarlyDefinitions])) {
+            varr.getParent.isInstanceOf[ScEarlyDefinitions])) {
           checkOverrideVars(varr, holder, isInSources)
         }
         varr.typeElement match {
@@ -437,7 +437,7 @@ class ScalaAnnotator
       override def visitValue(v: ScValue) {
         if (typeAware && !compiled &&
             (v.getParent.isInstanceOf[ScTemplateBody] ||
-                v.getParent.isInstanceOf[ScEarlyDefinitions])) {
+            v.getParent.isInstanceOf[ScEarlyDefinitions])) {
           checkOverrideVals(v, holder, isInSources)
         }
         v.typeElement match {
@@ -696,7 +696,7 @@ class ScalaAnnotator
       holder.registerValueUsed(value)
       // For use of unapply method, see SCL-3463
       resolveResult.parentElement.foreach(parent =>
-            holder.registerValueUsed(ReadValueUsed(parent)))
+        holder.registerValueUsed(ReadValueUsed(parent)))
     }
   }
 

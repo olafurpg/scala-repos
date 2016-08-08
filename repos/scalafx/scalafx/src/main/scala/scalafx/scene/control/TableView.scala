@@ -311,7 +311,7 @@ class TableView[S](
   def columnResizePolicy: ObjectProperty[
       TableView.ResizeFeatures[S] => Boolean] =
     ObjectProperty((features: TableView.ResizeFeatures[S]) =>
-          delegate.columnResizePolicyProperty.value.call(features))
+      delegate.columnResizePolicyProperty.value.call(features))
   def columnResizePolicy_=(p: TableView.ResizeFeatures[_] => Boolean) {
     delegate
       .columnResizePolicyProperty()
@@ -386,10 +386,10 @@ class TableView[S](
   def rowFactory_=(factory: TableView[S] => TableRow[S]) {
     delegate.rowFactoryProperty.setValue(
         new jfxu.Callback[jfxsc.TableView[S], jfxsc.TableRow[S]] {
-      def call(v: jfxsc.TableView[S]): jfxsc.TableRow[S] = {
-        factory(v)
-      }
-    })
+          def call(v: jfxsc.TableView[S]): jfxsc.TableRow[S] = {
+            factory(v)
+          }
+        })
   }
 
   /**
@@ -456,7 +456,7 @@ class TableView[S](
   def onScrollToColumn_=(
       v: jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]) {
     ObjectProperty.fillProperty[jfxe.EventHandler[
-            jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]](onScrollToColumn, v)
+        jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]](onScrollToColumn, v)
   }
 
   /** Called when there's a request to sort the control. */

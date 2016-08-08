@@ -76,7 +76,7 @@ trait ThriftTest { self: FunSuite =>
       val serviceFactory = ClientBuilder()
         .hosts(Seq(addr.asInstanceOf[InetSocketAddress]))
         .codec(ThriftClientFramedCodec(clientIdOpt).protocolFactory(
-                protocolFactory))
+            protocolFactory))
         .name("thriftclient")
         .hostConnectionLimit(2)
         .tracer(DefaultTracer)

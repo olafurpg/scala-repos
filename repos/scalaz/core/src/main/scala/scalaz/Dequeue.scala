@@ -133,10 +133,10 @@ sealed abstract class Dequeue[A] {
         case SingletonDequeue(a) => this :+ a
         case FullDequeue(of, ofs, ob, obs) =>
           FullDequeue(
-              OneAnd(f.head,
-                     (f.tail ++
-                           ((b.head +: b.tail) reverse_::: ICons(of.head,
-                                                                 of.tail)))),
+              OneAnd(
+                  f.head,
+                  (f.tail ++
+                    ((b.head +: b.tail) reverse_::: ICons(of.head, of.tail)))),
               fs + bs + ofs,
               ob,
               obs)

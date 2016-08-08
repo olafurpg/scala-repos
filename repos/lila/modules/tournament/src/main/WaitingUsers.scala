@@ -54,8 +54,8 @@ private[tournament] case class WaitingUsers(hash: Map[String, DateTime],
     copy(
         hash =
           hash filterKeys { k =>
-        !us.contains(k)
-      })
+            !us.contains(k)
+          })
 
   override def toString = all.toString
 }

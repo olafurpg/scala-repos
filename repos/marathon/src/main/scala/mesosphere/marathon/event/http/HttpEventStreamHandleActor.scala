@@ -64,8 +64,8 @@ class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
       context.become(stashEvents)
       val sendFuture = Future {
         toSend.foreach(event =>
-              handle.sendEvent(event.eventType,
-                               Json.stringify(eventToJson(event))))
+          handle.sendEvent(event.eventType,
+                           Json.stringify(eventToJson(event))))
         WorkDone
       }(ThreadPoolContext.ioContext)
 

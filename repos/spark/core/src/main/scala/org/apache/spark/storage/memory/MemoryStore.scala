@@ -170,9 +170,8 @@ private[spark] class MemoryStore(conf: SparkConf,
       reserveUnrollMemoryForThisTask(blockId, initialMemoryThreshold)
 
     if (!keepUnrolling) {
-      logWarning(
-          s"Failed to reserve initial memory threshold of " +
-            s"${Utils.bytesToString(initialMemoryThreshold)} for computing block $blockId in memory.")
+      logWarning(s"Failed to reserve initial memory threshold of " +
+        s"${Utils.bytesToString(initialMemoryThreshold)} for computing block $blockId in memory.")
     } else {
       unrollMemoryUsedByThisBlock += initialMemoryThreshold
     }

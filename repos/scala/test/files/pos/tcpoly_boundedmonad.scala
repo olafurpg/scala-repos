@@ -2,7 +2,7 @@ trait Monad[T <: Bound[T], MyType[x <: Bound[x]], Bound[_]] {
   def map[S <: Bound[S]](f: T => S): MyType[S]
 
   def flatMap[S <: RBound[S], RContainer[x <: RBound[x]], RBound[_],
-      Result[x <: RBound[x]] <: Monad[x, RContainer, RBound]](
+  Result[x <: RBound[x]] <: Monad[x, RContainer, RBound]](
       f: T => Result[S]): Result[S]
 
   def filter(p: T => Boolean): MyType[T]

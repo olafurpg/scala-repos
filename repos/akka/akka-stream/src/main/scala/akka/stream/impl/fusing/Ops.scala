@@ -1056,9 +1056,8 @@ private[stream] final class Delay[T](d: FiniteDuration,
                 buffer.clear()
                 grabAndPull(true)
               case Fail ⇒
-                failStage(
-                    new BufferOverflowException(
-                        s"Buffer overflow for delay combinator (max capacity was: $size)!"))
+                failStage(new BufferOverflowException(
+                    s"Buffer overflow for delay combinator (max capacity was: $size)!"))
               case Backpressure ⇒
                 throw new IllegalStateException(
                     "Delay buffer must never overflow in Backpressure mode")

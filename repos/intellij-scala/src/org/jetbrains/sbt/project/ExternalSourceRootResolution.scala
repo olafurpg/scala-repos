@@ -73,7 +73,7 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
         val dependency = projectToModuleNode.values
           .find(_.getId == dependencyId.project)
           .getOrElse(throw new ExternalSystemException(
-                  "Cannot find project dependency: " + dependencyId.project))
+              "Cannot find project dependency: " + dependencyId.project))
 
         val dependencyNode = new ModuleDependencyNode(moduleNode, dependency)
         dependencyNode.setScope(scopeFor(dependencyId.configuration))
@@ -133,7 +133,7 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
   private def sharedAndExternalRootsIn(
       projects: Seq[sbtStructure.ProjectData]): Seq[SharedRoot] = {
     val projectRoots = projects.flatMap(project =>
-          sourceRootsIn(project).map(ProjectRoot(project, _)))
+      sourceRootsIn(project).map(ProjectRoot(project, _)))
 
     // TODO return the message about omitted directories
     val internalSourceDirectories =
@@ -141,8 +141,8 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
 
     projectRoots
       .filter(it =>
-            it.isExternal &&
-              !internalSourceDirectories.contains(it.root.directory))
+        it.isExternal &&
+          !internalSourceDirectories.contains(it.root.directory))
       .groupBy(_.root)
       .mapValues(_.map(_.project).toSet)
       .map(p => SharedRoot(p._1, p._2.toSeq))

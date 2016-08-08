@@ -96,8 +96,8 @@ class GroupVersioningUtilTest
       maybeApp
         .map(
             _.copy(versionInfo = VersionInfo
-                  .forNewConfig(Timestamp(0))
-                  .withScaleOrRestartChange(Timestamp(10))))
+              .forNewConfig(Timestamp(0))
+              .withScaleOrRestartChange(Timestamp(10))))
         .get
     updated.toString should be(
         nestedAppScaled

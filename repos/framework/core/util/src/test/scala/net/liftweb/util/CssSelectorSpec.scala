@@ -688,7 +688,7 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "substitute multiple Strings with a List of XML by id" in {
       val answer = (("#foo" replaceWith "hello") &
-            ("#baz" replaceWith List[NodeSeq](<i/>, <i>Meow</i>)))(
+        ("#baz" replaceWith List[NodeSeq](<i/>, <i>Meow</i>)))(
           <b><div frog="dog" id="baz">Hello</div><span id="foo"/></b>)
 
       (answer \ "i").length must_== 2
@@ -769,8 +769,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
       val func =
         ".thinglist *" #>
           (".thing" #> List("xx1", "xx2", "xx2", "xx2", "xx4").map(t => {
-                ".thing [id]" #> t
-              }))
+            ".thing [id]" #> t
+          }))
       val answer =
         func(<ul class="thinglist"><li id="other" class="thing" /></ul>)
 

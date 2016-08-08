@@ -243,7 +243,7 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
   def orsetFromProto(orset: rd.ORSet): ORSet[Any] = {
     val elements: Iterator[Any] =
       (orset.getStringElementsList.iterator.asScala ++ orset.getIntElementsList.iterator.asScala ++ orset.getLongElementsList.iterator.asScala ++ orset.getOtherElementsList.iterator.asScala
-            .map(otherMessageFromProto))
+        .map(otherMessageFromProto))
 
     val dots = orset.getDotsList.asScala.map(versionVectorFromProto).iterator
     val elementsMap = elements.zip(dots).toMap
@@ -295,8 +295,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
   def gcounterFromProto(gcounter: rd.GCounter): GCounter = {
     new GCounter(
         state = gcounter.getEntriesList.asScala.map(entry ⇒
-              uniqueAddressFromProto(entry.getNode) -> BigInt(
-                  entry.getValue.toByteArray))(breakOut))
+          uniqueAddressFromProto(entry.getNode) -> BigInt(
+              entry.getValue.toByteArray))(breakOut))
   }
 
   def pncounterToProto(pncounter: PNCounter): rd.PNCounter =
@@ -339,8 +339,7 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
     else {
       val versions: TreeMap[UniqueAddress, Long] =
         versionVector.getEntriesList.asScala.map(entry ⇒
-              uniqueAddressFromProto(entry.getNode) -> entry.getVersion)(
-            breakOut)
+          uniqueAddressFromProto(entry.getNode) -> entry.getVersion)(breakOut)
       VersionVector(versions)
     }
   }
@@ -364,8 +363,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
   def ormapFromProto(ormap: rd.ORMap): ORMap[ReplicatedData] = {
     val entries = ormap.getEntriesList.asScala
       .map(entry ⇒
-            entry.getKey -> otherMessageFromProto(entry.getValue)
-              .asInstanceOf[ReplicatedData])
+        entry.getKey -> otherMessageFromProto(entry.getValue)
+          .asInstanceOf[ReplicatedData])
       .toMap
     new ORMap(keys = orsetFromProto(ormap.getKeys).asInstanceOf[ORSet[String]],
               entries)

@@ -80,7 +80,7 @@ object DecisionTreeRunner {
         .action((x, c) => c.copy(algo = Algo.withName(x)))
       opt[String]("impurity")
         .text(s"impurity type (${ImpurityType.values.mkString(",")}), " +
-              s"default: ${defaultParams.impurity}")
+          s"default: ${defaultParams.impurity}")
         .action((x, c) => c.copy(impurity = ImpurityType.withName(x)))
       opt[Int]("maxDepth")
         .text(s"max depth of the tree, default: ${defaultParams.maxDepth}")
@@ -99,12 +99,12 @@ object DecisionTreeRunner {
         .action((x, c) => c.copy(minInfoGain = x))
       opt[Int]("numTrees")
         .text(s"number of trees (1 = decision tree, 2+ = random forest)," +
-              s" default: ${defaultParams.numTrees}")
+          s" default: ${defaultParams.numTrees}")
         .action((x, c) => c.copy(numTrees = x))
       opt[String]("featureSubsetStrategy")
         .text(s"feature subset sampling strategy" +
-              s" (${RandomForest.supportedFeatureSubsetStrategies.mkString(", ")}), " +
-              s"default: ${defaultParams.featureSubsetStrategy}")
+          s" (${RandomForest.supportedFeatureSubsetStrategies.mkString(", ")}), " +
+          s"default: ${defaultParams.featureSubsetStrategy}")
         .action((x, c) => c.copy(featureSubsetStrategy = x))
       opt[Double]("fracTest")
         .text(
@@ -113,19 +113,19 @@ object DecisionTreeRunner {
         .action((x, c) => c.copy(fracTest = x))
       opt[Boolean]("useNodeIdCache")
         .text(s"whether to use node Id cache during training, " +
-              s"default: ${defaultParams.useNodeIdCache}")
+          s"default: ${defaultParams.useNodeIdCache}")
         .action((x, c) => c.copy(useNodeIdCache = x))
       opt[String]("checkpointDir")
         .text(
             s"checkpoint directory where intermediate node Id caches will be stored, " +
               s"default: ${defaultParams.checkpointDir match {
-            case Some(strVal) => strVal
-            case None => "None"
-          }}")
+                case Some(strVal) => strVal
+                case None => "None"
+              }}")
         .action((x, c) => c.copy(checkpointDir = Some(x)))
       opt[Int]("checkpointInterval")
         .text(s"how often to checkpoint the node Id cache, " +
-              s"default: ${defaultParams.checkpointInterval}")
+          s"default: ${defaultParams.checkpointInterval}")
         .action((x, c) => c.copy(checkpointInterval = x))
       opt[String]("testInput")
         .text(
@@ -211,7 +211,7 @@ object DecisionTreeRunner {
             origExamples
           } else {
             origExamples.map(lp =>
-                  LabeledPoint(classIndexMap(lp.label), lp.features))
+              LabeledPoint(classIndexMap(lp.label), lp.features))
           }
         }
         val numExamples = examples.count()
@@ -247,7 +247,7 @@ object DecisionTreeRunner {
               origTestExamples
             } else {
               origTestExamples.map(lp =>
-                    LabeledPoint(classIndexMap(lp.label), lp.features))
+                LabeledPoint(classIndexMap(lp.label), lp.features))
             }
           }
           Array(examples, testExamples)
@@ -316,7 +316,7 @@ object DecisionTreeRunner {
       }
       if (params.algo == Classification) {
         val trainAccuracy = new MulticlassMetrics(training.map(lp =>
-                  (model.predict(lp.features), lp.label))).precision
+          (model.predict(lp.features), lp.label))).precision
         println(s"Train accuracy = $trainAccuracy")
         val testAccuracy = new MulticlassMetrics(
             test.map(lp => (model.predict(lp.features), lp.label))).precision
@@ -345,7 +345,7 @@ object DecisionTreeRunner {
           println(model) // Print model summary.
         }
         val trainAccuracy = new MulticlassMetrics(training.map(lp =>
-                  (model.predict(lp.features), lp.label))).precision
+          (model.predict(lp.features), lp.label))).precision
         println(s"Train accuracy = $trainAccuracy")
         val testAccuracy = new MulticlassMetrics(
             test.map(lp => (model.predict(lp.features), lp.label))).precision

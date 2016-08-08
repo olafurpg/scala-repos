@@ -25,7 +25,7 @@ object ASMConverters {
 
     def dropLinesFrames =
       self.filterNot(i =>
-            i.isInstanceOf[LineNumber] || i.isInstanceOf[FrameEntry])
+        i.isInstanceOf[LineNumber] || i.isInstanceOf[FrameEntry])
 
     private def referencedLabels(instruction: Instruction): Set[Instruction] =
       instruction match {

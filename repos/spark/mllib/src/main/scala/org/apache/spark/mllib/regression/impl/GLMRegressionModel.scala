@@ -52,7 +52,7 @@ private[regression] object GLMRegressionModel {
       // Create JSON metadata.
       val metadata = compact(
           render(("class" -> modelClass) ~ ("version" -> thisFormatVersion) ~
-                ("numFeatures" -> weights.size)))
+            ("numFeatures" -> weights.size)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 

@@ -450,9 +450,8 @@ private[spark] class ExecutorAllocationManager(
     // Send a request to the backend to kill this executor
     val removeRequestAcknowledged = testing || client.killExecutor(executorId)
     if (removeRequestAcknowledged) {
-      logInfo(
-          s"Removing executor $executorId because it has been idle for " +
-            s"$executorIdleTimeoutS seconds (new desired total will be ${numExistingExecutors - 1})")
+      logInfo(s"Removing executor $executorId because it has been idle for " +
+        s"$executorIdleTimeoutS seconds (new desired total will be ${numExistingExecutors - 1})")
       executorsPendingToRemove.add(executorId)
       true
     } else {
@@ -508,9 +507,8 @@ private[spark] class ExecutorAllocationManager(
     */
   private def onSchedulerBacklogged(): Unit = synchronized {
     if (addTime == NOT_SET) {
-      logDebug(
-          s"Starting timer to add executors because pending tasks " +
-            s"are building up (to expire in $schedulerBacklogTimeoutS seconds)")
+      logDebug(s"Starting timer to add executors because pending tasks " +
+        s"are building up (to expire in $schedulerBacklogTimeoutS seconds)")
       addTime = clock.getTimeMillis + schedulerBacklogTimeoutS * 1000
     }
   }
@@ -551,9 +549,8 @@ private[spark] class ExecutorAllocationManager(
         }
         val realTimeout = if (timeout <= 0) Long.MaxValue else timeout // overflow
         removeTimes(executorId) = realTimeout
-        logDebug(
-            s"Starting idle timer for $executorId because there are no more tasks " +
-              s"scheduled to run on the executor (to expire in ${(realTimeout - now) / 1000} seconds)")
+        logDebug(s"Starting idle timer for $executorId because there are no more tasks " +
+          s"scheduled to run on the executor (to expire in ${(realTimeout - now) / 1000} seconds)")
       }
     } else {
       logWarning(s"Attempted to mark unknown executor $executorId idle")

@@ -29,9 +29,9 @@ object EnumeratorTTest extends SpecLite {
     val xs = (1 to 10).map(List(_)).toList
     val e = enumIterator(xs.iterator)
     (Iteratee
-          .sum[List[Int], IO] &= e).run.unsafePerformIO must_=== (xs.flatten)
+      .sum[List[Int], IO] &= e).run.unsafePerformIO must_=== (xs.flatten)
     (Iteratee
-          .sum[List[Int], IO] &= e).run.unsafePerformIO must_=== (xs.flatten)
+      .sum[List[Int], IO] &= e).run.unsafePerformIO must_=== (xs.flatten)
   }
 
   "eof" in {

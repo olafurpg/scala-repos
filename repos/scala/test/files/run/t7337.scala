@@ -7,7 +7,7 @@ object Test extends DirectTest {
   override def newCompiler(args: String*): Global = {
     val settings = newSettings(
         (CommandLineParser tokenize
-              ("-d doesnotexist " + extraSettings)) ++ args.toList)
+          ("-d doesnotexist " + extraSettings)) ++ args.toList)
     newCompiler(settings)
   }
 

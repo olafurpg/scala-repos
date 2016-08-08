@@ -14,9 +14,9 @@ object CategRepo {
     $find(
         $query(
             $or(Seq(
-                    Json.obj("team" -> $exists(false)),
-                    Json.obj("team" -> $in(teams))
-                ))) sort $sort.asc("pos"))
+                Json.obj("team" -> $exists(false)),
+                Json.obj("team" -> $in(teams))
+            ))) sort $sort.asc("pos"))
 
   def nextPosition: Fu[Int] =
     $primitive.one(

@@ -138,10 +138,9 @@ object Concurrent {
           }(dec)
       }
 
-      Iteratee.flatten(
-          Future
-            .sequence(ready)
-            .map[Iteratee[E, Unit]] { commitReady =>
+      Iteratee.flatten(Future
+        .sequence(ready)
+        .map[Iteratee[E, Unit]] { commitReady =>
           val downToZero = atomic { implicit txn =>
             iteratees.transform(commitReady.collect { case Some(s) => s } ++ _)
             (interested.length > 0 && iteratees().length <= 0)
@@ -384,8 +383,8 @@ object Concurrent {
         }
         Iteratee.flatten(in.map { in =>
           (new CheckDone[E, E] {
-                def continue[A](cont: K[E, A]) = moreInput(cont)
-              } &> k(in))
+            def continue[A](cont: K[E, A]) = moreInput(cont)
+          } &> k(in))
         }(dec))
       }
       (new CheckDone[E, E] { def continue[A](cont: K[E, A]) = moreInput(cont) } &> it).unflatten.onComplete {
@@ -490,9 +489,9 @@ object Concurrent {
         Promise[Iteratee[E, A]]()
       val iteratee: Ref[Future[Option[Input[E] => Iteratee[E, A]]]] = Ref(
           it.pureFold {
-        case Step.Cont(k) => Some(k);
-        case other => promise.success(other.it); None
-      }(dec))
+            case Step.Cont(k) => Some(k);
+            case other => promise.success(other.it); None
+          }(dec))
 
       val pushee = new Channel[E] {
 
@@ -840,16 +839,16 @@ object Concurrent {
 
         def patchIn(e: Enumerator[E]): Boolean = {
           !(closed() || {
-                val newRef = atomic { implicit txn =>
-                  val enRef = ref()
-                  val it = enRef.swap(Done(None, Input.Empty))
-                  val newRef = Ref(it)
-                  ref() = newRef
-                  newRef
-                }
-                e |>> refIteratee(newRef) //TODO maybe do something if the enumerator is done, maybe not
-                false
-              })
+            val newRef = atomic { implicit txn =>
+              val enRef = ref()
+              val it = enRef.swap(Done(None, Input.Empty))
+              val newRef = Ref(it)
+              ref() = newRef
+              newRef
+            }
+            e |>> refIteratee(newRef) //TODO maybe do something if the enumerator is done, maybe not
+            false
+          })
         }
       }))(pec).flatMap(_ => result.future)(dec)
     }
@@ -912,10 +911,10 @@ object Concurrent {
     val result = Promise[(A, Enumerator[E])]()
 
     (enumerator |>>> iteratee.flatMap { a =>
-          val (consumeRemaining, remaining) = Concurrent.joined[E]
-          result.success((a, remaining))
-          consumeRemaining
-        }(dec)).onFailure {
+      val (consumeRemaining, remaining) = Concurrent.joined[E]
+      result.success((a, remaining))
+      consumeRemaining
+    }(dec)).onFailure {
       case e => result.tryFailure(e)
     }(dec)
 

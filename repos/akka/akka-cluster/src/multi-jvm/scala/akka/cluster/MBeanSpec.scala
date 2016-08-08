@@ -85,7 +85,7 @@ abstract class MBeanSpec
             mbeanServer.getAttribute(mbeanName, "MemberStatus") should ===(
                 "Up"))
         awaitAssert(mbeanServer.getAttribute(mbeanName, "Leader") should ===(
-                address(first).toString))
+            address(first).toString))
         mbeanServer
           .getAttribute(mbeanName, "Singleton")
           .asInstanceOf[Boolean] should ===(true)
@@ -144,7 +144,7 @@ abstract class MBeanSpec
           .map(address(_))
           .mkString(",")
         awaitAssert(mbeanServer.getAttribute(mbeanName, "Members") should ===(
-                expectedMembers))
+            expectedMembers))
       }
       enterBarrier("fourth-unreachable")
 
@@ -200,9 +200,8 @@ abstract class MBeanSpec
 
         // awaitAssert to make sure that all nodes detects unreachable
         within(15.seconds) {
-          awaitAssert(
-              mbeanServer.getAttribute(mbeanName, "ClusterStatus") should ===(
-                  expectedJson))
+          awaitAssert(mbeanServer
+            .getAttribute(mbeanName, "ClusterStatus") should ===(expectedJson))
         }
       }
 
@@ -245,7 +244,7 @@ abstract class MBeanSpec
         val expectedMembers =
           Seq(first, second).sorted.map(address(_)).mkString(",")
         awaitAssert(mbeanServer.getAttribute(mbeanName, "Members") should ===(
-                expectedMembers))
+            expectedMembers))
       }
       runOn(third) {
         awaitCond(cluster.isTerminated)

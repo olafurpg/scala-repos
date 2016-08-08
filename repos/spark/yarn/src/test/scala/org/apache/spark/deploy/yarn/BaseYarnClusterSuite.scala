@@ -218,7 +218,7 @@ abstract class BaseYarnClusterSuite
 
     val testClasspath = new TestClasspathBuilder()
       .buildClassPath(logConfDir.getAbsolutePath() + File.pathSeparator +
-            extraClassPath.mkString(File.pathSeparator))
+        extraClassPath.mkString(File.pathSeparator))
       .asScala
       .mkString(File.pathSeparator)
 

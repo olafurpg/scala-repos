@@ -179,8 +179,8 @@ object JsonTransSpec extends Specification {
       val json = Json.obj("somekey1" -> 11, "somekey2" -> 22)
       val jsonTransform =
         ((__ \ "key1" \ "sk1").json.copyFrom((__ \ "somekey1").json.pick) and
-              (__ \ "key1" \ "sk2").json
-                .copyFrom((__ \ "somekey2").json.pick)).reduce
+          (__ \ "key1" \ "sk2").json
+            .copyFrom((__ \ "somekey2").json.pick)).reduce
 
       json.validate(jsonTransform).get must beEqualTo(
           Json.obj("key1" -> Json.obj("sk1" -> 11, "sk2" -> 22))

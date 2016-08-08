@@ -174,9 +174,8 @@ private[streaming] class FileBasedWriteAheadLog(
       pastLogs --= expiredLogs
       expiredLogs
     }
-    logInfo(
-        s"Attempting to clear ${oldLogFiles.size} old log files in $logDirectory " +
-          s"older than $threshTime: ${oldLogFiles.map { _.path }.mkString("\n")}")
+    logInfo(s"Attempting to clear ${oldLogFiles.size} old log files in $logDirectory " +
+      s"older than $threshTime: ${oldLogFiles.map { _.path }.mkString("\n")}")
 
     def deleteFile(walInfo: LogInfo): Unit = {
       try {

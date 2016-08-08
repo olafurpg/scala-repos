@@ -105,7 +105,7 @@ object Probes {
       name: String,
       messageLogger: T => String = (t: T) => t.toString): Flow[T, T, _] = {
     Flow[T].transform(() =>
-          new PushPullStage[T, T] with Probe {
+      new PushPullStage[T, T] with Probe {
         override def startTime: Long = System.nanoTime()
         override def probeName: String = name
 

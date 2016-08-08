@@ -16,8 +16,8 @@ object Util extends Build {
   val zkDependency =
     "org.apache.zookeeper" % "zookeeper" % zkVersion excludeAll
       (ExclusionRule("com.sun.jdmk", "jmxtools"),
-          ExclusionRule("com.sun.jmx", "jmxri"),
-          ExclusionRule("javax.jms", "jms"))
+      ExclusionRule("com.sun.jmx", "jmxri"),
+      ExclusionRule("javax.jms", "jms"))
 
   val parserCombinators = scalaVersion { sv =>
     CrossVersion.partialVersion(sv) match {
@@ -118,10 +118,10 @@ object Util extends Build {
           Defaults.coreDefaultSettings ++ sharedSettings ++ unidocSettings
     ) aggregate
       (utilFunction, utilRegistry, utilCore, utilCodec, utilCollection,
-          utilCache, utilReflect, utilLint, utilLogging, utilTest, utilThrift,
-          utilHashing, utilJvm, utilZk, utilZkCommon, utilZkTest,
-          utilClassPreloader, utilBenchmark, utilApp, utilEvents, utilStats,
-          utilEval)
+      utilCache, utilReflect, utilLint, utilLogging, utilTest, utilThrift,
+      utilHashing, utilJvm, utilZk, utilZkCommon, utilZkTest,
+      utilClassPreloader, utilBenchmark, utilApp, utilEvents, utilStats,
+      utilEval)
 
   lazy val utilApp = Project(
       id = "util-app",

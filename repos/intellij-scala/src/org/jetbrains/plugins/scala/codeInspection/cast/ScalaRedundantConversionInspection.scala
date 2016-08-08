@@ -53,7 +53,7 @@ class ScalaRedundantConversionInspection
           if f.getName == "toString" &&
             f.getParameterList.getParametersCount == 0 &&
             (f.getTypeParameterList == null ||
-                  f.getTypeParameterList.getTypeParameters.isEmpty) =>
+              f.getTypeParameterList.getTypeParameters.isEmpty) =>
         for (leftType <- left.getType(TypingContext.empty)
              if leftType.canonicalText == "_root_.java.lang.String")
           registerProblem(element, left, "java.lang.String", offset, holder)

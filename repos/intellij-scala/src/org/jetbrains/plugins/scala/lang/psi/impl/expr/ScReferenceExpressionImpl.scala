@@ -551,10 +551,9 @@ class ScReferenceExpressionImpl(node: ASTNode)
                 inner match {
                   case ScTypePolymorphicType(internal, typeParams2) =>
                     return Success(
-                        ScalaPsiUtil.removeBadBounds(
-                            ScTypePolymorphicType(
-                                internal,
-                                typeParams ++ typeParams2 ++ unresolvedTypeParameters)),
+                        ScalaPsiUtil.removeBadBounds(ScTypePolymorphicType(
+                            internal,
+                            typeParams ++ typeParams2 ++ unresolvedTypeParameters)),
                         Some(this))
                   case _ =>
                     return Success(ScTypePolymorphicType(
@@ -584,10 +583,9 @@ class ScReferenceExpressionImpl(node: ASTNode)
             inner match {
               case ScTypePolymorphicType(internal, typeParams2) =>
                 return Success(
-                    ScalaPsiUtil.removeBadBounds(
-                        ScTypePolymorphicType(
-                            internal,
-                            typeParams ++ typeParams2 ++ unresolvedTypeParameters)),
+                    ScalaPsiUtil.removeBadBounds(ScTypePolymorphicType(
+                        internal,
+                        typeParams ++ typeParams2 ++ unresolvedTypeParameters)),
                     Some(this))
               case _ =>
                 return Success(ScTypePolymorphicType(

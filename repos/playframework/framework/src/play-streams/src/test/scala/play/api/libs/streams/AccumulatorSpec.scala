@@ -58,8 +58,8 @@ object AccumulatorSpec extends Specification {
               sum
                 .map(error[Int])
                 .recover {
-              case e => 20
-            }
+                  case e => 20
+                }
                 .run(source)) must_== 20
       }
 
@@ -79,8 +79,8 @@ object AccumulatorSpec extends Specification {
               sum
                 .map(error[Int])
                 .recoverWith {
-              case e => Future(20)
-            }
+                  case e => Future(20)
+                }
                 .run(source)) must_== 20
       }
 
@@ -122,13 +122,11 @@ object AccumulatorSpec extends Specification {
 
     "be compatible with Java accumulator" in {
       "Java asScala" in withMaterializer { implicit m =>
-        await(
-            play.libs.streams.Accumulator
-              .fromSink(sum.toSink
-                    .mapMaterializedValue(FutureConverters.toJava)
-                    .asJava)
-              .asScala()
-              .run(source)) must_== 6
+        await(play.libs.streams.Accumulator
+          .fromSink(
+              sum.toSink.mapMaterializedValue(FutureConverters.toJava).asJava)
+          .asScala()
+          .run(source)) must_== 6
       }
 
       "Scala asJava" in withMaterializer { implicit m =>

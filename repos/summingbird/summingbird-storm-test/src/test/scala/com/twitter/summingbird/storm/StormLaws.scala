@@ -272,12 +272,10 @@ class StormLaws extends WordSpec {
         TestGraphs.leftJoinJob[Storm, Int, Int, Int, Int, Int](_, service, _)(
             staticFunc)(nextFn))
 
-    assert(
-        Equiv[Map[Int, Int]].equiv(
-            TestGraphs.leftJoinInScala(original)(serviceFn)(staticFunc)(
-                nextFn),
-            returnedState.toScala
-        ) == true)
+    assert(Equiv[Map[Int, Int]].equiv(
+        TestGraphs.leftJoinInScala(original)(serviceFn)(staticFunc)(nextFn),
+        returnedState.toScala
+    ) == true)
   }
 
   "StormPlatform matches Scala for left join with flatMapValues jobs" in {

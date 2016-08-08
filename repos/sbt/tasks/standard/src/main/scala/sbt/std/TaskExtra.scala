@@ -168,7 +168,7 @@ trait TaskExtra {
         mapR(x => Result.tryValue[S]({ fin; x }))
       def doFinally(t: Task[Unit]): Task[S] =
         flatMapR(x =>
-              t.mapR { tx =>
+          t.mapR { tx =>
             Result.tryValues[S](tx :: Nil, x)
         })
       def ||[T >: S](alt: Task[T]): Task[T] = flatMapR {

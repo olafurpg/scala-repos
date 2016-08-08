@@ -316,9 +316,9 @@ private[history] class ApplicationCache(
           logInfo(s"Failed to load application attempt $appId/$attemptId")
           throw new NoSuchElementException(
               s"no application with application Id '$appId'" + attemptId.map {
-            id =>
-              s" attemptId '$id'"
-          }.getOrElse(" and no attempt Id"))
+                id =>
+                  s" attemptId '$id'"
+              }.getOrElse(" and no attempt Id"))
       }
     }
   }
@@ -634,7 +634,7 @@ private[history] object ApplicationCacheCheckFilterRelay extends Logging {
     */
   def setApplicationCache(cache: ApplicationCache): Unit = {
     applicationCache.foreach(c =>
-          logWarning(s"Overwriting application cache $c"))
+      logWarning(s"Overwriting application cache $c"))
     applicationCache = Some(cache)
   }
 

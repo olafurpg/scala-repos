@@ -54,7 +54,7 @@ abstract class BaseJavaConvertersIntention(methodName: String)
     typeResult.exists { scType =>
       ScType.extractClass(scType) exists { psiClass =>
         alreadyConvertedPrefixes.exists(prefix =>
-              psiClass.getQualifiedName.startsWith(prefix))
+          psiClass.getQualifiedName.startsWith(prefix))
       }
     }
 

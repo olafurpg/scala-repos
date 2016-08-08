@@ -106,7 +106,7 @@ class MapStatusSuite extends SparkFunSuite {
   test("RoaringBitmap: runOptimize succeeded") {
     val r = new RoaringBitmap
     (1 to 200000).foreach(i =>
-          if (i % 200 != 0) {
+      if (i % 200 != 0) {
         r.add(i)
     })
     val size1 = r.getSizeInBytes
@@ -120,7 +120,7 @@ class MapStatusSuite extends SparkFunSuite {
   test("RoaringBitmap: runOptimize failed") {
     val r = new RoaringBitmap
     (1 to 200000).foreach(i =>
-          if (i % 200 == 0) {
+      if (i % 200 == 0) {
         r.add(i)
     })
     val size1 = r.getSizeInBytes

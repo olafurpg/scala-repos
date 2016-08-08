@@ -151,10 +151,8 @@ class ContainerTest extends MarathonSpec with Matchers {
         f.container3.docker.get.network == Some(proto3.getDocker.getNetwork))
     assert(
         f.container3.docker.get.privileged == proto3.getDocker.getPrivileged)
-    assert(
-        f.container3.docker.get.parameters
-          .map(_.key) == proto3.getDocker.getParametersList.asScala
-          .map(_.getKey))
+    assert(f.container3.docker.get.parameters
+      .map(_.key) == proto3.getDocker.getParametersList.asScala.map(_.getKey))
     assert(
         f.container3.docker.get.parameters
           .map(_.value) == proto3.getDocker.getParametersList.asScala
@@ -207,10 +205,8 @@ class ContainerTest extends MarathonSpec with Matchers {
         f.container3.docker.get.network == Some(proto3.getDocker.getNetwork))
     assert(
         f.container3.docker.get.privileged == proto3.getDocker.getPrivileged)
-    assert(
-        f.container3.docker.get.parameters
-          .map(_.key) == proto3.getDocker.getParametersList.asScala
-          .map(_.getKey))
+    assert(f.container3.docker.get.parameters
+      .map(_.key) == proto3.getDocker.getParametersList.asScala.map(_.getKey))
     assert(
         f.container3.docker.get.parameters
           .map(_.value) == proto3.getDocker.getParametersList.asScala

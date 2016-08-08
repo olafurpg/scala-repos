@@ -104,7 +104,7 @@ abstract class DockerJDBCIntegrationSuite
         .builder()
         .networkMode("bridge")
         .portBindings(Map(s"${db.jdbcPort}/tcp" -> List(
-                    PortBinding.of(dockerIp, externalPort)).asJava).asJava)
+            PortBinding.of(dockerIp, externalPort)).asJava).asJava)
         .build()
       // Create the database container:
       val config = ContainerConfig

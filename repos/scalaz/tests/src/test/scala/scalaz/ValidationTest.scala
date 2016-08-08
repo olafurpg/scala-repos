@@ -95,31 +95,29 @@ object ValidationTest extends SpecLite {
     import syntax.validation._
     def errmsg(i: Int) = "Int must be positive: " + i
     (List("1", "2", "3") map
-          (_.parseInt.leftMap(_.toString) excepting {
-                case i if i < 0 => errmsg(i)
-              })) must_===
+      (_.parseInt.leftMap(_.toString) excepting {
+        case i if i < 0 => errmsg(i)
+      })) must_===
       (List(1.success[String], 2.success[String], 3.success[String]))
 
     (List("1", "-2", "3") map
-          (_.parseInt.leftMap(_.toString) excepting {
-                case i if i < 0 => errmsg(i)
-              })) must_===
+      (_.parseInt.leftMap(_.toString) excepting {
+        case i if i < 0 => errmsg(i)
+      })) must_===
       (List(1.success[String], errmsg(-2).failure[Int], 3.success[String]))
 
     implicit val ShowAny: Show[Any] = Show.showA;
     implicit val EqualAny: Equal[Any] = Equal.equalA
     def errmsgA(i: Int): Any = errmsg(i)
     (List("1", "2", "3") map
-          (_.parseInt.leftMap(_.toString) excepting {
-                case i if i < 0 => errmsgA(i)
-              })) must_=== (List(1.success[Any],
-                                 2.success[Any],
-                                 3.success[Any]))
+      (_.parseInt.leftMap(_.toString) excepting {
+        case i if i < 0 => errmsgA(i)
+      })) must_=== (List(1.success[Any], 2.success[Any], 3.success[Any]))
 
     (List("1", "-2", "3") map
-          (_.parseInt.leftMap(_.toString) excepting {
-                case i if i < 0 => errmsgA(i)
-              })) must_===
+      (_.parseInt.leftMap(_.toString) excepting {
+        case i if i < 0 => errmsgA(i)
+      })) must_===
       (List(1.success[Any], errmsgA(-2).failure[Int], 3.success[Any]))
   }
 

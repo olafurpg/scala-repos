@@ -38,7 +38,7 @@ class Migration @Inject()(store: PersistentStore,
   def migrations: List[MigrationAction] = List(
       StorageVersions(0, 7, 0) -> { () =>
         Future.failed(new IllegalStateException(
-                "migration from 0.7.x not supported anymore"))
+            "migration from 0.7.x not supported anymore"))
       },
       StorageVersions(0, 11, 0) -> { () =>
         new MigrationTo0_11(groupRepo, appRepo).migrateApps().recover {
@@ -203,9 +203,8 @@ class MigrationTo0_11(groupRepository: GroupRepository,
           case Some(lastApp) if !lastApp.isUpgrade(nextApp) =>
             log.info(
                 s"Adding versionInfo to ${nextApp.id} (${nextApp.version}): scaling or restart")
-            nextApp.copy(
-                versionInfo = lastApp.versionInfo.withScaleOrRestartChange(
-                    nextApp.version))
+            nextApp.copy(versionInfo =
+              lastApp.versionInfo.withScaleOrRestartChange(nextApp.version))
           case _ =>
             log.info(
                 s"Adding versionInfo to ${nextApp.id} (${nextApp.version}): new config")
@@ -242,7 +241,7 @@ class MigrationTo0_11(groupRepository: GroupRepository,
                                                         maybeNextApp)
             storedResult <- withVersionInfo
                              .map((newApp: AppDefinition) =>
-                                   appRepository.store(newApp).map(Some(_)))
+                               appRepository.store(newApp).map(Some(_)))
                              .getOrElse(maybeLastAppFuture)
           } yield storedResult
       }
@@ -323,7 +322,7 @@ class MigrationTo0_13(taskRepository: TaskRepository, store: PersistentStore) {
         }
       case _ =>
         Future.failed[Unit](new RuntimeException(
-                s"Unable to load entity with key = $legacyKey"))
+            s"Unable to load entity with key = $legacyKey"))
     }
   }
 
@@ -408,7 +407,7 @@ class MigrationTo0_16(groupRepository: GroupRepository,
               case Some(group) => groupRepository.store(id, group).map(_ => ())
               case None =>
                 Future.failed(new MigrationFailedException(
-                        s"Group $id:$version not found"))
+                    s"Group $id:$version not found"))
             }
           }
         }
@@ -424,7 +423,7 @@ class MigrationTo0_16(groupRepository: GroupRepository,
               case Some(app) => appRepository.store(app).map(_ => ())
               case None =>
                 Future.failed(new MigrationFailedException(
-                        s"App $appId:$version not found"))
+                    s"App $appId:$version not found"))
             }
           }
         }

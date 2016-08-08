@@ -30,11 +30,9 @@ private[akka] object Reflect {
     try {
       val c = Class.forName("sun.reflect.Reflection")
       val m = c.getMethod("getCallerClass", Array(classOf[Int]): _*)
-      Some(
-          (i: Int) ⇒
-            m.invoke(null,
-                      Array[AnyRef](i.asInstanceOf[java.lang.Integer]): _*)
-              .asInstanceOf[Class[_]])
+      Some((i: Int) ⇒
+        m.invoke(null, Array[AnyRef](i.asInstanceOf[java.lang.Integer]): _*)
+          .asInstanceOf[Class[_]])
     } catch {
       case NonFatal(e) ⇒ None
     }
@@ -106,11 +104,11 @@ private[akka] object Reflect {
           val parameterTypes = c.getParameterTypes
           parameterTypes.length == length &&
           (parameterTypes.iterator zip args.iterator forall {
-                case (found, required) ⇒
-                  found.isInstance(required) ||
-                    BoxedType(found).isInstance(required) ||
-                    (required == null && !found.isPrimitive)
-              })
+            case (found, required) ⇒
+              found.isInstance(required) ||
+                BoxedType(found).isInstance(required) ||
+                (required == null && !found.isPrimitive)
+          })
         }
       if (candidates.hasNext) {
         val cstrtr = candidates.next()

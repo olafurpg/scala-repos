@@ -504,7 +504,7 @@ class ScaldingLaws extends WordSpec {
                                                         source2,
                                                         storeAndService,
                                                         finalStore)(tup =>
-            fnA(tup._2))(tup => fnB(tup._2))(postJoin)
+        fnA(tup._2))(tup => fnB(tup._2))(postJoin)
 
       val scald = Scalding("scalaCheckleftJoinWithStoreJob")
       val ws = new LoopState(intr)

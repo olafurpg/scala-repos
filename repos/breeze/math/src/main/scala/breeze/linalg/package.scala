@@ -82,7 +82,7 @@ package object linalg {
       DenseMatrix.zeros[Double](0, 0)
     } else {
       DenseMatrix.tabulate(mat.length, mat.head.length)((i, j) =>
-            mat(i)(j).toDouble)
+        mat(i)(j).toDouble)
     }
   }
 

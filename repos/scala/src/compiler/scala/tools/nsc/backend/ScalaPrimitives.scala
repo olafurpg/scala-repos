@@ -546,7 +546,7 @@ abstract class ScalaPrimitives {
           case TypeRef(_, ArrayClass, elem :: Nil) => elem
         }
       arrayParent getOrElse sys.error(fun.fullName + " : " +
-            (tpe :: tpe.baseTypeSeq.toList).mkString(", "))
+        (tpe :: tpe.baseTypeSeq.toList).mkString(", "))
     }
 
     code match {

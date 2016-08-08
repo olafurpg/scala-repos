@@ -382,7 +382,7 @@ trait Implicits { self: Analyzer =>
             sym.tpe match {
               case MethodType(params, restpe)
                   if (params forall (_.tpe
-                        .isInstanceOf[BoundedWildcardType])) =>
+                    .isInstanceOf[BoundedWildcardType])) =>
                 Some((sym.name, params map (_.tpe.bounds.lo), restpe))
               case _ => None
             }
@@ -567,10 +567,10 @@ trait Implicits { self: Analyzer =>
       // upon receiving `c.abort` the typechecker will decide that the corresponding implicit search has failed
       // which will fail the entire stack of implicit searches, producing a nice error message provided by the programmer
       (context.openImplicits find {
-            case OpenImplicit(info, tp, tree1) =>
-              !info.sym.isMacro && tree1.symbol == tree.symbol &&
-                dominates(pt, tp)
-          }) match {
+        case OpenImplicit(info, tp, tree1) =>
+          !info.sym.isMacro && tree1.symbol == tree.symbol &&
+            dominates(pt, tp)
+      }) match {
         case Some(pending) =>
           //println("Pending implicit "+pending+" dominates "+pt+"/"+undetParams) //@MDEBUG
           DivergentSearchFailure
@@ -642,7 +642,8 @@ trait Implicits { self: Analyzer =>
         ptres match {
           case HasMethodMatching(name, argtpes, restpe) =>
             (tpres.member(name) filter
-                  (m => isApplicableSafe(undet, m.tpe, argtpes, restpe))) != NoSymbol
+              (m =>
+                 isApplicableSafe(undet, m.tpe, argtpes, restpe))) != NoSymbol
           case _ =>
             tpres <:< ptres
         }
@@ -771,10 +772,9 @@ trait Implicits { self: Analyzer =>
             pt match {
               case Function1(arg1, arg2) =>
                 typed1(
-                    atPos(itree0.pos)(
-                        Apply(itree1,
-                              List(Ident(nme.argument) setType approximate(
-                                      arg1)))),
+                    atPos(itree0.pos)(Apply(
+                        itree1,
+                        List(Ident(nme.argument) setType approximate(arg1)))),
                     EXPRmode,
                     approximate(arg2)
                 ) match {
@@ -956,9 +956,9 @@ trait Implicits { self: Analyzer =>
                                                 symAcc.pos
                                                   .pointOrElse(0) < ownerPos &&
                                                 !(owner.ownerChain exists
-                                                      (o =>
-                                                         (o eq sym) ||
-                                                           (o eq symAcc))) // probably faster to iterate only once, don't feel like duplicating hasTransOwner for this case
+                                                  (o =>
+                                                     (o eq sym) ||
+                                                       (o eq symAcc))) // probably faster to iterate only once, don't feel like duplicating hasTransOwner for this case
                                               } else
                                                 !(owner hasTransOwner sym)) // faster than owner.ownerChain contains sym
       }
@@ -1003,20 +1003,20 @@ trait Implicits { self: Analyzer =>
 
       private def isIneligible(info: ImplicitInfo) =
         (info.isCyclicOrErroneous || isView &&
-              (info.sym eq Predef_conforms) // as an implicit conversion, Predef.$conforms is a no-op, so exclude it
-              || (!context.macrosEnabled && info.sym.isTermMacro))
+          (info.sym eq Predef_conforms) // as an implicit conversion, Predef.$conforms is a no-op, so exclude it
+          || (!context.macrosEnabled && info.sym.isTermMacro))
 
       /** True if a given ImplicitInfo (already known isValid) is eligible.
         */
       def survives(info: ImplicitInfo) =
         (!isIneligible(info) // cyclic, erroneous, shadowed, or specially excluded
-              &&
-                isPlausiblyCompatible(info.tpe, wildPt) // optimization to avoid matchesPt
-              &&
-                !shadower
-                  .isShadowed(info.name) // OPT rare, only check for plausible candidates
-              && matchesPt(info) // stable and matches expected type
-            )
+          &&
+            isPlausiblyCompatible(info.tpe, wildPt) // optimization to avoid matchesPt
+          &&
+            !shadower
+              .isShadowed(info.name) // OPT rare, only check for plausible candidates
+          && matchesPt(info) // stable and matches expected type
+        )
 
       /** The implicits that are not valid because they come later in the source and
         *  lack an explicit result type. Used for error diagnostics only.
@@ -1720,8 +1720,8 @@ trait Implicits { self: Analyzer =>
       def search(iss: Infoss, isLocalToCallsite: Boolean) =
         applicableInfos(iss, isLocalToCallsite).values
       (search(context.implicitss, isLocalToCallsite = true) ++ search(
-              implicitsOfExpectedType,
-              isLocalToCallsite = false)).toList.filter(_.tree ne EmptyTree)
+          implicitsOfExpectedType,
+          isLocalToCallsite = false)).toList.filter(_.tree ne EmptyTree)
     }
 
     // find all implicits for some type that contains type variables

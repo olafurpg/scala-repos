@@ -262,7 +262,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
             val size = finishedSize
             val columns: Map[ColumnRef, Column] = {
               (completeSlices.flatMap(_.columns) ++ prefixes.flatMap(
-                      _.columns)).groupBy(_._1).map {
+                  _.columns)).groupBy(_._1).map {
                 case (ref, columns) => {
                   val cp: Pair[ColumnRef, Column] = if (columns.size == 1) {
                     columns.head
@@ -692,12 +692,12 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                       val remission = req.nonEmpty.option(
                           rhead.mapColumns(cf.util.filter(0, rhead.size, req)))
                       (remission map { e =>
-                            writeAlignedSlices(rkey,
-                                               e,
-                                               rbs,
-                                               "alignRight",
-                                               SortAscending)
-                          } getOrElse rbs.point[M]) map { (lbs, _) }
+                        writeAlignedSlices(rkey,
+                                           e,
+                                           rbs,
+                                           "alignRight",
+                                           SortAscending)
+                      } getOrElse rbs.point[M]) map { (lbs, _) }
                   }
 
                 //println("Requested more left; emitting left based on bitset " + leq.toList.mkString("[", ",", "]"))
@@ -747,14 +747,14 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                           //println("No more data on right and not in a span; emitting left based on bitset " + leq.toList.mkString("[", ",", "]"))
                           // entirely done; just emit both
                           val lemission = leq.nonEmpty.option(lhead.mapColumns(
-                                  cf.util.filter(0, lhead.size, leq)))
+                              cf.util.filter(0, lhead.size, leq)))
                           (lemission map { e =>
-                                writeAlignedSlices(lkey,
-                                                   e,
-                                                   lbs,
-                                                   "alignLeft",
-                                                   SortAscending)
-                              } getOrElse lbs.point[M]) map { (_, rbs) }
+                            writeAlignedSlices(lkey,
+                                               e,
+                                               lbs,
+                                               "alignLeft",
+                                               SortAscending)
+                          } getOrElse lbs.point[M]) map { (_, rbs) }
 
                         case RightSpan =>
                           //println("No more data on right, but in a span so continuing on left.")
@@ -1364,8 +1364,9 @@ trait BlockStoreColumnarTableModule[M[+ _]]
       val right1 = right0.compact(rightKeySpec)
 
       if (yggConfig.hashJoins) {
-        (left1.toInternalTable()
-              .toEither |@| right1.toInternalTable().toEither).tupled flatMap {
+        (left1
+          .toInternalTable()
+          .toEither |@| right1.toInternalTable().toEither).tupled flatMap {
           case (Right(left), Right(right)) =>
             orderHint match {
               case Some(JoinOrder.LeftOrder) =>

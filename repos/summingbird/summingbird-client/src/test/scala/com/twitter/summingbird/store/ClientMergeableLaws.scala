@@ -88,12 +88,12 @@ object ClientMergeableLaws extends Properties("ClientMergeable") {
       Await.result(
           Future
             .collect(machine.mergeable
-                  .multiMerge(keys)
-                  .collect {
-            case ((k, BatchID(2)), fopt) =>
-              fopt.map(_ == Some(toMerge(k)._1 + init.getOrElse(k, 0)))
-          }
-                  .toSeq)
+              .multiMerge(keys)
+              .collect {
+                case ((k, BatchID(2)), fopt) =>
+                  fopt.map(_ == Some(toMerge(k)._1 + init.getOrElse(k, 0)))
+              }
+              .toSeq)
             .map(_.forall(identity)))
   }
 
@@ -117,9 +117,9 @@ object ClientMergeableLaws extends Properties("ClientMergeable") {
       Await.result(
           Future
             .collect(merged.collect {
-          case ((k, BatchID(2)), fopt) =>
-            fopt.map(_ == Some(toMerge(k)._1 + init.getOrElse(k, 0)))
-        })
+              case ((k, BatchID(2)), fopt) =>
+                fopt.map(_ == Some(toMerge(k)._1 + init.getOrElse(k, 0)))
+            })
             .map(_.forall(identity)))
   }
 

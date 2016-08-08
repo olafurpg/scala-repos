@@ -25,9 +25,9 @@ object PlayTime {
                     "$gte" -> chess.Status.Mate.id)
             ))
         .projection(BSONDocument(
-                moveTimeField -> true,
-                tvField -> true
-            ))
+            moveTimeField -> true,
+            tvField -> true
+        ))
         .cursor[BSONDocument]()
         .enumerate() |>>>
         (Iteratee.fold(User.PlayTime(0, 0)) {

@@ -126,8 +126,8 @@ class DispatchersSpec
           t ⇒
             (t,
              from(ConfigFactory
-                   .parseMap(Map(tipe -> t, id -> t).asJava)
-                   .withFallback(defaultDispatcherConfig))))
+               .parseMap(Map(tipe -> t, id -> t).asJava)
+               .withFallback(defaultDispatcherConfig))))
       .toMap
   }
 
@@ -176,7 +176,7 @@ class DispatchersSpec
     "get the correct types of dispatchers" in {
       //All created/obtained dispatchers are of the expeced type/instance
       assert(typesAndValidators.forall(tuple ⇒
-                tuple._2(allDispatchers(tuple._1))))
+        tuple._2(allDispatchers(tuple._1))))
     }
 
     "provide lookup of dispatchers by id" in {
@@ -193,7 +193,7 @@ class DispatchersSpec
 
     "include system name and dispatcher id in thread names for thread-pool-executor" in {
       system.actorOf(Props[ThreadNameEcho].withDispatcher(
-              "myapp.thread-pool-dispatcher")) ! "what's the name?"
+          "myapp.thread-pool-dispatcher")) ! "what's the name?"
       val Expected =
         "(DispatchersSpec-myapp.thread-pool-dispatcher-[1-9][0-9]*)".r
       expectMsgPF() {
@@ -212,7 +212,7 @@ class DispatchersSpec
 
     "include system name and dispatcher id in thread names for pinned dispatcher" in {
       system.actorOf(Props[ThreadNameEcho].withDispatcher(
-              "myapp.my-pinned-dispatcher")) ! "what's the name?"
+          "myapp.my-pinned-dispatcher")) ! "what's the name?"
       val Expected =
         "(DispatchersSpec-myapp.my-pinned-dispatcher-[1-9][0-9]*)".r
       expectMsgPF() {
@@ -222,7 +222,7 @@ class DispatchersSpec
 
     "include system name and dispatcher id in thread names for balancing dispatcher" in {
       system.actorOf(Props[ThreadNameEcho].withDispatcher(
-              "myapp.balancing-dispatcher")) ! "what's the name?"
+          "myapp.balancing-dispatcher")) ! "what's the name?"
       val Expected =
         "(DispatchersSpec-myapp.balancing-dispatcher-[1-9][0-9]*)".r
       expectMsgPF() {

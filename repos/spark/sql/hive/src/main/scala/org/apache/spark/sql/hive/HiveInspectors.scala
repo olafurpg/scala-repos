@@ -233,15 +233,13 @@ private[hive] trait HiveInspectors {
 
     // java list type unsupported
     case c: Class[_] if c == classOf[java.util.List[_]] =>
-      throw new AnalysisException(
-          "List type in java is unsupported because " +
-            "JVM type erasure makes spark fail to catch a component type in List<>")
+      throw new AnalysisException("List type in java is unsupported because " +
+        "JVM type erasure makes spark fail to catch a component type in List<>")
 
     // java map type unsupported
     case c: Class[_] if c == classOf[java.util.Map[_, _]] =>
-      throw new AnalysisException(
-          "Map type in java is unsupported because " +
-            "JVM type erasure makes spark fail to catch key and value types in Map<>")
+      throw new AnalysisException("Map type in java is unsupported because " +
+        "JVM type erasure makes spark fail to catch key and value types in Map<>")
 
     case c => throw new AnalysisException(s"Unsupported java type $c")
   }
@@ -395,10 +393,8 @@ private[hive] trait HiveInspectors {
     // currently, hive doesn't provide the ConstantStructObjectInspector
     case si: StructObjectInspector =>
       val allRefs = si.getAllStructFieldRefs
-      InternalRow.fromSeq(
-          allRefs.asScala.map(r =>
-                unwrap(si.getStructFieldData(data, r),
-                       r.getFieldObjectInspector)))
+      InternalRow.fromSeq(allRefs.asScala.map(r =>
+        unwrap(si.getStructFieldData(data, r), r.getFieldObjectInspector)))
   }
 
   /**
@@ -815,12 +811,10 @@ private[hive] trait HiveInspectors {
     inspector match {
       case s: StructObjectInspector =>
         StructType(
-            s.getAllStructFieldRefs.asScala.map(
-                f =>
-                  types.StructField(
-                      f.getFieldName,
-                      inspectorToDataType(f.getFieldObjectInspector),
-                      nullable = true)))
+            s.getAllStructFieldRefs.asScala.map(f =>
+              types.StructField(f.getFieldName,
+                                inspectorToDataType(f.getFieldObjectInspector),
+                                nullable = true)))
       case l: ListObjectInspector =>
         ArrayType(inspectorToDataType(l.getListElementObjectInspector))
       case m: MapObjectInspector =>

@@ -65,8 +65,8 @@ class SequenceFileRDDFunctions[K <% Writable: ClassTag,
         implicitly[T => Writable].getClass
           .getDeclaredMethods()
           .filter(m =>
-                m.getReturnType().toString != "class java.lang.Object" &&
-                  m.getName() == "apply")(0)
+            m.getReturnType().toString != "class java.lang.Object" &&
+              m.getName() == "apply")(0)
           .getReturnType
       }
       // TODO: use something like WritableConverter to avoid reflection

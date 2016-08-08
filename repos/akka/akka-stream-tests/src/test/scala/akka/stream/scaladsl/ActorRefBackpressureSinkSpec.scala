@@ -131,9 +131,9 @@ class ActorRefBackpressureSinkSpec extends AkkaSpec {
         .withAttributes(inputBuffer(bufferSize, bufferSize))
       val probe = Source(1 to streamElementCount)
         .alsoToMat(Flow[Int]
-              .take(bufferSize)
-              .watchTermination()(Keep.right)
-              .to(Sink.ignore))(Keep.right)
+          .take(bufferSize)
+          .watchTermination()(Keep.right)
+          .to(Sink.ignore))(Keep.right)
         .to(sink)
         .run()
       probe.futureValue should ===(akka.Done)
@@ -151,8 +151,8 @@ class ActorRefBackpressureSinkSpec extends AkkaSpec {
       val publisher = TestSource
         .probe[Int]
         .to(Sink
-              .actorRefWithAck(fw, initMessage, ackMessage, completeMessage)
-              .withAttributes(inputBuffer(1, 1)))
+          .actorRefWithAck(fw, initMessage, ackMessage, completeMessage)
+          .withAttributes(inputBuffer(1, 1)))
         .run()
 
       expectMsg(initMessage)

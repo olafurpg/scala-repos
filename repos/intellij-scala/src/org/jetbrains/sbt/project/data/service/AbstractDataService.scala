@@ -111,14 +111,14 @@ trait Importer[E] {
       .librariesOnly()
       .forEachLibrary(collector)
     collector.getResults.toSet.filter(l =>
-          Option(l.getName).exists(_.contains(ScalaLibraryName)))
+      Option(l.getName).exists(_.contains(ScalaLibraryName)))
   }
 
   def executeProjectChangeAction(action: => Unit): Unit =
     ExternalSystemApiUtil.executeProjectChangeAction(
         new DisposeAwareProjectChange(project) {
-      override def execute(): Unit = action
-    })
+          override def execute(): Unit = action
+        })
 
   def convertToScalaSdk(library: Library,
                         languageLevel: ScalaLanguageLevel,

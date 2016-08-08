@@ -224,11 +224,9 @@ object ScroogeGenerators {
                       Gen.listOf(Gen.alphaStr).map(l => l.to[collection.Set]))
                   .map(_.to[collection.Set])
       aMapSet <- Gen
-                  .listOf(
-                      Gen
-                        .listOf(arb[(Int, Int)])
-                        .map(l =>
-                              l.toMap.asInstanceOf[collection.Map[Int, Int]]))
+                  .listOf(Gen
+                    .listOf(arb[(Int, Int)])
+                    .map(l => l.toMap.asInstanceOf[collection.Map[Int, Int]]))
                   .map(_.to[collection.Set])
     } yield
       TestSets(aBoolSet,

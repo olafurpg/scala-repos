@@ -119,8 +119,8 @@ object Test {
     for (i <- 0 until sz) assert(store(i) == u1(i))
 
     assert((u1 map { x =>
-          x
-        }) == u1)
+      x
+    }) == u1)
     assert(u1.iterator.toSeq.size == u1.size)
   }
 }

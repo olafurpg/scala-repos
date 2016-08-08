@@ -274,36 +274,34 @@ class WorksheetEditorPrinter(originalEditor: Editor,
             override def run() {
               viewerFolding runBatchFoldingOperation
                 (new Runnable {
-                      override def run() {
-                        foldingOffsetsCopy map {
-                          case (start, end, limit, originalEnd) =>
-                            val offset =
-                              originalDocument getLineEndOffset Math.min(
-                                  originalEnd,
-                                  originalDocument.getLineCount)
-                            val linesCount =
-                              viewerDocument
-                                .getLineNumber(end) - start - limit +
-                                1
+                  override def run() {
+                    foldingOffsetsCopy map {
+                      case (start, end, limit, originalEnd) =>
+                        val offset =
+                          originalDocument getLineEndOffset Math
+                            .min(originalEnd, originalDocument.getLineCount)
+                        val linesCount =
+                          viewerDocument.getLineNumber(end) - start - limit +
+                            1
 
-                            new WorksheetFoldRegionDelegate(
-                                ed,
-                                viewerDocument.getLineStartOffset(start +
-                                      limit - 1),
-                                end,
-                                offset,
-                                linesCount,
-                                group,
-                                limit
-                            )
-                        } foreach {
-                          case region =>
-                            viewerFolding addFoldRegion region
-                        }
+                        new WorksheetFoldRegionDelegate(
+                            ed,
+                            viewerDocument.getLineStartOffset(start +
+                              limit - 1),
+                            end,
+                            offset,
+                            linesCount,
+                            group,
+                            limit
+                        )
+                    } foreach {
+                      case region =>
+                        viewerFolding addFoldRegion region
+                    }
 
-                        WorksheetFoldGroup.save(file, group)
-                      }
-                    }, false)
+                    WorksheetFoldGroup.save(file, group)
+                  }
+                }, false)
             }
           }, null, null)
       }
@@ -402,12 +400,11 @@ object WorksheetEditorPrinter {
                     .asInstanceOf[EditorImpl]
                     .getContentComponent
                     .hasFocus) return
-              recipient.getCaretModel.moveToVisualPosition(
-                  new VisualPosition(
-                      Math.min(
-                          group left2rightOffset don.getCaretModel.getVisualPosition.getLine,
-                          recipient.getDocument.getLineCount),
-                      0))
+              recipient.getCaretModel.moveToVisualPosition(new VisualPosition(
+                  Math.min(
+                      group left2rightOffset don.getCaretModel.getVisualPosition.getLine,
+                      recipient.getDocument.getLineCount),
+                  0))
             }
           }
       } getOrElse new CaretAdapter {

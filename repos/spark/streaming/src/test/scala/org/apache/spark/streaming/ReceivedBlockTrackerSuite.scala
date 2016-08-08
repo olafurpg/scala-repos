@@ -384,7 +384,7 @@ class ReceivedBlockTrackerSuite
           Array(byteBuffer)
         }
       validBuffer.map(b =>
-            Utils.deserialize[ReceivedBlockTrackerLogEvent](b.array()))
+        Utils.deserialize[ReceivedBlockTrackerLogEvent](b.array()))
     }.toList
   }
 

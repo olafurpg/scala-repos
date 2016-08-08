@@ -135,7 +135,7 @@ private[akka] class InputStreamAdapter(
             "begin + length must be smaller or equal to the array length")
 
     executeIfNotClosed(() ⇒
-          if (isStageAlive) {
+      if (isStageAlive) {
         detachedChunk match {
           case None ⇒
             try {

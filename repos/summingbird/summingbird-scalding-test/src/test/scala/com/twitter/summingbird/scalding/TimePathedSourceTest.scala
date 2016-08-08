@@ -93,7 +93,7 @@ object TimePathSourceLaws extends Properties("Time path source") {
         case None => true
         case Some(range) =>
           (data.availableRange.contains(range) &&
-                data.requestedRange.contains(range) && rangeLength(range) > 0)
+            data.requestedRange.contains(range) && rangeLength(range) > 0)
       }
     }
 
@@ -106,11 +106,10 @@ object TimePathSourceLaws extends Properties("Time path source") {
       retData match {
         case None =>
           (rangeLength(data.requestedRange) == 0 ||
-                rangeLength(data.availableRange) == 0 ||
-                data.requestedRange.isBefore(data.availableRange.start) ||
-                data.requestedRange
-                  .isAfter(data.availableRange.end) // Disjoint
-              )
+            rangeLength(data.availableRange) == 0 ||
+            data.requestedRange.isBefore(data.availableRange.start) ||
+            data.requestedRange.isAfter(data.availableRange.end) // Disjoint
+          )
         case Some(_) => true // Not in this test
       }
     }

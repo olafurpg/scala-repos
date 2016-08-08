@@ -261,7 +261,7 @@ abstract class UntypedPersistentActor
     */
   def persistAllAsync[A](events: JIterable[A], handler: Procedure[A]): Unit =
     super[Eventsourced].persistAllAsync(Util.immutableSeq(events))(event ⇒
-          handler(event))
+      handler(event))
 
   /**
     * Defer the handler execution until all pending handlers have been executed.

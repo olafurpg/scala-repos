@@ -109,7 +109,7 @@ object Run {
 
 class VectorSerializer
     extends CustomSerializer[Vector](format =>
-          ({
+      ({
         case JArray(x) =>
           val v = x.toArray.map { y =>
             y match {

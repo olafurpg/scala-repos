@@ -129,7 +129,7 @@ private[serverset2] object Stabilizer {
               case Addr.Failed(_) =>
                 State(None,
                       Some(active.getOrElse(Set.empty) ++ limbo.getOrElse(
-                              Set.empty)),
+                          Set.empty)),
                       addr)
 
               case Addr.Bound(bound, _) =>

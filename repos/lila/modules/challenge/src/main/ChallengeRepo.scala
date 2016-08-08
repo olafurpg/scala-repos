@@ -129,8 +129,8 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
               "$set" -> BSONDocument(
                   "status" -> status.id,
                   "expiresAt" -> expiresAt.fold(inTwoWeeks) {
-                _(DateTime.now)
-              }
+                    _(DateTime.now)
+                  }
               ))
       )
       .void

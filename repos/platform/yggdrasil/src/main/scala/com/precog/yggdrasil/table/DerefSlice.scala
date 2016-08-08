@@ -239,7 +239,7 @@ class DerefSlice(source: Slice, derefBy: PartialFunction[Int, CPathNode])
             def isDefinedAt(row: Int) =
               derefBy.isDefinedAt(row) &&
                 derefColumns(derefBy(row)).exists(cols =>
-                      cols(resultRef).isDefinedAt(row))
+                  cols(resultRef).isDefinedAt(row))
           }
 
         case CUndefined => UndefinedColumn.raw

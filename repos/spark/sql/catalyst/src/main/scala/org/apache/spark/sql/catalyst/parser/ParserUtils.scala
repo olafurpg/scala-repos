@@ -94,17 +94,16 @@ object ParserUtils {
 
     if (remainingNodes.nonEmpty) {
       sys.error(s"""Unhandled clauses: ${remainingNodes
-                 .map(_.treeString)
-                 .mkString("\n")}.
+                     .map(_.treeString)
+                     .mkString("\n")}.
             |You are likely trying to use an unsupported Hive feature."""".stripMargin)
     }
     clauses
   }
 
   def getClause(clauseName: String, nodeList: Seq[ASTNode]): ASTNode = {
-    getClauseOption(clauseName, nodeList).getOrElse(
-        sys.error(
-            s"Expected clause $clauseName missing from ${nodeList.map(_.treeString).mkString("\n")}"))
+    getClauseOption(clauseName, nodeList).getOrElse(sys.error(
+        s"Expected clause $clauseName missing from ${nodeList.map(_.treeString).mkString("\n")}"))
   }
 
   def getClauseOption(clauseName: String,

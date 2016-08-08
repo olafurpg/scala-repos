@@ -576,9 +576,8 @@ abstract class MultiReaderBuilder[Req, Rep, Builder] private[kestrel] (
                   factory.close()
               }
 
-              logger.info(
-                  s"Host ${addr} joined for reading ${config.queueName} " +
-                    s"(handle = ${_root_.java.lang.System.identityHashCode(handle)}).")
+              logger.info(s"Host ${addr} joined for reading ${config.queueName} " +
+                s"(handle = ${_root_.java.lang.System.identityHashCode(handle)}).")
 
               (addr, handle)
             }

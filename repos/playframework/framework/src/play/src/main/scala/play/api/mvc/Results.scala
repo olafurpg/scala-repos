@@ -99,10 +99,10 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
   def withDateHeaders(headers: (String, DateTime)*): Result = {
     copy(
         header = header.copy(headers =
-              header.headers ++ headers.map {
-        case (name, dateTime) =>
-          (name, ResponseHeader.httpDateFormat.print(dateTime.getMillis))
-      }))
+          header.headers ++ headers.map {
+            case (name, dateTime) =>
+              (name, ResponseHeader.httpDateFormat.print(dateTime.getMillis))
+          }))
   }
 
   /**
@@ -279,8 +279,8 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     */
   private def shouldWarnIfNotRedirect(flash: Flash): Boolean = {
     play.api.Play.privateMaybeApplication.exists(app =>
-          (app.mode == play.api.Mode.Dev) && (!flash.isEmpty) &&
-            (header.status < 300 || header.status > 399))
+      (app.mode == play.api.Mode.Dev) && (!flash.isEmpty) &&
+        (header.status < 300 || header.status > 399))
   }
 
   /**
@@ -439,7 +439,7 @@ trait Results {
                  fileName: java.io.File => String = _.getName,
                  onClose: () => Unit = () => ()): Result = {
       streamFile(StreamConverters.fromInputStream(() =>
-                       Files.newInputStream(content.toPath)),
+                   Files.newInputStream(content.toPath)),
                  fileName(content),
                  content.length,
                  inline)
@@ -457,7 +457,7 @@ trait Results {
                  fileName: Path => String = _.getFileName.toString,
                  onClose: () => Unit = () => ()): Result = {
       streamFile(StreamConverters.fromInputStream(() =>
-                       Files.newInputStream(content)),
+                   Files.newInputStream(content)),
                  fileName(content),
                  Files.size(content),
                  inline)
@@ -733,7 +733,7 @@ trait Results {
           (if (url.contains("?")) "&" else "?") + params.toSeq.flatMap {
             pair =>
               pair._2.map(value =>
-                    (pair._1 + "=" + URLEncoder.encode(value, "utf-8")))
+                (pair._1 + "=" + URLEncoder.encode(value, "utf-8")))
           }.mkString("&")
         }
         .getOrElse("")

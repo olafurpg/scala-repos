@@ -96,8 +96,8 @@ object FreeOption {
               Gen
                 .choose(0, 1)
                 .flatMap(Gen
-                      .listOfN(_, freeOptionArb[A].arbitrary.map(_.f))
-                      .map(_.headOption))
+                  .listOfN(_, freeOptionArb[A].arbitrary.map(_.f))
+                  .map(_.headOption))
           )
           .map(FreeOption.apply))
 

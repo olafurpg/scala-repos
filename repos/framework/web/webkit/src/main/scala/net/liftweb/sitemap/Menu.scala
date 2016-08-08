@@ -127,7 +127,7 @@ object Menu extends MenuSingleton {
                            pathElement
                              .charSplit('/')
                              .drop(if (pathElement.startsWith("/")) 1
-                                 else 0)
+                             else 0)
                              .map(_.trim)
                              .filter(_ != "**")
                              .map {
@@ -752,9 +752,9 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
                                populate: List[MenuItem]): List[MenuItem] = {
     val kids: List[MenuItem] = _parent.toList.flatMap(
         _.kids.toList.flatMap(m =>
-              m.loc.buildItem(if (m == this) populate else Nil,
-                              m == actual,
-                              m == pathAt)))
+          m.loc.buildItem(if (m == this) populate else Nil,
+                          m == actual,
+                          m == pathAt)))
 
     _parent.toList.flatMap(p => p.buildUpperLines(p, actual, kids))
   }

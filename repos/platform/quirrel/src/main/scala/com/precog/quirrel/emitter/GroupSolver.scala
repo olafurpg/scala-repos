@@ -702,7 +702,7 @@ trait GroupSolver
 
       case t @ TicVar(_, name)
           if b.isDefined && (t.binding == SolveBinding(b.get) ||
-                t.binding == FreeBinding(b.get)) => {
+            t.binding == FreeBinding(b.get)) => {
         t.binding match {
           case SolveBinding(b2) => Set((Some(b2), name))
           case FreeBinding(b2) => Set((Some(b2), name))

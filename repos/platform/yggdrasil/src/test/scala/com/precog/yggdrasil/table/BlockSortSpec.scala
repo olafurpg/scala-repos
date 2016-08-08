@@ -275,7 +275,7 @@ trait BlockSortSpec[M[+ _]]
   def heterogeneousSortSample2 = {
     val sampleData = SampleData(
         (JParser.parseUnsafe(
-                """[
+            """[
         {"key":[1,4,3],"value":{"b0":["",{"alxk":-1},-5.170005125478374E+307],"y":{"pvbT":[-1458654748381439976,{}]}}},
         {"key":[1,4,4],"value":{"y":false,"qvd":[],"aden":{}}},
         {"key":[3,3,3],"value":{"b0":["gxy",{"alxk":-1},6.614267528783459E+307],"y":{"pvbT":[1,{}]}}}

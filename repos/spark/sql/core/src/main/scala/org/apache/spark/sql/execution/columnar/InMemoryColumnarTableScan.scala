@@ -301,8 +301,8 @@ private[sql] case class InMemoryColumnarTableScan(
                                        allowFailures = true))
 
       boundFilter.foreach(_ =>
-            filter.foreach(f =>
-                  logInfo(s"Predicate $p generates partition filter: $f")))
+        filter.foreach(f =>
+          logInfo(s"Predicate $p generates partition filter: $f")))
 
       // If the filter can't be resolved then we are missing required statistics.
       boundFilter.filter(_.resolved)

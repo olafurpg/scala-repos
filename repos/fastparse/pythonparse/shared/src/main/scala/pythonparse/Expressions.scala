@@ -133,11 +133,9 @@ object Expressions {
           Ast.expr.Call(lhs, args, keywords, starargs, kwargs)
     }
     val slice = P("[" ~ subscriptlist ~ "]").map(args =>
-          (lhs: Ast.expr) =>
-            Ast.expr.Subscript(lhs, args, Ast.expr_context.Load))
+      (lhs: Ast.expr) => Ast.expr.Subscript(lhs, args, Ast.expr_context.Load))
     val attr = P("." ~ NAME).map(id =>
-          (lhs: Ast.expr) =>
-            Ast.expr.Attribute(lhs, id, Ast.expr_context.Load))
+      (lhs: Ast.expr) => Ast.expr.Attribute(lhs, id, Ast.expr_context.Load))
     P(call | slice | attr)
   }
   val subscriptlist = P(subscript.rep(1, ",") ~ ",".?).map {
@@ -152,8 +150,8 @@ object Expressions {
         Ast.slice.Slice(
             lower,
             upper,
-            step.map(_.getOrElse(Ast.expr.Name(Ast.identifier("None"),
-                                               Ast.expr_context.Load)))
+            step.map(_.getOrElse(
+                Ast.expr.Name(Ast.identifier("None"), Ast.expr_context.Load)))
         )
     }
     P(ellipses | multi | single)

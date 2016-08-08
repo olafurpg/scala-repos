@@ -49,7 +49,7 @@ object HttpBinApplication {
           // X-WWW-Form-Encoded
           case f: Map[String, Seq[String]] @unchecked =>
             Json.obj("form" -> JsObject(
-                    f.mapValues(x => JsString(x.mkString(", "))).toSeq))
+                f.mapValues(x => JsString(x.mkString(", "))).toSeq))
           // Anything else
           case m: play.api.mvc.AnyContentAsMultipartFormData @unchecked =>
             Json.obj(
@@ -131,7 +131,7 @@ object HttpBinApplication {
         case r @ p"/gzip" if r.method == method =>
           gzipFilter(mat)(Action { request =>
             Ok(requestHeaderWriter.writes(request).as[JsObject] ++ Json
-                  .obj("gzipped" -> true, "method" -> method))
+              .obj("gzipped" -> true, "method" -> method))
           })
       }
       route
@@ -182,7 +182,7 @@ object HttpBinApplication {
     case GET(p"/cookies") =>
       Action { request =>
         Ok(Json.obj("cookies" -> JsObject(request.cookies.toSeq.map(x =>
-                          x.name -> JsString(x.value)))))
+          x.name -> JsString(x.value)))))
       }
   }
 
@@ -191,8 +191,8 @@ object HttpBinApplication {
       Action { request =>
         Redirect("/cookies").withCookies(
             request.queryString.mapValues(_.head).toSeq.map {
-          case (k, v) => Cookie(k, v)
-        }: _*)
+              case (k, v) => Cookie(k, v)
+            }: _*)
       }
   }
 
@@ -216,7 +216,7 @@ object HttpBinApplication {
               .headOption
               .filter { encoded =>
                 new String(org.apache.commons.codec.binary.Base64.decodeBase64(
-                        encoded.getBytes)).split(":").toList match {
+                    encoded.getBytes)).split(":").toList match {
                   case u :: p :: Nil if u == username && password == p => true
                   case _ => false
                 }

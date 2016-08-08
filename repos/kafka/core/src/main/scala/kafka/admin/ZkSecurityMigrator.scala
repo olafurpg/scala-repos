@@ -61,8 +61,8 @@ import scala.concurrent.duration._
 object ZkSecurityMigrator extends Logging {
   val usageMessage =
     ("ZooKeeper Migration Tool Help. This tool updates the ACLs of " +
-          "znodes as part of the process of setting up ZooKeeper " +
-          "authentication.")
+      "znodes as part of the process of setting up ZooKeeper " +
+      "authentication.")
 
   def run(args: Array[String]) {
     var jaasFile = System.getProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM)
@@ -103,8 +103,7 @@ object ZkSecurityMigrator extends Logging {
     if ((jaasFile == null)) {
       val errorMsg =
         ("No JAAS configuration file has been specified. Please make sure that you have set " +
-              "the system property %s".format(
-                  JaasUtils.JAVA_LOGIN_CONFIG_PARAM))
+          "the system property %s".format(JaasUtils.JAVA_LOGIN_CONFIG_PARAM))
       System.out.println("ERROR: %s".format(errorMsg))
       throw new IllegalArgumentException("Incorrect configuration")
     }

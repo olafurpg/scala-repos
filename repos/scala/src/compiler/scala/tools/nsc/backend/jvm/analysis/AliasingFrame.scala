@@ -662,7 +662,7 @@ object AliasSet {
                      val otherHasI =
                        i == notA || i == notB || i == notC || i == notD ||
                          (notXs != null && index < notXs.length &&
-                               (notXs(index) & mask) != 0l)
+                           (notXs(index) & mask) != 0l)
                      if (otherHasI) setThisAndOther(i)
                      otherHasI
                    }

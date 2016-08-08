@@ -215,7 +215,7 @@ trait Mailer extends SimpleInjector {
     */
   lazy val testModeSend: Inject[MimeMessage => Unit] =
     new Inject[MimeMessage => Unit]((m: MimeMessage) =>
-          logger.info("Sending Mime Message: " + m)) {}
+      logger.info("Sending Mime Message: " + m)) {}
 
   /**
     * How to send a message in staging mode.  By default, use Transport.send(msg)
@@ -382,12 +382,12 @@ trait Mailer extends SimpleInjector {
         if (holder.attachment) Part.ATTACHMENT else Part.INLINE)
     part.setDataHandler(
         new javax.activation.DataHandler(new javax.activation.DataSource {
-      def getContentType = holder.mimeType
-      def getInputStream = new java.io.ByteArrayInputStream(holder.bytes)
-      def getName = holder.name
-      def getOutputStream =
-        throw new java.io.IOException("Unable to write to item")
-    }))
+          def getContentType = holder.mimeType
+          def getInputStream = new java.io.ByteArrayInputStream(holder.bytes)
+          def getName = holder.name
+          def getOutputStream =
+            throw new java.io.IOException("Unable to write to item")
+        }))
 
     part
   }

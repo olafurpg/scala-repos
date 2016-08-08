@@ -241,7 +241,7 @@ trait ManagedExecution
       } getOrElse {
         EitherT.left(
             Future(InvalidStateError(
-                    "Jobs service is down; cannot execute asynchronous queries.")))
+                "Jobs service is down; cannot execute asynchronous queries.")))
       }
     }
   }

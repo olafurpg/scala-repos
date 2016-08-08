@@ -127,8 +127,8 @@ class StackTraceTest extends Expecting {
       assert(res.length == 9)
       assert(res exists (_ startsWith CausedBy.toString))
       assert((res collect {
-            case s if s startsWith CausedBy.toString => s
-          }).size == 2)
+        case s if s startsWith CausedBy.toString => s
+      }).size == 2)
     }
   @Test def dontBlowOnCycle() = probe(insaner)(_.getMethodName != "insaner") {
     s =>

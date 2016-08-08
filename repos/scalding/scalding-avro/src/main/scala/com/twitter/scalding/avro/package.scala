@@ -44,7 +44,7 @@ package object avro {
     val outFields = {
       val schemaFields = schema.getFields
       schemaFields.asScala.foldLeft(new Fields())((cFields, sField) =>
-            cFields.append(new Fields(sField.name())))
+        cFields.append(new Fields(sField.name())))
     }
     pipe.toPipe(outFields).write(sink)
   }

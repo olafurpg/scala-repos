@@ -135,26 +135,16 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
     output.print(
         "            median = %2.2f %s%n"
           .format(convertDuration(snapshot.getMedian), getDurationUnit))
-    output.print(
-        "              75%% <= %2.2f %s%n".format(
-            convertDuration(snapshot.get75thPercentile),
-            getDurationUnit))
-    output.print(
-        "              95%% <= %2.2f %s%n".format(
-            convertDuration(snapshot.get95thPercentile),
-            getDurationUnit))
-    output.print(
-        "              98%% <= %2.2f %s%n".format(
-            convertDuration(snapshot.get98thPercentile),
-            getDurationUnit))
-    output.print(
-        "              99%% <= %2.2f %s%n".format(
-            convertDuration(snapshot.get99thPercentile),
-            getDurationUnit))
-    output.print(
-        "            99.9%% <= %2.2f %s%n".format(
-            convertDuration(snapshot.get999thPercentile),
-            getDurationUnit))
+    output.print("              75%% <= %2.2f %s%n"
+      .format(convertDuration(snapshot.get75thPercentile), getDurationUnit))
+    output.print("              95%% <= %2.2f %s%n"
+      .format(convertDuration(snapshot.get95thPercentile), getDurationUnit))
+    output.print("              98%% <= %2.2f %s%n"
+      .format(convertDuration(snapshot.get98thPercentile), getDurationUnit))
+    output.print("              99%% <= %2.2f %s%n"
+      .format(convertDuration(snapshot.get99thPercentile), getDurationUnit))
+    output.print("            99.9%% <= %2.2f %s%n"
+      .format(convertDuration(snapshot.get999thPercentile), getDurationUnit))
   }
 
   private def printKnownOpsInTimespanCounter(

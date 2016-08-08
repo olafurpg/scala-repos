@@ -594,41 +594,41 @@ trait ClusteringLibModule[M[+ _]]
         def reduce(schema: CSchema, range: Range): KS = {
           val columns = schema.columns(JObjectFixedT(Map("value" -> JNumberT)))
           val cols: List[Int] = (columns flatMap {
-                case lc: LongColumn =>
-                  range collect {
-                    case i if lc.isDefinedAt(i) && lc(i) > 0 => lc(i).toInt
-                  }
+            case lc: LongColumn =>
+              range collect {
+                case i if lc.isDefinedAt(i) && lc(i) > 0 => lc(i).toInt
+              }
 
-                case dc: DoubleColumn =>
-                  range flatMap { i =>
-                    if (dc.isDefinedAt(i)) {
-                      val n = dc(i)
-                      if (n.isValidInt && n > 0) {
-                        Some(n.toInt)
-                      } else {
-                        None
-                      }
-                    } else {
-                      None
-                    }
+            case dc: DoubleColumn =>
+              range flatMap { i =>
+                if (dc.isDefinedAt(i)) {
+                  val n = dc(i)
+                  if (n.isValidInt && n > 0) {
+                    Some(n.toInt)
+                  } else {
+                    None
                   }
+                } else {
+                  None
+                }
+              }
 
-                case nc: NumColumn =>
-                  range flatMap { i =>
-                    if (nc.isDefinedAt(i)) {
-                      val n = nc(i)
-                      if (n.isValidInt && n > 0) {
-                        Some(n.toInt)
-                      } else {
-                        None
-                      }
-                    } else {
-                      None
-                    }
+            case nc: NumColumn =>
+              range flatMap { i =>
+                if (nc.isDefinedAt(i)) {
+                  val n = nc(i)
+                  if (n.isValidInt && n > 0) {
+                    Some(n.toInt)
+                  } else {
+                    None
                   }
+                } else {
+                  None
+                }
+              }
 
-                case _ => List.empty[Int]
-              }).toList
+            case _ => List.empty[Int]
+          }).toList
           cols
         }
       }
@@ -732,8 +732,8 @@ trait ClusteringLibModule[M[+ _]]
               val tables: StreamT[M, (Table, JType)] = StreamT.wrapEffect {
                 specs map { ts =>
                   StreamT.fromStream(M.point((ts map {
-                        case (spec, jtype) => (table.transform(spec), jtype)
-                      }).toStream))
+                    case (spec, jtype) => (table.transform(spec), jtype)
+                  }).toStream))
                 }
               }
 

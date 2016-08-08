@@ -263,7 +263,7 @@ package object extensions {
                 val linearization = MixinNodes
                   .linearization(clazz)
                   .flatMap(tp =>
-                        ScType.extractClass(tp, Some(clazz.getProject)))
+                    ScType.extractClass(tp, Some(clazz.getProject)))
                 var index = linearization.indexWhere(_ == t)
                 while (index >= 0) {
                   val cl = linearization(index)
@@ -298,7 +298,7 @@ package object extensions {
           }
         case t: ScTypedDefinition
             if t.isVal || t.isVar || (t.isInstanceOf[ScClassParameter] &&
-                  t.asInstanceOf[ScClassParameter].isCaseClassVal) =>
+              t.asInstanceOf[ScClassParameter].isCaseClassVal) =>
           PsiTypedDefinitionWrapper.processWrappersFor(t,
                                                        concreteClassFor(t),
                                                        node.info.name,

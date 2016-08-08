@@ -198,9 +198,8 @@ private[scalding] object InternalService {
       }
     }
 
-    res.getOrElse(
-        sys.error(
-            "Could not find correct loop inputs for leftJoin-store loop. Check the job DAG for validity."))
+    res.getOrElse(sys.error(
+        "Could not find correct loop inputs for leftJoin-store loop. Check the job DAG for validity."))
   }
 
   /**
@@ -238,8 +237,8 @@ private[scalding] object InternalService {
 
     val bothPipes =
       (left.map { case (t, (k, v)) => (k, (t, Left(v))) } ++ mergeLog.map {
-            case (t, (k, u)) => (k, (t, Right(u)))
-          }).group
+        case (t, (k, u)) => (k, (t, Right(u)))
+      }).group
         .withReducers(reducers.getOrElse(-1)) // jank, but scalding needs a way to maybe set reducers
         .sorted
         .scanLeft((Option.empty[(T, (V, Option[U]))],

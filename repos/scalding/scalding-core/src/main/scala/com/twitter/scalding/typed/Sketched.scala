@@ -84,9 +84,10 @@ case class SketchJoined[K: Ordering, V, V2, R](
         val maxPerReducer =
           (cms.totalCount / numReducers) * maxReducerFraction + 1
         val maxReplicas =
-          (cms.frequency(Bytes(left.serialize(k)))
-                .estimate
-                .toDouble / maxPerReducer)
+          (cms
+            .frequency(Bytes(left.serialize(k)))
+            .estimate
+            .toDouble / maxPerReducer)
         //if the frequency is 0, maxReplicas.ceil will be 0 so we will filter out this key entirely
         //if it's < maxPerReducer, the ceil will round maxReplicas up to 1 to ensure we still see it
         val replicas = fn(maxReplicas.ceil.toInt.min(numReducers))

@@ -23,7 +23,7 @@ private[round] final class Rematcher(messenger: Messenger,
   def yes(pov: Pov): Fu[Events] = pov match {
     case Pov(game, color) if (game playerCanRematch color) =>
       (game.opponent(color).isOfferingRematch ||
-            game.opponent(color).isAi).fold(
+        game.opponent(color).isAi).fold(
           game.next.fold(rematchJoin(pov))(rematchExists(pov)),
           rematchCreate(pov)
       )

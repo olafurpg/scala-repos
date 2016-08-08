@@ -51,9 +51,8 @@ trait ExecutionDirectives {
             case None ⇒ FastFuture.successful(RouteResult.Rejected(rejections))
           }
         } else
-          sys.error(
-              s"Rejection handler still produced new rejections after $maxIterations iterations. " +
-                s"Is there an infinite handler cycle? Initial rejections: $originalRejections final rejections: $rejections")
+          sys.error(s"Rejection handler still produced new rejections after $maxIterations iterations. " +
+            s"Is there an infinite handler cycle? Initial rejections: $originalRejections final rejections: $rejections")
 
       recoverRejectionsWith { rejections ⇒
         val transformed = RejectionHandler.applyTransformations(rejections)

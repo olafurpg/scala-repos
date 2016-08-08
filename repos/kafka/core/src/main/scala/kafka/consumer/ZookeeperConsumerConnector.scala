@@ -295,7 +295,7 @@ private[kafka] class ZookeeperConsumerConnector(
     // make a list of (queue,stream) pairs, one pair for each threadId
     val queuesAndStreams = topicThreadIds.values
       .map(threadIdSet =>
-            threadIdSet.map(_ => {
+        threadIdSet.map(_ => {
           val queue =
             new LinkedBlockingQueue[FetchedDataChunk](config.queuedMaxMessages)
           val stream = new KafkaStream[K, V](queue,
@@ -445,7 +445,7 @@ private[kafka] class ZookeeperConsumerConnector(
                          folded._2 ||
                            // update retryableIfFailed - (only metadata too large is not retryable)
                            (errorCode != Errors.NONE.code &&
-                                 errorCode != Errors.OFFSET_METADATA_TOO_LARGE.code),
+                             errorCode != Errors.OFFSET_METADATA_TOO_LARGE.code),
                          folded._3 || // update shouldRefreshCoordinator
                            errorCode == Errors.NOT_COORDINATOR_FOR_GROUP.code ||
                            errorCode == Errors.GROUP_COORDINATOR_NOT_AVAILABLE.code,
@@ -831,8 +831,8 @@ private[kafka] class ZookeeperConsumerConnector(
                     topicRegistry
                       .map(topics => topics._1 -> topics._2.keys)
                       .toMap).asInstanceOf[java.util.Map[
-                        String,
-                        java.util.Set[java.lang.Integer]]]
+                    String,
+                    java.util.Set[java.lang.Integer]]]
           )
         }
         releasePartitionOwnership(topicRegistry)
@@ -848,7 +848,7 @@ private[kafka] class ZookeeperConsumerConnector(
         val currentTopicRegistry =
           new Pool[String, Pool[Int, PartitionTopicInfo]](
               valueFactory = Some((topic: String) =>
-                    new Pool[Int, PartitionTopicInfo]))
+                new Pool[Int, PartitionTopicInfo]))
 
         // fetch current offsets for all topic-partitions
         val topicPartitions = partitionAssignment.keySet.toSeq
@@ -1038,7 +1038,7 @@ private[kafka] class ZookeeperConsumerConnector(
       }
       val hasPartitionOwnershipFailed =
         partitionOwnershipSuccessful.foldLeft(0)((sum, decision) =>
-              sum + (if (decision) 0 else 1))
+          sum + (if (decision) 0 else 1))
       /* even if one of the partition ownership attempt has failed, return false */
       if (hasPartitionOwnershipFailed > 0) {
         // remove all paths that we have owned in ZK
@@ -1207,7 +1207,7 @@ private[kafka] class ZookeeperConsumerConnector(
     private var wildcardTopics = zkUtils
       .getChildrenParentMayNotExist(BrokerTopicsPath)
       .filter(topic =>
-            topicFilter.isTopicAllowed(topic, config.excludeInternalTopics))
+        topicFilter.isTopicAllowed(topic, config.excludeInternalTopics))
 
     private val wildcardTopicCount = TopicCount.constructTopicCount(
         consumerIdString,
@@ -1230,7 +1230,7 @@ private[kafka] class ZookeeperConsumerConnector(
       debug("Handling topic event")
 
       val updatedTopics = allTopics.filter(topic =>
-            topicFilter.isTopicAllowed(topic, config.excludeInternalTopics))
+        topicFilter.isTopicAllowed(topic, config.excludeInternalTopics))
 
       val addedTopics = updatedTopics filterNot (wildcardTopics contains)
       if (addedTopics.nonEmpty)

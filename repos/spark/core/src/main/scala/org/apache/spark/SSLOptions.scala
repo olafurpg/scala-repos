@@ -67,13 +67,13 @@ private[spark] case class SSLOptions(
       val sslContextFactory = new SslContextFactory()
 
       keyStore.foreach(file =>
-            sslContextFactory.setKeyStorePath(file.getAbsolutePath))
+        sslContextFactory.setKeyStorePath(file.getAbsolutePath))
       keyStorePassword.foreach(sslContextFactory.setKeyStorePassword)
       keyPassword.foreach(sslContextFactory.setKeyManagerPassword)
       keyStoreType.foreach(sslContextFactory.setKeyStoreType)
       if (needClientAuth) {
         trustStore.foreach(file =>
-              sslContextFactory.setTrustStore(file.getAbsolutePath))
+          sslContextFactory.setTrustStore(file.getAbsolutePath))
         trustStorePassword.foreach(sslContextFactory.setTrustStorePassword)
         trustStoreType.foreach(sslContextFactory.setTrustStoreType)
       }

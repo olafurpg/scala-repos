@@ -157,7 +157,7 @@ class HBLEvents(val client: HBClient,
 
       require(
           !((reversed == Some(true)) &&
-                (entityType.isEmpty || entityId.isEmpty)),
+            (entityType.isEmpty || entityId.isEmpty)),
           "the parameter reversed can only be used with both entityType and entityId specified.")
 
       val table = getTable(appId, channelId)

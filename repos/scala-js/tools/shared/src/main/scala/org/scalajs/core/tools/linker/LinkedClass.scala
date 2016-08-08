@@ -64,8 +64,8 @@ final class LinkedClass(
   def toInfo: Infos.ClassInfo = {
     val methodInfos =
       (staticMethods.map(_.info) ++ memberMethods
-            .map(_.info) ++ abstractMethods.map(_.info) ++ exportedMembers.map(
-              _.info) ++ classExportInfo)
+        .map(_.info) ++ abstractMethods.map(_.info) ++ exportedMembers.map(
+          _.info) ++ classExportInfo)
 
     Infos.ClassInfo(encodedName,
                     isExported,

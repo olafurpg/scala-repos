@@ -36,7 +36,7 @@ object ScalaConsoleInfo {
         case null =>
           allConsoles.put(project, (console, model, processHandler) :: Nil)
         case list: List[(ScalaLanguageConsole, ConsoleHistoryController,
-                ProcessHandler)] =>
+            ProcessHandler)] =>
           allConsoles.put(project, (console, model, processHandler) :: list)
       }
     }
@@ -48,7 +48,7 @@ object ScalaConsoleInfo {
       allConsoles.get(project) match {
         case null =>
         case list: List[(ScalaLanguageConsole, ConsoleHistoryController,
-                ProcessHandler)] =>
+            ProcessHandler)] =>
           allConsoles.put(project, list.filter {
             case (sConsole, _, _) => sConsole != console
           })

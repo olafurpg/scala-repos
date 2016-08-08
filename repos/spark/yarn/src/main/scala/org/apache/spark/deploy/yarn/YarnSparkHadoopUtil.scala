@@ -361,7 +361,7 @@ object YarnSparkHadoopUtil {
 
   def get: YarnSparkHadoopUtil = {
     val yarnMode = java.lang.Boolean.valueOf(System
-          .getProperty("SPARK_YARN_MODE", System.getenv("SPARK_YARN_MODE")))
+      .getProperty("SPARK_YARN_MODE", System.getenv("SPARK_YARN_MODE")))
     if (!yarnMode) {
       throw new SparkException(
           "YarnSparkHadoopUtil is not available in non-YARN mode!")

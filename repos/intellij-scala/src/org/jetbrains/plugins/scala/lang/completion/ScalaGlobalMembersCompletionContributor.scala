@@ -288,8 +288,7 @@ class ScalaGlobalMembersCompletionContributor
     def isAccessible(member: PsiMember, containingClass: PsiClass): Boolean = {
       invocationCount >= 3 ||
       (ResolveUtils.isAccessible(member, ref, forCompletion = true) &&
-          ResolveUtils
-            .isAccessible(containingClass, ref, forCompletion = true))
+      ResolveUtils.isAccessible(containingClass, ref, forCompletion = true))
     }
 
     while (methodNamesIterator.hasNext) {
@@ -324,7 +323,7 @@ class ScalaGlobalMembersCompletionContributor
                   case o: ScObject => o.functionsByName(methodName)
                   case _ =>
                     containingClass.getAllMethods.toSeq.filter(m =>
-                          m.name == methodName)
+                      m.name == methodName)
                 }
                 if (overloads.size == 1) {
                   result.addElement(

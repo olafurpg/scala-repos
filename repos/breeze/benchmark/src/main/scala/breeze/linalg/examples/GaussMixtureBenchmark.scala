@@ -74,7 +74,7 @@ object GaussMixtureTransform {
                        gamma: Double): Double = {
     samples
       .map((sample: DenseVector[Double]) =>
-            sampleTransform(sample, centers, gamma))
+        sampleTransform(sample, centers, gamma))
       .sum
   }
 

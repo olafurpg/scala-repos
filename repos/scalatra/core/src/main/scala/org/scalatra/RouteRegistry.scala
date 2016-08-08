@@ -70,10 +70,10 @@ class RouteRegistry {
   private def matchingMethodsExcept(requestPath: String)(
       p: HttpMethod => Boolean) = {
     var methods = (_methodRoutes filter { kv =>
-          val method = kv._1
-          val routes = kv._2
-          !p(method) && (routes exists (_.apply(requestPath).isDefined))
-        }).keys.toSet
+      val method = kv._1
+      val routes = kv._2
+      !p(method) && (routes exists (_.apply(requestPath).isDefined))
+    }).keys.toSet
     if (methods.contains(Get)) methods += Head
     methods
   }

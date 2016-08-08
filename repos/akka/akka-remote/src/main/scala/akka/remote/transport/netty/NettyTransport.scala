@@ -71,9 +71,9 @@ object NettyFutureBridge {
             if (future.isCompleteSuccess) future.getGroup
             else
               throw future.iterator.asScala.collectFirst {
-            case f if f.isCancelled ⇒ new CancellationException
-            case f if !f.isSuccess ⇒ f.getCause
-          } getOrElse new IllegalStateException(
+                case f if f.isCancelled ⇒ new CancellationException
+                case f if !f.isSuccess ⇒ f.getCause
+              } getOrElse new IllegalStateException(
                   "Error reported in ChannelGroupFuture, but no error found in individual futures."))
     })
     p.future
@@ -132,7 +132,7 @@ class NettyTransportSettings(config: Config) {
   val ReceiveBufferSize: Option[Int] =
     optionSize("receive-buffer-size") requiring
       (s ⇒ s.isDefined || TransportMode != Udp,
-          "receive-buffer-size must be specified for UDP")
+      "receive-buffer-size must be specified for UDP")
 
   val MaxFrameSize: Int =
     getBytes("maximum-frame-size").toInt requiring
@@ -257,7 +257,7 @@ private[netty] abstract class ServerHandler(
                                     hostName = None,
                                     port = None)
           .getOrElse(throw new NettyTransportException(
-                  s"Unknown inbound remote address type [${remoteSocketAddress.getClass.getName}]"))
+              s"Unknown inbound remote address type [${remoteSocketAddress.getClass.getName}]"))
         init(channel, remoteSocketAddress, remoteAddress, msg) {
           listener notify InboundAssociation(_)
         }
@@ -484,13 +484,13 @@ class NettyTransport(val settings: NettyTransportSettings,
           "receiveBufferSizePredictorFactory",
           new FixedReceiveBufferSizePredictorFactory(ReceiveBufferSize.get))
     settings.ReceiveBufferSize.foreach(sz ⇒
-          bootstrap.setOption("receiveBufferSize", sz))
+      bootstrap.setOption("receiveBufferSize", sz))
     settings.SendBufferSize.foreach(sz ⇒
-          bootstrap.setOption("sendBufferSize", sz))
+      bootstrap.setOption("sendBufferSize", sz))
     settings.WriteBufferHighWaterMark.foreach(sz ⇒
-          bootstrap.setOption("writeBufferHighWaterMark", sz))
+      bootstrap.setOption("writeBufferHighWaterMark", sz))
     settings.WriteBufferLowWaterMark.foreach(sz ⇒
-          bootstrap.setOption("writeBufferLowWaterMark", sz))
+      bootstrap.setOption("writeBufferLowWaterMark", sz))
     bootstrap
   }
 
@@ -511,13 +511,13 @@ class NettyTransport(val settings: NettyTransportSettings,
     bootstrap.setOption("tcpNoDelay", settings.TcpNodelay)
     bootstrap.setOption("keepAlive", settings.TcpKeepalive)
     settings.ReceiveBufferSize.foreach(sz ⇒
-          bootstrap.setOption("receiveBufferSize", sz))
+      bootstrap.setOption("receiveBufferSize", sz))
     settings.SendBufferSize.foreach(sz ⇒
-          bootstrap.setOption("sendBufferSize", sz))
+      bootstrap.setOption("sendBufferSize", sz))
     settings.WriteBufferHighWaterMark.foreach(sz ⇒
-          bootstrap.setOption("writeBufferHighWaterMark", sz))
+      bootstrap.setOption("writeBufferHighWaterMark", sz))
     settings.WriteBufferLowWaterMark.foreach(sz ⇒
-          bootstrap.setOption("writeBufferLowWaterMark", sz))
+      bootstrap.setOption("writeBufferLowWaterMark", sz))
     bootstrap
   }
 

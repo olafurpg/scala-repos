@@ -96,9 +96,9 @@ class ActivatorProjectBuilder
     val settings = ExternalSystemApiUtil
       .getSettings(modifiableRootModel.getProject, SbtProjectSystem.Id)
       .asInstanceOf[AbstractExternalSystemSettings[
-              _ <: AbstractExternalSystemSettings[_, SbtProjectSettings, _],
-              SbtProjectSettings,
-              _ <: ExternalSystemSettingsListener[SbtProjectSettings]]]
+          _ <: AbstractExternalSystemSettings[_, SbtProjectSettings, _],
+          SbtProjectSettings,
+          _ <: ExternalSystemSettingsListener[SbtProjectSettings]]]
 
     getExternalProjectSettings setExternalProjectPath getContentEntryPath
     settings linkProject getExternalProjectSettings

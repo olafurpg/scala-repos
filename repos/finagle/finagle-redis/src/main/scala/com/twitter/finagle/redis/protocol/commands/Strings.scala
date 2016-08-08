@@ -32,13 +32,13 @@ case class BitCount(key: ChannelBuffer,
     RedisCodec.toUnifiedFormat(
         Seq(CommandBytes.BITCOUNT, key) ++
           (start match {
-        case Some(i) => Seq(StringToChannelBuffer(i.toString))
-        case None => Seq.empty
-      }) ++
+            case Some(i) => Seq(StringToChannelBuffer(i.toString))
+            case None => Seq.empty
+          }) ++
           (end match {
-        case Some(i) => Seq(StringToChannelBuffer(i.toString))
-        case None => Seq.empty
-      }))
+            case Some(i) => Seq(StringToChannelBuffer(i.toString))
+            case None => Seq.empty
+          }))
   }
 }
 object BitCount {
@@ -359,8 +359,8 @@ object Set {
                   run(args.tail.tail,
                       set.copy(
                           ttl = Some(InSeconds(RequireClientProtocol.safe {
-                        NumberFormat.toLong(BytesToString(bytes))
-                      }))))
+                            NumberFormat.toLong(BytesToString(bytes))
+                          }))))
               }
             case Px =>
               args.tail.headOption match {
@@ -370,8 +370,8 @@ object Set {
                       set.copy(
                           ttl =
                             Some(InMilliseconds(RequireClientProtocol.safe {
-                          NumberFormat.toLong(BytesToString(bytes))
-                        }))))
+                              NumberFormat.toLong(BytesToString(bytes))
+                            }))))
               }
             case Nx => run(args.tail, set.copy(nx = true))
             case Xx => run(args.tail, set.copy(xx = true))

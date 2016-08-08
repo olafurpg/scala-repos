@@ -40,8 +40,8 @@ object Test extends App {
         (for (i <- 20 until 40)
           yield i + " " + (h2 contains ("" + i))).toList.sorted mkString (","))
     println((h2.toList map { x =>
-          "" + x
-        }).sorted mkString ",")
+      "" + x
+    }).sorted mkString ",")
 
     h2 -= null
     h2 -= "" + 0

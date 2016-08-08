@@ -150,7 +150,7 @@ class ScalaLookupItem(val element: PsiNamedElement,
         presentation.setTypeText(presentationString(fun.retType, substitutor))
         val paramClausesText = fun.paramClauses
           .map(_.map(presentationString(_, substitutor))
-                .mkString("(", ", ", ")"))
+            .mkString("(", ", ", ")"))
           .mkString
         presentation.setTailText(tailText + paramClausesText)
       case bind: ScBindingPattern =>

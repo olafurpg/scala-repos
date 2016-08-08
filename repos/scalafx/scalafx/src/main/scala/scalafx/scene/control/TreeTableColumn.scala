@@ -257,19 +257,17 @@ class TreeTableColumn[S, T](
     * Finally, there are a number of pre-built cell factories available in the javafx.scene.control.cell package.
     */
   def cellFactory: ObjectProperty[TreeTableColumn[S, T] => TreeTableCell[S, T]] =
-    ObjectProperty(
-        (column: TreeTableColumn[S, T]) =>
-          new TreeTableCell(
-              delegate.cellFactoryProperty.getValue.call(column)))
+    ObjectProperty((column: TreeTableColumn[S, T]) =>
+      new TreeTableCell(delegate.cellFactoryProperty.getValue.call(column)))
 
   def cellFactory_=(f: TreeTableColumn[S, T] => TreeTableCell[S, T]) {
-    delegate.cellFactoryProperty.setValue(
-        new jfxu.Callback[jfxsc.TreeTableColumn[S, T],
-                          jfxsc.TreeTableCell[S, T]] {
-      def call(v: jfxsc.TreeTableColumn[S, T]): jfxsc.TreeTableCell[S, T] = {
-        f(v)
-      }
-    })
+    delegate.cellFactoryProperty
+      .setValue(new jfxu.Callback[jfxsc.TreeTableColumn[S, T],
+                                  jfxsc.TreeTableCell[S, T]] {
+        def call(v: jfxsc.TreeTableColumn[S, T]): jfxsc.TreeTableCell[S, T] = {
+          f(v)
+        }
+      })
   }
 
   /**
@@ -310,11 +308,11 @@ class TreeTableColumn[S, T](
     delegate.cellValueFactoryProperty.setValue(
         new jfxu.Callback[jfxsc.TreeTableColumn.CellDataFeatures[S, T],
                           jfxbv.ObservableValue[T]] {
-      def call(v: jfxsc.TreeTableColumn.CellDataFeatures[S, T])
-        : jfxbv.ObservableValue[T] = {
-        f(v).delegate
-      }
-    })
+          def call(v: jfxsc.TreeTableColumn.CellDataFeatures[S, T])
+            : jfxbv.ObservableValue[T] = {
+            f(v).delegate
+          }
+        })
   }
 
   /**

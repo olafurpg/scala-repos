@@ -148,8 +148,8 @@ private class SelectorMap(binds: List[CssBind])
       case i @ CssBind(AttrSelector(name, value, _)) => {
         val oldMap = attrMap.getOrElse(name, Map())
         attrMap += (name ->
-              (oldMap +
-                    (value -> sortBinds(i :: oldMap.getOrElse(value, Nil)))))
+          (oldMap +
+            (value -> sortBinds(i :: oldMap.getOrElse(value, Nil)))))
       }
     }
 
@@ -472,11 +472,11 @@ private class SelectorMap(binds: List[CssBind])
             case n => {
               val calcedList = calced.toList
               val availableIds = (attrs.get("id").toList ++ calcedList
-                    .collect({
-                      case e: Elem => e.attribute("id")
-                    })
-                    .flatten
-                    .map(_.toString)).toSet
+                .collect({
+                  case e: Elem => e.attribute("id")
+                })
+                .flatten
+                .map(_.toString)).toSet
               val merged =
                 calcedList.foldLeft((availableIds, Nil: List[Seq[xml.Node]])) {
                   (idsAndResult, a) =>
@@ -980,7 +980,7 @@ object CanBind extends CssBindImplicits {
     new CanBind[T[N]] {
       def apply(info: => T[N])(ns: NodeSeq): Seq[NodeSeq] =
         f(info).toSeq.flatMap(a =>
-              if (a eq null) Nil else List(Text(a.toString)))
+          if (a eq null) Nil else List(Text(a.toString)))
     }
 
   implicit def iterableDouble[T[Double]](
@@ -988,7 +988,7 @@ object CanBind extends CssBindImplicits {
     new CanBind[T[Double]] {
       def apply(info: => T[Double])(ns: NodeSeq): Seq[NodeSeq] =
         f(info).toSeq.flatMap(a =>
-              if (a equals null) Nil else List(Text(a.toString)))
+          if (a equals null) Nil else List(Text(a.toString)))
     }
 
   implicit def iterableBindableTransform[T[_]](

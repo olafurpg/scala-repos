@@ -294,16 +294,16 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
                       acc +
                         ((path, Version.Archived(record.versionId)) -> record) +
                         (currentKey -> JsonRecord(
-                                Vector(records.map(_.value): _*),
-                                writeAs,
-                                id))
+                            Vector(records.map(_.value): _*),
+                            writeAs,
+                            id))
                   } getOrElse {
                     // start a new current version
                     acc +
                       (currentKey -> JsonRecord(
-                              Vector(records.map(_.value): _*),
-                              writeAs,
-                              id))
+                          Vector(records.map(_.value): _*),
+                          writeAs,
+                          id))
                   }
 
                 case (acc,
@@ -332,7 +332,7 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
                   acc ++ acc
                     .get(currentKey)
                     .map(record =>
-                          (path, Version.Archived(record.versionId)) -> record)
+                      (path, Version.Archived(record.versionId)) -> record)
               }
           }
       }
@@ -349,7 +349,7 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
         data
           .get((path, version))
           .toRightDisjunction(NotFound("No data found for path %s version %s"
-                    .format(path.path, version))) traverse { toResource }
+            .format(path.path, version))) traverse { toResource }
       }
     }
 

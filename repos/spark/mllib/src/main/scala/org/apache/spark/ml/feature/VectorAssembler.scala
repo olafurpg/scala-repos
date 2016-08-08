@@ -90,7 +90,7 @@ class VectorAssembler(override val uid: String)
             val numAttrs =
               group.numAttributes.getOrElse(first.getAs[Vector](index).size)
             Array.tabulate(numAttrs)(i =>
-                  NumericAttribute.defaultAttr.withName(c + "_" + i))
+              NumericAttribute.defaultAttr.withName(c + "_" + i))
           }
         case otherType =>
           throw new SparkException(

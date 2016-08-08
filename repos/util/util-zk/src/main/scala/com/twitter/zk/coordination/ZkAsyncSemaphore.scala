@@ -218,9 +218,8 @@ class ZkAsyncSemaphore(zk: ZkClient,
       val (promise, permitNode) = waitqIterator.next()
       val id = sequenceNumberOf(permitNode.path)
       if (!permits.contains(permitNode)) {
-        promise.setException(
-            PermitNodeException(
-                "Node for this permit has been deleted (client released, session expired, or tree was clobbered)."))
+        promise.setException(PermitNodeException(
+            "Node for this permit has been deleted (client released, session expired, or tree was clobbered)."))
       } else if (permits.size < numPermits) {
         promise.setValue(new ZkSemaphorePermit(permitNode))
         waitqIterator.remove()

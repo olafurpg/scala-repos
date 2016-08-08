@@ -519,9 +519,9 @@ trait EvaluatorModule[M[+ _]]
               case (true, true) =>
                 M point
                   (KeyOrder -> simpleJoin(leftResult, rightResult)(
-                          leftKeySpec,
-                          rightKeySpec,
-                          joinSpec))
+                      leftKeySpec,
+                      rightKeySpec,
+                      joinSpec))
               case (lSorted, rSorted) =>
                 val hint = Some(
                     if (lSorted) LeftOrder
@@ -667,7 +667,7 @@ trait EvaluatorModule[M[+ _]]
                 pendingTable <- prepareEval(parent, splits)
                 idSpec = makeTableTrans(
                     Map(paths.Key -> trans.WrapArray(
-                            Scan(Leaf(Source), freshIdScanner))))
+                        Scan(Leaf(Source), freshIdScanner))))
                 tableM2 = pendingTable.table
                   .transform(liftToValues(pendingTable.trans))
                   .transform(idSpec)
@@ -767,10 +767,10 @@ trait EvaluatorModule[M[+ _]]
                 mor.alignment match {
                   case MorphismAlignment.Cross(morph1) =>
                     ((transState liftM mn(morph1)) |@| cross(
-                            graph,
-                            left,
-                            right,
-                            None)(spec)).tupled
+                        graph,
+                        left,
+                        right,
+                        None)(spec)).tupled
 
                   case MorphismAlignment.Match(morph1)
                       if areJoinable(left, right) =>
@@ -778,7 +778,7 @@ trait EvaluatorModule[M[+ _]]
                                                             left,
                                                             right,
                                                             IdentitySort)(
-                            spec)).tupled
+                        spec)).tupled
 
                   // TODO: Remove and see if things break. Also,
                   case MorphismAlignment.Match(morph1) =>
@@ -787,15 +787,15 @@ trait EvaluatorModule[M[+ _]]
                         CrossOrder.CrossRight
                       else CrossOrder.CrossLeft
                     ((transState liftM mn(morph1)) |@| cross(
-                            graph,
-                            left,
-                            right,
-                            Some(hint))(spec)).tupled
+                        graph,
+                        left,
+                        right,
+                        Some(hint))(spec)).tupled
 
                   case MorphismAlignment.Custom(idPolicy, f) =>
                     val pair = (prepareEval(left, splits) |@| prepareEval(
-                            right,
-                            splits)).tupled
+                        right,
+                        splits)).tupled
                     pair flatMap {
                       case (ptLeft, ptRight) =>
                         val leftTable =
@@ -842,7 +842,7 @@ trait EvaluatorModule[M[+ _]]
             case dag.Distinct(parent) =>
               val idSpec = makeTableTrans(
                   Map(paths.Key -> trans.WrapArray(
-                          Scan(Leaf(Source), freshIdScanner))))
+                      Scan(Leaf(Source), freshIdScanner))))
 
               for {
                 pending <- prepareEval(parent, splits)
@@ -941,7 +941,7 @@ trait EvaluatorModule[M[+ _]]
             case s @ dag.Split(spec, child, id) =>
               val idSpec = makeTableTrans(
                   Map(paths.Key -> trans.WrapArray(
-                          Scan(Leaf(Source), freshIdScanner))))
+                      Scan(Leaf(Source), freshIdScanner))))
 
               val params = child.foldDown(true) {
                 case param: dag.SplitParam if param.parentId == id =>

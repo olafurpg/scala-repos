@@ -356,10 +356,9 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
       case (className, "1.0") if className == classNameV1_0 =>
         SaveLoadV1_0.load(sc, path)
       case _ =>
-        throw new IOException(
-            "MatrixFactorizationModel.load did not recognize model with" +
-              s"(class: $loadedClassName, version: $formatVersion). Supported:\n" +
-              s"  ($classNameV1_0, 1.0)")
+        throw new IOException("MatrixFactorizationModel.load did not recognize model with" +
+          s"(class: $loadedClassName, version: $formatVersion). Supported:\n" +
+          s"  ($classNameV1_0, 1.0)")
     }
   }
 
@@ -380,7 +379,7 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
       import sqlContext.implicits._
       val metadata = compact(
           render(("class" -> thisClassName) ~
-                ("version" -> thisFormatVersion) ~ ("rank" -> model.rank)))
+            ("version" -> thisFormatVersion) ~ ("rank" -> model.rank)))
       sc.parallelize(Seq(metadata), 1).saveAsTextFile(metadataPath(path))
       model.userFeatures.toDF("id", "features").write.parquet(userPath(path))
       model.productFeatures

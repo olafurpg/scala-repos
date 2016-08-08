@@ -158,15 +158,15 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     // TODO split "if" condition
     if ((c == '"' && Set(ScalaTokenTypes.tMULTILINE_STRING,
                          ScalaTokenTypes.tINTERPOLATED_STRING_END).contains(
-                elementType) && element.getTextOffset + element.getTextLength -
-              offset < 4) || isInDocComment(element) &&
+            elementType) && element.getTextOffset + element.getTextLength -
+          offset < 4) || isInDocComment(element) &&
         (elementType.isInstanceOf[ScaladocSyntaxElementType] ||
-            elementType == ScalaDocTokenType.DOC_INNER_CLOSE_CODE_TAG) &&
+        elementType == ScalaDocTokenType.DOC_INNER_CLOSE_CODE_TAG) &&
         element.getParent.getLastChild == element &&
         element.getText.startsWith("" + c) &&
         !(elementType == ScalaDocTokenType.DOC_ITALIC_TAG &&
-              element.getPrevSibling != null &&
-              element.getPrevSibling.getNode.getElementType == ScalaDocTokenType.DOC_ITALIC_TAG)) {
+          element.getPrevSibling != null &&
+          element.getPrevSibling.getNode.getElementType == ScalaDocTokenType.DOC_ITALIC_TAG)) {
       moveCaret()
       return Result.STOP
     } else if (c == '"' &&
@@ -300,7 +300,7 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         Option(element.getParent.getPrevSibling).exists(
             _.getNode.getElementType == tINTERPOLATED_STRING_INJECTION) &&
         (element.getNextSibling == null ||
-            element.getNextSibling.getNode.getElementType != tRBRACE)) {
+        element.getNextSibling.getNode.getElementType != tRBRACE)) {
       insertAndCommit(offset, "}", document, project)
     }
   }

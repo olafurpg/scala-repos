@@ -209,7 +209,7 @@ class ClusterMetricsView(system: ExtendedActorSystem) extends Closeable {
   private val eventBusListener: ActorRef = {
     system.systemActorOf(
         Props(new Actor with ActorLogging
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+        with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
           override def preStart(): Unit = extension.subscribe(self)
           override def postStop(): Unit = extension.unsubscribe(self)
           def receive = {

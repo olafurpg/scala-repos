@@ -432,8 +432,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
     assert(joined.size === 4)
     val joinedSet = joined
       .map(x =>
-            (x._1,
-             (x._2._1.toList, x._2._2.toList, x._2._3.toList, x._2._4.toList)))
+        (x._1,
+         (x._2._1.toList, x._2._2.toList, x._2._3.toList, x._2._4.toList)))
       .toSet
     assert(
         joinedSet === Set(
@@ -788,7 +788,7 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
         }
       }
       takeSample.foreach(x =>
-            assert(1 <= x._2 && x._2 <= n, s"elements not in [1, $n]"))
+        assert(1 <= x._2 && x._2 <= n, s"elements not in [1, $n]"))
     }
   }
 }

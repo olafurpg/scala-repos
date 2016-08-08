@@ -369,7 +369,7 @@ trait ScReferenceElement
               ref
                 .multiResolve(false)
                 .exists(rr =>
-                      rr.getElement match {
+                  rr.getElement match {
                     case p: ScPackage => p.getQualifiedName == qualifiedName
                     case p: PsiPackage => p.getQualifiedName == qualifiedName
                     case _ => false

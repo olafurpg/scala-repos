@@ -121,10 +121,8 @@ object Validation {
               http.setRequestMethod("HEAD")
               if (http.getResponseCode == HttpURLConnection.HTTP_OK) Success
               else
-                Failure(
-                    Set(RuleViolation(url,
-                                      "URL could not be resolved.",
-                                      None)))
+                Failure(Set(
+                    RuleViolation(url, "URL could not be resolved.", None)))
             case other: URLConnection =>
               other.getInputStream
               Success //if we come here, we could read the stream

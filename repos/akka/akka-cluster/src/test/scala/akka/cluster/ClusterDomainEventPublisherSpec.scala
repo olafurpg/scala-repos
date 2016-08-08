@@ -65,9 +65,8 @@ class ClusterDomainEventPublisherSpec
     .seen(aUp.uniqueAddress)
   val g8 = Gossip(
       members = SortedSet(aUp, bExiting, cUp, dUp),
-      overview = GossipOverview(
-          reachability = Reachability.empty.unreachable(aUp.uniqueAddress,
-                                                        dUp.uniqueAddress)))
+      overview = GossipOverview(reachability =
+        Reachability.empty.unreachable(aUp.uniqueAddress, dUp.uniqueAddress)))
     .seen(aUp.uniqueAddress)
 
   // created in beforeEach

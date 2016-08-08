@@ -495,7 +495,7 @@ case class Sum[R, C, V](left: Matrix2[R, C, V],
   override lazy val toTypedPipe: TypedPipe[(R, C, V)] = {
     if (left.equals(right)) {
       left.optimizedSelf.toTypedPipe.map(v =>
-            (v._1, v._2, mon.plus(v._3, v._3)))
+        (v._1, v._2, mon.plus(v._3, v._3)))
     } else {
       collectAddends(this)
         .reduce((x, y) => x ++ y)
@@ -542,15 +542,14 @@ case class HadamardProduct[R, C, V](left: Matrix2[R, C, V],
   override lazy val toTypedPipe: TypedPipe[(R, C, V)] = {
     if (left.equals(right)) {
       left.optimizedSelf.toTypedPipe.map(v =>
-            (v._1, v._2, ring.times(v._3, v._3)))
+        (v._1, v._2, ring.times(v._3, v._3)))
     } else {
       // tracking values which were reduced (multiplied by non-zero) or non-reduced (multiplied by zero) with a boolean
       (left.optimizedSelf.toTypedPipe.map {
-            case (r, c, v) => (r, c, (v, false))
-          } ++ right.optimizedSelf.toTypedPipe.map {
-            case (r, c, v) => (r, c, (v, false))
-          })
-        .groupBy(x => (x._1, x._2))
+        case (r, c, v) => (r, c, (v, false))
+      } ++ right.optimizedSelf.toTypedPipe.map {
+        case (r, c, v) => (r, c, (v, false))
+      }).groupBy(x => (x._1, x._2))
         .mapValues { _._3 }
         .reduce((x, y) => (ring.times(x._1, y._1), true))
         .filter { kv =>

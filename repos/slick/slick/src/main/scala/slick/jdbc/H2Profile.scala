@@ -41,9 +41,9 @@ trait H2Profile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - SqlCapabilities.sequenceMin -
-          SqlCapabilities.sequenceMax - SqlCapabilities.sequenceCycle -
-          JdbcCapabilities.returnInsertOther - RelationalCapabilities.joinFull -
-          JdbcCapabilities.insertOrUpdate - RelationalCapabilities.reverse)
+      SqlCapabilities.sequenceMax - SqlCapabilities.sequenceCycle -
+      JdbcCapabilities.returnInsertOther - RelationalCapabilities.joinFull -
+      JdbcCapabilities.insertOrUpdate - RelationalCapabilities.reverse)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
@@ -65,7 +65,7 @@ trait H2Profile extends JdbcProfile {
             .collect {
               case (v, "java.util.UUID") =>
                 Some(Some(java.util.UUID.fromString(
-                            v.replaceAll("[\'\"]", "")))) //strip quotes
+                    v.replaceAll("[\'\"]", "")))) //strip quotes
             }
             .getOrElse { super.default }
         override def tpe = dbType match {
@@ -100,7 +100,7 @@ trait H2Profile extends JdbcProfile {
         val size = sym.flatMap(
             _.findColumnOption[RelationalProfile.ColumnOption.Length])
         size.fold("VARCHAR")(l =>
-              if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})")
+          if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})")
       case _ => super.defaultSqlTypeName(tmd, sym)
     }
 
@@ -150,7 +150,7 @@ trait H2Profile extends JdbcProfile {
     // the same in ReturningInsertInvoker because H2 does not allow returning non-AutoInc keys anyway.
     override protected val useServerSideUpsert =
       compiled.upsert.fields.forall(fs =>
-            !fs.options.contains(ColumnOption.AutoInc))
+        !fs.options.contains(ColumnOption.AutoInc))
     override protected def useTransactionForUpsert = !useServerSideUpsert
   }
 }

@@ -569,7 +569,7 @@ object Arrays {
   @inline
   private def equalsImpl[T](a: Array[T], b: Array[T]): Boolean = {
     (a eq b) || (a != null && b != null && a.length == b.length &&
-        a.indices.forall(i => a(i) == b(i)))
+    a.indices.forall(i => a(i) == b(i)))
   }
 
   @noinline def fill(a: Array[Long], value: Long): Unit =
@@ -836,7 +836,7 @@ object Arrays {
     if (a == null) 0
     else
       a.foldLeft(1)((acc, x) =>
-            31 * acc + (if (x == null) 0 else elementHashCode(x)))
+        31 * acc + (if (x == null) 0 else elementHashCode(x)))
   }
 
   @noinline def deepHashCode(a: Array[AnyRef]): Int = {

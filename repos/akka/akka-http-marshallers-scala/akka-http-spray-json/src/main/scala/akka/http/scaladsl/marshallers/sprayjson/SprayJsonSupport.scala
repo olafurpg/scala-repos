@@ -40,7 +40,7 @@ trait SprayJsonSupport {
       printer: JsonPrinter = PrettyPrinter): ToEntityMarshaller[T] =
     sprayJsValueMarshaller compose writer.write
   implicit def sprayJsValueMarshaller(implicit printer: JsonPrinter =
-        PrettyPrinter): ToEntityMarshaller[JsValue] =
+    PrettyPrinter): ToEntityMarshaller[JsValue] =
     Marshaller.StringMarshaller.wrap(MediaTypes.`application/json`)(printer)
 }
 object SprayJsonSupport extends SprayJsonSupport

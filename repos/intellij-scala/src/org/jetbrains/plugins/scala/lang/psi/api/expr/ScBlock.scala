@@ -46,7 +46,7 @@ trait ScBlock
       val caseClauses = findChildByClassScala(classOf[ScCaseClauses])
       val clauses: Seq[ScCaseClause] = caseClauses.caseClauses
       val clausesType = clauses.foldLeft(types.Nothing: ScType)((tp, clause) =>
-            Bounds.lub(tp, clause.expr match {
+        Bounds.lub(tp, clause.expr match {
           case Some(expr) => expr.getType(TypingContext.empty).getOrNothing
           case _ => types.Nothing
         }))

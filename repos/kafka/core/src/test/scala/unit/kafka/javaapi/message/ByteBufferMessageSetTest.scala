@@ -29,8 +29,8 @@ class ByteBufferMessageSetTest
                                 compressed: CompressionCodec =
                                   NoCompressionCodec): ByteBufferMessageSet =
     new ByteBufferMessageSet(new kafka.message.ByteBufferMessageSet(
-            compressed,
-            messages: _*).buffer)
+        compressed,
+        messages: _*).buffer)
 
   val msgSeq: Seq[Message] =
     Seq(new Message("hello".getBytes()), new Message("there".getBytes()))

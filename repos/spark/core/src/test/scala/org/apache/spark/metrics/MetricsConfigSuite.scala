@@ -42,9 +42,8 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
 
     val property = conf.getInstance("random")
     assert(property.size() === 2)
-    assert(
-        property
-          .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
+    assert(property
+      .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(property.getProperty("sink.servlet.path") === "/metrics/json")
   }
 
@@ -58,12 +57,10 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(masterProp.size() === 5)
     assert(masterProp.getProperty("sink.console.period") === "20")
     assert(masterProp.getProperty("sink.console.unit") === "minutes")
-    assert(
-        masterProp
-          .getProperty("source.jvm.class") === "org.apache.spark.metrics.source.JvmSource")
-    assert(
-        masterProp
-          .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
+    assert(masterProp
+      .getProperty("source.jvm.class") === "org.apache.spark.metrics.source.JvmSource")
+    assert(masterProp
+      .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(
         masterProp.getProperty("sink.servlet.path") === "/metrics/master/json")
 
@@ -71,12 +68,10 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(workerProp.size() === 5)
     assert(workerProp.getProperty("sink.console.period") === "10")
     assert(workerProp.getProperty("sink.console.unit") === "seconds")
-    assert(
-        workerProp
-          .getProperty("source.jvm.class") === "org.apache.spark.metrics.source.JvmSource")
-    assert(
-        workerProp
-          .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
+    assert(workerProp
+      .getProperty("source.jvm.class") === "org.apache.spark.metrics.source.JvmSource")
+    assert(workerProp
+      .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(workerProp.getProperty("sink.servlet.path") === "/metrics/json")
   }
 
@@ -96,12 +91,10 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(masterProp.size() === 5)
     assert(masterProp.getProperty("sink.console.period") === "20")
     assert(masterProp.getProperty("sink.console.unit") === "minutes")
-    assert(
-        masterProp
-          .getProperty("source.jvm.class") === "org.apache.spark.metrics.source.JvmSource")
-    assert(
-        masterProp
-          .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
+    assert(masterProp
+      .getProperty("source.jvm.class") === "org.apache.spark.metrics.source.JvmSource")
+    assert(masterProp
+      .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(
         masterProp.getProperty("sink.servlet.path") === "/metrics/master/json")
 
@@ -109,12 +102,10 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(workerProp.size() === 5)
     assert(workerProp.getProperty("sink.console.period") === "10")
     assert(workerProp.getProperty("sink.console.unit") === "seconds")
-    assert(
-        workerProp
-          .getProperty("source.jvm.class") === "org.apache.spark.metrics.source.JvmSource")
-    assert(
-        workerProp
-          .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
+    assert(workerProp
+      .getProperty("source.jvm.class") === "org.apache.spark.metrics.source.JvmSource")
+    assert(workerProp
+      .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(workerProp.getProperty("sink.servlet.path") === "/metrics/json")
   }
 
@@ -136,12 +127,10 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(masterProp.size() === 5)
     assert(masterProp.getProperty("sink.console.period") === "50")
     assert(masterProp.getProperty("sink.console.unit") === "seconds")
-    assert(
-        masterProp
-          .getProperty("source.jvm.class") === "org.apache.spark.SomeOtherSource")
-    assert(
-        masterProp
-          .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
+    assert(masterProp
+      .getProperty("source.jvm.class") === "org.apache.spark.SomeOtherSource")
+    assert(masterProp
+      .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(
         masterProp.getProperty("sink.servlet.path") === "/metrics/master/json")
 
@@ -149,12 +138,10 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(workerProp.size() === 5)
     assert(workerProp.getProperty("sink.console.period") === "10")
     assert(workerProp.getProperty("sink.console.unit") === "seconds")
-    assert(
-        workerProp
-          .getProperty("source.jvm.class") === "org.apache.spark.SomeOtherSource")
-    assert(
-        workerProp
-          .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
+    assert(workerProp
+      .getProperty("source.jvm.class") === "org.apache.spark.SomeOtherSource")
+    assert(workerProp
+      .getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(workerProp.getProperty("sink.servlet.path") === "/metrics/json")
   }
 
@@ -171,9 +158,8 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     val sourceProps =
       conf.subProperties(masterProp, MetricsSystem.SOURCE_REGEX)
     assert(sourceProps.size === 1)
-    assert(
-        sourceProps("jvm")
-          .getProperty("class") === "org.apache.spark.metrics.source.JvmSource")
+    assert(sourceProps("jvm")
+      .getProperty("class") === "org.apache.spark.metrics.source.JvmSource")
 
     val sinkProps = conf.subProperties(masterProp, MetricsSystem.SINK_REGEX)
     assert(sinkProps.size === 2)

@@ -1049,7 +1049,7 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
       case pack: ScPackage =>
         //let's try to find package object:
         val qual = (pack.getQualifiedName +
-              ".package$").split('.').map(NameTransformer.encode).mkString(".")
+          ".package$").split('.').map(NameTransformer.encode).mkString(".")
         stableObjectEvaluator(qual)
       case _ =>
         //unresolved symbol => try to resolve it dynamically
@@ -1178,12 +1178,9 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
       ref.resolve() match {
         case fun: ScFunctionDefinition =>
           val elem = ref.bind().get.getActualElement //object or case class
-          val qual = ref.qualifier.map(
-              q =>
-                ScalaPsiElementFactory.createExpressionWithContextFromText(
-                    q.getText,
-                    q.getContext,
-                    q))
+          val qual = ref.qualifier.map(q =>
+            ScalaPsiElementFactory
+              .createExpressionWithContextFromText(q.getText, q.getContext, q))
           val refExpr =
             ScalaPsiElementFactory.createExpressionWithContextFromText(
                 ref.getText,
@@ -1225,7 +1222,7 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
             new ScalaMethodEvaluator(getEval, "apply", null, Seq(indexEval))
           } else
             throw EvaluationException(ScalaBundle
-                  .message("pattern.doesnot.resolves.to.unapply", ref.refName))
+              .message("pattern.doesnot.resolves.to.unapply", ref.refName))
           val nextPattern = pattern.subpatterns(nextPatternIndex)
           evaluateSubpatternFromPattern(newEval, nextPattern, subPattern)
         case _ =>
@@ -1238,7 +1235,7 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
     if (pattern == null || subPattern == null)
       throw new IllegalArgumentException("Patterns should not be null")
     val nextPatternIndex: Int = pattern.subpatterns.indexWhere(next =>
-          next == subPattern || subPattern.parents.contains(next))
+      next == subPattern || subPattern.parents.contains(next))
 
     if (pattern == subPattern) exprEval
     else if (nextPatternIndex < 0)
@@ -2098,7 +2095,7 @@ object ScalaEvaluatorBuilderUtil {
           case null => None
           case fun: ScFunction
               if isLocalFunction(fun) && !fun.parameters.exists(param =>
-                    PsiTreeUtil.isAncestor(param, elem, false)) =>
+                PsiTreeUtil.isAncestor(param, elem, false)) =>
             Some(fun)
           case other if other.getContext != null => inner(other.getContext)
           case _ => None
@@ -2130,7 +2127,7 @@ object ScalaEvaluatorBuilderUtil {
           v match {
             case mo: ScModifierListOwner
                 if mo.getModifierList.accessModifier.exists(am =>
-                      am.isPrivate && am.isThis) =>
+                  am.isPrivate && am.isThis) =>
               Some(bp)
             case _ => None
           }

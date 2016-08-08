@@ -58,7 +58,7 @@ class NonServerRunner(project: Project,
       case Right(jdk) =>
         val commands =
           ((FileUtil toCanonicalPath jdk.executable.getPath) +: "-cp" +: classPath(
-                  jdk) +: jvmParameters :+ SERVER_CLASS_NAME).++(args)
+              jdk) +: jvmParameters :+ SERVER_CLASS_NAME).++(args)
 
         val builder = new ProcessBuilder(commands.asJava)
 

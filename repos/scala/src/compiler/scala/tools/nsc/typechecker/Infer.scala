@@ -57,7 +57,7 @@ trait Infer extends Checkable { self: Analyzer =>
       isBetter: (Symbol, Symbol) => Boolean): List[Symbol] = {
     def improves(sym1: Symbol, sym2: Symbol) =
       ((sym2 eq NoSymbol) || sym2.isError ||
-            (sym2 hasAnnotation BridgeClass) || isBetter(sym1, sym2))
+        (sym2 hasAnnotation BridgeClass) || isBetter(sym1, sym2))
 
     alternatives sortWith improves match {
       case best :: rest if rest.nonEmpty =>
@@ -97,7 +97,7 @@ trait Infer extends Checkable { self: Analyzer =>
     private def applyTypeVar(tv: TypeVar): Type = tv match {
       case TypeVar(origin, constr) if !constr.instValid =>
         throw new DeferredNoInstance(() =>
-              s"no unique instantiation of type variable $origin could be found")
+          s"no unique instantiation of type variable $origin could be found")
       case _ if excludedVars(tv) =>
         throw new NoInstance("cyclic instantiation")
       case TypeVar(_, constr) =>
@@ -339,7 +339,7 @@ trait Infer extends Checkable { self: Analyzer =>
     private def isCompatible(tp: Type, pt: Type): Boolean = {
       def isCompatibleByName(tp: Type, pt: Type): Boolean =
         (isByNameParamType(pt) && !isByNameParamType(tp) &&
-              isCompatible(tp, dropByName(pt)))
+          isCompatible(tp, dropByName(pt)))
       def isCompatibleSam(tp: Type, pt: Type): Boolean = {
         val samFun = typer.samToFunctionType(pt)
         (samFun ne NoType) && isCompatible(tp, samFun)
@@ -348,7 +348,7 @@ trait Infer extends Checkable { self: Analyzer =>
       val tp1 = normalize(tp)
 
       ((tp1 weak_<:< pt) || isCoercible(tp1, pt) ||
-          isCompatibleByName(tp, pt) || isCompatibleSam(tp, pt))
+      isCompatibleByName(tp, pt) || isCompatibleSam(tp, pt))
     }
     def isCompatibleArgs(tps: List[Type], pts: List[Type]) =
       (tps corresponds pts)(isCompatible)
@@ -359,9 +359,9 @@ trait Infer extends Checkable { self: Analyzer =>
         case _ => false
       }
       (pt.typeSymbol == UnitClass // can perform unit coercion
-          || isCompatible(tp, pt) ||
-          isCompatibleNoParamsMethod // can perform implicit () instantiation
-          )
+      || isCompatible(tp, pt) ||
+      isCompatibleNoParamsMethod // can perform implicit () instantiation
+      )
     }
 
     /*  Like weakly compatible but don't apply any implicit conversions yet.
@@ -488,8 +488,8 @@ trait Infer extends Checkable { self: Analyzer =>
             (tparam, tvar) =>
               try instantiateToBound(tvar, varianceInTypes(formals)(tparam))
               catch {
-            case ex: NoInstance => WildcardType
-        })
+                case ex: NoInstance => WildcardType
+            })
       else tvars map (_ => WildcardType)
     }
 
@@ -563,9 +563,9 @@ trait Infer extends Checkable { self: Analyzer =>
       foreach3(tparams, tvars, targs) { (tparam, tvar, targ) =>
         val retract =
           (targ.typeSymbol == NothingClass // only retract Nothings
-                && (restpe.isWildcard ||
-                      !varianceInType(restpe)(tparam).isPositive) // don't retract covariant occurrences
-              )
+            && (restpe.isWildcard ||
+              !varianceInType(restpe)(tparam).isPositive) // don't retract covariant occurrences
+          )
 
         buf += ((tparam,
                  if (retract) None
@@ -637,10 +637,9 @@ trait Infer extends Checkable { self: Analyzer =>
         // Note that isCompatible side-effects: subtype checks involving typevars
         // are recorded in the typevar's bounds (see TypeConstraint)
         if (!isCompatible(tp1, pt1)) {
-          throw new DeferredNoInstance(
-              () =>
-                "argument expression's type is not compatible with formal parameter type" +
-                  foundReqMsg(tp1, pt1))
+          throw new DeferredNoInstance(() =>
+            "argument expression's type is not compatible with formal parameter type" +
+              foundReqMsg(tp1, pt1))
         }
       }
       val targs = solvedTypes(tvars,
@@ -670,7 +669,7 @@ trait Infer extends Checkable { self: Analyzer =>
       }
       if (settings.warnInferAny && context.reportErrors && canWarnAboutAny) {
         foreachWithIndex(targs)((targ, idx) =>
-              targ.typeSymbol match {
+          targ.typeSymbol match {
             case sym @ (AnyClass | AnyValClass) =>
               reporter.warning(
                   argumentPosition(idx),
@@ -766,7 +765,7 @@ trait Infer extends Checkable { self: Analyzer =>
           case NamedType(name, tp) => // a named argument
             var res = tp
             val pos = params.indexWhere(p =>
-                  paramMatchesName(p, name) && !p.isSynthetic)
+              paramMatchesName(p, name) && !p.isSynthetic)
 
             if (pos == -1) {
               if (positionalAllowed) {
@@ -931,7 +930,7 @@ trait Infer extends Checkable { self: Analyzer =>
           isApplicable(undetparams, restpe, argtpes0, pt)
         case PolyType(tparams, restpe) =>
           createFromClonedSymbols(tparams, restpe)((tps1, res1) =>
-                isApplicable(tps1 ::: undetparams, res1, argtpes0, pt))
+            isApplicable(tps1 ::: undetparams, res1, argtpes0, pt))
         case ErrorType => true
         case _ => false
       })
@@ -1024,17 +1023,16 @@ trait Infer extends Checkable { self: Analyzer =>
       */
     def isProperSubClassOrObject(sym1: Symbol, sym2: Symbol): Boolean =
       ((sym1 ne sym2) && (sym1 ne NoSymbol) &&
-            ((sym1 isSubClass sym2) || (sym1.isModuleClass &&
-                      isProperSubClassOrObject(sym1.linkedClassOfClass, sym2)) ||
-                  (sym2.isModuleClass &&
-                        isProperSubClassOrObject(sym1,
-                                                 sym2.linkedClassOfClass))))
+        ((sym1 isSubClass sym2) || (sym1.isModuleClass &&
+          isProperSubClassOrObject(sym1.linkedClassOfClass, sym2)) ||
+          (sym2.isModuleClass &&
+            isProperSubClassOrObject(sym1, sym2.linkedClassOfClass))))
 
     /** is symbol `sym1` defined in a proper subclass of symbol `sym2`?
       */
     def isInProperSubClassOrObject(sym1: Symbol, sym2: Symbol) =
       ((sym2 eq NoSymbol) ||
-            isProperSubClassOrObject(sym1.safeOwner, sym2.owner))
+        isProperSubClassOrObject(sym1.safeOwner, sym2.owner))
 
     def isStrictlyMoreSpecific(ftpe1: Type,
                                ftpe2: Type,
@@ -1153,7 +1151,7 @@ trait Infer extends Checkable { self: Analyzer =>
       val targs = exprTypeArgs(tvars, tparams, treeTp, pt, useWeaklyCompatible)
       def infer_s =
         map3(tparams, tvars, targs)((tparam, tvar, targ) =>
-              s"$tparam=$tvar/$targ") mkString ","
+          s"$tparam=$tvar/$targ") mkString ","
       printTyping(tree, s"infer expr instance from pt=$pt, $infer_s")
 
       // SI-7899 inferring by-name types is unsound. The correct behaviour is conditional because the hole is
@@ -1513,7 +1511,7 @@ trait Infer extends Checkable { self: Analyzer =>
       // have type constructors amongst their bounds. See SI-4070.
       def isFreeTypeParamOfTerm(sym: Symbol) =
         (sym.isAbstractType && sym.owner.isTerm &&
-              !sym.info.bounds.exists(_.typeParams.nonEmpty))
+          !sym.info.bounds.exists(_.typeParams.nonEmpty))
 
       // Intentionally *not* using `Type#typeSymbol` here, which would normalize `tp`
       // and collect symbols from the result type of any resulting `PolyType`s, which
@@ -1546,8 +1544,8 @@ trait Infer extends Checkable { self: Analyzer =>
             val tp2 = pre memberType sym2
 
             ((tp2 eq ErrorType) || isWeaklyCompatible(tp1, pt) &&
-                !isWeaklyCompatible(tp2, pt) ||
-                isStrictlyMoreSpecific(tp1, tp2, sym1, sym2))
+            !isWeaklyCompatible(tp2, pt) ||
+            isStrictlyMoreSpecific(tp1, tp2, sym1, sym2))
           }
           // todo: missing test case for bests.isEmpty
           bests match {
@@ -1772,10 +1770,8 @@ trait Infer extends Checkable { self: Analyzer =>
         case Nil => fail()
         case alt :: Nil => finish(alt, pre memberType alt)
         case _ =>
-          checkWithinBounds(
-              matchingLength filter
-                (alt =>
-                   isWithinBounds(pre, alt.owner, alt.typeParams, argtypes)))
+          checkWithinBounds(matchingLength filter
+            (alt => isWithinBounds(pre, alt.owner, alt.typeParams, argtypes)))
       }
     }
   }

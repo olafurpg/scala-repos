@@ -46,8 +46,8 @@ class PlannerSpec extends WordSpec {
 
   implicit val arbIntSource: Arbitrary[Producer[Memory, Int]] = Arbitrary(
       Gen.listOfN(100, Arbitrary.arbitrary[Int]).map { x: List[Int] =>
-    Memory.toSource(x)
-  })
+        Memory.toSource(x)
+      })
   implicit val arbTupleSource: Arbitrary[KeyedProducer[Memory, Int, Int]] =
     Arbitrary(Gen.listOfN(100, Arbitrary.arbitrary[(Int, Int)]).map {
       x: List[(Int, Int)] =>

@@ -154,7 +154,7 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
            */
           case _
               if (!noOpNode(activeBolt) &&
-                    dependsOnSummerProducer(currentProducer)) =>
+                dependsOnSummerProducer(currentProducer)) =>
             true
           /*
            * This should possibly be improved, but currently, we force a FlatMapNode just before a
@@ -171,7 +171,7 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
            */
           case _
               if ((!mergableWithSource(currentProducer)) &&
-                    allTransDepsMergeableWithSource(dep)) =>
+                allTransDepsMergeableWithSource(dep)) =>
             true
           case _ => false
         }

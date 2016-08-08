@@ -101,7 +101,7 @@ class ScalaInplaceVariableIntroducer(project: Project,
             setDeclaration(declaration)
             if (nameIsValid !=
                   (named.isDefined &&
-                      isIdentifier(input.trim, myFile.getLanguage))) {
+                  isIdentifier(input.trim, myFile.getLanguage))) {
               nameIsValid = !nameIsValid
             }
             resetBalloonPanel(nameIsValid)

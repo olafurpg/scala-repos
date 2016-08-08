@@ -327,22 +327,21 @@ class View(position: FrogShape => Int, val frogShapes: List[FrogShape]) {
         FIRST_FROG_CENTER_X + STONE_STEP * position(frogShape)
       val frogShapeCenterY = FROG_CENTER_Y
 
-      Timeline(
-          Seq(
-              at(length * TIME s) {
+      Timeline(Seq(
+          at(length * TIME s) {
             frogShape.centerY -> (frogShapeCenterY - length * STONE_STEP / 2)
           },
-              at(length * TIME s) {
+          at(length * TIME s) {
             frogShape.centerX -> next(frogShapeCenterX,
                                       length * STONE_STEP / 2)
           },
-              at(2 * length * TIME s) {
+          at(2 * length * TIME s) {
             frogShape.centerY -> frogShapeCenterY
           },
-              at(2 * length * TIME s) {
+          at(2 * length * TIME s) {
             frogShape.centerX -> next(frogShapeCenterX, length * STONE_STEP)
           }
-          )).play()
+      )).play()
     }
 
   val jumpOneRight = update(1, _ + _)

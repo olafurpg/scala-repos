@@ -52,7 +52,7 @@ object TestOptions {
       List(logLevel(level),
            configureConsole().startLocalConsole(),
            configureConsole().startRemoteShell()) ++ debugPort.toList.map(p =>
-            debugConfiguration(String.valueOf(p), true))
+        debugConfiguration(String.valueOf(p), true))
     new DefaultCompositeOption(options: _*)
   }
 

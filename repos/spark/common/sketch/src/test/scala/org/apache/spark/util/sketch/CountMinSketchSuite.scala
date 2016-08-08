@@ -119,7 +119,7 @@ class CountMinSketchSuite extends FunSuite {
       perSketchItems.foreach {
         _.foreach { item =>
           assert(mergedSketch.estimateCount(item) === expectedSketch
-                .estimateCount(item))
+            .estimateCount(item))
         }
       }
     }

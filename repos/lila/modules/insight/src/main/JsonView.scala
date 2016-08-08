@@ -88,8 +88,8 @@ final class JsonView {
         "filters" -> JsObject(p.question.filters.map {
           case Filter(dimension, selected) =>
             dimension.key -> JsArray(selected
-                  .map(Dimension.valueKey(dimension))
-                  .map(JsString.apply))
+              .map(Dimension.valueKey(dimension))
+              .map(JsString.apply))
         })
     )
   }

@@ -44,10 +44,10 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
         case Full(f: BaseField) => f
         case Full(_) =>
           org.squeryl.internals.Utils.throwError("field " + name +
-                " in Record metadata for " + clasz + " is not a TypedField")
+            " in Record metadata for " + clasz + " is not a TypedField")
         case _ =>
           org.squeryl.internals.Utils.throwError("failed to find field " +
-                name + " in Record metadata for " + clasz)
+            name + " in Record metadata for " + clasz)
       }
 
     metaRecordsByClass get clasz match {

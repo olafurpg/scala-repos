@@ -141,8 +141,8 @@ private[hive] class HadoopTableReader(
       partitions: Seq[HivePartition]): RDD[InternalRow] = {
     val partitionToDeserializer = partitions
       .map(part =>
-            (part,
-             part.getDeserializer.getClass.asInstanceOf[Class[Deserializer]]))
+        (part,
+         part.getDeserializer.getClass.asInstanceOf[Class[Deserializer]]))
       .toMap
     makeRDDForPartitionedTable(partitionToDeserializer, filterOpt = None)
   }
@@ -177,7 +177,7 @@ private[hive] class HadoopTableReader(
               val fs = pathPattern.getFileSystem(sc.hiveconf)
               val matches = fs.globStatus(pathPattern)
               matches.foreach(fileStatus =>
-                    existPathSet += fileStatus.getPath.toString)
+                existPathSet += fileStatus.getPath.toString)
             }
             // convert  /demo/data/year/month/day  to  /demo/data/*/*/*/
             def getPathPatternByPath(parNum: Int, tempPath: Path): String = {

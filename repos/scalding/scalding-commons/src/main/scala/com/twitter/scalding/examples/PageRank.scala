@@ -63,7 +63,7 @@ class PageRank(args: Args) extends Job(args) {
       val nextArgs =
         args + ("input", Some(args("output"))) +
           ("temp", Some(args("output"))) + ("output",
-            Some(args("temp"))) + ("jobCount", Some((JOB_COUNT + 1).toString))
+        Some(args("temp"))) + ("jobCount", Some((JOB_COUNT + 1).toString))
       //Actually read the error:
       val error = TypedTsv[Double](args("errorOut")).toIterator.next;
       // The last job should be even numbered so output is not in temp.
@@ -134,7 +134,7 @@ class PageRank(args: Args) extends Job(args) {
         //Here we make a false row that we use to tell dst how much incoming
         //Page rank it needs to add to itself:
         .map(('src, 'd_src, 'dst, 'rank, 'rowtype) ->
-              ('src, 'd_src, 'dst, 'rank, 'rowtype)) {
+          ('src, 'd_src, 'dst, 'rank, 'rowtype)) {
           intup: (Long, Long, Long, Double, Int) =>
             val (src: Long, d_src: Long, dst: Long, rank: Double, row: Int) =
               intup

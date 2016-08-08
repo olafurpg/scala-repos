@@ -107,9 +107,9 @@ trait BatchedService[K, V] extends ExternalService[K, V] {
           }
 
           if (existing.isEmpty) {
-            Left(
-                List("[ERROR] Could not load any batches of the service stream in: " +
-                      toString + " for: " + timeSpan.toString))
+            Left(List(
+                "[ERROR] Could not load any batches of the service stream in: " +
+                  toString + " for: " + timeSpan.toString))
           } else {
             val inBatches = List(startingBatch) ++ existing.map { _._1 }
             val bInt = BatchID.toInterval(inBatches).get // by construction this is an interval, so this can't throw

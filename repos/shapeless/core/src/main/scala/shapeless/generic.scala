@@ -310,7 +310,7 @@ trait CaseClassMacros extends ReprTypes {
 
   def isProductAux(tpe: Type): Boolean =
     tpe.typeSymbol.isClass && (isCaseClassLike(classSym(tpe)) ||
-          HasApplyUnapply(tpe) || HasCtorUnapply(tpe))
+      HasApplyUnapply(tpe) || HasCtorUnapply(tpe))
 
   def isProduct(tpe: Type): Boolean =
     tpe =:= typeOf[Unit] || (!(tpe =:= typeOf[AnyRef]) && isProductAux(tpe))
@@ -539,7 +539,7 @@ trait CaseClassMacros extends ReprTypes {
         appliedTypTree1(body, param, arg)
       case t @ TypeRef(pre, sym, List()) if t.takesTypeArgs =>
         val argTrees = t.typeParams.map(sym =>
-              appliedTypTree1(sym.asType.toType, param, arg))
+          appliedTypTree1(sym.asType.toType, param, arg))
         AppliedTypeTree(mkAttributedRef(pre, sym), argTrees)
       case TypeRef(pre, sym, List()) =>
         mkAttributedRef(pre, sym)
@@ -548,7 +548,7 @@ trait CaseClassMacros extends ReprTypes {
         AppliedTypeTree(mkAttributedRef(pre, sym), argTrees)
       case t if t.takesTypeArgs =>
         val argTrees = t.typeParams.map(sym =>
-              appliedTypTree1(sym.asType.toType, param, arg))
+          appliedTypTree1(sym.asType.toType, param, arg))
         AppliedTypeTree(mkAttributedRef(tpe.typeConstructor), argTrees)
       case t =>
         tq"$tpe"
@@ -642,7 +642,7 @@ trait CaseClassMacros extends ReprTypes {
 
     sym.isCaseClass ||
     (!sym.isAbstract && !sym.isTrait && !(sym == symbolOf[Object]) &&
-        sym.knownDirectSubclasses.isEmpty && checkCtor)
+    sym.knownDirectSubclasses.isEmpty && checkCtor)
   }
 
   def isCaseObjectLike(sym: ClassSymbol): Boolean = sym.isModuleClass
@@ -756,8 +756,8 @@ trait CaseClassMacros extends ReprTypes {
         .patchedLookup(original.asInstanceOf[global.Symbol].name.companionName,
                        owner.asInstanceOf[global.Symbol])
         .suchThat(sym =>
-              (original.isTerm || sym.hasModuleFlag) &&
-                (sym isCoDefinedWith original.asInstanceOf[global.Symbol]))
+          (original.isTerm || sym.hasModuleFlag) &&
+            (sym isCoDefinedWith original.asInstanceOf[global.Symbol]))
         .asInstanceOf[c.universe.Symbol]
     }
   }

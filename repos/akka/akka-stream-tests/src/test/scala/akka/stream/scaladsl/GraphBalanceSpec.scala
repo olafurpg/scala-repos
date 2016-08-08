@@ -139,16 +139,17 @@ class GraphBalanceSpec extends AkkaSpec {
       val (s1, s2, s3, s4, s5) = RunnableGraph
         .fromGraph(
             GraphDSL.create(sink, sink, sink, sink, sink)(Tuple5.apply) {
-          implicit b ⇒ (f1, f2, f3, f4, f5) ⇒
-            val balance = b.add(Balance[Int](5, waitForAllDownstreams = true))
-            Source(0 to 14) ~> balance.in
-            balance.out(0).grouped(15) ~> f1
-            balance.out(1).grouped(15) ~> f2
-            balance.out(2).grouped(15) ~> f3
-            balance.out(3).grouped(15) ~> f4
-            balance.out(4).grouped(15) ~> f5
-            ClosedShape
-        })
+              implicit b ⇒ (f1, f2, f3, f4, f5) ⇒
+                val balance =
+                  b.add(Balance[Int](5, waitForAllDownstreams = true))
+                Source(0 to 14) ~> balance.in
+                balance.out(0).grouped(15) ~> f1
+                balance.out(1).grouped(15) ~> f2
+                balance.out(2).grouped(15) ~> f3
+                balance.out(3).grouped(15) ~> f4
+                balance.out(4).grouped(15) ~> f5
+                ClosedShape
+            })
         .run()
 
       Set(s1, s2, s3, s4, s5) flatMap (Await.result(_, 3.seconds)) should be(

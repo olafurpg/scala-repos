@@ -311,10 +311,10 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
           registrationRetryTimer = Some(
               forwordMessageScheduler.scheduleAtFixedRate(
                   new Runnable {
-                override def run(): Unit = Utils.tryLogNonFatalError {
-                  self.send(ReregisterWithMaster)
-                }
-              },
+                    override def run(): Unit = Utils.tryLogNonFatalError {
+                      self.send(ReregisterWithMaster)
+                    }
+                  },
                   PROLONGED_REGISTRATION_RETRY_INTERVAL_SECONDS,
                   PROLONGED_REGISTRATION_RETRY_INTERVAL_SECONDS,
                   TimeUnit.SECONDS))
@@ -349,10 +349,10 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
         registrationRetryTimer = Some(
             forwordMessageScheduler.scheduleAtFixedRate(
                 new Runnable {
-              override def run(): Unit = Utils.tryLogNonFatalError {
-                Option(self).foreach(_.send(ReregisterWithMaster))
-              }
-            },
+                  override def run(): Unit = Utils.tryLogNonFatalError {
+                    Option(self).foreach(_.send(ReregisterWithMaster))
+                  }
+                },
                 INITIAL_REGISTRATION_RETRY_INTERVAL_SECONDS,
                 INITIAL_REGISTRATION_RETRY_INTERVAL_SECONDS,
                 TimeUnit.SECONDS))
@@ -471,7 +471,7 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
       changeMaster(masterRef, masterWebUiUrl)
 
       val execs = executors.values.map(e =>
-            new ExecutorDescription(e.appId, e.execId, e.cores, e.state))
+        new ExecutorDescription(e.appId, e.execId, e.cores, e.state))
       masterRef.send(
           WorkerSchedulerStateResponse(workerId,
                                        execs.toList,
@@ -517,7 +517,7 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
               appId,
               execId,
               appDesc.copy(command =
-                    Worker.maybeUpdateSSLSettings(appDesc.command, conf)),
+                Worker.maybeUpdateSSLSettings(appDesc.command, conf)),
               cores_,
               memory_,
               self,
@@ -587,7 +587,7 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
           workDir,
           sparkHome,
           driverDesc.copy(command =
-                Worker.maybeUpdateSSLSettings(driverDesc.command, conf)),
+            Worker.maybeUpdateSSLSettings(driverDesc.command, conf)),
           self,
           workerUri,
           securityMgr)

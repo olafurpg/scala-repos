@@ -81,16 +81,16 @@ object ScalaOptionParser {
             .map(StringSetting) ++ multiStringSettingNames.map(
               MultiStringSetting) ++ intSettingNames
             .map(IntSetting) ++ choiceSettingNames.map {
-        case (k, v) => ChoiceSetting(k, v)
-      } ++ multiChoiceSettingNames.map {
-        case (k, v) => MultiChoiceSetting(k, v)
-      } ++ scalaVersionSettings.map(ScalaVersionSetting))
+            case (k, v) => ChoiceSetting(k, v)
+          } ++ multiChoiceSettingNames.map {
+            case (k, v) => MultiChoiceSetting(k, v)
+          } ++ scalaVersionSettings.map(ScalaVersionSetting))
     val ScalacOpt = sourceFile | UniversalOpt
 
     val ScalaExtraSettings = oneOf(
         scalaChoiceSettingNames.map {
-      case (k, v) => ChoiceSetting(k, v)
-    }.toList ++ scalaStringSettingNames
+          case (k, v) => ChoiceSetting(k, v)
+        }.toList ++ scalaStringSettingNames
           .map(StringSetting) ++ scalaBooleanSettingNames.map(BooleanSetting))
     val ScalaOpt = UniversalOpt | ScalaExtraSettings
 
@@ -113,16 +113,14 @@ object ScalaOptionParser {
                 TokenCompletions.displayOnly("<script|class|object|jar>"))
             .filter(!_.startsWith("-"), x => x)
         val runnableAndArgs = concat(
-            runnable ~ Opt(
-                concat(Space.string ~ repsep(
-                        token(StringBasic,
-                              TokenCompletions.displayOnly("<arg>")),
-                        Space).map(_.mkString(" ")))))
+            runnable ~ Opt(concat(Space.string ~ repsep(
+                token(StringBasic, TokenCompletions.displayOnly("<arg>")),
+                Space).map(_.mkString(" ")))))
         val options = rep1sep(ScalaOpt, Space).map(_.mkString(" "))
         Opt(
             Space ~>
               (options | concat(
-                      concat(options ~ Space.string) ~ runnableAndArgs) | runnableAndArgs))
+                  concat(options ~ Space.string) ~ runnableAndArgs) | runnableAndArgs))
       case "scaladoc" =>
         Opt(Space ~> Opt(repsep(ScalaDocOpt, Space).map(_.mkString(" "))))
       case "scalac" =>

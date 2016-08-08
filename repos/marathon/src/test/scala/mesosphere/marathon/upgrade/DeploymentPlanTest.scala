@@ -536,10 +536,9 @@ class DeploymentPlanTest
       AppDefinition(
           id = PathId(id),
           container = Some(Container(mesos.ContainerInfo.Type.MESOS, volumes)),
-          residency = Some(
-              Residency(
-                  123,
-                  Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
+          residency = Some(Residency(
+              123,
+              Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
       )
     }
     val vol1 = persistentVolume("foo")

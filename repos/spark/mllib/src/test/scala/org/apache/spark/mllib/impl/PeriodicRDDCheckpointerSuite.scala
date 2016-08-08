@@ -168,13 +168,12 @@ private object PeriodicRDDCheckpointerSuite {
       }
     } catch {
       case e: AssertionError =>
-        throw new Exception(
-            s"PeriodicRDDCheckpointerSuite.checkCheckpoint failed with:\n" +
-              s"\t gIndex = $gIndex\n" + s"\t iteration = $iteration\n" +
-              s"\t checkpointInterval = $checkpointInterval\n" +
-              s"\t rdd.isCheckpointed = ${rdd.isCheckpointed}\n" +
-              s"\t rdd.getCheckpointFile = ${rdd.getCheckpointFile.mkString(", ")}\n" +
-              s"  AssertionError message: ${e.getMessage}")
+        throw new Exception(s"PeriodicRDDCheckpointerSuite.checkCheckpoint failed with:\n" +
+          s"\t gIndex = $gIndex\n" + s"\t iteration = $iteration\n" +
+          s"\t checkpointInterval = $checkpointInterval\n" +
+          s"\t rdd.isCheckpointed = ${rdd.isCheckpointed}\n" +
+          s"\t rdd.getCheckpointFile = ${rdd.getCheckpointFile.mkString(", ")}\n" +
+          s"  AssertionError message: ${e.getMessage}")
     }
   }
 }

@@ -80,13 +80,8 @@ trait Validators { self: DefaultMacroCompiler =>
                                  atparams map varianceInType(aret),
                                  upper = false,
                                  maxLubDepth)
-        val boundsOk = typer.silent(
-            _.infer.checkBounds(macroDdef,
-                                NoPrefix,
-                                NoSymbol,
-                                atparams,
-                                atargs,
-                                ""))
+        val boundsOk = typer.silent(_.infer
+          .checkBounds(macroDdef, NoPrefix, NoSymbol, atparams, atargs, ""))
         boundsOk match {
           case SilentResultValue(true) => // do nothing, success
           case SilentResultValue(false) | SilentTypeError(_) =>
@@ -210,7 +205,7 @@ trait Validators { self: DefaultMacroCompiler =>
               singleType(singleType(ctxPrefix, MacroContextPrefix), ExprValue)
             case SingleType(NoPrefix, sym) =>
               mfind(macroDdef.vparamss)(_.symbol == sym).fold(pre)(p =>
-                    singleType(singleType(NoPrefix, param(p)), ExprValue))
+                singleType(singleType(NoPrefix, param(p)), ExprValue))
             case _ =>
               mapOver(pre)
           }

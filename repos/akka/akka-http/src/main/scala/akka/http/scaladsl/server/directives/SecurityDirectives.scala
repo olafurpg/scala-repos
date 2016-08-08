@@ -197,7 +197,7 @@ trait SecurityDirectives {
       authenticator: Option[C] ⇒ Future[AuthenticationResult[T]])
     : AuthenticationDirective[T] =
     authenticateOrRejectWithChallenge[T](cred ⇒
-          authenticator(cred collect { case c: C ⇒ c }))
+      authenticator(cred collect { case c: C ⇒ c }))
 
   /**
     * Applies the given authorization check to the request.

@@ -315,7 +315,7 @@ class SparkHadoopUtil extends Logging {
     val fileName = credentialsPath.getName
     fileName
       .substring(fileName.lastIndexOf(
-              SparkHadoopUtil.SPARK_YARN_CREDS_COUNTER_DELIM) + 1)
+          SparkHadoopUtil.SPARK_YARN_CREDS_COUNTER_DELIM) + 1)
       .toInt
   }
 
@@ -403,7 +403,7 @@ object SparkHadoopUtil {
   def get: SparkHadoopUtil = {
     // Check each time to support changing to/from YARN
     val yarnMode = java.lang.Boolean.valueOf(System
-          .getProperty("SPARK_YARN_MODE", System.getenv("SPARK_YARN_MODE")))
+      .getProperty("SPARK_YARN_MODE", System.getenv("SPARK_YARN_MODE")))
     if (yarnMode) {
       yarn
     } else {

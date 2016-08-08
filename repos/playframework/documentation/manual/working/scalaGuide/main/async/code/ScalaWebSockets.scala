@@ -74,7 +74,7 @@ object ScalaWebSockets extends PlaySpecification {
 
         runWebSocket(
             WebSocket.acceptWithActor[String, String](req =>
-                  out => Props(new MyActor)),
+              out => Props(new MyActor)),
             Source.empty,
             0
         ) must beRight[List[Message]]
@@ -94,7 +94,7 @@ object ScalaWebSockets extends PlaySpecification {
 
         runWebSocket(
             WebSocket.acceptWithActor[String, String](req =>
-                  out => Props(new MyActor)),
+              out => Props(new MyActor)),
             Source.maybe,
             0
         ) must beRight[List[Message]]
@@ -120,11 +120,11 @@ object ScalaWebSockets extends PlaySpecification {
         runWebSocket(
             Samples.Controller5.socket,
             Source.single(TextMessage(Json.stringify(
-                        Json.toJson(Samples.Controller5.InEvent("blah"))))),
+                Json.toJson(Samples.Controller5.InEvent("blah"))))),
             1
         ) must beRight.which { out =>
           out must_== List(TextMessage(Json.stringify(
-                      Json.toJson(Samples.Controller5.OutEvent("blah")))))
+              Json.toJson(Samples.Controller5.OutEvent("blah")))))
         }
       }
     }

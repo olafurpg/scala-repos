@@ -39,8 +39,8 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
       case Some(u) =>
         GameRepo mostUrgentGame u zip
           (ctx.me.filter(u !=) ?? { me =>
-                crosstableApi.nbGames(me.id, u.id)
-              }) zip relationApi.countFollowing(u.id) zip relationApi.countFollowers(
+            crosstableApi.nbGames(me.id, u.id)
+          }) zip relationApi.countFollowing(u.id) zip relationApi.countFollowers(
             u.id) zip ctx.isAuth.?? { prefApi followable u.id } zip ctx.userId.?? {
           relationApi.fetchRelation(_, u.id)
         } zip ctx.userId.?? { relationApi.fetchFollows(u.id, _) } map {
@@ -52,7 +52,7 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
               Json.obj(
                   "url" -> makeUrl(s"@/$username"),
                   "playing" -> gameOption.map(g =>
-                        makeUrl(s"${g.gameId}/${g.color.name}")),
+                    makeUrl(s"${g.gameId}/${g.color.name}")),
                   "nbFollowing" -> following,
                   "nbFollowers" -> followers,
                   "count" -> Json.obj("all" -> u.count.game,

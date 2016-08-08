@@ -54,7 +54,7 @@ trait Models {
 @DeveloperApi
 class ModelSerializer
     extends CustomSerializer[Model](format =>
-          ({
+      ({
         case JObject(fields) =>
           implicit val formats = DefaultFormats
           val seed = Model(id = "", models = Array[Byte]())

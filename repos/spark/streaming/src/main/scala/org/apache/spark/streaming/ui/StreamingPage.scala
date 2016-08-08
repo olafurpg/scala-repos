@@ -65,10 +65,9 @@ private[ui] class GraphUIData(timelineDivId: String,
   def generateTimelineHtml(jsCollector: JsCollector): Seq[Node] = {
     jsCollector.addPreparedStatement(s"registerTimeline($minY, $maxY);")
     if (batchInterval.isDefined) {
-      jsCollector.addStatement(
-          "drawTimeline(" +
-            s"'#$timelineDivId', $dataJavaScriptName, $minX, $maxX, $minY, $maxY, '$unitY'," +
-            s" ${batchInterval.get}" + ");")
+      jsCollector.addStatement("drawTimeline(" +
+        s"'#$timelineDivId', $dataJavaScriptName, $minX, $maxX, $minY, $maxY, '$unitY'," +
+        s" ${batchInterval.get}" + ");")
     } else {
       jsCollector.addStatement(
           s"drawTimeline('#$timelineDivId', $dataJavaScriptName, $minX, $maxX, $minY, $maxY," +
@@ -82,10 +81,9 @@ private[ui] class GraphUIData(timelineDivId: String,
     jsCollector.addPreparedStatement(
         s"registerHistogram($histogramData, $minY, $maxY);")
     if (batchInterval.isDefined) {
-      jsCollector.addStatement(
-          "drawHistogram(" +
-            s"'#$histogramDivId', $histogramData, $minY, $maxY, '$unitY', ${batchInterval.get}" +
-            ");")
+      jsCollector.addStatement("drawHistogram(" +
+        s"'#$histogramDivId', $histogramData, $minY, $maxY, '$unitY', ${batchInterval.get}" +
+        ");")
     } else {
       jsCollector.addStatement(
           s"drawHistogram('#$histogramDivId', $histogramData, $minY, $maxY, '$unitY');")

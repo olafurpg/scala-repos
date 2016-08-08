@@ -63,7 +63,7 @@ class NettyBlockTransferServiceSuite
     service0 = createService(port)
     service0.port should be >= port
     service0.port should be <= (port +
-          10) // avoid testing equality in case of simultaneous tests
+      10) // avoid testing equality in case of simultaneous tests
   }
 
   test("can bind to a specific port twice and the second increments") {

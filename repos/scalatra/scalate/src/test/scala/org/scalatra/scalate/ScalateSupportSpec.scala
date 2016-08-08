@@ -130,19 +130,19 @@ class ScalateSupportSpec extends ScalatraSpec {
   // verify that it's looking in the right place.
   def e5 = get("/layout-strategy") {
     body must_== (List(
-            "/WEB-INF/templates/layouts/default.mustache",
-            "/WEB-INF/templates/layouts/default.ssp",
-            "/WEB-INF/templates/layouts/default.scaml",
-            "/WEB-INF/templates/layouts/default.jade",
-            "/WEB-INF/layouts/default.mustache",
-            "/WEB-INF/layouts/default.ssp",
-            "/WEB-INF/layouts/default.scaml",
-            "/WEB-INF/layouts/default.jade",
-            "/WEB-INF/scalate/layouts/default.mustache",
-            "/WEB-INF/scalate/layouts/default.ssp",
-            "/WEB-INF/scalate/layouts/default.scaml",
-            "/WEB-INF/scalate/layouts/default.jade"
-        ) mkString ";")
+        "/WEB-INF/templates/layouts/default.mustache",
+        "/WEB-INF/templates/layouts/default.ssp",
+        "/WEB-INF/templates/layouts/default.scaml",
+        "/WEB-INF/templates/layouts/default.jade",
+        "/WEB-INF/layouts/default.mustache",
+        "/WEB-INF/layouts/default.ssp",
+        "/WEB-INF/layouts/default.scaml",
+        "/WEB-INF/layouts/default.jade",
+        "/WEB-INF/scalate/layouts/default.mustache",
+        "/WEB-INF/scalate/layouts/default.ssp",
+        "/WEB-INF/scalate/layouts/default.scaml",
+        "/WEB-INF/scalate/layouts/default.jade"
+    ) mkString ";")
   }
 
   def e6 = get("/url-generation") {

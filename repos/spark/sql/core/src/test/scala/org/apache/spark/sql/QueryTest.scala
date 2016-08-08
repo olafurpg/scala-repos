@@ -289,7 +289,7 @@ abstract class QueryTest extends PlanTest {
       fail(s"""
            |== FAIL: the logical plan parsed from json does not match the original one ===
            |${sideBySide(logicalPlan.treeString, normalized2.treeString)
-            .mkString("\n")}
+                .mkString("\n")}
           """.stripMargin)
     }
   }

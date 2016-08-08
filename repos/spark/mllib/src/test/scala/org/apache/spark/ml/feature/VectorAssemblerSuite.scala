@@ -83,7 +83,7 @@ class VectorAssemblerSuite
     assembler.transform(df).select("features").collect().foreach {
       case Row(v: Vector) =>
         assert(v === Vectors
-              .sparse(6, Array(1, 2, 4, 5), Array(1.0, 2.0, 3.0, 10.0)))
+          .sparse(6, Array(1, 2, 4, 5), Array(1.0, 2.0, 3.0, 10.0)))
     }
   }
 

@@ -6,15 +6,13 @@ import scala.annotation.implicitNotFound
 import sbt.internal.util.Attributed
 
 object Append {
-  @implicitNotFound(
-      msg =
-        "No implicit for Append.Value[${A}, ${B}] found,\n  so ${B} cannot be appended to ${A}")
+  @implicitNotFound(msg =
+    "No implicit for Append.Value[${A}, ${B}] found,\n  so ${B} cannot be appended to ${A}")
   trait Value[A, B] {
     def appendValue(a: A, b: B): A
   }
-  @implicitNotFound(
-      msg =
-        "No implicit for Append.Values[${A}, ${B}] found,\n  so ${B} cannot be appended to ${A}")
+  @implicitNotFound(msg =
+    "No implicit for Append.Values[${A}, ${B}] found,\n  so ${B} cannot be appended to ${A}")
   trait Values[A, -B] {
     def appendValues(a: A, b: B): A
   }
@@ -30,8 +28,8 @@ object Append {
       def appendValues(a: Seq[T], b: Seq[V]): Seq[T] =
         a ++
           (b map { x =>
-                (x: T)
-              })
+            (x: T)
+          })
       def appendValue(a: Seq[T], b: V): Seq[T] = a :+ (b: T)
     }
   implicit def appendList[T, V <: T]: Sequence[List[T], List[V], V] =
@@ -44,8 +42,8 @@ object Append {
       def appendValues(a: List[T], b: List[V]): List[T] =
         a :::
           (b map { x =>
-                (x: T)
-              })
+            (x: T)
+          })
       def appendValue(a: List[T], b: V): List[T] = a :+ (b: T)
     }
   implicit def appendString: Value[String, String] =

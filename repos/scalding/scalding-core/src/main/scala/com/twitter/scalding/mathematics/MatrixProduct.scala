@@ -97,7 +97,7 @@ object MatrixProduct extends java.io.Serializable {
     hint.total.map { tot =>
       // + 1L is to make sure there is at least once reducer
       (tot / MatrixProduct.maxTinyJoin +
-            1L).toInt min MatrixProduct.maxReducers
+        1L).toInt min MatrixProduct.maxReducers
     }.getOrElse(-1)
   }
 
@@ -515,7 +515,7 @@ object MatrixProduct extends java.io.Serializable {
                      newRightPipe)
               // Do the product:
               .map((left.valSym
-                    .append(getField(newRightFields, 2))) -> left.valSym) {
+                .append(getField(newRightFields, 2))) -> left.valSym) {
                 pair: (ValT, ValT) =>
                   ring.times(pair._1, pair._2)
               }
@@ -561,14 +561,14 @@ object MatrixProduct extends java.io.Serializable {
                    newRightPipe)
             // Do the product:
             .map((left.valSym.append(getField(newRightFields, 2))) -> getField(
-                    newRightFields,
-                    2)) { pair: (ValT, ValT) =>
+                newRightFields,
+                2)) { pair: (ValT, ValT) =>
               ring.times(pair._1, pair._2)
             }
             // Keep the names from the right:
             .project(newRightFields)
             .rename(newRightFields ->
-                  (right.rowSym, right.colSym, right.valSym))
+              (right.rowSym, right.colSym, right.valSym))
         }
         new Matrix[RowT, ColT, ValT](right.rowSym,
                                      right.colSym,
@@ -616,7 +616,7 @@ object MatrixProduct extends java.io.Serializable {
                      newRightPipe)
               // Do the product:
               .map((left.valSym
-                    .append(getField(newRightFields, 1))) -> left.valSym) {
+                .append(getField(newRightFields, 1))) -> left.valSym) {
                 pair: (ValT, ValT) =>
                   ring.times(pair._1, pair._2)
               }

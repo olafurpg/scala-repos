@@ -590,11 +590,8 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         val cpos: compiler.Position = importer.importPosition(pos)
 
         if (compiler.settings.verbose)
-          println(
-              "inferring implicit %s of type %s, macros = %s".format(
-                  if (isView) "view" else "value",
-                  pt,
-                  !withMacrosDisabled))
+          println("inferring implicit %s of type %s, macros = %s"
+            .format(if (isView) "view" else "value", pt, !withMacrosDisabled))
         val itree: compiler.Tree = compiler.inferImplicit(ctree,
                                                           cpt,
                                                           isView = isView,

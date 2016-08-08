@@ -102,7 +102,7 @@ case class LocalAlgorithm()
 
 class VectorSerializer
     extends CustomSerializer[Vector[Double]](format =>
-          ({
+      ({
         case JArray(s) =>
           s.map {
             case JDouble(x) => x

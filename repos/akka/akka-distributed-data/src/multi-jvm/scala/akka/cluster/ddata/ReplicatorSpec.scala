@@ -169,7 +169,7 @@ class ReplicatorSpec
       replicator ! Update(KeyJ, GSet(), WriteLocal)(_ + "a" + "b")
       expectMsg(UpdateSuccess(KeyJ, None))
       replicator ! Update(KeyJ, GSet(), WriteLocal)(_ ⇒
-            GSet.empty[String] + "c") // normal usage would be `_ + "c"`
+        GSet.empty[String] + "c") // normal usage would be `_ + "c"`
       expectMsg(UpdateSuccess(KeyJ, None))
       replicator ! Get(KeyJ, ReadLocal)
       val s = expectMsgPF() { case g @ GetSuccess(KeyJ, _) ⇒ g.get(KeyJ) }

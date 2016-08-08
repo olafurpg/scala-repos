@@ -154,8 +154,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
           .agg(sum("earnings"),
                grouping_id("course", "year"),
                rank().over(Window
-                     .partitionBy(grouping_id("course", "year"))
-                     .orderBy(sum("earnings")))),
+                 .partitionBy(grouping_id("course", "year"))
+                 .orderBy(sum("earnings")))),
         Row("Java", 2012, 20000.0, 0, 2) :: Row("Java", 2013, 30000.0, 0, 3) :: Row(
             "Java",
             null,

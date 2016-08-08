@@ -63,9 +63,9 @@ class LatencyCompensationTest
 
   test("Override can only be set once") {
     assert(LatencyCompensation.DefaultOverride.set(Compensator(_ =>
-                  Duration.Zero)))
+      Duration.Zero)))
     assert(!LatencyCompensation.DefaultOverride.set(Compensator(_ =>
-                  Duration.Zero)))
+      Duration.Zero)))
   }
 
   class Ctx {
@@ -154,7 +154,7 @@ class LatencyCompensationTest
       // set a compensation to 0 which should cause a failure if the caller does not
       // explicitly .configure the client with a compensation parameter.
       LatencyCompensation.DefaultOverride.set(new Compensator(_ =>
-                Duration.Zero))
+        Duration.Zero))
 
       metadata = Addr.Metadata("compensation" -> 2.seconds)
 

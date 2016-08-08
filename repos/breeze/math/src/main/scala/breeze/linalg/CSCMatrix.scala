@@ -640,8 +640,7 @@ object CSCMatrix
   }
 
   object Builder {
-    def fromMatrix[
-        @spec(Double, Int, Float, Long) T: ClassTag: Semiring: Zero](
+    def fromMatrix[@spec(Double, Int, Float, Long) T: ClassTag: Semiring: Zero](
         matrix: CSCMatrix[T]): Builder[T] = {
       val bldr = new Builder[T](matrix.rows, matrix.cols, matrix.activeSize)
       var c = 0

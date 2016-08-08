@@ -743,11 +743,9 @@ class ArraysTest {
     assertEquals(
         94,
         Arrays.deepHashCode(Array[AnyRef](Array[AnyRef](Array[Int](1)))))
-    assertEquals(
-        94,
-        Arrays.deepHashCode(
-            Array[AnyRef](
-                Array[AnyRef](Array[AnyRef](1.asInstanceOf[AnyRef])))))
+    assertEquals(94,
+                 Arrays.deepHashCode(Array[AnyRef](
+                     Array[AnyRef](Array[AnyRef](1.asInstanceOf[AnyRef])))))
   }
 
   @Test def equals_Booleans(): Unit = {
@@ -924,12 +922,9 @@ class ArraysTest {
     assertTrue(
         Arrays.deepEquals(Array[AnyRef](Array[AnyRef](Array[Int](1))),
                           Array[AnyRef](Array[AnyRef](Array[Int](1)))))
-    assertTrue(
-        Arrays.deepEquals(
-            Array[AnyRef](
-                Array[AnyRef](Array[AnyRef](1.asInstanceOf[AnyRef]))),
-            Array[AnyRef](
-                Array[AnyRef](Array[AnyRef](1.asInstanceOf[AnyRef])))))
+    assertTrue(Arrays.deepEquals(
+        Array[AnyRef](Array[AnyRef](Array[AnyRef](1.asInstanceOf[AnyRef]))),
+        Array[AnyRef](Array[AnyRef](Array[AnyRef](1.asInstanceOf[AnyRef])))))
 
     assertFalse(Arrays.deepEquals(null: Array[AnyRef], Array[AnyRef]()))
     assertFalse(Arrays.deepEquals(Array[AnyRef](), null: Array[AnyRef]))
@@ -963,12 +958,9 @@ class ArraysTest {
     assertFalse(
         Arrays.deepEquals(Array[AnyRef](Array[AnyRef](Array[Int](1))),
                           Array[AnyRef](Array[AnyRef](Array[Int](2)))))
-    assertFalse(
-        Arrays.deepEquals(
-            Array[AnyRef](
-                Array[AnyRef](Array[AnyRef](1.asInstanceOf[AnyRef]))),
-            Array[AnyRef](
-                Array[AnyRef](Array[AnyRef](2.asInstanceOf[AnyRef])))))
+    assertFalse(Arrays.deepEquals(
+        Array[AnyRef](Array[AnyRef](Array[AnyRef](1.asInstanceOf[AnyRef]))),
+        Array[AnyRef](Array[AnyRef](Array[AnyRef](2.asInstanceOf[AnyRef])))))
   }
 
   @Test def toString_Long(): Unit = {

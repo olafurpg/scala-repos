@@ -64,9 +64,9 @@ trait ScalaUnusedImportPassBase { self: TextEditorHighlightingPass =>
             Seq[Annotation]()
           case Some(psi)
               if qName.exists(qName =>
-                    ScalaCodeStyleSettings
-                      .getInstance(file.getProject)
-                      .isAlwaysUsedImport(qName)) =>
+                ScalaCodeStyleSettings
+                  .getInstance(file.getProject)
+                  .isAlwaysUsedImport(qName)) =>
             Seq.empty
           case Some(psi) =>
             val annotation = annotationHolder
@@ -74,7 +74,7 @@ trait ScalaUnusedImportPassBase { self: TextEditorHighlightingPass =>
             annotation setHighlightType ProblemHighlightType.LIKE_UNUSED_SYMBOL
             getFixes.foreach(annotation.registerFix)
             qName.foreach(name =>
-                  annotation.registerFix(new MarkImportAsAlwaysUsed(name)))
+              annotation.registerFix(new MarkImportAsAlwaysUsed(name)))
             Seq[Annotation](annotation)
         }
       }

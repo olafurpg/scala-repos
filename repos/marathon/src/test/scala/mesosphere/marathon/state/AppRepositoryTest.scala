@@ -124,7 +124,7 @@ class AppRepositoryTest extends MarathonSpec {
     val allApps = Seq(appDef1, version1, version2, version3, appDef2)
 
     val future = Future.successful(Seq("app1", "app2") ++ allApps.map(x =>
-              s"${x.id.safePath}:${x.version}"))
+      s"${x.id.safePath}:${x.version}"))
 
     when(store.names()).thenReturn(future)
 
@@ -159,7 +159,7 @@ class AppRepositoryTest extends MarathonSpec {
     val allApps = Seq(appDef1, version1, version2, version3, appDef2)
 
     val future = Future.successful(Seq("app1", "app2") ++ allApps.map(x =>
-              s"${x.id.safePath}:${x.version}"))
+      s"${x.id.safePath}:${x.version}"))
 
     when(store.names()).thenReturn(future)
     when(store.expunge(any(), any())).thenReturn(Future.successful(true))

@@ -882,7 +882,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
     val lastPow = BigTenPows.length - 1
     val (integralValue, varScale) = {
       if ((divisor.approxPrecision() + newScale > this.approxPrecision() +
-                1L) || this.isZero) {
+            1L) || this.isZero) {
         // If the divisor's integer part is greater than this's integer part,
         // the result must be zero with the appropriate scale
         (BigInteger.ZERO, 0L)
@@ -1575,7 +1575,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
           bits >>= (-exponent)
           // To test if after discard bits, a new carry is generated
           if (((bits & 3) == 3) || (((bits & 1) == 1) && (tempBits != 0) &&
-                  (lowestSetBit < discardedSize))) {
+              (lowestSetBit < discardedSize))) {
             bits += 1
           }
           exponent = 0

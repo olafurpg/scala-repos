@@ -101,7 +101,7 @@ abstract class ClusterDeathWatchSpec
         cluster.down(third)
         // removed
         awaitAssert(clusterView.members.map(_.address) should not contain
-              (address(third)))
+          (address(third)))
         awaitAssert(
             clusterView.unreachableMembers.map(_.address) should not contain
               (address(third)))
@@ -118,11 +118,11 @@ abstract class ClusterDeathWatchSpec
         runOn(third) {
           markNodeAsUnavailable(second)
           awaitAssert(clusterView.unreachableMembers
-                .map(_.address) should contain(address(second)))
+            .map(_.address) should contain(address(second)))
           cluster.down(second)
           // removed
           awaitAssert(clusterView.members.map(_.address) should not contain
-                (address(second)))
+            (address(second)))
           awaitAssert(
               clusterView.unreachableMembers.map(_.address) should not contain
                 (address(second)))
@@ -211,7 +211,7 @@ abstract class ClusterDeathWatchSpec
             clusterView.unreachableMembers.map(_.address) should not contain
               (address(fifth)))
         awaitAssert(clusterView.members.map(_.address) should not contain
-              (address(fifth)))
+          (address(fifth)))
       }
 
       enterBarrier("fifth-terminated")
@@ -249,7 +249,7 @@ abstract class ClusterDeathWatchSpec
             clusterView.unreachableMembers.map(_.address) should not contain
               (address(first)))
         awaitAssert(clusterView.members.map(_.address) should not contain
-              (address(first)))
+          (address(first)))
 
         expectTerminated(hello)
 

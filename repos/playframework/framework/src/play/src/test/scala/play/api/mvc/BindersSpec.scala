@@ -20,8 +20,8 @@ object BindersSpec extends Specification {
       subject.bind("key", uuid.toString) must be_==(Right(uuid))
     }
     "Fail on unparseable UUID" in {
-      subject.bind("key", "bad-uuid") must be_==(
-          Left("Cannot parse parameter key as UUID: Invalid UUID string: bad-uuid"))
+      subject.bind("key", "bad-uuid") must be_==(Left(
+          "Cannot parse parameter key as UUID: Invalid UUID string: bad-uuid"))
     }
   }
 
@@ -36,8 +36,8 @@ object BindersSpec extends Specification {
           Some(Right(uuid)))
     }
     "Fail on unparseable UUID" in {
-      subject.bind("key", Map("key" -> Seq("bad-uuid"))) must be_==(
-          Some(Left("Cannot parse parameter key as UUID: Invalid UUID string: bad-uuid")))
+      subject.bind("key", Map("key" -> Seq("bad-uuid"))) must be_==(Some(Left(
+          "Cannot parse parameter key as UUID: Invalid UUID string: bad-uuid")))
     }
   }
 
@@ -105,12 +105,12 @@ object BindersSpec extends Specification {
           Some(Right(char)))
     }
     "Fail on length > 1" in {
-      subject.bind("key", Map("key" -> Seq("foo"))) must be_==(
-          Some(Left("Cannot parse parameter key with value 'foo' as Char: key must be exactly one digit in length.")))
+      subject.bind("key", Map("key" -> Seq("foo"))) must be_==(Some(Left(
+          "Cannot parse parameter key with value 'foo' as Char: key must be exactly one digit in length.")))
     }
     "Fail on empty" in {
-      subject.bind("key", Map("key" -> Seq(""))) must be_==(
-          Some(Left("Cannot parse parameter key with value '' as Char: key must be exactly one digit in length.")))
+      subject.bind("key", Map("key" -> Seq(""))) must be_==(Some(Left(
+          "Cannot parse parameter key with value '' as Char: key must be exactly one digit in length.")))
     }
   }
 
@@ -126,12 +126,12 @@ object BindersSpec extends Specification {
       subject.bind("key", string) must equalTo(Right(char))
     }
     "Fail on length > 1" in {
-      subject.bind("key", "foo") must be_==(
-          Left("Cannot parse parameter key with value 'foo' as Char: key must be exactly one digit in length."))
+      subject.bind("key", "foo") must be_==(Left(
+          "Cannot parse parameter key with value 'foo' as Char: key must be exactly one digit in length."))
     }
     "Fail on empty" in {
-      subject.bind("key", "") must be_==(
-          Left("Cannot parse parameter key with value '' as Char: key must be exactly one digit in length."))
+      subject.bind("key", "") must be_==(Left(
+          "Cannot parse parameter key with value '' as Char: key must be exactly one digit in length."))
     }
   }
 }

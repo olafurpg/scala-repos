@@ -239,17 +239,15 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
           .map(Utils.memoryStringToMb)
           .getOrElse(Utils.DEFAULT_DRIVER_MEM_MB)
         if (driverMemory <= memThreshold) {
-          logWarning(
-              s"$thisClassName.save() was called, but it may fail because of too little" +
-                s" driver memory (${driverMemory}m)." +
-                s"  If failure occurs, try setting driver-memory ${memThreshold}m (or larger).")
+          logWarning(s"$thisClassName.save() was called, but it may fail because of too little" +
+            s" driver memory (${driverMemory}m)." +
+            s"  If failure occurs, try setting driver-memory ${memThreshold}m (or larger).")
         }
       } else {
         if (sc.executorMemory <= memThreshold) {
-          logWarning(
-              s"$thisClassName.save() was called, but it may fail because of too little" +
-                s" executor memory (${sc.executorMemory}m)." +
-                s"  If failure occurs try setting executor-memory ${memThreshold}m (or larger).")
+          logWarning(s"$thisClassName.save() was called, but it may fail because of too little" +
+            s" executor memory (${sc.executorMemory}m)." +
+            s"  If failure occurs try setting executor-memory ${memThreshold}m (or larger).")
         }
       }
 

@@ -42,7 +42,7 @@ private[tracker] object TaskOpProcessorImpl {
           actionForTaskAndStatus(existingTask, status)
         case None =>
           Action.Fail(new IllegalStateException(
-                  s"$taskId of app [${taskId.appId}] does not exist"))
+              s"$taskId of app [${taskId.appId}] does not exist"))
       }
     }
 

@@ -53,7 +53,7 @@ private[log] class LogCleanerManager(val logDirs: Array[File],
   /* the offset checkpoints holding the last cleaned point for each log */
   private val checkpoints = logDirs
     .map(dir =>
-          (dir, new OffsetCheckpoint(new File(dir, offsetCheckpointFile))))
+      (dir, new OffsetCheckpoint(new File(dir, offsetCheckpointFile))))
     .toMap
 
   /* the set of logs currently being cleaned */
@@ -119,7 +119,7 @@ private[log] class LogCleanerManager(val logDirs: Array[File],
         else 0
       // and must meet the minimum threshold for dirty byte ratio
       val cleanableLogs = dirtyLogs.filter(ltc =>
-            ltc.cleanableRatio > ltc.log.config.minCleanableRatio)
+        ltc.cleanableRatio > ltc.log.config.minCleanableRatio)
       if (cleanableLogs.isEmpty) {
         None
       } else {

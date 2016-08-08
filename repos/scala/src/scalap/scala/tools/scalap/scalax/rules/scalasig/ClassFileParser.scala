@@ -273,7 +273,7 @@ case class ClassFile(header: ClassFileHeader,
 
   def annotation(name: String) =
     annotations.flatMap(seq =>
-          seq.find(annot => constant(annot.typeIndex) == name))
+      seq.find(annot => constant(annot.typeIndex) == name))
 }
 
 case class Attribute(nameIndex: Int, byteCode: ByteCode)

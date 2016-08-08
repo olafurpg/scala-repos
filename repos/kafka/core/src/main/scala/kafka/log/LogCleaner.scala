@@ -291,12 +291,11 @@ class LogCleaner(val config: CleanerConfig,
           "\tBuffer utilization: %.1f%%%n".format(
               100 * stats.bufferUtilization) +
           "\tCleaned %,.1f MB in %.1f seconds (%,.1f Mb/sec, %.1f%% of total time)%n"
-            .format(
-                mb(stats.bytesRead),
-                stats.elapsedSecs - stats.elapsedIndexSecs,
-                mb(stats.bytesRead) / (stats.elapsedSecs -
+            .format(mb(stats.bytesRead),
+                    stats.elapsedSecs - stats.elapsedIndexSecs,
+                    mb(stats.bytesRead) / (stats.elapsedSecs -
                       stats.elapsedIndexSecs),
-                100 * (stats.elapsedSecs -
+                    100 * (stats.elapsedSecs -
                       stats.elapsedIndexSecs).toDouble / stats.elapsedSecs) +
           "\tStart size: %,.1f MB (%,d messages)%n"
             .format(mb(stats.bytesRead), stats.messagesRead) +
@@ -305,7 +304,7 @@ class LogCleaner(val config: CleanerConfig,
           "\t%.1f%% size reduction (%.1f%% fewer messages)%n".format(
               100.0 * (1.0 - stats.bytesWritten.toDouble / stats.bytesRead),
               100.0 * (1.0 -
-                    stats.messagesWritten.toDouble / stats.messagesRead))
+                stats.messagesWritten.toDouble / stats.messagesRead))
       info(message)
       if (stats.invalidMessagesRead > 0) {
         warn(

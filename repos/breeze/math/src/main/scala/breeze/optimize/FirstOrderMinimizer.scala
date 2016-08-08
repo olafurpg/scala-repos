@@ -394,8 +394,8 @@ object FirstOrderMinimizer {
                                  fvalMemory: Int = 20)(
       implicit space: NormedModule[T, Double]): ConvergenceCheck[T] =
     (maxIterationsReached[T](maxIter) ||
-          functionValuesConverged(tolerance, relative, fvalMemory) ||
-          gradientConverged[T](tolerance, relative) || searchFailed)
+      functionValuesConverged(tolerance, relative, fvalMemory) ||
+      gradientConverged[T](tolerance, relative) || searchFailed)
 
   /**
     * OptParams is a Configuration-compatible case class that can be used to select optimization
@@ -453,7 +453,7 @@ object FirstOrderMinimizer {
       }
 
       it.asInstanceOf[Iterator[
-              FirstOrderMinimizer[T, BatchDiffFunction[T]]#State]]
+          FirstOrderMinimizer[T, BatchDiffFunction[T]]#State]]
     }
 
     @deprecated("Use breeze.optimize.iterations(f, init, params) instead.",

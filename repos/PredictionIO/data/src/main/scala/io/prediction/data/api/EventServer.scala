@@ -165,19 +165,19 @@ class EventServiceActor(val eventClient: LEvents,
         respondWithMediaType(MediaTypes.`application/json`) {
           complete {
             Map("plugins" -> Map(
-                    "inputblockers" -> pluginContext.inputBlockers.map {
+                "inputblockers" -> pluginContext.inputBlockers.map {
                   case (n, p) =>
                     n -> Map("name" -> p.pluginName,
                              "description" -> p.pluginDescription,
                              "class" -> p.getClass.getName)
                 },
-                    "inputsniffers" -> pluginContext.inputSniffers.map {
+                "inputsniffers" -> pluginContext.inputSniffers.map {
                   case (n, p) =>
                     n -> Map("name" -> p.pluginName,
                              "description" -> p.pluginDescription,
                              "class" -> p.getClass.getName)
                 }
-                ))
+            ))
           }
         }
       }
@@ -330,12 +330,12 @@ class EventServiceActor(val eventClient: LEvents,
                   respondWithMediaType(MediaTypes.`application/json`) {
                     complete {
                       logger.debug(s"GET events of appId=${appId} " +
-                            s"st=${startTimeStr} ut=${untilTimeStr} " +
-                            s"et=${entityType} eid=${entityId} " +
-                            s"li=${limit} rev=${reversed} ")
+                        s"st=${startTimeStr} ut=${untilTimeStr} " +
+                        s"et=${entityType} eid=${entityId} " +
+                        s"li=${limit} rev=${reversed} ")
 
                       require(!((reversed == Some(true)) &&
-                                    (entityType.isEmpty || entityId.isEmpty)),
+                                (entityType.isEmpty || entityId.isEmpty)),
                               "the parameter reversed can only be used with" +
                                 " both entityType and entityId specified.")
 
@@ -425,9 +425,9 @@ class EventServiceActor(val eventClient: LEvents,
                       }
                     data
                   } else {
-                    Future.successful(
-                        Map("status" -> StatusCodes.Forbidden.intValue,
-                            "message" -> s"${event.event} events are not allowed"))
+                    Future.successful(Map(
+                        "status" -> StatusCodes.Forbidden.intValue,
+                        "message" -> s"${event.event} events are not allowed"))
                   }
                 }
                 case Failure(exception) => {
@@ -444,8 +444,8 @@ class EventServiceActor(val eventClient: LEvents,
                   } else {
                     (StatusCodes.BadRequest,
                      Map("message" ->
-                           (s"Batch request must have less than or equal to " +
-                                 s"${MaxNumberOfEventsPerBatchRequest} events")))
+                       (s"Batch request must have less than or equal to " +
+                         s"${MaxNumberOfEventsPerBatchRequest} events")))
                   }
                 }
               }

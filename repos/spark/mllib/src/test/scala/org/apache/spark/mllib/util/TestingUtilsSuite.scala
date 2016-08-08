@@ -129,10 +129,10 @@ class TestingUtilsSuite extends SparkFunSuite {
           Vectors.dense(Array(3.135, 3.534)) relTol 0.01)
     assert(
         !(Vectors.dense(Array(3.1, 3.5)) !~=
-              Vectors.dense(Array(3.130, 3.534)) relTol 0.01))
+          Vectors.dense(Array(3.130, 3.534)) relTol 0.01))
     assert(
         !(Vectors.dense(Array(3.1, 3.5)) ~=
-              Vectors.dense(Array(3.135, 3.534)) relTol 0.01))
+          Vectors.dense(Array(3.135, 3.534)) relTol 0.01))
 
     // Should throw exception with message when test fails.
     intercept[TestFailedException](
@@ -184,11 +184,11 @@ class TestingUtilsSuite extends SparkFunSuite {
 
     assert(
         !(Vectors.dense(Array(3.1, 3.5, 0.0)) !~=
-              Vectors.dense(Array(3.1 + 1E-8, 3.5 + 2E-7, 1E-8)) absTol 1E-6))
+          Vectors.dense(Array(3.1 + 1E-8, 3.5 + 2E-7, 1E-8)) absTol 1E-6))
 
     assert(
         !(Vectors.dense(Array(3.1, 3.5, 0.0)) ~= Vectors.dense(
-                Array(3.1 + 1E-5, 3.5 + 2E-7, 1 + 1E-3)) absTol 1E-6))
+            Array(3.1 + 1E-5, 3.5 + 2E-7, 1 + 1E-3)) absTol 1E-6))
 
     // Should throw exception with message when test fails.
     intercept[TestFailedException](

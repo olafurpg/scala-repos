@@ -459,8 +459,8 @@ object Req {
 
     val localParams: Map[String, List[String]] = Map(
         rewritten.params.toList.map {
-      case (name, value) => name -> List(value)
-    }: _*)
+          case (name, value) => name -> List(value)
+        }: _*)
 
     // val session = request.getSession
     //  val body = ()
@@ -526,7 +526,7 @@ object Req {
         }
 
         val params = normal.foldLeft(eMap)((a, b) =>
-              a + (b.name -> (a.getOrElse(b.name, Nil) ::: List(b.value))))
+          a + (b.name -> (a.getOrElse(b.name, Nil) ::: List(b.value))))
 
         ParamCalcInfo((queryStringParam._1 ::: normal.map(_.name)).distinct,
                       queryStringParam._2 ++ localParams ++ params,
@@ -539,7 +539,7 @@ object Req {
                       Nil,
                       Empty)
       } else if (contentType.dmap(false)(_.toLowerCase.startsWith(
-                         "application/x-www-form-urlencoded"))) {
+                     "application/x-www-form-urlencoded"))) {
         val params =
           localParams ++ (request.params.sortWith { (s1, s2) =>
             s1.name < s2.name
@@ -1173,7 +1173,7 @@ class Req(val path: ParsePath,
     */
   lazy val hostAndPath: String =
     containerRequest.map(r =>
-          (r.scheme, r.serverPort) match {
+      (r.scheme, r.serverPort) match {
         case ("http", 80) if r.header("X-SSL").isDefined =>
           "https://" + r.serverName + contextPath
         case ("http", 80) => "http://" + r.serverName + contextPath
@@ -1403,14 +1403,14 @@ class Req(val path: ParsePath,
     */
   lazy val acceptsXml_? =
     (weightedAccept.find(_.matches("text" -> "xml")) orElse weightedAccept
-          .find(_.matches("application" -> "xml"))).isDefined
+      .find(_.matches("application" -> "xml"))).isDefined
 
   /**
     * Returns true if the request accepts JSON
     */
   lazy val acceptsJson_? =
     (weightedAccept.find(_.matches("text" -> "json")) orElse weightedAccept
-          .find(_.matches("application" -> "json"))).isDefined
+      .find(_.matches("application" -> "json"))).isDefined
 
   /**
     * Is the Accepts Header * / *
@@ -1421,8 +1421,8 @@ class Req(val path: ParsePath,
     * Returns true if the request accepts JavaScript
     */
   lazy val acceptsJavaScript_? = (weightedAccept.find(
-          _.matches("text" -> "javascript")) orElse weightedAccept.find(
-          _.matches("application" -> "javascript"))).isDefined
+      _.matches("text" -> "javascript")) orElse weightedAccept.find(
+      _.matches("application" -> "javascript"))).isDefined
 
   def updateWithContextPath(uri: String): String =
     if (uri.startsWith("/")) contextPath + uri else uri

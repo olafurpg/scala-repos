@@ -130,11 +130,9 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
         val poOpt = () =>
           exprQual.bind() match {
             case Some(ScalaResolveResult(p: PsiPackage, _)) =>
-              Option(
-                  ScalaShortNamesCacheManager
-                    .getInstance(getProject)
-                    .getPackageObjectByName(p.getQualifiedName,
-                                            getResolveScope))
+              Option(ScalaShortNamesCacheManager
+                .getInstance(getProject)
+                .getPackageObjectByName(p.getQualifiedName, getResolveScope))
             case _ => None
         }
 
@@ -194,10 +192,9 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
                 if complProc.includePrefixImports =>
               val settings: ScalaCodeStyleSettings =
                 ScalaCodeStyleSettings.getInstance(getProject)
-              val prefixImports = settings.getImportsWithPrefix.filter(
-                  s =>
-                    !s.startsWith(ScalaCodeStyleSettings.EXCLUDE_PREFIX) &&
-                      s.substring(0, s.lastIndexOf(".")) == pack.getQualifiedName)
+              val prefixImports = settings.getImportsWithPrefix.filter(s =>
+                !s.startsWith(ScalaCodeStyleSettings.EXCLUDE_PREFIX) &&
+                  s.substring(0, s.lastIndexOf(".")) == pack.getQualifiedName)
               val excludeImports = settings.getImportsWithPrefix.filter(
                   s =>
                     s.startsWith(ScalaCodeStyleSettings.EXCLUDE_PREFIX) &&
@@ -336,8 +333,8 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
                       override def execute(element: PsiElement,
                                            state: ResolveState): Boolean = {
                         if (shadowed.exists(p =>
-                                  ScEquivalenceUtil.smartEquivalence(element,
-                                                                     p._2)))
+                              ScEquivalenceUtil.smartEquivalence(element,
+                                                                 p._2)))
                           return true
 
                         var newState = state.put(ScSubstitutor.key, subst)

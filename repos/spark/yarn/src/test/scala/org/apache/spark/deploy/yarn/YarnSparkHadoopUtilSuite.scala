@@ -70,7 +70,7 @@ class YarnSparkHadoopUtilSuite
       val argLine =
         args.map(a => YarnSparkHadoopUtil.escapeForShell(a)).mkString(" ")
       Files.write(("bash -c \"echo " + argLine +
-                        "\"").getBytes(StandardCharsets.UTF_8),
+                    "\"").getBytes(StandardCharsets.UTF_8),
                   scriptFile)
       scriptFile.setExecutable(true)
 

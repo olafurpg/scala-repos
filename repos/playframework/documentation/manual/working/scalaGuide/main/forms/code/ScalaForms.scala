@@ -280,7 +280,7 @@ package scalaguide.forms.scalaforms {
               "age" -> number,
               "accept" -> checked("Please accept the terms and conditions")
           )((name, age, _) => UserData(name, age))((user: UserData) =>
-                Some(user.name, user.age, false))
+            Some(user.name, user.age, false))
       )
       //#userForm-verify
 
@@ -338,10 +338,10 @@ package scalaguide.forms.scalaforms {
               "age" -> number
           )(UserData.apply)(UserData.unapply) verifying
             ("Failed form constraints!", fields =>
-                  fields match {
-                    case userData =>
-                      validate(userData.name, userData.age).isDefined
-                })
+              fields match {
+                case userData =>
+                  validate(userData.name, userData.age).isDefined
+            })
       )
       //#userForm-constraints-ad-hoc
 

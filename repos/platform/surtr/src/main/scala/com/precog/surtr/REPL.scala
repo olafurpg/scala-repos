@@ -174,9 +174,9 @@ trait REPL
             val result = {
               consumeEval(graph, dummyEvaluationContext) fold
                 (error =>
-                      "An error occurred processing your query: " +
-                        error.getMessage, results =>
-                      JArray(results.toList.map(_._2.toJValue)).renderPretty)
+                  "An error occurred processing your query: " +
+                    error.getMessage, results =>
+                  JArray(results.toList.map(_._2.toJValue)).renderPretty)
             }
 
             out.println()
@@ -280,10 +280,10 @@ trait REPL
 
   lazy val prompt: Parser[Command] =
     (expr ^^ { t =>
-          Eval(t)
-        } | ":tree" ~ expr ^^ { (_, t) =>
-          PrintTree(t)
-        } | ":help" ^^^ Help | ":quit" ^^^ Quit)
+      Eval(t)
+    } | ":tree" ~ expr ^^ { (_, t) =>
+      PrintTree(t)
+    } | ":help" ^^^ Help | ":quit" ^^^ Quit)
 
   sealed trait Command
 
@@ -389,7 +389,7 @@ object Console extends App {
     case scalaz.Failure(error) =>
       IO(
           sys.error("An error occurred deserializing a database descriptor: " +
-                error))
+            error))
   }
 
   run.unsafePerformIO

@@ -180,19 +180,19 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                         val renamedMap =
                           new MHashMap[String, (String, PsiNamedElement)]
                         el.isRenamed.foreach(name =>
-                              renamedMap += ((clazz.name, (name, clazz))))
+                          renamedMap += ((clazz.name, (name, clazz))))
                         val isExcluded: Boolean =
                           ApplicationManager.getApplication.runReadAction(
                               new Computable[Boolean] {
-                            def compute: Boolean = {
-                              JavaCompletionUtil.isInExcludedPackage(clazz,
-                                                                     false)
-                            }
-                          })
+                                def compute: Boolean = {
+                                  JavaCompletionUtil.isInExcludedPackage(clazz,
+                                                                         false)
+                                }
+                              })
 
                         if (!isExcluded && !classNameCompletion &&
                             (!lookingForAnnotations ||
-                                clazz.isAnnotationType)) {
+                            clazz.isAnnotationType)) {
                           if (isAfterNew) {
                             val lookupElement =
                               getLookupElementFromClass(expectedTypesAfterNew,
@@ -345,10 +345,8 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                     )
                   val decorator =
                     castDecorator(runtimeQualifierType.canonicalText)
-                  lookupItems.foreach(
-                      item =>
-                        applyVariant(item,
-                                     addElementWithDecorator(_, decorator)))
+                  lookupItems.foreach(item =>
+                    applyVariant(item, addElementWithDecorator(_, decorator)))
                 }
 
                 val newRef =

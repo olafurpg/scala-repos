@@ -168,7 +168,7 @@ class MarathonSchedulerActor private (
         withLockFor(appId) {
           val promise = Promise[Unit]()
           context.actorOf(TaskKillActor
-                .props(driver, appId, taskTracker, eventBus, taskIds, promise))
+            .props(driver, appId, taskTracker, eventBus, taskIds, promise))
           val res = for {
             _ <- promise.future
             Some(app) <- appRepository.currentVersion(appId)

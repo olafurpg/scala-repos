@@ -296,9 +296,9 @@ trait GenJSExports extends SubComponent { self: GenJSCode =>
       // Highest non-repeated argument count
       val maxArgc =
         (// We have argc - 1, since a repeated parameter list may also be empty
-            // (unlike a normal parameter)
-            varArgMeths.map(_.params.size - 1) ++ normalMeths.map(
-                _.params.size)).max
+        // (unlike a normal parameter)
+        varArgMeths.map(_.params.size - 1) ++ normalMeths
+          .map(_.params.size)).max
 
       // Calculates possible arg counts for normal method
       def argCounts(ex: Exported) = ex match {

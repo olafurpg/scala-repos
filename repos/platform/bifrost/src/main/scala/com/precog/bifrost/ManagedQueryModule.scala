@@ -270,8 +270,8 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
         poller = Some(
             jobActorSystem.scheduler.schedule(yggConfig.jobPollFrequency,
                                               yggConfig.jobPollFrequency) {
-          poll()
-        })
+              poll()
+            })
       }
     }
 

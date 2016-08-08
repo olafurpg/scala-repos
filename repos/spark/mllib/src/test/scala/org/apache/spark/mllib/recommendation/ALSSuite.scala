@@ -306,13 +306,8 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
       }
       val rmse = math.sqrt(sqErr / denom)
       if (rmse > matchThreshold) {
-        fail(
-            "Model failed to predict RMSE: %f\ncorr: %s\npred: %s\nU: %s\n P: %s"
-              .format(rmse,
-                      truePrefs,
-                      predictedRatings,
-                      predictedU,
-                      predictedP))
+        fail("Model failed to predict RMSE: %f\ncorr: %s\npred: %s\nU: %s\n P: %s"
+          .format(rmse, truePrefs, predictedRatings, predictedU, predictedP))
       }
     }
   }

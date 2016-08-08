@@ -29,7 +29,7 @@ case class MixedChat(id: ChatId, lines: List[Line]) extends Chat[Line] {
     u.??(_.troll)
       .fold(this,
             copy(lines =
-                  lines filter {
+              lines filter {
                 case l: UserLine => !l.troll
                 case l: PlayerLine => true
               }))

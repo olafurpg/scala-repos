@@ -125,7 +125,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
         val nonStrictParents =
           Iterator(onTheLine.head) ++ onTheLine.head.parentsInFile
         nonStrictParents.find(p =>
-              ScalaEvaluatorBuilderUtil.isGenerateNonAnonfunClass(p))
+          ScalaEvaluatorBuilderUtil.isGenerateNonAnonfunClass(p))
       } else None
 
       val sourceImages = onTheLine ++ nonLambdaParent
@@ -220,7 +220,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
             qName.set(if (insideMacro) specificName + "*" else specificName)
           case _ =>
             findEnclosingTypeDefinition.foreach(typeDef =>
-                  qName.set(typeDef.getQualifiedNameForDebugger + "*"))
+              qName.set(typeDef.getQualifiedNameForDebugger + "*"))
         }
         // Enclosing type definition is not found
         if (qName.get == null) {
@@ -379,7 +379,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
         val generatingPsiElem = findElementByReferenceType(
             location.declaringType())
         possiblePositions.find(p =>
-              generatingPsiElem.contains(findGeneratingClassOrMethodParent(p)))
+          generatingPsiElem.contains(findGeneratingClassOrMethodParent(p)))
       }
     }
 
@@ -590,7 +590,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
       if (applySignature.isEmpty) candidates
       else {
         candidates.filter(l =>
-              applySignature == DebuggerUtil.lambdaJVMSignature(l))
+          applySignature == DebuggerUtil.lambdaJVMSignature(l))
       }
     }
 
@@ -612,7 +612,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
       return filteredWithSignature.headOption
 
     val byContainingClasses = filteredWithSignature.groupBy(c =>
-          findGeneratingClassOrMethodParent(c.getParent))
+      findGeneratingClassOrMethodParent(c.getParent))
     if (byContainingClasses.size > 1) {
       findContainingClass(refType) match {
         case Some(e) => return byContainingClasses.get(e).flatMap(_.headOption)
@@ -888,7 +888,7 @@ object ScalaPositionManager {
 
     val all = refType.methods().asScala.filter(isIndyLambda)
     val onLine = all.filter(m =>
-          Try(!m.locationsOfLine(lineNumber + 1).isEmpty).getOrElse(false))
+      Try(!m.locationsOfLine(lineNumber + 1).isEmpty).getOrElse(false))
     onLine.sortBy(ordinal)
   }
 

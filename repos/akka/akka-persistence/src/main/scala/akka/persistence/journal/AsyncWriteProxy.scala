@@ -32,7 +32,7 @@ private[persistence] trait AsyncWriteProxy
   protected var store: Option[ActorRef] = None
   private val storeNotInitialized = Future.failed(
       new TimeoutException("Store not initialized. " +
-            "Use `SharedLeveldbJournal.setStore(sharedStore, system)`"))
+        "Use `SharedLeveldbJournal.setStore(sharedStore, system)`"))
 
   override protected[akka] def aroundPreStart(): Unit = {
     context.system.scheduler.scheduleOnce(timeout.duration, self, InitTimeout)
@@ -162,9 +162,8 @@ private class ReplayMediator(replayCallback: PersistentRepr ⇒ Unit,
       replayCompletionPromise.failure(cause)
       context.stop(self)
     case ReceiveTimeout ⇒
-      replayCompletionPromise.failure(
-          new AsyncReplayTimeoutException(
-              s"replay timed out after ${replayTimeout.toSeconds} seconds inactivity"))
+      replayCompletionPromise.failure(new AsyncReplayTimeoutException(
+          s"replay timed out after ${replayTimeout.toSeconds} seconds inactivity"))
       context.stop(self)
   }
 }

@@ -350,9 +350,8 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
                   " Asking it to re-register.")
             worker.send(ReconnectWorker(masterUrl))
           } else {
-            logWarning(
-                s"Got heartbeat from unregistered worker $workerId." +
-                  " This worker was never registered, so ignoring the heartbeat.")
+            logWarning(s"Got heartbeat from unregistered worker $workerId." +
+              " This worker was never registered, so ignoring the heartbeat.")
           }
       }
     }
@@ -781,8 +780,8 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
       val usableWorkers = workers.toArray
         .filter(_.state == WorkerState.ALIVE)
         .filter(worker =>
-              worker.memoryFree >= app.desc.memoryPerExecutorMB &&
-                worker.coresFree >= coresPerExecutor.getOrElse(1))
+          worker.memoryFree >= app.desc.memoryPerExecutorMB &&
+            worker.coresFree >= coresPerExecutor.getOrElse(1))
         .sortBy(_.coresFree)
         .reverse
       val assignedCores =

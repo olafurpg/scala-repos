@@ -72,7 +72,7 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
       path <- genPath
       ownerAccountId <- alphaStr
       content <- containerOf[List, JValue](genContentJValue).map(l =>
-                      Vector(l: _*)) if !content.isEmpty
+                  Vector(l: _*)) if !content.isEmpty
       jobId <- oneOf(identifier.map(Option.apply), None)
       streamRef <- genStreamRef
     } yield
@@ -158,7 +158,7 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
       parent :: containerOfN[List, String](choose(2, 4).sample.get,
                                            resize(10, alphaStr))
         .map(_.filter(_.length > 1).flatMap(child =>
-                  buildChildPaths(child :: parent, depth - 1)))
+          buildChildPaths(child :: parent, depth - 1)))
         .sample
         .get
     }
@@ -184,7 +184,7 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
     for {
       path <- genStablePath
       ingestData <- containerOf[List, JValue](genIngestData).map(l =>
-                         Vector(l: _*))
+                     Vector(l: _*))
       streamRef <- genStreamRef
     } yield
       Ingest(ingestAPIKey,

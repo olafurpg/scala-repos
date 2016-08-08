@@ -27,9 +27,8 @@ package object config {
   /* Common app configuration. */
 
   private[spark] val APPLICATION_TAGS = ConfigBuilder("spark.yarn.tags")
-    .doc(
-        "Comma-separated list of strings to pass through as YARN application tags appearing " +
-          "in YARN Application Reports, which can be used for filtering when querying YARN.")
+    .doc("Comma-separated list of strings to pass through as YARN application tags appearing " +
+      "in YARN Application Reports, which can be used for filtering when querying YARN.")
     .stringConf
     .toSequence
     .optional
@@ -37,7 +36,7 @@ package object config {
   private[spark] val ATTEMPT_FAILURE_VALIDITY_INTERVAL_MS = ConfigBuilder(
       "spark.yarn.am.attemptFailuresValidityInterval")
     .doc("Interval after which AM failures will be considered independent and " +
-          "not accumulate towards the attempt count.")
+      "not accumulate towards the attempt count.")
     .timeConf(TimeUnit.MILLISECONDS)
     .optional
 
@@ -56,7 +55,7 @@ package object config {
   private[spark] val GATEWAY_ROOT_PATH = ConfigBuilder(
       "spark.yarn.config.gatewayPath")
     .doc("Root of configuration paths that is present on gateway nodes, and will be replaced " +
-          "with the corresponding path in cluster machines.")
+      "with the corresponding path in cluster machines.")
     .stringConf
     .withDefault(null)
 
@@ -110,7 +109,7 @@ package object config {
   private[spark] val WAIT_FOR_APP_COMPLETION = ConfigBuilder(
       "spark.yarn.submit.waitAppCompletion")
     .doc("In cluster mode, whether to wait for the application to finish before exiting the " +
-          "launcher process.")
+      "launcher process.")
     .booleanConf
     .withDefault(true)
 
@@ -211,7 +210,7 @@ package object config {
   private[spark] val NAMENODES_TO_ACCESS = ConfigBuilder(
       "spark.yarn.access.namenodes")
     .doc("Extra NameNode URLs for which to request delegation tokens. The NameNode that hosts " +
-          "fs.defaultFS does not need to be listed here.")
+      "fs.defaultFS does not need to be listed here.")
     .stringConf
     .toSequence
     .withDefault(Nil)

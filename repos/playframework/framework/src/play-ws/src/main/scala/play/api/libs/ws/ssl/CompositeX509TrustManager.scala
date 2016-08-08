@@ -85,7 +85,7 @@ class CompositeX509TrustManager(trustManagers: Seq[X509TrustManager],
       trustManager.checkServerTrusted(chain, authType)
       logger.debug(
           s"checkServerTrusted: trustManager $trustManager using authType $authType found a match for ${debugChain(
-          chain).toSeq}")
+              chain).toSeq}")
       trusted = true
     }
 

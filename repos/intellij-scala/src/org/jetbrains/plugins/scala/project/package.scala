@@ -194,7 +194,7 @@ package object project {
 
       def addRoots(files: Seq[File], rootType: OrderRootType) {
         files.foreach(file =>
-              editor.addRoot(VfsUtil.findFileByIoFile(file, false), rootType))
+          editor.addRoot(VfsUtil.findFileByIoFile(file, false), rootType))
       }
 
       addRoots(classes, OrderRootType.CLASSES)

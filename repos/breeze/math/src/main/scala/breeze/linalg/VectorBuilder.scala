@@ -360,19 +360,16 @@ object VectorBuilder extends VectorBuilderOps {
     }
   }
 
-  implicit def canCopyBuilder[
-      @spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero]
+  implicit def canCopyBuilder[@spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero]
     : CanCopyBuilder[V] = {
     new CanCopyBuilder[V]
   }
-  implicit def canZerosBuilder[
-      @spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero]
+  implicit def canZerosBuilder[@spec(Double, Int, Float, Long) V: ClassTag: Semiring: Zero]
     : CanZerosBuilder[V] = {
     new CanZerosBuilder[V]
   }
 
-  implicit def canZeroBuilder[
-      @spec(Double, Int, Float, Long) V: Semiring: Zero: ClassTag]
+  implicit def canZeroBuilder[@spec(Double, Int, Float, Long) V: Semiring: Zero: ClassTag]
     : CanCreateZeros[VectorBuilder[V], Int] = {
     new CanCreateZeros[VectorBuilder[V], Int] {
       def apply(d: Int): VectorBuilder[V] = zeros(d)

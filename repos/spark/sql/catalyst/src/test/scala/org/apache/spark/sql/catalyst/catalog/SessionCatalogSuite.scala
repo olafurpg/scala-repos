@@ -403,17 +403,14 @@ class SessionCatalogSuite extends SparkFunSuite {
     sessionCatalog.createTempTable("tbl1", tempTable1, ignoreIfExists = false)
     sessionCatalog.setCurrentDatabase("db2")
     // If we explicitly specify the database, we'll look up the relation in that database
-    assert(
-        sessionCatalog
-          .lookupRelation(TableIdentifier("tbl1", Some("db2"))) == SubqueryAlias(
-            "tbl1",
-            CatalogRelation("db2", metastoreTable1)))
+    assert(sessionCatalog
+      .lookupRelation(TableIdentifier("tbl1", Some("db2"))) == SubqueryAlias(
+        "tbl1",
+        CatalogRelation("db2", metastoreTable1)))
     // Otherwise, we'll first look up a temporary table with the same name
-    assert(
-        sessionCatalog
-          .lookupRelation(TableIdentifier("tbl1")) == SubqueryAlias(
-            "tbl1",
-            tempTable1))
+    assert(sessionCatalog
+      .lookupRelation(TableIdentifier("tbl1")) == SubqueryAlias("tbl1",
+                                                                tempTable1))
     // Then, if that does not exist, look up the relation in the current database
     sessionCatalog.dropTable(TableIdentifier("tbl1"),
                              ignoreIfNotExists = false)
@@ -710,7 +707,7 @@ class SessionCatalogSuite extends SparkFunSuite {
         Seq(oldPart1.copy(
                 storage = storageFormat.copy(locationUri = Some(newLocation))),
             oldPart2.copy(storage =
-                  storageFormat.copy(locationUri = Some(newLocation)))))
+              storageFormat.copy(locationUri = Some(newLocation)))))
     val newPart1 =
       catalog.getPartition(TableIdentifier("tbl2", Some("db2")), part1.spec)
     val newPart2 =
@@ -879,9 +876,8 @@ class SessionCatalogSuite extends SparkFunSuite {
     sessionCatalog.createTempFunction(tempFunc, ignoreIfExists = false)
     sessionCatalog.setCurrentDatabase("db2")
     // If a database is specified, we'll always return the function in that database
-    assert(
-        sessionCatalog
-          .getFunction(FunctionIdentifier("func1", Some("db2"))) == metastoreFunc)
+    assert(sessionCatalog
+      .getFunction(FunctionIdentifier("func1", Some("db2"))) == metastoreFunc)
     // If no database is specified, we'll first return temporary functions
     assert(sessionCatalog.getFunction(FunctionIdentifier("func1")) == tempFunc)
     // Then, if no such temporary function exist, check the current database

@@ -82,7 +82,7 @@ class AkkaHttpServer(config: ServerConfig,
   }
 
   private val httpServerBinding = config.port.map(port =>
-        createServerBinding(port, ConnectionContext.noEncryption()))
+    createServerBinding(port, ConnectionContext.noEncryption()))
 
   private val httpsServerBinding = config.sslPort.map { port =>
     val connectionContext = try {
@@ -227,7 +227,7 @@ class AkkaHttpServer(config: ServerConfig,
       // https://github.com/akka/akka/issues/17782 for more details.
       requestBodySource
         .map(source =>
-              Source.fromPublisher(new MaterializeOnDemandPublisher(source)))
+          Source.fromPublisher(new MaterializeOnDemandPublisher(source)))
         .orElse(Some(Source.empty))
     } else {
       requestBodySource

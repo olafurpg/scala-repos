@@ -298,12 +298,10 @@ class CheckpointSuite
     // and check whether the earlier checkpoint files are deleted
     val checkpointFiles =
       stateStream.checkpointData.currentCheckpointFiles.map(x =>
-            new File(x._2))
+        new File(x._2))
     advanceTimeWithRealDelay(ssc, secondNumBatches)
-    checkpointFiles.foreach(
-        file =>
-          assert(!file.exists,
-                 "Checkpoint file '" + file + "' was not deleted"))
+    checkpointFiles.foreach(file =>
+      assert(!file.exists, "Checkpoint file '" + file + "' was not deleted"))
     ssc.stop()
 
     // Restart stream computation using the checkpoint file and check whether
@@ -742,7 +740,7 @@ class CheckpointSuite
         eventually(eventuallyTimeout) {
           // Wait until all files have been recorded and all batches have started
           assert(recordedFiles(ssc) === Seq(1, 2, 3) &&
-                batchCounter.getNumStartedBatches === 3)
+            batchCounter.getNumStartedBatches === 3)
         }
         clock.advance(batchDuration.milliseconds)
         // Wait for a checkpoint to be written
@@ -775,7 +773,7 @@ class CheckpointSuite
         // with the batch time, we need to add the offset "batchDuration.milliseconds / 2".
         ssc.conf.set("spark.streaming.manualClock.jump",
                      (batchDuration.milliseconds / 2 +
-                           batchDuration.milliseconds * 3).toString)
+                       batchDuration.milliseconds * 3).toString)
         val oldClockTime = clock.getTimeMillis() // 15000ms
         clock = ssc.scheduler.clock.asInstanceOf[ManualClock]
         val batchCounter = new BatchCounter(ssc)
@@ -803,7 +801,7 @@ class CheckpointSuite
           clock.advance(batchDuration.milliseconds)
           eventually(eventuallyTimeout) {
             assert(batchCounter.getNumCompletedBatches === index +
-                  numBatchesAfterRestart + 1)
+              numBatchesAfterRestart + 1)
           }
         }
         logInfo(
@@ -986,7 +984,7 @@ class CheckpointSuite
         }
 
         shouldCheckpointAllMarkedRDDs = Option(rdd.sparkContext
-              .getLocalProperty(RDD.CHECKPOINT_ALL_MARKED_ANCESTORS))
+          .getLocalProperty(RDD.CHECKPOINT_ALL_MARKED_ANCESTORS))
           .map(_.toBoolean)
           .getOrElse(false)
 

@@ -79,11 +79,11 @@ object ScalaRefactoringUtil {
     if (start == end) return
     while (file.findElementAt(start).isInstanceOf[PsiWhiteSpace] ||
            (file.findElementAt(start).isInstanceOf[PsiComment] &&
-               trimComments) || file.getText.charAt(start) == '\n' ||
+           trimComments) || file.getText.charAt(start) == '\n' ||
            file.getText.charAt(start) == ' ') start = start + 1
     while (file.findElementAt(end - 1).isInstanceOf[PsiWhiteSpace] ||
            (file.findElementAt(end - 1).isInstanceOf[PsiComment] &&
-               trimComments) || file.getText.charAt(end - 1) == '\n' ||
+           trimComments) || file.getText.charAt(end - 1) == '\n' ||
            file.getText.charAt(end - 1) == ' ') end = end - 1
     editor.getSelectionModel.setSelection(start, end)
   }
@@ -224,7 +224,7 @@ object ScalaRefactoringUtil {
   def getMinOwner(ownres: Array[ScTypeParametersOwner],
                   currentFile: PsiFile): PsiElement = {
     val filtered = ownres.filter((value: ScTypeParametersOwner) =>
-          value.getContainingFile == currentFile)
+      value.getContainingFile == currentFile)
     PsiTreeUtil.findCommonParent(filtered: _*)
   }
 
@@ -520,7 +520,7 @@ object ScalaRefactoringUtil {
       mutable.MutableList()
 
     inheritors.foreach((x: ScTemplateDefinition) =>
-          helper(x, collectedOccurrences, collectedValidators))
+      helper(x, collectedOccurrences, collectedValidators))
 
     val occurrences: Array[ScTypeElement] =
       collectedOccurrences.foldLeft(Array[ScTypeElement]())((a, b) => a ++ b)
@@ -1196,7 +1196,7 @@ object ScalaRefactoringUtil {
     val revercedRangeMarkers =
       occurences.reverseMap(replaceOccurence(_, newString, file))
     revercedRangeMarkers.reverseMap(rm =>
-          new TextRange(rm.getStartOffset, rm.getEndOffset))
+      new TextRange(rm.getStartOffset, rm.getEndOffset))
   }
 
   def statementsAndMembersInClass(
@@ -1208,8 +1208,8 @@ object ScalaRefactoringUtil {
     (earlyDefs ++ body)
       .flatMap(_.children)
       .filter(child =>
-            child.isInstanceOf[ScBlockStatement] ||
-              child.isInstanceOf[ScMember])
+        child.isInstanceOf[ScBlockStatement] ||
+          child.isInstanceOf[ScMember])
       .toSeq
   }
 

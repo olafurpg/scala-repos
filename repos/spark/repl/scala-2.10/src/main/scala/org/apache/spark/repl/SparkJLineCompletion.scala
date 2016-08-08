@@ -155,8 +155,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
 
     def exclude(name: String): Boolean =
       ((name contains "$") || (excludeNames contains name) ||
-            (excludeEndsWith exists (name endsWith _)) ||
-            (excludeStartsWith exists (name startsWith _)))
+        (excludeEndsWith exists (name endsWith _)) ||
+        (excludeStartsWith exists (name startsWith _)))
     def filtered(xs: List[String]) = xs filterNot exclude distinct
 
     def completions(verbosity: Int) =
@@ -405,8 +405,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
 
       def tryAll =
         (lastResultCompletion orElse tryCompletion(mkDotted, topLevelFor) getOrElse Candidates(
-                cursor,
-                Nil))
+            cursor,
+            Nil))
 
       /**
         *  This is the kickoff point for all manner of theoretically

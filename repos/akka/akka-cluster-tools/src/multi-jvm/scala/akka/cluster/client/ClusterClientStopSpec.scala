@@ -92,7 +92,7 @@ class ClusterClientStopSpec
       runOn(client) {
         val c =
           system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(initialContacts)),
+                           .withInitialContacts(initialContacts)),
                          "client1")
         c ! ClusterClient.Send("/user/testService",
                                "hello",

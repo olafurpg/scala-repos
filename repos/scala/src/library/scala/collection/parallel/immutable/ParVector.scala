@@ -78,7 +78,7 @@ class ParVector[+T](private[this] val vector: Vector[T])
         remvector = remvector.drop(sz)
       }
       splitted.map(v =>
-            new ParVector(v).splitter.asInstanceOf[ParVectorIterator])
+        new ParVector(v).splitter.asInstanceOf[ParVectorIterator])
     }
   }
 }

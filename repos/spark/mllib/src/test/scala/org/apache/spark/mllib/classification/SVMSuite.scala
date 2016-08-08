@@ -250,8 +250,7 @@ class SVMClusterSuite extends SparkFunSuite with LocalClusterSparkContext {
       .mapPartitionsWithIndex { (idx, iter) =>
         val random = new Random(idx)
         iter.map(i =>
-              LabeledPoint(1.0,
-                           Vectors.dense(Array.fill(n)(random.nextDouble()))))
+          LabeledPoint(1.0, Vectors.dense(Array.fill(n)(random.nextDouble()))))
       }
       .cache()
     // If we serialize data directly in the task closure, the size of the serialized task would be

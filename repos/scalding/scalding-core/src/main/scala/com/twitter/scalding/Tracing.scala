@@ -88,12 +88,11 @@ object Tracing {
           _: IllegalAccessException | _: IllegalArgumentException |
           _: InvocationTargetException | _: NullPointerException |
           _: ClassNotFoundException) =>
-        LOG.warn(
-            "There was an error initializing tracing. " +
-              "Tracing information in DocumentServices such as Driven may point to Scalding code instead of " +
-              "user code. The most likely cause is a mismatch in Cascading library version. Upgrading the " +
-              "Cascading library to at least 2.6 should fix this issue.The cause was [" +
-              e + "]")
+        LOG.warn("There was an error initializing tracing. " +
+          "Tracing information in DocumentServices such as Driven may point to Scalding code instead of " +
+          "user code. The most likely cause is a mismatch in Cascading library version. Upgrading the " +
+          "Cascading library to at least 2.6 should fix this issue.The cause was [" +
+          e + "]")
     }
   }
 }

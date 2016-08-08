@@ -118,7 +118,7 @@ private final class ExplorerIndexer(endpoint: String,
     game.finished && game.rated && game.turns >= 10 &&
       game.variant != chess.variant.FromPosition &&
       (game.variant != chess.variant.Horde ||
-            game.createdAt.isAfter(Query.hordeWhitePawnsSince))
+        game.createdAt.isAfter(Query.hordeWhitePawnsSince))
 
   private def stableRating(player: Player) =
     player.rating ifFalse player.provisional

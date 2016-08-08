@@ -51,7 +51,7 @@ object LoggingAutoConfigurer {
     val namesToTry =
       Props.toTry.flatMap(f => files.toList.map(file => f() + file))
     first(namesToTry)(name =>
-          tryo(getClass.getResource(name)).filter(_ ne null))
+      tryo(getClass.getResource(name)).filter(_ ne null))
   }
 
   def apply(): () => Unit =

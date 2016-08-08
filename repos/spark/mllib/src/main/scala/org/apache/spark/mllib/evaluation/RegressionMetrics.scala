@@ -50,7 +50,7 @@ class RegressionMetrics @Since("2.0.0")(
     */
   private[mllib] def this(predictionAndObservations: DataFrame) =
     this(predictionAndObservations.rdd.map(r =>
-              (r.getDouble(0), r.getDouble(1))))
+      (r.getDouble(0), r.getDouble(1))))
 
   /**
     * Use MultivariateOnlineSummarizer to calculate summary statistics of observations and errors.

@@ -1095,14 +1095,14 @@ object JavaPairRDD {
       rdd: RDD[(K, (Iterable[V], Iterable[W1], Iterable[W2]))])
     : RDD[(K, (JIterable[V], JIterable[W1], JIterable[W2]))] = {
     rddToPairRDDFunctions(rdd).mapValues(x =>
-          (x._1.asJava, x._2.asJava, x._3.asJava))
+      (x._1.asJava, x._2.asJava, x._3.asJava))
   }
 
   private[spark] def cogroupResult3ToJava[K: ClassTag, V, W1, W2, W3](
       rdd: RDD[(K, (Iterable[V], Iterable[W1], Iterable[W2], Iterable[W3]))])
     : RDD[(K, (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3]))] = {
     rddToPairRDDFunctions(rdd).mapValues(x =>
-          (x._1.asJava, x._2.asJava, x._3.asJava, x._4.asJava))
+      (x._1.asJava, x._2.asJava, x._3.asJava, x._4.asJava))
   }
 
   def fromRDD[K: ClassTag, V: ClassTag](rdd: RDD[(K, V)]): JavaPairRDD[K, V] = {

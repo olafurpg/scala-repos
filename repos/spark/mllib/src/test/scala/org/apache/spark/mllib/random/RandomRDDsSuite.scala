@@ -83,7 +83,7 @@ class RandomRDDsSuite
 
       // check that partition sizes are balanced
       val partSizes = rdd.partitions.map(p =>
-            p.asInstanceOf[RandomRDDPartition[Double]].size.toDouble)
+        p.asInstanceOf[RandomRDDPartition[Double]].size.toDouble)
 
       val partStats = new StatCounter(partSizes)
       assert(partStats.max - partStats.min <= 1)

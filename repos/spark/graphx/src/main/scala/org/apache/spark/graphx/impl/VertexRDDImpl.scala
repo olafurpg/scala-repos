@@ -115,11 +115,11 @@ class VertexRDDImpl[VD] private[graphx] (
         this.withPartitionsRDD[VD](
             partitionsRDD.zipPartitions(other.partitionsRDD,
                                         preservesPartitioning = true) {
-          (thisIter, otherIter) =>
-            val thisPart = thisIter.next()
-            val otherPart = otherIter.next()
-            Iterator(thisPart.minus(otherPart))
-        })
+              (thisIter, otherIter) =>
+                val thisPart = thisIter.next()
+                val otherPart = otherIter.next()
+                Iterator(thisPart.minus(otherPart))
+            })
       case _ =>
         this.withPartitionsRDD[VD](
             partitionsRDD.zipPartitions(
@@ -231,7 +231,7 @@ class VertexRDDImpl[VD] private[graphx] (
 
   override def reverseRoutingTables(): VertexRDD[VD] =
     this.mapVertexPartitions(vPart =>
-          vPart.withRoutingTable(vPart.routingTable.reverse))
+      vPart.withRoutingTable(vPart.routingTable.reverse))
 
   override def withEdges(edges: EdgeRDD[_]): VertexRDD[VD] = {
     val routingTables =

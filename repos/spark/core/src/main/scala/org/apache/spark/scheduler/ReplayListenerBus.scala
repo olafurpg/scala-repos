@@ -61,9 +61,8 @@ private[spark] class ReplayListenerBus extends SparkListenerBus with Logging {
             if (!maybeTruncated || lines.hasNext) {
               throw jpe
             } else {
-              logWarning(
-                  s"Got JsonParseException from log file $sourceName" +
-                    s" at line $lineNumber, the file might not have finished writing cleanly.")
+              logWarning(s"Got JsonParseException from log file $sourceName" +
+                s" at line $lineNumber, the file might not have finished writing cleanly.")
             }
         }
         lineNumber += 1

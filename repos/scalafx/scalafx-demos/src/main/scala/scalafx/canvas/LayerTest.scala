@@ -75,12 +75,12 @@ object LayerTest extends JFXApp {
   val selectionModel: SelectionModel[String] = cb.selectionModel.get
   selectionModel.selectedItem.onChange(
       (ov: Any, olaValue: Any, newValue: Any) => {
-    if (newValue == layer1Title) {
-      layer1.toFront()
-    } else if (newValue == layer2Title) {
-      layer2.toFront()
-    }
-  })
+        if (newValue == layer1Title) {
+          layer1.toFront()
+        } else if (newValue == layer2Title) {
+          layer2.toFront()
+        }
+      })
   cb.value = layer1Title
 
   // Build GUI

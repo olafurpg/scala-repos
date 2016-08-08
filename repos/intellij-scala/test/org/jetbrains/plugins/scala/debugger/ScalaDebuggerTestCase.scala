@@ -209,11 +209,11 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
     semaphore.down()
     getDebugProcess.getManagerThread.invokeAndWait(
         new DebuggerContextCommandImpl(ctx) {
-      def threadAction() {
-        result = callback
-        semaphore.up()
-      }
-    })
+          def threadAction() {
+            result = callback
+            semaphore.up()
+          }
+        })
     def finished = semaphore.waitFor(20000)
     assert(finished, "Too long debugger action")
     result

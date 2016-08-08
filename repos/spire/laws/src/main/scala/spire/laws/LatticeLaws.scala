@@ -44,7 +44,7 @@ trait LatticeLaws[A] extends Laws {
       name = "lattice",
       parents = Seq(joinSemilattice, meetSemilattice),
       "absorption" → forAll((x: A, y: A) =>
-            ((x join (x meet y)) === x) && ((x meet (x join y)) === x))
+        ((x join (x meet y)) === x) && ((x meet (x join y)) === x))
   )
 
   def boundedJoinSemilattice(implicit A: BoundedJoinSemilattice[A]) =

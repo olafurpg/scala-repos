@@ -292,9 +292,8 @@ class InterpreterSupervisionSpec
       }
     }
 
-    "resume when Filter throws" in new OneBoundedSetup[Int](
-        Seq(Filter((x: Int) ⇒ if (x == 0) throw TE else true,
-                   resumingDecider))) {
+    "resume when Filter throws" in new OneBoundedSetup[Int](Seq(
+        Filter((x: Int) ⇒ if (x == 0) throw TE else true, resumingDecider))) {
       downstream.requestOne()
       lastEvents() should be(Set(RequestOne))
       upstream.onNext(2)
@@ -379,8 +378,8 @@ class InterpreterSupervisionSpec
 
     "fail when Expand `seed` throws" in new OneBoundedSetup[Int](
         new Expand((in: Int) ⇒
-              if (in == 2) throw TE
-              else Iterator(in) ++ Iterator.continually(-math.abs(in)))) {
+          if (in == 2) throw TE
+          else Iterator(in) ++ Iterator.continually(-math.abs(in)))) {
 
       lastEvents() should be(Set(RequestOne))
 
@@ -402,8 +401,8 @@ class InterpreterSupervisionSpec
 
     "fail when Expand `extrapolate` throws" in new OneBoundedSetup[Int](
         new Expand((in: Int) ⇒
-              if (in == 2) Iterator.continually(throw TE)
-              else Iterator(in) ++ Iterator.continually(-math.abs(in)))) {
+          if (in == 2) Iterator.continually(throw TE)
+          else Iterator(in) ++ Iterator.continually(-math.abs(in)))) {
 
       lastEvents() should be(Set(RequestOne))
 

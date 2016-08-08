@@ -42,7 +42,7 @@ trait HoconIncludeResolutionTest { this: UsefulTestCase =>
           .map(_.parent.map(_.nonWhitespaceChildren).getOrElse(Iterator.empty))
           .getOrElse(Iterator.empty)
           .takeWhile(e =>
-                e.getNode.getElementType == HoconTokenType.HashComment)
+            e.getNode.getElementType == HoconTokenType.HashComment)
           .toVector
 
         val references = it.getFileReferences

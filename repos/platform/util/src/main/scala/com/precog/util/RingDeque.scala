@@ -30,8 +30,7 @@ import scala.collection.mutable
   *
   * No objects were allocated in the making of this film.
   */
-final class RingDeque[
-    @specialized(Boolean, Int, Long, Double, Float, Short) A: ClassManifest](
+final class RingDeque[@specialized(Boolean, Int, Long, Double, Float, Short) A: ClassManifest](
     _bound: Int) {
   val bound = _bound + 1
 

@@ -64,7 +64,7 @@ object Servlet30AsyncProvider extends AsyncProviderMeta {
     */
   def providerFunction: Box[HTTPRequest => ServletAsyncProvider] =
     Full(req => new Servlet30AsyncProvider(req)).filter(i =>
-          suspendResumeSupport_?)
+      suspendResumeSupport_?)
 }
 
 /**

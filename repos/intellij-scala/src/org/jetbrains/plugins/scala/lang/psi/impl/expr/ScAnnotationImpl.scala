@@ -69,7 +69,7 @@ class ScAnnotationImpl private (stub: StubElement[ScAnnotation],
       case Some(args) =>
         args.exprs
           .map(expr =>
-                expr match {
+            expr match {
               case ass: ScAssignStmt =>
                 ass.getLExpression match {
                   case ref: ScReferenceExpression
@@ -130,7 +130,7 @@ class ScAnnotationImpl private (stub: StubElement[ScAnnotation],
           case arg: ScArgumentExprList =>
             var prev = elem.getPrevSibling
             while (prev != null && (ScalaPsiUtil.isLineTerminator(prev) ||
-                       prev.isInstanceOf[PsiWhiteSpace])) prev =
+                   prev.isInstanceOf[PsiWhiteSpace])) prev =
               prev.getPrevSibling
             if (prev != null &&
                 prev.getNode.getElementType == ScalaTokenTypes.tCOMMA) {
@@ -139,7 +139,7 @@ class ScAnnotationImpl private (stub: StubElement[ScAnnotation],
             } else {
               var next = elem.getNextSibling
               while (next != null && (ScalaPsiUtil.isLineTerminator(next) ||
-                         next.isInstanceOf[PsiWhiteSpace])) next =
+                     next.isInstanceOf[PsiWhiteSpace])) next =
                 next.getNextSibling
               if (next != null &&
                   next.getNode.getElementType == ScalaTokenTypes.tCOMMA) {
@@ -175,7 +175,7 @@ class ScAnnotationImpl private (stub: StubElement[ScAnnotation],
         }
         var allowNoName: Boolean =
           params.length == 0 && (PsiAnnotation.DEFAULT_REFERENCED_METHOD_NAME
-                .equals(attributeName) || null == attributeName)
+            .equals(attributeName) || null == attributeName)
         var namePrefix: String = null
         if (allowNoName) {
           namePrefix = ""

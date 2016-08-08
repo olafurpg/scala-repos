@@ -112,11 +112,9 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
               new ProductValue(Vector(l, r))
             }
           if (inner.headOption.isEmpty)
-            Vector(
-                new ProductValue(
-                    Vector(l,
-                           createNullRow(
-                               right.nodeType.asCollectionType.elementType))))
+            Vector(new ProductValue(Vector(
+                l,
+                createNullRow(right.nodeType.asCollectionType.elementType))))
           else inner
         }
         scope.remove(leftGen)
@@ -136,10 +134,9 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
             }
           if (inner.headOption.isEmpty)
             Vector(
-                new ProductValue(
-                    Vector(createNullRow(
-                               left.nodeType.asCollectionType.elementType),
-                           r)))
+                new ProductValue(Vector(
+                    createNullRow(left.nodeType.asCollectionType.elementType),
+                    r)))
           else inner
         }
         scope.remove(leftGen)
@@ -158,11 +155,9 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
               new ProductValue(Vector(l, r))
             }
           if (inner.headOption.isEmpty)
-            Vector(
-                new ProductValue(
-                    Vector(l,
-                           createNullRow(
-                               right.nodeType.asCollectionType.elementType))))
+            Vector(new ProductValue(Vector(
+                l,
+                createNullRow(right.nodeType.asCollectionType.elementType))))
           else inner
         }
         scope.remove(leftGen)

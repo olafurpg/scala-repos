@@ -46,11 +46,10 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
     val simple = new SimpleRegistry
     GlobalRegistry.withRegistry(simple) {
       assert(LoadService[Resolver]().nonEmpty)
-      assert(
-          GlobalRegistry.get.toSet == Set(
-              Entry(Seq("loadservice", "com.twitter.finagle.Resolver"),
-                    "com.twitter.finagle.TestResolver,com.twitter.finagle.TestAsyncInetResolver")
-          ))
+      assert(GlobalRegistry.get.toSet == Set(
+          Entry(Seq("loadservice", "com.twitter.finagle.Resolver"),
+                "com.twitter.finagle.TestResolver,com.twitter.finagle.TestAsyncInetResolver")
+      ))
     }
   }
 

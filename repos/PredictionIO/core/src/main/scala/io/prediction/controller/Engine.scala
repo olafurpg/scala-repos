@@ -234,7 +234,7 @@ class Engine[TD, EI, PD, Q, P, A](
         model match {
           case modelManifest: PersistentModelManifest => {
             logger.info("Custom-persisted model detected for algorithm " +
-                  algo.getClass.getName)
+              algo.getClass.getName)
             SparkWorkflowUtils.getPersistentModel(
                 modelManifest,
                 Seq(engineInstanceId, ax, algoName).mkString("-"),

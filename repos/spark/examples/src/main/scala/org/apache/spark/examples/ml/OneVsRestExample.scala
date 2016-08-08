@@ -80,7 +80,7 @@ object OneVsRestExample {
         .action((x, c) => c.copy(testInput = Some(x)))
       opt[Int]("maxIter")
         .text(s"maximum number of iterations for Logistic Regression." +
-              s" default: ${defaultParams.maxIter}")
+          s" default: ${defaultParams.maxIter}")
         .action((x, c) => c.copy(maxIter = x))
       opt[Double]("tol")
         .text(
@@ -89,7 +89,7 @@ object OneVsRestExample {
         .action((x, c) => c.copy(tol = x))
       opt[Boolean]("fitIntercept")
         .text(s"fit intercept for Logistic Regression." +
-              s" default: ${defaultParams.fitIntercept}")
+          s" default: ${defaultParams.fitIntercept}")
         .action((x, c) => c.copy(fitIntercept = x))
       opt[Double]("regParam")
         .text(s"the regularization parameter for Logistic Regression.")

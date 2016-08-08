@@ -108,10 +108,10 @@ class HoconObjectEntryMover extends LineMover {
       // todo suspicious
       if (down)
         entry.nextEntry.forall(ne =>
-              entry.parent.exists(pp => startLine(ne) == endLine(pp)))
+          entry.parent.exists(pp => startLine(ne) == endLine(pp)))
       else
         entry.previousEntry.forall(pe =>
-              entry.parent.exists(pp => endLine(pe) == startLine(pp)))
+          entry.parent.exists(pp => endLine(pe) == startLine(pp)))
     }
 
     def keyString(keyedField: HKeyedField) =
@@ -142,10 +142,10 @@ class HoconObjectEntryMover extends LineMover {
           .flatMap(_.prefixingField)
           .map(_.enclosingObjectField)
           .filter(of =>
-                field.parent.exists(pp => edgeLine(of) == edgeLine(pp)) &&
-                  canInsert(of))
+            field.parent.exists(pp => edgeLine(of) == edgeLine(pp)) &&
+              canInsert(of))
           .map(of =>
-                (of, of.keyedField.fieldsInPathForward.map(keyString).toList))
+            (of, of.keyedField.fieldsInPathForward.map(keyString).toList))
       } else None
 
     def canInsertInto(field: HObjectField) =

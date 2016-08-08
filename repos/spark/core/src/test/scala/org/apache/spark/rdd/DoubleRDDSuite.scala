@@ -323,7 +323,7 @@ class DoubleRDDSuite extends SparkFunSuite with SharedSparkContext {
     assert(histogramResults(1) === 1)
     assert(histogramResults.last === 1)
     assert((2 to histogramResults.length - 2).forall(i =>
-              histogramResults(i) == 0))
+      histogramResults(i) == 0))
   }
 
   // Test the failure mode with an invalid RDD

@@ -291,8 +291,8 @@ trait FiltersSpec extends Specification with ServerIntegrationSpecification {
                         message: String) = {
         Future.successful(
             Results.NotFound(request.headers
-                  .get(filterAddedHeaderKey)
-                  .getOrElse("undefined header")))
+              .get(filterAddedHeaderKey)
+              .getOrElse("undefined header")))
       }
       def onServerError(request: RequestHeader, exception: Throwable) =
         Future.successful(Results.InternalServerError)

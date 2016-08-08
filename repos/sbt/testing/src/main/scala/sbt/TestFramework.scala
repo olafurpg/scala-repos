@@ -141,8 +141,8 @@ object TestFramework {
         i =>
           try f(i)
           catch {
-        case e: Exception => log.trace(e); log.error(e.toString)
-    })
+            case e: Exception => log.trace(e); log.error(e.toString)
+        })
 
   private[sbt] def hashCode(f: Fingerprint): Int = f match {
     case s: SubclassFingerprint => (s.isModule, s.superclassName).hashCode

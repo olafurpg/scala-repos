@@ -253,8 +253,8 @@ class FileSourceStrategySuite
         df.queryExecution.analyzed transform {
           case l @ LogicalRelation(r: HadoopFsRelation, _, _) =>
             l.copy(
-                relation = r.copy(bucketSpec = Some(
-                        BucketSpec(numBuckets = buckets, "c1" :: Nil, Nil))))
+                relation = r.copy(bucketSpec =
+                  Some(BucketSpec(numBuckets = buckets, "c1" :: Nil, Nil))))
         }
       Dataset.newDataFrame(sqlContext, bucketed)
     } else {

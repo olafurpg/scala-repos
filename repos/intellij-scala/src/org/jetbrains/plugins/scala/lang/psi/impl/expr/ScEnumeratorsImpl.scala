@@ -44,9 +44,9 @@ class ScEnumeratorsImpl(node: ASTNode)
       if (reverseChildren.contains(lastParent))
         reverseChildren.drop(
             reverseChildren.indexOf(lastParent) + (lastParent match {
-          case g: ScGenerator => 1
-          case _ => 0
-        }))
+              case g: ScGenerator => 1
+              case _ => 0
+            }))
       else reverseChildren
     for (c <- children) {
       c match {

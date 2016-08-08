@@ -92,8 +92,8 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
       _ = r1 shouldBe Set(("a", Some("a")), ("b", Some("b")), ("c", None))
       // Nested left outer, lift primitive value
       q2 = ((xs.map(_.b) joinLeft ys.map(_.b) on (_ === _)) joinLeft ys.map(
-              _.b) on
-            (_._1 === _)).to[Set]
+          _.b) on
+        (_._1 === _)).to[Set]
       r2 <- mark("q2", q2.result)
       r2t: Set[((String, Option[String]), Option[String])] = r2
       _ = r2 shouldBe Set((("a", Some("a")), Some("a")),
@@ -149,8 +149,8 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
       // Nested right outer, lift primitive value
       // (left-associative; not symmetrical to the nested left outer case)
       q7 = ((ys.map(_.b) joinRight xs.map(_.b) on (_ === _)) joinRight xs.map(
-              _.b) on
-            (_._2 === _)).to[Set]
+          _.b) on
+        (_._2 === _)).to[Set]
       r7 <- mark("q7", q7.result)
       rt: Set[(Option[(Option[String], String)], String)] = r7
       _ = r7 shouldBe Set((Some((Some("a"), "a")), "a"),
@@ -185,10 +185,10 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
       // Nested right outer, lift non-primitive value
       // (left-associative; not symmetrical to the nested left outer case)
       q10 = ((ys joinRight xs on (_.b === _.b)) joinRight xs on
-            (_._1.map(_.b) === _.b)).to[Set]
+        (_._1.map(_.b) === _.b)).to[Set]
       r10 <- mark("q10", q10.result)
       r10t: Set[(Option[(Option[(Int, String)], (Int, String))],
-          (Int, String))] = r10
+      (Int, String))] = r10
       _ = r10 shouldBe Set(
           (Some((Some((1, "a")), (1, "a"))), (1, "a")),
           (Some((Some((2, "b")), (2, "b"))), (2, "b")),
@@ -310,7 +310,7 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
             .map(_.map(_._2).toSet shouldBe Set(0L, 1L, 2L, 3L))
       q6 = for {
         ((c, p), i) <- (categories.sortBy(_.id) zip posts
-                            .sortBy(_.id)).zipWithIndex
+                        .sortBy(_.id)).zipWithIndex
       } yield (c.id, p.category, i)
       _ <- mark("q6", q6.result)
             .map(_ shouldBe List((1, -1, 0), (2, 1, 1), (3, 2, 2), (4, 3, 3)))

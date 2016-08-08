@@ -72,14 +72,14 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
     val feature0importance =
       parentImp.calculate() * parentImp.count -
         (leftImp.calculate() * leftImp.count +
-              rightImp.calculate() * rightImp.count)
+          rightImp.calculate() * rightImp.count)
     testNode(parent, Map(0 -> feature0importance))
 
     // Full tree
     val feature1importance =
       grandImp.calculate() * grandImp.count -
         (left2Imp.calculate() * left2Imp.count +
-              parentImp.calculate() * parentImp.count)
+          parentImp.calculate() * parentImp.count)
     testNode(grandParent,
              Map(0 -> feature0importance, 1 -> feature1importance))
 

@@ -27,7 +27,7 @@ trait ScalaJSDirectCompiler extends DirectCompiler {
     new PartestGlobal(settings, reporter) {
       override protected def loadRoughPluginsList(): List[Plugin] = {
         (super.loadRoughPluginsList() :+ Plugin
-              .instantiate(classOf[ScalaJSPlugin], this))
+          .instantiate(classOf[ScalaJSPlugin], this))
       }
     }
   }

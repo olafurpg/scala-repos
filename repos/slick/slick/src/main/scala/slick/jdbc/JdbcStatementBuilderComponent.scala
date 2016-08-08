@@ -173,7 +173,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
         c.children.iterator
           .drop(1)
           .flatMap(_.collect { case c: Comprehension => c }.toSeq
-                .flatMap(_.findNode(_ == Ref(s))))
+            .flatMap(_.findNode(_ == Ref(s))))
           .nonEmpty
       currentUniqueFrom = from match {
         case Seq((s, _: TableNode)) if !containsSymbolInSubquery(s) => Some(s)

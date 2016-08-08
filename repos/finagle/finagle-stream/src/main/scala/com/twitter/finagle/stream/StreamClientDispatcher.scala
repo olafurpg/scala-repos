@@ -83,7 +83,7 @@ private[twitter] class StreamClientDispatcher[Req: RequestType](
 
           case invalid =>
             Future.exception(new IllegalArgumentException(
-                    "invalid message \"%s\"".format(invalid)))
+                "invalid message \"%s\"".format(invalid)))
         }
       }
 }

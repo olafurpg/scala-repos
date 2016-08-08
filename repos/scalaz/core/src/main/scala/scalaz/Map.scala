@@ -1205,7 +1205,7 @@ object ==>> extends MapInstances {
   final def fromFoldableWithKey[F[_]: Foldable, A: Order, B](fa: F[(A, B)])(
       f: (A, B, B) => B): A ==>> B =
     Foldable[F].foldLeft(fa, empty[A, B])((a, c) =>
-          a.insertWithKey(f, c._1, c._2))
+      a.insertWithKey(f, c._1, c._2))
 
   final def unions[A: Order, B](xs: List[A ==>> B]): A ==>> B =
     xs.foldLeft(empty[A, B])((a, c) => a.union(c))

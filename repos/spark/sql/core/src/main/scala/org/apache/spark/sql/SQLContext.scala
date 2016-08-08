@@ -915,7 +915,7 @@ class SQLContext private[sql] (
                                             schema: StructType): DataFrame = {
 
     val rowRdd = rdd.map(r =>
-          python.EvaluatePython.fromJava(r, schema).asInstanceOf[InternalRow])
+      python.EvaluatePython.fromJava(r, schema).asInstanceOf[InternalRow])
     Dataset.newDataFrame(this, LogicalRDD(schema.toAttributes, rowRdd)(self))
   }
 

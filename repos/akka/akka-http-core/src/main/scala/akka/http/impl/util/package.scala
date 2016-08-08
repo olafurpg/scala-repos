@@ -51,34 +51,34 @@ package object util {
     new EnhancedByteStringSource(byteStrings)
 
   private[http] def printEvent[T](marker: String): Flow[T, T, NotUsed] =
-    Flow[T]
-      .transform(() ⇒
-            new PushPullStage[T, T] {
-          override def onPush(element: T, ctx: Context[T]): SyncDirective = {
-            println(s"$marker: $element")
-            ctx.push(element)
-          }
-          override def onPull(ctx: Context[T]): SyncDirective = {
-            println(s"$marker: PULL")
-            ctx.pull()
-          }
-          override def onUpstreamFailure(
-              cause: Throwable,
-              ctx: Context[T]): TerminationDirective = {
-            println(s"$marker: Error $cause")
-            super.onUpstreamFailure(cause, ctx)
-          }
-          override def onUpstreamFinish(
-              ctx: Context[T]): TerminationDirective = {
-            println(s"$marker: Complete")
-            super.onUpstreamFinish(ctx)
-          }
-          override def onDownstreamFinish(
-              ctx: Context[T]): TerminationDirective = {
-            println(s"$marker: Cancel")
-            super.onDownstreamFinish(ctx)
-          }
-      })
+    Flow[T].transform(
+        () ⇒
+          new PushPullStage[T, T] {
+            override def onPush(element: T, ctx: Context[T]): SyncDirective = {
+              println(s"$marker: $element")
+              ctx.push(element)
+            }
+            override def onPull(ctx: Context[T]): SyncDirective = {
+              println(s"$marker: PULL")
+              ctx.pull()
+            }
+            override def onUpstreamFailure(
+                cause: Throwable,
+                ctx: Context[T]): TerminationDirective = {
+              println(s"$marker: Error $cause")
+              super.onUpstreamFailure(cause, ctx)
+            }
+            override def onUpstreamFinish(
+                ctx: Context[T]): TerminationDirective = {
+              println(s"$marker: Complete")
+              super.onUpstreamFinish(ctx)
+            }
+            override def onDownstreamFinish(
+                ctx: Context[T]): TerminationDirective = {
+              println(s"$marker: Cancel")
+              super.onDownstreamFinish(ctx)
+            }
+        })
 
   private[this] var eventStreamLogger: ActorRef = _
   private[http] def installEventStreamLoggerFor(channel: Class[_])(
@@ -192,9 +192,8 @@ package util {
         })
 
         override def onTimer(key: Any): Unit =
-          failStage(
-              new java.util.concurrent.TimeoutException(
-                  s"HttpEntity.toStrict timed out after $timeout while still waiting for outstanding data"))
+          failStage(new java.util.concurrent.TimeoutException(
+              s"HttpEntity.toStrict timed out after $timeout while still waiting for outstanding data"))
       }
 
     override def toString = "ToStrict"

@@ -387,9 +387,8 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
                     .map(new String(_, "UTF-8"))}'."
               )
 
-              Full(
-                  BadRequestResponse(
-                      "Unrecognized format for content security policy report."))
+              Full(BadRequestResponse(
+                  "Unrecognized format for content security policy report."))
           }
         }
   }

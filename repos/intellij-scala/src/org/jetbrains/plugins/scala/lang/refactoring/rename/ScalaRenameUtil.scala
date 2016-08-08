@@ -168,7 +168,7 @@ object ScalaRenameUtil {
           val grouped = usagez.groupBy(u => setterSuffix(u.getElement.getText))
           grouped
             .map(entry =>
-                  UsagesWithName(newNameWithoutSuffix + entry._1, entry._2))
+              UsagesWithName(newNameWithoutSuffix + entry._1, entry._2))
             .toSeq
         }
     }

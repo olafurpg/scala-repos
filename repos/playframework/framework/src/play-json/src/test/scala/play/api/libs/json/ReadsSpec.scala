@@ -504,8 +504,7 @@ object ReadsSpec extends org.specs2.mutable.Specification {
           .validate(flatMappedReads)
           .aka("read a")
           .must_==(JsError(
-                  List((aPath,
-                        List(ValidationError("error.expected.jsnumber"))))))
+              List((aPath, List(ValidationError("error.expected.jsnumber"))))))
       }
     }
   }

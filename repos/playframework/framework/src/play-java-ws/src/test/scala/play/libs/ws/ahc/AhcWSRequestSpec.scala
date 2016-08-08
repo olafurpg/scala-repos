@@ -109,7 +109,7 @@ class AhcWSRequestSpec extends Specification with Mockito {
       val queryParams = requestWithQueryString("q=playframework&src=typd")
       queryParams.size must beEqualTo(2)
       queryParams.exists(p =>
-            (p.getName == "q") && (p.getValue == "playframework")) must beTrue
+        (p.getName == "q") && (p.getValue == "playframework")) must beTrue
       queryParams
         .exists(p => (p.getName == "src") && (p.getValue == "typd")) must beTrue
     }
@@ -120,7 +120,7 @@ class AhcWSRequestSpec extends Specification with Mockito {
       queryParams
         .exists(p => (p.getName == "q") && (p.getValue == "scala")) must beTrue
       queryParams.exists(p =>
-            (p.getName == "q") && (p.getValue == "playframework")) must beTrue
+        (p.getName == "q") && (p.getValue == "playframework")) must beTrue
       queryParams
         .exists(p => (p.getName == "q") && (p.getValue == "fp")) must beTrue
       queryParams.count(p => p.getName == "q") must beEqualTo(3)
@@ -130,9 +130,9 @@ class AhcWSRequestSpec extends Specification with Mockito {
       val queryParams = requestWithQueryString("q=playframework&src=")
       queryParams.size must beEqualTo(2)
       queryParams.exists(p =>
-            (p.getName == "q") && (p.getValue == "playframework")) must beTrue
+        (p.getName == "q") && (p.getValue == "playframework")) must beTrue
       queryParams.exists(p =>
-            (p.getName.equals("src")) && (p.getValue == null)) must beTrue
+        (p.getName.equals("src")) && (p.getValue == null)) must beTrue
     }
 
     "not support a query string with more than 2 = per part" in {

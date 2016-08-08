@@ -83,14 +83,13 @@ final class ChatApi(coll: Coll,
   }
 
   private def pushLine(chatId: ChatId, line: Line) =
-    coll.update(BSONDocument("_id" -> chatId),
-                BSONDocument(
-                    "$push" -> BSONDocument(
-                        Chat.BSONFields.lines -> BSONDocument(
-                            "$each" -> List(line),
-                            "$slice" -> -maxLinesPerChat)
-                    )),
-                upsert = true) >>- lila.mon.chat.message()
+    coll.update(
+        BSONDocument("_id" -> chatId),
+        BSONDocument("$push" -> BSONDocument(
+            Chat.BSONFields.lines -> BSONDocument("$each" -> List(line),
+                                                  "$slice" -> -maxLinesPerChat)
+        )),
+        upsert = true) >>- lila.mon.chat.message()
 
   private object Writer {
 

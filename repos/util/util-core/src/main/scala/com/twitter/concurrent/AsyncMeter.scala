@@ -183,9 +183,8 @@ class AsyncMeter private[concurrent] (private[concurrent] val burstSize: Int,
     */
   def await(permits: Int): Future[Unit] = {
     if (permits > burstSize)
-      return Future.exception(
-          new IllegalArgumentException(
-              s"Tried to await on $permits permits, but the maximum burst size was $burstSize"))
+      return Future.exception(new IllegalArgumentException(
+          s"Tried to await on $permits permits, but the maximum burst size was $burstSize"))
 
     // don't jump the queue-this is racy, but the race here is indistinguishable
     // from the synchronized behavior
@@ -214,9 +213,8 @@ class AsyncMeter private[concurrent] (private[concurrent] val burstSize: Int,
       restartTimerIfDead()
       p
     } else {
-      Future.exception(
-          new RejectedExecutionException(
-              "Tried to wait when there were already the maximum number of waiters."))
+      Future.exception(new RejectedExecutionException(
+          "Tried to wait when there were already the maximum number of waiters."))
     }
   }
 

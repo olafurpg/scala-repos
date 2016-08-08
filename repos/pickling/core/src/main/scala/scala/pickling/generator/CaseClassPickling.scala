@@ -16,8 +16,8 @@ class CaseClassPickling(val allowReflection: Boolean,
   // TODO - This helper method should be available elsewhere.
   def allVars(cls: IrClass): Seq[IrMethod] = {
     (cls.methods.filter(_.isParamAccessor) ++ IrSymbol
-          .allDeclaredMethodIncludingSubclasses(cls)
-          .filter(x => x.isVar || x.isVal))
+      .allDeclaredMethodIncludingSubclasses(cls)
+      .filter(x => x.isVar || x.isVal))
       .groupBy(_.methodName)
       .map(_._2.head)
       .toList
@@ -53,15 +53,15 @@ class CaseClassPickling(val allowReflection: Boolean,
             }.toSeq ++ standAloneVars.map { field =>
               GetField(field.methodName, field)
             })))
-            val unpickle = UnpickleBehavior(Seq(CallConstructor(
-                        fields.map(_.name),
-                        c)) ++ standAloneVars.map { field =>
-              field.setter match {
-                case Some(mth) => SetField(field.methodName, mth)
-                case _ =>
-                  sys.error(
-                      s"Attempting to define unpickle behavior, when no setter is defined on a var: ${field}")
-              }
+            val unpickle = UnpickleBehavior(Seq(
+                CallConstructor(fields.map(_.name), c)) ++ standAloneVars.map {
+              field =>
+                field.setter match {
+                  case Some(mth) => SetField(field.methodName, mth)
+                  case _ =>
+                    sys.error(
+                        s"Attempting to define unpickle behavior, when no setter is defined on a var: ${field}")
+                }
             })
             if (!allowReflection &&
                 (pickle.requiresReflection || unpickle.requiresReflection)) {
@@ -86,7 +86,7 @@ class CaseClassPickling(val allowReflection: Boolean,
                 }
               val errors =
                 (reflectionErrorMessage(pickle) ++ reflectionErrorMessage(
-                        unpickle))
+                    unpickle))
               val errorString =
                 if (errors.isEmpty) "   unknown reason"
                 else errors.mkString("   - ", "\n   - ", "")
@@ -178,12 +178,11 @@ class CaseClassPickling(val allowReflection: Boolean,
                     )
                   case x: UnpickleBehavior =>
                     UnpickleBehavior(
-                        Seq(
-                            SubclassUnpicklerDelegation(
-                                Nil,
-                                tpe,
-                                Some(x),
-                                allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
+                        Seq(SubclassUnpicklerDelegation(
+                            Nil,
+                            tpe,
+                            Some(x),
+                            allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
                   case x => x
                 }
                 .asInstanceOf[PickleUnpickleImplementation]
@@ -201,12 +200,11 @@ class CaseClassPickling(val allowReflection: Boolean,
                     SubclassDispatch(Nil, tpe, Some(x), allowReflection) // TODO - This should be `allow runtime pickler lookup`.
                   case x: UnpickleBehavior =>
                     UnpickleBehavior(
-                        Seq(
-                            SubclassUnpicklerDelegation(
-                                Nil,
-                                tpe,
-                                Some(x),
-                                allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
+                        Seq(SubclassUnpicklerDelegation(
+                            Nil,
+                            tpe,
+                            Some(x),
+                            allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
                   case x => x
                 }
                 .asInstanceOf[PickleUnpickleImplementation]

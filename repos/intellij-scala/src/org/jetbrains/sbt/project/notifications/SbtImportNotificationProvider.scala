@@ -80,21 +80,21 @@ abstract class SbtImportNotificationProvider(
 
         ExternalSystemApiUtil.executeProjectChangeAction(
             new DisposeAwareProjectChange(project) {
-          def execute() {
-            ProjectRootManagerEx
-              .getInstanceEx(project)
-              .mergeRootsChangesDuring(new Runnable {
-                def run() {
-                  val dataManager: ProjectDataManager =
-                    ServiceManager.getService(classOf[ProjectDataManager])
-                  dataManager.importData[ProjectData](
-                      Collections.singleton(externalProject),
-                      project,
-                      false)
-                }
-              })
-          }
-        })
+              def execute() {
+                ProjectRootManagerEx
+                  .getInstanceEx(project)
+                  .mergeRootsChangesDuring(new Runnable {
+                    def run() {
+                      val dataManager: ProjectDataManager =
+                        ServiceManager.getService(classOf[ProjectDataManager])
+                      dataManager.importData[ProjectData](
+                          Collections.singleton(externalProject),
+                          project,
+                          false)
+                    }
+                  })
+              }
+            })
       }
     }
 
@@ -110,7 +110,7 @@ abstract class SbtImportNotificationProvider(
 
   protected def getExternalProject(filePath: String): Option[String] =
     (!project.isDisposed &&
-          Sbt.isProjectDefinitionFile(project, filePath.toFile))
+      Sbt.isProjectDefinitionFile(project, filePath.toFile))
       .option(project.getBasePath)
 
   protected def getProjectSettings(

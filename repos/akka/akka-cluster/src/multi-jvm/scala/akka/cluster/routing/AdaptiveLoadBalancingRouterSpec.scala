@@ -62,7 +62,7 @@ object AdaptiveLoadBalancingRouterMultiJvmSpec extends MultiNodeConfig {
   commonConfig(
       debugConfig(on = false)
         .withFallback(ConfigFactory.parseString(
-                """
+            """
       akka.failure-detector.acceptable-heartbeat-pause = 10s
       akka.cluster.metrics.collect-interval = 1s
       akka.cluster.metrics.gossip-interval = 1s

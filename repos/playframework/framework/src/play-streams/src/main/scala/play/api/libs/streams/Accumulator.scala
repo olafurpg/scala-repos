@@ -265,7 +265,7 @@ object Accumulator {
         Sink
           .asPublisher[E](fanout = false)
           .mapMaterializedValue(publisher =>
-                Future.successful(Source.fromPublisher(publisher))))
+            Future.successful(Source.fromPublisher(publisher))))
   }
 
   /**

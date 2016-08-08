@@ -36,7 +36,7 @@ class WebSocketServerSpec
           upgrade.isDefined shouldBe true
 
           val source = Source(List(1, 2, 3, 4, 5)).map(num ⇒
-                TextMessage.Strict(s"Message $num"))
+            TextMessage.Strict(s"Message $num"))
           val handler =
             Flow.fromSinkAndSourceMat(Sink.ignore, source)(Keep.none)
           val response = upgrade.get.handleMessages(handler)

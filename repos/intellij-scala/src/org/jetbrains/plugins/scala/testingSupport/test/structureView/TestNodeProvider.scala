@@ -323,15 +323,13 @@ object TestNodeProvider {
           case ref: ScReferenceExpression => Some(ref)
           case otherExpr =>
             Option(otherExpr.findFirstChildByType(
-                    ScalaElementTypes.REFERENCE_EXPRESSION))
+                ScalaElementTypes.REFERENCE_EXPRESSION))
               .map(_.asInstanceOf[ScReferenceExpression])
         }
       case _ => None
     }).exists(refExpr =>
-            checkRefExpr(refExpr,
-                         "pendingUntilFixed",
-                         List("java.lang.String")) ||
-              checkRefExpr(refExpr, "pendingUntilFixed"))
+      checkRefExpr(refExpr, "pendingUntilFixed", List("java.lang.String")) ||
+        checkRefExpr(refExpr, "pendingUntilFixed"))
   }
 
   private def extractScalaTestScInfixExpr(
@@ -339,7 +337,7 @@ object TestNodeProvider {
       entry: ExtractEntry,
       project: Project): Option[TestStructureViewElement] = {
     if (entry.canIgnore && (checkScInfixExpr(expr, "ignore", List("void")) ||
-            checkIgnoreExpr(expr))) {
+        checkIgnoreExpr(expr))) {
       Some(
           ignoredScalaTestElement(expr,
                                   getInfixExprTestName(expr),
@@ -564,13 +562,13 @@ object TestNodeProvider {
                   List("org.scalatest.words.StringVerbBlockRegistration")),
               project))
       .orElse(extractScalaTestScInfixExpr(
-              expr,
-              ExtractEntry("when", false, false, _ => children, List("void")),
-              project))
+          expr,
+          ExtractEntry("when", false, false, _ => children, List("void")),
+          project))
       .orElse(extractScalaTestScInfixExpr(
-              expr,
-              ExtractEntry("which", false, false, _ => children, List("void")),
-              project))
+          expr,
+          ExtractEntry("which", false, false, _ => children, List("void")),
+          project))
   }
 
   private def extractFunSpec(
@@ -592,9 +590,9 @@ object TestNodeProvider {
               ExtractEntry("it", true, true, scMethodCallDefaultArg: _*),
               project))
       .orElse(extractScMethodCall(
-              expr,
-              ExtractEntry("they", true, true, scMethodCallDefaultArg: _*),
-              project))
+          expr,
+          ExtractEntry("they", true, true, scMethodCallDefaultArg: _*),
+          project))
   }
 
   private def extractFeatureSpec(
@@ -662,21 +660,15 @@ object TestNodeProvider {
         expr: PsiElement,
         project: Project): Option[TestStructureViewElement] = {
       if (isUTestInfixExpr(expr)) {
-        Some(
-            new TestStructureViewElement(
-                expr,
-                getInfixExprTestName(expr.asInstanceOf[ScInfixExpr]),
-                processChildren(getInnerExprs(expr),
-                                extractUTestInner,
-                                project)))
+        Some(new TestStructureViewElement(
+            expr,
+            getInfixExprTestName(expr.asInstanceOf[ScInfixExpr]),
+            processChildren(getInnerExprs(expr), extractUTestInner, project)))
       } else if (isUTestApplyCall(expr)) {
-        Some(
-            new TestStructureViewElement(
-                expr,
-                getMethodCallTestName(expr.asInstanceOf[ScMethodCall]),
-                processChildren(getInnerExprs(expr),
-                                extractUTestInner,
-                                project)))
+        Some(new TestStructureViewElement(
+            expr,
+            getMethodCallTestName(expr.asInstanceOf[ScMethodCall]),
+            processChildren(getInnerExprs(expr), extractUTestInner, project)))
       } else None
     }
     if (isUTestSuiteApplyCall(expr)) {

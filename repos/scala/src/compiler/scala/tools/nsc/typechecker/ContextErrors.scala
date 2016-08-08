@@ -710,11 +710,10 @@ trait ContextErrors { self: Analyzer =>
             name + " does not support passing a vararg parameter")
 
       def DynamicRewriteError(tree: Tree, err: AbsTypeError) = {
-        issueTypeError(
-            PosAndMsgTypeError(
-                err.errPos,
-                err.errMsg +
-                  s"\nerror after rewriting to $tree\npossible cause: maybe a wrong Dynamic method signature?"))
+        issueTypeError(PosAndMsgTypeError(
+            err.errPos,
+            err.errMsg +
+              s"\nerror after rewriting to $tree\npossible cause: maybe a wrong Dynamic method signature?"))
         setError(tree)
       }
 
@@ -1011,12 +1010,12 @@ trait ContextErrors { self: Analyzer =>
                 realex.getStackTrace().take(relevancyThreshold + 1)
               def isMacroInvoker(este: StackTraceElement) =
                 este.isNativeMethod || (este.getClassName != null &&
-                      (este.getClassName contains "fastTrack"))
+                  (este.getClassName contains "fastTrack"))
               var threshold =
                 relevantElements.reverse.indexWhere(isMacroInvoker) + 1
               while (threshold != relevantElements.length &&
                      isMacroInvoker(relevantElements(relevantElements.length -
-                               threshold - 1))) threshold += 1
+                       threshold - 1))) threshold += 1
               relevantElements = relevantElements dropRight threshold
 
               realex.setStackTrace(relevantElements)
@@ -1044,7 +1043,7 @@ trait ContextErrors { self: Analyzer =>
       def MacroFreeSymbolError(expandee: Tree, sym: FreeSymbol) = {
         def template(kind: String) =
           (s"Macro expansion contains free $kind variable %s. Have you forgotten to use %s? " +
-                s"If you have troubles tracking free $kind variables, consider using -Xlog-free-${kind}s")
+            s"If you have troubles tracking free $kind variables, consider using -Xlog-free-${kind}s")
         val forgotten =
           (if (sym.isTerm) "splice when splicing this variable into a reifee"
            else "c.WeakTypeTag annotation for this type parameter")
@@ -1131,21 +1130,21 @@ trait ContextErrors { self: Analyzer =>
           !(pre.isErroneous || sym1.isErroneous || sym2.isErroneous)
         val ambiguousBuffered = !context.ambiguousErrors
         if (validTargets || ambiguousBuffered)
-          context.issueAmbiguousError(
-              if (sym1.hasDefault &&
-                  sym2.hasDefault && sym1.enclClass == sym2.enclClass) {
-            val methodName = nme.defaultGetterToMethod(sym1.name)
-            AmbiguousTypeError(
-                sym1.enclClass.pos,
-                s"in ${sym1.enclClass}, multiple overloaded alternatives of $methodName define default arguments")
-          } else {
-            AmbiguousTypeError(
-                pos,
-                "ambiguous reference to overloaded definition,\n" +
-                  s"both ${sym1.fullLocationString} of type ${pre.memberType(sym1)}\n" +
-                  s"and  ${sym2.fullLocationString} of type ${pre.memberType(sym2)}\n" +
-                  s"match $rest")
-          })
+          context
+            .issueAmbiguousError(if (sym1.hasDefault &&
+                                     sym2.hasDefault && sym1.enclClass == sym2.enclClass) {
+              val methodName = nme.defaultGetterToMethod(sym1.name)
+              AmbiguousTypeError(
+                  sym1.enclClass.pos,
+                  s"in ${sym1.enclClass}, multiple overloaded alternatives of $methodName define default arguments")
+            } else {
+              AmbiguousTypeError(
+                  pos,
+                  "ambiguous reference to overloaded definition,\n" +
+                    s"both ${sym1.fullLocationString} of type ${pre.memberType(sym1)}\n" +
+                    s"and  ${sym2.fullLocationString} of type ${pre.memberType(sym2)}\n" +
+                    s"match $rest")
+            })
       }
 
       def AccessError(tree: Tree,
@@ -1603,14 +1602,14 @@ trait ContextErrors { self: Analyzer =>
 
         context.issueAmbiguousError(
             AmbiguousImplicitTypeError(tree, (info1.sym, info2.sym) match {
-          case (ImplicitAmbiguousMsg(msg), _) =>
-            msg.format(treeTypeArgs(tree1))
-          case (_, ImplicitAmbiguousMsg(msg)) =>
-            msg.format(treeTypeArgs(tree2))
-          case (_, _) if isView => viewMsg
-          case (_, _) =>
-            s"ambiguous implicit values:\n${coreMsg}match expected type $pt"
-        }))
+              case (ImplicitAmbiguousMsg(msg), _) =>
+                msg.format(treeTypeArgs(tree1))
+              case (_, ImplicitAmbiguousMsg(msg)) =>
+                msg.format(treeTypeArgs(tree2))
+              case (_, _) if isView => viewMsg
+              case (_, _) =>
+                s"ambiguous implicit values:\n${coreMsg}match expected type $pt"
+            }))
       }
     }
 

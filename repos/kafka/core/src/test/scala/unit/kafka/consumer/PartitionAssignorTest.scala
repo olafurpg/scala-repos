@@ -43,20 +43,20 @@ class PartitionAssignorTest extends Logging {
       val topicPartitionCounts = Map(
           (1 to topicCount)
             .map(topic => {
-          ("topic-" + topic,
-           PartitionAssignorTest.MinPartitionCount.max(TestUtils.random
+              ("topic-" + topic,
+               PartitionAssignorTest.MinPartitionCount.max(TestUtils.random
                  .nextInt(PartitionAssignorTest.MaxPartitionCount)))
-        })
+            })
             .toSeq: _*)
 
       val subscriptions = Map(
           (1 to consumerCount)
             .map(consumer => {
-          val streamCount = 1.max(TestUtils.random.nextInt(
+              val streamCount = 1.max(TestUtils.random.nextInt(
                   PartitionAssignorTest.MaxStreamCount + 1))
-          ("g1c" + consumer,
-           WildcardSubscriptionInfo(streamCount, ".*", isWhitelist = true))
-        })
+              ("g1c" + consumer,
+               WildcardSubscriptionInfo(streamCount, ".*", isWhitelist = true))
+            })
             .toSeq: _*)
       val scenario = Scenario("g1", topicPartitionCounts, subscriptions)
       val zkUtils = PartitionAssignorTest.setupZkClientMock(scenario)
@@ -80,24 +80,24 @@ class PartitionAssignorTest extends Logging {
       val topicPartitionCounts = Map(
           (1 to topicCount)
             .map(topic => {
-          ("topic-" + topic,
-           PartitionAssignorTest.MinPartitionCount.max(TestUtils.random
+              ("topic-" + topic,
+               PartitionAssignorTest.MinPartitionCount.max(TestUtils.random
                  .nextInt(PartitionAssignorTest.MaxPartitionCount)))
-        })
+            })
             .toSeq: _*)
 
       val subscriptions = Map(
           (1 to consumerCount)
             .map(consumer => {
-          val streamCounts = Map((1 to topicCount)
+              val streamCounts = Map((1 to topicCount)
                 .map(topic => {
-              val streamCount = 1.max(TestUtils.random.nextInt(
+                  val streamCount = 1.max(TestUtils.random.nextInt(
                       PartitionAssignorTest.MaxStreamCount + 1))
-              ("topic-" + topic, streamCount)
-            })
+                  ("topic-" + topic, streamCount)
+                })
                 .toSeq: _*)
-          ("g1c" + consumer, StaticSubscriptionInfo(streamCounts))
-        })
+              ("g1c" + consumer, StaticSubscriptionInfo(streamCounts))
+            })
             .toSeq: _*)
       val scenario = Scenario("g1", topicPartitionCounts, subscriptions)
       val zkUtils = PartitionAssignorTest.setupZkClientMock(scenario)
@@ -191,7 +191,7 @@ private object PartitionAssignorTest extends Logging {
     scenario.topicPartitionCounts.foreach {
       case (topic, partitionCount) =>
         val replicaAssignment = Map((0 until partitionCount).map(partition =>
-                  (partition.toString, Seq(0))): _*)
+          (partition.toString, Seq(0))): _*)
         EasyMock
           .expect(zkClient.readData("/brokers/topics/%s".format(topic),
                                     new Stat()))
@@ -202,7 +202,7 @@ private object PartitionAssignorTest extends Logging {
     EasyMock
       .expect(zkUtils.zkClient.getChildren("/brokers/topics"))
       .andReturn(java.util.Arrays
-            .asList(scenario.topicPartitionCounts.keys.toSeq: _*))
+        .asList(scenario.topicPartitionCounts.keys.toSeq: _*))
     EasyMock.expectLastCall().anyTimes()
 
     zkUtils
@@ -239,7 +239,7 @@ private object PartitionAssignorTest extends Logging {
     val givenPartitions = scenario.topicPartitionCounts.flatMap {
       case (topic, partitionCount) =>
         (0 until partitionCount).map(partition =>
-              TopicAndPartition(topic, partition))
+          TopicAndPartition(topic, partition))
     }.toSet
     assertTrue(
         "Scenario %s: the list of given partitions and assigned partitions are different."

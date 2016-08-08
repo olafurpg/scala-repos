@@ -149,7 +149,7 @@ object RecommendationEngine extends IEngineFactory {
 
 class Tuple2IntSerializer
     extends CustomSerializer[(Int, Int)](format =>
-          ({
+      ({
         case JArray(List(JInt(x), JInt(y))) => (x.intValue, y.intValue)
       }, {
         case x: (Int, Int) => JArray(List(JInt(x._1), JInt(x._2)))

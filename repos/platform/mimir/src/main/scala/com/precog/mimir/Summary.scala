@@ -145,8 +145,8 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
         val jtypes: M[Seq[JType]] =
           jtypes0 map
             (_ collect {
-                  case opt if opt.isDefined => opt.get
-                })
+              case opt if opt.isDefined => opt.get
+            })
 
         val specs: M[Seq[TransSpec1]] =
           jtypes map {
@@ -157,8 +157,8 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
         val tables: M[Seq[Table]] =
           specs map
             (_ map { spec =>
-                  table.transform(spec).compact(TransSpec1.Id, AllDefined)
-                })
+              table.transform(spec).compact(TransSpec1.Id, AllDefined)
+            })
 
         val tablesWithType: M[Seq[(Table, JType)]] = for {
           tbls <- tables

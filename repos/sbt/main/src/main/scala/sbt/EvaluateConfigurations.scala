@@ -405,10 +405,10 @@ object Index {
     else
       sys.error(
           duplicates map {
-        case (k, tps) => "'" + k + "' (" + tps.mkString(", ") + ")"
-      } mkString
+            case (k, tps) => "'" + k + "' (" + tps.mkString(", ") + ")"
+          } mkString
             ("Some keys were defined with the same name but different types: ",
-                ", ", ""))
+            ", ", ""))
   }
   private[this] type TriggerMap =
     collection.mutable.HashMap[Task[_], Seq[Task[_]]]

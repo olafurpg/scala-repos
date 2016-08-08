@@ -516,9 +516,8 @@ class GroupMetadataManager(val brokerId: Int,
               loadedGroups.values.foreach { group =>
                 val currentGroup = addGroup(group)
                 if (group != currentGroup)
-                  debug(
-                      s"Attempt to load group ${group.groupId} from log with generation ${group.generationId} failed " +
-                        s"because there is already a cached group with generation ${currentGroup.generationId}")
+                  debug(s"Attempt to load group ${group.groupId} from log with generation ${group.generationId} failed " +
+                    s"because there is already a cached group with generation ${currentGroup.generationId}")
                 else onGroupLoaded(group)
               }
 
@@ -658,7 +657,7 @@ class GroupMetadataManager(val brokerId: Int,
         case (groupTopicAndPartition, offsetAndMetadata) =>
           val offsetsPartition = partitionFor(groupTopicAndPartition.group)
           trace("Removing expired offset and metadata for %s: %s"
-                .format(groupTopicAndPartition, offsetAndMetadata))
+            .format(groupTopicAndPartition, offsetAndMetadata))
 
           offsetsCache.remove(groupTopicAndPartition)
 
@@ -690,7 +689,7 @@ class GroupMetadataManager(val brokerId: Int,
             val messages = tombstones.map(_._2).toSeq
 
             trace("Marked %d offsets in %s for deletion."
-                  .format(messages.size, appendPartition))
+              .format(messages.size, appendPartition))
 
             try {
               // do not need to require acks since even if the tombstone is lost,

@@ -61,7 +61,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
 
       val (provenance, contribErrors, contribConstr) = {
         if ((left.provenance == InfiniteProvenance ||
-                right.provenance == InfiniteProvenance) &&
+            right.provenance == InfiniteProvenance) &&
             expr.disallowsInfinite) {
           val provenance = NullProvenance
           val errors = Set(Error(expr, CannotUseDistributionWithoutSampling))
@@ -553,12 +553,12 @@ trait ProvenanceChecker extends parser.AST with Binder {
 
           val relations2 =
             relations + (from.provenance ->
-                  (relations.getOrElse(from.provenance, Set()) +
-                        to.provenance))
+              (relations.getOrElse(from.provenance, Set()) +
+                to.provenance))
           val relations3 =
             relations2 + (to.provenance ->
-                  (relations.getOrElse(to.provenance, Set()) +
-                        from.provenance))
+              (relations.getOrElse(to.provenance, Set()) +
+                from.provenance))
 
           val constraints2 =
             constraints + (from.provenance -> from) + (to.provenance -> to)

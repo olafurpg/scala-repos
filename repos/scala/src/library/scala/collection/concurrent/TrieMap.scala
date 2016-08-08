@@ -138,15 +138,11 @@ private[collection] final class INode[K, V](bn: MainNode[K, V], g: Gen)
                 GCAS(cn, cn.updatedAt(pos, new SNode(k, v, hc), gen), ct)
               else {
                 val rn = if (cn.gen eq gen) cn else cn.renewed(gen, ct)
-                val nn = rn.updatedAt(pos,
-                                      inode(
-                                          CNode.dual(sn,
-                                                     sn.hc,
-                                                     new SNode(k, v, hc),
-                                                     hc,
-                                                     lev + 5,
-                                                     gen)),
-                                      gen)
+                val nn = rn.updatedAt(
+                    pos,
+                    inode(CNode
+                      .dual(sn, sn.hc, new SNode(k, v, hc), hc, lev + 5, gen)),
+                    gen)
                 GCAS(cn, nn, ct)
               }
           }

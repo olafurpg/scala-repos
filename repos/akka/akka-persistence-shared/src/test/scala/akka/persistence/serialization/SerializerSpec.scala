@@ -62,7 +62,7 @@ object SerializerSpecConfigs {
 
   def config(configs: String*): Config =
     configs.foldLeft(ConfigFactory.empty)((r, c) ⇒
-          r.withFallback(ConfigFactory.parseString(c)))
+      r.withFallback(ConfigFactory.parseString(c)))
 }
 
 import akka.persistence.serialization.SerializerSpecConfigs._

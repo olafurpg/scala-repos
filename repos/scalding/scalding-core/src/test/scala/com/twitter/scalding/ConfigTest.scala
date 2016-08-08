@@ -108,9 +108,10 @@ object ConfigProps extends Properties("Config") {
     val uids = l.filterNot { s =>
       s.isEmpty || s.contains(",")
     }.map(UniqueID(_))
-    (uids.foldLeft(Config.empty) { (conf, id) =>
-            conf.addUniqueId(id)
-          }
-          .getUniqueIds == uids.toSet)
+    (uids
+      .foldLeft(Config.empty) { (conf, id) =>
+        conf.addUniqueId(id)
+      }
+      .getUniqueIds == uids.toSet)
   }
 }

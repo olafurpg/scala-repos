@@ -25,7 +25,7 @@ package object testkit {
         eventFilters filterNot
           (_.awaitDone(Duration(stop - now, MILLISECONDS))) map
           ("Timeout (" + testKitSettings.TestEventFilterLeeway.dilated +
-                ") waiting for " + _)
+            ") waiting for " + _)
       if (failed.nonEmpty)
         throw new AssertionError(
             "Filter completion error:\n" + failed.mkString("\n"))

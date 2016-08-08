@@ -22,7 +22,7 @@ final class MongoCache[K, V: MongoCache.Handler] private (
       case None =>
         f(k) flatMap { v =>
           coll.insert(makeEntry(k, v)) recover lila.db.recoverDuplicateKey(_ =>
-                ()) inject v
+            ()) inject v
         }
       case Some(entry) => fuccess(entry.v)
     }

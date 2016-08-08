@@ -162,8 +162,8 @@ class CircuitBreaker(
     Await.result(withCircuitBreaker(
                      try Future.successful(body)
                      catch {
-                   case NonFatal(t) ⇒ Future.failed(t)
-                 }),
+                       case NonFatal(t) ⇒ Future.failed(t)
+                     }),
                  callTimeout)
 
   /**

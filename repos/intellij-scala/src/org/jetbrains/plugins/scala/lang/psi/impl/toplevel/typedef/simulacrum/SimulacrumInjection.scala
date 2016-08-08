@@ -189,7 +189,7 @@ class SimulacrumInjection extends SyntheticMembersInjector {
 
             val AllOpsSupers = clazz.extendsBlock.templateParents.toSeq
               .flatMap(parents =>
-                    parents.typeElements.flatMap {
+                parents.typeElements.flatMap {
                   case te =>
                     te.getType(TypingContext.empty) match {
                       case Success(ScParameterizedType(classType, Seq(tp)), _)

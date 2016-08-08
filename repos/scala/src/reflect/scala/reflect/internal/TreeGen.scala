@@ -231,8 +231,8 @@ abstract class TreeGen {
          else NoSymbol)
       val needsPackageQualifier =
         ((sym ne null) && qualsym.hasPackageFlag && !(sym.isDefinedInPackage ||
-                  sym.moduleClass.isDefinedInPackage) // SI-7817 work around strangeness in post-flatten `Symbol#owner`
-            )
+          sym.moduleClass.isDefinedInPackage) // SI-7817 work around strangeness in post-flatten `Symbol#owner`
+        )
       val pkgQualifier = if (needsPackageQualifier) {
         val packageObject = qualsym.packageObject
         Select(qual, nme.PACKAGE) setSymbol packageObject setType packageObject.typeOfThis
@@ -460,15 +460,14 @@ abstract class TreeGen {
         // (the type macros aren't in the trunk yet, but there is a plan for them to land there soon)
         // this means that we don't know what will be the arguments of the super call
         // therefore here we emit a dummy which gets populated when the template is named and typechecked
-        Some(
-            atPos(wrappingPos(superPos, lvdefs ::: vparamss1.flatten).makeTransparent)(
-                DefDef(constrMods,
-                       nme.CONSTRUCTOR,
-                       List(),
-                       vparamss1,
-                       TypeTree(),
-                       Block(lvdefs ::: List(superCall),
-                             Literal(Constant(()))))))
+        Some(atPos(
+            wrappingPos(superPos, lvdefs ::: vparamss1.flatten).makeTransparent)(
+            DefDef(constrMods,
+                   nme.CONSTRUCTOR,
+                   List(),
+                   vparamss1,
+                   TypeTree(),
+                   Block(lvdefs ::: List(superCall), Literal(Constant(()))))))
       }
     }
     constr foreach (ensureNonOverlapping(_, parents ::: gvdefs, focus = false))

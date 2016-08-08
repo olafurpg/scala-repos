@@ -40,10 +40,14 @@ class MappingUfuncBenchmark
   def timeMappingUfuncDenseMatWithStride(reps: Int) =
     runWith(reps, { randomMatrix(2048, 2048 * 2) })(
         (mat: DenseMatrix[Double]) => {
-      val newMat =
-        new DenseMatrix(2048, 2048, mat.data, offset = 0, majorStride = 2048)
-      addOne(newMat)
-    })
+          val newMat =
+            new DenseMatrix(2048,
+                            2048,
+                            mat.data,
+                            offset = 0,
+                            majorStride = 2048)
+          addOne(newMat)
+        })
 
   // Group 2: easy in place
 
@@ -95,10 +99,14 @@ class MappingUfuncBenchmark
   def timeMappingUfuncDenseMatHarderWithStride(reps: Int) =
     runWith(reps, { randomMatrix(2048, 2048 * 2) })(
         (mat: DenseMatrix[Double]) => {
-      val newMat =
-        new DenseMatrix(2048, 2048, mat.data, offset = 0, majorStride = 2048)
-      harderUfunc(newMat)
-    })
+          val newMat =
+            new DenseMatrix(2048,
+                            2048,
+                            mat.data,
+                            offset = 0,
+                            majorStride = 2048)
+          harderUfunc(newMat)
+        })
 
   def timeMappingUfuncDenseVecHarderMapValues(reps: Int) =
     runWith(reps, { randomArray(2048 * 2048) })((arr: DenseVector[Double]) => {

@@ -21,7 +21,7 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) { self =>
 
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = {
     F.foldRight[Maybe[A], Z](run, z)((a, b) =>
-          Foldable[Maybe].foldRight[A, Z](a, b)(f))
+      Foldable[Maybe].foldRight[A, Z](a, b)(f))
   }
 
   def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F],
@@ -199,7 +199,7 @@ private trait MaybeTBindRec[F[_]]
   final def tailrecM[A, B](f: A => MaybeT[F, A \/ B])(a: A): MaybeT[F, B] =
     MaybeT(
         B.tailrecM[A, Maybe[B]](a =>
-              F.map(f(a).run) {
+          F.map(f(a).run) {
             _.cata(_.map(Maybe.just), \/.right(Maybe.empty))
         })(a)
     )

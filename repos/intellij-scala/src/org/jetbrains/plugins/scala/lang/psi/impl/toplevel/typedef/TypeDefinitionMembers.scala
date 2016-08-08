@@ -844,13 +844,13 @@ object TypeDefinitionMembers {
             syntheticMethods = () => syntheticMethods)) return false
 
     if (!(types.AnyRef
-              .asClass(clazz.getProject)
-              .getOrElse(return true)
-              .processDeclarations(processor, state, lastParent, place) &&
-              types.Any
-                .asClass(clazz.getProject)
-                .getOrElse(return true)
-                .processDeclarations(processor, state, lastParent, place)))
+          .asClass(clazz.getProject)
+          .getOrElse(return true)
+          .processDeclarations(processor, state, lastParent, place) &&
+          types.Any
+            .asClass(clazz.getProject)
+            .getOrElse(return true)
+            .processDeclarations(processor, state, lastParent, place)))
       return false
 
     if (shouldProcessMethods(processor) &&
@@ -875,13 +875,13 @@ object TypeDefinitionMembers {
       return false
 
     if (!(types.AnyRef
-              .asClass(td.getProject)
-              .getOrElse(return true)
-              .processDeclarations(processor, state, lastParent, place) &&
-              types.Any
-                .asClass(td.getProject)
-                .getOrElse(return true)
-                .processDeclarations(processor, state, lastParent, place)))
+          .asClass(td.getProject)
+          .getOrElse(return true)
+          .processDeclarations(processor, state, lastParent, place) &&
+          types.Any
+            .asClass(td.getProject)
+            .getOrElse(return true)
+            .processDeclarations(processor, state, lastParent, place)))
       return false
     true
   }
@@ -910,13 +910,13 @@ object TypeDefinitionMembers {
       else if (place != null) place.getProject
       else return true
     if (!(types.AnyRef
-              .asClass(project)
-              .getOrElse(return true)
-              .processDeclarations(processor, state, lastParent, place) &&
-              types.Any
-                .asClass(project)
-                .getOrElse(return true)
-                .processDeclarations(processor, state, lastParent, place)))
+          .asClass(project)
+          .getOrElse(return true)
+          .processDeclarations(processor, state, lastParent, place) &&
+          types.Any
+            .asClass(project)
+            .getOrElse(return true)
+            .processDeclarations(processor, state, lastParent, place)))
       return false
 
     true

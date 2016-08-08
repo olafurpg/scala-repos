@@ -130,7 +130,7 @@ object FieldsProviderImpl {
       // Options just use Object as the type, due to the way cascading works on number types
       def columnTypes =
         of.columnTypes.map(_ =>
-              q"""_root_.scala.Predef.classOf[_root_.java.lang.Object]""")
+          q"""_root_.scala.Predef.classOf[_root_.java.lang.Object]""")
       def names = of.names
     }
     case class CaseClassBuilder(prefix: String, members: Vector[FieldBuilder])
@@ -163,7 +163,7 @@ object FieldsProviderImpl {
           OptionBuilder(matchField(innerType, name))
         case tpe
             if (tpe.typeSymbol.isClass &&
-                  tpe.typeSymbol.asClass.isCaseClass) =>
+              tpe.typeSymbol.asClass.isCaseClass) =>
           CaseClassBuilder(name, expandMethod(tpe).map {
             case (t, s) => matchField(t, s)
           })

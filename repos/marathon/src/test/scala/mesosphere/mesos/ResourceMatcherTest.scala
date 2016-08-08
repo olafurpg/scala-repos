@@ -100,18 +100,12 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
                                                       "marathon",
                                                       reservation =
                                                         Some(cpuReservation2)))
-      .addResources(MarathonTestHelper.scalarResource("mem",
-                                                      128.0,
-                                                      "*",
-                                                      reservation =
-                                                        Some(memReservation)))
-      .addResources(MarathonTestHelper.scalarResource("disk",
-                                                      2,
-                                                      "*",
-                                                      reservation =
-                                                        Some(diskReservation)))
       .addResources(MarathonTestHelper
-            .portsResource(80, 80, reservation = Some(portsReservation)))
+        .scalarResource("mem", 128.0, "*", reservation = Some(memReservation)))
+      .addResources(MarathonTestHelper
+        .scalarResource("disk", 2, "*", reservation = Some(diskReservation)))
+      .addResources(MarathonTestHelper
+        .portsResource(80, 80, reservation = Some(portsReservation)))
       .build()
 
     val app = AppDefinition(
@@ -160,7 +154,7 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
 
     res.portsMatch.hostPortsWithRole.toSet should be(
         Set(PortsMatcher
-              .PortWithRole("*", 80, reservation = Some(portsReservation)))
+          .PortWithRole("*", 80, reservation = Some(portsReservation)))
     )
 
     // reserved resources should not be matched by selector with reserved = false
@@ -187,11 +181,8 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
                                                       "marathon",
                                                       reservation =
                                                         Some(cpuReservation)))
-      .addResources(MarathonTestHelper.scalarResource("mem",
-                                                      128.0,
-                                                      "*",
-                                                      reservation =
-                                                        Some(memReservation)))
+      .addResources(MarathonTestHelper
+        .scalarResource("mem", 128.0, "*", reservation = Some(memReservation)))
       .addResources(MarathonTestHelper.reservedDisk(id = "disk",
                                                     size = 1024.0))
       .build()

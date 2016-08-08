@@ -60,7 +60,7 @@ class Range(val start: Int, val end: Int, val step: Int)
   // correct.
   override final val isEmpty =
     ((start > end && step > 0) || (start < end && step < 0) ||
-          (start == end && !isInclusive))
+      (start == end && !isInclusive))
   final val numRangeElements: Int = {
     if (step == 0) throw new IllegalArgumentException("step cannot be 0.")
     else if (isEmpty) 0
@@ -210,7 +210,7 @@ class Range(val start: Int, val end: Int, val step: Int)
   // whether it is a member of the sequence (i.e. when step > 1.)
   private def isWithinBoundaries(elem: Int) =
     !isEmpty && ((step > 0 && start <= elem && elem <= last) ||
-          (step < 0 && last <= elem && elem <= start))
+      (step < 0 && last <= elem && elem <= start))
   // Methods like apply throw exceptions on invalid n, but methods like take/drop
   // are forgiving: therefore the checks are with the methods.
   private def locationAfterN(n: Int) = start + (step * n)
@@ -276,9 +276,9 @@ class Range(val start: Int, val end: Int, val step: Int)
     case x: Range =>
       (x canEqual this) && (length == x.length) &&
         (isEmpty || // all empty sequences are equal
-              (start == x.start &&
-                    last == x.last) // same length and same endpoints implies equality
-            )
+          (start == x.start &&
+            last == x.last) // same length and same endpoints implies equality
+        )
     case _ =>
       super.equals(other)
   }

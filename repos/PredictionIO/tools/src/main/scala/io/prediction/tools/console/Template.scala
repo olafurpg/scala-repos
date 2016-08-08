@@ -231,7 +231,7 @@ object Template extends Logging {
       } catch {
         case e: MappingException =>
           error(s"Either ${ca.template.repository} is not a valid GitHub " +
-                "repository, or it does not have any tag. Aborting.")
+            "repository, or it does not have any tag. Aborting.")
           return 1
       }
     } getOrElse {
@@ -358,7 +358,7 @@ object Template extends Logging {
 
         if (organization != "" &&
             (nameOnly.endsWith(".scala") || nameOnly == "build.sbt" ||
-                nameOnly == "engine.json")) {
+            nameOnly == "engine.json")) {
           filesToModify += destFilename
         }
       }
@@ -421,9 +421,8 @@ object Template extends Logging {
 
     metadata.pioVersionMin.foreach { pvm =>
       if (Version(BuildInfo.version) < Version(pvm)) {
-        error(
-            s"This engine template requires at least PredictionIO $pvm. " +
-              s"The template may not work with PredictionIO ${BuildInfo.version}.")
+        error(s"This engine template requires at least PredictionIO $pvm. " +
+          s"The template may not work with PredictionIO ${BuildInfo.version}.")
         sys.exit(1)
       }
     }

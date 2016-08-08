@@ -203,7 +203,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
             rightRegion -= outputs(members(j))
             val error =
               (leftRegion.error * (j + 1) + rightRegion.error *
-                    (members.length - j - 1)) / members.length
+                (members.length - j - 1)) / members.length
             if (error < minError) {
               minError = error
               minVar = axis
@@ -234,7 +234,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
         val boundary =
           (data(members(minIdx)).coord(minVar) +
-                data(members(minIdx + 1)).coord(minVar)) / 2
+            data(members(minIdx + 1)).coord(minVar)) / 2
         val left = members take (minIdx + 1)
         val right = members drop (minIdx + 1)
         Split(minVar, boundary, growTree(left), growTree(right))
@@ -248,8 +248,8 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
       Forest(
           (1 to opts.numTrees).toList.par
             .map({ _ =>
-          growTree(sample())
-        })
+              growTree(sample())
+            })
             .toList)
     } else {
       Forest(List.fill(opts.numTrees)(growTree(sample())))

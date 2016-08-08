@@ -21,7 +21,7 @@ object CompileTimeDependencyInjection extends Specification {
       val context = ApplicationLoader
         .createContext(environment,
                        Map("play.application.loader" -> classOf[
-                               basic.MyApplicationLoader].getName))
+                           basic.MyApplicationLoader].getName))
       val application = ApplicationLoader(context).load(context)
       application must beAnInstanceOf[Application]
       application.routes.documentation must beEmpty

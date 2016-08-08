@@ -88,13 +88,11 @@ class CountVectorizerSuite
 
   test("CountVectorizer vocabSize and minDF") {
     val df = sqlContext
-      .createDataFrame(
-          Seq((0,
-               split("a b c d"),
-               Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
-              (1, split("a b c"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
-              (2, split("a b"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
-              (3, split("a"), Vectors.sparse(3, Seq((0, 1.0))))))
+      .createDataFrame(Seq(
+          (0, split("a b c d"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
+          (1, split("a b c"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
+          (2, split("a b"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
+          (3, split("a"), Vectors.sparse(3, Seq((0, 1.0))))))
       .toDF("id", "words", "expected")
     val cvModel = new CountVectorizer()
       .setInputCol("words")

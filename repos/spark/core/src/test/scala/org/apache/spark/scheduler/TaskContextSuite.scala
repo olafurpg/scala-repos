@@ -60,7 +60,7 @@ class TaskContextSuite
       override def getPartitions = Array[Partition](StubPartition(0))
       override def compute(split: Partition, context: TaskContext) = {
         context.addTaskCompletionListener(context =>
-              TaskContextSuite.completed = true)
+          TaskContextSuite.completed = true)
         sys.error("failed")
       }
     }
@@ -87,7 +87,7 @@ class TaskContextSuite
       override def getPartitions = Array[Partition](StubPartition(0))
       override def compute(split: Partition, context: TaskContext) = {
         context.addTaskFailureListener((context, error) =>
-              TaskContextSuite.lastError = error)
+          TaskContextSuite.lastError = error)
         sys.error("damn error")
       }
     }
@@ -125,10 +125,10 @@ class TaskContextSuite
     val context = TaskContext.empty()
     val listener = mock(classOf[TaskFailureListener])
     context.addTaskFailureListener((_, _) =>
-          throw new Exception("exception in listener1"))
+      throw new Exception("exception in listener1"))
     context.addTaskFailureListener(listener)
     context.addTaskFailureListener((_, _) =>
-          throw new Exception("exception in listener3"))
+      throw new Exception("exception in listener3"))
 
     val e = intercept[TaskCompletionListenerException] {
       context.markTaskFailed(new Exception("exception in task"))

@@ -69,7 +69,7 @@ object StreamingTestExample {
     val data = ssc
       .textFileStream(dataDir)
       .map(line =>
-            line.split(",") match {
+        line.split(",") match {
           case Array(label, value) =>
             BinarySample(label.toBoolean, value.toDouble)
       })

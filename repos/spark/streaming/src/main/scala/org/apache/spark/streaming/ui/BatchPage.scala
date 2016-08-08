@@ -299,7 +299,7 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
         case (outputOpData, sparkJobIds) =>
           (outputOpData,
            sparkJobIds.map(sparkJobId =>
-                 SparkJobIdWithUIData(sparkJobId, getJobData(sparkJobId))))
+             SparkJobIdWithUIData(sparkJobId, getJobData(sparkJobId))))
       }
 
       <table id="batch-job-table" class="table table-bordered table-striped table-condensed">
@@ -345,7 +345,7 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
       val inputMetadatas = batchUIData.streamIdToInputInfo.values.flatMap {
         inputInfo =>
           inputInfo.metadataDescription.map(desc =>
-                inputInfo.inputStreamId -> desc)
+            inputInfo.inputStreamId -> desc)
       }.toSeq
       val summary: NodeSeq = <div>
         <ul class="unstyled">

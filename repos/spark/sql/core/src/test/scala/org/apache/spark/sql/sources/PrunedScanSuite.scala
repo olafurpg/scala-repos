@@ -58,13 +58,9 @@ case class SimplePrunedScan(from: Int, to: Int)(
 
     sqlContext.sparkContext
       .parallelize(from to to)
-      .map(
-          i =>
-            Row.fromSeq(
-                rowBuilders
-                  .map(_(i))
-                  .reduceOption(_ ++ _)
-                  .getOrElse(Seq.empty)))
+      .map(i =>
+        Row.fromSeq(
+            rowBuilders.map(_(i)).reduceOption(_ ++ _).getOrElse(Seq.empty)))
   }
 }
 

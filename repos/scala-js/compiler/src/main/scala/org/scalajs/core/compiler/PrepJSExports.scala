@@ -255,8 +255,8 @@ trait PrepJSExports { this: PrepJSInterop =>
       def isIllegalApplyExport = {
         isMember && !hasExplicitName && sym.name == nme.apply &&
         !(isExportAll && directAnnots.exists(annot =>
-                  annot.symbol == JSExportAnnotation && annot.args.nonEmpty &&
-                    annot.stringArg(0) == Some("apply")))
+          annot.symbol == JSExportAnnotation && annot.args.nonEmpty &&
+            annot.stringArg(0) == Some("apply")))
       }
 
       // Don't allow apply without explicit name

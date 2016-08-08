@@ -37,7 +37,7 @@ class ActorRefSinkSpec extends AkkaSpec {
 
     "cancel stream when actor terminates" in assertAllStagesStopped {
       val fw = system.actorOf(Props(classOf[Fw], testActor)
-            .withDispatcher("akka.test.stream-dispatcher"))
+        .withDispatcher("akka.test.stream-dispatcher"))
       val publisher = TestSource
         .probe[Int]
         .to(Sink.actorRef(fw, onCompleteMessage = "done"))

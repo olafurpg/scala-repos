@@ -68,12 +68,12 @@ abstract class MemberWeaklyUpSpec
 
       runOn(first) {
         awaitAssert(clusterView.unreachableMembers.map(_.address) should be(
-                Set(address(third), address(fourth))))
+            Set(address(third), address(fourth))))
       }
 
       runOn(third, fourth) {
         awaitAssert(clusterView.unreachableMembers.map(_.address) should be(
-                Set(address(first))))
+            Set(address(first))))
       }
 
       enterBarrier("after-2")

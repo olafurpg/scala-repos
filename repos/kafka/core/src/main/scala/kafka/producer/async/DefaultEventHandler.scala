@@ -131,13 +131,9 @@ class DefaultEventHandler[K, V](
         val failedProduceRequests = new ArrayBuffer[KeyedMessage[K, Message]]
         for ((brokerid, messagesPerBrokerMap) <- partitionedData) {
           if (logger.isTraceEnabled) {
-            messagesPerBrokerMap.foreach(
-                partitionAndEvent =>
-                  trace(
-                      "Handling event for Topic: %s, Broker: %d, Partitions: %s"
-                        .format(partitionAndEvent._1,
-                                brokerid,
-                                partitionAndEvent._2)))
+            messagesPerBrokerMap.foreach(partitionAndEvent =>
+              trace("Handling event for Topic: %s, Broker: %d, Partitions: %s"
+                .format(partitionAndEvent._1, brokerid, partitionAndEvent._2)))
           }
           val messageSetPerBrokerOpt = groupMessagesToSet(messagesPerBrokerMap)
           messageSetPerBrokerOpt match {
@@ -151,7 +147,7 @@ class DefaultEventHandler[K, V](
               })
             case None => // failed to group messages
               messagesPerBrokerMap.values.foreach(m =>
-                    failedProduceRequests.appendAll(m))
+                failedProduceRequests.appendAll(m))
           }
         }
         failedProduceRequests
@@ -316,11 +312,8 @@ class DefaultEventHandler[K, V](
           "Invalid partition id: " + partition + " for topic " + topic +
             "; Valid values are in the inclusive range of [0, " +
             (numPartitions - 1) + "]")
-    trace(
-        "Assigning message of topic %s and key %s to a selected partition %d"
-          .format(topic,
-                  if (key == null) "[none]" else key.toString,
-                  partition))
+    trace("Assigning message of topic %s and key %s to a selected partition %d"
+      .format(topic, if (key == null) "[none]" else key.toString, partition))
     partition
   }
 
@@ -376,9 +369,9 @@ class DefaultEventHandler[K, V](
             successfullySentData.foreach(
                 m =>
                   messagesPerTopic(m._1).foreach(message =>
-                        trace("Successfully sent message: %s".format(
-                                if (message.message.isNull) null
-                                else message.message.toString()))))
+                    trace("Successfully sent message: %s".format(
+                        if (message.message.isNull) null
+                        else message.message.toString()))))
           }
           val failedPartitionsAndStatus =
             response.status.filter(_._2.error != Errors.NONE.code).toSeq
@@ -390,7 +383,7 @@ class DefaultEventHandler[K, V](
                   (p1, p2) =>
                     p1._1.topic.compareTo(p2._1.topic) < 0 ||
                       (p1._1.topic.compareTo(p2._1.topic) == 0 &&
-                            p1._1.partition < p2._1.partition))
+                        p1._1.partition < p2._1.partition))
               .map {
                 case (topicAndPartition, status) =>
                   topicAndPartition.toString + ": " +

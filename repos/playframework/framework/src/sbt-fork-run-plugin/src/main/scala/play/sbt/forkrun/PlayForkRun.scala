@@ -78,7 +78,7 @@ object PlayForkRun extends AutoPlugin {
       playForkReload <<= compileTask,
       SerializersKeys.registeredSerializers ++=
         Serializers.serializers.map(x =>
-              RegisteredSerializer(x.serializer, x.unserializer, x.manifest))
+          RegisteredSerializer(x.serializer, x.unserializer, x.manifest))
   )
 
   val allInput: Parser[String] = {

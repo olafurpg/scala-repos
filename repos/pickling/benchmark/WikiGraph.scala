@@ -33,10 +33,10 @@ final class Vertex(val label: String, var neighbors: List[Vertex])
   def sameAs(other: Vertex): Boolean = {
     (this ne other) && this.label == other.label &&
     (this.neighbors.length == other.neighbors.length && this.neighbors
-          .zip(other.neighbors)
-          .forall {
-            case (thisv, otherv) => thisv.label == otherv.label
-          })
+      .zip(other.neighbors)
+      .forall {
+        case (thisv, otherv) => thisv.label == otherv.label
+      })
   }
 
   override def toString = "Vertex(" + label + ")"

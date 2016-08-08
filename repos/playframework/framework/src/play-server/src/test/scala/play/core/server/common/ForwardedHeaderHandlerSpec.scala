@@ -287,12 +287,11 @@ class ForwardedHeaderHandlerSpec extends Specification {
     "kind of unquote rfc7239 header field with three \" characters" in {
       handler(
           version("rfc7239") ++ trustedProxies("192.168.1.1/24", "127.0.0.1"))
-        .remoteConnection(
-            localhost,
-            false,
-            headers("""
+        .remoteConnection(localhost,
+                          false,
+                          headers("""
           |Forwarded: for=""" + '"' + '"' +
-                  '"' + """
+                            '"' + """
           |Forwarded: for=192.168.1.10, for=127.0.0.1
         """.stripMargin)) mustEqual ConnectionInfo(addr("192.168.1.10"), false)
     }

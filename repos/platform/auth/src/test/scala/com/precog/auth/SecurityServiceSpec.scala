@@ -591,11 +591,10 @@ class SecurityServiceSpec
                                                                    None,
                                                                    Set.empty[
                                                                        GrantId],
-                                                                   Set(
-                                                                       ReadPermission(
-                                                                           Path("/user1/secret"),
-                                                                           WrittenByAccount(
-                                                                               "user1"))),
+                                                                   Set(ReadPermission(
+                                                                       Path("/user1/secret"),
+                                                                       WrittenByAccount(
+                                                                           "user1"))),
                                                                    None))
         details = jid.deserialize[v1.GrantDetails]
         HttpResponse(HttpStatus(OK, _), _, Some(jgs), _) <- getGrantChildren(
@@ -636,11 +635,10 @@ class SecurityServiceSpec
                                                                    None,
                                                                    None,
                                                                    Set.empty,
-                                                                   Set(
-                                                                       ReadPermission(
-                                                                           Path("/user1/public"),
-                                                                           WrittenByAccount(
-                                                                               "user1"))),
+                                                                   Set(ReadPermission(
+                                                                       Path("/user1/public"),
+                                                                       WrittenByAccount(
+                                                                           "user1"))),
                                                                    None))
         _ <- addAPIKeyGrant(user1.apiKey,
                             user4.apiKey,

@@ -169,7 +169,7 @@ class SocketServerTest extends JUnitSuite {
 
     // make sure the sockets are open
     server.acceptors.values.map(acceptor =>
-          assertFalse(acceptor.serverChannel.socket.isClosed))
+      assertFalse(acceptor.serverChannel.socket.isClosed))
     // then shutdown the server
     server.shutdown()
 

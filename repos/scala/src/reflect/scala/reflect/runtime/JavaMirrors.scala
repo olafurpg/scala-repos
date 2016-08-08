@@ -127,12 +127,12 @@ private[scala] trait JavaMirrors
     private implicit val tparamHasJavaClass: HasJavaClass[
         jTypeVariable[_ <: GenericDeclaration]] = new HasJavaClass(
         (tparam: jTypeVariable[_ <: GenericDeclaration]) => {
-      tparam.getGenericDeclaration match {
-        case jclazz: jClass[_] => jclazz
-        case jmeth: jMethod => jmeth.getDeclaringClass
-        case jconstr: jConstructor[_] => jconstr.getDeclaringClass
-      }
-    })
+          tparam.getGenericDeclaration match {
+            case jclazz: jClass[_] => jclazz
+            case jmeth: jMethod => jmeth.getDeclaringClass
+            case jconstr: jConstructor[_] => jconstr.getDeclaringClass
+          }
+        })
 
 // ----------- Implementations of mirror operations and classes  -------------------
 
@@ -224,9 +224,9 @@ private[scala] trait JavaMirrors
       // currently I'm simply sorting the methods to guarantee stability of the output
       override lazy val assocs: List[(Name, ClassfileAnnotArg)] =
         (jann.annotationType.getDeclaredMethods.sortBy(_.getName).toList map
-              (m =>
-                 TermName(m.getName) -> toAnnotArg(
-                     m.getReturnType -> m.invoke(jann))))
+          (m =>
+             TermName(m.getName) -> toAnnotArg(
+                 m.getReturnType -> m.invoke(jann))))
     }
 
     def reflect[T: ClassTag](obj: T): InstanceMirror =
@@ -367,7 +367,7 @@ private[scala] trait JavaMirrors
       (meth.name string_== "getClass") && meth.paramss.flatten.isEmpty
     private def isStringConcat(meth: MethodSymbol) =
       meth == String_+ || (meth.owner.isPrimitiveValueClass &&
-            meth.returnType =:= StringClass.toType)
+        meth.returnType =:= StringClass.toType)
     lazy val bytecodelessMethodOwners =
       Set[Symbol](AnyClass, AnyValClass, AnyRefClass, ObjectClass, ArrayClass) ++ ScalaPrimitiveValueClasses
     lazy val bytecodefulObjectMethods =
@@ -810,9 +810,9 @@ private[scala] trait JavaMirrors
               (anns exists (_.annotationType.getName == name)))
             throw new ClassNotFoundException(
                 sm"""Mirror classloader mismatch: $jclazz (loaded by ${ReflectionUtils
-              .show(jclazz.getClassLoader)})
+                  .show(jclazz.getClassLoader)})
                   |is unrelated to the mirror's classloader: (${ReflectionUtils
-              .show(classLoader)})""")
+                  .show(classLoader)})""")
           result
         }
       def loadBytes[T: ClassTag](name: String): Option[T] =
@@ -961,7 +961,7 @@ private[scala] trait JavaMirrors
       override def load(sym: Symbol): Unit = {
         debugInfo("completing from Java " + sym + "/" + clazz.fullName) //debug
         assert(sym == clazz || (module != NoSymbol &&
-                     (sym == module || sym == module.moduleClass)),
+                 (sym == module || sym == module.moduleClass)),
                sym)
 
         assignAssociatedFile(clazz, module, jclazz)
@@ -1130,7 +1130,7 @@ private[scala] trait JavaMirrors
     private def lookup(clazz: Symbol, jname: String): Symbol = {
       def approximateMatch(sym: Symbol, jstr: String): Boolean =
         ((sym.name string_== jstr) || sym.isPrivate &&
-              (nme.expandedName(sym.name.toTermName, sym.owner) string_== jstr))
+          (nme.expandedName(sym.name.toTermName, sym.owner) string_== jstr))
 
       clazz.info.decl(newTermName(jname)) orElse {
         (clazz.info.decls.iterator filter (approximateMatch(_, jname))).toList match {
@@ -1154,7 +1154,7 @@ private[scala] trait JavaMirrors
       val preOwner = classToScala(jOwner)
       val owner = followStatic(preOwner, jmeth.javaFlags)
       (lookup(owner, jmeth.getName) suchThat (erasesTo(_, jmeth)) orElse jmethodAsScala(
-              jmeth)).asMethod
+          jmeth)).asMethod
     }
 
     /**
@@ -1169,7 +1169,7 @@ private[scala] trait JavaMirrors
       val owner = followStatic(classToScala(jconstr.getDeclaringClass),
                                jconstr.javaFlags)
       (lookup(owner, jconstr.getName) suchThat (erasesTo(_, jconstr)) orElse jconstrAsScala(
-              jconstr)).asMethod
+          jconstr)).asMethod
     }
 
     /**
@@ -1330,8 +1330,8 @@ private[scala] trait JavaMirrors
           val tparam = owner
             .newExistential(newTypeName("T$" + tparams.length))
             .setInfo(TypeBounds(
-                    lub(jwild.getLowerBounds.toList map typeToScala),
-                    glb(jwild.getUpperBounds.toList map typeToScala map objToAny)))
+                lub(jwild.getLowerBounds.toList map typeToScala),
+                glb(jwild.getUpperBounds.toList map typeToScala map objToAny)))
           tparams += tparam
           typeRef(NoPrefix, tparam, List())
         case _ =>

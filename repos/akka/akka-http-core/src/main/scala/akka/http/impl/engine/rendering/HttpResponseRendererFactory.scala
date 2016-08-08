@@ -274,7 +274,7 @@ private[http] class HttpResponseRendererFactory(
                   alwaysClose ||
                   // if the client wants to close and we don't override
                   (ctx.closeRequested &&
-                      ((connHeader eq null) || !connHeader.hasKeepAlive)) ||
+                  ((connHeader eq null) || !connHeader.hasKeepAlive)) ||
                   // if the application wants to close explicitly
                   (protocol match {
                     case `HTTP/1.1` ⇒
@@ -343,8 +343,8 @@ private[http] class HttpResponseRendererFactory(
                 renderEntityContentType(r, entity)
                 renderContentLengthHeader(contentLength) ~~ CrLf
                 Streamed(
-                    byteStrings(data.via(CheckContentLengthTransformer.flow(
-                                contentLength))))
+                    byteStrings(data.via(
+                        CheckContentLengthTransformer.flow(contentLength))))
 
               case HttpEntity.CloseDelimited(_, data) ⇒
                 renderHeaders(headers.toList,

@@ -140,7 +140,7 @@ class JdbcRDD[T: ClassTag](sc: SparkContext,
 object JdbcRDD {
   def resultSetToObjectArray(rs: ResultSet): Array[Object] = {
     Array.tabulate[Object](rs.getMetaData.getColumnCount)(i =>
-          rs.getObject(i + 1))
+      rs.getObject(i + 1))
   }
 
   trait ConnectionFactory extends Serializable {

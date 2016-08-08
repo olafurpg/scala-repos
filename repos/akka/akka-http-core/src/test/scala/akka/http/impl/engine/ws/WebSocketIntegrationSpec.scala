@@ -78,10 +78,10 @@ class WebSocketIntegrationSpec
           .webSocketClientLayer(WebSocketRequest("ws://localhost:" + myPort))
           .atop(TLSPlacebo())
           .joinMat(Flow
-                .fromGraph(GraphStages.breaker[ByteString])
-                .via(Tcp().outgoingConnection(
-                        new InetSocketAddress("localhost", myPort),
-                        halfClose = true)))(Keep.both)
+            .fromGraph(GraphStages.breaker[ByteString])
+            .via(Tcp().outgoingConnection(new InetSocketAddress("localhost",
+                                                                myPort),
+                                          halfClose = true)))(Keep.both)
       }(Keep.right).toMat(TestSink.probe[Message])(Keep.both).run()
 
       response.futureValue.response.status.isSuccess should ===(true)

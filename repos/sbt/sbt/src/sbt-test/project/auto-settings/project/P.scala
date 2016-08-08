@@ -30,12 +30,12 @@ object B extends Build {
   lazy val e =
     project("e", "1.1") settings (version := "0.9") settingSets
       (buildScalaFiles, defaultSbtFiles, sbtFiles(file("../explicit/a.txt")),
-          userSettings)
+      userSettings)
 
   def project(id: String, expectedVersion: String): Project =
     Project(id, if (id == "root") file(".") else file(id)) settings
       (TaskKey[Unit]("check") <<= version map { v =>
-            assert(v == expectedVersion,
-                   "Expected version '" + expectedVersion + "', got: " + v)
-          })
+        assert(v == expectedVersion,
+               "Expected version '" + expectedVersion + "', got: " + v)
+      })
 }

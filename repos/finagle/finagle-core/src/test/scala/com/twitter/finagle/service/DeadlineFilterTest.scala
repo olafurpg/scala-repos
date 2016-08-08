@@ -60,7 +60,7 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
         val res = deadlineService("marco")
         assert(statsReceiver.counters.get(List("exceeded")) == None)
         assert(statsReceiver.counters
-              .get(List("exceeded_beyond_tolerance")) == None)
+          .get(List("exceeded_beyond_tolerance")) == None)
         assert(statsReceiver.counters.get(List("rejected")) == None)
         assert(Await.result(res, 1.second) == "polo")
       }
@@ -156,17 +156,16 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
         val res = deadlineService("marco")
         assert(statsReceiver.counters.get(List("exceeded")) == None)
         assert(statsReceiver.counters
-              .get(List("exceeded_beyond_tolerance")) == Some(1))
+          .get(List("exceeded_beyond_tolerance")) == Some(1))
         assert(statsReceiver.counters.get(List("rejected")) == None)
         assert(Await.result(res, 1.second) == "polo")
       }
     }
   }
 
-  test(
-      "When the deadline is exceeded and within the tolerance threshold, " +
-        "but the reject token bucket contains too few tokens, DeadlineFilter " +
-        "should service the request and increment the exceeded stat") {
+  test("When the deadline is exceeded and within the tolerance threshold, " +
+    "but the reject token bucket contains too few tokens, DeadlineFilter " +
+    "should service the request and increment the exceeded stat") {
     val h = new DeadlineFilterHelper
     import h._
 
@@ -179,17 +178,16 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
         val res = deadlineService("marco")
         assert(statsReceiver.counters.get(List("exceeded")) == Some(1))
         assert(statsReceiver.counters
-              .get(List("exceeded_beyond_tolerance")) == None)
+          .get(List("exceeded_beyond_tolerance")) == None)
         assert(statsReceiver.counters.get(List("rejected")) == None)
         assert(Await.result(res, 1.second) == "polo")
       }
     }
   }
 
-  test(
-      "When the deadline is exceeded and within the tolerance threshold, and " +
-        "the reject token bucket contains sufficient tokens, DeadlineFilter " +
-        "should service the request and increment the exceeded and rejected stats") {
+  test("When the deadline is exceeded and within the tolerance threshold, and " +
+    "the reject token bucket contains sufficient tokens, DeadlineFilter " +
+    "should service the request and increment the exceeded and rejected stats") {
     val h = new DeadlineFilterHelper
     import h._
 
@@ -202,7 +200,7 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
         assert(Await.result(deadlineService("marco"), 1.second) == "polo")
         assert(statsReceiver.counters.get(List("exceeded")) == Some(1))
         assert(statsReceiver.counters
-              .get(List("exceeded_beyond_tolerance")) == None)
+          .get(List("exceeded_beyond_tolerance")) == None)
         assert(statsReceiver.counters.get(List("rejected")) == Some(1))
       }
     }
@@ -349,14 +347,14 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
         tc.advance(7.seconds)
         assert(Await.result(service("marco"), 1.second) == "polo")
         assert(statsReceiver.counters.get(
-                List("admission_control", "deadline", "exceeded")) == Some(1))
+            List("admission_control", "deadline", "exceeded")) == Some(1))
         assert(
             statsReceiver.counters.get(
                 List("admission_control",
                      "deadline",
                      "exceeded_beyond_tolerance")) == None)
         assert(statsReceiver.counters.get(
-                List("admission_control", "deadline", "rejected")) == Some(1))
+            List("admission_control", "deadline", "rejected")) == Some(1))
       }
     }
   }

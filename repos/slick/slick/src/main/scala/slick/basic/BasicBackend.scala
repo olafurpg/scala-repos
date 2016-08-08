@@ -180,7 +180,7 @@ trait BasicBackend { self =>
         case FutureAction(f) => f
         case FlatMapAction(base, f, ec) =>
           runInContext(base, ctx, false, topLevel).flatMap(v =>
-                runInContext(f(v), ctx, streaming, false))(ctx.getEC(ec))
+            runInContext(f(v), ctx, streaming, false))(ctx.getEC(ec))
         case AndThenAction(actions) =>
           val last = actions.length - 1
           def run(pos: Int, v: Any): Future[Any] = {
@@ -240,7 +240,7 @@ trait BasicBackend { self =>
         case AsTryAction(a) =>
           val p = Promise[R]()
           runInContext(a, ctx, false, topLevel).onComplete(v =>
-                p.success(v.asInstanceOf[R]))(DBIO.sameThreadExecutionContext)
+            p.success(v.asInstanceOf[R]))(DBIO.sameThreadExecutionContext)
           p.future
         case NamedAction(a, _) =>
           runInContext(a, ctx, streaming, topLevel)
@@ -366,8 +366,7 @@ trait BasicBackend { self =>
                     if (debug)
                       streamLogger.debug((if (state eq null) "Starting initial"
                                           else "Restarting ") +
-                            " streaming action, realDemand = " + str(
-                              realDemand))
+                        " streaming action, realDemand = " + str(realDemand))
                     if (ctx.cancelled) {
                       if (ctx.deferredError ne null) throw ctx.deferredError
                       if (state ne null) {

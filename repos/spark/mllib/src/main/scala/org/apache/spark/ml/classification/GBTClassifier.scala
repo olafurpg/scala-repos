@@ -168,10 +168,9 @@ final class GBTClassifier @Since("1.4.0")(
       MetadataUtils.getNumClasses(dataset.schema($(labelCol))) match {
         case Some(n: Int) => n
         case None =>
-          throw new IllegalArgumentException(
-              "GBTClassifier was given input" +
-                s" with invalid label column ${$(labelCol)}, without the number of classes" +
-                " specified. See StringIndexer.")
+          throw new IllegalArgumentException("GBTClassifier was given input" +
+            s" with invalid label column ${$(labelCol)}, without the number of classes" +
+            " specified. See StringIndexer.")
         // TODO: Automatically index labels: SPARK-7126
       }
     require(

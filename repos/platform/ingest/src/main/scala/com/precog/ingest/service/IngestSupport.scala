@@ -86,11 +86,10 @@ trait IngestSupport extends Logging {
         logger.warn(
             "Unable to resolve accounts for write from %s owners %s to path %s"
               .format(apiKey, request.parameters.get('ownerAccountId), path))
-        M.point(
-            HttpResponse[JValue](
-                Forbidden,
-                content = Some(JString(
-                        "Either the ownerAccountId parameter you specified could not be resolved to a set of permitted accounts, or the API key specified was invalid."))))
+        M.point(HttpResponse[JValue](
+            Forbidden,
+            content = Some(JString(
+                "Either the ownerAccountId parameter you specified could not be resolved to a set of permitted accounts, or the API key specified was invalid."))))
     }
   }
 }

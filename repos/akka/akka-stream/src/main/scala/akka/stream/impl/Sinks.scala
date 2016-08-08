@@ -384,22 +384,21 @@ final private[stream] class QueueSink[T]()
         stopCallback(
             promise ⇒
               promise.failure(new IllegalStateException(
-                      "Stream is terminated. QueueSink is detached")))
+                  "Stream is terminated. QueueSink is detached")))
 
-      private val callback: AsyncCallback[Requested[T]] = getAsyncCallback(
-          promise ⇒
-            currentRequest match {
-          case Some(_) ⇒
-            promise.failure(
-                new IllegalStateException(
-                    "You have to wait for previous future to be resolved to send another request"))
-          case None ⇒
-            if (buffer.isEmpty) currentRequest = Some(promise)
-            else {
-              if (buffer.used == maxBuffer) tryPull(in)
-              sendDownstream(promise)
-            }
-      })
+      private val callback: AsyncCallback[Requested[T]] =
+        getAsyncCallback(promise ⇒
+          currentRequest match {
+            case Some(_) ⇒
+              promise.failure(new IllegalStateException(
+                  "You have to wait for previous future to be resolved to send another request"))
+            case None ⇒
+              if (buffer.isEmpty) currentRequest = Some(promise)
+              else {
+                if (buffer.used == maxBuffer) tryPull(in)
+                sendDownstream(promise)
+              }
+        })
 
       def sendDownstream(promise: Requested[T]): Unit = {
         val e = buffer.dequeue()

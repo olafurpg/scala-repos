@@ -115,7 +115,7 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
     ssc = setupStreams(input, (inputDStream: DStream[LabeledPoint]) => {
       model.trainOn(inputDStream)
       inputDStream.foreachRDD(x =>
-            history.append(math.abs(model.latestModel().weights(0) - 10.0)))
+        history.append(math.abs(model.latestModel().weights(0) - 10.0)))
       inputDStream.count()
     })
     runStreams(ssc, numBatches, numBatches)

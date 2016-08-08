@@ -178,7 +178,7 @@ class ReverseArrowSpec extends AkkaSpec {
                        Source.empty ~> f
                        src ~> f
                        (the[IllegalArgumentException] thrownBy
-                             (s <~ f <~ src)).getMessage should include(
+                         (s <~ f <~ src)).getMessage should include(
                            "no more inlets free")
                        ClosedShape
                      })
@@ -201,21 +201,21 @@ class ReverseArrowSpec extends AkkaSpec {
     }
 
     "fail towards already full UniformFanOutShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       val f: UniformFanOutShape[Int, Int] =
-                         b.add(Broadcast[Int](2))
-                       val sink2: SinkShape[Int] = b.add(Sink.ignore)
-                       val src = b.add(source)
-                       src ~> f
-                       sink2 <~ f
-                       (the[IllegalArgumentException] thrownBy
-                             (s <~ f <~ src)).getMessage should include(
-                           "already connected")
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+          RunnableGraph
+            .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+              val f: UniformFanOutShape[Int, Int] =
+                b.add(Broadcast[Int](2))
+              val sink2: SinkShape[Int] = b.add(Sink.ignore)
+              val src = b.add(source)
+              src ~> f
+              sink2 <~ f
+              (the[IllegalArgumentException] thrownBy
+                (s <~ f <~ src)).getMessage should include("already connected")
+              ClosedShape
+            })
+            .run(),
+          1.second) should ===(Seq(1, 2, 3))
     }
 
     "work across a Flow" in {

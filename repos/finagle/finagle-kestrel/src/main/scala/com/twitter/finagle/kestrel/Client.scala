@@ -341,7 +341,7 @@ abstract protected[kestrel] class CommandExecutorFactory[U] extends Closable {
   *                items
   */
 abstract protected[kestrel] class ClientBase[CommandExecutor <: Closable,
-    Reply, ItemId](underlying: CommandExecutorFactory[CommandExecutor])
+Reply, ItemId](underlying: CommandExecutorFactory[CommandExecutor])
     extends Client {
 
   /**
@@ -574,13 +574,13 @@ protected[kestrel] class ThriftConnectedClient(
 
   def flush(queueName: String): Future[Response] =
     withClient[Values](client =>
-          client.flushQueue(queueName).map { _ =>
+      client.flushQueue(queueName).map { _ =>
         Values(Nil)
     })
 
   def delete(queueName: String): Future[Response] =
     withClient[Response](client =>
-          client.deleteQueue(queueName).map { _ =>
+      client.deleteQueue(queueName).map { _ =>
         Deleted()
     })
 
@@ -593,15 +593,15 @@ protected[kestrel] class ThriftConnectedClient(
           client
             .put(queueName, List(Buf.ByteBuffer.Owned.extract(value)), timeout)
             .map { _ =>
-          Stored()
-      })
+              Stored()
+          })
   }
 
   def get(queueName: String,
           waitUpTo: Duration = 0.seconds): Future[Option[Buf]] = {
     val waitUpToMsec = safeLongToInt(waitUpTo.inMilliseconds)
     withClient[Option[Buf]](client =>
-          client.get(queueName, 1, waitUpToMsec).map {
+      client.get(queueName, 1, waitUpToMsec).map {
         case Seq() => None
         case Seq(item: Item) => Some(Buf.ByteBuffer.Owned(item.data))
         case _ => throw new IllegalArgumentException

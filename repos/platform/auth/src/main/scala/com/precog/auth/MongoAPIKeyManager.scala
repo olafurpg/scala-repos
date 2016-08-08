@@ -280,8 +280,10 @@ class MongoAPIKeyManager(
 
   def findGrant(gid: GrantId) =
     ToPlusOps[({ type λ[α] = Future[Option[α]] })#λ, Grant](findOneMatching[
-            Grant]("grantId", gid, settings.grants)) <+> findOneMatching[
-        Grant]("gid", gid, settings.grants)
+        Grant]("grantId", gid, settings.grants)) <+> findOneMatching[Grant](
+        "gid",
+        gid,
+        settings.grants)
 
   def findGrantChildren(gid: GrantId) = findGrantChildren(gid, settings.grants)
 
@@ -300,7 +302,7 @@ class MongoAPIKeyManager(
 
   def findDeletedGrant(gid: GrantId) =
     ToPlusOps[({ type λ[α] = Future[Option[α]] })#λ, Grant](findOneMatching[
-            Grant]("grantId", gid, settings.deletedGrants)) <+> findOneMatching[
+        Grant]("grantId", gid, settings.deletedGrants)) <+> findOneMatching[
         Grant]("gid", gid, settings.deletedGrants)
 
   def findDeletedGrantChildren(gid: GrantId) =
@@ -309,7 +311,7 @@ class MongoAPIKeyManager(
   // This has to account for structural changes between v0 and v1 grant documents
   private def findGrantChildren(gid: GrantId, collection: String) =
     ToPlusOps[({ type λ[α] = Future[Set[α]] })#λ, Grant](findAllIncluding[
-            Grant]("parentIds", gid, collection)) <+> findAllMatching[Grant](
+        Grant]("parentIds", gid, collection)) <+> findAllMatching[Grant](
         "issuer",
         gid,
         collection)

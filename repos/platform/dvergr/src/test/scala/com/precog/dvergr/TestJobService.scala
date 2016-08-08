@@ -97,8 +97,8 @@ class JobServiceSpec extends TestJobService {
   def startJob(ts: Option[DateTime] = None): JValue = JObject(
       JField("state", JString("started")) ::
         (ts map { dt =>
-              JField("timestamp", dt.serialize) :: Nil
-            } getOrElse Nil)
+          JField("timestamp", dt.serialize) :: Nil
+        } getOrElse Nil)
   )
 
   def postJob(job: JValue, apiKey: String = validAPIKey) =
@@ -542,16 +542,15 @@ class JobServiceSpec extends TestJobService {
         res1 <- putStatusRaw(jobId, None)(JObject(Nil))
         res2 <- putStatusRaw(jobId, None)(
                    JObject(JField("message", JString("a")) :: JField(
-                           "unit",
-                           JString("%")) :: Nil))
-        res3 <- putStatusRaw(jobId, None)(
-                   JObject(JField("message", JString("a")) :: JField(
-                           "progress",
-                           JNum(99)) :: Nil))
+                       "unit",
+                       JString("%")) :: Nil))
+        res3 <- putStatusRaw(jobId, None)(JObject(
+                   JField("message", JString("a")) :: JField("progress",
+                                                             JNum(99)) :: Nil))
         res4 <- putStatusRaw(jobId, None)(
                    JObject(JField("progress", JNum(99)) :: JField(
-                           "unit",
-                           JString("%")) :: Nil))
+                       "unit",
+                       JString("%")) :: Nil))
       } yield (res1, res2, res3, res4)).copoint
 
       def mustBeBad(res: HttpResponse[JValue]) = res must beLike {

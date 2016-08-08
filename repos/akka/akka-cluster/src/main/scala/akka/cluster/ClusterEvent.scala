@@ -353,7 +353,7 @@ object ClusterEvent {
 
       val removedMembers = oldGossip.members diff newGossip.members
       val removedEvents = removedMembers.map(m ⇒
-            MemberRemoved(m.copy(status = Removed), m.status))
+        MemberRemoved(m.copy(status = Removed), m.status))
 
       (new VectorBuilder[MemberEvent]() ++= memberEvents ++= removedEvents)
         .result()
@@ -464,11 +464,9 @@ private[cluster] final class ClusterDomainEventPublisher
         unreachable = unreachable,
         seenBy = latestGossip.seenBy.map(_.address),
         leader = latestGossip.leader(selfUniqueAddress).map(_.address),
-        roleLeaderMap = latestGossip.allRoles.map(
-            r ⇒
-              r -> latestGossip
-                .roleLeader(r, selfUniqueAddress)
-                .map(_.address))(collection.breakOut))
+        roleLeaderMap = latestGossip.allRoles.map(r ⇒
+          r -> latestGossip.roleLeader(r, selfUniqueAddress).map(_.address))(
+            collection.breakOut))
     receiver ! state
   }
 

@@ -154,7 +154,7 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
                   if typed.getType().getOrAny.conforms(expectedType) =>
                 variant.isLocalVariable =
                   (typed.isVar || typed.isVal) && (typed.containingFile exists
-                        (_.getName == parameters.getOriginalFile.getName))
+                    (_.getName == parameters.getOriginalFile.getName))
                 apply(variant)
               case _ => // do nothing
             }

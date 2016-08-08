@@ -75,7 +75,7 @@ object ProdServerStart {
     val configuration: Configuration = {
       val rootDirArg: Option[File] = process.args.headOption.map(new File(_))
       val rootDirConfig = rootDirArg.fold(Map.empty[String, String])(dir =>
-            ServerConfig.rootDirConfig(dir))
+        ServerConfig.rootDirConfig(dir))
       Configuration
         .load(process.classLoader, process.properties, rootDirConfig, true)
     }

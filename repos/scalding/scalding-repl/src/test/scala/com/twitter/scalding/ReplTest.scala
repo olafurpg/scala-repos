@@ -183,7 +183,7 @@ class ReplTest extends WordSpec {
       }
       "tuple" in {
         assert(hello.map(l => (l, l.length)).toList === helloRef.map(l =>
-                  (l, l.length)))
+          (l, l.length)))
       }
     }
   }

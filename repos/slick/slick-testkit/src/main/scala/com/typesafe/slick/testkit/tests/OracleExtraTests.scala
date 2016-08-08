@@ -45,7 +45,7 @@ class OracleExtraTests extends AsyncTest[JdbcTestDB] {
           .result
           .map(_ shouldBe Nil),
         as.filter(_ =>
-                LiteralColumn[Option[Int]](None) === (None: Option[Int]))
+            LiteralColumn[Option[Int]](None) === (None: Option[Int]))
           .map(_.id)
           .result
           .map(_ shouldBe Nil)

@@ -36,7 +36,7 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
     val qual = gen.mkAttributedStableRef(qualSym)
     val importSym =
       (NoSymbol newImport NoPosition setFlag SYNTHETIC setInfo ImportType(
-              qual))
+          qual))
     val importTree =
       (Import(qual, selector) setSymbol importSym setType NoType)
     importTree

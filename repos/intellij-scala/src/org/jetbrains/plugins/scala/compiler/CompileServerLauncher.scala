@@ -64,7 +64,7 @@ class CompileServerLauncher extends ApplicationComponent {
         }
 
       choice.foreach(sdk =>
-            applicationSettings.COMPILE_SERVER_SDK = sdk.getName)
+        applicationSettings.COMPILE_SERVER_SDK = sdk.getName)
 
 //       val message = "JVM SDK is automatically selected: " + name +
 //               "\n(can be changed in Application Settings / Scala)"

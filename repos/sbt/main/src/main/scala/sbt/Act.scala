@@ -160,7 +160,7 @@ object Act {
     val sep = ':' !!! "Expected ':' (if selecting a configuration)"
     token(
         (GlobalString ^^^ ParsedGlobal | value(
-                examples(ID, confs, "configuration"))) <~ sep) ?? Omitted
+            examples(ID, confs, "configuration"))) <~ sep) ?? Omitted
   }
 
   def configs(explicit: ParsedAxis[String],

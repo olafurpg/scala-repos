@@ -93,7 +93,7 @@ class OpenHashMap[Key, Value](initialSize: Int)
     table = new Array[Entry](newSize)
     mask = newSize - 1
     oldTable.foreach(entry =>
-          if (entry != null && entry.value != None) addEntry(entry))
+      if (entry != null && entry.value != None) addEntry(entry))
     deleted = 0
   }
 
@@ -257,7 +257,7 @@ class OpenHashMap[Key, Value](initialSize: Int)
 
   override def retain(f: (Key, Value) => Boolean) = {
     foreachUndeletedEntry(entry =>
-          if (!f(entry.key, entry.value.get)) {
+      if (!f(entry.key, entry.value.get)) {
         entry.value = None; size -= 1; deleted += 1
     })
     this

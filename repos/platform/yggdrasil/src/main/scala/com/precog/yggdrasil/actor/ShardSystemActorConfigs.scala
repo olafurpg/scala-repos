@@ -132,15 +132,16 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
                   maxCacheSize = conf.maxParallel,
                   maxConsecutiveFailures = conf.maxConsecutiveFailures) {
 
-            implicit val M = new FutureMonad(
-                ExecutionContext.defaultExecutionContext(actorSystem))
+                implicit val M = new FutureMonad(
+                    ExecutionContext.defaultExecutionContext(actorSystem))
 
-            def handleBatchComplete(ck: YggCheckpoint) {
-              logger.debug("Complete up to " + ck)
-              checkpointCoordination.saveYggCheckpoint(yggConfig.shardId, ck)
-              logger.info("Saved checkpoint: " + ck)
-            }
-          }),
+                def handleBatchComplete(ck: YggCheckpoint) {
+                  logger.debug("Complete up to " + ck)
+                  checkpointCoordination.saveYggCheckpoint(yggConfig.shardId,
+                                                           ck)
+                  logger.info("Saved checkpoint: " + ck)
+                }
+              }),
           "ingest")
     }
   }

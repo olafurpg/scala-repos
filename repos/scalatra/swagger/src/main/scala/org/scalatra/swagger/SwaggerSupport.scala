@@ -693,7 +693,7 @@ trait SwaggerSupport
         route.metadata.get(Symbols.ResponseClass) map
           (_.asInstanceOf[DataType]) getOrElse DataType.Void
       val summary = (route.metadata.get(Symbols.Summary) map
-            (_.asInstanceOf[String])).orNull
+        (_.asInstanceOf[String])).orNull
       val notes =
         route.metadata.get(Symbols.Notes) map (_.asInstanceOf[String])
       val nick =

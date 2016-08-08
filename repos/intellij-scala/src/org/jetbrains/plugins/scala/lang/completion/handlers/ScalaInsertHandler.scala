@@ -210,7 +210,7 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
           }
         }
       } else if (withSpace && (nextChar != ' ' ||
-                     documentText.charAt(endOffset + 1) != openChar)) {
+                 documentText.charAt(endOffset + 1) != openChar)) {
         document.insertString(endOffset, " ")
         shiftEndOffset(1, withSomeNum = false)
         insertIfNeeded(placeInto,

@@ -1206,16 +1206,12 @@ class BlockManagerSuite
                       tellMaster = false)
 
     // getLocations and getBlockStatus should yield the same locations
-    assert(
-        store.master
-          .getMatchingBlockIds(_.toString.contains("newlist"),
-                               askSlaves = false)
-          .size === 1)
-    assert(
-        store.master
-          .getMatchingBlockIds(_.toString.contains("newlist"),
-                               askSlaves = true)
-          .size === 3)
+    assert(store.master
+      .getMatchingBlockIds(_.toString.contains("newlist"), askSlaves = false)
+      .size === 1)
+    assert(store.master
+      .getMatchingBlockIds(_.toString.contains("newlist"), askSlaves = true)
+      .size === 3)
 
     val blockIds = Seq(RDDBlockId(1, 0), RDDBlockId(1, 1), RDDBlockId(2, 0))
     blockIds.foreach { blockId =>
@@ -1301,14 +1297,10 @@ class BlockManagerSuite
     assert(memoryStore.remove("unroll"))
 
     // Unroll with not enough space. This should succeed after kicking out someBlock1.
-    assert(
-        store.putIterator("someBlock1",
-                          smallList.iterator,
-                          StorageLevel.MEMORY_ONLY))
-    assert(
-        store.putIterator("someBlock2",
-                          smallList.iterator,
-                          StorageLevel.MEMORY_ONLY))
+    assert(store
+      .putIterator("someBlock1", smallList.iterator, StorageLevel.MEMORY_ONLY))
+    assert(store
+      .putIterator("someBlock2", smallList.iterator, StorageLevel.MEMORY_ONLY))
     putResult = memoryStore
       .putIterator("unroll", smallList.iterator, StorageLevel.MEMORY_ONLY)
     assert(putResult.isRight)
@@ -1324,10 +1316,8 @@ class BlockManagerSuite
     // Unroll huge block with not enough space. Even after ensuring free space of 12000 * 0.4 =
     // 4800 bytes, there is still not enough room to unroll this block. This returns an iterator.
     // In the mean time, however, we kicked out someBlock2 before giving up.
-    assert(
-        store.putIterator("someBlock3",
-                          smallList.iterator,
-                          StorageLevel.MEMORY_ONLY))
+    assert(store
+      .putIterator("someBlock3", smallList.iterator, StorageLevel.MEMORY_ONLY))
     putResult = memoryStore
       .putIterator("unroll", bigList.iterator, StorageLevel.MEMORY_ONLY)
     assert(memoryStore.currentUnrollMemoryForThisTask > 0) // we returned an iterator

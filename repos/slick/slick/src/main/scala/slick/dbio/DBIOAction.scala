@@ -137,13 +137,12 @@ sealed trait DBIOAction[+R, +S <: NoStream, -E <: Effect] extends Dumpable {
     * If this action fails, the resulting action also fails. */
   def collect[R2](pf: PartialFunction[R, R2])(
       implicit executor: ExecutionContext): DBIOAction[R2, NoStream, E] =
-    map(
-        r1 =>
-          pf.applyOrElse(
-              r1,
-              (r: R) =>
-                throw new NoSuchElementException(
-                    s"DBIOAction.collect partial function is not defined at: $r")))
+    map(r1 =>
+      pf.applyOrElse(
+          r1,
+          (r: R) =>
+            throw new NoSuchElementException(
+                s"DBIOAction.collect partial function is not defined at: $r")))
 
   /** Return an action which contains the Throwable with which this action failed as its result.
     * If this action succeeded, the resulting action fails with a NoSuchElementException. */
@@ -375,7 +374,8 @@ object DBIOAction {
         var err: Throwable = null
         var r = first
         while (r ne null) {
-          try r.run() catch { case t: Throwable => err = t }
+          try r.run()
+          catch { case t: Throwable => err = t }
           trampoline.get() match {
             case r2 :: rest =>
               trampoline.set(rest)
@@ -572,13 +572,10 @@ trait SynchronousDatabaseAction[
   override def andThen[R2, S2 <: NoStream, E2 <: Effect](
       a: DBIOAction[R2, S2, E2]): DBIOAction[R2, S2, E with E2] = a match {
     case a: SynchronousDatabaseAction.FusedAndThenAction[_, _, _, _] =>
-      new SynchronousDatabaseAction.FusedAndThenAction[R2, S2, B, E with E2](
-          self
-            .asInstanceOf[SynchronousDatabaseAction[Any, S2, B, E with E2]] +: a.as
-            .asInstanceOf[IndexedSeq[SynchronousDatabaseAction[Any,
-                                                               S2,
-                                                               B,
-                                                               E with E2]]])
+      new SynchronousDatabaseAction.FusedAndThenAction[R2, S2, B, E with E2](self
+        .asInstanceOf[SynchronousDatabaseAction[Any, S2, B, E with E2]] +: a.as
+        .asInstanceOf[IndexedSeq[
+            SynchronousDatabaseAction[Any, S2, B, E with E2]]])
     case a: SynchronousDatabaseAction[_, _, _, _] =>
       new SynchronousDatabaseAction.FusedAndThenAction[R2, S2, B, E with E2](
           Vector(self.asInstanceOf[SynchronousDatabaseAction[Any,
@@ -620,11 +617,13 @@ trait SynchronousDatabaseAction[
     case a: SynchronousDatabaseAction[_, _, _, _] =>
       new SynchronousDatabaseAction.Fused[R, S, B, E with E2] {
         def run(context: B#Context): R = {
-          val res = try self.run(context) catch {
+          val res = try self.run(context)
+          catch {
             case NonFatal(ex) =>
               try a
                 .asInstanceOf[SynchronousDatabaseAction[Any, NoStream, B, E2]]
-                .run(context) catch ignoreFollowOnError
+                .run(context)
+              catch ignoreFollowOnError
               throw ex
           }
           a.asInstanceOf[SynchronousDatabaseAction[Any, S, B, E2]].run(context)
@@ -641,7 +640,8 @@ trait SynchronousDatabaseAction[
     new SynchronousDatabaseAction.Fused[R, S, B, E] {
       def run(context: B#Context): R = {
         context.pin
-        val res = try self.run(context) catch {
+        val res = try self.run(context)
+        catch {
           case NonFatal(ex) =>
             context.unpin
             throw ex
@@ -674,7 +674,8 @@ trait SynchronousDatabaseAction[
   override def asTry: DBIOAction[Try[R], NoStream, E] =
     new SynchronousDatabaseAction.Fused[Try[R], NoStream, B, E] {
       def run(context: B#Context): Try[R] = {
-        try Success(self.run(context)) catch {
+        try Success(self.run(context))
+        catch {
           case NonFatal(ex) => Failure(ex)
         }
       }
@@ -708,15 +709,13 @@ object SynchronousDatabaseAction {
       case a: SynchronousDatabaseAction.FusedAndThenAction[_, _, _, _] =>
         new SynchronousDatabaseAction.FusedAndThenAction[R2, S2, B, E with E2](
             as.asInstanceOf[IndexedSeq[
-                    SynchronousDatabaseAction[Any, S2, B, E with E2]]] ++ a.as
-              .asInstanceOf[IndexedSeq[SynchronousDatabaseAction[Any,
-                                                                 S2,
-                                                                 B,
-                                                                 E with E2]]])
+                SynchronousDatabaseAction[Any, S2, B, E with E2]]] ++ a.as
+              .asInstanceOf[IndexedSeq[
+                  SynchronousDatabaseAction[Any, S2, B, E with E2]]])
       case a: SynchronousDatabaseAction[_, _, _, _] =>
         new SynchronousDatabaseAction.FusedAndThenAction[R2, S2, B, E with E2](
             as.asInstanceOf[IndexedSeq[
-                    SynchronousDatabaseAction[Any, S2, B, E with E2]]] :+ a
+                SynchronousDatabaseAction[Any, S2, B, E with E2]]] :+ a
               .asInstanceOf[SynchronousDatabaseAction[Any, S2, B, E with E2]])
       case a => super.andThen(a)
     }

@@ -98,9 +98,8 @@ class WindowedByteCounterTest
           nextPeriod()
         }
 
-        assert(
-            counter
-              .rate() == (WindowedByteCounter.N.kilobytes).inBytes / WindowedByteCounter.W.inMilliseconds)
+        assert(counter
+          .rate() == (WindowedByteCounter.N.kilobytes).inBytes / WindowedByteCounter.W.inMilliseconds)
     }
   }
 
@@ -116,19 +115,17 @@ class WindowedByteCounterTest
           nextPeriod()
         }
 
-        assert(
-            counter
-              .rate() == (WindowedByteCounter.N.kilobytes).inBytes / WindowedByteCounter.W.inMilliseconds)
+        assert(counter
+          .rate() == (WindowedByteCounter.N.kilobytes).inBytes / WindowedByteCounter.W.inMilliseconds)
 
         for (i <- 1 to WindowedByteCounter.N) {
           fakePool.setSnapshot(usage.copy(
-                  used = WindowedByteCounter.N.kilobytes + (i * 2).kilobytes))
+              used = WindowedByteCounter.N.kilobytes + (i * 2).kilobytes))
           nextPeriod()
         }
 
-        assert(
-            counter.rate() ==
-              (2 * (WindowedByteCounter.N.kilobytes).inBytes / WindowedByteCounter.W.inMilliseconds))
+        assert(counter.rate() ==
+          (2 * (WindowedByteCounter.N.kilobytes).inBytes / WindowedByteCounter.W.inMilliseconds))
     }
   }
 
@@ -180,9 +177,8 @@ class WindowedByteCounterTest
           nextPeriod()
         }
 
-        assert(
-            counter
-              .rate() == WindowedByteCounter.N.kilobytes.inBytes / WindowedByteCounter.W.inMilliseconds)
+        assert(counter
+          .rate() == WindowedByteCounter.N.kilobytes.inBytes / WindowedByteCounter.W.inMilliseconds)
     }
   }
 

@@ -84,10 +84,10 @@ object TestConfigurationUtil {
         //special handling for now, since only toString is allowed on integers
         refExpr.smartQualifier.flatMap(
             getStaticTestNameElement(_, allowSymbolLiterals) match {
-          case Some(string: String) => Some(string)
-          case Some(number: Number) => Some(number.toString)
-          case _ => None
-        })
+              case Some(string: String) => Some(string)
+              case Some(number: Number) => Some(number.toString)
+              case _ => None
+            })
       } else
         refExpr.smartQualifier
           .flatMap(getStaticTestNameRaw(_, allowSymbolLiterals))
@@ -116,11 +116,9 @@ object TestConfigurationUtil {
         infixExpr.getInvokedExpr match {
           case refExpr: ScReferenceExpression if refExpr.refName == "+" =>
             getStaticTestNameElement(infixExpr.lOp, allowSymbolLiterals)
-              .flatMap(
-                  left =>
-                    getStaticTestNameElement(
-                        infixExpr.rOp,
-                        allowSymbolLiterals).map(left + _.toString))
+              .flatMap(left =>
+                getStaticTestNameElement(infixExpr.rOp, allowSymbolLiterals)
+                  .map(left + _.toString))
           case _ => None
         }
       case methodCall: ScMethodCall =>
@@ -144,12 +142,10 @@ object TestConfigurationUtil {
               }
             methodCall.argumentExpressions.headOption
               .flatMap(getStaticTestNameElement(_, allowSymbolLiterals))
-              .flatMap(
-                  arg =>
-                    refExpr.smartQualifier
-                      .flatMap(
-                          getStaticTestNameElement(_, allowSymbolLiterals))
-                      .flatMap(helper(_, arg)))
+              .flatMap(arg =>
+                refExpr.smartQualifier
+                  .flatMap(getStaticTestNameElement(_, allowSymbolLiterals))
+                  .flatMap(helper(_, arg)))
           case refExpr: ScReferenceExpression
               if twoArgMethods.contains(refExpr.refName) &&
                 methodCall.argumentExpressions.size == 2 =>

@@ -99,7 +99,7 @@ private[http] object Handshake {
               subprotocol: Option[String]): HttpResponse = {
             require(
                 subprotocol.forall(chosen ⇒
-                      clientSupportedSubprotocols.contains(chosen)),
+                  clientSupportedSubprotocols.contains(chosen)),
                 s"Tried to choose invalid subprotocol '$subprotocol' which wasn't offered by the client: [${requestedProtocols
                   .mkString(", ")}]")
             buildResponse(key.get, handler, subprotocol)
@@ -284,7 +284,7 @@ private[http] object Handshake {
           else
             Left(
                 s"response that indicated that the given subprotocol was not supported. (client supported: ${subprotocols
-              .mkString(", ")}, server supported: $subs)")
+                  .mkString(", ")}, server supported: $subs)")
         case Some(problem) ⇒ Left(problem)
       }
     }

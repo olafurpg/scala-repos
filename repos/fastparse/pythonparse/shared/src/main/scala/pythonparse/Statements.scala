@@ -90,8 +90,8 @@ class Statements(indent: Int) {
           .map(_ => Ast.operator.BitOr) | "^=".!
           .map(_ => Ast.operator.BitXor) | "<<=".!
           .map(_ => Ast.operator.LShift) | ">>=".!.map(_ =>
-              Ast.operator.RShift) | "**=".!
-          .map(_ => Ast.operator.Pow) | "//=".!.map(_ => Ast.operator.FloorDiv)
+          Ast.operator.RShift) | "**=".!.map(_ => Ast.operator.Pow) | "//=".!
+          .map(_ => Ast.operator.FloorDiv)
     )
 
   val print_stmt: P[Ast.stmt.Print] = {
@@ -181,14 +181,14 @@ class Statements(indent: Int) {
   }
   val try_stmt: P[Ast.stmt] = {
     val `try` = P(kw("try") ~/ ":" ~~ suite)
-    val excepts: P[Seq[Ast.excepthandler]] = P(
-        (except_clause ~ ":" ~~ suite).map {
-      case (None, body) => Ast.excepthandler.ExceptHandler(None, None, body)
-      case (Some((x, None)), body) =>
-        Ast.excepthandler.ExceptHandler(Some(x), None, body)
-      case (Some((x, Some(y))), body) =>
-        Ast.excepthandler.ExceptHandler(Some(x), Some(y), body)
-    }.repX)
+    val excepts: P[Seq[Ast.excepthandler]] =
+      P((except_clause ~ ":" ~~ suite).map {
+        case (None, body) => Ast.excepthandler.ExceptHandler(None, None, body)
+        case (Some((x, None)), body) =>
+          Ast.excepthandler.ExceptHandler(Some(x), None, body)
+        case (Some((x, Some(y))), body) =>
+          Ast.excepthandler.ExceptHandler(Some(x), Some(y), body)
+      }.repX)
     val `else` = P(space_indents ~~ kw("else") ~/ ":" ~~ suite)
     val `finally` = P(space_indents ~~ kw("finally") ~/ ":" ~~ suite)
     P(`try` ~~ excepts ~~ `else`.? ~~ `finally`.?).map {

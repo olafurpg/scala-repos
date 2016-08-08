@@ -105,11 +105,9 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
       case objRef: ObjectReference =>
         val refType: ReferenceType = objRef.referenceType
         if (!(refType.isInstanceOf[ClassType] ||
-                  refType.isInstanceOf[ArrayType])) {
-          throw EvaluationException(
-              DebuggerBundle.message(
-                  "evaluation.error.class.or.array.expected",
-                  fieldName))
+              refType.isInstanceOf[ArrayType])) {
+          throw EvaluationException(DebuggerBundle
+            .message("evaluation.error.class.or.array.expected", fieldName))
         }
         objRef match {
           case arrayRef: ArrayReference if "length" == fieldName =>
@@ -143,7 +141,7 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
     var modifier: Modifier = null
     if (myEvaluatedField != null &&
         (myEvaluatedQualifier.isInstanceOf[ClassType] ||
-            myEvaluatedQualifier.isInstanceOf[ObjectReference])) {
+        myEvaluatedQualifier.isInstanceOf[ObjectReference])) {
       modifier = new Modifier {
         def canInspect: Boolean = {
           myEvaluatedQualifier.isInstanceOf[ObjectReference]

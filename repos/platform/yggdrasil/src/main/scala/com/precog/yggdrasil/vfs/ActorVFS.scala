@@ -164,7 +164,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
           }
         } getOrElse {
           \/.left(NotFound(
-                  "No NIHDB projection found in %s".format(descriptorDir)))
+              "No NIHDB projection found in %s".format(descriptorDir)))
         }
       }
     }
@@ -673,7 +673,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         } getOrElse {
           left(
               IO(Corrupt("No version %s found to exist for resource %s."
-                        .format(version, path.path))))
+                .format(version, path.path))))
         }
       }
     }
@@ -746,7 +746,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                                  response: PathActionResponse) = {
       //TODO: Add job progress updates
       (response == UpdateSuccess(msg.path) &&
-            terminal).option(msg.jobId).join traverse {
+        terminal).option(msg.jobId).join traverse {
         jobManager.finish(_, clock.now())
       } map { _ =>
         response
@@ -765,9 +765,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         openResource(version) flatMap {
           _.fold(
               blob =>
-                left(
-                    IO(NotFound(
-                            "Located resource on %s is a BLOB, not a projection" format path.path))),
+                left(IO(NotFound(
+                    "Located resource on %s is a BLOB, not a projection" format path.path))),
               db => right(IO(db))
           )
         }
@@ -872,11 +871,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                            terminal)
 
             case StreamRef.Replace(streamId, terminal) =>
-              logger.trace(
-                  "Received replace for %s stream %s: complete: %b".format(
-                      path.path,
-                      streamId,
-                      versionLog.isCompleted(streamId)))
+              logger.trace("Received replace for %s stream %s: complete: %b"
+                .format(path.path, streamId, versionLog.isCompleted(streamId)))
               persistNIHDB(!versionLog.isCompleted(streamId),
                            offset,
                            msg,
@@ -974,7 +970,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
               IO(
                   PathOpFailure(path,
                                 NotFound("No current version found for path %s"
-                                      .format(path.path))))
+                                  .format(path.path))))
             }
 
           case Version.Archived(id) =>

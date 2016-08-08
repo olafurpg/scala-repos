@@ -26,7 +26,7 @@ class Formatting(indent: Int) {
     */
   def indentCode(code: String) =
     stringFromWriter(str =>
-          for (line <- code.lines) {
+      for (line <- code.lines) {
         if (indenting(code)) str print indentation
         str println line
         str.flush()

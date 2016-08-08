@@ -54,9 +54,8 @@ private[jobs] object KillOverdueTasksActor {
           launched.status.mesosStatus.map(_.getState) match {
             case None | Some(TaskState.TASK_STARTING)
                 if launched.status.stagedAt < unconfirmedExpire =>
-              log.warn(
-                  s"Should kill: ${task.taskId} was launched " +
-                    s"${(launched.status.stagedAt.until(now).toSeconds)}s ago and was not confirmed yet")
+              log.warn(s"Should kill: ${task.taskId} was launched " +
+                s"${(launched.status.stagedAt.until(now).toSeconds)}s ago and was not confirmed yet")
               true
 
             case Some(TaskState.TASK_STAGING)

@@ -77,15 +77,15 @@ trait SQLiteProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.functionDatabase -
-          RelationalCapabilities.functionUser - RelationalCapabilities.joinFull -
-          RelationalCapabilities.joinRight - JdbcCapabilities.mutable -
-          SqlCapabilities.sequence - JdbcCapabilities.returnInsertOther -
-          RelationalCapabilities.typeBigDecimal -
-          RelationalCapabilities.typeBlob - RelationalCapabilities.zip -
-          JdbcCapabilities.insertOrUpdate -
-          JdbcCapabilities.defaultValueMetaData -
-          JdbcCapabilities.booleanMetaData - JdbcCapabilities.supportsByte -
-          JdbcCapabilities.distinguishesIntTypes)
+      RelationalCapabilities.functionUser - RelationalCapabilities.joinFull -
+      RelationalCapabilities.joinRight - JdbcCapabilities.mutable -
+      SqlCapabilities.sequence - JdbcCapabilities.returnInsertOther -
+      RelationalCapabilities.typeBigDecimal -
+      RelationalCapabilities.typeBlob - RelationalCapabilities.zip -
+      JdbcCapabilities.insertOrUpdate -
+      JdbcCapabilities.defaultValueMetaData -
+      JdbcCapabilities.booleanMetaData - JdbcCapabilities.supportsByte -
+      JdbcCapabilities.distinguishesIntTypes)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
@@ -248,7 +248,7 @@ trait SQLiteProfile extends JdbcProfile {
     // the same in ReturningInsertInvoker because SQLite does not allow returning non-AutoInc keys anyway.
     override protected val useServerSideUpsert =
       compiled.upsert.fields.forall(fs =>
-            !fs.options.contains(ColumnOption.AutoInc))
+        !fs.options.contains(ColumnOption.AutoInc))
     override protected def useTransactionForUpsert = !useServerSideUpsert
   }
 

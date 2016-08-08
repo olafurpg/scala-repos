@@ -122,11 +122,9 @@ object Streams {
         private[this] var closed = false
 
         def readText(a: Key, sid: String = default): BufferedReader =
-          make(a, sid)(
-              f =>
-                new BufferedReader(
-                    new InputStreamReader(new FileInputStream(f),
-                                          IO.defaultCharset)))
+          make(a, sid)(f =>
+            new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                                                     IO.defaultCharset)))
 
         def readBinary(a: Key, sid: String = default): BufferedInputStream =
           make(a, sid)(f => new BufferedInputStream(new FileInputStream(f)))
@@ -136,8 +134,8 @@ object Streams {
               f =>
                 new PrintWriter(
                     new DeferredWriter(new BufferedWriter(
-                            new OutputStreamWriter(new FileOutputStream(f),
-                                                   IO.defaultCharset)))))
+                        new OutputStreamWriter(new FileOutputStream(f),
+                                               IO.defaultCharset)))))
 
         def binary(sid: String = default): BufferedOutputStream =
           make(a, sid)(f => new BufferedOutputStream(new FileOutputStream(f)))

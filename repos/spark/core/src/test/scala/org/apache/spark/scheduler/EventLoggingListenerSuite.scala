@@ -121,12 +121,8 @@ class EventLoggingListenerSuite
         s"file:/base-dir/app1" === EventLoggingListener
           .getLogPath(Utils.resolveURI("/base-dir"), "app1", None))
     // with compression
-    assert(
-        s"file:/base-dir/app1.lzf" === EventLoggingListener.getLogPath(
-            Utils.resolveURI("/base-dir"),
-            "app1",
-            None,
-            Some("lzf")))
+    assert(s"file:/base-dir/app1.lzf" === EventLoggingListener
+      .getLogPath(Utils.resolveURI("/base-dir"), "app1", None, Some("lzf")))
     // illegal characters in app ID
     assert(
         s"file:/base-dir/a-fine-mind_dollar_bills__1" === EventLoggingListener

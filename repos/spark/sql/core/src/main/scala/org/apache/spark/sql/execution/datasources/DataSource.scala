@@ -240,7 +240,7 @@ case class DataSource(sqlContext: SQLContext,
             schema
               .find(_.name.toLowerCase() == c.toLowerCase())
               .getOrElse(throw new AnalysisException(
-                      s"Invalid partition column '$c'"))
+                  s"Invalid partition column '$c'"))
           })
         }
 
@@ -314,7 +314,7 @@ case class DataSource(sqlContext: SQLContext,
         }
 
         val dataSchema = StructType(data.schema.filterNot(f =>
-                  partitionColumns.exists(equality(_, f.name))))
+          partitionColumns.exists(equality(_, f.name))))
 
         // If we are appending to a table that already exists, make sure the partitioning matches
         // up.  If we fail to load the table for whatever reason, ignore the check.

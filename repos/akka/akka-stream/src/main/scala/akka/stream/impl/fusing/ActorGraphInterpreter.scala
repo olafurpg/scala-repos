@@ -460,10 +460,9 @@ private[stream] final class GraphInterpreterShell(
           subscribesPending -= 1
           if (canShutDown) _isTerminated = true
         case Abort(_) ⇒
-          tryAbort(
-              new TimeoutException(
-                  "Streaming actor has been already stopped processing (normally), but not all of its " +
-                    s"inputs or outputs have been subscribed in [${settings.subscriptionTimeoutSettings.timeout}}]. Aborting actor now."))
+          tryAbort(new TimeoutException(
+              "Streaming actor has been already stopped processing (normally), but not all of its " +
+                s"inputs or outputs have been subscribed in [${settings.subscriptionTimeoutSettings.timeout}}]. Aborting actor now."))
         case _ ⇒ // Ignore, there is nothing to do anyway
       }
       eventLimit

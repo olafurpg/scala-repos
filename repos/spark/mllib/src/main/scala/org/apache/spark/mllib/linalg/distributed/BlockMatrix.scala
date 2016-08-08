@@ -240,14 +240,14 @@ class BlockMatrix @Since("1.3.0")(
       case ((blockRowIndex, blockColIndex), (m, n)) =>
         if ((blockRowIndex < numRowBlocks - 1 && m != rowsPerBlock) ||
             (blockRowIndex == numRowBlocks - 1 &&
-                (m <= 0 || m > rowsPerBlock))) {
+            (m <= 0 || m > rowsPerBlock))) {
           throw new SparkException(
               s"The MatrixBlock at ($blockRowIndex, $blockColIndex) has " +
                 dimensionMsg)
         }
         if ((blockColIndex < numColBlocks - 1 && n != colsPerBlock) ||
             (blockColIndex == numColBlocks - 1 &&
-                (n <= 0 || n > colsPerBlock))) {
+            (n <= 0 || n > colsPerBlock))) {
           throw new SparkException(
               s"The MatrixBlock at ($blockRowIndex, $blockColIndex) has " +
                 dimensionMsg)
@@ -451,7 +451,7 @@ class BlockMatrix @Since("1.3.0")(
       case (rowIndex, colIndex) =>
         val rightCounterparts = rightMatrix.filter(_._1 == colIndex)
         val partitions = rightCounterparts.map(b =>
-              partitioner.getPartition((rowIndex, b._2)))
+          partitioner.getPartition((rowIndex, b._2)))
         ((rowIndex, colIndex), partitions.toSet)
     }.toMap
     val rightDestinations = rightMatrix.map {
@@ -533,9 +533,8 @@ class BlockMatrix @Since("1.3.0")(
                       numRows(),
                       other.numCols())
     } else {
-      throw new SparkException(
-          "colsPerBlock of A doesn't match rowsPerBlock of B. " +
-            s"A.colsPerBlock: $colsPerBlock, B.rowsPerBlock: ${other.rowsPerBlock}")
+      throw new SparkException("colsPerBlock of A doesn't match rowsPerBlock of B. " +
+        s"A.colsPerBlock: $colsPerBlock, B.rowsPerBlock: ${other.rowsPerBlock}")
     }
   }
 }

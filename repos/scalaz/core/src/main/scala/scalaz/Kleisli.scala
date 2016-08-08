@@ -549,7 +549,7 @@ private trait KleisliCatchable[F[_], A] extends Catchable[Kleisli[F, A, ?]] {
     Kleisli(
         a =>
           F.attempt(try f.run(a)
-              catch { case t: Throwable => F.fail(t) }))
+          catch { case t: Throwable => F.fail(t) }))
 
   def fail[B](err: Throwable): Kleisli[F, A, B] =
     Kleisli(_ => F.fail(err))

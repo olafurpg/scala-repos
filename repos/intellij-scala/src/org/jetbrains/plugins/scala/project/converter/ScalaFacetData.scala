@@ -35,7 +35,7 @@ private object ScalaFacetData {
 
   def findIn(module: ModuleSettings): Option[ScalaFacetData] =
     scalaFacetElementIn(module).map(element =>
-          ScalaFacetData(new FacetProperties(element)))
+      ScalaFacetData(new FacetProperties(element)))
 
   def apply(properties: FacetProperties): ScalaFacetData = {
     val compilerSettings = ScalaCompilerSettings.from(properties)

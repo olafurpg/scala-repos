@@ -94,7 +94,7 @@ object ReplicationUtils extends Logging {
     val leaderAndIsrPath = getTopicPartitionLeaderAndIsrPath(topic, partition)
     val (leaderAndIsrOpt, stat) = zkUtils.readDataMaybeNull(leaderAndIsrPath)
     leaderAndIsrOpt.flatMap(leaderAndIsrStr =>
-          parseLeaderAndIsr(leaderAndIsrStr, leaderAndIsrPath, stat))
+      parseLeaderAndIsr(leaderAndIsrStr, leaderAndIsrPath, stat))
   }
 
   private def parseLeaderAndIsr(

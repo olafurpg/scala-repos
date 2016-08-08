@@ -118,9 +118,9 @@ class ExpandTables extends Phase {
     }.withWellTyped(true)
     if (createdOption)
       s2 + (Phase.assignUniqueSymbols -> state
-            .get(Phase.assignUniqueSymbols)
-            .get
-            .copy(nonPrimitiveOption = true))
+        .get(Phase.assignUniqueSymbols)
+        .get
+        .copy(nonPrimitiveOption = true))
     else s2
   }
 }

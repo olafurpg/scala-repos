@@ -493,7 +493,7 @@ abstract class ExplicitOuter
           val qsym = qual.tpe.widen.typeSymbol
           if (sym.isProtected && //(4)
               (qsym.isTrait || !(qual.isInstanceOf[Super] ||
-                        (qsym isSubClass currentClass))))
+                (qsym isSubClass currentClass))))
             sym setFlag notPROTECTED
           super.transform(tree)
 

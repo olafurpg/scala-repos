@@ -43,8 +43,7 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
       if (tools.treatAsSealed(classSym)) {
         tools.directSubclasses(classSym).flatMap(cl => whyNotClosed(cl.asType))
       } else {
-        List(
-            s"'${sym.fullName}' allows unknown subclasses (it is not sealed or final isCaseClass=${isCaseClass(
+        List(s"'${sym.fullName}' allows unknown subclasses (it is not sealed or final isCaseClass=${isCaseClass(
             sym.asInstanceOf[u.TypeSymbol])} isEffectivelyFinal=${sym.isEffectivelyFinal} isSealed=${classSym.isSealed} directSubclasses=${tools
           .directSubclasses(classSym)})")
       }
@@ -117,8 +116,8 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
     // Here we only return "accessor" methods.
     override val methods: Seq[IrMethod] = {
       (allMethods map { mth =>
-            new ScalaIrMethod(mth, this)
-          })(collection.breakOut)
+        new ScalaIrMethod(mth, this)
+      })(collection.breakOut)
     }
     override def fields: Seq[IrField] = {
       // TODO - It's possible some terms come from the constructor.  We don't really know if they are available at runtime
@@ -172,11 +171,9 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
                 tpe.asInstanceOf[tools.c.universe.Type],
                 tools.u.rootMirror,
                 false)
-            dispatchees.map(
-                t =>
-                  new ScalaIrClass(t.asInstanceOf[u.Type],
-                                   quantified,
-                                   rawType))(collection.breakOut)
+            dispatchees.map(t =>
+              new ScalaIrClass(t.asInstanceOf[u.Type], quantified, rawType))(
+                collection.breakOut)
           })
         case errors =>
           scala.util.Failure(new UnclosedSubclassesException(errors))
@@ -229,9 +226,9 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
     override def isMarkedTransient: Boolean = {
       val tr = scala.util.Try {
         ((field.accessed != NoSymbol) && field.accessed.annotations
-              .exists(_.tpe =:= typeOf[scala.transient])) ||
+          .exists(_.tpe =:= typeOf[scala.transient])) ||
         ((field.getter != NoSymbol) && field.getter.annotations
-              .exists(_.tpe =:= typeOf[scala.transient])) ||
+          .exists(_.tpe =:= typeOf[scala.transient])) ||
         (field.annotations.exists(_.tpe =:= typeOf[scala.transient]))
       }
       // TODO - Here we wrokaround a scala symbol issue where the field is never annotated with transient.
@@ -281,7 +278,7 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
         u: U): List[List[u.Type]] = {
       mthd.paramss.map(
           _.map(x =>
-                fillParameters(x).asSeenFrom(owner.tpe, owner.tpe.typeSymbol))
+            fillParameters(x).asSeenFrom(owner.tpe, owner.tpe.typeSymbol))
             .map(_.asInstanceOf[u.Type]))
     }
 
@@ -289,9 +286,9 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
       // TODO - is this correct?
       val tr = scala.util.Try {
         ((mthd.accessed != NoSymbol) && mthd.accessed.annotations
-              .exists(_.tpe =:= typeOf[scala.transient])) ||
+          .exists(_.tpe =:= typeOf[scala.transient])) ||
         ((mthd.getter != NoSymbol) && mthd.getter.annotations
-              .exists(_.tpe =:= typeOf[scala.transient])) ||
+          .exists(_.tpe =:= typeOf[scala.transient])) ||
         (mthd.annotations.exists(_.tpe =:= typeOf[scala.transient]))
       }
       tr.getOrElse(false)

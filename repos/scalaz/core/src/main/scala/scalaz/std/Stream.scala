@@ -221,8 +221,8 @@ trait StreamFunctions {
 
     def unfoldTreeM(v: A) =
       Monad[M].bind(f(v))((abs: (B, Stream[A])) =>
-            Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))(
-                (ts: Stream[Tree[B]]) => Tree.Node(abs._1, ts)))
+        Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))(
+            (ts: Stream[Tree[B]]) => Tree.Node(abs._1, ts)))
 
     mapM(as, unfoldTreeM)
   }

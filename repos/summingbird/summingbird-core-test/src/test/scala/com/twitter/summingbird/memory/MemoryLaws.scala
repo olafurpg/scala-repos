@@ -218,7 +218,7 @@ class MemoryLaws extends WordSpec {
 
     val prod =
       TestGraphs.jobWithStats[Memory, T, K, V](jobID, source, store)(t =>
-            fn(t))
+        fn(t))
     mem.run(mem.plan(prod))
 
     val origCounter =

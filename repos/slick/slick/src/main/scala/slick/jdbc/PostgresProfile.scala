@@ -54,7 +54,7 @@ trait PostgresProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - JdbcCapabilities.insertOrUpdate -
-          JdbcCapabilities.nullableNoDefault - JdbcCapabilities.supportsByte)
+      JdbcCapabilities.nullableNoDefault - JdbcCapabilities.supportsByte)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
@@ -147,7 +147,7 @@ trait PostgresProfile extends JdbcProfile {
         val size = sym.flatMap(
             _.findColumnOption[RelationalProfile.ColumnOption.Length])
         size.fold("VARCHAR")(l =>
-              if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})")
+          if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})")
       case java.sql.Types.BLOB => "lo"
       case java.sql.Types.DOUBLE => "DOUBLE PRECISION"
       /* PostgreSQL does not have a TINYINT type, so we use SMALLINT instead. */

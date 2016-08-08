@@ -192,7 +192,7 @@ class MetricEvaluator[EI, Q, P, A, R](
         preparator =
           new MetricEvaluator.NameParams(engineParams.preparatorParams),
         algorithms = engineParams.algorithmParamsList.map(np =>
-              new MetricEvaluator.NameParams(np)),
+          new MetricEvaluator.NameParams(np)),
         serving = new MetricEvaluator.NameParams(engineParams.servingParams))
 
     implicit lazy val formats = Utils.json4sDefaultFormats

@@ -326,7 +326,7 @@ class ClientServerTestDispatch extends ClientServerTest(true) {
         new Answer[Future[Response]] {
           def answer(invocation: InvocationOnMock) =
             Future.value(Response(
-                    Contexts.broadcast.get(testContext).getOrElse(Buf.Empty)))
+                Contexts.broadcast.get(testContext).getOrElse(Buf.Empty)))
         }
     )
 

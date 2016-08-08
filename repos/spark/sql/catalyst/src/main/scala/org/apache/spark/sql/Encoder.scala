@@ -252,11 +252,9 @@ object Encoders {
     ExpressionEncoder[T](
         schema = new StructType().add("value", BinaryType),
         flat = true,
-        toRowExpressions = Seq(
-            EncodeUsingSerializer(BoundReference(0,
-                                                 ObjectType(classOf[AnyRef]),
-                                                 nullable = true),
-                                  kryo = useKryo)),
+        toRowExpressions = Seq(EncodeUsingSerializer(
+            BoundReference(0, ObjectType(classOf[AnyRef]), nullable = true),
+            kryo = useKryo)),
         fromRowExpression = DecodeUsingSerializer[T](
             BoundReference(0, BinaryType, nullable = true),
             classTag[T],

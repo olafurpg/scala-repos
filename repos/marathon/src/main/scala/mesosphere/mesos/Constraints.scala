@@ -187,12 +187,11 @@ object Constraints {
           //select tasks to kill (without already selected ones)
           .flatMap(_.tasksToKillIterator(toKillTasks)) ++ //fallback: if the distributions did not select a task, choose one of the not chosen ones
           runningTasks.iterator.filterNot(task =>
-                toKillTasks.contains(task.taskId))
+            toKillTasks.contains(task.taskId))
 
-      val matchingTask = tried.find(
-          tryTask =>
-            distributions.forall(_.isMoreEvenWithout(
-                    toKillTasks + (tryTask.taskId -> tryTask))))
+      val matchingTask = tried.find(tryTask =>
+        distributions.forall(
+            _.isMoreEvenWithout(toKillTasks + (tryTask.taskId -> tryTask))))
 
       matchingTask match {
         case Some(task) => toKillTasks += task.taskId -> task

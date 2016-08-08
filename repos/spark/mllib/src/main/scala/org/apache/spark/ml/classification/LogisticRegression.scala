@@ -335,18 +335,16 @@ class LogisticRegression @Since("1.2.0")(
         logError(msg)
         throw new SparkException(msg)
       } else if ($(fitIntercept) && numClasses == 2 && histogram(0) == 0.0) {
-        logWarning(
-            s"All labels are one and fitIntercept=true, so the coefficients will be " +
-              s"zeros and the intercept will be positive infinity; as a result, " +
-              s"training is not needed.")
+        logWarning(s"All labels are one and fitIntercept=true, so the coefficients will be " +
+          s"zeros and the intercept will be positive infinity; as a result, " +
+          s"training is not needed.")
         (Vectors.sparse(numFeatures, Seq()),
          Double.PositiveInfinity,
          Array.empty[Double])
       } else if ($(fitIntercept) && numClasses == 1) {
-        logWarning(
-            s"All labels are zero and fitIntercept=true, so the coefficients will be " +
-              s"zeros and the intercept will be negative infinity; as a result, " +
-              s"training is not needed.")
+        logWarning(s"All labels are zero and fitIntercept=true, so the coefficients will be " +
+          s"zeros and the intercept will be negative infinity; as a result, " +
+          s"training is not needed.")
         (Vectors.sparse(numFeatures, Seq()),
          Double.NegativeInfinity,
          Array.empty[Double])

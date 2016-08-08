@@ -466,7 +466,7 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
         // Hadoop 1 doesn't have `Configuration.unset`
         hadoopConfiguration.clear()
         clonedConf.asScala.foreach(entry =>
-              hadoopConfiguration.set(entry.getKey, entry.getValue))
+          hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }
@@ -479,12 +479,9 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
       .option("inferSchema", "true")
       .load(testFile(simpleSparseFile))
 
-    assert(
-        df.schema.fields.map(field => field.dataType).deep == Array(
-            IntegerType,
-            IntegerType,
-            IntegerType,
-            IntegerType).deep)
+    assert(df.schema.fields
+      .map(field => field.dataType)
+      .deep == Array(IntegerType, IntegerType, IntegerType, IntegerType).deep)
   }
 
   test("old csv data source name works") {

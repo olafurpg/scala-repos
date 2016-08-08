@@ -60,6 +60,6 @@ object CascadingTokenUpdater {
     val newClasses: Iterable[String] = clazzes.map { _.getName } -- toks.values
 
     config + (Config.CascadingSerializationTokens -> toksToString(
-            toks ++ assignTokens(firstAvailableToken(toks), newClasses)))
+        toks ++ assignTokens(firstAvailableToken(toks), newClasses)))
   }
 }

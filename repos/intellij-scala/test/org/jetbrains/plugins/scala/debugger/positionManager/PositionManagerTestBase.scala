@@ -64,7 +64,7 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
         val foundLocations: Set[Loc] = managed {
           val classes = posManager.getAllClasses(position)
           val locations = classes.asScala.flatMap(refType =>
-                posManager.locationsOfLine(refType, position).asScala)
+            posManager.locationsOfLine(refType, position).asScala)
           locations.foreach(checkSourcePosition(position, _))
           locations.map(toSimpleLocation).toSet
         }

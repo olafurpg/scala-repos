@@ -75,7 +75,7 @@ class HttpEventActorTest
     When("An event is send to the actor")
     Then("Only one subscriber is limited")
     EventFilter.info(start =
-          "Will not send event event_stream_attached to unresponsive hosts: host1") intercept {
+      "Will not send event event_stream_attached to unresponsive hosts: host1") intercept {
       aut ! EventStreamAttached("remote")
     }
 

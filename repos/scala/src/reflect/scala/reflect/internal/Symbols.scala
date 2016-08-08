@@ -634,9 +634,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     private[scala] def lockOK: Boolean = {
       ((_rawflags & LOCKED) == 0L) ||
       ((settings.Yrecursion.value != 0) && (recursionTable get this match {
-            case Some(n) => (n <= settings.Yrecursion.value)
-            case None => true
-          }))
+        case Some(n) => (n <= settings.Yrecursion.value)
+        case None => true
+      }))
     }
 
     // Lock a symbol, using the handler if the recursion depth becomes too great.
@@ -975,11 +975,11 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       (UnqualifiedOwners(skipPackageObject) || isEmptyPrefix)
     def isEmptyPrefix =
       (isEffectiveRoot // has no prefix for real, <empty> or <root>
-            ||
-              isAnonOrRefinementClass // has uninteresting <anon> or <refinement> prefix
-            ||
-              nme.isReplWrapperName(name) // has ugly $iw. prefix (doesn't call isInterpreterWrapper due to nesting)
-          )
+        ||
+          isAnonOrRefinementClass // has uninteresting <anon> or <refinement> prefix
+        ||
+          nme.isReplWrapperName(name) // has ugly $iw. prefix (doesn't call isInterpreterWrapper due to nesting)
+      )
     def isFBounded = info match {
       case TypeBounds(_, _) => info.baseTypeSeq exists (_ contains this)
       case _ => false
@@ -1000,7 +1000,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
         (enclClass hasAnnotation ScalaStrictFPAttr)
     def isSerializable =
       info.baseClasses.exists(p =>
-            p == SerializableClass || p == JavaSerializableClass)
+        p == SerializableClass || p == JavaSerializableClass)
     def hasBridgeAnnotation = hasAnnotation(BridgeClass)
     def isDeprecated = hasAnnotation(DeprecatedAttr)
     def deprecationMessage =
@@ -1125,17 +1125,17 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     /** A helper function for isEffectivelyFinal. */
     private def isNotOverridden =
       (owner.isClass && (owner.isEffectivelyFinal ||
-                (owner.isSealed && owner.sealedChildren.forall(c =>
-                          c.isEffectivelyFinal &&
-                            (overridingSymbol(c) == NoSymbol)))))
+        (owner.isSealed && owner.sealedChildren.forall(c =>
+          c.isEffectivelyFinal &&
+            (overridingSymbol(c) == NoSymbol)))))
 
     /** Is this symbol effectively final? I.e, it cannot be overridden */
     final def isEffectivelyFinal: Boolean =
       ((this hasFlag FINAL | PACKAGE) || isModuleOrModuleClass &&
-            (isTopLevel || !settings.overrideObjects) || isTerm &&
-            (isPrivate || isLocalToBlock) || isClass && originalOwner.isTerm &&
-            children.isEmpty // we track known subclasses of term-owned classes, use that infer finality
-          )
+        (isTopLevel || !settings.overrideObjects) || isTerm &&
+        (isPrivate || isLocalToBlock) || isClass && originalOwner.isTerm &&
+        children.isEmpty // we track known subclasses of term-owned classes, use that infer finality
+      )
 
     /** Is this symbol effectively final or a concrete term member of sealed class whose children do not override it */
     final def isEffectivelyFinalOrNotOverridden: Boolean =
@@ -1176,14 +1176,14 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       */
     def isOnlyRefinementMember =
       (isTerm // Type members are unaffected
-            && owner.isRefinementClass // owner must be a refinement class
-            &&
-              isPossibleInRefinement // any overridden symbols must also have refinement class owners
-            &&
-              !isConstant // Must not be a constant. Question: Can we exclude @inline methods as well?
-            &&
-              isDeclaredByOwner // Must be explicitly declared in the refinement (not synthesized from glb)
-          )
+        && owner.isRefinementClass // owner must be a refinement class
+        &&
+          isPossibleInRefinement // any overridden symbols must also have refinement class owners
+        &&
+          !isConstant // Must not be a constant. Question: Can we exclude @inline methods as well?
+        &&
+          isDeclaredByOwner // Must be explicitly declared in the refinement (not synthesized from glb)
+      )
     // "(owner.info decl name) == this" is inadequate, because "name" might
     // be overloaded in owner - and this might be an overloaded symbol.
     // TODO - make this cheaper and see where else we should be doing something similar.
@@ -1194,9 +1194,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       owner.isStructuralRefinement && isPossibleInRefinement && isPublic
     final def isPossibleInRefinement =
       (!isConstructor &&
-            allOverriddenSymbols
-              .forall(_.owner.isRefinementClass) // this includes allOverriddenSymbols.isEmpty
-          )
+        allOverriddenSymbols
+          .forall(_.owner.isRefinementClass) // this includes allOverriddenSymbols.isEmpty
+      )
 
     /** A a member of class `base` is incomplete if
       *  (1) it is declared deferred or
@@ -2075,9 +2075,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
         else sym.info.baseTypeSeq.length
       if (this.isType)
         (that.isType && {
-              val diff = baseTypeSeqLength(this) - baseTypeSeqLength(that)
-              diff > 0 || diff == 0 && this.id < that.id
-            })
+          val diff = baseTypeSeqLength(this) - baseTypeSeqLength(that)
+          diff > 0 || diff == 0 && this.id < that.id
+        })
       else that.isType || this.id < that.id
     }
 
@@ -2102,7 +2102,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       */
     def isBottomSubClass(that: Symbol) =
       ((this eq NothingClass) || (this eq NullClass) && that.isClass &&
-            (that ne NothingClass) && !(that isNonBottomSubClass AnyValClass))
+        (that ne NothingClass) && !(that isNonBottomSubClass AnyValClass))
 
     /** Overridden in NullClass and NothingClass for custom behavior.
       */
@@ -2393,12 +2393,12 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     /** Is this symbol defined in the same scope and compilation unit as `that` symbol? */
     def isCoDefinedWith(that: Symbol) =
       (!rawInfoIsNoType && (this.effectiveOwner == that.effectiveOwner) &&
-            (!this.effectiveOwner.isPackageClass ||
-                  (this.associatedFile eq NoAbstractFile) ||
-                  (that.associatedFile eq NoAbstractFile) ||
-                  (this.associatedFile.path == that.associatedFile.path) // Cheap possibly wrong check, then expensive normalization
-                  ||
-                    (this.associatedFile.canonicalPath == that.associatedFile.canonicalPath)))
+        (!this.effectiveOwner.isPackageClass ||
+          (this.associatedFile eq NoAbstractFile) ||
+          (that.associatedFile eq NoAbstractFile) ||
+          (this.associatedFile.path == that.associatedFile.path) // Cheap possibly wrong check, then expensive normalization
+          ||
+            (this.associatedFile.canonicalPath == that.associatedFile.canonicalPath)))
 
     /** The internal representation of classes and objects:
       *
@@ -2504,9 +2504,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       */
     final def overriddenSymbol(baseClass: Symbol): Symbol =
       (// concrete always overrides abstract, so don't let an abstract definition
-          // claim to be overriding an inherited concrete one.
-          matchingInheritedSymbolIn(baseClass) filter
-            (res => res.isDeferred || !this.isDeferred))
+      // claim to be overriding an inherited concrete one.
+      matchingInheritedSymbolIn(baseClass) filter
+        (res => res.isDeferred || !this.isDeferred))
 
     private def matchingInheritedSymbolIn(baseClass: Symbol): Symbol =
       if (canMatchInheritedSymbols) matchingSymbol(baseClass, owner.thisType)
@@ -2552,7 +2552,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     /** Equivalent to allOverriddenSymbols.nonEmpty, but more efficient. */
     lazy val isOverridingSymbol =
       (canMatchInheritedSymbols &&
-            owner.ancestors.exists(base => overriddenSymbol(base) != NoSymbol))
+        owner.ancestors.exists(base => overriddenSymbol(base) != NoSymbol))
 
     /** Equivalent to allOverriddenSymbols.head (or NoSymbol if no overrides) but more efficient. */
     def nextOverriddenSymbol: Symbol = {
@@ -2803,10 +2803,10 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       */
     def hasMeaninglessName =
       (isSetterParameter // x$1
-            || isClassConstructor // this
-            || isRefinementClass // <refinement>
-            || (name == nme.PACKAGE) // package
-          )
+        || isClassConstructor // this
+        || isRefinementClass // <refinement>
+        || (name == nme.PACKAGE) // package
+      )
 
     /** String representation of symbol's simple name.
       *  If !settings.debug translates expansions of operators back to operator symbol.
@@ -2881,8 +2881,8 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
          else briefParentsString(tp.parents))
       def isStructuralThisType =
         (// prevents disasters like SI-8158
-            owner.isInitialized && owner.isStructuralRefinement &&
-              tp == owner.tpe)
+        owner.isInitialized && owner.isStructuralRefinement &&
+          tp == owner.tpe)
       if (isType)
         typeParamsString(tp) + (if (isClass) " extends " + parents
                                 else if (isAliasType) " = " + tp.resultType
@@ -3359,7 +3359,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
 
     final override def isNonBottomSubClass(that: Symbol): Boolean =
       ((this eq that) || this.isError || that.isError ||
-            info.baseTypeIndex(that) >= 0)
+        info.baseTypeIndex(that) >= 0)
 
     override def reset(completer: Type): this.type = {
       super.reset(completer)
@@ -3492,7 +3492,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       */
     override def isLocalClass =
       (isAnonOrRefinementClass || isLocalToBlock || !isTopLevel &&
-            owner.isLocalClass)
+        owner.isLocalClass)
 
     override def enclClassChain = this :: owner.enclClassChain
 
@@ -3584,7 +3584,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     override def derivedValueClassUnbox =
       // (info.decl(nme.unbox)) orElse      uncomment once we accept unbox methods
       (info.decls
-            .find(_ hasAllFlags PARAMACCESSOR | METHOD) getOrElse NoSymbol)
+        .find(_ hasAllFlags PARAMACCESSOR | METHOD) getOrElse NoSymbol)
 
     private[this] var childSet: Set[Symbol] = Set()
     override def children = childSet
@@ -3692,7 +3692,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       */
     override def hasTransOwner(sym: Symbol) =
       (super.hasTransOwner(sym) ||
-            info.parents.exists(_.typeSymbol hasTransOwner sym))
+        info.parents.exists(_.typeSymbol hasTransOwner sym))
   }
   trait StubSymbol extends Symbol {
     devWarning("creating stub symbol to defer error: " + missingMessage)

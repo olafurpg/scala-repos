@@ -411,10 +411,10 @@ abstract class GraphStageLogic private[stream] (val inCount: Int,
     val connection = conn(in)
     // Fast path
     if ((interpreter
-              .portStates(connection) & (InReady | InFailed)) == InReady &&
+          .portStates(connection) & (InReady | InFailed)) == InReady &&
         (interpreter
-              .connectionSlots(connection)
-              .asInstanceOf[AnyRef] ne Empty)) {
+          .connectionSlots(connection)
+          .asInstanceOf[AnyRef] ne Empty)) {
       val elem = interpreter.connectionSlots(connection)
       interpreter.connectionSlots(connection) = Empty
       elem.asInstanceOf[T]
@@ -477,7 +477,7 @@ abstract class GraphStageLogic private[stream] (val inCount: Int,
     */
   final protected def push[T](out: Outlet[T], elem: T): Unit = {
     if ((interpreter
-              .portStates(conn(out)) & (OutReady | OutClosed)) == OutReady &&
+          .portStates(conn(out)) & (OutReady | OutClosed)) == OutReady &&
         (elem != null)) {
       interpreter.push(conn(out), elem)
     } else {

@@ -1144,7 +1144,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
 
       def needsInterfaceCall(sym: Symbol) =
         (sym.isTraitOrInterface || sym.isJavaDefined &&
-              sym.isNonBottomSubClass(definitions.ClassfileAnnotationClass))
+          sym.isNonBottomSubClass(definitions.ClassfileAnnotationClass))
 
       val isTraitCallToObjectMethod =
         hostSymbol != methodOwner && methodOwner.isTraitOrInterface &&
@@ -1155,8 +1155,8 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       // the type of the method owner
       val useMethodOwner =
         ((!style.isVirtual || hostSymbol.isBottomClass ||
-                  methodOwner == definitions.ObjectClass) &&
-              !(style.isSuper && hostSymbol != null)) ||
+          methodOwner == definitions.ObjectClass) &&
+          !(style.isSuper && hostSymbol != null)) ||
           isTraitCallToObjectMethod
       val receiver = if (useMethodOwner) methodOwner else hostSymbol
       val jowner = internalName(receiver)
@@ -1512,7 +1512,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       val invokedType = asm.Type.getMethodDescriptor(
           asmType(functionalInterface),
           (receiver ::: capturedParams).map(sym =>
-                typeToBType(sym.info).toASMType): _*)
+            typeToBType(sym.info).toASMType): _*)
 
       val constrainedType = new MethodBType(
           lambdaParams.map(p => typeToBType(p.tpe)),

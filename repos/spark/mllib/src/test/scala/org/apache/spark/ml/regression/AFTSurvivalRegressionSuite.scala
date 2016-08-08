@@ -38,16 +38,8 @@ class AFTSurvivalRegressionSuite
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    datasetUnivariate = sqlContext.createDataFrame(
-        sc.parallelize(
-            generateAFTInput(1,
-                             Array(5.5),
-                             Array(0.8),
-                             1000,
-                             42,
-                             1.0,
-                             2.0,
-                             2.0)))
+    datasetUnivariate = sqlContext.createDataFrame(sc.parallelize(
+        generateAFTInput(1, Array(5.5), Array(0.8), 1000, 42, 1.0, 2.0, 2.0)))
     datasetMultivariate = sqlContext.createDataFrame(
         sc.parallelize(
             generateAFTInput(2,

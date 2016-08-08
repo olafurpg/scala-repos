@@ -91,11 +91,11 @@ object Unmarshaller
       extends AnyVal {
     def mapWithInput[C](f: (A, B) ⇒ C): Unmarshaller[A, C] =
       Unmarshaller.withMaterializer(implicit ec ⇒
-            implicit mat ⇒ a ⇒ um(a).fast.map(f(a, _)))
+        implicit mat ⇒ a ⇒ um(a).fast.map(f(a, _)))
 
     def flatMapWithInput[C](f: (A, B) ⇒ Future[C]): Unmarshaller[A, C] =
       Unmarshaller.withMaterializer(implicit ec ⇒
-            implicit mat ⇒ a ⇒ um(a).fast.flatMap(f(a, _)))
+        implicit mat ⇒ a ⇒ um(a).fast.flatMap(f(a, _)))
   }
 
   implicit class EnhancedFromEntityUnmarshaller[A](

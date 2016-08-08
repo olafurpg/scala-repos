@@ -77,7 +77,7 @@ package javaguide.testhelpers {
         body: String)(implicit mat: Materializer): Result = {
       Helpers
         .await(Helpers
-              .call(action, requestBuilder.build()._underlyingRequest, body))
+          .call(action, requestBuilder.build()._underlyingRequest, body))
         .asJava
     }
 

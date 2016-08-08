@@ -51,10 +51,10 @@ object Message {
   private val MessageHeaderSizeMap = Map(
       (0: Byte) ->
         (CrcLength + MagicLength +
-              AttributesLength + KeySizeLength + ValueSizeLength),
+          AttributesLength + KeySizeLength + ValueSizeLength),
       (1: Byte) ->
         (CrcLength + MagicLength + AttributesLength + TimestampLength +
-              KeySizeLength + ValueSizeLength))
+          KeySizeLength + ValueSizeLength))
 
   /**
     * The amount of overhead bytes in a message

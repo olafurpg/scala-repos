@@ -198,7 +198,7 @@ object Permission {
               success(f(path, WrittenByAccount(accountIds.head)))
             else
               failure(Invalid(
-                      "Cannot extract read permission for more than one account ID."))
+                  "Cannot extract read permission for more than one account ID."))
         }
       } getOrElse {
         pathV map { f(_: Path, WrittenByAny) }

@@ -76,14 +76,14 @@ trait DerbyProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.functionDatabase -
-          RelationalCapabilities.pagingNested -
-          JdbcCapabilities.returnInsertOther - SqlCapabilities.sequenceCurr
-        // Cycling is broken in Derby. It cycles to the start value instead of min or max
-          - SqlCapabilities.sequenceCycle - RelationalCapabilities.zip -
-          RelationalCapabilities.joinFull - JdbcCapabilities.insertOrUpdate -
-          RelationalCapabilities.replace - RelationalCapabilities.reverse -
-          JdbcCapabilities.booleanMetaData - JdbcCapabilities.supportsByte -
-          RelationalCapabilities.repeat)
+      RelationalCapabilities.pagingNested -
+      JdbcCapabilities.returnInsertOther - SqlCapabilities.sequenceCurr
+    // Cycling is broken in Derby. It cycles to the start value instead of min or max
+      - SqlCapabilities.sequenceCycle - RelationalCapabilities.zip -
+      RelationalCapabilities.joinFull - JdbcCapabilities.insertOrUpdate -
+      RelationalCapabilities.replace - RelationalCapabilities.reverse -
+      JdbcCapabilities.booleanMetaData - JdbcCapabilities.supportsByte -
+      RelationalCapabilities.repeat)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)

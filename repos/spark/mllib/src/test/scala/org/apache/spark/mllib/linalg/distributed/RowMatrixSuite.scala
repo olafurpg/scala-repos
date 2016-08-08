@@ -159,7 +159,7 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
                                       k)
             assert(
                 closeToZero(s.toBreeze.asInstanceOf[BDV[Double]] -
-                      localSigma(0 until k)))
+                  localSigma(0 until k)))
           }
         }
         val svdWithoutU =
@@ -220,7 +220,7 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
                                 k)
       assert(
           closeToZero(BDV(expVariance.toArray) -
-                BDV(Arrays.copyOfRange(explainedVariance.data, 0, k))))
+            BDV(Arrays.copyOfRange(explainedVariance.data, 0, k))))
       // Check that this method returns the same answer
       assert(pc === mat.computePrincipalComponents(k))
     }
@@ -282,7 +282,7 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
       assert(rOnly.Q == null)
       assert(
           closeToZero(abs(expected.r) -
-                abs(rOnly.R.toBreeze.asInstanceOf[BDM[Double]])))
+            abs(rOnly.R.toBreeze.asInstanceOf[BDM[Double]])))
     }
   }
 

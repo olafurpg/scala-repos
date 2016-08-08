@@ -202,8 +202,8 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
       val circuitBreaker = system.actorOf(
           baseCircuitBreakerPropsBuilder
             .copy(openCircuitFailureConverter = { failureMsg ⇒
-          s"NOT SENT: ${failureMsg.failedMsg}"
-        })
+              s"NOT SENT: ${failureMsg.failedMsg}"
+            })
             .props(receiver.ref))
 
       When("A number of consecutive request equal to the maxFailures configuration of the circuit breaker is failing")
@@ -271,7 +271,7 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
       receiver.expectNoMsg()
 
       sender.expectMsg(CircuitOpenFailure(
-              "Second message in half-open state, should be ignored"))
+          "Second message in half-open state, should be ignored"))
     }
 
     "return to CLOSED state from HALF-OPEN if a successful message response notification is received" in new CircuitBreakerScenario {

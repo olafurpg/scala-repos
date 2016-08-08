@@ -238,9 +238,8 @@ object ScFunctionWrapper {
 
     function match {
       case function: ScFunction if function.typeParameters.nonEmpty =>
-        builder.append(
-            function.typeParameters
-              .map(tp => {
+        builder.append(function.typeParameters
+          .map(tp => {
             var res = tp.name
             tp.upperTypeElement match {
               case Some(tParam) =>
@@ -279,7 +278,7 @@ object ScFunctionWrapper {
             }
             res
           })
-              .mkString("<", ", ", ">"))
+          .mkString("<", ", ", ">"))
       case _ =>
     }
 
@@ -324,44 +323,44 @@ object ScFunctionWrapper {
 
     builder.append(
         function.effectiveParameterClauses.takeWhile { clause =>
-      defaultParam match {
-        case Some(param) => !clause.effectiveParameters.contains(param)
-        case None => true
-      }
-    }.flatMap(_.effectiveParameters)
-          .map {
-        case param =>
-          val builder = new StringBuilder
-          val varargs: Boolean = param.isRepeatedParameter && isJavaVarargs
-          val paramAnnotations =
-            JavaConversionUtil.annotations(param).mkString(" ")
-          if (!paramAnnotations.isEmpty)
-            builder.append(paramAnnotations).append(" ")
-          val tt =
-            if (varargs) param.getType(TypingContext.empty)
-            else param.getRealParameterType(TypingContext.empty)
-          tt match {
-            case Success(tp, _) if param.isCallByNameParameter =>
-              builder.append("scala.Function0<")
-              val psiType = ScType.toPsi(subst.subst(tp),
-                                         function.getProject,
-                                         function.getResolveScope,
-                                         noPrimitives = true)
-              builder.append(psiType.getCanonicalText)
-              builder.append(">")
-            case Success(tp, _) =>
-              builder.append(
-                  JavaConversionUtil.typeText(subst.subst(tp),
-                                              function.getProject,
-                                              function.getResolveScope))
-            case _ => builder.append("java.lang.Object")
+          defaultParam match {
+            case Some(param) => !clause.effectiveParameters.contains(param)
+            case None => true
           }
+        }.flatMap(_.effectiveParameters)
+          .map {
+            case param =>
+              val builder = new StringBuilder
+              val varargs: Boolean = param.isRepeatedParameter && isJavaVarargs
+              val paramAnnotations =
+                JavaConversionUtil.annotations(param).mkString(" ")
+              if (!paramAnnotations.isEmpty)
+                builder.append(paramAnnotations).append(" ")
+              val tt =
+                if (varargs) param.getType(TypingContext.empty)
+                else param.getRealParameterType(TypingContext.empty)
+              tt match {
+                case Success(tp, _) if param.isCallByNameParameter =>
+                  builder.append("scala.Function0<")
+                  val psiType = ScType.toPsi(subst.subst(tp),
+                                             function.getProject,
+                                             function.getResolveScope,
+                                             noPrimitives = true)
+                  builder.append(psiType.getCanonicalText)
+                  builder.append(">")
+                case Success(tp, _) =>
+                  builder.append(
+                      JavaConversionUtil.typeText(subst.subst(tp),
+                                                  function.getProject,
+                                                  function.getResolveScope))
+                case _ => builder.append("java.lang.Object")
+              }
 
-          if (varargs) builder.append("...")
+              if (varargs) builder.append("...")
 
-          builder.append(" ").append(param.getName)
-          builder.toString()
-      }
+              builder.append(" ").append(param.getName)
+              builder.toString()
+          }
           .mkString("(", ", ", ")"))
 
     function match {

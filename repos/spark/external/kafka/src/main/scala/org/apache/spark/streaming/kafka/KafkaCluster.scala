@@ -223,7 +223,7 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
                 }
               } else {
                 errs.append(new SparkException(
-                        s"Empty offsets for ${tp}, is ${before} before log beginning?"))
+                    s"Empty offsets for ${tp}, is ${before} before log beginning?"))
               }
             } else {
               errs.append(ErrorMapping.exceptionFor(por.error))
@@ -430,7 +430,7 @@ object KafkaCluster {
         .get("metadata.broker.list")
         .orElse(kafkaParams.get("bootstrap.servers"))
         .getOrElse(throw new SparkException(
-                "Must specify metadata.broker.list or bootstrap.servers"))
+            "Must specify metadata.broker.list or bootstrap.servers"))
 
       val props = new Properties()
       kafkaParams.foreach {

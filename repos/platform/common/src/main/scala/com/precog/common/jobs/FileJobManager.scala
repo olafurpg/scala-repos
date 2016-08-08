@@ -177,7 +177,7 @@ class FileJobManager[M[+ _]] private[FileJobManager] (workDir: File,
           val message = Message(jobId, prior.size, channel, value)
 
           cache += (jobId -> js.copy(
-                  messages = (messages + (channel -> (message :: prior)))))
+              messages = (messages + (channel -> (message :: prior)))))
           message
 
         case None =>

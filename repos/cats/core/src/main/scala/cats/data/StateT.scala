@@ -13,7 +13,7 @@ final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
   def flatMap[B](fas: A => StateT[F, S, B])(
       implicit F: Monad[F]): StateT[F, S, B] =
     StateT(s =>
-          F.flatMap(runF) { fsf =>
+      F.flatMap(runF) { fsf =>
         F.flatMap(fsf(s)) {
           case (s, a) =>
             fas(a).run(s)

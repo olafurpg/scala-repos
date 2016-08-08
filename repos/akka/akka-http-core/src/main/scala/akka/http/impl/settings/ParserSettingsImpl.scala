@@ -79,8 +79,7 @@ object ParserSettingsImpl
         c getBoolean "illegal-header-warnings",
         ErrorLoggingVerbosity(c getString "error-logging-verbosity"),
         cacheConfig.entrySet.asScala.map(kvp ⇒
-              kvp.getKey -> cacheConfig.getInt(kvp.getKey))(
-            collection.breakOut),
+          kvp.getKey -> cacheConfig.getInt(kvp.getKey))(collection.breakOut),
         c getBoolean "tls-session-info-header",
         noCustomMethods,
         noCustomStatusCodes)

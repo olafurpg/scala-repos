@@ -206,8 +206,8 @@ class ScalaTestConfigurationProducer extends {
               }
             }
             if (containingClass != null && fqns.exists(fqn =>
-                      fqn == containingClass.qualifiedName ||
-                        isInheritor(containingClass, fqn))) {
+                  fqn == containingClass.qualifiedName ||
+                    isInheritor(containingClass, fqn))) {
               if (!failedToCheck) {
                 val res = inv(call)
                 if (res.isDefined)
@@ -792,49 +792,49 @@ class ScalaTestConfigurationProducer extends {
     val oldResult =
       (clazz,
        (getFunSuiteBases.toStream
-             .map(checkFunSuite)
-             .find(_.isDefined)
-             .getOrElse(None) ++ getFeatureSpecBases.toStream
-             .map(checkFeatureSpec)
-             .find(_.isDefined)
-             .getOrElse(None) ++ getFreeSpecBases.toStream
-             .map(checkFreeSpec)
-             .find(_.isDefined)
-             .getOrElse(None) ++ getJUnit3SuiteBases.toStream
-             .map(checkJUnit3Suite)
-             .find(_.isDefined)
-             .getOrElse(None) ++ getJUnitSuiteBases.toStream
-             .map(checkJUnitSuite)
-             .find(_.isDefined)
-             .getOrElse(None) ++ getPropSpecBases.toStream
-             .map(checkPropSpec)
-             .find(_.isDefined)
-             .getOrElse(None) ++ /**
+         .map(checkFunSuite)
+         .find(_.isDefined)
+         .getOrElse(None) ++ getFeatureSpecBases.toStream
+         .map(checkFeatureSpec)
+         .find(_.isDefined)
+         .getOrElse(None) ++ getFreeSpecBases.toStream
+         .map(checkFreeSpec)
+         .find(_.isDefined)
+         .getOrElse(None) ++ getJUnit3SuiteBases.toStream
+         .map(checkJUnit3Suite)
+         .find(_.isDefined)
+         .getOrElse(None) ++ getJUnitSuiteBases.toStream
+         .map(checkJUnitSuite)
+         .find(_.isDefined)
+         .getOrElse(None) ++ getPropSpecBases.toStream
+         .map(checkPropSpec)
+         .find(_.isDefined)
+         .getOrElse(None) ++ /**
               //TODO: actually implement checkSpec for scalatest 2.0 Spec
         checkSpec("org.scalatest.Spec") ++
         checkSpec("org.scalatest.SpecLike") ++
         checkSpec("org.scalatest.fixture.Spec") ++
         checkSpec("org.scalatest.fixture.SpecLike") ++
-             */
-           //this is intended for scalatest versions < 2.0
-           getFunSpecBasesPre2_0.toStream
-             .map(checkFunSpec)
-             .find(_.isDefined)
-             .getOrElse(None) ++ //this is intended for scalatest version 2.0
-             getFunSpecBasesPost2_0.toStream
-               .map(checkFunSpec)
-               .find(_.isDefined)
-               .getOrElse(None) ++ //---
-             getTestNGSuiteBases.toStream
-               .map(checkTestNGSuite)
-               .find(_.isDefined)
-               .getOrElse(None) ++ getFlatSpecBases.toStream
-             .map(checkFlatSpec)
-             .find(_.isDefined)
-             .getOrElse(None) ++ getWordSpecBases.toStream
-             .map(checkWordSpec)
-             .find(_.isDefined)
-             .getOrElse(None)).orNull)
+         */
+       //this is intended for scalatest versions < 2.0
+       getFunSpecBasesPre2_0.toStream
+         .map(checkFunSpec)
+         .find(_.isDefined)
+         .getOrElse(None) ++ //this is intended for scalatest version 2.0
+         getFunSpecBasesPost2_0.toStream
+           .map(checkFunSpec)
+           .find(_.isDefined)
+           .getOrElse(None) ++ //---
+         getTestNGSuiteBases.toStream
+           .map(checkTestNGSuite)
+           .find(_.isDefined)
+           .getOrElse(None) ++ getFlatSpecBases.toStream
+         .map(checkFlatSpec)
+         .find(_.isDefined)
+         .getOrElse(None) ++ getWordSpecBases.toStream
+         .map(checkWordSpec)
+         .find(_.isDefined)
+         .getOrElse(None)).orNull)
 
     val astTransformer = new ScalaTestAstTransformer()
     val selection = astTransformer.testSelection(location)

@@ -156,8 +156,8 @@ trait FindMembers { this: SymbolTable =>
       def admitPrivate(sym: Symbol): Boolean =
         (selectorClass == owner) ||
           (!isPrivateLocal // private[this] only a member from within the selector class. (Optimization only? Does the spec back this up?)
-                && (!seenFirstNonRefinementClass ||
-                      refinementParents.contains(owner)))
+            && (!seenFirstNonRefinementClass ||
+              refinementParents.contains(owner)))
 
       (!isPrivate || admitPrivate(sym)) &&
       (sym.name != nme.CONSTRUCTOR || owner == initBaseClasses.head)
@@ -166,12 +166,12 @@ trait FindMembers { this: SymbolTable =>
     // True unless the already-found member of type `memberType` matches the candidate symbol `other`.
     protected def isNewMember(member: Symbol, other: Symbol): Boolean =
       ((other ne member) &&
-            ((member.owner eq other.owner) // same owner, therefore overload
-                  ||
-                    (member.flags & PRIVATE) != 0 // (unqualified) private members never participate in overriding
-                  || (other.flags & PRIVATE) != 0 // ... as overrider or overridee.
-                  || !(memberTypeLow(member) matches memberTypeHi(other)) // do the member types match? If so, it's an override. Otherwise it's an overload.
-                ))
+        ((member.owner eq other.owner) // same owner, therefore overload
+          ||
+            (member.flags & PRIVATE) != 0 // (unqualified) private members never participate in overriding
+          || (other.flags & PRIVATE) != 0 // ... as overrider or overridee.
+          || !(memberTypeLow(member) matches memberTypeHi(other)) // do the member types match? If so, it's an override. Otherwise it's an overload.
+        ))
 
     // Cache for the member type of a candidate member when comparing against multiple, already-found existing members
     //
@@ -254,7 +254,7 @@ trait FindMembers { this: SymbolTable =>
 
     protected def shortCircuit(sym: Symbol): Boolean =
       (name.isTypeName ||
-            (stableOnly && sym.isStable && !sym.hasVolatileType)) && {
+        (stableOnly && sym.isStable && !sym.hasVolatileType)) && {
         clearAndAddResult(sym)
         true
       }

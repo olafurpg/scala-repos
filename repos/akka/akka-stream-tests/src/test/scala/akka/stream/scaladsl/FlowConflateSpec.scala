@@ -215,7 +215,7 @@ class FlowConflateSpec extends AkkaSpec {
       val latch = TestLatch()
       val conflate = Flow[String]
         .conflateWithSeed(seed = i ⇒ i)((state, elem) ⇒
-              if (elem == "two") {
+          if (elem == "two") {
             latch.open()
             throw TE("two is a three letter word")
           } else state + elem)
@@ -253,7 +253,7 @@ class FlowConflateSpec extends AkkaSpec {
       val future = Source
         .fromPublisher(sourceProbe)
         .conflateWithSeed(seed = i ⇒ Vector(i))((state, elem) ⇒
-              if (elem == 2) {
+          if (elem == 2) {
             throw TE("three is a four letter word")
           } else {
             if (elem == 4) saw4Latch.open()

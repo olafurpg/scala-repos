@@ -35,7 +35,7 @@ object StreamTest extends SpecLite {
   }
 
   "intercalate empty stream is flatten" ! forAll((a: Stream[Stream[Int]]) =>
-        a.intercalate(Stream.empty[Int]) must_=== (a.flatten))
+    a.intercalate(Stream.empty[Int]) must_=== (a.flatten))
 
   "intersperse then remove odd items is identity" ! forAll {
     (a: Stream[Int], b: Int) =>
@@ -70,13 +70,13 @@ object StreamTest extends SpecLite {
   "foldl is foldLeft" ! forAll { (rnge: Stream[List[Int]]) =>
     val F = Foldable[Stream]
     (rnge.foldLeft(List[Int]())(_ ++ _) must_===
-          (F.foldLeft(rnge, List[Int]())(_ ++ _)))
+      (F.foldLeft(rnge, List[Int]())(_ ++ _)))
   }
 
   "foldr is foldRight" ! forAll { (rnge: Stream[List[Int]]) =>
     val F = Foldable[Stream]
     (rnge.foldRight(List[Int]())(_ ++ _) must_===
-          (F.foldRight(rnge, List[Int]())(_ ++ _)))
+      (F.foldRight(rnge, List[Int]())(_ ++ _)))
   }
 
   "foldMap evaluates lazily" in {

@@ -151,10 +151,9 @@ class PrimitiveApiTest
       val response = consumer.fetch(request)
       for ((topic, partition) <- topics) {
         val fetched = response.messageSet(topic, partition)
-        assertEquals(
-            messages(topic),
-            fetched.map(messageAndOffset =>
-                  TestUtils.readString(messageAndOffset.message.payload)))
+        assertEquals(messages(topic),
+                     fetched.map(messageAndOffset =>
+                       TestUtils.readString(messageAndOffset.message.payload)))
       }
     }
 
@@ -171,7 +170,7 @@ class PrimitiveApiTest
         val request = builder.build()
         val response = consumer.fetch(request)
         response.data.values.foreach(pdata =>
-              ErrorMapping.maybeThrowException(pdata.error))
+          ErrorMapping.maybeThrowException(pdata.error))
         fail("Expected exception when fetching message with invalid offset")
       } catch {
         case e: OffsetOutOfRangeException => "this is good"
@@ -187,7 +186,7 @@ class PrimitiveApiTest
         val request = builder.build()
         val response = consumer.fetch(request)
         response.data.values.foreach(pdata =>
-              ErrorMapping.maybeThrowException(pdata.error))
+          ErrorMapping.maybeThrowException(pdata.error))
         fail("Expected exception when fetching message with invalid partition")
       } catch {
         case e: UnknownTopicOrPartitionException => "this is good"
@@ -206,7 +205,7 @@ class PrimitiveApiTest
   private def multiProduce(producer: Producer[String, String]) {
     val topics = Map("test4" -> 0, "test1" -> 0, "test2" -> 0, "test3" -> 0)
     topics.keys.map(topic =>
-          TestUtils.createTopic(zkUtils, topic, servers = servers))
+      TestUtils.createTopic(zkUtils, topic, servers = servers))
 
     val messages = new mutable.HashMap[String, Seq[String]]
     val builder = new FetchRequestBuilder()
@@ -223,10 +222,9 @@ class PrimitiveApiTest
     val response = consumer.fetch(request)
     for ((topic, partition) <- topics) {
       val fetched = response.messageSet(topic, partition)
-      assertEquals(
-          messages(topic),
-          fetched.map(messageAndOffset =>
-                TestUtils.readString(messageAndOffset.message.payload)))
+      assertEquals(messages(topic),
+                   fetched.map(messageAndOffset =>
+                     TestUtils.readString(messageAndOffset.message.payload)))
     }
   }
 
@@ -253,7 +251,7 @@ class PrimitiveApiTest
   def testPipelinedProduceRequests() {
     val topics = Map("test4" -> 0, "test1" -> 0, "test2" -> 0, "test3" -> 0)
     topics.keys.map(topic =>
-          TestUtils.createTopic(zkUtils, topic, servers = servers))
+      TestUtils.createTopic(zkUtils, topic, servers = servers))
     val props = new Properties()
     props.put("request.required.acks", "0")
     val pipelinedProducer: Producer[String, String] =
@@ -337,10 +335,9 @@ class PrimitiveApiTest
     val response = consumer.fetch(request)
     for ((topic, partition) <- topics) {
       val fetched = response.messageSet(topic, partition)
-      assertEquals(
-          messages(topic),
-          fetched.map(messageAndOffset =>
-                TestUtils.readString(messageAndOffset.message.payload)))
+      assertEquals(messages(topic),
+                   fetched.map(messageAndOffset =>
+                     TestUtils.readString(messageAndOffset.message.payload)))
     }
   }
 }

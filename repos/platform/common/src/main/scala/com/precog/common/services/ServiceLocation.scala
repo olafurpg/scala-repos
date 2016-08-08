@@ -42,12 +42,13 @@ case class ServiceLocation(protocol: String,
 
 object ServiceLocation {
   def fromConfig(conf: Configuration): ValidationNel[String, ServiceLocation] = {
-    (conf.get[String]("protocol")
-          .toSuccess(nels("Configuration property protocol is required")) |@| conf
-          .get[String]("host")
-          .toSuccess(nels("Configuration property host is required")) |@| conf
-          .get[Int]("port")
-          .toSuccess(nels("Configuration property port is required"))) {
+    (conf
+      .get[String]("protocol")
+      .toSuccess(nels("Configuration property protocol is required")) |@| conf
+      .get[String]("host")
+      .toSuccess(nels("Configuration property host is required")) |@| conf
+      .get[Int]("port")
+      .toSuccess(nels("Configuration property port is required"))) {
       (protocol, host, port) =>
         ServiceLocation(protocol, host, port, conf.get[String]("pathPrefix"))
     }

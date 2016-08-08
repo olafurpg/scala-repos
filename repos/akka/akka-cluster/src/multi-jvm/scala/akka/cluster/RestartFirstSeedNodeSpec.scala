@@ -27,7 +27,7 @@ object RestartFirstSeedNodeMultiJvmSpec extends MultiNodeConfig {
   commonConfig(
       debugConfig(on = false)
         .withFallback(ConfigFactory.parseString(
-                """
+            """
       akka.cluster.auto-down-unreachable-after = off
       akka.cluster.retry-unsuccessful-join-after = 3s
       """))
@@ -124,7 +124,7 @@ abstract class RestartFirstSeedNodeSpec
               Cluster(restartedSeed1System).readView.members.size should ===(
                   3))
           awaitAssert(Cluster(restartedSeed1System).readView.members
-                .map(_.status) should ===(Set(Up)))
+            .map(_.status) should ===(Set(Up)))
         }
       }
       runOn(seed2, seed3) {

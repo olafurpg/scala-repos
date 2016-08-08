@@ -53,8 +53,8 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
       assert(
           transporter.tlsConfig == inputParams[Transport.TLSClientEngine].e
             .map(Netty3TransporterTLSConfig(
-                    _,
-                    inputParams[Transporter.TLSHostname].hostname)))
+                _,
+                inputParams[Transporter.TLSHostname].hostname)))
       assert(transporter.httpProxy == inputParams[Transporter.HttpProxy].sa)
       assert(
           transporter.httpProxyCredentials == inputParams[
@@ -64,25 +64,23 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
           transporter.socksUsernameAndPassword == inputParams[
               Transporter.SocksProxy].credentials)
       assert(transporter.channelReaderTimeout == inputParams[
-              Transport.Liveness].readTimeout)
+          Transport.Liveness].readTimeout)
       assert(transporter.channelWriterTimeout == inputParams[
-              Transport.Liveness].writeTimeout)
+          Transport.Liveness].writeTimeout)
       assert(
           transporter.channelOptions
             .get("sendBufferSize") == inputParams[Transport.BufferSizes].send)
-      assert(
-          transporter.channelOptions.get("receiveBufferSize") == inputParams[
-              Transport.BufferSizes].recv)
+      assert(transporter.channelOptions
+        .get("receiveBufferSize") == inputParams[Transport.BufferSizes].recv)
       assert(
           transporter.channelOptions
             .get("keepAlive") == inputParams[Transport.Liveness].keepAlive)
-      assert(
-          transporter.channelOptions
-            .get("connectTimeoutMillis")
-            .get == inputParams[Transporter.ConnectTimeout].howlong.inMilliseconds +
-            inputParams[LatencyCompensation.Compensation].howlong.inMilliseconds)
+      assert(transporter.channelOptions
+        .get("connectTimeoutMillis")
+        .get == inputParams[Transporter.ConnectTimeout].howlong.inMilliseconds +
+        inputParams[LatencyCompensation.Compensation].howlong.inMilliseconds)
       assert(transporter.channelSnooper.nonEmpty == inputParams[
-              Transport.Verbose].enabled)
+          Transport.Verbose].enabled)
     }
 
     it("newPipeline handles unresolved InetSocketAddresses") {

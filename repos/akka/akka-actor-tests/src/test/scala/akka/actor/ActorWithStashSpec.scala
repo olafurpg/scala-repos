@@ -146,10 +146,9 @@ class ActorWithStashSpec
     }
 
     "process stashed messages after restart" in {
-      val boss = system.actorOf(
-          Props(new Supervisor(OneForOneStrategy(
-                      maxNrOfRetries = 2,
-                      withinTimeRange = 1 second)(List(classOf[Throwable])))))
+      val boss = system.actorOf(Props(new Supervisor(
+          OneForOneStrategy(maxNrOfRetries = 2, withinTimeRange = 1 second)(
+              List(classOf[Throwable])))))
 
       val restartLatch = new TestLatch
       val hasMsgLatch = new TestLatch

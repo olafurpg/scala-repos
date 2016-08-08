@@ -130,6 +130,6 @@ class HashArrayEqualsWrapperTest extends FunSuite {
         HashEqualsArrayWrapper
           .classForTag(implicitly[ClassTag[String]]) === classOf[String])
     assert(HashEqualsArrayWrapper.classForTag(
-            implicitly[ClassTag[Array[Byte]]]) === classOf[Array[Byte]])
+        implicitly[ClassTag[Array[Byte]]]) === classOf[Array[Byte]])
   }
 }

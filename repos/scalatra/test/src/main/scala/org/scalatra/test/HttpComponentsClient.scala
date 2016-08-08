@@ -178,10 +178,9 @@ trait HttpComponentsClient extends Client {
     case uploadable: Uploadable => UploadableBody(uploadable)
 
     case s: Any =>
-      throw new IllegalArgumentException(
-          ("The body type for file parameter '%s' could not be inferred. The " +
-                "supported types are java.util.File and org.scalatra.test.Uploadable")
-            .format(name))
+      throw new IllegalArgumentException(("The body type for file parameter '%s' could not be inferred. The " +
+        "supported types are java.util.File and org.scalatra.test.Uploadable")
+        .format(name))
   }
 }
 

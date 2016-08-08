@@ -127,8 +127,8 @@ class DenseMatrixBenchmark extends BreezeBenchmark with BuildsRandomMatrices {
   def timeMapPairsTranspose(reps: Int) =
     runWith(reps, { randomMatrix(2048, 2048, true) })(
         (mat: DenseMatrix[Double]) => {
-      mat.mapPairs((x: (Int, Int), v: Double) => (x._1 * x._2 * v))
-    })
+          mat.mapPairs((x: (Int, Int), v: Double) => (x._1 * x._2 * v))
+        })
 
   def timeSinMatrix(reps: Int) = runWith(reps, randomMatrix(2500, 2500)) {
     dm =>

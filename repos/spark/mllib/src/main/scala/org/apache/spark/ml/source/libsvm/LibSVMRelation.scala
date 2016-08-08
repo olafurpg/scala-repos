@@ -115,7 +115,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
   private def verifySchema(dataSchema: StructType): Unit = {
     if (dataSchema.size != 2 ||
         (!dataSchema(0).dataType.sameType(DataTypes.DoubleType) ||
-            !dataSchema(1).dataType.sameType(new VectorUDT()))) {
+        !dataSchema(1).dataType.sameType(new VectorUDT()))) {
       throw new IOException(
           s"Illegal schema for libsvm data, schema=${dataSchema}")
     }

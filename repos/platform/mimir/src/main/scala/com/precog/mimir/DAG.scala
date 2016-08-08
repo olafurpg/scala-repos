@@ -70,8 +70,8 @@ trait DAG extends Instructions {
         : Trampoline[Either[StackError, DepGraph]] = {
         Free.suspend(
             M.sequence(f(roots).right map { roots2 =>
-            loop(loc, roots2, splits, stream.tail)
-          })
+                loop(loc, roots2, splits, stream.tail)
+              })
               .map(_.joinRight))
       }
 
@@ -119,7 +119,7 @@ trait DAG extends Instructions {
                 case Right(right) :: Right(left) :: tl =>
                   Right(
                       Right(IUI(instr == instructions.IUnion, left, right)(
-                              loc)) :: tl)
+                          loc)) :: tl)
                 case Left(_) :: _ | _ :: Left(_) :: _ =>
                   Left(OperationOnBucket(instr))
                 case _ => Left(StackUnderflow(instr))

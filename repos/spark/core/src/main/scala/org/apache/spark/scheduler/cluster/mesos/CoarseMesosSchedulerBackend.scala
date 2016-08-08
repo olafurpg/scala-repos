@@ -334,9 +334,8 @@ private[spark] class CoarseMesosSchedulerBackend(
         // accept
         val offerTasks = tasks(offer.getId)
 
-        logDebug(
-            s"Accepting offer: $id with attributes: $offerAttributes " +
-              s"mem: $offerMem cpu: $offerCpus.  Launching ${offerTasks.size} Mesos tasks.")
+        logDebug(s"Accepting offer: $id with attributes: $offerAttributes " +
+          s"mem: $offerMem cpu: $offerCpus.  Launching ${offerTasks.size} Mesos tasks.")
 
         for (task <- offerTasks) {
           val taskId = task.getTaskId
@@ -373,7 +372,7 @@ private[spark] class CoarseMesosSchedulerBackend(
 
     // offerID -> resources
     val remainingResources = mutable.Map(offers.map(offer =>
-              (offer.getId.getValue, offer.getResourcesList)): _*)
+      (offer.getId.getValue, offer.getResourcesList)): _*)
 
     var launchTasks = true
 
@@ -476,9 +475,8 @@ private[spark] class CoarseMesosSchedulerBackend(
         val externalShufflePort =
           conf.getInt("spark.shuffle.service.port", 7337)
 
-        logDebug(
-            s"Connecting to shuffle service on slave $slaveId, " +
-              s"host ${slave.hostname}, port $externalShufflePort for app ${conf.getAppId}")
+        logDebug(s"Connecting to shuffle service on slave $slaveId, " +
+          s"host ${slave.hostname}, port $externalShufflePort for app ${conf.getAppId}")
 
         mesosExternalShuffleClient.get.registerDriverWithShuffleService(
             slave.hostname,

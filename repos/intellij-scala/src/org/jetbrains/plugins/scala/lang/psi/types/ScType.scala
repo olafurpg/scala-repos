@@ -429,10 +429,10 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
           case t: ScTypeAliasDefinition if t.typeParameters.isEmpty =>
             t.aliasedType(TypingContext.empty)
               .flatMap(t =>
-                    expandAliases(proj.actualSubst.subst(t), visited + tp))
+                expandAliases(proj.actualSubst.subst(t), visited + tp))
           case t: ScTypeAliasDeclaration if t.typeParameters.isEmpty =>
             t.upperBound.flatMap(upper =>
-                  expandAliases(proj.actualSubst.subst(upper), visited + tp))
+              expandAliases(proj.actualSubst.subst(upper), visited + tp))
           case _ => Success(tp, None)
         }
       case at: ScAbstractType =>

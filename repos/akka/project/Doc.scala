@@ -67,7 +67,7 @@ object Scaladoc extends AutoPlugin {
               val hd = try source
                 .getLines()
                 .exists(_.contains(
-                        "<div class=\"toggleContainer block diagram-container\" id=\"inheritance-diagram-container\">"))
+                    "<div class=\"toggleContainer block diagram-container\" id=\"inheritance-diagram-container\">"))
               catch {
                 case e: Exception =>
                   throw new IllegalStateException(
@@ -120,7 +120,7 @@ object UnidocRoot extends AutoPlugin {
             scalacOptions += "-P:genjavadoc:suppressSynthetic=false",
             // FIXME: see #18056
             sources in (JavaUnidoc, unidoc) ~= (_.filterNot(_.getPath.contains(
-                    "Access$minusControl$minusAllow$minusOrigin")))
+                "Access$minusControl$minusAllow$minusOrigin")))
         ))
     .getOrElse(Nil)
 
@@ -168,7 +168,7 @@ object Unidoc extends AutoPlugin {
             unidocGenjavadocVersion in Global := "0.9",
             // FIXME: see #18056
             sources in (Genjavadoc, doc) ~= (_.filterNot(_.getPath.contains(
-                    "Access$minusControl$minusAllow$minusOrigin")))
+                "Access$minusControl$minusAllow$minusOrigin")))
         )
     )
     .getOrElse(Seq.empty)

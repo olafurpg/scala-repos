@@ -52,7 +52,7 @@ class LAFuture[T](val scheduler: LAScheduler) {
           toDo = Nil
           onFailure = Nil
           onComplete.foreach(f =>
-                LAFuture.executeWithObservers(scheduler, () => f(Full(value))))
+            LAFuture.executeWithObservers(scheduler, () => f(Full(value))))
           onComplete = Nil
           ret
         } else Nil
@@ -61,7 +61,7 @@ class LAFuture[T](val scheduler: LAScheduler) {
       }
     }
     funcs.foreach(f =>
-          LAFuture.executeWithObservers(scheduler, () => f(value)))
+      LAFuture.executeWithObservers(scheduler, () => f(value)))
   }
 
   /**
@@ -114,7 +114,7 @@ class LAFuture[T](val scheduler: LAScheduler) {
   def flatMap[A](f: T => LAFuture[A]): LAFuture[A] = {
     val ret = new LAFuture[A](scheduler)
     onComplete(v =>
-          v match {
+      v match {
         case Full(v) =>
           Box.tryo(f(v)) match {
             case Full(successfullyComputedFuture) =>
@@ -233,9 +233,9 @@ class LAFuture[T](val scheduler: LAScheduler) {
         aborted = true
         failure = e
         onFailure.foreach(f =>
-              LAFuture.executeWithObservers(scheduler, () => f(e)))
+          LAFuture.executeWithObservers(scheduler, () => f(e)))
         onComplete.foreach(f =>
-              LAFuture.executeWithObservers(scheduler, () => f(e)))
+          LAFuture.executeWithObservers(scheduler, () => f(e)))
         onComplete = Nil
         onFailure = Nil
         toDo = Nil

@@ -38,7 +38,7 @@ object Export extends LilaController {
           Ok(content).withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
                                   CONTENT_DISPOSITION ->
                                     ("attachment; filename=" +
-                                          (Env.api.pgnDump filename game)))
+                                      (Env.api.pgnDump filename game)))
         }
       }
     }

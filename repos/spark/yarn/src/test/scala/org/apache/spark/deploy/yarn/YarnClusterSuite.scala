@@ -242,11 +242,10 @@ private object YarnClusterDriver extends Logging with Matchers {
       System.exit(1)
     }
 
-    val sc = new SparkContext(
-        new SparkConf()
-          .set("spark.extraListeners", classOf[SaveExecutorInfo].getName)
-          .setAppName(
-              "yarn \"test app\" 'with quotes' and \\back\\slashes and $dollarSigns"))
+    val sc = new SparkContext(new SparkConf()
+      .set("spark.extraListeners", classOf[SaveExecutorInfo].getName)
+      .setAppName(
+          "yarn \"test app\" 'with quotes' and \\back\\slashes and $dollarSigns"))
     val conf = sc.getConf
     val status = new File(args(0))
     var result = "failure"

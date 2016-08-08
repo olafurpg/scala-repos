@@ -32,7 +32,7 @@ object SteppingInmemJournal {
   def config(instanceId: String): Config =
     ConfigFactory.parseString(s"""
         |akka.persistence.journal.stepping-inmem.class=${classOf[
-                                 SteppingInmemJournal].getName}
+                                     SteppingInmemJournal].getName}
         |akka.persistence.journal.plugin = "akka.persistence.journal.stepping-inmem"
         |akka.persistence.journal.stepping-inmem.instance-id = "$instanceId"
       """.stripMargin)

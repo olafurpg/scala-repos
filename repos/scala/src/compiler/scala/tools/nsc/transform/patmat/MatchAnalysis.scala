@@ -148,8 +148,8 @@ trait TreeAndTypeAnalysis extends Debugging {
               sym.sealedChildren.toList
                 .sortBy(_.sealedSortName)
                 .filterNot(x =>
-                      x.isSealed && x.isAbstractClass &&
-                        !isPrimitiveValueClass(x))
+                  x.isSealed && x.isAbstractClass &&
+                    !isPrimitiveValueClass(x))
             }
 
             // enumerate only direct subclasses,
@@ -184,9 +184,9 @@ trait TreeAndTypeAnalysis extends Debugging {
             List(
                 debug.patmatResult(
                     s"enum sealed tp=$tp, tpApprox=$tpApprox as") {
-              // valid subtypes are turned into checkable types, as we are entering the realm of the dynamic
-              filterChildren(subclasses)
-            })
+                  // valid subtypes are turned into checkable types, as we are entering the realm of the dynamic
+                  filterChildren(subclasses)
+                })
           }
         case sym if sym.isCase =>
           List(List(tp))
@@ -226,8 +226,8 @@ trait TreeAndTypeAnalysis extends Debugging {
     def uncheckableType(tp: Type): Boolean = {
       val checkable =
         ((isTupleType(tp) &&
-                  tupleComponents(tp).exists(tp => !uncheckableType(tp))) ||
-              enumerateSubtypes(tp, grouped = false).nonEmpty)
+          tupleComponents(tp).exists(tp => !uncheckableType(tp))) ||
+          enumerateSubtypes(tp, grouped = false).nonEmpty)
       // if (!checkable) debug.patmat("deemed uncheckable: "+ tp)
       !checkable
     }
@@ -353,9 +353,9 @@ trait MatchApproximation
 
           val okSubst = Substitution(unboundFrom, unboundTo map (normalize(_))) // it's important substitution does not duplicate trees here -- it helps to keep hash consing simple, anyway
           pointsToBound ++= ((okSubst.from, okSubst.to).zipped filter {
-                (f, t) =>
-                  pointsToBound exists (sym => t.exists(_.symbol == sym))
-              })._1
+            (f, t) =>
+              pointsToBound exists (sym => t.exists(_.symbol == sym))
+          })._1
           // debug.patmat("pointsToBound: "+ pointsToBound)
 
           accumSubst >>= okSubst
@@ -540,10 +540,9 @@ trait MatchAnalysis extends MatchApproximation {
         var reachable = true
         var caseIndex = 0
 
-        debug.patmat(
-            "reachability, vars:\n" +
-              ((propsCasesFail flatMap gatherVariables).distinct map (_.describe) mkString
-                    ("\n")))
+        debug.patmat("reachability, vars:\n" +
+          ((propsCasesFail flatMap gatherVariables).distinct map (_.describe) mkString
+            ("\n")))
         debug.patmat(s"equality axioms:\n$eqAxiomsOk")
 
         // invariant (prefixRest.length == current.length) && (prefix.reverse ++ prefixRest == symbolicCasesFail)
@@ -713,9 +712,9 @@ trait MatchAnalysis extends MatchApproximation {
         other match {
           case other @ ListExample(_) =>
             this == other || ((elems.length == other.elems.length) &&
-                  (elems zip other.elems).forall {
-                    case (a, b) => a coveredBy b
-                  })
+              (elems zip other.elems).forall {
+                case (a, b) => a coveredBy b
+              })
           case _ => super.coveredBy(other)
         }
 
@@ -729,9 +728,9 @@ trait MatchAnalysis extends MatchApproximation {
         other match {
           case TupleExample(otherArgs) =>
             this == other || ((ctorArgs.length == otherArgs.length) &&
-                  (ctorArgs zip otherArgs).forall {
-                    case (a, b) => a coveredBy b
-                  })
+              (ctorArgs zip otherArgs).forall {
+                case (a, b) => a coveredBy b
+              })
           case _ => super.coveredBy(other)
         }
     }
@@ -861,7 +860,7 @@ trait MatchAnalysis extends MatchApproximation {
         // since we want to report all missing cases
         // (i.e., combinations)
         val cartesianProd = expanded.reduceLeft((xs, ys) =>
-              for {
+          for {
             map1 <- xs
             map2 <- ys
           } yield {
@@ -1002,7 +1001,7 @@ trait MatchAnalysis extends MatchApproximation {
               case _
                   if cls != NoSymbol && !isPrimitiveValueClass(cls) &&
                     (uniqueEqualTo.nonEmpty || (fields.nonEmpty &&
-                              prunedEqualTo.isEmpty && notEqualTo.isEmpty)) =>
+                      prunedEqualTo.isEmpty && notEqualTo.isEmpty)) =>
                 def args(brevity: Boolean = beBrief) = {
                   // figure out the constructor arguments from the field assignment
                   val argLen = (caseFieldAccs.length min ctorParams.length)

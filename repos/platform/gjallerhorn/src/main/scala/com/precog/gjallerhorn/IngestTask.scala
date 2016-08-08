@@ -50,8 +50,8 @@ class IngestTask(settings: Settings)
       val account = createAccount
       val req =
         (((ingest / "sync" / "fs").POST / account.bareRootPath / "foo" / "") <<? List(
-                "apiKey" -> account.apiKey,
-                "ownerAccountId" -> account.accountId) << simpleData)
+            "apiKey" -> account.apiKey,
+            "ownerAccountId" -> account.accountId) << simpleData)
       val res = http(req)()
       EventuallyResults.eventually(10, 1.second) {
         val json =

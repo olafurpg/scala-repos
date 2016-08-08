@@ -116,8 +116,8 @@ abstract class Pickler extends SubComponent {
     private def isLocalToPickle(sym: Symbol): Boolean =
       (sym != NoSymbol) && !sym.isPackageClass &&
         (isRootSym(sym) || sym.isRefinementClass || sym.isAbstractType &&
-              sym.hasFlag(EXISTENTIAL) // existential param
-              || sym.isParameter || isLocalToPickle(sym.owner))
+          sym.hasFlag(EXISTENTIAL) // existential param
+          || sym.isParameter || isLocalToPickle(sym.owner))
     private def isExternalSymbol(sym: Symbol): Boolean =
       (sym != NoSymbol) && !isLocalToPickle(sym)
 

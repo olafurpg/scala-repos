@@ -41,9 +41,9 @@ class SetupScalaSdkNotificationProvider(project: Project,
       .filter(!_.getName.endsWith(".sbt")) // root SBT files belong to main (not *-build) modules
       .filter(_.isWritable)
       .flatMap(psiFile =>
-            Option(ModuleUtilCore.findModuleForPsiElement(psiFile)))
+        Option(ModuleUtilCore.findModuleForPsiElement(psiFile)))
       .filter(module =>
-            ModuleUtil.getModuleType(module) == JavaModuleType.getModuleType)
+        ModuleUtil.getModuleType(module) == JavaModuleType.getModuleType)
       .filter(!_.getName.endsWith("-build")) // gen-idea doesn't use the SBT module type
       .map(module => module.hasScala)
 

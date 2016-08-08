@@ -304,7 +304,7 @@ class ProducerFeatureTest
       filterEvents(EventFilter[Exception](occurrences = 1)) {
         val producerSupervisor =
           system.actorOf(Props(new ProducerSupervisor(
-                                 Props(new ChildProducer("mock:mock", true)))),
+                             Props(new ChildProducer("mock:mock", true)))),
                          "21-ignore-deadletter-sender-ref-test")
         mockEndpoint.reset()
         producerSupervisor.tell(CamelMessage("test", Map()), testActor)

@@ -92,7 +92,7 @@ class ModelSpec extends AkkaSpec {
     credentialsOfRequest(HttpRequest()) should be(None)
     credentialsOfRequest(
         HttpRequest(headers = List(Authorization(GenericHttpCredentials(
-                        "Other",
-                        Map.empty[String, String]))))) should be(None)
+            "Other",
+            Map.empty[String, String]))))) should be(None)
   }
 }

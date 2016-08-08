@@ -29,7 +29,7 @@ class FusingSpec extends AkkaSpec {
             .fold(0)(_ + _)
             .to(Sink.head.named("otherSink"))
             .addAttributes(if (async) Attributes.asyncBoundary
-                else Attributes.none))
+            else Attributes.none))
       .via(Flow[Int].fold(1)(_ + _).named("mainSink"))
 
   def singlePath[S <: Shape, M](fg: FusedGraph[S, M],

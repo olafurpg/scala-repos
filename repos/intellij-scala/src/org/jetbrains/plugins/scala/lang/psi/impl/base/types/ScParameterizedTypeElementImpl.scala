@@ -138,8 +138,8 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
         case w: ScWildcardTypeElement =>
           forSomeBuilder.append(
               "type _" + "$" + count + w.lowerTypeElement.fold("")(te =>
-                    s" >: ${te.getText}") + w.upperTypeElement.fold("")(te =>
-                    s" <: ${te.getText}"))
+                s" >: ${te.getText}") + w.upperTypeElement.fold("")(te =>
+                s" <: ${te.getText}"))
           forSomeBuilder.append("; ")
           val res = s"_$$$count"
           count += 1

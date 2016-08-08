@@ -136,15 +136,15 @@ object SwankProtocolCommon {
 
   implicit val DebugThreadIdFormat: SexpFormat[DebugThreadId] = viaString(
       new ViaString[DebugThreadId] {
-    def toSexpString(id: DebugThreadId) = id.id.toString
-    def fromSexpString(s: String) = DebugThreadId(s)
-  })
+        def toSexpString(id: DebugThreadId) = id.id.toString
+        def fromSexpString(s: String) = DebugThreadId(s)
+      })
 
   implicit val DebugObjectIdFormat: SexpFormat[DebugObjectId] = viaString(
       new ViaString[DebugObjectId] {
-    def toSexpString(id: DebugObjectId) = id.id.toString
-    def fromSexpString(s: String) = DebugObjectId(s)
-  })
+        def toSexpString(id: DebugObjectId) = id.id.toString
+        def fromSexpString(s: String) = DebugObjectId(s)
+      })
 
   implicit val DebugObjectReferenceHint =
     TypeHint[DebugObjectReference](SexpSymbol("reference"))

@@ -15,7 +15,7 @@ object Test extends App {
 
     def ok(t: Throwable) = {
       allowedMissingPackages.exists(p =>
-            t.getMessage.replace('/', '.').contains(p))
+        t.getMessage.replace('/', '.').contains(p))
     }
 
     def unapply(t: Throwable): Option[Throwable] = t match {

@@ -68,8 +68,8 @@ object ExtractionBugs extends Specification {
     implicit val formats = DefaultFormats.withHints(
         FullTypeHints(classOf[ExtractWithAnyRef] :: Nil))
     val json = JObject(JField(
-            "jsonClass",
-            JString(classOf[ExtractWithAnyRef].getName)) :: Nil)
+        "jsonClass",
+        JString(classOf[ExtractWithAnyRef].getName)) :: Nil)
     val extracted = Extraction.extract[AnyRef](json)
     extracted mustEqual ExtractWithAnyRef()
   }

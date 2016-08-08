@@ -20,7 +20,7 @@ class ScalaLiteralSelectioner extends ExtendWordSelectionHandlerBase {
       val children = l.getNode.getChildren(null)
       children.length == 1 &&
       (children(0).getElementType == ScalaTokenTypes.tSTRING ||
-          children(0).getElementType == ScalaTokenTypes.tMULTILINE_STRING)
+      children(0).getElementType == ScalaTokenTypes.tMULTILINE_STRING)
     case _ => false
   }
 

@@ -49,7 +49,7 @@ class FrameSpec extends Specification {
     val intVec = vec.randi(3)
     val df = Panel(strVec, intVec)
     val df2 = df.rfilter(x =>
-          x.get(0).map(_.toString).getOrElse("").contains("string"))
+      x.get(0).map(_.toString).getOrElse("").contains("string"))
     df2.colType[Int] must_!= Frame.empty[Int, Int, Int]
     df2.colType[String] must_!= Frame.empty[Int, Int, String]
   }

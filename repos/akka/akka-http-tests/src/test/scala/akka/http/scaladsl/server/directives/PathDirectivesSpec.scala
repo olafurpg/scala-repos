@@ -237,8 +237,8 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
     {
       val test = testFor(
           pathPrefix(IntNumber.repeat(min = 2, max = 5, separator = ".")) {
-        echoCaptureAndUnmatchedPath
-      })
+            echoCaptureAndUnmatchedPath
+          })
       "reject [/foo]" in test()
       "reject [/1foo]" in test()
       "reject [/1.foo]" in test()

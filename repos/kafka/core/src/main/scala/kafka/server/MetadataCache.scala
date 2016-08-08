@@ -113,12 +113,10 @@ private[server] class MetadataCache(brokerId: Int) extends Logging {
                     replicaInfo.asJava,
                     isrInfo.asJava)
               } else if (isrInfo.size < isr.size) {
-                debug(
-                    "Error while fetching metadata for %s: in sync replica information not available for following brokers %s"
-                      .format(topicPartition,
-                              isr
-                                .filterNot(isrInfo.map(_.id).contains)
-                                .mkString(",")))
+                debug("Error while fetching metadata for %s: in sync replica information not available for following brokers %s"
+                  .format(
+                      topicPartition,
+                      isr.filterNot(isrInfo.map(_.id).contains).mkString(",")))
                 new MetadataResponse.PartitionMetadata(
                     Errors.REPLICA_NOT_AVAILABLE,
                     partitionId,
@@ -218,7 +216,7 @@ private[server] class MetadataCache(brokerId: Int) extends Logging {
             removePartitionInfo(tp.topic, tp.partition)
             stateChangeLogger.trace(
                 ("Broker %d deleted partition %s from metadata cache in response to UpdateMetadata request " +
-                      "sent by controller %d epoch %d with correlation id %d")
+                  "sent by controller %d epoch %d with correlation id %d")
                   .format(brokerId,
                           tp,
                           updateMetadataRequest.controllerId,
@@ -229,7 +227,7 @@ private[server] class MetadataCache(brokerId: Int) extends Logging {
             addOrUpdatePartitionInfo(tp.topic, tp.partition, partitionInfo)
             stateChangeLogger.trace(
                 ("Broker %d cached leader info %s for partition %s in response to UpdateMetadata request " +
-                      "sent by controller %d epoch %d with correlation id %d")
+                  "sent by controller %d epoch %d with correlation id %d")
                   .format(brokerId,
                           info,
                           tp,

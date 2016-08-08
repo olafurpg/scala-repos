@@ -235,8 +235,8 @@ package scala.collection.mutable {
         from: Option[K],
         until: Option[K])(implicit bf: CanBuildFrom[This, (K, V), That]) = {
       (bf.apply(entries) ++= entries.filter {
-            case (k, _) => in(k, from, until)
-          }).result()
+        case (k, _) => in(k, from, until)
+      }).result()
     }
 
     property("get, contains") = forAll {
@@ -250,7 +250,7 @@ package scala.collection.mutable {
         allEntries.forall {
           case (k, v) =>
             mapView.contains(k) == (in(k, from, until) &&
-                  entries.contains(k)) && mapView.get(k) ==
+              entries.contains(k)) && mapView.get(k) ==
               (if (in(k, from, until)) entries.get(k) else None)
         }
     }

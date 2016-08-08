@@ -48,7 +48,7 @@ object LowPriorityDerivationTests {
       instance[Option[T]](n => s"Option[${apply[T].msg(n - 1)}]")
     implicit def tuple2TC[A: TC, B: TC]: TC[(A, B)] =
       instance[(A, B)](n =>
-            s"(${apply[A].msg(n - 1)}, ${apply[B].msg(n - 1)})")
+        s"(${apply[A].msg(n - 1)}, ${apply[B].msg(n - 1)})")
     implicit val cc1TC: TC[CC1] = instance[CC1](_ => "CC1")
   }
 
@@ -76,7 +76,7 @@ object LowPriorityDerivationTests {
       instance[Option[T]](n => s"Option[${apply[T].msg(n - 1)}]")
     implicit def tuple2TC[A: TC0, B: TC0]: TC0[(A, B)] =
       instance[(A, B)](n =>
-            s"(${apply[A].msg(n - 1)}, ${apply[B].msg(n - 1)})")
+        s"(${apply[A].msg(n - 1)}, ${apply[B].msg(n - 1)})")
     implicit val cc1TC: TC0[CC1] = instance[CC1](_ => "CC1")
   }
 
@@ -97,7 +97,7 @@ object LowPriorityDerivationTests {
           tail: MkHListTC[T]): MkHListTC[H :: T] =
         new MkHListTC[H :: T] {
           lazy val tc = instance[H :: T](n =>
-                s"${head.value.msg(n - 1)} :: ${tail.tc.msg(n - 1)}")
+            s"${head.value.msg(n - 1)} :: ${tail.tc.msg(n - 1)}")
         }
     }
 
@@ -115,7 +115,7 @@ object LowPriorityDerivationTests {
           tail: MkCoproductTC[T]): MkCoproductTC[H :+: T] =
         new MkCoproductTC[H :+: T] {
           lazy val tc = instance[H :+: T](n =>
-                s"${head.value.msg(n - 1)} :+: ${tail.tc.msg(n - 1)}")
+            s"${head.value.msg(n - 1)} :+: ${tail.tc.msg(n - 1)}")
         }
     }
 
@@ -174,8 +174,7 @@ object LowPriorityDerivationTests {
           cbf: CanBuildFrom[Nothing, T, M[T]]): MkStdTC[M[T]] =
         new MkStdTC[M[T]] {
           lazy val tc = instance[M[T]](n =>
-                s"${cbf().result().toString.stripSuffix("()")}[${underlying
-              .msg(n - 1)}]")
+            s"${cbf().result().toString.stripSuffix("()")}[${underlying.msg(n - 1)}]")
         }
     }
 
@@ -223,7 +222,7 @@ object LowPriorityDerivationTests {
           tail: MkHListTC[T]): MkHListTC[H :: T] =
         new MkHListTC[H :: T] {
           lazy val tc = instance[H :: T](n =>
-                s"${head.value.msg(n - 1)} :: ${tail.tc.msg(n - 1)}")
+            s"${head.value.msg(n - 1)} :: ${tail.tc.msg(n - 1)}")
         }
     }
 
@@ -239,7 +238,7 @@ object LowPriorityDerivationTests {
           tail: MkCoproductTC[T]): MkCoproductTC[H :+: T] =
         new MkCoproductTC[H :+: T] {
           lazy val tc = instance[H :+: T](n =>
-                s"${head.value.msg(n - 1)} :+: ${tail.tc.msg(n - 1)}")
+            s"${head.value.msg(n - 1)} :+: ${tail.tc.msg(n - 1)}")
         }
     }
 

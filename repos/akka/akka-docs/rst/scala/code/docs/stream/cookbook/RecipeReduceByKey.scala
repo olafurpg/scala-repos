@@ -69,7 +69,7 @@ class RecipeReduceByKey extends RecipeSpec {
           reduceByKey(MaximumDistinctWords,
                       groupKey = (word: String) => word,
                       map = (word: String) => 1)((left: Int, right: Int) =>
-                left + right))
+            left + right))
       //#reduce-by-key-general
 
       Await

@@ -79,13 +79,8 @@ object Marshallers {
       contentType: ContentType,
       convert: function.Function[T, ResponseEntity]): Marshaller[T] =
     MarshallerImpl { _ ⇒
-      ScalaMarshaller.withFixedContentType(contentType.asScala)(
-          t ⇒
-            HttpResponse
-              .create()
-              .withStatus(200)
-              .withEntity(convert(t))
-              .asScala)
+      ScalaMarshaller.withFixedContentType(contentType.asScala)(t ⇒
+        HttpResponse.create().withStatus(200).withEntity(convert(t)).asScala)
     }
 
   /**
@@ -96,6 +91,6 @@ object Marshallers {
       convert: function.Function[T, HttpResponse]): Marshaller[T] =
     MarshallerImpl { _ ⇒
       ScalaMarshaller.withFixedContentType(contentType.asScala)(t ⇒
-            convert(t).asScala)
+        convert(t).asScala)
     }
 }

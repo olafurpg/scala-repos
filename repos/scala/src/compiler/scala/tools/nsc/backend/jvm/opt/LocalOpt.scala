@@ -281,7 +281,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
       // boxUnboxElimination) require not having unreachable instructions (null frames).
       val runDCE =
         (compilerSettings.YoptUnreachableCode &&
-              (requestDCE || nullnessOptChanged)) ||
+          (requestDCE || nullnessOptChanged)) ||
           compilerSettings.YoptBoxUnbox || compilerSettings.YoptCopyPropagation
       val (codeRemoved, liveLabels) =
         if (runDCE) removeUnreachableCodeImpl(method, ownerClassName)
@@ -308,7 +308,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
       val runStaleStores =
         compilerSettings.YoptCopyPropagation &&
           (requestStaleStores || nullnessOptChanged || codeRemoved ||
-                boxUnboxChanged || copyPropChanged)
+            boxUnboxChanged || copyPropChanged)
       val storesRemoved =
         runStaleStores && eliminateStaleStores(method, ownerClassName)
       traceIfChanged("staleStores")
@@ -332,7 +332,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
       // STORE-LOAD PAIRS
       val runStoreLoad =
         compilerSettings.YoptCopyPropagation && (requestStoreLoad ||
-              boxUnboxChanged || copyPropChanged || pushPopRemoved)
+          boxUnboxChanged || copyPropChanged || pushPopRemoved)
       val storeLoadRemoved = runStoreLoad && eliminateStoreLoad(method)
       traceIfChanged("storeLoadPairs")
 
@@ -621,7 +621,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
       def isSubType(aRefDesc: String, bClass: InternalName): Boolean =
         aRefDesc == bClass || bClass == ObjectRef.internalName || {
           (bTypeForDescriptorOrInternalNameFromClassfile(aRefDesc) conformsTo classBTypeFromParsedClassfile(
-                  bClass)).getOrElse(false)
+              bClass)).getOrElse(false)
         }
 
       lazy val typeAnalyzer = new NonLubbingTypeFlowAnalyzer(method, owner)

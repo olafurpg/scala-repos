@@ -134,7 +134,7 @@ object VerifyConsumerRebalance extends Logging {
                 if (!consumerIds.contains(partitionOwner)) {
                   error(
                       ("Owner %s for partition [%s,%d] is not a valid member of consumer " +
-                            "group %s")
+                        "group %s")
                         .format(partitionOwner, topic, partition, group))
                   rebalanceSucceeded = false
                 } else

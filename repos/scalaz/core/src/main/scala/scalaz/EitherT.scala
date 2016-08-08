@@ -429,7 +429,7 @@ private trait EitherTBindRec[F[_], E]
       a: A): EitherT[F, E, B] =
     EitherT(
         B.tailrecM[A, E \/ B](a =>
-              F.map(f(a).run) {
+          F.map(f(a).run) {
             // E \/ (A \/ B) => A \/ (E \/ B) is _.sequenceU but can't use here
             _.fold(e => \/.right(\/.left(e)),
                    _.fold(a => \/.left(a), b => \/.right(\/.right(b))))

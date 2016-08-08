@@ -46,7 +46,7 @@ object PovToEntry {
       lila.game.Pov.ofUserId(game, userId) ?? { pov =>
         lila.game.GameRepo.initialFen(game) zip
           (game.metadata.analysed ?? lila.analyse.AnalysisRepo
-                .byId(game.id)) map {
+            .byId(game.id)) map {
           case (fen, an) =>
             for {
               boards <- chess.Replay

@@ -766,7 +766,7 @@ class InlinerTest extends ClearAfterClass {
     val t2 = getSingleMethod(t, "t2")
     val cast = TypeOp(CHECKCAST, "C")
     Set(t1, t2).foreach(m =>
-          assert(m.instructions.contains(cast), m.instructions))
+      assert(m.instructions.contains(cast), m.instructions))
   }
 
   @Test
@@ -972,7 +972,7 @@ class InlinerTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compileClasses(
         newCompiler(extraArgs =
-              InlinerTest.args + " -Yopt-inline-heuristics:everything"))(code)
+          InlinerTest.args + " -Yopt-inline-heuristics:everything"))(code)
     assertInvoke(getSingleMethod(c, "t"), "java/lang/System", "arraycopy")
   }
 

@@ -75,9 +75,9 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
 
     "execute action composition first is the default" in makeRequest(
         new ComposedController {
-      @ActionAnnotation
-      override def action: Result = Results.ok()
-    }) { response =>
+          @ActionAnnotation
+          override def action: Result = Results.ok()
+        }) { response =>
       response.body must beEqualTo("actioncontroller")
     }
   }
@@ -85,9 +85,9 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
   "Java action composition" should {
     "ensure the right request is set when the context is modified down the chain" in makeRequest(
         new MockController {
-      @WithUsername("foo")
-      def action = Results.ok(request.username())
-    }) { response =>
+          @WithUsername("foo")
+          def action = Results.ok(request.username())
+        }) { response =>
       response.body must_== "foo"
     }
   }

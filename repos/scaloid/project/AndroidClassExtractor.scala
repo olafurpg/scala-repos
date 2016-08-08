@@ -137,14 +137,13 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         ((arity == 0 && isGetter(name)) || (arity == 1 && isSetter(name)))
       }.filter { m =>
         (!cls.getName.endsWith("Service") ||
-            !m.getName.equals("setForeground")) &&
+        !m.getName.equals("setForeground")) &&
         // Android 2.1.1 has a weird undocumented method. manually ignore this.
         (!cls.getName.endsWith("WebView") ||
-            !m.getName.equals("getZoomControls")) &&
+        !m.getName.equals("getZoomControls")) &&
         //https://github.com/pocorall/scaloid/issues/56
         (!cls.getName.endsWith("View") ||
-            !m.getName
-              .equals("setBackground")) // manually specifies this method
+        !m.getName.equals("setBackground")) // manually specifies this method
       }
 
       val allMethodNames = clsMethods.map(_.getName).toSet
@@ -265,7 +264,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
       listeners map { l =>
         if (listeners
               .filter(l2 =>
-                    l.name == l2.name && l.setterArgTypes == l2.setterArgTypes)
+                l.name == l2.name && l.setterArgTypes == l2.setterArgTypes)
               .length > 1) {
           val t = "(^set|^add|Listener$)".r.replaceAllIn(l.setter, "")
           l.copy(name = t.head.toLower + t.tail)
@@ -274,7 +273,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
     val constructorNames: Map[List[String], List[String]] = {
       val constRegex = ("public +" + clsName +
-            """(?:\<[\w\<\>\[\]]+)? *\(([^)]*)\) *(?:\{?|[^;])""").r
+        """(?:\<[\w\<\>\[\]]+)? *\(([^)]*)\) *(?:\{?|[^;])""").r
       val argRegex = """(.+?) +([a-z][^\[,. ]*)(?:,|$)""".r
 
       constRegex
@@ -318,7 +317,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         case Nil => Nil
         case last :: init =>
           (toTypeStr(last, isVarArgs, true) :: init.map(
-                  toTypeStr(_, isVarArgs, false))).reverse
+              toTypeStr(_, isVarArgs, false))).reverse
       }
 
       val args = typeStrs match {

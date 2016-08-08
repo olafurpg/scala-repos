@@ -148,7 +148,7 @@ abstract class HadoopFsRelationTest
           .add("index", IntegerType, nullable = false)
           .add("col", dataType, nullable = true)
         val rdd = sqlContext.sparkContext.parallelize((1 to 10).map(i =>
-                  Row(i, dataGenerator())))
+          Row(i, dataGenerator())))
         val df =
           sqlContext.createDataFrame(rdd, schema).orderBy("index").coalesce(1)
 
@@ -707,7 +707,7 @@ abstract class HadoopFsRelationTest
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
       clonedConf.asScala.foreach(entry =>
-            hadoopConfiguration.set(entry.getKey, entry.getValue))
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -760,7 +760,7 @@ abstract class HadoopFsRelationTest
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
       clonedConf.asScala.foreach(entry =>
-            hadoopConfiguration.set(entry.getKey, entry.getValue))
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
       sqlContext.sparkContext.conf
         .set("spark.speculation", speculationEnabled.toString)
     }

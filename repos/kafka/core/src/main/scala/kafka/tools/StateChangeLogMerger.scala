@@ -113,9 +113,8 @@ object StateChangeLogMerger extends Logging {
       System.exit(1)
     }
     if (options.has(partitionsOpt) && !options.has(topicOpt)) {
-      System.err.println(
-          "The option \"" + topicOpt +
-            "\" needs to be provided an argument when specifying partition ids")
+      System.err.println("The option \"" + topicOpt +
+        "\" needs to be provided an argument when specifying partition ids")
       parser.printHelpOn(System.err)
       System.exit(1)
     }
@@ -200,7 +199,7 @@ object StateChangeLogMerger extends Logging {
               case Some(matcher) =>
                 if ((topic == null || topic == matcher.group(1)) &&
                     (partitions.isEmpty ||
-                        partitions.contains(matcher.group(3).toInt)))
+                    partitions.contains(matcher.group(3).toInt)))
                   return new LineIterator(nextLine, itr)
               case None =>
             }

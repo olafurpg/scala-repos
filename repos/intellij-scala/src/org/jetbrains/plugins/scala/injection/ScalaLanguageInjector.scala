@@ -203,7 +203,7 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
             ScalaLanguageInjector withInjectionSupport { support =>
               ScalaLanguageInjector performSimpleInjection
                 (literals, injectedLanguage, new BaseInjection(support.getId),
-                    host, registrar, support)
+                host, registrar, support)
               true
             }
         } getOrElse false
@@ -273,7 +273,7 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
               if (injectedLanguage != null) {
                 ScalaLanguageInjector handleInjectionImpl
                   (literal, injectedLanguage, new BaseInjection(support.getId),
-                      list)
+                  list)
                 allInjections put (injectedLanguage, list)
               }
           }

@@ -27,7 +27,7 @@ object RestartNode3MultiJvmSpec extends MultiNodeConfig {
   commonConfig(
       debugConfig(on = false)
         .withFallback(ConfigFactory.parseString(
-                "akka.cluster.auto-down-unreachable-after = off"))
+            "akka.cluster.auto-down-unreachable-after = off"))
         .withFallback(MultiNodeClusterSpec.clusterConfig))
 
   testTransport(on = true)
@@ -55,7 +55,7 @@ abstract class RestartNode3Spec
       system.name,
       ConfigFactory
         .parseString("akka.remote.netty.tcp.port=" +
-              secondUniqueAddress.address.port.get)
+          secondUniqueAddress.address.port.get)
         .withFallback(system.settings.config))
 
   override def afterAll(): Unit = {
@@ -108,7 +108,7 @@ abstract class RestartNode3Spec
         testConductor.blackhole(first, third, Direction.Both).await
         val thirdAddress = address(third)
         awaitAssert(clusterView.unreachableMembers.map(_.address) should ===(
-                Set(thirdAddress)))
+            Set(thirdAddress)))
       }
       enterBarrier("third-unreachable")
 
@@ -136,7 +136,7 @@ abstract class RestartNode3Spec
         awaitAssert(
             Cluster(restartedSecondSystem).readView.members.size should ===(3))
         awaitAssert(Cluster(restartedSecondSystem).readView.members
-              .map(_.status) should ===(Set(Up)))
+          .map(_.status) should ===(Set(Up)))
       }
       runOn(first, third) {
         awaitAssert {

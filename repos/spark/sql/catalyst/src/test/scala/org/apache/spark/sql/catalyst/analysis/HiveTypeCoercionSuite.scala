@@ -264,9 +264,9 @@ class HiveTypeCoercionSuite extends PlanTest {
                  Literal(1.0) :: Literal(1) :: Literal
                    .create(1.0, FloatType) :: Nil),
              Coalesce(Cast(Literal(1.0), DoubleType) :: Cast(
-                     Literal(1),
-                     DoubleType) :: Cast(Literal.create(1.0, FloatType),
-                                         DoubleType) :: Nil))
+                 Literal(1),
+                 DoubleType) :: Cast(Literal.create(1.0, FloatType),
+                                     DoubleType) :: Nil))
     ruleTest(
         HiveTypeCoercion.FunctionArgumentConversion,
         Coalesce(

@@ -139,7 +139,7 @@ final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
       capacity: Int,
       fair: Boolean): ThreadPoolConfigBuilder =
     this.copy(config =
-          config.copy(queueFactory = arrayBlockingQueue(capacity, fair)))
+      config.copy(queueFactory = arrayBlockingQueue(capacity, fair)))
 
   def setFixedPoolSize(size: Int): ThreadPoolConfigBuilder =
     this.copy(config = config.copy(corePoolSize = size, maxPoolSize = size))
@@ -151,7 +151,7 @@ final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
 
   def setMaxPoolSize(size: Int): ThreadPoolConfigBuilder =
     this.copy(config =
-          config.copy(maxPoolSize = math.max(size, config.corePoolSize)))
+      config.copy(maxPoolSize = math.max(size, config.corePoolSize)))
 
   def setCorePoolSizeFromFactor(min: Int,
                                 multiplier: Double,

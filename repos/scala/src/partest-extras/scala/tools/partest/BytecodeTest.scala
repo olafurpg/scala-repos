@@ -109,8 +109,8 @@ abstract class BytecodeTest {
 
         println(
             s"""$line${" " * (lineWidth - line.toString.length)} ${if (a == b)
-          "=="
-        else "<>"} $a${" " * (width - a.length)} | $b""")
+              "=="
+            else "<>"} $a${" " * (width - a.length)} | $b""")
       }
     }
   }

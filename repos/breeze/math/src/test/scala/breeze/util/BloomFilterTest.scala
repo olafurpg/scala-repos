@@ -73,7 +73,7 @@ class BloomFilterTest extends FunSuite with Checkers {
           val numBuckets = 1000
           assert(numBuckets >= 0, numBuckets + " " + _numBuckets)
           (attempt1(numBuckets, numHashes, strings, strings2) ||
-              attempt1(numBuckets + 1, numHashes + 1, strings, strings2))
+          attempt1(numBuckets + 1, numHashes + 1, strings, strings2))
         }
     }
   }

@@ -16,10 +16,10 @@ object B extends Build {
   def baseProject =
     Project("root", file(".")) settings
       (ivyPaths <<= (baseDirectory, target)((dir, t) =>
-                new IvyPaths(dir, Some(t / "ivy-cache"))))
+        new IvyPaths(dir, Some(t / "ivy-cache"))))
   def sourceDep(p: Project) = p dependsOn (file("ext"))
   def binaryDep(p: Project) =
     p settings
       (libraryDependencies += "org.example" %% "app" % "0.1.17", resolvers <+=
-            baseDirectory(base => "sample" at (base / "repo").toURI.toString))
+        baseDirectory(base => "sample" at (base / "repo").toURI.toString))
 }

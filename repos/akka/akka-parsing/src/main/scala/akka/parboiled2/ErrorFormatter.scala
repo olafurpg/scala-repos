@@ -198,9 +198,8 @@ class ErrorFormatter(showExpected: Boolean = true,
         val ec = if (inCol == errorColumn - 1) sb.length else errorCol
         line.charAt(inCol) match {
           case '\t' ⇒
-            sb.append(
-                new String(Array.fill[Char](
-                        expandTabs - (sb.length % expandTabs))(' ')))
+            sb.append(new String(
+                Array.fill[Char](expandTabs - (sb.length % expandTabs))(' ')))
           case c ⇒ sb.append(c)
         }
         rec(inCol + 1, ec)

@@ -75,9 +75,7 @@ object GradientTester extends SerializableLogging {
         xx(k) -= epsilon
         val relDif =
           (grad -
-                trueGrad(k)).abs / math
-            .max(trueGrad(k).abs, grad.abs)
-            .max(1E-4)
+            trueGrad(k)).abs / math.max(trueGrad(k).abs, grad.abs).max(1E-4)
         if (relDif < tolerance) {
           ok += 1
           logger.debug(s"OK: ${toString(k)} $relDif")

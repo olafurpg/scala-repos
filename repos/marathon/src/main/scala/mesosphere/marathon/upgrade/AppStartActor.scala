@@ -33,7 +33,7 @@ class AppStartActor(val driver: SchedulerDriver,
     eventBus.unsubscribe(self)
     if (!promise.isCompleted) {
       if (promise.tryFailure(new AppStartCanceledException(
-                  "The app start has been cancelled"))) {
+              "The app start has been cancelled"))) {
         scheduler
           .stopApp(driver, app)
           .onFailure {

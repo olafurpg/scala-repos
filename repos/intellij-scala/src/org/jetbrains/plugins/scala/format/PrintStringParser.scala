@@ -17,7 +17,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 object PrintStringParser extends StringParser {
   def parse(element: PsiElement) = {
     extractPrintCall(element).map(p =>
-          FormattedStringParser.parseFormatCall(p._1, p._2))
+      FormattedStringParser.parseFormatCall(p._1, p._2))
   }
 
   def extractPrintCall(

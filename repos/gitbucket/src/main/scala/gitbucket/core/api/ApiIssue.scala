@@ -21,8 +21,8 @@ case class ApiIssue(
       s"/api/v3/repos/${repositoryName.fullName}/issues/${number}/comments")
   val html_url = ApiPath(
       s"/${repositoryName.fullName}/${if (isPullRequest) { "pull" } else {
-    "issues"
-  }}/${number}")
+        "issues"
+      }}/${number}")
   val pull_request = if (isPullRequest) {
     Some(
         Map(

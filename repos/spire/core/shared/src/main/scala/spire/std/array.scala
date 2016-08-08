@@ -95,8 +95,7 @@ object ArraySupport {
     z
   }
 
-  def timesl[
-      @sp(Int, Long, Float, Double) A: ClassTag: MultiplicativeSemigroup](
+  def timesl[@sp(Int, Long, Float, Double) A: ClassTag: MultiplicativeSemigroup](
       r: A,
       x: Array[A]): Array[A] = {
     val y = new Array[A](x.length)
@@ -127,8 +126,7 @@ object ArraySupport {
 trait ArrayInstances0 {
   type NI0[A] = NoImplicit[VectorSpace[Array[A], A]]
 
-  implicit def ArrayModule[
-      @sp(Int, Long, Float, Double) A: NI0: ClassTag: Ring]
+  implicit def ArrayModule[@sp(Int, Long, Float, Double) A: NI0: ClassTag: Ring]
     : Module[Array[A], A] =
     new ArrayModule[A]
 }
@@ -136,8 +134,7 @@ trait ArrayInstances0 {
 trait ArrayInstances1 extends ArrayInstances0 {
   type NI1[A] = NoImplicit[NormedVectorSpace[Array[A], A]]
 
-  implicit def ArrayVectorSpace[
-      @sp(Int, Long, Float, Double) A: NI1: ClassTag: Field]
+  implicit def ArrayVectorSpace[@sp(Int, Long, Float, Double) A: NI1: ClassTag: Field]
     : VectorSpace[Array[A], A] =
     new ArrayVectorSpace[A]
 
@@ -155,8 +152,7 @@ trait ArrayInstances2 extends ArrayInstances1 {
 }
 
 trait ArrayInstances3 extends ArrayInstances2 {
-  implicit def ArrayNormedVectorSpace[
-      @sp(Float, Double) A: Field: NRoot: ClassTag]
+  implicit def ArrayNormedVectorSpace[@sp(Float, Double) A: Field: NRoot: ClassTag]
     : NormedVectorSpace[Array[A], A] =
     ArrayInnerProductSpace[A].normed
 }
@@ -167,8 +163,7 @@ trait ArrayInstances extends ArrayInstances3 {
 }
 
 @SerialVersionUID(0L)
-private final class ArrayModule[
-    @sp(Int, Long, Float, Double) A: ClassTag: Ring](
+private final class ArrayModule[@sp(Int, Long, Float, Double) A: ClassTag: Ring](
     implicit nvs: NoImplicit[VectorSpace[Array[A], A]])
     extends Module[Array[A], A]
     with Serializable {
@@ -182,8 +177,7 @@ private final class ArrayModule[
 }
 
 @SerialVersionUID(0L)
-private final class ArrayVectorSpace[
-    @sp(Int, Float, Long, Double) A: ClassTag: Field](
+private final class ArrayVectorSpace[@sp(Int, Float, Long, Double) A: ClassTag: Field](
     implicit nnvs: NoImplicit[NormedVectorSpace[Array[A], A]])
     extends VectorSpace[Array[A], A]
     with Serializable {

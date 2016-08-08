@@ -26,7 +26,7 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
     val lefts =
       bind(value)((aa) => G.leftFoldable.foldMap(aa)(a => point(a))(monoid[A]))
     val rights = bind(value)((bb) =>
-          G.rightFoldable.foldMap(bb)(b => point(b))(monoid[B]))
+      G.rightFoldable.foldMap(bb)(b => point(b))(monoid[B]))
     (lefts, rights)
   }
 

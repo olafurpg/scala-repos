@@ -56,7 +56,7 @@ object Protobuf {
               val relative = src
                 .relativeTo(sources)
                 .getOrElse(throw new Exception(
-                        s"path $src is not a in source tree $sources"))
+                    s"path $src is not a in source tree $sources"))
                 .toString
               val tmp = targets / "protoc" / relative
               IO.delete(tmp)

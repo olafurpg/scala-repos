@@ -76,7 +76,7 @@ class FormatStringConverterSpec
     }
 
     examples.foreach(example =>
-          runConversionsForExamples(example._1, example._2))
+      runConversionsForExamples(example._1, example._2))
   }
 
   it should "convert Number to String and vice-versa" in {

@@ -233,15 +233,18 @@ class ProxyTest extends WordSpec {
 
     def apply[T <: I](instance: T) = {
       proxyConstructor
-        .newInstance(new reflect.InvocationHandler {
-          def invoke(p: AnyRef, method: reflect.Method, args: Array[AnyRef]) = {
-            try {
-              f.apply(() => method.invoke(instance, args: _*))
-            } catch {
-              case e: reflect.InvocationTargetException => throw e.getCause
-            }
-          }
-        })
+        .newInstance(
+            new reflect.InvocationHandler {
+              def invoke(p: AnyRef,
+                         method: reflect.Method,
+                         args: Array[AnyRef]) = {
+                try {
+                  f.apply(() => method.invoke(instance, args: _*))
+                } catch {
+                  case e: reflect.InvocationTargetException => throw e.getCause
+                }
+              }
+            })
         .asInstanceOf[I]
     }
   }

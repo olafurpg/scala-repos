@@ -196,10 +196,10 @@ abstract class MessageDispatcher(
     // IllegalStateException is thrown if scheduler has been shutdown
     try prerequisites.scheduler.scheduleOnce(shutdownTimeout, shutdownAction)(
         new ExecutionContext {
-      override def execute(runnable: Runnable): Unit = runnable.run()
-      override def reportFailure(t: Throwable): Unit =
-        MessageDispatcher.this.reportFailure(t)
-    })
+          override def execute(runnable: Runnable): Unit = runnable.run()
+          override def reportFailure(t: Throwable): Unit =
+            MessageDispatcher.this.reportFailure(t)
+        })
     catch {
       case _: IllegalStateException ⇒ shutdown()
     }
@@ -564,11 +564,10 @@ class DefaultExecutorServiceConfigurator(
   val provider: ExecutorServiceFactoryProvider =
     prerequisites.defaultExecutionContext match {
       case Some(ec) ⇒
-        prerequisites.eventStream.publish(
-            Debug(
-                "DefaultExecutorServiceConfigurator",
-                this.getClass,
-                s"Using passed in ExecutionContext as default executor for this ActorSystem. If you want to use a different executor, please specify one in akka.actor.default-dispatcher.default-executor."))
+        prerequisites.eventStream.publish(Debug(
+            "DefaultExecutorServiceConfigurator",
+            this.getClass,
+            s"Using passed in ExecutionContext as default executor for this ActorSystem. If you want to use a different executor, please specify one in akka.actor.default-dispatcher.default-executor."))
 
         new AbstractExecutorService with ExecutorServiceFactory
         with ExecutorServiceFactoryProvider {

@@ -8,7 +8,7 @@ object PartestUtil {
     private val testCaseDir = new SimpleFileFilter(
         f =>
           f.isDirectory && f.listFiles.nonEmpty && !(f.getParentFile /
-                (f.name + ".res")).exists)
+            (f.name + ".res")).exists)
     private val testCaseFilter =
       GlobFilter("*.scala") | GlobFilter("*.java") | GlobFilter("*.res") ||
         testCaseDir
@@ -115,7 +115,7 @@ object PartestUtil {
       val completion = Completions.strict(
           Set("<filename glob>",
               "<regex> (for source, flags or checkfile contents)").map(s =>
-                Completion.displayOnly(s)))
+            Completion.displayOnly(s)))
       val tokenCompletion = TokenCompletions.fixed((seen, level) => completion)
 
       val globOrPattern = StringBasic.map(expandGrep).flatMap {
@@ -127,7 +127,7 @@ object PartestUtil {
 
     val SrcPath =
       ((token(srcPathOption) <~ Space) ~ token(
-              StringBasic.examples(Set("files", "pending", "scaladoc")))) map {
+          StringBasic.examples(Set("files", "pending", "scaladoc")))) map {
         case opt ~ path =>
           srcPath = path
           opt + " " + path

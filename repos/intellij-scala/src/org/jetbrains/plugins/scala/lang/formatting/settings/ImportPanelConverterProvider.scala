@@ -99,7 +99,7 @@ class ImportPanelConverterProvider
                     value.addContent(settingsValue)
                   }
                   getElements.foreach(elem =>
-                        settingsValue.addContent(elem.clone()))
+                    settingsValue.addContent(elem.clone()))
                 }
                 JDOMUtil.writeDocument(new Document(root.clone()),
                                        file,

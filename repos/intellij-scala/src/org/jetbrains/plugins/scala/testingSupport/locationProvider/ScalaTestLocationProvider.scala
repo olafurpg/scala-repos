@@ -45,7 +45,7 @@ class ScalaTestLocationProvider extends SMTestLocator {
               .getInstance(project)
               .getClassesByFQName(className, scope)
             val found = clazzes.find(c =>
-                  Option(c.getContainingFile).exists(_.name == fileName))
+              Option(c.getContainingFile).exists(_.name == fileName))
 
             found match {
               case Some(file) =>
@@ -70,7 +70,7 @@ class ScalaTestLocationProvider extends SMTestLocator {
               .find(!_.isInstanceOf[ScObject])
               .orElse(classes.headOption)
             clazz.foreach(c =>
-                  res.add(new PsiLocationWithName(project, c, testName)))
+              res.add(new PsiLocationWithName(project, c, testName)))
           case ScalaTestTopOfMethodPattern(classFqn, methodName, testName) =>
             val classes = ScalaShortNamesCacheManager
               .getInstance(project)
@@ -105,7 +105,7 @@ class ScalaTestLocationProvider extends SMTestLocator {
               .instance(project)
               .getCachedClass(GlobalSearchScope.allScope(project), classFqn)
             val found = clazzes.find(c =>
-                  Option(c.getContainingFile).exists(_.name == fileName))
+              Option(c.getContainingFile).exists(_.name == fileName))
             found match {
               case Some(file) =>
                 res.add(

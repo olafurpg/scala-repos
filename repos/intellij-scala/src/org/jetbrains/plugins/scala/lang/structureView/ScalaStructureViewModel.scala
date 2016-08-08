@@ -38,8 +38,8 @@ class ScalaStructureViewModel(private val myRootElement: ScalaFile,
     with StructureViewModel.ElementInfoProvider {
   def isAlwaysLeaf(element: StructureViewTreeElement): Boolean =
     !(isAlwaysShowsPlus(element) ||
-          element.isInstanceOf[TestStructureViewElement] ||
-          element.isInstanceOf[ScalaValueStructureViewElement])
+      element.isInstanceOf[TestStructureViewElement] ||
+      element.isInstanceOf[ScalaValueStructureViewElement])
 
   def isAlwaysShowsPlus(element: StructureViewTreeElement): Boolean = {
     element match {

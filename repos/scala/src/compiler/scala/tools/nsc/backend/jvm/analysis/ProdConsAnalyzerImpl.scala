@@ -110,8 +110,8 @@ trait ProdConsAnalyzerImpl {
         _consumersOfOutputsFrom
           .get(insn)
           .map(v =>
-                v.indices.flatMap(v.apply)(collection.breakOut): Set[
-                    AbstractInsnNode])
+            v.indices
+              .flatMap(v.apply)(collection.breakOut): Set[AbstractInsnNode])
           .getOrElse(Set.empty)
     }
 

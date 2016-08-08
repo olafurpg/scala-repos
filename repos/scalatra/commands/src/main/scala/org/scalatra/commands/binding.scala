@@ -195,7 +195,7 @@ trait BindingImplicits
     safeOption(df.parse(_).map(_.toDate))
 
   implicit def stringToSeqDateTime(implicit df: DateParser =
-        JodaDateFormats.Web): TypeConverter[String, Seq[DateTime]] =
+    JodaDateFormats.Web): TypeConverter[String, Seq[DateTime]] =
     stringToSeq(stringToDateTime)
 
   implicit def stringToSeqDate(implicit df: DateParser = JodaDateFormats.Web)

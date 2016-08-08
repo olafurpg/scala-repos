@@ -235,7 +235,7 @@ private[sql] case class DataSourceScan(
     ctx.addMutableState("int", idx, s"$idx = 0;")
 
     val exprs = output.zipWithIndex.map(x =>
-          new BoundReference(x._2, x._1.dataType, true))
+      new BoundReference(x._2, x._1.dataType, true))
     val row = ctx.freshName("row")
     val numOutputRows = metricTerm(ctx, "numOutputRows")
 

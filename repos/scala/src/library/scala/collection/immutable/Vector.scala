@@ -285,10 +285,10 @@ final class Vector[+A] private[immutable] (
 
         val freeSpace =
           ((1 << 5 * (depth)) -
-                endIndex) // free space at the right given the current tree-structure depth
+            endIndex) // free space at the right given the current tree-structure depth
         val shift =
           freeSpace & ~((1 << 5 * (depth - 1)) -
-                1) // number of elements by which we'll shift right (only move at top level)
+            1) // number of elements by which we'll shift right (only move at top level)
         val shiftBlocks =
           freeSpace >>> 5 * (depth - 1) // number of top-level blocks
 

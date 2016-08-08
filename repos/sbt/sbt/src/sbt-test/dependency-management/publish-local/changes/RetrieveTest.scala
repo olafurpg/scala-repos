@@ -18,9 +18,9 @@ object MultiPublishTest extends Build {
   lazy val root =
     Project("root", file(".")) settings
       (name := "Retrieve Test", mavenStyle, libraryDependencies <<=
-            publishMavenStyle { style =>
-              if (style) mavenStyleDependencies else ivyStyleDependencies
-            })
+        publishMavenStyle { style =>
+          if (style) mavenStyleDependencies else ivyStyleDependencies
+        })
 
   lazy val mavenStyle =
     publishMavenStyle <<= baseDirectory { base =>

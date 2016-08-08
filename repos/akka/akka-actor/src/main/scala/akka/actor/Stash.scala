@@ -236,7 +236,7 @@ private[akka] trait StashSupport {
   private[akka] def unstashAll(filterPredicate: Any ⇒ Boolean): Unit = {
     try {
       val i = theStash.reverseIterator.filter(envelope ⇒
-            filterPredicate(envelope.message))
+        filterPredicate(envelope.message))
       while (i.hasNext) enqueueFirst(i.next())
     } finally {
       theStash = Vector.empty[Envelope]

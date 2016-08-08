@@ -41,7 +41,7 @@ object SelectorConditions {
                                        GlobalSearchScope.allScope(project),
                                        ClassCategory.ALL)
               (psiClass != null && base != null &&
-                  ScEquivalenceUtil.areClassesEquivalent(psiClass, base)) ||
+              ScEquivalenceUtil.areClassesEquivalent(psiClass, base)) ||
               manager.cachedDeepIsInheritor(psiClass, base)
             }
           }

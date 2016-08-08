@@ -34,13 +34,13 @@ class ConvertToCurlyBracesIntention extends PsiElementBaseIntentionAction {
     val block = ScalaPsiElementFactory.parseElement("{}", manager)
 
     for (lParen <- Option(statement.findFirstChildByType(
-                          ScalaTokenTypes.tLPARENTHESIS))) {
+                      ScalaTokenTypes.tLPARENTHESIS))) {
       val lBrace = lParen.replace(block.getFirstChild)
       statement.addAfter(ScalaPsiElementFactory.createNewLine(manager), lBrace)
     }
 
     for (rParen <- Option(statement.findFirstChildByType(
-                          ScalaTokenTypes.tRPARENTHESIS))) {
+                      ScalaTokenTypes.tRPARENTHESIS))) {
       val rBrace = rParen.replace(block.getLastChild)
       statement
         .addBefore(ScalaPsiElementFactory.createNewLine(manager), rBrace)

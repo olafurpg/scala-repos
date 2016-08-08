@@ -254,10 +254,10 @@ trait MMRegistry2[R] {
     for (pair @ (aa, bb) <- options.keys) {
       // if there is no option (aaa,bbb) s.t. aaa <: aa && bbb <: bb, then add it to the list
       if (!bestCandidates.exists(pair =>
-                aa.isAssignableFrom(pair._1) &&
-                  bb.isAssignableFrom(pair._2))) {
+            aa.isAssignableFrom(pair._1) &&
+              bb.isAssignableFrom(pair._2))) {
         bestCandidates = bestCandidates.filterNot(pair =>
-              pair._1.isAssignableFrom(aa) && pair._2.isAssignableFrom(bb))
+          pair._1.isAssignableFrom(aa) && pair._2.isAssignableFrom(bb))
         bestCandidates += pair
       }
     }
@@ -332,8 +332,8 @@ trait MMRegistry3[R] {
     for (pair @ (aa, bb, cc) <- options.keys) {
       // if there is no option (aaa,bbb) s.t. aaa <: aa && bbb <: bb, then add it to the list
       if (!bestCandidates.exists(pair =>
-                aa.isAssignableFrom(pair._1) &&
-                  bb.isAssignableFrom(pair._2)) &&
+            aa.isAssignableFrom(pair._1) &&
+              bb.isAssignableFrom(pair._2)) &&
           cc.isAssignableFrom(pair._3)) {
         bestCandidates = bestCandidates.filterNot(
             pair =>

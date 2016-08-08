@@ -89,9 +89,9 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
         .treeWalkUp(completionProcessor, elem, null, ResolveState.initial)
       completionProcessor.candidates
         .filter(srr =>
-              !alreadyCollected.asScala
-                .map(ScalaParameterNameAdjuster.fixName)
-                .contains(srr.name))
+          !alreadyCollected.asScala
+            .map(ScalaParameterNameAdjuster.fixName)
+            .contains(srr.name))
         .filter(canEvaluate(_, elem))
     }
     val candidates =
@@ -189,18 +189,21 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
       if (contextClass == containingClass) return false
 
       val placesToSearch = ArrayBuffer[PsiElement]()
-      contextClass.accept(new ScalaRecursiveElementVisitor() {
-        override def visitFunctionDefinition(fun: ScFunctionDefinition): Unit = {
-          placesToSearch += fun
-        }
+      contextClass.accept(
+          new ScalaRecursiveElementVisitor() {
+            override def visitFunctionDefinition(
+                fun: ScFunctionDefinition): Unit = {
+              placesToSearch += fun
+            }
 
-        override def visitPatternDefinition(pat: ScPatternDefinition): Unit = {
-          pat match {
-            case LazyVal(_) => placesToSearch += pat
-            case _ =>
-          }
-        }
-      })
+            override def visitPatternDefinition(
+                pat: ScPatternDefinition): Unit = {
+              pat match {
+                case LazyVal(_) => placesToSearch += pat
+                case _ =>
+              }
+            }
+          })
       if (placesToSearch.isEmpty) true
       else {
         val scopes = placesToSearch.map(new LocalSearchScope(_))

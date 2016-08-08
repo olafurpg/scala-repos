@@ -39,7 +39,7 @@ trait ScalacPatternExpanders {
       val seq = repeatedToSeq(tpe)
 
       (typeOfMemberNamedHead(seq) orElse typeOfMemberNamedApply(seq) orElse definitions
-            .elementType(ArrayClass, seq))
+        .elementType(ArrayClass, seq))
     }
     def newExtractor(whole: Type,
                      fixed: List[Type],

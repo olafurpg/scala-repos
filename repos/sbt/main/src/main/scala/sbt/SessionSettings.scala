@@ -121,7 +121,7 @@ object SessionSettings {
     */
   def clearSettings(s: State): State =
     withSettings(s)(session =>
-          reapply(session.copy(append = session.append - session.current), s))
+      reapply(session.copy(append = session.append - session.current), s))
 
   /** This will clear ALL transient session settings in a given build state, returning the new build state. */
   def clearAllSettings(s: State): State =
@@ -356,16 +356,14 @@ save, save-all
   /** Parser for the session command. */
   lazy val parser =
     token(Space) ~>
-      (token("list-all" ^^^ new Print(true)) | token(
-              "list" ^^^ new Print(false)) | token(
-              "clear" ^^^ new Clear(false)) | token(
-              "save-all" ^^^ new Save(true)) | token(
-              "save" ^^^ new Save(false)) | token(
-              "clear-all" ^^^ new Clear(true)) | remove)
+      (token("list-all" ^^^ new Print(true)) | token("list" ^^^ new Print(
+          false)) | token("clear" ^^^ new Clear(false)) | token(
+          "save-all" ^^^ new Save(true)) | token("save" ^^^ new Save(false)) | token(
+          "clear-all" ^^^ new Clear(true)) | remove)
 
   lazy val remove =
     token("remove") ~> token(Space) ~> natSelect.map(ranges =>
-          new Remove(ranges))
+      new Remove(ranges))
 
   def natSelect = rep1sep(token(range, "<range>"), ',')
 

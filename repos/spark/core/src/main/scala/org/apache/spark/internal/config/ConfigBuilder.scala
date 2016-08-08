@@ -99,7 +99,7 @@ private[spark] class TypedConfigBuilder[T](val parent: ConfigBuilder,
       if (!validValues.contains(v)) {
         throw new IllegalArgumentException(
             s"The value of ${parent.key} should be one of ${validValues
-          .mkString(", ")}, but was $v")
+              .mkString(", ")}, but was $v")
       }
       v
     }

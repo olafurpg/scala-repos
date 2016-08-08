@@ -250,7 +250,7 @@ trait FieldConversions extends LowPriorityFieldConversions {
             StringField(y)(Ordering.comparatorToOrdering(comparator), None)
           case z =>
             sys.error("not expecting object of type " + z.getClass +
-                  " as field name")
+              " as field name")
         }
     })
   }

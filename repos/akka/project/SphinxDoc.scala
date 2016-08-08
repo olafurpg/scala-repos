@@ -65,13 +65,12 @@ object SphinxDoc {
 
   // pre-processing settings for sphinx
   lazy val sphinxPreprocessing =
-    inConfig(Sphinx)(
-        Seq(
-            target in preprocess <<= baseDirectory / "rst_preprocessed",
-            preprocessExts := Set("rst", "py"),
-            // customization of sphinx @<key>@ replacements, add to all sphinx-using projects
-            // add additional replacements here
-            preprocessVars <<= (scalaVersion, version) { (s, v) =>
+    inConfig(Sphinx)(Seq(
+        target in preprocess <<= baseDirectory / "rst_preprocessed",
+        preprocessExts := Set("rst", "py"),
+        // customization of sphinx @<key>@ replacements, add to all sphinx-using projects
+        // add additional replacements here
+        preprocessVars <<= (scalaVersion, version) { (s, v) =>
           val BinVer = """(\d+\.\d+)\.\d+""".r
           Map(
               "version" -> v,
@@ -96,12 +95,12 @@ object SphinxDoc {
               "github" -> GitHub.url(v)
           )
         },
-            preprocess <<= (sourceDirectory,
-                            target in preprocess,
-                            cacheDirectory,
-                            preprocessExts,
-                            preprocessVars,
-                            streams) map {
+        preprocess <<= (sourceDirectory,
+                        target in preprocess,
+                        cacheDirectory,
+                        preprocessExts,
+                        preprocessVars,
+                        streams) map {
           (src, target, cacheDir, exts, vars, s) =>
             simplePreprocess(src,
                              target,
@@ -110,11 +109,11 @@ object SphinxDoc {
                              vars,
                              s.log)
         },
-            sphinxInputs <<=
-              (sphinxInputs, preprocess) map { (inputs, preprocessed) =>
+        sphinxInputs <<=
+          (sphinxInputs, preprocess) map { (inputs, preprocessed) =>
             inputs.copy(src = preprocessed)
           }
-        )) ++ Seq(
+    )) ++ Seq(
         cleanFiles <+= target in preprocess in Sphinx
     )
 }

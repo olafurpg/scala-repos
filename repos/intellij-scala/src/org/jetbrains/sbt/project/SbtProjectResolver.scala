@@ -148,7 +148,7 @@ class SbtProjectResolver
           val dependency = moduleNodes
             .find(_.getId == dependencyId.project)
             .getOrElse(throw new ExternalSystemException(
-                    "Cannot find project dependency: " + dependencyId.project))
+                "Cannot find project dependency: " + dependencyId.project))
           val data = new ModuleDependencyNode(moduleNode, dependency)
           data.setScope(scopeFor(dependencyId.configuration))
           data.setExported(true)
@@ -167,12 +167,10 @@ class SbtProjectResolver
       val moduleNode = createModule(project, moduleFilesDirectory)
       val contentRootNode = createContentRoot(project)
       project.android.foreach(a =>
-            a.apklibs.foreach(addApklibDirs(contentRootNode, _)))
+        a.apklibs.foreach(addApklibDirs(contentRootNode, _)))
       moduleNode.add(contentRootNode)
-      moduleNode.addAll(
-          createLibraryDependencies(project.dependencies.modules)(
-              moduleNode,
-              libraryNodes.map(_.data)))
+      moduleNode.addAll(createLibraryDependencies(
+          project.dependencies.modules)(moduleNode, libraryNodes.map(_.data)))
       moduleNode.add(createModuleExtData(project))
       moduleNode.addAll(project.android.map(createFacet(project, _)).toSeq)
       moduleNode.addAll(
@@ -221,7 +219,7 @@ class SbtProjectResolver
       project: sbtStructure.ProjectData): ModuleExtNode = {
     val scalaVersion = project.scala.map(s => Version(s.version))
     val scalacClasspath = project.scala.fold(Seq.empty[File])(s =>
-          s.compilerJar +: s.libraryJar +: s.extraJars)
+      s.compilerJar +: s.libraryJar +: s.extraJars)
     val scalacOptions = project.scala.fold(Seq.empty[String])(_.options)
     val javacOptions = project.java.fold(Seq.empty[String])(_.options)
     val jdk = project.android
@@ -338,14 +336,14 @@ class SbtProjectResolver
 
     val managedDirectories = project.configurations
       .flatMap(configuration =>
-            configuration.sources ++ configuration.resources)
+        configuration.sources ++ configuration.resources)
       .filter(_.managed)
       .map(_.file)
 
     val defaultNames = Set("main", "test")
 
     val relevantDirectories = managedDirectories.filter(file =>
-          file.exists || !defaultNames.contains(file.getName))
+      file.exists || !defaultNames.contains(file.getName))
     def isRelevant(f: File): Boolean =
       !relevantDirectories.forall(_.isOutsideOf(f))
 

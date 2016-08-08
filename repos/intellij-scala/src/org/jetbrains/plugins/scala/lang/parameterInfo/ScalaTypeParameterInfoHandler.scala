@@ -132,26 +132,26 @@ class ScalaTypeParameterInfoHandler
       buffer.append(
           params
             .map((param: PsiTypeParameter) => {
-          val isBold =
-            if (params.indexOf(param) == index) true
-            else {
-              //todo: check type
-              false
-            }
-          var paramText = param.name
-          if (paramText == "?") paramText = "_"
-          val refTypes = param.getExtendsList.getReferencedTypes
-          if (refTypes.nonEmpty) {
-            paramText =
-              paramText + refTypes
-                .map((typez: PsiType) => {
-                  ScType.presentableText(substitutor.subst(
+              val isBold =
+                if (params.indexOf(param) == index) true
+                else {
+                  //todo: check type
+                  false
+                }
+              var paramText = param.name
+              if (paramText == "?") paramText = "_"
+              val refTypes = param.getExtendsList.getReferencedTypes
+              if (refTypes.nonEmpty) {
+                paramText =
+                  paramText + refTypes
+                    .map((typez: PsiType) => {
+                      ScType.presentableText(substitutor.subst(
                           ScType.create(typez, param.getProject)))
-                })
-                .mkString(" <: ", " with ", "")
-          }
-          if (isBold) "<b>" + paramText + "</b>" else paramText
-        })
+                    })
+                    .mkString(" <: ", " with ", "")
+              }
+              if (isBold) "<b>" + paramText + "</b>" else paramText
+            })
             .mkString(", "))
     }
   }
@@ -163,9 +163,8 @@ class ScalaTypeParameterInfoHandler
     if (params.isEmpty)
       buffer.append(CodeInsightBundle.message("parameter.info.no.parameters"))
     else {
-      buffer.append(
-          params
-            .map((param: ScTypeParam) => {
+      buffer.append(params
+        .map((param: ScTypeParam) => {
           val isBold =
             if (params.indexOf(param) == index) true
             else {
@@ -200,7 +199,7 @@ class ScalaTypeParameterInfoHandler
           }
           if (isBold) "<b>" + paramText + "</b>" else paramText
         })
-            .mkString(", "))
+        .mkString(", "))
     }
   }
 

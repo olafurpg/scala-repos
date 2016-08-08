@@ -61,7 +61,7 @@ class ScalaInlineHandler extends InlineHandler {
       var psiElement = value.getNextSibling
       while (psiElement != null &&
              (psiElement.getNode.getElementType == ScalaTokenTypes.tSEMICOLON ||
-                 psiElement.getText.trim == "")) {
+             psiElement.getText.trim == "")) {
         children += psiElement
         psiElement = psiElement.getNextSibling
       }
@@ -201,10 +201,10 @@ class ScalaInlineHandler extends InlineHandler {
                       inlineTitleSuffix)
       else if (!psiNamedElement.isInstanceOf[ScTypeAliasDefinition] &&
                refs.exists(ref =>
-                     ScalaPsiUtil.getParentOfType(
-                         ref.getElement,
-                         classOf[ScStableCodeReferenceElement],
-                         classOf[ScStableReferenceElementPattern]) != null))
+                 ScalaPsiUtil.getParentOfType(
+                     ref.getElement,
+                     classOf[ScStableCodeReferenceElement],
+                     classOf[ScStableReferenceElementPattern]) != null))
         showErrorHint(ScalaBundle.message("cannot.inline.stable.reference"),
                       inlineTitleSuffix)
       else if (!ApplicationManager.getApplication.isUnitTestMode) {

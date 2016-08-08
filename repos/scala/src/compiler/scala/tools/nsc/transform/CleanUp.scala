@@ -24,7 +24,7 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
   private var entryPoints: List[Symbol] = Nil
   def getEntryPoints: List[Symbol] =
     entryPoints sortBy ("" +
-          _.fullName) // For predictably ordered error messages.
+      _.fullName) // For predictably ordered error messages.
 
   protected def newTransformer(unit: CompilationUnit): Transformer =
     new CleanUpTransformer(unit)
@@ -43,7 +43,7 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
       clearStatics()
       val newBody = transformTrees(body)
       val templ = deriveTemplate(tree)(_ =>
-            transformTrees(newStaticMembers.toList) ::: newBody)
+        transformTrees(newStaticMembers.toList) ::: newBody)
       try if (newStaticInits.isEmpty) templ
       else
         deriveTemplate(templ)(
@@ -159,7 +159,7 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
                 BLOCK(
                     REF(methodSym) ===
                       (REF(currentRun.runDefinitions.ensureAccessibleMethod) APPLY
-                            (methodSymRHS)),
+                        (methodSymRHS)),
                     cacheAdd,
                     Return(REF(methodSym))
                 )
@@ -225,7 +225,7 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
           // and the method name should be in the primitive->structural map.
           def isJavaValueMethod =
             ((resType :: paramTypes forall isJavaValueType) && // issue #1110
-                  (getPrimitiveReplacementForStructuralCall(methSym.name).isDefined))
+              (getPrimitiveReplacementForStructuralCall(methSym.name).isDefined))
           // Erasure lets Unit through as Unit, but a method returning Any will have an
           // erased return type of Object and should also allow Unit.
           def isDefinitelyUnit = (resultSym == UnitClass)
@@ -514,7 +514,7 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
         super.transform(
             treeCopy.ApplyDynamic(tree,
                                   atPos(fn.pos)(Ident(SymbolLiteral_dummy)
-                                        .setType(SymbolLiteral_dummy.info)),
+                                    .setType(SymbolLiteral_dummy.info)),
                                   LIT(SymbolLiteral_bootstrap) :: arg :: Nil))
 
       // Replaces `Array(Predef.wrapArray(ArrayValue(...).$asInstanceOf[...]), <tag>)`

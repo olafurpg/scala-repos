@@ -105,7 +105,7 @@ trait DB extends Loggable {
     )
 
     first(toTry)(f =>
-          tryo { t: Throwable =>
+      tryo { t: Throwable =>
         logger.trace("JNDI Lookup failed: " + t)
       }(f())) or {
       logger.trace(
@@ -199,7 +199,7 @@ trait DB extends Loggable {
               " for JNDI connection " + name.jndiName + " opened")
         new SuperConnection(c, () => {
           logger.debug("Connection ID " + uniqueId +
-                " for JNDI connection " + name.jndiName + " closed"); c.close
+            " for JNDI connection " + name.jndiName + " closed"); c.close
         })
       })
 
@@ -585,7 +585,7 @@ trait DB extends Loggable {
                connectionIdentifier: ConnectionIdentifier)
     : (List[String], List[List[String]]) = {
     use(connectionIdentifier)(conn =>
-          prepareStatement(query, conn) { ps =>
+      prepareStatement(query, conn) { ps =>
         resultSetTo(setPreparedParams(ps, params).executeQuery)
     })
   }
@@ -611,7 +611,7 @@ trait DB extends Loggable {
                    connectionIdentifier: ConnectionIdentifier)
     : (List[String], List[List[Any]]) = {
     use(connectionIdentifier)(conn =>
-          prepareStatement(query, conn) { ps =>
+      prepareStatement(query, conn) { ps =>
         resultSetToAny(setPreparedParams(ps, params).executeQuery)
     })
   }
@@ -635,7 +635,7 @@ trait DB extends Loggable {
                 params: List[Any],
                 connectionIdentifier: ConnectionIdentifier): Int = {
     use(connectionIdentifier)(conn =>
-          prepareStatement(query, conn) { ps =>
+      prepareStatement(query, conn) { ps =>
         setPreparedParams(ps, params).executeUpdate
     })
   }

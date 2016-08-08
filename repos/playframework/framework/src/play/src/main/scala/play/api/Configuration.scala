@@ -66,10 +66,10 @@ object Configuration {
 
         {
           setting("config.resource").map(resource =>
-                ConfigFactory.parseResources(classLoader, resource.toString))
+            ConfigFactory.parseResources(classLoader, resource.toString))
         } orElse {
           setting("config.file").map(fileName =>
-                ConfigFactory.parseFileAnySyntax(new File(fileName.toString)))
+            ConfigFactory.parseFileAnySyntax(new File(fileName.toString)))
         } getOrElse {
           val parseOptions = ConfigParseOptions.defaults
             .setClassLoader(classLoader)
@@ -1156,7 +1156,7 @@ private[play] object ConfigLoader {
   implicit val seqFiniteDurationLoader: ConfigLoader[Seq[FiniteDuration]] =
     ConfigLoader(config => config.getDurationList(_, TimeUnit.MILLISECONDS))
       .map(toScala(_).map(millis =>
-                FiniteDuration(millis, TimeUnit.MILLISECONDS)))
+        FiniteDuration(millis, TimeUnit.MILLISECONDS)))
 
   implicit val doubleLoader = ConfigLoader(_.getDouble)
   implicit val seqDoubleLoader = ConfigLoader(_.getDoubleList).map(toScala)

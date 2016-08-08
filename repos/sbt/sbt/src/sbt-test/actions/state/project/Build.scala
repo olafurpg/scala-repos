@@ -23,7 +23,7 @@ object MyBuild extends Build {
   lazy val root =
     Project("root", file(".")) settings
       (updateDemo <<= updateDemoInit updateState demoState, check <<= checkInit,
-          inMemorySetting, persistedSetting, inMemoryCheck, persistedCheck)
+      inMemorySetting, persistedSetting, inMemoryCheck, persistedCheck)
   def demoState(s: State, i: Int): State = s put (sample, i + 1)
 
   def checkInit: Initialize[InputTask[Unit]] =

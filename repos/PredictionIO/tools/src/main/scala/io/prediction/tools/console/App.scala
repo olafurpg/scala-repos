@@ -77,7 +77,7 @@ object App extends Logging {
               error(s"Failed to revert back the App meta-data change.", e)
               error(s"The app ${ca.app.name} CANNOT be used!")
               error(s"Please run 'pio app delete ${ca.app.name}' " +
-                    "to delete this app!")
+                "to delete this app!")
               1
           }
         }

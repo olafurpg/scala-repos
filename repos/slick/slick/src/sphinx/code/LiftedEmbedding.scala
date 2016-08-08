@@ -140,10 +140,10 @@ object LiftedEmbedding extends App {
         u =>
           (u.first, u.last).shaped <>
             ({ t =>
-          User(None, t._1, t._2)
-        }, { (u: User) =>
-          Some((u.first, u.last))
-        }))
+              User(None, t._1, t._2)
+            }, { (u: User) =>
+              Some((u.first, u.last))
+            }))
 //#insert2
 
 //#index
@@ -351,10 +351,10 @@ object LiftedEmbedding extends App {
       Await.result(db.run(
                        DBIO.seq(
                            (suppliers ++= Seq(
-                                   (101, "", "", "", "", ""),
-                                   (49, "", "", "", "", ""),
-                                   (150, "", "", "", "", "")
-                               )),
+                               (101, "", "", "", "", ""),
+                               (49, "", "", "", "", ""),
+                               (150, "", "", "", "", "")
+                           )),
                            insertActions
                        )),
                    Duration.Inf)
@@ -368,7 +368,7 @@ object LiftedEmbedding extends App {
       //#insert3b
       val userWithId =
         (users returning users.map(_.id) into
-              ((user, id) => user.copy(id = Some(id)))) +=
+          ((user, id) => user.copy(id = Some(id)))) +=
           User(None, "Stefan", "Zeiger")
       //#insert3b
       val userWithIdRes =
@@ -555,7 +555,7 @@ object LiftedEmbedding extends App {
 
       // A Shape implementation for Pair
       final class PairShape[Level <: ShapeLevel, M <: Pair[_, _],
-          U <: Pair[_, _]: ClassTag, P <: Pair[_, _]](
+      U <: Pair[_, _]: ClassTag, P <: Pair[_, _]](
           val shapes: Seq[Shape[_, _, _, _]])
           extends MappedScalaProductShape[Level, Pair[_, _], M, U, P] {
         def buildValue(elems: IndexedSeq[Any]) = Pair(elems(0), elems(1))

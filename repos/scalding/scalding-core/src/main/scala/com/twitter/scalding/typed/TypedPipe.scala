@@ -217,9 +217,8 @@ trait TypedPipe[+T] extends Serializable {
     * Put the items in this into the keys, and unit as the value in a Group
     * in some sense, this is the dual of groupAll
     */
-  @annotation.implicitNotFound(
-      msg =
-        "For asKeys method to work, the type in TypedPipe must have an Ordering.")
+  @annotation.implicitNotFound(msg =
+    "For asKeys method to work, the type in TypedPipe must have an Ordering.")
   def asKeys[U >: T](implicit ord: Ordering[U]): Grouped[U, Unit] =
     map((_, ())).group
 
@@ -269,18 +268,16 @@ trait TypedPipe[+T] extends Serializable {
     * }
     * The latter creates 1 map/reduce phase rather than 2
     */
-  @annotation.implicitNotFound(
-      msg =
-        "For distinct method to work, the type in TypedPipe must have an Ordering.")
+  @annotation.implicitNotFound(msg =
+    "For distinct method to work, the type in TypedPipe must have an Ordering.")
   def distinct(implicit ord: Ordering[_ >: T]): TypedPipe[T] =
     asKeys(ord.asInstanceOf[Ordering[T]]).sum.keys
 
   /**
     * Returns the set of distinct elements identified by a given lambda extractor in the TypedPipe
     */
-  @annotation.implicitNotFound(
-      msg =
-        "For distinctBy method to work, the type to distinct on in the TypedPipe must have an Ordering.")
+  @annotation.implicitNotFound(msg =
+    "For distinctBy method to work, the type to distinct on in the TypedPipe must have an Ordering.")
   def distinctBy[U](fn: T => U, numReducers: Option[Int] = None)(
       implicit ord: Ordering[_ >: U]): TypedPipe[T] = {
     // cast because Ordering is not contravariant, but should be (and this cast is safe)
@@ -934,10 +931,10 @@ final case class IterablePipe[T](iterable: Iterable[T]) extends TypedPipe[T] {
           .groupBy(_._1)
           // use map to force this so it is not lazy.
           .map {
-        case (k, kvs) =>
-          // These lists are never empty, get is safe.
-          (k, Semigroup.sumOption(kvs.iterator.map(_._2)).get)
-      })
+            case (k, kvs) =>
+              // These lists are never empty, get is safe.
+              (k, Semigroup.sumOption(kvs.iterator.map(_._2)).get)
+          })
   }
 
   override def asPipe[U >: T](fieldNames: Fields)(

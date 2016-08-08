@@ -36,7 +36,7 @@ object LotsOfDataBot {
       val config = ConfigFactory
         .parseString("akka.remote.netty.tcp.port=" + port)
         .withFallback(ConfigFactory.load(ConfigFactory.parseString(
-                    """
+            """
             passive = off
             max-entries = 100000
             akka.actor.provider = "akka.cluster.ClusterActorRefProvider"

@@ -100,7 +100,7 @@ class ShuffledRDD[K: ClassTag, V: ClassTag, C: ClassTag](
 
   override def getPartitions: Array[Partition] = {
     Array.tabulate[Partition](part.numPartitions)(i =>
-          new ShuffledRDDPartition(i))
+      new ShuffledRDDPartition(i))
   }
 
   override protected def getPreferredLocations(

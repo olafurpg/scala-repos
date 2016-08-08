@@ -37,7 +37,7 @@ trait HsqldbProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - SqlCapabilities.sequenceCurr -
-          JdbcCapabilities.insertOrUpdate)
+      JdbcCapabilities.insertOrUpdate)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)

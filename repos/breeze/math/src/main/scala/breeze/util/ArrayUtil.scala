@@ -385,8 +385,14 @@ object ArrayUtil {
   }
 
   @expand
-  private def zeroSkippingHashCodeImpl[
-      @expand.args(Int, Float, Double, Long, Byte, Short, Char, Boolean) V](
+  private def zeroSkippingHashCodeImpl[@expand.args(Int,
+                                                    Float,
+                                                    Double,
+                                                    Long,
+                                                    Byte,
+                                                    Short,
+                                                    Char,
+                                                    Boolean) V](
       data: Array[V],
       offset: Int,
       stride: Int,

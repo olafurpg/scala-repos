@@ -16,9 +16,9 @@ trait Calculate { self: Reifier =>
   implicit class RichCalculateType(tpe: Type) {
     def isLocalToReifee =
       tpe != null && (tpe exists
-            (tp =>
-               (localSymbols contains tp.typeSymbol) ||
-                 (localSymbols contains tp.termSymbol)))
+        (tp =>
+           (localSymbols contains tp.typeSymbol) ||
+             (localSymbols contains tp.termSymbol)))
   }
 
   private def localSymbols: Map[Symbol, Int] =

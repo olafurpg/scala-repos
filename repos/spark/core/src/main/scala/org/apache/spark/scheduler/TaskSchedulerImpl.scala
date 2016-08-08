@@ -192,10 +192,9 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
         starvationTimer.scheduleAtFixedRate(new TimerTask() {
           override def run() {
             if (!hasLaunchedTask) {
-              logWarning(
-                  "Initial job has not accepted any resources; " +
-                    "check your cluster UI to ensure that workers are registered " +
-                    "and have sufficient resources")
+              logWarning("Initial job has not accepted any resources; " +
+                "check your cluster UI to ensure that workers are registered " +
+                "and have sufficient resources")
             } else {
               this.cancel()
             }
@@ -389,7 +388,7 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
           case None =>
             logError(
                 ("Ignoring update with state %s for TID %s because its task set is gone (this is " +
-                      "likely the result of receiving duplicate task finished status updates)")
+                  "likely the result of receiving duplicate task finished status updates)")
                   .format(state, tid))
         }
       } catch {

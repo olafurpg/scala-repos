@@ -97,7 +97,7 @@ class Tools[C <: Context](val c: C) {
                              excludeSelf: Boolean): List[Type] = {
     val subtypes =
       allStaticallyKnownConcreteSubclasses(tpe, mirror).filter(subtpe =>
-            subtpe.typeSymbol != tpe.typeSymbol)
+        subtpe.typeSymbol != tpe.typeSymbol)
     val selfTpe =
       if (isRelevantSubclass(tpe.typeSymbol, tpe.typeSymbol)) List(tpe)
       else Nil
@@ -220,7 +220,7 @@ class Tools[C <: Context](val c: C) {
       // NOTE: need to order the list: children first, parents last
       // otherwise pattern match which uses this list might work funnily
       val subSyms = unsorted.distinct.sortWith((c1, c2) =>
-            c1.asClass.baseClasses.contains(c2))
+        c1.asClass.baseClasses.contains(c2))
       val subTpes = subSyms
         .map(_.asClass)
         .map(subSym => {

@@ -253,7 +253,7 @@ abstract class HiveComparisonTest
     if (runOnlyDirectories.nonEmpty && runIndicators.isEmpty) {
       logDebug(
           s"Skipping test '$testCaseName' not found in ${runOnlyDirectories
-        .map(_.getCanonicalPath)}")
+            .map(_.getCanonicalPath)}")
       return
     }
 

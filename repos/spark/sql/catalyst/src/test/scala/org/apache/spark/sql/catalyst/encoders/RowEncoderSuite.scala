@@ -31,8 +31,8 @@ class ExamplePoint(val x: Double, val y: Double) extends Serializable {
     if (that.isInstanceOf[ExamplePoint]) {
       val e = that.asInstanceOf[ExamplePoint]
       (this.x == e.x || (this.x.isNaN && e.x.isNaN) ||
-          (this.x.isInfinity && e.x.isInfinity)) && (this.y == e.y ||
-          (this.y.isNaN && e.y.isNaN) || (this.y.isInfinity && e.y.isInfinity))
+      (this.x.isInfinity && e.x.isInfinity)) && (this.y == e.y ||
+      (this.y.isNaN && e.y.isNaN) || (this.y.isInfinity && e.y.isInfinity))
     } else {
       false
     }
@@ -119,18 +119,15 @@ class RowEncoderSuite extends SparkFunSuite {
         .add("mapOfStructAndString", MapType(structOfString, StringType))
         .add("mapOfStruct", MapType(structOfString, structOfString)))
 
-  encodeDecodeTest(
-      new StructType()
-        .add("structOfString", structOfString)
-        .add("structOfStructOfString",
-             new StructType().add("struct", structOfString))
-        .add("structOfArray", new StructType().add("array", arrayOfString))
-        .add("structOfMap", new StructType().add("map", mapOfString))
-        .add("structOfArrayAndMap",
-             new StructType()
-               .add("array", arrayOfString)
-               .add("map", mapOfString))
-        .add("structOfUDT", structOfUDT))
+  encodeDecodeTest(new StructType()
+    .add("structOfString", structOfString)
+    .add("structOfStructOfString",
+         new StructType().add("struct", structOfString))
+    .add("structOfArray", new StructType().add("array", arrayOfString))
+    .add("structOfMap", new StructType().add("map", mapOfString))
+    .add("structOfArrayAndMap",
+         new StructType().add("array", arrayOfString).add("map", mapOfString))
+    .add("structOfUDT", structOfUDT))
 
   test(s"encode/decode: Product") {
     val schema = new StructType().add("structAsProduct",

@@ -116,9 +116,8 @@ trait CheckAnalysis {
 
         operator match {
           case f: Filter if f.condition.dataType != BooleanType =>
-            failAnalysis(
-                s"filter expression '${f.condition.sql}' " +
-                  s"of type ${f.condition.dataType.simpleString} is not a boolean.")
+            failAnalysis(s"filter expression '${f.condition.sql}' " +
+              s"of type ${f.condition.dataType.simpleString} is not a boolean.")
 
           case j @ Join(_, _, UsingJoin(_, cols), _) =>
             val from = operator.inputSet.map(_.name).mkString(", ")
@@ -128,9 +127,8 @@ trait CheckAnalysis {
 
           case j @ Join(_, _, _, Some(condition))
               if condition.dataType != BooleanType =>
-            failAnalysis(
-                s"join condition '${condition.sql}' " +
-                  s"of type ${condition.dataType.simpleString} is not a boolean.")
+            failAnalysis(s"join condition '${condition.sql}' " +
+              s"of type ${condition.dataType.simpleString} is not a boolean.")
 
           case j @ Join(_, _, _, Some(condition)) =>
             def checkValidJoinConditionExprs(expr: Expression): Unit =
@@ -167,9 +165,8 @@ trait CheckAnalysis {
                     }
 
                     if (!child.deterministic) {
-                      failAnalysis(
-                          s"nondeterministic expression ${expr.sql} should not " +
-                            s"appear in the arguments of an aggregate function.")
+                      failAnalysis(s"nondeterministic expression ${expr.sql} should not " +
+                        s"appear in the arguments of an aggregate function.")
                     }
                   }
                 case e: Attribute
@@ -256,7 +253,7 @@ trait CheckAnalysis {
                  |Failure when resolving conflicting references in Join:
                  |$plan
                  |Conflicting attributes: ${conflictingAttributes
-                          .mkString(",")}
+                              .mkString(",")}
                  |""".stripMargin)
 
           case i: Intersect if !i.duplicateResolved =>
@@ -266,7 +263,7 @@ trait CheckAnalysis {
                  |Failure when resolving conflicting references in Intersect:
                  |$plan
                  |Conflicting attributes: ${conflictingAttributes
-                          .mkString(",")}
+                              .mkString(",")}
                  |""".stripMargin)
 
           case o if !o.resolved =>

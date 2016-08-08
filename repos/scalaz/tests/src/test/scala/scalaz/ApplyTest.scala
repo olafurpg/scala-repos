@@ -51,7 +51,7 @@ object ApplyTest extends SpecLite {
       (some("1234"))
     Apply[Option].ap5(some("1"), some("2"), some("3"), some("4"), some("5"))(
         some((_: String) + (_: String) + (_: String) + (_: String) +
-              (_: String))) must_=== (some("12345"))
+          (_: String))) must_=== (some("12345"))
   }
 
   "<*>" in {

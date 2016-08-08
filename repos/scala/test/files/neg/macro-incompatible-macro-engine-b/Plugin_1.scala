@@ -37,7 +37,7 @@ class Plugin(val global: Global) extends NscPlugin {
           Assign(
               Literal(Constant("macroEngine")),
               Literal(Constant(
-                      "vxxx (implemented in the incompatibleMacroEngine plugin)"))) :: others)
+                  "vxxx (implemented in the incompatibleMacroEngine plugin)"))) :: others)
       ddef.symbol.setAnnotations(
           List(AnnotationInfo(atp, List(fixupBinding(updatedBinding)), Nil)))
       Some(result)

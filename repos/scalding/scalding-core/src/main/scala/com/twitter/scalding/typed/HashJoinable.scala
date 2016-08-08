@@ -49,20 +49,19 @@ trait HashJoinable[K, +V] extends CoGroupable[K, V] with KeyedPipe[K] {
     // Note, the Ordering must have that compare(x,y)== 0 being consistent with hashCode and .equals to
     // otherwise, there may be funky issues with cascading
     TypedPipeFactory({ (fd, mode) =>
-      val newPipe =
-        new HashJoin(RichPipe.assignName(
-                         mapside.toPipe(('key, 'value))(fd, mode, tup2Setter)),
-                     Field.singleOrdered("key")(keyOrdering),
-                     getForceToDiskPipeIfNecessary(fd, mode),
-                     Field.singleOrdered("key1")(keyOrdering),
-                     WrappedJoiner(new HashJoiner(joinFunction, joiner)))
+          val newPipe =
+            new HashJoin(
+                RichPipe.assignName(
+                    mapside.toPipe(('key, 'value))(fd, mode, tup2Setter)),
+                Field.singleOrdered("key")(keyOrdering),
+                getForceToDiskPipeIfNecessary(fd, mode),
+                Field.singleOrdered("key1")(keyOrdering),
+                WrappedJoiner(new HashJoiner(joinFunction, joiner)))
 
-      //Construct the new TypedPipe
-      TypedPipe.from[(K, R)](newPipe.project('key, 'value), ('key, 'value))(
-          fd,
-          mode,
-          tuple2Converter)
-    })
+          //Construct the new TypedPipe
+          TypedPipe.from[(K, R)](newPipe.project('key, 'value),
+                                 ('key, 'value))(fd, mode, tuple2Converter)
+        })
 
   /**
     * Returns a Pipe for the mapped (rhs) pipe with checkpointing (forceToDisk) applied if needed.
@@ -94,7 +93,7 @@ trait HashJoinable[K, +V] extends CoGroupable[K, V] with KeyedPipe[K] {
         if (canSkipEachOperation(eachPipe.getOperation, mode)) {
           //need to recurse down to see if parent pipe is ok
           getPreviousPipe(eachPipe).exists(prevPipe =>
-                isSafeToSkipForceToDisk(prevPipe, mode))
+            isSafeToSkipForceToDisk(prevPipe, mode))
         } else false
       case _: Checkpoint => true
       case _: GroupBy => true

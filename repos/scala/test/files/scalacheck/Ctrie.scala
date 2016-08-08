@@ -120,8 +120,8 @@ object Test extends Properties("concurrent.TrieMap") {
 
       val ok =
         growing && ((0 until sz) forall {
-              case i => ct.get(Wrap(i)) == Some(i)
-            })
+          case i => ct.get(Wrap(i)) == Some(i)
+        })
 
       ok
   }
@@ -168,8 +168,8 @@ object Test extends Properties("concurrent.TrieMap") {
     }
 
     (results forall (_ == None)) && ((0 until sz) forall {
-          case i => ct.get(Wrap(i)) == Some(i)
-        })
+      case i => ct.get(Wrap(i)) == Some(i)
+    })
   }
 
   property("concurrent getOrElseUpdate") = forAll(threadCounts, sizes) {
@@ -185,7 +185,7 @@ object Test extends Properties("concurrent.TrieMap") {
       }
 
       (totalInserts.get == sz) && ((0 until sz) forall {
-            case i => ct(Wrap(i)).split(":")(1).toInt == i
-          })
+        case i => ct(Wrap(i)).split(":")(1).toInt == i
+      })
   }
 }

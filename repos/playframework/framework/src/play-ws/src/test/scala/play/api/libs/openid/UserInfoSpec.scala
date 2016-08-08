@@ -47,7 +47,7 @@ object UserInfoSpec extends Specification {
             "openid.ext1.value.email" -> "user@example.com", // the email attribute *is* in the list of signed fields
             "openid.signed" ->
               (defaultSigned +
-                    "ns.ext1,ext1.mode,ext1.type.email,ext1.value.email"))
+                "ns.ext1,ext1.mode,ext1.type.email,ext1.value.email"))
       val userInfo = UserInfo(requestParams)
       userInfo.attributes.get("email") must beSome("user@example.com")
     }
@@ -61,7 +61,7 @@ object UserInfoSpec extends Specification {
             "openid.ext1.value.fav_movie.2" -> "Movie2",
             "openid.signed" ->
               (defaultSigned +
-                    "ns.ext1,ext1.mode,ext1.type.fav_movie,ext1.value.fav_movie.1,ext1.value.fav_movie.2,ext1.count.fav_movie"))
+                "ns.ext1,ext1.mode,ext1.type.fav_movie,ext1.value.fav_movie.1,ext1.value.fav_movie.2,ext1.count.fav_movie"))
       val userInfo = UserInfo(requestParams)
       userInfo.attributes.size must be equalTo 2
       userInfo.attributes.get("fav_movie.1") must beSome("Movie1")
@@ -76,7 +76,7 @@ object UserInfoSpec extends Specification {
           "openid.ext1.value.firstName" -> Nil,
           "openid.signed" ->
             (defaultSigned +
-                  "ns.ext1,ext1.mode,ext1.type.email,ext1.value.email,ext1.type.firstName,ext1.value.firstName"))
+              "ns.ext1,ext1.mode,ext1.type.email,ext1.value.email,ext1.type.firstName,ext1.value.firstName"))
     val userInfo = UserInfo(requestParams)
     userInfo.attributes.get("firstName") must beNone
   }

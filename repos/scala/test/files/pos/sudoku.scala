@@ -12,8 +12,8 @@ object SudokuSolver extends App {
   // coordinate
   def invalid(i: Int, x: Int, y: Int, n: Char): Boolean =
     i < 9 && (m(y)(i) == n || m(i)(x) == n ||
-          m(y / 3 * 3 + i / 3)(x / 3 * 3 + i % 3) == n ||
-          invalid(i + 1, x, y, n))
+      m(y / 3 * 3 + i / 3)(x / 3 * 3 + i % 3) == n ||
+      invalid(i + 1, x, y, n))
 
   // Looping over a half-closed range of consecutive integers [l..u)
   // is factored out into a higher-order function

@@ -271,30 +271,23 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     sampler.setSeed(rngSeed.nextLong)
 
     // Array iterator (indexable type)
-    d = medianKSD(
-        gaps(
-            sampler.sample(
-                Iterator.from(0).take(20 * sampleSize).toArray.iterator)),
-        gaps(sample(Iterator.from(0), 0.1)))
+    d =
+      medianKSD(gaps(sampler.sample(
+                    Iterator.from(0).take(20 * sampleSize).toArray.iterator)),
+                gaps(sample(Iterator.from(0), 0.1)))
     d should be < D
 
     // ArrayBuffer iterator (indexable type)
-    d = medianKSD(gaps(
-                      sampler.sample(
-                          Iterator
-                            .from(0)
-                            .take(20 * sampleSize)
-                            .to[ArrayBuffer]
-                            .iterator)),
-                  gaps(sample(Iterator.from(0), 0.1)))
+    d = medianKSD(
+        gaps(sampler.sample(
+            Iterator.from(0).take(20 * sampleSize).to[ArrayBuffer].iterator)),
+        gaps(sample(Iterator.from(0), 0.1)))
     d should be < D
 
     // List iterator (non-indexable type)
-    d = medianKSD(
-        gaps(
-            sampler.sample(
-                Iterator.from(0).take(20 * sampleSize).toList.iterator)),
-        gaps(sample(Iterator.from(0), 0.1)))
+    d = medianKSD(gaps(sampler.sample(
+                      Iterator.from(0).take(20 * sampleSize).toList.iterator)),
+                  gaps(sample(Iterator.from(0), 0.1)))
     d should be < D
   }
 
@@ -445,30 +438,23 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     sampler.setSeed(rngSeed.nextLong)
 
     // Array iterator (indexable type)
-    d = medianKSD(
-        gaps(
-            sampler.sample(
-                Iterator.from(0).take(20 * sampleSize).toArray.iterator)),
-        gaps(sampleWR(Iterator.from(0), 0.1)))
+    d =
+      medianKSD(gaps(sampler.sample(
+                    Iterator.from(0).take(20 * sampleSize).toArray.iterator)),
+                gaps(sampleWR(Iterator.from(0), 0.1)))
     d should be < D
 
     // ArrayBuffer iterator (indexable type)
-    d = medianKSD(gaps(
-                      sampler.sample(
-                          Iterator
-                            .from(0)
-                            .take(20 * sampleSize)
-                            .to[ArrayBuffer]
-                            .iterator)),
-                  gaps(sampleWR(Iterator.from(0), 0.1)))
+    d = medianKSD(
+        gaps(sampler.sample(
+            Iterator.from(0).take(20 * sampleSize).to[ArrayBuffer].iterator)),
+        gaps(sampleWR(Iterator.from(0), 0.1)))
     d should be < D
 
     // List iterator (non-indexable type)
-    d = medianKSD(
-        gaps(
-            sampler.sample(
-                Iterator.from(0).take(20 * sampleSize).toList.iterator)),
-        gaps(sampleWR(Iterator.from(0), 0.1)))
+    d = medianKSD(gaps(sampler.sample(
+                      Iterator.from(0).take(20 * sampleSize).toList.iterator)),
+                  gaps(sampleWR(Iterator.from(0), 0.1)))
     d should be < D
   }
 

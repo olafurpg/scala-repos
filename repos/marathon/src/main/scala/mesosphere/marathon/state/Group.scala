@@ -265,10 +265,10 @@ object Group {
         maxApps.filter(group.transitiveApps.size > _).map { num =>
           Failure(
               Set(RuleViolation(
-                      group,
-                      s"""This Marathon instance may only handle up to $num Apps!
+                  group,
+                  s"""This Marathon instance may only handle up to $num Apps!
                 |(Override with command line option --max_apps)""".stripMargin,
-                      None)))
+                  None)))
         } getOrElse Success
       } and validator(group)
     }

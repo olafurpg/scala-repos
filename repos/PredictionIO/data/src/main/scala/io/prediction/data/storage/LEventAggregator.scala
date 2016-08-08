@@ -40,7 +40,7 @@ object LEventAggregator {
     events.toList
       .groupBy(_.entityId)
       .mapValues(_.sortBy(_.eventTime.getMillis)
-            .foldLeft[Prop](Prop())(propAggregator))
+        .foldLeft[Prop](Prop())(propAggregator))
       .filter { case (k, v) => v.dm.isDefined }
       .mapValues { v =>
         require(v.firstUpdated.isDefined,

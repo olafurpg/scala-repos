@@ -81,11 +81,11 @@ trait FlashCookieSpec
       ws =>
         val response = await(ws.url("/flash").withFollowRedirects(false).get())
         val Some(flashCookie) = readFlashCookie(response)
-        val response2 = await(
-            ws.url("/set-cookie")
-              .withHeaders(
-                  "Cookie" -> s"${flashCookie.name.get}=${flashCookie.value.get}")
-              .get())
+        val response2 = await(ws
+          .url("/set-cookie")
+          .withHeaders(
+              "Cookie" -> s"${flashCookie.name.get}=${flashCookie.value.get}")
+          .get())
 
         readFlashCookie(response2) must beSome.like {
           case cookie => cookie.value must beNone

@@ -4836,26 +4836,7 @@ trait GeneratedTupleAdders {
     new Tuple19Adder(tup)
 
   class Tuple20Adder[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
-      T](tup: Tuple20[A,
-                      B,
-                      C,
-                      D,
-                      E,
-                      F,
-                      G,
-                      H,
-                      I,
-                      J,
-                      K,
-                      L,
-                      M,
-                      N,
-                      O,
-                      P,
-                      Q,
-                      R,
-                      S,
-                      T]) {
+  T](tup: Tuple20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]) {
     def :+[U](other: U) = {
       (tup._1,
        tup._2,
@@ -4995,7 +4976,7 @@ trait GeneratedTupleAdders {
     new Tuple20Adder(tup)
 
   class Tuple21Adder[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
-      T, U](
+  T, U](
       tup: Tuple21[A,
                    B,
                    C,

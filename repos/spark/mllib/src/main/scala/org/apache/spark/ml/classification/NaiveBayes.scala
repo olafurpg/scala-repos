@@ -180,7 +180,7 @@ class NaiveBayesModel private[ml] (@Since("1.5.0") override val uid: String,
 
   private def bernoulliCalculation(features: Vector) = {
     features.foreachActive((_, value) =>
-          if (value != 0.0 && value != 1.0) {
+      if (value != 0.0 && value != 1.0) {
         throw new SparkException(
             s"Bernoulli naive Bayes requires 0 or 1 feature values but found $features.")
     })

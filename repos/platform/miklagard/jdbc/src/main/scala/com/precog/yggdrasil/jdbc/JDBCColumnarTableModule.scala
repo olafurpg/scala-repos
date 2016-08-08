@@ -426,7 +426,7 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
                   case err =>
                     sys.error("JDBC path " + path.path +
-                          " does not have the form /dbName/tableName; rollups not yet supported.")
+                      " does not have the form /dbName/tableName; rollups not yet supported.")
                 }
 
               case InitialLoad(Nil) =>

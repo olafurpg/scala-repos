@@ -293,7 +293,7 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
         processAllSystemMessages()
         if ((left > 1) &&
             ((dispatcher.isThroughputDeadlineTimeDefined == false) ||
-                (System.nanoTime - deadlineNs) < 0))
+            (System.nanoTime - deadlineNs) < 0))
           processMailbox(left - 1, deadlineNs)
       }
     }

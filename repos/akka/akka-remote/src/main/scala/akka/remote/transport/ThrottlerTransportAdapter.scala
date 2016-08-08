@@ -139,7 +139,7 @@ object ThrottlerTransportAdapter {
 
     private def tokensGenerated(nanoTimeOfSend: Long): Int =
       (TimeUnit.NANOSECONDS
-            .toMillis(nanoTimeOfSend - nanoTimeOfLastSend) * tokensPerSecond / 1000.0).toInt
+        .toMillis(nanoTimeOfSend - nanoTimeOfLastSend) * tokensPerSecond / 1000.0).toInt
   }
 
   @SerialVersionUID(1L)
@@ -529,10 +529,8 @@ private[transport] class ThrottledAssociation(
           .tryConsumeTokens(System.nanoTime(), payload.length)
           ._1
         if (throttledMessages.nonEmpty)
-          scheduleDequeue(
-              inboundThrottleMode.timeToAvailable(
-                  System.nanoTime(),
-                  throttledMessages.head.length))
+          scheduleDequeue(inboundThrottleMode
+            .timeToAvailable(System.nanoTime(), throttledMessages.head.length))
       }
       stay()
   }

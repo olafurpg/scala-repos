@@ -82,7 +82,7 @@ private[spark] class TimeBasedRollingPolicy(
   private def calculateNextRolloverTime(): Long = {
     val now = System.currentTimeMillis()
     val targetTime = (math
-          .ceil(now.toDouble / rolloverIntervalMillis) * rolloverIntervalMillis).toLong
+      .ceil(now.toDouble / rolloverIntervalMillis) * rolloverIntervalMillis).toLong
     logDebug(s"Next rollover time is $targetTime")
     targetTime
   }
@@ -108,9 +108,8 @@ private[spark] class SizeBasedRollingPolicy(
 
   import SizeBasedRollingPolicy._
   if (checkSizeConstraint && rolloverSizeBytes < MINIMUM_SIZE_BYTES) {
-    logWarning(
-        s"Rolling size [$rolloverSizeBytes bytes] is too small. " +
-          s"Setting the size to the acceptable minimum of $MINIMUM_SIZE_BYTES bytes.")
+    logWarning(s"Rolling size [$rolloverSizeBytes bytes] is too small. " +
+      s"Setting the size to the acceptable minimum of $MINIMUM_SIZE_BYTES bytes.")
     rolloverSizeBytes = MINIMUM_SIZE_BYTES
   }
 

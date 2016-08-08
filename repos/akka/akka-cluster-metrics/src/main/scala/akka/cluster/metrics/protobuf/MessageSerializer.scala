@@ -145,7 +145,7 @@ class MessageSerializer(val system: ExtendedActorSystem)
     val addressMapping = allAddresses.zipWithIndex.toMap
     val allMetricNames: Vector[String] = allNodeMetrics
       .foldLeft(Set.empty[String])((s, n) ⇒
-            s ++ n.metrics.iterator.map(_.name))
+        s ++ n.metrics.iterator.map(_.name))
       .toVector
     val metricNamesMapping = allMetricNames.zipWithIndex.toMap
     def mapAddress(address: Address) =
@@ -209,13 +209,11 @@ class MessageSerializer(val system: ExtendedActorSystem)
     cm.MetricsGossipEnvelope
       .newBuilder()
       .setFrom(addressToProto(envelope.from))
-      .setGossip(
-          cm.MetricsGossip
-            .newBuilder()
-            .addAllAllAddresses(
-                allAddresses.map(addressToProto(_).build()).asJava)
-            .addAllAllMetricNames(allMetricNames.asJava)
-            .addAllNodeMetrics(nodeMetrics.asJava))
+      .setGossip(cm.MetricsGossip
+        .newBuilder()
+        .addAllAllAddresses(allAddresses.map(addressToProto(_).build()).asJava)
+        .addAllAllMetricNames(allMetricNames.asJava)
+        .addAllNodeMetrics(nodeMetrics.asJava))
       .setReply(envelope.reply)
       .build
   }

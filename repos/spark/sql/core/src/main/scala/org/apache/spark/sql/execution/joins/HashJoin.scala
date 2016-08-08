@@ -281,8 +281,8 @@ trait HashJoin { self: SparkPlan =>
       val r =
         !key.anyNull && rowBuffer != null &&
           (condition.isEmpty || rowBuffer.exists { (row: InternalRow) =>
-                boundCondition(joinedRow(current, row))
-              })
+            boundCondition(joinedRow(current, row))
+          })
       if (r) numOutputRows += 1
       r
     }

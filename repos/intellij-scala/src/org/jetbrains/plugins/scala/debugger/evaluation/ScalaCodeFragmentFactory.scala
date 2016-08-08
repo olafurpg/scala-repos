@@ -130,17 +130,17 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
             getFileType)
         val codeFragment: JavaCodeFragment =
           createCodeFragmentInner(textWithImports, context, project)
-        codeFragment
-          .accept(new ScalaRecursiveElementVisitor() {
-            override def visitPatternDefinition(
-                pat: ScPatternDefinition): Unit = {
-              val bindingPattern = pat.bindings.head
-              val name: String = bindingPattern.name
-              bindingPattern.putUserData(
-                  CodeFragmentFactoryContextWrapper.LABEL_VARIABLE_VALUE_KEY,
-                  reverseMap.getOrElse(name, null))
-            }
-          })
+        codeFragment.accept(
+            new ScalaRecursiveElementVisitor() {
+              override def visitPatternDefinition(
+                  pat: ScPatternDefinition): Unit = {
+                val bindingPattern = pat.bindings.head
+                val name: String = bindingPattern.name
+                bindingPattern.putUserData(
+                    CodeFragmentFactoryContextWrapper.LABEL_VARIABLE_VALUE_KEY,
+                    reverseMap.getOrElse(name, null))
+              }
+            })
         val newContext: PsiElement = codeFragment.findElementAt(offset)
         if (newContext != null) {
           context = newContext

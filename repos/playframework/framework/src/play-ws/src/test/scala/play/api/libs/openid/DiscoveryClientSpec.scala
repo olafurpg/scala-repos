@@ -128,7 +128,7 @@ object DiscoveryClientSpec extends Specification with Mockito {
       response.header(HeaderNames.CONTENT_TYPE) returns Some(
           "application/xrds+xml")
       response.xml returns scala.xml.XML.loadString(readFixture(
-              "discovery/xrds/multi-service-with-op-and-claimed-id-service.xml"))
+          "discovery/xrds/multi-service-with-op-and-claimed-id-service.xml"))
       val maybeOpenIdServer = new XrdsResolver().resolve(response)
       maybeOpenIdServer.map(_.url) must beSome(
           "http://openidprovider-opid.example.com")

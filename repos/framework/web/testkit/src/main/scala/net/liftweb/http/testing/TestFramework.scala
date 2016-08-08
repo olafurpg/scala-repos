@@ -90,9 +90,9 @@ trait ToBoxTheResponse { self: BaseGetPoster =>
                               getter.getStatusText,
                               respHeaders,
                               for {
-                            st <- Box !! getter.getResponseBodyAsStream
-                            bytes <- tryo(readWholeStream(st))
-                          } yield bytes,
+                                st <- Box !! getter.getResponseBodyAsStream
+                                bytes <- tryo(readWholeStream(st))
+                              } yield bytes,
                               httpClient))
       }
     } catch {
@@ -124,7 +124,7 @@ trait BaseGetPoster {
       yield (e.getName -> e.getValue)
 
     headerSet.foldLeft[Map[String, List[String]]](Map.empty)((acc, e) =>
-          acc + (e._1 -> (e._2 :: acc.getOrElse(e._1, Nil))))
+      acc + (e._1 -> (e._2 :: acc.getOrElse(e._1, Nil))))
   }
 
   /**
@@ -613,10 +613,10 @@ object TestHelpers {
   def getCookie(headers: List[(String, String)],
                 respHeaders: Map[String, List[String]]): Box[String] = {
     val ret = (headers.filter { case ("Cookie", _) => true; case _ => false }
-          .map(_._2) ::: respHeaders
-          .get("Set-Cookie")
-          .toList
-          .flatMap(x => x)) match {
+      .map(_._2) ::: respHeaders
+      .get("Set-Cookie")
+      .toList
+      .flatMap(x => x)) match {
       case Nil => Empty
       case "" :: Nil => Empty
       case "" :: xs => Full(xs.mkString(","))

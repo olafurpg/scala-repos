@@ -445,7 +445,7 @@ object ScalaExtractMethodUtils {
     val params = settings.parameters
       .filter(_.passAsParameter)
       .map(param =>
-            parameterText(param) + (if (param.isFunction) " _" else ""))
+        parameterText(param) + (if (param.isFunction) " _" else ""))
 
     val paramsText =
       if (params.nonEmpty) params.mkString("(", ", ", ")") else ""

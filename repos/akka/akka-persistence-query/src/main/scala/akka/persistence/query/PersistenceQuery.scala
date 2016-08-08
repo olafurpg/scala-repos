@@ -104,10 +104,9 @@ class PersistenceQuery(system: ExtendedActorSystem) extends Extension {
         instantiate((classOf[ExtendedActorSystem], system) :: Nil)
     }.recoverWith { case x: NoSuchMethodException ⇒ instantiate(Nil) }.recoverWith {
       case ex: Exception ⇒
-        Failure.apply(
-            new IllegalArgumentException(
-                s"Unable to create read journal plugin instance for path [$configPath], class [$pluginClassName]!",
-                ex))
+        Failure.apply(new IllegalArgumentException(
+            s"Unable to create read journal plugin instance for path [$configPath], class [$pluginClassName]!",
+            ex))
     }.get
   }
 

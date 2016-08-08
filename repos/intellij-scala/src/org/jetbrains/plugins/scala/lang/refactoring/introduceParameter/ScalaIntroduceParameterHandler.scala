@@ -391,7 +391,7 @@ class ScalaIntroduceParameterHandler
 
   private def isLibraryInterfaceMethod(method: PsiMethod): Boolean = {
     (method.hasModifierPropertyScala(PsiModifier.ABSTRACT) ||
-        method.isInstanceOf[ScFunctionDefinition]) &&
+    method.isInstanceOf[ScFunctionDefinition]) &&
     !method.getManager.isInProject(method)
   }
 

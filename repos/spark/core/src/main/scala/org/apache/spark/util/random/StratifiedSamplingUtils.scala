@@ -264,7 +264,7 @@ private[spark] object StratifiedSamplingUtils extends Logging {
               rng.nextPoisson(finalResult(key).waitListBound)
             val copiesInSample =
               copiesAccepted + (0 until copiesWaitlisted).count(i =>
-                    rng.nextUniform() < thresholdByKey(key))
+                rng.nextUniform() < thresholdByKey(key))
             if (copiesInSample > 0) {
               Iterator.fill(copiesInSample.toInt)(item)
             } else {

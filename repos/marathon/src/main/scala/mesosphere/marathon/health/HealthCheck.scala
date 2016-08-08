@@ -144,12 +144,10 @@ object HealthCheck {
               case _ => true
             }) Success
         else
-          Failure(
-              Set(
-                  RuleViolation(
-                      hc,
-                      s"HealthCheck is having parameters violation ${hc.protocol} protocol.",
-                      None)))
+          Failure(Set(RuleViolation(
+              hc,
+              s"HealthCheck is having parameters violation ${hc.protocol} protocol.",
+              None)))
       }
     }
   }

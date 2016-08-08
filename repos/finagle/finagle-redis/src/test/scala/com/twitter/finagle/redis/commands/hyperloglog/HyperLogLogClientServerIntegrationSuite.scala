@@ -28,7 +28,7 @@ final class HyperLogLogClientServerIntegrationSuite
   test("PFCOUNT should work correctly", ClientServerTest, RedisTest) {
     withRedisClient { client =>
       val pfCountResult = client(PFAdd("foo", List("bar", "baz"))).flatMap(_ =>
-            client(PFCount(List(StringToChannelBuffer("foo")))))
+        client(PFCount(List(StringToChannelBuffer("foo")))))
       assert(Await.result(pfCountResult) == IntegerReply(2))
     }
   }

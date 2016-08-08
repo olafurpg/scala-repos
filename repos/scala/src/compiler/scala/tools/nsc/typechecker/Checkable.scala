@@ -110,14 +110,14 @@ trait Checkable { self: Analyzer =>
 
   private def isUnwarnableTypeArgSymbol(sym: Symbol) =
     (sym.isTypeParameter // dummy
-          || (sym.name.toTermName == nme.WILDCARD) // _
-          || nme.isVariableName(sym.name) // type variable
-        )
+      || (sym.name.toTermName == nme.WILDCARD) // _
+      || nme.isVariableName(sym.name) // type variable
+    )
   private def isUnwarnableTypeArg(arg: Type) =
     (uncheckedOk(arg) // @unchecked T
-          ||
-            isUnwarnableTypeArgSymbol(arg.typeSymbolDirect) // has to be direct: see pos/t1439
-        )
+      ||
+        isUnwarnableTypeArgSymbol(arg.typeSymbolDirect) // has to be direct: see pos/t1439
+    )
   private def uncheckedOk(tp: Type) = tp hasAnnotation UncheckedClass
 
   private def typeArgsInTopLevelType(tp: Type): List[Type] = {
@@ -220,14 +220,14 @@ trait Checkable { self: Analyzer =>
     /** Are these symbols classes with no subclass relationship? */
     def areUnrelatedClasses(sym1: Symbol, sym2: Symbol) =
       (sym1.isClass && sym2.isClass && !(sym1 isSubClass sym2) &&
-            !(sym2 isSubClass sym1))
+        !(sym2 isSubClass sym1))
 
     /** Are all children of these symbols pairwise irreconcilable? */
     def allChildrenAreIrreconcilable(sym1: Symbol, sym2: Symbol) =
       (sym1.sealedChildren.toList forall
-            (c1 =>
-               sym2.sealedChildren.toList forall
-                 (c2 => areIrreconcilableAsParents(c1, c2))))
+        (c1 =>
+           sym2.sealedChildren.toList forall
+             (c2 => areIrreconcilableAsParents(c1, c2))))
 
     /** Is it impossible for the given symbols to be parents in the same class?
       *  This means given A and B, can there be an instance of A with B? This is the
@@ -246,17 +246,17 @@ trait Checkable { self: Analyzer =>
     def areIrreconcilableAsParents(sym1: Symbol, sym2: Symbol): Boolean =
       areUnrelatedClasses(sym1, sym2) &&
         (isEffectivelyFinal(sym1) // initialization important
-              || isEffectivelyFinal(sym2) || !sym1.isTrait && !sym2.isTrait ||
-              isSealedOrFinal(sym1) && isSealedOrFinal(sym2) &&
-                allChildrenAreIrreconcilable(sym1, sym2) &&
-                !currentRun.compiles(sym1) && !currentRun.compiles(sym2))
+          || isEffectivelyFinal(sym2) || !sym1.isTrait && !sym2.isTrait ||
+          isSealedOrFinal(sym1) && isSealedOrFinal(sym2) &&
+            allChildrenAreIrreconcilable(sym1, sym2) &&
+            !currentRun.compiles(sym1) && !currentRun.compiles(sym2))
     private def isSealedOrFinal(sym: Symbol) = sym.isSealed || sym.isFinal
     private def isEffectivelyFinal(sym: Symbol): Boolean =
       (// initialization important
-          sym.initialize.isEffectivelyFinalOrNotOverridden ||
-            (settings.future &&
-                  isTupleSymbol(sym) // SI-7294 step into the future and treat TupleN as final.
-                ))
+      sym.initialize.isEffectivelyFinalOrNotOverridden ||
+        (settings.future &&
+          isTupleSymbol(sym) // SI-7294 step into the future and treat TupleN as final.
+        ))
 
     def isNeverSubClass(sym1: Symbol, sym2: Symbol) =
       areIrreconcilableAsParents(sym1, sym2)
@@ -300,12 +300,12 @@ trait Checkable { self: Analyzer =>
 
     def isCheckable(P0: Type): Boolean =
       (uncheckedOk(P0) || (P0.widen match {
-            case TypeRef(_, NothingClass | NullClass | AnyValClass, _) =>
-              false
-            case RefinedType(_, decls) if !decls.isEmpty => false
-            case RefinedType(parents, _) => parents forall isCheckable
-            case p => new CheckabilityChecker(AnyTpe, p) isCheckable
-          }))
+        case TypeRef(_, NothingClass | NullClass | AnyValClass, _) =>
+          false
+        case RefinedType(_, decls) if !decls.isEmpty => false
+        case RefinedType(parents, _) => parents forall isCheckable
+        case p => new CheckabilityChecker(AnyTpe, p) isCheckable
+      }))
 
     /** TODO: much better error positions.
       *  Kind of stuck right now because they just pass us the one tree.

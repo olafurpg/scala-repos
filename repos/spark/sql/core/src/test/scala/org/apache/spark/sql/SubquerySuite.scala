@@ -81,7 +81,7 @@ class SubquerySuite extends QueryTest with SharedSQLContext {
 
     assertResult(Array(Row("two"))) {
       sql("select (select min(value) from subqueryData" +
-            " where key = (select max(key) from subqueryData) - 1)").collect()
+        " where key = (select max(key) from subqueryData) - 1)").collect()
     }
   }
 }

@@ -1,6 +1,6 @@
 trait Monad[T <: Bound[T], MyType[x <: Bound[x]], Bound[_]] {
   def flatMap[S <: RBound[S], RContainer[x <: RBound[x]], RBound[_],
-      Result[x <: RBound[x]] <: Monad[x, RContainer, RBound]](
+  Result[x <: RBound[x]] <: Monad[x, RContainer, RBound]](
       f: T => Result[S]): Result[S]
   def flatMap[S <: RBound[S],
               RContainer[x <: RBound[x]],

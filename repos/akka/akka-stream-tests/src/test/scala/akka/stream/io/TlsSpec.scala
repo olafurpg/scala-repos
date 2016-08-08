@@ -267,7 +267,7 @@ class TlsSpec
             bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
         }.take(5)
           .mapAsync(5)(x ⇒
-                later(500.millis, system.scheduler)(Future.successful(x)))
+            later(500.millis, system.scheduler)(Future.successful(x)))
           .via(super.flow)
       override def rightClosing = IgnoreCancel
 
@@ -284,7 +284,7 @@ class TlsSpec
             bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
         }.take(5)
           .mapAsync(5)(x ⇒
-                later(500.millis, system.scheduler)(Future.successful(x)))
+            later(500.millis, system.scheduler)(Future.successful(x)))
           .via(super.flow)
       override def rightClosing = IgnoreBoth
 
@@ -377,7 +377,7 @@ class TlsSpec
                                         scenario.rightClosing,
                                         onRHS))
           .transform(() ⇒
-                new PushStage[SslTlsInbound, SslTlsInbound] {
+            new PushStage[SslTlsInbound, SslTlsInbound] {
               override def onPush(elem: SslTlsInbound,
                                   ctx: Context[SslTlsInbound]) =
                 ctx.push(elem)
@@ -424,7 +424,7 @@ class TlsSpec
         .map(c ⇒ {
           c.flow
             .joinMat(serverTls(IgnoreBoth).reversed.joinMat(simple)(
-                    Keep.right))(Keep.right)
+                Keep.right))(Keep.right)
             .run()
         })
         .toMat(Sink.head)(Keep.both)
@@ -433,7 +433,7 @@ class TlsSpec
       val clientErr = simple
         .join(badClientTls(IgnoreBoth))
         .join(Tcp().outgoingConnection(
-                Await.result(server, 1.second).localAddress))
+            Await.result(server, 1.second).localAddress))
         .run()
 
       Await

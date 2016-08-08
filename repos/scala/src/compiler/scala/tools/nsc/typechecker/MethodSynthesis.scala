@@ -91,10 +91,8 @@ trait MethodSynthesis { self: Analyzer =>
 
     def forwardMethod(original: Symbol, newMethod: Symbol)(
         transformArgs: List[Tree] => List[Tree]): Tree =
-      createMethod(original)(
-          m =>
-            gen.mkMethodCall(newMethod,
-                             transformArgs(m.paramss.head map Ident)))
+      createMethod(original)(m =>
+        gen.mkMethodCall(newMethod, transformArgs(m.paramss.head map Ident)))
 
     def createSwitchMethod(name: Name, range: Seq[Int], returnType: Type)(
         f: Int => Tree) = {
@@ -197,8 +195,8 @@ trait MethodSynthesis { self: Analyzer =>
         val annotations = stat.symbol.initialize.annotations
         val trees =
           ((field(vd) ::: standardAccessors(vd) ::: beanAccessors(vd)) map
-                (acc => atPos(vd.pos.focus)(acc derive annotations)) filterNot
-                (_ eq EmptyTree))
+            (acc => atPos(vd.pos.focus)(acc derive annotations)) filterNot
+            (_ eq EmptyTree))
         // Verify each annotation landed safely somewhere, else warn.
         // Filtering when isParamAccessor is a necessary simplification
         // because there's a bunch of unwritten annotation code involving

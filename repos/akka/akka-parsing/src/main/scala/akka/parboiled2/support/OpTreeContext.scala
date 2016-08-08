@@ -136,7 +136,7 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
       RuleCall(Right(call),
                Literal(
                    Constant(callName(call) getOrElse c
-                         .abort(call.pos, "Illegal rule call: " + call))))
+                     .abort(call.pos, "Illegal rule call: " + call))))
   }
 
   def OpTree(tree: Tree): OpTree =
@@ -186,7 +186,7 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
       q"""val mark = __saveState; ${ops
         .map(_.render(wrapped))
         .reduceLeft((l, r) ⇒
-              q"val l = $l; if (!l) { __restoreState(mark); $r } else true // work-around for https://issues.scala-lang.org/browse/SI-8657")}"""
+          q"val l = $l; if (!l) { __restoreState(mark); $r } else true // work-around for https://issues.scala-lang.org/browse/SI-8657")}"""
   }
 
   case class CharMatch(charTree: Tree) extends TerminalOpTree {

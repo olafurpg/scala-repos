@@ -150,8 +150,8 @@ class MetricsReporterService @Inject()(config: MetricsReporterConf,
       .withHost(InetAddress.getLocalHost.getHostName)
       .withPrefix(prefix)
       .withExpansions(util.EnumSet.copyOf(expansions
-                .flatMap(e => Expansion.values().find(_.toString == e))
-                .asJava))
+        .flatMap(e => Expansion.values().find(_.toString == e))
+        .asJava))
       .withTags(tags.asJava)
       .build()
 

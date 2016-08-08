@@ -179,13 +179,13 @@ class MatchToPartialFunctionQuickFix(matchStmt: ScMatchStmt,
     indexes.map(i => clauses(i).pattern).foreach {
       case Some(w: ScWildcardPattern) =>
         w.replace(ScalaPsiElementFactory
-              .createPatternFromText(name, matchStmt.getManager))
+          .createPatternFromText(name, matchStmt.getManager))
       case Some(p: ScPattern) =>
         val newPatternText =
           if (needParentheses(p)) s"$name @ (${p.getText})"
           else s"$name @ ${p.getText}"
         p.replace(ScalaPsiElementFactory
-              .createPatternFromText(newPatternText, matchStmt.getManager))
+          .createPatternFromText(newPatternText, matchStmt.getManager))
       case _ =>
     }
   }

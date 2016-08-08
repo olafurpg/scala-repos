@@ -212,7 +212,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
                               tparams: List[Symbol]): List[Type] =
       (if (trackVariance)
          map2Conserve(args, tparams)((arg, tparam) =>
-               withVariance(variance * tparam.variance)(this(arg)))
+           withVariance(variance * tparam.variance)(this(arg)))
        else args mapConserve this)
 
     /** Applies this map to the symbol's info, setting variance = Invariant
@@ -516,7 +516,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     private def isBaseClassOfEnclosingClass(base: Symbol) = {
       def loop(encl: Symbol): Boolean =
         (isPossiblePrefix(encl) &&
-              ((encl isSubClass base) || loop(encl.owner.enclClass)))
+          ((encl isSubClass base) || loop(encl.owner.enclClass)))
       // The hasCompleteInfo guard is necessary to avoid cycles during the typing
       // of certain classes, notably ones defined inside package objects.
       !base.hasCompleteInfo || loop(seenFromClass)
@@ -527,7 +527,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       */
     private def isTypeParamOfEnclosingClass(sym: Symbol): Boolean =
       (sym.isTypeParameter && sym.owner.isClass &&
-            isBaseClassOfEnclosingClass(sym.owner))
+        isBaseClassOfEnclosingClass(sym.owner))
 
     /** Creates an existential representing a type parameter which appears
       *  in the prefix of a ThisType.
@@ -735,10 +735,10 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     protected def renameBoundSyms(tp: Type): Type = tp match {
       case MethodType(ps, restp) =>
         createFromClonedSymbols(ps, restp)((ps1, tp1) =>
-              copyMethodType(tp, ps1, renameBoundSyms(tp1)))
+          copyMethodType(tp, ps1, renameBoundSyms(tp1)))
       case PolyType(bs, restp) =>
         createFromClonedSymbols(bs, restp)((ps1, tp1) =>
-              PolyType(ps1, renameBoundSyms(tp1)))
+          PolyType(ps1, renameBoundSyms(tp1)))
       case ExistentialType(bs, restp) =>
         createFromClonedSymbols(bs, restp)(newExistentialType)
       case _ =>
@@ -861,7 +861,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
 
           case sel @ Select(qual, name) =>
             transformIfMapped(sel)(toSym =>
-                  strictCopy.Select(sel, qual, toSym.name))
+              strictCopy.Select(sel, qual, toSym.name))
 
           case tree => tree
         }
@@ -967,9 +967,9 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         val param = params(pid)
         existentials(pid) =
           (param.owner.newExistential(
-                  param.name.toTypeName append nme.SINGLETON_SUFFIX,
-                  param.pos,
-                  param.flags) setInfo singletonBounds(actuals(pid)))
+              param.name.toTypeName append nme.SINGLETON_SUFFIX,
+              param.pos,
+              param.flags) setInfo singletonBounds(actuals(pid)))
       }
       existentials(pid)
     }

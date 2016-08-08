@@ -1811,7 +1811,7 @@ abstract class Future[+A] extends Awaitable[A] {
     if (other.isDefined) {
       throw new IllegalStateException(
           s"Cannot call proxyTo on an already satisfied Promise: ${Await
-        .result(other.liftToTry)}")
+            .result(other.liftToTry)}")
     }
     respond { other() = _ }
   }

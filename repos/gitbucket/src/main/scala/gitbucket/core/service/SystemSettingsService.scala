@@ -15,7 +15,7 @@ trait SystemSettingsService {
   def saveSystemSettings(settings: SystemSettings): Unit = {
     defining(new java.util.Properties()) { props =>
       settings.baseUrl.foreach(x =>
-            props.setProperty(BaseURL, x.replaceFirst("/\\Z", "")))
+        props.setProperty(BaseURL, x.replaceFirst("/\\Z", "")))
       settings.information.foreach(x => props.setProperty(Information, x))
       props.setProperty(AllowAccountRegistration,
                         settings.allowAccountRegistration.toString)
@@ -26,7 +26,7 @@ trait SystemSettingsService {
       props.setProperty(Gravatar, settings.gravatar.toString)
       props.setProperty(Notification, settings.notification.toString)
       settings.activityLogLimit.foreach(x =>
-            props.setProperty(ActivityLogLimit, x.toString))
+        props.setProperty(ActivityLogLimit, x.toString))
       props.setProperty(Ssh, settings.ssh.toString)
       settings.sshHost.foreach(x => props.setProperty(SshHost, x.trim))
       settings.sshPort.foreach(x => props.setProperty(SshPort, x.toString))
@@ -50,15 +50,15 @@ trait SystemSettingsService {
           ldap.port.foreach(x => props.setProperty(LdapPort, x.toString))
           ldap.bindDN.foreach(x => props.setProperty(LdapBindDN, x))
           ldap.bindPassword.foreach(x =>
-                props.setProperty(LdapBindPassword, x))
+            props.setProperty(LdapBindPassword, x))
           props.setProperty(LdapBaseDN, ldap.baseDN)
           props.setProperty(LdapUserNameAttribute, ldap.userNameAttribute)
           ldap.additionalFilterCondition.foreach(x =>
-                props.setProperty(LdapAdditionalFilterCondition, x))
+            props.setProperty(LdapAdditionalFilterCondition, x))
           ldap.fullNameAttribute.foreach(x =>
-                props.setProperty(LdapFullNameAttribute, x))
+            props.setProperty(LdapFullNameAttribute, x))
           ldap.mailAttribute.foreach(x =>
-                props.setProperty(LdapMailAddressAttribute, x))
+            props.setProperty(LdapMailAddressAttribute, x))
           ldap.tls.foreach(x => props.setProperty(LdapTls, x.toString))
           ldap.ssl.foreach(x => props.setProperty(LdapSsl, x.toString))
           ldap.keystore.foreach(x => props.setProperty(LdapKeystore, x))
@@ -79,7 +79,7 @@ trait SystemSettingsService {
       }
       SystemSettings(
           getOptionValue[String](props, BaseURL, None).map(x =>
-                x.replaceFirst("/\\Z", "")),
+            x.replaceFirst("/\\Z", "")),
           getOptionValue(props, Information, None),
           getValue(props, AllowAccountRegistration, false),
           getValue(props, AllowAnonymousAccess, true),

@@ -31,7 +31,7 @@ trait PathReads {
 
   def at[A](path: JsPath)(implicit reads: Reads[A]): Reads[A] =
     Reads[A](js =>
-          path.asSingleJsResult(js).flatMap(reads.reads(_).repath(path)))
+      path.asSingleJsResult(js).flatMap(reads.reads(_).repath(path)))
 
   /**
     * Reads a Option[T] search optional or nullable field at JsPath (field not found or null is None
@@ -72,8 +72,8 @@ trait PathReads {
           path
             .asSingleJsResult(js)
             .flatMap { jsv =>
-          reads.reads(jsv).repath(path)
-        }
+              reads.reads(jsv).repath(path)
+            }
             .map(jsv => JsPath.createObj(path -> jsv)))
 
   def jsPut(path: JsPath, a: => JsValue) =
@@ -81,11 +81,11 @@ trait PathReads {
 
   def jsCopyTo[A <: JsValue](path: JsPath)(reads: Reads[A]) =
     Reads[JsObject](js =>
-          reads.reads(js).map(js => JsPath.createObj(path -> js)))
+      reads.reads(js).map(js => JsPath.createObj(path -> js)))
 
   def jsUpdate[A <: JsValue](path: JsPath)(reads: Reads[A]) =
     Reads[JsObject](js =>
-          js match {
+      js match {
         case o: JsObject =>
           path
             .asSingleJsResult(o)
@@ -111,7 +111,7 @@ trait ConstraintReads {
   /** very simple optional field Reads that maps "null" to None */
   def optionWithNull[T](implicit rds: Reads[T]): Reads[Option[T]] =
     Reads(js =>
-          js match {
+      js match {
         case JsNull => JsSuccess(None)
         case js => rds.reads(js).map(Some(_))
     })
@@ -166,7 +166,7 @@ trait ConstraintReads {
   def pattern(regex: => scala.util.matching.Regex,
               error: String = "error.pattern")(implicit reads: Reads[String]) =
     Reads[String](js =>
-          reads.reads(js).flatMap { o =>
+      reads.reads(js).flatMap { o =>
         regex.unapplySeq(o).map(_ => JsSuccess(o)).getOrElse(JsError(error))
     })
 
@@ -183,7 +183,7 @@ trait ConstraintReads {
     Reads[A] { js =>
       rds.reads(js).flatMap { t =>
         (scala.util.control.Exception.catching(classOf[MatchError]) opt cond(
-                t)).flatMap { b =>
+            t)).flatMap { b =>
           if (b) Some(subreads.reads(js).map(_ => t))
           else None
         }.getOrElse(JsSuccess(t))
@@ -230,8 +230,7 @@ trait PathWrites {
       JsPath.createObj(
           path -> path(js).headOption
             .flatMap(js =>
-                  js.asOpt[JsObject]
-                    .map(obj => obj.deepMerge(wrs.writes(obj))))
+              js.asOpt[JsObject].map(obj => obj.deepMerge(wrs.writes(obj))))
             .getOrElse(JsNull)
       )
     }

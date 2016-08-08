@@ -278,7 +278,6 @@ object Formatter {
   private val DoublePercent = new RegExpExtractor(
       new js.RegExp("""^\x25{2}"""))
   private val EOLChunk = new RegExpExtractor(new js.RegExp("""^\x25n"""))
-  private val FormattedChunk = new RegExpExtractor(
-      new js.RegExp(
-          """^\x25(?:([1-9]\d*)\$)?([-#+ 0,\(<]*)(\d*)(?:\.(\d+))?([A-Za-z])"""))
+  private val FormattedChunk = new RegExpExtractor(new js.RegExp(
+      """^\x25(?:([1-9]\d*)\$)?([-#+ 0,\(<]*)(\d*)(?:\.(\d+))?([A-Za-z])"""))
 }

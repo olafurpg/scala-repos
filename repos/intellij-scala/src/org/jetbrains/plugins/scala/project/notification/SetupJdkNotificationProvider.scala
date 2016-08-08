@@ -39,7 +39,7 @@ class SetupJdkNotificationProvider(project: Project,
     val jdk = Option(PsiManager.getInstance(project).findFile(file))
       .filter(_.getLanguage == ScalaLanguage.Instance)
       .flatMap(psiFile =>
-            Option(ModuleUtilCore.findModuleForPsiElement(psiFile)))
+        Option(ModuleUtilCore.findModuleForPsiElement(psiFile)))
       .map(module => ModuleRootManager.getInstance(module).getSdk)
 
     if (jdk.exists(_ == null))

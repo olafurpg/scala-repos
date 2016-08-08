@@ -346,9 +346,9 @@ object WorksheetSourceProcessor {
         withPrecomputeLines(fun, {
           objectRes append
             (printMethodName + "(\"" + fun.getName + ": \" + " +
-                  macroPrinterName + s".printGeneric({import $instanceName._ ;" +
-                  fun.getText.stripPrefix(hadMods) + " })" + eraseClassName +
-                  ")\n")
+              macroPrinterName + s".printGeneric({import $instanceName._ ;" +
+              fun.getText.stripPrefix(hadMods) + " })" + eraseClassName +
+              ")\n")
         })
       case tpeDef: ScTypeDefinition =>
         withPrecomputeLines(tpeDef, {
@@ -370,7 +370,7 @@ object WorksheetSourceProcessor {
               classRes append s"def $defName = $pName;$END_GENERATED_MARKER"
               objectRes append
                 (printMethodName + "(\"" + startText + pName + ": \" + " +
-                      withTempVar(defName) + ")\n")
+                  withTempVar(defName) + ")\n")
           }
         })
       case varDef: ScVariableDefinition =>
@@ -390,8 +390,8 @@ object WorksheetSourceProcessor {
         val txt = (varDef.typeElement, varDef.expr) match {
           case (Some(tpl: ScTypeElement), Some(expr)) =>
             "var " + (typeElement2Types(tpl) zip varDef.declaredElements map {
-                  case (tpe, el) => el.name + ": " + tpe.getText
-                }).mkString("(", ",", ")") + " = { " + expr.getText + ";}"
+              case (tpe, el) => el.name + ": " + tpe.getText
+            }).mkString("(", ",", ")") + " = { " + expr.getText + ";}"
           case (_, Some(expr)) =>
             "var " + varDef.declaredElements.map {
               case tpePattern: ScTypedPattern => writeTypedPatter(tpePattern)
@@ -405,7 +405,7 @@ object WorksheetSourceProcessor {
           case pName =>
             objectRes append
               (printMethodName + "(\"" + startText + pName + ": \" + " +
-                    withTempVar(pName /*, withInstance = false*/ ) + ")\n")
+                withTempVar(pName /*, withInstance = false*/ ) + ")\n")
         }
 
         appendPsiLineInfo(varDef, lineNum)
@@ -418,7 +418,7 @@ object WorksheetSourceProcessor {
         classRes append s"def $defName = { $END_GENERATED_MARKER${assign.getText}}${insertNlsFromWs(assign)}"
         objectRes append s"$instanceName.$defName; " append
           (printMethodName + "(\"" + startText + pName + ": \" + " +
-                withTempVar(pName) + ")\n")
+            withTempVar(pName) + ")\n")
 
         appendPsiLineInfo(assign, lineNums)
 
@@ -435,7 +435,7 @@ object WorksheetSourceProcessor {
         classRes append s"def $resName = $END_GENERATED_MARKER${expr.getText}${insertNlsFromWs(expr)}"
         objectRes append
           (printMethodName + "(\"res" + startText + resCount + ": \" + " +
-                withTempVar(resName) + ")\n")
+            withTempVar(resName) + ")\n")
         appendPsiLineInfo(expr, lineNums)
 
         resCount += 1
@@ -448,7 +448,7 @@ object WorksheetSourceProcessor {
 
     classRes append "}"
     objectRes append (printMethodName + "(\"" + END_OUTPUT_MARKER +
-          "\")\n") append s"} \n $PRINT_ARRAY_TEXT \n }"
+      "\")\n") append s"} \n $PRINT_ARRAY_TEXT \n }"
 
     val codeResult =
       objectPrologue + importStmts.mkString(";") + classRes.toString() +

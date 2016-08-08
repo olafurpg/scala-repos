@@ -133,14 +133,10 @@ class OneHotEncoderSuite
     val output = encoder.transform(df)
     val group = AttributeGroup.fromStructField(output.schema("encoded"))
     assert(group.size === 2)
-    assert(
-        group.getAttr(0) === BinaryAttribute.defaultAttr
-          .withName("0")
-          .withIndex(0))
-    assert(
-        group.getAttr(1) === BinaryAttribute.defaultAttr
-          .withName("1")
-          .withIndex(1))
+    assert(group
+      .getAttr(0) === BinaryAttribute.defaultAttr.withName("0").withIndex(0))
+    assert(group
+      .getAttr(1) === BinaryAttribute.defaultAttr.withName("1").withIndex(1))
   }
 
   test("read/write") {

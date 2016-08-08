@@ -407,8 +407,8 @@ trait BodyParsers {
       */
     def json(maxLength: Int): BodyParser[JsValue] = when(
         _.contentType.exists(m =>
-              m.equalsIgnoreCase("text/json") ||
-                m.equalsIgnoreCase("application/json")),
+          m.equalsIgnoreCase("text/json") ||
+            m.equalsIgnoreCase("application/json")),
         tolerantJson(maxLength),
         createBadResult("Expecting text/json or application/json body",
                         UNSUPPORTED_MEDIA_TYPE)
@@ -558,7 +558,7 @@ trait BodyParsers {
       request =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
         Accumulator(StreamConverters.fromOutputStream(() =>
-                  new FileOutputStream(to))).map(_ => Right(to))
+          new FileOutputStream(to))).map(_ => Right(to))
     }
 
     /**
@@ -657,23 +657,23 @@ trait BodyParsers {
           case Some("text/plain") =>
             logger.trace("Parsing AnyContent as text")
             text(maxLengthOrDefault)(request).map(_.right.map(s =>
-                      AnyContentAsText(s)))
+              AnyContentAsText(s)))
 
           case Some("text/xml") | Some("application/xml") |
               Some(ApplicationXmlMatcher()) =>
             logger.trace("Parsing AnyContent as xml")
             xml(maxLengthOrDefault)(request).map(_.right.map(x =>
-                      AnyContentAsXml(x)))
+              AnyContentAsXml(x)))
 
           case Some("text/json") | Some("application/json") =>
             logger.trace("Parsing AnyContent as json")
             json(maxLengthOrDefault)(request).map(_.right.map(j =>
-                      AnyContentAsJson(j)))
+              AnyContentAsJson(j)))
 
           case Some("application/x-www-form-urlencoded") =>
             logger.trace("Parsing AnyContent as urlFormEncoded")
             urlFormEncoded(maxLengthOrDefault)(request).map(_.right.map(d =>
-                      AnyContentAsFormUrlEncoded(d)))
+              AnyContentAsFormUrlEncoded(d)))
 
           case Some("multipart/form-data") =>
             logger.trace("Parsing AnyContent as multipartFormData")
@@ -807,8 +807,8 @@ trait BodyParsers {
               val badResult = Future
                 .successful(())
                 .flatMap(_ =>
-                      createBadResult("Request Entity Too Large",
-                                      REQUEST_ENTITY_TOO_LARGE)(request))(
+                  createBadResult("Request Entity Too Large",
+                                  REQUEST_ENTITY_TOO_LARGE)(request))(
                     defaultCtx)
               badResult.map(Left(_))
             case MaxSizeNotExceeded => resultFuture

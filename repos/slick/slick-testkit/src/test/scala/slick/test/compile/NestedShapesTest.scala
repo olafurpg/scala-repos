@@ -69,11 +69,11 @@ class NestedShapesTest {
                      Query[(Rep[Int], Rep[String]), (Int, String), Seq],
                      Seq[(Int, String)],
                      Query[(Rep[Int], Rep[String]), (Int, String), Seq]]] // 6
-    implicitly[
-        Shape[NestedShapeLevel,
-              (Rep[Int], Query[(Rep[Int], Rep[String]), (Int, String), Seq]),
-              (Int, Seq[(Int, String)]),
-              (Rep[Int], Query[(Rep[Int], Rep[String]), (Int, String), Seq])]] // 7
+    implicitly[Shape[
+        NestedShapeLevel,
+        (Rep[Int], Query[(Rep[Int], Rep[String]), (Int, String), Seq]),
+        (Int, Seq[(Int, String)]),
+        (Rep[Int], Query[(Rep[Int], Rep[String]), (Int, String), Seq])]] // 7
     implicitly[
         Shape[NestedShapeLevel,
               (Int, Query[(Rep[Int], Rep[String]), (Int, String), Seq]),

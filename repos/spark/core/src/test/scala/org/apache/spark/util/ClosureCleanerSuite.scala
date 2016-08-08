@@ -78,9 +78,8 @@ class ClosureCleanerSuite extends SparkFunSuite {
       } catch {
         case rse: ReturnStatementInClosureException => // Success!
         case e @ (_: NotSerializableException | _: SparkException) =>
-          fail(
-              s"Expected ReturnStatementInClosureException, but got $e.\n" +
-                "This means the closure provided by user is not actually cleaned.")
+          fail(s"Expected ReturnStatementInClosureException, but got $e.\n" +
+            "This means the closure provided by user is not actually cleaned.")
       }
     }
 

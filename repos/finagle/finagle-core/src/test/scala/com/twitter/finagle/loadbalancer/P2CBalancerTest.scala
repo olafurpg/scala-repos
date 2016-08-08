@@ -328,7 +328,7 @@ class P2CBalancerEwmaTest extends FunSuite with App with P2CSuite {
           val latency = Await.result(svc((): Unit)).toLong
           val work =
             (clock() + latency ->
-                  (schedule.getOrElse(clock() + latency, Nil) :+ svc))
+              (schedule.getOrElse(clock() + latency, Nil) :+ svc))
           schedule + work
         }
       for (seq <- next.get(step); c <- seq) c.close()

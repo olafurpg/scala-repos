@@ -775,7 +775,7 @@ trait BaseCometActor
     */
   protected def calcFixedRender: Box[NodeSeq] =
     fixedRender.map(ns =>
-          theSession.postPageJavaScript() match {
+      theSession.postPageJavaScript() match {
         case Nil => ns
         case xs => {
           ns ++ Script(xs)
@@ -1457,11 +1457,11 @@ private[http] class XmlOrJsCmd(
          notices)
 
   val xml = _xml.flatMap(content =>
-        S.session.map(s =>
-              s.processSurroundAndInclude("JS SetHTML id: " + id, content)))
+    S.session.map(s =>
+      s.processSurroundAndInclude("JS SetHTML id: " + id, content)))
   val fixedXhtml = _fixedXhtml.flatMap(content =>
-        S.session.map(s =>
-              s.processSurroundAndInclude("JS SetHTML id: " + id, content)))
+    S.session.map(s =>
+      s.processSurroundAndInclude("JS SetHTML id: " + id, content)))
 
   /**
     * Returns the JsCmd that will be sent to client
@@ -1478,12 +1478,12 @@ private[http] class XmlOrJsCmd(
           LiftRules.jsArtifacts.setHtml(
               id + "_outer",
               (spanFunc(Helpers.stripHead(xml)) ++ fixedXhtml.openOr(
-                      Text("")))) & JsCmds.JsTry(js, false)
+                  Text("")))) & JsCmds.JsTry(js, false)
         case (Full(xml), _, true) =>
           LiftRules.jsArtifacts.setHtml(
               id + "_outer",
               (spanFunc(Helpers.stripHead(xml)) ++ fixedXhtml.openOr(
-                      Text(""))))
+                  Text(""))))
         case (_, Full(js), _) => js
         case _ => JsCmds.Noop
       }
@@ -1499,7 +1499,7 @@ private[http] class XmlOrJsCmd(
     var ret: JsCmd =
       JsCmds.JsTry(JsCmds.Run("destroy_" + id + "();"), false) & fullUpdateJs & JsCmds
         .JsTry(JsCmds.Run("destroy_" + id + " = function() {" +
-                     (destroy.openOr(JsCmds.Noop).toJsCmd) + "};"),
+                 (destroy.openOr(JsCmds.Noop).toJsCmd) + "};"),
                false)
 
     S.appendNotices(notices)
@@ -1513,8 +1513,8 @@ private[http] class XmlOrJsCmd(
   def outSpan: NodeSeq =
     Script(
         Run("var destroy_" + id + " = function() {" +
-              (destroy.openOr(JsCmds.Noop).toJsCmd) + "}")) ++ fixedXhtml
-      .openOr(Text(""))
+          (destroy.openOr(JsCmds.Noop).toJsCmd) + "}")) ++ fixedXhtml.openOr(
+        Text(""))
 }
 
 /**

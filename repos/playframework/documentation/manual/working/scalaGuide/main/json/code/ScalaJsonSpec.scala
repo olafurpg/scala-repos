@@ -68,15 +68,15 @@ class ScalaJsonSpec extends Specification {
               "residents" -> JsArray(
                   Seq(
                       JsObject(Seq(
-                              "name" -> JsString("Fiver"),
-                              "age" -> JsNumber(4),
-                              "role" -> JsNull
-                          )),
+                          "name" -> JsString("Fiver"),
+                          "age" -> JsNumber(4),
+                          "role" -> JsNull
+                      )),
                       JsObject(Seq(
-                              "name" -> JsString("Bigwig"),
-                              "age" -> JsNumber(6),
-                              "role" -> JsString("Owsla")
-                          ))
+                          "name" -> JsString("Bigwig"),
+                          "age" -> JsNumber(6),
+                          "role" -> JsString("Owsla")
+                      ))
                   ))
           ))
       //#convert-from-classes
@@ -187,12 +187,11 @@ class ScalaJsonSpec extends Specification {
 
       implicit val residentWrites: Writes[Resident] =
         ((JsPath \ "name").write[String] and (JsPath \ "age").write[Int] and
-              (JsPath \ "role")
-                .writeNullable[String])(unlift(Resident.unapply))
+          (JsPath \ "role").writeNullable[String])(unlift(Resident.unapply))
 
       implicit val placeWrites: Writes[Place] = ((JsPath \ "name")
-            .write[String] and (JsPath \ "location").write[Location] and
-            (JsPath \ "residents").write[Seq[Resident]])(unlift(Place.unapply))
+        .write[String] and (JsPath \ "location").write[Location] and
+        (JsPath \ "residents").write[Seq[Resident]])(unlift(Place.unapply))
       //#convert-from-model-prefwrites
 
       val place = Place(
@@ -339,16 +338,16 @@ class ScalaJsonSpec extends Specification {
       import play.api.libs.functional.syntax._
 
       implicit val locationReads: Reads[Location] = ((JsPath \ "lat")
-            .read[Double] and (JsPath \ "long").read[Double])(Location.apply _)
+        .read[Double] and (JsPath \ "long").read[Double])(Location.apply _)
 
       implicit val residentReads: Reads[Resident] =
         ((JsPath \ "name").read[String] and (JsPath \ "age").read[Int] and
-              (JsPath \ "role").readNullable[String])(Resident.apply _)
+          (JsPath \ "role").readNullable[String])(Resident.apply _)
 
       implicit val placeReads: Reads[Place] =
         ((JsPath \ "name").read[String] and (JsPath \ "location")
-              .read[Location] and (JsPath \ "residents")
-              .read[Seq[Resident]])(Place.apply _)
+          .read[Location] and (JsPath \ "residents")
+          .read[Seq[Resident]])(Place.apply _)
 
       //###replace: val json = { ... }
       val json = sampleJson

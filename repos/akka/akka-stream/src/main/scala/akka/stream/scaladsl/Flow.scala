@@ -1351,7 +1351,7 @@ trait FlowOps[+Out, +Mat] {
 
     val finish: (Sink[Out, NotUsed]) ⇒ Closed = s ⇒
       via(Split.when(p, substreamCancelStrategy)).to(Sink.foreach(
-              _.runWith(s)(GraphInterpreter.currentInterpreter.materializer)))
+          _.runWith(s)(GraphInterpreter.currentInterpreter.materializer)))
 
     new SubFlowImpl(Flow[Out], merge, finish)
   }
@@ -1422,7 +1422,7 @@ trait FlowOps[+Out, +Mat] {
     }
     val finish: (Sink[Out, NotUsed]) ⇒ Closed = s ⇒
       via(Split.after(p, substreamCancelStrategy)).to(Sink.foreach(
-              _.runWith(s)(GraphInterpreter.currentInterpreter.materializer)))
+          _.runWith(s)(GraphInterpreter.currentInterpreter.materializer)))
     new SubFlowImpl(Flow[Out], merge, finish)
   }
 
