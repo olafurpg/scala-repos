@@ -66,7 +66,7 @@ private[http] object FrameHandler {
       def handleRegularFrameStart(start: FrameStart)(
           implicit ctx: Ctx): SyncDirective = {
         if ((expectFirstHeader &&
-                start.header.opcode == expectedOpcode) // first opcode must be the expected
+            start.header.opcode == expectedOpcode) // first opcode must be the expected
             || start.header.opcode == Opcode.Continuation) {
           // further ones continuations
           expectFirstHeader = false
@@ -137,9 +137,8 @@ private[http] object FrameHandler {
           closeWithCode(Protocol.CloseCodes.ProtocolError,
                         "Unsupported opcode")
         case other ⇒
-          ctx.fail(
-              new IllegalStateException(
-                  s"unexpected message of type [${other.getClass.getName}] when expecting ControlFrame"))
+          ctx.fail(new IllegalStateException(
+              s"unexpected message of type [${other.getClass.getName}] when expecting ControlFrame"))
       }
     }
     private def collectControlFrame(start: FrameStart, nextState: State)(

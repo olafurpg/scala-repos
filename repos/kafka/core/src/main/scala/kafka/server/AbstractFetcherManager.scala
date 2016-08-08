@@ -64,9 +64,9 @@ abstract class AbstractFetcherManager(protected val name: String,
 
             fetcherThreadMap.foldLeft(headRate)(
                 (curMinAll, fetcherThreadMapEntry) => {
-              fetcherThreadMapEntry._2.fetcherStats.requestRate.oneMinuteRate
-                .min(curMinAll)
-            })
+                  fetcherThreadMapEntry._2.fetcherStats.requestRate.oneMinuteRate
+                    .min(curMinAll)
+                })
           }
         }
       },
@@ -103,9 +103,9 @@ abstract class AbstractFetcherManager(protected val name: String,
 
         fetcherThreadMap(brokerAndFetcherId).addPartitions(
             partitionAndOffsets.map {
-          case (topicAndPartition, brokerAndInitOffset) =>
-            topicAndPartition -> brokerAndInitOffset.initOffset
-        })
+              case (topicAndPartition, brokerAndInitOffset) =>
+                topicAndPartition -> brokerAndInitOffset.initOffset
+            })
       }
     }
 

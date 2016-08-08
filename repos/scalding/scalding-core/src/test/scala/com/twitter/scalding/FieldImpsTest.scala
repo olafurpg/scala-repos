@@ -256,7 +256,7 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       f2 = List(4, 5, 6) -> List(1, 2, 3)
       f2 shouldBe
         (new Fields(int2Integer(4), int2Integer(5), int2Integer(6)),
-            new Fields(int2Integer(1), int2Integer(2), int2Integer(3)))
+        new Fields(int2Integer(1), int2Integer(2), int2Integer(3)))
 
       object Schema extends Enumeration {
         val one, two, three = Value

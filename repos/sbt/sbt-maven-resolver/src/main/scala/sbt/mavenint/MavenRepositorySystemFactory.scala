@@ -68,7 +68,7 @@ object MavenRepositorySystemFactory {
     // instead of a pom.xml, but let's see if this is actually a problem in practice.
     val descriptorPolicy =
       new org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy(
-          /* ignoreMissing */ false, /* ignoreInvalid. */ true)
+      /* ignoreMissing */ false, /* ignoreInvalid. */ true)
     session.setArtifactDescriptorPolicy(descriptorPolicy)
     session
   }

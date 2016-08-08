@@ -53,8 +53,8 @@ class ResolvedDataSourceSuite extends SparkFunSuite {
         getProvidingClass("parquet") === classOf[
             org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
     assert(getProvidingClass(
-            "org.apache.spark.sql.execution.datasources.parquet") === classOf[
-            org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
+        "org.apache.spark.sql.execution.datasources.parquet") === classOf[
+        org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
     assert(
         getProvidingClass("org.apache.spark.sql.parquet") === classOf[
             org.apache.spark.sql.execution.datasources.parquet.DefaultSource])

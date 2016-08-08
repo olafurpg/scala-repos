@@ -35,20 +35,20 @@ class FinancialTest extends FunSuite {
     assert(netPresentValue(1.0, Seq(1, 1, 2)) == 2.0)
   }
   test("FutureValue") {
-    assert(
-        math.abs(futureValue(0.05 / 12, 10 * 12, -100, -100) - 15692.92889) < 1e-5)
+    assert(math
+      .abs(futureValue(0.05 / 12, 10 * 12, -100, -100) - 15692.92889) < 1e-5)
     assert(futureValue(0.0, 3, 1, 1) == -4.0)
   }
   test("presentValue") {
     assert(
         math.abs(presentValue(0.05 / 12, 10 * 12, -100, 15692.93) -
-              -100.0006713) < 1e-5)
+          -100.0006713) < 1e-5)
     assert(presentValue(0, 3, 1, 1) == -4.0)
   }
   test("payment") {
     assert(
         math.abs(payment(0.075 / 12, 12 * 15, 200000, 0) -
-              -1854.0247200054619) < 1e-5)
+          -1854.0247200054619) < 1e-5)
     assert(math.abs(payment(0.0, 10, 1100, -100) - -100.0) < 1e-5)
   }
 
@@ -104,17 +104,17 @@ class FinancialTest extends FunSuite {
     var expectNormalIRR = DenseVector[Double](-100, 39, 59, 55, 20);
     assert(
         math.abs(interalRateReturn(expectNormalIRR).get -
-              0.2809484211599611) < DOUBLE_ROUND5_MIN)
+          0.2809484211599611) < DOUBLE_ROUND5_MIN)
     //Some(0.08859833852775578)
     expectNormalIRR = DenseVector[Double](-5, 10.5, 1, -8, 1);
     assert(
         math.abs(interalRateReturn(expectNormalIRR).get -
-              0.08859833852775578) < DOUBLE_ROUND5_MIN)
+          0.08859833852775578) < DOUBLE_ROUND5_MIN)
     //Some(-0.09549583034897258)
     val expectNegativeIRR = DenseVector[Double](-100, 0, 0, 74)
     assert(
         math.abs(interalRateReturn(expectNegativeIRR).get +
-              0.09549583034897258) < DOUBLE_ROUND5_MIN)
+          0.09549583034897258) < DOUBLE_ROUND5_MIN)
 
     val expectZeroIRR = DenseVector[Double](-2000, 500, 500, 1000)
     assert(math.abs(interalRateReturn(expectZeroIRR).get) < DOUBLE_ROUND5_MIN)

@@ -313,12 +313,12 @@ trait WSRequest {
     new java.net.URI(
         if (queryString.isEmpty) url
         else {
-      val qs = (for {
-        (n, vs) <- queryString
-        v <- vs
-      } yield s"${enc(n)}=${enc(v)}").mkString("&")
-      s"$url?$qs"
-    })
+          val qs = (for {
+            (n, vs) <- queryString
+            v <- vs
+          } yield s"${enc(n)}=${enc(v)}").mkString("&")
+          s"$url?$qs"
+        })
   }
 
   /**

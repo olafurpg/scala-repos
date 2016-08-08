@@ -187,8 +187,8 @@ object Formats {
         Map(
             key -> precision
               .map({ p =>
-            value.setScale(p._2)
-          })
+                value.setScale(p._2)
+              })
               .getOrElse(value)
               .toString)
     }

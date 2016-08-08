@@ -173,8 +173,8 @@ private[finagle] object Simulation extends com.twitter.app.App {
     val underlying = Var(stable)
     val activity: Activity[Set[ServiceFactory[Unit, Unit]]] = Activity(
         underlying.map { facs =>
-      Activity.Ok(facs)
-    })
+          Activity.Ok(facs)
+        })
 
     val factory = bal() match {
       case "p2c" =>

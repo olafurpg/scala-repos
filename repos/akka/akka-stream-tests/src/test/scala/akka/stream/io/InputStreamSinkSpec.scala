@@ -268,8 +268,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       Source
         .single(byteString)
         .runWith(StreamConverters
-              .asInputStream(timeout)
-              .withAttributes(inputBuffer(0, 0)))
+          .asInputStream(timeout)
+          .withAttributes(inputBuffer(0, 0)))
       /*
        With Source.single we test the code path in which the sink
        itself throws an exception when being materialized. If

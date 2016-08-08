@@ -1068,15 +1068,9 @@ final class Replicator(settings: ReplicatorSettings)
         setData(key.id, DeletedEnvelope)
         if (isLocalUpdate(consistency)) sender() ! DeleteSuccess(key)
         else
-          context.actorOf(
-              WriteAggregator
-                .props(key,
-                       DeletedEnvelope,
-                       consistency,
-                       None,
-                       nodes,
-                       sender())
-                .withDispatcher(context.props.dispatcher))
+          context.actorOf(WriteAggregator
+            .props(key, DeletedEnvelope, consistency, None, nodes, sender())
+            .withDispatcher(context.props.dispatcher))
     }
   }
 
@@ -1400,7 +1394,7 @@ final class Replicator(settings: ReplicatorSettings)
     pruningPerformed.foreach {
       case (removed, timestamp)
           if ((allReachableClockTime -
-                    timestamp) > maxPruningDisseminationNanos) &&
+            timestamp) > maxPruningDisseminationNanos) &&
             allPruningPerformed(removed) ⇒
         log.debug("All pruning performed for [{}], tombstoned", removed)
         pruningPerformed -= removed
@@ -1418,7 +1412,7 @@ final class Replicator(settings: ReplicatorSettings)
 
   def pruningCleanupTombstoned(envelope: DataEnvelope): DataEnvelope =
     tombstoneNodes.foldLeft(envelope)((c, removed) ⇒
-          pruningCleanupTombstoned(removed, c))
+      pruningCleanupTombstoned(removed, c))
 
   def pruningCleanupTombstoned(removed: UniqueAddress,
                                envelope: DataEnvelope): DataEnvelope = {
@@ -1434,7 +1428,7 @@ final class Replicator(settings: ReplicatorSettings)
     if (tombstoneNodes.isEmpty) data
     else
       tombstoneNodes.foldLeft(data)((c, removed) ⇒
-            pruningCleanupTombstoned(removed, c))
+        pruningCleanupTombstoned(removed, c))
 
   def pruningCleanupTombstoned(removed: UniqueAddress,
                                data: ReplicatedData): ReplicatedData =

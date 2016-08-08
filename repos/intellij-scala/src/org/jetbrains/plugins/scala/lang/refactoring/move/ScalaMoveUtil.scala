@@ -179,7 +179,7 @@ object ScalaMoveUtil {
       case null =>
       case as: Associations =>
         as.associations.foreach(a =>
-              a.range = a.range.shiftRight(offsetChange))
+          a.range = a.range.shiftRight(offsetChange))
     }
   }
 

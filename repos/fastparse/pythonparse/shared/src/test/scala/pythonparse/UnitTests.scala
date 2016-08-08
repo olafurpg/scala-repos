@@ -294,10 +294,10 @@ object UnitTests extends TestSuite {
                             'c,
                             Seq(Pass),
                             Seq(If(
-                                    'd,
-                                    Seq(Pass),
-                                    Seq(Pass)
-                                ))
+                                'd,
+                                Seq(Pass),
+                                Seq(Pass)
+                            ))
                         ))
                 )),
             """if a:

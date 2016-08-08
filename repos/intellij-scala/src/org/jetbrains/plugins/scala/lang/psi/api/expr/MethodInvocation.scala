@@ -354,8 +354,8 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
           ref
             .bind()
             .exists(result =>
-                  result.isDynamic &&
-                    result.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED)
+              result.isDynamic &&
+                result.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED)
         case _ => false
       }
     }

@@ -32,7 +32,7 @@ object CodeGenerator extends App {
     val modelFuture = db.run(modelAction)
     // customize code generator
     val codegenFuture = modelFuture.map(model =>
-          new SourceCodeGenerator(model) {
+      new SourceCodeGenerator(model) {
         // override mapped table and class name
         override def entityName =
           dbTableName => dbTableName.dropRight(1).toLowerCase.toCamelCase

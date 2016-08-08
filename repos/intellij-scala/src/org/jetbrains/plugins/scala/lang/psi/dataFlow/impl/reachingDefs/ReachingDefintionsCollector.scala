@@ -55,7 +55,7 @@ object ReachingDefintionsCollector {
     val fragmentInstructions = filterByFragment(cfg, fragment)
 
     val inputInfos = computeInputVaribles(fragmentInstructions).filter(info =>
-          !isVisible(info.element, place))
+      !isVisible(info.element, place))
     val outputInfos = computeOutputVariables(fragmentInstructions, dfaResult)
 
     FragmentVariableInfos(inputInfos, outputInfos)

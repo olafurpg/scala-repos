@@ -25,7 +25,7 @@ object GenerateRoundtripSources {
     val a1 = profile
       .createModel(ignoreInvalidDefaults = false)
       .map(m =>
-            new SourceCodeGenerator(m) {
+        new SourceCodeGenerator(m) {
           override def tableName = {
             case n if n.toLowerCase == "null" =>
               "null" // testing null as table name
@@ -35,7 +35,7 @@ object GenerateRoundtripSources {
     val a2 = profile
       .createModel(ignoreInvalidDefaults = false)
       .map(m =>
-            new SourceCodeGenerator(m) {
+        new SourceCodeGenerator(m) {
           override def Table = new Table(_) {
             override def autoIncLastAsOption = true
           }

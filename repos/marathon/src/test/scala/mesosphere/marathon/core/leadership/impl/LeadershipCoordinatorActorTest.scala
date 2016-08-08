@@ -21,7 +21,7 @@ class LeadershipCoordinatorActorTest extends MarathonSpec {
     val probe = TestProbe()
 
     coordinatorRef.underlying.become(coordinatorRef.underlyingActor
-          .preparingForStart(Set(probe.ref), Set(whenLeader1Probe.ref)))
+      .preparingForStart(Set(probe.ref), Set(whenLeader1Probe.ref)))
 
     probe.send(coordinatorRef, WhenLeaderActor.Stop)
 
@@ -62,7 +62,7 @@ class LeadershipCoordinatorActorTest extends MarathonSpec {
     val probe = TestProbe()
 
     coordinatorRef.underlying.become(coordinatorRef.underlyingActor
-          .preparingForStart(Set(probe.ref), Set(whenLeader1Probe.ref)))
+      .preparingForStart(Set(probe.ref), Set(whenLeader1Probe.ref)))
     probe.send(whenLeader1Probe.ref, PoisonPill)
 
     assert(
@@ -111,7 +111,7 @@ class LeadershipCoordinatorActorTest extends MarathonSpec {
     val requester2 = TestProbe()
 
     coordinatorRef.underlying.become(coordinatorRef.underlyingActor
-          .preparingForStart(Set(requester1.ref), Set(whenLeader1Probe.ref)))
+      .preparingForStart(Set(requester1.ref), Set(whenLeader1Probe.ref)))
 
     requester2.send(coordinatorRef, PreparationMessages.PrepareForStart)
 

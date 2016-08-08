@@ -157,11 +157,10 @@ private[akka] class Mailboxes(val settings: ActorSystem.Settings,
     // TODO remove in 2.3
     if (!hasMailboxType && !mailboxSizeWarningIssued &&
         dispatcherConfig.hasPath("mailbox-size")) {
-      eventStream.publish(
-          Warning(
-              "mailboxes",
-              getClass,
-              s"ignoring setting 'mailbox-size' for dispatcher [$id], you need to specify 'mailbox-type=bounded'"))
+      eventStream.publish(Warning(
+          "mailboxes",
+          getClass,
+          s"ignoring setting 'mailbox-size' for dispatcher [$id], you need to specify 'mailbox-type=bounded'"))
       mailboxSizeWarningIssued = true
     }
 
@@ -249,10 +248,9 @@ private[akka] class Mailboxes(val settings: ActorSystem.Settings,
               mailboxType match {
                 case m: ProducesPushTimeoutSemanticsMailbox
                     if m.pushTimeOut.toNanos > 0L ⇒
-                  warn(
-                      s"Configured potentially-blocking mailbox [$id] configured with non-zero pushTimeOut (${m.pushTimeOut}), " +
-                        s"which can lead to blocking behaviour when sending messages to this mailbox. " +
-                        s"Avoid this by setting `$id.mailbox-push-timeout-time` to `0`.")
+                  warn(s"Configured potentially-blocking mailbox [$id] configured with non-zero pushTimeOut (${m.pushTimeOut}), " +
+                    s"which can lead to blocking behaviour when sending messages to this mailbox. " +
+                    s"Avoid this by setting `$id.mailbox-push-timeout-time` to `0`.")
                   mailboxNonZeroPushTimeoutWarningIssued = true
                 case _ ⇒ // good; nothing to see here, move along, sir.
               }

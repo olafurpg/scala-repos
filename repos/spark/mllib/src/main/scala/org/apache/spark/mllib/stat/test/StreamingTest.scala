@@ -149,10 +149,10 @@ class StreamingTest @Since("1.6.0")() extends Logging with Serializable {
     if (this.windowSize == 0) {
       categoryValuePair.updateStateByKey[StatCounter](
           (newValues: Seq[Double], oldSummary: Option[StatCounter]) => {
-        val newSummary = oldSummary.getOrElse(new StatCounter())
-        newSummary.merge(newValues)
-        Some(newSummary)
-      })
+            val newSummary = oldSummary.getOrElse(new StatCounter())
+            newSummary.merge(newValues)
+            Some(newSummary)
+          })
     } else {
       val windowDuration = data.slideDuration * this.windowSize
       categoryValuePair.groupByKeyAndWindow(windowDuration).mapValues {

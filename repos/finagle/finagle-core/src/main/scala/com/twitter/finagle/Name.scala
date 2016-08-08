@@ -137,7 +137,7 @@ object Name {
                 Addr.Bound(set + Address(ia), metadata)
               case (Addr.Bound(_, _), sa) =>
                 Addr.Failed(new IllegalArgumentException(
-                        s"Unsupported SocketAddress of type '${sa.getClass.getName}': $sa"))
+                    s"Unsupported SocketAddress of type '${sa.getClass.getName}': $sa"))
               case (addr, _) => addr
             }
         }

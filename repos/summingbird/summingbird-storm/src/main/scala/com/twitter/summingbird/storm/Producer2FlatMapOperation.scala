@@ -43,11 +43,11 @@ object Producer2FlatMapOperation {
             case OptionMappedProducer(_, op) =>
               acc.andThen(
                   FlatMapOperation[Any, Any](op
-                        .andThen(_.iterator)
-                        .asInstanceOf[Any => TraversableOnce[Any]]))
+                    .andThen(_.iterator)
+                    .asInstanceOf[Any => TraversableOnce[Any]]))
             case FlatMappedProducer(_, op) =>
               acc.andThen(FlatMapOperation(op)
-                    .asInstanceOf[FlatMapOperation[Any, Any]])
+                .asInstanceOf[FlatMapOperation[Any, Any]])
             case WrittenProducer(_, sinkSupplier) =>
               acc.andThen(FlatMapOperation.write(() => sinkSupplier.toFn))
             case IdentityKeyedProducer(_) => acc

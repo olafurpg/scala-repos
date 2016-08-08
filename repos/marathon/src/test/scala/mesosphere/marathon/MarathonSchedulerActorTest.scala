@@ -71,7 +71,7 @@ class MarathonSchedulerActorTest
     when(repo.allPathIds()).thenReturn(Future.successful(Seq(app.id)))
     when(taskTracker.tasksByApp()(any[ExecutionContext])).thenReturn(
         Future.successful(TaskTracker.TasksByApp.of(
-                TaskTracker.AppTasks("nope".toPath, tasks)))
+            TaskTracker.AppTasks("nope".toPath, tasks)))
     )
     when(repo.currentVersion(app.id)).thenReturn(Future.successful(Some(app)))
 
@@ -98,7 +98,7 @@ class MarathonSchedulerActorTest
     when(repo.allPathIds()).thenReturn(Future.successful(Seq(app.id)))
     when(taskTracker.appTasksSync(app.id)).thenReturn(Iterable.empty[Task])
     when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.of(
-            TaskTracker.AppTasks.forTasks("nope".toPath, tasks)))
+        TaskTracker.AppTasks.forTasks("nope".toPath, tasks)))
     when(taskTracker.appTasksSync("nope".toPath)).thenReturn(tasks)
     when(repo.currentVersion(app.id)).thenReturn(Future.successful(Some(app)))
     when(taskTracker.countLaunchedAppTasksSync(app.id)).thenReturn(0)

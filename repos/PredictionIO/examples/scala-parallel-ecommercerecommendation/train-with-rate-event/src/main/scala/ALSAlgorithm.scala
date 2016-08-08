@@ -84,11 +84,11 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
       if (uindex == -1)
         logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-              " to Int index.")
+          " to Int index.")
 
       if (iindex == -1)
         logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-              " to Int index.")
+          " to Int index.")
 
       ((uindex, iindex), (r.rating, r.t)) // MODIFIED
     }.filter {
@@ -154,7 +154,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
     // convert whiteList's string ID to integer index
     val whiteList: Option[Set[Int]] = query.whiteList.map(set =>
-          set.map(model.itemStringIntMap.get(_)).flatten)
+      set.map(model.itemStringIntMap.get(_)).flatten)
 
     val blackList: Set[String] = query.blackList.getOrElse(Set[String]())
 

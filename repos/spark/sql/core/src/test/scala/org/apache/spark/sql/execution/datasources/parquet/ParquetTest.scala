@@ -81,7 +81,7 @@ private[sql] trait ParquetTest extends SQLTestUtils {
       data: Seq[T],
       testVectorized: Boolean = true)(f: DataFrame => Unit): Unit = {
     withParquetFile(data)(path =>
-          readParquetFile(path.toString, testVectorized)(f))
+      readParquetFile(path.toString, testVectorized)(f))
   }
 
   /**

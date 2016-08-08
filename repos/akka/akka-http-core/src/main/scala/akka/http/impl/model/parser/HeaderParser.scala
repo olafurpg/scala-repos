@@ -110,10 +110,9 @@ private[http] object HeaderParser {
     dispatch(parser, headerName) match {
       case r @ Right(_) if parser.cursor == v.length ⇒ r
       case r @ Right(_) ⇒
-        Left(
-            ErrorInfo(
-                "Header parsing error",
-                s"Rule for $headerName accepted trailing garbage. Is the parser missing a trailing EOI?"))
+        Left(ErrorInfo(
+            "Header parsing error",
+            s"Rule for $headerName accepted trailing garbage. Is the parser missing a trailing EOI?"))
       case Left(e) ⇒
         Left(
             e.copy(summary = e.summary.filterNot(_ == EOI),

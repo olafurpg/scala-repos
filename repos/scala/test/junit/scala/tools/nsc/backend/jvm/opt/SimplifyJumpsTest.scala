@@ -113,7 +113,7 @@ class SimplifyJumpsTest {
     // rewritten to IFLT
     val twoRounds =
       genMethod()(List(VarOp(ILOAD, 1), Jump(IFLE, Label(22))) ::: begin ::: Label(
-              22) :: rest: _*)
+          22) :: rest: _*)
     assertTrue(LocalOptImpls.simplifyJumps(twoRounds))
     assertSameCode(instructionsFromMethod(twoRounds),
                    List(VarOp(ILOAD, 1),

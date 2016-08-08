@@ -36,7 +36,7 @@ class TTwitterClientFilterTest extends FunSuite with MockitoSugar {
     val tracing = new TraceInitializerFilter[ThriftClientRequest, Array[Byte]](
         tracer,
         true).andThen(new TracingFilter[ThriftClientRequest, Array[Byte]](
-            "TTwitterClientFilterTest"))
+        "TTwitterClientFilterTest"))
     val service = mock[Service[ThriftClientRequest, Array[Byte]]]
     val _request = ArgumentCaptor.forClass(classOf[ThriftClientRequest])
     when(service(_request.capture)).thenReturn(Future(Array[Byte]()))

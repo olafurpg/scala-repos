@@ -80,23 +80,23 @@ trait ClassTag[T]
     */
   def unapply(x: Any): Option[T] =
     if (null != x && ((runtimeClass.isInstance(x)) || (x.isInstanceOf[Byte] &&
-                runtimeClass.isAssignableFrom(classOf[Byte])) ||
-            (x.isInstanceOf[Short] &&
-                runtimeClass.isAssignableFrom(classOf[Short])) ||
-            (x.isInstanceOf[Char] &&
-                runtimeClass.isAssignableFrom(classOf[Char])) ||
-            (x.isInstanceOf[Int] &&
-                runtimeClass.isAssignableFrom(classOf[Int])) ||
-            (x.isInstanceOf[Long] &&
-                runtimeClass.isAssignableFrom(classOf[Long])) ||
-            (x.isInstanceOf[Float] &&
-                runtimeClass.isAssignableFrom(classOf[Float])) ||
-            (x.isInstanceOf[Double] &&
-                runtimeClass.isAssignableFrom(classOf[Double])) ||
-            (x.isInstanceOf[Boolean] &&
-                runtimeClass.isAssignableFrom(classOf[Boolean])) ||
-            (x.isInstanceOf[Unit] &&
-                runtimeClass.isAssignableFrom(classOf[Unit]))))
+        runtimeClass.isAssignableFrom(classOf[Byte])) ||
+        (x.isInstanceOf[Short] &&
+        runtimeClass.isAssignableFrom(classOf[Short])) ||
+        (x.isInstanceOf[Char] &&
+        runtimeClass.isAssignableFrom(classOf[Char])) ||
+        (x.isInstanceOf[Int] &&
+        runtimeClass.isAssignableFrom(classOf[Int])) ||
+        (x.isInstanceOf[Long] &&
+        runtimeClass.isAssignableFrom(classOf[Long])) ||
+        (x.isInstanceOf[Float] &&
+        runtimeClass.isAssignableFrom(classOf[Float])) ||
+        (x.isInstanceOf[Double] &&
+        runtimeClass.isAssignableFrom(classOf[Double])) ||
+        (x.isInstanceOf[Boolean] &&
+        runtimeClass.isAssignableFrom(classOf[Boolean])) ||
+        (x.isInstanceOf[Unit] &&
+        runtimeClass.isAssignableFrom(classOf[Unit]))))
       Some(x.asInstanceOf[T])
     else None
 

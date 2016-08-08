@@ -88,9 +88,8 @@ object WorksheetDiffSplitters {
       override def mouseReleased(mouseEvent: MouseEvent) {
         val f = getProportion
 
-        Option(
-            PsiDocumentManager
-              .getInstance(editor1.getProject) getCachedPsiFile editor1.getDocument) foreach {
+        Option(PsiDocumentManager
+          .getInstance(editor1.getProject) getCachedPsiFile editor1.getDocument) foreach {
           case file: ScalaFile =>
             WorksheetEditorPrinter.saveOnlyRatio(file, f)
           case _ =>

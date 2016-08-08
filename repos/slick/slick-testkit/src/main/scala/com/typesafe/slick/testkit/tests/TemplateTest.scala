@@ -59,8 +59,8 @@ class TemplateTest extends AsyncTest[RelationalTestDB] {
       uids <- users.map(_.id).result
       _ <- DBIO.seq(
               uids.map(uid =>
-                    orders.map(o => (o.userID, o.product)) +=
-                      (uid, if (uid < 4) "Product A" else "Product B")): _*)
+                orders.map(o => (o.userID, o.product)) +=
+                  (uid, if (uid < 4) "Product A" else "Product B")): _*)
       _ <- q1.result.map(_ shouldBe List("Apu"))
       _ <- q2.result.map(_ shouldBe List("Apu"))
       _ <- q3.result.map(_.toSet shouldBe Set("Marge", "Apu", "Carl", "Lenny"))
@@ -103,11 +103,11 @@ class TemplateTest extends AsyncTest[RelationalTestDB] {
     val impShaped = (ts.length, ts.length)
     val impShapedC = Compiled(impShaped)
     implicitly[slick.lifted.Executable[
-            slick.lifted.ShapedValue[(Rep[Int], Rep[Int]), (Int, Int)],
-            _]]
+        slick.lifted.ShapedValue[(Rep[Int], Rep[Int]), (Int, Int)],
+        _]]
     implicitly[slick.lifted.Compilable[
-            slick.lifted.ShapedValue[(Rep[Int], Rep[Int]), (Int, Int)],
-            _]]
+        slick.lifted.ShapedValue[(Rep[Int], Rep[Int]), (Int, Int)],
+        _]]
     val expShaped = impShaped.shaped
     val expShapedC = Compiled(expShaped)
 
@@ -118,7 +118,7 @@ class TemplateTest extends AsyncTest[RelationalTestDB] {
         Compiled(ts) ++= Seq((2, "b"), (3, "c")),
         byIdAndS(1, "a").result.map(r => r.toSet shouldBe Set((1, "a"))),
         byIdAndSC(1, "a").result.map((r: Seq[(Int, String)]) =>
-              r.toSet shouldBe Set((1, "a"))),
+          r.toSet shouldBe Set((1, "a"))),
         byIdAndFixedSC(2).result.map(r => r.toSet shouldBe Set((2, "b"))),
         byIdC3.result.map(r => r.toSet shouldBe Set((3, "c"))),
         byId3.result.map(r => r.toSet shouldBe Set((3, "c"))),

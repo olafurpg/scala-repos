@@ -42,9 +42,8 @@ class MemberMetadataTest extends JUnitSuite {
     assertTrue(member.matches(protocols))
     assertFalse(member.matches(List(("range", Array[Byte](0)))))
     assertFalse(member.matches(List(("roundrobin", Array.empty[Byte]))))
-    assertFalse(
-        member.matches(List(("range", Array.empty[Byte]),
-                            ("roundrobin", Array.empty[Byte]))))
+    assertFalse(member.matches(
+        List(("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte]))))
   }
 
   @Test

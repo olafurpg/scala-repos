@@ -103,12 +103,8 @@ abstract class IngestProducer(args: Array[String])
 
       val totalMessages = messages * threadCount * samples.size
 
-      println(
-          "Time: %.02f Messages: %d Throughput: %.01f msgs/s Errors: %d"
-            .format(seconds,
-                    totalMessages,
-                    totalMessages / seconds,
-                    totalErrors))
+      println("Time: %.02f Messages: %d Throughput: %.01f msgs/s Errors: %d"
+        .format(seconds, totalMessages, totalMessages / seconds, totalErrors))
     }
     close
   }

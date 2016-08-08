@@ -257,7 +257,7 @@ object DataType {
           fromFields.zip(toFields).forall {
             case (fromField, toField) =>
               fromField.name == toField.name && (toField.nullable ||
-                    !fromField.nullable) && equalsIgnoreCompatibleNullability(
+                !fromField.nullable) && equalsIgnoreCompatibleNullability(
                   fromField.dataType,
                   toField.dataType)
           }

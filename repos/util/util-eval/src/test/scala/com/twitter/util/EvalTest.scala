@@ -102,9 +102,8 @@ class EvalTest extends WordSpec {
     }
 
     "apply(InputStream)" in {
-      assert(
-          (new Eval).apply[Int](
-              getClass.getResourceAsStream("/OnePlusOne.scala")) == 2)
+      assert((new Eval)
+        .apply[Int](getClass.getResourceAsStream("/OnePlusOne.scala")) == 2)
     }
 
     "uses deprecated" in {
@@ -172,11 +171,11 @@ class EvalTest extends WordSpec {
       // with lots o dots
       assert(e.fileToClassName(new File("foo.bar.baz")) == "foo$2ebar")
       // with dashes
-      assert(
-          e.fileToClassName(new File("foo-bar-baz.scala")) == "foo$2dbar$2dbaz")
+      assert(e
+        .fileToClassName(new File("foo-bar-baz.scala")) == "foo$2dbar$2dbaz")
       // with crazy things
-      assert(
-          e.fileToClassName(new File("foo$! -@@@")) == "foo$24$21$20$2d$40$40$40")
+      assert(e
+        .fileToClassName(new File("foo$! -@@@")) == "foo$24$21$20$2d$40$40$40")
     }
 
     "allow custom error reporting" when {

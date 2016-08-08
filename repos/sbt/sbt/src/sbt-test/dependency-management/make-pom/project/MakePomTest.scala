@@ -7,12 +7,12 @@ object MakePomTest extends Build {
   lazy val root =
     Project("root", file(".")) settings
       (readPom <<= makePom map XML.loadFile,
-          TaskKey[Unit]("check-pom") <<= checkPom,
-          TaskKey[Unit]("check-extra") <<= checkExtra, TaskKey[Unit](
-              "check-version-plus-mapping") <<= checkVersionPlusMapping,
-          resolvers += Resolver.sonatypeRepo("snapshots"),
-          makePomConfiguration ~= { _.copy(extra = <extra-tag/>) },
-          libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.+")
+      TaskKey[Unit]("check-pom") <<= checkPom,
+      TaskKey[Unit]("check-extra") <<= checkExtra, TaskKey[Unit](
+          "check-version-plus-mapping") <<= checkVersionPlusMapping,
+      resolvers += Resolver.sonatypeRepo("snapshots"),
+      makePomConfiguration ~= { _.copy(extra = <extra-tag/>) },
+      libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.+")
 
   val readPom = TaskKey[Elem]("read-pom")
 
@@ -65,7 +65,7 @@ object MakePomTest extends Build {
         } distinct;
 
         lazy val explain = (("Written:" +: writtenRepositories) ++
-              ("Declared:" +: mavenStyleRepositories)).mkString("\n\t")
+          ("Declared:" +: mavenStyleRepositories)).mkString("\n\t")
 
         if (writtenRepositories != mavenStyleRepositories)
           sys.error(

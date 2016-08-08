@@ -93,8 +93,8 @@ case class Generate(generator: Generator,
   def output: Seq[Attribute] = {
     val qualified = qualifier
       .map(q =>
-            // prepend the new qualifier to the existed one
-            generatorOutput.map(a => a.withQualifiers(q +: a.qualifiers)))
+        // prepend the new qualifier to the existed one
+        generatorOutput.map(a => a.withQualifiers(q +: a.qualifiers)))
       .getOrElse(generatorOutput)
 
     if (join) child.output ++ qualified else qualified
@@ -221,8 +221,8 @@ case class Union(children: Seq[LogicalPlan]) extends LogicalPlan {
             child.output.length == children.head.output.length &&
               // compare the data types with the first child
               child.output.zip(children.head.output).forall {
-            case (l, r) => l.dataType == r.dataType
-        })
+                case (l, r) => l.dataType == r.dataType
+            })
 
     children.length > 1 && childrenResolved && allChildrenCompatible
   }
@@ -586,11 +586,11 @@ case class Pivot(groupByExprs: Seq[NamedExpression],
     groupByExprs.map(_.toAttribute) ++ aggregates match {
       case agg :: Nil =>
         pivotValues.map(value =>
-              AttributeReference(value.toString, agg.dataType)())
+          AttributeReference(value.toString, agg.dataType)())
       case _ =>
         pivotValues.flatMap { value =>
           aggregates.map(agg =>
-                AttributeReference(value + "_" + agg.sql, agg.dataType)())
+            AttributeReference(value + "_" + agg.sql, agg.dataType)())
         }
     }
 }

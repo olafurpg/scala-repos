@@ -14,11 +14,9 @@ import akka.cluster.ClusterEvent._
 object ClusterMetricsDisabledMultiJvmSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
-  commonConfig(
-      ConfigFactory
-        .parseString("akka.cluster.metrics.enabled = off")
-        .withFallback(
-            MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+  commonConfig(ConfigFactory
+    .parseString("akka.cluster.metrics.enabled = off")
+    .withFallback(MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
 class ClusterMetricsDisabledMultiJvmNode1 extends ClusterMetricsDisabledSpec

@@ -220,13 +220,12 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           formXml.isDefined must_== true
           formXml foreach { fprime =>
             val f = ("* [name]" #> ".*" & "select *" #>
-                  (((ns: NodeSeq) =>
-                      ns.filter {
-                        case e: Elem =>
-                          e.attribute("selected").map(_.text) == Some(
-                              "selected")
-                        case _ => false
-                      }) andThen "* [value]" #> ".*"))(fprime)
+              (((ns: NodeSeq) =>
+                  ns.filter {
+                    case e: Elem =>
+                      e.attribute("selected").map(_.text) == Some("selected")
+                    case _ => false
+                  }) andThen "* [value]" #> ".*"))(fprime)
             val ret: Boolean = Helpers.compareXml(f, fp)
 
             ret must_== true
@@ -615,12 +614,11 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         ("name" -> "subrecord") ~ ("subsub" -> ("name" -> "subsub")) ~
           ("subsublist" -> JArray(Nil)) ~
           ("when" ->
-                ("$dt" -> rec.meta.formats.dateFormat
-                      .format(subRec.when.value))) ~
+            ("$dt" -> rec.meta.formats.dateFormat.format(subRec.when.value))) ~
           ("slist" -> JArray(Nil)) ~ ("smap" -> JObject(Nil)) ~
           ("oid" -> ("$oid" -> subRec.oid.value.toString)) ~
           ("pattern" -> ("$regex" -> subRec.pattern.value.pattern) ~
-                ("$flags" -> subRec.pattern.value.flags)) ~
+            ("$flags" -> subRec.pattern.value.flags)) ~
           ("uuid" -> ("$uuid" -> subRec.uuid.value.toString))
 
       val srJsExp = new JsExp {
@@ -654,24 +652,22 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         ("name" -> "subrec1") ~ ("subsub" -> ("name" -> "subsub")) ~
           ("subsublist" -> JArray(Nil)) ~
           ("when" ->
-                ("$dt" -> rec.meta.formats.dateFormat
-                      .format(lst(0).when.value))) ~
+            ("$dt" -> rec.meta.formats.dateFormat.format(lst(0).when.value))) ~
           ("slist" -> JArray(Nil)) ~ ("smap" -> JObject(Nil)) ~
           ("oid" -> ("$oid" -> lst(0).oid.value.toString)) ~
           ("pattern" -> ("$regex" -> lst(0).pattern.value.pattern) ~
-                ("$flags" -> lst(0).pattern.value.flags)) ~
+            ("$flags" -> lst(0).pattern.value.flags)) ~
           ("uuid" -> ("$uuid" -> lst(0).uuid.value.toString))
 
       val sr2Json =
         ("name" -> "subrec2") ~ ("subsub" -> ("name" -> "subsub")) ~
           ("subsublist" -> JArray(Nil)) ~
           ("when" ->
-                ("$dt" -> rec.meta.formats.dateFormat
-                      .format(lst(1).when.value))) ~
+            ("$dt" -> rec.meta.formats.dateFormat.format(lst(1).when.value))) ~
           ("slist" -> JArray(Nil)) ~ ("smap" -> JObject(Nil)) ~
           ("oid" -> ("$oid" -> lst(1).oid.value.toString)) ~
           ("pattern" -> ("$regex" -> lst(1).pattern.value.pattern) ~
-                ("$flags" -> lst(1).pattern.value.flags)) ~
+            ("$flags" -> lst(1).pattern.value.flags)) ~
           ("uuid" -> ("$uuid" -> lst(1).uuid.value.toString))
 
       val sr1JsExp = new JsExp {

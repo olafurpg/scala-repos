@@ -199,7 +199,7 @@ class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
             FastTypeTag.Null
           case ELIDED_TAG =>
             hints.elidedType.getOrElse(throw new PicklingException(
-                    s"Type is elided in pickle, but no elide hint was provided by unpickler!"))
+                s"Type is elided in pickle, but no elide hint was provided by unpickler!"))
           case REF_TAG =>
             FastTypeTag.Ref
           case _ =>

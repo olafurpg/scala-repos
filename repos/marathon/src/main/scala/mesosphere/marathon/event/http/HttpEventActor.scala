@@ -108,7 +108,7 @@ class HttpEventActor(conf: HttpEventConfiguration,
     if (limited.nonEmpty) {
       log.info(
           s"""Will not send event ${event.eventType} to unresponsive hosts: ${limited
-        .mkString(" ")}""")
+            .mkString(" ")}""")
     }
     //remove all unsubscribed callback listener
     limiter = limiter

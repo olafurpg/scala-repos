@@ -100,7 +100,7 @@ abstract class NumericRange[T](
   // whether it is a member of the sequence (i.e. when step > 1.)
   private def isWithinBoundaries(elem: T) =
     !isEmpty && ((step > zero && start <= elem && elem <= last) ||
-          (step < zero && last <= elem && elem <= start))
+      (step < zero && last <= elem && elem <= start))
   // Methods like apply throw exceptions on invalid n, but methods like take/drop
   // are forgiving: therefore the checks are with the methods.
   private def locationAfterN(n: Int): T = start + (step * fromInt(n))
@@ -200,7 +200,7 @@ abstract class NumericRange[T](
     else if (numRangeElements == 1) head
     else
       ((this.num fromInt numRangeElements) * (head + last) /
-            (this.num fromInt 2))
+        (this.num fromInt 2))
   }
 
   override lazy val hashCode = super.hashCode()
@@ -208,9 +208,9 @@ abstract class NumericRange[T](
     case x: NumericRange[_] =>
       (x canEqual this) && (length == x.length) &&
         ((length == 0) || // all empty sequences are equal
-              (start == x.start &&
-                    last == x.last) // same length and same endpoints implies equality
-            )
+          (start == x.start &&
+            last == x.last) // same length and same endpoints implies equality
+        )
     case _ =>
       super.equals(other)
   }

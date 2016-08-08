@@ -402,9 +402,7 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
         assetInfo.etag
           .filter(someEtag => etags.split(',').exists(_.trim == someEtag))
           .flatMap(_ =>
-                Some(cacheableResult(assetInfo,
-                                     aggressiveCaching,
-                                     NotModified)))
+            Some(cacheableResult(assetInfo, aggressiveCaching, NotModified)))
       case None =>
         for {
           ifModifiedSinceStr <- request.headers.get(IF_MODIFIED_SINCE)

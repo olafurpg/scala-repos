@@ -166,8 +166,8 @@ object FoldableTest extends SpecLite {
 
   "product foldLeft equivalence" ! forAll { (l: List[Int], l2: List[Int]) =>
     (L.product(L)
-          .foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs) must_===
-          ((l ++ l2).reverse))
+      .foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs) must_===
+      ((l ++ l2).reverse))
   }
 }
 

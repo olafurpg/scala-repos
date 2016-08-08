@@ -201,7 +201,7 @@ trait SeqLike[+A, +Repr]
     private[this] def init() = {
       val m = mutable.HashMap[A, Int]()
       val (es, is) = (thisCollection map
-            (e => (e, m.getOrElseUpdate(e, m.size))) sortBy (_._2)).unzip
+        (e => (e, m.getOrElseUpdate(e, m.size))) sortBy (_._2)).unzip
 
       (es.toBuffer, is.toArray)
     }
@@ -255,7 +255,7 @@ trait SeqLike[+A, +Repr]
 
       // e => (e, weight(e))
       val (es, is) = (thisCollection map
-            (e => (e, m.getOrElseUpdate(e, m.size))) sortBy (_._2)).unzip
+        (e => (e, m.getOrElseUpdate(e, m.size))) sortBy (_._2)).unzip
       val cs = new Array[Int](m.size)
       is foreach (i => cs(i) += 1)
       val ns = new Array[Int](cs.length)

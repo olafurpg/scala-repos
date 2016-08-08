@@ -70,16 +70,15 @@ trait SQLServerProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - JdbcCapabilities.forceInsert -
-          JdbcCapabilities.returnInsertOther - JdbcCapabilities.insertOrUpdate -
-          SqlCapabilities.sequence - JdbcCapabilities.supportsByte)
+      JdbcCapabilities.returnInsertOther - JdbcCapabilities.insertOrUpdate -
+      SqlCapabilities.sequence - JdbcCapabilities.supportsByte)
 
   override protected def computeQueryCompiler =
     (super.computeQueryCompiler
-          .addAfter(new RemoveTakeDrop(translateTake = false),
-                    Phase.expandSums)
-          .addBefore(new ProtectGroupBy, Phase.mergeToComprehensions)
-          .replace(new RemoveFieldNames(alwaysKeepSubqueryNames = true)) +
-          Phase.rewriteBooleans)
+      .addAfter(new RemoveTakeDrop(translateTake = false), Phase.expandSums)
+      .addBefore(new ProtectGroupBy, Phase.mergeToComprehensions)
+      .replace(new RemoveFieldNames(alwaysKeepSubqueryNames = true)) +
+      Phase.rewriteBooleans)
   override protected lazy val useServerSideUpsert = true
   override protected lazy val useServerSideUpsertReturning = false
   override val columnTypes = new JdbcTypes

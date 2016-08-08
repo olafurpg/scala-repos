@@ -99,7 +99,7 @@ trait EngineInstances {
 @DeveloperApi
 class EngineInstanceSerializer
     extends CustomSerializer[EngineInstance](format =>
-          ({
+      ({
         case JObject(fields) =>
           implicit val formats = DefaultFormats
           val seed = EngineInstance(id = "",
@@ -140,7 +140,7 @@ class EngineInstanceSerializer
                   i.copy(env = Extraction.extract[Map[String, String]](env))
                 case JField("sparkConf", sparkConf) =>
                   i.copy(sparkConf =
-                        Extraction.extract[Map[String, String]](sparkConf))
+                    Extraction.extract[Map[String, String]](sparkConf))
                 case JField("dataSourceParams", JString(dataSourceParams)) =>
                   i.copy(dataSourceParams = dataSourceParams)
                 case JField("preparatorParams", JString(preparatorParams)) =>

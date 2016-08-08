@@ -27,7 +27,7 @@ object RestartNodeMultiJvmSpec extends MultiNodeConfig {
   commonConfig(
       debugConfig(on = false)
         .withFallback(ConfigFactory.parseString(
-                "akka.cluster.auto-down-unreachable-after = 5s"))
+            "akka.cluster.auto-down-unreachable-after = 5s"))
         .withFallback(MultiNodeClusterSpec.clusterConfig))
 }
 
@@ -54,7 +54,7 @@ abstract class RestartNodeSpec
       system.name,
       ConfigFactory
         .parseString("akka.remote.netty.tcp.port=" +
-              secondUniqueAddress.address.port.get)
+          secondUniqueAddress.address.port.get)
         .withFallback(system.settings.config))
 
   override def afterAll(): Unit = {
@@ -119,7 +119,7 @@ abstract class RestartNodeSpec
         awaitAssert(
             Cluster(restartedSecondSystem).readView.members.size should ===(3))
         awaitAssert(Cluster(restartedSecondSystem).readView.members
-              .map(_.status) should ===(Set(Up)))
+          .map(_.status) should ===(Set(Up)))
       }
       runOn(first, third) {
         awaitAssert {

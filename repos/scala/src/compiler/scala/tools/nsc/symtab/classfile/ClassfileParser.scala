@@ -512,8 +512,8 @@ abstract class ClassfileParser {
         0 until u2 foreach (_ => parseMethod())
         val needsConstructor =
           (!sawPrivateConstructor &&
-                !(instanceScope containsName nme.CONSTRUCTOR) &&
-                (sflags & INTERFACE) == 0)
+            !(instanceScope containsName nme.CONSTRUCTOR) &&
+            (sflags & INTERFACE) == 0)
         if (needsConstructor)
           instanceScope enter clazz.newClassConstructor(NoPosition)
       }

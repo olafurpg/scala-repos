@@ -179,7 +179,7 @@ class InMemoryAPIKeyManager[M[+ _]](clock: Clock)(implicit val M: Monad[M])
         .map { grant =>
           val children = grants.values.filter(_.parentIds.contains(gid))
           Set(grant) ++ children.flatMap(grant =>
-                deleteGrantAux(grant.grantId))
+            deleteGrantAux(grant.grantId))
         }
         .getOrElse(Set.empty)
     }

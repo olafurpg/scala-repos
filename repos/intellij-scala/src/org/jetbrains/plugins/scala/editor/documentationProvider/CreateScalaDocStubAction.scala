@@ -78,7 +78,7 @@ class CreateScalaDocStubAction
           extensions inWriteAction {
             CodeStyleManager getInstance project reformatText
               (docOwner.getContainingFile, docRange.getStartOffset,
-                  docRange.getEndOffset + 2)
+              docRange.getEndOffset + 2)
           }
         }
       }, "Create ScalaDoc stub", null, psiDocument)
@@ -157,7 +157,7 @@ class CreateScalaDocStubAction
             val range = docOwner.getDocComment.getTextRange
             CodeStyleManager getInstance project reformatText
               (docOwner.getContainingFile, range.getStartOffset,
-                  range.getEndOffset)
+              range.getEndOffset)
           }
         }
       }, "Create ScalaDoc Stub", null, psiDocument)

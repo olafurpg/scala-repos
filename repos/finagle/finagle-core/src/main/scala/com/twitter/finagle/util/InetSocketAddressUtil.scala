@@ -64,8 +64,8 @@ object InetSocketAddressUtil {
     hostPorts map {
       case (host, port) =>
         (InetAddress.getAllByName(host) map { addr =>
-              new InetSocketAddress(addr, port)
-            }).toSeq
+          new InetSocketAddress(addr, port)
+        }).toSeq
     }
 
   /**
@@ -82,9 +82,9 @@ object InetSocketAddressUtil {
     if (hosts == ":*") return Seq(new InetSocketAddress(0))
 
     (parseHostPorts(hosts) map {
-          case (host, port) =>
-            if (host == "") new InetSocketAddress(port)
-            else new InetSocketAddress(host, port)
-        }).toList
+      case (host, port) =>
+        if (host == "") new InetSocketAddress(port)
+        else new InetSocketAddress(host, port)
+    }).toList
   }
 }

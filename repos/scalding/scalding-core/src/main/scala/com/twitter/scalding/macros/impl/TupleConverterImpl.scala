@@ -92,7 +92,7 @@ object TupleConverterImpl {
         case tpe if tpe =:= typeOf[String] =>
           // In this case, null is identical to empty, and we always return non-null
           PrimitiveBuilder(idx =>
-                q"""{val s = t.getString($idx); if (s == null) "" else s}""")
+            q"""{val s = t.getString($idx); if (s == null) "" else s}""")
         case tpe if tpe =:= typeOf[Boolean] =>
           PrimitiveBuilder(idx => q"""t.getBoolean($idx)""")
         case tpe if tpe =:= typeOf[Short] =>
@@ -117,7 +117,7 @@ object TupleConverterImpl {
           }
         case tpe
             if (tpe.typeSymbol.isClass &&
-                  tpe.typeSymbol.asClass.isCaseClass) =>
+              tpe.typeSymbol.asClass.isCaseClass) =>
           CaseClassBuilder(tpe, membersOf(tpe).map(matchField))
         case tpe if allowUnknownTypes =>
           PrimitiveBuilder(

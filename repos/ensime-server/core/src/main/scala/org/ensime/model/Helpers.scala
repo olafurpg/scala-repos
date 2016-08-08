@@ -261,7 +261,7 @@ trait Helpers { self: Global =>
         s != EmptyPackage && !isRoot(s) &&
         // This check is necessary to prevent infinite looping..
         ((isRoot(s.owner) && isRoot(parent)) ||
-            (s.owner.fullName == parent.fullName))
+        (s.owner.fullName == parent.fullName))
       }
 
       // the nameString operation is depressingly expensive - mapping to tuples first reduces the overhead.

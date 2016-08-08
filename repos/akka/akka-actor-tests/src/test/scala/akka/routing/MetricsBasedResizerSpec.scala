@@ -160,9 +160,8 @@ class MetricsBasedResizerSpec
     "leave the underutilizationStreak start date unchanged when not fully utilized" in {
       val start: LocalDateTime = LocalDateTime.now.minusHours(1)
       val resizer = DefaultOptimalSizeExploringResizer()
-      resizer.record = ResizeRecord(
-          underutilizationStreak = Some(
-              UnderUtilizationStreak(start = start, highestUtilization = 1)))
+      resizer.record = ResizeRecord(underutilizationStreak =
+        Some(UnderUtilizationStreak(start = start, highestUtilization = 1)))
 
       resizer.reportMessageCount(routees(2), 0)
       resizer.record.underutilizationStreak.get.start shouldBe start
@@ -339,7 +338,7 @@ class MetricsBasedResizerSpec
 
       val exploreSamples = (1 to 100).map(_ ⇒ resizer.resize(routees(10)))
       exploreSamples.forall(change ⇒
-            Math.abs(change) >= 1 && Math.abs(change) <= (10 * 0.3)) should be(
+        Math.abs(change) >= 1 && Math.abs(change) <= (10 * 0.3)) should be(
           true)
     }
   }

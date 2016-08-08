@@ -288,9 +288,8 @@ trait PhaseAssembly { self: Global =>
     val fatnodes = new mutable.HashSet[graph.Node]()
     sbuf.append("digraph G {\n")
     for (edge <- graph.edges) {
-      sbuf.append(
-          "\"" + edge.frm.allPhaseNames + "(" + edge.frm.level + ")" +
-            "\"->\"" + edge.to.allPhaseNames + "(" + edge.to.level + ")" + "\"")
+      sbuf.append("\"" + edge.frm.allPhaseNames + "(" + edge.frm.level + ")" +
+        "\"->\"" + edge.to.allPhaseNames + "(" + edge.to.level + ")" + "\"")
       if (!edge.frm.phaseobj.get.head.internal) extnodes += edge.frm
       edge.frm.phaseobj foreach
         (phobjs => if (phobjs.tail.nonEmpty) fatnodes += edge.frm)

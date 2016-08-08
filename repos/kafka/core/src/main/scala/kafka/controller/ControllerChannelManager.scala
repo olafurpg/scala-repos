@@ -55,7 +55,7 @@ class ControllerChannelManager(controllerContext: ControllerContext,
   def startup() = {
     brokerLock synchronized {
       brokerStateInfo.foreach(brokerState =>
-            startRequestSendThread(brokerState._1))
+        startRequestSendThread(brokerState._1))
     }
   }
 
@@ -236,11 +236,10 @@ class RequestSendThread(val controllerId: Int,
               // if the send was not successful, reconnect to broker and resend the message
               warn(
                   ("Controller %d epoch %d fails to send request %s to broker %s. " +
-                        "Reconnecting to broker.").format(
-                      controllerId,
-                      controllerContext.epoch,
-                      request.toString,
-                      brokerNode.toString()),
+                    "Reconnecting to broker.").format(controllerId,
+                                                      controllerContext.epoch,
+                                                      request.toString,
+                                                      brokerNode.toString()),
                   e)
               networkClient.close(brokerNode.idString)
               isSendSuccessful = false
@@ -452,10 +451,10 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
             mutable.Map.empty[TopicPartition, PartitionStateInfo])
       } else
       filteredPartitions.foreach(partition =>
-            updateMetadataRequestMapFor(partition, beingDeleted = false))
+        updateMetadataRequestMapFor(partition, beingDeleted = false))
 
     controller.deleteTopicManager.partitionsToBeDeleted.foreach(partition =>
-          updateMetadataRequestMapFor(partition, beingDeleted = true))
+      updateMetadataRequestMapFor(partition, beingDeleted = true))
   }
 
   def sendRequestsToBrokers(controllerEpoch: Int) {
@@ -470,7 +469,7 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
                 else "become-follower"
               stateChangeLogger.trace(
                   ("Controller %d epoch %d sending %s LeaderAndIsr request %s to broker %d " +
-                        "for partition [%s,%d]").format(
+                    "for partition [%s,%d]").format(
                       controllerId,
                       controllerEpoch,
                       typeOfRequest,
@@ -518,16 +517,15 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
       leaderAndIsrRequestMap.clear()
       updateMetadataRequestMap.foreach {
         case (broker, partitionStateInfos) =>
-          partitionStateInfos.foreach(
-              p =>
-                stateChangeLogger.trace(
-                    ("Controller %d epoch %d sending UpdateMetadata request %s " +
-                          "to broker %d for partition %s").format(
-                        controllerId,
-                        controllerEpoch,
-                        p._2.leaderIsrAndControllerEpoch,
-                        broker,
-                        p._1)))
+          partitionStateInfos.foreach(p =>
+            stateChangeLogger.trace(
+                ("Controller %d epoch %d sending UpdateMetadata request %s " +
+                  "to broker %d for partition %s").format(
+                    controllerId,
+                    controllerEpoch,
+                    p._2.leaderIsrAndControllerEpoch,
+                    broker,
+                    p._1)))
           val partitionStates = partitionStateInfos.map {
             case (topicPartition, partitionStateInfo) =>
               val LeaderIsrAndControllerEpoch(leaderIsr, controllerEpoch) =

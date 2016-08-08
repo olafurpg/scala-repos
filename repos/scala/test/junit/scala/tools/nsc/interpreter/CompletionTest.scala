@@ -243,9 +243,9 @@ class CompletionTest {
     assert(
         Set("asInstanceOf", "==")
           .diff(completer
-                .complete("class C(val a: Int, val b: Int) { this.")
-                .candidates
-                .toSet)
+            .complete("class C(val a: Int, val b: Int) { this.")
+            .candidates
+            .toSet)
           .isEmpty)
     checkExact(completer, "case class D(a: Int, b: Int) { this.a")(
         "a",

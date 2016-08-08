@@ -155,8 +155,8 @@ private[impl] class OfferMatcherManagerActor private (
     //we use this information as filter criteria
     val appReservations = offer.getResourcesList.asScala
       .filter(r =>
-            r.hasDisk && r.getDisk.hasPersistence &&
-              r.getDisk.getPersistence.hasId)
+        r.hasDisk && r.getDisk.hasPersistence &&
+          r.getDisk.getPersistence.hasId)
       .map(_.getDisk.getPersistence.getId)
       .collect { case LocalVolumeId(volumeId) => volumeId.appId }
       .toSet
@@ -204,9 +204,8 @@ private[impl] class OfferMatcherManagerActor private (
                   addedOps.size,
                   conf.maxTasksPerOffer() - data.ops.size).min)
 
-          rejectedOps.foreach(
-              _.reject(
-                  "not enough launch tokens OR already scheduled sufficient tasks on offer"))
+          rejectedOps.foreach(_.reject(
+              "not enough launch tokens OR already scheduled sufficient tasks on offer"))
 
           val newData: OfferData = data.addTasks(acceptedOps)
           launchTokens -= acceptedOps.size
@@ -303,9 +302,8 @@ private[impl] class OfferMatcherManagerActor private (
     //scalastyle:off magic.number
     val maxRanges = if (log.isDebugEnabled) 1000 else 10
     //scalastyle:on magic.number
-    log.info(
-        s"Finished processing ${data.offer.getId.getValue}. " +
-          s"Matched ${data.ops.size} ops after ${data.matchPasses} passes. " +
-          s"${ResourceUtil.displayResources(data.offer.getResourcesList.asScala, maxRanges)} left.")
+    log.info(s"Finished processing ${data.offer.getId.getValue}. " +
+      s"Matched ${data.ops.size} ops after ${data.matchPasses} passes. " +
+      s"${ResourceUtil.displayResources(data.offer.getResourcesList.asScala, maxRanges)} left.")
   }
 }

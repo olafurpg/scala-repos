@@ -136,7 +136,7 @@ object SideEffectsUtil {
 
     val fromScalaUtil =
       Seq("Either", "Failure", "Left", "Right", "Success", "Try").map(name =>
-            s"scala.util.$name._")
+        s"scala.util.$name._")
 
     val fromScalaMath = Seq("scala.math.BigInt._", "scala.math.BigDecimal._")
 
@@ -151,8 +151,8 @@ object SideEffectsUtil {
         ref
           .bind()
           .exists(rr =>
-                rr.implicitConversionClass.isDefined ||
-                  rr.implicitFunction.isDefined)
+            rr.implicitConversionClass.isDefined ||
+              rr.implicitFunction.isDefined)
       case _ => false
     }
   }

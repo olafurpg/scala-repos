@@ -95,15 +95,14 @@ object Status {
   def fromMessage(message: Message): Option[Status] = {
     (message.channel == channels.Status) option {
       ((message.value \ "message").validated[String] |@|
-            (message.value \ "progress").validated[BigDecimal] |@|
-            (message.value \ "unit").validated[String]) {
-        (msg, progress, unit) =>
-          Status(message.job,
-                 message.id,
-                 msg,
-                 progress,
-                 unit,
-                 message.value \? "info")
+        (message.value \ "progress").validated[BigDecimal] |@|
+        (message.value \ "unit").validated[String]) { (msg, progress, unit) =>
+        Status(message.job,
+               message.id,
+               msg,
+               progress,
+               unit,
+               message.value \? "info")
       }
     } flatMap {
       _.toOption

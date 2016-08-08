@@ -213,13 +213,13 @@ abstract class BTypes {
       */
     def nestedInCurrentClass(innerClassNode: InnerClassNode): Boolean = {
       (innerClassNode.outerName != null &&
-          innerClassNode.outerName == classNode.name) ||
+      innerClassNode.outerName == classNode.name) ||
       (innerClassNode.outerName == null && {
-            val classNodeForInnerClass = byteCodeRepository
-              .classNode(innerClassNode.name)
-              .get // TODO: don't get here, but set the info to Left at the end
-            classNodeForInnerClass.outerClass == classNode.name
-          })
+        val classNodeForInnerClass = byteCodeRepository
+          .classNode(innerClassNode.name)
+          .get // TODO: don't get here, but set the info to Left at the end
+        classNodeForInnerClass.outerClass == classNode.name
+      })
     }
 
     val nestedClasses: List[ClassBType] =
@@ -279,8 +279,8 @@ abstract class BTypes {
       val warning = {
         val isScala =
           classNode.attrs != null && classNode.attrs.asScala.exists(a =>
-                a.`type` == BTypes.ScalaAttributeName ||
-                  a.`type` == BTypes.ScalaSigAttributeName)
+            a.`type` == BTypes.ScalaAttributeName ||
+              a.`type` == BTypes.ScalaSigAttributeName)
         if (isScala) Some(NoInlineInfoAttribute(classNode.name))
         else None
       }
@@ -961,7 +961,7 @@ abstract class BTypes {
 
     def superClassesTransitive: Either[NoClassBTypeInfo, List[ClassBType]] =
       info.flatMap(i =>
-            i.superClass match {
+        i.superClass match {
           case None => Right(Nil)
           case Some(sc) => sc.superClassesTransitive.map(sc :: _)
       })
@@ -996,7 +996,7 @@ abstract class BTypes {
     def innerClassAttributeEntry: Either[NoClassBTypeInfo,
                                          Option[InnerClassEntry]] =
       info.map(i =>
-            i.nestedInfo map {
+        i.nestedInfo map {
           case NestedInfo(_, outerName, innerName, isStaticNestedClass) =>
             InnerClassEntry(
                 internalName,

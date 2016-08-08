@@ -301,7 +301,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
 
   override def shouldLogAtThisPhase =
     settings.log.isSetByUser && ((settings.log containsPhase globalPhase) ||
-          (settings.log containsPhase phase))
+      (settings.log containsPhase phase))
   // Over 200 closure objects are eliminated by inlining this.
   @inline final def log(msg: => AnyRef) {
     if (shouldLogAtThisPhase)
@@ -847,10 +847,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   private def isSystemPackageClass(pkg: Symbol) =
     pkg == RootClass ||
       (pkg.hasTransOwner(definitions.ScalaPackageClass) && !pkg.hasTransOwner(
-              this.rootMirror
-                .staticPackage("scala.tools")
-                .moduleClass
-                .asClass))
+          this.rootMirror.staticPackage("scala.tools").moduleClass.asClass))
 
   /** Invalidates packages that contain classes defined in a classpath entry, and
     *  rescans that entry.
@@ -1035,8 +1032,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     (definitions.isDefinitionsInitialized && rootMirror.isMirrorInitialized)
   override def isPastTyper =
     ((curRun ne null) &&
-          isGlobalInitialized // defense against init order issues
-          && (globalPhase.id > currentRun.typerPhase.id))
+      isGlobalInitialized // defense against init order issues
+      && (globalPhase.id > currentRun.typerPhase.id))
 
   // TODO - trim these to the absolute minimum.
   @inline final def exitingErasure[T](op: => T): T =
@@ -1091,8 +1088,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
 
   private def formatExplain(pairs: (String, Any)*): String =
     (pairs.toList collect {
-          case (k, v) if v != null => "%20s: %s".format(k, v)
-        } mkString "\n")
+      case (k, v) if v != null => "%20s: %s".format(k, v)
+    } mkString "\n")
 
   /** Don't want to introduce new errors trying to report errors,
     *  so swallow exceptions.
@@ -1141,14 +1138,14 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
           "tree tpe" -> tpe,
           "symbol" -> Option(sym).fold("null")(_.debugLocationString),
           "symbol definition" -> Option(sym).fold("null")(s =>
-                s.defString + s" (a ${s.shortSymbolClass})"),
+            s.defString + s" (a ${s.shortSymbolClass})"),
           "symbol package" -> sym.enclosingPackage.fullName,
           "symbol owners" -> ownerChainString(sym),
           "call site" ->
             (site.fullLocationString + " in " + site.enclosingPackage)
       )
       ("\n  " + errorMessage + "\n" +
-            info1) :: info2 :: context_s :: Nil mkString "\n\n"
+        info1) :: info2 :: context_s :: Nil mkString "\n\n"
     } catch { case _: Exception | _: TypeError => errorMessage }
 
   /** The id of the currently active run
@@ -1629,7 +1626,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         val sources: List[SourceFile] =
           if (settings.script.isSetByUser && filenames.size > 1)
             returning(Nil)(_ =>
-                  globalError("can only compile one script at a time"))
+              globalError("can only compile one script at a time"))
           else filenames map getSourceFile
 
         compileSources(sources)
@@ -1706,10 +1703,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       // The name as given was not found, so we'll sift through every symbol in
       // the run looking for plausible matches.
       case NoSymbol =>
-        phased(
-            currentRun.symSource.keys map
-              (sym =>
-                 findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
+        phased(currentRun.symSource.keys map
+          (sym =>
+             findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
       // The name as given matched, so show only that.
       case sym => List(sym)
     }

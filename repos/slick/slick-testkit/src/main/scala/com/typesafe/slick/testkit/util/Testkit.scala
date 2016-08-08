@@ -442,7 +442,7 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
       if (!ct.runtimeClass.isInstance(v))
         fixStack(
             Assert.fail("Expected value of type " + ct.runtimeClass.getName +
-                  ", got " + v.getClass.getName))
+              ", got " + v.getClass.getName))
     }
   }
 

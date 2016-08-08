@@ -71,7 +71,7 @@ class ScalaDocNewlinedPreFormatProcessor
           //do not insert newlines when there is no description
           while (current != null &&
                  (current.getNode.getElementType == ScalaDocTokenType.DOC_WHITESPACE ||
-                     current.getNode.getElementType == ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS)) {
+                 current.getNode.getElementType == ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS)) {
             current = current.getPrevSibling
           }
           if (current != null &&

@@ -256,7 +256,7 @@ class HistoryServerSuite
     badQuantiles._1 should be(HttpServletResponse.SC_BAD_REQUEST)
     badQuantiles._3 should be(
         Some("Bad value for parameter \"quantiles\".  Expected a double, " +
-              "got \"foo\""))
+          "got \"foo\""))
 
     getContentAndCode("foobar")._1 should be(HttpServletResponse.SC_NOT_FOUND)
   }
@@ -310,7 +310,7 @@ class HistoryServerSuite
     def listDir(dir: Path): Seq[FileStatus] = {
       val statuses = fs.listStatus(dir)
       statuses.flatMap(stat =>
-            if (stat.isDirectory) listDir(stat.getPath) else Seq(stat))
+        if (stat.isDirectory) listDir(stat.getPath) else Seq(stat))
     }
 
     def dumpLogDir(msg: String = ""): Unit = {

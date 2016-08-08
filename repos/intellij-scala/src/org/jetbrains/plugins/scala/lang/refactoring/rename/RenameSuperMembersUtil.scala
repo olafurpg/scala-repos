@@ -167,9 +167,8 @@ object RenameSuperMembersUtil {
         selection)
 
     if (ApplicationManager.getApplication.isUnitTestMode) {
-      processor.execute(
-          if (oneSuperClass) classes(0)
-          else renameAllMarkerObject) //in unit tests uses base member or all base members
+      processor.execute(if (oneSuperClass) classes(0)
+      else renameAllMarkerObject) //in unit tests uses base member or all base members
       return
     }
     if (editor != null) popup.showInBestPositionFor(editor)
@@ -224,7 +223,7 @@ object RenameSuperMembersUtil {
     val classToElement = elements.flatMap(elementWithContainingClass).toMap
     val classes = classToElement.keys
     val maxClasses = classes.filter(maxClass =>
-          !classes.exists(maxClass.isInheritor(_, /*deep = */ true)))
+      !classes.exists(maxClass.isInheritor(_, /*deep = */ true)))
     maxClasses.flatMap(classToElement.get).toSeq
   }
 }

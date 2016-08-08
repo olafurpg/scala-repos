@@ -35,7 +35,7 @@ class MergeElseIfIntention extends PsiElementBaseIntentionAction {
     if (thenBranch == null || elseBranch == null) return false
 
     if (!(thenBranch.getTextRange.getEndOffset <= offset &&
-              offset <= elseBranch.getTextRange.getStartOffset)) return false
+          offset <= elseBranch.getTextRange.getStartOffset)) return false
 
     val blockExpr = ifStmt.elseBranch.orNull
     if (blockExpr != null && blockExpr.isInstanceOf[ScBlockExpr]) {

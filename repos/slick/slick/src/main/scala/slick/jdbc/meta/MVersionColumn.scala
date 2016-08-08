@@ -17,21 +17,12 @@ case class MVersionColumn(column: String,
 
 object MVersionColumn {
   def getVersionColumns(table: MQName) =
-    ResultSetAction[MVersionColumn](
-        _.metaData
-          .getVersionColumns(table.catalog_?, table.schema_?, table.name)) {
-      r =>
-        MVersionColumn(
-            r.skip.<<,
-            r.<<,
-            r.<<,
-            r.<<,
-            r.<<,
-            r.<<,
-            r.nextInt match {
-              case DatabaseMetaData.versionColumnPseudo => Some(true)
-              case DatabaseMetaData.versionColumnNotPseudo => Some(false)
-              case _ => None
-            })
+    ResultSetAction[MVersionColumn](_.metaData
+      .getVersionColumns(table.catalog_?, table.schema_?, table.name)) { r =>
+      MVersionColumn(r.skip.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.nextInt match {
+        case DatabaseMetaData.versionColumnPseudo => Some(true)
+        case DatabaseMetaData.versionColumnNotPseudo => Some(false)
+        case _ => None
+      })
     }
 }

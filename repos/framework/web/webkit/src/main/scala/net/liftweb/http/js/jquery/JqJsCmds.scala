@@ -589,8 +589,8 @@ object JqJsCmds {
       extends JsCmd {
     def toJsCmd =
       (Show(where) & JqSetHtml(where, msg) & After(
-              duration,
-              Hide(where, fadeTime))).toJsCmd
+          duration,
+          Hide(where, fadeTime))).toJsCmd
   }
 
   /**

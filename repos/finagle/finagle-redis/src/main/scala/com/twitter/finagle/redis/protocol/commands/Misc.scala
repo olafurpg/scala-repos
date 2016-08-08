@@ -52,7 +52,7 @@ case class Info(section: ChannelBuffer) extends Command {
 object Info {
   def apply(section: Seq[Array[Byte]]) = {
     new Info(section.headOption.map { ChannelBuffers.wrappedBuffer }
-          .getOrElse(ChannelBuffers.EMPTY_BUFFER))
+      .getOrElse(ChannelBuffers.EMPTY_BUFFER))
   }
 }
 

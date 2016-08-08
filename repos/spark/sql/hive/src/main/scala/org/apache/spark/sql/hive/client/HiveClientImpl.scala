@@ -110,9 +110,8 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
             s"Keytab file: ${keytabFileName}" +
               " specified in spark.yarn.keytab does not exist")
       } else {
-        logInfo(
-            "Attempting to login to Kerberos" +
-              s" using principal: ${principalName} and keytab: ${keytabFileName}")
+        logInfo("Attempting to login to Kerberos" +
+          s" using principal: ${principalName} and keytab: ${keytabFileName}")
         UserGroupInformation.loginUserFromKeytab(principalName, keytabFileName)
       }
     }
@@ -646,7 +645,7 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
     Utils
       .classForName(name)
       .asInstanceOf[Class[
-              _ <: org.apache.hadoop.hive.ql.io.HiveOutputFormat[_, _]]]
+          _ <: org.apache.hadoop.hive.ql.io.HiveOutputFormat[_, _]]]
 
   private def toHiveFunction(f: CatalogFunction, db: String): HiveFunction = {
     new HiveFunction(f.name.funcName,

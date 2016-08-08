@@ -103,8 +103,8 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     Kleisli[G, S, F[C, D]](s => {
       val kl =
         bitraverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B, C, D](fa)(z =>
-              Kleisli[Id, S, G[C]](i => f(z)(i)).lift[Trampoline])(z =>
-              Kleisli[Id, S, G[D]](i => g(z)(i)).lift[Trampoline])
+          Kleisli[Id, S, G[C]](i => f(z)(i)).lift[Trampoline])(z =>
+          Kleisli[Id, S, G[D]](i => g(z)(i)).lift[Trampoline])
       kl.run(s).run
     })
   }
@@ -112,7 +112,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   def bifoldLShape[A, B, C](fa: F[A, B], z: C)(f: (C, A) => C)(
       g: (C, B) => C): (C, F[Unit, Unit]) =
     runBitraverseS(fa, z)(a => State.modify(f(_, a)))(b =>
-          State.modify(g(_, b)))
+      State.modify(g(_, b)))
 
   def bisequence[G[_]: Applicative, A, B](x: F[G[A], G[B]]): G[F[A, B]] =
     bitraverseImpl(x)(fa => fa, fb => fb)
@@ -124,12 +124,12 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   def bifoldMap[A, B, M](fa: F[A, B])(f: A => M)(g: B => M)(
       implicit F: Monoid[M]): M =
     bifoldLShape(fa, F.zero)((m, a) => F.append(m, f(a)))((m, b) =>
-          F.append(m, g(b)))._1
+      F.append(m, g(b)))._1
 
   def bifoldRight[A, B, C](fa: F[A, B], z: => C)(f: (A, => C) => C)(
       g: (B, => C) => C): C =
     bifoldMap(fa)((a: A) => (Endo.endo(f(a, _: C))))((b: B) =>
-          (Endo.endo(g(b, _: C)))) apply z
+      (Endo.endo(g(b, _: C)))) apply z
 
   /** Embed a Traverse on each side of this Bitraverse . */
   def embed[G[_], H[_]](

@@ -61,9 +61,9 @@ case class ScalaMethodEvaluator(
     val requiresSuperObject: Boolean =
       objectEvaluator.isInstanceOf[ScSuperEvaluator] ||
         (objectEvaluator.isInstanceOf[DisableGC] && objectEvaluator
-              .asInstanceOf[DisableGC]
-              .getDelegate
-              .isInstanceOf[ScSuperEvaluator])
+          .asInstanceOf[DisableGC]
+          .getDelegate
+          .isInstanceOf[ScSuperEvaluator])
     val obj: AnyRef = DebuggerUtil.unwrapScalaRuntimeObjectRef {
       objectEvaluator.evaluate(context)
     }
@@ -158,8 +158,8 @@ case class ScalaMethodEvaluator(
                       result = m
                         .allLineLocations()
                         .exists(l =>
-                              lines.contains(
-                                  ScalaPositionManager.checkedLineNumber(l)))
+                          lines.contains(
+                              ScalaPositionManager.checkedLineNumber(l)))
                     } catch {
                       case e: Exception => //ignore
                     }

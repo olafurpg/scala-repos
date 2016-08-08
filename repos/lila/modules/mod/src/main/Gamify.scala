@@ -43,7 +43,7 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
                                 until: DateTime): Funit =
     (afterYear to until.getYear).flatMap { year =>
       ((year == afterYear).fold(afterMonth + 1, 1) to (year == until.getYear)
-            .fold(until.getMonthOfYear, 12)).map { month =>
+        .fold(until.getMonthOfYear, 12)).map { month =>
         mixedLeaderboard(
             after =
               new DateTime(year, month, 1, 0, 0).pp("compute mod history"),

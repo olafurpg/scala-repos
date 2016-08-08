@@ -30,7 +30,7 @@ abstract class Directive[L](implicit val ev: Tuple[L]) {
     */
   def |[R >: L](that: Directive[R]): Directive[R] =
     recover(rejections ⇒
-          directives.BasicDirectives.mapRejections(rejections ++ _) & that)(
+      directives.BasicDirectives.mapRejections(rejections ++ _) & that)(
         that.ev)
 
   /**

@@ -146,7 +146,7 @@ object Coroner {
                 #VM uptime: ${rtMx.getUptime()}ms
                 #Heap usage: ${memMx.getHeapMemoryUsage()}
                 #Non-heap usage: ${memMx
-             .getNonHeapMemoryUsage()}""".stripMargin('#'))
+                 .getNonHeapMemoryUsage()}""".stripMargin('#'))
 
     def dumpAllThreads: Seq[ThreadInfo] = {
       threadMx.dumpAllThreads(threadMx.isObjectMonitorUsageSupported,

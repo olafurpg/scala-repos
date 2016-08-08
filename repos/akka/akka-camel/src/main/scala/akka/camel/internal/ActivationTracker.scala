@@ -107,8 +107,8 @@ private[camel] class ActivationTracker extends Actor with ActorLogging {
   override def receive = {
     case msg @ ActivationMessage(ref) ⇒
       (activations
-            .getOrElseUpdate(ref, new ActivationStateMachine)
-            .receive orElse logStateWarning(ref))(msg)
+        .getOrElseUpdate(ref, new ActivationStateMachine)
+        .receive orElse logStateWarning(ref))(msg)
   }
 
   private[this] def logStateWarning(actorRef: ActorRef): Receive = {

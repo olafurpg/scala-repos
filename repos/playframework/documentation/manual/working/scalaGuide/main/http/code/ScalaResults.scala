@@ -71,7 +71,7 @@ package scalaguide.http.scalaresults {
       "Changing the charset for text based HTTP responses" in {
         val index = new scalaguide.http.scalaresults.full.Application().index
         assertAction(index)(res =>
-              testContentType(await(res), "charset=iso-8859-1"))
+          testContentType(await(res), "charset=iso-8859-1"))
       }
 
       "HTML method works" in {

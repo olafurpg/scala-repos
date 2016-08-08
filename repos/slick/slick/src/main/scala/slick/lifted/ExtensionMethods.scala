@@ -59,11 +59,10 @@ trait ColumnExtensionMethods[B1, P1]
   def inSetBind[R](seq: Traversable[B1])(implicit om: o#to[Boolean, R]) =
     if (seq.isEmpty) om(LiteralColumn(false))
     else
-      om.column(
-          Library.In,
-          n,
-          ProductNode(ConstArray.from(seq.map(v =>
-                        LiteralNode(implicitly[TypedType[B1]], v, vol = true)))))
+      om.column(Library.In,
+                n,
+                ProductNode(ConstArray.from(seq.map(v =>
+                  LiteralNode(implicitly[TypedType[B1]], v, vol = true)))))
 
   def between[P2, P3, R](start: Rep[P2], end: Rep[P3])(
       implicit om: o#arg[B1, P2]#arg[B1, P3]#to[Boolean, R]) =
@@ -93,11 +92,10 @@ final class OptionColumnExtensionMethods[B1](val c: Rep[Option[B1]])
     * inside a subquery that cannot be fused), otherwise the exception is thrown during query
     * compilation. */
   def get: Rep[B1] =
-    Rep.forNode[B1](GetOrElse(c.toNode,
-                              () =>
-                                throw new SlickException(
-                                    "Read NULL value for column " + this)))(c
-          .asInstanceOf[Rep.TypedRep[_]]
+    Rep.forNode[B1](GetOrElse(
+        c.toNode,
+        () => throw new SlickException("Read NULL value for column " + this)))(
+        c.asInstanceOf[Rep.TypedRep[_]]
           .tpe
           .asInstanceOf[OptionType]
           .elementType
@@ -237,8 +235,8 @@ final class AnyOptionExtensionMethods[O <: Rep[_], P](val r: O)
       implicit shape: Shape[FlatShapeLevel, B, _, BP]): BP = {
     val gen = new AnonSymbol
     val mapv = f(OptionLift.baseValue[P, O](r, Ref(gen)))
-    val n = OptionFold(
-        r.toNode, shape.toNode(ifEmpty), shape.toNode(mapv), gen)
+    val n =
+      OptionFold(r.toNode, shape.toNode(ifEmpty), shape.toNode(mapv), gen)
     shape.packedShape.encodeRef(shape.pack(mapv), n).asInstanceOf[BP]
   }
 
@@ -274,9 +272,9 @@ final class AnyOptionExtensionMethods[O <: Rep[_], P](val r: O)
   }
 
   /** Get the value inside this Option, if it is non-empty, otherwise the supplied default. */
-  def getOrElse[M, P2 <: P](
-      default: M)(implicit shape: Shape[FlatShapeLevel, M, _, P2],
-                  ol: OptionLift[P2, O]): P =
+  def getOrElse[M, P2 <: P](default: M)(
+      implicit shape: Shape[FlatShapeLevel, M, _, P2],
+      ol: OptionLift[P2, O]): P =
     // P2 != P can only happen if M contains plain values, which pack to ConstColumn instead of Rep.
     // Both have the same packedShape (RepShape), so we can safely cast here:
     fold[P, P](shape.pack(default): P)(identity)(
@@ -301,8 +299,8 @@ trait ExtensionMethodConversions {
   implicit def optionColumnExtensionMethods[B1: BaseTypedType](
       c: Rep[Option[B1]]): OptionColumnExtensionMethods[B1] =
     new OptionColumnExtensionMethods[B1](c)
-  implicit def numericColumnExtensionMethods[B1](
-      c: Rep[B1])(implicit tm: BaseTypedType[B1] with NumericTypedType)
+  implicit def numericColumnExtensionMethods[B1](c: Rep[B1])(
+      implicit tm: BaseTypedType[B1] with NumericTypedType)
     : BaseNumericColumnExtensionMethods[B1] =
     new BaseNumericColumnExtensionMethods[B1](c)
   implicit def numericOptionColumnExtensionMethods[B1](c: Rep[Option[B1]])(
@@ -336,8 +334,9 @@ trait ExtensionMethodConversions {
   implicit def singleColumnQueryExtensionMethods[B1: BaseTypedType, C[_]](
       q: Query[Rep[B1], _, C]): SingleColumnQueryExtensionMethods[B1, B1, C] =
     new SingleColumnQueryExtensionMethods[B1, B1, C](q)
-  implicit def singleOptionColumnQueryExtensionMethods[
-      B1: BaseTypedType, C[_]](q: Query[Rep[Option[B1]], _, C])
+  implicit def singleOptionColumnQueryExtensionMethods[B1: BaseTypedType,
+                                                       C[_]](
+      q: Query[Rep[Option[B1]], _, C])
     : SingleColumnQueryExtensionMethods[B1, Option[B1], C] =
     new SingleColumnQueryExtensionMethods[B1, Option[B1], C](q)
 

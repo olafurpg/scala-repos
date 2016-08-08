@@ -43,7 +43,7 @@ object DependantsTest extends Properties("Dependants") {
   property("we don't depend on ourself") = forAll {
     (prod: Producer[Memory, _]) =>
       !((Producer.dependenciesOf(prod) ++ Producer.transitiveDependenciesOf(
-              prod)).toSet.contains(prod))
+          prod)).toSet.contains(prod))
   }
 
   property("if transitive deps == non-transitive, then parents are sources") =

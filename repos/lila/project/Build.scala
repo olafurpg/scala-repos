@@ -60,8 +60,8 @@ object ApplicationBuild extends Build {
                   "lila.api.Context",
                   "lila.common.paginator.Paginator"),
             watchSources <<= sourceDirectory in Compile map { sources =>
-          (sources ** "*").get
-        },
+              (sources ** "*").get
+            },
             // trump sbt-web into not looking at public/
             resourceDirectory in Assets :=
               (sourceDirectory in Compile).value / "assets"

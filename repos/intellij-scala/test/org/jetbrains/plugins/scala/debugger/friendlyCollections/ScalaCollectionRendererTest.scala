@@ -79,8 +79,8 @@ class ScalaCollectionRendererTest
 
     managed {
       (testVariable.getLabel, (testVariableChildren map {
-            _.getDescriptor.getLabel
-          }).toList)
+        _.getDescriptor.getLabel
+      }).toList)
     }
   }
 

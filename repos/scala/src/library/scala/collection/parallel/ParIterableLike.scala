@@ -527,8 +527,8 @@ trait ParIterableLike[
           new Map[S, That](f,
                            combinerFactory(() => bf(repr).asCombiner),
                            splitter) mapResult {
-        _.resultWithTaskSupport
-      })
+            _.resultWithTaskSupport
+          })
     } else setTaskSupport(seq.map(f)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
     tasksupport.executeAndWaitResult(new Map[S, That](f, pbf, splitter) mapResult { _.result })
@@ -541,8 +541,8 @@ trait ParIterableLike[
           new Collect[S, That](pf,
                                combinerFactory(() => bf(repr).asCombiner),
                                splitter) mapResult {
-        _.resultWithTaskSupport
-      })
+            _.resultWithTaskSupport
+          })
     } else setTaskSupport(seq.collect(pf)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
     tasksupport.executeAndWaitResult(new Collect[S, That](pf, pbf, splitter) mapResult { _.result })
@@ -555,8 +555,8 @@ trait ParIterableLike[
           new FlatMap[S, That](f,
                                combinerFactory(() => bf(repr).asCombiner),
                                splitter) mapResult {
-        _.resultWithTaskSupport
-      })
+            _.resultWithTaskSupport
+          })
     } else setTaskSupport(seq.flatMap(f)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
     tasksupport.executeAndWaitResult(new FlatMap[S, That](f, pbf, splitter) mapResult { _.result })
@@ -650,15 +650,15 @@ trait ParIterableLike[
   def filter(pred: T => Boolean): Repr = {
     tasksupport.executeAndWaitResult(
         new Filter(pred, combinerFactory, splitter) mapResult {
-      _.resultWithTaskSupport
-    })
+          _.resultWithTaskSupport
+        })
   }
 
   def filterNot(pred: T => Boolean): Repr = {
     tasksupport.executeAndWaitResult(
         new FilterNot(pred, combinerFactory, splitter) mapResult {
-      _.resultWithTaskSupport
-    })
+          _.resultWithTaskSupport
+        })
   }
 
   def ++[U >: T, That](that: GenTraversableOnce[U])(
@@ -713,9 +713,9 @@ trait ParIterableLike[
   def groupBy[K](f: T => K): immutable.ParMap[K, Repr] = {
     val r = tasksupport.executeAndWaitResult(
         new GroupBy(f, () => HashMapCombiner[K, T], splitter) mapResult {
-      rcb =>
-        rcb.groupByKey(() => combinerFactory())
-    })
+          rcb =>
+            rcb.groupByKey(() => combinerFactory())
+        })
     setTaskSupport(r, tasksupport)
   }
 
@@ -725,8 +725,8 @@ trait ParIterableLike[
     else
       tasksupport.executeAndWaitResult(
           new Take(actualn, combinerFactory, splitter) mapResult {
-        _.resultWithTaskSupport
-      })
+            _.resultWithTaskSupport
+          })
   }
 
   private def take_sequential(n: Int) = {
@@ -747,8 +747,8 @@ trait ParIterableLike[
     else
       tasksupport.executeAndWaitResult(
           new Drop(actualn, combinerFactory, splitter) mapResult {
-        _.resultWithTaskSupport
-      })
+            _.resultWithTaskSupport
+          })
   }
 
   private def drop_sequential(n: Int) = {
@@ -766,8 +766,8 @@ trait ParIterableLike[
     else
       tasksupport.executeAndWaitResult(
           new Slice(from, until, combinerFactory, splitter) mapResult {
-        _.resultWithTaskSupport
-      })
+            _.resultWithTaskSupport
+          })
   }
 
   private def slice_sequential(from: Int, until: Int): Repr = {
@@ -813,16 +813,15 @@ trait ParIterableLike[
         if (size > 0)
           tasksupport.executeAndWaitResult(
               new CreateScanTree(0, size, z, op, splitter) mapResult { tree =>
-            tasksupport.executeAndWaitResult(
-                new FromScanTree(
-                    tree,
-                    z,
-                    op,
-                    combinerFactory(() => bf(repr).asCombiner)) mapResult {
-              cb =>
-                cb.resultWithTaskSupport
-            })
-          })
+                tasksupport.executeAndWaitResult(
+                    new FromScanTree(tree,
+                                     z,
+                                     op,
+                                     combinerFactory(() =>
+                                       bf(repr).asCombiner)) mapResult { cb =>
+                      cb.resultWithTaskSupport
+                    })
+              })
         else setTaskSupport((bf(repr) += z).result(), tasksupport)
       } else setTaskSupport(seq.scan(z)(op)(bf2seq(bf)), tasksupport)
     } else setTaskSupport(seq.scan(z)(op)(bf2seq(bf)), tasksupport)
@@ -849,8 +848,8 @@ trait ParIterableLike[
       val parseqspan = toSeq.takeWhile(pred)
       tasksupport.executeAndWaitResult(
           new Copy(combinerFactory, parseqspan.splitter) mapResult {
-        _.resultWithTaskSupport
-      })
+            _.resultWithTaskSupport
+          })
     } else {
       val cntx = new DefaultSignalling with AtomicIndexFlag
       cntx.setIndexFlag(Int.MaxValue)
@@ -898,8 +897,8 @@ trait ParIterableLike[
                    combinerFactory,
                    combinerFactory,
                    splitter assign cntx) mapResult { p =>
-        (p._1.resultWithTaskSupport, p._2.resultWithTaskSupport)
-      })
+            (p._1.resultWithTaskSupport, p._2.resultWithTaskSupport)
+          })
     }
   }
 
@@ -974,16 +973,16 @@ trait ParIterableLike[
       cbf: () => Combiner[U, That]): That = {
     tasksupport.executeAndWaitResult(
         new ToParCollection(combinerFactory(cbf), splitter) mapResult {
-      _.resultWithTaskSupport
-    })
+          _.resultWithTaskSupport
+        })
   }
 
   protected def toParMap[K, V, That](cbf: () => Combiner[(K, V), That])(
       implicit ev: T <:< (K, V)): That = {
     tasksupport.executeAndWaitResult(
         new ToParMap(combinerFactory(cbf), splitter)(ev) mapResult {
-      _.resultWithTaskSupport
-    })
+          _.resultWithTaskSupport
+        })
   }
 
   @deprecated("Use .seq.view instead", "2.11.0")
@@ -1019,11 +1018,11 @@ trait ParIterableLike[
 
   override def toSet[U >: T]: immutable.ParSet[U] =
     toParCollection[U, immutable.ParSet[U]](() =>
-          immutable.ParSet.newCombiner[U])
+      immutable.ParSet.newCombiner[U])
 
   override def toMap[K, V](implicit ev: T <:< (K, V)): immutable.ParMap[K, V] =
     toParMap[K, V, immutable.ParMap[K, V]](() =>
-          immutable.ParMap.newCombiner[K, V])
+      immutable.ParMap.newCombiner[K, V])
 
   override def toVector: Vector[T] = to[Vector]
 

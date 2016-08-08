@@ -422,7 +422,7 @@ class GroupBuilder(val groupFields: Fields)
           conv,
           setter)
       every(pipe =>
-            new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
+        new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
     }
   }
 }

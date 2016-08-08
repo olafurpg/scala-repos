@@ -258,7 +258,7 @@ trait TransSpecableModule[M[+ _]]
 
         def Op1(node: Operate)(parent: N[S], op: UnaryOperation) =
           parent.flatMap(leftMap(_)(parent =>
-                    op1ForUnOp(op).spec(MorphContext(ctx, node))(parent)))
+            op1ForUnOp(op).spec(MorphContext(ctx, node))(parent)))
 
         def Cond(node: dag.Cond)(pred: N[S], left: N[S], right: N[S]) = {
           for {

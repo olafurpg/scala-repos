@@ -539,15 +539,15 @@ private[scalajs] final class ScalaJSClassEmitter(
                         if (isAncestorOfString)
                           test =
                             test || (js.UnaryOp(JSUnaryOp.typeof, obj) === js
-                                  .StringLiteral("string"))
+                              .StringLiteral("string"))
                         if (isAncestorOfHijackedNumberClass)
                           test =
                             test || (js.UnaryOp(JSUnaryOp.typeof, obj) === js
-                                  .StringLiteral("number"))
+                              .StringLiteral("number"))
                         if (isAncestorOfBoxedBooleanClass)
                           test =
                             test || (js.UnaryOp(JSUnaryOp.typeof, obj) === js
-                                  .StringLiteral("boolean"))
+                              .StringLiteral("boolean"))
 
                         !(!test)
                     })))
@@ -626,10 +626,9 @@ private[scalajs] final class ScalaJSClassEmitter(
                   // Array[A] </: Array[Array[A]]
                   !js.BinaryOp(JSBinaryOp.<, arrayDepth, depth) &&
                   (// Array[Array[A]] <: Array[Object]
-                      js.BinaryOp(JSBinaryOp.>, arrayDepth, depth) ||
-                      // Array[Int] </: Array[Object]
-                      !genIdentBracketSelect(data DOT "arrayBase",
-                                             "isPrimitive"))
+                  js.BinaryOp(JSBinaryOp.>, arrayDepth, depth) ||
+                  // Array[Int] </: Array[Object]
+                  !genIdentBracketSelect(data DOT "arrayBase", "isPrimitive"))
                 })
               }))
 

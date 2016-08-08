@@ -412,9 +412,9 @@ abstract class CatalogTestCases extends SparkFunSuite with BeforeAndAfterEach {
           "db2",
           "tbl2",
           Seq(oldPart1.copy(storage =
-                    storageFormat.copy(locationUri = Some(newLocation))),
+                storageFormat.copy(locationUri = Some(newLocation))),
               oldPart2.copy(storage =
-                    storageFormat.copy(locationUri = Some(newLocation)))))
+                storageFormat.copy(locationUri = Some(newLocation)))))
       val newPart1 = catalog.getPartition("db2", "tbl2", part1.spec)
       val newPart2 = catalog.getPartition("db2", "tbl2", part2.spec)
       assert(newPart1.storage.locationUri == Some(newLocation))

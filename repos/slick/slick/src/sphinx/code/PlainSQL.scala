@@ -129,7 +129,7 @@ object PlainSQL extends App {
       println("Coffees:")
       for (c <- cs)
         println("* " + c.name + "\t" + c.supID + "\t" + c.price +
-              "\t" + c.sales + "\t" + c.total)
+          "\t" + c.sales + "\t" + c.total)
     }
 
   def namesByPrice(price: Double): DBIO[Seq[(String, String)]] = {

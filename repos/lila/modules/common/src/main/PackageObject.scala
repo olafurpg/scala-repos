@@ -123,9 +123,9 @@ trait WithPlay { self: PackageObject =>
       t: M[Fu[A]]) {
 
     def sequenceFu(implicit cbf: scala.collection.generic.CanBuildFrom[
-            M[Fu[A]],
-            A,
-            M[A]]) =
+        M[Fu[A]],
+        A,
+        M[A]]) =
       Future sequence t
   }
 
@@ -178,8 +178,8 @@ trait WithPlay { self: PackageObject =>
     def addFailureEffect(effect: Exception => Unit) =
       fua ~
         (_ onFailure {
-              case e: Exception => effect(e)
-            })
+          case e: Exception => effect(e)
+        })
 
     def addEffects(fail: Exception => Unit, succ: A => Unit): Fu[A] =
       fua andThen {

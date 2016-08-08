@@ -30,7 +30,7 @@ trait RemoteResourceOwner {
         output.flush()
         if (client != null) {
           using(new DataInputStream(
-                  new BufferedInputStream(socket.getInputStream))) { input =>
+              new BufferedInputStream(socket.getInputStream))) { input =>
             handle(input, client)
           }
         }

@@ -226,7 +226,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
         "__VAL__" -> knownValue,
         "__ERR__" -> key,
         "__ARGS__" -> args.foldLeft(JsArray())((acc: JsArray, arg: JsValue) =>
-              acc :+ arg)
+          acc :+ arg)
     )
   }
 
@@ -298,13 +298,13 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * Deserializer for BigDecimal
     */
   implicit val bigDecReads = Reads[BigDecimal](js =>
-        js match {
+    js match {
       case JsString(s) =>
         scala.util.control.Exception
           .catching(classOf[NumberFormatException])
           .opt(JsSuccess(BigDecimal(new java.math.BigDecimal(s))))
           .getOrElse(JsError(
-                  ValidationError("error.expected.numberformatexception")))
+              ValidationError("error.expected.numberformatexception")))
       case JsNumber(d) => JsSuccess(d.underlying)
       case _ => JsError(ValidationError("error.expected.jsnumberorjsstring"))
   })
@@ -313,13 +313,13 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * Deserializer for BigDecimal
     */
   implicit val javaBigDecReads = Reads[java.math.BigDecimal](js =>
-        js match {
+    js match {
       case JsString(s) =>
         scala.util.control.Exception
           .catching(classOf[NumberFormatException])
           .opt(JsSuccess(new java.math.BigDecimal(s)))
           .getOrElse(JsError(
-                  ValidationError("error.expected.numberformatexception")))
+              ValidationError("error.expected.numberformatexception")))
       case JsNumber(d) => JsSuccess(d.underlying)
       case _ => JsError(ValidationError("error.expected.jsnumberorjsstring"))
   })
@@ -341,11 +341,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
           parseJDate(pattern, corrector(s)) match {
             case Some(d) => JsSuccess(d)
             case None =>
-              JsError(
-                  Seq(
-                      JsPath() -> Seq(
-                          ValidationError("error.expected.date.isoformat",
-                                          pattern))))
+              JsError(Seq(JsPath() -> Seq(
+                  ValidationError("error.expected.date.isoformat", pattern))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -496,11 +493,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
           p(parsing).parse(corrector(s)) match {
             case Some(d) => JsSuccess(d)
             case None =>
-              JsError(
-                  Seq(
-                      JsPath() -> Seq(
-                          ValidationError("error.expected.date.isoformat",
-                                          parsing))))
+              JsError(Seq(JsPath() -> Seq(
+                  ValidationError("error.expected.date.isoformat", parsing))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -547,11 +541,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
           p(parsing).parse(corrector(s)) match {
             case Some(d) => JsSuccess(d)
             case None =>
-              JsError(
-                  Seq(
-                      JsPath() -> Seq(
-                          ValidationError("error.expected.date.isoformat",
-                                          parsing))))
+              JsError(Seq(JsPath() -> Seq(
+                  ValidationError("error.expected.date.isoformat", parsing))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -592,11 +583,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
           p(parsing).parse(corrector(s)) match {
             case Some(d) => JsSuccess(d)
             case None =>
-              JsError(
-                  Seq(
-                      JsPath() -> Seq(
-                          ValidationError("error.expected.date.isoformat",
-                                          parsing))))
+              JsError(Seq(JsPath() -> Seq(
+                  ValidationError("error.expected.date.isoformat", parsing))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -638,11 +626,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
           p(parsing).parse(corrector(s)) match {
             case Some(d) => JsSuccess(d)
             case None =>
-              JsError(
-                  Seq(
-                      JsPath() -> Seq(
-                          ValidationError("error.expected.date.isoformat",
-                                          parsing))))
+              JsError(Seq(JsPath() -> Seq(
+                  ValidationError("error.expected.date.isoformat", parsing))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -685,11 +670,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
           p(parsing).parse(corrector(s)) match {
             case Some(d) => JsSuccess(d)
             case None =>
-              JsError(
-                  Seq(
-                      JsPath() -> Seq(
-                          ValidationError("error.expected.date.isoformat",
-                                          parsing))))
+              JsError(Seq(JsPath() -> Seq(
+                  ValidationError("error.expected.date.isoformat", parsing))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -737,7 +719,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
           case (p, None) =>
             JsError(
                 Seq(JsPath() -> Seq(
-                        ValidationError("error.expected.date.isoformat", p))))
+                    ValidationError("error.expected.date.isoformat", p))))
         }
 
       case js => JsError("error.expected.date.isoformat")
@@ -764,11 +746,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
           parseDate(corrector(s)) match {
             case Some(d) => JsSuccess(d)
             case None =>
-              JsError(
-                  Seq(
-                      JsPath() -> Seq(
-                          ValidationError("error.expected.jodadate.format",
-                                          pattern))))
+              JsError(Seq(JsPath() -> Seq(
+                  ValidationError("error.expected.jodadate.format", pattern))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -807,11 +786,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
           parseDate(corrector(s)) match {
             case Some(d) => JsSuccess(d)
             case None =>
-              JsError(
-                  Seq(
-                      JsPath() -> Seq(
-                          ValidationError("error.expected.jodadate.format",
-                                          pattern))))
+              JsError(Seq(JsPath() -> Seq(
+                  ValidationError("error.expected.jodadate.format", pattern))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
@@ -851,11 +827,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
           parseTime(corrector(s)) match {
             case Some(d) => JsSuccess(d)
             case None =>
-              JsError(
-                  Seq(
-                      JsPath() -> Seq(
-                          ValidationError("error.expected.jodatime.format",
-                                          pattern))))
+              JsError(Seq(JsPath() -> Seq(
+                  ValidationError("error.expected.jodatime.format", pattern))))
           }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.time"))))
@@ -899,12 +872,11 @@ trait DefaultReads extends LowPriorityDefaultReads {
           enum.values
             .find(_.toString == str)
             .map(JsSuccess(_))
-            .getOrElse(JsError(Seq(JsPath() -> Seq(ValidationError(
-                                "error.expected.validenumvalue")))))
+            .getOrElse(JsError(Seq(JsPath() -> Seq(
+                ValidationError("error.expected.validenumvalue")))))
         case _ =>
-          JsError(
-              Seq(JsPath() -> Seq(
-                      ValidationError("error.expected.enumstring"))))
+          JsError(Seq(
+              JsPath() -> Seq(ValidationError("error.expected.enumstring"))))
       }
     }
 
@@ -1088,8 +1060,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
       case JsString(s) => {
         parseUuid(s)
           .map(JsSuccess(_))
-          .getOrElse(JsError(Seq(JsPath() -> Seq(
-                          ValidationError("error.expected.uuid")))))
+          .getOrElse(JsError(
+              Seq(JsPath() -> Seq(ValidationError("error.expected.uuid")))))
       }
       case _ =>
         JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.uuid"))))

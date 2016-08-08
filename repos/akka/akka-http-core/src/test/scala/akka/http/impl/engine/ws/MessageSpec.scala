@@ -621,12 +621,11 @@ class MessageSpec extends FreeSpec with Matchers with WithMaterializerSpec {
         netIn.expectCancellation()
       }
       "after receiving error close frame with close code and with reason" in new ServerTestSetup {
-        pushInput(
-            closeFrame(
-                Protocol.CloseCodes.UnexpectedCondition,
-                mask = true,
-                msg =
-                  "This alien landing came quite unexpected. Communication has been garbled."))
+        pushInput(closeFrame(
+            Protocol.CloseCodes.UnexpectedCondition,
+            mask = true,
+            msg =
+              "This alien landing came quite unexpected. Communication has been garbled."))
         val error =
           expectError(messageIn).asInstanceOf[PeerClosedConnectionException]
         error.closeCode shouldEqual Protocol.CloseCodes.UnexpectedCondition
@@ -953,11 +952,11 @@ class MessageSpec extends FreeSpec with Matchers with WithMaterializerSpec {
       .via(printEvent("netIn"))
       .via(FrameEventParser)
       .via(WebSocket
-            .stack(serverSide,
-                   maskingRandomFactory = Randoms.SecureRandomInstances,
-                   closeTimeout = closeTimeout,
-                   log = system.log)
-            .join(messageHandler))
+        .stack(serverSide,
+               maskingRandomFactory = Randoms.SecureRandomInstances,
+               closeTimeout = closeTimeout,
+               log = system.log)
+        .join(messageHandler))
       .via(printEvent("frameRendererIn"))
       .transform(() ⇒ new FrameEventRenderer)
       .via(printEvent("frameRendererOut"))

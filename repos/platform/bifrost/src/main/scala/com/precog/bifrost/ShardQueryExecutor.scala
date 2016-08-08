@@ -209,7 +209,7 @@ trait ShardQueryExecutorPlatform[M[+ _]]
         if (!opts.sortOn.isEmpty) {
           val sortKey = InnerArrayConcat(opts.sortOn map { cpath =>
             WrapArray(cpath.nodes.foldLeft(
-                    constants.SourceValue.Single: TransSpec1) {
+                constants.SourceValue.Single: TransSpec1) {
               case (inner, f @ CPathField(_)) =>
                 DerefObjectStatic(inner, f)
               case (inner, i @ CPathIndex(_)) =>

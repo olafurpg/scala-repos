@@ -254,7 +254,7 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
   // include "com.google.protobuf.GeneratedMessage" = proto in configured serialization-bindings.
   private def checkGoogleProtobuf(className: String): Boolean =
     (!className.startsWith("com.google.protobuf") ||
-          system.dynamicAccess.getClassFor[Any](className).isSuccess)
+      system.dynamicAccess.getClassFor[Any](className).isSuccess)
 
   /**
     * Sort so that subtypes always precede their supertypes, but without

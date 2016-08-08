@@ -243,20 +243,17 @@ trait TestShardService
                           .valueOr(throw _))
                   case Right(stream) =>
                     Right(stream.map(bytes =>
-                              utf8.decode(ByteBuffer.wrap(bytes))))
+                      utf8.decode(ByteBuffer.wrap(bytes))))
                 }
               } else {
                 response map {
                   case Left(bb) => Left(JString(new String(bb.array, "UTF-8")))
                   case chunk =>
-                    Right(
-                        StreamT.wrapEffect(
-                            chunkToFutureString
-                              .apply(chunk)
-                              .map(s =>
-                                    CharBuffer
-                                      .wrap(JString(s).renderCompact) :: StreamT
-                                      .empty[Future, CharBuffer])))
+                    Right(StreamT.wrapEffect(chunkToFutureString
+                      .apply(chunk)
+                      .map(s =>
+                        CharBuffer.wrap(JString(s).renderCompact) :: StreamT
+                          .empty[Future, CharBuffer])))
                 }
               }
           }
@@ -380,8 +377,8 @@ class ShardServiceSpec extends TestShardService {
       } yield result
 
       val expected = JObject(JField("warnings", JArray(Nil)) :: JField(
-              "errors",
-              JArray(Nil)) :: JField("data", JArray(JNum(2) :: Nil)) :: Nil)
+          "errors",
+          JArray(Nil)) :: JField("data", JArray(JNum(2) :: Nil)) :: Nil)
 
       res.copoint must_== expected
     }
@@ -406,7 +403,7 @@ class ShardServiceSpec extends TestShardService {
       query(simpleQuery, Some("not-gonna-find-it")).copoint must beLike {
         case HttpResponse(HttpStatus(Forbidden, _), _, Some(content), _) =>
           content must_== Left(JString(
-                  "The specified API key does not exist: not-gonna-find-it"))
+              "The specified API key does not exist: not-gonna-find-it"))
       }
     }
     "return 400 and errors if format is 'simple'" in {
@@ -506,7 +503,7 @@ class ShardServiceSpec extends TestShardService {
       browse(Some("not-gonna-find-it")).copoint must beLike {
         case HttpResponse(HttpStatus(Forbidden, _), _, Some(content), _) =>
           content must_== Left(JString(
-                  "The specified API key does not exist: not-gonna-find-it"))
+              "The specified API key does not exist: not-gonna-find-it"))
       }
     }
     /* Per John, this is not the desired behavior
@@ -553,7 +550,7 @@ class ShardServiceSpec extends TestShardService {
       meta(Some("not-gonna-find-it")).copoint must beLike {
         case HttpResponse(HttpStatus(Forbidden, _), _, Some(content), _) =>
           content must_== Left(JString(
-                  "The specified API key does not exist: not-gonna-find-it"))
+              "The specified API key does not exist: not-gonna-find-it"))
       }
     }
     "return empty response on metadata failure" in {

@@ -60,10 +60,10 @@ trait Kinds { self: SymbolTable =>
       kindMessage(a, p)(
           "%s's bounds%s are stricter than %s's declared bounds%s"
             .format(_, a.info, _, p.info match {
-          case tb @ TypeBounds(_, _) if tb.isEmptyBounds =>
-            " >: Nothing <: Any"
-          case tb => "" + tb
-        }))
+              case tb @ TypeBounds(_, _) if tb.isEmptyBounds =>
+                " >: Nothing <: Any"
+              case tb => "" + tb
+            }))
 
     private def varianceMessage(a: Symbol, p: Symbol) =
       kindMessage(a, p)(
@@ -83,14 +83,14 @@ trait Kinds { self: SymbolTable =>
        else
          xs map f.tupled mkString
            ("\n", ", ",
-               ""))
+           ""))
 
     def errorMessage(targ: Type, tparam: Symbol): String =
       ((targ + "'s type parameters do not match " + tparam +
-                "'s expected parameters:") + buildMessage(arity, arityMessage) +
-            buildMessage(variance, varianceMessage) + buildMessage(
-              strictness,
-              strictnessMessage))
+        "'s expected parameters:") + buildMessage(arity, arityMessage) +
+        buildMessage(variance, varianceMessage) + buildMessage(
+          strictness,
+          strictnessMessage))
   }
   val NoKindErrors = KindErrors(Nil, Nil, Nil)
 
@@ -339,9 +339,9 @@ trait Kinds { self: SymbolTable =>
       // Replace Head(o, Some(1), a) with Head(o, None, a) if countByOrder(o) <= 1, so F1[A] becomes F[A]
       def removeOnes: StringState = {
         val maxOrder = (tokens map {
-              case Head(o, _, _) => o
-              case _ => 0
-            }).max
+          case Head(o, _, _) => o
+          case _ => 0
+        }).max
         StringState((tokens /: (0 to maxOrder)) {
           (ts: Seq[ScalaNotation], o: Int) =>
             if (countByOrder(o) <= 1)
@@ -421,11 +421,11 @@ trait Kinds { self: SymbolTable =>
     def starNotation: String = {
       import Variance._
       (args map { arg =>
-            (if (arg.kind.order == 0) arg.kind.starNotation
-             else "(" + arg.kind.starNotation + ")") +
-              (if (arg.variance == Invariant) " -> "
-               else " -(" + arg.variance.symbolicString + ")-> ")
-          }).mkString + "*" + bounds.starNotation(_.toString)
+        (if (arg.kind.order == 0) arg.kind.starNotation
+         else "(" + arg.kind.starNotation + ")") +
+          (if (arg.variance == Invariant) " -> "
+           else " -(" + arg.variance.symbolicString + ")-> ")
+      }).mkString + "*" + bounds.starNotation(_.toString)
     }
   }
   object TypeConKind {

@@ -85,10 +85,9 @@ class PagedTableSuite extends SparkFunSuite {
     assert(
         (pagedTable.pageNavigation(1, 10, 100).head \\ "li")
           .map(_.text.trim) === (1 to 10).map(_.toString) ++ Seq(">", ">>"))
-    assert(
-        (pagedTable.pageNavigation(2, 10, 100).head \\ "li")
-          .map(_.text.trim) === Seq("<") ++ (1 to 10)
-          .map(_.toString) ++ Seq(">", ">>"))
+    assert((pagedTable.pageNavigation(2, 10, 100).head \\ "li")
+      .map(_.text.trim) === Seq("<") ++ (1 to 10).map(_.toString) ++ Seq(">",
+                                                                         ">>"))
 
     assert(
         (pagedTable.pageNavigation(100, 10, 100).head \\ "li")

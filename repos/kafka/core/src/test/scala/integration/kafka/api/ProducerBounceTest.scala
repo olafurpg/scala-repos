@@ -130,7 +130,7 @@ class ProducerBounceTest extends KafkaServerTestHarness {
 
     // double check that the leader info has been propagated after consecutive bounces
     val newLeaders = (0 until numPartitions).map(i =>
-          TestUtils.waitUntilMetadataIsPropagated(servers, topic1, i))
+      TestUtils.waitUntilMetadataIsPropagated(servers, topic1, i))
     val fetchResponses = newLeaders.zipWithIndex.map {
       case (leader, partition) =>
         // Consumers must be instantiated after all the restarts since they use random ports each time they start up

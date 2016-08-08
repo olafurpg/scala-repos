@@ -162,7 +162,7 @@ class MesosSchedulerBackendSuite
       mesosSchedulerBackend.createExecutorInfo(resources, "test-id")
     assert(
         executorInfo1.getCommand.getValue === s"cd test-app-1*;  ./bin/spark-class ${classOf[
-        MesosExecutorBackend].getName}")
+            MesosExecutorBackend].getName}")
   }
 
   test("spark docker properties correctly populate the DockerInfo message") {

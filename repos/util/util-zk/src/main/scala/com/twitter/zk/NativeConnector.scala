@@ -152,7 +152,7 @@ object NativeConnector {
               connectPromise.updateIfEmpty(Return(zk))
               authenticate foreach { auth =>
                 log.info("Authenticating to zk as %s".format(
-                        new String(auth.data, "UTF-8")))
+                    new String(auth.data, "UTF-8")))
                 zk.addAuthInfo(auth.mode, auth.data)
               }
             }

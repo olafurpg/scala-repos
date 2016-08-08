@@ -455,7 +455,7 @@ object SqlToSlick extends App {
         val slick = //#slickCase
         people
           .map(p =>
-                Case If (p.addressId === 1) Then "A" If (p.addressId === 2) Then "B")
+            Case If (p.addressId === 1) Then "A" If (p.addressId === 2) Then "B")
           .result
         //#slickCase
         val (sqlRes, slickRes) =

@@ -108,12 +108,13 @@ class EdgeRDDImpl[ED: ClassTag, VD: ClassTag] private[graphx] (
     val ed3Tag = classTag[ED3]
     this.withPartitionsRDD[ED3, VD](
         partitionsRDD.zipPartitions(other.partitionsRDD, true) {
-      (thisIter, otherIter) =>
-        val (pid, thisEPart) = thisIter.next()
-        val (_, otherEPart) = otherIter.next()
-        Iterator(
-            Tuple2(pid, thisEPart.innerJoin(otherEPart)(f)(ed2Tag, ed3Tag)))
-    })
+          (thisIter, otherIter) =>
+            val (pid, thisEPart) = thisIter.next()
+            val (_, otherEPart) = otherIter.next()
+            Iterator(
+                Tuple2(pid,
+                       thisEPart.innerJoin(otherEPart)(f)(ed2Tag, ed3Tag)))
+        })
   }
 
   def mapEdgePartitions[ED2: ClassTag, VD2: ClassTag](

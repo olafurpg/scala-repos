@@ -167,7 +167,7 @@ object NameSuggester {
             .getInstance(project)
             .findClass(baseFqn, GlobalSearchScope.allScope(project))
           baseClass != null && (c.isInheritor(baseClass, true) ||
-              ScEquivalenceUtil.areClassesEquivalent(c, baseClass))
+          ScEquivalenceUtil.areClassesEquivalent(c, baseClass))
         }
         val needPrefix = Map("scala.Option" -> "maybe",
                              "scala.Some" -> "some",
@@ -191,11 +191,11 @@ object NameSuggester {
             addFromTwoTypes(args(0), args(1), "Or")
           case c
               if (isInheritor(c, baseMapClassName) ||
-                    isInheritor(c, baseJavaMapClassName)) && args.size == 2 =>
+                isInheritor(c, baseJavaMapClassName)) && args.size == 2 =>
             addFromTwoTypes(args(0), args(1), "To")
           case c
               if (isInheritor(c, baseCollectionClassName) ||
-                    isInheritor(c, baseJavaCollectionClassName)) &&
+                isInheritor(c, baseJavaCollectionClassName)) &&
                 args.size == 1 =>
             addPlurals(args(0))
           case _ =>

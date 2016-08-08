@@ -123,8 +123,8 @@ class SupervisorSpec
 
   def temporaryActorAllForOne = {
     val supervisor = system.actorOf(
-        Props(new Supervisor(AllForOneStrategy(maxNrOfRetries = 0)(
-                    List(classOf[Exception])))))
+        Props(new Supervisor(
+            AllForOneStrategy(maxNrOfRetries = 0)(List(classOf[Exception])))))
     val temporaryActor = child(supervisor, Props(new PingPongActor(testActor)))
 
     (temporaryActor, supervisor)
@@ -133,9 +133,9 @@ class SupervisorSpec
   def singleActorAllForOne = {
     val supervisor = system.actorOf(
         Props(
-            new Supervisor(AllForOneStrategy(maxNrOfRetries = 3,
-                                             withinTimeRange = DilatedTimeout)(
-                    List(classOf[Exception])))))
+            new Supervisor(AllForOneStrategy(
+                maxNrOfRetries = 3,
+                withinTimeRange = DilatedTimeout)(List(classOf[Exception])))))
     val pingpong = child(supervisor, Props(new PingPongActor(testActor)))
 
     (pingpong, supervisor)
@@ -144,9 +144,9 @@ class SupervisorSpec
   def singleActorOneForOne = {
     val supervisor = system.actorOf(
         Props(
-            new Supervisor(OneForOneStrategy(maxNrOfRetries = 3,
-                                             withinTimeRange = DilatedTimeout)(
-                    List(classOf[Exception])))))
+            new Supervisor(OneForOneStrategy(
+                maxNrOfRetries = 3,
+                withinTimeRange = DilatedTimeout)(List(classOf[Exception])))))
     val pingpong = child(supervisor, Props(new PingPongActor(testActor)))
 
     (pingpong, supervisor)
@@ -155,9 +155,9 @@ class SupervisorSpec
   def multipleActorsAllForOne = {
     val supervisor = system.actorOf(
         Props(
-            new Supervisor(AllForOneStrategy(maxNrOfRetries = 3,
-                                             withinTimeRange = DilatedTimeout)(
-                    List(classOf[Exception])))))
+            new Supervisor(AllForOneStrategy(
+                maxNrOfRetries = 3,
+                withinTimeRange = DilatedTimeout)(List(classOf[Exception])))))
     val pingpong1, pingpong2, pingpong3 =
       child(supervisor, Props(new PingPongActor(testActor)))
 
@@ -167,9 +167,9 @@ class SupervisorSpec
   def multipleActorsOneForOne = {
     val supervisor = system.actorOf(
         Props(
-            new Supervisor(OneForOneStrategy(maxNrOfRetries = 3,
-                                             withinTimeRange = DilatedTimeout)(
-                    List(classOf[Exception])))))
+            new Supervisor(OneForOneStrategy(
+                maxNrOfRetries = 3,
+                withinTimeRange = DilatedTimeout)(List(classOf[Exception])))))
     val pingpong1, pingpong2, pingpong3 =
       child(supervisor, Props(new PingPongActor(testActor)))
 
@@ -179,9 +179,9 @@ class SupervisorSpec
   def nestedSupervisorsAllForOne = {
     val topSupervisor = system.actorOf(
         Props(
-            new Supervisor(AllForOneStrategy(maxNrOfRetries = 3,
-                                             withinTimeRange = DilatedTimeout)(
-                    List(classOf[Exception])))))
+            new Supervisor(AllForOneStrategy(
+                maxNrOfRetries = 3,
+                withinTimeRange = DilatedTimeout)(List(classOf[Exception])))))
     val pingpong1 = child(topSupervisor, Props(new PingPongActor(testActor)))
 
     val middleSupervisor = child(
@@ -418,10 +418,9 @@ class SupervisorSpec
 
     "attempt restart when exception during restart" in {
       val inits = new AtomicInteger(0)
-      val supervisor = system.actorOf(
-          Props(new Supervisor(OneForOneStrategy(maxNrOfRetries = 3,
-                                                 withinTimeRange = 10 seconds)(
-                      classOf[Exception] :: Nil))))
+      val supervisor = system.actorOf(Props(new Supervisor(
+          OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 10 seconds)(
+              classOf[Exception] :: Nil))))
 
       val dyingProps = Props(new Actor {
         val init = inits.getAndIncrement()

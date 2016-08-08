@@ -105,7 +105,7 @@ class HDFSMetadataLogSuite extends SparkFunSuite with SharedSQLContext {
       assert(
           metadataLog.getLatest() === Some(maxBatchId -> maxBatchId.toString))
       assert(metadataLog.get(None, maxBatchId) === (0 to maxBatchId).map(i =>
-                (i, i.toString)))
+        (i, i.toString)))
     }
   }
 }

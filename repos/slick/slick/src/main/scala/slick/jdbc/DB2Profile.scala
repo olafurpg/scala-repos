@@ -43,8 +43,8 @@ trait DB2Profile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.reverse -
-          JdbcCapabilities.insertOrUpdate - JdbcCapabilities.supportsByte -
-          JdbcCapabilities.booleanMetaData)
+      JdbcCapabilities.insertOrUpdate - JdbcCapabilities.supportsByte -
+      JdbcCapabilities.booleanMetaData)
 
   override protected lazy val useServerSideUpsert = true
   override protected lazy val useServerSideUpsertReturning = false
@@ -53,8 +53,8 @@ trait DB2Profile extends JdbcProfile {
 
   override protected def computeQueryCompiler =
     (super.computeQueryCompiler.addAfter(
-            Phase.removeTakeDrop,
-            Phase.expandSums) + Phase.rewriteBooleans)
+        Phase.removeTakeDrop,
+        Phase.expandSums) + Phase.rewriteBooleans)
   override val columnTypes = new JdbcTypes
   override def createQueryBuilder(n: Node,
                                   state: CompilerState): QueryBuilder =

@@ -111,7 +111,7 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
 
       Await.result(client.set(foo, bar))
       assert(Await.result(
-              client.move(foo, StringToChannelBuffer(toDb.toString))) == true)
+          client.move(foo, StringToChannelBuffer(toDb.toString))) == true)
 
       Await.result(client.del(Seq(foo))) // clean up
     }

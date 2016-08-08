@@ -247,9 +247,9 @@ class FileUploadSupportSpec extends MutableScalatraSpec {
     "use default charset (UTF-8) for decoding form params if not excplicitly set to something else" in {
       val boundary = "XyXyXy"
       val reqBody = ("--{boundary}\r\n" +
-            "Content-Disposition: form-data; name=\"utf8-string\"\r\n" +
-            "Content-Type: text/plain\r\n" +
-            "\r\n" + "föo\r\n" + "--{boundary}--\r\n")
+        "Content-Disposition: form-data; name=\"utf8-string\"\r\n" +
+        "Content-Type: text/plain\r\n" +
+        "\r\n" + "föo\r\n" + "--{boundary}--\r\n")
         .replace("{boundary}", boundary)
         .getBytes("UTF-8")
 
@@ -260,10 +260,10 @@ class FileUploadSupportSpec extends MutableScalatraSpec {
 
     "use the charset specified in Content-Type header of a part for decoding form params" in {
       val reqBody = ("--XyXyXy\r\n" +
-            "Content-Disposition: form-data; name=\"latin1-string\"\r\n" +
-            "Content-Type: text/plain; charset=ISO-8859-1\r\n" + "\r\n" +
-            "äöööölfldflfldfdföödfödfödfåååååå\r\n" +
-            "--XyXyXy--").getBytes("ISO-8859-1")
+        "Content-Disposition: form-data; name=\"latin1-string\"\r\n" +
+        "Content-Type: text/plain; charset=ISO-8859-1\r\n" + "\r\n" +
+        "äöööölfldflfldfdföödfödfödfåååååå\r\n" +
+        "--XyXyXy--").getBytes("ISO-8859-1")
 
       post("/params", headers = multipartHeaders, body = reqBody) {
         header("latin1-string") must_== "äöööölfldflfldfdföödfödfödfåååååå"
@@ -276,7 +276,7 @@ class FileUploadSupportSpec extends MutableScalatraSpec {
       post("/max-size/upload",
            Map(),
            Map("file" -> new File(
-                   "core/src/test/resources/org/scalatra/servlet/smiley.png"))) {
+               "core/src/test/resources/org/scalatra/servlet/smiley.png"))) {
         (status mustEqual 413) and (body mustEqual "too much!")
       }
     }
@@ -286,7 +286,7 @@ class FileUploadSupportSpec extends MutableScalatraSpec {
           "/max-size/upload",
           Map(),
           Map("file" -> new File(
-                  "core/src/test/resources/org/scalatra/servlet/lorem_ipsum.txt"))) {
+              "core/src/test/resources/org/scalatra/servlet/lorem_ipsum.txt"))) {
         body must_== "ok"
       }
     }

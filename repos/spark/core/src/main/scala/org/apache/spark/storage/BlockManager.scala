@@ -341,10 +341,8 @@ private[spark] class BlockManager(executorId: String,
   def getMatchingBlockIds(filter: BlockId => Boolean): Seq[BlockId] = {
     // The `toArray` is necessary here in order to force the list to be materialized so that we
     // don't try to serialize a lazy iterator when responding to client requests.
-    (blockInfoManager.entries.map(_._1) ++ diskBlockManager.getAllBlocks())
-      .filter(filter)
-      .toArray
-      .toSeq
+    (blockInfoManager.entries.map(_._1) ++ diskBlockManager
+      .getAllBlocks()).filter(filter).toArray.toSeq
   }
 
   /**
@@ -1202,9 +1200,8 @@ private[spark] class BlockManager(executorId: String,
         s"Replicating $blockId of ${data.size} bytes to " +
           s"${peersReplicatedTo.size} peer(s) took $timeTakeMs ms")
     if (peersReplicatedTo.size < numPeersToReplicateTo) {
-      logWarning(
-          s"Block $blockId replicated to only " +
-            s"${peersReplicatedTo.size} peer(s) instead of $numPeersToReplicateTo peers")
+      logWarning(s"Block $blockId replicated to only " +
+        s"${peersReplicatedTo.size} peer(s) instead of $numPeersToReplicateTo peers")
     }
   }
 

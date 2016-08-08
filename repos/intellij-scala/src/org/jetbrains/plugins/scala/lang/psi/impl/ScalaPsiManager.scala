@@ -182,8 +182,8 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
       .getInstance(project)
       .getClassesByName(name, scope)
       .filterNot(p =>
-            p.isInstanceOf[ScTemplateDefinition] ||
-              p.isInstanceOf[PsiClassWrapper])
+        p.isInstanceOf[ScTemplateDefinition] ||
+          p.isInstanceOf[PsiClassWrapper])
       .toBuffer
     val classesIterator = scalaClasses.iterator
     while (classesIterator.hasNext) {
@@ -228,8 +228,8 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
       .asInstanceOf[JavaPsiFacadeImpl]
       .getClasses(pack, scope)
       .filterNot(p =>
-            p.isInstanceOf[ScTemplateDefinition] ||
-              p.isInstanceOf[PsiClassWrapper])
+        p.isInstanceOf[ScTemplateDefinition] ||
+          p.isInstanceOf[PsiClassWrapper])
     val scalaClasses =
       ScalaShortNamesCacheManager.getInstance(project).getClasses(pack, scope)
     classes ++ scalaClasses

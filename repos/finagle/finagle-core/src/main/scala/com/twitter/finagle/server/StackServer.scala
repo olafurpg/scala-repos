@@ -264,10 +264,8 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
             // also gracefully deny new sessions.
             val d = server.newDispatcher(
                 transport,
-                Service.const(
-                    Future.exception(Failure.rejected(
-                            "Terminating session and ignoring request",
-                            exc)))
+                Service.const(Future.exception(Failure
+                  .rejected("Terminating session and ignoring request", exc)))
             )
             connections.add(d)
             transport.onClose ensure connections.remove(d)

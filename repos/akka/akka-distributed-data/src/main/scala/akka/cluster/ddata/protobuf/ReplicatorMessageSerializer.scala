@@ -260,11 +260,10 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
 
   private def statusFromBinary(bytes: Array[Byte]): Status = {
     val status = dm.Status.parseFrom(bytes)
-    Status(
-        status.getEntriesList.asScala.map(e ⇒
-              e.getKey -> AkkaByteString(e.getDigest.toByteArray()))(breakOut),
-        status.getChunk,
-        status.getTotChunks)
+    Status(status.getEntriesList.asScala.map(e ⇒
+             e.getKey -> AkkaByteString(e.getDigest.toByteArray()))(breakOut),
+           status.getChunk,
+           status.getTotChunks)
   }
 
   private def gossipToProto(gossip: Gossip): dm.Gossip = {
@@ -283,7 +282,7 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
   private def gossipFromBinary(bytes: Array[Byte]): Gossip = {
     val gossip = dm.Gossip.parseFrom(decompress(bytes))
     Gossip(gossip.getEntriesList.asScala.map(e ⇒
-                 e.getKey -> dataEnvelopeFromProto(e.getEnvelope))(breakOut),
+             e.getKey -> dataEnvelopeFromProto(e.getEnvelope))(breakOut),
            sendBack = gossip.getSendBack)
   }
 
@@ -456,7 +455,7 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
           if (pruningEntry.getPerformed) PruningState.PruningPerformed
           else
             PruningState.PruningInitialized(pruningEntry.getSeenList.asScala
-                  .map(addressFromProto)(breakOut))
+              .map(addressFromProto)(breakOut))
         val state =
           PruningState(uniqueAddressFromProto(pruningEntry.getOwnerAddress),
                        phase)

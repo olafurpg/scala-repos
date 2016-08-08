@@ -572,7 +572,7 @@ class SparkContext(config: SparkConf)
     _env.metricsSystem.start()
     // Attach the driver metrics servlet handler to the web ui after the metrics system is started.
     _env.metricsSystem.getServletHandlers.foreach(handler =>
-          ui.foreach(_.attachHandler(handler)))
+      ui.foreach(_.attachHandler(handler)))
 
     _eventLogger = if (isEventLogEnabled) {
       val logger = new EventLoggingListener(_applicationId,
@@ -1283,8 +1283,8 @@ class SparkContext(config: SparkConf)
                    classOf[NullWritable],
                    classOf[BytesWritable],
                    minPartitions).flatMap(x =>
-            Utils.deserialize[Array[T]](x._2.getBytes,
-                                        Utils.getContextOrSparkClassLoader))
+        Utils.deserialize[Array[T]](x._2.getBytes,
+                                    Utils.getContextOrSparkClassLoader))
     }
 
   protected[spark] def checkpointFile[T: ClassTag](path: String): RDD[T] =

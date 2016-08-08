@@ -18,8 +18,8 @@ private[wiki] final class Api {
             }
       pages ← $find(
                  $query(Json.obj(
-                         "lang" -> $in(Seq(lang, DefaultLang))
-                     )).sort($sort asc "number"))
+                     "lang" -> $in(Seq(lang, DefaultLang))
+                 )).sort($sort asc "number"))
     } yield page map { _ -> makeMenu(pages) }
 
   private def makeMenu(pages: List[Page]): List[Page] = {

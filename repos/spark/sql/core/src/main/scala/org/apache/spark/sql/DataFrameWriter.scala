@@ -358,8 +358,8 @@ final class DataFrameWriter private[sql] (df: DataFrame) {
     validColumnNames
       .find(df.sqlContext.sessionState.analyzer.resolver(_, columnName))
       .getOrElse(throw new AnalysisException(
-              s"$columnType column $columnName not found in " +
-                s"existing columns (${validColumnNames.mkString(", ")})"))
+          s"$columnType column $columnName not found in " +
+            s"existing columns (${validColumnNames.mkString(", ")})"))
   }
 
   private def assertNotBucketed(): Unit = {

@@ -137,7 +137,7 @@ sealed class Supervisor(
   def configure(config: SupervisorConfig): Unit = config match {
     case SupervisorConfig(_, servers, _) =>
       servers.map(server =>
-            server match {
+        server match {
           case Supervise(actorRef, lifeCycle, registerAsRemoteService) =>
             actorRef.start()
             val className = actorRef.actor.getClass.getName

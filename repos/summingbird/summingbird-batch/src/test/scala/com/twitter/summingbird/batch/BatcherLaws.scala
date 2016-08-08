@@ -121,9 +121,9 @@ object BatcherLaws extends Properties("Batcher") {
     val flooredBatch = BatchID(if (millis < 0) (hourIndex - 1) else hourIndex)
 
     (hourlyBatcher
-          .batchOf(Timestamp(millis)) == flooredBatch) && (hourlyBatcher
-          .earliestTimeOf(flooredBatch)
-          .milliSinceEpoch == hourlyBatchFloor(flooredBatch.id))
+      .batchOf(Timestamp(millis)) == flooredBatch) && (hourlyBatcher
+      .earliestTimeOf(flooredBatch)
+      .milliSinceEpoch == hourlyBatchFloor(flooredBatch.id))
   }
 
   property(

@@ -46,7 +46,7 @@ trait VectorInstances extends VectorInstances0 {
     override def traverseS[S, A, B](v: Vector[A])(
         f: A => State[S, B]): State[S, Vector[B]] =
       State((s: S) =>
-            v.foldLeft((s, empty[B]))((acc, a) => {
+        v.foldLeft((s, empty[B]))((acc, a) => {
           val bs = f(a)(acc._1)
           (bs._1, acc._2 :+ bs._2)
         }))
@@ -159,9 +159,9 @@ trait VectorFunctions {
   final def takeWhileM[A, M[_]: Monad](as: Vector[A])(
       p: A => M[Boolean]): M[Vector[A]] =
     lazyFoldRight(as, Monad[M].point(empty[A]))((a, as) =>
-          Monad[M].bind(p(a))(b =>
-                if (b) Monad[M].map(as)((tt: Vector[A]) => a +: tt)
-                else Monad[M].point(empty)))
+      Monad[M].bind(p(a))(b =>
+        if (b) Monad[M].map(as)((tt: Vector[A]) => a +: tt)
+        else Monad[M].point(empty)))
 
   /** Run `p(a)`s and collect `as` while `p` yields false.  Don't run
     * any `p`s after the first true.
@@ -173,7 +173,7 @@ trait VectorFunctions {
   final def filterM[A, M[_]](as: Vector[A])(p: A => M[Boolean])(
       implicit F: Applicative[M]): M[Vector[A]] =
     lazyFoldRight(as, F.point(empty[A]))((a, g) =>
-          F.ap(g)(F.map(p(a))(b => t => if (b) a +: t else t)))
+      F.ap(g)(F.map(p(a))(b => t => if (b) a +: t else t)))
 
   /** Run `p(a)`s left-to-right until it yields a true value,
     * answering `Some(that)`, or `None` if nothing matched `p`.
@@ -181,8 +181,8 @@ trait VectorFunctions {
   final def findM[A, M[_]: Monad](as: Vector[A])(
       p: A => M[Boolean]): M[Option[A]] =
     lazyFoldRight(as, Monad[M].point(None: Option[A]))((a, g) =>
-          Monad[M].bind(p(a))(b =>
-                if (b) Monad[M].point(Some(a): Option[A]) else g))
+      Monad[M].bind(p(a))(b =>
+        if (b) Monad[M].point(Some(a): Option[A]) else g))
 
   final def powerset[A](as: Vector[A]): Vector[Vector[A]] = {
     import vector.vectorInstance
@@ -194,7 +194,7 @@ trait VectorFunctions {
   final def partitionM[A, M[_]](as: Vector[A])(p: A => M[Boolean])(
       implicit F: Applicative[M]): M[(Vector[A], Vector[A])] =
     lazyFoldRight(as, F.point(empty[A], empty[A]))((a, g) =>
-          F.ap(g)(F.map(p(a))(b => {
+      F.ap(g)(F.map(p(a))(b => {
         case (x, y) => if (b) (a +: x, y) else (x, a +: y)
       })))
 
@@ -219,7 +219,7 @@ trait VectorFunctions {
       Monad[M].bind(spanM[A, StateT[M, A, ?]](as.tail)(stateP).eval(as.head)) {
         case (x, y) =>
           Monad[M].map(groupWhenM(y)(p))((g: Vector[Vector[A]]) =>
-                (as.head +: x) +: g)
+            (as.head +: x) +: g)
       }
     }
 

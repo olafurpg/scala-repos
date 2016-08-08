@@ -187,10 +187,9 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
     if (in.atEnd) Success(CharSequenceReader.EofCh, in) else Failure("", in)
   }
   private lazy val topParser: Parser[CssSelector] =
-    phrase(
-        rep1(
-            (_idMatch | _dataNameMatch | _nameMatch | _classMatch | _attrMatch | _elemMatch | _colonMatch | _starMatch) <~
-              (rep1(' ') | atEnd)) ~ opt(subNode)) ^^ {
+    phrase(rep1(
+        (_idMatch | _dataNameMatch | _nameMatch | _classMatch | _attrMatch | _elemMatch | _colonMatch | _starMatch) <~
+          (rep1(' ') | atEnd)) ~ opt(subNode)) ^^ {
       case (one :: Nil) ~ sn => fixAll(List(one), sn)
       case all ~ None if all.takeRight(1).head == StarSelector(Empty, false) =>
         fixAll(all.dropRight(1), Some(KidsSubNode()))
@@ -226,11 +225,11 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
 
   private lazy val _starMatch: Parser[CssSelector] =
     ('*' ^^ {
-          case sn => StarSelector(Empty, false)
-        }) |
+      case sn => StarSelector(Empty, false)
+    }) |
       ('^' ^^ {
-            case sn => StarSelector(Empty, true)
-          })
+        case sn => StarSelector(Empty, true)
+      })
 
   private lazy val _dataNameMatch: Parser[CssSelector] =
     ';' ~> id ^^ {
@@ -264,25 +263,22 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
   private lazy val subNode: Parser[SubNode] =
     rep(' ') ~>
       ((opt('*') ~ '[' ~> attrName <~ '+' ~ ']' ^^ { name =>
-                AttrAppendSubNode(name)
-              }) |
-            (opt('*') ~ '[' ~> attrName <~ '!' ~ ']' ^^ { name =>
-                  AttrRemoveSubNode(name)
-                }) |
-            (opt('*') ~ '[' ~> attrName <~ ']' ^^ { name =>
-                  AttrSubNode(name)
-                }) | ('!' ~ '!' ^^ (a =>
-                                      DontMergeAttributes)) | ('<' ~ '*' ~ '>') ^^
-            (a => SurroundKids()) | ('-' ~ '*' ^^ (a =>
-                                                     PrependKidsSubNode())) |
-            ('>' ~ '*' ^^ (a => PrependKidsSubNode())) |
-            ('*' ~ '+' ^^ (a => AppendKidsSubNode())) |
-            ('*' ~ '<' ^^ (a =>
-                             AppendKidsSubNode())) | '*' ^^ (a =>
-                                                               KidsSubNode()) | '^' ~ '*' ^^
-            (a => SelectThisNode(true)) | '^' ~ '^' ^^ (a =>
-                                                          SelectThisNode(
-                                                              false)))
+        AttrAppendSubNode(name)
+      }) |
+        (opt('*') ~ '[' ~> attrName <~ '!' ~ ']' ^^ { name =>
+          AttrRemoveSubNode(name)
+        }) |
+        (opt('*') ~ '[' ~> attrName <~ ']' ^^ { name =>
+          AttrSubNode(name)
+        }) | ('!' ~ '!' ^^ (a => DontMergeAttributes)) | ('<' ~ '*' ~ '>') ^^
+        (a => SurroundKids()) | ('-' ~ '*' ^^ (a => PrependKidsSubNode())) |
+        ('>' ~ '*' ^^ (a => PrependKidsSubNode())) |
+        ('*' ~ '+' ^^ (a => AppendKidsSubNode())) |
+        ('*' ~ '<' ^^ (a =>
+                         AppendKidsSubNode())) | '*' ^^ (a =>
+                                                           KidsSubNode()) | '^' ~ '*' ^^
+        (a => SelectThisNode(true)) | '^' ~ '^' ^^ (a =>
+                                                      SelectThisNode(false)))
 
   private lazy val attrName: Parser[String] =
     (letter | '_' | ':') ~ rep(letter | number | '-' | '_' | ':' | '.') ^^ {
@@ -291,19 +287,19 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
 
   private lazy val attrConst: Parser[String] = {
     (('\'' ~> rep(elem("isValid", (c: Char) => {
-              c != '\'' && c >= ' '
-            })) <~ '\'') ^^ {
-          case s => s.mkString
-        }) |
+      c != '\'' && c >= ' '
+    })) <~ '\'') ^^ {
+      case s => s.mkString
+    }) |
       (('"' ~> rep(elem("isValid", (c: Char) => {
-                c != '"' && c >= ' '
-              })) <~ '"') ^^ {
-            case s => s.mkString
-          }) |
+        c != '"' && c >= ' '
+      })) <~ '"') ^^ {
+        case s => s.mkString
+      }) |
       (rep1(elem("isValid", (c: Char) => {
-            c != '\'' && c != '"' && c > ' '
-          })) ^^ {
-            case s => s.mkString
-          })
+        c != '\'' && c != '"' && c > ' '
+      })) ^^ {
+        case s => s.mkString
+      })
   }
 }

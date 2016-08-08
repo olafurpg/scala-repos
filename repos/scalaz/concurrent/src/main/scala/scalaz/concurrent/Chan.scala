@@ -27,7 +27,7 @@ private[this] class ChanImpl[A](readVar: MVar[ChStream[A]],
     extends Chan[A] {
   def read =
     readVar.modify(readEnd =>
-          for {
+      for {
         item <- readEnd.read
       } yield (item.end, item.a))
 

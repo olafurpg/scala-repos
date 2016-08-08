@@ -180,7 +180,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
               account,
               members.map(_.userName),
               context.loginAccount.exists(x =>
-                    members.exists { member =>
+                members.exists { member =>
                   member.userName == x.userName && member.isManager
               }))
         }
@@ -195,7 +195,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
               else getGroupsByUserName(userName),
               getVisibleRepositories(context.loginAccount, Some(userName)),
               context.loginAccount.exists(x =>
-                    members.exists { member =>
+                members.exists { member =>
                   member.userName == x.userName && member.isManager
               }))
         }
@@ -230,17 +230,18 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
   post("/:userName/_edit", editForm)(oneselfOnly { form =>
     val userName = params("userName")
-    getAccountByUserName(userName).map { account =>
-      updateAccount(
-          account.copy(password =
-                         form.password.map(sha1).getOrElse(account.password),
-                       fullName = form.fullName,
-                       mailAddress = form.mailAddress,
-                       url = form.url))
+    getAccountByUserName(userName).map {
+      account =>
+        updateAccount(
+            account.copy(password =
+                           form.password.map(sha1).getOrElse(account.password),
+                         fullName = form.fullName,
+                         mailAddress = form.mailAddress,
+                         url = form.url))
 
-      updateImage(userName, form.fileId, form.clearImage)
-      flash += "info" -> "Account information has been updated."
-      redirect(s"/${userName}/_edit")
+        updateImage(userName, form.fileId, form.clearImage)
+        flash += "info" -> "Account information has been updated."
+        redirect(s"/${userName}/_edit")
     } getOrElse NotFound
   })
 
@@ -463,7 +464,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
         val managerPermissions = groups.map { group =>
           val members = getGroupMembers(group)
           context.loginAccount.exists(x =>
-                members.exists { member =>
+            members.exists { member =>
               member.userName == x.userName && member.isManager
           })
         }
@@ -484,7 +485,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
       LockUtil.lock(s"${accountName}/${repository.name}") {
         if (getRepository(accountName, repository.name).isDefined ||
             (accountName != loginUserName &&
-                !getGroupsByUserName(loginUserName).contains(accountName))) {
+            !getGroupsByUserName(loginUserName).contains(accountName))) {
           // redirect to the repository if repository already exists
           redirect(s"/${accountName}/${repository.name}")
         } else {

@@ -25,9 +25,9 @@ final class Env(config: Config,
       registerDriverShutdownHook(driver)
       logger.info(
           s"""ReactiveMongoApi successfully started with DB '$dbUri'! Servers: ${parsedUri.hosts.map {
-        s =>
-          s"[${s._1}:${s._2}]"
-      }.mkString("\n\t\t")}""")
+            s =>
+              s"[${s._1}:${s._2}]"
+          }.mkString("\n\t\t")}""")
       db
     }
   }

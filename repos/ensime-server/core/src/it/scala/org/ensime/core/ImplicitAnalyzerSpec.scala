@@ -101,15 +101,10 @@ class ImplicitAnalyzerSpec
             }
         """
       )
-      dets should ===(
-          List(
-              ("param",
-               "zz(1)(\"abc\")",
-               "zz",
-               List("myThing", "myThong"),
-               false),
-              ("param", "yy", "yy", List("myThing"), false)
-          ))
+      dets should ===(List(
+          ("param", "zz(1)(\"abc\")", "zz", List("myThing", "myThong"), false),
+          ("param", "yy", "yy", List("myThing"), false)
+      ))
     }
   }
 

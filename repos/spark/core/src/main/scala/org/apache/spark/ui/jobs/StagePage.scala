@@ -339,7 +339,7 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
 
       // Excludes tasks which failed and have incomplete metrics
       val validTasks = tasks.filter(t =>
-            t.taskInfo.status == "SUCCESS" && t.taskMetrics.isDefined)
+        t.taskInfo.status == "SUCCESS" && t.taskMetrics.isDefined)
 
       val summaryTable: Option[Seq[Node]] = if (validTasks.size == 0) {
         None
@@ -353,7 +353,7 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
         }
         def getFormattedSizeQuantiles(data: Seq[Double]): Seq[Elem] = {
           getDistributionQuantiles(data).map(d =>
-                <td>{Utils.bytesToString(d.toLong)}</td>)
+            <td>{Utils.bytesToString(d.toLong)}</td>)
         }
 
         val deserializationTimes = validTasks.map {
@@ -435,7 +435,7 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
             records: Seq[Double]): Seq[Elem] = {
           val recordDist = getDistributionQuantiles(records).iterator
           getDistributionQuantiles(data).map(d =>
-                <td>{s"${Utils.bytesToString(d.toLong)} / ${recordDist.next().toLong}"}</td>)
+            <td>{s"${Utils.bytesToString(d.toLong)} / ${recordDist.next().toLong}"}</td>)
         }
 
         val inputSizes = validTasks.map {
@@ -632,7 +632,7 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
         summary ++ dagViz ++ showAdditionalMetrics ++ makeTimeline(
             // Only show the tasks in the table
             stageData.taskData.values.toSeq.filter(t =>
-                  taskIdsInPage.contains(t.taskInfo.taskId)),
+              taskIdsInPage.contains(t.taskInfo.taskId)),
             currentTime) ++ <h4>Summary Metrics for {numCompleted} Completed Tasks</h4> ++ <div>{summaryTable.getOrElse("No tasks have reported metrics yet.")}</div> ++ <h4>Aggregated Metrics by Executor</h4> ++ executorTable.toNodeSeq ++ maybeAccumulableTable ++ <h4 id="tasks-section">Tasks</h4> ++ taskTableHTML ++ jsForScrollingDownToTaskTable
       UIUtils.headerSparkPage(stageHeader,
                               content,
@@ -670,8 +670,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
           .getOrElse(0L)
         val shuffleReadTimeProportion = toProportion(shuffleReadTime)
         val shuffleWriteTime = (metricsOpt
-              .flatMap(_.shuffleWriteMetrics.map(_.writeTime))
-              .getOrElse(0L) / 1e6).toLong
+          .flatMap(_.shuffleWriteMetrics.map(_.writeTime))
+          .getOrElse(0L) / 1e6).toLong
         val shuffleWriteTimeProportion = toProportion(shuffleWriteTime)
 
         val serializationTime =
@@ -701,8 +701,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
           executorRunTime - shuffleReadTime - shuffleWriteTime
         val executorComputingTimeProportion =
           (100 - schedulerDelayProportion - shuffleReadTimeProportion -
-                shuffleWriteTimeProportion - serializationTimeProportion -
-                deserializationTimeProportion - gettingResultTimeProportion)
+            shuffleWriteTimeProportion - serializationTimeProportion -
+            deserializationTimeProportion - gettingResultTimeProportion)
 
         val schedulerDelayProportionPos = 0
         val deserializationTimeProportionPos =
@@ -978,7 +978,7 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
     val inputSortable = maybeInput.map(_.bytesRead).getOrElse(0L)
     val inputReadable = maybeInput
       .map(m =>
-            s"${Utils.bytesToString(m.bytesRead)} (${m.readMethod.toString.toLowerCase()})")
+        s"${Utils.bytesToString(m.bytesRead)} (${m.readMethod.toString.toLowerCase()})")
       .getOrElse("")
     val inputRecords = maybeInput.map(_.recordsRead.toString).getOrElse("")
 

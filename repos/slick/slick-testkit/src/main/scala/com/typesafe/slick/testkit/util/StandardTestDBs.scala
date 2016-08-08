@@ -232,7 +232,7 @@ object StandardTestDBs {
           _ <- DBIO.sequence(constraintStatements)
           tables <- localTables
           tableStatements = tables.map(t =>
-                sqlu"drop table #${profile.quoteIdentifier(t)}")
+            sqlu"drop table #${profile.quoteIdentifier(t)}")
           _ <- DBIO.sequence(tableStatements)
         } yield ()
       }
@@ -293,10 +293,10 @@ class SQLiteTestDB(dburl: String, confName: String)
         tables <- localTables
         sequences <- localSequences
         _ <- DBIO.seq((tables.map(t =>
-                          sqlu"""drop table if exists #${profile
-                    .quoteIdentifier(t)}""") ++ sequences.map(t =>
-                          sqlu"""drop sequence if exists #${profile
-                    .quoteIdentifier(t)}""")): _*)
+              sqlu"""drop table if exists #${profile
+                .quoteIdentifier(t)}""") ++ sequences.map(t =>
+              sqlu"""drop sequence if exists #${profile
+                .quoteIdentifier(t)}""")): _*)
       } yield ()
     }
 }
@@ -326,15 +326,14 @@ abstract class DerbyDB(confName: String) extends InternalJdbcTestDB(confName) {
                   (for ((c, t) <- constraints if !c.startsWith("SQL"))
                     yield
                       sqlu"""alter table ${profile
-                    .quoteIdentifier(t)} drop constraint ${profile
-                    .quoteIdentifier(c)}"""): _*)
+                        .quoteIdentifier(t)} drop constraint ${profile
+                        .quoteIdentifier(c)}"""): _*)
           tables <- localTables
           sequences <- localSequences
           _ <- DBIO.seq((tables.map(t =>
-                            sqlu"""drop table #${profile
-                      .quoteIdentifier(t)}""") ++ sequences.map(t =>
-                            sqlu"""drop sequence #${profile
-                      .quoteIdentifier(t)}""")): _*)
+                sqlu"""drop table #${profile
+                  .quoteIdentifier(t)}""") ++ sequences.map(t =>
+                sqlu"""drop sequence #${profile.quoteIdentifier(t)}""")): _*)
         } yield ()
       }
     } catch {

@@ -48,15 +48,15 @@ object Files {
     applicationLifecycle.addStopHook { () =>
       Future.successful(
           JFiles.walkFileTree(playTempFolder, new SimpleFileVisitor[Path] {
-        override def visitFile(file: Path, attrs: BasicFileAttributes) = {
-          JFiles.deleteIfExists(file)
-          FileVisitResult.CONTINUE
-        }
-        override def postVisitDirectory(dir: Path, exc: IOException) = {
-          JFiles.deleteIfExists(dir)
-          FileVisitResult.CONTINUE
-        }
-      }))
+            override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+              JFiles.deleteIfExists(file)
+              FileVisitResult.CONTINUE
+            }
+            override def postVisitDirectory(dir: Path, exc: IOException) = {
+              JFiles.deleteIfExists(dir)
+              FileVisitResult.CONTINUE
+            }
+          }))
     }
 
     def create(prefix: String, suffix: String): File = {

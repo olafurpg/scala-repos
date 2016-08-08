@@ -98,7 +98,7 @@ class MessageSerializer(val system: ExtendedActorSystem)
           .setDeliveryId(unconfirmed.deliveryId)
           .setDestination(unconfirmed.destination.toString)
           .setPayload(persistentPayloadBuilder(
-                  unconfirmed.message.asInstanceOf[AnyRef]))
+              unconfirmed.message.asInstanceOf[AnyRef]))
       builder.addUnconfirmedDeliveries(unconfirmedBuilder)
     }
     builder

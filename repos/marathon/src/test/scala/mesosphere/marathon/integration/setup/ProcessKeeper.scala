@@ -173,7 +173,7 @@ object ProcessKeeper {
     // Omit the classpath in order to avoid cluttering the tests output
     log.info(
         s"Start java process $name with command: ${(javaExecutable :: memSettings :: arguments)
-      .mkString(" ")}")
+          .mkString(" ")}")
     val command: List[String] =
       javaExecutable :: memSettings :: "-classpath" :: classPath :: arguments
     val builder = Process(command, cwd, env.toList: _*)

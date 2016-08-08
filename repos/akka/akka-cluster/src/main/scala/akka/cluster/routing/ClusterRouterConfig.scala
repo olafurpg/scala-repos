@@ -71,7 +71,7 @@ final case class ClusterRouterGroupSettings(
     throw new IllegalArgumentException("routeesPaths must be defined")
 
   routeesPaths.foreach(p ⇒
-        p match {
+    p match {
       case RelativeActorPath(elements) ⇒ // good
       case _ ⇒
         throw new IllegalArgumentException(

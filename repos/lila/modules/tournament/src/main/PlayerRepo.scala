@@ -89,9 +89,8 @@ object PlayerRepo {
     find(tourId, userId) flatMap {
       _ ?? { player =>
         coll.count(Some(selectTour(tourId) ++ BSONDocument(
-                    "m" -> BSONDocument("$gt" -> player.magicScore)))) map {
-          n =>
-            PlayerInfo((n + 1), player.withdraw).some
+            "m" -> BSONDocument("$gt" -> player.magicScore)))) map { n =>
+          PlayerInfo((n + 1), player.withdraw).some
         }
       }
     }
@@ -161,8 +160,8 @@ object PlayerRepo {
                        userIds: Iterable[String]): Fu[List[Player]] =
     coll
       .find(selectTour(tourId) ++ BSONDocument(
-              "uid" -> BSONDocument("$in" -> userIds)
-          ))
+          "uid" -> BSONDocument("$in" -> userIds)
+      ))
       .cursor[Player]()
       .collect[List]()
       .chronometer

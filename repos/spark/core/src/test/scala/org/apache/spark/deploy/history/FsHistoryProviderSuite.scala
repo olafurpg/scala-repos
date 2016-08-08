@@ -521,8 +521,7 @@ class FsHistoryProviderSuite
     val writer = new OutputStreamWriter(bstream, StandardCharsets.UTF_8)
     Utils.tryWithSafeFinally {
       events.foreach(e =>
-            writer.write(
-                compact(render(JsonProtocol.sparkEventToJson(e))) + "\n"))
+        writer.write(compact(render(JsonProtocol.sparkEventToJson(e))) + "\n"))
     } {
       writer.close()
     }

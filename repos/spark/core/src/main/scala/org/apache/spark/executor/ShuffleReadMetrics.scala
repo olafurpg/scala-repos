@@ -70,8 +70,8 @@ class ShuffleReadMetrics private (_remoteBlocksFetched: Accumulator[Int],
         InternalAccumulator
           .createShuffleReadAccums()
           .map { a =>
-        (a.name.get, a)
-      }
+            (a.name.get, a)
+          }
           .toMap)
   }
 

@@ -113,15 +113,15 @@ object FileContent {
       jv match {
         case JObject(fields) =>
           (fields
-                .get("encoding")
-                .toSuccess(Invalid("File data object missing encoding field."))
-                .flatMap(_.validated[ContentEncoding]) |@| fields
-                .get("mimeType")
-                .toSuccess(Invalid("File data object missing MIME type."))
-                .flatMap(_.validated[MimeType]) |@| fields
-                .get("data")
-                .toSuccess(Invalid("File data object missing data field."))
-                .flatMap(_.validated[String])) {
+            .get("encoding")
+            .toSuccess(Invalid("File data object missing encoding field."))
+            .flatMap(_.validated[ContentEncoding]) |@| fields
+            .get("mimeType")
+            .toSuccess(Invalid("File data object missing MIME type."))
+            .flatMap(_.validated[MimeType]) |@| fields
+            .get("data")
+            .toSuccess(Invalid("File data object missing data field."))
+            .flatMap(_.validated[String])) {
             (encoding, mimeType, contentString) =>
               FileContent(encoding.decode(contentString), mimeType, encoding)
           }
@@ -129,7 +129,7 @@ object FileContent {
         case _ =>
           Failure(
               Invalid("File contents " + jv.renderCompact +
-                    " was not properly encoded as a JSON object."))
+                " was not properly encoded as a JSON object."))
       }
     }
   }

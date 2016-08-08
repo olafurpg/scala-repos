@@ -96,7 +96,7 @@ private object ScalaGoToSuperActionHandler {
             "scala.AnyRef",
             "scala.AnyVal")
       val supers = template.supers.filterNot((x: PsiClass) =>
-            ignored.contains(x.qualifiedName))
+        ignored.contains(x.qualifiedName))
       mutable.HashSet[PsiClass](supers: _*).toArray
     }
 
@@ -113,12 +113,13 @@ private object ScalaGoToSuperActionHandler {
       val supers = mutable.HashSet[NavigatablePsiElement](
           (if (el != null &&
                elements.contains(el.asInstanceOf[ScTypedDefinition])) {
-         ScalaPsiUtil.superValsSignatures(el.asInstanceOf[ScTypedDefinition])
-       } else ScalaPsiUtil.superValsSignatures(elements.head))
+             ScalaPsiUtil.superValsSignatures(
+                 el.asInstanceOf[ScTypedDefinition])
+           } else ScalaPsiUtil.superValsSignatures(elements.head))
             .flatMap(_.namedElement match {
-          case n: NavigatablePsiElement => Some(n)
-          case _ => None
-        }): _*)
+              case n: NavigatablePsiElement => Some(n)
+              case _ => None
+            }): _*)
       supers.toArray
     }
 
@@ -131,9 +132,9 @@ private object ScalaGoToSuperActionHandler {
       case func: ScFunction =>
         val supers = mutable.HashSet[NavigatablePsiElement](
             func.superSignatures.flatMap(_.namedElement match {
-          case n: NavigatablePsiElement => Some(n)
-          case _ => None
-        }): _*)
+              case n: NavigatablePsiElement => Some(n)
+              case _ => None
+            }): _*)
         (Seq(), supers.toSeq)
       case d: ScDeclaredElementsHolder =>
         (Seq(), declaredElementHolderSupers(d))

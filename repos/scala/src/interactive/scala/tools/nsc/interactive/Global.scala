@@ -170,17 +170,17 @@ with ContextTrees with RichCompilationUnits with Picklers {
     */
   val unitOfFile = mapAsScalaMapConverter(
       new ConcurrentHashMap[AbstractFile, RichCompilationUnit] {
-    override def put(key: AbstractFile, value: RichCompilationUnit) = {
-      val r = super.put(key, value)
-      if (r == null) debugLog("added unit for " + key)
-      r
-    }
-    override def remove(key: Any) = {
-      val r = super.remove(key)
-      if (r != null) debugLog("removed unit for " + key)
-      r
-    }
-  }).asScala
+        override def put(key: AbstractFile, value: RichCompilationUnit) = {
+          val r = super.put(key, value)
+          if (r == null) debugLog("added unit for " + key)
+          r
+        }
+        override def remove(key: Any) = {
+          val r = super.remove(key)
+          if (r != null) debugLog("removed unit for " + key)
+          r
+        }
+      }).asScala
 
   /** A set containing all those files that need to be removed
     *  Units are removed by getUnit, typically once a unit is finished compiled.
@@ -341,8 +341,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
   override def signalDone(context: Context, old: Tree, result: Tree) {
     val canObserveTree =
       (interruptsEnabled && analyzer.lockedCount == 0 &&
-            !context.bufferErrors // SI-7558 look away during exploratory typing in "silent mode"
-          )
+        !context.bufferErrors // SI-7558 look away during exploratory typing in "silent mode"
+      )
     if (canObserveTree) {
       if (context.unit.exists && result.pos.isOpaqueRange &&
           (result.pos includes context.unit.targetPos)) {
@@ -1243,7 +1243,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
     /** Cursor Offset - positionDelta == position of the start of the name */
     def positionDelta: Int
     def matchingResults(nameMatcher: (Name) => Name => Boolean = entered =>
-          candidate => candidate.startsWith(entered)): List[M] = {
+      candidate => candidate.startsWith(entered)): List[M] = {
       val enteredName = if (name == nme.ERROR) nme.EMPTY else name
       val matcher = nameMatcher(enteredName)
       results filter { (member: Member) =>
@@ -1256,8 +1256,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
             !isIdentifierStart(member.sym.name.charAt(0)) // e.g. <byname>
         !isJunk && member.accessible && !symbol.isConstructor &&
         (name.isEmpty || matcher(member.sym.name) &&
-            (symbol.name.isTermName == name.isTermName || name.isTypeName &&
-                isStable))
+        (symbol.name.isTermName == name.isTermName || name.isTypeName &&
+        isStable))
       }
     }
   }
@@ -1361,7 +1361,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
         val source = pos.source
         val nameStart: Int = (qualPos.end + 1 until focus1.pos.end)
           .find(p =>
-                source.identifier(source.position(p)).exists(_.length > 0))
+            source.identifier(source.position(p)).exists(_.length > 0))
           .getOrElse(fallback)
         typeCompletions(sel, qual, nameStart, name)
       case Ident(name) =>

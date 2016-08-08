@@ -190,20 +190,18 @@ class RemoveApplyIntention extends PsiElementBaseIntentionAction {
                         val clauses = con.effectiveParameterClauses
                         if (clauses.length > 1 && clauses.last.isImplicit &&
                             clauses.length == argsCount + 1) {
-                          showErrorHint(
-                              InspectionBundle.message(
-                                  "remove.apply.constructor.implicit.parameter",
-                                  parents.constructor.get.getText))
+                          showErrorHint(InspectionBundle.message(
+                              "remove.apply.constructor.implicit.parameter",
+                              parents.constructor.get.getText))
                           return
                         }
                       case fun: ScFunction =>
                         val clauses = fun.effectiveParameterClauses
                         if (clauses.length > 1 && clauses.last.isImplicit &&
                             clauses.length == argsCount + 1) {
-                          showErrorHint(
-                              InspectionBundle.message(
-                                  "remove.apply.constructor.implicit.parameter",
-                                  parents.constructor.get.getText))
+                          showErrorHint(InspectionBundle.message(
+                              "remove.apply.constructor.implicit.parameter",
+                              parents.constructor.get.getText))
                           return
                         }
                       case _ =>

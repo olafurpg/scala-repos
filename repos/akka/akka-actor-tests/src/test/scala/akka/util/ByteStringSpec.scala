@@ -239,7 +239,7 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     input.getFloats(decoded, a, b - a)(byteOrder)
     for (i ← b until n) decoded(i) = input.getFloat(byteOrder)
     ((decoded.toSeq map floatToRawIntBits) ==
-          (reference.toSeq map floatToRawIntBits)) &&
+      (reference.toSeq map floatToRawIntBits)) &&
     (input.toSeq == bytes.drop(n * elemSize))
   }
 
@@ -257,7 +257,7 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     input.getDoubles(decoded, a, b - a)(byteOrder)
     for (i ← b until n) decoded(i) = input.getDouble(byteOrder)
     ((decoded.toSeq map doubleToRawLongBits) ==
-          (reference.toSeq map doubleToRawLongBits)) &&
+      (reference.toSeq map doubleToRawLongBits)) &&
     (input.toSeq == bytes.drop(n * elemSize))
   }
 
@@ -358,7 +358,7 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
       }
       "dropping" in {
         check((a: ByteString, b: ByteString) ⇒
-              (a ++ b).drop(b.size).size == a.size)
+          (a ++ b).drop(b.size).size == a.size)
       }
     }
 
@@ -750,7 +750,7 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
 
           (output.toSeq.drop(a) == bytes.drop(a)) &&
           (input.asInputStream.read() == -1) && ((output.length < 1) ||
-              (input.asInputStream.read(output, 0, 1) == -1))
+          (input.asInputStream.read(output, 0, 1) == -1))
         }
       }
 

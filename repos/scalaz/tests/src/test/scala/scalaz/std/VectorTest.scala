@@ -54,7 +54,7 @@ object VectorTest extends SpecLite {
 
   "groupWhen" ! forAll { (xs: Vector[Int]) =>
     (xs.groupWhen(_ < _) must_===
-          (list.groupWhen(xs.toList)(_ < _).map(_.toVector).toVector))
+      (list.groupWhen(xs.toList)(_ < _).map(_.toVector).toVector))
   }
 
   "partitionM" ! forAll { (xs: Vector[Int]) =>

@@ -27,7 +27,7 @@ object HttpDtab {
   private val Base64 = BaseEncoding.base64()
 
   private val indexstr: Int => String = ((0 until Maxsize) map
-        (i => i -> "%02d".format(i))).toMap
+    (i => i -> "%02d".format(i))).toMap
 
   private def b64Encode(v: String): String =
     Base64.encode(v.getBytes(Utf8))

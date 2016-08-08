@@ -152,12 +152,8 @@ package parallel {
       extends Exception(
           "Multiple exceptions thrown during a parallel computation: " +
             throwables
-              .map(
-                  t =>
-                    t + "\n" + t.getStackTrace
-                      .take(10)
-                      .++("...")
-                      .mkString("\n"))
+              .map(t =>
+                t + "\n" + t.getStackTrace.take(10).++("...").mkString("\n"))
               .mkString("\n\n")
       )
 
@@ -224,7 +220,7 @@ package parallel {
     *  the receiver (which will be the return value).
     */
   private[parallel] abstract class BucketCombiner[-Elem, +To, Buck,
-      +CombinerType <: BucketCombiner[Elem, To, Buck, CombinerType]](
+  +CombinerType <: BucketCombiner[Elem, To, Buck, CombinerType]](
       private val bucketnumber: Int)
       extends Combiner[Elem, To] {
     //self: EnvironmentPassingCombiner[Elem, To] =>

@@ -19,7 +19,7 @@ object Test extends Properties("Either") {
       (n: Int) => Right(n).fold(a => sys.error("fail"), x => x) == n)
 
   val prop_swap = forAll((e: Either[Int, Int]) =>
-        e match {
+    e match {
       case Left(a) => e.swap.right.get == a
       case Right(b) => e.swap.left.get == b
   })
@@ -33,21 +33,21 @@ object Test extends Properties("Either") {
         (e: Either[Int, Int], or: Int) =>
           e.left.getOrElse(or) ==
             (e match {
-          case Left(a) => a
-          case Right(_) => or
-        }))
+              case Left(a) => a
+              case Right(_) => or
+            }))
 
     val prop_forall = forAll((e: Either[Int, Int]) =>
-          e.left.forall(_ % 2 == 0) == (e.isRight || e.left.get % 2 == 0))
+      e.left.forall(_ % 2 == 0) == (e.isRight || e.left.get % 2 == 0))
 
     val prop_exists = forAll((e: Either[Int, Int]) =>
-          e.left.exists(_ % 2 == 0) == (e.isLeft && e.left.get % 2 == 0))
+      e.left.exists(_ % 2 == 0) == (e.isLeft && e.left.get % 2 == 0))
 
     val prop_flatMapLeftIdentity = forAll(
         (e: Either[Int, Int], n: Int, s: String) => {
-      def f(x: Int) = if (x % 2 == 0) Left(s) else Right(s)
-      Left(n).left.flatMap(f(_)) == f(n)
-    })
+          def f(x: Int) = if (x % 2 == 0) Left(s) else Right(s)
+          Left(n).left.flatMap(f(_)) == f(n)
+        })
 
     val prop_flatMapRightIdentity = forAll(
         (e: Either[Int, Int]) => e.left.flatMap(Left(_)) == e)
@@ -77,17 +77,17 @@ object Test extends Properties("Either") {
         (e: Either[Int, Int]) =>
           e.left.toSeq ==
             (e match {
-          case Left(a) => Seq(a)
-          case Right(_) => Seq.empty
-        }))
+              case Left(a) => Seq(a)
+              case Right(_) => Seq.empty
+            }))
 
     val prop_option = forAll(
         (e: Either[Int, Int]) =>
           e.left.toOption ==
             (e match {
-          case Left(a) => Some(a)
-          case Right(_) => None
-        }))
+              case Left(a) => Some(a)
+              case Right(_) => None
+            }))
   }
 
   object CheckRightProjection {
@@ -97,21 +97,21 @@ object Test extends Properties("Either") {
         (e: Either[Int, Int], or: Int) =>
           e.right.getOrElse(or) ==
             (e match {
-          case Left(_) => or
-          case Right(b) => b
-        }))
+              case Left(_) => or
+              case Right(b) => b
+            }))
 
     val prop_forall = forAll((e: Either[Int, Int]) =>
-          e.right.forall(_ % 2 == 0) == (e.isLeft || e.right.get % 2 == 0))
+      e.right.forall(_ % 2 == 0) == (e.isLeft || e.right.get % 2 == 0))
 
     val prop_exists = forAll((e: Either[Int, Int]) =>
-          e.right.exists(_ % 2 == 0) == (e.isRight && e.right.get % 2 == 0))
+      e.right.exists(_ % 2 == 0) == (e.isRight && e.right.get % 2 == 0))
 
     val prop_flatMapLeftIdentity = forAll(
         (e: Either[Int, Int], n: Int, s: String) => {
-      def f(x: Int) = if (x % 2 == 0) Left(s) else Right(s)
-      Right(n).right.flatMap(f(_)) == f(n)
-    })
+          def f(x: Int) = if (x % 2 == 0) Left(s) else Right(s)
+          Right(n).right.flatMap(f(_)) == f(n)
+        })
 
     val prop_flatMapRightIdentity = forAll(
         (e: Either[Int, Int]) => e.right.flatMap(Right(_)) == e)
@@ -141,17 +141,17 @@ object Test extends Properties("Either") {
         (e: Either[Int, Int]) =>
           e.right.toSeq ==
             (e match {
-          case Left(_) => Seq.empty
-          case Right(b) => Seq(b)
-        }))
+              case Left(_) => Seq.empty
+              case Right(b) => Seq(b)
+            }))
 
     val prop_option = forAll(
         (e: Either[Int, Int]) =>
           e.right.toOption ==
             (e match {
-          case Left(_) => None
-          case Right(b) => Some(b)
-        }))
+              case Left(_) => None
+              case Right(b) => Some(b)
+            }))
   }
 
   val prop_Either_left = forAll((n: Int) => Left(n).left.get == n)
@@ -159,13 +159,13 @@ object Test extends Properties("Either") {
   val prop_Either_right = forAll((n: Int) => Right(n).right.get == n)
 
   val prop_Either_joinLeft = forAll((e: Either[Either[Int, Int], Int]) =>
-        e match {
+    e match {
       case Left(ee) => e.joinLeft == ee
       case Right(n) => e.joinLeft == Right(n)
   })
 
   val prop_Either_joinRight = forAll((e: Either[Int, Either[Int, Int]]) =>
-        e match {
+    e match {
       case Left(n) => e.joinRight == Left(n)
       case Right(ee) => e.joinRight == ee
   })
@@ -174,13 +174,13 @@ object Test extends Properties("Either") {
       (e: Either[Int, Int]) =>
         e.merge ==
           (e match {
-        case Left(a) => a
-        case Right(a) => a
-      }))
+            case Left(a) => a
+            case Right(a) => a
+          }))
 
   /** Hard to believe I'm "fixing" a test to reflect B before A ... */
   val prop_Either_cond = forAll((c: Boolean, a: Int, b: Int) =>
-        Either.cond(c, a, b) == (if (c) Right(a) else Left(b)))
+    Either.cond(c, a, b) == (if (c) Right(a) else Left(b)))
 
   val tests = List(
       ("prop_either1", prop_either1),

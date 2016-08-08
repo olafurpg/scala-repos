@@ -155,7 +155,7 @@ object GaussianMixtureModel extends Loader[GaussianMixtureModel] {
       // Create JSON metadata.
       val metadata = compact(
           render(("class" -> classNameV1_0) ~
-                ("version" -> formatVersionV1_0) ~ ("k" -> weights.length)))
+            ("version" -> formatVersionV1_0) ~ ("k" -> weights.length)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 

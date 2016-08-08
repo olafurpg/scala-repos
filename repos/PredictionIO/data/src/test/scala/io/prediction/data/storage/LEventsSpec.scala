@@ -140,7 +140,7 @@ class LEventsSpec extends Specification with TestEvents {
 
     (resultBefore must beEqualTo(Some(expectedBefore))) and
       (deleteStatus must beEqualTo(true)) and (resultAfter must beEqualTo(
-            None))
+        None))
   }
 
   def insertTestUserEvents(eventClient: LEvents) = {
@@ -228,7 +228,7 @@ class LEventsSpec extends Specification with TestEvents {
 
     (resultBefore must beEqualTo(Some(expectedBefore))) and
       (deleteStatus must beEqualTo(true)) and (resultAfter must beEqualTo(
-            None))
+        None))
   }
 
   def findChannel(eventClient: LEvents) = {

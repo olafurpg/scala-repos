@@ -318,7 +318,7 @@ package object templates {
   def reverseSignature(routes: Seq[Route]) =
     reverseParameters(routes)
       .map(p =>
-            safeKeyword(p._1.name) + ":" + p._1.typeName + {
+        safeKeyword(p._1.name) + ":" + p._1.typeName + {
           Option(routes.map(_.call.parameters.get(p._2).default).distinct)
             .filter(_.size == 1)
             .flatMap(_.headOption)
@@ -372,9 +372,9 @@ package object templates {
     } else {
       """ + queryString(List(%s))""".format(queryParams.map { p =>
         ("""implicitly[QueryStringBindable[""" + p.typeName +
-              """]].unbind("""" + paramNameOnQueryString(p.name) + """", """ +
-              safeKeyword(localNames.get(p.name).getOrElse(p.name)) +
-              """)""") -> p
+          """]].unbind("""" + paramNameOnQueryString(p.name) + """", """ +
+          safeKeyword(localNames.get(p.name).getOrElse(p.name)) +
+          """)""") -> p
       }.map {
         case (u, Parameter(name, typeName, None, Some(default))) =>
           """if(""" + safeKeyword(localNames.getOrElse(name, name)) +
@@ -399,12 +399,12 @@ package object templates {
         route.call.parameters
           .getOrElse(Nil)
           .filter { p =>
-        localNames.contains(p.name) && p.fixed.isDefined
-      }
+            localNames.contains(p.name) && p.fixed.isDefined
+          }
           .map { p =>
-        localNames(p.name) + " == \"\"\" + implicitly[JavascriptLiteral[" +
-          p.typeName + "]].to(" + p.fixed.get + ") + \"\"\""
-      }).filterNot(_.isEmpty).map(_.mkString(" && "))
+            localNames(p.name) + " == \"\"\" + implicitly[JavascriptLiteral[" +
+              p.typeName + "]].to(" + p.fixed.get + ") + \"\"\""
+          }).filterNot(_.isEmpty).map(_.mkString(" && "))
   }
 
   /**
@@ -477,9 +477,9 @@ package object templates {
       """ + _qS([%s])""".format(queryParams.map { p =>
         val paramName: String = paramNameOnQueryString(p.name)
         ("(\"\"\" + implicitly[QueryStringBindable[" +
-              p.typeName + "]].javascriptUnbind + \"\"\")" + """("""" +
-              paramName + """", """ +
-              localNames.get(p.name).getOrElse(p.name) + """)""") -> p
+          p.typeName + "]].javascriptUnbind + \"\"\")" + """("""" +
+          paramName + """", """ +
+          localNames.get(p.name).getOrElse(p.name) + """)""") -> p
       }.map {
         case (u, Parameter(name, typeName, None, Some(default))) =>
           """(""" + localNames.get(name).getOrElse(name) +
@@ -546,7 +546,7 @@ package object templates {
   def groupRoutesByMethod(
       routes: Seq[Route]): Map[(String, Seq[String]), Seq[Route]] =
     routes.groupBy(r =>
-          (r.call.method, r.call.parameters.getOrElse(Nil).map(_.typeName)))
+      (r.call.method, r.call.parameters.getOrElse(Nil).map(_.typeName)))
 
   val ob = "{"
   val cb = "}"

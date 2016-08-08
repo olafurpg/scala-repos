@@ -400,7 +400,7 @@ trait ScalatraBase
       matchedRoute.map(_.multiParams).getOrElse(Map.empty).map {
         case (key, values) =>
           key -> values.map(s =>
-                if (s.nonBlank) UriDecoder.secondStep(s) else s)
+            if (s.nonBlank) UriDecoder.secondStep(s) else s)
       }
     request(MultiParamsKey) = originalParams ++ routeParams
   }
@@ -896,7 +896,7 @@ trait ScalatraBase
     val found =
       request.get(MultiParamsKey) map
         (_.asInstanceOf[MultiParams] ++
-              (if (read) Map.empty else request.multiParameters))
+          (if (read) Map.empty else request.multiParameters))
     val multi = found getOrElse request.multiParameters
     request("MultiParamsRead") = new {}
     request(MultiParamsKey) = multi

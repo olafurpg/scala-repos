@@ -188,11 +188,11 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
     initThread.setName(s"${getClass().getSimpleName()}-init")
     initThread.setUncaughtExceptionHandler(
         errorHandler.getOrElse(new Thread.UncaughtExceptionHandler() {
-      override def uncaughtException(t: Thread, e: Throwable): Unit = {
-        logError("Error initializing FsHistoryProvider.", e)
-        System.exit(1)
-      }
-    }))
+          override def uncaughtException(t: Thread, e: Throwable): Unit = {
+            logError("Error initializing FsHistoryProvider.", e)
+            System.exit(1)
+          }
+        }))
     initThread.start()
     initThread
   }

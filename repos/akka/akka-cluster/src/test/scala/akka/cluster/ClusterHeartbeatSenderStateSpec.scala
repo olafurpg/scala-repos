@@ -55,7 +55,7 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
                                  monitoredByNrOfMembers = 3),
         oldReceiversNowUnreachable = Set.empty[UniqueAddress],
         failureDetector = new DefaultFailureDetectorRegistry[Address](() ⇒
-              new FailureDetectorStub))
+          new FailureDetectorStub))
 
   private def fd(state: ClusterHeartbeatSenderState,
                  node: UniqueAddress): FailureDetectorStub =
@@ -261,10 +261,9 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
           }
         } catch {
           case e: Throwable ⇒
-            println(
-                s"Failure context: i=$i, node=$node, op=$operation, " +
-                  s"oldReceiversNowUnreachable=${state.oldReceiversNowUnreachable}, " +
-                  s"ringReceivers=${state.ring.myReceivers}, ringNodes=${state.ring.nodes}")
+            println(s"Failure context: i=$i, node=$node, op=$operation, " +
+              s"oldReceiversNowUnreachable=${state.oldReceiversNowUnreachable}, " +
+              s"ringReceivers=${state.ring.myReceivers}, ringNodes=${state.ring.nodes}")
             throw e
         }
       }

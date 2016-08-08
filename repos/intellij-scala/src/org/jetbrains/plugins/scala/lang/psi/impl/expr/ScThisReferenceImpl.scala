@@ -71,7 +71,7 @@ object ScThisReferenceImpl {
     lazy val selfTypeOfClass = td
       .getTypeWithProjections(TypingContext.empty, thisProjections = true)
       .map(tp =>
-            td.selfType match {
+        td.selfType match {
           case Some(selfType) => Bounds.glb(tp, selfType)
           case _ => tp
       })

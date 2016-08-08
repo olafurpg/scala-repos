@@ -153,12 +153,12 @@ abstract class ControllerBase
         } else {
           org.scalatra.Unauthorized(
               redirect("/signin?redirect=" + StringUtil.urlEncode(
-                      defining(request.getQueryString) { queryString =>
-                request.getRequestURI
-                  .substring(request.getContextPath.length) +
-                  (if (queryString != null) "?" + queryString else "")
-              }
-                  )))
+                  defining(request.getQueryString) { queryString =>
+                    request.getRequestURI.substring(
+                        request.getContextPath.length) +
+                      (if (queryString != null) "?" + queryString else "")
+                  }
+              )))
         }
       }
     }

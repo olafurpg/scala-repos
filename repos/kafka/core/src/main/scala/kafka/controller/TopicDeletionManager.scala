@@ -379,7 +379,7 @@ class TopicDeletionManager(controller: KafkaController,
         replicaStateMachine.handleStateChanges(replicasForDeletionRetry,
                                                OfflineReplica)
         debug("Deletion started for replicas %s".format(
-                replicasForDeletionRetry.mkString(",")))
+            replicasForDeletionRetry.mkString(",")))
         controller.replicaStateMachine.handleStateChanges(
             replicasForDeletionRetry,
             ReplicaDeletionStarted,
@@ -388,7 +388,7 @@ class TopicDeletionManager(controller: KafkaController,
               .build)
         if (deadReplicasForTopic.size > 0) {
           debug("Dead Replicas (%s) found for topic %s"
-                .format(deadReplicasForTopic.mkString(","), topic))
+            .format(deadReplicasForTopic.mkString(","), topic))
           markTopicIneligibleForDeletion(Set(topic))
         }
     }
@@ -429,7 +429,7 @@ class TopicDeletionManager(controller: KafkaController,
           .map(_._1)
           .toSet
     val replicasInError = partitionsInError.map(p =>
-          PartitionAndReplica(p.topic, p.partition, replicaId))
+      PartitionAndReplica(p.topic, p.partition, replicaId))
     inLock(controllerContext.controllerLock) {
       // move all the failed replicas to ReplicaDeletionIneligible
       failReplicaDeletion(replicasInError)
@@ -437,7 +437,7 @@ class TopicDeletionManager(controller: KafkaController,
         // some replicas could have been successfully deleted
         val deletedReplicas = responseMap.keySet -- partitionsInError
         completeReplicaDeletion(deletedReplicas.map(p =>
-                  PartitionAndReplica(p.topic, p.partition, replicaId)))
+          PartitionAndReplica(p.topic, p.partition, replicaId)))
       }
     }
   }
@@ -476,7 +476,7 @@ class TopicDeletionManager(controller: KafkaController,
                   .replicasInState(topic, ReplicaDeletionStarted)
               val replicaIds = replicasInDeletionStartedState.map(_.replica)
               val partitions = replicasInDeletionStartedState.map(r =>
-                    TopicAndPartition(r.topic, r.partition))
+                TopicAndPartition(r.topic, r.partition))
               info(
                   "Deletion for replicas %s for partition %s of topic %s in progress"
                     .format(replicaIds.mkString(","),

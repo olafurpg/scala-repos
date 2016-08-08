@@ -318,7 +318,7 @@ class PipelineModel private[ml] (
   @Since("1.2.0")
   override def transformSchema(schema: StructType): StructType = {
     stages.foldLeft(schema)((cur, transformer) =>
-          transformer.transformSchema(cur))
+      transformer.transformSchema(cur))
   }
 
   @Since("1.4.0")

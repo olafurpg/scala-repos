@@ -151,25 +151,25 @@ trait Trees extends api.Trees { self: SymbolTable =>
 
     def correspondsStructure(that: Tree)(f: (Tree, Tree) => Boolean): Boolean =
       f(this, that) || ((productArity == that.productArity) && {
-            def equals0(this0: Any, that0: Any): Boolean =
-              (this0, that0) match {
-                case (x: Tree, y: Tree) =>
-                  f(x, y) || (x correspondsStructure y)(f)
-                case (xs: List[_], ys: List[_]) => (xs corresponds ys)(equals0)
-                case _ => this0 == that0
-              }
-            def compareOriginals() = (this, that) match {
-              case (x: TypeTree, y: TypeTree)
-                  if x.original != null && y.original != null =>
-                (x.original correspondsStructure y.original)(f)
-              case _ =>
-                true
-            }
+        def equals0(this0: Any, that0: Any): Boolean =
+          (this0, that0) match {
+            case (x: Tree, y: Tree) =>
+              f(x, y) || (x correspondsStructure y)(f)
+            case (xs: List[_], ys: List[_]) => (xs corresponds ys)(equals0)
+            case _ => this0 == that0
+          }
+        def compareOriginals() = (this, that) match {
+          case (x: TypeTree, y: TypeTree)
+              if x.original != null && y.original != null =>
+            (x.original correspondsStructure y.original)(f)
+          case _ =>
+            true
+        }
 
-            (productIterator zip that.productIterator forall {
-                  case (x, y) => equals0(x, y)
-                }) && compareOriginals()
-          })
+        (productIterator zip that.productIterator forall {
+          case (x, y) => equals0(x, y)
+        }) && compareOriginals()
+      })
 
     override def children: List[Tree] = {
       def subtrees(x: Any): List[Tree] = x match {

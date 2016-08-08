@@ -29,14 +29,14 @@ final class DataForm(keys: I18nKeys,
               user: String): Funit = {
     val messages =
       (data mapValues { msg =>
-            msg.some map sanitize filter (_.nonEmpty)
-          }).toList collect {
+        msg.some map sanitize filter (_.nonEmpty)
+      }).toList collect {
         case (key, Some(value)) => key -> value
       }
     messages.nonEmpty ?? TranslationRepo.nextId flatMap { id =>
       val sorted = (keys.keys map { key =>
-            messages find (_._1 == key.key)
-          }).flatten
+        messages find (_._1 == key.key)
+      }).flatten
       val translation = Translation(id = id,
                                     code = code,
                                     text =
@@ -54,9 +54,9 @@ final class DataForm(keys: I18nKeys,
     req.body match {
       case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined =>
         (body.asFormUrlEncoded.get collect {
-              case (key, msgs) if key startsWith "key_" =>
-                msgs.headOption map { key.drop(4) -> _ }
-            }).flatten.toMap
+          case (key, msgs) if key startsWith "key_" =>
+            msgs.headOption map { key.drop(4) -> _ }
+        }).flatten.toMap
       case body => {
         logger.warn("Can't parse translation request body: " + body)
         Map.empty

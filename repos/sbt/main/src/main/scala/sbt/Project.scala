@@ -367,7 +367,7 @@ object Project extends ProjectExtra {
       base: File,
       aggregate: => Seq[ProjectReference]): Project = {
     validProjectID(id).foreach(errMsg =>
-          sys.error("Invalid project ID: " + errMsg))
+      sys.error("Invalid project ID: " + errMsg))
     new ProjectDef[ProjectReference](id,
                                      base,
                                      aggregate,
@@ -457,7 +457,7 @@ object Project extends ProjectExtra {
                          plugins: Plugins,
                          autoPlugins: Seq[AutoPlugin]): Project = {
     validProjectID(id).foreach(errMsg =>
-          sys.error("Invalid project ID: " + errMsg))
+      sys.error("Invalid project ID: " + errMsg))
     new ProjectDef[ProjectReference](id,
                                      base,
                                      aggregate,

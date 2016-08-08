@@ -95,7 +95,7 @@ class TailChoppingSpec
       probe.expectMsg("ack")
 
       oneOfShouldEqual(1, 1, actor1, actor2)(ref ⇒
-            Await.result(ref ? "times", timeout.duration))
+        Await.result(ref ? "times", timeout.duration))
 
       routedActor ! Broadcast("stop")
     }
@@ -116,7 +116,7 @@ class TailChoppingSpec
       }
 
       allShouldEqual(1, actor1, actor2)(ref ⇒
-            Await.result(ref ? "times", timeout.duration))
+        Await.result(ref ? "times", timeout.duration))
 
       routedActor ! Broadcast("stop")
     }

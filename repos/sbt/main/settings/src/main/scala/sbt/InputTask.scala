@@ -17,7 +17,7 @@ final class InputTask[T] private (val parser: State => Parser[Task[T]]) {
 
   def fullInput(in: String): InputTask[T] =
     new InputTask[T](s =>
-          Parser.parse(in, parser(s)) match {
+      Parser.parse(in, parser(s)) match {
         case Right(v) => Parser.success(v)
         case Left(msg) =>
           val indented = msg.lines.map("   " + _).mkString("\n")
@@ -34,9 +34,9 @@ object InputTask {
     import std.FullInstance._
     def toTask(in: String): Initialize[Task[T]] = flatten(
         (Def.stateKey zipWith i)((sTask, it) =>
-              sTask map
-                (s =>
-                   Parser.parse(in, it.parser(s)) match {
+          sTask map
+            (s =>
+               Parser.parse(in, it.parser(s)) match {
                  case Right(t) => Def.value(t)
                  case Left(msg) =>
                    val indented = msg.lines.map("   " + _).mkString("\n")

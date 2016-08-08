@@ -49,7 +49,7 @@ class ConcurrentActivationTest
         // send a broadcast to all registrars, so that number * number messages are sent
         // every Register registers a consumer and a producer
         (1 to number).map(i ⇒
-              ref ! RegisterConsumersAndProducers("direct:concurrent-"))
+          ref ! RegisterConsumersAndProducers("direct:concurrent-"))
         // de-register all consumers and producers
         ref ! DeRegisterConsumersAndProducers()
 

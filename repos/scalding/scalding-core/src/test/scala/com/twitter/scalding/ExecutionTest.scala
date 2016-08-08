@@ -154,7 +154,7 @@ class ExecutionTest extends WordSpec with Matchers {
         cfg =>
           if (cfg.get("test.cfg.variable").isDefined)
             Execution.failed(new Exception(
-                    s"${message}\n: var: ${cfg.get("test.cfg.variable")}"))
+                s"${message}\n: var: ${cfg.get("test.cfg.variable")}"))
           else Execution.from(())
       }
 
@@ -172,8 +172,8 @@ class ExecutionTest extends WordSpec with Matchers {
         _ =>
           Execution.withConfig(hasVariable)(addOption)
       }.flatMap(_ =>
-              doesNotHaveVariable(
-                  "Should not see variable in flatMap's after the isolation"))
+          doesNotHaveVariable(
+              "Should not see variable in flatMap's after the isolation"))
         .map(_ => true)
         .shouldSucceed() shouldBe true
     }

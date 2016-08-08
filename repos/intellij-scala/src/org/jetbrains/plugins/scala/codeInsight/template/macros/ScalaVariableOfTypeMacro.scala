@@ -172,7 +172,7 @@ class ScalaVariableOfTypeMacro extends Macro {
       case _ =>
         exprs
           .find(expr =>
-                (ScType.extractClassType(scType, Some(project)) match {
+            (ScType.extractClassType(scType, Some(project)) match {
               case Some((x, _)) => x.qualifiedName
               case None => ""
             }) == expr.calculateResult(context).toString)

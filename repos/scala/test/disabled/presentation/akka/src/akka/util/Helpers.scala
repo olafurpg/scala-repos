@@ -21,8 +21,8 @@ object Helpers {
 
   def bytesToInt(bytes: Array[Byte], offset: Int): Int = {
     (0 until 4).foldLeft(0)((value, index) =>
-          value +
-            ((bytes(index + offset) & 0x000000FF) << ((4 - 1 - index) * 8)))
+      value +
+        ((bytes(index + offset) & 0x000000FF) << ((4 - 1 - index) * 8)))
   }
 
   /**

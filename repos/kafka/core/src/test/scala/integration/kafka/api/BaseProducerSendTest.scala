@@ -549,7 +549,7 @@ abstract class BaseProducerSendTest extends KafkaServerTestHarness {
         // send message to partition 0
         val responses =
           ((0 until numRecords) map
-                (i => producer.send(record, new CloseCallback(producer))))
+            (i => producer.send(record, new CloseCallback(producer))))
         assertTrue("No request is complete.", responses.forall(!_.isDone()))
         // flush the messages.
         producer.flush()

@@ -122,24 +122,24 @@ class StabilizerTest extends FunSuite {
 
   test("Removes are delayed while failures are observed on empty serversets")(
       new Ctx {
-    setVa(Addr.Neg)
-    assertStabilized(Addr.Neg)
+        setVa(Addr.Neg)
+        assertStabilized(Addr.Neg)
 
-    pulse()
-    setVa(Addr.Failed(new Exception))
+        pulse()
+        setVa(Addr.Failed(new Exception))
 
-    assertStabilized(Addr.Neg)
+        assertStabilized(Addr.Neg)
 
-    pulse()
-    assertStabilized(Addr.Neg)
+        pulse()
+        assertStabilized(Addr.Neg)
 
-    pulse(); pulse(); pulse()
-    assertStabilized(Addr.Neg)
+        pulse(); pulse(); pulse()
+        assertStabilized(Addr.Neg)
 
-    setVa(Addr.Bound(addr1))
-    pulse()
-    assertStabilized(Addr.Bound(addr1))
-  })
+        setVa(Addr.Bound(addr1))
+        pulse()
+        assertStabilized(Addr.Bound(addr1))
+      })
 
   test("Reflect additions while addrs are unstable")(new Ctx {
     setVa(Addr.Bound(addr1, addr2))
@@ -225,22 +225,22 @@ class StabilizerTest extends FunSuite {
   test(
       "Adds are published immediately when >1 epoch has passed since last update")(
       new Ctx {
-    Time.withCurrentTimeFrozen { timeControl =>
-      timeControl.advance(30.seconds)
-      va() = Addr.Bound(addr1)
-      assertBatchStabilized(Addr.Bound(addr1))
+        Time.withCurrentTimeFrozen { timeControl =>
+          timeControl.advance(30.seconds)
+          va() = Addr.Bound(addr1)
+          assertBatchStabilized(Addr.Bound(addr1))
 
-      va() = Addr.Bound(addr1, addr2)
-      assertBatchStabilized(Addr.Bound(addr1))
-      timeControl.advance(30.seconds)
-      batchEvent.notify(())
-      assertBatchStabilized(Addr.Bound(addr1, addr2))
+          va() = Addr.Bound(addr1, addr2)
+          assertBatchStabilized(Addr.Bound(addr1))
+          timeControl.advance(30.seconds)
+          batchEvent.notify(())
+          assertBatchStabilized(Addr.Bound(addr1, addr2))
 
-      timeControl.advance(30.seconds)
-      va() = Addr.Bound(addr1, addr2, addr3)
-      assertBatchStabilized(Addr.Bound(addr1, addr2, addr3))
-    }
-  })
+          timeControl.advance(30.seconds)
+          va() = Addr.Bound(addr1, addr2, addr3)
+          assertBatchStabilized(Addr.Bound(addr1, addr2, addr3))
+        }
+      })
 
   test("First update does not wait for epoch to turn")(new Ctx {
     Time.withCurrentTimeFrozen { timeControl =>

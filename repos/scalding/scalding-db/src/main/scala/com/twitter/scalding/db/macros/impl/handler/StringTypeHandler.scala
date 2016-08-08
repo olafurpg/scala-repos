@@ -33,21 +33,17 @@ object StringTypeHandler {
     extracted.flatMap { t =>
       t match {
         case (_, WithVarchar, WithText) =>
-          Failure(
-              new Exception(
-                  s"String field $fieldName, has mutually exclusive annotations @text and @varchar"))
+          Failure(new Exception(
+              s"String field $fieldName, has mutually exclusive annotations @text and @varchar"))
         case (WithoutSize, WithVarchar, WithoutText) =>
-          Failure(
-              new Exception(
-                  s"String field $fieldName, is forced varchar but has no size annotation. size is required in the presence of varchar."))
+          Failure(new Exception(
+              s"String field $fieldName, is forced varchar but has no size annotation. size is required in the presence of varchar."))
         case (WithoutSize, WithoutVarchar, WithoutText) =>
-          Failure(
-              new Exception(
-                  s"String field $fieldName, at least one of size, varchar, text must be present."))
+          Failure(new Exception(
+              s"String field $fieldName, at least one of size, varchar, text must be present."))
         case (WithSize(siz), _, _) if siz <= 0 =>
-          Failure(
-              new Exception(
-                  s"String field $fieldName, has a size $siz which is <= 0. Doesn't make sense for a string."))
+          Failure(new Exception(
+              s"String field $fieldName, has a size $siz which is <= 0. Doesn't make sense for a string."))
         case (WithSize(siz), WithoutVarchar, WithoutText) if siz <= 255 =>
           Success(List(ColumnFormat(c)(accessorTree, "VARCHAR", Some(siz))))
         case (WithSize(siz), WithoutVarchar, WithoutText) if siz > 255 =>

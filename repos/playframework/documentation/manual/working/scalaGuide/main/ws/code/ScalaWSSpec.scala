@@ -193,7 +193,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
       "post with multipart/form encoded body" in withServer {
         case ("POST", "/") =>
           Action(BodyParsers.parse.multipartFormData)(r =>
-                Ok(r.body.asFormUrlEncoded("key").head))
+            Ok(r.body.asFormUrlEncoded("key").head))
       } { ws =>
         import play.api.mvc.MultipartFormData._
         val response = //#multipart-encoded
@@ -371,9 +371,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
                 // If there's a content length, send that, otherwise return the body chunked
                 response.headers.get("Content-Length") match {
                   case Some(Seq(length)) =>
-                    Ok.sendEntity(HttpEntity.Streamed(body,
-                                                      Some(length.toLong),
-                                                      Some(contentType)))
+                    Ok.sendEntity(HttpEntity
+                      .Streamed(body, Some(length.toLong), Some(contentType)))
                   case _ =>
                     Ok.chunked(body).as(contentType)
                 }

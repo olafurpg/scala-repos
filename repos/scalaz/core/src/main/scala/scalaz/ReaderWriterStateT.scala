@@ -13,7 +13,7 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
   /** Discards the writer component. */
   def state(r: R)(implicit F: Monad[F]): IndexedStateT[F, S1, S2, A] =
     IndexedStateT((s: S1) =>
-          F.map(run(r, s)) {
+      F.map(run(r, s)) {
         case (w, a, s1) => (s1, a)
     })
 
@@ -41,16 +41,15 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
   def map[B](f: A => B)(
       implicit F: Functor[F]): IndexedReaderWriterStateT[F, R, W, S1, S2, B] =
     IndexedReaderWriterStateT.create[F, R, W, S1, S2, B]((G: Monad[F]) =>
-          (r: R, s: S1) =>
-            F.map(self.run(r, s)(G))(t => (t._1, f(t._2), t._3)))
+      (r: R, s: S1) => F.map(self.run(r, s)(G))(t => (t._1, f(t._2), t._3)))
 
   def flatMap[B, RR <: R, S3](
       f: A => IndexedReaderWriterStateT[F, RR, W, S2, S3, B])(
       implicit F: Bind[F],
       W: Semigroup[W]): IndexedReaderWriterStateT[F, RR, W, S1, S3, B] =
     IndexedReaderWriterStateT.create[F, RR, W, S1, S3, B]((G: Monad[F]) =>
-          (r: RR, s1: S1) =>
-            F.bind(self.run(r, s1)(G)) {
+      (r: RR, s1: S1) =>
+        F.bind(self.run(r, s1)(G)) {
           case (w1, a, s2) => {
             F.map(f(a).run(r, s2)(G)) {
               case (w2, b, s3) => (W.append(w1, w2), b, s3)
@@ -161,7 +160,7 @@ private trait IndexedReaderWriterStateTPlus[F[_], R, W, S1, S2]
   override final def plus[A](a: IRWST[F, R, W, S1, S2, A],
                              b: => IRWST[F, R, W, S1, S2, A]) =
     IRWST.create((G: Monad[F]) =>
-          (r: R, s: S1) => F.plus(a.run(r, s)(G), b.run(r, s)(G)))
+      (r: R, s: S1) => F.plus(a.run(r, s)(G), b.run(r, s)(G)))
 }
 
 private trait IndexedReaderWriterStateTPlusEmpty[F[_], R, W, S1, S2]
@@ -208,7 +207,7 @@ private trait ReaderWriterStateTBindRec[F[_], R, W, S]
       }
 
     ReaderWriterStateT((r, s) =>
-          F.bind(f(a).run(r, s)) {
+      F.bind(f(a).run(r, s)) {
         case (w, -\/(a0), s0) => F.tailrecM(go(r))(w, a0, s0)
         case (w, \/-(b), s0) => A.point((w, b, s0))
     })

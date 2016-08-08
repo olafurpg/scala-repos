@@ -20,7 +20,7 @@ object LeaderDowningAllOtherNodesMultiJvmSpec extends MultiNodeConfig {
   commonConfig(
       debugConfig(on = false)
         .withFallback(ConfigFactory.parseString(
-                """
+            """
       akka.cluster.failure-detector.monitored-by-nr-of-members = 2
       akka.cluster.auto-down-unreachable-after = 1s
       """))

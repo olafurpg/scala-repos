@@ -65,8 +65,8 @@ class InputMetrics private (_bytesRead: Accumulator[Long],
         InternalAccumulator
           .createInputAccums()
           .map { a =>
-        (a.name.get, a)
-      }
+            (a.name.get, a)
+          }
           .toMap[String, Accumulator[_]])
   }
 

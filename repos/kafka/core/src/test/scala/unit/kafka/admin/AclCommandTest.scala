@@ -64,7 +64,7 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
                                              "Describe")),
         Set(Resource.ClusterResource) ->
           (Set(Create, ClusterAction),
-              Array("--operation", "Create", "--operation", "ClusterAction")),
+          Array("--operation", "Create", "--operation", "ClusterAction")),
         GroupResources ->
           (Set(Read).toSet[Operation], Array("--operation", "Read"))
     )
@@ -181,7 +181,7 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
       if (permissionType == Allow) AllowHostCommand else DenyHostCommand
 
     Users.foldLeft(cmd)((cmd, user) =>
-          cmd ++ Array(principalCmd, user.toString))
+      cmd ++ Array(principalCmd, user.toString))
   }
 
   def withAuthorizer(props: Properties)(f: Authorizer => Unit) {

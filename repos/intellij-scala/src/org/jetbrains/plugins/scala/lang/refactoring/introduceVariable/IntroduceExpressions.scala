@@ -338,7 +338,7 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
     val occCount = occurrences.length
 
     val mainOcc = occurrences.indexWhere(range =>
-          range.contains(mainRange) || mainRange.contains(range))
+      range.contains(mainRange) || mainRange.contains(range))
     val fastDefinition = occCount == 1 && isOneLiner
 
     //changes document directly

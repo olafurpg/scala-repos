@@ -245,8 +245,8 @@ class ScalaDocumentationProvider extends CodeDocumentationProvider {
           case definition: ScTypeAliasDefinition =>
             buffer.append(
                 " = " + ScType.urlText(definition.aliasedTypeElement
-                      .getType(TypingContext.empty)
-                      .getOrAny))
+                  .getType(TypingContext.empty)
+                  .getOrAny))
           case _ =>
         }
         buffer.append("</PRE>")
@@ -302,8 +302,8 @@ class ScalaDocumentationProvider extends CodeDocumentationProvider {
     }
     findDocCommentOwner(startPoint)
       .map(d =>
-            Pair.create(d.asInstanceOf[PsiElement],
-                        d.getDocComment.asInstanceOf[PsiComment]))
+        Pair.create(d.asInstanceOf[PsiElement],
+                    d.getDocComment.asInstanceOf[PsiComment]))
       .orNull
   }
 }
@@ -554,7 +554,7 @@ object ScalaDocumentationProvider {
             .append(parameterName.substring(1, parameterName.length - 1))
             .append(" ")
             .append(descriptionText
-                  .substring(0, descriptionText.lastIndexOf("\n") + 1))
+              .substring(0, descriptionText.lastIndexOf("\n") + 1))
         } else {
           buffer
             .append(leadingAsterisks)
@@ -611,7 +611,7 @@ object ScalaDocumentationProvider {
             .append(MyScaladocParsing.THROWS_TAG)
             .append(" ")
           annotation.constructor.args.foreach(a =>
-                a.exprs.headOption.map {
+            a.exprs.headOption.map {
               case exprHead =>
                 exprHead.getType(TypingContext.empty) match {
                   case Success(head, _) =>
@@ -1033,7 +1033,7 @@ object ScalaDocumentationProvider {
           case _
               if replaceWikiScheme.contains(element.getText) &&
                 (element.getParent.getFirstChild == element ||
-                      element.getParent.getLastChild == element) =>
+                  element.getParent.getLastChild == element) =>
             val prefix =
               if (element.getParent.getFirstChild == element) "<" else "</"
             result.append(prefix + replaceWikiScheme.get(element.getText).get)
@@ -1156,10 +1156,8 @@ object ScalaDocumentationProvider {
       case clazz: ScClass =>
         clazz.constructor match {
           case Some(x: ScPrimaryConstructor) =>
-            buffer.append(
-                StructureViewUtil.getParametersAsString(x.parameterList,
-                                                        short = false,
-                                                        subst))
+            buffer.append(StructureViewUtil
+              .getParametersAsString(x.parameterList, short = false, subst))
           case None =>
         }
       case _ =>

@@ -197,7 +197,7 @@ object WebSocketClient {
       val clientInitiatedClose = new AtomicBoolean
 
       val captureClientClose = Flow[WebSocketFrame].transform(() =>
-            new PushStage[WebSocketFrame, WebSocketFrame] {
+        new PushStage[WebSocketFrame, WebSocketFrame] {
           def onPush(elem: WebSocketFrame, ctx: Context[WebSocketFrame]) =
             elem match {
               case close: CloseWebSocketFrame =>
@@ -260,9 +260,8 @@ object WebSocketClient {
         message
       }
 
-      messagesToFrames via captureClientClose via Flow.fromGraph(
-          GraphDSL.create[FlowShape[WebSocketFrame, WebSocketFrame]]() {
-        implicit b =>
+      messagesToFrames via captureClientClose via Flow.fromGraph(GraphDSL
+        .create[FlowShape[WebSocketFrame, WebSocketFrame]]() { implicit b =>
           import GraphDSL.Implicits._
 
           val broadcast = b.add(Broadcast[WebSocketFrame](2))
@@ -281,7 +280,7 @@ object WebSocketClient {
           }
 
           val handleConnectionTerminated = Flow[WebSocketFrame].transform(() =>
-                new PushStage[WebSocketFrame, WebSocketFrame] {
+            new PushStage[WebSocketFrame, WebSocketFrame] {
               def onPush(elem: WebSocketFrame, ctx: Context[WebSocketFrame]) =
                 ctx.push(elem)
               override def onUpstreamFinish(ctx: Context[WebSocketFrame]) = {
@@ -312,7 +311,7 @@ object WebSocketClient {
           merge.in(0) <~ handleServerClose <~ broadcast.out(0)
 
           FlowShape(merge.in(1), broadcast.out(1))
-      }) via framesToMessages
+        }) via framesToMessages
     }
 
     def toByteString(data: ByteBufHolder) = {

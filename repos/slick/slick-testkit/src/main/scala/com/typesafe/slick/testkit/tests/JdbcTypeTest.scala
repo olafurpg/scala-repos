@@ -71,8 +71,8 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
     val ts = TableQuery[T]
 
     val a1 = (ts.schema.create >>
-          (ts += (1, new SerialBlob(Array[Byte](1, 2, 3)))) >>
-          (ts += (2, new SerialBlob(Array[Byte](4, 5)))) >> ts.result).transactionally
+      (ts += (1, new SerialBlob(Array[Byte](1, 2, 3)))) >>
+      (ts += (2, new SerialBlob(Array[Byte](4, 5)))) >> ts.result).transactionally
     val p1 = db.stream(a1).mapResult {
       case (id, data) => (id, data.getBytes(1, data.length.toInt).mkString)
     }

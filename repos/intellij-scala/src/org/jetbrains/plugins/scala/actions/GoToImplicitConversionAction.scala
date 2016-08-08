@@ -110,13 +110,13 @@ class GoToImplicitConversionAction
       JListCompatibility.setCellRenderer(list, renderer)
       list.getSelectionModel.addListSelectionListener(
           new ListSelectionListener {
-        def valueChanged(e: ListSelectionEvent) {
-          hintAlarm.cancelAllRequests
-          val item = list.getSelectedValue.asInstanceOf[Parameters]
-          if (item == null) return
-          updateHint(item, project)
-        }
-      })
+            def valueChanged(e: ListSelectionEvent) {
+              hintAlarm.cancelAllRequests
+              val item = list.getSelectedValue.asInstanceOf[Parameters]
+              if (item == null) return
+              updateHint(item, project)
+            }
+          })
       JListCompatibility.GoToImplicitConversionAction.setList(list)
 
       val builder = JBPopupFactory.getInstance.createListPopupBuilder(list)
@@ -194,16 +194,16 @@ class GoToImplicitConversionAction
                     ._2
                     .isDefined ||
                   (ScUnderScoreSectionUtil.isUnderscoreFunction(expr) && expr
-                        .getImplicitConversions(fromUnder = true)
-                        ._2
-                        .isDefined) || (expr.getAdditionalExpression.isDefined &&
-                      expr.getAdditionalExpression.get._1
-                        .getImplicitConversions(
-                            fromUnder = false,
-                            expectedOption =
-                              Some(expr.getAdditionalExpression.get._2))
-                        ._2
-                        .isDefined) =>
+                    .getImplicitConversions(fromUnder = true)
+                    ._2
+                    .isDefined) || (expr.getAdditionalExpression.isDefined &&
+                  expr.getAdditionalExpression.get._1
+                    .getImplicitConversions(
+                        fromUnder = false,
+                        expectedOption =
+                          Some(expr.getAdditionalExpression.get._2))
+                    ._2
+                    .isDefined) =>
               res += expr
             case _ =>
           }

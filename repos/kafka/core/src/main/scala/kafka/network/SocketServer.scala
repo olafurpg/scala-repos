@@ -435,9 +435,8 @@ private[kafka] class Processor(val id: Int,
     def value = {
       metrics
         .metrics()
-        .get(metrics.metricName("io-wait-ratio",
-                                "socket-server-metrics",
-                                metricTags))
+        .get(metrics
+          .metricName("io-wait-ratio", "socket-server-metrics", metricTags))
         .value()
     }
   }, metricTags.asScala)

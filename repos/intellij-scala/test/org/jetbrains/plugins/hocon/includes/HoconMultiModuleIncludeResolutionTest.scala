@@ -50,7 +50,7 @@ class HoconMultiModuleIncludeResolutionTest
       def libMapping(lib: String) =
         Map(OrderRootType.CLASSES -> lib,
             OrderRootType.SOURCES -> (lib +
-                  "src")).mapValues(s => Array(subpath(s))).asJava
+              "src")).mapValues(s => Array(subpath(s))).asJava
 
       builder.addLibrary(dir.getName + "lib", libMapping("lib"))
       builder.addLibrary(dir.getName + "testlib", libMapping("testlib"))

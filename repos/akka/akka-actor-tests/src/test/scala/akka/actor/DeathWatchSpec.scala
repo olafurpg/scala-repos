@@ -122,8 +122,8 @@ trait DeathWatchSpec { this: AkkaSpec with ImplicitSender with DefaultTimeout â‡
 
     "notify with a Terminated message once when an Actor is stopped but not when restarted" in {
       filterException[ActorKilledException] {
-        val supervisor = system.actorOf(Props(new Supervisor(OneForOneStrategy(
-                        maxNrOfRetries = 2)(List(classOf[Exception])))))
+        val supervisor = system.actorOf(Props(new Supervisor(
+            OneForOneStrategy(maxNrOfRetries = 2)(List(classOf[Exception])))))
         val terminalProps = Props(new Actor {
           def receive = { case x â‡’ sender() ! x }
         })
@@ -166,9 +166,9 @@ trait DeathWatchSpec { this: AkkaSpec with ImplicitSender with DefaultTimeout â‡
         val failed = Await.result((supervisor ? Props.empty).mapTo[ActorRef],
                                   timeout.duration)
         val brother = Await.result((supervisor ? Props(new Actor {
-              context.watch(failed)
-              def receive = Actor.emptyBehavior
-            })).mapTo[ActorRef], timeout.duration)
+          context.watch(failed)
+          def receive = Actor.emptyBehavior
+        })).mapTo[ActorRef], timeout.duration)
 
         startWatching(brother)
 

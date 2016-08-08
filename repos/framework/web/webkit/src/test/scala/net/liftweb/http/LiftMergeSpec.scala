@@ -65,7 +65,7 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
   // Avoid extra appended elements by default.
   testRules.javaScriptSettings.default.set(() => () => Empty)
   testRules.autoIncludeAjaxCalc.default.set(() =>
-        () => (_: LiftSession) => false)
+    () => (_: LiftSession) => false)
   testRules.excludePathFromContextPathRewriting.default.set(
       () => { in: String =>
         in.startsWith("exclude-me")

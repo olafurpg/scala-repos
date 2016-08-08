@@ -62,15 +62,15 @@ object NIHDBShardServer
   override def configureShardState(config: Configuration) =
     M.point {
       val apiKeyFinder = new CachingAPIKeyFinder(WebAPIKeyFinder(
-              config.detach("security")).map(_.withM[Future]) valueOr { errs =>
+          config.detach("security")).map(_.withM[Future]) valueOr { errs =>
         sys.error("Unable to build new WebAPIKeyFinder: " +
-              errs.list.mkString("\n", "\n", ""))
+          errs.list.mkString("\n", "\n", ""))
       })
 
       val accountFinder = new CachingAccountFinder(WebAccountFinder(
-              config.detach("accounts")).map(_.withM[Future]) valueOr { errs =>
+          config.detach("accounts")).map(_.withM[Future]) valueOr { errs =>
         sys.error("Unable to build new WebAccountFinder: " +
-              errs.list.mkString("\n", "\n", ""))
+          errs.list.mkString("\n", "\n", ""))
       })
 
       val (asyncQueries, jobManager) = {
@@ -82,7 +82,7 @@ object NIHDBShardServer
             (ShardStateOptions.NoOptions, webJobManager.withM[Future])
           } valueOr { errs =>
             sys.error("Unable to build new WebJobManager: " +
-                  errs.list.mkString("\n", "\n", ""))
+              errs.list.mkString("\n", "\n", ""))
           }
         }
       }

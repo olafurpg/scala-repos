@@ -117,7 +117,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
 
   def %=[A >: A2 <: A1](f: B1 => B2): PState[A, B2] =
     State(a =>
-          run(a) match {
+      run(a) match {
         case None => (a, None)
         case Some(w) => {
           val r = f(w.pos)
@@ -133,7 +133,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
 
   def %%=[A >: A2 <: A1, C](s: IndexedState[B1, B2, C]): PState[A, C] =
     State(a =>
-          run(a) match {
+      run(a) match {
         case None => (a, None)
         case Some(w) => {
           val r = s.run(w.pos): (B2, C)
@@ -146,7 +146,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
 
   def >>-[A >: A2 <: A1, C](f: B1 => State[A, C]): PState[A, C] =
     StateT(a =>
-          get(a) match {
+      get(a) match {
         case None => (a, None)
         case Some(w) =>
           f(w) apply a match {
@@ -161,7 +161,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   def compose[C1, C2](
       that: PLensFamily[C1, C2, A1, A2]): PLensFamily[C1, C2, B1, B2] =
     plensFamily(c =>
-          (that run c).flatMap(x => {
+      (that run c).flatMap(x => {
         val (ac, a) = x.run
         run(a) map
           (y => {
@@ -240,7 +240,7 @@ trait PLensFamilyFunctions extends PLensInstances {
       set: A1 => Option[B2 => A2],
       get: A1 => Option[B1]): PLensFamily[A1, A2, B1, B2] =
     plensFamily(a =>
-          for {
+      for {
         w <- set(a)
         x <- get(a)
       } yield IndexedStore(w, x))
@@ -373,7 +373,7 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
   def plensg[A, B](set: A => Option[B => A],
                    get: A => Option[B]): PLens[A, B] =
     plens(a =>
-          for {
+      for {
         w <- set(a)
         x <- get(a)
       } yield Store(w, x))
@@ -587,11 +587,10 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
           if (s.isEmpty) None
           else lookupr((cons(x, l), s.head(), s.tail()))
       }
-    plens(
-        s =>
-          if (s.isEmpty) None
-          else
-            lookupr((EphemeralStream.emptyEphemeralStream, s.head(), s.tail())) map {
+    plens(s =>
+      if (s.isEmpty) None
+      else
+        lookupr((EphemeralStream.emptyEphemeralStream, s.head(), s.tail())) map {
           case (l, (k, v), r) => Store(w => l.reverse ++ cons((k, w), r), v)
       })
   }
@@ -631,16 +630,16 @@ abstract class PLensInstances {
                 x =>
                   a run x map
                     (c => {
-                   val (p, q) = c.pos
-                   IndexedStore(a => c.put((a, q)): R, p)
-                 })),
+                       val (p, q) = c.pos
+                       IndexedStore(a => c.put((a, q)): R, p)
+                     })),
             plensFamily(
                 x =>
                   a run x map
                     (c => {
-                   val (p, q) = c.pos
-                   IndexedStore(a => c.put((p, a)): R, q)
-                 }))
+                       val (p, q) = c.pos
+                       IndexedStore(a => c.put((p, a)): R, q)
+                     }))
         )
     }
 

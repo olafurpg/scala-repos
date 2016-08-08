@@ -153,7 +153,7 @@ class TimeStampedHashMapSuite extends SparkFunSuite {
 
     val threads =
       (1 to 25).map(i =>
-            new Thread() {
+        new Thread() {
           override def run() {
             try {
               for (j <- 1 to 1000) {

@@ -35,7 +35,7 @@ class TaskReplaceActor(driver: SchedulerDriver,
   var oldTaskIds = tasksToKill.map(_.taskId).toSet
   val toKill = oldTaskIds.to[mutable.Queue]
   var maxCapacity = (app.instances *
-        (1 + app.upgradeStrategy.maximumOverCapacity)).toInt
+    (1 + app.upgradeStrategy.maximumOverCapacity)).toInt
   var outstandingKills = Set.empty[Task.Id]
   val periodicalRetryKills: Cancellable =
     context.system.scheduler.schedule(15.seconds, 15.seconds, self, RetryKills)

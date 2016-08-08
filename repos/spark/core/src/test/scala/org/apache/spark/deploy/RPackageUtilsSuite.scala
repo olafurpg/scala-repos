@@ -75,7 +75,7 @@ class RPackageUtilsSuite
     val deps = Seq(dep1, dep2).mkString(",")
     IvyTestUtils.withRepository(main, Some(deps), None, withR = true) { repo =>
       val jars = Seq(main, dep1, dep2).map(c =>
-            new JarFile(getJarPath(c, new File(new URI(repo)))))
+        new JarFile(getJarPath(c, new File(new URI(repo)))))
       assert(RPackageUtils.checkManifestForR(jars(0)), "should have R code")
       assert(!RPackageUtils.checkManifestForR(jars(1)),
              "should not have R code")

@@ -70,12 +70,12 @@ final class FishnetApi(
     sequencer {
       analysisColl
         .find(BSONDocument(
-                "acquired" -> BSONDocument("$exists" -> false)
-            ))
+            "acquired" -> BSONDocument("$exists" -> false)
+        ))
         .sort(BSONDocument(
-                "sender.system" -> 1, // user requests first, then lichess auto analysis
-                "createdAt" -> 1 // oldest requests first
-            ))
+            "sender.system" -> 1, // user requests first, then lichess auto analysis
+            "createdAt" -> 1 // oldest requests first
+        ))
         .one[Work.Analysis]
         .flatMap {
           _ ?? { work =>

@@ -43,11 +43,10 @@ trait DiagramFactory extends DiagramDirectiveParser {
     def implicitTooltip(from: DocTemplateEntity,
                         to: TemplateEntity,
                         conv: ImplicitConversion) =
-      Some(
-          from.qualifiedName + " can be implicitly converted to " +
-            conv.targetType + " by the implicit method " +
-            conv.conversionShortName + " in " + conv.convertorOwner.kind + " " +
-            conv.convertorOwner.qualifiedName)
+      Some(from.qualifiedName + " can be implicitly converted to " +
+        conv.targetType + " by the implicit method " +
+        conv.conversionShortName + " in " + conv.convertorOwner.kind + " " +
+        conv.convertorOwner.qualifiedName)
 
     val result =
       if (diagramFilter == NoDiagramAtAll) None
@@ -143,7 +142,7 @@ trait DiagramFactory extends DiagramDirectiveParser {
           pack.members collect {
             case d: TemplateEntity
                 if ((!diagramFilter.hideInheritedNodes) ||
-                      (d.inTemplate == pack)) =>
+                  (d.inTemplate == pack)) =>
               d
           }
 
@@ -281,7 +280,7 @@ trait DiagramFactory extends DiagramDirectiveParser {
                 val dests2 = dests.collect({
                   case dest
                       if (!(diagramFilter.hideEdge(source, dest) ||
-                            diagramFilter.hideNode(dest))) =>
+                        diagramFilter.hideNode(dest))) =>
                     dest
                 })
                 if (dests2 != Nil) List((source, dests2))

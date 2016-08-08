@@ -44,7 +44,7 @@ private[remote] class AkkaProtocolSettings(config: Config) {
     TransportFailureDetectorConfig.getMillisDuration("heartbeat-interval")
   } requiring
     (_ > Duration.Zero,
-        "transport-failure-detector.heartbeat-interval must be > 0")
+    "transport-failure-detector.heartbeat-interval must be > 0")
 
   val RequireCookie: Boolean = getBoolean("akka.remote.require-cookie")
 
@@ -517,17 +517,15 @@ private[transport] class ProtocolStateActor(
     case Event(HandshakeTimer,
                OutboundUnderlyingAssociated(_, wrappedHandle)) ⇒
       sendDisassociate(wrappedHandle, Unknown)
-      stop(
-          FSM.Failure(TimeoutReason(
-                  "No response from remote for outbound association. Handshake timed out after " +
-                    s"[${settings.HandshakeTimeout.toMillis} ms].")))
+      stop(FSM.Failure(TimeoutReason(
+          "No response from remote for outbound association. Handshake timed out after " +
+            s"[${settings.HandshakeTimeout.toMillis} ms].")))
 
     case Event(HandshakeTimer, InboundUnassociated(_, wrappedHandle)) ⇒
       sendDisassociate(wrappedHandle, Unknown)
-      stop(
-          FSM.Failure(TimeoutReason(
-                  "No response from remote for inbound association. Handshake timed out after " +
-                    s"[${settings.HandshakeTimeout.toMillis} ms].")))
+      stop(FSM.Failure(TimeoutReason(
+          "No response from remote for inbound association. Handshake timed out after " +
+            s"[${settings.HandshakeTimeout.toMillis} ms].")))
   }
 
   when(Open) {
@@ -606,9 +604,8 @@ private[transport] class ProtocolStateActor(
     } else {
       // send disassociate just to be sure
       sendDisassociate(wrappedHandle, Unknown)
-      stop(
-          FSM.Failure(TimeoutReason(s"No response from remote. " +
-                    s"Transport failure detector triggered. (internal state was $stateName)")))
+      stop(FSM.Failure(TimeoutReason(s"No response from remote. " +
+        s"Transport failure detector triggered. (internal state was $stateName)")))
     }
   }
 

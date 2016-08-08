@@ -45,9 +45,9 @@ private[gameSearch] final class DataForm {
             "status" -> optional(numberIn(Query.statuses)),
             "analysed" -> optional(number),
             "sort" -> optional(mapping(
-                    "field" -> stringIn(Sorting.fields),
-                    "order" -> stringIn(Sorting.orders)
-                )(SearchSort.apply)(SearchSort.unapply))
+                "field" -> stringIn(Sorting.fields),
+                "order" -> stringIn(Sorting.orders)
+            )(SearchSort.apply)(SearchSort.unapply))
         )(SearchData.apply)(SearchData.unapply)) fill SearchData()
 }
 

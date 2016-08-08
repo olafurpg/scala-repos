@@ -61,8 +61,8 @@ class Kalman(N: Int) {
     val sum = samples.sum
     val mean = sum / samples.length
     val diff = (samples map { x =>
-          (x - mean) * (x - mean)
-        }).sum
+      (x - mean) * (x - mean)
+    }).sum
     diff / (samples.length - 1)
   }
 

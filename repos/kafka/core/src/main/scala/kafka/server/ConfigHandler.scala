@@ -49,9 +49,8 @@ class TopicConfigHandler(private val logManager: LogManager,
         topicConfig.getProperty(LogConfig.MessageFormatVersionProp)).flatMap {
       versionString =>
         if (kafkaConfig.interBrokerProtocolVersion < ApiVersion(versionString)) {
-          warn(
-              s"Log configuration ${LogConfig.MessageFormatVersionProp} is ignored for `$topic` because `$versionString` " +
-                s"is not compatible with Kafka inter-broker protocol version `${kafkaConfig.interBrokerProtocolVersionString}`")
+          warn(s"Log configuration ${LogConfig.MessageFormatVersionProp} is ignored for `$topic` because `$versionString` " +
+            s"is not compatible with Kafka inter-broker protocol version `${kafkaConfig.interBrokerProtocolVersionString}`")
           Some(LogConfig.MessageFormatVersionProp)
         } else None
     }

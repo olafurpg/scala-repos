@@ -92,8 +92,8 @@ object NatWith {
     macro SingletonTypeMacros.convertInstanceImplNat[TC]
 
   implicit def apply2[B, T <: B, TC[_ <: B, _ <: Nat]](i: Int): NatWith[({
-        type λ[t <: Nat] = TC[T, t]
-      })#λ] = macro SingletonTypeMacros.convertInstanceImplNat1[B, T, TC]
+    type λ[t <: Nat] = TC[T, t]
+  })#λ] = macro SingletonTypeMacros.convertInstanceImplNat1[B, T, TC]
 }
 
 /**

@@ -266,10 +266,9 @@ class StandardImageExtractor(httpClient: HttpClient,
 
     getImageCandidates(node) match {
       case Some(goodImages) => {
-        trace(
-            logPrefix +
-              "checkForLargeImages: After findImagesThatPassByteSizeTest we have: " +
-              goodImages.size + " at parent depth: " + parentDepthLevel)
+        trace(logPrefix +
+          "checkForLargeImages: After findImagesThatPassByteSizeTest we have: " +
+          goodImages.size + " at parent depth: " + parentDepthLevel)
         val scoredImages =
           downloadImagesAndGetResults(goodImages, parentDepthLevel)
         var highScoreImage: Element = null
@@ -353,10 +352,9 @@ class StandardImageExtractor(httpClient: HttpClient,
         val MAX_BYTES_SIZE: Int = 15728640
         if ((bytes == 0 || bytes > minBytesForImages) &&
             bytes < MAX_BYTES_SIZE) {
-          trace(
-              logPrefix +
-                "findImagesThatPassByteSizeTest: Found potential image - size: " +
-                bytes + " src: " + image.attr("src"))
+          trace(logPrefix +
+            "findImagesThatPassByteSizeTest: Found potential image - size: " +
+            bytes + " src: " + image.attr("src"))
           goodImages.add(image)
         } else {
           trace(logPrefix + " Removing image: " + image.attr("src"))
@@ -579,9 +577,8 @@ class StandardImageExtractor(httpClient: HttpClient,
             if (depthLevel > 1) {
               if (width < 300) {
                 if (logger.isDebugEnabled) {
-                  logger.debug(
-                      "going depthlevel: " + depthLevel +
-                        " and img was only: " + width + " wide: " + localSrcPath)
+                  logger.debug("going depthlevel: " + depthLevel +
+                    " and img was only: " + width + " wide: " + localSrcPath)
                 }
                 continueVar = false
               }

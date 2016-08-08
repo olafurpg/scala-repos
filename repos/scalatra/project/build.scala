@@ -128,7 +128,7 @@ object ScalatraBuild extends Build {
           )
     ) dependsOn
       (scalatraSpecs2 % "test->compile", scalatraScalatest % "test->compile",
-          scalatraCommon % "compile;test->test")
+      scalatraCommon % "compile;test->test")
 
   lazy val scalatraAuth =
     Project(
@@ -290,7 +290,7 @@ object ScalatraBuild extends Build {
           )
     ) dependsOn
       (scalatraCore % "compile;test->test;provided->provided",
-          scalatraJson % "compile;test->test;provided->provided")
+      scalatraJson % "compile;test->test;provided->provided")
 
   lazy val scalatraSwaggerExt =
     Project(
@@ -302,8 +302,8 @@ object ScalatraBuild extends Build {
           )
     ) dependsOn
       (scalatraSwagger % "compile;test->test;provided->provided",
-          scalatraCommands % "compile;test->test;provided->provided",
-          scalatraAuth % "compile;test->test")
+      scalatraCommands % "compile;test->test;provided->provided",
+      scalatraAuth % "compile;test->test")
 
   lazy val scalatraSlf4j =
     Project(
@@ -362,7 +362,7 @@ object ScalatraBuild extends Build {
           )
     ) dependsOn
       (scalatraCore % "compile;test->test;provided->provided",
-          scalatraCache % "compile;test->test;provided->provided")
+      scalatraCache % "compile;test->test;provided->provided")
 
   lazy val scalatraExample =
     Project(
@@ -383,8 +383,8 @@ object ScalatraBuild extends Build {
           )
     ) dependsOn
       (scalatraCore % "compile;test->test;provided->provided", scalatraScalate,
-          scalatraAuth, scalatraFileupload, scalatraJetty, scalatraCommands,
-          scalatraAtmosphere)
+      scalatraAuth, scalatraFileupload, scalatraJetty, scalatraCommands,
+      scalatraAtmosphere)
 
   object Dependencies {
     lazy val parserCombinators =

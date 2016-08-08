@@ -197,11 +197,11 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
                 "can't access file under root added directory")
           }
           if (!new File(SparkFiles.get(neptune.getName + sep + saturn.getName +
-                        sep + alien2.getName)).exists()) {
+                sep + alien2.getName)).exists()) {
             throw new SparkException("can't access file in nested directory")
           }
           if (new File(SparkFiles.get(pluto.getName + sep + neptune.getName +
-                        sep + alien1.getName)).exists()) {
+                sep + alien1.getName)).exists()) {
             throw new SparkException("file exists that shouldn't")
           }
           x

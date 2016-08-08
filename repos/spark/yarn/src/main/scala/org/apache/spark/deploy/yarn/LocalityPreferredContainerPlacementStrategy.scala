@@ -168,7 +168,7 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
   private def numExecutorsPending(numTasksPending: Int): Int = {
     val coresPerExecutor = resource.getVirtualCores
     (numTasksPending * sparkConf.get(CPUS_PER_TASK) + coresPerExecutor -
-          1) / coresPerExecutor
+      1) / coresPerExecutor
   }
 
   /**

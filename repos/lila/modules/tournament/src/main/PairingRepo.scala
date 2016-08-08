@@ -180,14 +180,14 @@ object PairingRepo {
                       Unwind("u"),
                       Group(BSONBoolean(true))("ids" -> AddToSet("u"))))
       .map(_.documents.headOption
-            .flatMap(_.getAs[Set[String]]("ids"))
-            .getOrElse(Set.empty[String]))
+        .flatMap(_.getAs[Set[String]]("ids"))
+        .getOrElse(Set.empty[String]))
 
   def playingGameIds(tourId: String): Fu[List[String]] =
     coll
       .aggregate(Match(selectTour(tourId) ++ selectPlaying),
                  List(Group(BSONBoolean(true))("ids" -> Push("_id"))))
       .map(_.documents.headOption
-            .flatMap(_.getAs[List[String]]("ids"))
-            .getOrElse(List.empty[String]))
+        .flatMap(_.getAs[List[String]]("ids"))
+        .getOrElse(List.empty[String]))
 }

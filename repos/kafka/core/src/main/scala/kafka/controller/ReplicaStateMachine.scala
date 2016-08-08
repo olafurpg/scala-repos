@@ -172,7 +172,7 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
     if (!hasStarted.get)
       throw new StateChangeFailedException(
           ("Controller %d epoch %d initiated state change of replica %d for partition %s " +
-                "to %s failed because replica state machine has not started")
+            "to %s failed because replica state machine has not started")
             .format(controllerId,
                     controller.epoch,
                     replicaId,
@@ -416,7 +416,7 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
     val replicaStatesForTopic =
       replicasForTopic.map(r => (r, replicaState(r))).toMap
     replicaStatesForTopic.foldLeft(false)((deletionState, r) =>
-          deletionState || r._2 == ReplicaDeletionStarted)
+      deletionState || r._2 == ReplicaDeletionStarted)
   }
 
   def replicasInState(topic: String,

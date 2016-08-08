@@ -39,7 +39,7 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
       expandInnerResult: Boolean = true): Option[ScalaResolveResult] = {
     mostSpecificGeneric(
         applicable.map(r =>
-              r.innerResolveResult match {
+          r.innerResolveResult match {
             case Some(rr) if expandInnerResult =>
               new InnerScalaResolveResult(rr.element,
                                           rr.implicitConversionClass,
@@ -180,9 +180,8 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                                                 s.subst(tp.upperType())))
                 Left(
                     params.map(p =>
-                          p.copy(paramType =
-                                ScExistentialType(s.subst(p.paramType),
-                                                  arguments))))
+                      p.copy(paramType =
+                        ScExistentialType(s.subst(p.paramType), arguments))))
               }
             case ScTypePolymorphicType(internal, typeParams) =>
               if (!existential) {
@@ -220,12 +219,12 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
           case (Left(p1), Left(p2)) =>
             var (params1, params2) = (p1, p2)
             if ((t1.isInstanceOf[ScTypePolymorphicType] &&
-                    t2.isInstanceOf[ScTypePolymorphicType] ||
-                    (!(m1.isInstanceOf[ScFunction] || m1.isInstanceOf[ScFun] ||
-                              m1.isInstanceOf[ScPrimaryConstructor]) ||
-                        !(m2.isInstanceOf[ScFunction] ||
-                              m2.isInstanceOf[ScFun] ||
-                              m2.isInstanceOf[ScPrimaryConstructor]))) &&
+                t2.isInstanceOf[ScTypePolymorphicType] ||
+                (!(m1.isInstanceOf[ScFunction] || m1.isInstanceOf[ScFun] ||
+                  m1.isInstanceOf[ScPrimaryConstructor]) ||
+                !(m2.isInstanceOf[ScFunction] ||
+                  m2.isInstanceOf[ScFun] ||
+                  m2.isInstanceOf[ScPrimaryConstructor]))) &&
                 (lastRepeated(params1) ^ lastRepeated(params2)))
               return lastRepeated(params2) //todo: this is hack!!! see SCL-3846, SCL-4048
             if (lastRepeated(params1) && !lastRepeated(params2))

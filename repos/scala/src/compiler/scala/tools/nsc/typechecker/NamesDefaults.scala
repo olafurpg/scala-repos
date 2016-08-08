@@ -298,7 +298,7 @@ trait NamesDefaults { self: Analyzer =>
                    blockTyper: Typer): List[Option[ValDef]] = {
       val context = blockTyper.context
       val symPs = map2(args, paramTypes)((arg, paramTpe) =>
-            arg match {
+        arg match {
           case Ident(nme.SELECTOR_DUMMY) =>
             None // don't create a local ValDef if the argument is <unapply-selector>
           case _ =>
@@ -386,19 +386,19 @@ trait NamesDefaults { self: Analyzer =>
                   map3(reorderArgs(valDefs, argPos), formals, typedArgs)(
                       (vDefOpt, tpe, origArg) =>
                         vDefOpt match {
-                      case None => origArg
-                      case Some(vDef) =>
-                        val ref = gen.mkAttributedRef(vDef.symbol)
-                        atPos(vDef.pos.focus) {
-                          // for by-name parameters, the local value is a nullary function returning the argument
-                          tpe.typeSymbol match {
-                            case ByNameParamClass => Apply(ref, Nil)
-                            case RepeatedParamClass =>
-                              Typed(ref, Ident(tpnme.WILDCARD_STAR))
-                            case _ => ref
-                          }
-                        }
-                  })
+                          case None => origArg
+                          case Some(vDef) =>
+                            val ref = gen.mkAttributedRef(vDef.symbol)
+                            atPos(vDef.pos.focus) {
+                              // for by-name parameters, the local value is a nullary function returning the argument
+                              tpe.typeSymbol match {
+                                case ByNameParamClass => Apply(ref, Nil)
+                                case RepeatedParamClass =>
+                                  Typed(ref, Ident(tpnme.WILDCARD_STAR))
+                                case _ => ref
+                              }
+                            }
+                      })
                 // cannot call blockTyper.typedBlock here, because the method expr might be partially applied only
                 val res =
                   blockTyper.doTypedApply(tree, expr, refArgs, mode, pt)
@@ -457,7 +457,7 @@ trait NamesDefaults { self: Analyzer =>
 
     // missing parameters: those with a name which is not specified in one of the namedArgsOnChangedPosition
     val missingParams = paramsWithoutPositionalArg.filter(p =>
-          namedArgsOnChangedPosition.forall { arg =>
+      namedArgsOnChangedPosition.forall { arg =>
         val n = argName(arg)
         n.isEmpty || n.get != p.name
     })
@@ -503,7 +503,7 @@ trait NamesDefaults { self: Analyzer =>
                    if (targs.isEmpty) default1
                    else TypeApply(default1, targs.map(_.duplicate))
                  val default2 = (default1 /: previousArgss)((tree, args) =>
-                       Apply(tree, args.map(_.duplicate)))
+                   Apply(tree, args.map(_.duplicate)))
                  Some(atPos(pos) {
                    if (positional) default2
                    else AssignOrNamedArg(Ident(p.name), default2)

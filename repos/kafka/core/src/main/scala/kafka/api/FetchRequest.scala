@@ -132,9 +132,9 @@ case class FetchRequest(
       foldedTopics + shortStringLength(topic) + 4 + /* partition count */
       partitionFetchInfos.size *
         (4 + /* partition id */
-            8 + /* offset */
-            4 /* fetch size */
-            )
+        8 + /* offset */
+        4 /* fetch size */
+        )
     })
   }
 

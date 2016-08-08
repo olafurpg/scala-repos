@@ -94,7 +94,7 @@ class PageRankSuite extends SparkFunSuite with LocalSparkContext {
       val staticErrors = staticRanks2.map {
         case (vid, pr) =>
           val p = math.abs(pr -
-                (resetProb + (1.0 - resetProb) * (resetProb * (nVertices - 1))))
+            (resetProb + (1.0 - resetProb) * (resetProb * (nVertices - 1))))
           val correct =
             (vid > 0 && pr == resetProb) || (vid == 0L && p < 1.0E-5)
           if (!correct) 1 else 0

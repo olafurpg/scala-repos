@@ -49,7 +49,7 @@ object SerializationBugs extends Specification {
     (g2.buy.size mustEqual 1) and (leftOp.functionName mustEqual "f1") and
       (leftOp.symbol mustEqual "s") and (leftOp.inParams.toList mustEqual Nil) and
       (leftOp.subOperand mustEqual None) and (plan.operator mustEqual Some(
-            "A")) and
+        "A")) and
       (rightOp.functionName mustEqual "f2") and (rightOp.symbol mustEqual "s2") and
       (rightOp.inParams.toList mustEqual List(0, 1, 2)) and
       (rightOp.subOperand mustEqual None)
@@ -157,13 +157,9 @@ object SerializationBugs extends Specification {
       def serialize(implicit format: Formats) = {
         case SingleValue(x: Double) => JObject(List(JField("val", JDouble(x))))
         case VectorValue(x: Vector[_]) =>
-          JObject(
-              List(
-                  JField("val",
-                         JArray(x
-                               .asInstanceOf[Vector[Double]]
-                               .toList
-                               .map(JDouble(_))))))
+          JObject(List(JField(
+              "val",
+              JArray(x.asInstanceOf[Vector[Double]].toList.map(JDouble(_))))))
       }
     }
 
@@ -178,9 +174,9 @@ object SerializationBugs extends Specification {
     val jsonB = """ { "data": { "bar": "string" }, "success": true } """
 
     (read[SomeContainer[TypeA]](jsonA) mustEqual SomeContainer(
-            TypeA("string"))) and
+        TypeA("string"))) and
       (read[SomeContainer[TypeB]](jsonB) mustEqual SomeContainer(
-              TypeB("string")))
+          TypeB("string")))
   }
 }
 

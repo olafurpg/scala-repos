@@ -35,9 +35,9 @@ object TestDetector {
       (js.typeOf(item) == "function") && {
         js.isUndefined(item.prototype) || // happens for static methods
         (js.Object
-              .getPrototypeOf(item.prototype.asInstanceOf[js.Object]) eq js.Object
-              .asInstanceOf[js.Dynamic]
-              .prototype)
+          .getPrototypeOf(item.prototype.asInstanceOf[js.Object]) eq js.Object
+          .asInstanceOf[js.Dynamic]
+          .prototype)
       }
     }
 

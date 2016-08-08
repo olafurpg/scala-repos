@@ -162,13 +162,13 @@ object ScalaCompletionUtil {
 
   def awful(parent: PsiElement, leaf: PsiElement): Boolean = {
     (leaf.getPrevSibling == null ||
-        leaf.getPrevSibling.getPrevSibling == null ||
-        leaf.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaTokenTypes.kDEF) &&
+    leaf.getPrevSibling.getPrevSibling == null ||
+    leaf.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaTokenTypes.kDEF) &&
     (parent.getPrevSibling == null ||
-        parent.getPrevSibling.getPrevSibling == null ||
-        (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
-            !parent.getPrevSibling.getPrevSibling.getLastChild
-              .isInstanceOf[PsiErrorElement]))
+    parent.getPrevSibling.getPrevSibling == null ||
+    (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
+    !parent.getPrevSibling.getPrevSibling.getLastChild
+      .isInstanceOf[PsiErrorElement]))
   }
 
   val DUMMY_IDENTIFIER = "IntellijIdeaRulezzz"

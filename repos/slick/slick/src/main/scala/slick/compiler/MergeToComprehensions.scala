@@ -30,10 +30,10 @@ class MergeToComprehensions extends Phase {
         n =>
           ClientSideOp
             .mapResultSetMapping(n, keepType = false) { rsm =>
-          rsm.copy(from = convert(rsm.from), map = rsm.map.replace {
-            case r: Ref => r.untyped
-          })
-        }
+              rsm.copy(from = convert(rsm.from), map = rsm.map.replace {
+                case r: Ref => r.untyped
+              })
+            }
             .infer())
 
   def convert(tree: Node): Node = {
@@ -122,8 +122,8 @@ class MergeToComprehensions extends Phase {
                        Ellipsis(n, List(0)))
           val o2 = applyReplacements(o1, replacements1a, c1a)
           val c2 =
-            c1a.copy(distinct = Some(ProductNode(ConstArray(o2)).flatten
-                      .infer())) :@ c1a.nodeType
+            c1a.copy(distinct = Some(
+                ProductNode(ConstArray(o2)).flatten.infer())) :@ c1a.nodeType
           logger.debug("Merged Distinct into Comprehension:", c2)
           (c2, replacements1a)
 
@@ -273,21 +273,22 @@ class MergeToComprehensions extends Phase {
           val mappingsM = mappings.iterator.toMap
           logger.debug(
               s"Mappings for `on` clause in Join $ls/$rs: " + mappingsM)
-          val on2 = on1
-            .replace({
-              case p @ FwdPathOnTypeSymbol(ts, _ :: s :: Nil) =>
-                //logger.debug(s"Finding ($ts, $s)")
-                mappingsM.get((ts, s)) match {
-                  case Some(ElementSymbol(idx) :: ss) =>
-                    //logger.debug(s"Found $idx :: $ss")
-                    FwdPath((if (idx == 1) ls else rs) :: ss)
-                  case _ => p
-                }
-            }, bottomUp = true)
-            .infer(scope =
-                  Type.Scope(
-                      j.leftGen -> l2.nodeType.asCollectionType.elementType) +
-                    (j.rightGen -> r2.nodeType.asCollectionType.elementType))
+          val on2 =
+            on1
+              .replace({
+                case p @ FwdPathOnTypeSymbol(ts, _ :: s :: Nil) =>
+                  //logger.debug(s"Finding ($ts, $s)")
+                  mappingsM.get((ts, s)) match {
+                    case Some(ElementSymbol(idx) :: ss) =>
+                      //logger.debug(s"Found $idx :: $ss")
+                      FwdPath((if (idx == 1) ls else rs) :: ss)
+                    case _ => p
+                  }
+              }, bottomUp = true)
+              .infer(scope =
+                Type.Scope(
+                    j.leftGen -> l2.nodeType.asCollectionType.elementType) +
+                  (j.rightGen -> r2.nodeType.asCollectionType.elementType))
           logger.debug(s"Transformed `on` clause in Join $ls/$rs:", on2)
           val j2 = j.copy(left = l2, right = r2, on = on2).infer()
           logger.debug(s"Created source from Join $ls/$rs:", j2)
@@ -324,8 +325,8 @@ class MergeToComprehensions extends Phase {
         val c2 = c.select match {
           // Ensure that the select clause is non-empty
           case Pure(StructNode(ConstArray.empty), _) =>
-            c.copy(select = Pure(StructNode(
-                          ConstArray((new AnonSymbol, LiteralNode(1))))))
+            c.copy(select =
+                Pure(StructNode(ConstArray((new AnonSymbol, LiteralNode(1))))))
               .infer()
           case _ => c
         }
@@ -463,8 +464,8 @@ class MergeToComprehensions extends Phase {
               case Select(_ :@ NominalType(_, _), _) => true
               case _ => false
             }.getOrElse(throw new SlickTreeException(
-                    "Missing path on top of TypeSymbol in:",
-                    p))
+                "Missing path on top of TypeSymbol in:",
+                p))
             val Select(_ :@ NominalType(ts2, _), f2) = sel
             (ts1, f1) -> map1M((ts2, f2))
         }

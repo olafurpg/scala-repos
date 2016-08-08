@@ -167,10 +167,8 @@ class Log(val dir: File,
           file.delete()
         } else if (baseName.getPath.endsWith(LogFileSuffix)) {
           // delete the index
-          val index = new File(
-              CoreUtils.replaceSuffix(baseName.getPath,
-                                      LogFileSuffix,
-                                      IndexFileSuffix))
+          val index = new File(CoreUtils
+            .replaceSuffix(baseName.getPath, LogFileSuffix, IndexFileSuffix))
           index.delete()
           swapFiles += file
         }

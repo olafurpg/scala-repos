@@ -8,10 +8,10 @@ object MyBuild extends Build {
   lazy val root =
     Project("root", file(".")) settings (externalPom(): _*) settings
       (scalaVersion := "2.9.0-1", check <<= checkTask,
-          managedClasspath in Provided <<= (classpathTypes, update) map {
-            (cpts, report) =>
-              Classpaths.managedJars(Provided, cpts, report)
-          })
+      managedClasspath in Provided <<= (classpathTypes, update) map {
+        (cpts, report) =>
+          Classpaths.managedJars(Provided, cpts, report)
+      })
 
   def checkTask = InputTask(_ => parser) { result =>
     (result,

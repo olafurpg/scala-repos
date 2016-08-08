@@ -538,18 +538,18 @@ trait TraitPreference[This <: android.preference.Preference] {
       f: (android.preference.Preference, Any) => Boolean): This = {
     basis.setOnPreferenceChangeListener(
         new android.preference.Preference.OnPreferenceChangeListener {
-      def onPreferenceChange(p1: android.preference.Preference,
-                             p2: Any): Boolean = { f(p1, p2) }
-    })
+          def onPreferenceChange(p1: android.preference.Preference,
+                                 p2: Any): Boolean = { f(p1, p2) }
+        })
     basis
   }
 
   @inline def onPreferenceChange(f: => Boolean): This = {
     basis.setOnPreferenceChangeListener(
         new android.preference.Preference.OnPreferenceChangeListener {
-      def onPreferenceChange(p1: android.preference.Preference,
-                             p2: Any): Boolean = { f }
-    })
+          def onPreferenceChange(p1: android.preference.Preference,
+                                 p2: Any): Boolean = { f }
+        })
     basis
   }
 
@@ -557,18 +557,20 @@ trait TraitPreference[This <: android.preference.Preference] {
   def onPreferenceClick(f: android.preference.Preference => Boolean): This = {
     basis.setOnPreferenceClickListener(
         new android.preference.Preference.OnPreferenceClickListener {
-      def onPreferenceClick(p: android.preference.Preference): Boolean = {
-        f(p)
-      }
-    })
+          def onPreferenceClick(p: android.preference.Preference): Boolean = {
+            f(p)
+          }
+        })
     basis
   }
 
   @inline def onPreferenceClick(f: => Boolean): This = {
     basis.setOnPreferenceClickListener(
         new android.preference.Preference.OnPreferenceClickListener {
-      def onPreferenceClick(p: android.preference.Preference): Boolean = { f }
-    })
+          def onPreferenceClick(p: android.preference.Preference): Boolean = {
+            f
+          }
+        })
     basis
   }
   @inline def setIntent[T: ClassTag](implicit context: Context): Unit =

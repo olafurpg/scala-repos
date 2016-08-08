@@ -113,7 +113,7 @@ class ClusterSingletonManagerLeaveSpec
       join(third, first)
       within(10.seconds) {
         awaitAssert(cluster.state.members.count(m ⇒
-                  m.status == MemberStatus.Up) should be(3))
+          m.status == MemberStatus.Up) should be(3))
       }
       enterBarrier("all-up")
 

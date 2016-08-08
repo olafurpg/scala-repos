@@ -84,7 +84,7 @@ object OneAndTest extends SpecLite {
   "traverse1 on traverse" ! forAll { (ints: OneAnd[List, Int], f: Int => List[
                                           Int]) =>
     (Traverse1[OneAndList].traverse1(ints)(f) must_==
-          (Traverse[OneAndList].traverse(ints)(f)))
+      (Traverse[OneAndList].traverse(ints)(f)))
   }
 
   implicit def OneAndNelEqual[A](
@@ -100,7 +100,7 @@ object OneAndTest extends SpecLite {
   "traverse1 on traverse1" ! forAll {
     (ints: OneAnd[NonEmptyList, Int], f: Int => NonEmptyList[Int]) =>
       (Traverse1[OneAndNel].traverse1(ints)(f) must_===
-            (Traverse[OneAndNel].traverse(ints)(f)))
+        (Traverse[OneAndNel].traverse(ints)(f)))
   }
 
   "inequality exists" ! forAll { (a: OneAnd[List, Int]) =>

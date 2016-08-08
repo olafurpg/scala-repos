@@ -29,8 +29,8 @@ private[routing] object RouterBuilderHelper {
       .from(Function.unlift { requestHeader =>
         // Find the first route that matches
         routes.collectFirst(Function.unlift(route =>
-                  // First check method
-                  if (requestHeader.method == route.method) {
+          // First check method
+          if (requestHeader.method == route.method) {
 
             // Now match against the path pattern
             val matcher = route.pathPattern.matcher(requestHeader.path)

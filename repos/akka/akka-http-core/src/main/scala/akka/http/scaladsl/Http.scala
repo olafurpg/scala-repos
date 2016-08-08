@@ -107,7 +107,7 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
                            layer atop tlsStage join flowWithTimeoutRecovered)
     }.mapMaterializedValue {
       _.map(tcpBinding ⇒
-            ServerBinding(tcpBinding.localAddress)(() ⇒ tcpBinding.unbind()))(
+        ServerBinding(tcpBinding.localAddress)(() ⇒ tcpBinding.unbind()))(
           fm.executionContext)
     }
   }
@@ -711,7 +711,7 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
         gatewayPromise
           .success(gateway) // satisfy everyone who got a hold of our promise while we were starting up
         whenShuttingDown.future.onComplete(_ ⇒
-              hostPoolCache.remove(setup, fastFuture))(fm.executionContext)
+          hostPoolCache.remove(setup, fastFuture))(fm.executionContext)
         fastFuture
 
       case future ⇒ future // return cached instance
@@ -739,8 +739,7 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
         gatewayFuture
           .flatMap(_(effectiveRequest))(fm.executionContext)
           .onComplete(responseTry ⇒
-                result.success(responseTry -> userContext))(
-              fm.executionContext)
+            result.success(responseTry -> userContext))(fm.executionContext)
         result.future
     }
   }

@@ -137,7 +137,7 @@ object TaskSerializer {
       builder.setVersion(appVersion.toString)
       builder.setStagedAt(status.stagedAt.toDateTime.getMillis)
       status.startedAt.foreach(startedAt =>
-            builder.setStartedAt(startedAt.toDateTime.getMillis))
+        builder.setStartedAt(startedAt.toDateTime.getMillis))
       status.mesosStatus.foreach(status => builder.setStatus(status))
       networking match {
         case Task.HostPorts(hostPorts) =>
@@ -246,7 +246,7 @@ private[impl] object ReservationSerializer {
       val builder =
         Protos.MarathonTask.Reservation.State.newBuilder().setType(stateType)
       state.timeout.foreach(timeout =>
-            builder.setTimeout(TimeoutSerializer.toProto(timeout)))
+        builder.setTimeout(TimeoutSerializer.toProto(timeout)))
       builder.build()
     }
   }

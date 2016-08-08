@@ -492,7 +492,7 @@ class ParquetFilterSuite
         // We will remove the temporary metadata when writing Parquet file.
         val schema = sqlContext.read.parquet(pathThree).schema
         assert(schema.forall(
-                !_.metadata.contains(StructType.metadataKeyForOptionalField)))
+            !_.metadata.contains(StructType.metadataKeyForOptionalField)))
 
         val pathFour = s"${dir.getCanonicalPath}/table4"
         val dfStruct = sparkContext.parallelize(Seq((1, 1))).toDF("a", "b")
@@ -513,9 +513,9 @@ class ParquetFilterSuite
         // The fields "s.a" and "s.c" only exist in one Parquet file.
         val field = dfStruct3.schema("s").dataType.asInstanceOf[StructType]
         assert(field("a").metadata
-              .getBoolean(StructType.metadataKeyForOptionalField))
+          .getBoolean(StructType.metadataKeyForOptionalField))
         assert(field("c").metadata
-              .getBoolean(StructType.metadataKeyForOptionalField))
+          .getBoolean(StructType.metadataKeyForOptionalField))
 
         val pathSix = s"${dir.getCanonicalPath}/table6"
         dfStruct3.write.parquet(pathSix)
@@ -523,7 +523,7 @@ class ParquetFilterSuite
         // We will remove the temporary metadata when writing Parquet file.
         val forPathSix = sqlContext.read.parquet(pathSix).schema
         assert(forPathSix.forall(
-                !_.metadata.contains(StructType.metadataKeyForOptionalField)))
+            !_.metadata.contains(StructType.metadataKeyForOptionalField)))
 
         // sanity test: make sure optional metadata field is not wrongly set.
         val pathSeven = s"${dir.getCanonicalPath}/table7"

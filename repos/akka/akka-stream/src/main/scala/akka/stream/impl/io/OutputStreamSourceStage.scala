@@ -171,7 +171,7 @@ private[akka] class OutputStreamAdapter(
   private[this] def sendMessage(message: AdapterToStageMessage,
                                 handleCancelled: Boolean = true) =
     send(() ⇒
-          try {
+      try {
         Await.ready(sendToStage(message), writeTimeout)
         if (downstreamStatus.get() == Canceled && handleCancelled) {
           //Publisher considered to be terminated at earliest convenience to minimize messages sending back and forth

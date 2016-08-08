@@ -39,7 +39,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       val warnings = inline(request)
       for (warning <- warnings) {
         if ((callee.annotatedInline &&
-                btypes.compilerSettings.YoptWarningEmitAtInlineFailed) ||
+            btypes.compilerSettings.YoptWarningEmitAtInlineFailed) ||
             warning.emitWarning(compilerSettings)) {
           val annotWarn =
             if (callee.annotatedInline) " is annotated @inline but" else ""
@@ -129,9 +129,10 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     val selfParamTypeV: Either[OptimizerWarning, ClassBType] =
       calleeDeclarationClass.info.map(
           _.inlineInfo.traitImplClassSelfType match {
-        case Some(internalName) => classBTypeFromParsedClassfile(internalName)
-        case None => calleeDeclarationClass
-      })
+            case Some(internalName) =>
+              classBTypeFromParsedClassfile(internalName)
+            case None => calleeDeclarationClass
+          })
 
     def implClassMethodV(
         implMethodDescriptor: String): Either[OptimizerWarning, MethodNode] = {

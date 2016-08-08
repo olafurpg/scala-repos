@@ -734,7 +734,7 @@ private[spark] class ExternalSorter[K, V, C](
     : Iterator[(Int, Iterator[Product2[K, C]])] = {
     val buffered = data.buffered
     (0 until numPartitions).iterator.map(p =>
-          (p, new IteratorForPartition(p, buffered)))
+      (p, new IteratorForPartition(p, buffered)))
   }
 
   /**

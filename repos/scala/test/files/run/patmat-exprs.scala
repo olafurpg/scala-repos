@@ -308,8 +308,8 @@ trait Pattern {
     private def optimizeWith(f: Expr[T] => Expr[T]): Expr[T] = {
       f(
           mapArgs(EndoFunction[Expr[_]](
-                  a => a match { case x: Expr[T] => x.optimizeWith(f) }
-              )))
+              a => a match { case x: Expr[T] => x.optimizeWith(f) }
+          )))
     }
 
     /** Simplifies this expression to make evaluation faster and more accurate.*/

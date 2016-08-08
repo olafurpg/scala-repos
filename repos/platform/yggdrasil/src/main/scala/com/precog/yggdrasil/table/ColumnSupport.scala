@@ -123,7 +123,7 @@ class OrLotsColumn(cols: Array[BoolColumn])
 class ConcatColumn[T <: Column](at: Int, c1: T, c2: T) { this: T =>
   def isDefinedAt(row: Int) =
     row >= 0 && ((row < at && c1.isDefinedAt(row)) ||
-          (row >= at && c2.isDefinedAt(row - at)))
+      (row >= at && c2.isDefinedAt(row - at)))
 }
 
 class NConcatColumn[T <: Column](offsets: Array[Int], columns: Array[T]) {

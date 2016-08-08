@@ -83,7 +83,7 @@ trait CodingDirectives {
 
     requestEntityEmpty |
       (requestEncodedWith(decoder.encoding) & applyDecoder & cancelRejections(
-              classOf[UnsupportedRequestEncodingRejection]))
+          classOf[UnsupportedRequestEncodingRejection]))
   }
 
   /**

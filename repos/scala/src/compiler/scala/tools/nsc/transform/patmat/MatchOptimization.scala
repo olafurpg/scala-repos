@@ -69,9 +69,9 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
             dependencies find {
               case (priorTest, deps) =>
                 ((simplify(priorTest.prop) == nonTrivial) ||
-                      // our conditions are implied by priorTest if it checks the same thing directly
-                      (nonTrivial subsetOf deps) // or if it depends on a superset of our conditions
-                    ) &&
+                  // our conditions are implied by priorTest if it checks the same thing directly
+                  (nonTrivial subsetOf deps) // or if it depends on a superset of our conditions
+                ) &&
                   (deps subsetOf tested) // the conditions we've tested when we are here in the match satisfy the prior test, and hence what it tested
             } foreach {
               case (priorTest, _) =>
@@ -678,9 +678,9 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
         def unapply(x: TreeMaker): Option[Tree] = x match {
           case tm @ TypeTestTreeMaker(_, _, pt, _) if tm.isPureTypeTest =>
             //  -- TODO: use this if binder does not occur in the body
-            Some(
-                Bind(tm.nextBinder,
-                     Typed(Ident(nme.WILDCARD), TypeTree(pt)) /* not used by back-end */ ))
+            Some(Bind(
+                tm.nextBinder,
+                Typed(Ident(nme.WILDCARD), TypeTree(pt)) /* not used by back-end */ ))
           case _ =>
             None
         }
@@ -704,8 +704,9 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
                       body: Tree = defaultBody): CaseDef = {
         import CODE._;
         atPos(body.pos) {
-          (CASE(Bind(scrutSym,
-                     Typed(Ident(nme.WILDCARD), TypeTree(ThrowableTpe)))) IF guard) ==> body
+          (CASE(Bind(
+              scrutSym,
+              Typed(Ident(nme.WILDCARD), TypeTree(ThrowableTpe)))) IF guard) ==> body
         }
       }
     }

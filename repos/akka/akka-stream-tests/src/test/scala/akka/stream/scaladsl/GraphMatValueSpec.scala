@@ -106,12 +106,12 @@ class GraphMatValueSpec extends AkkaSpec {
 
           val compositeSource2 = Source.fromGraph(
               GraphDSL.create(compositeSource1, compositeSource1)(Keep.both) {
-            implicit b ⇒ (s1, s2) ⇒
-              val zip = b.add(ZipWith[Int, Int, Int](_ + _))
-              s1.out ~> zip.in0
-              s2.out.map(_ * 10000) ~> zip.in1
-              SourceShape(zip.out)
-          })
+                implicit b ⇒ (s1, s2) ⇒
+                  val zip = b.add(ZipWith[Int, Int, Int](_ + _))
+                  s1.out ~> zip.in0
+                  s2.out.map(_ * 10000) ~> zip.in1
+                  SourceShape(zip.out)
+              })
 
           val (((f1, f2), (f3, f4)), result) =
             compositeSource2.toMat(Sink.head)(Keep.both).run()
@@ -124,11 +124,11 @@ class GraphMatValueSpec extends AkkaSpec {
         }
 
         "work also when the source’s module is copied" in {
-          val foldFlow: Flow[Int, Int, Future[Int]] = Flow.fromGraph(
-              GraphDSL.create(foldSink) { implicit builder ⇒ fold ⇒
-            FlowShape(fold.in,
-                      builder.materializedValue.mapAsync(4)(identity).outlet)
-          })
+          val foldFlow: Flow[Int, Int, Future[Int]] = Flow
+            .fromGraph(GraphDSL.create(foldSink) { implicit builder ⇒ fold ⇒
+              FlowShape(fold.in,
+                        builder.materializedValue.mapAsync(4)(identity).outlet)
+            })
 
           Await.result(Source(1 to 10).via(foldFlow).runWith(Sink.head),
                        3.seconds) should ===(55)
@@ -182,7 +182,7 @@ class GraphMatValueSpec extends AkkaSpec {
           var done = false
           Source.empty
             .viaMat(Flow[Int].via(Flow[Int].mapMaterializedValue(_ ⇒
-                          done = true)))(Keep.right)
+              done = true)))(Keep.right)
             .to(Sink.ignore)
             .run() should ===(akka.NotUsed)
           done should ===(true)

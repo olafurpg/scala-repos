@@ -494,7 +494,7 @@ object ScalaImportOptimizer {
             case other => other.allNames
           }.toSet -- explicitNames
         (info.allNamesForWildcard & usedImportedNames &
-              (namesFromOtherWildcards ++ namesAtRangeStart)).isEmpty
+          (namesFromOtherWildcards ++ namesAtRangeStart)).isEmpty
       } else false
     }
 
@@ -576,12 +576,12 @@ object ScalaImportOptimizer {
           .flatMap(_.singleNames)
           .toSet & namesFromOtherWildcards & usedImportedNames
       val simpleInfosToRemain = simpleInfos.filter(si =>
-            simpleNamesToRemain.contains(si.singleNames.head))
+        simpleNamesToRemain.contains(si.singleNames.head))
       val renames = withArrows.flatMap(_.renames)
       val hiddenNames = withArrows.flatMap(_.hiddenNames)
       val newHiddenNames =
         (actuallyInserted.allNamesForWildcard -- simpleNamesToRemain -- renames
-              .map(_._1) -- hiddenNames) & namesFromOtherWildcards & usedImportedNames
+          .map(_._1) -- hiddenNames) & namesFromOtherWildcards & usedImportedNames
 
       withArrows ++= newHiddenNames.map(actuallyInserted.toHiddenNameInfo)
 
@@ -679,7 +679,7 @@ object ScalaImportOptimizer {
     val suitable = groups.filter { group =>
       group != ScalaCodeStyleSettings.BLANK_LINE &&
       (group == ScalaCodeStyleSettings.ALL_OTHER_IMPORTS ||
-          info.startsWith(group))
+      info.startsWith(group))
     }
     val elem = suitable.tail.foldLeft(suitable.head) { (l, r) =>
       if (l == ScalaCodeStyleSettings.ALL_OTHER_IMPORTS) r

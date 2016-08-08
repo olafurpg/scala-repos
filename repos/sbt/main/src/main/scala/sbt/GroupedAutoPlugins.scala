@@ -16,7 +16,7 @@ private[sbt] object GroupedAutoPlugins {
       units: Map[URI, LoadedBuildUnit]): GroupedAutoPlugins = {
     val byBuild: Map[URI, Seq[AutoPlugin]] = units
       .mapValues(unit =>
-            unit.defined.values.flatMap(_.autoPlugins).toSeq.distinct)
+        unit.defined.values.flatMap(_.autoPlugins).toSeq.distinct)
       .toMap
     val all: Seq[AutoPlugin] = byBuild.values.toSeq.flatten.distinct
     new GroupedAutoPlugins(all, byBuild)

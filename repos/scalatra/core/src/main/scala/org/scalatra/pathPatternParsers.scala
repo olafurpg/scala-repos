@@ -74,7 +74,7 @@ class SinatraPathPatternParser extends RegexPathPatternParser {
     parseAll(pathPattern, pattern) match {
       case Success(pathPattern, _) =>
         (PartialPathPattern("^") + pathPattern +
-              PartialPathPattern("$")).toPathPattern
+          PartialPathPattern("$")).toPathPattern
       case _ =>
         throw new IllegalArgumentException("Invalid path pattern: " + pattern)
     }

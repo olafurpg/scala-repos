@@ -22,16 +22,14 @@ object Serbench extends Benchmark {
     ("name" -> "test") ~ ("startDate" -> new Date().getTime) ~
       ("lang" -> (("name" -> "Scala") ~ ("version" -> 2.75))) ~
       ("teams" -> List(
-              ("role" -> "QA") ~
-                ("members" -> List(
-                        ("name" -> "John Doe") ~ ("experience" -> 5),
-                        ("name" -> "Mike") ~ ("experience" -> 3))),
-              ("role" -> "Impl") ~
-                ("members" -> List(
-                        ("name" -> "Mark") ~ ("experience" -> 4),
-                        ("name" -> "Mary") ~ ("experience" -> 5),
-                        ("name" -> "Nick Noob") ~ ("experience" -> 1)))
-          ))
+          ("role" -> "QA") ~
+            ("members" -> List(("name" -> "John Doe") ~ ("experience" -> 5),
+                               ("name" -> "Mike") ~ ("experience" -> 3))),
+          ("role" -> "Impl") ~
+            ("members" -> List(("name" -> "Mark") ~ ("experience" -> 4),
+                               ("name" -> "Mary") ~ ("experience" -> 5),
+                               ("name" -> "Nick Noob") ~ ("experience" -> 1)))
+      ))
   }
 
   lazy val bigJValue = {

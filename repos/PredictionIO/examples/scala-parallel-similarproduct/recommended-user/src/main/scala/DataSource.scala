@@ -34,7 +34,7 @@ class DataSource(val dsp: DataSourceParams)
           } catch {
             case e: Exception => {
               logger.error(s"Failed to get properties $properties of" +
-                    s" user $entityId. Exception: $e.")
+                s" user $entityId. Exception: $e.")
               throw e
             }
           }
@@ -62,7 +62,7 @@ class DataSource(val dsp: DataSourceParams)
         } catch {
           case e: Exception => {
             logger.error(s"Cannot convert $event to FollowEvent." +
-                  s" Exception: $e.")
+              s" Exception: $e.")
             throw e
           }
         }

@@ -57,7 +57,7 @@ class DotRunner(settings: doc.Settings) {
         def helpStr(s: doc.Settings#Setting) =
           ("%-" + width + "s") format (s.helpSyntax) + "  " + s.helpDescription
         baseList.foreach((sett: doc.Settings#Setting) =>
-              settings.printMsg(helpStr(sett)))
+          settings.printMsg(helpStr(sett)))
         settings.printMsg(
             "\nPlease note that graphviz package version 2.26 or above is required.")
         settings.printMsg(

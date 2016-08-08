@@ -116,7 +116,7 @@ class ScProjectionType private (
             new ArrayBuffer[ScExistentialArgument]()
           val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
               ta.typeParameters.map(tp =>
-                    (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+                (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
               ta.typeParameters.map(tp => {
                 val name = tp.name + "$$"
                 args += new ScExistentialArgument(name,
@@ -127,12 +127,11 @@ class ScProjectionType private (
               }))
           val s = actualSubst.followed(genericSubst)
           Some(
-              AliasType(
-                  ta,
-                  ta.lowerBound.map(scType =>
-                        ScExistentialType(s.subst(scType), args.toList)),
-                  ta.upperBound.map(scType =>
-                        ScExistentialType(s.subst(scType), args.toList))))
+              AliasType(ta,
+                        ta.lowerBound.map(scType =>
+                          ScExistentialType(s.subst(scType), args.toList)),
+                        ta.upperBound.map(scType =>
+                          ScExistentialType(s.subst(scType), args.toList))))
         case _ => None
       }
     } else None
@@ -504,7 +503,7 @@ case class ScDesignatorType(element: PsiNamedElement) extends ValueType {
           new ArrayBuffer[ScExistentialArgument]()
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
             ta.typeParameters.map(tp =>
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+              (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             ta.typeParameters.map(tp => {
               val name = tp.name + "$$"
               args +=
@@ -512,13 +511,12 @@ case class ScDesignatorType(element: PsiNamedElement) extends ValueType {
               ScTypeVariable(name)
             }))
         Some(
-            AliasType(ta,
-                      ta.lowerBound.map(scType =>
-                            ScExistentialType(genericSubst.subst(scType),
-                                              args.toList)),
-                      ta.upperBound.map(scType =>
-                            ScExistentialType(genericSubst.subst(scType),
-                                              args.toList))))
+            AliasType(
+                ta,
+                ta.lowerBound.map(scType =>
+                  ScExistentialType(genericSubst.subst(scType), args.toList)),
+                ta.upperBound.map(scType =>
+                  ScExistentialType(genericSubst.subst(scType), args.toList))))
       case _ => None
     }
   }

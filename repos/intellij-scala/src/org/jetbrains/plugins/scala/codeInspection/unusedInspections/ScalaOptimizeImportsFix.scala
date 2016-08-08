@@ -30,7 +30,7 @@ class ScalaOptimizeImportsFix extends IntentionAction with HighPriorityAction {
 
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = {
     file.getManager.isInProject(file) && (file.isInstanceOf[ScalaFile] ||
-        ScalaLanguageDerivative.hasDerivativeOnFile(file))
+    ScalaLanguageDerivative.hasDerivativeOnFile(file))
   }
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
@@ -59,7 +59,7 @@ class ScalaEnableOptimizeImportsOnTheFlyFix extends IntentionAction {
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     ScalaApplicationSettings.getInstance().OPTIMIZE_IMPORTS_ON_THE_FLY = true
     if (file.getManager.isInProject(file) && (file.isInstanceOf[ScalaFile] ||
-            ScalaLanguageDerivative.hasDerivativeOnFile(file))) {
+        ScalaLanguageDerivative.hasDerivativeOnFile(file))) {
       if (!FileModificationService.getInstance.prepareFileForWrite(file))
         return
 

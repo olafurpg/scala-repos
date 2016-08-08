@@ -50,7 +50,7 @@ class BatchCompleteNotifier(p: Promise[BatchComplete]) extends Actor {
     case other =>
       p.complete(
           Left(new RuntimeException(
-                  "Received non-complete notification: " + other.toString)))
+              "Received non-complete notification: " + other.toString)))
       self ! PoisonPill
   }
 }

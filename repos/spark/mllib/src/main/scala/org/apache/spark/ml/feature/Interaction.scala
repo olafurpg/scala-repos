@@ -130,10 +130,9 @@ class Interaction @Since("1.6.0")(override val uid: String)
     def getNumFeatures(attr: Attribute): Int = {
       attr match {
         case nominal: NominalAttribute =>
-          math.max(
-              1,
-              nominal.getNumValues.getOrElse(throw new SparkException(
-                      "Nominal features must have attr numValues defined.")))
+          math.max(1,
+                   nominal.getNumValues.getOrElse(throw new SparkException(
+                       "Nominal features must have attr numValues defined.")))
         case _ =>
           1 // numeric feature
       }
@@ -147,7 +146,7 @@ class Interaction @Since("1.6.0")(override val uid: String)
             .fromStructField(f)
             .attributes
             .getOrElse(throw new SparkException(
-                    "Vector attributes must be defined for interaction."))
+                "Vector attributes must be defined for interaction."))
           attrs.map(getNumFeatures).toArray
       }
       new FeatureEncoder(numFeatures)
@@ -220,12 +219,12 @@ class Interaction @Since("1.6.0")(override val uid: String)
       case (nominal: NominalAttribute, i) =>
         if (nominal.values.isDefined) {
           nominal.values.get.map(v =>
-                BinaryAttribute.defaultAttr.withName(
-                    format(i, nominal.name, Some(v))))
+            BinaryAttribute.defaultAttr.withName(
+                format(i, nominal.name, Some(v))))
         } else {
           Array.tabulate(nominal.getNumValues.get)(j =>
-                BinaryAttribute.defaultAttr.withName(
-                    format(i, nominal.name, Some(j.toString))))
+            BinaryAttribute.defaultAttr.withName(
+                format(i, nominal.name, Some(j.toString))))
         }
       case (a: Attribute, i) =>
         Seq(NumericAttribute.defaultAttr.withName(format(i, a.name, None)))

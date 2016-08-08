@@ -72,7 +72,7 @@ sealed abstract class HoconPsiElement(ast: ASTNode)
 
   def nonWhitespaceChildren =
     allChildren.filterNot(ch =>
-          ch.getNode.getElementType == TokenType.WHITE_SPACE)
+      ch.getNode.getElementType == TokenType.WHITE_SPACE)
 
   def nonWhitespaceOrCommentChildren =
     allChildren.filterNot(

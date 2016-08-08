@@ -25,13 +25,11 @@ object BaseTypes {
     t match {
       case ScDesignatorType(td: ScTemplateDefinition) =>
         reduce(
-            td.superTypes.flatMap(
-                tp =>
-                  if (!notAll)
-                    BaseTypes
-                      .get(tp, notAll, visitedAliases = visitedAliases) ++ Seq(
-                        tp)
-                  else Seq(tp)))
+            td.superTypes.flatMap(tp =>
+              if (!notAll)
+                BaseTypes
+                  .get(tp, notAll, visitedAliases = visitedAliases) ++ Seq(tp)
+              else Seq(tp)))
       case ScDesignatorType(c: PsiClass) =>
         reduce(c.getSuperTypes.flatMap { p =>
           if (!notAll)
@@ -67,7 +65,7 @@ object BaseTypes {
         if (visitedAliases.contains(ta)) return Seq.empty
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
             ta.typeParameters.map(tp =>
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+              (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             args)
         BaseTypes.get(
             genericSubst.subst(ta.aliasedType.getOrElse(return Seq.empty)),
@@ -78,7 +76,7 @@ object BaseTypes {
         if (visitedAliases.contains(ta)) return Seq.empty
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
             ta.typeParameters.map(tp =>
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+              (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             args)
         val s = p.actualSubst.followed(genericSubst)
         BaseTypes.get(s.subst(ta.aliasedType.getOrElse(return Seq.empty)),
@@ -111,13 +109,10 @@ object BaseTypes {
           ScExistentialType(bt, wilds).simplify()
         }
       case ScCompoundType(comps, _, _) =>
-        reduce(
-            if (notAll) comps
-            else
-              comps.flatMap(comp =>
-                    BaseTypes
-                      .get(comp, visitedAliases = visitedAliases) ++ Seq(
-                        comp)))
+        reduce(if (notAll) comps
+        else
+          comps.flatMap(comp =>
+            BaseTypes.get(comp, visitedAliases = visitedAliases) ++ Seq(comp)))
       case proj @ ScProjectionType(p, elem, _) =>
         val s = proj.actualSubst
         elem match {

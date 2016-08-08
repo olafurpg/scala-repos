@@ -79,9 +79,9 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
   def isAssignmentOperator = {
     val context = getContext
     (context.isInstanceOf[ScInfixExpr] ||
-        context.isInstanceOf[ScMethodCall]) && refName.endsWith("=") &&
+    context.isInstanceOf[ScMethodCall]) && refName.endsWith("=") &&
     !(refName.startsWith("=") || Seq("!=", "<=", ">=").contains(refName) ||
-          refName.exists(_.isLetterOrDigit))
+      refName.exists(_.isLetterOrDigit))
   }
 
   def isUnaryOperator = {
@@ -337,10 +337,8 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
                   case assignStmt: ScAssignStmt =>
                     assignStmt.getLExpression match {
                       case ref: ScReferenceExpression =>
-                        val ind = methods.indexWhere(
-                            p =>
-                              ScalaPsiUtil.memberNamesEquals(p.name,
-                                                             ref.refName))
+                        val ind = methods.indexWhere(p =>
+                          ScalaPsiUtil.memberNamesEquals(p.name, ref.refName))
                         if (ind != -1) methods.remove(ind)
                         else tail()
                       case _ => tail()
@@ -446,10 +444,9 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
         val secondaryConstructors = (c: ScClass) => {
           if (c != clazz) Seq.empty
           else {
-            c.secondaryConstructors.filter(
-                f =>
-                  !PsiTreeUtil.isContextAncestor(f, s, true) &&
-                    f.getTextRange.getStartOffset < s.getTextRange.getStartOffset)
+            c.secondaryConstructors.filter(f =>
+              !PsiTreeUtil.isContextAncestor(f, s, true) &&
+                f.getTextRange.getStartOffset < s.getTextRange.getStartOffset)
           }
         }
         processConstructor(s, tp, typeArgs, arguments, secondaryConstructors)
@@ -489,7 +486,7 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
             assignStmt.getLExpression match {
               case ref: ScReferenceExpression =>
                 val ind = params.indexWhere(p =>
-                      ScalaPsiUtil.memberNamesEquals(p.name, ref.refName))
+                  ScalaPsiUtil.memberNamesEquals(p.name, ref.refName))
                 if (ind != -1) params.remove(ind)
                 else tail()
               case _ => tail()
@@ -571,7 +568,7 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
     if (candidates.isEmpty ||
         (!shape && candidates.forall(!_.isApplicable())) ||
         (processor.isInstanceOf[CompletionProcessor] &&
-            processor.asInstanceOf[CompletionProcessor].collectImplicits)) {
+        processor.asInstanceOf[CompletionProcessor].collectImplicits)) {
       processor match {
         case rp: ResolveProcessor =>
           rp.resetPrecedence() //do not clear candidate set, we want wrong resolve, if don't found anything

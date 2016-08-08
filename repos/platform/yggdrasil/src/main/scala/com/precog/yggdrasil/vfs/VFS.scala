@@ -162,13 +162,13 @@ trait VFSModule[M[+ _], Block] extends Logging {
       // FIXME: We're dealing with MimeType in too many places here
       val acceptableMimeTypes =
         ((Seq(ApplicationJson, XJsonStream, TextCSV).map { mt =>
-              mt -> (mt, mt)
-            }) ++ Seq(AnyMimeType -> (XJsonStream, XJsonStream),
-                      OctetStream -> (XJsonStream, OctetStream))).toMap
+          mt -> (mt, mt)
+        }) ++ Seq(AnyMimeType -> (XJsonStream, XJsonStream),
+                  OctetStream -> (XJsonStream, OctetStream))).toMap
       for {
         selectedMT <- OptionT(
                          M.point(requestedMimeTypes.find(
-                                 acceptableMimeTypes.contains)))
+                             acceptableMimeTypes.contains)))
         (conversionMT, returnMT) = acceptableMimeTypes(selectedMT)
         stream <- asByteStream(conversionMT)
       } yield (returnMT, stream)
@@ -192,7 +192,7 @@ trait VFSModule[M[+ _], Block] extends Logging {
       for {
         selectedMT <- OptionT(
                          M.point(requestedMimeTypes.find(
-                                 acceptableMimeTypes.contains)))
+                             acceptableMimeTypes.contains)))
         stream <- asByteStream(selectedMT)
       } yield (selectedMT, stream)
     }

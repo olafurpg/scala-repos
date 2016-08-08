@@ -54,14 +54,14 @@ class ScSuperReferenceImpl(node: ASTNode)
                   .getCachedClasses(getResolveScope, path)
                 if (classes.length == 1) {
                   drvTemplate.exists(td =>
-                        !ScalaPsiUtil.cachedDeepIsInheritor(td, classes(0)))
+                    !ScalaPsiUtil.cachedDeepIsInheritor(td, classes(0)))
                 } else {
                   val clazz: Option[PsiClass] =
                     classes.find(!_.isInstanceOf[ScObject])
                   clazz match {
                     case Some(psiClass) =>
                       drvTemplate.exists(td =>
-                            !ScalaPsiUtil.cachedDeepIsInheritor(td, psiClass))
+                        !ScalaPsiUtil.cachedDeepIsInheritor(td, psiClass))
                     case _ => false
                   }
                 }

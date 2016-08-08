@@ -155,14 +155,14 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
           if (!ResolveUtils.kindMatches(element, suitableKinds))
             throw new IncorrectOperationException(
                 "class does not match expected kind, problem place: " + {
-              if (getContext != null)
-                if (getContext.getContext != null)
-                  if (getContext.getContext.getContext != null)
-                    getContext.getContext.getContext.getText
-                  else getContext.getContext.getText
-                else getContext.getText
-              else getText
-            })
+                  if (getContext != null)
+                    if (getContext.getContext != null)
+                      if (getContext.getContext.getContext != null)
+                        getContext.getContext.getContext.getText
+                      else getContext.getContext.getText
+                    else getContext.getText
+                  else getText
+                })
           if (nameId.getText != c.name) {
             val ref = ScalaPsiElementFactory
               .createReferenceFromText(c.name, getManager)

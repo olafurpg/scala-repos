@@ -329,7 +329,7 @@ class ALSSuite
     }
     val width = b - a
     ids.toSeq.sorted.map(id =>
-          (id, Array.fill(rank)(a + random.nextFloat() * width)))
+      (id, Array.fill(rank)(a + random.nextFloat() * width)))
   }
 
   /**

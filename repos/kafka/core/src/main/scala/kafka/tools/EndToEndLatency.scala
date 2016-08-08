@@ -40,9 +40,8 @@ object EndToEndLatency {
 
   def main(args: Array[String]) {
     if (args.length != 5 && args.length != 6) {
-      System.err.println(
-          "USAGE: java " + getClass.getName +
-            " broker_list topic num_messages producer_acks message_size_bytes [optional] ssl_properties_file")
+      System.err.println("USAGE: java " + getClass.getName +
+        " broker_list topic num_messages producer_acks message_size_bytes [optional] ssl_properties_file")
       System.exit(1)
     }
 

@@ -45,7 +45,7 @@ abstract class MappedBirthYear[T <: Mapper[T]](owner: T, minAge: Int)
     val start = end - 100
     Full(
         SHtml.selectObj((start to end).toList.reverse.map(y =>
-                              (y, y.toString)),
+                          (y, y.toString)),
                         Full(get),
                         this.set) % ("id" -> fieldId))
   }

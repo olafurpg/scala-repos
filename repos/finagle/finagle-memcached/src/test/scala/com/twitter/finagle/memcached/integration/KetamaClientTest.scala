@@ -103,7 +103,7 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
   test("using custom keys doesn't blow up") {
     val client = KetamaClientBuilder()
       .nodes("localhost:%d:1:key1,localhost:%d:1:key2"
-            .format(address1.getPort, address2.getPort))
+        .format(address1.getPort, address2.getPort))
       .build()
 
     Await.result(client.delete("foo"))

@@ -118,7 +118,7 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
     def withTransactionIsolation(
         ti: TransactionIsolation): DBIOAction[R, S, E] = {
       val isolated = (new SetTransactionIsolation(ti.intValue)).flatMap(old =>
-            a.andFinally(new SetTransactionIsolation(old)))(
+        a.andFinally(new SetTransactionIsolation(old)))(
           DBIO.sameThreadExecutionContext)
       val fused =
         if (a.isInstanceOf[SynchronousDatabaseAction[_, _, _, _]])
@@ -700,7 +700,7 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
         val sql1 = sql.head
         if (!useBatchUpdates(ctx.session) ||
             (values.isInstanceOf[IndexedSeq[_]] &&
-                values.asInstanceOf[IndexedSeq[_]].length < 2))
+            values.asInstanceOf[IndexedSeq[_]].length < 2))
           retMany(values, values.map { v =>
             preparedInsert(sql1, ctx.session) { st =>
               st.clearParameters()
@@ -860,7 +860,7 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
     protected def buildKeysResult(st: Statement): Invoker[QR] =
       ResultSetInvoker[QR](_ => st.getGeneratedKeys)(pr =>
-            keyConverter.read(pr.rs).asInstanceOf[QR])
+        keyConverter.read(pr.rs).asInstanceOf[QR])
 
     // Returning keys from batch inserts is generally not supported
     override protected def useBatchUpdates(implicit session: Backend#Session) =

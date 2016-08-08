@@ -158,13 +158,12 @@ object AllowedHostsFilterSpec extends PlaySpecification {
         """
         |play.filters.hosts.allowed = [".mozilla.org"]
       """.stripMargin) {
-      status(
-          request("www.securepasswordreset.com",
-                  "https://addons.mozilla.org/en-US/firefox/users/pwreset")) must_== OK
-      status(
-          request(
-              "addons.mozilla.org",
-              "https://www.securepasswordreset.com/en-US/firefox/users/pwreset")) must_== BAD_REQUEST
+      status(request(
+          "www.securepasswordreset.com",
+          "https://addons.mozilla.org/en-US/firefox/users/pwreset")) must_== OK
+      status(request(
+          "addons.mozilla.org",
+          "https://www.securepasswordreset.com/en-US/firefox/users/pwreset")) must_== BAD_REQUEST
     }
 
     "not allow bypassing with X-Forwarded-Host header" in withServer(

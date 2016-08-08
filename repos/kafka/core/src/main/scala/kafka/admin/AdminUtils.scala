@@ -218,9 +218,9 @@ object AdminUtils extends Logging {
           //    that do not have any replica, or
           // 2. the broker has already assigned a replica AND there is one or more brokers that do not have replica assigned
           if ((!racksWithReplicas.contains(rack) ||
-                  racksWithReplicas.size == numRacks) &&
+              racksWithReplicas.size == numRacks) &&
               (!brokersWithReplicas.contains(broker) ||
-                  brokersWithReplicas.size == numBrokers)) {
+              brokersWithReplicas.size == numBrokers)) {
             replicaBuffer += broker
             racksWithReplicas += rack
             brokersWithReplicas += broker
@@ -332,7 +332,7 @@ object AdminUtils extends Logging {
 
     // check if manual assignment has the right replication factor
     val unmatchedRepFactorList = newPartitionReplicaList.values.filter(p =>
-          (p.size != existingReplicaListForPartitionZero.size))
+      (p.size != existingReplicaListForPartitionZero.size))
     if (unmatchedRepFactorList.size != 0)
       throw new AdminOperationException(
           "The replication factor in manual replication assignment " +
@@ -448,7 +448,7 @@ object AdminUtils extends Logging {
   def deleteAllConsumerGroupInfoForTopicInZK(zkUtils: ZkUtils, topic: String) {
     val groups = zkUtils.getAllConsumerGroupsForTopic(topic)
     groups.foreach(group =>
-          deleteConsumerGroupInfoForTopicInZK(zkUtils, group, topic))
+      deleteConsumerGroupInfoForTopicInZK(zkUtils, group, topic))
   }
 
   def topicExists(zkUtils: ZkUtils, topic: String): Boolean =
@@ -683,7 +683,7 @@ object AdminUtils extends Logging {
     zkUtils
       .getAllTopics()
       .map(topic =>
-            (topic, fetchEntityConfig(zkUtils, ConfigType.Topic, topic)))
+        (topic, fetchEntityConfig(zkUtils, ConfigType.Topic, topic)))
       .toMap
 
   def fetchAllEntityConfigs(zkUtils: ZkUtils,
@@ -703,7 +703,7 @@ object AdminUtils extends Logging {
       zkUtils: ZkUtils): Set[MetadataResponse.TopicMetadata] = {
     val cachedBrokerInfo = new mutable.HashMap[Int, Broker]()
     topics.map(topic =>
-          fetchTopicMetadataFromZk(topic, zkUtils, cachedBrokerInfo))
+      fetchTopicMetadataFromZk(topic, zkUtils, cachedBrokerInfo))
   }
 
   private def fetchTopicMetadataFromZk(

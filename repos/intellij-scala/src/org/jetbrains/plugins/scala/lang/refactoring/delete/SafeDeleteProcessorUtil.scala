@@ -508,7 +508,7 @@ object SafeDeleteProcessorUtil {
                 newText.append("/** @see #").append(method.name).append('(')
                 val parameters: java.util.List[PsiParameter] =
                   new util.ArrayList[PsiParameter](util.Arrays.asList(
-                          method.getParameterList.getParameters: _*))
+                      method.getParameterList.getParameters: _*))
                 parameters.remove(parameter)
                 newText.append(
                     parameters.map(_.getType.getCanonicalText).mkString(","))
@@ -517,16 +517,16 @@ object SafeDeleteProcessorUtil {
                     new SafeDeleteReferenceJavaDeleteUsageInfo(element,
                                                                parameter,
                                                                true) {
-                  override def deleteElement() {
-                    val javadocMethodReference: PsiDocMethodOrFieldRef#MyReference =
-                      element.getReference
-                        .asInstanceOf[PsiDocMethodOrFieldRef#MyReference]
-                    if (javadocMethodReference != null) {
-                      javadocMethodReference.bindToText(method.containingClass,
-                                                        newText)
-                    }
-                  }
-                })
+                      override def deleteElement() {
+                        val javadocMethodReference: PsiDocMethodOrFieldRef#MyReference =
+                          element.getReference
+                            .asInstanceOf[PsiDocMethodOrFieldRef#MyReference]
+                        if (javadocMethodReference != null) {
+                          javadocMethodReference
+                            .bindToText(method.containingClass, newText)
+                        }
+                      }
+                    })
               }
             case _ =>
           }

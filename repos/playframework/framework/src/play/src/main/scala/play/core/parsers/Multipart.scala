@@ -48,9 +48,7 @@ object Multipart {
     maybeBoundary.map { boundary =>
       val multipartFlow = Flow[ByteString]
         .transform(() =>
-              new BodyPartParser(boundary,
-                                 maxMemoryBufferSize,
-                                 maxHeaderBuffer))
+          new BodyPartParser(boundary, maxMemoryBufferSize, maxHeaderBuffer))
         .splitWhen(_.isLeft)
         .prefixAndTail(1)
         .map {
@@ -105,20 +103,19 @@ object Multipart {
             }
 
             parseError orElse bufferExceededError getOrElse {
-              Future.successful(
-                  Right(MultipartFormData(
-                          parts.collect {
+              Future.successful(Right(MultipartFormData(
+                  parts.collect {
                     case dp: DataPart => dp
                   }.groupBy(_.key).map {
                     case (key, partValues) => key -> partValues.map(_.value)
                   },
-                          parts.collect {
+                  parts.collect {
                     case fp: FilePart[A] => fp
                   },
-                          parts.collect {
+                  parts.collect {
                     case bad: BadPart => bad
                   }
-                      )))
+              )))
             }
         }
 
@@ -132,7 +129,7 @@ object Multipart {
     case FileInfo(partName, filename, contentType) =>
       val tempFile = TemporaryFile("multipartBody", "asTemporaryFile")
       Accumulator(StreamConverters.fromOutputStream(() =>
-                new java.io.FileOutputStream(tempFile.file))).map { _ =>
+        new java.io.FileOutputStream(tempFile.file))).map { _ =>
         FilePart(partName, filename, contentType, tempFile)
       }
   }
@@ -194,11 +191,11 @@ object Multipart {
                        split(_)
                          .map(_.trim)
                          .map {
-                       // unescape escaped quotes
-                       case KeyValue(key, v) =>
-                         (key.trim, v.trim.replaceAll("""\\"""", "\""))
-                       case key => (key.trim, "")
-                     }
+                           // unescape escaped quotes
+                           case KeyValue(key, v) =>
+                             (key.trim, v.trim.replaceAll("""\\"""", "\""))
+                           case key => (key.trim, "")
+                         }
                          .toMap)
 
         _ <- values.get("form-data")
@@ -221,9 +218,9 @@ object Multipart {
                        _.split(";")
                          .map(_.trim)
                          .map {
-                       case KeyValue(key, v) => (key.trim, v.trim)
-                       case key => (key.trim, "")
-                     }
+                           case KeyValue(key, v) => (key.trim, v.trim)
+                           case key => (key.trim, "")
+                         }
                          .toMap)
         _ <- values.get("form-data")
         partName <- values.get("name")
@@ -373,7 +370,7 @@ object Multipart {
           // The amount of memory taken by the headers
           def headersSize =
             headers.foldLeft(0)((total, value) =>
-                  total + value._1.length + value._2.length)
+              total + value._1.length + value._2.length)
 
           headers match {
             case FileInfoMatcher(partName, fileName, contentType) =>
@@ -468,7 +465,7 @@ object Multipart {
       } catch {
         case NotEnoughDataException =>
           if (memoryBufferSize + (input.length - partStart -
-                    needle.length) > maxMemoryBufferSize) {
+                needle.length) > maxMemoryBufferSize) {
             bufferExceeded("Memory buffer full on part " + partName)
           }
           continue(input, partStart)(

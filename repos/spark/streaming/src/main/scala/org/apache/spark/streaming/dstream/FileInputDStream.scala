@@ -296,11 +296,10 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
         case None => context.sparkContext.newAPIHadoopFile[K, V, F](file)
       }
       if (rdd.partitions.isEmpty) {
-        logError(
-            "File " + file +
-              " has no data in it. Spark Streaming can only ingest " +
-              "files that have been \"moved\" to the directory assigned to the file stream. " +
-              "Refer to the streaming programming guide for more details.")
+        logError("File " + file +
+          " has no data in it. Spark Streaming can only ingest " +
+          "files that have been \"moved\" to the directory assigned to the file stream. " +
+          "Refer to the streaming programming guide for more details.")
       }
       rdd
     }
@@ -363,7 +362,7 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
         case (t, f) => {
           // Restore the metadata in both files and generatedRDDs
           logInfo("Restoring files for time " + t + " - " +
-                f.mkString("[", ", ", "]"))
+            f.mkString("[", ", ", "]"))
           batchTimeToSelectedFiles.synchronized {
             batchTimeToSelectedFiles += ((t, f))
           }

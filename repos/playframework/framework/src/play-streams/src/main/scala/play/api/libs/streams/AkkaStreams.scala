@@ -89,7 +89,7 @@ object AkkaStreams {
     */
   def ignoreAfterFinish[T]: Flow[T, T, _] =
     Flow[T].transform(() =>
-          new PushPullStage[T, T] {
+      new PushPullStage[T, T] {
         override def onPush(elem: T, ctx: Context[T]) = ctx.push(elem)
         override def onUpstreamFinish(ctx: Context[T]) =
           ctx.absorbTermination()

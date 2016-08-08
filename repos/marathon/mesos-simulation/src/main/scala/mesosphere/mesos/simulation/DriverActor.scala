@@ -115,11 +115,9 @@ class DriverActor(schedulerProps: Props) extends Actor {
                 .setName("ports")
                 .setType(Value.Type.RANGES)
                 .setRanges(Value.Ranges
-                      .newBuilder()
-                      .addRange(Value.Range
-                            .newBuilder()
-                            .setBegin(10000)
-                            .setEnd(20000)))
+                  .newBuilder()
+                  .addRange(
+                      Value.Range.newBuilder().setBegin(10000).setEnd(20000)))
                 .build()
           ))
       .build()

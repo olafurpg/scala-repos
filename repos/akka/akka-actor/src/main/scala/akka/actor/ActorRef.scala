@@ -844,11 +844,10 @@ private[akka] final class FunctionRef(override val path: ActorPath,
             if (!_watchedBy.compareAndSet(watchedBy, watchedBy + watcher))
               addWatcher(watchee, watcher) // try again
         } else if (!watcheeSelf && watcherSelf) {
-          publish(
-              Logging.Warning(
-                  path.toString,
-                  classOf[FunctionRef],
-                  s"externally triggered watch from $watcher to $watchee is illegal on FunctionRef"))
+          publish(Logging.Warning(
+              path.toString,
+              classOf[FunctionRef],
+              s"externally triggered watch from $watcher to $watchee is illegal on FunctionRef"))
         } else {
           publish(
               Logging.Error(
@@ -870,11 +869,10 @@ private[akka] final class FunctionRef(override val path: ActorPath,
             if (!_watchedBy.compareAndSet(watchedBy, watchedBy - watcher))
               remWatcher(watchee, watcher) // try again
         } else if (!watcheeSelf && watcherSelf) {
-          publish(
-              Logging.Warning(
-                  path.toString,
-                  classOf[FunctionRef],
-                  s"externally triggered unwatch from $watcher to $watchee is illegal on FunctionRef"))
+          publish(Logging.Warning(
+              path.toString,
+              classOf[FunctionRef],
+              s"externally triggered unwatch from $watcher to $watchee is illegal on FunctionRef"))
         } else {
           publish(
               Logging.Error(

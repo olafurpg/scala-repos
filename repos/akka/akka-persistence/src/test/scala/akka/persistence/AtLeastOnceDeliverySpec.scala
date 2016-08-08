@@ -71,7 +71,7 @@ object AtLeastOnceDeliverySpec {
             s"deliver(destination, deliveryId ⇒ Action(deliveryId, $payload)), recovery: " +
               recoveryRunning)
         deliver(context.actorSelection(destination))(deliveryId ⇒
-              Action(deliveryId, payload))
+          Action(deliveryId, payload))
 
       case AcceptedReq(payload, destination) ⇒
         log.debug(

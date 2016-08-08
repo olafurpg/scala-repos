@@ -177,7 +177,7 @@ with AbstractTestConfigurationProducer {
   private def buildPathFromTestExpr(expr: ScExpression): Option[String] =
     expr.firstChild
       .flatMap(TestConfigurationUtil
-            .getStaticTestName(_, allowSymbolLiterals = true))
+        .getStaticTestName(_, allowSymbolLiterals = true))
       .flatMap(buildTestPath(expr, _))
 
   override def getLocationClassAndTest(
@@ -197,7 +197,7 @@ with AbstractTestConfigurationProducer {
     }
     if (!containingObject.isInstanceOf[ScObject]) return fail
     if (!suitePaths.exists(suitePath =>
-              TestConfigurationUtil.isInheritor(containingObject, suitePath)))
+          TestConfigurationUtil.isInheritor(containingObject, suitePath)))
       return (null, null)
     val testClassPath = containingObject.qualifiedName
 

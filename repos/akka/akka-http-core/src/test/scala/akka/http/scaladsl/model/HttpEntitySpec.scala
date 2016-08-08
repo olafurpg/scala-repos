@@ -259,7 +259,7 @@ class HttpEntitySpec
 
   def duplicateBytesTransformer(): Flow[ByteString, ByteString, NotUsed] =
     Flow[ByteString].transform(() ⇒
-          StreamUtils.byteStringTransformer(doubleChars, () ⇒ trailer))
+      StreamUtils.byteStringTransformer(doubleChars, () ⇒ trailer))
 
   def trailer: ByteString = ByteString("--dup")
   def doubleChars(bs: ByteString): ByteString =

@@ -59,14 +59,13 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
 
       if (RunWorksheetAction.isScratchWorksheet(Option(file), project)) {
         addSplitter()
-        addChild(panel,
-                 createSelectClassPathList(
-                     Option(
-                         RunWorksheetAction
-                           .getModuleFor(
-                               PsiManager getInstance project findFile file)
-                           .getName),
-                     file))
+        addChild(
+            panel,
+            createSelectClassPathList(
+                Option(RunWorksheetAction
+                  .getModuleFor(PsiManager getInstance project findFile file)
+                  .getName),
+                file))
         addChild(panel, new JLabel("Use class path of module:  "))
       }
 

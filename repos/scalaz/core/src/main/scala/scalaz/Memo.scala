@@ -93,7 +93,7 @@ object Memo extends MemoInstances {
     var a = m
 
     memo[K, V](f =>
-          k => {
+      k => {
         a get k getOrElse {
           val v = f(k)
           a = a updated (k, v)

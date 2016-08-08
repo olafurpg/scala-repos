@@ -195,9 +195,8 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
         .queryExecution
         .assertAnalyzed()
     }
-    assert(
-        e.getMessage.contains(
-            "Cannot explode *, explode can only be applied on a specific column."))
+    assert(e.getMessage.contains(
+        "Cannot explode *, explode can only be applied on a specific column."))
 
     df.explode('prefix, 'csv) {
         case Row(prefix: String, csv: String) =>
@@ -891,7 +890,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
   test("SPARK-8797: sort by float column containing NaN should not crash") {
     val inputData =
       Seq.fill(10)(Tuple1(Float.NaN)) ++ (1 to 1000).map(x =>
-            Tuple1(x.toFloat))
+        Tuple1(x.toFloat))
     val df = Random.shuffle(inputData).toDF("a")
     df.orderBy("a").collect()
   }
@@ -899,7 +898,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
   test("SPARK-8797: sort by double column containing NaN should not crash") {
     val inputData =
       Seq.fill(10)(Tuple1(Double.NaN)) ++ (1 to 1000).map(x =>
-            Tuple1(x.toDouble))
+        Tuple1(x.toDouble))
     val df = Random.shuffle(inputData).toDF("a")
     df.orderBy("a").collect()
   }
@@ -1402,10 +1401,9 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
 
     val df9 = Seq((1L, Tuple4(1L, Tuple4(1L, 2L, 3L, 4L), 2L, 3L), 20.0, 1))
       .toDF("c1", "c2", "c3", "c4")
-    assert(
-        df9.toString === "[c1: bigint, c2: struct<_1: bigint," +
-          " _2: struct<_1: bigint," +
-          " _2: bigint ... 2 more fields> ... 2 more fields> ... 2 more fields]")
+    assert(df9.toString === "[c1: bigint, c2: struct<_1: bigint," +
+      " _2: struct<_1: bigint," +
+      " _2: bigint ... 2 more fields> ... 2 more fields> ... 2 more fields]")
   }
 
   test("reuse exchange") {

@@ -26,7 +26,7 @@ object PlayExceptions {
           message.getOrElse {
             unexpected
               .map(t =>
-                    "%s: %s".format(t.getClass.getSimpleName, t.getMessage))
+                "%s: %s".format(t.getClass.getSimpleName, t.getMessage))
               .getOrElse("")
           },
           unexpected.orNull

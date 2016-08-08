@@ -125,7 +125,7 @@ abstract class UnCurry
      */
     def isByNameRef(tree: Tree) =
       (tree.isTerm && (tree.symbol ne null) && (isByName(tree.symbol)) &&
-            !byNameArgs(tree))
+        !byNameArgs(tree))
 
 // ------- Handling non-local returns -------------------------------------------------
 
@@ -184,7 +184,7 @@ abstract class UnCurry
           gen.mkBindForCase(ex, NonLocalReturnControlClass, List(argType))
         val rhs =
           (IF((ex DOT nme.key)() OBJ_EQ Ident(key)) THEN ((ex DOT nme.value)()) ELSE
-                (Throw(Ident(ex))))
+            (Throw(Ident(ex))))
         val keyDef = ValDef(key, New(ObjectTpe))
         val tryCatch = Try(body, pat -> rhs)
 
@@ -260,7 +260,7 @@ abstract class UnCurry
             val anonClass =
               fun.symbol.owner newAnonymousFunctionClass
                 (fun.pos,
-                    inConstructorFlag) addAnnotation SerialVersionUIDAnnotation
+                inConstructorFlag) addAnnotation SerialVersionUIDAnnotation
             // The original owner is used in the backend for the EnclosingMethod attribute. If fun is
             // nested in a value-class method, its owner was already changed to the extension method.
             // Saving the original owner allows getting the source structure from the class symbol.
@@ -389,7 +389,7 @@ abstract class UnCurry
           log(s"Argument '$arg' at line ${arg.pos.line} is $formal from ${fun.fullName}")
           def canUseDirectly(recv: Tree) =
             (recv.tpe.typeSymbol.isSubClass(FunctionClass(0)) &&
-                  treeInfo.isExprSafeToInline(recv))
+              treeInfo.isExprSafeToInline(recv))
           arg match {
             // don't add a thunk for by-name argument if argument already is an application of
             // a Function0. We can then remove the application and use the existing Function0.
@@ -490,8 +490,8 @@ abstract class UnCurry
                val vparamssNoRhs =
                  dd.vparamss mapConserve
                    (_ mapConserve { p =>
-                         treeCopy.ValDef(p, p.mods, p.name, p.tpt, EmptyTree)
-                       })
+                     treeCopy.ValDef(p, p.mods, p.name, p.tpt, EmptyTree)
+                   })
 
                if (dd.symbol hasAnnotation VarargsClass) validateVarargs(dd)
 
@@ -524,14 +524,8 @@ abstract class UnCurry
                                      rhs1)
                    }
                  } else {
-                   super.transform(
-                       treeCopy.DefDef(dd,
-                                       mods,
-                                       name,
-                                       tparams,
-                                       vparamssNoRhs,
-                                       tpt,
-                                       rhs))
+                   super.transform(treeCopy
+                     .DefDef(dd, mods, name, tparams, vparamssNoRhs, tpt, rhs))
                  }
                }
              case ValDef(_, _, _, rhs) =>
@@ -857,7 +851,7 @@ abstract class UnCurry
             "A constructor cannot be annotated with a `varargs` annotation.")
       else {
         val hasRepeated = mexists(dd.symbol.paramss)(sym =>
-              definitions.isRepeatedParamType(sym.tpe))
+          definitions.isRepeatedParamType(sym.tpe))
         if (!hasRepeated)
           reporter.error(
               dd.symbol.pos,
@@ -871,7 +865,7 @@ abstract class UnCurry
     private def addJavaVarargsForwarders(dd: DefDef, flatdd: DefDef): DefDef = {
       if (!dd.symbol.hasAnnotation(VarargsClass) ||
           !enteringUncurry(mexists(dd.symbol.paramss)(sym =>
-                    definitions.isRepeatedParamType(sym.tpe))))
+            definitions.isRepeatedParamType(sym.tpe))))
         return flatdd
 
       def toArrayType(tp: Type): Type = {
@@ -891,7 +885,7 @@ abstract class UnCurry
       val flatparams = flatdd.symbol.paramss.head
       val isRepeated = enteringUncurry(
           dd.symbol.info.paramss.flatten.map(sym =>
-                definitions.isRepeatedParamType(sym.tpe)))
+            definitions.isRepeatedParamType(sym.tpe)))
 
       // create the type
       val forwformals = map2(flatparams, isRepeated) {

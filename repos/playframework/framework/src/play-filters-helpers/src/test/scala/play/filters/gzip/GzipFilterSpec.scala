@@ -63,7 +63,7 @@ object GzipFilterSpec extends PlaySpecification with DataTables {
 
     "not gzip HEAD requests" in withApplication(Ok) { implicit mat =>
       checkNotGzipped(route(FakeRequest("HEAD", "/").withHeaders(
-                              ACCEPT_ENCODING -> "gzip")).get,
+                          ACCEPT_ENCODING -> "gzip")).get,
                       "")
     }
 
@@ -88,7 +88,7 @@ object GzipFilterSpec extends PlaySpecification with DataTables {
 
     "not buffer more than the configured threshold" in withApplication(
         Ok.sendEntity(HttpEntity
-              .Streamed(Source.single(ByteString(body)), Some(1000), None)),
+          .Streamed(Source.single(ByteString(body)), Some(1000), None)),
         chunkedThreshold = 512) { implicit mat =>
       val result = makeGzipRequest
       checkGzippedBody(result, body)
@@ -115,7 +115,7 @@ object GzipFilterSpec extends PlaySpecification with DataTables {
       val result = makeGzipRequest
       checkGzipped(result)
       header(VARY, result) must beSome.which(header =>
-            header contains "original,")
+        header contains "original,")
     }
 
     "preserve original Vary header values and not duplicate case-insensitive ACCEPT-ENCODING" in withApplication(
@@ -123,14 +123,12 @@ object GzipFilterSpec extends PlaySpecification with DataTables {
       implicit mat =>
         val result = makeGzipRequest
         checkGzipped(result)
-        header(VARY, result) must beSome.which(
-            header =>
-              header
-                .split(",")
-                .filter(
-                    _.toLowerCase(java.util.Locale.ENGLISH) == ACCEPT_ENCODING
-                      .toLowerCase(java.util.Locale.ENGLISH))
-                .size == 1)
+        header(VARY, result) must beSome.which(header =>
+          header
+            .split(",")
+            .filter(_.toLowerCase(java.util.Locale.ENGLISH) == ACCEPT_ENCODING
+              .toLowerCase(java.util.Locale.ENGLISH))
+            .size == 1)
     }
   }
 

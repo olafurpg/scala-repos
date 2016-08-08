@@ -221,7 +221,7 @@ class Dataset[T] private[sql] (
       .getOrElse {
         throw new AnalysisException(
             s"""Cannot resolve column name "$colName" among (${schema.fieldNames
-          .mkString(", ")})""")
+              .mkString(", ")})""")
       }
   }
 
@@ -1840,7 +1840,7 @@ class Dataset[T] private[sql] (
       val aggExprs = statistics.flatMap {
         case (_, colToAgg) =>
           outputCols.map(c =>
-                Column(Cast(colToAgg(Column(c).expr), StringType)).as(c))
+            Column(Cast(colToAgg(Column(c).expr), StringType)).as(c))
       }
 
       val row = agg(aggExprs.head, aggExprs.tail: _*).head().toSeq

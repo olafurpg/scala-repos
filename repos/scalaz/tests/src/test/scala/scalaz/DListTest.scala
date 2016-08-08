@@ -18,7 +18,7 @@ object DListTest extends SpecLite {
 
   "DList append" !
     ((0 to 100000).foldLeft(DList[Int]())(_ :+ _).toList must_==
-          (0 to 100000).toList)
+      (0 to 100000).toList)
 
   "headOption, tailOption" ! forAll { (n: Int, d: DList[Int]) =>
     // Defined when appropriate?

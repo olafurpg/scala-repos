@@ -110,7 +110,7 @@ class ScParameterizedType private (val designator: ScType,
       case ScParameterizedType(ScDesignatorType(ta: ScTypeAlias), args) =>
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
             ta.typeParameters.map(tp =>
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+              (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             args)
         Some(
             AliasType(ta,
@@ -122,7 +122,7 @@ class ScParameterizedType private (val designator: ScType,
         val subst: ScSubstitutor = p.actualSubst
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
             ta.typeParameters.map(tp =>
-                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+              (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             args)
         val s = subst.followed(genericSubst)
         Some(
@@ -403,8 +403,7 @@ case class ScTypeParameterType(name: String,
     if (hash == -1) {
       hash =
         (((param.hashCode() * 31 + upper.hashCode) * 31 +
-                  lower.hashCode()) * 31 + args
-              .hashCode()) * 31 + name.hashCode
+          lower.hashCode()) * 31 + args.hashCode()) * 31 + name.hashCode
     }
     hash
   }

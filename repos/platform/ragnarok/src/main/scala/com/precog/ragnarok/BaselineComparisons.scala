@@ -175,8 +175,8 @@ trait BaselineComparisons {
       test match {
         case Tree.Node((RunQuery(query), Some(stats)), _) =>
           JObject(JField("path", JArray(path)) :: JField(
-                  "query",
-                  JString(query)) :: statsJson(stats)) :: Nil
+              "query",
+              JString(query)) :: statsJson(stats)) :: Nil
 
         case Tree.Node((Group(name), Some(stats)), kids) =>
           val newPath = path :+ JString(name)

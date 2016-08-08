@@ -62,8 +62,8 @@ private[round] final class Drawer(messenger: Messenger,
 
   def claim(pov: Pov): Fu[Events] =
     (pov.game.playable &&
-          pov.game.toChessHistory.threefoldRepetition) ?? finisher
-      .other(pov.game, _.Draw)
+      pov.game.toChessHistory.threefoldRepetition) ?? finisher.other(pov.game,
+                                                                     _.Draw)
 
   def force(game: Game): Fu[Events] = finisher.other(game, _.Draw, None, None)
 }

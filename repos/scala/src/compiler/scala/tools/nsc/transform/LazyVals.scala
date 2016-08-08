@@ -195,7 +195,7 @@ abstract class LazyVals
                 toAdd0
               } else List()
             deriveTemplate(tree)(_ =>
-                  innerClassBitmaps ++ flattenThickets(stats))
+              innerClassBitmaps ++ flattenThickets(stats))
           }
 
         case ValDef(_, _, _, _) if !sym.owner.isModule && !sym.owner.isClass =>
@@ -224,12 +224,11 @@ abstract class LazyVals
               name0.startsWith(nme.DO_WHILE_PREFIX) =>
           val stats1 = super.transformTrees(stats0)
           if (LocalLazyValFinder.find(stats1))
-            deriveLabelDef(l)(
-                _ =>
-                  treeCopy.Block(
-                      block,
-                      typed(addBitmapDefs(sym.owner, stats1.head)) :: stats1.tail,
-                      expr))
+            deriveLabelDef(l)(_ =>
+              treeCopy.Block(
+                  block,
+                  typed(addBitmapDefs(sym.owner, stats1.head)) :: stats1.tail,
+                  expr))
           else l
 
         case _ => super.transform(tree)

@@ -292,9 +292,9 @@ private[http] object HttpServerBluePrint {
 
     Flow[SessionBytes]
       .transform(() ⇒
-            // each connection uses a single (private) request parser instance for all its requests
-            // which builds a cache of all header instances seen on that connection
-            rootParser.createShallowCopy().stage)
+        // each connection uses a single (private) request parser instance for all its requests
+        // which builds a cache of all header instances seen on that connection
+        rootParser.createShallowCopy().stage)
       .named("rootParser")
       .map(establishAbsoluteUri)
   }
@@ -420,7 +420,7 @@ private[http] object HttpServerBluePrint {
     def clear(): Unit =
       // best effort timeout cancellation
       get.fast.foreach(setup ⇒
-            if (setup.scheduledTask ne null) setup.scheduledTask.cancel())
+        if (setup.scheduledTask ne null) setup.scheduledTask.cancel())
 
     override def updateTimeout(timeout: Duration): Unit =
       update(timeout, null: HttpRequest ⇒ HttpResponse)
@@ -657,17 +657,17 @@ private[http] object HttpServerBluePrint {
               _.via(
                   Flow[T]
                     .transform(() ⇒
-                          new PushPullStage[T, T] {
-                    private var oneHundredContinueSent = false
-                    def onPush(elem: T, ctx: Context[T]) = ctx.push(elem)
-                    def onPull(ctx: Context[T]) = {
-                      if (!oneHundredContinueSent) {
-                        oneHundredContinueSent = true
-                        emit100ContinueResponse.invoke(())
-                      }
-                      ctx.pull()
-                    }
-                })
+                      new PushPullStage[T, T] {
+                        private var oneHundredContinueSent = false
+                        def onPush(elem: T, ctx: Context[T]) = ctx.push(elem)
+                        def onPull(ctx: Context[T]) = {
+                          if (!oneHundredContinueSent) {
+                            oneHundredContinueSent = true
+                            emit100ContinueResponse.invoke(())
+                          }
+                          ctx.pull()
+                        }
+                    })
                     .named("expect100continueTrigger"))
             }
           }

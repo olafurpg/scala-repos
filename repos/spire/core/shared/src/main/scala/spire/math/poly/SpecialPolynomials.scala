@@ -38,7 +38,7 @@ object SpecialPolynomials {
     (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => {
       Polynomial(Map((0, f.one / f.fromInt(n + 1)))) *
         (Polynomial(Map((0, f.fromInt(2 * n + 1)), (1, -f.one))) * pn -
-              pnm1 * Polynomial(Map((0, f.fromInt(n)))))
+          pnm1 * Polynomial(Map((0, f.fromInt(n)))))
     }
 
   // Chebyshev recurrence function

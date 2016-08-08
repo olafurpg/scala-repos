@@ -481,7 +481,7 @@ object TypedActor
         case "toString" ⇒ actor.toString
         case "equals" ⇒
           (args.length == 1 && (proxy eq args(0)) ||
-                actor == extension.getActorRefFor(args(0)))
+            actor == extension.getActorRefFor(args(0)))
             .asInstanceOf[AnyRef] //Force boxing of the boolean
         case "hashCode" ⇒ actor.hashCode.asInstanceOf[AnyRef]
         case _ ⇒
@@ -779,8 +779,8 @@ class TypedActorExtension(val system: ExtendedActorSystem)
     val proxy = Proxy
       .newProxyInstance(
           (props.loader orElse props.interfaces.collectFirst {
-                case any ⇒ any.getClassLoader
-              }).orNull, //If we have no loader, we arbitrarily take the loader of the first interface
+            case any ⇒ any.getClassLoader
+          }).orNull, //If we have no loader, we arbitrarily take the loader of the first interface
           props.interfaces.toArray,
           new TypedActorInvocationHandler(
               this,

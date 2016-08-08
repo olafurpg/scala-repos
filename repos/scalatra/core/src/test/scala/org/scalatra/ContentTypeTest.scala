@@ -169,7 +169,7 @@ class ContentTypeTest extends ScalatraFunSuite with BeforeAndAfterAll {
 
     post("/echo",
          headers = Map("Content-Type" ->
-               ("application/x-www-form-urlencoded; charset=" + charset)),
+           ("application/x-www-form-urlencoded; charset=" + charset)),
          body = ("echo=" + message.urlEncode(Charset.forName(charset)))) {
       body should equal(message)
     }

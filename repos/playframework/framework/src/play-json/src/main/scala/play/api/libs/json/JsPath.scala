@@ -207,9 +207,8 @@ case class JsPath(path: List[PathNode] = List()) {
                     Seq(this -> Seq(ValidationError("error.path.missing")))))
           case List(js) => Right(JsSuccess(js))
           case _ :: _ =>
-            Right(
-                JsError(Seq(this -> Seq(
-                            ValidationError("error.path.result.multiple")))))
+            Right(JsError(Seq(
+                this -> Seq(ValidationError("error.path.result.multiple")))))
         }
       case head :: tail =>
         head(json) match {
@@ -219,9 +218,8 @@ case class JsPath(path: List[PathNode] = List()) {
                     Seq(this -> Seq(ValidationError("error.path.missing")))))
           case List(js) => step(tail, js)
           case _ :: _ =>
-            Left(
-                JsError(Seq(this -> Seq(
-                            ValidationError("error.path.result.multiple")))))
+            Left(JsError(Seq(
+                this -> Seq(ValidationError("error.path.result.multiple")))))
         }
     }
 

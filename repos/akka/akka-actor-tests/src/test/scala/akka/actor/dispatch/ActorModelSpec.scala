@@ -475,9 +475,9 @@ abstract class ActorModelSpec(config: String)
                   val team = dispatcher.team
                   val mq = dispatcher.messageQueue
 
-                  System.err.println(
-                      "Teammates left: " + team.size + " stopLatch: " +
-                        stopLatch.getCount + " inhab:" + dispatcher.inhabitants)
+                  System.err
+                    .println("Teammates left: " + team.size + " stopLatch: " +
+                      stopLatch.getCount + " inhab:" + dispatcher.inhabitants)
                   team.toArray sorted new Ordering[AnyRef] {
                     def compare(l: AnyRef, r: AnyRef) = (l, r) match {
                       case (ll: ActorCell, rr: ActorCell) ⇒
@@ -540,15 +540,11 @@ abstract class ActorModelSpec(config: String)
         assert(Await.result(f1, timeout.duration) === "foo")
         assert(Await.result(f2, timeout.duration) === "bar")
         assert(Await.result(f4, timeout.duration) === "foo2")
-        assert(
-            intercept[ActorInterruptedException](Await.result(
-                    f3,
-                    timeout.duration)).getCause.getMessage === "Ping!")
+        assert(intercept[ActorInterruptedException](Await
+          .result(f3, timeout.duration)).getCause.getMessage === "Ping!")
         assert(Await.result(f6, timeout.duration) === "bar2")
-        assert(
-            intercept[ActorInterruptedException](Await.result(
-                    f5,
-                    timeout.duration)).getCause.getMessage === "Ping!")
+        assert(intercept[ActorInterruptedException](Await
+          .result(f5, timeout.duration)).getCause.getMessage === "Ping!")
         c.cancel()
         Thread.sleep(300) // give the EventFilters a chance of catching all messages
       }

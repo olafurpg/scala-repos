@@ -336,7 +336,7 @@ object InferUtil {
                             isByName = false)),
               Seq(
                   new Expression(undefineSubstitutor(typeParams).subst(
-                          innerInternal.inferValueType))),
+                      innerInternal.inferValueType))),
               typeParams,
               shouldUndefineParameters = false,
               safeCheck = check,
@@ -361,7 +361,7 @@ object InferUtil {
                                 isByName = false)),
                   Seq(
                       new Expression(undefineSubstitutor(typeParams).subst(
-                              internal.inferValueType))),
+                          internal.inferValueType))),
                   typeParams,
                   shouldUndefineParameters = false,
                   safeCheck = check,
@@ -543,8 +543,8 @@ object InferUtil {
                 typez.recursiveUpdate {
                   case tpt: ScTypeParameterType =>
                     typeParams.find(tp =>
-                          (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)) ==
-                            (tpt.name, tpt.getId)) match {
+                      (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)) ==
+                        (tpt.name, tpt.getId)) match {
                       case None => (true, tpt)
                       case _ =>
                         hasRecursiveTypeParameters = true
@@ -614,8 +614,8 @@ object InferUtil {
                     typez.recursiveUpdate {
                       case tpt: ScTypeParameterType =>
                         typeParams.find(tp =>
-                              (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)) ==
-                                (tpt.name, tpt.getId)) match {
+                          (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)) ==
+                            (tpt.name, tpt.getId)) match {
                           case None => (true, tpt)
                           case _ =>
                             hasRecursiveTypeParameters = true
@@ -715,12 +715,11 @@ object InferUtil {
                       }
                       !removeMe
                   }.map(tp =>
-                        TypeParameter(
-                            tp.name,
-                            tp.typeParams /* doesn't important here */,
-                            () => sub.subst(tp.lowerType()),
-                            () => sub.subst(tp.upperType()),
-                            tp.ptp)))
+                    TypeParameter(tp.name,
+                                  tp.typeParams /* doesn't important here */,
+                                  () => sub.subst(tp.lowerType()),
+                                  () => sub.subst(tp.upperType()),
+                                  tp.ptp)))
             }
 
             un.getSubstitutor match {

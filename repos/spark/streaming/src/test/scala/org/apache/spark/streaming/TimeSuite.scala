@@ -113,10 +113,8 @@ class TimeSuite extends TestSuiteBase {
   }
 
   test("to") {
-    assert(
-        new Time(1000).to(new Time(1100), new Duration(100)) == Seq(
-            Time(1000),
-            Time(1100)))
+    assert(new Time(1000)
+      .to(new Time(1100), new Duration(100)) == Seq(Time(1000), Time(1100)))
     assert(
         new Time(1000).to(new Time(1000), new Duration(100)) == Seq(
             Time(1000)))

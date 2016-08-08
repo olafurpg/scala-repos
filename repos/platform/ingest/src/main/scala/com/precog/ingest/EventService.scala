@@ -88,8 +88,8 @@ object EventService {
   object ServiceConfig {
     def fromConfiguration(config: Configuration) = {
       (ServiceLocation
-            .fromConfig(config.detach("eventService")) |@| ServiceLocation
-            .fromConfig(config.detach("bifrost"))) { (serviceLoc, shardLoc) =>
+        .fromConfig(config.detach("eventService")) |@| ServiceLocation
+        .fromConfig(config.detach("bifrost"))) { (serviceLoc, shardLoc) =>
         ServiceConfig(
             serviceLocation = serviceLoc,
             shardLocation = shardLoc,
@@ -100,9 +100,8 @@ object EventService {
             ingestTmpDir = config
               .get[String]("ingest.tmpdir")
               .map(new File(_))
-              .orElse(Option(File
-                        .createTempFile("ingest.tmpfile", null)
-                        .getParentFile))
+              .orElse(Option(
+                  File.createTempFile("ingest.tmpfile", null).getParentFile))
               .get, //fail fast
             deleteTimeout =
               akka.util.Timeout(config[Long]("delete.timeout", 10000l))

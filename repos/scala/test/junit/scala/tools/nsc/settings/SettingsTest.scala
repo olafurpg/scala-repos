@@ -121,7 +121,7 @@ class SettingsTest {
     assertThrows[IllegalArgumentException](
         check("-Xlint:-_")(_.warnAdaptedArgs))
     assertThrows[IllegalArgumentException](check("-Xlint:-warn-adapted-args")(
-            _.warnAdaptedArgs)) // "warn-" should not be there
+        _.warnAdaptedArgs)) // "warn-" should not be there
   }
 
   @Test def xLintNonColonated(): Unit = {
@@ -135,7 +135,7 @@ class SettingsTest {
               "adapted-args",
               "missing-interpolator",
               "-deprecation")(s =>
-              s.warnMissingInterpolator && s.warnAdaptedArgs))
+          s.warnMissingInterpolator && s.warnAdaptedArgs))
     assertThrows[IllegalArgumentException](
         check("-Xlint", "adapted-args", "-missing-interpolator")(
             _.warnAdaptedArgs)) // non-colonated: cannot provide negative args

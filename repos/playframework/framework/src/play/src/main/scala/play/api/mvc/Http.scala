@@ -599,8 +599,8 @@ package play.api.mvc {
           .split("&")
           .map(_.split("=", 2))
           .map(p =>
-                URLDecoder.decode(p(0), "UTF-8") -> URLDecoder.decode(p(1),
-                                                                      "UTF-8"))
+            URLDecoder.decode(p(0), "UTF-8") -> URLDecoder.decode(p(1),
+                                                                  "UTF-8"))
           .toMap
       }
 
@@ -1051,7 +1051,7 @@ package play.api.mvc {
     def mergeCookieHeader(cookieHeader: String, cookies: Seq[Cookie]): String = {
       val tupledCookies =
         (decodeCookieHeader(cookieHeader) ++ cookies).map(cookie =>
-              cookie.name -> cookie)
+          cookie.name -> cookie)
       // Put cookies in a map
       // Note: Seq.toMap do not preserve order
       val uniqCookies = scala.collection.immutable.ListMap(tupledCookies: _*)

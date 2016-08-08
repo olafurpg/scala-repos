@@ -52,7 +52,7 @@ class DataSource(val dsp: DataSourceParams)
           } catch {
             case e: Exception => {
               logger.error(s"Failed to get properties ${properties} of" +
-                    s" ${entityId}. Exception: ${e}.")
+                s" ${entityId}. Exception: ${e}.")
               throw e
             }
           }

@@ -133,9 +133,9 @@ object Sink {
       .fromGraph(new HeadOptionStage[T])
       .withAttributes(DefaultAttributes.headSink)
       .mapMaterializedValue(e ⇒
-            e.map(_.getOrElse(
-                    throw new NoSuchElementException("head of empty stream")))(
-                ExecutionContexts.sameThreadExecutionContext))
+        e.map(_.getOrElse(
+            throw new NoSuchElementException("head of empty stream")))(
+            ExecutionContexts.sameThreadExecutionContext))
 
   /**
     * A `Sink` that materializes into a `Future` of the optional first value received.
@@ -161,9 +161,9 @@ object Sink {
       .fromGraph(new LastOptionStage[T])
       .withAttributes(DefaultAttributes.lastSink)
       .mapMaterializedValue(e ⇒
-            e.map(_.getOrElse(
-                    throw new NoSuchElementException("last of empty stream")))(
-                ExecutionContexts.sameThreadExecutionContext))
+        e.map(_.getOrElse(
+            throw new NoSuchElementException("last of empty stream")))(
+            ExecutionContexts.sameThreadExecutionContext))
 
   /**
     * A `Sink` that materializes into a `Future` of the optional last value received.

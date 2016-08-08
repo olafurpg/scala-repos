@@ -183,7 +183,7 @@ class ScalaImportTypeFix(private var classes: Array[TypeToImport],
                 ref.bindToElement(clazz.element)
               else
                 ref.replace(ScalaPsiElementFactory
-                      .createDocLinkValue(clazz.qualifiedName, ref.getManager))
+                  .createDocLinkValue(clazz.qualifiedName, ref.getManager))
             }
           }, clazz.getProject, "Add import action")
         }

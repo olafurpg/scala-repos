@@ -219,7 +219,7 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
 
     // Filter any resource that has depleted.
     val filteredResources = remainingResources.filter(r =>
-          r.getType != Value.Type.SCALAR || r.getScalar.getValue > 0.0)
+      r.getType != Value.Type.SCALAR || r.getScalar.getValue > 0.0)
 
     (filteredResources.toList, requestedResources.toList)
   }
@@ -340,7 +340,7 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
           .asScala
           .toMap
           .mapValues(v =>
-                if (v == null || v.isEmpty) {
+            if (v == null || v.isEmpty) {
               Set[String]()
             } else {
               v.split(',').toSet

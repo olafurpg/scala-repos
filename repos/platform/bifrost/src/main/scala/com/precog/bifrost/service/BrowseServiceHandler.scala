@@ -70,18 +70,17 @@ class BrowseSupport[M[+ _]: Bind](vfs: VFSMetadata[M]) {
     vfs.findDirectChildren(apiKey, path) map { paths =>
       JArray(
           (paths map { p =>
-                val fields: Map[String, JValue] = p.pathType match {
-                  case DataDir(contentType) =>
-                    Map("contentType" -> JString(contentType.value),
-                        "type" -> JArray(JString("file"),
-                                         JString("directory")))
-                  case DataOnly(contentType) =>
-                    Map("contentType" -> JString(contentType.value),
-                        "type" -> JArray(JString("file")))
-                  case PathOnly => Map("type" -> JArray(JString("directory")))
-                }
-                JObject(fields + ("name" -> JString(p.path.path.substring(1))))
-              }).toSeq: _*
+            val fields: Map[String, JValue] = p.pathType match {
+              case DataDir(contentType) =>
+                Map("contentType" -> JString(contentType.value),
+                    "type" -> JArray(JString("file"), JString("directory")))
+              case DataOnly(contentType) =>
+                Map("contentType" -> JString(contentType.value),
+                    "type" -> JArray(JString("file")))
+              case PathOnly => Map("type" -> JArray(JString("directory")))
+            }
+            JObject(fields + ("name" -> JString(p.path.path.substring(1))))
+          }).toSeq: _*
       )
     }
   }
@@ -172,25 +171,25 @@ class BrowseServiceHandler[A](
               HttpResponse[JValue](
                   InternalServerError,
                   content = Some(JObject("errors" -> JArray(
-                              "sorry, we're looking into it!".serialize))))
+                      "sorry, we're looking into it!".serialize))))
             }, {
               case ResourceError.NotFound(message) =>
                 HttpResponse[JValue](
                     HttpStatusCodes.NotFound,
                     content = Some(
                         JObject("errors" -> JArray(
-                                "Could not find any resource that corresponded to path %s: %s"
-                                  .format(path.path, message)
-                                  .serialize))))
+                            "Could not find any resource that corresponded to path %s: %s"
+                              .format(path.path, message)
+                              .serialize))))
 
               case PermissionsError(message) =>
                 HttpResponse[JValue](
                     Forbidden,
                     content = Some(
                         JObject("errors" -> JArray(
-                                "API key %s does not have the ability to browse path %s: %s"
-                                  .format(apiKey, path.path, message)
-                                  .serialize))))
+                            "API key %s does not have the ability to browse path %s: %s"
+                              .format(apiKey, path.path, message)
+                              .serialize))))
 
               case unexpected =>
                 logger.error(
@@ -199,7 +198,7 @@ class BrowseServiceHandler[A](
                 HttpResponse[JValue](
                     InternalServerError,
                     content = Some(JObject(
-                            "errors" -> "sorry, we're looking into it!".serialize)))
+                        "errors" -> "sorry, we're looking into it!".serialize)))
             }
         )
       }

@@ -443,7 +443,7 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
           case (key, _) =>
             GetsResult(
                 GetResult(failures = Map(key -> SimpleReplicationFailure(
-                            "One or more underlying replica failed gets"))))
+                    "One or more underlying replica failed gets"))))
         }
       GetResult.merged(getsResultSeq.toSeq)
     }

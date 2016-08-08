@@ -58,10 +58,10 @@ object Embed extends DispatchSnippet {
       ctx <- S.session ?~ ("FIX" + "ME: session is invalid")
       what <- S.attr ~ ("what") ?~
                ("FIX" +
-                     "ME The 'what' attribute not defined. In order to embed a template, the 'what' attribute must be specified")
+                 "ME The 'what' attribute not defined. In order to embed a template, the 'what' attribute must be specified")
       templateOpt <- ctx.findTemplate(what.text) ?~
                       ("FIX" + "ME trying to embed a template named '" + what +
-                            "', but the template was not found. ")
+                        "', but the template was not found. ")
     } yield {
       (what, Templates.checkForContentId(templateOpt))
     }

@@ -187,17 +187,17 @@ object Plugins extends PluginsFunctions {
             defined.filter(_.isAlwaysEnabled).filterNot(explicitlyDisabled)
           val knowlege0: Set[Atom] =
             ((flatten(requestedPlugins) ++ alwaysEnabled) collect {
-                  case x: AutoPlugin => Atom(x.label)
-                }).toSet
+              case x: AutoPlugin => Atom(x.label)
+            }).toSet
           val clauses = Clauses(
               (allRequirementsClause ::: allEnabledByClause) filterNot {
-            _.head subsetOf knowlege0
-          })
+                _.head subsetOf knowlege0
+              })
           log.debug(
               s"deducing auto plugins based on known facts ${knowlege0.toString} and clauses ${clauses.toString}")
           Logic.reduce(clauses,
                        (flattenConvert(requestedPlugins) ++ convertAll(
-                               alwaysEnabled)).toSet) match {
+                           alwaysEnabled)).toSet) match {
             case Left(problem) => throw AutoPluginException(problem)
             case Right(results) =>
               log.debug(s"  :: deduced result: ${results}")
@@ -209,8 +209,8 @@ object Plugins extends PluginsFunctions {
                                           s"${a} was not found in atom map."))
                 }
               val forbidden: Set[AutoPlugin] = (selectedPlugins flatMap {
-                    Plugins.asExclusions
-                  }).toSet
+                Plugins.asExclusions
+              }).toSet
               val c = selectedPlugins.toSet & forbidden
               if (c.nonEmpty) {
                 exlusionConflictError(requestedPlugins,
@@ -277,30 +277,30 @@ object Plugins extends PluginsFunctions {
       conflicting: Seq[AutoPlugin]): Unit = {
     def listConflicts(ns: Seq[AutoPlugin]) =
       (ns map { c =>
-            val reasons =
-              (if (flatten(requested) contains c) List("requested")
-               else Nil) ++
-                (if (c.requires != empty && c.trigger == allRequirements)
-                   List(s"enabled by ${c.requires.toString}")
-                 else Nil) ++ {
-                val reqs =
-                  selected filter { x =>
-                    asRequirements(x) contains c
-                  }
-                if (reqs.nonEmpty)
-                  List(s"""required by ${reqs.mkString(", ")}""")
-                else Nil
-              } ++ {
-                val exs =
-                  selected filter { x =>
-                    asExclusions(x) contains c
-                  }
-                if (exs.nonEmpty)
-                  List(s"""excluded by ${exs.mkString(", ")}""")
-                else Nil
+        val reasons =
+          (if (flatten(requested) contains c) List("requested")
+           else Nil) ++
+            (if (c.requires != empty && c.trigger == allRequirements)
+               List(s"enabled by ${c.requires.toString}")
+             else Nil) ++ {
+            val reqs =
+              selected filter { x =>
+                asRequirements(x) contains c
               }
-            s"""  - conflict: ${c.label} is ${reasons.mkString("; ")}"""
-          }).mkString("\n")
+            if (reqs.nonEmpty)
+              List(s"""required by ${reqs.mkString(", ")}""")
+            else Nil
+          } ++ {
+            val exs =
+              selected filter { x =>
+                asExclusions(x) contains c
+              }
+            if (exs.nonEmpty)
+              List(s"""excluded by ${exs.mkString(", ")}""")
+            else Nil
+          }
+        s"""  - conflict: ${c.label} is ${reasons.mkString("; ")}"""
+      }).mkString("\n")
     throw AutoPluginException(s"""Contradiction in enabled plugins:
   - requested: ${requested.toString}
   - enabled: ${selected.mkString(", ")}

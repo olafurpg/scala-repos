@@ -196,10 +196,8 @@ private[persistence] class LocalSnapshotStore
       extends FilenameFilter {
     private final def matches(pid: String, snr: String, tms: String): Boolean = {
       pid.equals(URLEncoder.encode(md.persistenceId)) &&
-      Try(
-          snr.toLong == md.sequenceNr &&
-            (md.timestamp == 0L || tms.toLong == md.timestamp))
-        .getOrElse(false)
+      Try(snr.toLong == md.sequenceNr &&
+        (md.timestamp == 0L || tms.toLong == md.timestamp)).getOrElse(false)
     }
 
     def accept(dir: File, name: String): Boolean =

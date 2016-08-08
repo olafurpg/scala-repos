@@ -278,7 +278,7 @@ final class JSONIngestProcessing(
                         parsed.errors
                           .map(pe => (pe.line, pe.msg)) ++ (overLarge.nonEmpty)
                           .option(state.report.ingested +
-                                toIngest.size -> overLargeMsg)
+                            toIngest.size -> overLargeMsg)
 
                       state.update(updatedParser, ingestSize, errors)
                     }

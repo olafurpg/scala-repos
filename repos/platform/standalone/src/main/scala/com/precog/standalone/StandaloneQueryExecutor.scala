@@ -134,8 +134,8 @@ trait StandaloneQueryExecutor
   }
 
   def syncExecutorFor(apiKey: APIKey): Future[Validation[
-          String,
-          QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]]] = {
+      String,
+      QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]]] = {
     logger.debug(
         "Creating new sync executor for %s => %s".format(apiKey,
                                                          executionContext))

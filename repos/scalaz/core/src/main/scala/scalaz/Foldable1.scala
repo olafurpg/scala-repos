@@ -119,7 +119,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   /** ``O(n log n)`` complexity */
   def distinct1[A](fa: F[A])(implicit A: Order[A]): NonEmptyList[A] =
     foldMapLeft1[A, (ISet[A], NonEmptyList[A])](fa)(a =>
-          (ISet.singleton(a), NonEmptyList(a))) {
+      (ISet.singleton(a), NonEmptyList(a))) {
       case ((seen, acc), a) =>
         if (seen.notMember(a)) (seen.insert(a), a <:: acc)
         else (seen, acc)

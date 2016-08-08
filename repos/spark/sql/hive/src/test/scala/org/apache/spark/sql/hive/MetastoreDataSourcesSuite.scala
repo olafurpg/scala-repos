@@ -101,11 +101,9 @@ class MetastoreDataSourcesSuite
          """.stripMargin)
 
       val innerStruct = StructType(
-          Seq(
-              StructField(
-                  "=",
-                  ArrayType(StructType(
-                          StructField("Dd2", BooleanType, true) :: Nil)))))
+          Seq(StructField("=",
+                          ArrayType(StructType(
+                              StructField("Dd2", BooleanType, true) :: Nil)))))
 
       val expectedSchema = StructType(
           Seq(StructField("<d>", innerStruct, true),
@@ -456,7 +454,7 @@ class MetastoreDataSourcesSuite
           sql("DROP TABLE savedJsonTable")
           intercept[AnalysisException] {
             read.json(sessionState.catalog.hiveDefaultTableFilePath(
-                    TableIdentifier("savedJsonTable")))
+                TableIdentifier("savedJsonTable")))
           }
         }
 
@@ -717,7 +715,7 @@ class MetastoreDataSourcesSuite
               outputFormat = None,
               serde = None,
               serdeProperties = Map("path" -> sessionState.catalog
-                    .hiveDefaultTableFilePath(TableIdentifier(tableName)))
+                .hiveDefaultTableFilePath(TableIdentifier(tableName)))
           ),
           properties = Map("spark.sql.sources.provider" -> "json",
                            "spark.sql.sources.schema" -> schema.json,
@@ -753,7 +751,7 @@ class MetastoreDataSourcesSuite
       val actualPartitionColumns = StructType((0 until numPartCols).map {
         index =>
           df.schema(metastoreTable.properties(
-                  s"spark.sql.sources.schema.partCol.$index"))
+              s"spark.sql.sources.schema.partCol.$index"))
       })
       // Make sure partition columns are correctly stored in metastore.
       assert(
@@ -802,7 +800,7 @@ class MetastoreDataSourcesSuite
       val actualBucketByColumns = StructType((0 until numBucketCols).map {
         index =>
           df.schema(metastoreTable.properties(
-                  s"spark.sql.sources.schema.bucketCol.$index"))
+              s"spark.sql.sources.schema.bucketCol.$index"))
       })
       // Make sure bucketBy columns are correctly stored in metastore.
       assert(
@@ -812,7 +810,7 @@ class MetastoreDataSourcesSuite
 
       val actualSortByColumns = StructType((0 until numSortCols).map { index =>
         df.schema(metastoreTable.properties(
-                s"spark.sql.sources.schema.sortCol.$index"))
+            s"spark.sql.sources.schema.sortCol.$index"))
       })
       // Make sure sortBy columns are correctly stored in metastore.
       assert(
@@ -923,7 +921,7 @@ class MetastoreDataSourcesSuite
           .getTable("default", "not_skip_hive_metadata")
           .schema
           .forall(column =>
-                HiveMetastoreTypes.toDataType(column.dataType) == StringType))
+            HiveMetastoreTypes.toDataType(column.dataType) == StringType))
 
     sessionState.catalog.createDataSourceTable(
         tableIdent = TableIdentifier("skip_hive_metadata"),
@@ -942,7 +940,7 @@ class MetastoreDataSourcesSuite
           .getTable("default", "skip_hive_metadata")
           .schema
           .forall(column =>
-                HiveMetastoreTypes.toDataType(column.dataType) == ArrayType(
-                    StringType)))
+            HiveMetastoreTypes.toDataType(column.dataType) == ArrayType(
+                StringType)))
   }
 }

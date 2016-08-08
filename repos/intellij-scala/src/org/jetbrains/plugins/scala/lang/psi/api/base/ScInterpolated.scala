@@ -49,11 +49,10 @@ trait ScInterpolated extends ScalaPsiElement {
     val params = getInjections.map(_.getText).mkString("(", ",", ")")
     if (getContext == null) None
     else
-      Option(
-          ScalaPsiElementFactory.createExpressionWithContextFromText(
-              s"_root_.scala.StringContext($parts).${getFirstChild.getText}$params",
-              getContext,
-              this))
+      Option(ScalaPsiElementFactory.createExpressionWithContextFromText(
+          s"_root_.scala.StringContext($parts).${getFirstChild.getText}$params",
+          getContext,
+          this))
   }
 
   def getInjections: Array[ScExpression] = {

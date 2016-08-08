@@ -47,27 +47,27 @@ class ESEngineInstances(client: Client,
   if (!typeExistResponse.isExists) {
     val json =
       (estype ->
-            ("properties" ->
-                  ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-                    ("startTime" -> ("type" -> "date")) ~
-                    ("endTime" -> ("type" -> "date")) ~
-                    ("engineId" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-                    ("engineVersion" -> ("type" -> "string") ~
-                          ("index" -> "not_analyzed")) ~
-                    ("engineVariant" -> ("type" -> "string") ~
-                          ("index" -> "not_analyzed")) ~
-                    ("engineFactory" -> ("type" -> "string") ~
-                          ("index" -> "not_analyzed")) ~
-                    ("batch" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-                    ("dataSourceParams" -> ("type" -> "string") ~
-                          ("index" -> "not_analyzed")) ~
-                    ("preparatorParams" -> ("type" -> "string") ~
-                          ("index" -> "not_analyzed")) ~
-                    ("algorithmsParams" -> ("type" -> "string") ~
-                          ("index" -> "not_analyzed")) ~
-                    ("servingParams" -> ("type" -> "string") ~
-                          ("index" -> "not_analyzed")) ~
-                    ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
+        ("properties" ->
+          ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+            ("startTime" -> ("type" -> "date")) ~
+            ("endTime" -> ("type" -> "date")) ~
+            ("engineId" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+            ("engineVersion" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("engineVariant" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("engineFactory" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("batch" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+            ("dataSourceParams" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("preparatorParams" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("algorithmsParams" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("servingParams" -> ("type" -> "string") ~
+              ("index" -> "not_analyzed")) ~
+            ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
     indices
       .preparePutMapping(index)
       .setType(estype)

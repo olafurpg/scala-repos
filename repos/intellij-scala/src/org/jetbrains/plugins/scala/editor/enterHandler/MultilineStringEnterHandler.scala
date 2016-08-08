@@ -170,7 +170,7 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
 
       if (wasSingleLine || lines.length == 3 &&
           (lines(0).endsWith("(") && lines(2).trim.startsWith(")") ||
-              lines(0).endsWith("{") && lines(2).trim.startsWith("}"))) {
+          lines(0).endsWith("{") && lines(2).trim.startsWith("}"))) {
         val trimmedStartLine =
           getLineByNumber(document.getLineNumber(offset) - 1).trim()
         val inConcatenation = literal.getParent match {
@@ -185,7 +185,7 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
         }
         val needInsertNLBefore =
           (!trimmedStartLine.startsWith(firstMLQuote) ||
-                inConcatenation.isDefined) && quotesOnNewLine
+            inConcatenation.isDefined) && quotesOnNewLine
 
         selectBySettings()(
             if (needAddByType(literal))

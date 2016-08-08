@@ -152,9 +152,9 @@ final class MongoJobManager(
               val status = Status(jobId, statusId, msg, progress, unit, extra)
               val message = Status.toMessage(status)
               database(insert(message.serialize.asInstanceOf[JObject])
-                    .into(settings.messages)) map { _ =>
+                .into(settings.messages)) map { _ =>
                 logger.trace("Job %s updated in %f ms"
-                      .format(jobId, (System.nanoTime - start) / 1000.0))
+                  .format(jobId, (System.nanoTime - start) / 1000.0))
                 Right(status)
               }
 
@@ -173,7 +173,7 @@ final class MongoJobManager(
               .where("id" === jobId)
           } flatMap { _ =>
             database(insert(message.serialize.asInstanceOf[JObject])
-                  .into(settings.messages))
+              .into(settings.messages))
           } map { _ =>
             Right(status)
           }

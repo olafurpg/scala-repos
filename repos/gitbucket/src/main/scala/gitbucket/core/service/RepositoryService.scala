@@ -145,9 +145,9 @@ trait RepositoryService { self: AccountService =>
               milestoneId = x.milestoneId.map { id =>
                 newMilestones
                   .find(_.title == milestones
-                        .find(_.milestoneId == id)
-                        .get
-                        .title)
+                    .find(_.milestoneId == id)
+                    .get
+                    .title)
                   .get
                   .milestoneId
               }
@@ -203,13 +203,8 @@ trait RepositoryService { self: AccountService =>
                 )): _*)
 
         if (account.isGroupAccount) {
-          Collaborators
-            .insertAll(
-                getGroupMembers(newUserName)
-                  .map(m =>
-                        Collaborator(newUserName,
-                                     newRepositoryName,
-                                     m.userName)): _*)
+          Collaborators.insertAll(getGroupMembers(newUserName).map(m =>
+            Collaborator(newUserName, newRepositoryName, m.userName)): _*)
         } else {
           Collaborators.insertAll(
               collaborators.map(

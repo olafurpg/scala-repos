@@ -54,7 +54,7 @@ object SizeHintProps extends Properties("SizeHint") {
 
   property("ordering makes sense") = forAll { (a: SizeHint, b: SizeHint) =>
     (List(a, b).max.total.getOrElse(BigInt(-1L)) >= a.total.getOrElse(
-            BigInt(-1L)))
+        BigInt(-1L)))
   }
 
   property("addition increases sparsity fraction") = forAll {

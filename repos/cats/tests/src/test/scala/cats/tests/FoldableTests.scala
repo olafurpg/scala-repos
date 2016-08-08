@@ -80,7 +80,7 @@ class FoldableTestsAdditional extends CatsSuite {
 
     // safely build large lists
     val larger = F.foldRight(large, Now(List.empty[Int]))((x, lxs) =>
-          lxs.map((x + 1) :: _))
+      lxs.map((x + 1) :: _))
     larger.value should ===(large.map(_ + 1))
   }
 

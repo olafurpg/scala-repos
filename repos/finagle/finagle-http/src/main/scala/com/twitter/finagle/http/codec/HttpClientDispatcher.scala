@@ -95,7 +95,7 @@ class HttpClientDispatcher(trans: Transport[Any, Any],
                 case invalid =>
                   // We rely on the base class to satisfy p.
                   Future.exception(new IllegalArgumentException(
-                          s"invalid message '$invalid'"))
+                      s"invalid message '$invalid'"))
               }
           )
           .unit

@@ -89,11 +89,11 @@ abstract class TestConfigurationProducer(configurationType: ConfigurationType)
         isConfigurationByLocation(configuration, context.getLocation)
       } else {
         (context.getModule == configurationModule || context.getRunManager
-              .getConfigurationTemplate(getConfigurationFactory)
-              .getConfiguration
-              .asInstanceOf[AbstractTestRunConfiguration]
-              .getConfigurationModule
-              .getModule == configurationModule) &&
+          .getConfigurationTemplate(getConfigurationFactory)
+          .getConfiguration
+          .asInstanceOf[AbstractTestRunConfiguration]
+          .getConfigurationModule
+          .getModule == configurationModule) &&
         configuration.getTestClassPath == null &&
         configuration.getTestName == null
       }

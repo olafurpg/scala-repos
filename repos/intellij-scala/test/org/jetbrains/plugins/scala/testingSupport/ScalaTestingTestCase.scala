@@ -120,8 +120,8 @@ abstract class ScalaTestingTestCase(
           import scala.collection.JavaConversions._
           wrapper.initChildren()
           wrapper.getChildren.toList.foreach(node =>
-                initTree(node.asInstanceOf[
-                        StructureViewComponent.StructureViewTreeElementWrapper]))
+            initTree(node.asInstanceOf[
+                StructureViewComponent.StructureViewTreeElementWrapper]))
         }
         initTree(wrapper)
       }

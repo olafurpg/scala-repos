@@ -63,8 +63,8 @@ class OutputMetrics private (_bytesWritten: Accumulator[Long],
         InternalAccumulator
           .createOutputAccums()
           .map { a =>
-        (a.name.get, a)
-      }
+            (a.name.get, a)
+          }
           .toMap[String, Accumulator[_]])
   }
 

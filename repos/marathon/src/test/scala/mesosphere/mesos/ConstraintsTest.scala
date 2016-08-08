@@ -60,22 +60,24 @@ class ConstraintsTest extends MarathonSpec with GivenWhenThen with Matchers {
                           makeConstraint("color", Operator.GROUP_BY, "")))
     val tasks =
       0.to(9)
-        .map(num =>
+        .map(
+            num =>
               makeSampleTask(s"$num",
                              Map("rack" -> "rack-1", "color" -> "blue"))) ++ 10
         .to(19)
-        .map(num =>
+        .map(
+            num =>
               makeSampleTask(
                   s"$num",
                   Map("rack" -> "rack-1", "color" -> "green"))) ++ 20
         .to(29)
-        .map(num =>
+        .map(
+            num =>
               makeSampleTask(s"$num",
                              Map("rack" -> "rack-2", "color" -> "blue"))) ++ 30
         .to(39)
         .map(num =>
-              makeSampleTask(s"$num",
-                             Map("rack" -> "rack-2", "color" -> "green")))
+          makeSampleTask(s"$num", Map("rack" -> "rack-2", "color" -> "green")))
 
     When("20 tasks should be selected to kill")
     val result = Constraints.selectTasksToKill(app, tasks, 20)
@@ -103,8 +105,7 @@ class ConstraintsTest extends MarathonSpec with GivenWhenThen with Matchers {
     val tasks = 0
       .to(9)
       .map(num =>
-            makeSampleTask(s"$num",
-                           Map("rack" -> "rack-1", "color" -> "blue")))
+        makeSampleTask(s"$num", Map("rack" -> "rack-1", "color" -> "blue")))
 
     When("10 tasks should be selected to kill")
     val result = Constraints.selectTasksToKill(app, tasks, 5)

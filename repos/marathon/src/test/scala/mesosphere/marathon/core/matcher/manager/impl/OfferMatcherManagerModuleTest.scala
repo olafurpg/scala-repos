@@ -195,7 +195,7 @@ class OfferMatcherManagerModuleTest
       tasks.map { task =>
         task.toBuilder
           .setTaskId(task.getTaskId.toBuilder.setValue(
-                  task.getTaskId.getValue + "_" + processCycle))
+              task.getTaskId.getValue + "_" + processCycle))
           .build()
       }
     }

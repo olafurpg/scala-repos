@@ -57,7 +57,7 @@ object Cross {
         val (add, exclude) = if (home.exists) {
           val instance = ScalaInstance(home)(state.classLoaderCache.apply _)
           state.log.info("Setting Scala home to " + home +
-                " with actual version " + instance.actualVersion)
+            " with actual version " + instance.actualVersion)
           val version =
             if (resolveVersion.isEmpty) instance.actualVersion
             else resolveVersion

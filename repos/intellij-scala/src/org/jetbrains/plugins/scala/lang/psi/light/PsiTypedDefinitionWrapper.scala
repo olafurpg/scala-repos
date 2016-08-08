@@ -182,11 +182,8 @@ object PsiTypedDefinitionWrapper {
                                       cClass))
       processName(t.name)
       if (t.isVar) {
-        processMethod(
-            t.getTypedDefinitionWrapper(isStatic,
-                                        isInterface,
-                                        role = EQ,
-                                        cClass))
+        processMethod(t
+          .getTypedDefinitionWrapper(isStatic, isInterface, role = EQ, cClass))
         processName(t.name + "_eq")
       }
     }

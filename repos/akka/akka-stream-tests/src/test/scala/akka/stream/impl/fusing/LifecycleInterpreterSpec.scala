@@ -14,10 +14,10 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
   "Interpreter" must {
 
-    "call preStart in order on stages" in new OneBoundedSetup[String](
-        Seq(PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-a"),
-            PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-b"),
-            PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-c"))) {
+    "call preStart in order on stages" in new OneBoundedSetup[String](Seq(
+        PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-a"),
+        PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-b"),
+        PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-c"))) {
       expectMsg("start-a")
       expectMsg("start-b")
       expectMsg("start-c")

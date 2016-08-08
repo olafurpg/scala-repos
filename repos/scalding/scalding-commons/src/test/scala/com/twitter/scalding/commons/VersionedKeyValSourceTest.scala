@@ -74,7 +74,7 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
             assert(input.map { k =>
               (k, k)
             }.sortBy(_._1)
-                  .toString === outputBuffer.sortBy(_._1).toList.toString)
+              .toString === outputBuffer.sortBy(_._1).toList.toString)
           }
       }
       .run
@@ -93,7 +93,7 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
             assert(input.map { k =>
               (k, k)
             }.sortBy(_._1)
-                  .toString === outputBuffer.sortBy(_._1).toList.toString)
+              .toString === outputBuffer.sortBy(_._1).toList.toString)
           }
       }
       .run

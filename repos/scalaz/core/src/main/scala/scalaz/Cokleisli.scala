@@ -136,5 +136,5 @@ private trait CokleisliArrow[F[_]]
 
   def first[A, B, C](f: Cokleisli[F, A, B]) =
     Cokleisli[F, (A, C), (B, C)](w =>
-          (f.run(F.map(w)(ac => ac._1)), F.copoint(w)._2))
+      (f.run(F.map(w)(ac => ac._1)), F.copoint(w)._2))
 }

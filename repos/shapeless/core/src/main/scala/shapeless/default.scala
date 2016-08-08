@@ -275,7 +275,7 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
     val oneOverloadWithDefaults =
       mainOverloadsWithDefaultCount == 1 ||
         (mainOverloadsWithDefaultCount == 0 &&
-              secondOverloadsWithDefaultCount == 1)
+          secondOverloadsWithDefaultCount == 1)
 
     // Checking if the primary constructor has default parameters, and returning
     // a Default instance with non-empty types / values only if that holds.

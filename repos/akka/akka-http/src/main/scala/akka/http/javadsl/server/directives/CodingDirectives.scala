@@ -81,5 +81,5 @@ private[http] object CodingDirectives {
 
   private[http] val _DefaultCodersToDecodeRequest =
     scaladsl.server.directives.CodingDirectives.DefaultCoders.map(c ⇒
-          Coder.values().find(_._underlyingScalaCoder() == c).get)
+      Coder.values().find(_._underlyingScalaCoder() == c).get)
 }

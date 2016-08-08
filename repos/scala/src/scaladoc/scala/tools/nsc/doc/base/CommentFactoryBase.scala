@@ -855,16 +855,16 @@ trait CommentFactoryBase { this: MemberLookupBase =>
 
     def checkParaEnded(): Boolean = {
       (char == endOfText) || ((char == endOfLine) && {
-            val poff = offset
-            nextChar() // read EOL
-            val ok = {
-              checkSkipInitWhitespace(endOfLine) ||
-              checkSkipInitWhitespace('=') || checkSkipInitWhitespace("{{{") ||
-              checkList || checkSkipInitWhitespace('\u003D')
-            }
-            offset = poff
-            ok
-          })
+        val poff = offset
+        nextChar() // read EOL
+        val ok = {
+          checkSkipInitWhitespace(endOfLine) ||
+          checkSkipInitWhitespace('=') || checkSkipInitWhitespace("{{{") ||
+          checkList || checkSkipInitWhitespace('\u003D')
+        }
+        offset = poff
+        ok
+      })
     }
 
     def checkSentenceEnded(): Boolean = {

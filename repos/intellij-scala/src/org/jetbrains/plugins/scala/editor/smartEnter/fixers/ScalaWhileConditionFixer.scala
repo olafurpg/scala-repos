@@ -40,11 +40,8 @@ class ScalaWhileConditionFixer extends ScalaFixer {
           doc.getLineEndOffset(doc getLineNumber whileStartOffset)
         val whLength = "while (".length
 
-        whileStatement.body
-          .foreach(
-              bl =>
-                stopOffset =
-                  Math.min(stopOffset, bl.getTextRange.getStartOffset))
+        whileStatement.body.foreach(bl =>
+          stopOffset = Math.min(stopOffset, bl.getTextRange.getStartOffset))
 
         doc.replaceString(whileStartOffset, stopOffset, "while () {\n\n}")
         moveToStart(editor, whileStatement)

@@ -143,7 +143,7 @@ class MarathonSchedulerService @Inject()(
     (schedulerActor ? RetrieveRunningDeployments).recoverWith {
       case _: TimeoutException =>
         Future.failed(new TimeoutException(
-                s"Can not retrieve the list of running deployments in time"))
+            s"Can not retrieve the list of running deployments in time"))
     }.mapTo[RunningDeployments].map(_.plans)
 
   def getApp(appId: PathId, version: Timestamp): Option[AppDefinition] = {

@@ -170,7 +170,7 @@ class AdminTest extends ZooKeeperTestHarness with Logging with RackAwareTest {
                                          partitionId: Int): Set[Int] = {
     servers
       .filter(server =>
-            new File(server.config.logDirs.head, topic + "-" + partitionId).exists)
+        new File(server.config.logDirs.head, topic + "-" + partitionId).exists)
       .map(_.config.brokerId)
       .toSet
   }

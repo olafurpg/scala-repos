@@ -45,16 +45,10 @@ object Query {
   implicit val jsonWriter = Json.writes[Query]
 
   val durations = {
-    ((30, "30 seconds") :: options(List(60,
-                                        60 * 2,
-                                        60 * 3,
-                                        60 * 5,
-                                        60 * 10,
-                                        60 * 15,
-                                        60 * 20,
-                                        60 * 30),
-                                   _ / 60,
-                                   "%d minute{s}").toList) :+
+    ((30, "30 seconds") :: options(
+        List(60, 60 * 2, 60 * 3, 60 * 5, 60 * 10, 60 * 15, 60 * 20, 60 * 30),
+        _ / 60,
+        "%d minute{s}").toList) :+
       (60 * 60 * 1, "One hour") :+ (60 * 60 * 3, "Three hours") :+
       (60 * 60 * 24, "One day") :+ (60 * 60 * 24 * 3, "Three days") :+
       (60 * 60 * 24 * 7, "One week") :+ (60 * 60 * 24 * 7 * 2, "Two weeks") :+

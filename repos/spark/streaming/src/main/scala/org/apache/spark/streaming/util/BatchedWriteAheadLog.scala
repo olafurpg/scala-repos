@@ -213,10 +213,8 @@ private[util] object BatchedWriteAheadLog {
 
   /** Aggregate multiple serialized ReceivedBlockTrackerLogEvents in a single ByteBuffer. */
   def aggregate(records: Seq[Record]): ByteBuffer = {
-    ByteBuffer.wrap(
-        Utils.serialize[Array[Array[Byte]]](records
-              .map(record => JavaUtils.bufferToArray(record.data))
-              .toArray))
+    ByteBuffer.wrap(Utils.serialize[Array[Array[Byte]]](
+        records.map(record => JavaUtils.bufferToArray(record.data)).toArray))
   }
 
   /**

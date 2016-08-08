@@ -188,8 +188,8 @@ object ValidatePullRequest extends AutoPlugin {
         val diffedModuleNames = diffOutput
           .map(l => l.trim)
           .filter(l =>
-                l.startsWith("akka-") ||
-                  (l.startsWith("project") && l != "project/MiMa.scala"))
+            l.startsWith("akka-") ||
+              (l.startsWith("project") && l != "project/MiMa.scala"))
           .map(l ⇒ l.takeWhile(_ != '/'))
           .toSet
 
@@ -210,7 +210,7 @@ object ValidatePullRequest extends AutoPlugin {
 
         val allModuleNames = dirtyModuleNames ++ diffedModuleNames
         log.info("Detected changes in directories: " +
-              allModuleNames.mkString("[", ", ", "]"))
+          allModuleNames.mkString("[", ", ", "]"))
         allModuleNames
       }
   )

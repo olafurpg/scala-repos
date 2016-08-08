@@ -34,7 +34,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
 
   def map[B](f: A => B)(implicit F: Functor[F]): IndexedStateT[F, S1, S2, B] =
     mapsf((sf: (S1 => F[(S2, A)])) =>
-          (s: S1) => F.map(sf(s))(t => (t._1, f(t._2))))
+      (s: S1) => F.map(sf(s))(t => (t._1, f(t._2))))
 
   def xmap[X1, X2](f: S2 => X1)(g: X2 => S1): IndexedStateT[F, X2, X1, A] =
     IndexedStateT.createState(
@@ -69,8 +69,8 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
   def flatMap[S3, B](f: A => IndexedStateT[F, S2, S3, B])(
       implicit F: Monad[F]): IndexedStateT[F, S1, S3, B] =
     mapsf(sf =>
-          (s: S1) =>
-            F.bind[(S2, A), (S3, B)](sf(s)) { t =>
+      (s: S1) =>
+        F.bind[(S2, A), (S3, B)](sf(s)) { t =>
           val sfb: F[(S2 => F[(S3, B)])] = f(t._2).getF(F)
           F.bind[S2 => F[(S3, B)], (S3, B)](sfb)(ff => ff(t._1))
     })
@@ -107,8 +107,8 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
           F.bind[S1 => F[(S2, A)], (W, A, S2)](getF(F))(
               (sf: (S1 => F[(S2, A)])) =>
                 F.map(sf(s)) {
-              case (s, a) => (W.zero, a, s)
-          })
+                  case (s, a) => (W.zero, a, s)
+              })
     )
 
   def zoom[S0, S3, S <: S1](l: LensFamily[S0, S3, S, S2])(

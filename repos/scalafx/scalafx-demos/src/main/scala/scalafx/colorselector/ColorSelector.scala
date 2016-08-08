@@ -60,7 +60,7 @@ object ColorSelector extends JFXApp {
 
   val synchronizedControls = new ObservableBuffer[SliderControl]
   synchronizedControls.onChange((buffer, changes) =>
-        synchronizeValues(buffer, changes))
+    synchronizeValues(buffer, changes))
 
   // METHODS - BEGIN
 
@@ -153,7 +153,7 @@ object ColorSelector extends JFXApp {
 
   currentColor.onChange(
       rectangleRegion.setStyle("-fx-background-color: " + RgbFormatter
-            .format(currentColor(), !this.chbDisableAlpha.selected.value)))
+        .format(currentColor(), !this.chbDisableAlpha.selected.value)))
 
   val controlRed = new SliderControl("R") {
     value = 255

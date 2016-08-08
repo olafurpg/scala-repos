@@ -120,7 +120,7 @@ object GenerateMIMAIgnore {
       classSymbol: unv.ClassSymbol) = {
     classSymbol.typeSignature.members
       .filterNot(x =>
-            x.fullName.startsWith("java") || x.fullName.startsWith("scala"))
+        x.fullName.startsWith("java") || x.fullName.startsWith("scala"))
       .filter(x => isPackagePrivate(x))
       .map(_.fullName) ++ getInnerFunctions(classSymbol)
   }

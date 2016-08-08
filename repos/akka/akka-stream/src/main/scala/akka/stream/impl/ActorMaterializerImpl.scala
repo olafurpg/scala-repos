@@ -273,7 +273,7 @@ private[akka] case class ActorMaterializerImpl(
         else {
           implicit val timeout = ref.system.settings.CreationTimeout
           val f = (supervisor ? StreamSupervisor
-                .Materialize(props.withDispatcher(dispatcher), name))
+            .Materialize(props.withDispatcher(dispatcher), name))
             .mapTo[ActorRef]
           Await.result(f, timeout.duration)
         }

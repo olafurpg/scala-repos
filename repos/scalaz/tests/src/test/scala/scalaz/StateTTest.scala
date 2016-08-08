@@ -75,9 +75,9 @@ object StateTTest extends SpecLite {
     import scalaz.Free._
     val result = (0 to 4000).toList
       .map(i =>
-            StateT[Trampoline, Int, Int]((ii: Int) => Trampoline.done((i, i))))
+        StateT[Trampoline, Int, Int]((ii: Int) => Trampoline.done((i, i))))
       .foldLeft(StateT((s: Int) => Trampoline.done((s, s))))((a, b) =>
-            a.flatMap(_ => b))
+        a.flatMap(_ => b))
     4000 must_=== result(0).run._1
   }
 }

@@ -56,12 +56,12 @@ class PartialSyntaxTest
   def testPartialActionSyntax(seq: Seq[Int], perm: Map[Int, Int]) = {
     import spire.syntax.partialAction._
     ((perm ?|+|> seq) === PartialAction[Seq[Int], Map[Int, Int]]
-          .partialActl(perm, seq)) &&
+      .partialActl(perm, seq)) &&
     ((seq <|+|? perm) === PartialAction[Seq[Int], Map[Int, Int]]
-          .partialActr(seq, perm)) &&
+      .partialActr(seq, perm)) &&
     ((perm ??|+|> seq) === PartialAction[Seq[Int], Map[Int, Int]]
-          .actlIsDefined(perm, seq)) &&
+      .actlIsDefined(perm, seq)) &&
     ((seq <|+|?? perm) === PartialAction[Seq[Int], Map[Int, Int]]
-          .actrIsDefined(seq, perm))
+      .actrIsDefined(seq, perm))
   }
 }

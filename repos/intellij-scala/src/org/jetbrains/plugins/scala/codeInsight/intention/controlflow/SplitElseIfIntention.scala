@@ -35,7 +35,7 @@ class SplitElseIfIntention extends PsiElementBaseIntentionAction {
     if (thenBranch == null || elseBranch == null) return false
 
     if (!(thenBranch.getTextRange.getEndOffset <= offset &&
-              offset <= elseBranch.getTextRange.getStartOffset)) return false
+          offset <= elseBranch.getTextRange.getStartOffset)) return false
 
     val elseIfExpr = ifStmt.elseBranch.orNull
     if (elseIfExpr != null && elseIfExpr.isInstanceOf[ScIfStmt]) {

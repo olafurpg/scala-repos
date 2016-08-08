@@ -295,7 +295,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
         .getMethodType(methodNode.desc)
         .getArgumentTypes
         .map(t =>
-              bTypeForDescriptorOrInternalNameFromClassfile(t.getDescriptor))
+          bTypeForDescriptorOrInternalNameFromClassfile(t.getDescriptor))
       val isStatic = BytecodeUtils.isStaticMethod(methodNode)
       if (isStatic) params else receiverType +: params
     }
@@ -629,16 +629,15 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
             }
 
             val isIndyLambda =
-              (Type.getType(implMethod.getDesc) == expectedImplMethodType // (1)
-                    && (isStatic ||
-                          implMethod.getOwner == indyParamTypes(0).getInternalName) // (2)
-                    && samMethodType.getArgumentTypes
-                      .corresponds(instantiatedMethodArgTypes)(
-                          (samArgType, instArgType) =>
-                            samArgType == instArgType || isReference(
-                                samArgType) &&
-                              isReference(instArgType)) // (3)
-                  )
+              (Type
+                .getType(implMethod.getDesc) == expectedImplMethodType // (1)
+                && (isStatic ||
+                  implMethod.getOwner == indyParamTypes(0).getInternalName) // (2)
+                && samMethodType.getArgumentTypes.corresponds(
+                    instantiatedMethodArgTypes)((samArgType, instArgType) =>
+                  samArgType == instArgType || isReference(samArgType) &&
+                    isReference(instArgType)) // (3)
+              )
 
             if (isIndyLambda)
               Some((indy, samMethodType, implMethod, instantiatedMethodType))

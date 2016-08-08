@@ -91,9 +91,8 @@ trait EchoHttpClientModule[M[+ _]] extends HttpClientModule[M] {
       : EitherT[M, HttpClientError, Response[String]] =
       urlMap get baseUrl map (_(request)) getOrElse {
         EitherT(
-            M.point(
-                -\/(HttpClientError.ConnectionError(Some(baseUrl),
-                                                    new java.io.IOException))))
+            M.point(-\/(HttpClientError
+              .ConnectionError(Some(baseUrl), new java.io.IOException))))
       }
   }
 

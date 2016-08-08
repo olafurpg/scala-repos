@@ -64,9 +64,9 @@ class FlatmapIteratorSuite extends SparkFunSuite with LocalSparkContext {
     val data = sc
       .parallelize(Seq(1, 2))
       .flatMap(x =>
-            Stream
-              .range(1, expand_size)
-              .map(y => "%d: string test %d".format(y, x)))
+        Stream
+          .range(1, expand_size)
+          .map(y => "%d: string test %d".format(y, x)))
     val persisted = data.persist(StorageLevel.MEMORY_ONLY_SER)
     assert(persisted.filter(_.startsWith("1:")).count() === 2)
   }

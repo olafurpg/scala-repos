@@ -82,9 +82,8 @@ class BucketedWriteSuite
   def tableDir: File = {
     val identifier =
       hiveContext.sessionState.sqlParser.parseTableIdentifier("bucketed_table")
-    new File(
-        URI.create(hiveContext.sessionState.catalog
-              .hiveDefaultTableFilePath(identifier)))
+    new File(URI.create(
+        hiveContext.sessionState.catalog.hiveDefaultTableFilePath(identifier)))
   }
 
   /**

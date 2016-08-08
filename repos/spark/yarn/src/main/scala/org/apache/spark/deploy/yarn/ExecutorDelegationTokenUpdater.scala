@@ -66,7 +66,7 @@ private[spark] class ExecutorDelegationTokenUpdater(sparkConf: SparkConf,
               credentialsStatus.getPath)
           if (suffix > lastCredentialsFileSuffix) {
             logInfo("Reading new delegation tokens from " +
-                  credentialsStatus.getPath)
+              credentialsStatus.getPath)
             val newCredentials =
               getCredentialsFromHDFSFile(remoteFs, credentialsStatus.getPath)
             lastCredentialsFileSuffix = suffix

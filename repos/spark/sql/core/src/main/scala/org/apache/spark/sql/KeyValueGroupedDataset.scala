@@ -328,6 +328,6 @@ class KeyValueGroupedDataset[K, V] private[sql] (
                     f: CoGroupFunction[K, V, U, R],
                     encoder: Encoder[R]): Dataset[R] = {
     cogroup(other)((key, left, right) =>
-          f.call(key, left.asJava, right.asJava).asScala)(encoder)
+      f.call(key, left.asJava, right.asJava).asScala)(encoder)
   }
 }

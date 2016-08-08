@@ -109,9 +109,9 @@ case class OffsetRequest(
       foldedTopics + shortStringLength(topic) + 4 + /* partition count */
       partitionInfos.size *
         (4 + /* partition */
-            8 + /* time */
-            4 /* maxNumOffsets */
-            )
+        8 + /* time */
+        4 /* maxNumOffsets */
+        )
     })
 
   def isFromOrdinaryClient = replicaId == Request.OrdinaryConsumerId

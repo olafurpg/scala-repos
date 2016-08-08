@@ -38,9 +38,9 @@ trait Dependent {
     _iDependOn =
       new WeakReference(who.asInstanceOf[Object]) :: _iDependOn.filter(
           _.get match {
-        case null => false
-        case x => x ne who
-      })
+            case null => false
+            case x => x ne who
+          })
   }
 
   /**
@@ -263,7 +263,7 @@ final case class SeqCell[T](cells: Cell[T]*) extends Cell[Seq[T]] {
   def currentValue: (Seq[T], Long) = {
     val tcv = cells.map(_.currentValue)
     tcv.map(_._1) -> tcv.foldLeft(0L)((max, c) =>
-          if (max > c._2) max else c._2)
+      if (max > c._2) max else c._2)
   }
 
   /**

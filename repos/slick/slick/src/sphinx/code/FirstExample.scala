@@ -96,7 +96,7 @@ object FirstExample extends App {
         .map(_.foreach {
           case (name, supID, price, sales, total) =>
             println("  " + name + "\t" + supID + "\t" + price +
-                  "\t" + sales + "\t" + total)
+              "\t" + sales + "\t" + total)
         })
       // Equivalent SQL code:
       // select COF_NAME, SUP_ID, PRICE, SALES, TOTAL from COFFEES

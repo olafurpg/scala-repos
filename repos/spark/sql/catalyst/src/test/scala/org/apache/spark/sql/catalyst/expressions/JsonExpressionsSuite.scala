@@ -201,40 +201,36 @@ class JsonExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("json_tuple - hive key 1") {
     checkJsonTuple(
-        JsonTuple(
-            Literal(
-                """{"f1": "value1", "f2": "value2", "f3": 3, "f5": 5.23}""") :: jsonTupleQuery),
+        JsonTuple(Literal(
+            """{"f1": "value1", "f2": "value2", "f3": 3, "f5": 5.23}""") :: jsonTupleQuery),
         InternalRow.fromSeq(Seq("value1", "value2", "3", null, "5.23").map(
-                UTF8String.fromString)))
+            UTF8String.fromString)))
   }
 
   test("json_tuple - hive key 2") {
     checkJsonTuple(
-        JsonTuple(
-            Literal(
-                """{"f1": "value12", "f3": "value3", "f2": 2, "f4": 4.01}""") :: jsonTupleQuery),
+        JsonTuple(Literal(
+            """{"f1": "value12", "f3": "value3", "f2": 2, "f4": 4.01}""") :: jsonTupleQuery),
         InternalRow.fromSeq(Seq("value12", "2", "value3", "4.01", null).map(
-                UTF8String.fromString)))
+            UTF8String.fromString)))
   }
 
   test("json_tuple - hive key 2 (mix of foldable fields)") {
     checkJsonTuple(
-        JsonTuple(
-            Literal(
-                """{"f1": "value12", "f3": "value3", "f2": 2, "f4": 4.01}""") :: Literal(
-                "f1") :: NonFoldableLiteral("f2") :: NonFoldableLiteral("f3") :: Literal(
-                "f4") :: Literal("f5") :: Nil),
+        JsonTuple(Literal(
+            """{"f1": "value12", "f3": "value3", "f2": 2, "f4": 4.01}""") :: Literal(
+            "f1") :: NonFoldableLiteral("f2") :: NonFoldableLiteral("f3") :: Literal(
+            "f4") :: Literal("f5") :: Nil),
         InternalRow.fromSeq(Seq("value12", "2", "value3", "4.01", null).map(
-                UTF8String.fromString)))
+            UTF8String.fromString)))
   }
 
   test("json_tuple - hive key 3") {
     checkJsonTuple(
-        JsonTuple(
-            Literal(
-                """{"f1": "value13", "f4": "value44", "f3": "value33", "f2": 2, "f5": 5.01}""") :: jsonTupleQuery),
+        JsonTuple(Literal(
+            """{"f1": "value13", "f4": "value44", "f3": "value33", "f2": 2, "f5": 5.01}""") :: jsonTupleQuery),
         InternalRow.fromSeq(Seq("value13", "2", "value33", "value44", "5.01")
-              .map(UTF8String.fromString)))
+          .map(UTF8String.fromString)))
   }
 
   test("json_tuple - hive key 3 (nonfoldable json)") {
@@ -242,18 +238,18 @@ class JsonExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
         JsonTuple(NonFoldableLiteral("""{"f1": "value13", "f4": "value44",
             | "f3": "value33", "f2": 2, "f5": 5.01}""".stripMargin) :: jsonTupleQuery),
         InternalRow.fromSeq(Seq("value13", "2", "value33", "value44", "5.01")
-              .map(UTF8String.fromString)))
+          .map(UTF8String.fromString)))
   }
 
   test("json_tuple - hive key 3 (nonfoldable fields)") {
-    checkJsonTuple(
-        JsonTuple(
-            Literal("""{"f1": "value13", "f4": "value44",
+    checkJsonTuple(JsonTuple(Literal("""{"f1": "value13", "f4": "value44",
           | "f3": "value33", "f2": 2, "f5": 5.01}""".stripMargin) :: NonFoldableLiteral(
-                "f1") :: NonFoldableLiteral("f2") :: NonFoldableLiteral("f3") :: NonFoldableLiteral(
-                "f4") :: NonFoldableLiteral("f5") :: Nil),
-        InternalRow.fromSeq(Seq("value13", "2", "value33", "value44", "5.01")
-              .map(UTF8String.fromString)))
+                       "f1") :: NonFoldableLiteral("f2") :: NonFoldableLiteral(
+                       "f3") :: NonFoldableLiteral("f4") :: NonFoldableLiteral(
+                       "f5") :: Nil),
+                   InternalRow.fromSeq(
+                       Seq("value13", "2", "value33", "value44", "5.01").map(
+                           UTF8String.fromString)))
   }
 
   test("json_tuple - hive key 4 - null json") {

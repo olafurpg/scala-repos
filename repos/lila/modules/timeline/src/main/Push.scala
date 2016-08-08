@@ -34,8 +34,8 @@ private[timeline] final class Push(lobbySocket: ActorSelection,
         if (users.nonEmpty)
           makeEntry(users, data) >>-
             (users foreach { u =>
-                  lobbySocket ! ReloadTimeline(u)
-                })
+              lobbySocket ! ReloadTimeline(u)
+            })
         lila.mon.timeline.notification(users.size)
       }
   }
@@ -67,7 +67,7 @@ private[timeline] final class Push(lobbySocket: ActorSelection,
           entries =>
             entries.exists(_ similarTo entry) fold
               (fufail[Entry]("[timeline] a similar entry already exists"),
-                  entryRepo insert entry inject entry)
+              entryRepo insert entry inject entry)
         }
       }
 }

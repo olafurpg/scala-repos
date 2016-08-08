@@ -840,7 +840,7 @@ private[spark] object Utils extends Logging {
         for (ni <- reOrderedNetworkIFs) {
           val addresses = ni.getInetAddresses.asScala
             .filterNot(addr =>
-                  addr.isLinkLocalAddress || addr.isLoopbackAddress)
+              addr.isLinkLocalAddress || addr.isLoopbackAddress)
             .toSeq
           if (addresses.nonEmpty) {
             val addr = addresses
@@ -849,21 +849,19 @@ private[spark] object Utils extends Logging {
             // because of Inet6Address.toHostName may add interface at the end if it knows about it
             val strippedAddress = InetAddress.getByAddress(addr.getAddress)
             // We've found an address that looks reasonable!
-            logWarning(
-                "Your hostname, " +
-                  InetAddress.getLocalHost.getHostName + " resolves to" +
-                  " a loopback address: " + address.getHostAddress + "; using " +
-                  strippedAddress.getHostAddress + " instead (on interface " +
-                  ni.getName + ")")
+            logWarning("Your hostname, " +
+              InetAddress.getLocalHost.getHostName + " resolves to" +
+              " a loopback address: " + address.getHostAddress + "; using " +
+              strippedAddress.getHostAddress + " instead (on interface " +
+              ni.getName + ")")
             logWarning(
                 "Set SPARK_LOCAL_IP if you need to bind to another address")
             return strippedAddress
           }
         }
-        logWarning(
-            "Your hostname, " + InetAddress.getLocalHost.getHostName +
-              " resolves to" + " a loopback address: " + address.getHostAddress +
-              ", but we couldn't find any" + " external IP address!")
+        logWarning("Your hostname, " + InetAddress.getLocalHost.getHostName +
+          " resolves to" + " a loopback address: " + address.getHostAddress +
+          ", but we couldn't find any" + " external IP address!")
         logWarning("Set SPARK_LOCAL_IP if you need to bind to another address")
       }
       address
@@ -2361,7 +2359,7 @@ private[spark] object Utils extends Logging {
           "Dynamic Allocation and num executors both set, thus dynamic allocation disabled.")
     }
     numExecutor == 0 && dynamicAllocationEnabled && (!isLocalMaster(conf) ||
-        conf.getBoolean("spark.dynamicAllocation.testing", false))
+    conf.getBoolean("spark.dynamicAllocation.testing", false))
   }
 
   def tryWithResource[R <: Closeable, T](createResource: => R)(f: R => T): T = {

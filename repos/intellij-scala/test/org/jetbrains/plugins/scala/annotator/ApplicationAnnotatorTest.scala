@@ -68,7 +68,7 @@ class ApplicationAnnotatorTest extends SimpleTestCase {
 
   def testPositionalAfterNamed() {
     assertMatches(messages(
-            "def f(a: Any, b: Any, c: Any) {}; f(c = null, null, Unit)")) {
+        "def f(a: Any, b: Any, c: Any) {}; f(c = null, null, Unit)")) {
       case Error("null", "Positional after named argument") :: Error(
           "Unit",
           "Positional after named argument") :: Nil =>
@@ -109,7 +109,7 @@ class ApplicationAnnotatorTest extends SimpleTestCase {
 
   def testIncorrectExpansion() {
     assertMatches(messages(
-            "def f(a: Any, b: Any) {}; f(Seq(null): _*, Seq(null): _*)")) {
+        "def f(a: Any, b: Any) {}; f(Seq(null): _*, Seq(null): _*)")) {
       case Error("Seq(null): _*", "Expansion for non-repeated parameter") :: Error(
           "Seq(null): _*",
           "Expansion for non-repeated parameter") :: Nil =>

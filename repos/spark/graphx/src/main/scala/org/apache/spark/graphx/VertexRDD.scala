@@ -375,7 +375,7 @@ object VertexRDD {
     // Determine which vertices each edge partition needs by creating a mapping from vid to pid.
     val vid2pid = edges.partitionsRDD
       .mapPartitions(_.flatMap(
-              Function.tupled(RoutingTablePartition.edgePartitionToMsgs)))
+          Function.tupled(RoutingTablePartition.edgePartitionToMsgs)))
       .setName("VertexRDD.createRoutingTables - vid2pid (aggregation)")
 
     val numEdgePartitions = edges.partitions.length

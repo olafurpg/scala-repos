@@ -86,8 +86,8 @@ object ConsumerOffsetChecker extends Logging {
             val topicAndPartition = TopicAndPartition(topic, pid)
             val request = OffsetRequest(
                 immutable.Map(topicAndPartition -> PartitionOffsetRequestInfo(
-                        OffsetRequest.LatestTime,
-                        1)))
+                    OffsetRequest.LatestTime,
+                    1)))
             val logSize = consumer
               .getOffsetsBefore(request)
               .partitionErrorAndOffsets(topicAndPartition)
@@ -95,7 +95,7 @@ object ConsumerOffsetChecker extends Logging {
               .head
 
             val lagString = offsetOpt.map(o =>
-                  if (o == -1) "unknown" else (logSize - o).toString)
+              if (o == -1) "unknown" else (logSize - o).toString)
             println(
                 "%-15s %-30s %-3s %-15s %-15s %-15s %s".format(
                     group,
@@ -105,9 +105,9 @@ object ConsumerOffsetChecker extends Logging {
                     logSize,
                     lagString.getOrElse("unknown"),
                     owner match {
-                  case Some(ownerStr) => ownerStr
-                  case None => "none"
-                }))
+                      case Some(ownerStr) => ownerStr
+                      case None => "none"
+                    }))
           case None => // ignore
         }
       case None =>
@@ -238,7 +238,7 @@ object ConsumerOffsetChecker extends Logging {
             try {
               val offset = zkUtils
                 .readData(topicDirs.consumerOffsetDir +
-                      "/%d".format(topicAndPartition.partition))
+                  "/%d".format(topicAndPartition.partition))
                 ._1
                 .toLong
               offsetMap.put(topicAndPartition, offset)
@@ -259,14 +259,8 @@ object ConsumerOffsetChecker extends Logging {
       }
       channel.disconnect()
 
-      println(
-          "%-15s %-30s %-3s %-15s %-15s %-15s %s".format("Group",
-                                                         "Topic",
-                                                         "Pid",
-                                                         "Offset",
-                                                         "logSize",
-                                                         "Lag",
-                                                         "Owner"))
+      println("%-15s %-30s %-3s %-15s %-15s %-15s %s"
+        .format("Group", "Topic", "Pid", "Offset", "logSize", "Lag", "Owner"))
       topicList.sorted.foreach { topic =>
         processTopic(zkUtils, group, topic)
       }

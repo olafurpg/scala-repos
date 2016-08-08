@@ -60,29 +60,28 @@ trait Player { this: TestConductorExt ⇒
       throw new IllegalStateException("TestConductorClient already started")
     _client = system.actorOf(Props(classOf[ClientFSM], name, controllerAddr),
                              "TestConductorClient")
-    val a = system.actorOf(
-        Props(new Actor
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
-      var waiting: ActorRef = _
-      def receive = {
-        case fsm: ActorRef ⇒
-          waiting = sender(); fsm ! SubscribeTransitionCallBack(self)
-        case Transition(_, f: ClientFSM.State, t: ClientFSM.State)
-            if (f == Connecting && t == AwaitDone) ⇒
-        // step 1, not there yet // // SI-5900 workaround
-        case Transition(_, f: ClientFSM.State, t: ClientFSM.State)
-            if (f == AwaitDone && t == Connected) ⇒ // SI-5900 workaround
-          waiting ! Done; context stop self
-        case t: Transition[_] ⇒
-          waiting ! Status.Failure(
-              new RuntimeException("unexpected transition: " + t));
-          context stop self
-        case CurrentState(_, s: ClientFSM.State) if (s == Connected) ⇒
-          // SI-5900 workaround
-          waiting ! Done; context stop self
-        case _: CurrentState[_] ⇒
-      }
-    }))
+    val a = system.actorOf(Props(
+        new Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+          var waiting: ActorRef = _
+          def receive = {
+            case fsm: ActorRef ⇒
+              waiting = sender(); fsm ! SubscribeTransitionCallBack(self)
+            case Transition(_, f: ClientFSM.State, t: ClientFSM.State)
+                if (f == Connecting && t == AwaitDone) ⇒
+            // step 1, not there yet // // SI-5900 workaround
+            case Transition(_, f: ClientFSM.State, t: ClientFSM.State)
+                if (f == AwaitDone && t == Connected) ⇒ // SI-5900 workaround
+              waiting ! Done; context stop self
+            case t: Transition[_] ⇒
+              waiting ! Status.Failure(
+                  new RuntimeException("unexpected transition: " + t));
+              context stop self
+            case CurrentState(_, s: ClientFSM.State) if (s == Connected) ⇒
+              // SI-5900 workaround
+              waiting ! Done; context stop self
+            case _: CurrentState[_] ⇒
+          }
+        }))
 
     a ? client mapTo classTag[Done]
   }
@@ -247,7 +246,7 @@ private[akka] class ClientFSM(name: RoleName,
                 if (b != barrier)
                   Status.Failure(
                       new RuntimeException("wrong barrier " + b +
-                            " received while waiting for " + barrier))
+                        " received while waiting for " + barrier))
                 else if (!success)
                   Status.Failure(new RuntimeException("barrier failed: " + b))
                 else b

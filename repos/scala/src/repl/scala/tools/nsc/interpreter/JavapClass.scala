@@ -123,15 +123,15 @@ class JavapClass(
     // instead of translatePath and then asking did I get a class back)
     val q =
       (// only simple names get the scope treatment
-          Some(p) filter (_ contains '.')
-          // take path as a Name in scope
-            orElse (intp translatePath p filter loadable)
-          // take path as a Name in scope and find its enclosing class
-            orElse (intp translateEnclosingClass p filter loadable)
-          // take path as a synthetic derived from some Name in scope
-            orElse desynthesize(p)
-          // just try it plain
-            getOrElse p)
+      Some(p) filter (_ contains '.')
+      // take path as a Name in scope
+        orElse (intp translatePath p filter loadable)
+      // take path as a Name in scope and find its enclosing class
+        orElse (intp translateEnclosingClass p filter loadable)
+      // take path as a synthetic derived from some Name in scope
+        orElse desynthesize(p)
+      // just try it plain
+        getOrElse p)
     load(q)
   }
 
@@ -180,7 +180,7 @@ class JavapClass(
           else {
             val method = line.substring(blank + 1, lparen)
             (method == pattern || isSpecialized(method) ||
-                isAnonymized(method))
+            isAnonymized(method))
           }
         }
         filtering = if (filtering) {
@@ -253,12 +253,12 @@ class JavapClass(
     // DisassemblerTool.getStandardFileManager(reporter,locale,charset)
     val defaultFileManager: JavaFileManager =
       (loader
-            .tryToLoadClass[JavaFileManager](
-                "com.sun.tools.javap.JavapFileManager")
-            .get getMethod
-            ("create", classOf[DiagnosticListener[_]],
-                classOf[PrintWriter]) invoke
-            (null, reporter, new PrintWriter(System.err, true)))
+        .tryToLoadClass[JavaFileManager](
+            "com.sun.tools.javap.JavapFileManager")
+        .get getMethod
+        ("create", classOf[DiagnosticListener[_]],
+        classOf[PrintWriter]) invoke
+        (null, reporter, new PrintWriter(System.err, true)))
         .asInstanceOf[JavaFileManager] orFailed null
 
     // manages named arrays of bytes, which might have failed to load
@@ -363,10 +363,10 @@ class JavapClass(
     def apply(options: Seq[String], filter: Boolean)(
         inputs: Seq[Input]): List[JpResult] =
       (inputs map {
-            case (klass, Success(_)) =>
-              applyOne(options, filter, klass, inputs).get
-            case (_, Failure(e)) => JpResult(e.toString)
-          }).toList orFailed List(noToolError)
+        case (klass, Success(_)) =>
+          applyOne(options, filter, klass, inputs).get
+        case (_, Failure(e)) => JpResult(e.toString)
+      }).toList orFailed List(noToolError)
   }
 
   object JavapTool {

@@ -88,7 +88,7 @@ abstract class TestResponse(_response: HttpResponse,
     response
       .header(ClassTag(clazz))
       .getOrElse(doFail(
-              s"Expected header of type ${clazz.getSimpleName} but wasn't found."))
+          s"Expected header of type ${clazz.getSimpleName} but wasn't found."))
 
   /**
     * Assert on the numeric status code.

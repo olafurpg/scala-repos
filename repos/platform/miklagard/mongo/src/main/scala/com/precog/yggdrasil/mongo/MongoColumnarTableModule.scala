@@ -195,7 +195,7 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                                  }
                              }
                         coll <- safeOp("Collection " + collectionName +
-                                     " does not exist") {
+                                 " does not exist") {
                                  logger.trace(
                                      "Fetching collection: " + collectionName)
                                  db.getCollection(collectionName)
@@ -225,7 +225,7 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
                   case err =>
                     sys.error("MongoDB path " + path.path +
-                          " does not have the form /dbName/collectionName; rollups not yet supported.")
+                      " does not have the form /dbName/collectionName; rollups not yet supported.")
                 }
 
               case InitialLoad(Nil) =>

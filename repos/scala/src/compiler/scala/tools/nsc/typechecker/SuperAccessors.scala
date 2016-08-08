@@ -353,12 +353,12 @@ abstract class SuperAccessors
                   // subtlety which presently eludes me is foiling my attempts.
                   val shouldEnsureAccessor =
                     (currentClass.isTrait && sym.isProtected &&
-                          sym.enclClass != currentClass &&
-                          !sym.owner.isPackageClass // SI-7091 no accessor needed package owned (ie, top level) symbols
-                          && !sym.owner.isTrait &&
-                          sym.owner.enclosingPackageClass != currentClass.enclosingPackageClass &&
-                          qual.symbol.info.member(sym.name).exists &&
-                          !needsProtectedAccessor(sym, tree.pos))
+                      sym.enclClass != currentClass &&
+                      !sym.owner.isPackageClass // SI-7091 no accessor needed package owned (ie, top level) symbols
+                      && !sym.owner.isTrait &&
+                      sym.owner.enclosingPackageClass != currentClass.enclosingPackageClass &&
+                      qual.symbol.info.member(sym.name).exists &&
+                      !needsProtectedAccessor(sym, tree.pos))
                   if (shouldEnsureAccessor) {
                     log(
                         "Ensuring accessor for call to protected " +
@@ -510,7 +510,7 @@ abstract class SuperAccessors
             val base: Tree = Select(Ident(receiver), sym)
             val allParamTypes = mapParamss(sym)(_.tpe)
             val args = map2(tail, allParamTypes)((params, tpes) =>
-                  map2(params, tpes)(makeArg(_, receiver, _)))
+              map2(params, tpes)(makeArg(_, receiver, _)))
             args.foldLeft(base)(Apply(_, _))
           })
 
@@ -606,10 +606,10 @@ abstract class SuperAccessors
 
       val isCandidate =
         (sym.isProtected && sym.isJavaDefined && !sym.isDefinedInPackage &&
-              !accessibleThroughSubclassing &&
-              (sym.enclosingPackageClass != currentClass.enclosingPackageClass) &&
-              (sym.enclosingPackageClass == sym.accessBoundary(
-                      sym.enclosingPackageClass)))
+          !accessibleThroughSubclassing &&
+          (sym.enclosingPackageClass != currentClass.enclosingPackageClass) &&
+          (sym.enclosingPackageClass == sym.accessBoundary(
+              sym.enclosingPackageClass)))
       val host = hostForAccessorOf(sym, clazz)
       def isSelfType = !(host.tpe <:< host.typeOfThis) && {
         if (host.typeOfThis.typeSymbol.isJavaDefined)

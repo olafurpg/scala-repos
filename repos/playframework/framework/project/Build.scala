@@ -182,7 +182,7 @@ object PlayBuild extends Build {
   lazy val RunSupportProject =
     PlayDevelopmentProject("Run-Support", "run-support")
       .settings(libraryDependencies ++=
-            runSupportDependencies(sbtVersion.value, scalaVersion.value))
+        runSupportDependencies(sbtVersion.value, scalaVersion.value))
       .dependsOn(BuildLinkProject)
 
   // extra run-support project that is only compiled against sbt scala version

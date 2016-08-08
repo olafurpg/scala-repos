@@ -208,34 +208,34 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
           // stable Addr doesn't vary.
           var lastu: Addr = Addr.Pending
 
-          val reg = (discoverer.health.changes joinLast states).register(
-              Witness { tuple =>
-            val (clientHealth, state) = tuple
+          val reg = (discoverer.health.changes joinLast states)
+            .register(Witness { tuple =>
+              val (clientHealth, state) = tuple
 
-            if (chatty()) {
-              eprintf("New state for %s!%s: %s\n",
-                      path,
-                      endpointOption getOrElse "default",
-                      state)
-            }
-
-            synchronized {
-              val State(addr, _nlimbo, _size) = state
-              nlimbo = _nlimbo
-              size = _size
-
-              val newAddr = if (clientHealth == ClientHealth.Unhealthy) {
-                logger.info(
-                    "ZkResolver reports unhealthy. resolution moving to Addr.Pending")
-                Addr.Pending
-              } else addr
-
-              if (lastu != newAddr) {
-                lastu = newAddr
-                u() = newAddr
+              if (chatty()) {
+                eprintf("New state for %s!%s: %s\n",
+                        path,
+                        endpointOption getOrElse "default",
+                        state)
               }
-            }
-          })
+
+              synchronized {
+                val State(addr, _nlimbo, _size) = state
+                nlimbo = _nlimbo
+                size = _size
+
+                val newAddr = if (clientHealth == ClientHealth.Unhealthy) {
+                  logger.info(
+                      "ZkResolver reports unhealthy. resolution moving to Addr.Pending")
+                  Addr.Pending
+                } else addr
+
+                if (lastu != newAddr) {
+                  lastu = newAddr
+                  u() = newAddr
+                }
+              }
+            })
 
           Closable.make { deadline =>
             reg.close(deadline) ensure {

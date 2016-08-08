@@ -69,7 +69,7 @@ object ResultsSpec extends Specification {
       val Result(ResponseHeader(_, headers, _), _) = Ok("hello")
         .as("text/html")
         .withDateHeaders(DATE -> new DateTime(2015, 4, 1, 0, 0)
-              .withZoneRetainFields(DateTimeZone.UTC))
+          .withZoneRetainFields(DateTimeZone.UTC))
       headers must havePair(DATE -> "Wed, 01 Apr 2015 00:00:00 GMT")
     }
 
@@ -169,11 +169,10 @@ object ResultsSpec extends Specification {
 
     "allow discarding multiple cookies by deprecated names method" in withApplication {
       val cookies = Cookies
-        .decodeSetCookieHeader(
-            Ok.discardingCookies(DiscardingCookie("foo"),
-                                 DiscardingCookie("bar"))
-              .header
-              .headers("Set-Cookie"))
+        .decodeSetCookieHeader(Ok
+          .discardingCookies(DiscardingCookie("foo"), DiscardingCookie("bar"))
+          .header
+          .headers("Set-Cookie"))
         .map(_.name)
       cookies must containTheSameElementsAs(Seq("foo", "bar"))
     }
@@ -183,7 +182,7 @@ object ResultsSpec extends Specification {
 
       (rh.status aka "status" must_== OK) and
         (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                s"""attachment; filename="${fileName}""""))
+            s"""attachment; filename="${fileName}""""))
     }
 
     "support sending a file with Unauthorized status" in withFile {
@@ -192,7 +191,7 @@ object ResultsSpec extends Specification {
 
         (rh.status aka "status" must_== UNAUTHORIZED) and
           (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                  s"""attachment; filename="${fileName}""""))
+              s"""attachment; filename="${fileName}""""))
     }
 
     "support sending a file inline with Unauthorized status" in withFile {
@@ -201,7 +200,7 @@ object ResultsSpec extends Specification {
 
         (rh.status aka "status" must_== UNAUTHORIZED) and
           (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                  s"""inline; filename="${fileName}""""))
+              s"""inline; filename="${fileName}""""))
     }
 
     "support sending a file with PaymentRequired status" in withFile {
@@ -210,7 +209,7 @@ object ResultsSpec extends Specification {
 
         (rh.status aka "status" must_== PAYMENT_REQUIRED) and
           (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                  s"""attachment; filename="${fileName}""""))
+              s"""attachment; filename="${fileName}""""))
     }
 
     "support sending a file inline with PaymentRequired status" in withFile {
@@ -219,7 +218,7 @@ object ResultsSpec extends Specification {
 
         (rh.status aka "status" must_== PAYMENT_REQUIRED) and
           (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                  s"""inline; filename="${fileName}""""))
+              s"""inline; filename="${fileName}""""))
     }
 
     "support sending a path with Ok status" in withPath { (file, fileName) =>
@@ -227,7 +226,7 @@ object ResultsSpec extends Specification {
 
       (rh.status aka "status" must_== OK) and
         (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                s"""attachment; filename="${fileName}""""))
+            s"""attachment; filename="${fileName}""""))
     }
 
     "support sending a path with Unauthorized status" in withPath {
@@ -236,7 +235,7 @@ object ResultsSpec extends Specification {
 
         (rh.status aka "status" must_== UNAUTHORIZED) and
           (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                  s"""attachment; filename="${fileName}""""))
+              s"""attachment; filename="${fileName}""""))
     }
 
     "support sending a path inline with Unauthorized status" in withPath {
@@ -245,7 +244,7 @@ object ResultsSpec extends Specification {
 
         (rh.status aka "status" must_== UNAUTHORIZED) and
           (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
-                  s"""inline; filename="${fileName}""""))
+              s"""inline; filename="${fileName}""""))
     }
 
     "allow checking content length" in withPath { (file, fileName) =>

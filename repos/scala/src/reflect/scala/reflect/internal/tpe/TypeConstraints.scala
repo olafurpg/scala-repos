@@ -148,8 +148,8 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
 
     def isWithinBounds(tp: Type): Boolean =
       (lobounds.forall(_ <:< tp) && hibounds.forall(tp <:< _) &&
-            (numlo == NoType || (numlo weak_<:< tp)) &&
-            (numhi == NoType || (tp weak_<:< numhi)))
+        (numlo == NoType || (numlo weak_<:< tp)) &&
+        (numhi == NoType || (tp weak_<:< numhi)))
 
     var inst: Type = NoType // @M reduce visibility?
 
@@ -206,8 +206,8 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
         foreach3(tvars, tparams, variances)((tvar2, tparam2, variance2) => {
           val ok =
             (tparam2 != tparam) && ((bound contains tparam2) || up &&
-                  (tparam2.info.bounds.lo =:= tparam.tpeHK) ||
-                  !up && (tparam2.info.bounds.hi =:= tparam.tpeHK))
+              (tparam2.info.bounds.lo =:= tparam.tpeHK) ||
+              !up && (tparam2.info.bounds.hi =:= tparam.tpeHK))
           if (ok) {
             if (tvar2.constr.inst eq null) cyclic = true
             solveOne(tvar2, tparam2, variance2)

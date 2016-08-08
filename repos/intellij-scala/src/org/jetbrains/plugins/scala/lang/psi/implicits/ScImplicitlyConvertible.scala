@@ -381,8 +381,8 @@ class ScImplicitlyConvertible(place: PsiElement,
                   typez.recursiveUpdate {
                     case tpt: ScTypeParameterType =>
                       f.typeParameters.find(tp =>
-                            (tp.name, ScalaPsiUtil.getPsiElementId(tp)) ==
-                              (tpt.name, tpt.getId)) match {
+                        (tp.name, ScalaPsiUtil.getPsiElementId(tp)) ==
+                          (tpt.name, tpt.getId)) match {
                         case None => (true, tpt)
                         case _ =>
                           hasRecursiveTypeParameters = true
@@ -546,8 +546,8 @@ class ScImplicitlyConvertible(place: PsiElement,
           ScParameterizedType(
               ScType.designator(funClass),
               cl.typeParameters.map(tp =>
-                    new ScUndefinedType(
-                        new ScTypeParameterType(tp, ScSubstitutor.empty))))
+                new ScUndefinedType(
+                    new ScTypeParameterType(tp, ScSubstitutor.empty))))
         case _ => null
       }
     }
@@ -607,7 +607,7 @@ class ScImplicitlyConvertible(place: PsiElement,
               ScalaPsiUtil.nameContext(b) match {
                 case d: ScDeclaredElementsHolder
                     if (d.isInstanceOf[ScValue] ||
-                          d.isInstanceOf[ScVariable]) && d
+                      d.isInstanceOf[ScVariable]) && d
                       .asInstanceOf[ScModifierListOwner]
                       .hasModifierProperty("implicit") =>
                   if (!ResolveUtils.isAccessible(d.asInstanceOf[ScMember],
@@ -659,8 +659,7 @@ object ScImplicitlyConvertible {
   val IMPLICIT_RESOLUTION_KEY: Key[PsiClass] =
     Key.create("implicit.resolution.key")
   val IMPLICIT_CONVERSIONS_KEY: Key[CachedValue[
-          collection.Map[ScType,
-                         Set[(ScFunctionDefinition, Set[ImportUsed])]]]] =
+      collection.Map[ScType, Set[(ScFunctionDefinition, Set[ImportUsed])]]]] =
     Key.create("implicit.conversions.key")
 
   case class Implicit(tp: ScType,

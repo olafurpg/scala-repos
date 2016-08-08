@@ -164,19 +164,17 @@ trait ParSeqLike[
       val until = if (end >= length) length else end + 1
       val ctx = new DefaultSignalling with AtomicIndexFlag
       ctx.setIndexFlag(Int.MinValue)
-      tasksupport.executeAndWaitResult(
-          new LastIndexWhere(p,
-                             0,
-                             splitter.psplitWithSignalling(
-                                 until,
-                                 length - until)(0) assign ctx))
+      tasksupport.executeAndWaitResult(new LastIndexWhere(
+          p,
+          0,
+          splitter.psplitWithSignalling(until, length - until)(0) assign ctx))
     }
 
   def reverse: Repr = {
     tasksupport.executeAndWaitResult(
         new Reverse(() => newCombiner, splitter) mapResult {
-      _.resultWithTaskSupport
-    })
+          _.resultWithTaskSupport
+        })
   }
 
   def reverseMap[S, That](f: T => S)(
@@ -263,10 +261,10 @@ trait ParSeqLike[
       val copyend = new Copy[U, That](cfactory, pits(2))
       tasksupport.executeAndWaitResult(
           ((copystart parallel copymiddle) { _ combine _ } parallel copyend) {
-        _ combine _
-      } mapResult {
-        _.resultWithTaskSupport
-      })
+            _ combine _
+          } mapResult {
+            _.resultWithTaskSupport
+          })
     } else patch_sequential(from, patch.seq, replaced)
   }
 

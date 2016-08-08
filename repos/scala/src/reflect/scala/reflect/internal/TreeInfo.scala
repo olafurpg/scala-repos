@@ -128,16 +128,16 @@ abstract class TreeInfo {
                        tree: Tree,
                        allowVolatile: Boolean): Boolean =
     (symOk(sym) && (!sym.isTerm ||
-              (sym.isStable && (allowVolatile || !sym.hasVolatileType))) &&
-          typeOk(tree.tpe) && (allowVolatile || !hasVolatileType(tree)) &&
-          !definitions.isByNameParamType(tree.tpe))
+      (sym.isStable && (allowVolatile || !sym.hasVolatileType))) &&
+      typeOk(tree.tpe) && (allowVolatile || !hasVolatileType(tree)) &&
+      !definitions.isByNameParamType(tree.tpe))
 
   private def isStableIdent(tree: Ident, allowVolatile: Boolean): Boolean =
     (symOk(tree.symbol) && tree.symbol.isStable &&
-          !definitions.isByNameParamType(tree.tpe) &&
-          !definitions.isByName(tree.symbol) && (allowVolatile ||
-              !tree.symbol.hasVolatileType) // TODO SPEC: not required by spec
-        )
+      !definitions.isByNameParamType(tree.tpe) &&
+      !definitions.isByName(tree.symbol) && (allowVolatile ||
+      !tree.symbol.hasVolatileType) // TODO SPEC: not required by spec
+    )
 
   /** Is `tree`'s type volatile? (Ignored if its symbol has the @uncheckedStable annotation.)
     */
@@ -227,7 +227,7 @@ abstract class TreeInfo {
       def isWarnableSymbol = {
         val sym = tree.symbol
         (sym == null) || !(sym.isModule || sym.isLazy ||
-              definitions.isByNameParamType(sym.tpe_*)) || {
+          definitions.isByNameParamType(sym.tpe_*)) || {
           debuglog(
               "'Pure' but side-effecting expression in statement position: " +
                 tree)
@@ -236,7 +236,7 @@ abstract class TreeInfo {
       }
 
       (!tree.isErrorTyped && (isExprSafeToInline(tree) || isWarnableRefTree) &&
-          isWarnableSymbol)
+      isWarnableSymbol)
   }
 
   def mapMethodParamsAndArgs[R](params: List[Symbol], args: List[Tree])(
@@ -628,10 +628,10 @@ abstract class TreeInfo {
   /** Does this CaseDef catch Throwable? */
   def catchesThrowable(cdef: CaseDef) =
     (cdef.guard.isEmpty && (unbind(cdef.pat) match {
-          case Ident(nme.WILDCARD) => true
-          case i @ Ident(name) => hasNoSymbol(i)
-          case _ => false
-        }))
+      case Ident(nme.WILDCARD) => true
+      case i @ Ident(name) => hasNoSymbol(i)
+      case _ => false
+    }))
 
   /** Is this CaseDef synthetically generated, e.g. by `MatchTranslation.translateTry`? */
   def isSyntheticCase(cdef: CaseDef) = cdef.pat.exists {

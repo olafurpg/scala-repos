@@ -90,14 +90,13 @@ final class PlaybanApi(coll: Coll, isRematch: String => Boolean) {
   private def save(outcome: Outcome): String => Funit =
     userId => {
       coll
-        .findAndUpdate(selector = BSONDocument("_id" -> userId),
-                       update = BSONDocument(
-                           "$push" -> BSONDocument(
-                               "o" -> BSONDocument("$each" -> List(outcome),
-                                                   "$slice" -> -20)
-                           )),
-                       fetchNewObject = true,
-                       upsert = true)
+        .findAndUpdate(
+            selector = BSONDocument("_id" -> userId),
+            update = BSONDocument("$push" -> BSONDocument(
+                "o" -> BSONDocument("$each" -> List(outcome), "$slice" -> -20)
+            )),
+            fetchNewObject = true,
+            upsert = true)
         .map(_.value)
     } map2 UserRecordBSONHandler.read flatMap {
       case None => fufail(s"can't find record for user $userId")

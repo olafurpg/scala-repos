@@ -518,7 +518,7 @@ class Analyzer(catalog: Catalog,
               if containsStar(args) =>
             val newChildren = expandStarExpressions(args, child)
             Alias(child = f.copy(children = newChildren), name)(isGenerated =
-                  a.isGenerated) :: Nil
+              a.isGenerated) :: Nil
           case UnresolvedAlias(c @ CreateArray(args), _)
               if containsStar(args) =>
             val expandedArgs = args.flatMap {
@@ -561,7 +561,7 @@ class Analyzer(catalog: Catalog,
       case s @ Sort(ordering, global, child)
           if child.resolved && !s.resolved =>
         val newOrdering = ordering.map(order =>
-              resolveExpression(order, child).asInstanceOf[SortOrder])
+          resolveExpression(order, child).asInstanceOf[SortOrder])
         Sort(newOrdering, global, child)
 
       // A special case for Generate, because the output of Generate should not be resolved by
@@ -925,7 +925,7 @@ class Analyzer(catalog: Catalog,
           val unresolvedSortOrders =
             sortOrder.filter(s => !s.resolved || containsAggregate(s))
           val aliasedOrdering = unresolvedSortOrders.map(o =>
-                Alias(o.child, "aggOrder")(isGenerated = true))
+            Alias(o.child, "aggOrder")(isGenerated = true))
           val aggregatedOrdering =
             aggregate.copy(aggregateExpressions = aliasedOrdering)
           val resolvedAggregate: Aggregate =
@@ -978,7 +978,7 @@ class Analyzer(catalog: Catalog,
                     Sort(finalSortOrders,
                          global,
                          aggregate.copy(aggregateExpressions =
-                               originalAggExprs ++ needsPushDown)))
+                           originalAggExprs ++ needsPushDown)))
           }
         } catch {
           // Attempting to resolve in the aggregate can result in ambiguity.  When this happens,
@@ -1084,10 +1084,9 @@ class Analyzer(catalog: Catalog,
           case (t, nullable, name) => AttributeReference(name, t, nullable)()
         }
       } else {
-        failAnalysis(
-            "The number of aliases supplied in the AS clause does not match the number of columns " +
-              s"output by the UDTF expected ${elementTypes.size} aliases but got " +
-              s"${names.mkString(",")} ")
+        failAnalysis("The number of aliases supplied in the AS clause does not match the number of columns " +
+          s"output by the UDTF expected ${elementTypes.size} aliases but got " +
+          s"${names.mkString(",")} ")
       }
     }
   }
@@ -1626,7 +1625,7 @@ object CleanupAliases extends Rule[LogicalPlan] {
 
     case w @ Window(windowExprs, partitionSpec, orderSpec, child) =>
       val cleanedWindowExprs = windowExprs.map(e =>
-            trimNonTopLevelAliases(e).asInstanceOf[NamedExpression])
+        trimNonTopLevelAliases(e).asInstanceOf[NamedExpression])
       Window(cleanedWindowExprs,
              partitionSpec.map(trimAliases),
              orderSpec.map(trimAliases(_).asInstanceOf[SortOrder]),
@@ -1657,13 +1656,12 @@ object ResolveUpCast extends Rule[LogicalPlan] {
   private def fail(from: Expression,
                    to: DataType,
                    walkedTypePath: Seq[String]) = {
-    throw new AnalysisException(
-        s"Cannot up cast ${from.sql} from " +
-          s"${from.dataType.simpleString} to ${to.simpleString} as it may truncate\n" +
-          "The type path of the target object is:\n" +
-          walkedTypePath.mkString("", "\n", "\n") +
-          "You can either add an explicit cast to the input data or choose a higher precision " +
-          "type of the field in the target object")
+    throw new AnalysisException(s"Cannot up cast ${from.sql} from " +
+      s"${from.dataType.simpleString} to ${to.simpleString} as it may truncate\n" +
+      "The type path of the target object is:\n" +
+      walkedTypePath.mkString("", "\n", "\n") +
+      "You can either add an explicit cast to the input data or choose a higher precision " +
+      "type of the field in the target object")
   }
 
   private def illegalNumericPrecedence(from: DataType, to: DataType): Boolean = {

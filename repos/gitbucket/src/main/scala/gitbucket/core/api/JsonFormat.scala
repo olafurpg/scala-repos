@@ -16,12 +16,12 @@ object JsonFormat {
 
   val jsonFormats =
     Serialization.formats(NoTypeHints) + new CustomSerializer[Date](format =>
-          ({
+      ({
         case JString(s) =>
           Try(parserISO.parseDateTime(s)).toOption
             .map(_.toDate)
             .getOrElse(throw new MappingException("Can't convert " +
-                      s + " to Date"))
+              s + " to Date"))
       }, {
         case x: Date =>
           JString(parserISO.print(new DateTime(x).withZone(DateTimeZone.UTC)))
@@ -38,7 +38,7 @@ object JsonFormat {
 
   def apiPathSerializer(c: Context) =
     new CustomSerializer[ApiPath](format =>
-          ({
+      ({
         case JString(s) if s.startsWith(c.baseUrl) =>
           ApiPath(s.substring(c.baseUrl.length))
         case JString(s) =>

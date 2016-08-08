@@ -38,10 +38,8 @@ object InspectionsUtil {
         c.getTypeParameters.toSeq match {
           case Seq() => designatorType
           case params =>
-            val undefines = params.map(
-                p =>
-                  ScUndefinedType(
-                      new ScTypeParameterType(p, ScSubstitutor.empty)))
+            val undefines = params.map(p =>
+              ScUndefinedType(new ScTypeParameterType(p, ScSubstitutor.empty)))
             ScParameterizedType(designatorType, undefines)
         }
       }

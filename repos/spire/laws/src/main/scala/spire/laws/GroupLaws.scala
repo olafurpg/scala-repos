@@ -70,7 +70,7 @@ trait GroupLaws[A] extends Laws {
               (A.sumOption(Seq.empty[A]) === Option.empty[A]) &&
                 (A.sumOption(Seq(a)) === Option(a)) &&
                 (A.sumOption(Seq(a, a)) === Option(a + a)) && (A.sumOption(
-                      Seq(a, a, a)) === Option(a + a + a)))
+                  Seq(a, a, a)) === Option(a + a + a)))
     )
 
   def additiveMonoid(implicit A: AdditiveMonoid[A]) = new AdditiveProperties(

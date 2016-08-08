@@ -103,7 +103,7 @@ object Handler {
       val control = controller orElse baseController(member)
       Iteratee
         .foreach[JsValue](jsv =>
-              jsv.asOpt[JsObject] foreach { obj =>
+          jsv.asOpt[JsObject] foreach { obj =>
             obj str "t" foreach { t =>
               control.lift(t -> obj)
             }

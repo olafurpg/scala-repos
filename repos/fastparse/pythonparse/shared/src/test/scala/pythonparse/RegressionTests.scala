@@ -75,9 +75,8 @@ object RegressionTests extends TestSuite {
                         Seq(
                             TryExcept(
                                 Seq(Pass),
-                                Seq(excepthandler.ExceptHandler(Some('s),
-                                                                None,
-                                                                Seq(Pass))),
+                                Seq(excepthandler
+                                  .ExceptHandler(Some('s), None, Seq(Pass))),
                                 Nil
                             )
                         ),

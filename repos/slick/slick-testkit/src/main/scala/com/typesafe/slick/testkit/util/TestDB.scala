@@ -195,19 +195,19 @@ abstract class JdbcTestDB(val confName: String) extends SqlTestDB {
         tables <- localTables
         sequences <- localSequences
         _ <- DBIO.seq((tables.map(t =>
-                          sqlu"""drop table if exists #${profile
-                    .quoteIdentifier(t)} cascade""") ++ sequences.map(t =>
-                          sqlu"""drop sequence if exists #${profile
-                    .quoteIdentifier(t)} cascade""")): _*)
+              sqlu"""drop table if exists #${profile
+                .quoteIdentifier(t)} cascade""") ++ sequences.map(t =>
+              sqlu"""drop sequence if exists #${profile
+                .quoteIdentifier(t)} cascade""")): _*)
       } yield ()
     }
   def assertTablesExist(tables: String*) =
     DBIO.seq(tables.map(t =>
-              sql"""select 1 from #${profile
+      sql"""select 1 from #${profile
         .quoteIdentifier(t)} where 1 < 0""".as[Int]): _*)
   def assertNotTablesExist(tables: String*) =
     DBIO.seq(tables.map(t =>
-              sql"""select 1 from #${profile
+      sql"""select 1 from #${profile
         .quoteIdentifier(t)} where 1 < 0""".as[Int].failed): _*)
   def createSingleSessionDatabase(implicit session: profile.Backend#Session,
                                   executor: AsyncExecutor = AsyncExecutor
@@ -267,9 +267,9 @@ abstract class ExternalJdbcTestDB(confName: String)
       Class[_ <: GenericTest[_ >: Null <: TestDB]]] = TestkitConfig
     .getStrings(config, "testClasses")
     .map(_.map(n =>
-              Class
-                .forName(n)
-                .asInstanceOf[Class[_ <: GenericTest[_ >: Null <: TestDB]]]))
+      Class
+        .forName(n)
+        .asInstanceOf[Class[_ <: GenericTest[_ >: Null <: TestDB]]]))
     .getOrElse(super.testClasses)
 
   def databaseFor(path: String) =
@@ -280,12 +280,9 @@ abstract class ExternalJdbcTestDB(confName: String)
   override def cleanUpBefore() {
     if (!drop.isEmpty || !create.isEmpty) {
       println("[Creating test database " + this + "]")
-      await(
-          databaseFor("adminConn").run(
-              DBIO
-                .seq((drop ++ create).map(s => sqlu"#$s"): _*)
-                .withPinnedSession
-          ))
+      await(databaseFor("adminConn").run(
+          DBIO.seq((drop ++ create).map(s => sqlu"#$s"): _*).withPinnedSession
+      ))
     }
     if (!postCreate.isEmpty) {
       await(

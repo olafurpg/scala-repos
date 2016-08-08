@@ -263,11 +263,11 @@ object TopicCommand extends Logging {
                 zkUtils.getInSyncReplicasForPartition(topic, partitionId)
               val leader = zkUtils.getLeaderForPartition(topic, partitionId)
               if ((!reportUnderReplicatedPartitions &&
-                      !reportUnavailablePartitions) ||
+                  !reportUnavailablePartitions) ||
                   (reportUnderReplicatedPartitions &&
-                      inSyncReplicas.size < assignedReplicas.size) ||
+                  inSyncReplicas.size < assignedReplicas.size) ||
                   (reportUnavailablePartitions && (!leader.isDefined ||
-                          !liveBrokers.contains(leader.get)))) {
+                  !liveBrokers.contains(leader.get)))) {
                 print("\tTopic: " + topic)
                 print("\tPartition: " + partitionId)
                 print(
@@ -292,12 +292,12 @@ object TopicCommand extends Logging {
         "Invalid topic config: all configs to be added must be in the format \"key=val\".")
     val props = new Properties
     configsToBeAdded.foreach(pair =>
-          props.setProperty(pair(0).trim, pair(1).trim))
+      props.setProperty(pair(0).trim, pair(1).trim))
     LogConfig.validate(props)
     if (props.containsKey(LogConfig.MessageFormatVersionProp)) {
       println(
           s"WARNING: The configuration ${LogConfig.MessageFormatVersionProp}=${props
-        .getProperty(LogConfig.MessageFormatVersionProp)} is specified. " +
+            .getProperty(LogConfig.MessageFormatVersionProp)} is specified. " +
             s"This configuration will be ignored if the version is newer than the inter.broker.protocol.version specified in the broker.")
     }
     props

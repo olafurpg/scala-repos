@@ -174,8 +174,8 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
               }
 
               Some(EstimatedContribution(
-                      name,
-                      floor(income / (lifeExpectancy - age))))
+                  name,
+                  floor(income / (lifeExpectancy - age))))
             case _ => None
           }
           .values

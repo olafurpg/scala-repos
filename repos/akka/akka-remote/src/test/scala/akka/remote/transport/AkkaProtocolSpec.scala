@@ -272,8 +272,8 @@ class AkkaProtocolSpec
               handle,
               ActorAssociationEventListener(testActor),
               new AkkaProtocolSettings(ConfigFactory
-                    .parseString("akka.remote.require-cookie = on")
-                    .withFallback(conf)),
+                .parseString("akka.remote.require-cookie = on")
+                .withFallback(conf)),
               codec,
               failureDetector))
 
@@ -296,8 +296,8 @@ class AkkaProtocolSpec
               handle,
               ActorAssociationEventListener(testActor),
               new AkkaProtocolSettings(ConfigFactory
-                    .parseString("akka.remote.require-cookie = on")
-                    .withFallback(conf)),
+                .parseString("akka.remote.require-cookie = on")
+                .withFallback(conf)),
               codec,
               failureDetector))
 
@@ -335,8 +335,8 @@ class AkkaProtocolSpec
               statusPromise,
               transport,
               new AkkaProtocolSettings(ConfigFactory
-                    .parseString("akka.remote.require-cookie = on")
-                    .withFallback(conf)),
+                .parseString("akka.remote.require-cookie = on")
+                .withFallback(conf)),
               codec,
               failureDetector,
               refuseUid = None))

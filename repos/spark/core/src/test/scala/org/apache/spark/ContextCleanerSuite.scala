@@ -140,7 +140,7 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
 
     // Explicit cleanup
     shuffleDeps.foreach(s =>
-          cleaner.doCleanupShuffle(s.shuffleId, blocking = true))
+      cleaner.doCleanupShuffle(s.shuffleId, blocking = true))
     tester.assertCleanup()
 
     // Verify that shuffles can be re-executed after cleaning up
@@ -315,9 +315,9 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
     assert(
         sc.env.blockManager.master
           .getMatchingBlockIds({
-        case BroadcastBlockId(`taskClosureBroadcastId`, _) => true
-        case _ => false
-      }, askSlaves = true)
+            case BroadcastBlockId(`taskClosureBroadcastId`, _) => true
+            case _ => false
+          }, askSlaves = true)
           .isEmpty)
   }
 
@@ -359,9 +359,9 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
     assert(
         sc.env.blockManager.master
           .getMatchingBlockIds({
-        case BroadcastBlockId(`taskClosureBroadcastId`, _) => true
-        case _ => false
-      }, askSlaves = true)
+            case BroadcastBlockId(`taskClosureBroadcastId`, _) => true
+            case _ => false
+          }, askSlaves = true)
           .isEmpty)
   }
 }
@@ -379,7 +379,7 @@ class SortShuffleContextCleanerSuite
 
     // Explicit cleanup
     shuffleDeps.foreach(s =>
-          cleaner.doCleanupShuffle(s.shuffleId, blocking = true))
+      cleaner.doCleanupShuffle(s.shuffleId, blocking = true))
     tester.assertCleanup()
 
     // Verify that shuffles can be re-executed after cleaning up
@@ -442,9 +442,9 @@ class SortShuffleContextCleanerSuite
     assert(
         sc.env.blockManager.master
           .getMatchingBlockIds({
-        case BroadcastBlockId(`taskClosureBroadcastId`, _) => true
-        case _ => false
-      }, askSlaves = true)
+            case BroadcastBlockId(`taskClosureBroadcastId`, _) => true
+            case _ => false
+          }, askSlaves = true)
           .isEmpty)
   }
 }

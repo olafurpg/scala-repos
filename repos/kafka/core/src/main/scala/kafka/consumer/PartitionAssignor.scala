@@ -129,7 +129,7 @@ class RoundRobinAssignor() extends PartitionAssignor with Logging {
 
     // assign Map.empty for the consumers which are not associated with topic partitions
     ctx.consumers.foreach(consumerId =>
-          partitionAssignment.getAndMaybePut(consumerId))
+      partitionAssignment.getAndMaybePut(consumerId))
     partitionAssignment
   }
 }
@@ -199,7 +199,7 @@ class RangeAssignor() extends PartitionAssignor with Logging {
 
     // assign Map.empty for the consumers which are not associated with topic partitions
     ctx.consumers.foreach(consumerId =>
-          partitionAssignment.getAndMaybePut(consumerId))
+      partitionAssignment.getAndMaybePut(consumerId))
     partitionAssignment
   }
 }

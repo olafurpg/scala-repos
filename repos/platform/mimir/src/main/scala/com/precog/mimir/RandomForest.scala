@@ -199,7 +199,7 @@ trait TreeMaker[ /*@specialized(Double) */ A] {
             rightRegion -= dependent(order(j))
             val error =
               (leftRegion.error * (j + 1) + rightRegion.error *
-                    (order.length - j - 1)) / order.length
+                (order.length - j - 1)) / order.length
             if (error < minError) {
               minError = error
               minVar = axis
@@ -239,7 +239,7 @@ trait TreeMaker[ /*@specialized(Double) */ A] {
 
           val boundary =
             (independent(featureOrder(minIdx))(minVar) +
-                  independent(featureOrder(minIdx + 1))(minVar)) / 2
+              independent(featureOrder(minIdx + 1))(minVar)) / 2
           Split(minVar, boundary, growTree(leftOrders), growTree(rightOrders))
         }
       }
@@ -611,8 +611,8 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
         schemas flatMap
           (_ traverse { tpe =>
-                makeForest(table, tpe) map (tpe -> _)
-              })
+            makeForest(table, tpe) map (tpe -> _)
+          })
       }
 
       def makeForest(table: Table,

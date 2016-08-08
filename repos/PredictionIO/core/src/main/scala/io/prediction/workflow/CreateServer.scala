@@ -136,7 +136,7 @@ object CreateServer extends Logging {
         c.copy(env = Some(x))
       } text
         ("Comma-separated list of environmental variables (in 'FOO=BAR' " +
-              "format) to pass to the Spark execution environment.")
+          "format) to pass to the Spark execution environment.")
       opt[Int]("port") action { (x, c) =>
         c.copy(port = x)
       } text ("Port to bind to (default: 8000).")
@@ -467,7 +467,7 @@ class ServerActor[Q, P](val args: ServerConfig,
       scalaj.http
         .Http(logUrl)
         .postData(logPrefix + write(
-                Map("engineInstance" -> engineInstance, "message" -> message)))
+            Map("engineInstance" -> engineInstance, "message" -> message)))
         .asString
     } catch {
       case e: Throwable =>
@@ -608,7 +608,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                   case Success(code) => {
                     if (code != 201) {
                       log.error(s"Feedback event failed. Status code: $code." +
-                            s"Data: ${write(data)}.")
+                        s"Data: ${write(data)}.")
                     }
                   }
                   case Failure(t) => {
@@ -636,7 +636,7 @@ class ServerActor[Q, P](val args: ServerConfig,
               val servingEndTime = DateTime.now
               lastServingSec =
                 (servingEndTime.getMillis -
-                      servingStartTime.getMillis) / 1000.0
+                  servingStartTime.getMillis) / 1000.0
               avgServingSec =
                 ((avgServingSec * requestCount) + lastServingSec) /
                   (requestCount + 1)
@@ -697,7 +697,7 @@ class ServerActor[Q, P](val args: ServerConfig,
         respondWithMediaType(MediaTypes.`application/json`) {
           complete {
             Map("plugins" -> Map(
-                    "outputblockers" -> pluginContext.outputBlockers.map {
+                "outputblockers" -> pluginContext.outputBlockers.map {
                   case (n, p) =>
                     n -> Map(
                         "name" -> p.pluginName,
@@ -705,7 +705,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                         "class" -> p.getClass.getName,
                         "params" -> pluginContext.pluginParams(p.pluginName))
                 },
-                    "outputsniffers" -> pluginContext.outputSniffers.map {
+                "outputsniffers" -> pluginContext.outputSniffers.map {
                   case (n, p) =>
                     n -> Map(
                         "name" -> p.pluginName,
@@ -713,7 +713,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                         "class" -> p.getClass.getName,
                         "params" -> pluginContext.pluginParams(p.pluginName))
                 }
-                ))
+            ))
           }
         }
       }

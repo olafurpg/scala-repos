@@ -94,7 +94,7 @@ object ReassignPartitionsCommand extends Logging {
   def generateAssignment(zkUtils: ZkUtils,
                          opts: ReassignPartitionsCommandOptions) {
     if (!(opts.options.has(opts.topicsToMoveJsonFileOpt) &&
-              opts.options.has(opts.brokerListOpt)))
+          opts.options.has(opts.brokerListOpt)))
       CommandLineUtils.printUsageAndDie(
           opts.parser,
           "If --generate option is used, command must include both --topics-to-move-json-file and --broker-list options")
@@ -206,13 +206,12 @@ object ReassignPartitionsCommand extends Logging {
     println(
         "Current partition replica assignment\n\n%s\n\nSave this to use as the --reassignment-json-file option during rollback"
           .format(zkUtils.getPartitionReassignmentZkData(
-                  currentPartitionReplicaAssignment)))
+              currentPartitionReplicaAssignment)))
     // start the reassignment
     if (reassignPartitionsCommand.reassignPartitions())
       println(
-          "Successfully started reassignment of partitions %s".format(
-              zkUtils.getPartitionReassignmentZkData(
-                  partitionsToBeReassigned.toMap)))
+          "Successfully started reassignment of partitions %s".format(zkUtils
+            .getPartitionReassignmentZkData(partitionsToBeReassigned.toMap)))
     else
       println(
           "Failed to reassign partitions %s".format(partitionsToBeReassigned))
@@ -253,9 +252,9 @@ object ReassignPartitionsCommand extends Logging {
         else {
           println(
               ("ERROR: Assigned replicas (%s) don't match the list of replicas for reassignment (%s)" +
-                    " for partition %s").format(assignedReplicas.mkString(","),
-                                                newReplicas.mkString(","),
-                                                topicAndPartition))
+                " for partition %s").format(assignedReplicas.mkString(","),
+                                            newReplicas.mkString(","),
+                                            topicAndPartition))
           ReassignmentFailed
         }
     }
@@ -327,7 +326,7 @@ class ReassignPartitionsCommand(
   def reassignPartitions(): Boolean = {
     try {
       val validPartitions = partitions.filter(p =>
-            validatePartition(zkUtils, p._1.topic, p._1.partition))
+        validatePartition(zkUtils, p._1.topic, p._1.partition))
       if (validPartitions.isEmpty) {
         false
       } else {

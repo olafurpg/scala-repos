@@ -605,8 +605,8 @@ trait GrouperSpec[M[+ _]]
 
         fromJson(
             Stream(JObject(JField("key", key.toJValue(tic_aj)) :: JField(
-                        "value",
-                        JNum(gs1Json.size + gs2Json.size)) :: Nil)))
+                "value",
+                JNum(gs1Json.size + gs2Json.size)) :: Nil)))
       }
     }
 
@@ -705,9 +705,9 @@ trait GrouperSpec[M[+ _]]
             Stream(
                 JObject(JField("key",
                                JArray(key.toJValue(tic_aj) :: key.toJValue(
-                                       tic_bj) :: Nil)) :: JField(
-                        "value",
-                        JNum(gs1Json.size + gs2Json.size)) :: Nil)))
+                                   tic_bj) :: Nil)) :: JField(
+                    "value",
+                    JNum(gs1Json.size + gs2Json.size)) :: Nil)))
       }
     }
 
@@ -821,8 +821,8 @@ trait GrouperSpec[M[+ _]]
 
         val result = fromJson(
             Stream(JObject(JField("key", key.toJValue(tic_aj)) :: JField(
-                        "value",
-                        JNum(gs1Json.size + gs2Json.size)) :: Nil)))
+                "value",
+                JNum(gs1Json.size + gs2Json.size)) :: Nil)))
 
         elapsed += (System.currentTimeMillis - start)
         result

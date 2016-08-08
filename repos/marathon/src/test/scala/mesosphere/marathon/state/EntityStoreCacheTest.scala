@@ -211,7 +211,7 @@ class EntityStoreCacheTest
     val names = Set("a", "b", "c")
     val now = Timestamp.now()
     content ++= (names.map(t => t -> TestApp(t)) ++ names.map(t =>
-              s"$t:$now" -> TestApp(t, now)))
+      s"$t:$now" -> TestApp(t, now)))
     content should have size 6
     entityCache.onElected.futureValue
 
@@ -230,7 +230,7 @@ class EntityStoreCacheTest
     val names = Set("a", "b", "c")
     val now = Timestamp.now()
     content ++= (names.map(t => t -> TestApp(t)) ++ names.map(t =>
-              s"$t:$now" -> TestApp(t, now)))
+      s"$t:$now" -> TestApp(t, now)))
     content should have size 6
 
     When("Get all names in the cache")

@@ -166,7 +166,7 @@ trait Crudify {
                 showAllMenuName,
                 addlMenuLocParams :::
                   (locSnippets :: Loc
-                        .Template(showAllTemplate) :: showAllMenuLocParams))))
+                    .Template(showAllTemplate) :: showAllMenuLocParams))))
 
   /**
     * Override to include new Params for the show all menu
@@ -183,8 +183,8 @@ trait Crudify {
                 createPath,
                 createMenuName,
                 (addlMenuLocParams :::
-                      (locSnippets :: Loc
-                            .Template(createTemplate) :: createMenuLocParams)))))
+                  (locSnippets :: Loc
+                    .Template(createTemplate) :: createMenuLocParams)))))
 
   /**
     * Override to include new Params for the create menu
@@ -766,8 +766,7 @@ trait Crudify {
             S.getNotices
               .filter(_._3 == fid)
               .flatMap(err =>
-                    List(Text(" "),
-                         <span class={editErrorClass}>{err._2}</span>))
+                List(Text(" "), <span class={editErrorClass}>{err._2}</span>))
 
           case _ => NodeSeq.Empty
         }

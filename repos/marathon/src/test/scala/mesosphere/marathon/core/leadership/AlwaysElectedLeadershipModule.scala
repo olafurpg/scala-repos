@@ -30,7 +30,7 @@ object AlwaysElectedLeadershipModule extends Mockito {
   }
 
   private[this] def forActorsModule(actorsModule: ActorsModule =
-        new ActorsModule(ShutdownHooks())): LeadershipModule = {
+    new ActorsModule(ShutdownHooks())): LeadershipModule = {
     new AlwaysElectedLeadershipModule(actorsModule)
   }
 }

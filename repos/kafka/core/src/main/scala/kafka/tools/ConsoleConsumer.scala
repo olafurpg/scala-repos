@@ -102,10 +102,9 @@ object ConsoleConsumer extends Logging {
         checkZkPathExists(config.options.valueOf(config.zkConnectOpt),
                           "/consumers/" + config.consumerProps.getProperty(
                               "group.id") + "/offsets")) {
-      System.err.println(
-          "Found previous offset information for this group " +
-            config.consumerProps.getProperty("group.id") +
-            ". Please use --delete-consumer-offsets to delete previous offsets metadata")
+      System.err.println("Found previous offset information for this group " +
+        config.consumerProps.getProperty("group.id") +
+        ". Please use --delete-consumer-offsets to delete previous offsets metadata")
       System.exit(1)
     }
   }
@@ -194,10 +193,9 @@ object ConsoleConsumer extends Logging {
         config.options.has(config.resetBeginningOpt) && checkZkPathExists(
             config.options.valueOf(config.zkConnectOpt),
             "/consumers/" + props.getProperty("group.id") + "/offsets")) {
-      System.err.println(
-          "Found previous offset information for this group " +
-            props.getProperty("group.id") +
-            ". Please use --delete-consumer-offsets to delete previous offsets metadata")
+      System.err.println("Found previous offset information for this group " +
+        props.getProperty("group.id") +
+        ". Please use --delete-consumer-offsets to delete previous offsets metadata")
       System.exit(1)
     }
 
@@ -507,10 +505,10 @@ class LoggingMessageFormatter extends MessageFormatter {
     defaultWriter.writeTo(consumerRecord, output)
     if (logger.isInfoEnabled)
       logger.info({
-        if (timestampType != TimestampType.NO_TIMESTAMP_TYPE)
-          s"$timestampType:$timestamp, "
-        else ""
-      } + s"key:${if (key == null) "null" else new String(key)}, " +
+            if (timestampType != TimestampType.NO_TIMESTAMP_TYPE)
+              s"$timestampType:$timestamp, "
+            else ""
+          } + s"key:${if (key == null) "null" else new String(key)}, " +
             s"value:${if (value == null) "null" else new String(value)}")
   }
 }

@@ -201,9 +201,8 @@ object PersistenceTCKDoc {
 
     //#snapshot-store-tck-scala
     class MySnapshotStoreSpec
-        extends SnapshotStoreSpec(
-            config = ConfigFactory.parseString(
-                """
+        extends SnapshotStoreSpec(config = ConfigFactory.parseString(
+            """
         akka.persistence.snapshot-store.plugin = "my.snapshot-store.plugin"
         """))
     //#snapshot-store-tck-scala

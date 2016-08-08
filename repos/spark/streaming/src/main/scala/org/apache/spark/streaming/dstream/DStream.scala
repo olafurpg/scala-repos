@@ -321,9 +321,8 @@ abstract class DStream[T: ClassTag](
       throw new SparkException(this + " has not been initialized")
     } else if (time <= zeroTime ||
                !(time - zeroTime).isMultipleOf(slideDuration)) {
-      logInfo(
-          s"Time $time is invalid as zeroTime is $zeroTime" +
-            s" , slideDuration is $slideDuration and difference is ${time - zeroTime}")
+      logInfo(s"Time $time is invalid as zeroTime is $zeroTime" +
+        s" , slideDuration is $slideDuration and difference is ${time - zeroTime}")
       false
     } else {
       logDebug(s"Time $time is valid")

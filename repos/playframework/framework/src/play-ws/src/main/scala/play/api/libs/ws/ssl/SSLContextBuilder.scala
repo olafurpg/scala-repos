@@ -409,7 +409,7 @@ class ConfigSSLContextBuilder(info: SSLConfig,
             store.deleteEntry(alias)
           case e: Exception =>
             logger.warn(s"validateStore: Skipping unknown exception $alias: " +
-                  e.getMessage)
+              e.getMessage)
             store.deleteEntry(alias)
         }
       }

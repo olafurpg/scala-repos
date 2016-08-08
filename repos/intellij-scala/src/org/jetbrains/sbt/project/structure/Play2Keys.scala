@@ -41,11 +41,11 @@ object Play2Keys {
             new StringXmlKey(keyName,
                              children
                                .map(projectKey =>
-                                     (projectKey.label, projectKey.text))
+                                 (projectKey.label, projectKey.text))
                                .toMap))
       } else if (children.forall(_.child.forall(node =>
-                           node.label == ENTRY_SEQ_NAME ||
-                             node.isInstanceOf[Text]))) {
+                   node.label == ENTRY_SEQ_NAME ||
+                     node.isInstanceOf[Text]))) {
         val values = children.flatMap {
           case _: Text => None
           case projectKey =>

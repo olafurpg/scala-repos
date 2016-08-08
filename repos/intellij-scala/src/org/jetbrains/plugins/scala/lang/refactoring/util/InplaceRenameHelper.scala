@@ -85,7 +85,7 @@ class InplaceRenameHelper(parent: PsiElement) {
     val templateVariables = template.getVariables
     val stopAtVariables = templateVariables.asScala.filter(_.isAlwaysStopAt)
     val primarySortedVariables = primaries.flatMap(p =>
-          stopAtVariables.find(_.getName == primaryNames(p)))
+      stopAtVariables.find(_.getName == primaryNames(p)))
     for ((v, idx) <- primarySortedVariables.zipWithIndex) {
       templateVariables.set(idx, v)
     }

@@ -178,12 +178,12 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
       dag.idToExp
         .collect(
             new GenPartial[HMap[Id, ExpressionDag[Formula]#E]#Pair, BoolT] {
-          def apply[T] = {
-            case (id, expr) =>
-              val node = expr.evaluate(dag.idToExp)
-              dag.idOf(node) == id
-          }
-        })
+              def apply[T] = {
+                case (id, expr) =>
+                  val node = expr.evaluate(dag.idToExp)
+                  dag.idOf(node) == id
+              }
+            })
         .forall(identity)
   }
 

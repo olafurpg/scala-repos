@@ -38,7 +38,7 @@ case class StaticHistogramBins(splits: Array[Double]) extends HistogramBins {
 case class DynamicHistogramBins(number: Int = 10) extends HistogramBins {
   def apply(lower: Double, upper: Double) =
     StaticHistogramBins(Array.tabulate(number - 1)(i =>
-              lower + ((i + 1.0) / (number)) * (upper - lower)))
+      lower + ((i + 1.0) / (number)) * (upper - lower)))
 }
 
 /**

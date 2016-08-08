@@ -64,9 +64,8 @@ object PlayReload {
             .find(_.severity == xsbti.Severity.Error)
             .map(CompilationException)
             .getOrElse(UnexpectedException(
-                    Some(
-                        "The compilation failed without reporting any problem!"),
-                    Some(e)))
+                Some("The compilation failed without reporting any problem!"),
+                Some(e)))
         case e: Exception => UnexpectedException(unexpected = Some(e))
       }
       .getOrElse {
@@ -129,8 +128,8 @@ object PlayReload {
                   def pointer =
                     maybePosition
                       .map(pos =>
-                            xsbti.Maybe.just(
-                                (pos - 1).asInstanceOf[java.lang.Integer]))
+                        xsbti.Maybe.just(
+                            (pos - 1).asInstanceOf[java.lang.Integer]))
                       .getOrElse(xsbti.Maybe.nothing[java.lang.Integer])
                   def pointerSpace = xsbti.Maybe.nothing[String]
                   def sourceFile = xsbti.Maybe.just(file(error._1))

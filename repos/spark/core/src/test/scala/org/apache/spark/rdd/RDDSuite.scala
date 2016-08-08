@@ -401,7 +401,7 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
 
     // RDD with locality preferences spread (non-randomly) over 6 machines, m0 through m5
     val data = sc.makeRDD((1 to 9).map(i =>
-              (i, (i to (i + 2)).map { j =>
+      (i, (i to (i + 2)).map { j =>
         "m" + (j % 6)
       })))
     val coalesced1 = data.coalesce(3)

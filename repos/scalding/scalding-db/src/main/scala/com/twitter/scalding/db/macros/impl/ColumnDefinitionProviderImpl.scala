@@ -49,7 +49,7 @@ object ColumnDefinitionProviderImpl {
           else {
             val getterName = newTermName("apply$default$" + (i + 1))
             Some(p.name.toString -> c.Expr(
-                    q"${moduleSym}.$getterName.toString"))
+                q"${moduleSym}.$getterName.toString"))
           }
       }
       .toMap
@@ -123,15 +123,13 @@ object ColumnDefinitionProviderImpl {
                              annotationInfo,
                              nullable)
         case tpe if tpe.erasure =:= typeOf[Option[Any]] && nullable == true =>
-          Failure(
-              new Exception(
-                  s"Case class ${T.tpe} has field ${fieldName} which contains a nested option. This is not supported by this macro."))
+          Failure(new Exception(
+              s"Case class ${T.tpe} has field ${fieldName} which contains a nested option. This is not supported by this macro."))
 
         case tpe if tpe.erasure =:= typeOf[Option[Any]] && nullable == false =>
           if (defaultValOpt.isDefined)
-            Failure(
-                new Exception(
-                    s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, with a default value. Options cannot have default values"))
+            Failure(new Exception(
+                s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, with a default value. Options cannot have default values"))
           else {
             matchField(accessorTree,
                        tpe.asInstanceOf[TypeRefApi].args.head,
@@ -145,9 +143,8 @@ object ColumnDefinitionProviderImpl {
 
         // default
         case _ =>
-          Failure(
-              new Exception(
-                  s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, which is not supported for talking to JDBC"))
+          Failure(new Exception(
+              s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, which is not supported for talking to JDBC"))
       }
     }
 

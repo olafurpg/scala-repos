@@ -96,7 +96,7 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
           // XXX dummy implementation for now
           val getClassMethod =
             createMethod(nme.getClass_, getClassReturnType(clazz.tpe))(_ =>
-                  NULL)
+              NULL)
           deriveTemplate(templ)(_ :+ getClassMethod)
         } else templ
       }
@@ -139,7 +139,7 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
     def perElementMethod(name: Name, returnType: Type)(
         caseFn: Symbol => Tree): Tree =
       createSwitchMethod(name, accessors.indices, returnType)(idx =>
-            caseFn(accessors(idx)))
+        caseFn(accessors(idx)))
 
     // def productElementNameMethod = perElementMethod(nme.productElementName, StringTpe)(x => LIT(x.name.toString))
 
@@ -151,7 +151,7 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
     def canEqualMethod: Tree = {
       syntheticCanEqual = true
       createMethod(nme.canEqual_, List(AnyTpe), BooleanTpe)(m =>
-            Ident(m.firstParam) IS_OBJ classExistentialType(clazz))
+        Ident(m.firstParam) IS_OBJ classExistentialType(clazz))
     }
 
     /* that match { case _: this.C => true ; case _ => false }
@@ -351,7 +351,7 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
      */
     def needsReadResolve =
       (clazz.isModuleClass && clazz.isSerializable &&
-            !hasConcreteImpl(nme.readResolve) && clazz.isStatic)
+        !hasConcreteImpl(nme.readResolve) && clazz.isStatic)
 
     def synthesize(): List[Tree] = {
       val methods =
@@ -450,8 +450,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
           if (clazz.isCase) caseTemplateBody()
           else
             synthesize() match {
-          case Nil => body // avoiding unnecessary copy
-          case ms => body ++ ms
-      })
+              case Nil => body // avoiding unnecessary copy
+              case ms => body ++ ms
+          })
   }
 }

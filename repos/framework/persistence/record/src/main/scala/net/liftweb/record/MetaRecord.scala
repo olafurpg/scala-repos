@@ -298,7 +298,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
 
   def foreachCallback(inst: BaseRecord, f: LifecycleCallbacks => Any) {
     lifecycleCallbacks.foreach(m =>
-          f(m._2.invoke(inst).asInstanceOf[LifecycleCallbacks]))
+      f(m._2.invoke(inst).asInstanceOf[LifecycleCallbacks]))
   }
 
   /**
@@ -362,7 +362,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
 
       case s: Seq[_] =>
         s.flatMap(e =>
-              e match {
+          e match {
             case elem: Elem =>
               elem.copy(
                   child =

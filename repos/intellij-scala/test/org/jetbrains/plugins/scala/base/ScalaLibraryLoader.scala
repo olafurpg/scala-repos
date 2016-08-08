@@ -57,7 +57,7 @@ class ScalaLibraryLoader(project: Project,
     addScalaSdk(module, libVersion, isIncludeReflectLibrary)
 
     additionalLibraries.foreach(name =>
-          addLibrary(module, CommonLibrary(name, libVersion)))
+      addLibrary(module, CommonLibrary(name, libVersion)))
 
     javaSdk.foreach { sdk =>
       val rootModel = ModuleRootManager.getInstance(module).getModifiableModel
@@ -101,7 +101,7 @@ class ScalaLibraryLoader(project: Project,
         (if (loadReflect) Seq(reflectPath) else Seq.empty)
     val classRoots = scalaSdkJars
       .map(path =>
-            JarFileSystem.getInstance.refreshAndFindFileByPath(path + "!/"))
+        JarFileSystem.getInstance.refreshAndFindFileByPath(path + "!/"))
       .asJava
 
     val scalaLibrarySrc = TestUtils.getScalaLibrarySrc(sdkVersion)

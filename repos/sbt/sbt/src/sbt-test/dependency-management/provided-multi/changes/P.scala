@@ -14,16 +14,14 @@ object P extends Build {
   lazy val a =
     Project("A", file("a")) settings
       (libraryDependencies +=
-            "org.scala-tools.sbinary" %% "sbinary" % "0.4.0" % "provided",
-          configIvyScala)
+        "org.scala-tools.sbinary" %% "sbinary" % "0.4.0" % "provided",
+      configIvyScala)
 
   lazy val b =
     Project("B", file("b")) dependsOn (a) settings
-      (libraryDependencies <<= declared(
-              d =>
-                if (d)
-                  Seq("org.scala-tools.sbinary" %% "sbinary" % "0.4.0" % "provided")
-                else Nil), declared <<= baseDirectory(
-              _ / "declare.lib" exists),
-          configIvyScala)
+      (libraryDependencies <<= declared(d =>
+        if (d)
+          Seq("org.scala-tools.sbinary" %% "sbinary" % "0.4.0" % "provided")
+        else Nil), declared <<= baseDirectory(_ / "declare.lib" exists),
+      configIvyScala)
 }

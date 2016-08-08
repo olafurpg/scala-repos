@@ -105,8 +105,8 @@ object ClientConfig {
 
     def newClient(dest: Name, label: String): ServiceFactory[Req, Rep] =
       ServiceFactory(() =>
-            Future.value(Service.mk[Req, Rep](_ =>
-                      Future.exception(new Exception("unimplemented")))))
+        Future.value(Service.mk[Req, Rep](_ =>
+          Future.exception(new Exception("unimplemented")))))
   }
 
   def nilClient[Req, Rep]: StackBasedClient[Req, Rep] = NilClient[Req, Rep]()

@@ -304,10 +304,9 @@ private[spark] class Client(val args: ClientArguments,
     }
     val amMem = args.amMemory + amMemoryOverhead
     if (amMem > maxMem) {
-      throw new IllegalArgumentException(
-          s"Required AM memory (${args.amMemory}" +
-            s"+$amMemoryOverhead MB) is above the max threshold ($maxMem MB) of this cluster! " +
-            "Please increase the value of 'yarn.scheduler.maximum-allocation-mb'.")
+      throw new IllegalArgumentException(s"Required AM memory (${args.amMemory}" +
+        s"+$amMemoryOverhead MB) is above the max threshold ($maxMem MB) of this cluster! " +
+        "Please increase the value of 'yarn.scheduler.maximum-allocation-mb'.")
     }
     logInfo(
         "Will allocate AM container, with %d MB memory including %d MB overhead"
@@ -933,7 +932,7 @@ private[spark] class Client(val args: ClientArguments,
 
     // For log4j configuration to reference
     javaOpts += ("-Dspark.yarn.app.container.log.dir=" +
-          ApplicationConstants.LOG_DIR_EXPANSION_VAR)
+      ApplicationConstants.LOG_DIR_EXPANSION_VAR)
     YarnCommandBuilderUtils.addPermGenSizeOpt(javaOpts)
 
     val userClass = if (isClusterMode) {

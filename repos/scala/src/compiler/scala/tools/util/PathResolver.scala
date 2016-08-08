@@ -320,8 +320,8 @@ abstract class PathResolverBase[BaseClassPathType <: ClassFileLookup[
       val xs = (Calculated.basis drop 2).flatten.distinct
       Console print
         (xs mkLines
-              (s"After java boot/extdirs classpath has ${xs.size} entries:",
-                  indented = true))
+          (s"After java boot/extdirs classpath has ${xs.size} entries:",
+          indented = true))
     }
     cp
   }

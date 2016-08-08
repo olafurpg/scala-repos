@@ -103,7 +103,7 @@ class EvaluationInstanceSerializer
                     case JField("engineParamsGeneratorClass",
                                 JString(engineParamsGeneratorClass)) =>
                       i.copy(engineParamsGeneratorClass =
-                            engineParamsGeneratorClass)
+                        engineParamsGeneratorClass)
                     case JField("batch", JString(batch)) =>
                       i.copy(batch = batch)
                     case JField("env", env) =>
@@ -111,7 +111,7 @@ class EvaluationInstanceSerializer
                           env = Extraction.extract[Map[String, String]](env))
                     case JField("sparkConf", sparkConf) =>
                       i.copy(sparkConf =
-                            Extraction.extract[Map[String, String]](sparkConf))
+                        Extraction.extract[Map[String, String]](sparkConf))
                     case JField("evaluatorResults",
                                 JString(evaluatorResults)) =>
                       i.copy(evaluatorResults = evaluatorResults)

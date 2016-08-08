@@ -31,9 +31,9 @@ trait Adaptations { self: Analyzer =>
       }
       def callString =
         ((if (t.symbol.isConstructor) "new " else "") +
-              (t.symbol.owner.decodedName) +
-              (if (t.symbol.isConstructor || t.symbol.name == nme.apply) ""
-               else "." + t.symbol.decodedName))
+          (t.symbol.owner.decodedName) +
+          (if (t.symbol.isConstructor || t.symbol.name == nme.apply) ""
+           else "." + t.symbol.decodedName))
       def sigString =
         t.symbol.owner.decodedName + (if (t.symbol.isConstructor)
                                         t.symbol.signatureString
@@ -65,8 +65,8 @@ trait Adaptations { self: Analyzer =>
         // they are used limits our ability to enforce anything sensible until
         // an opt-in compiler option is given.
         oneArgObject && !(isStringAddition(t.symbol) ||
-              isArrowAssoc(t.symbol) || t.symbol.name == nme.equals_ ||
-              t.symbol.name == nme.EQ || t.symbol.name == nme.NE)
+          isArrowAssoc(t.symbol) || t.symbol.name == nme.equals_ ||
+          t.symbol.name == nme.EQ || t.symbol.name == nme.NE)
       }
 
       if (settings.noAdaptedArgs)

@@ -109,7 +109,7 @@ trait Slice { source =>
         case (tpe, cols) =>
           (ColumnRef(CPath.Identity, tpe),
            cols.reduceLeft((c1, c2) =>
-                 Column.unionRightSemigroup.append(c1, c2)))
+             Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -129,7 +129,7 @@ trait Slice { source =>
            pairs
              .map(_._2)
              .reduceLeft((c1, c2) =>
-                   Column.unionRightSemigroup.append(c1, c2)))
+               Column.unionRightSemigroup.append(c1, c2)))
       } toMap
     }
   }
@@ -623,7 +623,7 @@ trait Slice { source =>
         case (tpe, cols) =>
           (ColumnRef(to, tpe),
            cols.reduceLeft((c1, c2) =>
-                 Column.unionRightSemigroup.append(c1, c2)))
+             Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -646,7 +646,7 @@ trait Slice { source =>
         case (tpe, cols) =>
           (ColumnRef(to, tpe),
            cols.reduceLeft((c1, c2) =>
-                 Column.unionRightSemigroup.append(c1, c2)))
+             Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -777,13 +777,13 @@ trait Slice { source =>
 
         val lastDefined = prevFilter.flatMap { slice =>
           (slice.size - 1 to 0 by -1).find(row =>
-                slice.columns.values.exists(_.isDefinedAt(row)))
+            slice.columns.values.exists(_.isDefinedAt(row)))
         }.map {
           (prevFilter.get, _)
         }
 
         val firstDefined = (0 until filter.size).find(i =>
-              filter.columns.values.exists(_.isDefinedAt(i)))
+          filter.columns.values.exists(_.isDefinedAt(i)))
 
         (lastDefined, firstDefined) match {
           case (Some((prev, i)), Some(j)) => findStraddlingDistinct(prev, i, j)
@@ -963,9 +963,9 @@ trait Slice { source =>
         other.columns.foldLeft(source.columns) {
           case (acc, (ref, col)) =>
             acc + (ref ->
-                  (acc get ref flatMap { c =>
-                        cf.util.UnionRight(c, col)
-                      } getOrElse col))
+              (acc get ref flatMap { c =>
+                cf.util.UnionRight(c, col)
+              } getOrElse col))
         }
     }
   }
@@ -1761,10 +1761,10 @@ trait Slice { source =>
 
   def toString(row: Int): Option[String] = {
     (columns.toList.sortBy(_._1) map {
-          case (ref, col) =>
-            ref.toString + ": " + (if (col.isDefinedAt(row)) col.strValue(row)
-                                   else "(undefined)")
-        }) match {
+      case (ref, col) =>
+        ref.toString + ": " + (if (col.isDefinedAt(row)) col.strValue(row)
+                               else "(undefined)")
+    }) match {
       case Nil => None
       case l => Some(l.mkString("[", ", ", "]"))
     }
@@ -1981,7 +1981,7 @@ object Slice {
         val ctype =
           CType.forJValue(v) getOrElse {
             sys.error("Cannot determine ctype for " + v + " at " + jpath +
-                  " in " + jv)
+              " in " + jv)
           }
         val ref =
           ColumnRef(remapPath.map(_(jpath)).getOrElse(CPath(jpath)), ctype)

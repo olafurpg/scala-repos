@@ -46,7 +46,7 @@ class CodeGeneratorAllTest(val tdb: JdbcTestDB) extends DBTest {
     val modelA = tdb.profile.createModel()
     // customize code generator
     val codegenA = modelA.map(m =>
-          new SourceCodeGenerator(m) {
+      new SourceCodeGenerator(m) {
         // override mapped table and class name
         override def entityName =
           dbTableName => dbTableName.dropRight(1).toLowerCase.toCamelCase

@@ -462,7 +462,7 @@ abstract class PrepJSInterop
            * and similar constructs. This causes the unsoundness filed as #1385.
            */
           !(t <:< JSAnyClass.tpe || t =:= AnyRefClass.tpe ||
-                t =:= DynamicClass.tpe)
+            t =:= DynamicClass.tpe)
         }
 
       def isNativeJSTraitType(tpe: Type): Boolean = {
@@ -1050,7 +1050,7 @@ abstract class PrepJSInterop
     val sym = ddef.symbol
     val needsFix = {
       sym.isPrivate && (wasPublicBeforeTyper(sym) ||
-          (sym.isAccessor && wasPublicBeforeTyper(sym.accessed)))
+      (sym.isAccessor && wasPublicBeforeTyper(sym.accessed)))
     }
     if (needsFix) {
       sym.resetFlag(Flag.PRIVATE)

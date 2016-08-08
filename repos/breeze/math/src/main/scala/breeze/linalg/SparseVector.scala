@@ -168,7 +168,7 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
     else {
       var ii = 0
       val nIndex = Array.tabulate[Int](length + 1)((cp: Int) =>
-            if (ii < used && cp == index(ii)) { ii += 1; ii - 1 } else ii)
+        if (ii < used && cp == index(ii)) { ii += 1; ii - 1 } else ii)
       assert(ii == used)
       new CSCMatrix[V](data,
                        1,

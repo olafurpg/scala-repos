@@ -146,11 +146,10 @@ private[sql] case class PreWriteCheck(catalog: Catalog)
         val existingPartitionColumns = r.partitionSchema.fieldNames.toSet
         val specifiedPartitionColumns = part.keySet
         if (existingPartitionColumns != specifiedPartitionColumns) {
-          failAnalysis(
-              s"Specified partition columns " +
-                s"(${specifiedPartitionColumns.mkString(", ")}) " +
-                s"do not match the partition columns of the table. Please use " +
-                s"(${existingPartitionColumns.mkString(", ")}) as the partition columns.")
+          failAnalysis(s"Specified partition columns " +
+            s"(${specifiedPartitionColumns.mkString(", ")}) " +
+            s"do not match the partition columns of the table. Please use " +
+            s"(${existingPartitionColumns.mkString(", ")}) as the partition columns.")
         } else {
           // OK
         }

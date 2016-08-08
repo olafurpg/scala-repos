@@ -141,13 +141,9 @@ object AddressFromURIString {
       // case 2: “akka://system@host:port”
       if (uri.getHost == null || uri.getPort == -1) None
       else
-        Some(
-            if (uri.getUserInfo == null) Address(uri.getScheme, uri.getHost)
-            else
-              Address(uri.getScheme,
-                      uri.getUserInfo,
-                      uri.getHost,
-                      uri.getPort))
+        Some(if (uri.getUserInfo == null) Address(uri.getScheme, uri.getHost)
+        else
+          Address(uri.getScheme, uri.getUserInfo, uri.getHost, uri.getPort))
     }
 
   /**

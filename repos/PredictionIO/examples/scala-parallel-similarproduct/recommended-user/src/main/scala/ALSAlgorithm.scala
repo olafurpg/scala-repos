@@ -67,7 +67,7 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
       if (uindex == -1)
         logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-              " to Int index.")
+          " to Int index.")
 
       if (iindex == -1)
         logger.info(
@@ -124,9 +124,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     }.flatten
 
     val whiteList: Option[Set[Int]] = query.whiteList.map(set =>
-          set.map(model.similarUserStringIntMap.get).flatten)
+      set.map(model.similarUserStringIntMap.get).flatten)
     val blackList: Option[Set[Int]] = query.blackList.map(set =>
-          set.map(model.similarUserStringIntMap.get).flatten)
+      set.map(model.similarUserStringIntMap.get).flatten)
 
     val ord = Ordering.by[(Int, Double), Double](_._2).reverse
 

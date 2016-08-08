@@ -440,18 +440,18 @@ class SparkIMain(initialSettings: Settings,
       urls: URL*): MergedClassPath[AbstractFile] = {
     // Collect our new jars/directories and add them to the existing set of classpaths
     val allClassPaths = (platform.classPath
-          .asInstanceOf[MergedClassPath[AbstractFile]]
-          .entries ++ urls.map(url => {
-          platform.classPath.context.newClassPath(
-              if (url.getProtocol == "file") {
-                val f = new File(url.getPath)
-                if (f.isDirectory) io.AbstractFile.getDirectory(f)
-                else io.AbstractFile.getFile(f)
-              } else {
-                io.AbstractFile.getURL(url)
-              }
-          )
-        })).distinct
+      .asInstanceOf[MergedClassPath[AbstractFile]]
+      .entries ++ urls.map(url => {
+      platform.classPath.context.newClassPath(
+          if (url.getProtocol == "file") {
+            val f = new File(url.getPath)
+            if (f.isDirectory) io.AbstractFile.getDirectory(f)
+            else io.AbstractFile.getFile(f)
+          } else {
+            io.AbstractFile.getURL(url)
+          }
+      )
+    })).distinct
 
     // Combine all of our classpaths (old and new) into one merged classpath
     new MergedClassPath(allClassPaths, platform.classPath.context)
@@ -632,9 +632,8 @@ class SparkIMain(initialSettings: Settings,
         case Seq(s1, s2) => s1.isClass && s2.isModule
       }
     } {
-      afterTyper(
-          replwarn(
-              s"warning: previously defined $oldSym is not a companion to $newSym."))
+      afterTyper(replwarn(
+          s"warning: previously defined $oldSym is not a companion to $newSym."))
       replwarn(
           "Companions must be defined together; you may wish to use :paste mode for this.")
     }
@@ -783,7 +782,7 @@ class SparkIMain(initialSettings: Settings,
             logDebug("[raw] " + raw1 + "   <--->   " + raw2)
 
             val adjustment = (raw1.reverse takeWhile
-                  (ch => (ch != ';') && (ch != '\n'))).size
+              (ch => (ch != ';') && (ch != '\n'))).size
             val lastpos = lastpos0 - adjustment
 
             // the source code split at the laboriously determined position.
@@ -800,8 +799,8 @@ class SparkIMain(initialSettings: Settings,
                      " content" -> content,
                      "     was" -> l2,
                      "combined" -> combined) map {
-              case (label, s) => label + ": '" + s + "'"
-            } mkString "\n")
+                  case (label, s) => label + ": '" + s + "'"
+                } mkString "\n")
             combined
           })
         // Rewriting    "foo ; bar ; 123"
@@ -1386,7 +1385,7 @@ class SparkIMain(initialSettings: Settings,
 
     private def typeMap[T](f: Type => T) =
       mapFrom[Name, Name, T](termNames ++ typeNames)(x =>
-            f(cleanMemberDecl(resultSymbol, x)))
+        f(cleanMemberDecl(resultSymbol, x)))
 
     /** Types of variables defined by this request. */
     lazy val compilerTypeOf = typeMap[Type](x => x) withDefaultValue NoType
@@ -1399,7 +1398,7 @@ class SparkIMain(initialSettings: Settings,
     // }
     lazy val definedSymbols =
       (termNames.map(x => x -> applyToResultMember(x, x => x)) ++ typeNames
-            .map(x => x -> compilerTypeOf(x).typeSymbolDirect))
+        .map(x => x -> compilerTypeOf(x).typeSymbolDirect))
         .toMap[Name, Symbol] withDefaultValue NoSymbol
 
     lazy val typesOfDefinedTerms =

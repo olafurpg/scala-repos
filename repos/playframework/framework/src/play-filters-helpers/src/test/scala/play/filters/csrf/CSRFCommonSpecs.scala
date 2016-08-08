@@ -64,20 +64,17 @@ trait CSRFCommonSpecs extends Specification with PlaySpecification {
     }
     "accept requests with token in form body" in {
       lazy val token = generate
-      csrfCheckRequest(
-          req =>
-            addToken(req, token).post(
-                Map("foo" -> "bar", TokenName -> token)))(_.status must_== OK)
+      csrfCheckRequest(req =>
+        addToken(req, token).post(Map("foo" -> "bar", TokenName -> token)))(
+          _.status must_== OK)
     }
     "accept requests with a session token and token in multipart body" in {
       lazy val token = generate
-      csrfCheckRequest(
-          req =>
-            addToken(req, token)
-              .withHeaders(
-                  "Content-Type" -> s"multipart/form-data; boundary=$Boundary")
-              .post(multiPartFormDataBody(TokenName, token)))(
-          _.status must_== OK)
+      csrfCheckRequest(req =>
+        addToken(req, token)
+          .withHeaders(
+              "Content-Type" -> s"multipart/form-data; boundary=$Boundary")
+          .post(multiPartFormDataBody(TokenName, token)))(_.status must_== OK)
     }
     "accept requests with token in header" in {
       lazy val token = generate
@@ -169,14 +166,14 @@ trait CSRFCommonSpecs extends Specification with PlaySpecification {
 
       "reject requests with unsigned token in body" in {
         csrfCheckRequest(req =>
-              addToken(req, generate).post(
-                  Map("foo" -> "bar", TokenName -> "foo")))(
+          addToken(req, generate).post(
+              Map("foo" -> "bar", TokenName -> "foo")))(
             _.status must_== FORBIDDEN)
       }
       "reject requests with unsigned token in session" in {
         csrfCheckRequest(req =>
-              addToken(req, "foo").post(
-                  Map("foo" -> "bar", TokenName -> generate))) { response =>
+          addToken(req, "foo").post(
+              Map("foo" -> "bar", TokenName -> generate))) { response =>
           response.status must_== FORBIDDEN
           response.cookies
             .find(_.name.exists(_ == Session.COOKIE_NAME)) must beSome.like {
@@ -376,12 +373,11 @@ trait CSRFCommonSpecs extends Specification with PlaySpecification {
   def withServer[T](config: Seq[(String, String)])(
       router: PartialFunction[(String, String), Handler])(block: => T) = {
     import play.api.inject._
-    running(
-        TestServer(testServerPort,
-                   GuiceApplicationBuilder()
-                     .configure(Map(config: _*) ++ Map(
-                             "play.crypto.secret" -> "foobar"))
-                     .routes(router)
-                     .build()))(block)
+    running(TestServer(
+        testServerPort,
+        GuiceApplicationBuilder()
+          .configure(Map(config: _*) ++ Map("play.crypto.secret" -> "foobar"))
+          .routes(router)
+          .build()))(block)
   }
 }

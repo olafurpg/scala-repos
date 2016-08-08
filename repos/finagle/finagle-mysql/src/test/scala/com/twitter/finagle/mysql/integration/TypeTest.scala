@@ -256,8 +256,8 @@ class BlobTypeTest extends FunSuite with IntegrationClient {
 @RunWith(classOf[JUnitRunner])
 class DateTimeTypeTest extends FunSuite with IntegrationClient {
   for (c <- client) {
-    Await.ready(
-        c.query("""CREATE TEMPORARY TABLE `datetime` (
+    Await.ready(c.query(
+        """CREATE TEMPORARY TABLE `datetime` (
         `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
         `date` date NOT NULL,
         `datetime` datetime NOT NULL,

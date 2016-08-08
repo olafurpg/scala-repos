@@ -63,7 +63,7 @@ trait JxBase { self: Node =>
                   ");").cmd
           } else {
             JsRaw(varName + ".setAttribute(" + m.key.encJs + "," +
-                  x.text.encJs + ");").cmd
+              x.text.encJs + ");").cmd
           }
       }.foldLeft(Noop)(_ & _)
     }.foldLeft(Noop)(_ & _)
@@ -83,10 +83,10 @@ trait JxBase { self: Node =>
       case Group(nodes) => addToDocFrag(parent, nodes.toList)
       case Text(txt) =>
         JsRaw(parent + ".appendChild(document.createTextNode(" +
-              fixText(txt).encJs + "));").cmd
+          fixText(txt).encJs + "));").cmd
       case a: Atom[_] =>
         JsRaw(parent + ".appendChild(document.createTextNode(" + a.text.encJs +
-              "));").cmd
+          "));").cmd
       case e: scala.xml.Elem =>
         val varName = "v" + Helpers.nextFuncName
         JsCrVar(
@@ -94,12 +94,12 @@ trait JxBase { self: Node =>
             JsRaw("document.createElement(" + e.label.encJs + ")")) & addAttrs(
             varName,
             e.attributes.toList) & JsRaw(parent + ".appendChild(" +
-              varName + ")") & addToDocFrag(varName, e.child.toList)
+          varName + ")") & addToDocFrag(varName, e.child.toList)
       case ns: NodeSeq =>
         if (ns.length == 0) Noop
         else if (ns.length == 1) {
           logger.error("In addToDocFrag, got a " + ns + " of type " +
-                ns.getClass.getName)
+            ns.getClass.getName)
           Noop
         } else addToDocFrag(parent, ns.toList)
     }.foldLeft(Noop)(_ & _)

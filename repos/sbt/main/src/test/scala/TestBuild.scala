@@ -83,7 +83,7 @@ object TestBuild {
           (ScopedKey(scope.copy(task = Global), key), scope.task): (ScopedKey[
                                                                         _],
                                                                     ScopeAxis[AttributeKey[
-                                                                            _]])
+                                                                        _]])
 
       val taskAxes = Relation.empty ++ taskAxesMappings
       val global = new HashSet[ScopedKey[_]]
@@ -284,12 +284,12 @@ object TestBuild {
                  maxDeps: Gen[Int],
                  count: Gen[Int]): Gen[Seq[Config]] =
     genAcyclicDirect[Config, String](maxDeps, genName, count)((key, deps) =>
-          new Config(key, deps))
+      new Config(key, deps))
   def genTasks(implicit genName: Gen[String],
                maxDeps: Gen[Int],
                count: Gen[Int]): Gen[Seq[Taskk]] =
     genAcyclicDirect[Taskk, String](maxDeps, genName, count)((key, deps) =>
-          new Taskk(AttributeKey[String](key), deps))
+      new Taskk(AttributeKey[String](key), deps))
 
   def genAcyclicDirect[A, T](maxDeps: Gen[Int], keyGen: Gen[T], max: Gen[Int])(
       make: (T, Seq[A]) => A): Gen[Seq[A]] =

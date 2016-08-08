@@ -224,7 +224,7 @@ class GradientBoostedTreesSuite
         val (errorWithoutValidation, errorWithValidation) = {
           if (algo == Classification) {
             val remappedRdd = validateRdd.map(x =>
-                  new LabeledPoint(2 * x.label - 1, x.features))
+              new LabeledPoint(2 * x.label - 1, x.features))
             (loss.computeError(gbt, remappedRdd),
              loss.computeError(gbtValidate, remappedRdd))
           } else {

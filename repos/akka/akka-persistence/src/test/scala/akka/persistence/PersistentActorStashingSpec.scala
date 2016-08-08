@@ -224,12 +224,10 @@ abstract class PersistentActorStashingSpec(config: Config)
 }
 
 class SteppingInMemPersistentActorStashingSpec
-    extends PersistenceSpec(
-        SteppingInmemJournal
-          .config("persistence-stash")
-          .withFallback(PersistenceSpec.config(
-                  "stepping-inmem",
-                  "SteppingInMemPersistentActorStashingSpec")))
+    extends PersistenceSpec(SteppingInmemJournal
+      .config("persistence-stash")
+      .withFallback(PersistenceSpec
+        .config("stepping-inmem", "SteppingInMemPersistentActorStashingSpec")))
     with ImplicitSender {
   import PersistentActorStashingSpec._
 

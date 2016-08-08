@@ -189,7 +189,7 @@ object PairingSystem extends AbstractPairingSystem {
       if (!continue)
         pairingLogger.info(
             s"smartPairings cutoff! [${nowMillis - startAt}ms] ${url(
-            data.tour.id)} ${players.size} players, ${preps.size} preps")
+                data.tour.id)} ${players.size} players, ${preps.size} preps")
       preps
     }
 

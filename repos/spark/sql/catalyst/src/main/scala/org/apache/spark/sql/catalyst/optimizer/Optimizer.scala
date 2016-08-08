@@ -344,14 +344,13 @@ object ColumnPruning extends Rule[LogicalPlan] {
     // Prunes the unused columns from project list of Project/Aggregate/Expand
     case p @ Project(_, p2: Project)
         if (p2.outputSet -- p.references).nonEmpty =>
-      p.copy(
-          child = p2.copy(
-              projectList = p2.projectList.filter(p.references.contains)))
+      p.copy(child =
+        p2.copy(projectList = p2.projectList.filter(p.references.contains)))
     case p @ Project(_, a: Aggregate)
         if (a.outputSet -- p.references).nonEmpty =>
       p.copy(
           child = a.copy(aggregateExpressions =
-                a.aggregateExpressions.filter(p.references.contains)))
+            a.aggregateExpressions.filter(p.references.contains)))
     case a @ Project(_, e @ Expand(_, _, grandChild))
         if (e.outputSet -- a.references).nonEmpty =>
       val newOutput = e.output.filter(a.references.contains(_))
@@ -418,7 +417,7 @@ object ColumnPruning extends Rule[LogicalPlan] {
         if (w.windowOutputSet -- p.references).nonEmpty =>
       p.copy(
           child = w.copy(windowExpressions =
-                w.windowExpressions.filter(p.references.contains)))
+            w.windowExpressions.filter(p.references.contains)))
 
     // Eliminate no-op Window
     case w: Window if w.windowExpressions.isEmpty => w.child
@@ -905,7 +904,7 @@ object CombineFilters extends Rule[LogicalPlan] with PredicateHelper {
   def apply(plan: LogicalPlan): LogicalPlan = plan transform {
     case ff @ Filter(fc, nf @ Filter(nc, grandChild)) =>
       (ExpressionSet(splitConjunctivePredicates(fc)) -- ExpressionSet(
-              splitConjunctivePredicates(nc))).reduceOption(And) match {
+          splitConjunctivePredicates(nc))).reduceOption(And) match {
         case Some(ac) =>
           Filter(And(ac, nc), grandChild)
         case None =>
@@ -1175,12 +1174,12 @@ object OuterJoinElimination extends Rule[LogicalPlan] with PredicateHelper {
       leftConditions.exists(canFilterOutNull) || filter.constraints
         .filter(_.isInstanceOf[IsNotNull])
         .exists(expr =>
-              join.left.outputSet.intersect(expr.references).nonEmpty)
+          join.left.outputSet.intersect(expr.references).nonEmpty)
     val rightHasNonNullPredicate =
       rightConditions.exists(canFilterOutNull) || filter.constraints
         .filter(_.isInstanceOf[IsNotNull])
         .exists(expr =>
-              join.right.outputSet.intersect(expr.references).nonEmpty)
+          join.right.outputSet.intersect(expr.references).nonEmpty)
 
     join.joinType match {
       case RightOuter if leftHasNonNullPredicate => Inner

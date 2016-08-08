@@ -102,7 +102,7 @@ trait ModelFactoryImplicitSupport {
           .allViewsFrom(sym.tpe_*, context, sym.typeParams) ++ global.analyzer
           .allViewsFrom(byNameType(sym.tpe_*), context, sym.typeParams)
       var conversions = results.flatMap(result =>
-            makeImplicitConversion(sym, result._1, result._2, context, inTpl))
+        makeImplicitConversion(sym, result._1, result._2, context, inTpl))
       //debug(results.mkString("All views\n  ", "\n  ", "\n"))
       //debug(conversions.mkString("Conversions\n  ", "\n  ", "\n"))
 

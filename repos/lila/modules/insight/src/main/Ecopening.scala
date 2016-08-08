@@ -41,10 +41,10 @@ object Ecopening {
     ops.foldLeft(Map.empty[FamilyName, Family]) {
       case (fams, op) =>
         fams + (op.family -> fams
-              .get(op.family)
-              .fold(Family(op.family, List(op.eco))) { existing =>
-                existing.copy(ecos = op.eco :: existing.ecos)
-              })
+          .get(op.family)
+          .fold(Family(op.family, List(op.eco))) { existing =>
+            existing.copy(ecos = op.eco :: existing.ecos)
+          })
     }
 
   def fromGame(game: lila.game.Game): Option[Ecopening] =

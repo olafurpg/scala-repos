@@ -120,7 +120,7 @@ class TypeAnnotationInspection extends AbstractInspection {
     if (requirement == TypeAnnotationRequirement.Required.ordinal &&
         (!isSimple || simplePolicy == TypeAnnotationPolicy.Regular.ordinal) &&
         (overridingPolicy == TypeAnnotationPolicy.Regular.ordinal ||
-            !isOverriding)) {
+        !isOverriding)) {
       holder.registerProblem(
           element,
           s"$name requires an explicit type annotation (according to Code Style settings)",

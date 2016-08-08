@@ -184,7 +184,7 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
            "No highlightings with such description: " + annotation)
 
     val ranges = withRightDescription.map(info =>
-          (info.getStartOffset, info.getEndOffset))
+      (info.getStartOffset, info.getEndOffset))
     val message =
       "Highlights with this description are at " + ranges.mkString(" ") +
         ", but has to be at " + (selectionStart, selectionEnd)

@@ -109,7 +109,7 @@ abstract class EndToEndEventAdapterSpec(journalName: String,
   import EndToEndEventAdapterSpec._
 
   val storageLocations = List("akka.persistence.journal.leveldb.dir").map(s ⇒
-        new File(journalConfig.getString(s)))
+    new File(journalConfig.getString(s)))
 
   override protected def beforeAll() {
     storageLocations.foreach(FileUtils.deleteDirectory)

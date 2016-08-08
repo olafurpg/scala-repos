@@ -30,8 +30,8 @@ class ScalaKeywordCompletionContributor extends ScalaCompletionContributor {
     extend(CompletionType.BASIC,
            PlatformPatterns.psiElement.and(
                new FilterPattern(new AndFilter(
-                       new NotFilter(new LeftNeighbour(new TextFilter("."))),
-                       filter))),
+                   new NotFilter(new LeftNeighbour(new TextFilter("."))),
+                   filter))),
            new CompletionProvider[CompletionParameters] {
              def addCompletions(parameters: CompletionParameters,
                                 context: ProcessingContext,
@@ -49,10 +49,8 @@ class ScalaKeywordCompletionContributor extends ScalaCompletionContributor {
   private def registerTypeAfterDotCompletion(filter: ElementFilter,
                                              keywords: String*) {
     extend(CompletionType.BASIC,
-           PlatformPatterns.psiElement.and(
-               new FilterPattern(
-                   new AndFilter(new LeftNeighbour(new TextFilter(".")),
-                                 filter))),
+           PlatformPatterns.psiElement.and(new FilterPattern(
+               new AndFilter(new LeftNeighbour(new TextFilter(".")), filter))),
            new CompletionProvider[CompletionParameters] {
              def addCompletions(parameters: CompletionParameters,
                                 context: ProcessingContext,

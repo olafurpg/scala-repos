@@ -12,7 +12,7 @@ trait Tabulator {
 
   protected def fits(items: Seq[String], width: Int): Boolean =
     ((items map
-              (_.length)).sum + (items.length - 1) * marginSize < width)
+      (_.length)).sum + (items.length - 1) * marginSize < width)
   def tabulate(items: Seq[String]): Seq[Seq[String]] =
     (if (fits(items, width)) Seq(Seq(items mkString " " * marginSize))
      else printMultiLineColumns(items))

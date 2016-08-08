@@ -80,12 +80,12 @@ object Topic {
 
   private[forum] lazy val tube = JsTube(
       (__.json update
-            (merge(defaults) andThen readDate('createdAt) andThen readDate(
-                    'updatedAt) andThen readDate('updatedAtTroll))) andThen Json
+        (merge(defaults) andThen readDate('createdAt) andThen readDate(
+            'updatedAt) andThen readDate('updatedAtTroll))) andThen Json
         .reads[Topic],
       Json.writes[Topic] andThen
         (__.json update
-              (writeDate('createdAt) andThen writeDate('updatedAt) andThen writeDate(
-                      'updatedAtTroll)))
+          (writeDate('createdAt) andThen writeDate('updatedAt) andThen writeDate(
+              'updatedAtTroll)))
   )
 }

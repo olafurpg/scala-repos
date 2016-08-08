@@ -58,7 +58,7 @@ private[mesos] object MesosSchedulerBackendUtil extends Logging {
                   .setMode(Volume.Mode.RO))
           case spec => {
             logWarning(s"Unable to parse volume specs: $volumes. " +
-                  "Expected form: \"[host-dir:]container-dir[:rw|:ro](, ...)\"")
+              "Expected form: \"[host-dir:]container-dir[:rw|:ro](, ...)\"")
             None
           }
         }
@@ -99,7 +99,7 @@ private[mesos] object MesosSchedulerBackendUtil extends Logging {
                   .setProtocol(protocol))
           case spec => {
             logWarning(s"Unable to parse port mapping specs: $portmaps. " +
-                  "Expected form: \"host_port:container_port[:udp|:tcp](, ...)\"")
+              "Expected form: \"host_port:container_port[:udp|:tcp](, ...)\"")
             None
           }
         }

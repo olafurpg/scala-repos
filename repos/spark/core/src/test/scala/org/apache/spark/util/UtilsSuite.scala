@@ -244,10 +244,8 @@ class UtilsSuite
     assert(Utils.splitCommandString("a \"b c\"") === Seq("a", "b c"))
     assert(Utils.splitCommandString("a \"b c\" d") === Seq("a", "b c", "d"))
     assert(Utils.splitCommandString("\"b c\"") === Seq("b c"))
-    assert(
-        Utils.splitCommandString("a 'b\" c' \"d' e\"") === Seq("a",
-                                                               "b\" c",
-                                                               "d' e"))
+    assert(Utils
+      .splitCommandString("a 'b\" c' \"d' e\"") === Seq("a", "b\" c", "d' e"))
     assert(Utils.splitCommandString("a\t'b\nc'\nd") === Seq("a", "b\nc", "d"))
     assert(Utils.splitCommandString("a \"b\\\\c\"") === Seq("a", "b\\c"))
     assert(Utils.splitCommandString("a \"b\\\"c\"") === Seq("a", "b\"c"))
@@ -453,46 +451,38 @@ class UtilsSuite
     assert(
         Utils.nonLocalPaths("hdfs:///spark.jar") === Array(
             "hdfs:///spark.jar"))
-    assert(
-        Utils
-          .nonLocalPaths("file:/spark.jar,local:/smart.jar,family.py") === Array.empty)
-    assert(
-        Utils
-          .nonLocalPaths("local:/spark.jar,file:/smart.jar,family.py") === Array.empty)
+    assert(Utils
+      .nonLocalPaths("file:/spark.jar,local:/smart.jar,family.py") === Array.empty)
+    assert(Utils
+      .nonLocalPaths("local:/spark.jar,file:/smart.jar,family.py") === Array.empty)
     assert(
         Utils.nonLocalPaths("hdfs:/spark.jar,s3:/smart.jar") === Array(
             "hdfs:/spark.jar",
             "s3:/smart.jar"))
-    assert(
-        Utils.nonLocalPaths("hdfs:/spark.jar,path to/a.jar,s3:/smart.jar") === Array(
-            "hdfs:/spark.jar",
-            "s3:/smart.jar"))
-    assert(
-        Utils.nonLocalPaths(
-            "hdfs:/spark.jar,s3:/smart.jar,local.py,file:/hello/pi.py") === Array(
-            "hdfs:/spark.jar",
-            "s3:/smart.jar"))
-    assert(
-        Utils.nonLocalPaths(
-            "local.py,hdfs:/spark.jar,file:/hello/pi.py,s3:/smart.jar") === Array(
-            "hdfs:/spark.jar",
-            "s3:/smart.jar"))
+    assert(Utils
+      .nonLocalPaths("hdfs:/spark.jar,path to/a.jar,s3:/smart.jar") === Array(
+        "hdfs:/spark.jar",
+        "s3:/smart.jar"))
+    assert(Utils.nonLocalPaths(
+        "hdfs:/spark.jar,s3:/smart.jar,local.py,file:/hello/pi.py") === Array(
+        "hdfs:/spark.jar",
+        "s3:/smart.jar"))
+    assert(Utils.nonLocalPaths(
+        "local.py,hdfs:/spark.jar,file:/hello/pi.py,s3:/smart.jar") === Array(
+        "hdfs:/spark.jar",
+        "s3:/smart.jar"))
 
     // Test Windows paths
-    assert(
-        Utils.nonLocalPaths("C:/some/path.jar", testWindows = true) === Array.empty)
-    assert(
-        Utils
-          .nonLocalPaths("file:/C:/some/path.jar", testWindows = true) === Array.empty)
-    assert(
-        Utils
-          .nonLocalPaths("file:///C:/some/path.jar", testWindows = true) === Array.empty)
-    assert(
-        Utils
-          .nonLocalPaths("local:/C:/some/path.jar", testWindows = true) === Array.empty)
-    assert(
-        Utils
-          .nonLocalPaths("local:///C:/some/path.jar", testWindows = true) === Array.empty)
+    assert(Utils
+      .nonLocalPaths("C:/some/path.jar", testWindows = true) === Array.empty)
+    assert(Utils
+      .nonLocalPaths("file:/C:/some/path.jar", testWindows = true) === Array.empty)
+    assert(Utils
+      .nonLocalPaths("file:///C:/some/path.jar", testWindows = true) === Array.empty)
+    assert(Utils
+      .nonLocalPaths("local:/C:/some/path.jar", testWindows = true) === Array.empty)
+    assert(Utils
+      .nonLocalPaths("local:///C:/some/path.jar", testWindows = true) === Array.empty)
     assert(
         Utils.nonLocalPaths("hdfs:/a.jar,C:/my.jar,s3:/another.jar",
                             testWindows = true) === Array("hdfs:/a.jar",
@@ -808,8 +798,8 @@ class UtilsSuite
     assert(
         Utils.isDynamicAllocationEnabled(
             conf.set("spark.executor.instances", "0")) === true)
-    assert(
-        Utils.isDynamicAllocationEnabled(conf.set("spark.master", "local")) === false)
+    assert(Utils
+      .isDynamicAllocationEnabled(conf.set("spark.master", "local")) === false)
     assert(
         Utils.isDynamicAllocationEnabled(
             conf.set("spark.dynamicAllocation.testing", "true")))

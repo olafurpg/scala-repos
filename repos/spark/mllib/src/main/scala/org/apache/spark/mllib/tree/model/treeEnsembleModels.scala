@@ -102,10 +102,9 @@ object RandomForestModel extends Loader[RandomForestModel] {
           TreeEnsembleModel.SaveLoadV1_0.loadTrees(sc, path, metadata.treeAlgo)
         new RandomForestModel(Algo.fromString(metadata.algo), trees)
       case _ =>
-        throw new Exception(
-            s"RandomForestModel.load did not recognize model" +
-              s" with (className, format version): ($loadedClassName, $version).  Supported:\n" +
-              s"  ($classNameV1_0, 1.0)")
+        throw new Exception(s"RandomForestModel.load did not recognize model" +
+          s" with (className, format version): ($loadedClassName, $version).  Supported:\n" +
+          s"  ($classNameV1_0, 1.0)")
     }
   }
 
@@ -468,17 +467,15 @@ private[tree] object TreeEnsembleModel extends Logging {
           .map(Utils.memoryStringToMb)
           .getOrElse(Utils.DEFAULT_DRIVER_MEM_MB)
         if (driverMemory <= memThreshold) {
-          logWarning(
-              s"$className.save() was called, but it may fail because of too little" +
-                s" driver memory (${driverMemory}m)." +
-                s"  If failure occurs, try setting driver-memory ${memThreshold}m (or larger).")
+          logWarning(s"$className.save() was called, but it may fail because of too little" +
+            s" driver memory (${driverMemory}m)." +
+            s"  If failure occurs, try setting driver-memory ${memThreshold}m (or larger).")
         }
       } else {
         if (sc.executorMemory <= memThreshold) {
-          logWarning(
-              s"$className.save() was called, but it may fail because of too little" +
-                s" executor memory (${sc.executorMemory}m)." +
-                s"  If failure occurs try setting executor-memory ${memThreshold}m (or larger).")
+          logWarning(s"$className.save() was called, but it may fail because of too little" +
+            s" executor memory (${sc.executorMemory}m)." +
+            s"  If failure occurs try setting executor-memory ${memThreshold}m (or larger).")
         }
       }
 
@@ -490,7 +487,7 @@ private[tree] object TreeEnsembleModel extends Logging {
                                       model.treeWeights)
       val metadata = compact(
           render(("class" -> className) ~ ("version" -> thisFormatVersion) ~
-                ("metadata" -> Extraction.decompose(ensembleMetadata))))
+            ("metadata" -> Extraction.decompose(ensembleMetadata))))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -500,7 +497,7 @@ private[tree] object TreeEnsembleModel extends Logging {
         .flatMap {
           case (tree, treeId) =>
             tree.topNode.subtreeIterator.toSeq.map(node =>
-                  NodeData(treeId, node))
+              NodeData(treeId, node))
         }
         .toDF()
       dataRDD.write.parquet(Loader.dataPath(path))

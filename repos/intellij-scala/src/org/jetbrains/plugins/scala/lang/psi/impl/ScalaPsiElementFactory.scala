@@ -656,8 +656,8 @@ object ScalaPsiElementFactory {
     for (expr <- exprs) names ++= expr.getNames
     val arrow = ScalaPsiUtil.functionArrow(manager.getProject)
     if ((names("_") || ScalaCodeStyleSettings
-              .getInstance(manager.getProject)
-              .getClassCountToUseImportOnDemand <= names.size) &&
+          .getInstance(manager.getProject)
+          .getClassCountToUseImportOnDemand <= names.size) &&
         names.filter(_.indexOf(arrow) != -1).toSeq.size == 0)
       text = text + "._"
     else {
@@ -1155,10 +1155,9 @@ object ScalaPsiElementFactory {
           val strings = for (param <- params) yield {
             val extendsTypes = param.getExtendsListTypes
             val extendsTypesText = if (extendsTypes.length > 0) {
-              val typeTexts = extendsTypes.map(
-                  (t: PsiClassType) =>
-                    ScType.canonicalText(substitutor.subst(
-                            ScType.create(t, method.getProject))))
+              val typeTexts = extendsTypes.map((t: PsiClassType) =>
+                ScType.canonicalText(
+                    substitutor.subst(ScType.create(t, method.getProject))))
               typeTexts.mkString(" <: ", " with ", "")
             } else ""
             param.name + extendsTypesText

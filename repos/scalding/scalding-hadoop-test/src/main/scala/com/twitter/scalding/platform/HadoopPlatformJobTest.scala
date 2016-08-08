@@ -51,15 +51,15 @@ case class HadoopPlatformJobTest(
     copy(
         sourceWriters =
           sourceWriters :+ { args: Args =>
-        new Job(args) {
-          TypedPipe
-            .from(List(""))
-            .flatMap { _ =>
-              data
+            new Job(args) {
+              TypedPipe
+                .from(List(""))
+                .flatMap { _ =>
+                  data
+                }
+                .write(out)
             }
-            .write(out)
-        }
-      })
+          })
 
   def sink[T: TypeDescriptor](location: String)(
       toExpect: Seq[T] => Unit): HadoopPlatformJobTest =
@@ -70,8 +70,8 @@ case class HadoopPlatformJobTest(
     copy(
         sourceReaders =
           sourceReaders :+ { m: Mode =>
-        toExpect(in.toIterator(Config.defaultFrom(m), m).toSeq)
-      })
+            toExpect(in.toIterator(Config.defaultFrom(m), m).toSeq)
+          })
 
   def inspectCompletedFlow(
       checker: Flow[JobConf] => Unit): HadoopPlatformJobTest =

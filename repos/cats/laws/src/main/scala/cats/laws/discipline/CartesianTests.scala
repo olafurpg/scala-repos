@@ -20,7 +20,7 @@ trait CartesianTests[F[_]] extends Laws {
         name = "cartesian",
         parent = None,
         "cartesian associativity" -> forAll((fa: F[A], fb: F[B], fc: F[C]) =>
-              iso.associativity(laws.cartesianAssociativity(fa, fb, fc)))
+          iso.associativity(laws.cartesianAssociativity(fa, fb, fc)))
     )
   }
 }

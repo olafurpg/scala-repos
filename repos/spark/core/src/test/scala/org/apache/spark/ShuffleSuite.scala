@@ -84,7 +84,7 @@ abstract class ShuffleSuite
       val statuses =
         SparkEnv.get.mapOutputTracker.getMapSizesByExecutorId(shuffleId, id)
       assert(statuses.forall(_._2.forall(blockIdSizePair =>
-                    blockIdSizePair._2 > 0)))
+        blockIdSizePair._2 > 0)))
     }
   }
 

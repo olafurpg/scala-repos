@@ -125,9 +125,8 @@ private[upgrade] object DeploymentPlanReverter {
         case _ if newGroup.dependencies.nonEmpty =>
           // group dependencies have changed
           if (log.isDebugEnabled)
-            log.debug(
-                s"group ${newGroup.id} has changed. " +
-                  s"Removed added dependencies ${newGroup.dependencies.mkString(", ")}")
+            log.debug(s"group ${newGroup.id} has changed. " +
+              s"Removed added dependencies ${newGroup.dependencies.mkString(", ")}")
           result.update(newGroup.id,
                         group =>
                           group.copy(

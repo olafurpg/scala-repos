@@ -228,7 +228,7 @@ class InputStreamsSuite extends TestSuiteBase with BeforeAndAfter {
       val clock = ssc.scheduler.clock.asInstanceOf[ManualClock]
       val startTime = System.currentTimeMillis()
       while ((!MultiThreadTestReceiver.haveAllThreadsFinished ||
-                 output.sum < numTotalRecords) &&
+             output.sum < numTotalRecords) &&
              System.currentTimeMillis() - startTime < 5000) {
         Thread.sleep(100)
         clock.advance(batchDuration.milliseconds)
@@ -545,7 +545,7 @@ class MultiThreadTestReceiver(numThreads: Int, numRecordsPerThread: Int)
       val runnable = new Runnable {
         def run() {
           (1 to numRecordsPerThread).foreach(i =>
-                store(threadId * numRecordsPerThread + i))
+            store(threadId * numRecordsPerThread + i))
           if (finishCount.incrementAndGet == numThreads) {
             MultiThreadTestReceiver.haveAllThreadsFinished = true
           }

@@ -139,8 +139,8 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
       msg match {
         case Failed(barrier, thr: ClientLost)
             if (thr == ClientLost(
-                    Data(Set(nodeA), "bar6", a.ref :: Nil, thr.data.deadline),
-                    B)) ⇒
+                Data(Set(nodeA), "bar6", a.ref :: Nil, thr.data.deadline),
+                B)) ⇒
         case x ⇒
           fail(
               "Expected " +
@@ -224,8 +224,8 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
       msg match {
         case Failed(barrier, thr: BarrierEmpty)
             if (thr == BarrierEmpty(
-                    Data(Set(), "", Nil, thr.data.deadline),
-                    "cannot remove RoleName(a): no client to remove")) ⇒
+                Data(Set(), "", Nil, thr.data.deadline),
+                "cannot remove RoleName(a): no client to remove")) ⇒
         case x ⇒
           fail(
               "Expected " +
@@ -257,13 +257,11 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
                                              a.ref :: Nil,
                                              thr.data.deadline))) ⇒
           case x ⇒
-            fail(
-                "Expected " + Failed(barrier,
-                                     BarrierTimeout(Data(Set(nodeA, nodeB),
-                                                         "bar10",
-                                                         a.ref :: Nil,
-                                                         null))) +
-                  " but got " + x)
+            fail("Expected " + Failed(
+                barrier,
+                BarrierTimeout(
+                    Data(Set(nodeA, nodeB), "bar10", a.ref :: Nil, null))) +
+              " but got " + x)
         }
       }
     }
@@ -281,8 +279,8 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
       msg match {
         case Failed(barrier, thr: DuplicateNode)
             if (thr == DuplicateNode(
-                    Data(Set(nodeA), "", Nil, thr.data.deadline),
-                    nodeB)) ⇒
+                Data(Set(nodeA), "", Nil, thr.data.deadline),
+                nodeB)) ⇒
         case x ⇒
           fail(
               "Expected " +

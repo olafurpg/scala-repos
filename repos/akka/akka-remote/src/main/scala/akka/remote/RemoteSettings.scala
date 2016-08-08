@@ -130,7 +130,7 @@ final class RemoteSettings(val config: Config) {
         "unreachable-nodes-reaper-interval")
   } requiring
     (_ > Duration.Zero,
-        "watch-failure-detector.unreachable-nodes-reaper-interval must be > 0")
+    "watch-failure-detector.unreachable-nodes-reaper-interval must be > 0")
   val WatchHeartbeatExpectedResponseAfter: FiniteDuration = {
     WatchFailureDetectorConfig.getMillisDuration("expected-response-after")
   } requiring

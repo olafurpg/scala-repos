@@ -160,8 +160,8 @@ private[controllers] trait LilaController
     Env.security.firewall.accepts(ctx.req) flatMap {
       _ fold
         (a, {
-              fuccess { Redirect(routes.Lobby.home()) }
-            })
+          fuccess { Redirect(routes.Lobby.home()) }
+        })
     }
 
   protected def NoEngine[A <: Result](a: => Fu[A])(
@@ -186,10 +186,9 @@ private[controllers] trait LilaController
             html = Lobby.renderHome(Results.Forbidden),
             api = _ =>
               fuccess {
-                Forbidden(
-                    jsonError(
-                        s"Banned from playing for ${ban.remainingMinutes} minutes. Reason: Too many aborts or unplayed games"
-                    )) as JSON
+                Forbidden(jsonError(
+                    s"Banned from playing for ${ban.remainingMinutes} minutes. Reason: Too many aborts or unplayed games"
+                )) as JSON
             }
         )
       }
@@ -229,7 +228,7 @@ private[controllers] trait LilaController
       op: A => Fu[B])(implicit ctx: Context) =
     fua flatMap {
       _.fold(notFound(ctx))(a =>
-            op(a) map { b =>
+        op(a) map { b =>
           Ok(Json toJson b) as JSON
       })
     }
@@ -267,7 +266,7 @@ private[controllers] trait LilaController
       implicit ctx: Context) =
     fua flatMap {
       _.fold(notFound(ctx))(a =>
-            op(a) map { b =>
+        op(a) map { b =>
           Redirect(b)
       })
     }
@@ -276,7 +275,7 @@ private[controllers] trait LilaController
       op: A => Fu[String])(implicit ctx: Context) =
     fua flatMap {
       _.fold(notFound(ctx))(a =>
-            op(a) map { b =>
+        op(a) map { b =>
           Redirect(b)
       })
     }
@@ -369,8 +368,8 @@ private[controllers] trait LilaController
           import akka.pattern.ask
           import makeTimeout.short
           (Env.hub.actor.relation ? GetOnlineFriends(me.id) map {
-                case OnlineFriends(users) => users
-              } recover { case _ => Nil }) zip Env.team.api
+            case OnlineFriends(users) => users
+          } recover { case _ => Nil }) zip Env.team.api
             .nbRequests(me.id) zip Env.message.api
             .unreadIds(me.id) zip Env.challenge.api.countInFor(me.id)
         }

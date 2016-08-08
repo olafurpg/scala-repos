@@ -89,12 +89,10 @@ object Compatibility {
                   case function1: ScTrait =>
                     ScParameterizedType(
                         ScType.designator(function1),
-                        function1.typeParameters.map(
-                            tp =>
-                              new ScUndefinedType(
-                                  new ScTypeParameterType(tp,
-                                                          ScSubstitutor.empty),
-                                  1))) match {
+                        function1.typeParameters.map(tp =>
+                          new ScUndefinedType(
+                              new ScTypeParameterType(tp, ScSubstitutor.empty),
+                              1))) match {
                       case funTp: ScParameterizedType =>
                         val secondArg = funTp.typeArgs(1)
                         Conformance

@@ -87,8 +87,8 @@ object PathData {
                 .parseMimeTypes(mimeString)
                 .headOption
                 .toSuccess(Extractor.Error.invalid(
-                        "No recognized mimeType values foundin %s".format(
-                            v.renderCompact)))
+                    "No recognized mimeType values foundin %s".format(
+                        v.renderCompact)))
           }
 
           (v.validated[String]("type") tuple mimeTypeV) flatMap {

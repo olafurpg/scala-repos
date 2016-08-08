@@ -83,10 +83,8 @@ object GameRepo {
     ) map { _.flatMap(g => Pov(g, user)) }
 
   def gamesForAssessment(userId: String, nb: Int): Fu[List[Game]] = $find(
-      $query(
-          Query.finished ++ Query.rated ++ Query.user(userId) ++ Query
-            .analysed(true) ++ Query.turnsMoreThan(20) ++ Query
-            .clock(true)) sort
+      $query(Query.finished ++ Query.rated ++ Query.user(userId) ++ Query
+        .analysed(true) ++ Query.turnsMoreThan(20) ++ Query.clock(true)) sort
         ($sort asc F.createdAt),
       nb
   )
@@ -104,10 +102,9 @@ object GameRepo {
   def goBerserk(pov: Pov): Funit =
     $update(
         $select(pov.gameId),
-        BSONDocument(
-            "$set" -> BSONDocument(
-                s"${pov.color.fold(F.whitePlayer, F.blackPlayer)}.${Player.BSONFields.berserk}" -> true
-            )))
+        BSONDocument("$set" -> BSONDocument(
+            s"${pov.color.fold(F.whitePlayer, F.blackPlayer)}.${Player.BSONFields.berserk}" -> true
+        )))
 
   def save(progress: Progress): Funit =
     GameDiff(progress.origin, progress.game) match {
@@ -129,27 +126,25 @@ object GameRepo {
   def setRatingDiffs(id: ID, white: Int, black: Int) =
     $update(
         $select(id),
-        BSONDocument(
-            "$set" -> BSONDocument(
-                s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
-                    white),
-                s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
-                    black))))
+        BSONDocument("$set" -> BSONDocument(
+            s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
+                white),
+            s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
+                black))))
 
   // used by RatingFest
   def setRatingAndDiffs(id: ID, white: (Int, Int), black: (Int, Int)) =
     $update(
         $select(id),
-        BSONDocument(
-            "$set" -> BSONDocument(
-                s"${F.whitePlayer}.${Player.BSONFields.rating}" -> BSONInteger(
-                    white._1),
-                s"${F.blackPlayer}.${Player.BSONFields.rating}" -> BSONInteger(
-                    black._1),
-                s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
-                    white._2),
-                s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
-                    black._2))))
+        BSONDocument("$set" -> BSONDocument(
+            s"${F.whitePlayer}.${Player.BSONFields.rating}" -> BSONInteger(
+                white._1),
+            s"${F.blackPlayer}.${Player.BSONFields.rating}" -> BSONInteger(
+                black._1),
+            s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
+                white._2),
+            s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
+                black._2))))
 
   def urgentGames(user: User): Fu[List[Pov]] =
     $find(Query nowPlaying user.id, 100) map { games =>
@@ -340,7 +335,7 @@ object GameRepo {
       ) ++ $or(
           Seq(
               Json.obj(s"${F.whitePlayer}.${Player.BSONFields.rating}" -> $gt(
-                      1200)),
+                  1200)),
               Json.obj(
                   s"${F.blackPlayer}.${Player.BSONFields.rating}" -> $gt(1200))
           ))
@@ -350,11 +345,10 @@ object GameRepo {
 
   def nbPerDay(days: Int): Fu[List[Int]] =
     ((days to 1 by -1).toList map { day =>
-          val from = DateTime.now.withTimeAtStartOfDay minusDays day
-          val to = from plusDays 1
-          $count(
-              Json.obj(F.createdAt -> ($gte($date(from)) ++ $lt($date(to)))))
-        }).sequenceFu
+      val from = DateTime.now.withTimeAtStartOfDay minusDays day
+      val to = from plusDays 1
+      $count(Json.obj(F.createdAt -> ($gte($date(from)) ++ $lt($date(to)))))
+    }).sequenceFu
 
   // #TODO expensive stuff, run on DB replica
   // Can't be done on reactivemongo 0.11.9 :(
@@ -400,9 +394,9 @@ object GameRepo {
                     "$gt" -> (DateTime.now minusMinutes 5)),
                 "$or" -> BSONArray(
                     BSONDocument(s"${F.whitePlayer}.ai" -> BSONDocument(
-                            "$exists" -> true)),
+                        "$exists" -> true)),
                     BSONDocument(s"${F.blackPlayer}.ai" -> BSONDocument(
-                            "$exists" -> true))
+                        "$exists" -> true))
                 ),
                 F.binaryPieces -> game.binaryPieces
             )

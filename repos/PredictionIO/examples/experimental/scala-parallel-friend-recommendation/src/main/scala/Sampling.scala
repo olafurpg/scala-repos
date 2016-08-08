@@ -101,7 +101,7 @@ object Sampling {
     val vertices = graph.vertices.sample(false, fraction, Random.nextLong)
     val vertexMap = vertices.collectAsMap()
     val edges = graph.edges.filter(e =>
-          vertexMap.contains(e.srcId) && vertexMap.contains(e.dstId))
+      vertexMap.contains(e.srcId) && vertexMap.contains(e.dstId))
     val graph2 = Graph(vertices, edges)
     graph2
   }

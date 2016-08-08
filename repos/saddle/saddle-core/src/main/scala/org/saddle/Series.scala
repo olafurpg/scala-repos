@@ -916,8 +916,8 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
           util.buildStr(len,
                         length,
                         (i: Int) => createIx(i) + " -> " + createVal(i), {
-                      resetRowLabels(0); " ... \n"
-                    }))
+                          resetRowLabels(0); " ... \n"
+                        }))
     }
 
     buf.toString()

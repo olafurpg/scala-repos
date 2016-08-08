@@ -95,7 +95,7 @@ final case class DeploymentPlan(id: String,
 
   def createdOrUpdatedApps: Seq[AppDefinition] = {
     target.transitiveApps.toIndexedSeq.filter(app =>
-          affectedApplicationIds(app.id))
+      affectedApplicationIds(app.id))
   }
 
   override def toString: String = {

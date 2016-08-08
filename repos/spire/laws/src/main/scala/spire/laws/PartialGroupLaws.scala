@@ -28,9 +28,9 @@ trait PartialGroupLaws[A] extends GroupLaws[A] {
               !((a |+|?? b) && (b |+|?? c)) || ((a |+|? b).get |+|?? c)),
         "associative: (a |+|? b) |+|? c === a |+|? (b |+|? c)" → forAll(
             (a: A, b: A, c: A) => {
-          (!(a |+|?? b) || !(b |+|?? c)) || ((a |+|? b).get |+|? c).get ===
-            (a |+|? (b |+|? c).get).get
-        })
+              (!(a |+|?? b) || !(b |+|?? c)) || ((a |+|? b).get |+|? c).get ===
+                (a |+|? (b |+|? c).get).get
+            })
     )
 
   def groupoid(implicit A: Groupoid[A]) =
@@ -46,7 +46,7 @@ trait PartialGroupLaws[A] extends GroupLaws[A] {
         "product with inverse is a left and right identity" → forAll(
             (a: A, b: A) =>
               !(a |+|?? b) || (((a |+|? b).get |+|? b.inverse).get === a &&
-                    ((a.inverse |+|? a).get |+|? b).get === b))
+                ((a.inverse |+|? a).get |+|? b).get === b))
     )
 }
 

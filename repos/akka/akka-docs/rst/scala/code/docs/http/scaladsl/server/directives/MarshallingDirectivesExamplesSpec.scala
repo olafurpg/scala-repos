@@ -48,7 +48,7 @@ class MarshallingDirectivesExamplesSpec extends RoutingSpec {
       entity(as[JsValue]) { json =>
         complete(
             s"Person: ${json.asJsObject.fields("name")} - favorite number: ${json.asJsObject
-          .fields("favoriteNumber")}")
+              .fields("favoriteNumber")}")
       }
     }
 

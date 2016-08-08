@@ -83,7 +83,7 @@ trait MatchCodeGen extends Interface {
         Function(List(ValDef(arg)), body)
       def tupleSel(binder: Symbol)(i: Int): Tree =
         (REF(binder) DOT nme
-              .productAccessorName(i)) // make tree that accesses the i'th component of the tuple referenced by binder
+          .productAccessorName(i)) // make tree that accesses the i'th component of the tuple referenced by binder
       def index(tgt: Tree)(i: Int): Tree = tgt APPLY (LIT(i))
 
       // Right now this blindly calls drop on the result of the unapplySeq

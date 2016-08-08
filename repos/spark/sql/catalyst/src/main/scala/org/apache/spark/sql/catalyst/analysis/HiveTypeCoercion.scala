@@ -109,7 +109,7 @@ object HiveTypeCoercion {
   private def findTightestCommonTypeAndPromoteToString(
       types: Seq[DataType]): Option[DataType] = {
     types.foldLeft[Option[DataType]](Some(NullType))((r, c) =>
-          r match {
+      r match {
         case None => None
         case Some(d) =>
           findTightestCommonTypeToString(d, c)
@@ -122,7 +122,7 @@ object HiveTypeCoercion {
     */
   private def findTightestCommonType(types: Seq[DataType]): Option[DataType] = {
     types.foldLeft[Option[DataType]](Some(NullType))((r, c) =>
-          r match {
+      r match {
         case None => None
         case Some(d) => findTightestCommonTypeOfTwo(d, c)
     })
@@ -152,7 +152,7 @@ object HiveTypeCoercion {
 
   private def findWiderCommonType(types: Seq[DataType]) = {
     types.foldLeft[Option[DataType]](Some(NullType))((r, c) =>
-          r match {
+      r match {
         case Some(d) => findWiderTypeForTwo(d, c)
         case None => None
     })

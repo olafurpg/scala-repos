@@ -48,8 +48,8 @@ case class CategoricalPaintScaleFactory[T]() extends PaintScaleFactory[T] {
     CategoricalPaintScale[T](
         Map() ++
           (distinct zip Stream
-                .continually(PaintScale.Category20.values.toList)
-                .flatten))
+            .continually(PaintScale.Category20.values.toList)
+            .flatten))
   }
 }
 

@@ -50,8 +50,8 @@ object DateParser {
         .map { p =>
           p.parse(s)
         }
-        .getOrElse(Failure(new IllegalArgumentException(
-                    "Could not find parser for: " + s)))
+        .getOrElse(Failure(
+            new IllegalArgumentException("Could not find parser for: " + s)))
   }
 
   /** Try these Parsers in order */

@@ -268,7 +268,7 @@ abstract class ContainerVar[T](dflt: => T)(
   override protected def wasInitialized(name: String, bn: String): Boolean = {
     val old: Boolean =
       S.session.flatMap(s =>
-            localGet(s, bn) match {
+        localGet(s, bn) match {
           case Full(b: Boolean) => Full(b)
           case _ => Empty
       }) openOr false
@@ -279,10 +279,10 @@ abstract class ContainerVar[T](dflt: => T)(
   override protected def testWasSet(name: String, bn: String): Boolean = {
     S.session.flatMap(s => localGet(s, name)).isDefined ||
     (S.session.flatMap(s =>
-              localGet(s, bn) match {
-            case Full(b: Boolean) => Full(b)
-            case _ => Empty
-        }) openOr false)
+      localGet(s, bn) match {
+        case Full(b: Boolean) => Full(b)
+        case _ => Empty
+    }) openOr false)
   }
 
   protected override def registerCleanupFunc(in: LiftSession => Unit): Unit =
@@ -598,7 +598,7 @@ private[http] trait CoreRequestVarHandler {
                   val ret: T = f()
 
                   cleanup.value.toList.foreach(clean =>
-                        Helpers.tryo(clean(sessionThing.value)))
+                    Helpers.tryo(clean(sessionThing.value)))
 
                   ret
                 }
@@ -663,19 +663,18 @@ private[http] trait CoreRequestVarHandler {
                   val ret: T = f
 
                   cleanup.value.toList.foreach(clean =>
-                        Helpers.tryo(clean(sessionThing.value)))
+                    Helpers.tryo(clean(sessionThing.value)))
 
                   if (Props.devMode && LiftRules.logUnreadRequestVars) {
                     vals.value.keys
                       .filter(!_.startsWith(VarConstants.varPrefix +
-                                "net.liftweb"))
+                        "net.liftweb"))
                       .filter(!_.endsWith(VarConstants.initedSuffix))
                       .foreach(key =>
-                            vals.value(key) match {
+                        vals.value(key) match {
                           case (rv, _, true) if rv.logUnreadVal =>
-                            logger.warn(
-                                "RequestVar %s was set but not read".format(
-                                    key.replace(VarConstants.varPrefix, "")))
+                            logger.warn("RequestVar %s was set but not read"
+                              .format(key.replace(VarConstants.varPrefix, "")))
                           case _ =>
                       })
                   }

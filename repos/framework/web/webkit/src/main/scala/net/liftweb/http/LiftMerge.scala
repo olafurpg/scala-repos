@@ -90,12 +90,13 @@ private[http] trait LiftMerge { self: LiftSession =>
 
     val processedSnippets: Map[String, NodeSeq] = Map(
         snippetHashs.toList.flatMap {
-      case (name, Full(value)) => List((name, value))
-      case (name, f: Failure) =>
-        List((name, LiftRules.deferredSnippetFailure.vend(f)))
-      case (name, Empty) => List((name, LiftRules.deferredSnippetTimeout.vend))
-      case _ => Nil
-    }: _*)
+          case (name, Full(value)) => List((name, value))
+          case (name, f: Failure) =>
+            List((name, LiftRules.deferredSnippetFailure.vend(f)))
+          case (name, Empty) =>
+            List((name, LiftRules.deferredSnippetTimeout.vend))
+          case _ => Nil
+        }: _*)
 
     val hasHtmlHeadAndBody: Boolean = xhtml.find {
       case e: Elem if e.label == "html" =>
@@ -151,7 +152,7 @@ private[http] trait LiftMerge { self: LiftSession =>
 
             case element: Elem
                 if mergeHeadAndTail && (element.label == "head" ||
-                      element.label.startsWith("head_")) && htmlDescendant &&
+                  element.label.startsWith("head_")) && htmlDescendant &&
                   bodyDescendant =>
               startingState.copy(headInBodyChild = true)
 
@@ -280,7 +281,7 @@ private[http] trait LiftMerge { self: LiftSession =>
           ("data-lift-gc" -> RenderVersion.get) ::
             (if (autoIncludeComet) {
                ("data-lift-session-id" -> (S.session
-                         .map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList.map {
+                 .map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList.map {
                  case CometVersionPair(guid, version) =>
                    (s"data-lift-comet-$guid" -> version.toString)
                }
@@ -312,7 +313,7 @@ private[http] trait LiftMerge { self: LiftSession =>
             import scala.xml.transform._
 
             val errors: NodeSeq = xs.map(e =>
-                  <div style="border: red solid 2px">XHTML Validation error:{e.msg}at line{e.line + 1}and column{e.col}</div>)
+              <div style="border: red solid 2px">XHTML Validation error:{e.msg}at line{e.line + 1}and column{e.col}</div>)
 
             val rule = new RewriteRule {
               override def transform(n: Node) = n match {

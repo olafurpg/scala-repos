@@ -171,7 +171,7 @@ class UnauthorizedDigestResponse(override val realm: String,
         List(
             "WWW-Authenticate" ->
               ("Digest realm=\"" + realm + "\", " + "qop=\"" + qop + "\", " +
-                    "nonce=\"" + nonce + "\", " + "opaque=\"" + opaque + "\"")),
+                "nonce=\"" + nonce + "\", " + "opaque=\"" + opaque + "\"")),
         Nil,
         401)
 }

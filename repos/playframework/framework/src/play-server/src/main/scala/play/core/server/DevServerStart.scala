@@ -73,7 +73,7 @@ object DevServerStart {
             System.out.println(this.getClass.getClassLoader)
             System.out.println("\n---- The where is Scala? test ----\n")
             System.out.println(this.getClass.getClassLoader
-                  .getResource("scala/Predef$.class"))
+              .getResource("scala/Predef$.class"))
           }
         }
 
@@ -96,9 +96,8 @@ object DevServerStart {
                 "No play.logger.configurator found: logging must be configured entirely by the application.")
         }
 
-        println(
-            play.utils.Colors.magenta(
-                "--- (Running the application, auto-reloading is enabled) ---"))
+        println(play.utils.Colors.magenta(
+            "--- (Running the application, auto-reloading is enabled) ---"))
         println()
 
         // Create reloadable ApplicationProvider
@@ -138,7 +137,7 @@ object DevServerStart {
                             if (lastState.isSuccess) {
                               println()
                               println(play.utils.Colors
-                                    .magenta("--- (RELOAD) ---"))
+                                .magenta("--- (RELOAD) ---"))
                               println()
                             }
 
@@ -153,13 +152,11 @@ object DevServerStart {
                             val sourceMapper = new SourceMapper {
                               def sourceOf(className: String,
                                            line: Option[Int]) = {
-                                Option(
-                                    buildLink.findSource(
-                                        className,
-                                        line
-                                          .map(_.asInstanceOf[
-                                                  java.lang.Integer])
-                                          .orNull)).flatMap {
+                                Option(buildLink.findSource(
+                                    className,
+                                    line
+                                      .map(_.asInstanceOf[java.lang.Integer])
+                                      .orNull)).flatMap {
                                   case Array(file: java.io.File, null) =>
                                     Some((file, None))
                                   case Array(file: java.io.File,

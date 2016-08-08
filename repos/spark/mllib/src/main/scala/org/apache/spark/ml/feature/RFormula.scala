@@ -182,9 +182,9 @@ class RFormula(override val uid: String)
           schema.fields :+ StructField($(featuresCol), new VectorUDT, true))
     } else {
       StructType(schema.fields :+ StructField(
-              $(featuresCol),
-              new VectorUDT,
-              true) :+ StructField($(labelCol), DoubleType, true))
+          $(featuresCol),
+          new VectorUDT,
+          true) :+ StructField($(labelCol), DoubleType, true))
     }
   }
 

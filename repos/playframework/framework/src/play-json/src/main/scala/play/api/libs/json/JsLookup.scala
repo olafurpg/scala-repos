@@ -92,7 +92,7 @@ case class JsLookup(result: JsLookupResult) extends AnyVal {
   def \\(fieldName: String): Seq[JsValue] = result match {
     case JsDefined(obj: JsObject) =>
       obj.value.foldLeft(Seq[JsValue]())((o, pair) =>
-            pair match {
+        pair match {
           case (key, value) if key == fieldName =>
             o ++ (value +: (value \\ fieldName))
           case (_, value) => o ++ (value \\ fieldName)

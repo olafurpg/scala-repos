@@ -250,7 +250,7 @@ object Scalding {
       .map { Right(_) }
       .getOrElse(
           Left(List("only finite time ranges are supported by scalding: " +
-                    timeSpan.toString)))
+            timeSpan.toString)))
 
   /**
     * This makes sure that the output FlowToPipe[T] produces a TypedPipe[T] with only
@@ -415,8 +415,8 @@ object Scalding {
               val Summer(storeLog, _, sg) = InternalService
                 .getSummer[K, V](dependants, bstore)
                 .getOrElse(sys.error(
-                        "join %s is against store not in the entire job's Dag"
-                          .format(ljp)))
+                    "join %s is against store not in the entire job's Dag"
+                      .format(ljp)))
               val (leftPf, m1) = recurse(left)
               // We have to force the fanOut on the storeLog because this kind of fanout
               // due to joining is not visible in the Dependants dag
@@ -461,8 +461,8 @@ object Scalding {
               val Summer(storeLog, _, sg) = InternalService
                 .getSummer[K, U](dependants, bs)
                 .getOrElse(sys.error(
-                        "join %s is against store not in the entire job's Dag"
-                          .format(ljp)))
+                    "join %s is against store not in the entire job's Dag"
+                      .format(ljp)))
               implicit val semigroup: Semigroup[U] = sg
               logger.info("Service {} using {} reducers (-1 means unset)",
                           ljp,

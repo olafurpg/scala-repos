@@ -71,7 +71,7 @@ class StochasticAveragedGradient[T](maxIter: Int = -1,
       if (tuneStepFrequency > 0 && (oldState.iter % tuneStepFrequency) == 0) {
         val xdiff = newX - oldState.x
         if ((f.valueAt(newX, IndexedSeq(nextPos)) +
-                  l2Regularization / 2 * norm(newX) - oldState.adjustedValue) >
+              l2Regularization / 2 * norm(newX) - oldState.adjustedValue) >
               (oldState.adjustedGradient dot xdiff) + (xdiff dot xdiff) /
                 (2 * stepSize)) {
           stepSize / 2

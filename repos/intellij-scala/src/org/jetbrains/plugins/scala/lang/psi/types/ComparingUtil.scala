@@ -49,7 +49,7 @@ object ComparingUtil {
         !(clazz1.isInheritor(clazz2, true) || clazz2.isInheritor(clazz1, true))
 
     areUnrelatedClasses && (oneFinal || twoNonTraitsOrInterfaces ||
-        sealedAndAllChildrenAreIrreconcilable)
+    sealedAndAllChildrenAreIrreconcilable)
   }
 
   def isNeverSubType(tp1: ScType,
@@ -97,6 +97,6 @@ object ComparingUtil {
 
     isNeverSubClass(clazz1, clazz2) ||
     ((areClassesEquivalent(clazz1, clazz2) || (!sameType) &&
-            clazz1.isInheritor(clazz2, true)) && neverSubArgs())
+    clazz1.isInheritor(clazz2, true)) && neverSubArgs())
   }
 }

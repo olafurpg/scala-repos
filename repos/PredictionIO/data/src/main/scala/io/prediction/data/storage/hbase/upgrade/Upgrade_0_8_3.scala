@@ -88,9 +88,9 @@ object Upgrade_0_8_3 {
       .filter(
           e =>
             (obsEntityTypes.contains(e.entityType) || e.targetEntityType
-                  .map(obsEntityTypes.contains(_))
-                  .getOrElse(false) ||
-                  (!e.properties.keySet.forall(!obsProperties.contains(_)))))
+              .map(obsEntityTypes.contains(_))
+              .getOrElse(false) ||
+              (!e.properties.keySet.forall(!obsProperties.contains(_)))))
       .hasNext
   }
 

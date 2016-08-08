@@ -165,11 +165,10 @@ case class Game(
     val (history, situation) = (game.board.history, game.situation)
 
     def copyPlayer(player: Player) = player.copy(
-        blurs =
-          math.min(playerMoves(player.color),
-                   player.blurs + (blur &&
-                         moveOrDrop.fold(_.color, _.color) == player.color)
-                     .fold(1, 0))
+        blurs = math.min(
+            playerMoves(player.color),
+            player.blurs + (blur &&
+              moveOrDrop.fold(_.color, _.color) == player.color).fold(1, 0))
     )
 
     val updated = copy(

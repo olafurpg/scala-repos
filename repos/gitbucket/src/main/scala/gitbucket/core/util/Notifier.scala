@@ -28,16 +28,15 @@ trait Notifier
   protected def recipients(issue: Issue)(
       notify: String => Unit)(implicit session: Session, context: Context) =
     (// individual repository's owner
-        issue.userName :: // collaborators
-          getCollaborators(issue.userName, issue.repositoryName) ::: // participants
-            issue.openedUserName :: getComments(
-                issue.userName,
-                issue.repositoryName,
-                issue.issueId).map(_.commentedUserName)).distinct
+    issue.userName :: // collaborators
+      getCollaborators(issue.userName, issue.repositoryName) ::: // participants
+        issue.openedUserName :: getComments(
+            issue.userName,
+            issue.repositoryName,
+            issue.issueId).map(_.commentedUserName)).distinct
       .withFilter(_ != context.loginAccount.get.userName) // the operation in person is excluded
       .foreach(getAccountByUserName(_) filterNot (_.isGroupAccount) filterNot
-            (LDAPUtil.isDummyMailAddress(_)) foreach (x =>
-                                                        notify(x.mailAddress)))
+        (LDAPUtil.isDummyMailAddress(_)) foreach (x => notify(x.mailAddress)))
 }
 
 object Notifier {
@@ -108,9 +107,9 @@ class Mailer(private val smtp: Smtp) extends Notifier {
               }
               smtp.fromAddress
                 .map(_ -> smtp.fromName.getOrElse(
-                        context.loginAccount.get.userName))
+                    context.loginAccount.get.userName))
                 .orElse(Some(
-                        "notifications@gitbucket.com" -> context.loginAccount.get.userName))
+                    "notifications@gitbucket.com" -> context.loginAccount.get.userName))
                 .foreach {
                   case (address, name) =>
                     email.setFrom(address, name)

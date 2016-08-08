@@ -105,7 +105,7 @@ trait RelationalProfile
       import self.api._
       Compiled { (p: Rep[P]) =>
         (q: Query[T, U, Seq]).filter(table =>
-              Library.==.column[Boolean](f(table).toNode, p.toNode))
+          Library.==.column[Boolean](f(table).toNode, p.toNode))
       }
     }
   }

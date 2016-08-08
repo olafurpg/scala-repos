@@ -77,7 +77,7 @@ class HoconHighlightKeyUsagesHandler(editor: Editor,
           def fromPaths =
             if (firstKey.enclosingEntries eq firstKey.getContainingFile.toplevelEntries)
               allValidPathsInFile.iterator.flatMap(pathKeys =>
-                    fromPath(keys, pathKeys))
+                fromPath(keys, pathKeys))
             else Iterator.empty
 
           fromFields(Iterator(firstKey.enclosingEntries), keys) ++ fromPaths

@@ -18,8 +18,8 @@ object Test extends App {
   tags.foreach(_.info)
 
   val outliers = typeMembers.filter(tm =>
-        !tags.exists(tag =>
-              tag.info match {
+    !tags.exists(tag =>
+      tag.info match {
         case NullaryMethodType(TypeRef(_, sym, targ :: Nil)) =>
           sym == typeOf[ClassTag[_]].typeSymbol && targ.typeSymbol == tm
         case _ => false

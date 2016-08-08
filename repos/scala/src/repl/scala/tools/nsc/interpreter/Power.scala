@@ -184,7 +184,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     /** Standard noise reduction filter. */
     def excludeMember(s: Symbol) =
       (isSpecialized(s) || isImplClass(s) || s.isAnonOrRefinementClass ||
-            s.isAnonymousFunction)
+        s.isAnonymousFunction)
     def symbol = compilerSymbolFromTag(tag)
     def tpe = compilerTypeFromTag(tag)
     def members = membersUnabridged filterNot excludeMember
@@ -320,9 +320,9 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     def sanitize(s: String): String = sanitize(s.getBytes())
     def sanitize(s: Array[Byte]): String =
       (s map {
-            case x if x.toChar.isControl => '?'
-            case x => x.toChar
-          }).mkString
+        case x if x.toChar.isControl => '?'
+        case x => x.toChar
+      }).mkString
 
     def strings(s: Seq[Byte]): List[String] = {
       if (s.length == 0) Nil

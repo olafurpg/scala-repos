@@ -150,11 +150,7 @@ class SQLConfEntrySuite extends SparkFunSuite {
     conf.setConfString(key, "a,b,c,d,e")
     assert(conf.getConfString(key, "a,b,c") === "a,b,c,d,e")
     assert(conf.getConfString(key) === "a,b,c,d,e")
-    assert(
-        conf.getConf(confEntry, Seq("a", "b", "c")) === Seq("a",
-                                                            "b",
-                                                            "c",
-                                                            "d",
-                                                            "e"))
+    assert(conf
+      .getConf(confEntry, Seq("a", "b", "c")) === Seq("a", "b", "c", "d", "e"))
   }
 }

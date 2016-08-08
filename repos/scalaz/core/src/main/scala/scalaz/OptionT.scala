@@ -29,7 +29,7 @@ final case class OptionT[F[_], A](run: F[Option[A]]) { self =>
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = {
     import std.option._
     F.foldRight[Option[A], Z](run, z)((a, b) =>
-          Foldable[Option].foldRight[A, Z](a, b)(f))
+      Foldable[Option].foldRight[A, Z](a, b)(f))
   }
 
   def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F],
@@ -235,7 +235,7 @@ private trait OptionTBindRec[F[_]]
   final def tailrecM[A, B](f: A => OptionT[F, A \/ B])(a: A): OptionT[F, B] =
     OptionT(
         B.tailrecM[A, Option[B]](a0 =>
-              F.map(f(a0).run) {
+          F.map(f(a0).run) {
             _.fold(\/.right[A, Option[B]](None: Option[B]))(_.map(Some.apply))
         })(a)
     )

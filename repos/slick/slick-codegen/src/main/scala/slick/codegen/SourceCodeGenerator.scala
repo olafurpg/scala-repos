@@ -82,12 +82,11 @@ object SourceCodeGenerator {
                               password = password.getOrElse(null),
                               keepAliveConnection = true)
     try {
-      val m = Await.result(db.run(
-                               profileInstance
-                                 .createModel(None, ignoreInvalidDefaults)(
-                                     ExecutionContext.global)
-                                 .withPinnedSession),
-                           Duration.Inf)
+      val m = Await.result(
+          db.run(profileInstance
+            .createModel(None, ignoreInvalidDefaults)(ExecutionContext.global)
+            .withPinnedSession),
+          Duration.Inf)
       new SourceCodeGenerator(m).writeToFile(profile, outputDir, pkg)
     } finally db.close
   }
@@ -102,12 +101,11 @@ object SourceCodeGenerator {
     val profile =
       if (dc.profileIsObject) dc.profileName else "new " + dc.profileName
     try {
-      val m = Await.result(dc.db.run(
-                               dc.profile
-                                 .createModel(None, ignoreInvalidDefaults)(
-                                     ExecutionContext.global)
-                                 .withPinnedSession),
-                           Duration.Inf)
+      val m = Await.result(
+          dc.db.run(dc.profile
+            .createModel(None, ignoreInvalidDefaults)(ExecutionContext.global)
+            .withPinnedSession),
+          Duration.Inf)
       new SourceCodeGenerator(m).writeToFile(profile, out, pkg)
     } finally dc.db.close
   }

@@ -197,9 +197,8 @@ private[hive] object SparkSQLCLIDriver extends Logging {
       }
     } catch {
       case e: Exception =>
-        logWarning(
-            "WARNING: Encountered an error while trying to initialize Hive's " +
-              "history file.  History will not be available during this session.")
+        logWarning("WARNING: Encountered an error while trying to initialize Hive's " +
+          "history file.  History will not be available during this session.")
         logWarning(e.getMessage)
     }
 

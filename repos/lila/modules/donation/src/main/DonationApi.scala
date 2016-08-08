@@ -57,7 +57,7 @@ final class DonationApi(coll: Coll,
 
   def create(donation: Donation) = {
     coll insert donation recover lila.db.recoverDuplicateKey(e =>
-          println(e.getMessage)) void
+      println(e.getMessage)) void
   } >> donation.userId.??(donorCache.remove) >>- progress.foreach { prog =>
     bus.publish(lila.hub.actorApi.DonationEvent(
                     userId = donation.userId,
@@ -75,9 +75,9 @@ final class DonationApi(coll: Coll,
     coll
       .find(
           BSONDocument("date" -> BSONDocument(
-                  "$gte" -> from,
-                  "$lt" -> to
-              )),
+              "$gte" -> from,
+              "$lt" -> to
+          )),
           BSONDocument("net" -> true, "_id" -> false)
       )
       .cursor[BSONDocument]()

@@ -789,7 +789,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
       def shutdownAll[T](resources: TraversableOnce[T])(
           shutdown: T ⇒ Future[Boolean]): Future[Boolean] = {
         (Future sequence resources
-              .map(shutdown)) map { _.forall(identity) } recover {
+          .map(shutdown)) map { _.forall(identity) } recover {
           case NonFatal(_) ⇒ false
         }
       }

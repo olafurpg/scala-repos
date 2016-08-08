@@ -367,8 +367,8 @@ case class ExpressionEncoder[T](schema: StructType,
     copy(
         fromRowExpression =
           fromRowExpression transform {
-        case r: BoundReference => r.copy(ordinal = r.ordinal + delta)
-      })
+            case r: BoundReference => r.copy(ordinal = r.ordinal + delta)
+          })
   }
 
   protected val attrs = toRowExpressions.flatMap(_.collect {

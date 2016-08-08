@@ -341,7 +341,7 @@ private[sbt] object SettingCompletions {
     val showKeys = if (showAll) applicable else prominentOnly
     val showDescriptions = (level >= 2) || (showKeys.size <= detailLimit)
     completeDescribed(seen, showDescriptions, showKeys)(s =>
-          description(s).toList.mkString)
+      description(s).toList.mkString)
   }
   def completeDescribed[T](
       seen: String,

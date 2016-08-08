@@ -98,7 +98,7 @@ object ActorPath {
       case invalidAt ⇒
         throw new InvalidActorNameException(
             s"""Invalid actor path element [$element]$fullPathMsg, illegal character [${element(
-            invalidAt)}] at position: $invalidAt. """ +
+                invalidAt)}] at position: $invalidAt. """ +
               """Actor paths MUST: """ + """not start with `$`, """ +
               s"""include only ASCII letters and can only contain these special characters: ${ActorPath.ValidSymbols}.""")
     }

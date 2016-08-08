@@ -36,7 +36,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
       val latch = (1 to 4).map(_ -> TestLatch(1)).toMap
       val p = Source(1 to 4)
         .mapAsyncUnordered(4)(n ⇒
-              Future {
+          Future {
             Await.ready(latch(n), 5.seconds)
             n
         })
@@ -61,7 +61,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
       implicit val ec = system.dispatcher
       val p = Source(1 to 20)
         .mapAsyncUnordered(4)(n ⇒
-              Future {
+          Future {
             probe.ref ! n
             n
         })
@@ -90,7 +90,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
       implicit val ec = system.dispatcher
       val p = Source(1 to 5)
         .mapAsyncUnordered(4)(n ⇒
-              Future {
+          Future {
             if (n == 3) throw new RuntimeException("err1") with NoStackTrace
             else {
               Await.ready(latch, 10.seconds)
@@ -111,8 +111,8 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
       implicit val ec = system.dispatcher
       val p = Source(1 to 5)
         .mapAsyncUnordered(4)(n ⇒
-              if (n == 3) throw new RuntimeException("err2") with NoStackTrace
-              else {
+          if (n == 3) throw new RuntimeException("err2") with NoStackTrace
+          else {
             Future {
               Await.ready(latch, 10.seconds)
               n
@@ -130,7 +130,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
       implicit val ec = system.dispatcher
       Source(1 to 5)
         .mapAsyncUnordered(4)(n ⇒
-              Future {
+          Future {
             if (n == 3) throw new RuntimeException("err3") with NoStackTrace
             else n
         })
@@ -161,7 +161,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
       import system.dispatcher
       Await.result(Source(1 to 3)
                      .mapAsyncUnordered(1)(n ⇒
-                           Future {
+                       Future {
                          if (n == 3)
                            throw new RuntimeException("err3b")
                            with NoStackTrace
@@ -177,8 +177,8 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
       implicit val ec = system.dispatcher
       Source(1 to 5)
         .mapAsyncUnordered(4)(n ⇒
-              if (n == 3) throw new RuntimeException("err4") with NoStackTrace
-              else Future(n))
+          if (n == 3) throw new RuntimeException("err4") with NoStackTrace
+          else Future(n))
         .withAttributes(supervisionStrategy(resumingDecider))
         .runWith(TestSink.probe[Int])
         .request(10)
@@ -202,9 +202,9 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
       val c = TestSubscriber.manualProbe[String]()
       val p = Source(List("a", "b", "c"))
         .mapAsyncUnordered(4)(elem ⇒
-              if (elem == "b")
-                Future.successful(null)
-              else Future.successful(elem))
+          if (elem == "b")
+            Future.successful(null)
+          else Future.successful(elem))
         .withAttributes(supervisionStrategy(resumingDecider))
         .to(Sink.fromSubscriber(c))
         .run()

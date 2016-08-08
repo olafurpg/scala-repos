@@ -219,109 +219,112 @@ class LightArrayRevolverScheduler(config: Config,
   @volatile private var timerThread: Thread = threadFactory.newThread(
       new Runnable {
 
-    var tick = 0
-    val wheel = Array.fill(WheelSize)(new TaskQueue)
+        var tick = 0
+        val wheel = Array.fill(WheelSize)(new TaskQueue)
 
-    private def clearAll(): immutable.Seq[TimerTask] = {
-      @tailrec
-      def collect(q: TaskQueue, acc: Vector[TimerTask]): Vector[TimerTask] = {
-        q.poll() match {
-          case null ⇒ acc
-          case x ⇒ collect(q, acc :+ x)
+        private def clearAll(): immutable.Seq[TimerTask] = {
+          @tailrec
+          def collect(q: TaskQueue,
+                      acc: Vector[TimerTask]): Vector[TimerTask] = {
+            q.poll() match {
+              case null ⇒ acc
+              case x ⇒ collect(q, acc :+ x)
+            }
+          }
+          ((0 until WheelSize) flatMap (i ⇒
+                                          collect(wheel(i), Vector.empty))) ++ collect(
+              queue,
+              Vector.empty)
         }
-      }
-      ((0 until WheelSize) flatMap (i ⇒ collect(wheel(i), Vector.empty))) ++ collect(
-          queue,
-          Vector.empty)
-    }
 
-    @tailrec
-    private def checkQueue(time: Long): Unit = queue.pollNode() match {
-      case null ⇒ ()
-      case node ⇒
-        node.value.ticks match {
-          case 0 ⇒ node.value.executeTask()
-          case ticks ⇒
-            val futureTick =
-              ((time - start + // calculate the nanos since timer start
-                        (ticks * tickNanos) + // adding the desired delay
-                        tickNanos - 1 // rounding up
-                      ) / tickNanos).toInt // and converting to slot number
-            // tick is an Int that will wrap around, but toInt of futureTick gives us modulo operations
-            // and the difference (offset) will be correct in any case
-            val offset = futureTick - tick
-            val bucket = futureTick & wheelMask
-            node.value.ticks = offset
-            wheel(bucket).addNode(node)
+        @tailrec
+        private def checkQueue(time: Long): Unit = queue.pollNode() match {
+          case null ⇒ ()
+          case node ⇒
+            node.value.ticks match {
+              case 0 ⇒ node.value.executeTask()
+              case ticks ⇒
+                val futureTick =
+                  ((time - start + // calculate the nanos since timer start
+                    (ticks * tickNanos) + // adding the desired delay
+                    tickNanos - 1 // rounding up
+                  ) / tickNanos).toInt // and converting to slot number
+                // tick is an Int that will wrap around, but toInt of futureTick gives us modulo operations
+                // and the difference (offset) will be correct in any case
+                val offset = futureTick - tick
+                val bucket = futureTick & wheelMask
+                node.value.ticks = offset
+                wheel(bucket).addNode(node)
+            }
+            checkQueue(time)
         }
-        checkQueue(time)
-    }
 
-    override final def run =
-      try nextTick()
-      catch {
-        case t: Throwable ⇒
-          log.error(t, "exception on LARS’ timer thread")
-          stopped.get match {
-            case null ⇒
-              val thread = threadFactory.newThread(this)
-              log.info("starting new LARS thread")
-              try thread.start()
-              catch {
-                case e: Throwable ⇒
-                  log.error(e,
-                            "LARS cannot start new thread, ship’s going down!")
-                  stopped.set(Promise successful Nil)
-                  clearAll()
+        override final def run =
+          try nextTick()
+          catch {
+            case t: Throwable ⇒
+              log.error(t, "exception on LARS’ timer thread")
+              stopped.get match {
+                case null ⇒
+                  val thread = threadFactory.newThread(this)
+                  log.info("starting new LARS thread")
+                  try thread.start()
+                  catch {
+                    case e: Throwable ⇒
+                      log.error(
+                          e,
+                          "LARS cannot start new thread, ship’s going down!")
+                      stopped.set(Promise successful Nil)
+                      clearAll()
+                  }
+                  timerThread = thread
+                case p ⇒
+                  assert(stopped.compareAndSet(p, Promise successful Nil),
+                         "Stop signal violated in LARS")
+                  p success clearAll()
               }
-              timerThread = thread
+              throw t
+          }
+
+        @tailrec final def nextTick(): Unit = {
+          val time = clock()
+          val sleepTime = start + (tick * tickNanos) - time
+
+          if (sleepTime > 0) {
+            // check the queue before taking a nap
+            checkQueue(time)
+            waitNanos(sleepTime)
+          } else {
+            val bucket = tick & wheelMask
+            val tasks = wheel(bucket)
+            val putBack = new TaskQueue
+
+            @tailrec def executeBucket(): Unit = tasks.pollNode() match {
+              case null ⇒ ()
+              case node ⇒
+                val task = node.value
+                if (!task.isCancelled) {
+                  if (task.ticks >= WheelSize) {
+                    task.ticks -= WheelSize
+                    putBack.addNode(node)
+                  } else task.executeTask()
+                }
+                executeBucket()
+            }
+            executeBucket()
+            wheel(bucket) = putBack
+
+            tick += 1
+          }
+          stopped.get match {
+            case null ⇒ nextTick()
             case p ⇒
               assert(stopped.compareAndSet(p, Promise successful Nil),
                      "Stop signal violated in LARS")
               p success clearAll()
           }
-          throw t
-      }
-
-    @tailrec final def nextTick(): Unit = {
-      val time = clock()
-      val sleepTime = start + (tick * tickNanos) - time
-
-      if (sleepTime > 0) {
-        // check the queue before taking a nap
-        checkQueue(time)
-        waitNanos(sleepTime)
-      } else {
-        val bucket = tick & wheelMask
-        val tasks = wheel(bucket)
-        val putBack = new TaskQueue
-
-        @tailrec def executeBucket(): Unit = tasks.pollNode() match {
-          case null ⇒ ()
-          case node ⇒
-            val task = node.value
-            if (!task.isCancelled) {
-              if (task.ticks >= WheelSize) {
-                task.ticks -= WheelSize
-                putBack.addNode(node)
-              } else task.executeTask()
-            }
-            executeBucket()
         }
-        executeBucket()
-        wheel(bucket) = putBack
-
-        tick += 1
-      }
-      stopped.get match {
-        case null ⇒ nextTick()
-        case p ⇒
-          assert(stopped.compareAndSet(p, Promise successful Nil),
-                 "Stop signal violated in LARS")
-          p success clearAll()
-      }
-    }
-  })
+      })
 
   timerThread.start()
 }

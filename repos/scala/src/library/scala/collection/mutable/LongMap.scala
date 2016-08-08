@@ -66,7 +66,7 @@ final class LongMap[V] private[collection] (defaultEntry: Long => V,
       if (n < 0) 0x7
       else
         (((1 << (32 - java.lang.Integer.numberOfLeadingZeros(n - 1))) -
-                  1) & 0x3FFFFFFF) | 0x7
+          1) & 0x3FFFFFFF) | 0x7
     _keys = new Array[Long](mask + 1)
     _values = new Array[AnyRef](mask + 1)
   }
@@ -375,16 +375,16 @@ final class LongMap[V] private[collection] (defaultEntry: Long => V,
 
     def hasNext: Boolean =
       nextPair != null || (index < kz.length && {
-            var q = kz(index)
-            while (q == -q) {
-              index += 1
-              if (index >= kz.length) return false
-              q = kz(index)
-            }
-            nextPair = (kz(index), vz(index).asInstanceOf[V])
-            index += 1
-            true
-          })
+        var q = kz(index)
+        while (q == -q) {
+          index += 1
+          if (index >= kz.length) return false
+          q = kz(index)
+        }
+        nextPair = (kz(index), vz(index).asInstanceOf[V])
+        index += 1
+        true
+      })
     def next = {
       if (nextPair == null && !hasNext)
         throw new NoSuchElementException("next")

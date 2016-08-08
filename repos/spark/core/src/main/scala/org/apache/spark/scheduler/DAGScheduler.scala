@@ -550,7 +550,7 @@ private[spark] class DAGScheduler(
                 // data structures based on StageId
                 stageIdToStage -= stageId
                 logDebug("After removal of stage %d, remaining stages = %d"
-                      .format(stageId, stageIdToStage.size))
+                  .format(stageId, stageIdToStage.size))
               }
 
               jobSet -= job.jobId

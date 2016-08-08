@@ -68,7 +68,7 @@ final class ClosureLinkerBackend(
 
     module.add(
         new CompilerInput(toClosureSource(
-                CoreJSLibs.lib(semantics, OutputMode.ECMAScript51Isolated))))
+            CoreJSLibs.lib(semantics, OutputMode.ECMAScript51Isolated))))
 
     val ast = builder.closureAST
     module.add(new CompilerInput(ast, ast.getInputId(), false))

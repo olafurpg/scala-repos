@@ -36,7 +36,7 @@ trait DocUsecaseHandling { self: DocResolver =>
               re.findFirstMatchIn(html)
                 .map { m =>
                   sig.copy(member =
-                        Some(StringEscapeUtils.unescapeHtml(m.group(1))))
+                    Some(StringEscapeUtils.unescapeHtml(m.group(1))))
                 }
                 .getOrElse(sig)
             } finally jarFile.close()

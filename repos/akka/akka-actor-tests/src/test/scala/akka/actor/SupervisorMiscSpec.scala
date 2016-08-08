@@ -37,11 +37,9 @@ class SupervisorMiscSpec
       filterEvents(EventFilter[Exception]("Kill")) {
         val countDownLatch = new CountDownLatch(4)
 
-        val supervisor = system.actorOf(
-            Props(
-                new Supervisor(OneForOneStrategy(maxNrOfRetries = 3,
-                                                 withinTimeRange = 5 seconds)(
-                        List(classOf[Exception])))))
+        val supervisor = system.actorOf(Props(new Supervisor(
+            OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 5 seconds)(
+                List(classOf[Exception])))))
 
         val workerProps = Props(new Actor {
           override def postRestart(cause: Throwable) {
@@ -55,16 +53,16 @@ class SupervisorMiscSpec
 
         val actor1, actor2 =
           Await.result((supervisor ? workerProps.withDispatcher(
-                               "pinned-dispatcher")).mapTo[ActorRef],
+                           "pinned-dispatcher")).mapTo[ActorRef],
                        timeout.duration)
 
         val actor3 = Await.result((supervisor ? workerProps.withDispatcher(
-                                          "test-dispatcher")).mapTo[ActorRef],
+                                      "test-dispatcher")).mapTo[ActorRef],
                                   timeout.duration)
 
         val actor4 =
           Await.result((supervisor ? workerProps.withDispatcher(
-                               "pinned-dispatcher")).mapTo[ActorRef],
+                           "pinned-dispatcher")).mapTo[ActorRef],
                        timeout.duration)
 
         actor1 ! Kill

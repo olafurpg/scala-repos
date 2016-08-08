@@ -43,9 +43,8 @@ import org.saddle._
   * The multiplication above relies on two BinOp implementations: the first is BinOp[Multiply, Vec, Vec, Vec],
   * whose implementation in turn relies on BinOp[Multiply, Int, Int, Int].
   */
-@implicitNotFound(
-    msg =
-      "No BinOp ${O} instance available to operate on values of type ${X} and ${Y}")
+@implicitNotFound(msg =
+  "No BinOp ${O} instance available to operate on values of type ${X} and ${Y}")
 trait BinOp[O <: OpType,
             @spec(Boolean, Int, Long, Double) -X,
             @spec(Boolean, Int, Long, Double) -Y,
@@ -63,7 +62,7 @@ trait BinOp[O <: OpType,
   */
 object BinOp {
   private final class BinOpImpl[O <: OpType, @spec(Int, Long, Double) Q: ST,
-      @spec(Int, Long, Double) R: ST, @spec(Boolean, Int, Long, Double) S: ST](
+  @spec(Int, Long, Double) R: ST, @spec(Boolean, Int, Long, Double) S: ST](
       f: (Q, R) => S)
       extends BinOp[O, Q, R, S] {
     val sq = implicitly[ST[Q]]

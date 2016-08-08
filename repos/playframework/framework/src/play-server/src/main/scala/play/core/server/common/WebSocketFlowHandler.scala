@@ -19,8 +19,8 @@ object WebSocketFlowHandler {
     */
   def webSocketProtocol(bufferLimit: Int)
     : BidiFlow[RawMessage, Message, Message, Message, NotUsed] = {
-    BidiFlow.fromGraph(
-        new GraphStage[BidiShape[RawMessage, Message, Message, Message]] {
+    BidiFlow.fromGraph(new GraphStage[
+        BidiShape[RawMessage, Message, Message, Message]] {
       // The stream of incoming messages from the websocket connection
       val remoteIn = Inlet[RawMessage]("WebSocketIn")
       // The stream of websocket messages going to the application
@@ -124,10 +124,9 @@ object WebSocketFlowHandler {
                              false)
                 null
               case _ if currentPartialMessage != null =>
-                serverInitiatedClose(
-                    CloseMessage(
-                        CloseCodes.ProtocolError,
-                        "Received non continuation frame when previous message wasn't finished"))
+                serverInitiatedClose(CloseMessage(
+                    CloseCodes.ProtocolError,
+                    "Received non continuation frame when previous message wasn't finished"))
                 null
               case _ if read.isFinal =>
                 toMessage(read.messageType, read.data)

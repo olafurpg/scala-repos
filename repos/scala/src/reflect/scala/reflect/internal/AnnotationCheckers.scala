@@ -110,14 +110,14 @@ trait AnnotationCheckers { self: SymbolTable =>
     if (annotationCheckers.isEmpty) tpe
     else
       annotationCheckers.foldLeft(tpe)((tpe, checker) =>
-            if (!checker.isActive()) tpe else checker.annotationsLub(tpe, ts))
+        if (!checker.isActive()) tpe else checker.annotationsLub(tpe, ts))
 
   /** @see AnnotationChecker.annotationsGlb */
   def annotationsGlb(tpe: Type, ts: List[Type]): Type =
     if (annotationCheckers.isEmpty) tpe
     else
       annotationCheckers.foldLeft(tpe)((tpe, checker) =>
-            if (!checker.isActive()) tpe else checker.annotationsGlb(tpe, ts))
+        if (!checker.isActive()) tpe else checker.annotationsGlb(tpe, ts))
 
   /** @see AnnotationChecker.adaptBoundsToAnnotations */
   def adaptBoundsToAnnotations(bounds: List[TypeBounds],

@@ -243,8 +243,8 @@ object ConsumerGroupCommand {
             val topicAndPartition = new TopicAndPartition(topic, partition)
             val request = OffsetRequest(
                 Map(topicAndPartition -> PartitionOffsetRequestInfo(
-                        OffsetRequest.LatestTime,
-                        1)))
+                    OffsetRequest.LatestTime,
+                    1)))
             val logEndOffset = consumer
               .getOffsetsBefore(request)
               .partitionErrorAndOffsets(topicAndPartition)
@@ -284,7 +284,7 @@ object ConsumerGroupCommand {
             try {
               val offset = zkUtils
                 .readData(topicDirs.consumerOffsetDir +
-                      "/" + topicAndPartition.partition)
+                  "/" + topicAndPartition.partition)
                 ._1
                 .toLong
               offsetMap.put(topicAndPartition, offset)
@@ -417,7 +417,7 @@ object ConsumerGroupCommand {
         printDescribeHeader()
         consumerSummaries.foreach { consumerSummary =>
           val topicPartitions = consumerSummary.assignment.map(tp =>
-                TopicAndPartition(tp.topic, tp.partition))
+            TopicAndPartition(tp.topic, tp.partition))
           val partitionOffsets = topicPartitions.flatMap { topicPartition =>
             Option(
                 consumer.committed(

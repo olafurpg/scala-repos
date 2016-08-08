@@ -142,7 +142,7 @@ object JdbcUtils extends Logging {
       .getJDBCType(dt)
       .orElse(getCommonJDBCType(dt))
       .getOrElse(throw new IllegalArgumentException(
-              s"Can't get JDBC type for ${dt.simpleString}"))
+          s"Can't get JDBC type for ${dt.simpleString}"))
   }
 
   /**

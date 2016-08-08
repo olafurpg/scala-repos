@@ -268,9 +268,9 @@ object ActorSystem {
       Iterator.from(2 /*is the magic number, promise*/ ).map(get) dropWhile {
         c ⇒
           c != null && (c.getName.startsWith("akka.actor.ActorSystem") ||
-              c.getName.startsWith("scala.Option") ||
-              c.getName.startsWith("scala.collection.Iterator") ||
-              c.getName.startsWith("akka.util.Reflect"))
+          c.getName.startsWith("scala.Option") ||
+          c.getName.startsWith("scala.collection.Iterator") ||
+          c.getName.startsWith("akka.util.Reflect"))
       } next () match {
         case null ⇒ getClass.getClassLoader
         case c ⇒ c.getClassLoader
@@ -574,9 +574,8 @@ private[akka] class ActorSystemImpl(
     extends ExtendedActorSystem {
 
   if (!name.matches("""^[a-zA-Z0-9][a-zA-Z0-9-_]*$"""))
-    throw new IllegalArgumentException(
-        "invalid ActorSystem name [" + name +
-          "], must contain only word characters (i.e. [a-zA-Z0-9] plus non-leading '-' or '_')")
+    throw new IllegalArgumentException("invalid ActorSystem name [" + name +
+      "], must contain only word characters (i.e. [a-zA-Z0-9] plus non-leading '-' or '_')")
 
   import ActorSystem._
 
@@ -932,8 +931,8 @@ private[akka] class ActorSystemImpl(
             case ChildrenContainer
                   .TerminatingChildrenContainer(_, toDie, reason) ⇒
               "Terminating(" + reason + ")" + (toDie.toSeq.sorted mkString
-                    ("\n" + indent + "   |    toDie: ",
-                        "\n" + indent + "   |           ", ""))
+                ("\n" + indent + "   |    toDie: ",
+                "\n" + indent + "   |           ", ""))
             case x @ (ChildrenContainer.TerminatedChildrenContainer |
                 ChildrenContainer.EmptyChildrenContainer) ⇒
               x.toString

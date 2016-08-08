@@ -95,7 +95,7 @@ class ProtectedBranchServiceSpec
                                ReceiveCommand.Type.UPDATE_NONFASTFORWARD)
           generateNewUserWithDBRepository("user1", "repo1")
           assert(receiveHook
-                .preReceive("user1", "repo1", rp, rc, "user1") == None)
+            .preReceive("user1", "repo1", rp, rc, "user1") == None)
           enableBranchProtection("user1", "repo1", "branch", false, Nil)
           assert(
               receiveHook
@@ -118,7 +118,7 @@ class ProtectedBranchServiceSpec
                                ReceiveCommand.Type.UPDATE_NONFASTFORWARD)
           generateNewUserWithDBRepository("user1", "repo1")
           assert(receiveHook
-                .preReceive("user1", "repo1", rp, rc, "user2") == None)
+            .preReceive("user1", "repo1", rp, rc, "user2") == None)
           enableBranchProtection("user1", "repo1", "branch", false, Nil)
           assert(
               receiveHook
@@ -140,7 +140,7 @@ class ProtectedBranchServiceSpec
                                       ReceiveCommand.Type.UPDATE)
           val user1 = generateNewUserWithDBRepository("user1", "repo1")
           assert(receiveHook
-                .preReceive("user1", "repo1", rp, rc, "user2") == None)
+            .preReceive("user1", "repo1", rp, rc, "user2") == None)
           enableBranchProtection("user1",
                                  "repo1",
                                  "branch",
@@ -195,7 +195,7 @@ class ProtectedBranchServiceSpec
                              now,
                              user1)
           assert(receiveHook
-                .preReceive("user1", "repo1", rp, rc, "user2") == None)
+            .preReceive("user1", "repo1", rp, rc, "user2") == None)
         }
       }
     }
@@ -212,14 +212,14 @@ class ProtectedBranchServiceSpec
                                       ReceiveCommand.Type.UPDATE)
           val user1 = generateNewUserWithDBRepository("user1", "repo1")
           assert(receiveHook
-                .preReceive("user1", "repo1", rp, rc, "user1") == None)
+            .preReceive("user1", "repo1", rp, rc, "user1") == None)
           enableBranchProtection("user1",
                                  "repo1",
                                  "branch",
                                  false,
                                  Seq("must"))
           assert(receiveHook
-                .preReceive("user1", "repo1", rp, rc, "user1") == None)
+            .preReceive("user1", "repo1", rp, rc, "user1") == None)
           enableBranchProtection("user1", "repo1", "branch", true, Seq("must"))
           assert(
               receiveHook
@@ -231,7 +231,7 @@ class ProtectedBranchServiceSpec
                                  false,
                                  Seq("must", "must2"))
           assert(receiveHook
-                .preReceive("user1", "repo1", rp, rc, "user1") == None)
+            .preReceive("user1", "repo1", rp, rc, "user1") == None)
           enableBranchProtection("user1",
                                  "repo1",
                                  "branch",
@@ -277,7 +277,7 @@ class ProtectedBranchServiceSpec
                              now,
                              user1)
           assert(receiveHook
-                .preReceive("user1", "repo1", rp, rc, "user1") == None)
+            .preReceive("user1", "repo1", rp, rc, "user1") == None)
         }
       }
     }
@@ -384,19 +384,19 @@ class ProtectedBranchServiceSpec
     it("if disabled, needStatusCheck is false") {
       withTestDB { implicit session =>
         assert(ProtectedBranchInfo("user1", "repo1", false, Seq("must"), true)
-              .needStatusCheck("user1") == false)
+          .needStatusCheck("user1") == false)
       }
     }
     it("needStatusCheck includeAdministrators") {
       withTestDB { implicit session =>
         assert(ProtectedBranchInfo("user1", "repo1", true, Seq("must"), false)
-              .needStatusCheck("user2") == true)
+          .needStatusCheck("user2") == true)
         assert(ProtectedBranchInfo("user1", "repo1", true, Seq("must"), false)
-              .needStatusCheck("user1") == false)
+          .needStatusCheck("user1") == false)
         assert(ProtectedBranchInfo("user1", "repo1", true, Seq("must"), true)
-              .needStatusCheck("user2") == true)
+          .needStatusCheck("user2") == true)
         assert(ProtectedBranchInfo("user1", "repo1", true, Seq("must"), true)
-              .needStatusCheck("user1") == true)
+          .needStatusCheck("user1") == true)
       }
     }
   }

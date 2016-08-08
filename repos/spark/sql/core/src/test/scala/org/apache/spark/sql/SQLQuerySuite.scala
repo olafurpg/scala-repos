@@ -199,7 +199,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   test("grouping on nested fields") {
     sqlContext.read
       .json(sparkContext.parallelize(
-              """{"nested": {"attribute": 1}, "value": 2}""" :: Nil))
+          """{"nested": {"attribute": 1}, "value": 2}""" :: Nil))
       .registerTempTable("rows")
 
     checkAnswer(sql("""
@@ -216,7 +216,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   test("SPARK-6201 IN type conversion") {
     sqlContext.read
       .json(sparkContext.parallelize(
-              Seq("{\"a\": \"1\"}}", "{\"a\": \"2\"}}", "{\"a\": \"3\"}}")))
+          Seq("{\"a\": \"1\"}}", "{\"a\": \"2\"}}", "{\"a\": \"3\"}}")))
       .registerTempTable("d")
 
     checkAnswer(sql("select * from d where d.a in (1,2)"),
@@ -225,11 +225,8 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
 
   test("SPARK-11226 Skip empty line in json file") {
     sqlContext.read
-      .json(
-          sparkContext.parallelize(Seq("{\"a\": \"1\"}}",
-                                       "{\"a\": \"2\"}}",
-                                       "{\"a\": \"3\"}}",
-                                       "")))
+      .json(sparkContext.parallelize(
+          Seq("{\"a\": \"1\"}}", "{\"a\": \"2\"}}", "{\"a\": \"3\"}}", "")))
       .registerTempTable("d")
 
     checkAnswer(sql("select count(1) from d"), Seq(Row(3)))
@@ -430,9 +427,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         sql("SELECT nestedData, nestedData[0][0], nestedData[0][0] + nestedData[0][1] FROM arrayData"),
         arrayData
           .map(d =>
-                Row(d.nestedData,
-                    d.nestedData(0)(0),
-                    d.nestedData(0)(0) + d.nestedData(0)(1)))
+            Row(d.nestedData,
+                d.nestedData(0)(0),
+                d.nestedData(0)(0) + d.nestedData(0)(1)))
           .collect()
           .toSeq)
   }
@@ -458,9 +455,8 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
 
   test("aggregates with nulls") {
     checkAnswer(
-        sql(
-            "SELECT SKEWNESS(a), KURTOSIS(a), MIN(a), MAX(a)," +
-              "AVG(a), VARIANCE(a), STDDEV(a), SUM(a), COUNT(a) FROM nullInts"),
+        sql("SELECT SKEWNESS(a), KURTOSIS(a), MIN(a), MAX(a)," +
+          "AVG(a), VARIANCE(a), STDDEV(a), SUM(a), COUNT(a) FROM nullInts"),
         Row(0, -1.5, 1, 3, 2, 1.0, 1, 6, 3)
     )
   }
@@ -1054,8 +1050,8 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     validateMetadata(sql("SELECT id, name FROM personWithMeta"))
     validateMetadata(
         sql("SELECT * FROM personWithMeta JOIN salary ON id = personId"))
-    validateMetadata(
-        sql("SELECT name, salary FROM personWithMeta JOIN salary ON id = personId"))
+    validateMetadata(sql(
+        "SELECT name, salary FROM personWithMeta JOIN salary ON id = personId"))
   }
 
   test("SPARK-3371 Renaming a function expression with group by gives error") {
@@ -1380,7 +1376,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   test("SPARK-6145: ORDER BY test for nested fields") {
     sqlContext.read
       .json(sparkContext.makeRDD(
-              """{"a": {"b": 1, "a": {"a": 1}}, "c": [{"d": 1}]}""" :: Nil))
+          """{"a": {"b": 1, "a": {"a": 1}}, "c": [{"d": 1}]}""" :: Nil))
       .registerTempTable("nestedOrder")
 
     checkAnswer(sql("SELECT 1 FROM nestedOrder ORDER BY a.b"), Row(1))
@@ -1394,7 +1390,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   test("SPARK-6145: special cases") {
     sqlContext.read
       .json(sparkContext.makeRDD(
-              """{"a": {"b": [1]}, "b": [{"a": 1}], "_c0": {"a": 1}}""" :: Nil))
+          """{"a": {"b": [1]}, "b": [{"a": 1}], "_c0": {"a": 1}}""" :: Nil))
       .registerTempTable("t")
     checkAnswer(sql("SELECT a.b[0] FROM t ORDER BY _c0.a"), Row(1))
     checkAnswer(sql("SELECT b[0].a FROM t ORDER BY _c0.a"), Row(1))
@@ -1403,7 +1399,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   test("SPARK-6898: complete support for special chars in column names") {
     sqlContext.read
       .json(sparkContext.makeRDD(
-              """{"a": {"c.b": 1}, "b.$q": [{"a@!.q": 1}], "q.w": {"w.i&": [1]}}""" :: Nil))
+          """{"a": {"c.b": 1}, "b.$q": [{"a@!.q": 1}], "q.w": {"w.i&": [1]}}""" :: Nil))
       .registerTempTable("t")
 
     checkAnswer(
@@ -1504,7 +1500,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     withTempTable("t") {
       sqlContext.read
         .json(sparkContext.makeRDD(
-                """{"a": {"b": [{"c": 1}]}, "b": [{"d": 1}]}""" :: Nil))
+            """{"a": {"b": [{"c": 1}]}, "b": [{"d": 1}]}""" :: Nil))
         .registerTempTable("t")
       checkAnswer(sql("SELECT a.b FROM t ORDER BY b[0].d"), Row(Seq(Row(1))))
     }
@@ -2071,10 +2067,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     )
 
     checkAnswer(
-        sql(
-            "select course, sum(earnings) as sum, grouping_id(course, earnings) from courseSales " +
-              "group by course, earnings grouping sets((), (course), (course, earnings)) " +
-              "order by course, sum"),
+        sql("select course, sum(earnings) as sum, grouping_id(course, earnings) from courseSales " +
+          "group by course, earnings grouping sets((), (course), (course, earnings)) " +
+          "order by course, sum"),
         Row(null, 113000.0, 3) :: Row("Java", 20000.0, 0) :: Row(
             "Java",
             30000.0,

@@ -886,10 +886,9 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
           ErrorInfo("Illegal HTTP header name", " X"))
     }
     "not accept illegal header values" in {
-      parse("Foo", "ba\u0000r") shouldEqual ParsingResult.Error(
-          ErrorInfo(
-              "Illegal HTTP header value: Invalid input '\\u0000', expected field-value-char, FWS or 'EOI' (line 1, column 3)",
-              "ba\u0000r\n  ^"))
+      parse("Foo", "ba\u0000r") shouldEqual ParsingResult.Error(ErrorInfo(
+          "Illegal HTTP header value: Invalid input '\\u0000', expected field-value-char, FWS or 'EOI' (line 1, column 3)",
+          "ba\u0000r\n  ^"))
     }
     "allow UTF8 characters in RawHeaders" in {
       parse("Flood-Resistant-Hammerdrill", "árvíztűrő ütvefúrógép") shouldEqual ParsingResult
@@ -911,7 +910,7 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       HeaderParser.parseFull("location",
                              "http://example.org/?abc=def=ghi",
                              HeaderParser.Settings(uriParsingMode =
-                                   Uri.ParsingMode.Relaxed)) shouldEqual Right(
+                               Uri.ParsingMode.Relaxed)) shouldEqual Right(
           Location(targetUri))
     }
   }
@@ -934,8 +933,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       val Array(name, value) = line.split(": ", 2)
       HttpHeader.parse(name, value, settings) should
         (equal(HttpHeader.ParsingResult.Ok(header, Nil)) and renderFromHeaderTo(
-                this,
-                line))
+            this,
+            line))
     }
     def rendering(line: String): String = line
     def settings: HeaderParser.Settings = HeaderParser.DefaultSettings

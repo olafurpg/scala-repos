@@ -63,8 +63,8 @@ object Foo {
     assert(
         7 ==
           (4 match {
-        case VarFoo(x) => x
-      }))
+            case VarFoo(x) => x
+          }))
   }
 }
 
@@ -85,8 +85,8 @@ object Mas {
     assert(
         (60, "too large") ==
           (b match {
-        case Gaz(s: Int, n: String) => (s, n)
-      }))
+            case Gaz(s: Int, n: String) => (s, n)
+          }))
   }
 }
 

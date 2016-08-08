@@ -65,16 +65,15 @@ class SteppingInMemPersistentActorBoundedStashingSpec(strategyConfig: String)
         SteppingInmemJournal
           .config("persistence-bounded-stash")
           .withFallback(PersistenceSpec.config(
-                  "stepping-inmem",
-                  "SteppingInMemPersistentActorBoundedStashingSpec",
-                  extraConfig = Some(strategyConfig))))
+              "stepping-inmem",
+              "SteppingInMemPersistentActorBoundedStashingSpec",
+              extraConfig = Some(strategyConfig))))
     with BeforeAndAfterEach
     with ImplicitSender {
 
   override def atStartup: Unit = {
-    system.eventStream.publish(
-        Mute(EventFilter.warning(
-                pattern = ".*received dead letter from.*Cmd.*")))
+    system.eventStream.publish(Mute(
+        EventFilter.warning(pattern = ".*received dead letter from.*Cmd.*")))
   }
 
   override def beforeEach(): Unit =

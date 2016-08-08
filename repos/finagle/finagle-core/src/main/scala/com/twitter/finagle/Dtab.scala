@@ -161,8 +161,8 @@ object Dtab {
   implicit val equiv: Equiv[Dtab] = new Equiv[Dtab] {
     def equiv(d1: Dtab, d2: Dtab): Boolean =
       (d1.size == d2.size && d1.zip(d2).forall {
-            case (de1, de2) => Equiv[Dentry].equiv(de1, de2)
-          })
+        case (de1, de2) => Equiv[Dentry].equiv(de1, de2)
+      })
   }
 
   /**

@@ -39,7 +39,7 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
 
       def checkableForInit(sym: Symbol) =
         ((sym ne null) && (sym.isVal || sym.isVar) &&
-              !(sym hasFlag LAZY | DEFERRED | SYNTHETIC))
+          !(sym hasFlag LAZY | DEFERRED | SYNTHETIC))
       val uninitializedVals = mutable.Set[Symbol](
           stats collect {
             case vd: ValDef if checkableForInit(vd.symbol) =>
@@ -296,12 +296,12 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
 
           val outerField: TermSymbol =
             (closureClass newValue
-                  (nme.OUTER, impl.pos,
-                      PrivateLocal | PARAMACCESSOR) setInfoAndEnter clazz.tpe)
+              (nme.OUTER, impl.pos,
+              PrivateLocal | PARAMACCESSOR) setInfoAndEnter clazz.tpe)
           val applyMethod: MethodSymbol =
             (closureClass newMethod (nme.apply, impl.pos, FINAL) setInfoAndEnter MethodType(
-                    Nil,
-                    ObjectTpe))
+                Nil,
+                ObjectTpe))
           val outerFieldDef = ValDef(outerField)
           val closureClassTyper = localTyper.atOwner(closureClass)
           val applyMethodTyper = closureClassTyper.atOwner(applyMethod)
@@ -554,7 +554,7 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
       // Terminology: a stationary location is never written after being read.
       private def isStationaryParamRef(sym: Symbol) =
         (isParamRef(sym) && !(sym.isGetter && sym.accessed.isVariable) &&
-              !sym.isSetter)
+          !sym.isSetter)
 
       private def possiblySpecialized(s: Symbol) =
         specializeTypes.specializedTypeVars(s).nonEmpty

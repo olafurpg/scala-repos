@@ -215,7 +215,7 @@ class HTTPRequestServlet(val req: HttpServletRequest,
   lazy val suspendResumeSupport_? = {
     LiftRules.asyncProviderMeta.map(
         _.suspendResumeSupport_? && (asyncProvider.map(
-                _.suspendResumeSupport_?) openOr false)) openOr false
+            _.suspendResumeSupport_?) openOr false)) openOr false
   }
 }
 

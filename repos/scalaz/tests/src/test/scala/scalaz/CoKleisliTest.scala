@@ -27,7 +27,7 @@ object CokleisliTest extends SpecLite {
         f: (Option[Int],
             Int) => (Int => Int)): Gen[Cokleisli[Option, Int, Int => Int]] =
       implicitly[Arbitrary[Int]].arbitrary.map(a =>
-            Cokleisli[Option, Int, Int => Int](f(_, a)))
+        Cokleisli[Option, Int, Int => Int](f(_, a)))
 
     Arbitrary(
         Gen.oneOf(

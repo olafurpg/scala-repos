@@ -13,7 +13,7 @@ object build extends Build {
   lazy val p1 =
     Project("p1", file("p1")) settings
       (checkTask(expectedMongo), libraryDependencies +=
-            "org.mongodb" %% "casbah" % "2.4.1" pomOnly ())
+        "org.mongodb" %% "casbah" % "2.4.1" pomOnly ())
   lazy val p2 =
     Project("p2", file("p2")) dependsOn (p1) settings
       (checkTask(expectedInter))

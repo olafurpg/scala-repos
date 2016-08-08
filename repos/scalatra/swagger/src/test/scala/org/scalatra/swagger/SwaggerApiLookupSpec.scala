@@ -81,12 +81,12 @@ class ApiController1()(implicit val swagger: Swagger)
 
   val getFoo =
     (apiOperation[String]("getFoo") summary "Retrieve a single foo by id" notes "Foo" parameters Parameter(
-            "id",
-            DataType.Int,
-            Some("The id"),
-            None,
-            ParamType.Path,
-            required = true))
+        "id",
+        DataType.Int,
+        Some("The id"),
+        None,
+        ParamType.Path,
+        required = true))
 
   get("/:id", operation(getFoo)) {
     "Foo!"
@@ -110,12 +110,12 @@ class ApiController2()(implicit val swagger: Swagger)
 
   val getBar =
     (apiOperation[String]("getBar") summary "Retrieve a single bar by id" notes "Bar" parameters Parameter(
-            "id",
-            DataType.Int,
-            Some("The id"),
-            None,
-            ParamType.Path,
-            required = true))
+        "id",
+        DataType.Int,
+        Some("The id"),
+        None,
+        ParamType.Path,
+        required = true))
 
   get("/:id", operation(getBar)) {
     "Bar!"

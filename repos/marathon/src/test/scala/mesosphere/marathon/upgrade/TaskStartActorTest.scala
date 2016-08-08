@@ -102,11 +102,11 @@ class TaskStartActorTest
 
   for ((counts, description) <- Seq(
                                    Some(LaunchQueueTestHelper.zeroCounts.copy(
-                                           tasksLeftToLaunch = 1)) -> "with one task left to launch",
+                                       tasksLeftToLaunch = 1)) -> "with one task left to launch",
                                    Some(LaunchQueueTestHelper.zeroCounts.copy(
-                                           taskLaunchesInFlight = 1)) -> "with one task in flight",
+                                       taskLaunchesInFlight = 1)) -> "with one task in flight",
                                    Some(LaunchQueueTestHelper.zeroCounts.copy(
-                                           tasksLaunched = 1)) -> "with one task already running"
+                                       tasksLaunched = 1)) -> "with one task already running"
                                )) {
     test(s"Start success $description") {
       val promise = Promise[Unit]()
@@ -414,7 +414,7 @@ class TaskStartActorTest
     // launch 4 of the tasks
     when(launchQueue.get(app.id)).thenReturn(
         Some(LaunchQueueTestHelper.zeroCounts.copy(
-                tasksLeftToLaunch = app.instances)))
+            tasksLeftToLaunch = app.instances)))
     when(taskTracker.countLaunchedAppTasksSync(app.id)).thenReturn(4)
     List(0, 1, 2, 3) foreach { i =>
       system.eventStream.publish(

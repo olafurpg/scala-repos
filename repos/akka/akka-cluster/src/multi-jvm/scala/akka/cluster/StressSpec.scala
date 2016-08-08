@@ -186,12 +186,12 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
     // remaining will join to seed nodes
     val numberOfNodesJoiningToSeedNodes =
       (totalNumberOfNodes - numberOfSeedNodes -
-            numberOfNodesJoiningToSeedNodesInitially -
-            numberOfNodesJoiningOneByOneSmall -
-            numberOfNodesJoiningOneByOneLarge -
-            numberOfNodesJoiningToOneNode) requiring
+        numberOfNodesJoiningToSeedNodesInitially -
+        numberOfNodesJoiningOneByOneSmall -
+        numberOfNodesJoiningOneByOneLarge -
+        numberOfNodesJoiningToOneNode) requiring
         (_ >= 0,
-            s"too many configured nr-of-nodes-joining-*, total should be <= ${totalNumberOfNodes}")
+        s"too many configured nr-of-nodes-joining-*, total should be <= ${totalNumberOfNodes}")
     val numberOfNodesLeavingOneByOneSmall =
       getInt("nr-of-nodes-leaving-one-by-one-small") * nFactor
     val numberOfNodesLeavingOneByOneLarge =
@@ -341,7 +341,7 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
     def formatMetrics: String = {
       import akka.cluster.Member.addressOrdering
       (formatMetricsHeader +:
-            (nodeMetrics.toSeq.sortBy(_.address) map formatMetricsLine))
+        (nodeMetrics.toSeq.sortBy(_.address) map formatMetricsLine))
         .mkString("\n")
     }
 
@@ -394,8 +394,8 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
         s"ClusterStats($receivedGossipCount, $mergeCount, $sameCount, $newerCount, $olderCount, $versionSize, $seenLatest)"
       }
       (clusterStatsObservedByNode map {
-            case (monitor, stats) ⇒ s"${monitor}\t${f(stats)}"
-          }).mkString(
+        case (monitor, stats) ⇒ s"${monitor}\t${f(stats)}"
+      }).mkString(
           "ClusterStats(gossip, merge, same, newer, older, vclockSize, seenLatest)\n",
           "\n",
           "")
@@ -812,9 +812,8 @@ abstract class StressSpec
 
   override def muteLog(sys: ActorSystem = system): Unit = {
     super.muteLog(sys)
-    sys.eventStream.publish(
-        Mute(EventFilter[RuntimeException](
-                pattern = ".*Simulated exception.*")))
+    sys.eventStream.publish(Mute(
+        EventFilter[RuntimeException](pattern = ".*Simulated exception.*")))
     muteDeadLetters(classOf[SimpleJob],
                     classOf[AggregatedClusterResult],
                     SendBatch.getClass,

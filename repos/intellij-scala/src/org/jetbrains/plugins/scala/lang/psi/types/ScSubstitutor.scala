@@ -729,7 +729,7 @@ class ScUndefinedSubstitutor(
           (lowerMap
             .get(name)
             .map(set =>
-                  lowerAdditionalMap.get(name) match {
+              lowerAdditionalMap.get(name) match {
                 case Some(set1) => set ++ set1
                 case _ => set
             }) match {
@@ -790,7 +790,7 @@ class ScUndefinedSubstitutor(
           (upperMap
             .get(name)
             .map(set =>
-                  upperAdditionalMap.get(name) match {
+              upperAdditionalMap.get(name) match {
                 case Some(set1) => set ++ set1
                 case _ => set
             }) match {

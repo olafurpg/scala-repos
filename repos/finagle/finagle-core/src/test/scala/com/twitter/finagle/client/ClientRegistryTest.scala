@@ -57,80 +57,80 @@ class ClientRegistryTest
 
   test("ClientRegistry.expAllRegisteredClientsResolved handles Addr.Bound")(
       new Ctx {
-    val va = Var[Addr](Addr.Pending)
+        val va = Var[Addr](Addr.Pending)
 
-    val c = stackClient.newClient(Name.Bound(va, new Object()), "foo")
-    val allResolved = ClientRegistry.expAllRegisteredClientsResolved()
-    assert(allResolved.poll == None)
+        val c = stackClient.newClient(Name.Bound(va, new Object()), "foo")
+        val allResolved = ClientRegistry.expAllRegisteredClientsResolved()
+        assert(allResolved.poll == None)
 
-    va() = Addr.Bound(Set.empty[Address])
-    eventually {
-      assert(allResolved.poll == Some(Return(Set("foo"))))
-    }
-  })
+        va() = Addr.Bound(Set.empty[Address])
+        eventually {
+          assert(allResolved.poll == Some(Return(Set("foo"))))
+        }
+      })
 
   test("ClientRegistry.expAllRegisteredClientsResolved handles Addr.Failed")(
       new Ctx {
-    val va = Var[Addr](Addr.Pending)
+        val va = Var[Addr](Addr.Pending)
 
-    val c = stackClient.newClient(Name.Bound(va, new Object()), "foo")
-    val allResolved = ClientRegistry.expAllRegisteredClientsResolved()
-    assert(allResolved.poll == None)
+        val c = stackClient.newClient(Name.Bound(va, new Object()), "foo")
+        val allResolved = ClientRegistry.expAllRegisteredClientsResolved()
+        assert(allResolved.poll == None)
 
-    va() = Addr.Failed(new Exception("foo"))
-    eventually {
-      assert(allResolved.poll == Some(Return(Set("foo"))))
-    }
-  })
+        va() = Addr.Failed(new Exception("foo"))
+        eventually {
+          assert(allResolved.poll == Some(Return(Set("foo"))))
+        }
+      })
 
   test("ClientRegistry.expAllRegisteredClientsResolved handles Addr.Neg")(
       new Ctx {
-    val va = Var[Addr](Addr.Pending)
+        val va = Var[Addr](Addr.Pending)
 
-    val c = stackClient.newClient(Name.Bound(va, new Object()), "foo")
-    val allResolved = ClientRegistry.expAllRegisteredClientsResolved()
-    assert(allResolved.poll == None)
+        val c = stackClient.newClient(Name.Bound(va, new Object()), "foo")
+        val allResolved = ClientRegistry.expAllRegisteredClientsResolved()
+        assert(allResolved.poll == None)
 
-    va() = Addr.Neg
-    eventually {
-      assert(allResolved.poll == Some(Return(Set("foo"))))
-    }
-  })
+        va() = Addr.Neg
+        eventually {
+          assert(allResolved.poll == Some(Return(Set("foo"))))
+        }
+      })
 
   test("ClientRegistry.expAllRegisteredClientsResolved more than one client")(
       new Ctx {
-    val va0 = Var[Addr](Addr.Pending)
-    val va1 = Var[Addr](Addr.Pending)
+        val va0 = Var[Addr](Addr.Pending)
+        val va1 = Var[Addr](Addr.Pending)
 
-    val c0 = stackClient.newClient(Name.Bound(va0, new Object()), "foo")
-    val allResolved0 = ClientRegistry.expAllRegisteredClientsResolved()
-    assert(allResolved0.poll == None)
-    va0() = Addr.Bound(Set.empty[Address])
-    eventually {
-      assert(allResolved0.poll == Some(Return(Set("foo"))))
-    }
+        val c0 = stackClient.newClient(Name.Bound(va0, new Object()), "foo")
+        val allResolved0 = ClientRegistry.expAllRegisteredClientsResolved()
+        assert(allResolved0.poll == None)
+        va0() = Addr.Bound(Set.empty[Address])
+        eventually {
+          assert(allResolved0.poll == Some(Return(Set("foo"))))
+        }
 
-    val c1 = stackClient.newClient(Name.Bound(va1, new Object()), "bar")
-    val allResolved1 = ClientRegistry.expAllRegisteredClientsResolved()
-    assert(allResolved1.poll == None)
-    va1() = Addr.Bound(Set.empty[Address])
+        val c1 = stackClient.newClient(Name.Bound(va1, new Object()), "bar")
+        val allResolved1 = ClientRegistry.expAllRegisteredClientsResolved()
+        assert(allResolved1.poll == None)
+        va1() = Addr.Bound(Set.empty[Address])
 
-    eventually {
-      assert(allResolved1.poll == Some(Return(Set("foo", "bar"))))
-    }
-  })
+        eventually {
+          assert(allResolved1.poll == Some(Return(Set("foo", "bar"))))
+        }
+      })
 
   test("ClientRegistry.expAllRegisteredClientsResolved handles Name.Path")(
       new Ctx {
-    val path = Path.read("/$/com.twitter.finagle.client.crtnamer/foo")
-    val c = stackClient.newClient(Name.Path(path), "foo")
-    val allResolved = ClientRegistry.expAllRegisteredClientsResolved()
-    assert(allResolved.poll == None)
-    crtnamer.va() = Addr.Bound(Set.empty[Address])
-    eventually {
-      assert(allResolved.poll == Some(Return(Set("foo"))))
-    }
-  })
+        val path = Path.read("/$/com.twitter.finagle.client.crtnamer/foo")
+        val c = stackClient.newClient(Name.Path(path), "foo")
+        val allResolved = ClientRegistry.expAllRegisteredClientsResolved()
+        assert(allResolved.poll == None)
+        crtnamer.va() = Addr.Bound(Set.empty[Address])
+        eventually {
+          assert(allResolved.poll == Some(Return(Set("foo"))))
+        }
+      })
 
   test("ClientRegistry registers clients in registry")(new Ctx {
     val path = Path.read("/$/com.twitter.finagle.client.crtnamer/foo")

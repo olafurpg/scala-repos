@@ -350,7 +350,7 @@ object KafkaTools extends Command {
        } else {
          // see if we can deduce from the data (assuming Nathan's twitter feed or SE postings)
          val timestamps = (msg.data.map(_.value \ "timeStamp") ++ msg.data.map(
-                 _.value \ "timestamp")).flatMap {
+             _.value \ "timestamp")).flatMap {
            case JString(date) =>
              // Dirty hack for trying variations of ISO8601 in use by customers
              List(date, date.replaceFirst(":", "-").replaceFirst(":", "-")).flatMap {
@@ -514,10 +514,9 @@ object KafkaTools extends Command {
                 if (byAccount.contains(account)) {
                   println(JObject("index" -> JNum(timestamp),
                                   "account" -> JString(accountLookup
-                                        .getOrElse(account, account)),
-                                  "size" -> JNum(byAccount.getOrElse(
-                                          account,
-                                          0L))).renderCompact)
+                                    .getOrElse(account, account)),
+                                  "size" -> JNum(byAccount
+                                    .getOrElse(account, 0L))).renderCompact)
                 }
               }
             }
@@ -1137,7 +1136,7 @@ object ImportTools extends Command with Logging {
     val complete =
       grantWrite(config.apiKey) >> logGrants(config.apiKey) >> runIngest(
           config.apiKey) >> Future(logger.info(
-              "Finalizing chef work-in-progress")) >> chefs.toList.traverse(
+          "Finalizing chef work-in-progress")) >> chefs.toList.traverse(
           gracefulStop(_, stopTimeout)) >> gracefulStop(masterChef,
                                                         stopTimeout) >> Future(
           logger.info("Completed chef shutdown")) >> Future(
@@ -1398,8 +1397,9 @@ object CSVToJSONConverter {
             header
               .zip(line)
               .map {
-            case (k, v) => JField(k, parse(v, timestampConversion, verbose))
-          }
+                case (k, v) =>
+                  JField(k, parse(v, timestampConversion, verbose))
+              }
               .toList)
         line = reader.readNext
         result

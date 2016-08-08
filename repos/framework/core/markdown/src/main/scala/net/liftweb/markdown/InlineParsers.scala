@@ -195,7 +195,7 @@ trait InlineParsers extends BaseParsers {
     */
   val code: Parser[String] =
     ((("``" ~> ((not("``") ~> aChar) +) <~ "``") ^^ { _.mkString }) |
-          ('`' ~> markdownText(Set('`'), false) <~ '`')) ^^ { c =>
+      ('`' ~> markdownText(Set('`'), false) <~ '`')) ^^ { c =>
       deco.decorateCode(c.mkString)
     }
 
@@ -250,7 +250,7 @@ trait InlineParsers extends BaseParsers {
   def linkInline(ctx: InlineContext): Parser[String] =
     //( (not(']') ~> oneInline(ctx.addTag("a")))* ) ^^ {_.mkString}
     ((markdownText(specialLinkInlineChars, true) | elementParsers(ctx) |
-          ((not(']') ~> aChar))) *) ^^ { _.mkString }
+      ((not(']') ~> aChar))) *) ^^ { _.mkString }
 
   /** We parse everything as a link/img url until we hit whitespace or a closing brace.
     */
@@ -261,9 +261,8 @@ trait InlineParsers extends BaseParsers {
     * ends or not.
     */
   val title: Parser[Option[String]] =
-    opt(
-        '"' ~>
-          ((markdownText(Set('"'), true) ~ opt(not('"' ~ ows ~ ')') ~> aChar)) *) <~ '"') ^^ {
+    opt('"' ~>
+      ((markdownText(Set('"'), true) ~ opt(not('"' ~ ows ~ ')') ~> aChar)) *) <~ '"') ^^ {
       case None => None
       case Some(chunks) => {
         val result = new StringBuilder()
@@ -296,11 +295,11 @@ trait InlineParsers extends BaseParsers {
     */
   def ref(ctx: InlineContext): Parser[(LinkDefinition, String)] =
     ('[' ~> linkInline(ctx) ~ (']' ~ opt(' ') ~ '[') ~ idReference(ctx) <~ ']' ^^ {
-          case t ~ dummy ~ pair => (pair._2, t)
-        }) |
+      case t ~ dummy ~ pair => (pair._2, t)
+    }) |
       ('[' ~> idReference(ctx) <~ (']' ~ opt(opt(' ') ~ '[' ~ ows ~ ']')) ^^ {
-            case (t, ld) => (ld, t)
-          })
+        case (t, ld) => (ld, t)
+      })
 
   /**
     * Parses either a referenced or a directly defined image.
@@ -326,7 +325,7 @@ trait InlineParsers extends BaseParsers {
     */
   def spanInline(end: Parser[Any], ctx: InlineContext): Parser[String] =
     (markdownText(specialInlineChars, true) | elementParsers(ctx) |
-          (not(end) ~> aChar)) ^^ { _.mkString }
+      (not(end) ~> aChar)) ^^ { _.mkString }
 
   /** Parses a span element like __foo__ or *bar*
     */

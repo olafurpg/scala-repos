@@ -489,8 +489,7 @@ object DenseMatrix
     * @tparam V
     * @return
     */
-  override def ones[
-      @specialized(Int, Float, Double, Long) V: ClassTag: Zero: Semiring](
+  override def ones[@specialized(Int, Float, Double, Long) V: ClassTag: Zero: Semiring](
       rows: Int,
       cols: Int): DenseMatrix[V] = {
     val data = new Array[V](rows * cols)

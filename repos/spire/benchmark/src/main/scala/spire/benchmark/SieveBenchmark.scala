@@ -17,10 +17,10 @@ object SieveBenchmark {
   def main(args: Array[String]): Unit = {
     val defaults: List[Long] =
       (1L :: 10L :: 100L :: 1L * 1000 :: 10L * 1000 :: 100L * 1000 :: 1L * 1000 * 1000 :: 10L * 1000 * 1000 :: // 100L * 1000 * 1000 ::
-            // 1L * 1000 * 1000 * 1000 ::
-            // 2L * 1000 * 1000 * 1000 ::
-            // 4L * 1000 * 1000 * 1000 ::
-            Nil)
+        // 1L * 1000 * 1000 * 1000 ::
+        // 2L * 1000 * 1000 * 1000 ::
+        // 4L * 1000 * 1000 * 1000 ::
+        Nil)
 
     val ns = Try(args.toList.map(_.toLong).filter(_ > 0L)) match {
       case Success(ns) if ns.nonEmpty => ns

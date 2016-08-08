@@ -95,7 +95,7 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
         val size = sym.flatMap(
             _.findColumnOption[RelationalProfile.ColumnOption.Length])
         size.fold("VARCHAR(254)")(l =>
-              if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})")
+          if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})")
       case java.sql.Types.DECIMAL => "DECIMAL(21,2)"
       case t =>
         JdbcTypesComponent.typeNames.getOrElse(

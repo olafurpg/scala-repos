@@ -37,11 +37,10 @@ private[akka] class EventStreamUnsubscriber(eventStream: EventStream,
   def receive = {
     case Register(actor) ⇒
       if (debug)
-        eventStream.publish(
-            Logging.Debug(
-                simpleName(getClass),
-                getClass,
-                s"watching $actor in order to unsubscribe from EventStream when it terminates"))
+        eventStream.publish(Logging.Debug(
+            simpleName(getClass),
+            getClass,
+            s"watching $actor in order to unsubscribe from EventStream when it terminates"))
       context watch actor
 
     case UnregisterIfNoMoreSubscribedChannels(actor)
@@ -59,11 +58,10 @@ private[akka] class EventStreamUnsubscriber(eventStream: EventStream,
 
     case Terminated(actor) ⇒
       if (debug)
-        eventStream.publish(
-            Logging.Debug(
-                simpleName(getClass),
-                getClass,
-                s"unsubscribe $actor from $eventStream, because it was terminated"))
+        eventStream.publish(Logging.Debug(
+            simpleName(getClass),
+            getClass,
+            s"unsubscribe $actor from $eventStream, because it was terminated"))
       eventStream unsubscribe actor
   }
 }

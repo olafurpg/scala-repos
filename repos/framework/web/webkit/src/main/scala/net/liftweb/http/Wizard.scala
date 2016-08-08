@@ -36,7 +36,7 @@ object WizardRules extends Factory with FormVendor {
 
   val allTemplatePath: FactoryMaker[List[String]] =
     new FactoryMaker[List[String]](() =>
-          List("templates-hidden", "wizard-all")) {}
+      List("templates-hidden", "wizard-all")) {}
 
   private object currentWizards extends SessionVar[Set[String]](Set())
 
@@ -267,8 +267,8 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
         Full(
             prevId ->
               (() => {
-             this.prevScreen
-           })), // prevId: Box[(String, () => Unit)],
+                 this.prevScreen
+               })), // prevId: Box[(String, () => Unit)],
         cancelId ->
           (() => {
              WizardRules.deregisterWizardSession(CurrentSession.is);

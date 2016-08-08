@@ -226,9 +226,9 @@ abstract class GenJSCode
          * we process class defs in reverse order here.
          */
         val fullClassDefs = (nonRawJSFunctionDefs.reverse filterNot { cd =>
-              cd.symbol.isAnonymousFunction &&
-              tryGenAndRecordAnonFunctionClass(cd)
-            }).reverse
+          cd.symbol.isAnonymousFunction &&
+          tryGenAndRecordAnonFunctionClass(cd)
+        }).reverse
 
         /* Finally, we emit true code for the remaining class defs. */
         for (cd <- fullClassDefs) {
@@ -317,9 +317,9 @@ abstract class GenJSCode
 
       val shouldMarkInline =
         (sym.hasAnnotation(InlineAnnotationClass) ||
-              (sym.isAnonymousFunction &&
-                    !sym.isSubClass(PartialFunctionClass)) ||
-              isStdLibClassWithAdHocInlineAnnot(sym))
+          (sym.isAnonymousFunction &&
+            !sym.isSubClass(PartialFunctionClass)) ||
+          isStdLibClassWithAdHocInlineAnnot(sym))
 
       val optimizerHints = OptimizerHints.empty
         .withInline(shouldMarkInline)
@@ -1196,8 +1196,8 @@ abstract class GenJSCode
                 methodDef
               } else {
                 val patches = (unmutatedMutableLocalVars.map(
-                        encodeLocalSym(_).name -> false) ::: mutatedImmutableLocalVals
-                      .map(encodeLocalSym(_).name -> true)).toMap
+                    encodeLocalSym(_).name -> false) ::: mutatedImmutableLocalVals
+                  .map(encodeLocalSym(_).name -> true)).toMap
                 patchMutableFlagOfLocals(methodDef, patches)
               }
             }
@@ -1583,8 +1583,8 @@ abstract class GenJSCode
             case Select(qualifier, _) =>
               val ctorAssignment =
                 (currentMethodSym.isClassConstructor &&
-                      currentMethodSym.owner == qualifier.symbol &&
-                      qualifier.isInstanceOf[This])
+                  currentMethodSym.owner == qualifier.symbol &&
+                  qualifier.isInstanceOf[This])
               if (!ctorAssignment && !suspectFieldMutable(sym))
                 unexpectedMutatedFields += sym
 
@@ -2704,8 +2704,8 @@ abstract class GenJSCode
       def isLongOp(ltpe: Type, rtpe: Type) =
         (isLongType(ltpe) || isLongType(rtpe)) &&
           !(toTypeKind(ltpe).isInstanceOf[FLOAT] ||
-                toTypeKind(rtpe).isInstanceOf[FLOAT] || isStringType(ltpe) ||
-                isStringType(rtpe))
+            toTypeKind(rtpe).isInstanceOf[FLOAT] || isStringType(ltpe) ||
+            isStringType(rtpe))
 
       val sources = args map genExpr
 
@@ -4416,7 +4416,7 @@ abstract class GenJSCode
 
         if (paramAccessors.size != ctorParams.size &&
             !(paramAccessors.size == ctorParams.size - 1 &&
-                  ctorParams.head.unexpandedName == jsnme.arg_outer)) {
+              ctorParams.head.unexpandedName == jsnme.arg_outer)) {
           fail(
               s"Have param accessors $paramAccessors but " +
                 s"ctor params $ctorParams in anon function $cd")

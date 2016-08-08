@@ -145,7 +145,7 @@ class TopicDataSend(val dest: String, val topicData: TopicData) extends Send {
   private val sends = new MultiSend(
       dest,
       JavaConversions.seqAsJavaList(topicData.partitionData.toList.map(d =>
-                new PartitionDataSend(d._1, d._2))))
+        new PartitionDataSend(d._1, d._2))))
 
   override def writeTo(channel: GatheringByteChannel): Long = {
     if (completed)
@@ -299,12 +299,12 @@ class FetchResponseSend(val dest: String, val fetchResponse: FetchResponse)
       dest,
       JavaConversions.seqAsJavaList(
           fetchResponse.dataGroupedByTopic.toList.map {
-        case (topic, data) =>
-          new TopicDataSend(dest, TopicData(topic, data.map {
-            case (topicAndPartition, message) =>
-              (topicAndPartition.partition, message)
+            case (topic, data) =>
+              new TopicDataSend(dest, TopicData(topic, data.map {
+                case (topicAndPartition, message) =>
+                  (topicAndPartition.partition, message)
+              }))
           }))
-      }))
 
   override def writeTo(channel: GatheringByteChannel): Long = {
     if (completed)

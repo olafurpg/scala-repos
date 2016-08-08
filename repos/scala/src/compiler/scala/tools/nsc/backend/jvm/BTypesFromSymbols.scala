@@ -505,13 +505,12 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       * for A contain both the class B and the module class B.
       * Here we get rid of the module class B, making sure that the class B is present.
       */
-    val nestedClassSymbolsNoJavaModuleClasses = nestedClassSymbols.filter(
-        s => {
+    val nestedClassSymbolsNoJavaModuleClasses = nestedClassSymbols.filter(s => {
       if (s.isJavaDefined && s.isModuleClass) {
         // We could also search in nestedClassSymbols for s.linkedClassOfClass, but sometimes that
         // returns NoSymbol, so it doesn't work.
         val nb = nestedClassSymbols.count(mc =>
-              mc.name == s.name && mc.owner == s.owner)
+          mc.name == s.name && mc.owner == s.owner)
         assert(
             nb == 2,
             s"Java member module without member class: $s - $nestedClassSymbols")
@@ -568,9 +567,9 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
 
         // (2) Java compatibility. See the big comment in BTypes that summarizes the InnerClass spec.
         if ((innerClassSym.isJavaDefined &&
-                innerClassSym.rawowner.isModuleClass) || // (1)
+            innerClassSym.rawowner.isModuleClass) || // (1)
             (!isAnonymousOrLocalClass(innerClassSym) &&
-                isTopLevelModuleClass(innerClassSym.rawowner))) {
+            isTopLevelModuleClass(innerClassSym.rawowner))) {
           // (2)
           // phase travel for linkedCoC - does not always work in late phases
           exitingPickler(innerClassSym.rawowner.linkedClassOfClass) match {
@@ -595,7 +594,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         // phase travel necessary: after flatten, the name includes the name of outer classes.
         // if some outer name contains $anon, a non-anon class is considered anon.
         if (exitingPickler(innerClassSym.isAnonymousClass ||
-                  innerClassSym.isAnonymousFunction)) None
+              innerClassSym.isAnonymousFunction)) None
         else
           Some(innerClassSym.rawname + innerClassSym.moduleSuffix) // moduleSuffix for module classes
       }
@@ -776,9 +775,9 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
 
     val finalFlag =
       ((((sym.rawflags & symtab.Flags.FINAL) != 0) ||
-                isTopLevelModuleClass(sym)) && !sym.enclClass.isTrait &&
-            !sym.isClassConstructor && !sym.isMutable // lazy vals and vars both
-          )
+        isTopLevelModuleClass(sym)) && !sym.enclClass.isTrait &&
+        !sym.isClassConstructor && !sym.isMutable // lazy vals and vars both
+      )
 
     // Primitives are "abstract final" to prohibit instantiation
     // without having to provide any implementations, but that is an
@@ -788,7 +787,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     GenBCode.mkFlags(
         if (privateFlag) ACC_PRIVATE else ACC_PUBLIC,
         if ((sym.isDeferred &&
-                !sym.hasFlag(symtab.Flags.JAVA_DEFAULTMETHOD)) ||
+            !sym.hasFlag(symtab.Flags.JAVA_DEFAULTMETHOD)) ||
             sym.hasAbstractFlag) ACC_ABSTRACT
         else 0,
         if (sym.isTraitOrInterface) ACC_INTERFACE else 0,

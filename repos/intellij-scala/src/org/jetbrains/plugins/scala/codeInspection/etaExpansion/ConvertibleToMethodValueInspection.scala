@@ -42,7 +42,7 @@ class ConvertibleToMethodValueInspection
         if ref
           .bind()
           .exists(srr =>
-                srr.implicitType.nonEmpty || srr.implicitFunction.nonEmpty) =>
+            srr.implicitType.nonEmpty || srr.implicitFunction.nonEmpty) =>
     //do nothing if implicit conversions are involved
     case MethodRepr(expr, Some(qual), Some(_), args) =>
       if (allArgsUnderscores(args) && onlyStableValuesUsed(qual))

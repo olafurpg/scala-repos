@@ -162,9 +162,9 @@ object PlatformBuild extends Build {
     Project(id = "standalone", base = file("standalone"))
       .settings((commonAssemblySettings ++ jettySettings): _*) dependsOn
       (common % "compile->compile;test->test",
-          yggdrasil % "compile->compile;test->test", util, bifrost,
-          muspelheim % "compile->compile;test->test", logging % "test->test",
-          auth, accounts, ingest, dvergr)
+      yggdrasil % "compile->compile;test->test", util, bifrost,
+      muspelheim % "compile->compile;test->test", logging % "test->test",
+      auth, accounts, ingest, dvergr)
 
   lazy val platform = Project(id = "platform", base = file("."))
     .settings(
@@ -258,13 +258,13 @@ object PlatformBuild extends Build {
     Project(id = "muspelheim", base = file("muspelheim"))
       .settings(commonNexusSettings: _*) dependsOn
       (util % "compile->compile;test->test", common, quirrel, mimir,
-          yggdrasil % "compile->compile;test->test", logging % "test->test")
+      yggdrasil % "compile->compile;test->test", logging % "test->test")
 
   lazy val surtr =
     Project(id = "surtr", base = file("surtr"))
       .settings(commonAssemblySettings: _*) dependsOn
       (quirrel, mimir, yggdrasil, ingest,
-          muspelheim % "compile->compile;test->test", logging % "test->test")
+      muspelheim % "compile->compile;test->test", logging % "test->test")
 
   lazy val ragnarok = Project(id = "ragnarok", base = file("ragnarok"))
     .settings(commonAssemblySettings: _*)
@@ -297,11 +297,8 @@ object PlatformBuild extends Build {
                  logging % "test->test")
 
   lazy val jprofiler = Project(id = "jprofiler", base = file("jprofiler"))
-    .settings(
-        jprofilerSettings ++ commonNexusSettings ++ Seq(fullRunInputTask(
-                profileTask,
-                Test,
-                "com.precog.jprofiler.Run")): _*)
+    .settings(jprofilerSettings ++ commonNexusSettings ++ Seq(
+        fullRunInputTask(profileTask, Test, "com.precog.jprofiler.Run")): _*)
     .dependsOn(ragnarok, logging % "test->test")
 
   /// Services ///

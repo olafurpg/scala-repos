@@ -76,11 +76,8 @@ class MarathonScheduler @Inject()(
 
   override def statusUpdate(driver: SchedulerDriver,
                             status: TaskStatus): Unit = {
-    log.info(
-        "Received status update for task %s: %s (%s)".format(
-            status.getTaskId.getValue,
-            status.getState,
-            status.getMessage))
+    log.info("Received status update for task %s: %s (%s)"
+      .format(status.getTaskId.getValue, status.getState, status.getMessage))
 
     taskStatusProcessor.publish(status).onFailure {
       case NonFatal(e) =>
@@ -121,11 +118,10 @@ class MarathonScheduler @Inject()(
   }
 
   override def error(driver: SchedulerDriver, message: String) {
-    log.warn(
-        s"Error: $message\n" +
-          s"In case Mesos does not allow registration with the current frameworkId, " +
-          s"delete the ZooKeeper Node: ${config.zkPath}/state/framework:id\n" +
-          s"CAUTION: if you remove this node, all tasks started with the current frameworkId will be orphaned!")
+    log.warn(s"Error: $message\n" +
+      s"In case Mesos does not allow registration with the current frameworkId, " +
+      s"delete the ZooKeeper Node: ${config.zkPath}/state/framework:id\n" +
+      s"CAUTION: if you remove this node, all tasks started with the current frameworkId will be orphaned!")
 
     // Currently, it's pretty hard to disambiguate this error from other causes of framework errors.
     // Watch MESOS-2522 which will add a reason field for framework errors to help with this.

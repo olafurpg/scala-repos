@@ -45,7 +45,7 @@ object ApiBranchProtection {
 
   implicit val enforcementLevelSerializer =
     new CustomSerializer[EnforcementLevel](format =>
-          ({
+      ({
         case JString("off") => Off
         case JString("non_admins") => NonAdmins
         case JString("everyone") => Everyone

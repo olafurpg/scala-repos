@@ -127,8 +127,8 @@ class Signature(val name: String,
 
     ScalaPsiUtil.convertMemberName(name) == ScalaPsiUtil.convertMemberName(
         other.name) && ((typeParams.length == other.typeParams.length &&
-            paramTypesEquiv(other)) ||
-        (paramLength == other.paramLength && javaErasedEquiv(other))) &&
+    paramTypesEquiv(other)) ||
+    (paramLength == other.paramLength && javaErasedEquiv(other))) &&
     fieldCheck(other)
   }
 
@@ -254,7 +254,7 @@ object Signature {
       res =
         res bindT
           ((tp2.name, ScalaPsiUtil.getPsiElementId(tp2.ptp)),
-              ScTypeParameterType.toTypeParameterType(tp1))
+          ScTypeParameterType.toTypeParameterType(tp1))
     }
     res
   }
@@ -266,7 +266,7 @@ object PhysicalSignature {
     case fun: ScFunction =>
       fun.effectiveParameterClauses
         .map(clause =>
-              ScalaPsiUtil.mapToLazyTypesSeq(clause.effectiveParameters))
+          ScalaPsiUtil.mapToLazyTypesSeq(clause.effectiveParameters))
         .toList
     case _ =>
       List(ScalaPsiUtil.mapToLazyTypesSeq(method.getParameterList match {

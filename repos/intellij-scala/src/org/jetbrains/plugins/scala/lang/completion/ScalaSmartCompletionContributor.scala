@@ -186,9 +186,9 @@ class ScalaSmartCompletionContributor extends ScalaCompletionContributor {
                 if (!PsiTreeUtil
                       .isContextAncestor(typed.nameContext, place, false) &&
                     (originalPlace == null || !PsiTreeUtil.isContextAncestor(
-                            typed.nameContext,
-                            originalPlace,
-                            false)))
+                        typed.nameContext,
+                        originalPlace,
+                        false)))
                   for (tt <- typed.getType(TypingContext.empty))
                     checkType(tt,
                               ScSubstitutor.empty,

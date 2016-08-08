@@ -371,7 +371,7 @@ object JGitUtil {
           } else None
           fileList +:=
             (treeWalk.getObjectId(0), treeWalk.getFileMode(0),
-                treeWalk.getNameString, linkUrl)
+            treeWalk.getNameString, linkUrl)
         }
       }
       revWalk.markStart(revCommit)
@@ -613,39 +613,41 @@ object JGitUtil {
             val newIsImage = FileUtil.isImage(treeWalk.getPathString)
             buffer.append(
                 (if (!fetchContent) {
-               DiffInfo(
-                   changeType = ChangeType.ADD,
-                   oldPath = null,
-                   newPath = treeWalk.getPathString,
-                   oldContent = None,
-                   newContent = None,
-                   oldIsImage = false,
-                   newIsImage = newIsImage,
-                   oldObjectId = None,
-                   newObjectId = Option(treeWalk.getObjectId(0)).map(_.name),
-                   oldMode = treeWalk.getFileMode(0).toString,
-                   newMode = treeWalk.getFileMode(0).toString,
-                   tooLarge = false
-               )
-             } else {
-               DiffInfo(
-                   changeType = ChangeType.ADD,
-                   oldPath = null,
-                   newPath = treeWalk.getPathString,
-                   oldContent = None,
-                   newContent = JGitUtil
-                     .getContentFromId(git, treeWalk.getObjectId(0), false)
-                     .filter(FileUtil.isText)
-                     .map(convertFromByteArray),
-                   oldIsImage = false,
-                   newIsImage = newIsImage,
-                   oldObjectId = None,
-                   newObjectId = Option(treeWalk.getObjectId(0)).map(_.name),
-                   oldMode = treeWalk.getFileMode(0).toString,
-                   newMode = treeWalk.getFileMode(0).toString,
-                   tooLarge = false
-               )
-             }))
+                   DiffInfo(
+                       changeType = ChangeType.ADD,
+                       oldPath = null,
+                       newPath = treeWalk.getPathString,
+                       oldContent = None,
+                       newContent = None,
+                       oldIsImage = false,
+                       newIsImage = newIsImage,
+                       oldObjectId = None,
+                       newObjectId =
+                         Option(treeWalk.getObjectId(0)).map(_.name),
+                       oldMode = treeWalk.getFileMode(0).toString,
+                       newMode = treeWalk.getFileMode(0).toString,
+                       tooLarge = false
+                   )
+                 } else {
+                   DiffInfo(
+                       changeType = ChangeType.ADD,
+                       oldPath = null,
+                       newPath = treeWalk.getPathString,
+                       oldContent = None,
+                       newContent = JGitUtil
+                         .getContentFromId(git, treeWalk.getObjectId(0), false)
+                         .filter(FileUtil.isText)
+                         .map(convertFromByteArray),
+                       oldIsImage = false,
+                       newIsImage = newIsImage,
+                       oldObjectId = None,
+                       newObjectId =
+                         Option(treeWalk.getObjectId(0)).map(_.name),
+                       oldMode = treeWalk.getFileMode(0).toString,
+                       newMode = treeWalk.getFileMode(0).toString,
+                       tooLarge = false
+                   )
+                 }))
           }
           (buffer.toList, None)
         }
@@ -738,8 +740,8 @@ object JGitUtil {
         commit =>
           git.getRepository.getAllRefs.entrySet.asScala.filter { e =>
             (e.getKey.startsWith(Constants.R_HEADS) && revWalk.isMergedInto(
-                    commit,
-                    revWalk.parseCommit(e.getValue.getObjectId)))
+                commit,
+                revWalk.parseCommit(e.getValue.getObjectId)))
           }.map { e =>
             e.getValue.getName.substring(
                 org.eclipse.jgit.lib.Constants.R_HEADS.length)
@@ -756,8 +758,8 @@ object JGitUtil {
         commit =>
           git.getRepository.getAllRefs.entrySet.asScala.filter { e =>
             (e.getKey.startsWith(Constants.R_TAGS) && revWalk.isMergedInto(
-                    commit,
-                    revWalk.parseCommit(e.getValue.getObjectId)))
+                commit,
+                revWalk.parseCommit(e.getValue.getObjectId)))
           }.map { e =>
             e.getValue.getName.substring(
                 org.eclipse.jgit.lib.Constants.R_TAGS.length)
@@ -796,7 +798,7 @@ object JGitUtil {
                        revstr: String = ""): Option[(ObjectId, String)] = {
     Seq(
         Some(if (revstr.isEmpty) repository.repository.defaultBranch
-            else revstr),
+        else revstr),
         repository.branchList.headOption
     ).flatMap {
       case Some(rev) => Some((git.getRepository.resolve(rev), rev))
@@ -1049,8 +1051,8 @@ object JGitUtil {
                 .toURI
                 .toString)
           .setRefSpecs(new RefSpec(
-                  s"refs/heads/${requestBranch}:refs/pull/${issueId}/head")
-                .setForceUpdate(true))
+              s"refs/heads/${requestBranch}:refs/pull/${issueId}/head")
+            .setForceUpdate(true))
           .call
 
         val commitIdTo =
@@ -1121,13 +1123,10 @@ object JGitUtil {
             val mergeBase = walk.next()
             walk.reset()
             walk.setRevFilter(RevFilter.ALL)
-            Some(
-                BranchMergeInfo(ahead = RevWalkUtils
-                                  .count(walk, branchCommit, mergeBase),
-                                behind = RevWalkUtils
-                                  .count(walk, defaultCommit, mergeBase),
-                                isMerged = walk.isMergedInto(branchCommit,
-                                                             defaultCommit)))
+            Some(BranchMergeInfo(
+                ahead = RevWalkUtils.count(walk, branchCommit, mergeBase),
+                behind = RevWalkUtils.count(walk, defaultCommit, mergeBase),
+                isMerged = walk.isMergedInto(branchCommit, defaultCommit)))
           }
           BranchInfo(branchName,
                      committer,

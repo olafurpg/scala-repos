@@ -73,7 +73,7 @@ object ResolveUtils {
             val cclazz = clazz.getContainingClass
             cclazz == null ||
             (clazz.hasModifierProperty(PsiModifier.STATIC) &&
-                isStaticCorrect(cclazz))
+            isStaticCorrect(cclazz))
           }
           (kinds contains OBJECT) && isStaticCorrect(c)
         }
@@ -98,7 +98,7 @@ object ResolveUtils {
       case f: PsiField =>
         (kinds contains VAR) ||
           (f.hasModifierPropertyScala(PsiModifier.FINAL) &&
-                kinds.contains(VAL))
+            kinds.contains(VAL))
       case _: PsiParameter =>
         kinds contains VAL //to enable named Parameters resolve in Play 2.0 routing file for java methods
       case _ => false
@@ -337,8 +337,8 @@ object ResolveUtils {
                             .getOrElse(null: PsiElement),
                           place,
                           false) || (td.isInstanceOf[ScObject] &&
-                          td.asInstanceOf[ScObject].isPackageObject &&
-                          processPackage(td.qualifiedName))
+                      td.asInstanceOf[ScObject].isPackageObject &&
+                      processPackage(td.qualifiedName))
                   case pack: PsiPackage =>
                     val packageName = pack.getQualifiedName
                     processPackage(packageName)
@@ -479,11 +479,11 @@ object ResolveUtils {
                 case td: ScTypeDefinition =>
                   if (PsiTreeUtil.isContextAncestor(td, place, false) ||
                       (withCompanion && PsiTreeUtil.isContextAncestor(
-                              ScalaPsiUtil
-                                .getCompanionModule(td)
-                                .getOrElse(null: PsiElement),
-                              place,
-                              false))) return true
+                          ScalaPsiUtil
+                            .getCompanionModule(td)
+                            .getOrElse(null: PsiElement),
+                          place,
+                          false))) return true
                   checkProtected(td, withCompanion)
                 case td: ScTemplateDefinition =>
                   //it'd anonymous class, has access only inside

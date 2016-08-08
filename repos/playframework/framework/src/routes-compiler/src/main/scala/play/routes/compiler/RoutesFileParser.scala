@@ -125,7 +125,7 @@ object RoutesFileParser {
       g =>
         (g._1,
          g._2.groupBy(route =>
-               route.call.parameters.map(p => p.length).getOrElse(0)))
+           route.call.parameters.map(p => p.length).getOrElse(0)))
     }
 
     sameHandlerMethodParameterCountGroup.find(g => g._1._2.size > 1).foreach {
@@ -259,7 +259,7 @@ private[routes] class RoutesFileParser extends JavaTokenParsers {
   def path: Parser[PathPattern] =
     "/" ~
       ((positioned(singleComponentPathPart) | positioned(multipleComponentsPathPart) | positioned(
-              regexComponentPathPart) | staticPathPart) *) ^^ {
+          regexComponentPathPart) | staticPathPart) *) ^^ {
       case _ ~ parts => PathPattern(parts)
     }
 

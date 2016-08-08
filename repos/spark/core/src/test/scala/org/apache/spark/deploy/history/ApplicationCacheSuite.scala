@@ -88,7 +88,7 @@ class ApplicationCacheSuite
       instances
         .get(CacheKey(appId, attemptId))
         .map(e =>
-              LoadedAppUI(e.ui, updateProbe(appId, attemptId, e.probeTime)))
+          LoadedAppUI(e.ui, updateProbe(appId, attemptId, e.probeTime)))
     }
 
     override def attachSparkUI(appId: String,
@@ -128,10 +128,10 @@ class ApplicationCacheSuite
                     completed: Boolean,
                     timestamp: Long): Unit = {
       instances += (CacheKey(appId, attemptId) -> new CacheEntry(
-              ui,
-              completed,
-              updateProbe(appId, attemptId, timestamp),
-              timestamp))
+          ui,
+          completed,
+          updateProbe(appId, attemptId, timestamp),
+          timestamp))
     }
 
     /**

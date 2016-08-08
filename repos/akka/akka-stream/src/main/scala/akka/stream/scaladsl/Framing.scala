@@ -110,14 +110,13 @@ object Framing {
   def simpleFramingProtocolEncoder(
       maximumMessageLength: Int): Flow[ByteString, ByteString, NotUsed] =
     Flow[ByteString].transform(() ⇒
-          new PushStage[ByteString, ByteString] {
+      new PushStage[ByteString, ByteString] {
         override def onPush(message: ByteString,
                             ctx: Context[ByteString]): SyncDirective = {
           val msgSize = message.size
           if (msgSize > maximumMessageLength)
-            ctx.fail(
-                new FramingException(
-                    s"Maximum allowed message size is $maximumMessageLength but tried to send $msgSize bytes"))
+            ctx.fail(new FramingException(
+                s"Maximum allowed message size is $maximumMessageLength but tried to send $msgSize bytes"))
           else {
             val header = ByteString((msgSize >> 24) & 0xFF,
                                     (msgSize >> 16) & 0xFF,
@@ -181,9 +180,8 @@ object Framing {
       if (ctx.isFinishing) {
         if (allowTruncation) ctx.pushAndFinish(buffer)
         else
-          ctx.fail(
-              new FramingException(
-                  "Stream finished but there was a truncated final frame in the buffer"))
+          ctx.fail(new FramingException(
+              "Stream finished but there was a truncated final frame in the buffer"))
       } else ctx.pull()
     }
 
@@ -192,9 +190,8 @@ object Framing {
       val possibleMatchPos =
         buffer.indexOf(firstSeparatorByte, from = nextPossibleMatch)
       if (possibleMatchPos > maximumLineBytes)
-        ctx.fail(
-            new FramingException(s"Read ${buffer.size} bytes " +
-                  s"which is more than $maximumLineBytes without seeing a line terminator"))
+        ctx.fail(new FramingException(s"Read ${buffer.size} bytes " +
+          s"which is more than $maximumLineBytes without seeing a line terminator"))
       else {
         if (possibleMatchPos == -1) {
           // No matching character, we need to accumulate more bytes into the buffer
@@ -243,9 +240,8 @@ object Framing {
 
     private def tryPull(ctx: Context[ByteString]): SyncDirective =
       if (ctx.isFinishing)
-        ctx.fail(
-            new FramingException(
-                "Stream finished but there was a truncated final frame in the buffer"))
+        ctx.fail(new FramingException(
+            "Stream finished but there was a truncated final frame in the buffer"))
       else ctx.pull()
 
     override def onPush(chunk: ByteString,
@@ -277,9 +273,8 @@ object Framing {
                                       lengthFieldLength)
         frameSize = parsedLength + minimumChunkSize
         if (frameSize > maximumFrameLength)
-          ctx.fail(
-              new FramingException(
-                  s"Maximum allowed frame size is $maximumFrameLength but decoded frame header reported size $frameSize"))
+          ctx.fail(new FramingException(
+              s"Maximum allowed frame size is $maximumFrameLength but decoded frame header reported size $frameSize"))
         else if (bufSize >= frameSize) emitFrame(ctx)
         else tryPull(ctx)
       } else tryPull(ctx)

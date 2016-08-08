@@ -121,11 +121,10 @@ class Zk2ResolverTest
   super.test("statsOf takes the first two components of the first hostname") {
     assert(Zk2Resolver.statsOf("foo-bar.baz.twitter.com") == "foo-bar.baz")
     assert(Zk2Resolver.statsOf(
-            "foo-bar.baz.twitter.com,foo-bar2.baz.twitter.com") == "foo-bar.baz")
+        "foo-bar.baz.twitter.com,foo-bar2.baz.twitter.com") == "foo-bar.baz")
     assert(Zk2Resolver.statsOf("foo-bar,foo-baz") == "foo-bar")
-    assert(
-        Zk2Resolver
-          .statsOf("some-very-very-very-long-hostname") == "some-very-very-very-long-hostn")
+    assert(Zk2Resolver
+      .statsOf("some-very-very-very-long-hostname") == "some-very-very-very-long-hostn")
     assert(Zk2Resolver.statsOf("localhost:2181") == "localhost:2181")
   }
 }

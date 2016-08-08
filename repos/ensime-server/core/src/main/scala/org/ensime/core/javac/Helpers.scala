@@ -38,11 +38,9 @@ object JavaFqn {
 trait Helpers extends UnsafeHelpers with SLF4JLogging {
 
   def typeMirror(info: CompilationInfo, t: Tree): Option[TypeMirror] = {
-    Option(
-        info
-          .getTrees()
-          .getTypeMirror(
-              info.getTrees().getPath(info.getCompilationUnit(), t)))
+    Option(info
+      .getTrees()
+      .getTypeMirror(info.getTrees().getPath(info.getCompilationUnit(), t)))
   }
 
   def typeElement(info: CompilationInfo, t: Tree): Option[Element] = {

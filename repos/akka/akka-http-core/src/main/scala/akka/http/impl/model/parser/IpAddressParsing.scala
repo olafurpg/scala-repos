@@ -50,13 +50,12 @@ private[parser] trait IpAddressParsing { this: Parser ⇒
     rule {
       !(':' ~ HEXDIG) ~ push { a = new Array[Byte](16); a } ~
         (h16c(0) ~ tail2 | cc(0) ~ tail2 | ch16o(0) ~
-              (cc(2) ~ tail4 | ch16o(2) ~
-                    (cc(4) ~ tail6 | ch16o(4) ~
-                          (cc(6) ~ tail8 | ch16o(6) ~
-                                (cc(8) ~ tail10 | ch16o(8) ~
-                                      (cc(10) ~ ls32 | ch16o(10) ~
-                                            (cc(12) ~ h16(14) | ch16o(12) ~ cc(
-                                                    14))))))))
+          (cc(2) ~ tail4 | ch16o(2) ~
+            (cc(4) ~ tail6 | ch16o(4) ~
+              (cc(6) ~ tail8 | ch16o(6) ~
+                (cc(8) ~ tail10 | ch16o(8) ~
+                  (cc(10) ~ ls32 | ch16o(10) ~
+                    (cc(12) ~ h16(14) | ch16o(12) ~ cc(14))))))))
     }
   }
 

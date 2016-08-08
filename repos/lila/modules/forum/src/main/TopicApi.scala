@@ -35,8 +35,8 @@ private[forum] final class TopicApi(
                lila.mon.forum.topic.view()
                (TopicRepo incViews topic) >>
                  (env.postApi.paginator(topic, page, troll) map {
-                       (categ, topic, _).some
-                     })
+                   (categ, topic, _).some
+                 })
            }
     } yield res
 
@@ -61,7 +61,7 @@ private[forum] final class TopicApi(
                              number = 1,
                              categId = categ.id)
         $insert(post) >> $insert(topic withPost post) >> $update(categ withTopic post) >>- (indexer ! InsertPost(
-                post)) >> env.recent.invalidate >>- ctx.userId.?? { userId =>
+            post)) >> env.recent.invalidate >>- ctx.userId.?? { userId =>
           val text = topic.name + " " + post.text
           shutup ! post.isTeam.fold(
               lila.hub.actorApi.shutup.RecordTeamForumMessage(userId, text),

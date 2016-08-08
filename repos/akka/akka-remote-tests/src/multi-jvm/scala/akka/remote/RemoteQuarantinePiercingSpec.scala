@@ -24,9 +24,8 @@ object RemoteQuarantinePiercingSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(
-      debugConfig(on = false).withFallback(ConfigFactory.parseString(
-              """
+  commonConfig(debugConfig(on = false).withFallback(
+      ConfigFactory.parseString("""
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
                               """)))

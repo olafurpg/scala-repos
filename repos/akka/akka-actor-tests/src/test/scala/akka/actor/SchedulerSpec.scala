@@ -203,7 +203,7 @@ trait SchedulerSpec
       val pingLatch = new TestLatch(6)
 
       val supervisor = system.actorOf(Props(new Supervisor(
-                  AllForOneStrategy(3, 1 second)(List(classOf[Exception])))))
+          AllForOneStrategy(3, 1 second)(List(classOf[Exception])))))
       val props = Props(new Actor {
         def receive = {
           case Ping ⇒ pingLatch.countDown()
@@ -248,7 +248,7 @@ trait SchedulerSpec
 
       (1 to 300).foreach { i ⇒
         collectCancellable(system.scheduler
-              .scheduleOnce(20 milliseconds, actor, Msg(System.nanoTime)))
+          .scheduleOnce(20 milliseconds, actor, Msg(System.nanoTime)))
         Thread.sleep(5)
       }
 
@@ -420,7 +420,7 @@ class LightArrayRevolverSchedulerSpec
 
     "survive vicious enqueueing" in {
       withScheduler(config =
-            ConfigFactory.parseString("akka.scheduler.ticks-per-wheel=2")) {
+        ConfigFactory.parseString("akka.scheduler.ticks-per-wheel=2")) {
         (sched, driver) ⇒
           import driver._
           import system.dispatcher
@@ -478,7 +478,7 @@ class LightArrayRevolverSchedulerSpec
 
     "correctly wrap around wheel rounds" in {
       withScheduler(config =
-            ConfigFactory.parseString("akka.scheduler.ticks-per-wheel=2")) {
+        ConfigFactory.parseString("akka.scheduler.ticks-per-wheel=2")) {
         (sched, driver) ⇒
           implicit def ec = localEC
           import driver._

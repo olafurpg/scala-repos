@@ -175,11 +175,11 @@ class Word2Vec extends Serializable with Logging {
       .reduceByKey(_ + _)
       .filter(_._2 >= minCount)
       .map(x =>
-            VocabWord(x._1,
-                      x._2,
-                      new Array[Int](MAX_CODE_LENGTH),
-                      new Array[Int](MAX_CODE_LENGTH),
-                      0))
+        VocabWord(x._1,
+                  x._2,
+                  new Array[Int](MAX_CODE_LENGTH),
+                  new Array[Int](MAX_CODE_LENGTH),
+                  0))
       .collect()
       .sortWith((a, b) => a.cn > b.cn)
 
@@ -352,7 +352,7 @@ class Word2Vec extends Serializable with Logging {
                   alpha =
                     learningRate *
                       (1 - numPartitions * wordCount.toDouble /
-                            (trainWordsCount + 1))
+                        (trainWordsCount + 1))
                   if (alpha < learningRate * 0.0001)
                     alpha = learningRate * 0.0001
                   logInfo("wordCount = " + wordCount + ", alpha = " + alpha)
@@ -381,10 +381,10 @@ class Word2Vec extends Serializable with Logging {
                             blas.sdot(vectorSize, syn0, l1, 1, syn1, l2, 1)
                           if (f > -MAX_EXP && f < MAX_EXP) {
                             val ind = ((f + MAX_EXP) *
-                                  (EXP_TABLE_SIZE / MAX_EXP / 2.0)).toInt
+                              (EXP_TABLE_SIZE / MAX_EXP / 2.0)).toInt
                             f = expTable.value(ind)
                             val g = ((1 - bcVocab.value(word).code(d) -
-                                      f) * alpha).toFloat
+                              f) * alpha).toFloat
                             blas.saxpy(vectorSize, g, syn1, l2, 1, neu1e, 0, 1)
                             blas.saxpy(vectorSize, g, syn0, l1, 1, syn1, l2, 1)
                             syn1Modify(inner) += 1

@@ -136,14 +136,14 @@ class DefaultHttpRequestHandler(router: Router,
     // * path.startsWith(context) && path.charAt(context.length) == '/')
     //   - Path starts with context followed by a '/' character.
     context.isEmpty || (path.startsWith(context) &&
-        (path.length == context.length || path.charAt(context.length) == '/'))
+    (path.length == context.length || path.charAt(context.length) == '/'))
   }
 
   def handlerForRequest(request: RequestHeader) = {
 
     def notFoundHandler =
       Action.async(BodyParsers.parse.empty)(req =>
-            errorHandler.onClientError(req, NOT_FOUND))
+        errorHandler.onClientError(req, NOT_FOUND))
 
     val (routedRequest, handler) =
       routeRequest(request) map {

@@ -241,13 +241,13 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
                  messages.size,
                  validatedMessages.size)
     validatedMessages.foreach(messageAndOffset =>
-          validateLogAppendTime(messageAndOffset.message))
+      validateLogAppendTime(messageAndOffset.message))
 
     assertEquals("message set size should not change",
                  compressedMessagesWithRecompresion.size,
                  validatedCompressedMessages.size)
     validatedCompressedMessages.foreach(messageAndOffset =>
-          validateLogAppendTime(messageAndOffset.message))
+      validateLogAppendTime(messageAndOffset.message))
     assertTrue(
         "MessageSet should still valid",
         validatedCompressedMessages.shallowIterator.next().message.isValid)
@@ -256,7 +256,7 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
                  compressedMessagesWithoutRecompression.size,
                  validatedCompressedMessagesWithoutRecompression.size)
     validatedCompressedMessagesWithoutRecompression.foreach(messageAndOffset =>
-          validateLogAppendTime(messageAndOffset.message))
+      validateLogAppendTime(messageAndOffset.message))
     assertTrue("MessageSet should still valid",
                validatedCompressedMessagesWithoutRecompression.shallowIterator
                  .next()

@@ -119,9 +119,8 @@ object PlayRun {
         devModeServer
 
         println()
-        println(
-            Colors.green(
-                "(Server started, use Ctrl+D to stop and go back to the console...)"))
+        println(Colors.green(
+            "(Server started, use Ctrl+D to stop and go back to the console...)"))
         println()
 
         // If we have both Watched.Configuration and Watched.ContinuousState
@@ -316,9 +315,8 @@ object PlayRun {
           }
         }.start()
 
-        println(
-            Colors.green(
-                """|
+        println(Colors.green(
+            """|
             |(Starting server. Type Ctrl+D to exit logs, the server will remain in background)
             | """.stripMargin))
 

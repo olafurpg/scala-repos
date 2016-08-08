@@ -148,7 +148,7 @@ class LocalActorRefProviderSpec
             }), address))
         val set =
           Set() ++ actors.map(a ⇒
-                Await.ready(a, timeout.duration).value match {
+            Await.ready(a, timeout.duration).value match {
               case Some(Success(a: ActorRef)) ⇒ 1
               case Some(Failure(ex: InvalidActorNameException)) ⇒ 2
               case x ⇒ x

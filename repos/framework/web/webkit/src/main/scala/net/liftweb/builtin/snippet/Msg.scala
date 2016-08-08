@@ -75,11 +75,11 @@ object Msg extends DispatchSnippet {
       case Full(id) => {
         // Extract the currently set CSS
         (attr("errorClass") or attr("errorclass")).map(cls =>
-              MsgErrorMeta += (id -> cls))
+          MsgErrorMeta += (id -> cls))
         (attr("warningClass") or attr("warningclass")).map(cls =>
-              MsgWarningMeta += (id -> cls))
+          MsgWarningMeta += (id -> cls))
         (attr("noticeClass") or attr("noticeclass")).map(cls =>
-              MsgNoticeMeta += (id -> cls))
+          MsgNoticeMeta += (id -> cls))
 
         <span id={id}>{renderIdMsgs(id)}</span> ++ effects(id)
       }

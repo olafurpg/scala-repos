@@ -233,8 +233,8 @@ object BSON {
     doc.values.toList.map(debug).mkString("[", ", ", "]")
   def debugDoc(doc: BSONDocument): String =
     (doc.elements.toList map {
-          case (k, v) => s"$k: ${debug(v)}"
-        }).mkString("{", ", ", "}")
+      case (k, v) => s"$k: ${debug(v)}"
+    }).mkString("{", ", ", "}")
 
   def asStrings(vs: List[BSONValue]): List[String] = {
     val b = new scala.collection.mutable.ListBuffer[String]

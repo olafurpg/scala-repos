@@ -42,7 +42,7 @@ class KeywordSimilarityAlgorithm(val ap: FriendRecommendationAlgoParams)
                             keywordMap2: HashMap[Int, Double]): Double = {
     var similarity = 0.0
     keywordMap1.foreach(kw =>
-          similarity += kw._2 * keywordMap2.getOrElse(kw._1, 0.0))
+      similarity += kw._2 * keywordMap2.getOrElse(kw._1, 0.0))
     similarity
   }
 

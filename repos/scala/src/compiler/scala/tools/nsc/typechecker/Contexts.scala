@@ -112,7 +112,7 @@ trait Contexts { self: Analyzer =>
                   throwing: Boolean = false,
                   checking: Boolean = false): Context = {
     val rootImportsContext = (startContext /: rootImports(unit))((c, sym) =>
-          c.make(gen.mkWildcardImport(sym)))
+      c.make(gen.mkWildcardImport(sym)))
 
     // there must be a scala.xml package when xml literals were parsed in this unit
     if (unit.hasXml && ScalaXmlPackage == NoSymbol)
@@ -758,7 +758,7 @@ trait Contexts { self: Analyzer =>
           // stops at first package, since further owners can only be surrounding packages
           @tailrec def abEnclosesStopAtPkg(o: Symbol): Boolean =
             (o eq ab) || (!o.isPackageClass && (o ne NoSymbol) &&
-                  abEnclosesStopAtPkg(o.owner))
+              abEnclosesStopAtPkg(o.owner))
           abEnclosesStopAtPkg(owner)
         } else (owner hasTransOwner ab)
       }
@@ -801,13 +801,13 @@ trait Contexts { self: Analyzer =>
         val ab = sym.accessBoundary(sym.owner)
 
         ((ab.isTerm || ab == rootMirror.RootClass) || (accessWithin(ab) ||
-                accessWithinLinked(ab)) && (!sym.isLocalToThis ||
-                sym.isProtected && isSubThisType(pre, sym.owner) ||
-                pre =:= sym.owner.thisType) || sym.isProtected &&
-            (superAccess || pre.isInstanceOf[ThisType] || phase.erasedTypes ||
-                (sym.overrideChain exists isProtectedAccessOK)
-                // that last condition makes protected access via self types work.
-                ))
+        accessWithinLinked(ab)) && (!sym.isLocalToThis ||
+        sym.isProtected && isSubThisType(pre, sym.owner) ||
+        pre =:= sym.owner.thisType) || sym.isProtected &&
+        (superAccess || pre.isInstanceOf[ThisType] || phase.erasedTypes ||
+        (sym.overrideChain exists isProtectedAccessOK)
+        // that last condition makes protected access via self types work.
+        ))
         // note: phase.erasedTypes disables last test, because after addinterfaces
         // implementation classes are not in the superclass chain. If we enable the
         // test, bug780 fails.
@@ -889,10 +889,10 @@ trait Contexts { self: Analyzer =>
                                      pre: Type,
                                      imported: Boolean) =
       sym.isImplicit && isAccessible(sym, pre) && !(imported && {
-            val e = scope.lookupEntry(name)
-            (e ne null) && (e.owner == scope) &&
-            (!settings.isScala212 || e.sym.exists)
-          })
+        val e = scope.lookupEntry(name)
+        (e ne null) && (e.owner == scope) &&
+        (!settings.isScala212 || e.sym.exists)
+      })
 
     /** Do something with the symbols with name `name` imported via the import in `imp`,
       *  if any such symbol is accessible from this context and is a qualifying implicit.
@@ -1087,7 +1087,7 @@ trait Contexts { self: Analyzer =>
 
     private def requiresQualifier(s: Symbol): Boolean =
       (s.owner.isClass && !s.owner.isPackageClass &&
-            !s.isTypeParameterOrSkolem && !s.isExistentiallyBound)
+        !s.isTypeParameterOrSkolem && !s.isExistentiallyBound)
 
     /** Must `sym` defined in package object of package `pkg`, if
       *  it selected from a prefix with `pkg` as its type symbol?
@@ -1127,7 +1127,7 @@ trait Contexts { self: Analyzer =>
 
       def isPackageOwnedInDifferentUnit(s: Symbol) =
         (s.isDefinedInPackage && (!currentRun.compiles(s) || unit.exists &&
-                  s.sourceFile != unit.source.file))
+          s.sourceFile != unit.source.file))
       def lookupInPrefix(name: Name) = pre member name filter qualifies
       def accessibleInPrefix(s: Symbol) =
         isAccessible(s, pre, superAccess = false)
@@ -1207,7 +1207,7 @@ trait Contexts { self: Analyzer =>
       //  2) Explicit imports have next highest precedence.
       def depthOk(imp: ImportInfo) =
         (imp.depth > symbolDepth || (unit.isJava &&
-                  imp.isExplicitImport(name) && imp.depth == symbolDepth))
+          imp.isExplicitImport(name) && imp.depth == symbolDepth))
 
       while (!impSym.exists && imports.nonEmpty && depthOk(imports.head)) {
         impSym = lookupImport(imp1, requireExplicit = false)
@@ -1235,7 +1235,7 @@ trait Contexts { self: Analyzer =>
         //   - imp1 is a wildcard import, so all explicit imports from outer scopes must be checked
         def keepLooking =
           (lookupError == null && imports.tail.nonEmpty &&
-                (sameDepth || !imp1Explicit))
+            (sameDepth || !imp1Explicit))
         // If we find a competitor imp2 which imports the same name, possible outcomes are:
         //
         //  - same depth, imp1 wild, imp2 explicit:        imp2 wins, drop imp1
@@ -1548,8 +1548,7 @@ trait Contexts { self: Analyzer =>
       importedSymbol(name, requireExplicit = false, record = true)
 
     private def recordUsage(sel: ImportSelector, result: Symbol): Unit = {
-      debuglog(
-          s"In $this at ${pos.source.file.name}:${posOf(sel).line}, selector '${selectorString(
+      debuglog(s"In $this at ${pos.source.file.name}:${posOf(sel).line}, selector '${selectorString(
           sel)}' resolved to ${if (tree.symbol.hasCompleteInfo) s"(qual=$qual, $result)"
       else s"(expr=${tree.expr}, ${result.fullLocationString})"}")
       allUsedSelectors(this) += sel

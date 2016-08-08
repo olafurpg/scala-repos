@@ -365,7 +365,7 @@ class NodeJSEnv private (
       val baseNodePath = sys.env.get("NODE_PATH").filter(_.nonEmpty)
       val nodePath =
         libCache.cacheDir.getAbsolutePath + baseNodePath.fold("")(p =>
-              File.pathSeparator + p)
+          File.pathSeparator + p)
 
       sys.env ++ Seq(
           "NODE_MODULE_CONTEXTS" -> "0",

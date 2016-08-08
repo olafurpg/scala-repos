@@ -22,7 +22,7 @@ class FusableProcessorTest extends AkkaIdentityProcessorVerification[Int] {
     // withAttributes "wraps" the underlying identity and protects it from automatic removal
     Flow[Int]
       .via(GraphStages.Identity
-            .asInstanceOf[Graph[FlowShape[Int, Int], NotUsed]])
+        .asInstanceOf[Graph[FlowShape[Int, Int], NotUsed]])
       .named("identity")
       .toProcessor
       .run()

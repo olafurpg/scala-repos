@@ -89,7 +89,7 @@ abstract class OperationOnCollectionInspectionBase
       } yield st
 
     simplificationTypes.flatMap(st =>
-          st.getSimplifications(expr) ++ st.getSimplification(expr))
+      st.getSimplifications(expr) ++ st.getSimplification(expr))
   }
 
   def getLikeCollectionClasses: Array[String] =

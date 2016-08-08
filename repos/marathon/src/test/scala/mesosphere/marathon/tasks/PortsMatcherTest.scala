@@ -174,13 +174,11 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(
-                    new Docker(
-                        portMappings = Some(Seq(
-                                new Docker.PortMapping(containerPort = 1,
-                                                       hostPort = 0)
-                            ))
+                docker = Some(new Docker(
+                    portMappings = Some(Seq(
+                        new Docker.PortMapping(containerPort = 1, hostPort = 0)
                     ))
+                ))
             )
         ))
 
@@ -195,13 +193,11 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(
-                    new Docker(
-                        portMappings = Some(Seq(
-                                new Docker.PortMapping(containerPort = 1,
-                                                       hostPort = 0)
-                            ))
+                docker = Some(new Docker(
+                    portMappings = Some(Seq(
+                        new Docker.PortMapping(containerPort = 1, hostPort = 0)
                     ))
+                ))
             )
         ))
 
@@ -218,13 +214,11 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
         container = Some(
             Container(
-                docker = Some(
-                    new Docker(
-                        portMappings = Some(Seq(
-                                new Docker.PortMapping(containerPort = 1,
-                                                       hostPort = 0)
-                            ))
+                docker = Some(new Docker(
+                    portMappings = Some(Seq(
+                        new Docker.PortMapping(containerPort = 1, hostPort = 0)
                     ))
+                ))
             )
         ))
 
@@ -261,9 +255,9 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
                 docker = Some(
                     new Docker(
                         portMappings = Some(Seq(
-                                new Docker.PortMapping(containerPort = 1,
-                                                       hostPort = 8080)
-                            ))
+                            new Docker.PortMapping(containerPort = 1,
+                                                   hostPort = 8080)
+                        ))
                     ))
             )
         ))
@@ -283,9 +277,9 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
                 docker = Some(
                     new Docker(
                         portMappings = Some(Seq(
-                                new Docker.PortMapping(containerPort = 1,
-                                                       hostPort = 31200)
-                            ))
+                            new Docker.PortMapping(containerPort = 1,
+                                                   hostPort = 31200)
+                        ))
                     ))
             )
         ))
@@ -307,9 +301,9 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
                 docker = Some(
                     new Docker(
                         portMappings = Some(Seq(
-                                new Docker.PortMapping(containerPort = 1,
-                                                       hostPort = 31200)
-                            ))
+                            new Docker.PortMapping(containerPort = 1,
+                                                   hostPort = 31200)
+                        ))
                     ))
             )
         ))
@@ -331,21 +325,16 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
 
   test(
       "satisfy fixed and dynamic mapped port from container from one offered range") {
-    val app = AppDefinition(
-        container = Some(
-            Container(
-                docker = Some(
-                    new Docker(
-                        portMappings = Some(
-                            Seq(
-                                new Docker.PortMapping(containerPort = 1,
-                                                       hostPort = 0),
-                                new Docker.PortMapping(containerPort = 1,
-                                                       hostPort = 31000)
-                            ))
-                    ))
-            )
-        ))
+    val app = AppDefinition(container = Some(
+        Container(
+            docker = Some(new Docker(
+                portMappings = Some(Seq(
+                    new Docker.PortMapping(containerPort = 1, hostPort = 0),
+                    new Docker.PortMapping(containerPort = 1, hostPort = 31000)
+                ))
+            ))
+        )
+    ))
 
     val offer = MarathonTestHelper
       .makeBasicOffer(beginPort = 31000, endPort = 31001)
@@ -358,21 +347,16 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
 
   test(
       "satisfy fixed and dynamic mapped port from container from ranges with different roles") {
-    val app = AppDefinition(
-        container = Some(
-            Container(
-                docker = Some(
-                    new Docker(
-                        portMappings = Some(
-                            Seq(
-                                new Docker.PortMapping(containerPort = 1,
-                                                       hostPort = 0),
-                                new Docker.PortMapping(containerPort = 1,
-                                                       hostPort = 31000)
-                            ))
-                    ))
-            )
-        ))
+    val app = AppDefinition(container = Some(
+        Container(
+            docker = Some(new Docker(
+                portMappings = Some(Seq(
+                    new Docker.PortMapping(containerPort = 1, hostPort = 0),
+                    new Docker.PortMapping(containerPort = 1, hostPort = 31000)
+                ))
+            ))
+        )
+    ))
 
     val portsResource = RangesResource(
         Resource.PORTS,

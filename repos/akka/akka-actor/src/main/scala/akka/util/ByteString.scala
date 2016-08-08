@@ -390,8 +390,7 @@ object ByteString {
       .map(x ⇒ x.SerializationIdentity -> x)
       .toMap
       .withDefault(x ⇒
-            throw new IllegalArgumentException(
-                "Invalid serialization id " + x))
+        throw new IllegalArgumentException("Invalid serialization id " + x))
 
     def apply(from: Byte): Companion = companionMap(from)
   }

@@ -62,7 +62,7 @@ sealed abstract class Tree[A] {
         case ts if ts.isEmpty => done(Vector.empty[StringBuilder])
         case t #:: ts if ts.isEmpty =>
           suspend(t.draw).map(subtree =>
-                new StringBuilder("|") +: shift(stem, "   ", subtree))
+            new StringBuilder("|") +: shift(stem, "   ", subtree))
         case t #:: ts =>
           for {
             subtree <- suspend(t.draw)

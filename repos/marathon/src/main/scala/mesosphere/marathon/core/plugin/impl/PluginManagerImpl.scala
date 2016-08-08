@@ -38,7 +38,7 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
   private[this] def load[T](implicit ct: ClassTag[T]): PluginHolder[T] = {
     log.info(
         s"Loading plugins implementing '${ct.runtimeClass.getName}' from these urls: [${urls
-      .mkString(", ")}]")
+          .mkString(", ")}]")
     def configure(plugin: T, definition: PluginDefinition): T = plugin match {
       case cf: PluginConfiguration if definition.configuration.isDefined =>
         log.info(
@@ -57,9 +57,9 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
           providers
             .find(_.getClass.getName == definition.implementation)
             .map(plugin =>
-                  PluginReference(configure(plugin, definition), definition))
+              PluginReference(configure(plugin, definition), definition))
             .getOrElse(throw new WrongConfigurationException(
-                    s"Plugin not found: $definition"))
+                s"Plugin not found: $definition"))
       }
     log.info(s"Found ${plugins.size} plugins.")
     PluginHolder(ct, plugins)

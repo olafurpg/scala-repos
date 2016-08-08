@@ -91,7 +91,7 @@ abstract class BasicDirectives extends BasicDirectivesBase {
   def extractHere(extractions: RequestVal[_]*): Directive =
     Directives.custom(
         Extract(extractions.map(
-                _.asInstanceOf[StandaloneExtractionImpl[_ <: AnyRef]])))
+            _.asInstanceOf[StandaloneExtractionImpl[_ <: AnyRef]])))
 
   private[http] def handle(extractions: RequestVal[_]*)(
       f: RequestContext ⇒ RouteResult): Route = {

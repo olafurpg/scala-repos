@@ -64,7 +64,7 @@ object TestResultLogger {
              t: TestResultLogger,
              f: TestResultLogger) =
     TestResultLogger((log, results, taskName) =>
-          (if (cond(results, taskName)) t else f).run(log, results, taskName))
+      (if (cond(results, taskName)) t else f).run(log, results, taskName))
 
   /** Transforms the input to be completely silent when the subject module doesn't contain any tests. */
   def silenceWhenNoTests(d: Defaults.Main) =
@@ -183,6 +183,6 @@ object TestResultLogger {
     })
 
     val printNoTests = TestResultLogger((log, results, taskName) =>
-          log.info("No tests to run for " + taskName))
+      log.info("No tests to run for " + taskName))
   }
 }

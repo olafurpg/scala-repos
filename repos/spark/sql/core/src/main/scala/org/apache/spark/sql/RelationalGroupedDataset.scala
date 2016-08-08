@@ -321,11 +321,10 @@ class RelationalGroupedDataset protected[sql] (
       .toSeq
 
     if (values.length > maxValues) {
-      throw new AnalysisException(
-          s"The pivot column $pivotColumn has more than $maxValues distinct values, " +
-            "this could indicate an error. " +
-            s"If this was intended, set ${SQLConf.DATAFRAME_PIVOT_MAX_VALUES.key} " +
-            "to at least the number of distinct values of the pivot column.")
+      throw new AnalysisException(s"The pivot column $pivotColumn has more than $maxValues distinct values, " +
+        "this could indicate an error. " +
+        s"If this was intended, set ${SQLConf.DATAFRAME_PIVOT_MAX_VALUES.key} " +
+        "to at least the number of distinct values of the pivot column.")
     }
 
     pivot(pivotColumn, values)

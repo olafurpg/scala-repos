@@ -96,7 +96,7 @@ class UpgradedImageIExtractor(httpClient: HttpClient,
           case Some(JSONObject(headlineImageMap)) =>
             val imgOpt = headlineImageMap.get("url").map(_.toString)
             imgOpt.foreach(imgUrl =>
-                  trace("Got Known MSN Video Headline Image: " + imgUrl))
+              trace("Got Known MSN Video Headline Image: " + imgUrl))
             imgOpt
 
           case _ => None
@@ -242,7 +242,7 @@ class UpgradedImageIExtractor(httpClient: HttpClient,
           fileExtension = locallyStoredImage.fileExtension
           if (fileExtension != ".gif" && fileExtension != "NA")
           imageSrc = locallyStoredImage.imgSrc if ((depthLevel >= 1 &&
-                    locallyStoredImage.width > 300) || depthLevel < 1)
+            locallyStoredImage.width > 300) || depthLevel < 1)
           if (!isBannerDimensions(width, height))
         } {
           val sequenceScore: Float = 1.0f / cnt
@@ -593,7 +593,7 @@ object UpgradedImageIExtractor {
   lazy val customSiteMapping = {
     val lines = Source
       .fromInputStream(getClass.getResourceAsStream(
-              "/com/gravity/goose/images/known-image-css.txt"))
+          "/com/gravity/goose/images/known-image-css.txt"))
       .getLines()
     (for (line <- lines) yield {
       val Array(domain, css) = delimRegex.split(line)

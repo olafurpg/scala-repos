@@ -77,7 +77,7 @@ class AppInfoBaseDataTest
     import scala.concurrent.ExecutionContext.Implicits.global
     f.taskTracker.tasksByApp()(global) returns Future.successful(
         TaskTracker.TasksByApp.of(TaskTracker.AppTasks
-              .forTasks(app.id, Iterable(running1, running2, running3))))
+          .forTasks(app.id, Iterable(running1, running2, running3))))
 
     val alive = Health(running2.taskId, lastSuccess = Some(Timestamp(1)))
     val unhealthy = Health(running3.taskId, lastFailure = Some(Timestamp(1)))
@@ -176,15 +176,10 @@ class AppInfoBaseDataTest
     val unrelatedDeployment =
       DeploymentPlan(emptyGroup, emptyGroup.copy(apps = Set(other)))
     f.marathonSchedulerService.listRunningDeployments() returns Future
-      .successful(
-          Seq[DeploymentStepInfo](
-              DeploymentStepInfo(relatedDeployment,
-                                 DeploymentStep(Seq.empty),
-                                 1),
-              DeploymentStepInfo(unrelatedDeployment,
-                                 DeploymentStep(Seq.empty),
-                                 1)
-          ))
+      .successful(Seq[DeploymentStepInfo](
+          DeploymentStepInfo(relatedDeployment, DeploymentStep(Seq.empty), 1),
+          DeploymentStepInfo(unrelatedDeployment, DeploymentStep(Seq.empty), 1)
+      ))
 
     When("Getting AppInfos without counts")
     val appInfo =

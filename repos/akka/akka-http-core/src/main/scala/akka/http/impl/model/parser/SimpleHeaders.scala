@@ -17,7 +17,7 @@ private[parser] trait SimpleHeaders {
   // http://tools.ietf.org/html/rfc7233#section-2.3
   def `accept-ranges` = rule {
     ("none" ~ push(Nil) | zeroOrMore(ws(',')) ~ oneOrMore(`range-unit`)
-          .separatedBy(listSep)) ~ EOI ~> (`Accept-Ranges`(_))
+      .separatedBy(listSep)) ~ EOI ~> (`Accept-Ranges`(_))
   }
 
   // http://www.w3.org/TR/cors/#access-control-allow-credentials-response-header
@@ -25,7 +25,7 @@ private[parser] trait SimpleHeaders {
   def `access-control-allow-credentials` =
     rule(
         ("true" ~ push(`Access-Control-Allow-Credentials`(true)) | "false" ~ push(
-                `Access-Control-Allow-Credentials`(false))) ~ EOI)
+            `Access-Control-Allow-Credentials`(false))) ~ EOI)
 
   // http://www.w3.org/TR/cors/#access-control-allow-headers-response-header
   def `access-control-allow-headers` = rule {
@@ -41,11 +41,9 @@ private[parser] trait SimpleHeaders {
 
   // http://www.w3.org/TR/cors/#access-control-allow-origin-response-header
   def `access-control-allow-origin` =
-    rule(
-        ws('*') ~ EOI ~ push(`Access-Control-Allow-Origin`.`*`) | `origin-list-or-null` ~ EOI ~>
-          (origins ⇒
-             `Access-Control-Allow-Origin`.forRange(
-                 HttpOriginRange(origins: _*))))
+    rule(ws('*') ~ EOI ~ push(`Access-Control-Allow-Origin`.`*`) | `origin-list-or-null` ~ EOI ~>
+      (origins ⇒
+         `Access-Control-Allow-Origin`.forRange(HttpOriginRange(origins: _*))))
 
   // http://www.w3.org/TR/cors/#access-control-expose-headers-response-header
   def `access-control-expose-headers` = rule {

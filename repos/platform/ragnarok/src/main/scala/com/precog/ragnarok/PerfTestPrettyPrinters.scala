@@ -33,7 +33,7 @@ trait JsonConverters {
         case Tree.Node((RunQuery(query), a), _) =>
           JObject(JField("path", JArray(path)) :: JField("query",
                                                          JString(query)) :: f(
-                  a)) :: Nil
+              a)) :: Nil
 
         case Tree.Node((Group(name), a), kids) =>
           val newPath = path :+ JString(name)
@@ -96,17 +96,17 @@ trait PrettyPrinters {
 
         case Tree.Node((RunSequential, result), kids) =>
           (kids.toList map (lines(_)) flatMap {
-                case head :: tail =>
-                  (" + " + head) :: (tail map (" | " + _))
-                case Nil => Nil
-              }) ++ List(" ' " + prettyResult(result), "")
+            case head :: tail =>
+              (" + " + head) :: (tail map (" | " + _))
+            case Nil => Nil
+          }) ++ List(" ' " + prettyResult(result), "")
 
         case Tree.Node((RunConcurrent, result), kids) =>
           (kids.toList map (lines(_)) flatMap {
-                case head :: tail =>
-                  (" * " + head) :: (tail map (" | " + _))
-                case Nil => Nil
-              }) ++ List(" ' " + prettyResult(result), "")
+            case head :: tail =>
+              (" * " + head) :: (tail map (" | " + _))
+            case Nil => Nil
+          }) ++ List(" ' " + prettyResult(result), "")
 
         case Tree.Node((RunQuery(q), result), kids) =>
           (q split "\n").toList match {

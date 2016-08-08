@@ -94,9 +94,8 @@ class Sender(path: String,
       maxRoundTripMillis = math.max(maxRoundTripMillis, roundTripMillis)
       if (duration >= 500) {
         val throughtput = (n * 1000.0 / duration).toInt
-        println(
-            s"It took $duration ms to deliver $n messages, throughtput $throughtput msg/s, " +
-              s"latest round-trip $roundTripMillis ms, remaining $remaining of $totalMessages")
+        println(s"It took $duration ms to deliver $n messages, throughtput $throughtput msg/s, " +
+          s"latest round-trip $roundTripMillis ms, remaining $remaining of $totalMessages")
       }
 
       val nextRemaining = sendBatch(actor, remaining)

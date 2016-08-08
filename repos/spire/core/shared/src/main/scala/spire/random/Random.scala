@@ -119,8 +119,8 @@ trait RandomCompanion[G <: Generator] { self =>
     def unfold[B](init: B)(f: (B, A) => Option[B]): Random[B, G] = {
       def loop(mb: Op[B], ma: Op[A]): Op[B] =
         mb.flatMap(b =>
-              ma.flatMap(a =>
-                    f(b, a) match {
+          ma.flatMap(a =>
+            f(b, a) match {
               case Some(b2) => More(() => loop(Const(b2), ma))
               case None => Const(b)
           }))

@@ -135,12 +135,10 @@ class MetadataCacheTest {
     val controllerId = 2
     val controllerEpoch = 1
     val brokers =
-      Set(
-          new Broker(0,
-                     Map(SecurityProtocol.PLAINTEXT -> new EndPoint(
-                             "foo",
-                             9092)).asJava,
-                     null))
+      Set(new Broker(
+          0,
+          Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava,
+          null))
 
     val leader = 1
     val leaderEpoch = 1
@@ -187,12 +185,10 @@ class MetadataCacheTest {
     val controllerId = 2
     val controllerEpoch = 1
     val brokers =
-      Set(
-          new Broker(0,
-                     Map(SecurityProtocol.PLAINTEXT -> new EndPoint(
-                             "foo",
-                             9092)).asJava,
-                     null))
+      Set(new Broker(
+          0,
+          Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava,
+          null))
 
     // replica 1 is not available
     val leader = 0
@@ -242,12 +238,10 @@ class MetadataCacheTest {
     val controllerId = 2
     val controllerEpoch = 1
     val brokers =
-      Set(
-          new Broker(0,
-                     Map(SecurityProtocol.PLAINTEXT -> new EndPoint(
-                             "foo",
-                             9092)).asJava,
-                     "rack1"))
+      Set(new Broker(
+          0,
+          Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava,
+          "rack1"))
 
     // replica 1 is not available
     val leader = 0
@@ -292,12 +286,10 @@ class MetadataCacheTest {
     val topic = "topic"
     val cache = new MetadataCache(1)
     val brokers =
-      Set(
-          new Broker(0,
-                     Map(SecurityProtocol.PLAINTEXT -> new EndPoint(
-                             "foo",
-                             9092)).asJava,
-                     ""))
+      Set(new Broker(
+          0,
+          Map(SecurityProtocol.PLAINTEXT -> new EndPoint("foo", 9092)).asJava,
+          ""))
     val controllerEpoch = 1
     val leader = 0
     val leaderEpoch = 0

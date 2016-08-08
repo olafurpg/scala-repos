@@ -152,7 +152,7 @@ package mongotestrecords {
             dbo.get(k.toString) match {
               case bdbo: BasicDBObject
                   if (bdbo.containsField("name") &&
-                        bdbo.containsField("type")) =>
+                    bdbo.containsField("type")) =>
                 Map("name" -> bdbo.getString("name"),
                     "type" -> bdbo.getString("type"))
               case _ => null

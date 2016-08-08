@@ -18,8 +18,8 @@ class ParquetScroogeTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new DailySuffixParquetScrooge[MockThriftStruct](path, dateRange) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
 
     testDefaultColumns(default)
 
@@ -44,8 +44,8 @@ class ParquetScroogeTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new HourlySuffixParquetScrooge[MockThriftStruct](path, dateRange) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
 
     testDefaultColumns(default)
 
@@ -70,8 +70,8 @@ class ParquetScroogeTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new FixedPathParquetScrooge[MockThriftStruct](path, path, path) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
 
     testDefaultColumns(default)
 

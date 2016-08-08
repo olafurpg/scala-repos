@@ -505,7 +505,7 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
         var eq = true
         while (eq && i < this.length) {
           eq &&= (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
-              rv.scalarTag.isMissing(rv(i)))
+          rv.scalarTag.isMissing(rv(i)))
           i += 1
         }
         eq

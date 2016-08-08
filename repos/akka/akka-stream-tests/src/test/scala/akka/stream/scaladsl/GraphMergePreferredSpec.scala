@@ -69,17 +69,17 @@ class GraphMergePreferredSpec extends TwoStreamsSetup {
       val s = Source(0 to 3)
 
       (the[IllegalArgumentException] thrownBy {
-            val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit b ⇒
-              val merge = b.add(MergePreferred[Int](1))
+        val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit b ⇒
+          val merge = b.add(MergePreferred[Int](1))
 
-              s ~> merge.preferred
-              s ~> merge.preferred
-              s ~> merge.in(0)
+          s ~> merge.preferred
+          s ~> merge.preferred
+          s ~> merge.in(0)
 
-              merge.out ~> Sink.head[Int]
-              ClosedShape
-            })
-          }).getMessage should include(
+          merge.out ~> Sink.head[Int]
+          ClosedShape
+        })
+      }).getMessage should include(
           "[MergePreferred.preferred] is already connected")
     }
   }

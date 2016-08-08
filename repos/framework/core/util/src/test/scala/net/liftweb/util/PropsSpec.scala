@@ -47,7 +47,7 @@ object PropsSpec extends Specification {
             ("test propsters",
              () =>
                Full(new ByteArrayInputStream(
-                       "test.prop=value".getBytes("UTF-8"))))
+                   "test.prop=value".getBytes("UTF-8"))))
         )
       }
 

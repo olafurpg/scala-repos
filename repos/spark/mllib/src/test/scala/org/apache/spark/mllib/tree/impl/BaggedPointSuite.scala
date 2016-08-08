@@ -32,7 +32,7 @@ class BaggedPointSuite extends SparkFunSuite with MLlibTestSparkContext {
     val baggedRDD = BaggedPoint.convertToBaggedRDD(rdd, 1.0, 1, false, 42)
     baggedRDD.collect().foreach { baggedPoint =>
       assert(baggedPoint.subsampleWeights.size == 1 &&
-            baggedPoint.subsampleWeights(0) == 1)
+        baggedPoint.subsampleWeights(0) == 1)
     }
   }
 

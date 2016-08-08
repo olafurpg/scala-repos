@@ -63,8 +63,7 @@ class LogManager(val logDirs: Array[File],
   private val dirLocks = lockLogDirs(logDirs)
   private val recoveryPointCheckpoints = logDirs
     .map(dir =>
-          (dir,
-           new OffsetCheckpoint(new File(dir, RecoveryPointCheckpointFile))))
+      (dir, new OffsetCheckpoint(new File(dir, RecoveryPointCheckpointFile))))
     .toMap
   loadLogs()
 
@@ -109,10 +108,9 @@ class LogManager(val logDirs: Array[File],
     dirs.map { dir =>
       val lock = new FileLock(new File(dir, LockFile))
       if (!lock.tryLock())
-        throw new KafkaException(
-            "Failed to acquire lock on file .lock in " +
-              lock.file.getParentFile.getAbsolutePath +
-              ". A Kafka instance in another process or thread is using this directory.")
+        throw new KafkaException("Failed to acquire lock on file .lock in " +
+          lock.file.getParentFile.getAbsolutePath +
+          ". A Kafka instance in another process or thread is using this directory.")
       lock
     }
   }
@@ -398,8 +396,8 @@ class LogManager(val logDirs: Array[File],
             .format(topicAndPartition.topic,
                     topicAndPartition.partition,
                     dataDir.getAbsolutePath, {
-                  import JavaConversions._; config.originals.mkString(", ")
-                }))
+                      import JavaConversions._; config.originals.mkString(", ")
+                    }))
       log
     }
   }

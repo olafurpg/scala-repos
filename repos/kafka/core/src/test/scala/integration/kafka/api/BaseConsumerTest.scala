@@ -161,7 +161,7 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     this
       .consumers(0)
       .commitSync(Map[TopicPartition, OffsetAndMetadata](
-              (tp, new OffsetAndMetadata(3L))).asJava)
+          (tp, new OffsetAndMetadata(3L))).asJava)
     assertEquals(3, this.consumers(0).committed(tp).offset)
     assertNull(this.consumers(0).committed(tp2))
 
@@ -171,7 +171,7 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     this
       .consumers(0)
       .commitSync(Map[TopicPartition, OffsetAndMetadata](
-              (tp2, new OffsetAndMetadata(5L))).asJava)
+          (tp2, new OffsetAndMetadata(5L))).asJava)
     assertEquals(3, this.consumers(0).committed(tp).offset)
     assertEquals(5, this.consumers(0).committed(tp2).offset)
 

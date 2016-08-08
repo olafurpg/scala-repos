@@ -136,14 +136,14 @@ trait HeadActionSpec
 
     "tag request with DefaultHttpRequestHandler" in serverWithAction(
         new RequestTaggingHandler with EssentialAction {
-      def tagRequest(request: RequestHeader) =
-        request.copy(tags = Map(RouteComments -> "some comment"))
-      def apply(rh: RequestHeader) =
-        Action {
-          Results.Ok.withHeaders(
-              rh.tags.get(RouteComments).map(RouteComments -> _).toSeq: _*)
-        }(rh)
-    }) { client =>
+          def tagRequest(request: RequestHeader) =
+            request.copy(tags = Map(RouteComments -> "some comment"))
+          def apply(rh: RequestHeader) =
+            Action {
+              Results.Ok.withHeaders(
+                  rh.tags.get(RouteComments).map(RouteComments -> _).toSeq: _*)
+            }(rh)
+        }) { client =>
       val result = await(client.url("/get").head())
       result.status must_== OK
       result.header(RouteComments) must beSome("some comment")

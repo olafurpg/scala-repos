@@ -47,7 +47,7 @@ object Search extends LilaController {
                     .withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
                                  CONTENT_DISPOSITION ->
                                    ("attachment; filename=" +
-                                         s"lichess_search_$date.pgn"))
+                                     s"lichess_search_$date.pgn"))
               }
           }
       )

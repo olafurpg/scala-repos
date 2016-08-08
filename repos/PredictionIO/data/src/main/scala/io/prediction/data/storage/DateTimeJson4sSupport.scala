@@ -42,5 +42,5 @@ object DateTimeJson4sSupport {
   /** Custom JSON4S serializer for Joda-Time */
   class Serializer
       extends CustomSerializer[DateTime](format =>
-            (deserializeFromJValue, serializeToJValue))
+        (deserializeFromJValue, serializeToJValue))
 }

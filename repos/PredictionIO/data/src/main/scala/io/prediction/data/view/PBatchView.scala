@@ -107,7 +107,7 @@ private[prediction] case class EventOp(
     setProp.flatMap { set =>
       val unsetKeys: Set[String] = unsetProp
         .map(unset =>
-              unset.fields.filter { case (k, v) => (v >= set.fields(k).t) }.keySet)
+          unset.fields.filter { case (k, v) => (v >= set.fields(k).t) }.keySet)
         .getOrElse(Set())
 
       val combinedFields = deleteEntity.map { delete =>
@@ -189,8 +189,8 @@ class PBatchView(val appId: Int,
 
     _events
       .filter(e =>
-            ((e.entityType == entityType) &&
-                  (EventValidation.isSpecialEvents(e.event))))
+        ((e.entityType == entityType) &&
+          (EventValidation.isSpecialEvents(e.event))))
       .map(e => (e.entityId, EventOp(e)))
       .aggregateByKey[EventOp](EventOp())(
           // within same partition

@@ -121,7 +121,7 @@ class FlowDelaySpec extends AkkaSpec {
         .runWith(TestSink.probe[Int])
         .request(100)
         .expectError(new BufferOverflowException(
-                "Buffer overflow for delay combinator (max capacity was: 16)!"))
+            "Buffer overflow for delay combinator (max capacity was: 16)!"))
     }
 
     "emit early when buffer is full and in EmitEarly mode" in assertAllStagesStopped {

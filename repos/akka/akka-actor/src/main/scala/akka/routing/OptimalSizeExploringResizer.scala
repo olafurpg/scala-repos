@@ -266,7 +266,7 @@ case class DefaultOptimalSizeExploringResizer(
     val now = LocalDateTime.now
     val proposedChange =
       if (record.underutilizationStreak.fold(false)(_.start.isBefore(
-                  now.minus(downsizeAfterUnderutilizedFor.asJava)))) {
+              now.minus(downsizeAfterUnderutilizedFor.asJava)))) {
         val downsizeTo =
           (record.underutilizationStreak.get.highestUtilization * downsizeRatio).toInt
         Math.min(downsizeTo - currentSize, 0)

@@ -48,7 +48,7 @@ object Artifact {
     try {
       val url = new URL("jar:%s!/%s".format(file.toURI.toString, resource))
       Option(url.openStream).flatMap(it =>
-            using(new BufferedInputStream(it))(readProperty(_, name)))
+        using(new BufferedInputStream(it))(readProperty(_, name)))
     } catch {
       case _: IOException => None
     }
@@ -112,7 +112,7 @@ object Component {
     val patterns = (Artifact.values ++ DottyArtifact.values).flatMap {
       artifact =>
         Kind.values.map(kind =>
-              (kind.patternFor(artifact.prefix), artifact, kind))
+          (kind.patternFor(artifact.prefix), artifact, kind))
     }
 
     files.filter(it => it.isFile && it.getName.endsWith(".jar")).flatMap {

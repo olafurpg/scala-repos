@@ -80,8 +80,8 @@ trait HttpClientModule[M[+ _]] {
       copy(
           body =
             body map {
-          case Request.Body(ct, data) => Request.Body(ct, f(data))
-        })
+              case Request.Body(ct, data) => Request.Body(ct, f(data))
+            })
   }
 
   object Request {

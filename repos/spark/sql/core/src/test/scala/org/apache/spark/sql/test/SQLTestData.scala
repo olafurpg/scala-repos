@@ -85,13 +85,12 @@ private[sql] trait SQLTestData { self =>
   protected lazy val largeAndSmallInts: DataFrame = {
     val df =
       sqlContext.sparkContext
-        .parallelize(LargeAndSmallInts(2147483644, 1) :: LargeAndSmallInts(
-                1,
-                2) :: LargeAndSmallInts(2147483645, 1) :: LargeAndSmallInts(
-                2,
-                2) :: LargeAndSmallInts(2147483646, 1) :: LargeAndSmallInts(
-                3,
-                2) :: Nil)
+        .parallelize(
+            LargeAndSmallInts(2147483644, 1) :: LargeAndSmallInts(1, 2) :: LargeAndSmallInts(
+                2147483645,
+                1) :: LargeAndSmallInts(2, 2) :: LargeAndSmallInts(
+                2147483646,
+                1) :: LargeAndSmallInts(3, 2) :: Nil)
         .toDF()
     df.registerTempTable("largeAndSmallInts")
     df
@@ -100,11 +99,10 @@ private[sql] trait SQLTestData { self =>
   protected lazy val decimalData: DataFrame = {
     val df =
       sqlContext.sparkContext
-        .parallelize(DecimalData(1, 1) :: DecimalData(1, 2) :: DecimalData(
+        .parallelize(
+            DecimalData(1, 1) :: DecimalData(1, 2) :: DecimalData(2, 1) :: DecimalData(
                 2,
-                1) :: DecimalData(2, 2) :: DecimalData(3, 1) :: DecimalData(
-                3,
-                2) :: Nil)
+                2) :: DecimalData(3, 1) :: DecimalData(3, 2) :: Nil)
         .toDF()
     df.registerTempTable("decimalData")
     df
@@ -163,9 +161,9 @@ private[sql] trait SQLTestData { self =>
                                                       3 -> "c1",
                                                       4 -> "d1",
                                                       5 -> "e1")) :: MapData(
-              Map(1 -> "a2", 2 -> "b2", 3 -> "c2", 4 -> "d2")) :: MapData(
-              Map(1 -> "a3", 2 -> "b3", 3 -> "c3")) :: MapData(
-              Map(1 -> "a4", 2 -> "b4")) :: MapData(Map(1 -> "a5")) :: Nil)
+          Map(1 -> "a2", 2 -> "b2", 3 -> "c2", 4 -> "d2")) :: MapData(
+          Map(1 -> "a3", 2 -> "b3", 3 -> "c3")) :: MapData(
+          Map(1 -> "a4", 2 -> "b4")) :: MapData(Map(1 -> "a5")) :: Nil)
     rdd.toDF().registerTempTable("mapData")
     rdd
   }

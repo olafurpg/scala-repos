@@ -215,7 +215,7 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     // For log4j configuration to reference
     javaOpts += ("-Dspark.yarn.app.container.log.dir=" +
-          ApplicationConstants.LOG_DIR_EXPANSION_VAR)
+      ApplicationConstants.LOG_DIR_EXPANSION_VAR)
     YarnCommandBuilderUtils.addPermGenSizeOpt(javaOpts)
 
     val userClassPath = Client

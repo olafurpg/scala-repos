@@ -605,11 +605,9 @@ with Eventually with IntegrationPatience {
       val tolerance = 2.microseconds // we permit 1us slop
 
       forAll { i: Int =>
-        assert(
-            Time
-              .fromSeconds(i)
-              .moreOrLessEquals(Time.fromFractionalSeconds(i.toDouble),
-                                tolerance))
+        assert(Time
+          .fromSeconds(i)
+          .moreOrLessEquals(Time.fromFractionalSeconds(i.toDouble), tolerance))
       }
 
       forAll { d: Double =>

@@ -23,7 +23,7 @@ class FormBodyParserSpec extends PlaySpecification {
         mat: Materializer): Either[Result, A] = {
       await(
           bodyParser(FakeRequest().withHeaders(
-                  writeable.contentType.map(CONTENT_TYPE -> _).toSeq: _*))
+              writeable.contentType.map(CONTENT_TYPE -> _).toSeq: _*))
             .run(Source.single(writeable.transform(body)))
       )
     }

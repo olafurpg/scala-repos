@@ -626,11 +626,11 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
     val q13 = (as.filter(_.id < 2) union as.filter(_.id > 2)).map(_.id)
     val q14 = q13.to[Set]
     val q15 = (as.map(a => a.id.?).filter(_ < 2) unionAll as
-          .map(a => a.id.?)
-          .filter(_ > 2)).map(_.get).to[Set]
+      .map(a => a.id.?)
+      .filter(_ > 2)).map(_.get).to[Set]
     val q16 = (as.map(a => a.id.?).filter(_ < 2) unionAll as
-          .map(a => a.id.?)
-          .filter(_ > 2)).map(_.getOrElse(-1)).to[Set].filter(_ =!= 42)
+      .map(a => a.id.?)
+      .filter(_ > 2)).map(_.getOrElse(-1)).to[Set].filter(_ =!= 42)
     val q17 = as.sortBy(_.id).zipWithIndex.filter(_._2 < 2L).map {
       case (a, i) => (a.id, i)
     }

@@ -226,9 +226,9 @@ abstract class ScaladocModelTest extends DirectTest {
             "Error getting " + expl + ": " + list.length +
               " elements with this name. " + "All elements in list: [" + list
               .map({
-            case ent: Entity => ent.kind + " " + ent.qualifiedName
-            case other => other.toString
-          })
+                case ent: Entity => ent.kind + " " + ent.qualifiedName
+                case other => other.toString
+              })
               .mkString(", ") + "]")
     }
 

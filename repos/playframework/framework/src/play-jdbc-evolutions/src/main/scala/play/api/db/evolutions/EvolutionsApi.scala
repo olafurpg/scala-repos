@@ -118,9 +118,9 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
       val database = databaseEvolutions()
 
       val (nonConflictingDowns, dRest) = database.span(e =>
-            !application.headOption.exists(e.revision <= _.revision))
+        !application.headOption.exists(e.revision <= _.revision))
       val (nonConflictingUps, uRest) = application.span(e =>
-            !database.headOption.exists(_.revision >= e.revision))
+        !database.headOption.exists(_.revision >= e.revision))
 
       val (conflictingDowns, conflictingUps) =
         Evolutions.conflictings(dRest, uRest)
@@ -148,9 +148,8 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
 
     try {
 
-      Collections.unfoldLeft(
-          executeQuery(
-              """
+      Collections.unfoldLeft(executeQuery(
+          """
             select id, hash, apply_script, revert_script from ${schema}play_evolutions order by id
         """)) { rs =>
         rs.next match {

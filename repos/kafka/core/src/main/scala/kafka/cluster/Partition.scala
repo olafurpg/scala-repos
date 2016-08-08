@@ -269,7 +269,7 @@ class Partition(val topic: String,
       case None =>
         throw new NotAssignedReplicaException(
             ("Leader %d failed to record follower %d's position %d since the replica" +
-                  " is not recognized to be one of the assigned replicas %s for partition %s.")
+              " is not recognized to be one of the assigned replicas %s for partition %s.")
               .format(localBrokerId,
                       replicaId,
                       logReadResult.info.fetchOffsetMetadata.messageOffset,
@@ -457,7 +457,7 @@ class Partition(val topic: String,
     val candidateReplicas = inSyncReplicas - leaderReplica
 
     val laggingReplicas = candidateReplicas.filter(r =>
-          (time.milliseconds - r.lastCaughtUpTimeMs) > maxLagMs)
+      (time.milliseconds - r.lastCaughtUpTimeMs) > maxLagMs)
     if (laggingReplicas.size > 0)
       debug(
           "Lagging replicas for partition %s are %s".format(

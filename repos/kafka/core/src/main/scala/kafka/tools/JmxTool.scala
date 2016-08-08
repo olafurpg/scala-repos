@@ -107,7 +107,7 @@ object JmxTool extends Logging {
 
     val names = queries
       .map((name: ObjectName) =>
-            mbsc.queryNames(name, null): mutable.Set[ObjectName])
+        mbsc.queryNames(name, null): mutable.Set[ObjectName])
       .flatten
 
     val numExpectedAttributes: Map[ObjectName, Int] =

@@ -77,12 +77,11 @@ class TestScalaSymbols extends FunSuite {
 
   test("parentClassesWithTypeArgs") {
     val parentClassKeys = Compat.parentClassTags[ParentTag.Biz].toSet
-    assert(
-        parentClassKeys == Set(
-            "scala.pickling.generator.scalasymbols.ParentTag.Foo[java.lang.String,scala.Int]",
-            "scala.pickling.generator.scalasymbols.ParentTag.Baz[java.lang.String]",
-            "scala.Any",
-            "java.lang.Object"))
+    assert(parentClassKeys == Set(
+        "scala.pickling.generator.scalasymbols.ParentTag.Foo[java.lang.String,scala.Int]",
+        "scala.pickling.generator.scalasymbols.ParentTag.Baz[java.lang.String]",
+        "scala.Any",
+        "java.lang.Object"))
   }
 
   test("detectTransient") {

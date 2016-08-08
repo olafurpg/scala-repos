@@ -86,7 +86,7 @@ class ScalaMavenImporter
         val plugins =
           configuration.plugins.map(id => mavenProject.localPathTo(id).getPath)
         configuration.compilerOptions ++ plugins.map(path =>
-              "-Xplugin:" + path)
+          "-Xplugin:" + path)
       }
 
       module.configureScalaCompilerSettingsFrom("Maven", compilerOptions)
@@ -97,8 +97,8 @@ class ScalaMavenImporter
         .filter(_.getName.contains("scala-library"))
         .find(_.scalaVersion == Some(compilerVersion))
         .getOrElse(throw new ExternalSystemException(
-                "Cannot find project Scala library " + compilerVersion.number +
-                  " for module " + module.getName))
+            "Cannot find project Scala library " + compilerVersion.number +
+              " for module " + module.getName))
 
       if (!scalaLibrary.isScalaSdk) {
         val languageLevel =

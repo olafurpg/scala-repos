@@ -52,7 +52,7 @@ class InjectorReviewDialog(project: Project,
   private val highlighterFactory = EditorHighlighterFactory.getInstance
   editors.foreach(
       _.asInstanceOf[EditorEx].setHighlighter(highlighterFactory
-            .createEditorHighlighter(project, ScalaFileType.SCALA_FILE_TYPE)))
+        .createEditorHighlighter(project, ScalaFileType.SCALA_FILE_TYPE)))
   setTitle(s"Library '${manifest._1.jarPath}' Injectors Source Review")
   setOKButtonText("Accept")
   setCancelButtonText("Reject")
@@ -81,7 +81,7 @@ class InjectorReviewDialog(project: Project,
 
   override def dispose(): Unit = {
     editors.foreach(e =>
-          if (!e.isDisposed) EditorFactory.getInstance().releaseEditor(e))
+      if (!e.isDisposed) EditorFactory.getInstance().releaseEditor(e))
     super.dispose()
   }
 }

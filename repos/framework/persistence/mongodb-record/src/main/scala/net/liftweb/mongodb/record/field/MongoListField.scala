@@ -131,7 +131,7 @@ class MongoListField[OwnerType <: BsonRecord[OwnerType], ListType: Manifest](
 
   def asJValue: JValue =
     JArray(value.map(li =>
-              li.asInstanceOf[AnyRef] match {
+      li.asInstanceOf[AnyRef] match {
         case x if primitive_?(x.getClass) => primitive2jvalue(x)
         case x if mongotype_?(x.getClass) =>
           mongotype2jvalue(x)(owner.meta.formats)

@@ -134,7 +134,7 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
         val grandParent = parent.getParent
         new ChildAttributes(if (grandParent != null &&
                                 (grandParent.isInstanceOf[ScCaseClause] ||
-                                    grandParent.isInstanceOf[ScFunctionExpr]))
+                                grandParent.isInstanceOf[ScFunctionExpr]))
                               Indent.getNormalIndent
                             else Indent.getNoneIndent,
                             null)
@@ -189,7 +189,7 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
       paramClause: ScParameterClause): Boolean = {
     val owner = paramClause.owner
     owner != null && (owner.isInstanceOf[ScPrimaryConstructor] ||
-        owner.isInstanceOf[ScFunction])
+    owner.isInstanceOf[ScFunction])
   }
 
   def getSpacing(child1: Block, child2: Block) = {
@@ -217,7 +217,7 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
     var lastChild = node.getLastChildNode
     while (lastChild != null &&
            (lastChild.getPsi.isInstanceOf[PsiWhiteSpace] ||
-               lastChild.getPsi.isInstanceOf[PsiComment])) {
+           lastChild.getPsi.isInstanceOf[PsiComment])) {
       lastChild = lastChild.getTreePrev
     }
     if (lastChild == null) {

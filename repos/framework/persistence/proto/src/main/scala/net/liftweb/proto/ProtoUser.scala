@@ -430,12 +430,11 @@ trait ProtoUser {
     * The menu item for lost password (make this "Empty" to disable)
     */
   def lostPasswordMenuLoc: Box[Menu] =
-    Full(
-        Menu(
-            Loc("LostPassword" + menuNameSuffix,
-                lostPasswordPath,
-                S.?("lost.password"),
-                lostPasswordMenuLocParams ::: globalUserLocParams))) // not logged in
+    Full(Menu(Loc(
+        "LostPassword" + menuNameSuffix,
+        lostPasswordPath,
+        S.?("lost.password"),
+        lostPasswordMenuLocParams ::: globalUserLocParams))) // not logged in
 
   /**
     * The LocParams for the menu item for lost password.
@@ -449,12 +448,11 @@ trait ProtoUser {
     * The menu item for resetting the password (make this "Empty" to disable)
     */
   def resetPasswordMenuLoc: Box[Menu] =
-    Full(
-        Menu(
-            Loc("ResetPassword" + menuNameSuffix,
-                (passwordResetPath, true),
-                S.?("reset.password"),
-                resetPasswordMenuLocParams ::: globalUserLocParams))) //not Logged in
+    Full(Menu(Loc(
+        "ResetPassword" + menuNameSuffix,
+        (passwordResetPath, true),
+        S.?("reset.password"),
+        resetPasswordMenuLocParams ::: globalUserLocParams))) //not Logged in
 
   /**
     * The LocParams for the menu item for resetting the password.
@@ -722,8 +720,8 @@ trait ProtoUser {
     Mailer.sendMail(From(emailFrom),
                     Subject(signupMailSubject),
                     (To(user.getEmail) :: generateValidationEmailBodies(
-                            user,
-                            resetLink) ::: (bccEmail.toList.map(BCC(_)))): _*)
+                        user,
+                        resetLink) ::: (bccEmail.toList.map(BCC(_)))): _*)
   }
 
   /**
@@ -984,7 +982,7 @@ trait ProtoUser {
             From(emailFrom),
             Subject(passwordResetEmailSubject),
             (To(user.getEmail) :: generateResetEmailBodies(user, resetLink) :::
-                  (bccEmail.toList.map(BCC(_)))): _*)
+              (bccEmail.toList.map(BCC(_)))): _*)
 
         S.notice(S.?("password.reset.email.sent"))
         S.redirectTo(homePage)

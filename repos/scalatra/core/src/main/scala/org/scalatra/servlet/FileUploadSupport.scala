@@ -181,9 +181,9 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
 
       override def getParameterMap: JMap[String, Array[String]] = {
         (new JHashMap[String, Array[String]].asScala ++
-              (formMap transform { (k, v) =>
-                    v.toArray
-                  })).asJava
+          (formMap transform { (k, v) =>
+            v.toArray
+          })).asJava
       }
     }
     wrapped

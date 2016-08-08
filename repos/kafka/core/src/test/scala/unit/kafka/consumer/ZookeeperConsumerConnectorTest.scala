@@ -552,12 +552,9 @@ class ZookeeperConsumerConnectorTest
       import scala.collection.JavaConversions._
       children.toSeq
     }
-    childrenAsSeq.map(
-        partition =>
-          (partition,
-           zkUtils.zkClient
-             .readData(path + "/" + partition)
-             .asInstanceOf[String]))
+    childrenAsSeq.map(partition =>
+      (partition,
+       zkUtils.zkClient.readData(path + "/" + partition).asInstanceOf[String]))
   }
 
   private class TestConsumerRebalanceListener

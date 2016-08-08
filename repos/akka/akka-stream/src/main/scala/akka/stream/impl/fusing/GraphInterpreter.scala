@@ -553,8 +553,8 @@ private[stream] final class GraphInterpreter(
   private def shutdownCounters: String =
     shutdownCounter
       .map(x ⇒
-            if (x >= KeepGoingFlag) s"${x & KeepGoingMask}(KeepGoing)"
-            else x.toString)
+        if (x >= KeepGoingFlag) s"${x & KeepGoingMask}(KeepGoing)"
+        else x.toString)
       .mkString(",")
 
   /**
@@ -668,7 +668,7 @@ private[stream] final class GraphInterpreter(
         if (Debug)
           println(
               s"$Name COMPLETE ${outOwnerName(connection)} -> ${inOwnerName(
-              connection)} (${inHandlers(connection)}) [${inLogicName(connection)}]")
+                  connection)} (${inHandlers(connection)}) [${inLogicName(connection)}]")
         portStates(connection) |= InClosed
         val stageId = assembly.inOwners(connection)
         activeStage = safeLogics(stageId)
@@ -691,7 +691,7 @@ private[stream] final class GraphInterpreter(
     if (fuzzingMode) {
       val swapWith =
         (ThreadLocalRandom.current.nextInt(queueTail - queueHead) +
-              queueHead) & mask
+          queueHead) & mask
       val ev = eventQueue(swapWith)
       eventQueue(swapWith) = eventQueue(idx)
       eventQueue(idx) = ev

@@ -87,7 +87,7 @@ private[spark] class PartitionerAwareUnionRDD[T: ClassTag](
       case (rdd, part) => {
         val parentLocations = currPrefLocs(rdd, part)
         logDebug("Location of " + rdd + " partition " +
-              part.index + " = " + parentLocations)
+          part.index + " = " + parentLocations)
         parentLocations
       }
     }

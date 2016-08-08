@@ -103,10 +103,10 @@ private[spark] object ApplicationsListResource {
                 startTime = new Date(internal.startTime),
                 endTime = new Date(internal.endTime),
                 duration = if (internal.endTime > 0) {
-              internal.endTime - internal.startTime
-            } else {
-              0
-            },
+                  internal.endTime - internal.startTime
+                } else {
+                  0
+                },
                 lastUpdated = new Date(internal.endTime),
                 sparkUser = internal.desc.user,
                 completed = completed

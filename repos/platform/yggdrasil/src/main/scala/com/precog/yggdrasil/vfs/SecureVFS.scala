@@ -106,10 +106,9 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
           .hasCapability(apiKey, permissions, Some(clock.now())) map {
           case true => \/.right(resource)
           case false =>
-            \/.left(
-                permissionsError(
-                    "API key %s does not provide %s permission to resource at path %s."
-                      .format(apiKey, readMode.name, path.path)))
+            \/.left(permissionsError(
+                "API key %s does not provide %s permission to resource at path %s."
+                  .format(apiKey, readMode.name, path.path)))
         }
       }
     }
@@ -204,8 +203,7 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
 
       val pathPrefix = EitherT(
           (path.prefix \/> invalidState(
-                  "Path %s cannot be relativized.".format(path.path)))
-            .point[M])
+              "Path %s cannot be relativized.".format(path.path))).point[M])
 
       val cachePath = path / Path(".cached")
       def fallBack =
@@ -323,10 +321,9 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
                                if (pset.nonEmpty) \/.right(PrecogUnit)
                                else
                                  \/.left(
-                                     storageError(
-                                         PermissionsError(
-                                             "API key %s has no permission to write to the caching path %s."
-                                               .format(ctx.apiKey, cachePath)))
+                                     storageError(PermissionsError(
+                                         "API key %s has no permission to write to the caching path %s."
+                                           .format(ctx.apiKey, cachePath)))
                                  )
                              }
                            }

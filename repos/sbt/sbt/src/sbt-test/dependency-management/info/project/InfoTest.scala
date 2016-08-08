@@ -7,13 +7,13 @@ object InfoTest extends Build {
   lazy val root =
     Project("root", file(".")) settings
       (ivyPaths <<= (baseDirectory, target)((dir, t) =>
-                new IvyPaths(dir, Some(t / "ivy-cache"))), ivyXML <<=
-            (customInfo, organization, moduleName, version) apply inlineXML,
-          scalaVersion := "2.9.1", projectID ~= (_ cross false),
-          customInfo <<= baseDirectory { _ / "info" exists },
-          TaskKey[Unit]("check-download") <<= checkDownload,
-          delivered <<= deliverLocal map XML.loadFile,
-          TaskKey[Unit]("check-info") <<= checkInfo)
+        new IvyPaths(dir, Some(t / "ivy-cache"))), ivyXML <<=
+        (customInfo, organization, moduleName, version) apply inlineXML,
+      scalaVersion := "2.9.1", projectID ~= (_ cross false),
+      customInfo <<= baseDirectory { _ / "info" exists },
+      TaskKey[Unit]("check-download") <<= checkDownload,
+      delivered <<= deliverLocal map XML.loadFile,
+      TaskKey[Unit]("check-info") <<= checkInfo)
   lazy val delivered = TaskKey[NodeSeq]("delivered")
   lazy val customInfo = SettingKey[Boolean]("custom-info")
 

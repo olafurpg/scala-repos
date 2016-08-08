@@ -29,8 +29,8 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
         PsiDocumentManager
           .getInstance(project)
           .getDocument(PsiFileFactory
-                .getInstance(project)
-                .createFileFromText("dummy", lang, defaultText)),
+            .getInstance(project)
+            .createFileFromText("dummy", lang, defaultText)),
         project)
     editor setBorder null
     editor

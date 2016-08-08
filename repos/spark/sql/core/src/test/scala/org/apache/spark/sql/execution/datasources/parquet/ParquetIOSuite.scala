@@ -506,7 +506,7 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
       clonedConf.asScala.foreach(entry =>
-            hadoopConfiguration.set(entry.getKey, entry.getValue))
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -536,7 +536,7 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
       clonedConf.asScala.foreach(entry =>
-            hadoopConfiguration.set(entry.getKey, entry.getValue))
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -561,7 +561,7 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
         // Hadoop 1 doesn't have `Configuration.unset`
         hadoopConfiguration.clear()
         clonedConf.asScala.foreach(entry =>
-              hadoopConfiguration.set(entry.getKey, entry.getValue))
+          hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }
@@ -609,7 +609,7 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
       clonedConf.asScala.foreach(entry =>
-            hadoopConfiguration.set(entry.getKey, entry.getValue))
+        hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -650,7 +650,7 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
         // Manually clear the hadoop configuration for other tests.
         hadoopConfiguration.clear()
         clonedConf.asScala.foreach(entry =>
-              hadoopConfiguration.set(entry.getKey, entry.getValue))
+          hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }
@@ -661,8 +661,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     val data: Dataset[String] = sqlContext
       .range(200)
       .map(i =>
-            if (i < 150) null
-            else "a")
+        if (i < 150) null
+        else "a")
     val df = data.toDF("col")
     assert(df.agg("col" -> "count").collect().head.getLong(0) == 50)
 

@@ -99,7 +99,7 @@ class InsertIntoHiveTableSuite
     val schema = StructType(
         StructField("m", MapType(StringType, StringType), true) :: Nil)
     val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
-              Row(scala.collection.mutable.HashMap(s"key$i" -> s"value$i"))))
+      Row(scala.collection.mutable.HashMap(s"key$i" -> s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithMapValue")
     sql("CREATE TABLE hiveTableWithMapValue(m MAP <STRING, STRING>)")
@@ -171,7 +171,7 @@ class InsertIntoHiveTableSuite
     val schema = StructType(
         Seq(StructField("a", ArrayType(StringType, containsNull = false))))
     val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
-              Row(Seq(s"value$i"))))
+      Row(Seq(s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithArrayValue")
     sql("CREATE TABLE hiveTableWithArrayValue(a Array <STRING>)")
@@ -186,10 +186,10 @@ class InsertIntoHiveTableSuite
   test("Insert MapType.valueContainsNull == false") {
     val schema = StructType(
         Seq(StructField(
-                "m",
-                MapType(StringType, StringType, valueContainsNull = false))))
+            "m",
+            MapType(StringType, StringType, valueContainsNull = false))))
     val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
-              Row(Map(s"key$i" -> s"value$i"))))
+      Row(Map(s"key$i" -> s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithMapValue")
     sql("CREATE TABLE hiveTableWithMapValue(m Map <STRING, STRING>)")
@@ -203,13 +203,11 @@ class InsertIntoHiveTableSuite
 
   test("Insert StructType.fields.exists(_.nullable == false)") {
     val schema = StructType(
-        Seq(
-            StructField(
-                "s",
-                StructType(
-                    Seq(StructField("f", StringType, nullable = false))))))
+        Seq(StructField(
+            "s",
+            StructType(Seq(StructField("f", StringType, nullable = false))))))
     val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
-              Row(Row(s"value$i"))))
+      Row(Row(s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithStructValue")
     sql("CREATE TABLE hiveTableWithStructValue(s Struct <f: STRING>)")

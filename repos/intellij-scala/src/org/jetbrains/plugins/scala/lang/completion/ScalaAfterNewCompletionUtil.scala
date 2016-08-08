@@ -72,18 +72,15 @@ object ScalaAfterNewCompletionUtil {
       clazz: PsiClass,
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)])
     : LookupElement = {
-    val undefines: Seq[ScUndefinedType] = clazz.getTypeParameters.map(
-        ptp =>
-          new ScUndefinedType(
-              new ScTypeParameterType(ptp, ScSubstitutor.empty)))
+    val undefines: Seq[ScUndefinedType] = clazz.getTypeParameters.map(ptp =>
+      new ScUndefinedType(new ScTypeParameterType(ptp, ScSubstitutor.empty)))
     val predefinedType = if (clazz.getTypeParameters.length == 1) {
       ScParameterizedType(ScDesignatorType(clazz), undefines)
     } else ScDesignatorType(clazz)
     val noUndefType = if (clazz.getTypeParameters.length == 1) {
-      ScParameterizedType(
-          ScDesignatorType(clazz),
-          clazz.getTypeParameters.map(ptp =>
-                new ScTypeParameterType(ptp, ScSubstitutor.empty)))
+      ScParameterizedType(ScDesignatorType(clazz),
+                          clazz.getTypeParameters.map(ptp =>
+                            new ScTypeParameterType(ptp, ScSubstitutor.empty)))
     } else ScDesignatorType(clazz)
 
     val iterator = expectedTypes.iterator
@@ -229,7 +226,7 @@ object ScalaAfterNewCompletionUtil {
         //todo: filter inner classes smarter (how? don't forget deep inner classes)
         if (clazz.containingClass != null &&
             (!clazz.containingClass.isInstanceOf[ScObject] ||
-                clazz.hasModifierPropertyScala("static"))) return null
+            clazz.hasModifierPropertyScala("static"))) return null
         if (!ResolveUtils.isAccessible(clazz, place, forCompletion = true))
           return null
         if (addedClasses.contains(clazz.qualifiedName)) return null
@@ -267,8 +264,8 @@ object ScalaAfterNewCompletionUtil {
               if (clazz.name == null || clazz.name == "") return true
               val undefines: Seq[ScUndefinedType] =
                 clazz.getTypeParameters.map(ptp =>
-                      new ScUndefinedType(
-                          new ScTypeParameterType(ptp, ScSubstitutor.empty)))
+                  new ScUndefinedType(
+                      new ScTypeParameterType(ptp, ScSubstitutor.empty)))
               val predefinedType = if (clazz.getTypeParameters.nonEmpty) {
                 ScParameterizedType(ScDesignatorType(clazz), undefines)
               } else ScDesignatorType(clazz)
@@ -276,7 +273,7 @@ object ScalaAfterNewCompletionUtil {
                 ScParameterizedType(
                     ScDesignatorType(clazz),
                     clazz.getTypeParameters.map(ptp =>
-                          new ScTypeParameterType(ptp, ScSubstitutor.empty)))
+                      new ScTypeParameterType(ptp, ScSubstitutor.empty)))
               } else ScDesignatorType(clazz)
               if (!predefinedType.conforms(typez)) return true
               val undef = Conformance.undefinedSubst(typez, predefinedType)

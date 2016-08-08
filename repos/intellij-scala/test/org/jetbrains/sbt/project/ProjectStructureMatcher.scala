@@ -23,12 +23,10 @@ trait ProjectStructureMatcher {
 
   def assertProjectsEqual(expected: project, actual: Project): Unit = {
     assertEquals("Project name", expected.name, actual.getName)
-    expected.foreach(sdk)(
-        it =>
-          assertEquals(
-              "Project SDK",
-              it,
-              roots.ProjectRootManager.getInstance(actual).getProjectSdk))
+    expected.foreach(sdk)(it =>
+      assertEquals("Project SDK",
+                   it,
+                   roots.ProjectRootManager.getInstance(actual).getProjectSdk))
     expected.foreach(languageLevel)(
         it =>
           assertEquals("Project language level",
@@ -163,9 +161,9 @@ trait ProjectStructureMatcher {
       expected: dependency[_],
       actual: roots.ExportableOrderEntry): Unit = {
     expected.foreach(isExported)(it =>
-          assertEquals("Dependency isExported flag", it, actual.isExported))
+      assertEquals("Dependency isExported flag", it, actual.isExported))
     expected.foreach(scope)(it =>
-          assertEquals("Dependency scope", it, actual.getScope))
+      assertEquals("Dependency scope", it, actual.getScope))
   }
 
   private def assertProjectLibrariesEqual(project: Project)(
@@ -251,11 +249,10 @@ trait InexactMatch { self: ProjectStructureMatcher =>
   override def assertMatch[T](what: String,
                               expected: Seq[T],
                               actual: Seq[T]): Unit =
-    expected.foreach(
-        it =>
-          assertTrue(
-              s"$what mismatch\nExpected [ ${expected.toList} ]\nActual   [ ${actual.toList} ]",
-              actual.contains(it)))
+    expected.foreach(it =>
+      assertTrue(
+          s"$what mismatch\nExpected [ ${expected.toList} ]\nActual   [ ${actual.toList} ]",
+          actual.contains(it)))
 }
 
 trait ExactMatch { self: ProjectStructureMatcher =>

@@ -305,7 +305,7 @@ class LiftServlet extends Loggable {
             if (isComet)
               js.JE
                 .JsRaw(LiftRules.noCometSessionCmd.vend.toJsCmd +
-                      ";lift.setToWatch({});")
+                  ";lift.setToWatch({});")
                 .cmd
             else js.JE.JsRaw(LiftRules.noAjaxSessionCmd.vend.toJsCmd).cmd
 
@@ -369,7 +369,7 @@ class LiftServlet extends Loggable {
               .map(_.apply() match {
                 case Full(a) =>
                   Full(LiftRules.convertResponse(
-                          (a, Nil, S.responseCookies, req)))
+                      (a, Nil, S.responseCookies, req)))
                 case r => r
               })
             tmpStatelessHolder.isDefined
@@ -674,9 +674,9 @@ class LiftServlet extends Loggable {
               case (jv: JValue) :: Nil => JsonResponse(jv)
               case (js: JsCmd) :: xs => {
                 (JsCommands(S.noticesToJsCmd :: Nil) &
-                      (js :: (xs.collect {
-                            case js: JsCmd => js
-                          }).reverse)).toResponse
+                  (js :: (xs.collect {
+                    case js: JsCmd => js
+                  }).reverse)).toResponse
               }
 
               case (n: Node) :: _ => XmlResponse(n)
@@ -721,7 +721,7 @@ class LiftServlet extends Loggable {
                          requestState: Req): Box[LiftResponse] = {
     extractVersions(requestState.path.partPath) { versionInfo =>
       LiftRules.cometLogger.debug("AJAX Request: " + liftSession.underlyingId +
-            " " + requestState.params)
+        " " + requestState.params)
       tryo {
         LiftSession.onBeginServicing.foreach(_(liftSession, requestState))
       }
@@ -914,8 +914,8 @@ class LiftServlet extends Loggable {
       Left(
           Full(
               new JsCommands(LiftRules.noCometSessionCmd.vend :: js.JE
-                    .JsRaw("lift.setToWatch({});")
-                    .cmd :: Nil).toResponse))
+                .JsRaw("lift.setToWatch({});")
+                .cmd :: Nil).toResponse))
     else
       requestState.request.suspendResumeSupport_? match {
         case true => {
@@ -940,7 +940,7 @@ class LiftServlet extends Loggable {
     val ret2: List[AnswerRender] = ret.toList
     val jsUpdateTime = ret2
       .map(ar =>
-            "lift.updWatch('" + ar.who.uniqueId + "', '" + ar.when + "');")
+        "lift.updWatch('" + ar.who.uniqueId + "', '" + ar.when + "');")
       .mkString("\n")
     val jsUpdateStuff = ret2.map { ar =>
       {
@@ -1036,9 +1036,9 @@ class LiftServlet extends Loggable {
                 ((for (updated <- Full((if (!LiftRules.excludePathFromContextPathRewriting
                                               .vend(uri)) u.contextPath
                                         else "") + uri).filter(ignore =>
-                                       uri.startsWith("/"));
+                                   uri.startsWith("/"));
                        rwf <- URLRewriter.rewriteFunc)
-                      yield rwf(updated)) openOr uri))
+                  yield rwf(updated)) openOr uri))
              case _ => v
            })
 
@@ -1080,7 +1080,7 @@ class LiftServlet extends Loggable {
             (if (len >= 0) List(("Content-Length", len.toString)) else Nil))
 
     LiftRules.beforeSend.toList.foreach(f =>
-          tryo(f(resp, response, header, Full(request))))
+      tryo(f(resp, response, header, Full(request))))
     // set the cookies
     response.addCookies(resp.cookies)
 
@@ -1139,7 +1139,7 @@ class LiftServlet extends Loggable {
     }
 
     LiftRules.afterSend.toList.foreach(f =>
-          tryo(f(resp, response, header, Full(request))))
+      tryo(f(resp, response, header, Full(request))))
   }
 }
 

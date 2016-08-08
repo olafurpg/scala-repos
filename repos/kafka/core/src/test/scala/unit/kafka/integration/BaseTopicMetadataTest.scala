@@ -276,12 +276,12 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
           .sortBy(_.id) == metadata.topicsMetadata.head.partitionsMetadata.head.isr
           .sortBy(_.id)
       }, "Topic metadata is not correctly updated for broker " +
-            x + ".\n" + "Expected ISR: " + expectedIsr + "\n" +
-            "Actual ISR  : " +
-            (if (metadata.topicsMetadata.nonEmpty &&
-                 metadata.topicsMetadata.head.partitionsMetadata.nonEmpty)
-               metadata.topicsMetadata.head.partitionsMetadata.head.isr
-             else ""), 8000L)
+        x + ".\n" + "Expected ISR: " + expectedIsr + "\n" +
+        "Actual ISR  : " +
+        (if (metadata.topicsMetadata.nonEmpty &&
+             metadata.topicsMetadata.head.partitionsMetadata.nonEmpty)
+           metadata.topicsMetadata.head.partitionsMetadata.head.isr
+         else ""), 8000L)
     })
   }
 
@@ -333,7 +333,7 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
     servers
       .filter(x => x.brokerState.currentState != NotRunning.state)
       .foreach(x =>
-            waitUntilTrue(() => {
+        waitUntilTrue(() => {
           val foundMetadata = ClientUtils.fetchTopicMetadata(
               Set.empty,
               Seq(

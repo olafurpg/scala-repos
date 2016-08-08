@@ -569,7 +569,7 @@ trait SortingRowFormat extends RowFormat with StdCodecs with RowFormatSupport {
   @transient lazy val selectors: List[(CPath, List[CType])] = {
     val refs: Map[CPath, Seq[ColumnRef]] = columnRefs.groupBy(_.selector)
     (columnRefs map (_.selector)).distinct.map(selector =>
-          (selector, refs(selector).map(_.ctype).toList))(collection.breakOut)
+      (selector, refs(selector).map(_.ctype).toList))(collection.breakOut)
   }
 
   private def zipWithSelectors[A](xs: Seq[A]): List[(CPath, Seq[(A, CType)])] = {

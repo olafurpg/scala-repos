@@ -41,9 +41,8 @@ akka {
                             .withFallback(system.settings.config))
 
   override def beforeTermination() {
-    system.eventStream.publish(
-        TestEvent.Mute(EventFilter.warning(
-                pattern = "received dead letter.*Disassociate")))
+    system.eventStream.publish(TestEvent.Mute(
+        EventFilter.warning(pattern = "received dead letter.*Disassociate")))
   }
 
   override def afterTermination() {

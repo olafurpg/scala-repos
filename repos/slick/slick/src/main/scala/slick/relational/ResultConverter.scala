@@ -47,7 +47,7 @@ trait ResultConverterDomain {
 
 /** An efficient (albeit boxed) ResultConverter for Product/Tuple values. */
 final case class ProductResultConverter[M <: ResultConverterDomain,
-    T <: Product](elementConverters: ResultConverter[M, _]*)
+T <: Product](elementConverters: ResultConverter[M, _]*)
     extends ResultConverter[M, T] {
   private[this] val cha = elementConverters.to[Array]
   private[this] val len = cha.length

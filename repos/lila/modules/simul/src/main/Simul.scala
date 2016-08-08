@@ -54,9 +54,9 @@ case class Simul(_id: Simul.ID,
     copy(
         applicants =
           applicants map {
-        case a if a is userId => a.copy(accepted = v)
-        case a => a
-      })
+            case a if a is userId => a.copy(accepted = v)
+            case a => a
+          })
   }
 
   def removePairing(userId: String) =
@@ -78,9 +78,9 @@ case class Simul(_id: Simul.ID,
     copy(
         pairings =
           pairings collect {
-        case p if p.gameId == gameId => f(p)
-        case p => p
-      }).finishIfDone
+            case p if p.gameId == gameId => f(p)
+            case p => p
+          }).finishIfDone
 
   def ejectCheater(userId: String): Option[Simul] =
     hasUser(userId) option removeApplicant(userId).removePairing(userId)

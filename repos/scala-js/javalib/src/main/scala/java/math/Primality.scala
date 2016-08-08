@@ -294,7 +294,7 @@ private[math] object Primality {
 
   /** All {@code BigInteger} prime numbers with bit length lesser than 8 bits. */
   private val BiPrimes = Array.tabulate[BigInteger](Primes.length)(i =>
-        BigInteger.valueOf(Primes(i)))
+    BigInteger.valueOf(Primes(i)))
 
   /** A random number is generated until a probable prime number is found.
     *

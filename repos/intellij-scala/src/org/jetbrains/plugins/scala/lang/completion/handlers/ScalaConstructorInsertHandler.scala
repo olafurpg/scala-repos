@@ -70,7 +70,7 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
               case _ =>
             }
             c.secondaryConstructors.foreach(fun =>
-                  if (fun.parameters.nonEmpty) hasNonEmptyParams = true)
+              if (fun.parameters.nonEmpty) hasNonEmptyParams = true)
           case _ =>
             clazz.getConstructors.foreach(
                 meth =>
@@ -148,7 +148,7 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
         }
 
         if ((clazz.isInterface || clazz.isInstanceOf[ScTrait] ||
-                clazz.hasModifierPropertyScala("abstract")) &&
+            clazz.hasModifierPropertyScala("abstract")) &&
             !item.typeParametersProblem) {
           context.setLaterRunnable(new Runnable {
             def run() {

@@ -204,7 +204,7 @@ class ScalaIntroduceFieldFromExpressionHandler
         def isBlockStmtOrMember(elem: PsiElement) =
           elem != null &&
             (elem.isInstanceOf[ScBlockStatement] || elem
-                  .isInstanceOf[ScMember])
+              .isInstanceOf[ScMember])
         var declaration = createdDeclaration.getText
         if (isBlockStmtOrMember(anchor)) declaration += "; "
         if (isBlockStmtOrMember(anchor.getPrevSibling))

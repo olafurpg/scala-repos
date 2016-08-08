@@ -113,7 +113,7 @@ object TestLinearWriteSpeed {
     val messageSet = new ByteBufferMessageSet(
         compressionCodec = compressionCodec,
         messages = (0 until numMessages).map(x =>
-              new Message(new Array[Byte](messageSize))): _*)
+          new Message(new Array[Byte](messageSize))): _*)
 
     val writables = new Array[Writable](numFiles)
     val scheduler = new KafkaScheduler(1)
@@ -168,7 +168,7 @@ object TestLinearWriteSpeed {
       count += 1
       totalWritten += writeSize
       if ((start -
-                lastReport) / (1000.0 * 1000.0) > reportingInterval.doubleValue) {
+            lastReport) / (1000.0 * 1000.0) > reportingInterval.doubleValue) {
         val ellapsedSecs = (start - lastReport) / (1000.0 * 1000.0 * 1000.0)
         val mb = written / (1024.0 * 1024.0)
         println(

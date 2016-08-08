@@ -65,7 +65,7 @@ class Word2VecSuite
           sentence
             .map(codes.apply)
             .reduce((word1, word2) =>
-                  word1.zip(word2).map { case (v1, v2) => v1 + v2 })
+              word1.zip(word2).map { case (v1, v2) => v1 + v2 })
             .map(_ / numOfWords))
     }
 

@@ -425,9 +425,8 @@ private[http] abstract class HttpMessageParser[
         val chunkBodyEnd = cursor + chunkSize
         def result(terminatorLen: Int) = {
           emit(
-              EntityChunk(
-                  HttpEntity.Chunk(input.slice(cursor, chunkBodyEnd).compact,
-                                   extension)))
+              EntityChunk(HttpEntity
+                .Chunk(input.slice(cursor, chunkBodyEnd).compact, extension)))
           Trampoline(
               _ ⇒
                 parseChunk(input,

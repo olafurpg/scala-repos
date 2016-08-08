@@ -103,10 +103,8 @@ class ScalaCompilerConfiguration(project: Project)
       .map(it => IncrementalityType.valueOf(it.getAttributeValue("value")))
       .getOrElse(IncrementalityType.IDEA)
 
-    defaultProfile.setSettings(
-        new ScalaCompilerSettings(
-            XmlSerializer.deserialize(configurationElement,
-                                      classOf[ScalaCompilerSettingsState])))
+    defaultProfile.setSettings(new ScalaCompilerSettings(XmlSerializer
+      .deserialize(configurationElement, classOf[ScalaCompilerSettingsState])))
 
     customProfiles = configurationElement.getChildren("profile").asScala.map {
       profileElement =>

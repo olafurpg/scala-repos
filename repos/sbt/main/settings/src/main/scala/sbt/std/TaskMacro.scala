@@ -296,7 +296,7 @@ object TaskMacro {
     val ec = c.enclosingClass.symbol
     def inEmptyPackage(s: c.Symbol): Boolean =
       s != c.universe.NoSymbol && (s.owner == c.mirror.EmptyPackage ||
-            s.owner == c.mirror.EmptyPackageClass || inEmptyPackage(s.owner))
+        s.owner == c.mirror.EmptyPackageClass || inEmptyPackage(s.owner))
     if (!ec.isStatic) name
     else if (inEmptyPackage(ec)) path
     else s"(${ec.fullName}) $name"

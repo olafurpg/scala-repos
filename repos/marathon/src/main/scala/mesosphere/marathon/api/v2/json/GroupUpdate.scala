@@ -29,15 +29,14 @@ case class GroupUpdate(id: Option[PathId],
       val groupUpdates = changedIdList
         .flatMap(gid => current.groups.find(_.id == gid))
         .zip(changedIdList.flatMap(gid =>
-                  updates.find(_.groupId.canonicalPath(current.id) == gid)))
+          updates.find(_.groupId.canonicalPath(current.id) == gid)))
         .map { case (group, groupUpdate) => groupUpdate(group, timestamp) }
       val groupAdditions = groupIds
         .diff(changedIds)
         .flatMap(gid =>
-              updates.find(_.groupId.canonicalPath(current.id) == gid))
+          updates.find(_.groupId.canonicalPath(current.id) == gid))
         .map(update =>
-              update.toGroup(update.groupId.canonicalPath(current.id),
-                             timestamp))
+          update.toGroup(update.groupId.canonicalPath(current.id), timestamp))
       groupUpdates.toSet ++ groupAdditions
     }
     val effectiveApps: Set[AppDefinition] =

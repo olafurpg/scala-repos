@@ -118,7 +118,7 @@ object ListTest extends SpecLite {
   "takeWhileM example" in {
     def takeWhileN[A](as: List[A], n: Int)(f: A => Boolean): List[A] =
       as.takeWhileM[State[Int, ?]](a =>
-              State { i =>
+          State { i =>
             val j = i + (if (f(a)) 0 else 1)
             val done = j >= n
             (j, !done)
@@ -132,13 +132,13 @@ object ListTest extends SpecLite {
   "foldl is foldLeft" ! forAll { (rnge: List[List[Int]]) =>
     val F = Foldable[List]
     (rnge.foldLeft(List[Int]())(_ ++ _) must_===
-          (F.foldLeft(rnge, List[Int]())(_ ++ _)))
+      (F.foldLeft(rnge, List[Int]())(_ ++ _)))
   }
 
   "foldr is foldRight" ! forAll { (rnge: List[List[Int]]) =>
     val F = Foldable[List]
     (rnge.foldRight(List[Int]())(_ ++ _) must_===
-          (F.foldRight(rnge, List[Int]())(_ ++ _)))
+      (F.foldRight(rnge, List[Int]())(_ ++ _)))
   }
 
   "index" ! forAll { (xs: List[Int], n: Int) =>

@@ -8,7 +8,7 @@ object DefaultsTest extends Specification {
   private def assertFiltered(filter: List[String],
                              expected: Map[String, Boolean]) = {
     val actual = expected.map(t =>
-          (t._1, Defaults.selectedFilter(filter).exists(fn => fn(t._1))))
+      (t._1, Defaults.selectedFilter(filter).exists(fn => fn(t._1))))
 
     actual must be equalTo (expected)
   }

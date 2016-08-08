@@ -198,8 +198,8 @@ abstract class ActorTransportAdapter(wrappedTransport: Transport,
 
   private def registerManager(): Future[ActorRef] =
     (system.actorSelection("/system/transports") ? RegisterTransportActor(
-            managerProps,
-            managerName)).mapTo[ActorRef]
+        managerProps,
+        managerName)).mapTo[ActorRef]
 
   override def interceptListen(
       listenAddress: Address,

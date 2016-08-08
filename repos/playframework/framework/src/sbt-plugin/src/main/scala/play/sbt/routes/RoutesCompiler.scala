@@ -146,7 +146,7 @@ object RoutesCompiler extends AutoPlugin {
                     cacheDirectory: File,
                     log: Logger): Seq[File] = {
     val ops = tasks.map(task =>
-          RoutesCompilerOp(task, generator.id, PlayVersion.current))
+      RoutesCompilerOp(task, generator.id, PlayVersion.current))
     val (products, errors) = syncIncremental(cacheDirectory, ops) {
       opsToRun: Seq[RoutesCompilerOp] =>
         val results = opsToRun.map { op =>

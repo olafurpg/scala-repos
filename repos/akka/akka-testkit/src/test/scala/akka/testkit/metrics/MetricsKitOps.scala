@@ -88,8 +88,8 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL { this: MetricsKit ⇒
   def measureGc(key: MetricKey) =
     registry.registerAll(
         new jvm.GarbageCollectorMetricSet() with MetricsPrefix {
-      val prefix = key / "gc"
-    })
+          val prefix = key / "gc"
+        })
 
   /** Enable File Descriptor measurements */
   def measureFileDescriptors(key: MetricKey) =

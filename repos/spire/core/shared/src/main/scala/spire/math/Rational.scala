@@ -231,7 +231,7 @@ object Rational extends RationalInstances {
 
         val addBit =
           if (nShared < dShared || (nShared == dShared &&
-                  d.toBigInteger.getLowestSetBit < dLowerLength)) {
+              d.toBigInteger.getLowestSetBit < dLowerLength)) {
             1
           } else {
             0

@@ -24,7 +24,7 @@ sealed abstract class DupInstances {
               Kleisli[RegionT[PS, PP, ?],
                       IORef[List[RefCountedFinalizer]],
                       FinalizerHandle[RegionT[PS, PP, ?]]](hsIORef =>
-                    copy[PS, PP, RegionT[CS, RegionT[PS, PP, ?], ?]](h)))
+                copy[PS, PP, RegionT[CS, RegionT[PS, PP, ?], ?]](h)))
     }
 }
 
@@ -40,7 +40,7 @@ object Dup extends DupInstances {
     : RegionT[S, P, FinalizerHandle[RegionT[S, P, ?]]] = h match {
     case h =>
       RegionT(Kleisli(hsIORef =>
-                (for {
+        (for {
           _ <- h.finalizer.refcount.mod(_ + 1)
           _ <- hsIORef.mod(h.finalizer :: _)
         } yield FinalizerHandle[RegionT[S, P, ?]](h.finalizer)).liftIO[P]))

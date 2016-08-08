@@ -380,7 +380,7 @@ class IRs[U <: Universe with Singleton](val uni: U) {
     }
 
     val paramFields = ctorParams.map(sym =>
-          mkFieldIR(sym, Some(sym), paramAccessors.find(_.name == sym.name)))
+      mkFieldIR(sym, Some(sym), paramAccessors.find(_.name == sym.name)))
     val varGetters = otherAccessors.collect {
       case meth
           if meth.isGetter && meth.accessed != NoSymbol &&

@@ -236,7 +236,7 @@ class ClientServerSpec
             }
 
             (System.nanoTime() -
-                  serverReceivedRequestAtNanos).millis should be >= serverTimeout
+              serverReceivedRequestAtNanos).millis should be >= serverTimeout
           } finally Await.result(b1.unbind(), 1.second)
         }
       }
@@ -561,7 +561,7 @@ class ClientServerSpec
     val connSourceSub = connSource.expectSubscription()
 
     def openNewClientConnection(settings: ClientConnectionSettings =
-          ClientConnectionSettings(system)) = {
+      ClientConnectionSettings(system)) = {
       val requestPublisherProbe = TestPublisher.manualProbe[HttpRequest]()
       val responseSubscriberProbe = TestSubscriber.manualProbe[HttpResponse]()
 
@@ -610,7 +610,7 @@ class ClientServerSpec
 
     def readAll(socket: Socket)(
         reader: BufferedReader = new BufferedReader(new InputStreamReader(
-                socket.getInputStream))): (String, BufferedReader) = {
+            socket.getInputStream))): (String, BufferedReader) = {
       val sb = new java.lang.StringBuilder
       val cbuf = new Array[Char](256)
       @tailrec def drain(): (String, BufferedReader) =

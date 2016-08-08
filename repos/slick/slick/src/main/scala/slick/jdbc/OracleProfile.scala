@@ -63,8 +63,8 @@ trait OracleProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.foreignKeyActions -
-          JdbcCapabilities.insertOrUpdate - JdbcCapabilities.booleanMetaData -
-          JdbcCapabilities.distinguishesIntTypes - JdbcCapabilities.supportsByte)
+      JdbcCapabilities.insertOrUpdate - JdbcCapabilities.booleanMetaData -
+      JdbcCapabilities.distinguishesIntTypes - JdbcCapabilities.supportsByte)
 
   override protected lazy val useServerSideUpsert = true
   override protected lazy val useServerSideUpsertReturning = false
@@ -116,10 +116,10 @@ trait OracleProfile extends JdbcProfile {
 
   override protected def computeQueryCompiler =
     (super.computeQueryCompiler
-          .addAfter(Phase.removeTakeDrop, Phase.expandSums)
-          .replace(Phase.resolveZipJoinsRownumStyle) -
-          Phase.fixRowNumberOrdering + Phase.rewriteBooleans +
-          new RemoveSubqueryOrdering)
+      .addAfter(Phase.removeTakeDrop, Phase.expandSums)
+      .replace(Phase.resolveZipJoinsRownumStyle) -
+      Phase.fixRowNumberOrdering + Phase.rewriteBooleans +
+      new RemoveSubqueryOrdering)
 
   override def createQueryBuilder(n: Node,
                                   state: CompilerState): QueryBuilder =

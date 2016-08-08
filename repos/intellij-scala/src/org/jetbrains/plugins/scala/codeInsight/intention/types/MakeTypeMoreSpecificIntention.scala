@@ -95,7 +95,7 @@ class MakeTypeMoreSpecificStrategy(editor: Option[Editor]) extends Strategy {
                  editor: Editor): Unit = {
     val types =
       computeBaseTypes(declaredType, dynamicType).sortWith((t1, t2) =>
-            t1.conforms(t2))
+        t1.conforms(t2))
     if (types.size == 1) {
       val replaced = te.replace(
           ScalaPsiElementFactory.createTypeElementFromText(

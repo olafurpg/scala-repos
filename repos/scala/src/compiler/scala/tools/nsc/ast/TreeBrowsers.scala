@@ -195,11 +195,11 @@ abstract class TreeBrowsers {
 
       jTree.addTreeSelectionListener(
           new javax.swing.event.TreeSelectionListener() {
-        def valueChanged(e: javax.swing.event.TreeSelectionEvent): Unit = {
-          textArea.setText(e.getPath().getLastPathComponent().toString)
-          infoPanel.update(e.getPath().getLastPathComponent())
-        }
-      })
+            def valueChanged(e: javax.swing.event.TreeSelectionEvent): Unit = {
+              textArea.setText(e.getPath().getLastPathComponent().toString)
+              infoPanel.update(e.getPath().getLastPathComponent())
+            }
+          })
 
       val topSplitPane =
         new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, topLeftPane, topRightPane)
@@ -544,10 +544,10 @@ abstract class TreeBrowsers {
         var str = s.flagString
         if (s.isStaticMember) str = str + " isStatic "
         (str + " annotations: " + s.annotations.mkString("", " ", "") +
-              (if (s.isTypeSkolem)
-                 "\ndeSkolemized annotations: " +
-                   s.deSkolemize.annotations.mkString("", " ", "")
-               else ""))
+          (if (s.isTypeSkolem)
+             "\ndeSkolemized annotations: " +
+               s.deSkolemize.annotations.mkString("", " ", "")
+           else ""))
       } else ""
     }
   }
@@ -663,7 +663,7 @@ abstract class TreeBrowsers {
             Document.nest(
                 4,
                 "ExistentialType(" :/: Document.group("(" :/: symsToDocument(
-                        tparams) :/: "), ") :/: toDocument(result) :: ")"))
+                    tparams) :/: "), ") :/: toDocument(result) :: ")"))
 
       case ImportType(expr) =>
         "ImportType(" + expr.toString + ")"

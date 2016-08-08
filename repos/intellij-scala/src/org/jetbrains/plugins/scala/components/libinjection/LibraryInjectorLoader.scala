@@ -292,7 +292,7 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
       .filterNot(jarCache.cache.values().contains)
     val validManifests = parsedManifests.flatMap(verifyManifest)
     val candidates = validManifests.map(manifest =>
-          manifest -> findMatchingInjectors(manifest))
+      manifest -> findMatchingInjectors(manifest))
     LOG.trace(s"Found ${candidates.size} new jars with embedded extensions")
     if (candidates.nonEmpty) askUser(candidates)
   }
@@ -362,7 +362,7 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     val curVer =
       ScalaPluginVersionVerifier.getPluginVersion.getOrElse(Version.Snapshot)
     libraryManifest.pluginDescriptors.find(d =>
-          (curVer > d.since && curVer < d.until) || curVer.isSnapshot)
+      (curVer > d.since && curVer < d.until) || curVer.isSnapshot)
   }
 
   private def findMatchingInjectors(
@@ -457,7 +457,7 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
           val msg =
             if (numFailed == 0)
               s"Compiled $numSuccessful injector(s) in ${(System
-                    .currentTimeMillis() - startTime) / 1000} seconds"
+                .currentTimeMillis() - startTime) / 1000} seconds"
             else
               s"Failed to compile $numFailed injectors out of ${numSuccessful + numFailed}, see Event Log for details"
           val notificationDisplayType =
@@ -478,7 +478,7 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     val file = new File(
         myInjectorCacheDir,
         (jar.getName +
-              ScalaPluginVersionVerifier.getPluginVersion.get.toString)
+          ScalaPluginVersionVerifier.getPluginVersion.get.toString)
           .replaceAll("\\.", "_"))
     file.mkdir()
     file

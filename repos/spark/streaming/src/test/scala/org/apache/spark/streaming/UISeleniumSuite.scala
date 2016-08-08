@@ -127,8 +127,7 @@ class UISeleniumSuite
         val h4Text = findAll(cssSelector("h4")).map(_.text).toSeq
         h4Text.exists(_.matches("Active Batches \\(\\d+\\)")) should be(true)
         h4Text.exists(_.matches(
-                "Completed Batches \\(last \\d+ out of \\d+\\)")) should be(
-            true)
+            "Completed Batches \\(last \\d+ out of \\d+\\)")) should be(true)
 
         findAll(cssSelector("""#active-batches-table th"""))
           .map(_.text)
@@ -221,7 +220,7 @@ class UISeleniumSuite
         // Check a non-exist batch
         go to
           (sparkUI.appUIAddress
-                .stripSuffix("/") + "/streaming/batch/?id=12345")
+            .stripSuffix("/") + "/streaming/batch/?id=12345")
         webDriver.getPageSource should include("does not exist")
       }
 

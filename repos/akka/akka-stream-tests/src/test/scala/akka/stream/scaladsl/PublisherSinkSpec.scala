@@ -52,11 +52,9 @@ class PublisherSinkSpec extends AkkaSpec {
     }
 
     "be able to use Publisher in materialized value transformation" in {
-      val f = Source(1 to 3).runWith(
-          Sink
-            .asPublisher[Int](false)
-            .mapMaterializedValue(p ⇒
-                  Source.fromPublisher(p).runFold(0)(_ + _)))
+      val f = Source(1 to 3).runWith(Sink
+        .asPublisher[Int](false)
+        .mapMaterializedValue(p ⇒ Source.fromPublisher(p).runFold(0)(_ + _)))
 
       Await.result(f, 3.seconds) should be(6)
     }

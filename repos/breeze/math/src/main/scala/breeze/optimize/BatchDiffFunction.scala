@@ -68,9 +68,9 @@ trait BatchDiffFunction[T]
   def groupItems(groupSize: Int): BatchDiffFunction[T] =
     new BatchDiffFunction[T] {
       val numGroups = (outer.fullRange.size + groupSize - 1) / groupSize
-      val groups: Array[immutable.IndexedSeq[Int]] = Array.tabulate(numGroups)(
-          i =>
-            (i until outer.fullRange.length by numGroups).map(outer.fullRange))
+      val groups: Array[immutable.IndexedSeq[Int]] =
+        Array.tabulate(numGroups)(i =>
+          (i until outer.fullRange.length by numGroups).map(outer.fullRange))
 
       /**
         * Calculates the value and gradient of the function on a subset of the data

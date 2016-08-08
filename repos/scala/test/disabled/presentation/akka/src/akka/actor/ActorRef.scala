@@ -1224,9 +1224,8 @@ class LocalActorRef private[akka] (private[this] val actorFactory: () => Actor,
       else {
         val parent = clazz.getSuperclass
         if (parent eq null)
-          throw new IllegalActorStateException(
-              toString +
-                " is not an Actor since it have not mixed in the 'Actor' trait")
+          throw new IllegalActorStateException(toString +
+            " is not an Actor since it have not mixed in the 'Actor' trait")
         lookupAndSetSelfFields(parent, actor, value)
       }
     }

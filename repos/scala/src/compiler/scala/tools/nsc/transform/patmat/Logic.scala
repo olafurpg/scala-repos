@@ -554,8 +554,8 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
           // values and null
           lower == upper || // type implication
             (lower != NullConst && !upper.isValue && instanceOfTpImplies(
-                    if (lower.isValue) lower.wideTp else lower.tp,
-                    upper.tp))
+                if (lower.isValue) lower.wideTp else lower.tp,
+                upper.tp))
 
         // if(r) debug.patmat("implies    : "+(lower, lower.tp, upper, upper.tp))
         // else  debug.patmat("NOT implies: "+(lower, upper))
@@ -703,15 +703,15 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
           .get(tp)
           .getOrElse(
               uniques.find { case (oldTp, oldC) => oldTp =:= tp } match {
-            case Some((_, c)) =>
-              debug.patmat("unique const: " + ((tp, c)))
-              c
-            case _ =>
-              val fresh = mkFresh
-              debug.patmat("uniqued const: " + ((tp, fresh)))
-              uniques(tp) = fresh
-              fresh
-          })
+                case Some((_, c)) =>
+                  debug.patmat("unique const: " + ((tp, c)))
+                  c
+                case _ =>
+                  val fresh = mkFresh
+                  debug.patmat("uniqued const: " + ((tp, fresh)))
+                  uniques(tp) = fresh
+                  fresh
+              })
 
       private val trees = mutable.HashSet.empty[Tree]
 

@@ -6,7 +6,7 @@ object B extends Build {
   lazy val root =
     Project("root", file(".")) settings
       (myRun, fork in demo := true, javaOptions in demo :=
-            "-Dsbt.check.forked=true" :: Nil, myIn)
+        "-Dsbt.check.forked=true" :: Nil, myIn)
 
   lazy val demoIn = InputKey[Unit]("demo-in", "Demo run input task", demo)
   lazy val demo = TaskKey[Unit]("demo", "Demo run task")

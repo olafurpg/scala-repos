@@ -66,22 +66,21 @@ object Step {
 
   implicit val stepJsonWriter: Writes[Step] = Writes { step =>
     import step._
-    (add("check", true, check) _ compose add("eval", eval) _ compose add("nag",
-                                                                         nag) _ compose add(
-            "comments",
-            comments,
-            comments.nonEmpty) _ compose add("variations",
-                                             variations,
-                                             variations.nonEmpty) _ compose add(
-            "opening",
-            opening) _ compose add("dests", dests.map {
+    (add("check", true, check) _ compose add("eval", eval) _ compose add(
+        "nag",
+        nag) _ compose add("comments", comments, comments.nonEmpty) _ compose add(
+        "variations",
+        variations,
+        variations.nonEmpty) _ compose add("opening", opening) _ compose add(
+        "dests",
+        dests.map {
           _.map {
             case (orig, dests) =>
               s"${orig.piotr}${dests.map(_.piotr).mkString}"
           }.mkString(" ")
         }) _ compose add("drops", drops.map { drops =>
-          JsString(drops.map(_.key).mkString)
-        }) _ compose add("crazy", crazyData))(
+      JsString(drops.map(_.key).mkString)
+    }) _ compose add("crazy", crazyData))(
         Json.obj("ply" -> ply,
                  "uci" -> move.map(_.uciString),
                  "san" -> move.map(_.san),

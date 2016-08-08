@@ -51,13 +51,14 @@ final class PostApi(env: Env,
                                                                     post.text))
             } >>- {
               (ctx.userId ifFalse post.troll) ?? { userId =>
-                timeline ! Propagate(
-                    ForumPost(userId, topic.id.some, topic.name, post.id)).|>(
-                    prop =>
-                      post.isStaff.fold(
-                          prop toStaffFriendsOf userId,
-                          prop toFollowersOf userId toUsers topicUserIds exceptUser userId
-                    ))
+                timeline ! Propagate(ForumPost(userId,
+                                               topic.id.some,
+                                               topic.name,
+                                               post.id)).|>(prop =>
+                  post.isStaff.fold(
+                      prop toStaffFriendsOf userId,
+                      prop toFollowersOf userId toUsers topicUserIds exceptUser userId
+                ))
               }
               lila.mon.forum.post.create()
             } inject post

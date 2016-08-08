@@ -742,7 +742,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
   def publish(path: String, msg: Any, allButSelf: Boolean = false): Unit = {
     for {
       (address, bucket) ← registry if !(allButSelf &&
-            address == selfAddress) // if we should skip sender() node and current address == self address => skip
+        address == selfAddress) // if we should skip sender() node and current address == self address => skip
       valueHolder ← bucket.content.get(path)
       ref ← valueHolder.ref
     } ref forward msg
@@ -770,8 +770,8 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
     val bucket = registry(selfAddress)
     val v = nextVersion()
     registry += (selfAddress -> bucket.copy(
-            version = v,
-            content = bucket.content + (key -> ValueHolder(v, valueOption))))
+        version = v,
+        content = bucket.content + (key -> ValueHolder(v, valueOption))))
   }
 
   def getCurrentTopics(): Set[String] = {

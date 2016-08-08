@@ -14,9 +14,8 @@ import scala.pickling.internal._
   *  This pickler requires that the dynamic type of the object-to-be-pickled is equal to
   *  the erasure of its static type `T`.
   */
-@implicitNotFound(
-    msg =
-      "Cannot generate a pickler for ${T}. Recompile with -Xlog-implicits for details")
+@implicitNotFound(msg =
+  "Cannot generate a pickler for ${T}. Recompile with -Xlog-implicits for details")
 trait Pickler[T] {
 
   /** Uses the given builder to place 'primitive' values, or collections/structures, into the
@@ -41,9 +40,8 @@ object Pickler {
   *  In contrast to static picklers (instances of type `Pickler[T]`), a dynamic pickler of
   *  type `DPickler[T]` pickles any object of type `T`.
   */
-@implicitNotFound(
-    msg =
-      "Cannot generate a DPickler for ${T}. Recompile with -Xlog-implicits for details")
+@implicitNotFound(msg =
+  "Cannot generate a DPickler for ${T}. Recompile with -Xlog-implicits for details")
 trait DPickler[T] {
   def pickle(picklee: T, builder: PBuilder): Unit
 }
@@ -54,9 +52,8 @@ trait Generated
 /** This is something which knowns how to reconstitute/materialize a type out of
   *  a pickle reader.
   */
-@implicitNotFound(
-    msg =
-      "Cannot generate an unpickler for ${T}. Recompile with -Xlog-implicits for details")
+@implicitNotFound(msg =
+  "Cannot generate an unpickler for ${T}. Recompile with -Xlog-implicits for details")
 trait Unpickler[T] {
   // TODO - we'd like  to call this method unpickeRaw and the unpickleEntry method `unpickle`,
   //        as there is some logic about how to use the reader encoded here.

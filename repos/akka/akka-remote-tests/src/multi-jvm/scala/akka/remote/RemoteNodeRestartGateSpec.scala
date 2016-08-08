@@ -28,7 +28,7 @@ object RemoteNodeRestartGateSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false).withFallback(ConfigFactory.parseString(
-              """
+          """
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
       akka.remote.retry-gate-closed-for  = 1d # Keep it long

@@ -167,9 +167,8 @@ trait PrecogLibModule[M[+ _]]
 
                   def populate(data: List[JValue]): Validation[Error, Slice] = {
                     if (data.size != members.cardinality) {
-                      Failure(
-                          Error.invalid(
-                              "Number of items returned does not match number sent."))
+                      Failure(Error.invalid(
+                          "Number of items returned does not match number sent."))
                     } else {
                       def sparseStream(row: Int,
                                        xs: List[RValue]): Stream[RValue] =

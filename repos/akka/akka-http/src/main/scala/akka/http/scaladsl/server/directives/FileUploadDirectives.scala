@@ -66,10 +66,8 @@ trait FileUploadDirectives {
           formData.parts
             .filter(part ⇒ part.filename.isDefined && part.name == fieldName)
             .map(part ⇒
-                  (FileInfo(part.name,
-                            part.filename.get,
-                            part.entity.contentType),
-                   part.entity.dataBytes))
+              (FileInfo(part.name, part.filename.get, part.entity.contentType),
+               part.entity.dataBytes))
             .take(1)
 
         val onePartF = onePartSource.runWith(

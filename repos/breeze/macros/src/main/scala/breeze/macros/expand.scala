@@ -99,8 +99,8 @@ object expand {
           val grounded = substitute(c)(typeMap, valExpansions, rhs)
           val newvargs = valsToLeave
             .filterNot(_.isEmpty)
-            .map(_.map(substitute(c)(typeMap, valExpansions, _)
-                      .asInstanceOf[ValDef]))
+            .map(_.map(
+                substitute(c)(typeMap, valExpansions, _).asInstanceOf[ValDef]))
           val newtpt = substitute(c)(typeMap, valExpansions, tpt)
           val newName = newTermName(mkName(c)(name, typeMap))
           if (shouldValify) {
@@ -249,8 +249,8 @@ object expand {
         args.map(
             aa =>
               (targs zip aa
-                    .map(c.typeCheck(_))
-                    .map(_.symbol.asModule.companionSymbol.asType.toType)).toMap)
+                .map(c.typeCheck(_))
+                .map(_.symbol.asModule.companionSymbol.asType.toType)).toMap)
     }.flatten.toSeq
   }
 

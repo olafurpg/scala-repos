@@ -91,13 +91,13 @@ final class AssessApi(collAssessments: Coll,
   def refreshAssessByUsername(username: String): Funit = withUser(username) {
     user =>
       (GameRepo.gamesForAssessment(user.id, 100) flatMap { gs =>
-            (gs map { g =>
-                  AnalysisRepo.byId(g.id) flatMap {
-                    case Some(a) => onAnalysisReady(g, a, false)
-                    case _ => funit
-                  }
-                }).sequenceFu.void
-          }) >> assessUser(user.id)
+        (gs map { g =>
+          AnalysisRepo.byId(g.id) flatMap {
+            case Some(a) => onAnalysisReady(g, a, false)
+            case _ => funit
+          }
+        }).sequenceFu.void
+      }) >> assessUser(user.id)
   }
 
   def onAnalysisReady(game: Game,
@@ -119,9 +119,9 @@ final class AssessApi(collAssessments: Coll,
           assessible playerAssessment chess.Black)
     } >>
       ((shouldAssess && thenAssessUser) ?? {
-            game.whitePlayer.userId.??(assessUser) >> game.blackPlayer.userId
-              .??(assessUser)
-          })
+        game.whitePlayer.userId.??(assessUser) >> game.blackPlayer.userId
+          .??(assessUser)
+      })
   }
 
   def assessUser(userId: String): Funit =

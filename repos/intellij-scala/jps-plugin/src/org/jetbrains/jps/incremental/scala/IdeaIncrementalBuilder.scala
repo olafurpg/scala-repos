@@ -90,7 +90,7 @@ class IdeaIncrementalBuilder(category: BuilderCategory)
         packageObjectsData.invalidatedPackageObjects(sources).filter(_.exists)
       if (additionalFiles.nonEmpty) {
         (sources ++ additionalFiles).foreach(f =>
-              FSOperations.markDirty(context, CompilationRound.NEXT, f))
+          FSOperations.markDirty(context, CompilationRound.NEXT, f))
         return ExitCode.ADDITIONAL_PASS_REQUIRED
       }
     }
@@ -184,10 +184,10 @@ class IdeaIncrementalBuilder(category: BuilderCategory)
 
     dirtyFilesHolder.processDirtyFiles(
         new FileProcessor[JavaSourceRootDescriptor, ModuleBuildTarget] {
-      def apply(target: ModuleBuildTarget,
-                file: File,
-                root: JavaSourceRootDescriptor) = checkAndCollectFile(file)
-    })
+          def apply(target: ModuleBuildTarget,
+                    file: File,
+                    root: JavaSourceRootDescriptor) = checkAndCollectFile(file)
+        })
 
     for {
       target <- chunk.getTargets.asScala

@@ -46,14 +46,9 @@ object User extends LilaController {
         (ctx.isAuth ?? { Env.pref.api.followable(user.id) }) zip
         (ctx.userId ?? { relationApi.fetchRelation(_, user.id) }) map {
         case (((((pov, donor), blocked), crosstable), followable), relation) =>
-          Ok(
-              html.user.mini(user,
-                             pov,
-                             blocked,
-                             followable,
-                             relation,
-                             crosstable,
-                             donor)).withHeaders(CACHE_CONTROL -> "max-age=5")
+          Ok(html.user
+            .mini(user, pov, blocked, followable, relation, crosstable, donor))
+            .withHeaders(CACHE_CONTROL -> "max-age=5")
       }
     }
   }
@@ -72,8 +67,8 @@ object User extends LilaController {
           env.cached top50Online true map { list =>
             Ok(
                 Json.toJson(list
-                      .take(getInt("nb").fold(10)(_ min max))
-                      .map(env.jsonView(_))))
+                  .take(getInt("nb").fold(10)(_ min max))
+                  .map(env.jsonView(_))))
         }
     )
   }
@@ -280,7 +275,7 @@ object User extends LilaController {
               .jsonView(u, perfStat, ranks get perfType.key, distribution)
             response <- negotiate(
                            html = Ok(html.user
-                                 .perfStat(u, ranks, perfType, data)).fuccess,
+                             .perfStat(u, ranks, perfType, data)).fuccess,
                            api = _ => Ok(data).fuccess)
           } yield response
         }

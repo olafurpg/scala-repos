@@ -133,8 +133,8 @@ abstract class TailCalls extends Transform {
                 method.ownerChain.mkString(" -> "),
                 currentClass.ownerChain.mkString(" -> ")
             )
-        logResult(msg)(
-            method.newValue(nme.THIS, pos, SYNTHETIC) setInfo currentClass.typeOfThis)
+        logResult(msg)(method
+          .newValue(nme.THIS, pos, SYNTHETIC) setInfo currentClass.typeOfThis)
       }
       override def toString =
         s"${method.name} tparams=$tparams tailPos=$tailPos label=$label label info=${label.info}"
@@ -186,8 +186,8 @@ abstract class TailCalls extends Transform {
         val receiver = t.symbol
 
         ((receiver != null) && receiver.isMethod &&
-            (method.name == receiver.name) &&
-            (method.enclClass isSubClass receiver.enclClass))
+        (method.name == receiver.name) &&
+        (method.enclClass isSubClass receiver.enclClass))
       }
       def containsRecursiveCall(t: Tree) = t exists isRecursiveCall
     }
@@ -271,7 +271,7 @@ abstract class TailCalls extends Transform {
           accessed += ctx.label
           typedPos(fun.pos) {
             val args = mapWithIndex(transformArgs)((arg, i) =>
-                  mkAttributedCastHack(arg, ctx.label.info.params(i + 1).tpe))
+              mkAttributedCastHack(arg, ctx.label.info.params(i + 1).tpe))
             Apply(Ident(ctx.label), noTailTransform(recv) :: args)
           }
         }

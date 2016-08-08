@@ -38,7 +38,7 @@ object ScalaIndentProcessor extends ScalaTokenTypes {
           if (scalaSettings.USE_SCALADOC2_FORMATTING) 2 else 1)
     }
     if ((node.getElementType == ScalaTokenTypes.kIF ||
-            node.getElementType == ScalaTokenTypes.kELSE) &&
+        node.getElementType == ScalaTokenTypes.kELSE) &&
         parent.myLastNode != null) {
       child.getPsi match {
         case _: ScBlockExpr
@@ -202,9 +202,8 @@ object ScalaIndentProcessor extends ScalaTokenTypes {
       case arg: ScArgumentExprList if arg.isBraceArgs =>
         if (scalaSettings.INDENT_BRACED_FUNCTION_ARGS &&
             arg.children.exists(child =>
-                  Set(ScalaTokenTypes.tLPARENTHESIS,
-                      ScalaTokenTypes.tRPARENTHESIS).contains(
-                      child.getNode.getElementType)) &&
+              Set(ScalaTokenTypes.tLPARENTHESIS, ScalaTokenTypes.tRPARENTHESIS)
+                .contains(child.getNode.getElementType)) &&
             child.getElementType != ScalaTokenTypes.tRPARENTHESIS &&
             child.getElementType != ScalaTokenTypes.tLPARENTHESIS)
           Indent.getNormalIndent
@@ -318,6 +317,6 @@ object ScalaIndentProcessor extends ScalaTokenTypes {
       paramClause: ScParameterClause): Boolean = {
     val owner = paramClause.owner
     owner != null && (owner.isInstanceOf[ScPrimaryConstructor] ||
-        owner.isInstanceOf[ScFunction])
+    owner.isInstanceOf[ScFunction])
   }
 }

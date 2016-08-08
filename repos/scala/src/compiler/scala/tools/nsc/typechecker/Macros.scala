@@ -191,7 +191,7 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
                                                          (param,
                                                           tparam) => tparam)
         mmap(transformed)(p =>
-              if (p.isTerm) fingerprint(p.info) else Tagged(p.paramPos))
+          if (p.isTerm) fingerprint(p.info) else Tagged(p.paramPos))
       }
 
       val payload = List[(String, Any)](
@@ -479,8 +479,8 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
         // STEP I: prepare value arguments of the macro expansion
         // wrap argss in c.Expr if necessary (i.e. if corresponding macro impl param is of type c.Expr[T])
         // expand varargs (nb! varargs can apply to any parameter section, not necessarily to the last one)
-        val trees = map3(argss, paramss, signature)(
-            (args, defParams, implParams) => {
+        val trees = map3(argss, paramss, signature)((args, defParams,
+                                                     implParams) => {
           val isVarargs = isVarArgsList(defParams)
           if (isVarargs) {
             if (defParams.length > args.length + 1)

@@ -113,9 +113,8 @@ private[mllib] object EigenValueDecomposition {
     // ido = 99 : done flag in reverse communication
     while (ido.`val` != 99) {
       if (ido.`val` != -1 && ido.`val` != 1) {
-        throw new IllegalStateException(
-            "ARPACK returns ido = " + ido.`val` +
-              " This flag is not compatible with Mode 1: A*x = lambda*x, A symmetric.")
+        throw new IllegalStateException("ARPACK returns ido = " + ido.`val` +
+          " This flag is not compatible with Mode 1: A*x = lambda*x, A symmetric.")
       }
       // multiply working vector with the matrix
       val inputOffset = ipntr(0) - 1

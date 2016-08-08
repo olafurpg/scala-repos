@@ -510,13 +510,13 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   val maxConcurrentRequests: FactoryMaker[Req => Int] = new FactoryMaker(
       (x: Req) =>
         x match {
-      case r if r.isIPad || r.isIPhone => 1
-      case r
-          if r.isFirefox35_+ || r.isIE8 || r.isIE9 || r.isChrome3_+ ||
-            r.isOpera9 || r.isSafari3_+ =>
-        4
-      case _ => 2
-  }) {}
+          case r if r.isIPad || r.isIPhone => 1
+          case r
+              if r.isFirefox35_+ || r.isIE8 || r.isIE9 || r.isChrome3_+ ||
+                r.isOpera9 || r.isSafari3_+ =>
+            4
+          case _ => 2
+      }) {}
 
   /**
     * A partial function that determines content type based on an incoming
@@ -772,7 +772,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     // We need to determine the full set of IDs that need messages rendered.
     val idSet =
       (S.idMessages((S.errors)) ++ S.idMessages((S.warnings)) ++ S.idMessages(
-              (S.notices))).map(_._1).distinct
+          (S.notices))).map(_._1).distinct
 
     // Merge each Id's messages and effects into the JsCmd chain
     idSet.foldLeft(groupMessages) { (chain, id) =>
@@ -994,9 +994,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
 
     case (_, _, Full(s))
         if (s.toLowerCase.startsWith("text/xml") ||
-              s.toLowerCase.startsWith("text/xhtml") ||
-              s.toLowerCase.startsWith("application/xml") ||
-              s.toLowerCase.startsWith("application/xhtml+xml")) =>
+          s.toLowerCase.startsWith("text/xhtml") ||
+          s.toLowerCase.startsWith("application/xml") ||
+          s.toLowerCase.startsWith("application/xhtml+xml")) =>
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 
     case _ => ""
@@ -1103,11 +1103,11 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * if the function is not defined for the locale/path pair, the normal templating system will
     * be used.  Also, keep in mind how FactoryMaker can be used... it can be global, per request, etc.
     */
-  val externalTemplateResolver: FactoryMaker[() => PartialFunction[
-          (Locale, List[String]),
-          Box[NodeSeq]]] = new FactoryMaker(() =>
-        (() =>
-           Map.empty: PartialFunction[(Locale, List[String]), Box[NodeSeq]])) {}
+  val externalTemplateResolver: FactoryMaker[
+      () => PartialFunction[(Locale, List[String]), Box[NodeSeq]]] =
+    new FactoryMaker(() =>
+      (() =>
+         Map.empty: PartialFunction[(Locale, List[String]), Box[NodeSeq]])) {}
 
   /**
     * There may be times when you want to entirely control the templating process.  You can insert a function
@@ -1781,14 +1781,14 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
                 str =>
                   CSSHelpers.fixCSS(new BufferedReader(new StringReader(str)),
                                     prefix openOr (S.contextPath)) match {
-                case (Full(c), _) => CSSResponse(c)
-                case (x, input) => {
-                  logger.info(
-                      "Fixing " +
-                        cssPath + " failed with result %s".format(x));
-                  CSSResponse(input)
-                }
-            })
+                    case (Full(c), _) => CSSResponse(c)
+                    case (x, input) => {
+                      logger.info(
+                          "Fixing " +
+                            cssPath + " failed with result %s".format(x));
+                      CSSResponse(input)
+                    }
+                })
           }
       }
     }
@@ -2078,13 +2078,11 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
 
   private def ctor() {
     appendGlobalFormBuilder(FormBuilderLocator[String]((value, setter) =>
-              SHtml.text(value, setter)))
-    appendGlobalFormBuilder(
-        FormBuilderLocator[Int]((value, setter) =>
-              SHtml.text(value.toString,
-                         s => Helpers.asInt(s).foreach((setter)))))
+      SHtml.text(value, setter)))
+    appendGlobalFormBuilder(FormBuilderLocator[Int]((value, setter) =>
+      SHtml.text(value.toString, s => Helpers.asInt(s).foreach((setter)))))
     appendGlobalFormBuilder(FormBuilderLocator[Boolean]((value, setter) =>
-              SHtml.checkbox(value, s => setter(s))))
+      SHtml.checkbox(value, s => setter(s))))
 
     import net.liftweb.builtin.snippet._
 

@@ -194,12 +194,12 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
   test(s"conversion is working") {
     assert(
         sql("SELECT * FROM normal_parquet").queryExecution.sparkPlan.collect {
-      case _: HiveTableScan => true
-    }.isEmpty)
+          case _: HiveTableScan => true
+        }.isEmpty)
     assert(
         sql("SELECT * FROM normal_parquet").queryExecution.sparkPlan.collect {
-      case _: DataSourceScan => true
-    }.nonEmpty)
+          case _: DataSourceScan => true
+        }.nonEmpty)
   }
 
   test("scan an empty parquet table") {
@@ -261,7 +261,7 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
     checkAnswer(
         sql(s"SELECT intField, stringField FROM test_insert_parquet"),
         (1 to 10).map(i => Row(i, s"str$i")) ++ (1 to 4).map(i =>
-              Row(i, s"str$i"))
+          Row(i, s"str$i"))
     )
     dropTables("test_insert_parquet")
   }
@@ -309,11 +309,10 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
       df.queryExecution.sparkPlan match {
         case ExecutedCommand(_: InsertIntoHadoopFsRelation) => // OK
         case o =>
-          fail(
-              "test_insert_parquet should be converted to a " +
-                s"${classOf[HadoopFsRelation].getCanonicalName} and " +
-                s"${classOf[InsertIntoDataSource].getCanonicalName} is expcted as the SparkPlan. " +
-                s"However, found a ${o.toString} ")
+          fail("test_insert_parquet should be converted to a " +
+            s"${classOf[HadoopFsRelation].getCanonicalName} and " +
+            s"${classOf[InsertIntoDataSource].getCanonicalName} is expcted as the SparkPlan. " +
+            s"However, found a ${o.toString} ")
       }
 
       checkAnswer(
@@ -341,11 +340,10 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
       df.queryExecution.sparkPlan match {
         case ExecutedCommand(_: InsertIntoHadoopFsRelation) => // OK
         case o =>
-          fail(
-              "test_insert_parquet should be converted to a " +
-                s"${classOf[HadoopFsRelation].getCanonicalName} and " +
-                s"${classOf[InsertIntoDataSource].getCanonicalName} is expcted as the SparkPlan." +
-                s"However, found a ${o.toString} ")
+          fail("test_insert_parquet should be converted to a " +
+            s"${classOf[HadoopFsRelation].getCanonicalName} and " +
+            s"${classOf[InsertIntoDataSource].getCanonicalName} is expcted as the SparkPlan." +
+            s"However, found a ${o.toString} ")
       }
 
       checkAnswer(

@@ -83,7 +83,7 @@ abstract class MixinNodes {
       val thisMap: NodesMap = toNodesMap(
           getOrElse(convertedName, new ArrayBuffer))
       val maps: List[NodesMap] = supersList.map(sup =>
-            toNodesMap(sup.getOrElse(convertedName, new ArrayBuffer)))
+        toNodesMap(sup.getOrElse(convertedName, new ArrayBuffer)))
       val supers = mergeWithSupers(thisMap, mergeSupers(maps))
       val list = supersList.flatMap(
           _.privatesMap.getOrElse(convertedName, new ArrayBuffer[(T, Node)]))
@@ -501,8 +501,7 @@ abstract class MixinNodes {
       res =
         res bindT
           ((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-              derived.subst(
-                  superSubst.subst(ScalaPsiManager.typeVariable(tp))))
+          derived.subst(superSubst.subst(ScalaPsiManager.typeVariable(tp))))
     }
     superClass match {
       case td: ScTypeDefinition =>
@@ -551,12 +550,10 @@ object MixinNodes {
         def default =
           if (clazz.getTypeParameters.isEmpty) ScType.designator(clazz)
           else
-            ScParameterizedType(ScType.designator(clazz),
-                                clazz.getTypeParameters.map(
-                                    tp =>
-                                      ScalaPsiManager
-                                        .instance(clazz.getProject)
-                                        .typeVariable(tp)))
+            ScParameterizedType(
+                ScType.designator(clazz),
+                clazz.getTypeParameters.map(tp =>
+                  ScalaPsiManager.instance(clazz.getProject).typeVariable(tp)))
         clazz match {
           case td: ScTypeDefinition =>
             td.getType(TypingContext.empty).getOrElse(default)

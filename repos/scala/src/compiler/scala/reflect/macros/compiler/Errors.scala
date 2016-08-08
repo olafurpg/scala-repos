@@ -89,7 +89,7 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
     private def abbreviateCoreAliases(s: String): String = {
       val coreAliases = List("WeakTypeTag", "Expr", "Tree")
       coreAliases.foldLeft(s)((res, x) =>
-            res.replace("c.universe." + x, "c." + x))
+        res.replace("c.universe." + x, "c." + x))
     }
 
     private def showMeth(pss: List[List[Symbol]],
@@ -98,9 +98,9 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
                          untype: Boolean) = {
       def preprocess(tpe: Type) = if (untype) untypeMetalevel(tpe) else tpe
       var pssPart = (pss map
-            (ps =>
-               ps map (p => p.defStringSeenAs(preprocess(p.info))) mkString
-                 ("(", ", ", ")"))).mkString
+        (ps =>
+           ps map (p => p.defStringSeenAs(preprocess(p.info))) mkString
+             ("(", ", ", ")"))).mkString
       if (abbreviate) pssPart = abbreviateCoreAliases(pssPart)
       var retPart = preprocess(restpe).toString
       if (abbreviate || macroDdef.tpt.tpe == null)
@@ -145,15 +145,14 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
     }
 
     private def compatibilityError(message: String) =
-      implRefError(
-          s"${macroImplementationWording} has incompatible shape:" +
-            "\n required: " +
-            showMeth(rparamss, rret, abbreviate = true, untype = false) +
-            "\n or      : " +
-            showMeth(rparamss, rret, abbreviate = true, untype = true) +
-            "\n found   : " +
-            showMeth(aparamss, aret, abbreviate = false, untype = false) + "\n" +
-            message)
+      implRefError(s"${macroImplementationWording} has incompatible shape:" +
+        "\n required: " +
+        showMeth(rparamss, rret, abbreviate = true, untype = false) +
+        "\n or      : " +
+        showMeth(rparamss, rret, abbreviate = true, untype = true) +
+        "\n found   : " +
+        showMeth(aparamss, aret, abbreviate = false, untype = false) + "\n" +
+        message)
 
     def MacroImplParamssMismatchError() =
       compatibilityError("number of parameter sections differ")

@@ -68,7 +68,7 @@ trait StdNames { self: SymbolTable =>
         settings.maxClassfileName.value - maxSuffixLength,
         2 *
           (settings.maxClassfileName.value - maxSuffixLength -
-                2 * marker.length - 32)
+            2 * marker.length - 32)
     )
     def toMD5(s: String, edge: Int): String = {
       val prefix = s take edge
@@ -406,7 +406,7 @@ trait StdNames { self: SymbolTable =>
     def isVariableName(name: Name): Boolean = {
       val first = name.startChar
       (((first.isLower && first.isLetter) || first == '_') &&
-          (name != nme.false_) && (name != nme.true_) && (name != nme.null_))
+      (name != nme.false_) && (name != nme.true_) && (name != nme.null_))
     }
 
     def isOpAssignmentName(name: Name) = name match {

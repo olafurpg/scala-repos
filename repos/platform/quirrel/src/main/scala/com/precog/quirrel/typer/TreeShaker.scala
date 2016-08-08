@@ -93,9 +93,8 @@ trait TreeShaker extends Phases with parser.AST with Binder with Errors {
       val (child2, childNames, childVars, childErrors) = performShake(child)
 
       val unusedBindings =
-        Set(
-            b.vars.toSeq zip
-              (Stream continually (SolveBinding(b): VarBinding)): _*) &~ childVars
+        Set(b.vars.toSeq zip
+          (Stream continually (SolveBinding(b): VarBinding)): _*) &~ childVars
 
       val errors =
         unusedBindings map {

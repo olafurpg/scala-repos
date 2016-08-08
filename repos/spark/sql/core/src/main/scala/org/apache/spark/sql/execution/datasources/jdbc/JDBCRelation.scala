@@ -61,7 +61,7 @@ private[sql] object JDBCRelation {
     // Here we get a little roundoff, but that's (hopefully) OK.
     val stride: Long =
       (partitioning.upperBound / numPartitions -
-            partitioning.lowerBound / numPartitions)
+        partitioning.lowerBound / numPartitions)
     var i: Int = 0
     var currentValue: Long = partitioning.lowerBound
     var ans = new ArrayBuffer[Partition]()

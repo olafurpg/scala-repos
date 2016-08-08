@@ -35,7 +35,7 @@ object JodaTimeSerializers {
 
 case object PeriodSerializer
     extends CustomSerializer[Period](format =>
-          ({
+      ({
         case JString(p) => new Period(p)
         case JNull => null
       }, {
@@ -44,7 +44,7 @@ case object PeriodSerializer
 
 case object DurationSerializer
     extends CustomSerializer[Duration](format =>
-          ({
+      ({
         case JInt(d) => new Duration(d.longValue)
         case JNull => null
       }, {
@@ -53,7 +53,7 @@ case object DurationSerializer
 
 case object InstantSerializer
     extends CustomSerializer[Instant](format =>
-          ({
+      ({
         case JInt(i) => new Instant(i.longValue)
         case JNull => null
       }, {
@@ -70,7 +70,7 @@ object DateParser {
 
 case object DateTimeSerializer
     extends CustomSerializer[DateTime](format =>
-          ({
+      ({
         case JString(s) => new DateTime(DateParser.parse(s, format))
         case JNull => null
       }, {
@@ -79,7 +79,7 @@ case object DateTimeSerializer
 
 case object DateMidnightSerializer
     extends CustomSerializer[DateMidnight](format =>
-          ({
+      ({
         case JString(s) => new DateMidnight(DateParser.parse(s, format))
         case JNull => null
       }, {

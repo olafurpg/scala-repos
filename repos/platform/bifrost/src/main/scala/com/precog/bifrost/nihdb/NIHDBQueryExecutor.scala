@@ -256,8 +256,8 @@ trait NIHDBQueryExecutorComponent {
         for {
           _ <- Stoppable.stop(
                   Stoppable.fromFuture(gracefulStop(
-                          scheduleActor,
-                          yggConfig.schedulingTimeout.duration)(actorSystem)))
+                      scheduleActor,
+                      yggConfig.schedulingTimeout.duration)(actorSystem)))
           _ <- Stoppable.stop(
                   ingestSystem
                     .map(_.stoppable)

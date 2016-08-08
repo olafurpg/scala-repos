@@ -118,7 +118,7 @@ object CodeGenTools {
     val run = newRun(compiler)
     run.compileSources(
         makeSourceFile(scalaCode, "unitTestSource.scala") :: javaCode.map(p =>
-              makeSourceFile(p._1, p._2)))
+          makeSourceFile(p._1, p._2)))
     checkReport(compiler, allowMessage)
     getGeneratedClassfiles(compiler.settings.outputDirs.getSingleOutput.get)
   }

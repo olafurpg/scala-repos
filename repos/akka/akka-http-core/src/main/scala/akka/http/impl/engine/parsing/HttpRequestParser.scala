@@ -140,8 +140,8 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
         val allHeaders0 =
           if (rawRequestUriHeader)
             `Raw-Request-URI`(new String(
-                    uriBytes,
-                    HttpCharsets.`US-ASCII`.nioCharset)) :: headers
+                uriBytes,
+                HttpCharsets.`US-ASCII`.nioCharset)) :: headers
           else headers
 
         val allHeaders = if (method == HttpMethods.GET) {

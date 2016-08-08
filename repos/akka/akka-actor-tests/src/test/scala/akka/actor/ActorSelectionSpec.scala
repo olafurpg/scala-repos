@@ -252,7 +252,7 @@ class ActorSelectionSpec
         if (target != root)
           askNode(c1,
                   SelectString("../.." + target.path.elements
-                        .mkString("/", "/", "/"))) should ===(Some(target))
+                    .mkString("/", "/", "/"))) should ===(Some(target))
       }
       for (target ← Seq(root, syst, user)) check(target)
     }

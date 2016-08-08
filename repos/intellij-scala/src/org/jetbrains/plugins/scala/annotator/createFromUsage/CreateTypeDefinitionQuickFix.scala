@@ -82,7 +82,7 @@ abstract class CreateTypeDefinitionQuickFix(ref: ScReferenceElement,
         val currentDir = dirs
           .find(PsiTreeUtil.isAncestor(_, ref, true))
           .orElse(dirs.find(
-                  ScalaPsiUtil.getModule(_) == ScalaPsiUtil.getModule(ref)))
+              ScalaPsiUtil.getModule(_) == ScalaPsiUtil.getModule(ref)))
         currentDir.getOrElse(dirs(0))
     }
     createClassInDirectory(directory)

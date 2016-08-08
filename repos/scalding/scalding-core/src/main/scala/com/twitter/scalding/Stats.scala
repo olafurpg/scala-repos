@@ -215,7 +215,7 @@ class StatsFlowListener(f: Map[StatKey, Long] => Try[Unit])
     if (success) {
       val stats = flow.getFlowStats
       val keys = stats.getCounterGroups.asScala.flatMap(g =>
-            stats.getCountersFor(g).asScala.map(c => StatKey(c, g)))
+        stats.getCountersFor(g).asScala.map(c => StatKey(c, g)))
       val values =
         keys.map(k => (k, stats.getCounterValue(k.group, k.counter))).toMap
       f(values).get

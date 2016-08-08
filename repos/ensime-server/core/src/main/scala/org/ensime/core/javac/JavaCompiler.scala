@@ -122,16 +122,13 @@ class JavaCompiler(
                                           List.empty,
                                           List.empty,
                                           None)
-          Some(
-              SymbolInfo(
-                  fqn(info, path).map(_.toFqnString).getOrElse(name),
-                  name,
-                  findDeclPos(info, path),
-                  tpeMirror.map(typeMirrorToTypeInfo).getOrElse(nullTpe),
-                  tpeMirror
-                    .map(_.getKind == TypeKind.EXECUTABLE)
-                    .getOrElse(false)
-              ))
+          Some(SymbolInfo(
+              fqn(info, path).map(_.toFqnString).getOrElse(name),
+              name,
+              findDeclPos(info, path),
+              tpeMirror.map(typeMirrorToTypeInfo).getOrElse(nullTpe),
+              tpeMirror.map(_.getKind == TypeKind.EXECUTABLE).getOrElse(false)
+          ))
         }
         path.getLeaf match {
           case t: IdentifierTree => withName(t.getName.toString)
@@ -279,15 +276,15 @@ class JavaCompiler(
                   diag.getSource().getName(),
                   diag.getMessage(Locale.ENGLISH),
                   diag.getKind() match {
-                case Diagnostic.Kind.ERROR => NoteError
-                case Diagnostic.Kind.WARNING => NoteWarn
-                case Diagnostic.Kind.MANDATORY_WARNING => NoteWarn
-                case _ => NoteInfo
-              },
+                    case Diagnostic.Kind.ERROR => NoteError
+                    case Diagnostic.Kind.WARNING => NoteWarn
+                    case Diagnostic.Kind.MANDATORY_WARNING => NoteWarn
+                    case _ => NoteInfo
+                  },
                   diag.getStartPosition() match {
-                case x if x > -1 => x.toInt
-                case _ => diag.getPosition().toInt
-              },
+                    case x if x > -1 => x.toInt
+                    case _ => diag.getPosition().toInt
+                  },
                   diag.getEndPosition().toInt,
                   diag.getLineNumber().toInt,
                   diag.getColumnNumber().toInt

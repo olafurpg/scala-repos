@@ -39,10 +39,8 @@ object BifunctorUsage extends App {
       Bifunctor[Either].bimap(Left("asdf"): Either[String, Int])(
           _.toUpperCase,
           _ + 1) === (Left("ASDF")))
-  assert(
-      Bifunctor[Either].bimap(Right(1): Either[String, Int])(
-          _.toUpperCase,
-          _ + 1) === (Right(2)))
+  assert(Bifunctor[Either]
+    .bimap(Right(1): Either[String, Int])(_.toUpperCase, _ + 1) === (Right(2)))
 
   assert(
       Bifunctor[Validation]

@@ -248,7 +248,7 @@ trait CoGrouped[K, +R]
               */
             val NUM_OF_SELF_JOINS = firstCount - 1
             new CoGroup(assignName(inputs.head.toPipe[(K, Any)](
-                                ("key", "value"))(flowDef, mode, tupset)),
+                            ("key", "value"))(flowDef, mode, tupset)),
                         ordKeyField,
                         NUM_OF_SELF_JOINS,
                         outFields(firstCount),

@@ -108,7 +108,7 @@ trait BatchedSink[T] extends Sink[T] {
         if (flows.isEmpty)
           Left(
               List("Zero batches requested, should never occur: " +
-                    timeSpan.toString))
+                timeSpan.toString))
         else {
           // it is a static (i.e. independent from input) bug if this get ever throws
           val available = batchOps.intersect(batches, timeSpan).get

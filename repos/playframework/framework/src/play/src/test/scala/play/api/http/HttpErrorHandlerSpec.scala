@@ -41,8 +41,8 @@ object HttpErrorHandlerSpec extends Specification {
       }
       "render a server error" in {
         await(errorHandler.onServerError(
-                FakeRequest(),
-                new RuntimeException())).header.status must_== 500
+            FakeRequest(),
+            new RuntimeException())).header.status must_== 500
       }
     }
 

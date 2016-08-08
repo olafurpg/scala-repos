@@ -32,11 +32,11 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     (softmax(Double.NegativeInfinity, mlog(5)) should be(mlog(5) +- 1e-10))
     (softmax(mlog(5), Double.NegativeInfinity) should be(mlog(5) +- 1e-10))
     (softmax(Double.NegativeInfinity, Double.NegativeInfinity) should be(
-            Double.NegativeInfinity))
+        Double.NegativeInfinity))
 
     (softmax(Array(mlog(1), mlog(2), mlog(3))) should be(mlog(6) +- 1e-10))
     (softmax(Array(mlog(1), mlog(2), Double.NegativeInfinity)) should be(
-            mlog(3) +- (1e-10)))
+        mlog(3) +- (1e-10)))
 
     val s = log1p(Array.tabulate(5)(_.toDouble))
     (softmax(s) should be(mlog(15) +- 1e-10))
@@ -45,7 +45,7 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
 
     (softmax(DenseVector(s)) should be(mlog(15) +- 1e-10))
     (softmax(DenseVector(s)(0 until s.length - 1)) should be(
-            mlog(10) +- 1e-10))
+        mlog(10) +- 1e-10))
   }
 
   test("logDiff") {

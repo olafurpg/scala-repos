@@ -808,38 +808,38 @@ object Test extends Properties("HtmlFactory") {
       check("some/pack/index.html") { node =>
         ("type link" |: node.assertTypeLink("../../some/pack/index.html")) &&
         ("member: SomeType (object)" |: node.assertValuesLink(
-                "some.pack.SomeType",
-                "../../some/pack/index.html#SomeType")) &&
+            "some.pack.SomeType",
+            "../../some/pack/index.html#SomeType")) &&
         ("member: SomeType (class)" |: node.assertMemberLink("types")(
-                "some.pack.SomeType",
-                "../../some/pack/index.html#SomeTypeextendsAnyRef"))
+            "some.pack.SomeType",
+            "../../some/pack/index.html#SomeTypeextendsAnyRef"))
       }
 
     property("SI-8144: Members' permalink - companion object") =
       check("some/pack/SomeType$.html") { node =>
         ("type link" |: node
-              .assertTypeLink("../../some/pack/SomeType$.html")) &&
+          .assertTypeLink("../../some/pack/SomeType$.html")) &&
         ("member: someVal" |: node.assertMemberLink("allMembers")(
-                "some.pack.SomeType#someVal",
-                "../../some/pack/SomeType$.html#someVal:String"))
+            "some.pack.SomeType#someVal",
+            "../../some/pack/SomeType$.html#someVal:String"))
       }
 
     property("SI-8144: Members' permalink - class") =
       check("some/pack/SomeType.html") { node =>
         ("type link" |: node
-              .assertTypeLink("../../some/pack/SomeType.html")) &&
+          .assertTypeLink("../../some/pack/SomeType.html")) &&
         ("constructor " |: node.assertMemberLink("constructors")(
-                "some.pack.SomeType#<init>",
-                "../../some/pack/SomeType.html#<init>(arg:String):some.pack.SomeType")) &&
+            "some.pack.SomeType#<init>",
+            "../../some/pack/SomeType.html#<init>(arg:String):some.pack.SomeType")) &&
         ("member: type TypeAlias" |: node.assertMemberLink("types")(
-                "some.pack.SomeType.TypeAlias",
-                "../../some/pack/SomeType.html#TypeAlias=String")) &&
+            "some.pack.SomeType.TypeAlias",
+            "../../some/pack/SomeType.html#TypeAlias=String")) &&
         ("member: def >#<():Int " |: node.assertValuesLink(
-                "some.pack.SomeType#>#<",
-                "../../some/pack/SomeType.html#>#<():Int")) &&
+            "some.pack.SomeType#>#<",
+            "../../some/pack/SomeType.html#>#<():Int")) &&
         ("member: def >@<():TypeAlias " |: node.assertValuesLink(
-                "some.pack.SomeType#>@<",
-                "../../some/pack/SomeType.html#>@<():SomeType.this.TypeAlias"))
+            "some.pack.SomeType#>@<",
+            "../../some/pack/SomeType.html#>@<():SomeType.this.TypeAlias"))
       }
   }
 

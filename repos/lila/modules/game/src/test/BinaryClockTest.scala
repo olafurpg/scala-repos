@@ -54,11 +54,11 @@ class BinaryClockTest extends Specification {
         clock
       }
       read(bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(
-              8)(_0_)) must_== {
+          8)(_0_)) must_== {
         clock.giveTime(chess.White, 0.03f)
       }
       read(bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(
-              8)(_0_)) must_== {
+          8)(_0_)) must_== {
         clock.giveTime(chess.White, -0.03f)
       }
     }

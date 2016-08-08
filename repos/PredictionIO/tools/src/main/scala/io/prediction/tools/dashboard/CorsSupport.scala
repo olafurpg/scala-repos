@@ -48,7 +48,7 @@ trait CORSSupport { this: HttpService =>
       // OPTION request for a resource that responds to other methods
       case Rejected(x)
           if (ctx.request.method.equals(HttpMethods.OPTIONS) &&
-                x.exists(_.isInstanceOf[MethodRejection])) => {
+            x.exists(_.isInstanceOf[MethodRejection])) => {
         val allowedMethods: List[HttpMethod] = x.collect {
           case rejection: MethodRejection => rejection.supported
         }

@@ -225,10 +225,10 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
 
       Runtime.getRuntime.addShutdownHook(
           new Thread("MirrorMakerShutdownHook") {
-        override def run() {
-          cleanShutdown()
-        }
-      })
+            override def run() {
+              cleanShutdown()
+            }
+          })
 
       // create producer
       val producerProps = Utils.loadProps(options.valueOf(producerConfigOpt))
@@ -293,23 +293,21 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
             val rebalanceListenerArgs =
               options.valueOf(rebalanceListenerArgsOpt)
             if (rebalanceListenerArgs != null) {
-              Some(
-                  CoreUtils
-                    .createObject[org.apache.kafka.clients.consumer.ConsumerRebalanceListener](
-                        customRebalanceListenerClass,
-                        rebalanceListenerArgs))
+              Some(CoreUtils.createObject[
+                  org.apache.kafka.clients.consumer.ConsumerRebalanceListener](
+                  customRebalanceListenerClass,
+                  rebalanceListenerArgs))
             } else {
-              Some(
-                  CoreUtils
-                    .createObject[org.apache.kafka.clients.consumer.ConsumerRebalanceListener](
-                        customRebalanceListenerClass))
+              Some(CoreUtils.createObject[
+                  org.apache.kafka.clients.consumer.ConsumerRebalanceListener](
+                  customRebalanceListenerClass))
             }
           } else {
             None
           }
         }
         if (customRebalanceListener.exists(!_.isInstanceOf[
-                    org.apache.kafka.clients.consumer.ConsumerRebalanceListener]))
+                org.apache.kafka.clients.consumer.ConsumerRebalanceListener]))
           throw new IllegalArgumentException(
               "The rebalance listener should be an instance of" +
                 "org.apache.kafka.clients.consumer.ConsumerRebalanceListner")
@@ -418,11 +416,8 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
     whitelist.getOrElse(
         throw new IllegalArgumentException(
             "White list cannot be empty for new consumer"))
-    consumers.map(
-        consumer =>
-          new MirrorMakerNewConsumer(consumer,
-                                     customRebalanceListener,
-                                     whitelist))
+    consumers.map(consumer =>
+      new MirrorMakerNewConsumer(consumer, customRebalanceListener, whitelist))
   }
 
   def commitOffsets(mirrorMakerConsumer: MirrorMakerBaseConsumer) {

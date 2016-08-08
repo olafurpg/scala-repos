@@ -65,7 +65,7 @@ abstract class PlanTest extends SparkFunSuite with PredicateHelper {
       fail(s"""
           |== FAIL: Plans do not match ===
           |${sideBySide(normalized1.treeString, normalized2.treeString)
-            .mkString("\n")}
+                .mkString("\n")}
          """.stripMargin)
     }
   }

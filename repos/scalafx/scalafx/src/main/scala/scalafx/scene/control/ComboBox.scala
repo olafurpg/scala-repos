@@ -69,14 +69,14 @@ class ComboBox[T](
     */
   def cellFactory: ObjectProperty[ListView[T] => ListCell[T]] =
     ObjectProperty((view: ListView[T]) =>
-          new ListCell(delegate.cellFactoryProperty.getValue.call(view)))
+      new ListCell(delegate.cellFactoryProperty.getValue.call(view)))
   def cellFactory_=(f: ListView[T] => ListCell[T]) {
     delegate.cellFactoryProperty.setValue(
         new jfxu.Callback[jfxsc.ListView[T], jfxsc.ListCell[T]] {
-      def call(v: jfxsc.ListView[T]): jfxsc.ListCell[T] = {
-        f(v)
-      }
-    })
+          def call(v: jfxsc.ListView[T]): jfxsc.ListCell[T] = {
+            f(v)
+          }
+        })
   }
 
   /**

@@ -29,7 +29,7 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
       val binding = Http().bindAndHandleSync(
           r ⇒
             HttpResponse(entity =
-                  r.uri.toString.reverse.takeWhile(Character.isDigit).reverse),
+              r.uri.toString.reverse.takeWhile(Character.isDigit).reverse),
           serverHostName,
           serverPort)
 
@@ -46,7 +46,7 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
         .runFold(0)(_ + _)
 
       result.futureValue(PatienceConfig(10.seconds)) shouldEqual N * (N +
-            1) / 2
+        1) / 2
       binding.futureValue.unbind()
     }
 
@@ -57,7 +57,7 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
       val binding = Http().bindAndHandleSync(
           r ⇒
             HttpResponse(entity =
-                  r.uri.toString.reverse.takeWhile(Character.isDigit).reverse),
+              r.uri.toString.reverse.takeWhile(Character.isDigit).reverse),
           serverHostName,
           serverPort)
 

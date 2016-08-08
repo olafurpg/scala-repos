@@ -161,7 +161,7 @@ object RemoteServerConnector {
           val buffer = new StringBuilder
 
           for (j <- 0 until (linesLength -
-                         2)) buffer append lines(j) append "\n"
+                     2)) buffer append lines(j) append "\n"
 
           val lines1 = lines(linesLength - 1)
 

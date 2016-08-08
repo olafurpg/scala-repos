@@ -334,7 +334,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       */
     def isSameScope(other: Scope) =
       ((size == other.size) // optimization - size is cached
-            && (this isSubScope other) && (other isSubScope this))
+        && (this isSubScope other) && (other isSubScope this))
 
     def isSubScope(other: Scope) = {
       def scopeContainsSym(sym: Symbol): Boolean = {

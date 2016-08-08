@@ -40,7 +40,7 @@ class SerializabilitySpec extends WordSpec with Matchers {
         HttpRequest()
           .withHeaders(`Accept-Encoding`(HttpEncodings.chunked)) should beSerializable
         HttpRequest().withHeaders(`Accept-Encoding`(
-                HttpEncoding.custom("test"))) should beSerializable
+            HttpEncoding.custom("test"))) should beSerializable
       }
     }
   }

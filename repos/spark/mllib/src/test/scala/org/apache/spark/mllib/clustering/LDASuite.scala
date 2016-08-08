@@ -185,7 +185,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
           // For "term" in actual doc,
           // check that it has a topic assigned.
           doc.foreachActive((term, wcnt) =>
-                assert(wcnt === 0 || inds.contains(term)))
+            assert(wcnt === 0 || inds.contains(term)))
         } else {
           assert(doc.numNonzeros === 0)
         }
@@ -323,12 +323,12 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val docsSingleWord = sc.parallelize(
         Array(Vectors.sparse(6, Array(0), Array(1))).zipWithIndex.map {
-      case (wordCounts, docId) => (docId.toLong, wordCounts)
-    })
+          case (wordCounts, docId) => (docId.toLong, wordCounts)
+        })
     val docsRepeatedWord = sc.parallelize(
         Array(Vectors.sparse(6, Array(0), Array(5))).zipWithIndex.map {
-      case (wordCounts, docId) => (docId.toLong, wordCounts)
-    })
+          case (wordCounts, docId) => (docId.toLong, wordCounts)
+        })
 
     /* Verify results using gensim:
        import numpy as np
@@ -424,7 +424,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     expectedPredictions.zip(topTopics).foreach {
       case (expected, actual) =>
         assert(expected._1 === actual._1 &&
-              (expected._2 ~== actual._2 relTol 1E-3D))
+          (expected._2 ~== actual._2 relTol 1E-3D))
     }
 
     docs

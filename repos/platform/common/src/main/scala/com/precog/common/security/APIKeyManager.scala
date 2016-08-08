@@ -232,7 +232,7 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
       grants: Set[v1.NewGrantRequest]): M[Option[APIKeyRecord]] = {
     val grantList = grants.toList
     grantList.traverse(grant =>
-          hasCapability(issuerKey, grant.permissions, grant.expirationDate)) flatMap {
+      hasCapability(issuerKey, grant.permissions, grant.expirationDate)) flatMap {
       checks =>
         if (checks.forall(_ == true)) {
           for {

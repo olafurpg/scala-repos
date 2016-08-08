@@ -127,8 +127,8 @@ object Package {
   }
   def sourcesDebugString(sources: Seq[(File, String)]): String =
     "Input file mappings:\n\t" + (sources map {
-          case (f, s) => s + "\n\t  " + f
-        } mkString ("\n\t"))
+      case (f, s) => s + "\n\t  " + f
+    } mkString ("\n\t"))
 
   implicit def manifestEquiv: Equiv[Manifest] = defaultEquiv
   implicit def manifestFormat: Format[Manifest] =

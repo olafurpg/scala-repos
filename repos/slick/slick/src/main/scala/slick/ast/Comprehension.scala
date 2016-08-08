@@ -20,12 +20,12 @@ final case class Comprehension(sym: TermSymbol,
   type Self = Comprehension
   lazy val children =
     (ConstArray.newBuilder() + from + select ++ where ++ groupBy ++ orderBy
-          .map(_._1) ++ having ++ distinct ++ fetch ++ offset).result
+      .map(_._1) ++ having ++ distinct ++ fetch ++ offset).result
   override def childNames =
     Seq("from " + sym, "select") ++ where.map(_ => "where") ++ groupBy.map(_ =>
-          "groupBy") ++ orderBy.map("orderBy " + _._2).toSeq ++ having.map(
+      "groupBy") ++ orderBy.map("orderBy " + _._2).toSeq ++ having.map(
         _ => "having") ++ distinct.map(_ => "distinct") ++ fetch.map(_ =>
-          "fetch") ++ offset.map(_ => "offset")
+      "fetch") ++ offset.map(_ => "offset")
   protected[this] def rebuild(ch: ConstArray[Node]) = {
     val newFrom = ch(0)
     val newSelect = ch(1)

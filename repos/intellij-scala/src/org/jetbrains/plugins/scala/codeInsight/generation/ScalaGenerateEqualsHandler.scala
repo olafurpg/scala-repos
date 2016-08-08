@@ -58,16 +58,16 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
               Messages.getQuestionIcon) == DialogWrapper.OK_EXIT_CODE) {
         val deletedOk = ApplicationManager.getApplication.runWriteAction(
             new Computable[Boolean] {
-          def compute: Boolean = {
-            try {
-              equalsMethod.get.delete()
-              hashCodeMethod.get.delete()
-              true
-            } catch {
-              case e: IncorrectOperationException => false
-            }
-          }
-        })
+              def compute: Boolean = {
+                try {
+                  equalsMethod.get.delete()
+                  hashCodeMethod.get.delete()
+                  true
+                } catch {
+                  case e: IncorrectOperationException => false
+                }
+              }
+            })
         if (!deletedOk) return false
         else {
           needEquals = true

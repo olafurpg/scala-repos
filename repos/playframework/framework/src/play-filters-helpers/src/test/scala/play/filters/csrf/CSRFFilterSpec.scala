@@ -94,10 +94,10 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
       } {
         val token = crypto.generateSignedToken
         import play.api.Play.current
-        await(
-            WS.url("http://localhost:" + testServerPort)
-              .withSession(TokenName -> token)
-              .post(Map("foo" -> "bar", TokenName -> token))).body must_== "bar"
+        await(WS
+          .url("http://localhost:" + testServerPort)
+          .withSession(TokenName -> token)
+          .post(Map("foo" -> "bar", TokenName -> token))).body must_== "bar"
       }
     }
 

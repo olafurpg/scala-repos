@@ -71,8 +71,8 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new DailySuffixParquetThrift[MockTBase](path, dateRange) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
 
     testDefaultColumns(default)
 
@@ -96,8 +96,8 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new HourlySuffixParquetThrift[MockTBase](path, dateRange) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
 
     testDefaultColumns(default)
 
@@ -121,8 +121,8 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new FixedPathParquetThrift[MockTBase](path, path, path) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
 
     testDefaultColumns(default)
 
@@ -146,8 +146,8 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new DailySuffixParquetTuple(path, dateRange, fields) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
   }
 
   "HourlySuffixParquetTuple" should {
@@ -157,8 +157,8 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new HourlySuffixParquetTuple(path, dateRange, fields) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
   }
 
   "FixedPathParquetTuple" should {
@@ -168,8 +168,8 @@ class ParquetSourcesTests extends ParquetSourcesTestsBase {
 
     testReturnProvidedFilter(
         new FixedPathParquetTuple(fields, path, path, path) {
-      override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+          override val withFilter: Option[FilterPredicate] = Some(filter1)
+        })
   }
 }
 

@@ -145,7 +145,7 @@ object helpers
     */
   def isRenderable(fileName: String): Boolean = {
     PluginRegistry().renderableExtensions.exists(extension =>
-          fileName.toLowerCase.endsWith("." + extension))
+      fileName.toLowerCase.endsWith("." + extension))
   }
 
   /**
@@ -199,31 +199,29 @@ object helpers
     * Convert link notations in the activity message.
     */
   def activityMessage(message: String)(implicit context: Context): Html =
-    Html(
-        message
-          .replaceAll(
-              "\\[issue:([^\\s]+?)/([^\\s]+?)#((\\d+))\\]",
-              s"""<a href="${context.path}/$$1/$$2/issues/$$3">$$1/$$2#$$3</a>""")
-          .replaceAll(
-              "\\[pullreq:([^\\s]+?)/([^\\s]+?)#((\\d+))\\]",
-              s"""<a href="${context.path}/$$1/$$2/pull/$$3">$$1/$$2#$$3</a>""")
-          .replaceAll("\\[repo:([^\\s]+?)/([^\\s]+?)\\]",
-                      s"""<a href="${context.path}/$$1/$$2\">$$1/$$2</a>""")
-          .replaceAll("\\[branch:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
-                      (m: Match) =>
-                        s"""<a href="${context.path}/${m.group(1)}/${m
+    Html(message
+      .replaceAll(
+          "\\[issue:([^\\s]+?)/([^\\s]+?)#((\\d+))\\]",
+          s"""<a href="${context.path}/$$1/$$2/issues/$$3">$$1/$$2#$$3</a>""")
+      .replaceAll(
+          "\\[pullreq:([^\\s]+?)/([^\\s]+?)#((\\d+))\\]",
+          s"""<a href="${context.path}/$$1/$$2/pull/$$3">$$1/$$2#$$3</a>""")
+      .replaceAll("\\[repo:([^\\s]+?)/([^\\s]+?)\\]",
+                  s"""<a href="${context.path}/$$1/$$2\">$$1/$$2</a>""")
+      .replaceAll("\\[branch:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
+                  (m: Match) =>
+                    s"""<a href="${context.path}/${m.group(1)}/${m
                       .group(2)}/tree/${encodeRefName(m.group(3))}">${m.group(
                         3)}</a>""")
-          .replaceAll("\\[tag:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
-                      (m: Match) =>
-                        s"""<a href="${context.path}/${m.group(1)}/${m
+      .replaceAll("\\[tag:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
+                  (m: Match) =>
+                    s"""<a href="${context.path}/${m.group(1)}/${m
                       .group(2)}/tree/${encodeRefName(m.group(3))}">${m.group(
                         3)}</a>""")
-          .replaceAll("\\[user:([^\\s]+?)\\]", (m: Match) =>
-                user(m.group(1)).body)
-          .replaceAll("\\[commit:([^\\s]+?)/([^\\s]+?)\\@([^\\s]+?)\\]",
-                      (m: Match) =>
-                        s"""<a href="${context.path}/${m.group(1)}/${m
+      .replaceAll("\\[user:([^\\s]+?)\\]", (m: Match) => user(m.group(1)).body)
+      .replaceAll("\\[commit:([^\\s]+?)/([^\\s]+?)\\@([^\\s]+?)\\]",
+                  (m: Match) =>
+                    s"""<a href="${context.path}/${m.group(1)}/${m
                       .group(2)}/commit/${m.group(3)}">${m.group(1)}/${m.group(
                         2)}@${m.group(3).substring(0, 7)}</a>"""))
 
@@ -393,11 +391,11 @@ object helpers
           val href = url.replace("\"", "&quot;")
           (x ++
              (Seq(
-                     if (pos < m.start)
-                       Some(HtmlFormat.escape(text.substring(pos, m.start)))
-                     else None,
-                     Some(Html(s"""<a href="${href}">${url}</a>"""))
-                 ).flatten),
+                 if (pos < m.start)
+                   Some(HtmlFormat.escape(text.substring(pos, m.start)))
+                 else None,
+                 Some(Html(s"""<a href="${href}">${url}</a>"""))
+             ).flatten),
            m.end)
       }
     // append rest fragment

@@ -520,24 +520,23 @@ class LispUser(lisp: Lisp) {
 
     Console.println(
         "faculty(10) = " + evaluate("(def (faculty n) " + "(if (= n 0) " +
-              "1 " + "(* n (faculty (- n 1)))) " + "(faculty 10))"));
+          "1 " + "(* n (faculty (- n 1)))) " + "(faculty 10))"));
     Console.println(
         "faculty(10) = " + evaluate(
             "(def (faculty n) " + "(cond " + "((= n 0) 1) " +
               "(else (* n (faculty (- n 1))))) " + "(faculty 10))"));
     Console.println(
         "foobar = " +
-          evaluate(
-              "(def (foo n) " +
-                "(cond " +
-                "((= n 0) \"a\")" + "((= n 1) \"b\")" + "((= (/ n 2) 1) " +
-                "(cond " + "((= n 2) \"c\")" + "(else    \"d\")))" + "(else " +
-                "(def (bar m) " + "(cond " + "((= m 0) \"e\")" +
-                "((= m 1) \"f\")" + "(else    \"z\"))" +
-                "(bar (- n 4)))))" + "(val nil (quote ())" + "(val v1 (foo 0) " +
-                "(val v2 (+ (foo 1) (foo 2)) " +
-                "(val v3 (+ (+ (foo 3) (foo 4)) (foo 5)) " + "(val v4 (foo 6) " +
-                "(cons v1 (cons v2 (cons v3 (cons v4 nil))))))))))"));
+          evaluate("(def (foo n) " +
+            "(cond " +
+            "((= n 0) \"a\")" + "((= n 1) \"b\")" + "((= (/ n 2) 1) " +
+            "(cond " + "((= n 2) \"c\")" + "(else    \"d\")))" + "(else " +
+            "(def (bar m) " + "(cond " + "((= m 0) \"e\")" +
+            "((= m 1) \"f\")" + "(else    \"z\"))" +
+            "(bar (- n 4)))))" + "(val nil (quote ())" + "(val v1 (foo 0) " +
+            "(val v2 (+ (foo 1) (foo 2)) " +
+            "(val v3 (+ (+ (foo 3) (foo 4)) (foo 5)) " + "(val v4 (foo 6) " +
+            "(cons v1 (cons v2 (cons v3 (cons v4 nil))))))))))"));
     Console.println;
   }
 }

@@ -322,12 +322,10 @@ object Messages {
         rep(
             ("""\""" ^^ (_ => "")) ~>
               (// Ignore the leading \
-                  ("\r" ?) ~> "\n" ^^ (_ =>
-                                         "") | // Ignore escaped end of lines \
-                    "n" ^^ (_ =>
-                              "\n") | // Translate literal \n to real newline
-                    """\""" | // Handle escaped \\
-                    "^.".r ^^ ("""\""" + _)) | "^.".r // Or any character
+              ("\r" ?) ~> "\n" ^^ (_ => "") | // Ignore escaped end of lines \
+                "n" ^^ (_ => "\n") | // Translate literal \n to real newline
+                """\""" | // Handle escaped \\
+                "^.".r ^^ ("""\""" + _)) | "^.".r // Or any character
         ) ^^ { case chars => chars.mkString },
         "Message pattern expected"
     )
@@ -570,7 +568,7 @@ class DefaultMessagesApi @Inject()(environment: Environment,
     val codesToTry = Seq(lang.code, lang.language, "default", "default.play")
     val pattern: Option[String] =
       codesToTry.foldLeft[Option[String]](None)((res, lang) =>
-            res.orElse(messages.get(lang).flatMap(_.get(key))))
+        res.orElse(messages.get(lang).flatMap(_.get(key))))
     pattern.map(
         pattern =>
           new MessageFormat(pattern, lang.toLocale)

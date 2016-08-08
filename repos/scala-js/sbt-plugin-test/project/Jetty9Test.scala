@@ -51,19 +51,19 @@ object Jetty9Test {
 
       jetty.addLifeCycleListener(
           new AbstractLifeCycle.AbstractLifeCycleListener {
-        override def lifeCycleStarted(event: LifeCycle): Unit = {
-          try {
-            runner.send(s"http://localhost:$jettyPort/test.txt")
-            val msg = runner.receive()
-            val expected = "It works!"
-            if (msg != expected)
-              sys.error(s"""received "$msg" instead of "$expected"""")
-          } finally {
-            runner.close()
-            jetty.stop()
-          }
-        }
-      })
+            override def lifeCycleStarted(event: LifeCycle): Unit = {
+              try {
+                runner.send(s"http://localhost:$jettyPort/test.txt")
+                val msg = runner.receive()
+                val expected = "It works!"
+                if (msg != expected)
+                  sys.error(s"""received "$msg" instead of "$expected"""")
+              } finally {
+                runner.close()
+                jetty.stop()
+              }
+            }
+          })
 
       jetty.start()
       runner.await(30.seconds)

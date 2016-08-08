@@ -118,7 +118,7 @@ class ErrorCodeSerializer(knownCodes: ErrorCode*)
 class ValidationErrorSerializer(includeCode: Boolean = true,
                                 includeArgs: Boolean = true)
     extends CustomSerializer[ValidationError]((formats: Formats) ⇒
-          ({
+      ({
         case jo @ JObject(JField("message", _) :: _) ⇒
           implicit val fmts = formats
           new ValidationError((jo \ "message").extractOrElse(""),

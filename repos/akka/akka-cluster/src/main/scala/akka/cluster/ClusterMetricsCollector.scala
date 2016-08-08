@@ -886,11 +886,10 @@ private[cluster] object MetricsCollector {
       Try(new SigarMetricsCollector(system)) match {
         case Success(sigarCollector) ⇒ sigarCollector
         case Failure(e) ⇒
-          Cluster(system).InfoLogger.logInfo(
-              "Metrics will be retreived from MBeans, and may be incorrect on some platforms. " +
-                "To increase metric accuracy add the 'sigar.jar' to the classpath and the appropriate " +
-                "platform-specific native libary to 'java.library.path'. Reason: " +
-                e.toString)
+          Cluster(system).InfoLogger.logInfo("Metrics will be retreived from MBeans, and may be incorrect on some platforms. " +
+            "To increase metric accuracy add the 'sigar.jar' to the classpath and the appropriate " +
+            "platform-specific native libary to 'java.library.path'. Reason: " +
+            e.toString)
           new JmxMetricsCollector(system)
       }
     } else {

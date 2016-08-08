@@ -35,8 +35,8 @@ final class TeamApi(cached: Cached,
         (forum ! MakeTeam(team.id, team.name))
         (indexer ! InsertTeam(team))
         (timeline ! Propagate(
-                TeamCreate(me.id, team.id)
-            ).toFollowersOf(me.id))
+            TeamCreate(me.id, team.id)
+        ).toFollowersOf(me.id))
       } inject team
     }
 
@@ -118,8 +118,7 @@ final class TeamApi(cached: Cached,
       _ ← userOption
            .filter(_ => accept)
            .??(user =>
-                 doJoin(team, user.id) >>- notifier.acceptRequest(team,
-                                                                  request))
+             doJoin(team, user.id) >>- notifier.acceptRequest(team, request))
     } yield ()
 
   def doJoin(team: Team, userId: String): Funit =

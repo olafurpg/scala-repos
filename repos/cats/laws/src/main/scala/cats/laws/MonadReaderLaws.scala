@@ -18,7 +18,7 @@ trait MonadReaderLaws[F[_], R] extends MonadLaws[F] {
                                     f: A => F[B],
                                     g: R => R): IsEq[F[B]] =
     F.local(g)(F.flatMap(fra)(f)) <-> F.flatMap(F.local(g)(fra))(a =>
-          F.local(g)(f(a)))
+      F.local(g)(f(a)))
 }
 
 object MonadReaderLaws {

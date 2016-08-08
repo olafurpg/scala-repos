@@ -200,7 +200,7 @@ class MatrixMappableExtensions[T](mappable: Mappable[T])(implicit fd: FlowDef,
       .map(fn)
       .groupBy(t => (t._1, t._2))
       .mapValueStream(s =>
-            Iterator(s.map { case (_, _, c, v) => (c, v) }.toMap))
+        Iterator(s.map { case (_, _, c, v) => (c, v) }.toMap))
       .toTypedPipe
       .map { case ((g, r), m) => (r, g, m) }
       .toPipe(('row, 'col, 'val))
@@ -520,13 +520,12 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
     val newPipe = inPipe
       .groupBy(rowSym) { _.sizeAveStdev((valSym) -> ('size, 'ave, 'stdev)) }
       .flatMapTo((rowSym, 'size, 'ave, 'stdev) ->
-            (rowSym, newColSym, newValSym)) {
-        tup: (RowT, Long, Double, Double) =>
-          val row = tup._1
-          val size = tup._2.toDouble
-          val avg = tup._3
-          val stdev = tup._4
-          List((row, 1, size), (row, 2, avg), (row, 3, stdev))
+        (rowSym, newColSym, newValSym)) { tup: (RowT, Long, Double, Double) =>
+        val row = tup._1
+        val size = tup._2.toDouble
+        val avg = tup._3
+        val stdev = tup._4
+        List((row, 1, size), (row, 2, avg), (row, 3, stdev))
       }
     val newHint = sizeHint.setCols(3L)
     new Matrix[RowT, Int, Double](rowSym,
@@ -870,7 +869,7 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
     val joined = pipe.joinWithSmaller(
         (rowSym, colSym) -> (filterR, filterC),
         that.pipe.rename((that.rowSym, that.colSym, that.valSym) ->
-              (filterR, filterC, filterV)),
+          (filterR, filterC, filterV)),
         new LeftJoin)
     val filtered = joined.filter(filterV) { x: ValU =>
       null == x

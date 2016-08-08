@@ -158,8 +158,8 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
           Message.debug(s"Aether about to resolve version for [$coords]...")
           val versionRequest = addRepositories(
               new AetherVersionRangeRequest().setArtifact(new AetherArtifact(
-                      coords,
-                      getArtifactProperties(dd.getDependencyRevisionId))))
+                  coords,
+                  getArtifactProperties(dd.getDependencyRevisionId))))
           val result = system.resolveVersionRange(session, versionRequest)
           Message.debug(s"Version result = $result, from $getName")
           if (result.getVersions.isEmpty)
@@ -453,7 +453,7 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
       // Now we add the artifact....
       if ((d.getArtifact.getClassifier != null) ||
           ((d.getArtifact.getExtension != null) &&
-              !("jar" == d.getArtifact.getExtension))) {
+          !("jar" == d.getArtifact.getExtension))) {
         val tpe: String =
           if (d.getArtifact.getExtension != null) d.getArtifact.getExtension
           else "jar"
@@ -623,7 +623,7 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
         val artifacts = for ((art, file) <- t.artifacts) yield {
           Message.debug(
               s" - Publishing $art (${art.getType})(${art.getExtraAttribute(
-              "classifier")}) in [${art.getConfigurations.mkString(",")}] from $file")
+                  "classifier")}) in [${art.getConfigurations.mkString(",")}] from $file")
           new AetherArtifact(
               t.module.getOrganisation,
               aetherArtifactIdFromMrid(t.module),

@@ -22,7 +22,7 @@ private class ScalaModuleConversionProcessor(context: ConversionContext)
     val scalaFacet = ScalaFacetData
       .findIn(module)
       .getOrElse(throw new IllegalStateException(
-              "Cannot find Scala facet in module: " + module.getModuleName))
+          "Cannot find Scala facet in module: " + module.getModuleName))
 
     val scalaStandardLibraryReference =
       ScalaProjectConverter.findStandardScalaLibraryIn(module)

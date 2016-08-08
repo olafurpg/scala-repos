@@ -22,8 +22,8 @@ class DeflateSpec extends CoderSpec {
   override def extraTests(): Unit = {
     "throw early if header is corrupt" in {
       (the[RuntimeException] thrownBy {
-            ourDecode(ByteString(0, 1, 2, 3, 4))
-          }).getCause should be(a[DataFormatException])
+        ourDecode(ByteString(0, 1, 2, 3, 4))
+      }).getCause should be(a[DataFormatException])
     }
   }
 }

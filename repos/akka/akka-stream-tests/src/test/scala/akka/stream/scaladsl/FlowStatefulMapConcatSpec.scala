@@ -59,7 +59,7 @@ class FlowStatefulMapConcatSpec extends AkkaSpec with ScriptedTest {
             }
         })
         .withAttributes(ActorAttributes.supervisionStrategy(
-                Supervision.restartingDecider))
+            Supervision.restartingDecider))
         .runWith(TestSink.probe[Int])
         .request(2)
         .expectNext(1, 1)
@@ -86,7 +86,7 @@ class FlowStatefulMapConcatSpec extends AkkaSpec with ScriptedTest {
             }
         })
         .withAttributes(ActorAttributes.supervisionStrategy(
-                Supervision.resumingDecider))
+            Supervision.resumingDecider))
         .runWith(TestSink.probe[Int])
         .request(2)
         .expectNext(1, 1)

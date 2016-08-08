@@ -98,9 +98,9 @@ object ShardServiceCombinators extends Logging {
 
     val requested =
       (request.headers
-            .header[Accept]
-            .toSeq
-            .flatMap(_.mimeTypes) ++ requestParamType)
+        .header[Accept]
+        .toSeq
+        .flatMap(_.mimeTypes) ++ requestParamType)
 
     val allowed = Set(JSON, CSV, anymaintype / anysubtype)
 
@@ -141,10 +141,9 @@ object ShardServiceCombinators extends Logging {
           case JString(path) =>
             Validation.success(CPath(path) :: Nil)
           case badJVal =>
-            Validation.failure(
-                Invalid(
-                    "The sortOn query parameter was expected to be JSON string or array, but found " +
-                      badJVal))
+            Validation.failure(Invalid(
+                "The sortOn query parameter was expected to be JSON string or array, but found " +
+                  badJVal))
         }
 
       onError <-: parsed
@@ -272,17 +271,16 @@ trait ShardServiceCombinators
                     .filter(_ != null)
                     .map(Promise.successful)
                     .orElse(quirrelContent(request).map(ByteChunk
-                              .forceByteArray(_: ByteChunk)
-                              .map(new String(_: Array[Byte], "UTF-8"))))
+                      .forceByteArray(_: ByteChunk)
+                      .map(new String(_: Array[Byte], "UTF-8"))))
 
                   val result: Future[HttpResponse[B]] =
                     query map { q =>
                       q flatMap { f(apiKey, account, path, _: String, opts) }
                     } getOrElse {
-                      Promise.successful(
-                          HttpResponse(HttpStatus(
-                                  BadRequest,
-                                  "Neither the query string nor request body contained an identifiable quirrel query.")))
+                      Promise.successful(HttpResponse(HttpStatus(
+                          BadRequest,
+                          "Neither the query string nor request body contained an identifiable quirrel query.")))
                     }
                   result
               }
@@ -310,11 +308,10 @@ trait ShardServiceCombinators
         val path =
           request.parameters.get('prefixPath).filter(_ != null).getOrElse("")
         delegate.service(request.copy(
-                parameters = request.parameters + ('sync -> "async"))) map {
-          f =>
-            { (cred: (APIKey, AccountDetails)) =>
-              f(cred, Path(path))
-            }
+            parameters = request.parameters + ('sync -> "async"))) map { f =>
+          { (cred: (APIKey, AccountDetails)) =>
+            f(cred, Path(path))
+          }
         }
       }
 

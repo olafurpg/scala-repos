@@ -295,7 +295,7 @@ private[spark] class MesosSchedulerBackend(scheduler: TaskSchedulerImpl,
           val meetsRequirements =
             (meetsMemoryRequirements && meetsCPURequirements) ||
               (slaveIdToExecutorInfo.contains(slaveId) &&
-                    cpus >= scheduler.CPUS_PER_TASK)
+                cpus >= scheduler.CPUS_PER_TASK)
           val debugstr = if (meetsRequirements) "Accepting" else "Declining"
           logDebug(
               s"$debugstr offer: ${o.getId.getValue} with attributes: " +
@@ -314,7 +314,7 @@ private[spark] class MesosSchedulerBackend(scheduler: TaskSchedulerImpl,
           // If the Mesos executor has not been started on this slave yet, set aside a few
           // cores for the Mesos executor by offering fewer cores to the Spark executor
           (getResource(o.getResourcesList, "cpus") -
-                mesosExecutorCores).toInt
+            mesosExecutorCores).toInt
         }
         new WorkerOffer(o.getSlaveId.getValue, o.getHostname, cpus)
       }

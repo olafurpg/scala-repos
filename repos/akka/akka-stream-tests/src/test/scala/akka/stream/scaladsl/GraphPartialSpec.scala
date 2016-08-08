@@ -30,7 +30,7 @@ class GraphPartialSpec extends AkkaSpec {
 
       val (_, _, result) = RunnableGraph
         .fromGraph(GraphDSL.create(doubler, doubler, Sink.head[Seq[Int]])(
-                Tuple3.apply) { implicit b ⇒ (d1, d2, sink) ⇒
+            Tuple3.apply) { implicit b ⇒ (d1, d2, sink) ⇒
           Source(List(1, 2, 3)) ~> d1.in
           d1.out ~> d2.in
           d2.out.grouped(100) ~> sink.in
@@ -54,7 +54,7 @@ class GraphPartialSpec extends AkkaSpec {
 
       val (sub1, sub2, result) = RunnableGraph
         .fromGraph(GraphDSL.create(doubler, doubler, Sink.head[Seq[Int]])(
-                Tuple3.apply) { implicit b ⇒ (d1, d2, sink) ⇒
+            Tuple3.apply) { implicit b ⇒ (d1, d2, sink) ⇒
           Source(List(1, 2, 3)) ~> d1.in
           d1.out ~> d2.in
           d2.out.grouped(100) ~> sink.in
@@ -88,7 +88,7 @@ class GraphPartialSpec extends AkkaSpec {
 
       val (sub1, sub2, result) = RunnableGraph
         .fromGraph(GraphDSL.create(doubler, doubler, Sink.head[Seq[Int]])(
-                Tuple3.apply) { implicit b ⇒ (d1, d2, sink) ⇒
+            Tuple3.apply) { implicit b ⇒ (d1, d2, sink) ⇒
           Source(List(1, 2, 3)) ~> d1.in
           d1.out ~> d2.in
           d2.out.grouped(100) ~> sink.in

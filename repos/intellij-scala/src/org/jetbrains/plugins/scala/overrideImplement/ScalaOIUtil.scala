@@ -209,7 +209,7 @@ object ScalaOIUtil {
       case x if x.containingClass == clazz => false
       case x: PsiModifierListOwner
           if (x.hasModifierPropertyScala("abstract") &&
-                !x.isInstanceOf[ScFunctionDefinition]) ||
+            !x.isInstanceOf[ScFunctionDefinition]) ||
             x.hasModifierPropertyScala("final") =>
         false
       case x if x.isConstructor => false

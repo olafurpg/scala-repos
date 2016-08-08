@@ -271,8 +271,8 @@ object FactoryToService {
            */
           val service = Future.value(
               new ServiceProxy[Req, Rep](new FactoryToService(next)) {
-            override def close(deadline: Time): Future[Unit] = Future.Done
-          })
+                override def close(deadline: Time): Future[Unit] = Future.Done
+              })
           new ServiceFactoryProxy(next) {
             override def apply(
                 conn: ClientConnection): Future[ServiceProxy[Req, Rep]] =

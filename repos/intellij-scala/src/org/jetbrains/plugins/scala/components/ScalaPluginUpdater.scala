@@ -197,7 +197,7 @@ object ScalaPluginUpdater {
     }
 
     url.foreach(u =>
-          invokeLater {
+      invokeLater {
         try {
           val resp = XML.load(u)
           val text =
@@ -228,8 +228,8 @@ object ScalaPluginUpdater {
             try {
               Some(
                   new UpdatesInfo(JDOMUtil
-                        .loadDocument(request.getInputStream)
-                        .detachRootElement))
+                    .loadDocument(request.getInputStream)
+                    .detachRootElement))
             } catch { case e: JDOMException => LOG.info(e); None }
           }
         })
@@ -263,24 +263,25 @@ object ScalaPluginUpdater {
                 message,
                 NotificationType.WARNING,
                 new NotificationListener {
-              override def hyperlinkUpdate(notification: Notification,
-                                           event: HyperlinkEvent): Unit = {
-                notification.expire()
-                event.getDescription match {
-                  case "No" => // do nothing, will ask next time
-                  case "Yes" =>
-                    UpdateSettings.getInstance().setUpdateChannelType("eap")
-                  case "Ignore" => appSettings.ASK_PLATFORM_UPDATE = false
+                  override def hyperlinkUpdate(notification: Notification,
+                                               event: HyperlinkEvent): Unit = {
+                    notification.expire()
+                    event.getDescription match {
+                      case "No" => // do nothing, will ask next time
+                      case "Yes" =>
+                        UpdateSettings
+                          .getInstance()
+                          .setUpdateChannelType("eap")
+                      case "Ignore" => appSettings.ASK_PLATFORM_UPDATE = false
+                    }
+                  }
                 }
-              }
-            }
             ))
       case Some(result) =>
-        Some(
-            GROUP.createNotification(
-                s"Your IDEA is outdated to use with Scala plugin $branch branch.<br/>" +
-                  s"Please update IDEA to at least $suggestedVersion to use latest Scala plugin.",
-                NotificationType.WARNING))
+        Some(GROUP.createNotification(
+            s"Your IDEA is outdated to use with Scala plugin $branch branch.<br/>" +
+              s"Please update IDEA to at least $suggestedVersion to use latest Scala plugin.",
+            NotificationType.WARNING))
       case None => None
     }
     notification.foreach(Notifications.Bus.notify)
@@ -368,12 +369,11 @@ object ScalaPluginUpdater {
       hack.set(pluginDescriptor, "0.0.0")
     } catch {
       case _: NoSuchFieldException | _: IllegalAccessException =>
-        Notifications.Bus.notify(
-            new Notification(
-                updGroupId,
-                "Scala Plugin Update",
-                "Please remove and reinstall Scala plugin to finish downgrading",
-                NotificationType.INFORMATION))
+        Notifications.Bus.notify(new Notification(
+            updGroupId,
+            "Scala Plugin Update",
+            "Please remove and reinstall Scala plugin to finish downgrading",
+            NotificationType.INFORMATION))
     }
   }
 

@@ -94,7 +94,7 @@ case class SRandMember(key: ChannelBuffer, count: Option[Int] = None)
   override def toChannelBuffer = {
     val commands =
       Seq(CommandBytes.SRANDMEMBER, key) ++ count.map(c =>
-            StringToChannelBuffer(c.toString))
+        StringToChannelBuffer(c.toString))
     RedisCodec.toUnifiedFormat(commands)
   }
 }

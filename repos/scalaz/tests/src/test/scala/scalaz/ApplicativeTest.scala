@@ -23,7 +23,7 @@ object ApplicativeTest extends SpecLite {
       case Nil => Monad[F].point(List())
       case h :: t =>
         Monad[F].bind(f(h))(b =>
-              Monad[F].map(filterM(t, f))(t => if (b) h :: t else t))
+          Monad[F].map(filterM(t, f))(t => if (b) h :: t else t))
     }
 
   "replicateM is the same" ! forAll { (fa: Option[Int]) =>

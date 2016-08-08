@@ -214,8 +214,8 @@ class RoutingSpec
           case "start" ⇒
             context.actorOf(
                 RoundRobinPool(2).props(routeeProps = Props(new Actor {
-              def receive = { case x ⇒ sender() ! x }
-            }))) ? "hello" pipeTo sender()
+                  def receive = { case x ⇒ sender() ! x }
+                }))) ? "hello" pipeTo sender()
         }
       })) ! "start"
       expectMsg("hello")

@@ -95,7 +95,7 @@ object ResourceServer {
       ): Box[LiftResponse] =
     for {
       auri <- Full(uri.filter(!_.startsWith("."))).filter(auri =>
-                   isAllowed(auri))
+               isAllowed(auri))
       rw = baseResourceLocation :: pathRewriter(auri)
       path = rw.mkString("/", "/", "")
       url <- LiftRules.getResource(path)
@@ -136,9 +136,9 @@ object ResourceServer {
   def detectContentType(path: String): String = {
     // Configure response with content type of resource
     (LiftRules.context.mimeType(path) or
-          (Box !! URLConnection
-                .getFileNameMap()
-                .getContentTypeFor(path))) openOr "application/octet-stream"
+      (Box !! URLConnection
+        .getFileNameMap()
+        .getContentTypeFor(path))) openOr "application/octet-stream"
   }
 
   private def isAllowed(path: List[String]) =

@@ -191,8 +191,8 @@ class ScConstructorImpl(node: ASTNode)
                                       0)),
                     Seq(
                         new Expression(InferUtil
-                              .undefineSubstitutor(nonValueType.typeParameters)
-                              .subst(subst.subst(tp).inferValueType))),
+                          .undefineSubstitutor(nonValueType.typeParameters)
+                          .subst(subst.subst(tp).inferValueType))),
                     nonValueType.typeParameters,
                     shouldUndefineParameters = false,
                     filterTypeParams = false)
@@ -220,7 +220,7 @@ class ScConstructorImpl(node: ASTNode)
               val params = clazz.getMethods.flatMap {
                 case p: PsiAnnotationMethod =>
                   val paramType = subst.subst(ScType
-                        .create(p.getReturnType, getProject, getResolveScope))
+                    .create(p.getReturnType, getProject, getResolveScope))
                   Seq(
                       Parameter(p.getName,
                                 None,

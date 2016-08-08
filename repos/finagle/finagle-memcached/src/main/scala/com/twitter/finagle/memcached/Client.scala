@@ -921,8 +921,8 @@ private[finagle] class KetamaFailureAccrualFactory[Req, Rep](
     Future.exception(
         new FailureAccrualException(
             "Endpoint is marked dead by failureAccrual") {
-      serviceName = label
-    })
+          serviceName = label
+        })
 
   // exclude CancelledRequestException and CancelledConnectionException for cache client failure accrual
   override def isSuccess(reqRep: ReqRep): Boolean = reqRep.response match {
@@ -1271,8 +1271,8 @@ case class KetamaClientBuilder private[memcached] (
 
   def build(): Client = {
     val stackBasedClient = (_clientBuilder getOrElse ClientBuilder()
-          .hostConnectionLimit(1)
-          .daemon(true)).codec(text.Memcached()).underlying
+      .hostConnectionLimit(1)
+      .daemon(true)).codec(text.Memcached()).underlying
 
     val keyHasher = KeyHasher.byName(_hashName.getOrElse("ketama"))
 

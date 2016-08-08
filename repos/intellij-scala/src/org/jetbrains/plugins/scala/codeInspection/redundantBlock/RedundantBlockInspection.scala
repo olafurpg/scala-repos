@@ -78,7 +78,7 @@ object RedundantBlockInspection {
           val nextLetter = next.getText.headOption.getOrElse(' ')
           val checkId =
             ScalaNamesUtil.isIdentifier(text) && (nextLetter == '$' ||
-                  !ScalaNamesUtil.isIdentifier(text + nextLetter))
+              !ScalaNamesUtil.isIdentifier(text + nextLetter))
           checkId && !text.startsWith("_") && !text.exists(_ == '$') &&
           !text.startsWith("`")
         case _ => false

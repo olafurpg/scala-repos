@@ -600,7 +600,7 @@ object List extends SeqFactory[List] {
   @deprecated("use `Either.lefts' instead")
   def lefts[A, B](es: Iterable[Either[A, B]]) =
     es.foldRight[List[A]](Nil)((e, as) =>
-          e match {
+      e match {
         case Left(a) => a :: as
         case Right(_) => as
     })
@@ -611,7 +611,7 @@ object List extends SeqFactory[List] {
   @deprecated("use `Either.rights' instead")
   def rights[A, B](es: Iterable[Either[A, B]]) =
     es.foldRight[List[B]](Nil)((e, bs) =>
-          e match {
+      e match {
         case Left(_) => bs
         case Right(b) => b :: bs
     })

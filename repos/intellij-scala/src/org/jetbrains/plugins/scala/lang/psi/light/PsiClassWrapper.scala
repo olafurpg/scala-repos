@@ -227,7 +227,7 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
       case o: ScObject =>
         baseClass.getQualifiedName == "java.lang.Object" ||
           (baseClass.getQualifiedName == "scala.ScalaObject" &&
-                !baseClass.isDeprecated)
+            !baseClass.isDeprecated)
       case _ => false
     }
   }
@@ -237,7 +237,7 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
       case o: ScObject =>
         baseClass.getQualifiedName == "java.lang.Object" ||
           (baseClass.getQualifiedName == "scala.ScalaObject" &&
-                !baseClass.isDeprecated)
+            !baseClass.isDeprecated)
       case _ => false
     }
   }

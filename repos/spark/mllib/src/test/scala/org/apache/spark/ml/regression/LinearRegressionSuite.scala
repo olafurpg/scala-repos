@@ -798,7 +798,7 @@ class LinearRegressionSuite
           (datasetWithDenseFeature.schema.fieldNames.toSet)
             .subsetOf(modelNoPredictionColFieldNames.toSet))
       assert(modelNoPredictionColFieldNames.exists(s =>
-                s.startsWith("prediction_")))
+        s.startsWith("prediction_")))
 
       // Residuals in [[LinearRegressionResults]] should equal those manually computed
       val expectedResiduals = datasetWithDenseFeature

@@ -151,8 +151,8 @@ class StatsReceiverTest extends FunSuite {
     assert(
         "BlacklistStatsReceiver(NullStatsReceiver)" == new BlacklistStatsReceiver(
             NullStatsReceiver, { _ =>
-          false
-        }).toString)
+              false
+            }).toString)
 
     val inMem = new InMemoryStatsReceiver()
     assert("InMemoryStatsReceiver" == inMem.toString)

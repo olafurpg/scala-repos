@@ -48,7 +48,7 @@ class HASkipListView[S <: Sys[S], A](private val l: HASkipList[S, A])(
       else {
         val nb = n.asBranch
         Some(IndexedSeq.tabulate(sz)(i =>
-                  buildBoxMap(nb.down(i), isRight && (i == szm))))
+          buildBoxMap(nb.down(i), isRight && (i == szm))))
       }
     val b = NodeBox(n, keys, chbo.map(_.map(_._2)))
     val bb = chbo match {

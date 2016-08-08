@@ -236,7 +236,7 @@ trait ResolvableStableCodeReferenceElement
         val refText: String = ref.getText
         if (!refText.contains("this") && !refText.contains("super") &&
             (refText.contains(".") ||
-                ref.getContext.isInstanceOf[ScStableCodeReferenceElement])) {
+            ref.getContext.isInstanceOf[ScStableCodeReferenceElement])) {
           //so this is full qualified reference => findClass, or findPackage
           val facade = JavaPsiFacade.getInstance(getProject)
           val manager = ScalaPsiManager.instance(getProject)

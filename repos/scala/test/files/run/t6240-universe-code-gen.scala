@@ -60,9 +60,8 @@ object Test extends App {
 
   import java.io.File
   val testFile = new File(sys.props("partest.test-path"))
-  val actualFile = new java.io.File(
-      testFile.getParent +
-        "/../../../src/reflect/scala/reflect/runtime/JavaUniverseForce.scala").getCanonicalFile
+  val actualFile = new java.io.File(testFile.getParent +
+    "/../../../src/reflect/scala/reflect/runtime/JavaUniverseForce.scala").getCanonicalFile
   val actual = scala.io.Source.fromFile(actualFile)
   val actualLines = actual.getLines.toList
   val generatedLines = code.lines.toList

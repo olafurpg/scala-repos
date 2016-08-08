@@ -64,7 +64,7 @@ object TestExtras {
           // add filters for tests excluded by name
           testOptions in Test <++= excludeTestNames map {
             _.toSeq.map(exclude =>
-                  Tests.Filter(test => !test.contains(exclude)))
+              Tests.Filter(test => !test.contains(exclude)))
           },
           // add arguments for tests excluded by tag
           testOptions in Test <++= excludeTestTags map { tags =>

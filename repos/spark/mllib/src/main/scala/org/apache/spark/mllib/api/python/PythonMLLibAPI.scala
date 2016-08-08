@@ -1045,7 +1045,7 @@ private[python] class PythonMLLibAPI extends Serializable {
     */
   def newRankingMetrics(predictionAndLabels: DataFrame): RankingMetrics[Any] = {
     new RankingMetrics(predictionAndLabels.rdd.map(r =>
-              (r.getSeq(0).toArray[Any], r.getSeq(1).toArray[Any])))
+      (r.getSeq(0).toArray[Any], r.getSeq(1).toArray[Any])))
   }
 
   /**

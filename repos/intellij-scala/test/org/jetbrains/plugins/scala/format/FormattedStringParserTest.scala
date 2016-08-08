@@ -131,10 +131,8 @@ class FormattedStringParserTest extends SimpleTestCase {
 
   private def parse(formatString: String, arguments: Int*): List[StringPart] = {
     val manager = PsiManager.getInstance(fixture.getProject)
-    val expressions = arguments.map(
-        it =>
-          ScalaPsiElementFactory.createExpressionFromText(it.toString,
-                                                          manager))
+    val expressions = arguments.map(it =>
+      ScalaPsiElementFactory.createExpressionFromText(it.toString, manager))
     val literal = ScalaPsiElementFactory
       .parseElement('"' + formatString + '"', manager)
       .asInstanceOf[ScLiteral]

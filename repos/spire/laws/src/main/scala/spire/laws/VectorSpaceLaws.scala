@@ -68,7 +68,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
         "symmetric" → forAll(
             (x: V, y: V) => V.distance(x, y) === V.distance(y, x)),
         "triangle inequality" → forAll((x: V, y: V, z: V) =>
-              V.distance(x, z) <= (V.distance(x, y) + V.distance(y, z)))
+          V.distance(x, z) <= (V.distance(x, y) + V.distance(y, z)))
     )
 
   def normedVectorSpace(implicit V: NormedVectorSpace[V, A],

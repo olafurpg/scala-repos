@@ -71,9 +71,9 @@ object RunServer extends Logging {
     }
 
     val jarFiles = (em.files ++ Option(
-            new File(ca.common.pioHome.get, "plugins").listFiles())
-          .getOrElse(Array.empty[File])
-          .map(_.getAbsolutePath)).mkString(",")
+        new File(ca.common.pioHome.get, "plugins").listFiles())
+      .getOrElse(Array.empty[File])
+      .map(_.getAbsolutePath)).mkString(",")
 
     val sparkSubmit =
       Seq(Seq(sparkHome, "bin", "spark-submit").mkString(File.separator)) ++ ca.common.sparkPassThrough ++ Seq(

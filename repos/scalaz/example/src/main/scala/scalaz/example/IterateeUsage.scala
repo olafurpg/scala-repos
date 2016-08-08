@@ -29,14 +29,14 @@ object IterateeUsage extends App {
     takeWhile[Char, List](_ != '\n') flatMap
       (ln => drop[Char, Id](1).map(_ => ln))
   (collect[List[Char], List] %= readLn.sequenceI &=
-        enumStream("Iteratees\nare\ncomposable".toStream)).run assert_===
+    enumStream("Iteratees\nare\ncomposable".toStream)).run assert_===
     List("Iteratees".toList, "are".toList, "composable".toList)
 
   (collect[List[Int], List] %= splitOn(_ % 3 != 0) &= stream1_10).run assert_===
     List(List(1, 2), List(4, 5), List(7, 8), List(10))
 
   (collect[Int, List] %= map((_: String).toInt) &=
-        enumStream(Stream("1", "2", "3"))).run assert_=== List(1, 2, 3)
+    enumStream(Stream("1", "2", "3"))).run assert_=== List(1, 2, 3)
   (collect[Int, List] %= filter((_: Int) % 2 == 0) &= stream1_10).run assert_===
     List(2, 4, 6, 8, 10)
 
@@ -57,8 +57,8 @@ object IterateeUsage extends App {
     .run
     .unsafePerformIO()) assert_=== Some('f')
   ((head[IoExceptionOr[Char], IO] &= enumReader[IO](new StringReader("")))
-        .map(_ flatMap (_.toOption))
-        .run unsafePerformIO ()) assert_=== None
+    .map(_ flatMap (_.toOption))
+    .run unsafePerformIO ()) assert_=== None
 
   // As a monad
   val m1 = head[Int, Id] flatMap (b => head[Int, Id] map (b2 => (b tuple b2)))

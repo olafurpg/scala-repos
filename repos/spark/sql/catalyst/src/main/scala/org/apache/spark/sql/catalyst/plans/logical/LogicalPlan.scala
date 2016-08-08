@@ -250,7 +250,7 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
         // expression as "c".
         val fieldExprs =
           nestedFields.foldLeft(a: Expression)((expr, fieldName) =>
-                ExtractValue(expr, Literal(fieldName), resolver))
+            ExtractValue(expr, Literal(fieldName), resolver))
         Some(Alias(fieldExprs, nestedFields.last)())
 
       // No matches.

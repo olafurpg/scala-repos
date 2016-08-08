@@ -96,11 +96,11 @@ object Grant extends Logging {
   val extractorV0: Extractor[Grant] = new Extractor[Grant] {
     override def validated(obj: JValue) = {
       (obj.validated[GrantId]("gid") |@| obj
-            .validated[Option[APIKey]]("cid")
-            .map(_.getOrElse("(undefined)")) |@| obj.validated[Option[
-                  GrantId]]("issuer") |@| obj.validated[Permission](
-              "permission")(Permission.extractorV0) |@| obj
-            .validated[Option[DateTime]]("permission.expirationDate")).apply {
+        .validated[Option[APIKey]]("cid")
+        .map(_.getOrElse("(undefined)")) |@| obj.validated[Option[GrantId]](
+          "issuer") |@| obj.validated[Permission]("permission")(
+          Permission.extractorV0) |@| obj.validated[Option[DateTime]](
+          "permission.expirationDate")).apply {
         (gid, cid, issuer, permission, expiration) =>
           Grant(gid,
                 None,

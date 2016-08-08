@@ -146,7 +146,7 @@ class DelayedFetch(delayMs: Long,
         fetchMetadata.fetchOnlyLeader,
         fetchMetadata.fetchOnlyCommitted,
         fetchMetadata.fetchPartitionStatus.mapValues(status =>
-              status.fetchInfo))
+          status.fetchInfo))
 
     val fetchPartitionData = logReadResults.mapValues(
         result =>

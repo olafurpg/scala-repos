@@ -387,7 +387,7 @@ class ScribeHandler(hostname: String,
 
   override def toString = {
     ("<%s level=%s hostname=%s port=%d scribe_buffer=%s " +
-          "scribe_backoff=%s scribe_max_packet_size=%d formatter=%s>").format(
+      "scribe_backoff=%s scribe_max_packet_size=%d formatter=%s>").format(
         getClass.getName,
         getLevel,
         hostname,

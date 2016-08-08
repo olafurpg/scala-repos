@@ -209,7 +209,7 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
     if (!hasStarted.get)
       throw new StateChangeFailedException(
           ("Controller %d epoch %d initiated state change for partition %s to %s failed because " +
-                "the partition state machine has not started").format(
+            "the partition state machine has not started").format(
               controllerId,
               controller.epoch,
               topicAndPartition,
@@ -357,12 +357,12 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
     val replicaAssignment =
       controllerContext.partitionReplicaAssignment(topicAndPartition)
     val liveAssignedReplicas = replicaAssignment.filter(r =>
-          controllerContext.liveBrokerIds.contains(r))
+      controllerContext.liveBrokerIds.contains(r))
     liveAssignedReplicas.size match {
       case 0 =>
         val failMsg =
           ("encountered error during state change of partition %s from New to Online, assigned replicas are [%s], " +
-                "live brokers are [%s]. No assigned replica is alive.").format(
+            "live brokers are [%s]. No assigned replica is alive.").format(
               topicAndPartition,
               replicaAssignment.mkString(","),
               controllerContext.liveBrokerIds)
@@ -410,7 +410,7 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
               .get
             val failMsg =
               ("encountered error while changing partition %s's state from New to Online since LeaderAndIsr path already " +
-                    "exists with value %s and controller epoch %d").format(
+                "exists with value %s and controller epoch %d").format(
                   topicAndPartition,
                   leaderIsrAndEpoch.leaderAndIsr.toString(),
                   leaderIsrAndEpoch.controllerEpoch)
@@ -449,8 +449,8 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
         if (controllerEpoch > controller.epoch) {
           val failMsg =
             ("aborted leader election for partition [%s,%d] since the LeaderAndIsr path was " +
-                  "already written by another controller. This probably means that the current controller %d went through " +
-                  "a soft failure and another controller was elected with epoch %d.")
+              "already written by another controller. This probably means that the current controller %d went through " +
+              "a soft failure and another controller was elected with epoch %d.")
               .format(topic, partition, controllerId, controllerEpoch)
           stateChangeLogger.error(
               "Controller %d epoch %d "
@@ -589,7 +589,7 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
               zkUtils.getReplicaAssignmentForTopics(newTopics.toSeq)
             controllerContext.partitionReplicaAssignment =
               controllerContext.partitionReplicaAssignment.filter(p =>
-                    !deletedTopics.contains(p._1.topic))
+                !deletedTopics.contains(p._1.topic))
             controllerContext.partitionReplicaAssignment.++=(
                 addedPartitionReplicaAssignment)
             info(
@@ -635,13 +635,13 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
             "Delete topics listener fired for topics %s to be deleted".format(
                 topicsToBeDeleted.mkString(",")))
         val nonExistentTopics = topicsToBeDeleted.filter(t =>
-              !controllerContext.allTopics.contains(t))
+          !controllerContext.allTopics.contains(t))
         if (nonExistentTopics.size > 0) {
           warn(
               "Ignoring request to delete non-existing topics " +
                 nonExistentTopics.mkString(","))
           nonExistentTopics.foreach(topic =>
-                zkUtils.deletePathRecursive(getDeleteTopicPath(topic)))
+            zkUtils.deletePathRecursive(getDeleteTopicPath(topic)))
         }
         topicsToBeDeleted --= nonExistentTopics
         if (topicsToBeDeleted.size > 0) {
@@ -694,12 +694,10 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
           val partitionReplicaAssignment =
             zkUtils.getReplicaAssignmentForTopics(List(topic))
           val partitionsToBeAdded = partitionReplicaAssignment.filter(p =>
-                !controllerContext.partitionReplicaAssignment.contains(p._1))
+            !controllerContext.partitionReplicaAssignment.contains(p._1))
           if (controller.deleteTopicManager.isTopicQueuedUpForDeletion(topic))
-            error(
-                "Skipping adding partitions %s for topic %s since it is currently being deleted"
-                  .format(
-                      partitionsToBeAdded.map(_._1.partition).mkString(","),
+            error("Skipping adding partitions %s for topic %s since it is currently being deleted"
+              .format(partitionsToBeAdded.map(_._1.partition).mkString(","),
                       topic))
           else {
             if (partitionsToBeAdded.size > 0) {

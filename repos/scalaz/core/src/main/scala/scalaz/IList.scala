@@ -596,7 +596,7 @@ sealed abstract class IListInstances extends IListInstance0 {
     def traverseImpl[F[_], A, B](fa: IList[A])(f: A => F[B])(
         implicit F: Applicative[F]): F[IList[B]] =
       fa.foldRight(F.point(IList.empty[B]))((a, fbs) =>
-            F.apply2(f(a), fbs)(_ :: _))
+        F.apply2(f(a), fbs)(_ :: _))
 
     def unzip[A, B](a: IList[(A, B)]): (IList[A], IList[B]) =
       a.unzip

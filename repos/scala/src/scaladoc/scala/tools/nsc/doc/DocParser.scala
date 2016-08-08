@@ -71,8 +71,8 @@ object DocParser {
 
     override def toString =
       (nameChain.init
-            .map(x => if (x.isTypeName) x + "#" else x + ".")
-            .mkString +
-            nameChain.last)
+        .map(x => if (x.isTypeName) x + "#" else x + ".")
+        .mkString +
+        nameChain.last)
   }
 }

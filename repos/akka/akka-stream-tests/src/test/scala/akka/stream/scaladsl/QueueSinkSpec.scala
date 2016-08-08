@@ -126,9 +126,9 @@ class QueueSinkSpec extends AkkaSpec {
         Sink.queue[Int]().withAttributes(inputBuffer(bufferSize, bufferSize))
       val (probe, queue) = Source(1 to streamElementCount)
         .alsoToMat(Flow[Int]
-              .take(bufferSize)
-              .watchTermination()(Keep.right)
-              .to(Sink.ignore))(Keep.right)
+          .take(bufferSize)
+          .watchTermination()(Keep.right)
+          .to(Sink.ignore))(Keep.right)
         .toMat(sink)(Keep.both)
         .run()
       probe.futureValue should ===(akka.Done)

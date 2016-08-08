@@ -32,12 +32,10 @@ class PythonRunnerSuite extends SparkFunSuite {
     if (Utils.isWindows) {
       assert(PythonRunner.formatPath("file:/C:/a/b/spark.py",
                                      testWindows = true) === "C:/a/b/spark.py")
-      assert(
-          PythonRunner
-            .formatPath("C:\\a\\b\\spark.py", testWindows = true) === "C:/a/b/spark.py")
-      assert(
-          PythonRunner
-            .formatPath("C:\\a b\\spark.py", testWindows = true) === "C:/a b/spark.py")
+      assert(PythonRunner
+        .formatPath("C:\\a\\b\\spark.py", testWindows = true) === "C:/a/b/spark.py")
+      assert(PythonRunner
+        .formatPath("C:\\a b\\spark.py", testWindows = true) === "C:/a b/spark.py")
     }
     intercept[IllegalArgumentException] { PythonRunner.formatPath("one:two") }
     intercept[IllegalArgumentException] {

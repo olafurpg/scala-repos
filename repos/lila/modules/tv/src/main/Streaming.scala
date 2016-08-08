@@ -43,9 +43,9 @@ private final class Streaming(system: ActorSystem,
             val twitch =
               WS.url("https://api.twitch.tv/kraken/streams")
                 .withQueryString("channel" -> streamers
-                      .filter(_.twitch)
-                      .map(_.streamerName)
-                      .mkString(","))
+                  .filter(_.twitch)
+                  .map(_.streamerName)
+                  .mkString(","))
                 .withHeaders("Accept" -> "application/vnd.twitchtv.v3+json")
                 .get() map {
                 res =>
@@ -61,9 +61,9 @@ private final class Streaming(system: ActorSystem,
               }
             val hitbox =
               WS.url("http://api.hitbox.tv/media/live/" + streamers
-                      .filter(_.twitch)
-                      .map(_.streamerName)
-                      .mkString(","))
+                  .filter(_.twitch)
+                  .map(_.streamerName)
+                  .mkString(","))
                 .get() map {
                 res =>
                   res.json.validate[Hitbox.Result] match {

@@ -940,8 +940,8 @@ abstract class AggregationQuerySuite
           RandomDataGenerator.forType(dataType = schemaForGenerator,
                                       nullable = true,
                                       new Random(System.nanoTime()))
-        val dataGenerator = maybeDataGenerator.getOrElse(
-            fail(s"Failed to create data generator for schema $schemaForGenerator"))
+        val dataGenerator = maybeDataGenerator.getOrElse(fail(
+            s"Failed to create data generator for schema $schemaForGenerator"))
         val data = (1 to 50).map { i =>
           dataGenerator.apply() match {
             case row: Row => Row.fromSeq(i +: row.toSeq)
@@ -949,7 +949,7 @@ abstract class AggregationQuerySuite
               Row.fromSeq(i +: Seq.fill(schemaForGenerator.length)(null))
             case other =>
               fail(s"Row or null is expected to be generated, " +
-                    s"but a ${other.getClass.getCanonicalName} is generated.")
+                s"but a ${other.getClass.getCanonicalName} is generated.")
           }
         }
 
@@ -978,10 +978,9 @@ abstract class AggregationQuerySuite
         Row(1, Seq(Row(1), Row(2), Row(3))) :: Row(
             1,
             Seq(Row(4), Row(5), Row(6))) :: Row(2, Seq(Row(-10))) :: Nil
-      val schema = StructType(
-          StructField("key", IntegerType) :: StructField(
-              "myArray",
-              ArrayType(StructType(StructField("v", IntegerType) :: Nil))) :: Nil)
+      val schema = StructType(StructField("key", IntegerType) :: StructField(
+          "myArray",
+          ArrayType(StructType(StructField("v", IntegerType) :: Nil))) :: Nil)
       sqlContext
         .createDataFrame(sparkContext.parallelize(data, 2), schema)
         .registerTempTable("noInputSchemaUDAF")

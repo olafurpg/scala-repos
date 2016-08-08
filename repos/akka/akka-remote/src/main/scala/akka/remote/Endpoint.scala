@@ -83,9 +83,9 @@ private[remote] class DefaultMessageDispatcher(
         payload match {
           case sel: ActorSelectionMessage ⇒
             if (UntrustedMode && (!TrustedSelectionPaths.contains(
-                        sel.elements.mkString("/", "/", "")) ||
-                    sel.msg.isInstanceOf[PossiblyHarmful] ||
-                    l != provider.rootGuardian))
+                    sel.elements.mkString("/", "/", "")) ||
+                sel.msg.isInstanceOf[PossiblyHarmful] ||
+                l != provider.rootGuardian))
               log.debug(
                   "operating in UntrustedMode, dropping inbound actor selection to [{}], " +
                     "allow it by adding the path to 'akka.remote.trusted-selection-paths' configuration",
@@ -444,7 +444,7 @@ private[remote] class ReliableDeliverySupervisor(
           new TimeoutException(
               "Remote system has been silent for too long. " +
                 s"(more than ${settings.QuarantineSilentSystemTimeout.toUnit(
-                TimeUnit.HOURS)} hours)"))
+                    TimeUnit.HOURS)} hours)"))
     case EndpointWriter.FlushAndStop ⇒ context.stop(self)
     case EndpointWriter.StopReading(w, replyTo) ⇒
       replyTo ! EndpointWriter.StoppedReading(w)
@@ -1185,9 +1185,8 @@ private[remote] class EndpointReader(
       throw InvalidAssociation(
           localAddress,
           remoteAddress,
-          InvalidAssociationException(
-              "The remote system has quarantined this system. No further associations " +
-                "to the remote system are possible until this system is restarted."),
+          InvalidAssociationException("The remote system has quarantined this system. No further associations " +
+            "to the remote system are possible until this system is restarted."),
           Some(AssociationHandle.Quarantined))
   }
 

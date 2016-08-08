@@ -147,8 +147,8 @@ package ll {
               xs.groupBy(_._2).toList.sortBy(_._1.toString) flatMap {
                 case (tp, ys) =>
                   (ys map {
-                        case (_, _, prefix, seen) => fmt(tp, prefix, seen)
-                      }).sorted.distinct
+                    case (_, _, prefix, seen) => fmt(tp, prefix, seen)
+                  }).sorted.distinct
               }
             }
           }
@@ -161,9 +161,9 @@ package ll {
 
   def signaturesIn(info: Type): List[String] =
     (info.members.toList filterNot
-          (s =>
-             s.isType || s.owner == ObjectClass || s.owner == AnyClass ||
-               s.isConstructor) map (_.defString))
+      (s =>
+         s.isType || s.owner == ObjectClass || s.owner == AnyClass ||
+           s.isConstructor) map (_.defString))
 
   def check(source: String, unit: global.CompilationUnit) = {
     import syms._

@@ -204,9 +204,8 @@ trait ScFunction
             Some(
                 typeParamSubst
                   .followed(subst)
-                  .subst(ScType.create(fun.getReturnType,
-                                       getProject,
-                                       getResolveScope)))
+                  .subst(ScType
+                    .create(fun.getReturnType, getProject, getResolveScope)))
           case _ => None
         }
         superReturnType
@@ -566,8 +565,8 @@ trait ScFunction
       option.get.primarySuper
         .filter(_.info.isInstanceOf[PhysicalSignature])
         .map(node =>
-              (node.info.asInstanceOf[PhysicalSignature].method,
-               node.info.substitutor))
+          (node.info.asInstanceOf[PhysicalSignature].method,
+           node.info.substitutor))
     } else None
   }
 
@@ -790,7 +789,7 @@ trait ScFunction
         val project = getProject
         val resolveScope = getResolveScope
         rt.map(params.foldLeft(_)((res, params) =>
-                  ScFunctionType(res, params)(project, resolveScope)))
+          ScFunctionType(res, params)(project, resolveScope)))
       case None => Failure("no params", Some(this))
     }
   }

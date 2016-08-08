@@ -43,7 +43,7 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
 
   val foldingSink =
     Sink.fold[ByteString, ByteString](ByteString.empty)((state, bs) =>
-          state ++ bs)
+      state ++ bs)
 
   "WS@java" should {
 
@@ -235,7 +235,7 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
 
     val foldingSink =
       Sink.fold[ByteString, ByteString](ByteString.empty)((state, bs) =>
-            state ++ bs)
+        state ++ bs)
 
     def withServer[T](block: play.api.libs.ws.WSClient => T) = {
       Server.withApplication(app) { implicit port =>

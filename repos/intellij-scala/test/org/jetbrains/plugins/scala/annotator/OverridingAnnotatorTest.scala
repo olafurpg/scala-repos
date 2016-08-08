@@ -19,8 +19,8 @@ class OverridingAnnotatorTest extends SimpleTestCase {
   final val Header = "\n"
 
   def testSyntheticUnapply(): Unit = {
-    assertMatches(
-        messages("""
+    assertMatches(messages(
+        """
         |trait Test {
         |  trait Tree
         |  trait Name

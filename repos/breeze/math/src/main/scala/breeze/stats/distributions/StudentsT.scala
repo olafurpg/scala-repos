@@ -58,8 +58,8 @@ case class StudentsT(degreesOfFreedom: Double)(implicit randBasis: RandBasis =
 
   def entropy: Double =
     ((degreesOfFreedom + 1) / 2 *
-          (digamma((degreesOfFreedom + 1) / 2) - digamma(degreesOfFreedom)) -
-          .5 * log(degreesOfFreedom) + lbeta(degreesOfFreedom / 2, 0.5))
+      (digamma((degreesOfFreedom + 1) / 2) - digamma(degreesOfFreedom)) -
+      .5 * log(degreesOfFreedom) + lbeta(degreesOfFreedom / 2, 0.5))
 
   def mode: Double = mean
 }

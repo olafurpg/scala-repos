@@ -20,7 +20,7 @@ case class CreateAStatus(
     CommitState.valueOf(state).isDefined && // only http
     target_url
       .filterNot(f =>
-            "\\Ahttps?://".r.findPrefixOf(f).isDefined && f.length < 255)
+        "\\Ahttps?://".r.findPrefixOf(f).isDefined && f.length < 255)
       .isEmpty && context.filterNot(f => f.length < 255).isEmpty &&
     description.filterNot(f => f.length < 1000).isEmpty
   }

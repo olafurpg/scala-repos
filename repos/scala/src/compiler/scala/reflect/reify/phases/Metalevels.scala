@@ -156,10 +156,8 @@ trait Metalevels { self: Reifier =>
           // if (settings.logRuntimeSplices.value) reporter.echo(tree.pos, "this splice cannot be resolved statically")
           // withinSplice { super.transform(tree) }
           if (reifyDebug)
-            println(
-                "metalevel breach in %s: %s".format(
-                    tree,
-                    (breaches map (_.symbol)).distinct mkString ", "))
+            println("metalevel breach in %s: %s"
+              .format(tree, (breaches map (_.symbol)).distinct mkString ", "))
           CannotReifyRuntimeSplice(tree)
         } else {
           withinSplice { super.transform(tree) }

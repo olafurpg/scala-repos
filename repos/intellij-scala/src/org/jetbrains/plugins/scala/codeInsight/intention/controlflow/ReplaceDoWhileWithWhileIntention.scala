@@ -46,9 +46,9 @@ class ReplaceDoWhileWithWhileIntention extends PsiElementBaseIntentionAction {
       val offset = editor.getCaretModel.getOffset
       //offset is on the word "do" or "while"
       if ((offset >= doStmt.getTextRange.getStartOffset &&
-              offset < body.getTextRange.getStartOffset) ||
+          offset < body.getTextRange.getStartOffset) ||
           (offset > body.getTextRange.getEndOffset &&
-              offset < condition.getTextRange.getStartOffset)) return true
+          offset < condition.getTextRange.getStartOffset)) return true
     }
 
     false

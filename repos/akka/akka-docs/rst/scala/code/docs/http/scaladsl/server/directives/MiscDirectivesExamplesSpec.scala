@@ -21,7 +21,7 @@ class MiscDirectivesExamplesSpec extends RoutingSpec {
 
     // tests:
     Get("/").withHeaders(`Remote-Address`(RemoteAddress(
-                InetAddress.getByName("192.168.3.12")))) ~> route ~> check {
+        InetAddress.getByName("192.168.3.12")))) ~> route ~> check {
       responseAs[String] shouldEqual "Client's ip is 192.168.3.12"
     }
   }

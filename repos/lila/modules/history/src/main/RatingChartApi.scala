@@ -39,13 +39,13 @@ final class RatingChartApi(historyApi: HistoryApi,
     def ratingsMapToJson(perfType: PerfType, ratingsMap: RatingsMap) =
       Json obj
         ("name" -> perfType.name, "points" -> ratingsMap.map {
-              case (days, rating) =>
-                val date = user.createdAt plusDays days
-                Json.arr(date.getYear,
-                         date.getMonthOfYear - 1,
-                         date.getDayOfMonth,
-                         rating)
-            })
+          case (days, rating) =>
+            val date = user.createdAt plusDays days
+            Json.arr(date.getYear,
+                     date.getMonthOfYear - 1,
+                     date.getDayOfMonth,
+                     rating)
+        })
 
     historyApi get user.id map2 { (history: History) =>
       Json stringify {

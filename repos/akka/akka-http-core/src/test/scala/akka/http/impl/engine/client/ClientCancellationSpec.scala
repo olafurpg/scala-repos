@@ -57,8 +57,8 @@ class ClientCancellationSpec
           Flow[HttpRequest]
             .map((_, ()))
             .via(Http().cachedHostConnectionPool(
-                    address.getHostName,
-                    address.getPort)(noncheckedMaterializer))
+                address.getHostName,
+                address.getPort)(noncheckedMaterializer))
             .map(_._1.get))
     }
 
@@ -75,8 +75,8 @@ class ClientCancellationSpec
           Flow[HttpRequest]
             .map((_, ()))
             .via(Http().cachedHostConnectionPoolHttps(
-                    addressTls.getHostName,
-                    addressTls.getPort)(noncheckedMaterializer))
+                addressTls.getHostName,
+                addressTls.getPort)(noncheckedMaterializer))
             .map(_._1.get))
     }
   }

@@ -44,7 +44,7 @@ object WebSocketHandler {
     Flow[FrameEvent]
       .transform(() => aggregateFrames(bufferLimit))
       .via(handleProtocolFailures(
-              WebSocketFlowHandler.webSocketProtocol(bufferLimit).join(flow)))
+          WebSocketFlowHandler.webSocketProtocol(bufferLimit).join(flow)))
       .map(messageToFrameEvent)
   }
 
@@ -164,8 +164,8 @@ object WebSocketHandler {
       _] = {
     AkkaStreams.bypassWith(
         Flow[Either[Message, RawMessage]].transform(() =>
-              new PushStage[Either[Message, RawMessage],
-                            Either[RawMessage, Message]] {
+          new PushStage[Either[Message, RawMessage],
+                        Either[RawMessage, Message]] {
             var closing = false
             def onPush(elem: Either[Message, RawMessage],
                        ctx: Context[Either[RawMessage, Message]]) =

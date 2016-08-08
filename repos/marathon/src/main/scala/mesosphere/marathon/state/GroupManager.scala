@@ -268,7 +268,7 @@ class GroupManager @Singleton @Inject()(
           from
             .app(app.id)
             .map(_.portNumbers.filter(p =>
-                      portRange.contains(p) && !app.servicePorts.contains(p)))
+              portRange.contains(p) && !app.servicePorts.contains(p)))
             .getOrElse(Nil): _*
       )
 

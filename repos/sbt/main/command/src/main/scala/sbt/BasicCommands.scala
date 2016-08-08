@@ -104,8 +104,8 @@ object BasicCommands {
   def multiParser(s: State): Parser[Seq[String]] = {
     val nonSemi = token(charClass(_ != ';').+, hide = const(true))
     (token(';' ~> OptSpace) flatMap { _ =>
-          matched((s.combinedParser & nonSemi) | nonSemi) <~ token(OptSpace)
-        } map (_.trim)).+
+      matched((s.combinedParser & nonSemi) | nonSemi) <~ token(OptSpace)
+    } map (_.trim)).+
   }
 
   def multiApplied(s: State) =
@@ -141,8 +141,8 @@ object BasicCommands {
         s.copy(onFailure = None)
       },
       Command.arb(s =>
-            token(Compat.OnFailure, hide = const(true)).flatMap(x =>
-                  otherCommandParser(s))) { (s, arg) =>
+        token(Compat.OnFailure, hide = const(true)).flatMap(x =>
+          otherCommandParser(s))) { (s, arg) =>
         s.log.warn(Compat.OnFailureDeprecated)
         s.copy(onFailure = Some(arg))
       },
@@ -176,7 +176,7 @@ object BasicCommands {
 
   def call =
     Command(ApplyCommand, Help.more(ApplyCommand, ApplyDetailed))(_ =>
-          callParser) {
+      callParser) {
       case (state, (cp, args)) =>
         val parentLoader = getClass.getClassLoader
         state.log.info(
@@ -186,11 +186,8 @@ object BasicCommands {
         val loader =
           if (cp.isEmpty) parentLoader
           else toLoader(cp.map(f => new File(f)), parentLoader)
-        val loaded = args.map(
-            arg =>
-              ModuleUtilities
-                .getObject(arg, loader)
-                .asInstanceOf[State => State])
+        val loaded = args.map(arg =>
+          ModuleUtilities.getObject(arg, loader).asInstanceOf[State => State])
         (state /: loaded)((s, obj) => obj(s))
     }
   def callParser: Parser[(Seq[String], Seq[String])] =
@@ -262,7 +259,7 @@ object BasicCommands {
 
   def read =
     Command.make(ReadCommand, Help.more(ReadCommand, ReadDetailed))(s =>
-          applyEffect(readParser(s))(doRead(s)))
+      applyEffect(readParser(s))(doRead(s)))
   def readParser(s: State) = {
     val files = (token(Space) ~> fileParser(s.baseDir)).+
     val portAndSuccess = token(OptSpace) ~> Port
@@ -337,7 +334,7 @@ object BasicCommands {
   def removeAliases(s: State): State = removeTagged(s, CommandAliasKey)
   def removeAlias(s: State, name: String): State =
     s.copy(definedCommands = s.definedCommands.filter(c =>
-              !isAliasNamed(name, c)))
+      !isAliasNamed(name, c)))
 
   def removeTagged(s: State, tag: AttributeKey[_]): State =
     s.copy(definedCommands = removeTagged(s.definedCommands, tag))

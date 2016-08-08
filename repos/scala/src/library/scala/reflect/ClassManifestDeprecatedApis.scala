@@ -135,7 +135,7 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
     java.lang.reflect.Array
       .newInstance(
           arrayClass[Array[Array[Array[T]]]](arrayClass[Array[Array[T]]](
-                  arrayClass[Array[T]](arrayClass[T](runtimeClass)))),
+              arrayClass[Array[T]](arrayClass[T](runtimeClass)))),
           len)
       .asInstanceOf[Array[Array[Array[Array[Array[T]]]]]]
 

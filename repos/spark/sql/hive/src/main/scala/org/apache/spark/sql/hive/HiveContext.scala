@@ -265,11 +265,10 @@ class HiveContext private[hive] (
 
     val isolatedLoader = if (hiveMetastoreJars == "builtin") {
       if (hiveExecutionVersion != hiveMetastoreVersion) {
-        throw new IllegalArgumentException(
-            "Builtin jars can only be used when hive execution version == hive metastore version. " +
-              s"Execution: ${hiveExecutionVersion} != Metastore: ${hiveMetastoreVersion}. " +
-              "Specify a vaild path to the correct hive jars using $HIVE_METASTORE_JARS " +
-              s"or change ${HIVE_METASTORE_VERSION.key} to $hiveExecutionVersion.")
+        throw new IllegalArgumentException("Builtin jars can only be used when hive execution version == hive metastore version. " +
+          s"Execution: ${hiveExecutionVersion} != Metastore: ${hiveMetastoreVersion}. " +
+          "Specify a vaild path to the correct hive jars using $HIVE_METASTORE_JARS " +
+          s"or change ${HIVE_METASTORE_VERSION.key} to $hiveExecutionVersion.")
       }
 
       // We recursively find all jars in the class loader chain,
@@ -450,8 +449,8 @@ class HiveContext private[hive] (
         if (newTotalSize > 0 && newTotalSize != oldTotalSize) {
           sessionState.catalog.client.alterTable(
               relation.table.copy(properties =
-                    relation.table.properties +
-                      (StatsSetupConst.TOTAL_SIZE -> newTotalSize.toString)))
+                relation.table.properties +
+                  (StatsSetupConst.TOTAL_SIZE -> newTotalSize.toString)))
         }
       case otherRelation =>
         throw new UnsupportedOperationException(

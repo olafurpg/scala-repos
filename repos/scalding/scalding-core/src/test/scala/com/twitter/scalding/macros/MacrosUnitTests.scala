@@ -86,7 +86,7 @@ class MacrosUnitTests extends WordSpec with Matchers {
   }
 
   def isMacroTupleConverterAvailable[T](implicit proof: TupleConverter[T] =
-        dummy.asInstanceOf[TupleConverter[T]]) =
+    dummy.asInstanceOf[TupleConverter[T]]) =
     proof.isInstanceOf[MacroGenerated]
 
   def isMacroTypeDescriptorAvailable[T](

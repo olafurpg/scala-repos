@@ -106,7 +106,7 @@ object Combinatorics {
         x: TupleEntry =>
           Boolean
           val values = (0 until allc.size).map(i =>
-                x.getInteger(i.asInstanceOf[java.lang.Integer]))
+            x.getInteger(i.asInstanceOf[java.lang.Integer]))
           values.size == values.distinct.size
       }
 
@@ -204,7 +204,7 @@ object Combinatorics {
            .crossWithSmaller(bpipe)
            .map(allc -> 'temp) { x: TupleEntry =>
              val values = (0 until allc.size).map(i =>
-                   x.getDouble(i.asInstanceOf[java.lang.Integer]))
+               x.getDouble(i.asInstanceOf[java.lang.Integer]))
              values.sum
            }
            .filter('temp) { x: Double =>

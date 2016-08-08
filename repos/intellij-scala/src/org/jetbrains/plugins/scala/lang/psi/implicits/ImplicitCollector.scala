@@ -284,8 +284,8 @@ class ImplicitCollector(
             if function.hasModifierProperty("implicit") =>
           placeCalculated = true
           if (isPredefPriority || (ScImplicitlyConvertible
-                    .checkFucntionIsEligible(function, place) &&
-                  ResolveUtils.isAccessible(function, getPlace))) {
+                .checkFucntionIsEligible(function, place) &&
+              ResolveUtils.isAccessible(function, getPlace))) {
             addResult(
                 new ScalaResolveResult(named,
                                        subst,
@@ -510,18 +510,18 @@ class ImplicitCollector(
                               .getInstance(place.getProject)
                               .getImplicitParametersSearchDepth
                             if (lastImplicit.isDefined && (depth < 0 ||
-                                    searchImplicitsRecursively < depth)) {
+                                searchImplicitsRecursively < depth)) {
                               predicate match {
                                 case Some(predicateFunction)
                                     if isExtensionConversion =>
                                   inferValueType(
                                       nonValueType
                                         .getOrElse(return reportWrong(
-                                                BadTypeResult))) match {
+                                            BadTypeResult))) match {
                                     case (ScFunctionType(rt, _), _) =>
                                       if (predicateFunction(
                                               c.copy(implicitParameterType =
-                                                    Some(rt)),
+                                                Some(rt)),
                                               subst).isEmpty)
                                         return reportWrong(
                                             CantFindExtensionMethodResult)
@@ -546,7 +546,7 @@ class ImplicitCollector(
                                       CantInferTypeParameterResult)
                               }
                               if (fullInfo && results.exists(_.exists(
-                                          _.name == InferUtil.notFoundParameterName)))
+                                      _.name == InferUtil.notFoundParameterName)))
                                 return Some(
                                     c.copy(implicitParameters =
                                              results.getOrElse(Seq.empty),
@@ -563,7 +563,7 @@ class ImplicitCollector(
                                   case (r1: ScalaResolveResult,
                                         r2: ScalaResolveResult) =>
                                     r1.copy(importsUsed =
-                                          r1.importsUsed ++ r2.importsUsed)
+                                      r1.importsUsed ++ r2.importsUsed)
                                 }
                               }
                               Some(addImportsUsed(
@@ -722,7 +722,7 @@ class ImplicitCollector(
       def mapCandidates(withLocalTypeInference: Boolean)
         : collection.Set[(ScalaResolveResult, ScSubstitutor)] = {
         var candidatesSeq = candidates.toSeq.filter(c =>
-              forMap(c, withLocalTypeInference, checkFast = true).isDefined)
+          forMap(c, withLocalTypeInference, checkFast = true).isDefined)
         val results: ArrayBuffer[(ScalaResolveResult, ScSubstitutor)] =
           new ArrayBuffer[(ScalaResolveResult, ScSubstitutor)]()
         var lastResult: Option[ScalaResolveResult] = None
@@ -755,12 +755,10 @@ class ImplicitCollector(
       }
 
       if (fullInfo)
-        return (candidates.toSeq
-              .map(c =>
-                    forMap(c,
-                           withLocalTypeInference = false,
-                           checkFast = false)) ++ candidates.toSeq.map(c =>
-                  forMap(c, withLocalTypeInference = true, checkFast = false)))
+        return (candidates.toSeq.map(c =>
+          forMap(c, withLocalTypeInference = false, checkFast = false)) ++ candidates.toSeq
+          .map(c =>
+            forMap(c, withLocalTypeInference = true, checkFast = false)))
           .flatMap(_.toSeq)
           .map(_._1)
           .toSet

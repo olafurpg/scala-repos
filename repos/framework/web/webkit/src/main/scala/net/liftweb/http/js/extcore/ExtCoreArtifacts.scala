@@ -139,15 +139,13 @@ object ExtCoreArtifacts extends JSArtifacts {
                      server: String,
                      path: String => JsExp): String =
     (("url : liftAjax.addPageName(" + path(server).toJsCmd +
-              ")") :: "params : " + info.data.toJsCmd ::
-          ("method : " + info.action.encJs) ::
-            ("dataType : " + info.dataType.encJs) :: "timeout : " +
-              info.timeout :: "disableCaching : " +
-              !info.cache :: "success: function(response, options) { res = Ext.lift.eval(response.responseText);" +
-              info.successFunc
-                .map(_ + "(res);")
-                .openOr("") + "}" :: "failure: " +
-              info.failFunc.openOr(
-                  "function(arg) {alert('Ajax request failed');}") :: Nil) mkString
+      ")") :: "params : " + info.data.toJsCmd ::
+      ("method : " + info.action.encJs) ::
+        ("dataType : " + info.dataType.encJs) :: "timeout : " +
+          info.timeout :: "disableCaching : " +
+          !info.cache :: "success: function(response, options) { res = Ext.lift.eval(response.responseText);" +
+          info.successFunc.map(_ + "(res);").openOr("") + "}" :: "failure: " +
+          info.failFunc
+            .openOr("function(arg) {alert('Ajax request failed');}") :: Nil) mkString
       ("{ ", ", ", " }")
 }

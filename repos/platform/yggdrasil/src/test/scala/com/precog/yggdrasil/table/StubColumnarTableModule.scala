@@ -115,17 +115,16 @@ trait StubColumnarTableModule[M[+ _]]
                 parsed zip (Stream from index) map {
                   case (value, id) =>
                     JObject(JField("key", JArray(JNum(id) :: Nil)) :: JField(
-                            "value",
-                            value) :: Nil)
+                        "value",
+                        value) :: Nil)
                 }
               }
             }
 
           case x =>
-            failure(
-                ResourceError.corrupt(
-                    "Attempted to load JSON as a table from something that wasn't a string: " +
-                      x))
+            failure(ResourceError.corrupt(
+                "Attempted to load JSON as a table from something that wasn't a string: " +
+                  x))
         }
 
         parsedV.map(_.flatten).disjunction.map(fromJson(_))

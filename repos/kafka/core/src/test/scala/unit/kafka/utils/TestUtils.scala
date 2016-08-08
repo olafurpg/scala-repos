@@ -123,7 +123,7 @@ object TestUtils extends Logging {
       .take(attempts)
       .find(_.mkdir())
       .getOrElse(sys.error(
-              s"Failed to create directory after $attempts attempts"))
+          s"Failed to create directory after $attempts attempts"))
     f.deleteOnExit()
     f
   }
@@ -705,7 +705,7 @@ object TestUtils extends Logging {
 
   def deleteBrokersInZk(zkUtils: ZkUtils, ids: Seq[Int]): Seq[Broker] = {
     val brokers = ids.map(id =>
-          new Broker(id, "localhost", 6667, SecurityProtocol.PLAINTEXT))
+      new Broker(id, "localhost", 6667, SecurityProtocol.PLAINTEXT))
     brokers.foreach(b => zkUtils.deletePath(ZkUtils.BrokerIdsPath + "/" + b))
     brokers
   }
@@ -749,8 +749,8 @@ object TestUtils extends Logging {
                              correlationId: Int = 0,
                              clientId: String): ProducerRequest = {
     val data = topics.flatMap(topic =>
-          partitions.map(partition =>
-                (TopicAndPartition(topic, partition), message)))
+      partitions.map(partition =>
+        (TopicAndPartition(topic, partition), message)))
     new ProducerRequest(correlationId,
                         clientId,
                         acks.toShort,
@@ -1044,8 +1044,8 @@ object TestUtils extends Logging {
                    .toArray
                    .map(_.asInstanceOf[Thread])
                    .count(t =>
-                         !t.isDaemon && t.isAlive &&
-                           t.getName.startsWith(threadNamePrefix)))
+                     !t.isDaemon && t.isAlive &&
+                       t.getName.startsWith(threadNamePrefix)))
   }
 
   /**
@@ -1218,25 +1218,25 @@ object TestUtils extends Logging {
           servers.forall(
               server =>
                 topicAndPartitions.forall(tp =>
-                      server.replicaManager
-                        .getPartition(tp.topic, tp.partition) == None)),
+                  server.replicaManager
+                    .getPartition(tp.topic, tp.partition) == None)),
         "Replica manager's should have deleted all of this topic's partitions")
     // ensure that logs from all replicas are deleted if delete topic is marked successful in zookeeper
     assertTrue("Replica logs not deleted after delete topic is complete",
                servers.forall(server =>
-                     topicAndPartitions.forall(tp =>
-                           server.getLogManager().getLog(tp).isEmpty)))
+                 topicAndPartitions.forall(tp =>
+                   server.getLogManager().getLog(tp).isEmpty)))
     // ensure that topic is removed from all cleaner offsets
     TestUtils.waitUntilTrue(
         () =>
           servers.forall(server =>
-                topicAndPartitions.forall { tp =>
+            topicAndPartitions.forall { tp =>
               val checkpoints = server.getLogManager().logDirs.map { logDir =>
                 new OffsetCheckpoint(
                     new File(logDir, "cleaner-offset-checkpoint")).read()
               }
               checkpoints.forall(checkpointsPerLogDir =>
-                    !checkpointsPerLogDir.contains(tp))
+                !checkpointsPerLogDir.contains(tp))
           }),
         "Cleaner offset for deleted partition should have been removed")
   }

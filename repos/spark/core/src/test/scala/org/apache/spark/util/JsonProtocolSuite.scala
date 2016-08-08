@@ -93,7 +93,7 @@ class JsonProtocolSuite extends SparkFunSuite {
     val jobStart = {
       val stageIds = Seq[Int](1, 2, 3, 4)
       val stageInfos = stageIds.map(x =>
-            makeStageInfo(x, x * 200, x * 300, x * 400L, x * 500L))
+        makeStageInfo(x, x * 200, x * 300, x * 400L, x * 500L))
       SparkListenerJobStart(10, jobSubmissionTime, stageInfos, properties)
     }
     val jobEnd = SparkListenerJobEnd(20, jobCompletionTime, JobSucceeded)
@@ -465,7 +465,7 @@ class JsonProtocolSuite extends SparkFunSuite {
     val stageInfos =
       stageIds.map(x => makeStageInfo(x, x * 200, x * 300, x * 400, x * 500))
     val dummyStageInfos = stageIds.map(id =>
-          new StageInfo(id, 0, "unknown", 0, Seq.empty, Seq.empty, "unknown"))
+      new StageInfo(id, 0, "unknown", 0, Seq.empty, Seq.empty, "unknown"))
     val jobStart =
       SparkListenerJobStart(10, jobSubmissionTime, stageInfos, properties)
     val oldEvent = JsonProtocol

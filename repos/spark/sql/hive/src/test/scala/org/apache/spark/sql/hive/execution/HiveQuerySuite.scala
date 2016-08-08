@@ -755,7 +755,7 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
     assertResult(Array(Row(2, "str2"))) {
       sql("SELECT tablealias.A, TABLEALIAS.b FROM reGisteredTABle TableAlias " +
-            "WHERE TableAliaS.a > 1").collect()
+        "WHERE TableAliaS.a > 1").collect()
     }
   }
 
@@ -819,10 +819,10 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
   }
 
   test("SPARK-5383 alias for udfs with multi output columns") {
-    assert(
-        sql("select stack(2, key, value, key, value) as (a, b) from src limit 5")
-          .collect()
-          .size == 5)
+    assert(sql(
+        "select stack(2, key, value, key, value) as (a, b) from src limit 5")
+      .collect()
+      .size == 5)
 
     assert(
         sql("select a, b from (select stack(2, key, value, key, value) as (a, b) from src) t limit 5")

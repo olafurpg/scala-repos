@@ -290,7 +290,7 @@ object ParquetReadBenchmark {
         sqlContext.range(values).registerTempTable("t1")
         sqlContext
           .sql(s"select IF(rand(1) < $fractionOfNulls, NULL, cast(id as STRING)) as c1, " +
-                s"IF(rand(2) < $fractionOfNulls, NULL, cast(id as STRING)) as c2 from t1")
+            s"IF(rand(2) < $fractionOfNulls, NULL, cast(id as STRING)) as c2 from t1")
           .write
           .parquet(dir.getCanonicalPath)
         sqlContext.read
@@ -302,7 +302,7 @@ object ParquetReadBenchmark {
         benchmark.addCase("SQL Parquet Vectorized") { iter =>
           sqlContext
             .sql("select sum(length(c2)) from tempTable where c1 is " +
-                  "not NULL and c2 is not NULL")
+              "not NULL and c2 is not NULL")
             .collect()
         }
 

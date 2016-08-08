@@ -150,11 +150,8 @@ abstract class TreeCheckers extends Analyzer {
 
       // duplicate defs
       for ((sym, defs) <- defSyms; if defs.size > 1) {
-        errorFn(
-            "%s DefTrees with symbol '%s': %s".format(
-                defs.size,
-                ownerstr(sym),
-                defs map beststr mkString ", "))
+        errorFn("%s DefTrees with symbol '%s': %s"
+          .format(defs.size, ownerstr(sym), defs map beststr mkString ", "))
       }
       defSyms.clear()
     }
@@ -417,7 +414,7 @@ abstract class TreeCheckers extends Analyzer {
 
         def isOk(sym: Symbol) =
           treeSym hasTransOwner sym.enclosingSuchThat(x =>
-                !x.isTypeParameterOrSkolem) // account for higher order type params
+            !x.isTypeParameterOrSkolem) // account for higher order type params
         def isEligible(sym: Symbol) =
           (sym ne NoSymbol) && (sym.isTypeParameter || sym.isLocalToBlock)
         val referencedSymbols =

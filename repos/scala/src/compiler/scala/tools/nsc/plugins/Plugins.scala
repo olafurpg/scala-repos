@@ -101,7 +101,7 @@ trait Plugins { global: Global =>
     // Verify no non-existent plugin given with -P
     for {
       opt <- settings.pluginOptions.value if !(plugs exists
-            (opt startsWith _.name + ":"))
+        (opt startsWith _.name + ":"))
     } globalError("bad option: -P:" + opt)
 
     // Plugins may opt out, unless we just want to show info

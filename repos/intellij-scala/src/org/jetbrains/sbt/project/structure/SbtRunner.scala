@@ -46,7 +46,7 @@ class SbtRunner(vmExecutable: File,
 
     checkFilePresence
       .fold(read0(directory, options.mkString(", "))(listener))(it =>
-            Left(new FileNotFoundException(it)))
+        Left(new FileNotFoundException(it)))
   }
 
   private def read0(directory: File, options: String)(
@@ -103,17 +103,16 @@ class SbtRunner(vmExecutable: File,
         }
         val process = processBuilder.start()
         using(
-            new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                        process.getOutputStream,
-                        "UTF-8")))) { writer =>
-          sbtCommands.foreach(writer.println)
-          writer.flush()
-          val result = handle(process, listener)
-          result.map { output =>
-            (structureFile.length > 0).either(
-                XML.load(structureFile.toURI.toURL))(
-                SbtException.fromSbtLog(output))
-          }.getOrElse(Left(new ImportCancelledException))
+            new PrintWriter(new BufferedWriter(
+                new OutputStreamWriter(process.getOutputStream, "UTF-8")))) {
+          writer =>
+            sbtCommands.foreach(writer.println)
+            writer.flush()
+            val result = handle(process, listener)
+            result.map { output =>
+              (structureFile.length > 0).either(XML.load(
+                  structureFile.toURI.toURL))(SbtException.fromSbtLog(output))
+            }.getOrElse(Left(new ImportCancelledException))
         }
       } catch {
         case e: Exception => Left(e)

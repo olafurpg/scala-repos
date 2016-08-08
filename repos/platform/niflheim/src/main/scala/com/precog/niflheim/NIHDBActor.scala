@@ -244,13 +244,8 @@ private[niflheim] object NIHDBActor extends Logging {
 
     currentState map {
       _ map { s =>
-        actorSystem.actorOf(
-            Props(
-                new NIHDBActor(s,
-                               baseDir,
-                               chef,
-                               cookThreshold,
-                               txLogScheduler)))
+        actorSystem.actorOf(Props(
+            new NIHDBActor(s, baseDir, chef, cookThreshold, txLogScheduler)))
       }
     }
   }
@@ -444,8 +439,8 @@ private[niflheim] class NIHDBActor private (
   def updatedThresholds(current: Map[Int, Int],
                         ids: Seq[Long]): Map[Int, Int] = {
     (current.toSeq ++ ids.map { i =>
-          val EventId(p, s) = EventId.fromLong(i); (p -> s)
-        }).groupBy(_._1).map { case (p, ids) => (p -> ids.map(_._2).max) }
+      val EventId(p, s) = EventId.fromLong(i); (p -> s)
+    }).groupBy(_._1).map { case (p, ids) => (p -> ids.map(_._2).max) }
   }
 
   override def receive = {

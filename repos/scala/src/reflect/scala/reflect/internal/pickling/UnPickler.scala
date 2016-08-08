@@ -131,7 +131,7 @@ abstract class UnPickler {
     protected def isSymbolEntry(i: Int): Boolean = {
       val tag = bytes(index(i)).toInt
       (firstSymTag <= tag && tag <= lastSymTag &&
-          (tag != CLASSsym || !isRefinementSymbolEntry(i)))
+      (tag != CLASSsym || !isRefinementSymbolEntry(i)))
     }
 
     /** Does entry represent an (internal or external) symbol */
@@ -256,10 +256,10 @@ abstract class UnPickler {
             else None
 
           (module map {
-                case (group, art) =>
-                  s"""\n(NOTE: It looks like the $art module is missing; try adding a dependency on "$group" : "$art".
+            case (group, art) =>
+              s"""\n(NOTE: It looks like the $art module is missing; try adding a dependency on "$group" : "$art".
                |       See http://docs.scala-lang.org/overviews/ for more information.)""".stripMargin
-              } getOrElse "")
+          } getOrElse "")
         }
 
         def localDummy = {
@@ -798,7 +798,7 @@ abstract class UnPickler {
           if (alias.isOverloaded)
             alias = slowButSafeEnteringPhase(picklerPhase)(
                 (alias suchThat
-                      (alt => sym.tpe =:= sym.owner.thisType.memberType(alt))))
+                  (alt => sym.tpe =:= sym.owner.thisType.memberType(alt))))
 
           sym.asInstanceOf[TermSymbol].setAlias(alias)
         } catch {

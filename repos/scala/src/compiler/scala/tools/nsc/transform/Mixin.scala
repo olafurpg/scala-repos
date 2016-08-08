@@ -46,12 +46,12 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
     */
   private def isImplementedStatically(sym: Symbol) =
     (sym.isMethod && (!sym.hasFlag(DEFERRED | SUPERACCESSOR) ||
-              (sym hasFlag lateDEFERRED)) && sym.owner.isTrait && sym.isMethod &&
-          (!sym.isModule || sym.hasFlag(PRIVATE | LIFTED)) &&
-          (!(sym hasFlag (ACCESSOR | SUPERACCESSOR)) || sym.isLazy) &&
-          !sym.isPrivate && !sym.hasAllFlags(LIFTED | MODULE | METHOD) &&
-          !sym.isConstructor && (!sym.hasFlag(notPRIVATE | LIFTED) ||
-              sym.hasFlag(ACCESSOR | SUPERACCESSOR | MODULE)))
+      (sym hasFlag lateDEFERRED)) && sym.owner.isTrait && sym.isMethod &&
+      (!sym.isModule || sym.hasFlag(PRIVATE | LIFTED)) &&
+      (!(sym hasFlag (ACCESSOR | SUPERACCESSOR)) || sym.isLazy) &&
+      !sym.isPrivate && !sym.hasAllFlags(LIFTED | MODULE | METHOD) &&
+      !sym.isConstructor && (!sym.hasFlag(notPRIVATE | LIFTED) ||
+      sym.hasFlag(ACCESSOR | SUPERACCESSOR | MODULE)))
 
   private def isFieldWithBitmap(field: Symbol) = {
     field.info // ensure that nested objects are transformed
@@ -70,11 +70,11 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
     */
   private def needsInitFlag(sym: Symbol) =
     (settings.checkInit && sym.isGetter && !sym.isInitializedToDefault &&
-          !isConstantType(sym.info.finalResultType) // SI-4742
-          && !sym.hasFlag(PARAMACCESSOR | SPECIALIZED | LAZY) &&
-          !sym.accessed.hasFlag(PRESUPER) && !sym.isOuterAccessor &&
-          !(sym.owner isSubClass DelayedInitClass) &&
-          !(sym.accessed hasAnnotation TransientAttr))
+      !isConstantType(sym.info.finalResultType) // SI-4742
+      && !sym.hasFlag(PARAMACCESSOR | SPECIALIZED | LAZY) &&
+      !sym.accessed.hasFlag(PRESUPER) && !sym.isOuterAccessor &&
+      !(sym.owner isSubClass DelayedInitClass) &&
+      !(sym.accessed hasAnnotation TransientAttr))
 
   /** Returns the symbol that is accessed by a super-accessor in a mixin composition.
     *
@@ -120,11 +120,11 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
           .nonPrivateDecl(member.name)
           .alternatives
           .exists(sym =>
-                isConcreteAccessor(sym) && !sym.hasFlag(MIXEDIN) &&
-                  matchesType(sym.tpe, member.tpe, alwaysMatchSimple = true))
+            isConcreteAccessor(sym) && !sym.hasFlag(MIXEDIN) &&
+              matchesType(sym.tpe, member.tpe, alwaysMatchSimple = true))
       }
       (bcs.head != member.owner && (hasOverridingAccessor(bcs.head) ||
-              isOverriddenAccessor(member, bcs.tail)))
+      isOverriddenAccessor(member, bcs.tail)))
     }
 
   /** Add given member to given class, and mark member as mixed-in.
@@ -281,7 +281,7 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
             if (mixinMember.isLazy) {
               initializer(mixedInAccessor) =
                 (mixinClass.info.decl(mixinMember.name) orElse abort(
-                        "Could not find initializer for " + mixinMember.name))
+                    "Could not find initializer for " + mixinMember.name))
             }
             if (!mixinMember.isSetter)
               mixinMember.tpe match {
@@ -307,7 +307,7 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
 
                   val newFlags =
                     ((PrivateLocal) | (mixinMember getFlag MUTABLE | LAZY) |
-                          (if (mixinMember.hasStableFlag) 0 else MUTABLE))
+                      (if (mixinMember.hasStableFlag) 0 else MUTABLE))
 
                   addMember(
                       clazz,
@@ -379,7 +379,7 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
               val sym = tree.symbol
               if ((sym.hasAccessorFlag || (sym.isTerm && !sym.isMethod)) &&
                   sym.isPrivate && !(currentOwner.isGetter &&
-                        currentOwner.accessed == sym) // getter
+                    currentOwner.accessed == sym) // getter
                   && !definitions.isPrimitiveValueClass(
                       sym.tpe.resultType.typeSymbol) &&
                   sym.owner == templ.symbol.owner && !sym.isLazy &&
@@ -546,9 +546,9 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
           case DefDef(_, _, _, _, _, _) =>
             val sym = tree.symbol
             !(sym.isDeferred && (newSyms exists
-                      (nsym =>
-                         nsym.name == sym.name &&
-                           (nsym.tpe matches sym.tpe))))
+              (nsym =>
+                 nsym.name == sym.name &&
+                   (nsym.tpe matches sym.tpe))))
           case _ =>
             true
         }
@@ -801,11 +801,11 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
         val kind = bitmapKind(sym)
         val mask = maskForOffset(offset, sym, kind)
         val msg = s"Uninitialized field: ${unit.source}: ${pos.line}"
-        val result = IF(
-            mkTest(clazz, mask, bitmapSym, equalToZero = false, kind))
-          .THEN(retVal)
-          .ELSE(Throw(
-                  NewFromConstructor(UninitializedFieldConstructor, LIT(msg))))
+        val result =
+          IF(mkTest(clazz, mask, bitmapSym, equalToZero = false, kind))
+            .THEN(retVal)
+            .ELSE(Throw(
+                NewFromConstructor(UninitializedFieldConstructor, LIT(msg))))
 
         typedPos(pos)(BLOCK(result, retVal))
       }

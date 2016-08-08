@@ -303,11 +303,12 @@ trait StreamTest extends QueryTest with Timeouts {
               .asInstanceOf[StreamExecution]
             currentStream.microBatchThread.setUncaughtExceptionHandler(
                 new UncaughtExceptionHandler {
-              override def uncaughtException(t: Thread, e: Throwable): Unit = {
-                streamDeathCause = e
-                testThread.interrupt()
-              }
-            })
+                  override def uncaughtException(t: Thread,
+                                                 e: Throwable): Unit = {
+                    streamDeathCause = e
+                    testThread.interrupt()
+                  }
+                })
 
           case StopStream =>
             verify(currentStream != null,

@@ -14,7 +14,7 @@ object GuavaCache extends Cache {
 
   override def get[V](key: String): Option[V] =
     Option(cache.getIfPresent(key).asInstanceOf[Entry[V]]).flatMap(e =>
-          if (e.isExpired) {
+      if (e.isExpired) {
         remove(key)
         None
       } else {

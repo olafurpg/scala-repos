@@ -153,7 +153,7 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
   implicit def mapShow[K, V](implicit K: Show[K],
                              V: Show[V]): Show[XMap[K, V]] =
     Show.show(m =>
-          "Map[" +: Cord.mkCord(", ", m.toSeq.view.map {
+      "Map[" +: Cord.mkCord(", ", m.toSeq.view.map {
         case (k, v) => Cord(K show k, "->", V show v)
       }: _*) :+ "]")
 

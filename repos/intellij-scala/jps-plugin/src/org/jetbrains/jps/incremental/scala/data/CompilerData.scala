@@ -71,7 +71,7 @@ object CompilerData {
             }
           } else {
             Option(model.getProject.getSdkReferencesTable.getSdkReference(
-                    JpsJavaSdkType.INSTANCE))
+                JpsJavaSdkType.INSTANCE))
               .flatMap(references => Option(references.resolve))
               .map(_.getProperties)
           }
@@ -130,7 +130,7 @@ object CompilerData {
             case version if version.startsWith("2.10") =>
               // TODO implement a better version comparison
               find(extraJars, "scala-reflect", ".jar").left.toOption.map(_ +
-                    " in Scala compiler classpath in Scala SDK " + sdk.getName)
+                " in Scala compiler classpath in Scala SDK " + sdk.getName)
             case _ => None
           }
         }
@@ -145,17 +145,14 @@ object CompilerData {
                    prefix: String,
                    suffix: String): Either[String, File] = {
     files.filter(it =>
-          it.getName.startsWith(prefix) && it.getName.endsWith(suffix)) match {
+      it.getName.startsWith(prefix) && it.getName.endsWith(suffix)) match {
       case Seq() =>
         Left("No '%s*%s'".format(prefix, suffix))
       case Seq(file) =>
         Right(file)
       case Seq(duplicates @ _ *) =>
-        Left(
-            "Multiple '%s*%s' files (%s)".format(
-                prefix,
-                suffix,
-                duplicates.map(_.getName).mkString(", ")))
+        Left("Multiple '%s*%s' files (%s)"
+          .format(prefix, suffix, duplicates.map(_.getName).mkString(", ")))
     }
   }
 }

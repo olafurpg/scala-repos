@@ -55,7 +55,7 @@ object StrictForm {
     implicit def unmarshaller[T](implicit um: FieldUnmarshaller[T])
       : FromStrictFormFieldUnmarshaller[T] =
       Unmarshaller.withMaterializer(implicit ec ⇒
-            implicit mat ⇒ {
+        implicit mat ⇒ {
           case FromString(value) ⇒ um.unmarshalString(value)
           case FromPart(value) ⇒ um.unmarshalPart(value)
       })
@@ -63,7 +63,7 @@ object StrictForm {
     def unmarshallerFromFSU[T](
         fsu: FromStringUnmarshaller[T]): FromStrictFormFieldUnmarshaller[T] =
       Unmarshaller.withMaterializer(implicit ec ⇒
-            implicit mat ⇒ {
+        implicit mat ⇒ {
           case FromString(value) ⇒ fsu(value)
           case FromPart(value) ⇒
             val charsetName = value.entity.contentType
@@ -74,9 +74,8 @@ object StrictForm {
             fsu(value.entity.data.decodeString(charsetName))
       })
 
-    @implicitNotFound(
-        "In order to unmarshal a `StrictForm.Field` to type `${T}` you need to supply a " +
-          "`FromStringUnmarshaller[${T}]` and/or a `FromEntityUnmarshaller[${T}]`")
+    @implicitNotFound("In order to unmarshal a `StrictForm.Field` to type `${T}` you need to supply a " +
+      "`FromStringUnmarshaller[${T}]` and/or a `FromEntityUnmarshaller[${T}]`")
     sealed trait FieldUnmarshaller[T] {
       def unmarshalString(value: String)(implicit ec: ExecutionContext,
                                          mat: Materializer): Future[T]
@@ -162,7 +161,7 @@ object StrictForm {
           tryUnmarshalToMultipartForm.fast.recoverWith {
             case Unmarshaller.UnsupportedContentTypeException(supported2) ⇒
               FastFuture.failed(Unmarshaller.UnsupportedContentTypeException(
-                      supported1 ++ supported2))
+                  supported1 ++ supported2))
           }
       }
     }

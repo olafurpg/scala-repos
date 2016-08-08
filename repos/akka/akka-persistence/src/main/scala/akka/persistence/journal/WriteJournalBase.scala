@@ -20,7 +20,7 @@ private[akka] trait WriteJournalBase { this: Actor ⇒
       case a: AtomicWrite ⇒
         // don't store sender
         a.copy(payload = a.payload.map(p ⇒
-                  adaptToJournal(p.update(sender = Actor.noSender))))
+          adaptToJournal(p.update(sender = Actor.noSender))))
     }
 
   /** INTERNAL API */

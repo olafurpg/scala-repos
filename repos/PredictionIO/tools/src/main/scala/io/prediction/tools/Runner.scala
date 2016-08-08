@@ -31,7 +31,7 @@ object Runner extends Logging {
     env
       .split(',')
       .flatMap(p =>
-            p.split('=') match {
+        p.split('=') match {
           case Array(k, v) => List(k -> v)
           case _ => Nil
       })

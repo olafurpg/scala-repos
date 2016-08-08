@@ -190,8 +190,8 @@ class MacroExpandAction extends AnAction {
             block.children
               .find(_.isInstanceOf[ScalaPsiElement])
               .foreach(p =>
-                    p.putCopyableUserData(MacroExpandAction.EXPANDED_KEY,
-                                          holder.getText))
+                p.putCopyableUserData(MacroExpandAction.EXPANDED_KEY,
+                                      holder.getText))
             holder.getParent.addRangeAfter(children.tail.head,
                                            children.dropRight(1).last,
                                            holder)

@@ -444,9 +444,9 @@ private[sql] class DynamicPartitionWriterContainer(
       } else {
         UnsafeProjection.create(
             sortingExpressions.dropRight(sortColumns.length).zipWithIndex.map {
-          case (expr, ordinal) =>
-            BoundReference(ordinal, expr.dataType, expr.nullable)
-        })
+              case (expr, ordinal) =>
+                BoundReference(ordinal, expr.dataType, expr.nullable)
+            })
       }
 
     val sortedIterator = sorter.sortedIterator()

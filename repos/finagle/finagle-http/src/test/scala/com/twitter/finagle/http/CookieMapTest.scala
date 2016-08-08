@@ -99,9 +99,8 @@ class CookieMapTest extends FunSuite {
     assert(cookie !== cookie2)
     assert(request.cookies.size == 2)
     assert(request.cookies("name").value == "value")
-    assert(
-        request.headers
-          .get("Cookie") == "name=value2; $Domain=bar; name=value; $Domain=foo")
+    assert(request.headers
+      .get("Cookie") == "name=value2; $Domain=bar; name=value; $Domain=foo")
   }
 
   test("parse header with two cookies with the same name") {

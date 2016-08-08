@@ -353,7 +353,7 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
 
     val g = {
       val dataTable = (0 until tableSize).map(_ =>
-            RandomStringUtils.randomAlphabetic(strLen))
+        RandomStringUtils.randomAlphabetic(strLen))
       val rng = genHigherSkewData()
       () =>
         dataTable(rng().toInt % tableSize)

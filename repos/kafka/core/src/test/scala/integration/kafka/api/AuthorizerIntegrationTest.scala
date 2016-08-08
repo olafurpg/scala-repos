@@ -67,12 +67,8 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
   val TopicWriteAcl = Map(
       topicResource -> Set(
           new Acl(KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Write)))
-  val TopicDescribeAcl = Map(
-      topicResource -> Set(
-          new Acl(KafkaPrincipal.ANONYMOUS,
-                  Allow,
-                  Acl.WildCardHost,
-                  Describe)))
+  val TopicDescribeAcl = Map(topicResource -> Set(
+      new Acl(KafkaPrincipal.ANONYMOUS, Allow, Acl.WildCardHost, Describe)))
 
   val consumers = Buffer[KafkaConsumer[Array[Byte], Array[Byte]]]()
   val producers = Buffer[KafkaProducer[Array[Byte], Array[Byte]]]()
@@ -259,13 +255,12 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
             List(brokerId).asJava,
             2,
             Set(brokerId).asJava)).asJava
-    val brokers = Set(
-        new requests.UpdateMetadataRequest.Broker(
-            brokerId,
-            Map(SecurityProtocol.PLAINTEXT -> new requests.UpdateMetadataRequest.EndPoint(
-                    "localhost",
-                    0)).asJava,
-            null)).asJava
+    val brokers = Set(new requests.UpdateMetadataRequest.Broker(
+        brokerId,
+        Map(SecurityProtocol.PLAINTEXT -> new requests.UpdateMetadataRequest.EndPoint(
+            "localhost",
+            0)).asJava,
+        null)).asJava
     new requests.UpdateMetadataRequest(brokerId,
                                        Int.MaxValue,
                                        partitionState,

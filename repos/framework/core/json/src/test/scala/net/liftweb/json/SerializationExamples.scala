@@ -298,7 +298,7 @@ object CustomSerializerExamples extends Specification {
 
   class IntervalSerializer
       extends CustomSerializer[Interval](format =>
-            ({
+        ({
           case JObject(
               JField("start", JInt(s)) :: JField("end", JInt(e)) :: Nil) =>
             new Interval(s.longValue, e.longValue)
@@ -312,7 +312,7 @@ object CustomSerializerExamples extends Specification {
 
   class PatternSerializer
       extends CustomSerializer[Pattern](format =>
-            ({
+        ({
           case JObject(JField("$pattern", JString(s)) :: Nil) =>
             Pattern.compile(s)
         }, {
@@ -322,7 +322,7 @@ object CustomSerializerExamples extends Specification {
 
   class DateSerializer
       extends CustomSerializer[Date](format =>
-            ({
+        ({
           case JObject(List(JField("$dt", JString(s)))) =>
             format.dateFormat
               .parse(s)

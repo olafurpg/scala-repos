@@ -262,8 +262,8 @@ class StateMapSuite extends SparkFunSuite {
           // E.g.  nth bit from the right of any binary number B is [ B / (2 ^ (n - 1)) ] % 2
           val opCode =
             (keyId / math
-                  .pow(numTypeMapOps, numTotalOps - opId - 1)
-                  .toInt) % numTypeMapOps
+              .pow(numTypeMapOps, numTotalOps - opId - 1)
+              .toInt) % numTypeMapOps
           opCode match {
             case 0 =>
               val value = Random.nextInt()

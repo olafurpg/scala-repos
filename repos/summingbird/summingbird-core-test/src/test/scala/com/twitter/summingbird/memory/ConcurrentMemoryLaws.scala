@@ -59,7 +59,7 @@ class ConcurrentMemoryLaws extends WordSpec {
                 K: Arbitrary,
                 V: Monoid: Arbitrary: Equiv] =
     new TestGraphs[ConcurrentMemory, T, K, V](new ConcurrentMemory)(() =>
-          new ConcurrentHashMap[K, V]())(() => new LinkedBlockingQueue[T]())(
+      new ConcurrentHashMap[K, V]())(() => new LinkedBlockingQueue[T]())(
         Producer.source[ConcurrentMemory, T](_))(s => { k =>
       Option(s.get(k))
     })({ (f, items) =>

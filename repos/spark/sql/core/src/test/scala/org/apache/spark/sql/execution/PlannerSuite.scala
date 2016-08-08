@@ -47,8 +47,8 @@ class PlannerSuite extends SharedSQLContext {
     val planner = sqlContext.sessionState.planner
     import planner._
     val plannedOption = Aggregation(query).headOption
-    val planned = plannedOption.getOrElse(
-        fail(s"Could query play aggregation query $query. Is it an aggregation query?"))
+    val planned = plannedOption.getOrElse(fail(
+        s"Could query play aggregation query $query. Is it an aggregation query?"))
     val aggregations = planned.collect {
       case n if n.nodeName contains "Aggregate" => n
     }
@@ -172,7 +172,7 @@ class PlannerSuite extends SharedSQLContext {
         val exp =
           sql("select * from testPushed where key = 15").queryExecution.sparkPlan
         assert(exp.toString.contains(
-                "PushedFilters: [IsNotNull(key), EqualTo(key,15)]"))
+            "PushedFilters: [IsNotNull(key), EqualTo(key,15)]"))
       }
     }
   }

@@ -187,11 +187,11 @@ object Bounds {
                     bClass.getTypeParameters
                       .zip(typeArgs)
                       .foldLeft(ScSubstitutor.empty) {
-                    case (subst: ScSubstitutor, (ptp, typez)) =>
-                      subst.bindT(
-                          (ptp.name, ScalaPsiUtil.getPsiElementId(ptp)),
-                          typez)
-                  })
+                        case (subst: ScSubstitutor, (ptp, typez)) =>
+                          subst.bindT(
+                              (ptp.name, ScalaPsiUtil.getPsiElementId(ptp)),
+                              typez)
+                      })
               case _ => return None
             }
           }
@@ -254,7 +254,7 @@ object Bounds {
   private def lub(seq: Seq[ScType], checkWeak: Boolean)(
       implicit stopAddingUpperBound: Boolean): ScType = {
     seq.reduce((l: ScType, r: ScType) =>
-          lub(l, r, lubDepth(Seq(l, r)), checkWeak))
+      lub(l, r, lubDepth(Seq(l, r)), checkWeak))
   }
 
   private def lub(t1: ScType, t2: ScType, depth: Int, checkWeak: Boolean)(
@@ -523,8 +523,8 @@ object Bounds {
           run =
             run bindA
               (aliasDef.name, { () =>
-                    aliasDef.aliasedType(TypingContext.empty).getOrAny
-                  })
+                aliasDef.aliasedType(TypingContext.empty).getOrAny
+              })
         case _ =>
       }
     }

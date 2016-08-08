@@ -171,7 +171,7 @@ object ReplicaVerificationTool extends Logging {
     val expectedReplicasPerTopicAndPartition: Map[TopicAndPartition, Int] =
       topicPartitionReplicaList
         .groupBy(replica =>
-              new TopicAndPartition(replica.topic, replica.partitionId))
+          new TopicAndPartition(replica.topic, replica.partitionId))
         .map {
           case (topicAndPartition, replicaSet) =>
             topicAndPartition -> replicaSet.size
@@ -184,13 +184,13 @@ object ReplicaVerificationTool extends Logging {
         .flatMap(
             topicMetadataResponse =>
               topicMetadataResponse.partitionsMetadata.map(partitionMetadata =>
-                    (new TopicAndPartition(topicMetadataResponse.topic,
-                                           partitionMetadata.partitionId),
-                     partitionMetadata.leader.get.id))
+                (new TopicAndPartition(topicMetadataResponse.topic,
+                                       partitionMetadata.partitionId),
+                 partitionMetadata.leader.get.id))
         )
         .groupBy(_._2)
         .mapValues(topicAndPartitionAndLeaderIds =>
-              topicAndPartitionAndLeaderIds.map {
+          topicAndPartitionAndLeaderIds.map {
             case (topicAndPartition, leaderId) => topicAndPartition
         })
     debug("Leaders per broker: " + leadersPerBroker)
@@ -302,11 +302,9 @@ private class ReplicaBuffer(
                                         ReplicaVerificationTool.clientId)
       val initialOffsetMap: Map[TopicAndPartition, PartitionOffsetRequestInfo] =
         topicAndPartitions
-          .map(
-              topicAndPartition =>
-                topicAndPartition -> PartitionOffsetRequestInfo(
-                    initialOffsetTime,
-                    1))
+          .map(topicAndPartition =>
+            topicAndPartition -> PartitionOffsetRequestInfo(initialOffsetTime,
+                                                            1))
           .toMap
       val offsetRequest = OffsetRequest(initialOffsetMap)
       val offsetResponse = consumer.getOffsetsBefore(offsetRequest)
@@ -383,16 +381,15 @@ private class ReplicaBuffer(
                       System.exit(1)
                     }
                     if (messageInfoFromFirstReplica.checksum != messageAndOffset.message.checksum)
-                      println(
-                          ReplicaVerificationTool.getCurrentTimeString +
-                            ": partition " + topicAndPartition +
-                            " has unmatched checksum at offset " +
-                            messageAndOffset.offset + "; replica " +
-                            messageInfoFromFirstReplica.replicaId +
-                            "'s checksum " +
-                            messageInfoFromFirstReplica.checksum + "; replica " +
-                            replicaId + "'s checksum " +
-                            messageAndOffset.message.checksum)
+                      println(ReplicaVerificationTool.getCurrentTimeString +
+                        ": partition " + topicAndPartition +
+                        " has unmatched checksum at offset " +
+                        messageAndOffset.offset + "; replica " +
+                        messageInfoFromFirstReplica.replicaId +
+                        "'s checksum " +
+                        messageInfoFromFirstReplica.checksum + "; replica " +
+                        replicaId + "'s checksum " +
+                        messageAndOffset.message.checksum)
                 }
               }
             } else isMessageInAllReplicas = false

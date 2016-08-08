@@ -117,11 +117,11 @@ abstract class JavaAction(components: JavaHandlerComponents)
 
     val finalAction = components.actionCreator.wrapAction(
         if (config.executeActionCreatorActionFirst) {
-      baseAction.delegate = finalUserDeclaredAction
-      baseAction
-    } else {
-      finalUserDeclaredAction
-    })
+          baseAction.delegate = finalUserDeclaredAction
+          baseAction
+        } else {
+          finalUserDeclaredAction
+        })
 
     val trampolineWithContext: ExecutionContext = {
       val javaClassLoader = Thread.currentThread.getContextClassLoader

@@ -225,7 +225,7 @@ trait Config extends Serializable {
       .+(
           // This is setting a property for cascading/driven
           (AppProps.APP_FRAMEWORKS -> ("scalding:" +
-                    scaldingVersion.toString)))
+            scaldingVersion.toString)))
 
   def getUniqueIds: Set[UniqueID] =
     get(UniqueID.UNIQUE_JOB_ID).map { str =>
@@ -559,9 +559,10 @@ object Config {
    * (or some other system that handles general instances at runtime).
    */
   def hadoopWithDefaults(conf: Configuration): Config =
-    (empty.setListSpillThreshold(100 * 1000)
-          .setMapSpillThreshold(100 * 1000)
-          .setMapSideAggregationThreshold(100 * 1000) ++ fromHadoop(conf))
+    (empty
+      .setListSpillThreshold(100 * 1000)
+      .setMapSpillThreshold(100 * 1000)
+      .setMapSideAggregationThreshold(100 * 1000) ++ fromHadoop(conf))
       .setSerialization(Right(classOf[serialization.KryoHadoop]))
       .setScaldingVersion
   /*

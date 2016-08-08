@@ -189,15 +189,15 @@ trait Printers { self: Universe =>
     val writer = new PrintWriter(buffer)
     val printer = mkPrinter(writer)
     printTypes.value.map(printTypes =>
-          if (printTypes) printer.withTypes else printer.withoutTypes)
+      if (printTypes) printer.withTypes else printer.withoutTypes)
     printIds.value.map(printIds =>
-          if (printIds) printer.withIds else printer.withoutIds)
+      if (printIds) printer.withIds else printer.withoutIds)
     printOwners.value.map(printOwners =>
-          if (printOwners) printer.withOwners else printer.withoutOwners)
+      if (printOwners) printer.withOwners else printer.withoutOwners)
     printKinds.value.map(printKinds =>
-          if (printKinds) printer.withKinds else printer.withoutKinds)
+      if (printKinds) printer.withKinds else printer.withoutKinds)
     printMirrors.value.map(printMirrors =>
-          if (printMirrors) printer.withMirrors else printer.withoutMirrors)
+      if (printMirrors) printer.withMirrors else printer.withoutMirrors)
     printPositions.value.map(
         printPositions =>
           if (printPositions) printer.withPositions

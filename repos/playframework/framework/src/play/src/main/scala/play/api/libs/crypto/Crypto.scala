@@ -239,7 +239,7 @@ class HMACSHA1CookieSigner @Inject()(config: CryptoConfig)
     */
   def sign(message: String, key: Array[Byte]): String = {
     val mac = config.provider.fold(Mac.getInstance("HmacSHA1"))(p =>
-          Mac.getInstance("HmacSHA1", p))
+      Mac.getInstance("HmacSHA1", p))
     mac.init(new SecretKeySpec(key, "HmacSHA1"))
     Codecs.toHexString(mac.doFinal(message.getBytes("utf-8")))
   }
@@ -542,7 +542,7 @@ class CryptoConfigParser @Inject()(environment: Environment,
         val md5Secret = DigestUtils.md5Hex(secret)
         logger.debug(
             s"Generated dev mode secret $md5Secret for app at ${appConfLocation
-          .getOrElse("unknown location")}")
+              .getOrElse("unknown location")}")
         md5Secret
       case Some(s) => s
     }

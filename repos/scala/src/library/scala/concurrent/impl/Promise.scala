@@ -426,7 +426,7 @@ private[concurrent] object Promise {
       override def failed: Future[Throwable] =
         KeptPromise(
             Failure(new NoSuchElementException(
-                    "Future.failed not completed with a throwable."))).future
+                "Future.failed not completed with a throwable."))).future
       override def recover[U >: T](pf: PartialFunction[Throwable, U])(
           implicit executor: ExecutionContext): Future[U] = this
       override def recoverWith[U >: T](

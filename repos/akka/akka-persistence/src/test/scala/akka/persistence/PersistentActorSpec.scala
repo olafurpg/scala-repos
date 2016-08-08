@@ -53,9 +53,8 @@ object PersistentActorSpec {
         case Cmd(data) ⇒
           persistAll(Seq(Evt(s"${data}-1"), Evt(s"${data}-2")))(updateState)
         case d: DeleteMessagesSuccess ⇒
-          val replyTo = askedForDelete.getOrElse(
-              throw new RuntimeException(
-                  "Received DeleteMessagesSuccess without anyone asking for delete!"))
+          val replyTo = askedForDelete.getOrElse(throw new RuntimeException(
+              "Received DeleteMessagesSuccess without anyone asking for delete!"))
           replyTo ! d
       }
 
@@ -255,7 +254,7 @@ object PersistentActorSpec {
           1 to 3 foreach { i ⇒
             persistAsync(Evt(s"$data-${incCounter()}")) { evt ⇒
               sender() ! ("a" +
-                    evt.data.toString.drop(1)) // c-1 => a-1, as in "ack"
+                evt.data.toString.drop(1)) // c-1 => a-1, as in "ack"
             }
           }
       }

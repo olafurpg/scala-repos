@@ -183,10 +183,10 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
   def getClassIfDefined(path: String) =
     (noFatal(runtimeMirror staticClass path) orElse noFatal(
-            rootMirror staticClass path))
+        rootMirror staticClass path))
   def getModuleIfDefined(path: String) =
     (noFatal(runtimeMirror staticModule path) orElse noFatal(
-            rootMirror staticModule path))
+        rootMirror staticModule path))
 
   implicit class ReplTypeOps(tp: Type) {
     def andAlso(fn: Type => Type): Type = if (tp eq NoType) tp else fn(tp)
@@ -302,10 +302,10 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
   def backticked(s: String): String =
     ((s split '.').toList map {
-          case "_" => "_"
-          case s if nme.keywords(newTermName(s)) => s"`$s`"
-          case s => s
-        } mkString ".")
+      case "_" => "_"
+      case s if nme.keywords(newTermName(s)) => s"`$s`"
+      case s => s
+    } mkString ".")
   def readRootPath(readPath: String) = getModuleIfDefined(readPath)
 
   abstract class PhaseDependentOps {
@@ -548,7 +548,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
             repldbg("[raw] " + raw1 + "   <--->   " + raw2)
 
             val adjustment = (raw1.reverse takeWhile
-                  (ch => (ch != ';') && (ch != '\n'))).size
+              (ch => (ch != ';') && (ch != '\n'))).size
             val lastpos = lastpos0 - adjustment
 
             // the source code split at the laboriously determined position.
@@ -565,8 +565,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
                      " content" -> content,
                      "     was" -> l2,
                      "combined" -> combined) map {
-              case (label, s) => label + ": '" + s + "'"
-            } mkString "\n")
+                  case (label, s) => label + ": '" + s + "'"
+                } mkString "\n")
             combined
           })
         // Rewriting    "foo ; bar ; 123"
@@ -1108,7 +1108,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
     private def typeMap[T](f: Type => T) =
       mapFrom[Name, Name, T](termNames ++ typeNames)(x =>
-            f(cleanMemberDecl(resultSymbol, x)))
+        f(cleanMemberDecl(resultSymbol, x)))
 
     /** Types of variables defined by this request. */
     lazy val compilerTypeOf = typeMap[Type](x => x) withDefaultValue NoType
@@ -1118,7 +1118,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
     lazy val definedSymbols =
       (termNames.map(x => x -> applyToResultMember(x, x => x)) ++ typeNames
-            .map(x => x -> compilerTypeOf(x).typeSymbolDirect))
+        .map(x => x -> compilerTypeOf(x).typeSymbolDirect))
         .toMap[Name, Symbol] withDefaultValue NoSymbol
 
     lazy val typesOfDefinedTerms =
@@ -1152,10 +1152,9 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
   @throws[ScriptException]
   def compile(script: String): CompiledScript =
-    eval(
-        "new javax.script.CompiledScript { def eval(context: javax.script.ScriptContext): Object = { " +
-          script +
-          " }.asInstanceOf[Object]; def getEngine: javax.script.ScriptEngine = engine }")
+    eval("new javax.script.CompiledScript { def eval(context: javax.script.ScriptContext): Object = { " +
+      script +
+      " }.asInstanceOf[Object]; def getEngine: javax.script.ScriptEngine = engine }")
       .asInstanceOf[CompiledScript]
 
   @throws[ScriptException]

@@ -91,7 +91,7 @@ object Thread {
             .reads[Thread],
           Json.writes[Thread] andThen
             (__.json update (writeDate('createdAt) andThen writeDate(
-                        'updatedAt)))
+                'updatedAt)))
       )
     }
 }

@@ -212,7 +212,7 @@ class GaussianMixture private (private var k: Int,
       if (shouldDistributeGaussians) {
         val numPartitions = math.min(k, 1024)
         val tuples = Seq.tabulate(k)(i =>
-              (sums.means(i), sums.sigmas(i), sums.weights(i)))
+          (sums.means(i), sums.sigmas(i), sums.weights(i)))
         val (ws, gs) = sc
           .parallelize(tuples, numPartitions)
           .map {

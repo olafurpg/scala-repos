@@ -45,7 +45,7 @@ trait Compat210Component {
       mods: Modifiers = Modifiers(sym.flags),
       name: TypeName = sym.name.toTypeName,
       tparams: List[TypeDef] = sym.typeParams.map(sym =>
-            newTypeDef(sym, typeBoundsTree(sym))())): TypeDef = {
+        newTypeDef(sym, typeBoundsTree(sym))())): TypeDef = {
     atPos(sym.pos)(TypeDef(mods, name, tparams, rhs)) setSymbol sym
   }
 

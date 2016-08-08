@@ -98,7 +98,7 @@ class WebSocketDirectivesSpec extends RoutingSpec {
     Flow[Message].mapConcat {
       case tm: TextMessage ⇒
         TextMessage(Source.single("Hello ") ++ tm.textStream ++ Source.single(
-                "!")) :: Nil
+            "!")) :: Nil
       case bm: BinaryMessage ⇒ // ignore binary messages
         bm.dataStream.runWith(Sink.ignore)
         Nil

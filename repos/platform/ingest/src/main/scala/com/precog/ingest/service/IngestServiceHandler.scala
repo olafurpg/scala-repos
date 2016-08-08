@@ -153,7 +153,7 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
       case Some(processing) =>
         EitherT {
           (processing.forRequest(request) tuple request.content.toSuccess(
-                  nels("Ingest request missing body content."))) traverse {
+              nels("Ingest request missing body content."))) traverse {
             case (processor, data) =>
               processor.ingest(durability, errorHandling, storeMode, data)
           } map {
@@ -162,9 +162,8 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
         }
 
       case None =>
-        right(
-            Promise successful NotIngested(
-                "Could not determine a data type for your batch ingest. Please set the Content-Type header."))
+        right(Promise successful NotIngested(
+            "Could not determine a data type for your batch ingest. Please set the Content-Type header."))
     }
 
   def notifyJob(durability: Durability,
@@ -211,7 +210,7 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                                       Some(timestamp.toInstant)) {
             authorities =>
               logger.debug("Write permission granted for " + authorities +
-                    " to " + path)
+                " to " + path)
               request.content map { content =>
                 import MimeTypes._
                 import Validation._
@@ -234,11 +233,11 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                     }
                   case HttpMethods.PATCH =>
                     right[Future, String, (Durability, WriteMode)](Promise
-                          .successful((LocalDurability, AccessMode.Append)))
+                      .successful((LocalDurability, AccessMode.Append)))
                   case _ =>
                     left[Future, String, (Durability, WriteMode)](
                         Promise.successful("HTTP method " + request.method +
-                              " not supported for data ingest."))
+                          " not supported for data ingest."))
                 }
 
                 durabilityM flatMap {
@@ -261,7 +260,7 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                           HttpResponse[JValue](
                               BadRequest,
                               content = Some(JObject(
-                                      "errors" -> JArray(JString(reason)))))
+                                  "errors" -> JArray(JString(reason)))))
                         }
 
                       case StreamingResult(ingested, None) =>
@@ -328,8 +327,8 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                   HttpResponse(
                       BadRequest,
                       content = Some(JString(
-                              "Errors were encountered processing your ingest request: " +
-                                errors)))
+                          "Errors were encountered processing your ingest request: " +
+                            errors)))
                 }
               } getOrElse {
                 logger.warn(

@@ -53,7 +53,7 @@ object JavaToScala {
 
     val references =
       findVariableUsage(element, parent).filter((el: PsiReferenceExpression) =>
-            PsiUtil.isAccessedForWriting(el))
+        PsiUtil.isAccessedForWriting(el))
 
     references.length match {
       case 0 if possibleVal => false
@@ -216,7 +216,7 @@ object JavaToScala {
                                      externalProperties))
       case f: PsiForeachStatement =>
         val tp = Option(f.getIteratedValue).flatMap((e: PsiExpression) =>
-              Option(e.getType))
+          Option(e.getType))
         val isJavaCollection =
           if (tp.isEmpty) true else !tp.get.isInstanceOf[PsiArrayType]
 
@@ -404,12 +404,9 @@ object JavaToScala {
                   if mc.getMethodExpression.getQualifiedName == "this" =>
                 Some(convertPsiToIntermdeiate(m.getBody, externalProperties))
               case _ =>
-                getStatements(m).map(
-                    statements =>
-                      BlockConstruction(
-                          LiteralExpression("this()") +: statements.map(
-                              convertPsiToIntermdeiate(_,
-                                                       externalProperties))))
+                getStatements(m).map(statements =>
+                  BlockConstruction(LiteralExpression("this()") +: statements
+                    .map(convertPsiToIntermdeiate(_, externalProperties))))
             }
           } else {
             Option(m.getBody)
@@ -559,7 +556,7 @@ object JavaToScala {
           }
         }
         val tryBlock = Option(t.getTryBlock).map((c: PsiCodeBlock) =>
-              convertPsiToIntermdeiate(c, externalProperties))
+          convertPsiToIntermdeiate(c, externalProperties))
         val catches = t.getCatchSections.map(
             (cb: PsiCatchSection) =>
               (convertPsiToIntermdeiate(cb.getParameter, externalProperties),
@@ -651,7 +648,7 @@ object JavaToScala {
     def associationFor(range: PsiElement): Option[AssociationHelper] = {
       refs
         .find(ref =>
-              new TextRange(ref.startOffset, ref.endOffset) == range.getTextRange)
+          new TextRange(ref.startOffset, ref.endOffset) == range.getTextRange)
         .map { ref =>
           if (ref.staticMemberName == null) {
             AssociationHelper(DependencyKind.Reference,
@@ -720,7 +717,7 @@ object JavaToScala {
           .map(convertPsiToIntermdeiate(_, externalProperties))
         val initializers =
           inClass.getInitializers.map((x: PsiClassInitializer) =>
-                convertPsiToIntermdeiate(x.getBody, externalProperties))
+            convertPsiToIntermdeiate(x.getBody, externalProperties))
         val primaryConstructor = None
         val typeParams = None
         val companionObject = EmptyConstruction()
@@ -921,7 +918,7 @@ object JavaToScala {
                       where: Seq[PsiExpressionStatement]): Boolean = {
         !statement.isInstanceOf[PsiExpressionStatement] ||
         (statement.isInstanceOf[PsiExpressionStatement] &&
-            !where.contains(statement))
+        !where.contains(statement))
       }
 
       def getSuperCall(dropStatements: ArrayBuffer[PsiExpressionStatement])
@@ -1140,10 +1137,9 @@ object JavaToScala {
           owner.getContainingFile.asInstanceOf[PsiClassOwner].getPackageName
         if (packageName != "")
           modifiers.append(
-              ModifierWithExpression(
-                  ModifierType.PRIVATE,
-                  LiteralExpression(packageName.substring(
-                          packageName.lastIndexOf(".") + 1))))
+              ModifierWithExpression(ModifierType.PRIVATE,
+                                     LiteralExpression(packageName.substring(
+                                         packageName.lastIndexOf(".") + 1))))
       }
 
       if (owner.hasModifierProperty(PsiModifier.FINAL) &&

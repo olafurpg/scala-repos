@@ -56,7 +56,7 @@ class MediaRange(mediaType: String,
   def accepts(mimeType: String): Boolean =
     (mediaType + "/" + mediaSubType).equalsIgnoreCase(mimeType) ||
       (mediaSubType == "*" &&
-            mediaType.equalsIgnoreCase(mimeType.takeWhile(_ != '/'))) ||
+        mediaType.equalsIgnoreCase(mimeType.takeWhile(_ != '/'))) ||
       (mediaType == "*" && mediaSubType == "*")
 
   override def toString = {
@@ -195,7 +195,7 @@ object MediaRange {
     val text = not(ctl) ~> any
     val separators = {
       acceptIf(c => separatorBitSet(c))(_ =>
-            "Expected one of " + separatorChars)
+        "Expected one of " + separatorChars)
     }
 
     val token = rep1(not(separators | ctl) ~> any) ^^ charSeqToString
@@ -249,8 +249,7 @@ object MediaRange {
     // need to support it.
     val mediaRange =
       (mediaType |
-            ('*' ~> parameters
-                  .map(ps => MediaType("*", "*", ps.flatten)))) ^^ {
+        ('*' ~> parameters.map(ps => MediaType("*", "*", ps.flatten)))) ^^ {
         mediaType =>
           val (params, rest) = mediaType.parameters.span(_._1 != "q")
           val (qValueStr, acceptParams) = rest match {

@@ -25,7 +25,7 @@ object JsonBodyParserSpec extends PlaySpecification {
         implicit mat: Materializer) = {
       await(
           bodyParser(FakeRequest().withHeaders(
-                  contentType.map(CONTENT_TYPE -> _).toSeq: _*))
+              contentType.map(CONTENT_TYPE -> _).toSeq: _*))
             .run(Source.single(ByteString(json.getBytes(encoding))))
       )
     }
@@ -91,7 +91,7 @@ object JsonBodyParserSpec extends PlaySpecification {
 
       val fooParser = BodyParsers.parse.json.validate {
         _.validate[Foo].asEither.left.map(e =>
-              BadRequest(JsError.toFlatJson(e)))
+          BadRequest(JsError.toFlatJson(e)))
       }
       parse("""{"a":1,"b":"bar"}""",
             Some("application/json"),

@@ -223,7 +223,7 @@ trait ListHelpers {
       case x :: Nil => List(List(x))
       case xs =>
         rotateList(xs).flatMap(x =>
-              (x: @unchecked) match {
+          (x: @unchecked) match {
             case x :: xs => permuteList(xs).map(x :: _)
             case _ => Nil
         })
@@ -243,7 +243,7 @@ trait ListHelpers {
       case xs =>
         val rot = rotateList(xs)
         val ret = rot.flatMap(z =>
-              (z: @unchecked) match {
+          (z: @unchecked) match {
             case x :: xs => permuteList(xs).map(x :: _)
         })
         ret ::: rot

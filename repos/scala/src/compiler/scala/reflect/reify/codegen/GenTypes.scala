@@ -120,7 +120,7 @@ trait GenTypes { self: Reifier =>
       manifest exists
         (sub =>
            sub.symbol != null && (sub.symbol == FullManifestModule ||
-                 sub.symbol.owner == FullManifestModule))
+             sub.symbol.owner == FullManifestModule))
     def searchForManifest(typer: analyzer.Typer): Tree =
       analyzer.inferImplicit(
           EmptyTree,
@@ -148,10 +148,8 @@ trait GenTypes { self: Reifier =>
         case _ =>
           EmptyTree
       }
-    val result = typer.silent(
-        silentTyper =>
-          silentTyper.context.withMacrosDisabled(
-              searchForManifest(silentTyper)))
+    val result = typer.silent(silentTyper =>
+      silentTyper.context.withMacrosDisabled(searchForManifest(silentTyper)))
     result match {
       case analyzer.SilentResultValue(result) => result
       case analyzer.SilentTypeError(_) => EmptyTree

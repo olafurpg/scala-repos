@@ -223,13 +223,13 @@ trait ManyToMany extends BaseKeyedMapper { this: KeyedMapper[_, _] =>
         thisField
           .actualField(_)
           .asInstanceOf[MappedForeignKey[K, O, X] forSome {
-                type X <: KeyedMapper[K, X]
-              }] set ManyToMany.this.primaryKeyField.get.asInstanceOf[K]
+            type X <: KeyedMapper[K, X]
+          }] set ManyToMany.this.primaryKeyField.get.asInstanceOf[K]
       }
 
       removedJoins.forall { _.delete_! } &
         (// continue saving even if deleting fails
-            children.forall(_.save) && joins.forall(_.save))
+        children.forall(_.save) && joins.forall(_.save))
     }
 
     /**

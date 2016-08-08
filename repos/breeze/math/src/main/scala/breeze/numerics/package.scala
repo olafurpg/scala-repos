@@ -909,9 +909,8 @@ package object numerics {
     * closeTo for Doubles.
     */
   def closeTo(a: Double, b: Double, relDiff: Double = 1E-4) = {
-    a == b || (scala.math.abs(a - b) < scala.math.max(
-            scala.math.max(scala.math.abs(a), scala.math.abs(b)),
-            1) * relDiff)
+    a == b || (scala.math.abs(a - b) < scala.math
+      .max(scala.math.max(scala.math.abs(a), scala.math.abs(b)), 1) * relDiff)
   }
 
   /**

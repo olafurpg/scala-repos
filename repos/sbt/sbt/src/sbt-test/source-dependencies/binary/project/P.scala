@@ -7,5 +7,5 @@ object B extends Build {
   lazy val use =
     Project("use", file("use")) settings
       (unmanagedJars in Compile <+=
-            packageBin in (dep, Compile) map Attributed.blank)
+        packageBin in (dep, Compile) map Attributed.blank)
 }

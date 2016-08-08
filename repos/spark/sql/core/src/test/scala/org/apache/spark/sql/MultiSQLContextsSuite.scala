@@ -45,7 +45,7 @@ class MultiSQLContextsSuite extends SparkFunSuite with BeforeAndAfterAll {
     // Set these states back.
     originalActiveSQLContext.foreach(ctx => SQLContext.setActive(ctx))
     originalInstantiatedSQLContext.foreach(ctx =>
-          SQLContext.setInstantiatedContext(ctx))
+      SQLContext.setInstantiatedContext(ctx))
   }
 
   def testNewSession(rootSQLContext: SQLContext): Unit = {

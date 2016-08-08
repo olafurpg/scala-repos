@@ -113,7 +113,7 @@ trait StandardLiftables { self: Universe =>
         liftT4: Liftable[T4]): Liftable[Tuple4[T1, T2, T3, T4]] = Liftable {
       t =>
         SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-                t._4) :: Nil)
+            t._4) :: Nil)
     }
     implicit def liftTuple5[T1, T2, T3, T4, T5](
         implicit liftT1: Liftable[T1],
@@ -123,7 +123,7 @@ trait StandardLiftables { self: Universe =>
         liftT5: Liftable[T5]): Liftable[Tuple5[T1, T2, T3, T4, T5]] =
       Liftable { t =>
         SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-                t._4) :: liftT5(t._5) :: Nil)
+            t._4) :: liftT5(t._5) :: Nil)
       }
     implicit def liftTuple6[T1, T2, T3, T4, T5, T6](
         implicit liftT1: Liftable[T1],
@@ -134,7 +134,7 @@ trait StandardLiftables { self: Universe =>
         liftT6: Liftable[T6]): Liftable[Tuple6[T1, T2, T3, T4, T5, T6]] =
       Liftable { t =>
         SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-                t._4) :: liftT5(t._5) :: liftT6(t._6) :: Nil)
+            t._4) :: liftT5(t._5) :: liftT6(t._6) :: Nil)
       }
     implicit def liftTuple7[T1, T2, T3, T4, T5, T6, T7](
         implicit liftT1: Liftable[T1],
@@ -146,7 +146,7 @@ trait StandardLiftables { self: Universe =>
         liftT7: Liftable[T7]): Liftable[Tuple7[T1, T2, T3, T4, T5, T6, T7]] =
       Liftable { t =>
         SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-                t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: Nil)
+            t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: Nil)
       }
     implicit def liftTuple8[T1, T2, T3, T4, T5, T6, T7, T8](
         implicit liftT1: Liftable[T1],
@@ -158,9 +158,9 @@ trait StandardLiftables { self: Universe =>
         liftT7: Liftable[T7],
         liftT8: Liftable[T8])
       : Liftable[Tuple8[T1, T2, T3, T4, T5, T6, T7, T8]] = Liftable { t =>
-      SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-              t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-              t._8) :: Nil)
+      SyntacticTuple(
+          liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(t._4) :: liftT5(
+              t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(t._8) :: Nil)
     }
     implicit def liftTuple9[T1, T2, T3, T4, T5, T6, T7, T8, T9](
         implicit liftT1: Liftable[T1],
@@ -173,9 +173,10 @@ trait StandardLiftables { self: Universe =>
         liftT8: Liftable[T8],
         liftT9: Liftable[T9])
       : Liftable[Tuple9[T1, T2, T3, T4, T5, T6, T7, T8, T9]] = Liftable { t =>
-      SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-              t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-              t._8) :: liftT9(t._9) :: Nil)
+      SyntacticTuple(
+          liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(t._4) :: liftT5(
+              t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(t._8) :: liftT9(
+              t._9) :: Nil)
     }
     implicit def liftTuple10[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10](
         implicit liftT1: Liftable[T1],
@@ -191,8 +192,8 @@ trait StandardLiftables { self: Universe =>
       : Liftable[Tuple10[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]] = Liftable {
       t =>
         SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-                t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-                t._8) :: liftT9(t._9) :: liftT10(t._10) :: Nil)
+            t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
+            t._8) :: liftT9(t._9) :: liftT10(t._10) :: Nil)
     }
     implicit def liftTuple11[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11](
         implicit liftT1: Liftable[T1],
@@ -209,8 +210,8 @@ trait StandardLiftables { self: Universe =>
       : Liftable[Tuple11[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11]] =
       Liftable { t =>
         SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-                t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-                t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: Nil)
+            t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
+            t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: Nil)
       }
     implicit def liftTuple12[T1,
                              T2,
@@ -238,9 +239,9 @@ trait StandardLiftables { self: Universe =>
       : Liftable[Tuple12[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12]] =
       Liftable { t =>
         SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-                t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-                t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
-                t._12) :: Nil)
+            t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
+            t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
+            t._12) :: Nil)
       }
     implicit def liftTuple13[T1,
                              T2,
@@ -270,9 +271,9 @@ trait StandardLiftables { self: Universe =>
         Tuple13[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13]] =
       Liftable { t =>
         SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-                t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-                t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
-                t._12) :: liftT13(t._13) :: Nil)
+            t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
+            t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
+            t._12) :: liftT13(t._13) :: Nil)
       }
     implicit def liftTuple14[T1,
                              T2,
@@ -304,9 +305,9 @@ trait StandardLiftables { self: Universe =>
         Tuple14[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14]] =
       Liftable { t =>
         SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-                t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-                t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
-                t._12) :: liftT13(t._13) :: liftT14(t._14) :: Nil)
+            t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
+            t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
+            t._12) :: liftT13(t._13) :: liftT14(t._14) :: Nil)
       }
     implicit def liftTuple15[T1,
                              T2,
@@ -406,10 +407,9 @@ trait StandardLiftables { self: Universe =>
                 T15,
                 T16]] = Liftable { t =>
       SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-              t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-              t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
-              t._12) :: liftT13(t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(
-              t._16) :: Nil)
+          t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(t._8) :: liftT9(
+          t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(t._12) :: liftT13(
+          t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(t._16) :: Nil)
     }
     implicit def liftTuple17[T1,
                              T2,
@@ -461,11 +461,12 @@ trait StandardLiftables { self: Universe =>
                 T15,
                 T16,
                 T17]] = Liftable { t =>
-      SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-              t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-              t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
-              t._12) :: liftT13(t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(
-              t._16) :: liftT17(t._17) :: Nil)
+      SyntacticTuple(
+          liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(t._4) :: liftT5(
+              t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(t._8) :: liftT9(
+              t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(t._12) :: liftT13(
+              t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(t._16) :: liftT17(
+              t._17) :: Nil)
     }
     implicit def liftTuple18[T1,
                              T2,
@@ -520,11 +521,12 @@ trait StandardLiftables { self: Universe =>
                 T16,
                 T17,
                 T18]] = Liftable { t =>
-      SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-              t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-              t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
-              t._12) :: liftT13(t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(
-              t._16) :: liftT17(t._17) :: liftT18(t._18) :: Nil)
+      SyntacticTuple(
+          liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(t._4) :: liftT5(
+              t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(t._8) :: liftT9(
+              t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(t._12) :: liftT13(
+              t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(t._16) :: liftT17(
+              t._17) :: liftT18(t._18) :: Nil)
     }
     implicit def liftTuple19[T1,
                              T2,
@@ -649,11 +651,10 @@ trait StandardLiftables { self: Universe =>
                 T19,
                 T20]] = Liftable { t =>
       SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-              t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-              t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
-              t._12) :: liftT13(t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(
-              t._16) :: liftT17(t._17) :: liftT18(t._18) :: liftT19(t._19) :: liftT20(
-              t._20) :: Nil)
+          t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(t._8) :: liftT9(
+          t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(t._12) :: liftT13(
+          t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(t._16) :: liftT17(
+          t._17) :: liftT18(t._18) :: liftT19(t._19) :: liftT20(t._20) :: Nil)
     }
     implicit def liftTuple21[T1,
                              T2,
@@ -717,12 +718,13 @@ trait StandardLiftables { self: Universe =>
                 T19,
                 T20,
                 T21]] = Liftable { t =>
-      SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-              t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-              t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
-              t._12) :: liftT13(t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(
-              t._16) :: liftT17(t._17) :: liftT18(t._18) :: liftT19(t._19) :: liftT20(
-              t._20) :: liftT21(t._21) :: Nil)
+      SyntacticTuple(
+          liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(t._4) :: liftT5(
+              t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(t._8) :: liftT9(
+              t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(t._12) :: liftT13(
+              t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(t._16) :: liftT17(
+              t._17) :: liftT18(t._18) :: liftT19(t._19) :: liftT20(t._20) :: liftT21(
+              t._21) :: Nil)
     }
     implicit def liftTuple22[T1,
                              T2,
@@ -789,12 +791,13 @@ trait StandardLiftables { self: Universe =>
                 T20,
                 T21,
                 T22]] = Liftable { t =>
-      SyntacticTuple(liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(
-              t._4) :: liftT5(t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(
-              t._8) :: liftT9(t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(
-              t._12) :: liftT13(t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(
-              t._16) :: liftT17(t._17) :: liftT18(t._18) :: liftT19(t._19) :: liftT20(
-              t._20) :: liftT21(t._21) :: liftT22(t._22) :: Nil)
+      SyntacticTuple(
+          liftT1(t._1) :: liftT2(t._2) :: liftT3(t._3) :: liftT4(t._4) :: liftT5(
+              t._5) :: liftT6(t._6) :: liftT7(t._7) :: liftT8(t._8) :: liftT9(
+              t._9) :: liftT10(t._10) :: liftT11(t._11) :: liftT12(t._12) :: liftT13(
+              t._13) :: liftT14(t._14) :: liftT15(t._15) :: liftT16(t._16) :: liftT17(
+              t._17) :: liftT18(t._18) :: liftT19(t._19) :: liftT20(t._20) :: liftT21(
+              t._21) :: liftT22(t._22) :: Nil)
     }
   }
 

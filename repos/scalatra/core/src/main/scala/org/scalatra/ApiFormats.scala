@@ -114,7 +114,7 @@ trait ApiFormats extends ScalatraBase {
   private[this] def getFromAcceptHeader(
       implicit request: HttpServletRequest): Option[String] = {
     val hdrs = request.contentType.fold(acceptHeader)(contentType =>
-          (acceptHeader ::: List(contentType)).distinct)
+      (acceptHeader ::: List(contentType)).distinct)
     formatForMimeTypes(hdrs: _*)
   }
 
@@ -186,8 +186,8 @@ trait ApiFormats extends ScalatraBase {
       else accepted.map(_.name).toList
     }
     conditions.isEmpty || (conditions filter { s =>
-          formats.get(s).isDefined
-        } contains contentType)
+      formats.get(s).isDefined
+    } contains contentType)
   }
 
   private def getFormat(implicit request: HttpServletRequest,
@@ -203,7 +203,7 @@ trait ApiFormats extends ScalatraBase {
       matchedRoute.map(_.multiParams).getOrElse(Map.empty).map {
         case (key, values) =>
           key -> values.map(s =>
-                if (s.nonBlank) UriDecoder.secondStep(s) else s)
+            if (s.nonBlank) UriDecoder.secondStep(s) else s)
       }
     }
     if (routeParams.contains("format")) {

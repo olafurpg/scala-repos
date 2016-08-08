@@ -347,7 +347,7 @@ private[akka] class ServerFSM(val controller: ActorRef, val channel: Channel)
   whenUnhandled {
     case Event(ClientDisconnected, Some(s)) ⇒
       s ! Status.Failure(new ClientDisconnectedException(
-              "client disconnected in state " + stateName + ": " + channel))
+          "client disconnected in state " + stateName + ": " + channel))
       stop()
     case Event(ClientDisconnected, None) ⇒ stop()
   }

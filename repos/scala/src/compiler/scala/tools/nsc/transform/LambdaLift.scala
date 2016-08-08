@@ -34,13 +34,13 @@ abstract class LambdaLift extends InfoTransform {
   /** Each scala.runtime.*Ref class has a static method `create(value)` that simply instantiates the Ref to carry that value. */
   private lazy val refCreateMethod: Map[Symbol, Symbol] = {
     mapFrom(allRefClasses.toList)(x =>
-          getMemberMethod(x.companionModule, nme.create))
+      getMemberMethod(x.companionModule, nme.create))
   }
 
   /** Quite frequently a *Ref is initialized with its zero (e.g., null, 0.toByte, etc.) Method `zero()` of *Ref class encapsulates that pattern. */
   private lazy val refZeroMethod: Map[Symbol, Symbol] = {
     mapFrom(allRefClasses.toList)(x =>
-          getMemberMethod(x.companionModule, nme.zero))
+      getMemberMethod(x.companionModule, nme.zero))
   }
 
   def transformInfo(sym: Symbol, tp: Type): Type =
@@ -381,11 +381,9 @@ abstract class LambdaLift extends InfoTransform {
               ps map (p => ValDef(p) setPos tree.pos setType NoType)
 
             sym.updateInfo(
-                lifted(
-                    MethodType(addFree(sym,
-                                       free = paramSyms,
-                                       original = sym.info.params),
-                               sym.info.resultType)))
+                lifted(MethodType(
+                    addFree(sym, free = paramSyms, original = sym.info.params),
+                    sym.info.resultType)))
             copyDefDef(tree)(
                 vparamss =
                   List(addFree(sym, free = paramDefs, original = vparams)))
@@ -398,7 +396,7 @@ abstract class LambdaLift extends InfoTransform {
           if (freeParamDefs.isEmpty) tree
           else
             deriveClassDef(tree)(impl =>
-                  deriveTemplate(impl)(_ ::: freeParamDefs))
+              deriveTemplate(impl)(_ ::: freeParamDefs))
 
         case _ => tree
       }
@@ -577,9 +575,9 @@ abstract class LambdaLift extends InfoTransform {
                          original: List[A]): List[A] = {
     val prependFree =
       (!sym.isConstructor // this condition is redundant for now. It will be needed if we remove the second condition in 2.12.x
-            && (settings.Ydelambdafy.value == "method" &&
-                  sym.isDelambdafyTarget) // SI-8359 Makes the lambda body a viable as the target MethodHandle for a call to LambdaMetafactory
-          )
+        && (settings.Ydelambdafy.value == "method" &&
+          sym.isDelambdafyTarget) // SI-8359 Makes the lambda body a viable as the target MethodHandle for a call to LambdaMetafactory
+      )
     if (prependFree) free ::: original
     else original ::: free
   }

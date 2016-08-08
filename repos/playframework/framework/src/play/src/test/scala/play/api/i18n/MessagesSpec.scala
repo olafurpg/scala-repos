@@ -97,8 +97,8 @@ object MessagesSpec extends Specification {
       "when a cookie and an acceptable lang are available" in {
         api
           .preferred(FakeRequest()
-                .withCookies(Cookie("PLAY_LANG", "fr"))
-                .withHeaders("Accept-Language" -> "en"))
+            .withCookies(Cookie("PLAY_LANG", "fr"))
+            .withHeaders("Accept-Language" -> "en"))
           .lang must_== Lang("fr")
       }
     }
@@ -110,7 +110,7 @@ object MessagesSpec extends Specification {
                           Mode.Dev),
           Configuration.reference,
           new DefaultLangs(Configuration.reference ++ Configuration.from(
-                  Map("play.i18n.langs" -> Seq("invalid_language"))))) must throwA[
+              Map("play.i18n.langs" -> Seq("invalid_language"))))) must throwA[
           PlayException]
     }
   }

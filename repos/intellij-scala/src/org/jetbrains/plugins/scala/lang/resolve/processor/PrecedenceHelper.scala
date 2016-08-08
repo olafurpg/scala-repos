@@ -164,7 +164,7 @@ trait PrecedenceHelper[T] { this: BaseProcessor =>
     else if (currentPrecedence == topPrecedence) {
       if (isCheckForEqualPrecedence && qualifiedName != null &&
           (levelQualifiedNamesSet.contains(qualifiedName) ||
-              qualifiedNamesSet.contains(qualifiedName))) {
+          qualifiedNamesSet.contains(qualifiedName))) {
         return false
       } else if (qualifiedName != null &&
                  qualifiedNamesSet.contains(qualifiedName)) return false

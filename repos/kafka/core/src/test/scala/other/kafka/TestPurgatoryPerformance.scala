@@ -125,7 +125,7 @@ object TestPurgatoryPerformance {
     val start = System.currentTimeMillis
     val rand = new Random()
     val keys = (0 until numKeys).map(i =>
-          "fakeKey%d".format(rand.nextInt(numPossibleKeys)))
+      "fakeKey%d".format(rand.nextInt(numPossibleKeys)))
     @volatile var requestArrivalTime = start
     @volatile var end = 0L
     val generator = new Runnable {
@@ -174,7 +174,7 @@ object TestPurgatoryPerformance {
     val actualRate = numRequests.toDouble * 1000d / (end - start).toDouble
 
     val cpuTime = getProcessCpuTimeNanos(osMXBean).map(x =>
-          (x - initialCpuTimeNano.get) / 1000000L)
+      (x - initialCpuTimeNano.get) / 1000000L)
     val gcCounts = gcMXBeans.map(_.getCollectionCount)
     val gcTimes = gcMXBeans.map(_.getCollectionTime)
 
@@ -243,7 +243,7 @@ object TestPurgatoryPerformance {
       val normalMean = math.log(pct50)
       val normalStDev =
         (math.log(pct75) -
-              normalMean) / 0.674490d // 0.674490 is 75th percentile point in N(0,1)
+          normalMean) / 0.674490d // 0.674490 is 75th percentile point in N(0,1)
       val dist = new LogNormalDistribution(normalMean, normalStDev)
       (0 until sampleSize).map { _ =>
         dist.next().toLong

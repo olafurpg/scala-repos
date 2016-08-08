@@ -168,7 +168,7 @@ object FormFieldDirectives extends FormFieldDirectives {
     private def filter[T](fieldName: String, fu: FSFFOU[T])(
         implicit sfu: SFU): Directive1[T] =
       extract(fieldOfForm(fieldName, fu)).flatMap(r ⇒
-            handleFieldResult(fieldName, r))
+        handleFieldResult(fieldName, r))
     implicit def forString(
         implicit sfu: SFU,
         fu: FSFFU[String]): FieldDefAux[String, Directive1[String]] =
@@ -253,7 +253,7 @@ object FormFieldDirectives extends FormFieldDirectives {
       extract { ctx ⇒
         import ctx.{executionContext, materializer}
         sfu(ctx.request.entity).fast.flatMap(form ⇒
-              Future.sequence(form.fields.collect {
+          Future.sequence(form.fields.collect {
             case (`fieldName`, value) ⇒ fu(value)
           }))
       }.flatMap { result ⇒

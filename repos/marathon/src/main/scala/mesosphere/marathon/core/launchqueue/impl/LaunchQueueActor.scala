@@ -112,7 +112,7 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
                           actorRef)
             case Some(deferredMessages) =>
               deferredMessages.foreach(msg =>
-                    self.tell(msg.message, msg.sender))
+                self.tell(msg.message, msg.sender))
 
               suspendedLauncherPathIds -= pathId
               suspendedLaunchersMessages -= actorRef
@@ -164,7 +164,7 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
     case List =>
       import context.dispatcher
       val scatter = launchers.keys.map(appId =>
-            (self ? Count(appId)).mapTo[Option[QueuedTaskInfo]])
+        (self ? Count(appId)).mapTo[Option[QueuedTaskInfo]])
       val gather: Future[Seq[QueuedTaskInfo]] =
         Future.sequence(scatter).map(_.flatten.to[Seq])
       gather.pipeTo(sender())

@@ -134,7 +134,7 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
       .findMethodsAndTheirSubstitutorsByName(this, name, checkBases)
       .toList
       .sortBy(myPair =>
-            myPair.first match {
+        myPair.first match {
           case wrapper: ScFunctionWrapper
               if wrapper.function.isInstanceOf[ScFunctionDeclaration] =>
             1
@@ -212,7 +212,7 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
       .getTypes(this)
       .allFirstSeq()
       .flatMap(n =>
-            n.map {
+        n.map {
           case (_, x) => (x.info, x.substitutor)
       }) ++ syntheticTypeDefinitions
       .filter(!_.isObject)
@@ -241,7 +241,7 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
       .getSignatures(this)
       .allFirstSeq()
       .flatMap(n =>
-            n.filter {
+        n.filter {
           case (_, x) =>
             !x.info.isInstanceOf[PhysicalSignature] &&
               (x.info.namedElement match {
@@ -265,7 +265,7 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
               .getSignatures(c, Some(clazzType), this)
               .allFirstSeq()
               .flatMap(n =>
-                    n.filter {
+                n.filter {
                   case (_, x) =>
                     !x.info.isInstanceOf[PhysicalSignature] &&
                       (x.info.namedElement match {

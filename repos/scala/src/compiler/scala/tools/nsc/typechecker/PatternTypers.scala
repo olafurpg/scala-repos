@@ -90,9 +90,9 @@ trait PatternTypers { self: Analyzer =>
       def isEmptyType = resultOfMatchingMethod(resultType, nme.isEmpty)()
       def isOkay =
         (resultType.isErroneous || (resultType <:< BooleanTpe) ||
-              (isEmptyType <:< BooleanTpe) || member.isMacro ||
-              member.isOverloaded // the whole overloading situation is over the rails
-            )
+          (isEmptyType <:< BooleanTpe) || member.isMacro ||
+          member.isOverloaded // the whole overloading situation is over the rails
+        )
 
       // Dueling test cases: pos/overloaded-unapply.scala, run/case-class-23.scala, pos/t5022.scala
       // A case class with 23+ params has no unapply method.
@@ -191,7 +191,7 @@ trait PatternTypers { self: Analyzer =>
       // Test case which presently requires the exclusion is run/gadts.scala.
       def eligible(tparam: Symbol) =
         (tparam.isTypeParameterOrSkolem && tparam.owner.isTerm &&
-              (settings.strictInference || !variance.isInvariant))
+          (settings.strictInference || !variance.isInvariant))
 
       def skolems =
         try skolemBuffer.toList
@@ -247,7 +247,7 @@ trait PatternTypers { self: Analyzer =>
       //      For now, I've put it completely behind -Xstrict-inference.
       val untrustworthyPt =
         settings.strictInference && (ptIn =:= AnyTpe || ptIn =:= NothingTpe ||
-              ptIn.typeSymbol != caseClass)
+          ptIn.typeSymbol != caseClass)
       val variantToSkolem = new VariantToSkolemMap
       val caseClassType = tree.tpe.prefix memberType caseClass
       val caseConstructorType =
@@ -336,10 +336,10 @@ trait PatternTypers { self: Analyzer =>
 
       val unapplyArg =
         (context.owner
-              .newValue(nme.SELECTOR_DUMMY, fun.pos, Flags.SYNTHETIC) setInfo
-              (if (isApplicableSafe(Nil, unapplyType, pt :: Nil, WildcardType))
-                 pt
-               else freshUnapplyArgType()))
+          .newValue(nme.SELECTOR_DUMMY, fun.pos, Flags.SYNTHETIC) setInfo
+          (if (isApplicableSafe(Nil, unapplyType, pt :: Nil, WildcardType))
+             pt
+           else freshUnapplyArgType()))
       val unapplyArgTree =
         Ident(unapplyArg) updateAttachment SubpatternsAttachment(args)
 

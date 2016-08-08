@@ -145,12 +145,12 @@ case class SourceBuilder[T: Manifest] private (
         node = node
           .asInstanceOf[Node[(K, V)]]
           .leftJoin((
-                  service.offline,
-                  service.online.map {
+              service.offline,
+              service.online.map {
                 fn: Function0[ReadableStore[K, JoinedValue]] =>
                   ReadableServiceFactory(fn)
               }
-              ))
+          ))
     )
 
   /** Set's an Option on all nodes ABOVE this point */
@@ -214,7 +214,7 @@ case class SourceBuilder[T: Manifest] private (
         val newNode = OptionalUnzip2[Scalding, Storm]()(node)._1.map { p =>
           Producer.evToKeyed(p.name(id)).sumByKey(batchSetStore)
         }.getOrElse(sys.error(
-                "Scalding mode specified alongside some online-only Source, Service or Sink."))
+            "Scalding mode specified alongside some online-only Source, Service or Sink."))
         CompletedBuilder(newNode,
                          registrar,
                          batcher,
@@ -231,7 +231,7 @@ case class SourceBuilder[T: Manifest] private (
         val newNode = OptionalUnzip2[Scalding, Storm]()(node)._2.map { p =>
           Producer.evToKeyed(p.name(id)).sumByKey(givenStore)
         }.getOrElse(sys.error(
-                "Storm mode specified alongside some offline-only Source, Service or Sink."))
+            "Storm mode specified alongside some offline-only Source, Service or Sink."))
         CompletedBuilder(newNode,
                          registrar,
                          batcher,

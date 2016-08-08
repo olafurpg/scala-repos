@@ -204,7 +204,7 @@ class Word2VecModel private[ml] (
     val sqlContext = SQLContext.getOrCreate(sc)
     import sqlContext.implicits._
     val wordVec = wordVectors.getVectors.mapValues(vec =>
-          Vectors.dense(vec.map(_.toDouble)))
+      Vectors.dense(vec.map(_.toDouble)))
     sc.parallelize(wordVec.toSeq).toDF("word", "vector")
   }
 

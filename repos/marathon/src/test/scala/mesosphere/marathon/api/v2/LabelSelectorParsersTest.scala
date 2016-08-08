@@ -76,10 +76,9 @@ class LabelSelectorParsersTest extends MarathonSpec with Matchers {
     val combined = parser.parsed(
         "foo==one, bla!=one, foo in (one, two, three), bla notin (one, two, three), existence")
     combined.selectors should have size 5
-    combined.matches(
-        AppDefinition(labels = Map("foo" -> "one",
-                                   "bla" -> "four",
-                                   "existence" -> "true"))) should be(true)
+    combined.matches(AppDefinition(labels =
+      Map("foo" -> "one", "bla" -> "four", "existence" -> "true"))) should be(
+        true)
     combined.matches(AppDefinition(labels = Map("foo" -> "one"))) should be(
         false)
     combined.matches(AppDefinition(labels = Map("bla" -> "four"))) should be(
@@ -93,8 +92,7 @@ class LabelSelectorParsersTest extends MarathonSpec with Matchers {
         """\{\{\{ in (\*\*\*, \&\&\&, \$\$\$), \^\^\^ notin (\-\-\-, \!\!\!, \@\@\@), \#\#\#""")
     combined.selectors should have size 3
     combined.matches(AppDefinition(labels =
-              Map("{{{" -> "&&&", "^^^" -> "&&&", "###" -> "&&&"))) should be(
-        true)
+      Map("{{{" -> "&&&", "^^^" -> "&&&", "###" -> "&&&"))) should be(true)
     combined.matches(AppDefinition(labels = Map("^^^" -> "---"))) should be(
         false)
     combined.matches(AppDefinition(labels = Map("###" -> "four"))) should be(

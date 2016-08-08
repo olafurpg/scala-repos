@@ -14,11 +14,11 @@ object Namer {
 
   def player(p: Player, withRating: Boolean = true, withTitle: Boolean = true)(
       implicit lightUser: String => Option[LightUser]) = Html {
-    p.aiLevel.fold(
-        p.userId.flatMap(lightUser).fold(lila.user.User.anonymous) { user =>
-      if (withRating)
-        s"${withTitle.fold(user.titleNameHtml, user.name)}&nbsp;(${ratingString(p)})"
-      else withTitle.fold(user.titleName, user.name)
+    p.aiLevel.fold(p.userId.flatMap(lightUser).fold(lila.user.User.anonymous) {
+      user =>
+        if (withRating)
+          s"${withTitle.fold(user.titleNameHtml, user.name)}&nbsp;(${ratingString(p)})"
+        else withTitle.fold(user.titleName, user.name)
     }) { level =>
       s"A.I.&nbsp;level&nbsp;$level"
     }

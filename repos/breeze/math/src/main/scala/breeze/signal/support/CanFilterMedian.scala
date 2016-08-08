@@ -79,9 +79,9 @@ object CanFilterMedian {
                                             halfWindow)
               //if the new value and old value lie on different sides of the current Median,
               if ((nowObsoleteWindowValue >= currentMedian ||
-                      newWindowValue >= currentMedian) &&
+                  newWindowValue >= currentMedian) &&
                   (nowObsoleteWindowValue <= currentMedian ||
-                      newWindowValue <= currentMedian)) {
+                  newWindowValue <= currentMedian)) {
                 //then the median needs to be recalculated
                 currentMedian = quickSelectImpl(tempDataExtract, halfWindow)
               }

@@ -127,9 +127,8 @@ class FormatterTest extends WordSpec {
       assert(
           utcFormatter
             .format(record1) == "ERR [20080329-05:53:16.722] jobs: boo.\n")
-      assert(
-          fullPackageFormatter
-            .format(record1) == "ERR [20080329-05:53:16.722] com.example.jobs: boo.\n")
+      assert(fullPackageFormatter
+        .format(record1) == "ERR [20080329-05:53:16.722] com.example.jobs: boo.\n")
     }
 
     "handle other prefixes" in {
@@ -138,9 +137,8 @@ class FormatterTest extends WordSpec {
     }
 
     "truncate line" in {
-      assert(
-          truncateFormatter
-            .format(record3) == "CRI [20080329-05:53:16.722] whiskey: Something terrible happened th...\n")
+      assert(truncateFormatter
+        .format(record3) == "CRI [20080329-05:53:16.722] whiskey: Something terrible happened th...\n")
     }
 
     "write stack traces" should {
@@ -210,10 +208,9 @@ class FormatterTest extends WordSpec {
       }
 
       "log even blank exceptions" in {
-        assert(
-            utcFormatter
-              .format(record4) == "ERR [20080329-05:53:16.722] jobs: with minimal exception\n" +
-              "ERR [20080329-05:53:16.722] jobs: java.lang.Exception: fast exception no stacktrace\n")
+        assert(utcFormatter
+          .format(record4) == "ERR [20080329-05:53:16.722] jobs: with minimal exception\n" +
+          "ERR [20080329-05:53:16.722] jobs: java.lang.Exception: fast exception no stacktrace\n")
       }
     }
   }

@@ -424,7 +424,7 @@ class IntervalCheck
           val ok = c.contains(g(x, y))
           if (!ok)
             println("(%s, %s) failed on (%s, %s)" format
-                  (a, b, x.toString, y.toString))
+              (a, b, x.toString, y.toString))
           ok shouldBe true
       }
     }

@@ -52,7 +52,7 @@ object JavaScriptContext {
               case fut: LAFuture[_] =>
                 val ret = new LAFuture[NodeSeq]
                 fut.foreach(v =>
-                      ret.satisfy(session.runSourceContext(v, rule, elem)))
+                  ret.satisfy(session.runSourceContext(v, rule, elem)))
                 ret
 
               case func: Function0[_] =>

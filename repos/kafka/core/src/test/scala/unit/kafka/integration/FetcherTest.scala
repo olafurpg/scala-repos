@@ -51,7 +51,7 @@ class FetcherTest extends KafkaServerTestHarness {
                           servers = servers)
 
     val cluster = new Cluster(servers.map(s =>
-              new Broker(s.config.brokerId, "localhost", s.boundPort())))
+      new Broker(s.config.brokerId, "localhost", s.boundPort())))
 
     fetcher = new ConsumerFetcherManager(
         "consumer1",

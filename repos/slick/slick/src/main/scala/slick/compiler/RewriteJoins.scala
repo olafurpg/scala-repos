@@ -188,7 +188,8 @@ class RewriteJoins extends Phase {
           case p: Select =>
             allRefs
               .get(p)
-              .map(s =>
+              .map(
+                  s =>
                     Select(Ref(fs) :@ b.nodeType.asCollectionType.elementType,
                            s) :@ p.nodeType)
               .getOrElse(p)
@@ -240,8 +241,8 @@ class RewriteJoins extends Phase {
         val sn2 = StructNode(ConstArray.from(legalDefs ++ createDefs))
         logger.debug("Pulled refs out of:", sn2)
         val replacements = (existingOkDefs ++ createDefs.map {
-              case (s, n) => (n, s)
-            }).toMap
+          case (s, n) => (n, s)
+        }).toMap
         def rebase(n: Node): Node =
           n.replace({
             case (p @ FwdPath(s :: _)) :@ tpe if s == ok =>
@@ -329,7 +330,7 @@ class RewriteJoins extends Phase {
         val pull = alsoPull + s1
         val j2b = rearrangeJoinConditions(j2a, pull)
         val (on1Down, on1Keep) = splitConjunctions(on1).partition(p =>
-              hasRefTo(p, Set(s2)) && !hasRefTo(p, pull))
+          hasRefTo(p, Set(s2)) && !hasRefTo(p, pull))
         val (on2Up, on2Keep) =
           splitConjunctions(j2b.on).partition(p => hasRefTo(p, pull))
         if (on1Down.nonEmpty || on2Up.nonEmpty) {

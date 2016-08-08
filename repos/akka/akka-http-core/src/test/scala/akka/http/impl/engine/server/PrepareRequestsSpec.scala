@@ -100,7 +100,7 @@ class PrepareRequestsSpec extends AkkaSpec {
       upstreamProbe.expectNoMsg(100.millis)
 
       inSub.sendNext(ParserOutput.EntityChunk(
-              HttpEntity.ChunkStreamPart(ByteString("abc"))))
+          HttpEntity.ChunkStreamPart(ByteString("abc"))))
       entityProbe.expectNext()
       entitySub.request(1)
       inSub.sendNext(ParserOutput.MessageEnd)

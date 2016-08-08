@@ -79,7 +79,7 @@ abstract private[converter] class AbstractStringConverterDelegateSpec[
     }
 
     examples.foreach(example =>
-          runConversionsForExamples(example._1, example._2))
+      runConversionsForExamples(example._1, example._2))
   }
 
   protected val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")

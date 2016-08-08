@@ -578,7 +578,7 @@ object DebuggerUtil {
       }
     })
     buf.toSeq.sortBy(e =>
-          (e.isInstanceOf[ScObject], e.getTextRange.getStartOffset))
+      (e.isInstanceOf[ScObject], e.getTextRange.getStartOffset))
   }
 
   def isLocalV(resolve: PsiElement): Boolean = {

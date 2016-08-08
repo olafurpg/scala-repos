@@ -116,7 +116,7 @@ class GradientBoostedTrees @Since("1.2.0")(
         val remappedInput =
           input.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
         val remappedValidationInput = validationInput.map(x =>
-              new LabeledPoint((x.label * 2) - 1, x.features))
+          new LabeledPoint((x.label * 2) - 1, x.features))
         GradientBoostedTrees.boost(remappedInput,
                                    remappedValidationInput,
                                    boostingStrategy,

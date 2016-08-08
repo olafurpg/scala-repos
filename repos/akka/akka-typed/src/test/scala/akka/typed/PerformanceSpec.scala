@@ -26,14 +26,14 @@ class PerformanceSpec
           startWith {
 
             val pinger = Props(SelfAware[Ping](self ⇒
-                      Static { msg ⇒
+              Static { msg ⇒
                 if (msg.x == 0) {
                   msg.report ! Pong(0, self, msg.report)
                 } else msg.pong ! Pong(msg.x - 1, self, msg.report)
             })).withDispatcher(executor)
 
             val ponger = Props(SelfAware[Pong](self ⇒
-                      Static { msg ⇒
+              Static { msg ⇒
                 msg.ping ! Ping(msg.x, self, msg.report)
             })).withDispatcher(executor)
 

@@ -181,7 +181,7 @@ object UnifiedMemoryManager {
         conf,
         maxMemory = maxMemory,
         storageRegionSize = (maxMemory * conf
-              .getDouble("spark.memory.storageFraction", 0.5)).toLong,
+          .getDouble("spark.memory.storageFraction", 0.5)).toLong,
         numCores = numCores)
   }
 
@@ -196,10 +196,9 @@ object UnifiedMemoryManager {
                                       else RESERVED_SYSTEM_MEMORY_BYTES)
     val minSystemMemory = reservedMemory * 1.5
     if (systemMemory < minSystemMemory) {
-      throw new IllegalArgumentException(
-          s"System memory $systemMemory must " +
-            s"be at least $minSystemMemory. Please increase heap size using the --driver-memory " +
-            s"option or spark.driver.memory in Spark configuration.")
+      throw new IllegalArgumentException(s"System memory $systemMemory must " +
+        s"be at least $minSystemMemory. Please increase heap size using the --driver-memory " +
+        s"option or spark.driver.memory in Spark configuration.")
     }
     // SPARK-12759 Check executor memory to fail fast if memory is insufficient
     if (conf.contains("spark.executor.memory")) {

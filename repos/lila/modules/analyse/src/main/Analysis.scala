@@ -30,19 +30,19 @@ case class Analysis(id: String,
   // ply -> UCI
   def bestMoves: Map[Int, String] =
     (infos map { i =>
-          i.best map { b =>
-            i.ply -> b.keys
-          }
-        }).flatten.toMap
+      i.best map { b =>
+        i.ply -> b.keys
+      }
+    }).flatten.toMap
 
   def summary: List[(Color, List[(Nag, Int)])] = Color.all map { color =>
     color ->
       (Nag.badOnes map { nag =>
-            nag ->
-              (advices count { adv =>
-                    adv.color == color && adv.nag == nag
-                  })
+        nag ->
+          (advices count { adv =>
+            adv.color == color && adv.nag == nag
           })
+      })
   }
 
   def valid = infos.nonEmpty

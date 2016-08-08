@@ -79,10 +79,9 @@ object Config {
 
     val configVersion = newInstance.getString("akka.version", VERSION)
     if (configVersion != VERSION)
-      throw new ConfigurationException(
-          "Akka JAR version [" + VERSION +
-            "] is different than the provided config version [" + configVersion +
-            "]")
+      throw new ConfigurationException("Akka JAR version [" + VERSION +
+        "] is different than the provided config version [" + configVersion +
+        "]")
 
     newInstance
   } catch {

@@ -179,7 +179,7 @@ private[cluster] final case class Gossip(
         case node if (node != selfUniqueAddress) ⇒ member(node)
       }
     unreachable.forall(m ⇒
-          Gossip.convergenceSkipUnreachableWithMemberStatus(m.status)) &&
+      Gossip.convergenceSkipUnreachableWithMemberStatus(m.status)) &&
     !members.exists(
         m ⇒
           Gossip.convergenceMemberStatus(m.status) &&

@@ -113,13 +113,13 @@ class ZookeeperConsumerConnectorTest
         val ms = 0
           .until(messagesPerNode)
           .map(x =>
-                header + server.config.brokerId + "-" + partition + "-" + x)
+            header + server.config.brokerId + "-" + partition + "-" + x)
         messages ++= ms
         import JavaConversions._
         javaProducer.send(ms.map(new KeyedMessage[Int, String](
-                    topic,
-                    partition,
-                    _)): java.util.List[KeyedMessage[Int, String]])
+            topic,
+            partition,
+            _)): java.util.List[KeyedMessage[Int, String]])
       }
       javaProducer.close
     }
@@ -142,7 +142,7 @@ class ZookeeperConsumerConnectorTest
       scalaMap: Map[String, Int]): java.util.Map[String, java.lang.Integer] = {
     val javaMap = new java.util.HashMap[String, java.lang.Integer]()
     scalaMap.foreach(m =>
-          javaMap.put(m._1, m._2.asInstanceOf[java.lang.Integer]))
+      javaMap.put(m._1, m._2.asInstanceOf[java.lang.Integer]))
     javaMap
   }
 }

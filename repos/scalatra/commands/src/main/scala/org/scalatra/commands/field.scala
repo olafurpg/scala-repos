@@ -110,10 +110,8 @@ class BasicFieldDescriptor[T](
         Some(bindingValidators.map(_ apply name).reduce(_ andThen _))
       else None
 
-    copy(
-        validator =
-          validator
-            .flatMap(v => nwValidators.map(v andThen)) orElse nwValidators)
+    copy(validator =
+      validator.flatMap(v => nwValidators.map(v andThen)) orElse nwValidators)
   }
 
   def copy(name: String = name,
@@ -519,7 +517,7 @@ object BindingValidators {
     : BindingValidator[TResult] =
     nonEmptyCollection[TResult]()
   def nonEmptyCollection[TResult <: Traversable[_]](messageFormat: String =
-        "%s must not be empty."): BindingValidator[TResult] =
+    "%s must not be empty."): BindingValidator[TResult] =
     (s: String) => {
       _ flatMap (Validation.nonEmptyCollection(s, _, messageFormat))
     }

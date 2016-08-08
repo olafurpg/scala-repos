@@ -535,15 +535,14 @@ class DenseVectorTest extends FunSuite with Checkers {
   test("isClose") {
     check((a: DenseVector[Double]) => isClose(a, a))
     check((a: DenseVector[Double], b: DenseVector[Double]) =>
-          isClose(a, b) == zipValues(a, b).forall((a, b) =>
-                (a - b).abs < 1E-8))
+      isClose(a, b) == zipValues(a, b).forall((a, b) => (a - b).abs < 1E-8))
   }
 
   test("nonfinite") {
     check((a: DenseVector[Double]) =>
-          any(isNonfinite, a) == a.exists(isNonfinite(_)))
+      any(isNonfinite, a) == a.exists(isNonfinite(_)))
     check((a: DenseVector[Double]) =>
-          all(isNonfinite, a) == a.forall(isNonfinite(_)))
+      all(isNonfinite, a) == a.forall(isNonfinite(_)))
     assert(all(isNonfinite, DenseVector[Double]())(all.reduceUFunc))
     assert(!any(isNonfinite, DenseVector[Double]()))
   }

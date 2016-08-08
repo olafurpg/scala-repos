@@ -61,9 +61,9 @@ trait ClassHelpers { self: ControlHelpers =>
                         classOf[ClassCastException],
                         classOf[NoClassDefFoundError]);
           klass <- tryo(ignore)(Class
-                        .forName(fullName)
-                        .asSubclass(targetType)
-                        .asInstanceOf[Class[C]])) yield klass).headOption
+                    .forName(fullName)
+                    .asSubclass(targetType)
+                    .asInstanceOf[Class[C]])) yield klass).headOption
 
   /**
     * General method to in find a class according to its type, its name, a list of possible
@@ -321,8 +321,8 @@ trait ClassHelpers { self: ControlHelpers =>
        */
       def alternateMethods: List[Method] =
         clz.getDeclaredMethods.toList.filter(m =>
-              m.getName.equals(meth) && isPublic(m.getModifiers) &&
-                m.getParameterTypes.length == params.length)
+          m.getName.equals(meth) && isPublic(m.getModifiers) &&
+            m.getParameterTypes.length == params.length)
       methCacheLock.read {
         def key = (clz.getName, meth, params.length)
         if (Props.productionMode && methodCache.contains(key)) {
@@ -358,7 +358,7 @@ trait ClassHelpers { self: ControlHelpers =>
       .filter(m => inst != null || isStatic(m.getModifiers))
       .map((m: Method) => tryo { m.invoke(inst, params: _*) })
       .find((x: Box[Any]) =>
-            x match {
+        x match {
           case result @ Full(_) => true
           case Failure(_, Full(c: IllegalAccessException), _) => false
           case Failure(_, Full(c: IllegalArgumentException), _) => false

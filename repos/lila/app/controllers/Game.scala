@@ -54,7 +54,7 @@ object Game extends LilaController {
                 .withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
                              CONTENT_DISPOSITION ->
                                ("attachment; filename=" +
-                                     s"lichess_${me.username}_$date.pgn"))
+                                 s"lichess_${me.username}_$date.pgn"))
           })
     else notFound
   }

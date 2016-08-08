@@ -68,11 +68,11 @@ object LDAExample {
         .action((x, c) => c.copy(maxIterations = x))
       opt[Double]("docConcentration")
         .text(s"amount of topic smoothing to use (> 1.0) (-1=auto)." +
-              s"  default: ${defaultParams.docConcentration}")
+          s"  default: ${defaultParams.docConcentration}")
         .action((x, c) => c.copy(docConcentration = x))
       opt[Double]("topicConcentration")
         .text(s"amount of term (word) smoothing to use (> 1.0) (-1=auto)." +
-              s"  default: ${defaultParams.topicConcentration}")
+          s"  default: ${defaultParams.topicConcentration}")
         .action((x, c) => c.copy(topicConcentration = x))
       opt[Int]("vocabSize")
         .text(
@@ -86,12 +86,12 @@ object LDAExample {
         .action((x, c) => c.copy(stopwordFile = x))
       opt[String]("algorithm")
         .text(s"inference algorithm to use. em and online are supported." +
-              s" default: ${defaultParams.algorithm}")
+          s" default: ${defaultParams.algorithm}")
         .action((x, c) => c.copy(algorithm = x))
       opt[String]("checkpointDir")
         .text(s"Directory for checkpointing intermediate results." +
-              s"  Checkpointing helps with recovery and eliminates temporary shuffle files on disk." +
-              s"  default: ${defaultParams.checkpointDir}")
+          s"  Checkpointing helps with recovery and eliminates temporary shuffle files on disk." +
+          s"  default: ${defaultParams.checkpointDir}")
         .action((x, c) => c.copy(checkpointDir = Some(x)))
       opt[Int]("checkpointInterval")
         .text(
@@ -100,7 +100,7 @@ object LDAExample {
         .action((x, c) => c.copy(checkpointInterval = x))
       arg[String]("<input>...")
         .text("input paths (directories) to plain text corpora." +
-              "  Each text file line should hold 1 document.")
+          "  Each text file line should hold 1 document.")
         .unbounded()
         .required()
         .action((x, c) => c.copy(input = c.input :+ x))

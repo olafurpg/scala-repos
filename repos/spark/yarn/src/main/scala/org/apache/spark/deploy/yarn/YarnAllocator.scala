@@ -275,9 +275,8 @@ private[yarn] class YarnAllocator(driverUrl: String,
     val missing = targetNumExecutors - numPendingAllocate - numExecutorsRunning
 
     if (missing > 0) {
-      logInfo(
-          s"Will request $missing executor containers, each with ${resource.getVirtualCores} " +
-            s"cores and ${resource.getMemory} MB memory including $memoryOverhead MB overhead")
+      logInfo(s"Will request $missing executor containers, each with ${resource.getVirtualCores} " +
+        s"cores and ${resource.getMemory} MB memory including $memoryOverhead MB overhead")
 
       // Split the pending container request into three groups: locality matched list, locality
       // unmatched list and non-locality list. Take the locality matched container request into
@@ -711,6 +710,6 @@ private object YarnAllocator {
     val matcher = pattern.matcher(diagnostics)
     val diag = if (matcher.find()) " " + matcher.group() + "." else ""
     ("Container killed by YARN for exceeding memory limits." + diag +
-          " Consider boosting spark.yarn.executor.memoryOverhead.")
+      " Consider boosting spark.yarn.executor.memoryOverhead.")
   }
 }

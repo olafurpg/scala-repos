@@ -90,9 +90,8 @@ private[http] object WebSocket {
             if (code.exists(Protocol.CloseCodes.isError))
               ctx.fail(new PeerClosedConnectionException(code.get, reason))
             else if (inMessage)
-              ctx.fail(
-                  new ProtocolException(
-                      s"Truncated message, peer closed connection in the middle of message."))
+              ctx.fail(new ProtocolException(
+                  s"Truncated message, peer closed connection in the middle of message."))
             else ctx.finish()
           case ActivelyCloseWithCode(code, reason) ⇒
             if (code.exists(Protocol.CloseCodes.isError))
@@ -152,29 +151,29 @@ private[http] object WebSocket {
     BidiFlow.fromGraph(
         GraphDSL
           .create() { implicit b ⇒
-        import GraphDSL.Implicits._
+            import GraphDSL.Implicits._
 
-        val split = b.add(BypassRouter)
-        val tick = Source.tick(closeTimeout, closeTimeout, Tick)
-        val merge = b.add(BypassMerge)
-        val messagePreparation = b.add(prepareMessages)
-        val messageRendering = b.add(renderMessages.via(LiftCompletions))
+            val split = b.add(BypassRouter)
+            val tick = Source.tick(closeTimeout, closeTimeout, Tick)
+            val merge = b.add(BypassMerge)
+            val messagePreparation = b.add(prepareMessages)
+            val messageRendering = b.add(renderMessages.via(LiftCompletions))
 
-        // user handler
-        split.out1 ~> messagePreparation
-        messageRendering.outlet ~> merge.in1
+            // user handler
+            split.out1 ~> messagePreparation
+            messageRendering.outlet ~> merge.in1
 
-        // bypass
-        split.out0 ~> merge.in0
+            // bypass
+            split.out0 ~> merge.in0
 
-        // timeout support
-        tick ~> merge.in2
+            // timeout support
+            tick ~> merge.in2
 
-        BidiShape(split.in,
-                  messagePreparation.out,
-                  messageRendering.in,
-                  merge.out)
-      }
+            BidiShape(split.in,
+                      messagePreparation.out,
+                      messageRendering.in,
+                      merge.out)
+          }
           .named("ws-message-api"))
   }
 

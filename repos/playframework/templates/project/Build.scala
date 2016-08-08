@@ -63,7 +63,7 @@ object Templates {
           val mappings: Seq[(File, File)] = preparedTemplates.flatMap {
             template =>
               (template.***
-                    .filter(!_.isDirectory) x relativeTo(template)).map { f =>
+                .filter(!_.isDirectory) x relativeTo(template)).map { f =>
                 (f._1, syncTemplateDirValue / template.getName / f._2)
               }
           }
@@ -87,7 +87,7 @@ object Templates {
           val outDir: File = target.value / "prepared-templates"
 
           streams.value.log.info("Preparing templates for Play " + params(
-                  "PLAY_VERSION") + " with Scala " + params("SCALA_VERSION"))
+              "PLAY_VERSION") + " with Scala " + params("SCALA_VERSION"))
 
           // Don't sync directories or .gitkeep files. We can remove
           // .gitkeep files. These files are only there to make sure we preserve
@@ -100,7 +100,7 @@ object Templates {
             case templateSources: TemplateSources =>
               val relativeMappings: Seq[(File, String)] =
                 templateSources.sourceDirs.flatMap(dir =>
-                      dir.***.filter(fileFilter(_)) x relativeTo(dir))
+                  dir.***.filter(fileFilter(_)) x relativeTo(dir))
               // Rebase the files onto the target directory, also filtering out ignored files
               relativeMappings.collect {
                 case (orig, targ) if !ignore.contains(orig.getName) =>
@@ -123,7 +123,7 @@ object Templates {
                   if (f.getParent == null) f else topDir(parent)
                 }
                 val rebasedFile = (file relativeTo outDir).getOrElse(sys.error(
-                        s"Can't rebase prepared template $file to dir $outDir"))
+                    s"Can't rebase prepared template $file to dir $outDir"))
                 val templateName: String = topDir(rebasedFile).getName
                 val templateSources: TemplateSources = templateSourcesList
                   .find(_.name == templateName)
@@ -329,7 +329,7 @@ object Templates {
                   false
                 case (name, key, Right(uuid)) =>
                   logger.info("Template " + name +
-                        " published successfully with uuid: " + uuid)
+                    " published successfully with uuid: " + uuid)
                   overall
               }
             }

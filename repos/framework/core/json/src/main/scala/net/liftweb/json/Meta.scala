@@ -73,7 +73,7 @@ private[json] object Meta {
         args.foldLeft(0)((n, x) => if (x.optional) n + 1 else n)
       def score(args: List[Arg]) =
         args.foldLeft(0)((s, arg) =>
-              if (names.contains(arg.path)) s + 1 else -100)
+          if (names.contains(arg.path)) s + 1 else -100)
 
       if (choices.isEmpty) None
       else {
@@ -319,13 +319,11 @@ private[json] object Meta {
                 val arg = typeArgs.getOrElse(v, v)
                 if (arg == classOf[java.lang.Object])
                   context
-                    .map(
-                        ctx =>
-                          ScalaSigReader.readConstructor(
-                              ctx.argName,
-                              ctx.containingClass,
-                              idx,
-                              ctx.allArgs.map(_._1)))
+                    .map(ctx =>
+                      ScalaSigReader.readConstructor(ctx.argName,
+                                                     ctx.containingClass,
+                                                     idx,
+                                                     ctx.allArgs.map(_._1)))
                     .getOrElse(arg)
                 else arg
               case (x, _) => x
@@ -426,10 +424,10 @@ private[json] object Meta {
     def fields(clazz: Class[_]): List[(String, TypeInfo)] = {
       val fs = clazz.getDeclaredFields.toList
         .filterNot(f =>
-              Modifier.isStatic(f.getModifiers) ||
-                Modifier.isTransient(f.getModifiers))
+          Modifier.isStatic(f.getModifiers) ||
+            Modifier.isTransient(f.getModifiers))
         .map(f =>
-              (f.getName, TypeInfo(f.getType, f.getGenericType match {
+          (f.getName, TypeInfo(f.getType, f.getGenericType match {
             case p: ParameterizedType => Some(p)
             case _ => None
           })))

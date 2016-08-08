@@ -284,7 +284,7 @@ object CoreUtils extends Logging {
        */
       case c
           if ((c >= '\u0000' && c <= '\u001f') ||
-                (c >= '\u007f' && c <= '\u009f')) =>
+            (c >= '\u007f' && c <= '\u009f')) =>
         "\\u%04x".format(c: Int)
       case c => c
     }.mkString

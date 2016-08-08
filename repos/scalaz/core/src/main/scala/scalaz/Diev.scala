@@ -103,12 +103,12 @@ trait DievImplementation {
               else {
                 if (value < start)
                   Between(liftedIntervals(adjustedPosition - 1).map(_ =>
-                                adjustedPosition - 1),
+                            adjustedPosition - 1),
                           adjustedPosition.some)
                 else
                   Between(adjustedPosition.some,
                           liftedIntervals(adjustedPosition + 1).map(_ =>
-                                adjustedPosition + 1))
+                            adjustedPosition + 1))
               }
             }
             case _ => Between(None, None)
@@ -259,7 +259,7 @@ trait DievImplementation {
 
     def filter(f: A => Boolean): Diev[A] =
       foldLeft[Diev[A]](DieVector[A]())((working, value) =>
-            if (f(value)) working + value else working)
+        if (f(value)) working + value else working)
 
     def foreach(f: A => Unit): Unit =
       foldLeft[Unit](())((_, value) => f(value))

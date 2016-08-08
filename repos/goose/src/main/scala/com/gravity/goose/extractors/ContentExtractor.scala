@@ -461,7 +461,7 @@ trait ContentExtractor {
         for (a <- attrs) {
           try {
             if ((a.getValue.contains(youtubeStr) ||
-                    a.getValue.contains(vimdeoStr)) && (a.getKey == "src")) {
+                a.getValue.contains(vimdeoStr)) && (a.getKey == "src")) {
               trace(logPrefix + "This page has a video!: " + a.getValue)
               goodMovies += el
             }

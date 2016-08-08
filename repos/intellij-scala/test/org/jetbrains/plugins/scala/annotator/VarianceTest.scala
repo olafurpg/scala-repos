@@ -50,9 +50,8 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testVariancePrivateThis() {
-    assertMatches(
-        messages(
-            "private[this] abstract class G[-P[+_], +R](in: P[R]) {def a = in}")) {
+    assertMatches(messages(
+        "private[this] abstract class G[-P[+_], +R](in: P[R]) {def a = in}")) {
       case Error("a", CovariantPosition()) :: Nil =>
     }
   }

@@ -660,7 +660,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
         if (statics.isEmpty) cdef
         else
           deriveClassDef(cdef)(_ =>
-                implWithImport(importCompanionObject(cdef)))
+            implWithImport(importCompanionObject(cdef)))
 
       List(makeCompanionObject(cdefNew, statics), cdefNew)
     }

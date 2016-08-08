@@ -23,6 +23,6 @@ trait MarathonClusterIntegrationTest extends SingleMarathonIntegrationTest {
     val parameters =
       List("--master", config.master, "--event_subscriber", "http_callback") ++ extraMarathonParameters
     config.marathonPorts.tail.foreach(port =>
-          startMarathon(port, parameters: _*))
+      startMarathon(port, parameters: _*))
   }
 }

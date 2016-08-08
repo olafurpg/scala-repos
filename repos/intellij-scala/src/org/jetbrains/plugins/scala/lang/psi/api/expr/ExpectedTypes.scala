@@ -185,10 +185,10 @@ private[expr] object ExpectedTypes {
           a.getLExpression match {
             case ref: ScReferenceExpression
                 if (!a.getContext.isInstanceOf[ScArgumentExprList] &&
-                      !(a.getContext.isInstanceOf[ScInfixArgumentExpression] &&
-                            a.getContext
-                              .asInstanceOf[ScInfixArgumentExpression]
-                              .isCall)) || ref.qualifier.isDefined ||
+                  !(a.getContext.isInstanceOf[ScInfixArgumentExpression] &&
+                    a.getContext
+                      .asInstanceOf[ScInfixArgumentExpression]
+                      .isCall)) || ref.qualifier.isDefined ||
                   ScUnderScoreSectionUtil
                     .isUnderscore(expr) /* See SCL-3512, SCL-3525, SCL-4809, SCL-6785 */ =>
               ref.bind() match {
@@ -290,9 +290,9 @@ private[expr] object ExpectedTypes {
           buffer.toArray
         case infix: ScInfixExpr
             if ((infix.isLeftAssoc &&
-                      infix.lOp == expr.getSameElementInContext) ||
-                  (!infix.isLeftAssoc &&
-                        infix.rOp == expr.getSameElementInContext)) &&
+              infix.lOp == expr.getSameElementInContext) ||
+              (!infix.isLeftAssoc &&
+                infix.rOp == expr.getSameElementInContext)) &&
               !expr.isInstanceOf[ScTuple] =>
           val res = new ArrayBuffer[(ScType, Option[ScTypeElement])]
           val zExpr: ScExpression = expr match {
@@ -401,7 +401,7 @@ private[expr] object ExpectedTypes {
               case _ => None
             }
             callOption.foreach(call =>
-                  tps = tps.map {
+              tps = tps.map {
                 case (r, isDynamicNamed) =>
                   (call.updateAccordingToExpectedType(r), isDynamicNamed)
             })
@@ -584,7 +584,7 @@ private[expr] object ExpectedTypes {
                   case tp => update(ScTypePolymorphicType(tp, typeParams))
                 }, Some(expr))
               call.foreach(call =>
-                    polyType = call.updateAccordingToExpectedType(polyType))
+                polyType = call.updateAccordingToExpectedType(polyType))
               processArgsExpected(res,
                                   expr,
                                   i,
@@ -613,7 +613,7 @@ private[expr] object ExpectedTypes {
               var polyType: TypeResult[ScType] =
                 Success(update(subst.subst(fun.polymorphicType())), Some(expr))
               call.foreach(call =>
-                    polyType = call.updateAccordingToExpectedType(polyType))
+                polyType = call.updateAccordingToExpectedType(polyType))
               processArgsExpected(res,
                                   expr,
                                   i,

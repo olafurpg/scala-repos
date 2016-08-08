@@ -36,7 +36,7 @@ object SurviveNetworkInstabilityMultiJvmSpec extends MultiNodeConfig {
   commonConfig(
       debugConfig(on = false)
         .withFallback(ConfigFactory.parseString(
-                """
+            """
       akka.remote.system-message-buffer-size=100
       akka.remote.netty.tcp.connection-timeout = 10s
       """))
@@ -314,7 +314,7 @@ abstract class SurviveNetworkInstabilitySpec
       runOn(others: _*) {
         // second should be removed because of quarantine
         awaitAssert(clusterView.members.map(_.address) should not contain
-              (address(second)))
+          (address(second)))
       }
 
       enterBarrier("after-6")

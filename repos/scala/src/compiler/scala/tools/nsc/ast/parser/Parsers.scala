@@ -2420,7 +2420,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       }
       val result = vds.toList
       if (owner == nme.CONSTRUCTOR && (result.isEmpty ||
-              (result.head take 1 exists (_.mods.isImplicit)))) {
+          (result.head take 1 exists (_.mods.isImplicit)))) {
         in.token match {
           case LBRACKET =>
             syntaxError(in.offset,
@@ -2571,7 +2571,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       if (in.token == LBRACKET)
         inBrackets(
             commaSeparated(typeParam(
-                    NoMods withAnnotations annotations(skipNewLines = true))))
+                NoMods withAnnotations annotations(skipNewLines = true))))
       else Nil
     }
 
@@ -3005,7 +3005,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
               pos,
               (mods | Flags.CASE) withPosition
                 (Flags.CASE, tokenRange(
-                        in.prev /*scanner skips on 'case' to 'class', thus take prev*/ )))
+                    in.prev /*scanner skips on 'case' to 'class', thus take prev*/ )))
         case OBJECT =>
           objectDef(pos, mods)
         case CASEOBJECT =>
@@ -3013,7 +3013,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
               pos,
               (mods | Flags.CASE) withPosition
                 (Flags.CASE, tokenRange(
-                        in.prev /*scanner skips on 'case' to 'object', thus take prev*/ )))
+                    in.prev /*scanner skips on 'case' to 'object', thus take prev*/ )))
         case _ =>
           syntaxErrorOrIncompleteAnd("expected start of definition",
                                      skipIt = true)(

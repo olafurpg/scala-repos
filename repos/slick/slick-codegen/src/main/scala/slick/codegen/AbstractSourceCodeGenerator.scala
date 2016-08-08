@@ -84,8 +84,8 @@ abstract class AbstractSourceCodeGenerator(model: m.Model)
           .mkString(", ")
         if (classEnabled) {
           val prns = (parents.take(1).map(" extends " + _) ++ parents
-                .drop(1)
-                .map(" with " + _)).mkString("")
+            .drop(1)
+            .map(" with " + _)).mkString("")
           s"""case class $name($args)$prns"""
         } else {
           s"""
@@ -103,8 +103,8 @@ def $name($args): $name = {
       def code = {
         val positional = compoundValue(
             columnsPositional.map(c =>
-                  (if (c.fakeNullable || c.model.nullable) s"<<?[${c.rawType}]"
-                   else s"<<[${c.rawType}]")))
+              (if (c.fakeNullable || c.model.nullable) s"<<?[${c.rawType}]"
+               else s"<<[${c.rawType}]")))
         val dependencies = columns
           .map(_.exposedType)
           .distinct
@@ -112,7 +112,7 @@ def $name($args): $name = {
           .map { case (t, i) => s"""e$i: GR[$t]""" }
           .mkString(", ")
         val rearranged = compoundValue(desiredColumnOrder.map(i =>
-                  if (hlistEnabled) s"r($i)" else tuple(i)))
+          if (hlistEnabled) s"r($i)" else tuple(i)))
         def result(args: String) =
           if (mappingEnabled) s"$factory($args)" else args
         val body = if (autoIncLastAsOption && columns.size > 1) {
@@ -135,8 +135,8 @@ implicit def ${name}(implicit $dependencies): GR[${TableClass.elementType}] = GR
       def star = {
         val struct = compoundValue(
             columns.map(c =>
-                  if (c.fakeNullable) s"Rep.Some(${c.name})"
-                  else s"${c.name}"))
+              if (c.fakeNullable) s"Rep.Some(${c.name})"
+              else s"${c.name}"))
         val rhs =
           if (mappingEnabled) s"$struct <> ($factory, $extractor)" else struct
         s"def * = $rhs"
@@ -144,8 +144,8 @@ implicit def ${name}(implicit $dependencies): GR[${TableClass.elementType}] = GR
       def option = {
         val struct = compoundValue(
             columns.map(c =>
-                  if (c.model.nullable) s"${c.name}"
-                  else s"Rep.Some(${c.name})"))
+              if (c.model.nullable) s"${c.name}"
+              else s"Rep.Some(${c.name})"))
         val rhs =
           if (mappingEnabled)
             s"""$struct.shaped.<>($optionFactory, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))"""

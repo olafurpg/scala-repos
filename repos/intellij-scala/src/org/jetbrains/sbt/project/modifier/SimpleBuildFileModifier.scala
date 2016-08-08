@@ -38,7 +38,7 @@ class SimpleBuildFileModifier(
     : Option[List[VirtualFile]] = {
     val empty: Option[List[VirtualFile]] = Some(List())
     requiredElementTypes.foldLeft(empty)((acc, nextType) =>
-          acc match {
+      acc match {
         case Some(accList) =>
           addElements(module, nextType, fileToWorkingCopy).map(_ :: accList)
         case _ => None
@@ -54,30 +54,27 @@ class SimpleBuildFileModifier(
     //TODO: rewrite this?
     buildFileProviders
       .map(fileProvider =>
-            fileProvider.findBuildFile(module, elementType, fileToWorkingCopy))
+        fileProvider.findBuildFile(module, elementType, fileToWorkingCopy))
       .toStream
       .map(
           _.map(
               buildFileEntry =>
                 locationProvidersStream
-                  .map(
-                      locationProvider =>
-                        buildPsiElement(module.getProject,
-                                        Option(
-                                            if (buildFileEntry.isModuleLocal)
-                                              null
-                                            else
-                                              module.getName),
-                                        elementType).map(
-                            SimpleBuildFileModifier.addElementsToBuildFile(
-                                module,
-                                locationProvider,
-                                elementType,
-                                buildFileEntry.file,
-                                SimpleBuildFileModifier.newLine(
-                                    module.getProject),
-                                _)
-                      ))
+                  .map(locationProvider =>
+                    buildPsiElement(module.getProject,
+                                    Option(if (buildFileEntry.isModuleLocal)
+                                      null
+                                    else
+                                      module.getName),
+                                    elementType).map(
+                        SimpleBuildFileModifier.addElementsToBuildFile(
+                            module,
+                            locationProvider,
+                            elementType,
+                            buildFileEntry.file,
+                            SimpleBuildFileModifier.newLine(module.getProject),
+                            _)
+                  ))
                   .find(_.isDefined)
                   .flatten))
       .map(opt => opt.flatten.flatten)

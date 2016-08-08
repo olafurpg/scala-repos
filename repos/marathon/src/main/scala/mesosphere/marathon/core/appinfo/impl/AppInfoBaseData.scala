@@ -66,20 +66,20 @@ class AppInfoBaseData(clock: Clock,
         embed match {
           case AppInfo.Embed.Counts =>
             appData.taskCountsFuture.map(counts =>
-                  info.copy(maybeCounts = Some(counts)))
+              info.copy(maybeCounts = Some(counts)))
           case AppInfo.Embed.Deployments =>
             runningDeploymentsByAppFuture.map(deployments =>
-                  info.copy(maybeDeployments = Some(deployments(app.id))))
+              info.copy(maybeDeployments = Some(deployments(app.id))))
           case AppInfo.Embed.LastTaskFailure =>
             appData.maybeLastTaskFailureFuture.map { maybeLastTaskFailure =>
               info.copy(maybeLastTaskFailure = maybeLastTaskFailure)
             }
           case AppInfo.Embed.Tasks =>
             appData.enrichedTasksFuture.map(tasks =>
-                  info.copy(maybeTasks = Some(tasks)))
+              info.copy(maybeTasks = Some(tasks)))
           case AppInfo.Embed.TaskStats =>
             appData.taskStatsFuture.map(taskStats =>
-                  info.copy(maybeTaskStats = Some(taskStats)))
+              info.copy(maybeTaskStats = Some(taskStats)))
         }
       }
     }

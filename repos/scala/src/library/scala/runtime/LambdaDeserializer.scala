@@ -124,7 +124,7 @@ object LambdaDeserializer {
       }
 
     val captures = Array.tabulate(serialized.getCapturedArgCount)(n =>
-          serialized.getCapturedArg(n))
+      serialized.getCapturedArg(n))
     factory.invokeWithArguments(captures: _*)
   }
 

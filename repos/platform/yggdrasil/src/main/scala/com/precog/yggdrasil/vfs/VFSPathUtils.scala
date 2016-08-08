@@ -94,7 +94,7 @@ object VFSPathUtils extends Logging {
         "Checking for children of path %s in dir %s".format(path, pathRoot))
     Option(pathRoot.listFiles(pathFileFilter)) map { files =>
       logger.debug("Filtering children %s in path %s"
-            .format(files.mkString("[", ", ", "]"), path))
+        .format(files.mkString("[", ", ", "]"), path))
       val childMetadata =
         files.toList traverse { f =>
           val childPath = unescapePath(path / Path(f.getName))
@@ -140,29 +140,29 @@ object VFSPathUtils extends Logging {
               currentVersionV.fold[IO[ResourceError \/ PathMetadata]]({
                 case NotFound(message) =>
                   // Recurse on children to find one that is nonempty
-                  containsNonemptyChild(Option(pathDir0.listFiles(
-                              pathFileFilter)).toList.flatten) map {
+                  containsNonemptyChild(Option(
+                      pathDir0.listFiles(pathFileFilter)).toList.flatten) map {
                     case true =>
                       \/.right(PathMetadata(path, PathMetadata.PathOnly))
                     case false =>
                       \/.left(NotFound("All subpaths of %s appear to be empty."
-                                .format(path.path)))
+                        .format(path.path)))
                   }
 
                 case otherError =>
                   IO(\/.left(otherError))
               }, {
                 case VersionEntry(uuid, dataType, timestamp) =>
-                  containsNonemptyChild(Option(pathDir0.listFiles(
-                              pathFileFilter)).toList.flatten) map {
+                  containsNonemptyChild(Option(
+                      pathDir0.listFiles(pathFileFilter)).toList.flatten) map {
                     case true =>
                       \/.right(PathMetadata(
-                              path,
-                              PathMetadata.DataDir(dataType.contentType)))
+                          path,
+                          PathMetadata.DataDir(dataType.contentType)))
                     case false =>
                       \/.right(PathMetadata(
-                              path,
-                              PathMetadata.DataOnly(dataType.contentType)))
+                          path,
+                          PathMetadata.DataOnly(dataType.contentType)))
                   }
               })
           }

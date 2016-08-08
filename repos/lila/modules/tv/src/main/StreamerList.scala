@@ -64,12 +64,13 @@ final class StreamerList(val store: {
         single(
             "text" -> text.verifying(
                 Constraint[String]("constraint.text_parsable") { t =>
-          validate(t) match {
-            case (_, Nil) => Valid
-            case (_, errs) =>
-              Invalid(ValidationError(errs.map(_.getMessage) mkString ","))
-          }
-        })
+                  validate(t) match {
+                    case (_, Nil) => Valid
+                    case (_, errs) =>
+                      Invalid(
+                          ValidationError(errs.map(_.getMessage) mkString ","))
+                  }
+                })
         ))
   }
 }

@@ -129,20 +129,20 @@ class BlockManagerReplicationSuite
         master
           .getPeers(stores(0).blockManagerId)
           .toSet === storeIds.filterNot {
-      _ == stores(0).blockManagerId
-    })
+          _ == stores(0).blockManagerId
+        })
     assert(
         master
           .getPeers(stores(1).blockManagerId)
           .toSet === storeIds.filterNot {
-      _ == stores(1).blockManagerId
-    })
+          _ == stores(1).blockManagerId
+        })
     assert(
         master
           .getPeers(stores(2).blockManagerId)
           .toSet === storeIds.filterNot {
-      _ == stores(2).blockManagerId
-    })
+          _ == stores(2).blockManagerId
+        })
 
     // Add driver store and test whether it is filtered out
     val driverStore = makeBlockManager(1000, SparkContext.DRIVER_IDENTIFIER)
@@ -156,20 +156,20 @@ class BlockManagerReplicationSuite
         master
           .getPeers(stores(0).blockManagerId)
           .toSet === storeIds.filterNot {
-      _ == stores(0).blockManagerId
-    } + newStore.blockManagerId)
+          _ == stores(0).blockManagerId
+        } + newStore.blockManagerId)
     assert(
         master
           .getPeers(stores(1).blockManagerId)
           .toSet === storeIds.filterNot {
-      _ == stores(1).blockManagerId
-    } + newStore.blockManagerId)
+          _ == stores(1).blockManagerId
+        } + newStore.blockManagerId)
     assert(
         master
           .getPeers(stores(2).blockManagerId)
           .toSet === storeIds.filterNot {
-      _ == stores(2).blockManagerId
-    } + newStore.blockManagerId)
+          _ == stores(2).blockManagerId
+        } + newStore.blockManagerId)
     assert(master.getPeers(newStore.blockManagerId).toSet === storeIds)
 
     // Remove a store and test whether get peers returns it

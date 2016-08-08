@@ -202,7 +202,7 @@ trait CompletionControl { self: RichPresentationCompiler =>
                 .sortWith({ (c1, c2) =>
                   c1.relevance > c2.relevance ||
                   (c1.relevance == c2.relevance &&
-                      c1.name.length < c2.name.length)
+                  c1.name.length < c2.name.length)
                 })
                 .take(maxResults)
           )
@@ -298,7 +298,7 @@ trait CompletionControl { self: RichPresentationCompiler =>
             val p = sym.pos
             val inSymbol =
               p.isRange && (context.offset >= p.startOrCursor &&
-                    context.offset <= p.endOrCursor)
+                context.offset <= p.endOrCursor)
             if (!sym.isConstructor && !inSymbol) {
               buff ++= toCompletionInfo(context,
                                         sym,

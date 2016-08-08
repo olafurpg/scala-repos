@@ -49,8 +49,9 @@ class BalancingDispatcher(
     */
   private[akka] val team = new ConcurrentSkipListSet[ActorCell](
       Helpers.identityHashComparator(new Comparator[ActorCell] {
-    def compare(l: ActorCell, r: ActorCell) = l.self.path compareTo r.self.path
-  }))
+        def compare(l: ActorCell, r: ActorCell) =
+          l.self.path compareTo r.self.path
+      }))
 
   /**
     * INTERNAL API

@@ -118,7 +118,7 @@ object UnwrappedExamples {
       new Encode2[FieldType[K, V] :: Rest] {
         def fields(hl: FieldType[K, V] :: Rest) =
           encodeRest.value.fields(hl.tail) + (key.value.name -> encodeV.value
-                .toJsonFragment(uw.value.unwrap(hl.head)))
+            .toJsonFragment(uw.value.unwrap(hl.head)))
       }
     implicit def encodeGeneric[T, Repr](
         implicit gen: LabelledGeneric.Aux[T, Repr],

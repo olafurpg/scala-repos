@@ -60,22 +60,22 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
     )
 
     val p1 = db.stream(((for {
-          _ <- ddl.create
-          ins1 <- users.map(u => (u.first, u.last)) +=
-                   ("Homer", Some("Simpson"))
-          ins2 <- users.map(u => (u.first, u.last)) ++=
-                   Seq(("Marge", Some("Simpson")),
-                       ("Apu", Some("Nahasapeemapetilon")),
-                       ("Carl", Some("Carlson")),
-                       ("Lenny", Some("Leonard")))
-          ins3 <- users.map(_.first) ++=
-                   Seq("Santa's Little Helper", "Snowball")
-          total = for (i2 <- ins2; i3 <- ins3) yield ins1 + i2 + i3
-          /* All test DBs seem to report the actual number of rows. None would also be acceptable: */
-          _ = total.map(_ shouldBe 7)
-          r1 <- q1.result
-          _ = r1 shouldBe expectedUserTuples
-        } yield ()) andThen q1.result).withPinnedSession)
+      _ <- ddl.create
+      ins1 <- users.map(u => (u.first, u.last)) +=
+               ("Homer", Some("Simpson"))
+      ins2 <- users.map(u => (u.first, u.last)) ++=
+               Seq(("Marge", Some("Simpson")),
+                   ("Apu", Some("Nahasapeemapetilon")),
+                   ("Carl", Some("Carlson")),
+                   ("Lenny", Some("Leonard")))
+      ins3 <- users.map(_.first) ++=
+               Seq("Santa's Little Helper", "Snowball")
+      total = for (i2 <- ins2; i3 <- ins3) yield ins1 + i2 + i3
+      /* All test DBs seem to report the actual number of rows. None would also be acceptable: */
+      _ = total.map(_ shouldBe 7)
+      r1 <- q1.result
+      _ = r1 shouldBe expectedUserTuples
+    } yield ()) andThen q1.result).withPinnedSession)
 
     materialize(p1.mapResult { case (id, f, l) => User(id, f, l.orNull) }).flatMap {
       allUsers =>
@@ -100,7 +100,7 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
         yield
           orders.map(o => (o.userID, o.product, o.shipped, o.rebate)) +=
             (u.id, "Gizmo " + ((scala.math.random * 10) + 1).toInt, i == 2,
-                Some(u.first == "Marge"))
+            Some(u.first == "Marge"))
       db.run(seq(ordersInserts: _*))
     }.flatMap { _ =>
       val q3 = for (u <- users.sortBy(_.first) if u.last.isDefined;
@@ -113,8 +113,8 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
       val q4 = for {
         u <- users
         o <- u.orders if (o.orderID === (for {
-              o2 <- orders filter (o.userID === _.userID)
-            } yield o2.orderID).max)
+          o2 <- orders filter (o.userID === _.userID)
+        } yield o2.orderID).max)
       } yield (u.first, o.orderID)
       q4.result.statements.toSeq.length.should(_ >= 1)
 

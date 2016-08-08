@@ -387,7 +387,7 @@ class TypedActorSpec
         }))
         val t =
           Await.result((boss ? TypedProps[Bar](classOf[Foo], classOf[Bar])
-                             .withTimeout(2 seconds)).mapTo[Foo],
+                         .withTimeout(2 seconds)).mapTo[Foo],
                        timeout.duration)
 
         t.incr()

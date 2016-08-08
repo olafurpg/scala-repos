@@ -169,7 +169,7 @@ trait MemberHandlers {
       extends MemberDefHandler(member) {
     override def referencedNames =
       super.referencedNames.flatMap(name =>
-            List(name.toTermName, name.toTypeName))
+        List(name.toTermName, name.toTypeName))
     override def definesValue = false
     override def definesTerm: Option[TermName] = Some(name.toTermName)
     override def definesType: Option[TypeName] = None

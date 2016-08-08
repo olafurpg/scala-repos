@@ -71,143 +71,139 @@ trait Parser extends RegexParsers with Filters with AST {
 
   lazy val expr: Parser[Expr] =
     (id ~ "(" ~ formals ~ ")" ~ ":=" ~ expr ~ expr ^# {
-          (loc, id, _, fs, _, _, e1, e2) =>
-            Let(loc, Identifier(Vector(), id), fs, e1, e2)
-        } | id ~ ":=" ~ expr ~ expr ^# { (loc, id, _, e1, e2) =>
-          Let(loc, Identifier(Vector(), id), Vector(), e1, e2)
-        } | """solve\b""".r ~ actuals ~ expr ^# { (loc, _, t, e) =>
-          Solve(loc, t, e)
-        } | """observe\b""".r ~ "(" ~ expr ~ "," ~ expr ~ ")" ^# {
-          (loc, _, _, e1, _, e2, _) =>
-            Observe(loc, e1, e2)
-        } | """import\b""".r ~ importSpec ~ expr ^# { (loc, _, s, e) =>
-          Import(loc, s, e)
-        } | """assert\b""".r ~ expr ~ expr ^# { (loc, _, e1, e2) =>
-          Assert(loc, e1, e2)
-        } | """new\b""".r ~ expr ^# { (loc, _, e) =>
-          New(loc, e)
-        } | relations ~ expr ^# { (loc, es, e) =>
-          buildDeepRelate(loc, es, e)
-        } | namespacedId ^# { (loc, id) =>
-          Dispatch(loc, id, Vector())
-        } | ticId ^# TicVar | pathLiteral ^# { (loc, str) =>
-          Dispatch(loc,
-                   LoadId,
-                   Vector(Dispatch(loc,
-                                   ExpandGlobId,
-                                   Vector(StrLit(loc, str)))))
-        } | relPathLiteral ^# { (loc, str) =>
-          Dispatch(loc,
-                   RelLoadId,
-                   Vector(Dispatch(loc,
-                                   ExpandGlobId,
-                                   Vector(StrLit(loc, str)))))
-        } | strLiteral ^# StrLit | numLiteral ^# NumLit | boolLiteral ^# BoolLit | undefinedLiteral ^# {
-          (loc, _) =>
-            UndefinedLit(loc)
-        } | nullLiteral ^# { (loc, _) =>
-          NullLit(loc)
-        } | "{" ~ properties ~ "}" ^# { (loc, _, ps, _) =>
-          ObjectDef(loc, ps)
-        } | "[" ~ nullableActuals ~ "]" ^# { (loc, _, as, _) =>
-          ArrayDef(loc, as)
-        } | expr ~ "." ~ propertyName ^# { (loc, e, _, p) =>
-          Descent(loc, e, p)
-        } | expr ~ "@" ~ propertyName ^# { (loc, e, _, p) =>
-          MetaDescent(loc, e, p)
-        } | expr ~ "[" ~ expr ~ "]" ^# { (loc, e1, _, e2, _) =>
-          Deref(loc, e1, e2)
-        } | namespacedId ~ "(" ~ actuals ~ ")" ^# { (loc, id, _, as, _) =>
-          Dispatch(loc, id, as)
-        } | """if\b""".r ~ expr ~ """then\b""".r ~ expr ~ """else\b""".r ~ expr ^# {
-          (loc, _, e1, _, e2, _, e3) =>
-            Cond(loc, e1, e2, e3)
-        } | expr ~ """where\b""".r ~ expr ^# { (loc, e1, _, e2) =>
-          Where(loc, e1, e2)
-        } | expr ~ """with\b""".r ~ expr ^# { (loc, e1, _, e2) =>
-          With(loc, e1, e2)
-        } | expr ~ """union\b""".r ~ expr ^# { (loc, e1, _, e2) =>
-          Union(loc, e1, e2)
-        } | expr ~ """intersect\b""".r ~ expr ^# { (loc, e1, _, e2) =>
-          Intersect(loc, e1, e2)
-        } | expr ~ """difference\b""".r ~ expr ^# { (loc, e1, _, e2) =>
-          Difference(loc, e1, e2)
-        } | expr ~ "+" ~ expr ^# { (loc, e1, _, e2) =>
-          Add(loc, e1, e2)
-        } | expr ~ "-" ~ expr ^# { (loc, e1, _, e2) =>
-          Sub(loc, e1, e2)
-        } | expr ~ "*" ~ expr ^# { (loc, e1, _, e2) =>
-          Mul(loc, e1, e2)
-        } | expr ~ "/" ~ expr ^# { (loc, e1, _, e2) =>
-          Div(loc, e1, e2)
-        } | expr ~ "%" ~ expr ^# { (loc, e1, _, e2) =>
-          Mod(loc, e1, e2)
-        } | expr ~ "^" ~ expr ^# { (loc, e1, _, e2) =>
-          Pow(loc, e1, e2)
-        } | expr ~ "<" ~ expr ^# { (loc, e1, _, e2) =>
-          Lt(loc, e1, e2)
-        } | expr ~ "<=" ~ expr ^# { (loc, e1, _, e2) =>
-          LtEq(loc, e1, e2)
-        } | expr ~ ">" ~ expr ^# { (loc, e1, _, e2) =>
-          Gt(loc, e1, e2)
-        } | expr ~ ">=" ~ expr ^# { (loc, e1, _, e2) =>
-          GtEq(loc, e1, e2)
-        } | expr ~ "=" ~ expr ^# { (loc, e1, _, e2) =>
-          Eq(loc, e1, e2)
-        } | expr ~ "!=" ~ expr ^# { (loc, e1, _, e2) =>
-          NotEq(loc, e1, e2)
-        } | expr ~ "&" ~ expr ^# { (loc, e1, _, e2) =>
-          And(loc, e1, e2)
-        } | expr ~ "|" ~ expr ^# { (loc, e1, _, e2) =>
-          Or(loc, e1, e2)
-        } | "!" ~ expr ^# { (loc, _, e) =>
-          Comp(loc, e)
-        } | """neg\b""".r ~ expr ^# { (loc, _, e) =>
-          Neg(loc, e)
-        } | "(" ~ expr ~ ")" ^# { (loc, _, e, _) =>
-          Paren(loc, e)
-        }) filter (precedence & arrayDefDeref & relateRelate)
+      (loc, id, _, fs, _, _, e1, e2) =>
+        Let(loc, Identifier(Vector(), id), fs, e1, e2)
+    } | id ~ ":=" ~ expr ~ expr ^# { (loc, id, _, e1, e2) =>
+      Let(loc, Identifier(Vector(), id), Vector(), e1, e2)
+    } | """solve\b""".r ~ actuals ~ expr ^# { (loc, _, t, e) =>
+      Solve(loc, t, e)
+    } | """observe\b""".r ~ "(" ~ expr ~ "," ~ expr ~ ")" ^# {
+      (loc, _, _, e1, _, e2, _) =>
+        Observe(loc, e1, e2)
+    } | """import\b""".r ~ importSpec ~ expr ^# { (loc, _, s, e) =>
+      Import(loc, s, e)
+    } | """assert\b""".r ~ expr ~ expr ^# { (loc, _, e1, e2) =>
+      Assert(loc, e1, e2)
+    } | """new\b""".r ~ expr ^# { (loc, _, e) =>
+      New(loc, e)
+    } | relations ~ expr ^# { (loc, es, e) =>
+      buildDeepRelate(loc, es, e)
+    } | namespacedId ^# { (loc, id) =>
+      Dispatch(loc, id, Vector())
+    } | ticId ^# TicVar | pathLiteral ^# { (loc, str) =>
+      Dispatch(loc,
+               LoadId,
+               Vector(Dispatch(loc, ExpandGlobId, Vector(StrLit(loc, str)))))
+    } | relPathLiteral ^# { (loc, str) =>
+      Dispatch(loc,
+               RelLoadId,
+               Vector(Dispatch(loc, ExpandGlobId, Vector(StrLit(loc, str)))))
+    } | strLiteral ^# StrLit | numLiteral ^# NumLit | boolLiteral ^# BoolLit | undefinedLiteral ^# {
+      (loc, _) =>
+        UndefinedLit(loc)
+    } | nullLiteral ^# { (loc, _) =>
+      NullLit(loc)
+    } | "{" ~ properties ~ "}" ^# { (loc, _, ps, _) =>
+      ObjectDef(loc, ps)
+    } | "[" ~ nullableActuals ~ "]" ^# { (loc, _, as, _) =>
+      ArrayDef(loc, as)
+    } | expr ~ "." ~ propertyName ^# { (loc, e, _, p) =>
+      Descent(loc, e, p)
+    } | expr ~ "@" ~ propertyName ^# { (loc, e, _, p) =>
+      MetaDescent(loc, e, p)
+    } | expr ~ "[" ~ expr ~ "]" ^# { (loc, e1, _, e2, _) =>
+      Deref(loc, e1, e2)
+    } | namespacedId ~ "(" ~ actuals ~ ")" ^# { (loc, id, _, as, _) =>
+      Dispatch(loc, id, as)
+    } | """if\b""".r ~ expr ~ """then\b""".r ~ expr ~ """else\b""".r ~ expr ^# {
+      (loc, _, e1, _, e2, _, e3) =>
+        Cond(loc, e1, e2, e3)
+    } | expr ~ """where\b""".r ~ expr ^# { (loc, e1, _, e2) =>
+      Where(loc, e1, e2)
+    } | expr ~ """with\b""".r ~ expr ^# { (loc, e1, _, e2) =>
+      With(loc, e1, e2)
+    } | expr ~ """union\b""".r ~ expr ^# { (loc, e1, _, e2) =>
+      Union(loc, e1, e2)
+    } | expr ~ """intersect\b""".r ~ expr ^# { (loc, e1, _, e2) =>
+      Intersect(loc, e1, e2)
+    } | expr ~ """difference\b""".r ~ expr ^# { (loc, e1, _, e2) =>
+      Difference(loc, e1, e2)
+    } | expr ~ "+" ~ expr ^# { (loc, e1, _, e2) =>
+      Add(loc, e1, e2)
+    } | expr ~ "-" ~ expr ^# { (loc, e1, _, e2) =>
+      Sub(loc, e1, e2)
+    } | expr ~ "*" ~ expr ^# { (loc, e1, _, e2) =>
+      Mul(loc, e1, e2)
+    } | expr ~ "/" ~ expr ^# { (loc, e1, _, e2) =>
+      Div(loc, e1, e2)
+    } | expr ~ "%" ~ expr ^# { (loc, e1, _, e2) =>
+      Mod(loc, e1, e2)
+    } | expr ~ "^" ~ expr ^# { (loc, e1, _, e2) =>
+      Pow(loc, e1, e2)
+    } | expr ~ "<" ~ expr ^# { (loc, e1, _, e2) =>
+      Lt(loc, e1, e2)
+    } | expr ~ "<=" ~ expr ^# { (loc, e1, _, e2) =>
+      LtEq(loc, e1, e2)
+    } | expr ~ ">" ~ expr ^# { (loc, e1, _, e2) =>
+      Gt(loc, e1, e2)
+    } | expr ~ ">=" ~ expr ^# { (loc, e1, _, e2) =>
+      GtEq(loc, e1, e2)
+    } | expr ~ "=" ~ expr ^# { (loc, e1, _, e2) =>
+      Eq(loc, e1, e2)
+    } | expr ~ "!=" ~ expr ^# { (loc, e1, _, e2) =>
+      NotEq(loc, e1, e2)
+    } | expr ~ "&" ~ expr ^# { (loc, e1, _, e2) =>
+      And(loc, e1, e2)
+    } | expr ~ "|" ~ expr ^# { (loc, e1, _, e2) =>
+      Or(loc, e1, e2)
+    } | "!" ~ expr ^# { (loc, _, e) =>
+      Comp(loc, e)
+    } | """neg\b""".r ~ expr ^# { (loc, _, e) =>
+      Neg(loc, e)
+    } | "(" ~ expr ~ ")" ^# { (loc, _, e, _) =>
+      Paren(loc, e)
+    }) filter (precedence & arrayDefDeref & relateRelate)
 
   private lazy val importSpec: Parser[ImportSpec] =
     (namespace ~ "::" ~ "*" ^^ { (p, _, _) =>
-          WildcardImport(p)
-        } | namespace ^^ SpecificImport)
+      WildcardImport(p)
+    } | namespace ^^ SpecificImport)
 
   private lazy val namespacedId: Parser[Identifier] =
     (namespace ~ "::" ~ id ^^ { (ns, _, id) =>
-          Identifier(ns, id)
-        } | id ^^ { str =>
-          Identifier(Vector(), str)
-        })
+      Identifier(ns, id)
+    } | id ^^ { str =>
+      Identifier(Vector(), str)
+    })
 
   private lazy val namespace: Parser[Vector[String]] =
     (namespace ~ "::" ~ id ^^ { (ns, _, id) =>
-          ns :+ id
-        } | id ^^ { Vector(_) })
+      ns :+ id
+    } | id ^^ { Vector(_) })
 
   private lazy val formals: Parser[Vector[String]] =
     (formals ~ "," ~ id ^^ { (fs, _, f) =>
-          fs :+ f
-        } | id ^^ { Vector(_) })
+      fs :+ f
+    } | id ^^ { Vector(_) })
 
   private lazy val relations: Parser[Vector[Expr]] =
     (relations ~ "~" ~ expr ^^ { (es, _, e) =>
-          es :+ e
-        } | expr ~ "~" ~ expr ^^ { (e1, _, e2) =>
-          Vector(e1, e2)
-        })
+      es :+ e
+    } | expr ~ "~" ~ expr ^^ { (e1, _, e2) =>
+      Vector(e1, e2)
+    })
 
   private lazy val actuals: Parser[Vector[Expr]] =
     (actuals ~ "," ~ expr ^^ { (es, _, e) =>
-          es :+ e
-        } | expr ^^ { Vector(_) })
+      es :+ e
+    } | expr ^^ { Vector(_) })
 
   private lazy val nullableActuals = (actuals | "" ^^^ Vector[Expr]())
 
   private lazy val properties: Parser[Vector[(String, Expr)]] =
     (properties ~ "," ~ property ^^ { (ps, _, p) =>
-          ps :+ p
-        } | property ^^ { Vector(_) } | "" ^^^ Vector())
+      ps :+ p
+    } | property ^^ { Vector(_) } | "" ^^^ Vector())
 
   private lazy val property =
     propertyName ~ ":" ~ expr ^^ { (n, _, e) =>
@@ -221,7 +217,7 @@ trait Parser extends RegexParsers with Filters with AST {
 
   private lazy val propertyName =
     ("""[a-zA-Z_][a-zA-Z_0-9]*""".r | """`([^`\\]|\\.)+`""".r ^^ canonicalizePropertyName | """"([^"\\]|\\.)+"""".r ^^ canonicalizeStr //"
-        )
+    )
 
   private val basePathLiteralRegex = """(/[a-zA-Z0-9\-\._~:/?#@!$&'*+=]+)+"""
 
@@ -411,8 +407,8 @@ trait Parser extends RegexParsers with Filters with AST {
         pairs.headOption flatMap {
           case (_, headCount) => {
             val (possibilities, _) = (pairs takeWhile {
-                  case (_, c) => headCount == c
-                }).unzip
+              case (_, c) => headCount == c
+            }).unzip
 
             if (possibilities.isEmpty) None
             else Some(possibilities mkString " or ")

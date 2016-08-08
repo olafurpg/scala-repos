@@ -312,7 +312,7 @@ abstract class FormatInterpolator {
     def pickAcceptable(arg: Tree, variants: Type*): Option[Type] =
       variants find (arg.tpe <:< _) orElse
         (variants find (c
-                  .inferImplicitView(arg, arg.tpe, _) != EmptyTree)) orElse Some(
+          .inferImplicitView(arg, arg.tpe, _) != EmptyTree)) orElse Some(
           variants(0))
   }
   object Conversion {
@@ -388,13 +388,12 @@ abstract class FormatInterpolator {
     override def verify = {
       def d_# =
         (cc == 'd' && hasFlag('#') && truly {
-              badFlag('#', "# not allowed for d conversion")
-            })
+          badFlag('#', "# not allowed for d conversion")
+        })
       def x_comma =
         (cc != 'd' && hasFlag(',') && truly {
-              badFlag(',',
-                      "',' only allowed for d conversion of integral types")
-            })
+          badFlag(',', "',' only allowed for d conversion of integral types")
+        })
       super.verify && noPrecision && !d_# && !x_comma
     }
     override def accepts(arg: Tree) = {
@@ -438,8 +437,8 @@ abstract class FormatInterpolator {
     import SpecifierGroups.CC
     def hasCC =
       (op.length == 2 || falsely {
-            errorAt(CC, "Date/time conversion must have two characters")
-          })
+        errorAt(CC, "Date/time conversion must have two characters")
+      })
     def goodCC = ("HIklMSLNpzZsQBbhAaCYyjmdeRTrDFc" contains cc) || falsely {
       errorAtOffset(CC,
                     1,

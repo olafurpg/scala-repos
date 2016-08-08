@@ -177,9 +177,8 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
     val errMsg = intercept[AnalysisException] {
       sql("SELECT testUDFToListString(s) FROM inputTable")
     }
-    assert(
-        errMsg.getMessage contains "List type in java is unsupported because " +
-          "JVM type erasure makes spark fail to catch a component type in List<>;")
+    assert(errMsg.getMessage contains "List type in java is unsupported because " +
+      "JVM type erasure makes spark fail to catch a component type in List<>;")
 
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToListString")
     hiveContext.reset()
@@ -194,9 +193,8 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
     val errMsg = intercept[AnalysisException] {
       sql("SELECT testUDFToListInt(s) FROM inputTable")
     }
-    assert(
-        errMsg.getMessage contains "List type in java is unsupported because " +
-          "JVM type erasure makes spark fail to catch a component type in List<>;")
+    assert(errMsg.getMessage contains "List type in java is unsupported because " +
+      "JVM type erasure makes spark fail to catch a component type in List<>;")
 
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToListInt")
     hiveContext.reset()
@@ -242,9 +240,8 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
   test("UDFListListInt") {
     val testData = hiveContext.sparkContext
-      .parallelize(ListListIntCaseClass(Nil) :: ListListIntCaseClass(
-              Seq((1, 2, 3))) :: ListListIntCaseClass(
-              Seq((4, 5, 6), (7, 8, 9))) :: Nil)
+      .parallelize(ListListIntCaseClass(Nil) :: ListListIntCaseClass(Seq(
+          (1, 2, 3))) :: ListListIntCaseClass(Seq((4, 5, 6), (7, 8, 9))) :: Nil)
       .toDF()
     testData.registerTempTable("listListIntTable")
 
@@ -295,9 +292,8 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
   test("UDFTwoListList") {
     val testData = hiveContext.sparkContext
-      .parallelize(ListListIntCaseClass(Nil) :: ListListIntCaseClass(
-              Seq((1, 2, 3))) :: ListListIntCaseClass(
-              Seq((4, 5, 6), (7, 8, 9))) :: Nil)
+      .parallelize(ListListIntCaseClass(Nil) :: ListListIntCaseClass(Seq(
+          (1, 2, 3))) :: ListListIntCaseClass(Seq((4, 5, 6), (7, 8, 9))) :: Nil)
       .toDF()
     testData.registerTempTable("TwoListTable")
 
@@ -371,7 +367,7 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
       Seq(Tuple1(1451400761)).toDF("test_date").registerTempTable("tab1")
       sql(s"CREATE TEMPORARY FUNCTION testUDFToDate AS '${classOf[GenericUDFToDate].getName}'")
       val count = sql("select testUDFToDate(cast(test_date as timestamp))" +
-            " from tab1 group by testUDFToDate(cast(test_date as timestamp))")
+        " from tab1 group by testUDFToDate(cast(test_date as timestamp))")
         .count()
       sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFToDate")
       assert(count == 1)

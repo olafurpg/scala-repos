@@ -21,7 +21,7 @@ private[lease] class Coordinator(
   def gateCycle() {
     Alarm.arm { () =>
       new PredicateAlarm(() =>
-            counter.info.remaining >= (counter.info.committed * 80 / 100)) min new BytesAlarm(
+        counter.info.remaining >= (counter.info.committed * 80 / 100)) min new BytesAlarm(
           counter,
           () => 0.bytes)
     }
@@ -72,9 +72,8 @@ private[lease] class Coordinator(
     val elapsed = Stopwatch.start()
     // TODO: if grabbing memory info is slow, rewrite this to only check memory info occasionally
     Alarm.armAndExecute({ () =>
-      new BytesAlarm(counter, () => space.left) min new DurationAlarm(
-          (maxWait -
-                elapsed()) / 2) min new GenerationAlarm(counter) min new PredicateAlarm(
+      new BytesAlarm(counter, () => space.left) min new DurationAlarm((maxWait -
+        elapsed()) / 2) min new GenerationAlarm(counter) min new PredicateAlarm(
           () => npending() == 0)
     }, { () =>
       // TODO MN: reenable

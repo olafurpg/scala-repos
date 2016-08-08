@@ -102,9 +102,9 @@ class FieldFinder[T: ClassTag](metaMapper: AnyRef,
           filter(m => Modifier.isPublic(m.getModifiers))
           . // that are public
           filter(m =>
-                fields.contains(m.getName) &&
-                  // that are associated with private fields
-                  fields(m.getName).getType == m.getReturnType)
+            fields.contains(m.getName) &&
+              // that are associated with private fields
+              fields(m.getName).getType == m.getReturnType)
           .filter(validActualType) // and have a validated type
 
         meths ::: findForClass(clz.getSuperclass)

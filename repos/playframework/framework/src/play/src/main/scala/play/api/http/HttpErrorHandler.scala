@@ -99,7 +99,7 @@ private[play] class GlobalSettingsHttpErrorHandler @Inject()(
       case clientError if statusCode >= 400 && statusCode < 500 =>
         Future.successful(
             Results.Status(clientError)(views.html.defaultpages
-                  .badRequest(request.method, request.uri, message)))
+              .badRequest(request.method, request.uri, message)))
       case nonClientError =>
         throw new IllegalArgumentException(
             s"onClientError invoked with non client error status code $statusCode: $message")
@@ -176,7 +176,7 @@ class DefaultHttpErrorHandler(environment: Environment,
                              message: String): Future[Result] =
     Future.successful(
         BadRequest(views.html.defaultpages
-              .badRequest(request.method, request.uri, message)))
+          .badRequest(request.method, request.uri, message)))
 
   /**
     * Invoked when a client makes a request that was forbidden.
@@ -218,7 +218,7 @@ class DefaultHttpErrorHandler(environment: Environment,
                                    message: String): Future[Result] = {
     Future.successful(
         Results.Status(statusCode)(views.html.defaultpages
-              .badRequest(request.method, request.uri, message)))
+          .badRequest(request.method, request.uri, message)))
   }
 
   /**

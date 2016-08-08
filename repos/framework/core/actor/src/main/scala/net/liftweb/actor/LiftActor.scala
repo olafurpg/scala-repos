@@ -258,13 +258,13 @@ trait SpecializedLiftActor[T] extends SimpleActor[T] {
     def putListIntoMB(): Unit = {
       if (!priorityMsgList.isEmpty) {
         priorityMsgList.foldRight(baseMailbox)((msg, mb) =>
-              mb.insertAfter(new MailboxItem(msg)))
+          mb.insertAfter(new MailboxItem(msg)))
         priorityMsgList = Nil
       }
 
       if (!msgList.isEmpty) {
         msgList.foldLeft(baseMailbox)((mb, msg) =>
-              mb.insertBefore(new MailboxItem(msg)))
+          mb.insertBefore(new MailboxItem(msg)))
         msgList = Nil
       }
     }

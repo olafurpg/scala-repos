@@ -59,7 +59,7 @@ private[parser] trait CommonRules { this: Parser with StringBuilding ⇒
     rule {
       &('(') ~ run(saved = sb.toString) ~
         (comment ~ prependSB(saved + " (") ~ appendSB(')') | setSB(saved) ~ test(
-                false))
+            false))
     }
   }
 
@@ -117,10 +117,8 @@ private[parser] trait CommonRules { this: Parser with StringBuilding ⇒
   }
 
   def `day-name-l` =
-    rule(
-        "Sunday" ~ push(0) | "Monday" ~ push(1) | "Tuesday" ~ push(2) | "Wednesday" ~ push(
-            3) | "Thursday" ~ push(4) | "Friday" ~ push(5) | "Saturday" ~ push(
-            6))
+    rule("Sunday" ~ push(0) | "Monday" ~ push(1) | "Tuesday" ~ push(2) | "Wednesday" ~ push(
+        3) | "Thursday" ~ push(4) | "Friday" ~ push(5) | "Saturday" ~ push(6))
 
   def `asctime-date` = rule {
     `day-name` ~ ' ' ~ date3 ~ ' ' ~ `time-of-day` ~ ' ' ~ year ~> {
@@ -199,7 +197,7 @@ private[parser] trait CommonRules { this: Parser with StringBuilding ⇒
   def `challenge-or-credentials`: Rule2[String, Seq[(String, String)]] = rule {
     `auth-scheme` ~
       (oneOrMore(`auth-param` ~> (_ -> _)).separatedBy(listSep) | `token68` ~>
-            (x ⇒ ("" -> x) :: Nil) | push(Nil))
+        (x ⇒ ("" -> x) :: Nil) | push(Nil))
   }
 
   // ******************************************************************************************
@@ -251,7 +249,7 @@ private[parser] trait CommonRules { this: Parser with StringBuilding ⇒
   def `optional-cookie-pair`: Rule1[Option[HttpCookiePair]] = rule {
     (`cookie-pair` ~ &(`cookie-separator`) ~> (Some(_: HttpCookiePair))) | // fallback that parses and discards everything until the next semicolon
       (zeroOrMore(!`cookie-separator` ~ ANY) ~ &(`cookie-separator`) ~ push(
-              None))
+          None))
   }
 
   def `cookie-pair`: Rule1[HttpCookiePair] = rule {
@@ -269,7 +267,7 @@ private[parser] trait CommonRules { this: Parser with StringBuilding ⇒
   // ******************************************************************************************
   def `cookie-value-rfc-6265` = rule {
     ('"' ~ capture(zeroOrMore(`cookie-octet-rfc-6265`)) ~ '"' | capture(
-            zeroOrMore(`cookie-octet-rfc-6265`))) ~ OWS
+        zeroOrMore(`cookie-octet-rfc-6265`))) ~ OWS
   }
 
   def `cookie-value-raw` = rule {
@@ -336,7 +334,7 @@ private[parser] trait CommonRules { this: Parser with StringBuilding ⇒
   // http://www.rfc-editor.org/errata_search.php?rfc=6265
   def `extension-av` = rule {
     !(ignoreCase("expires=") | ignoreCase("max-age=") | ignoreCase("domain=") | ignoreCase(
-            "path=") | ignoreCase("secure") | ignoreCase("httponly")) ~ capture(
+        "path=") | ignoreCase("secure") | ignoreCase("httponly")) ~ capture(
         zeroOrMore(`av-octet`)) ~ OWS ~> { (c: HttpCookie, s: String) ⇒
       c.copy(extension = Some(s))
     }
@@ -380,7 +378,7 @@ private[parser] trait CommonRules { this: Parser with StringBuilding ⇒
   def `byte-range-spec` = rule {
     `first-byte-pos` ~ ws('-') ~
       (`last-byte-pos` ~> (ByteRange(_: Long, _)) | run(
-              ByteRange.fromOffset(_)))
+          ByteRange.fromOffset(_)))
   }
 
   def `byte-ranges-specifier` = rule {
@@ -489,7 +487,7 @@ private[parser] trait CommonRules { this: Parser with StringBuilding ⇒
   def longNumberCapped =
     rule(
         (capture((1 to 18).times(DIGIT)) ~ !DIGIT ~> (_.toLong) | oneOrMore(
-                DIGIT) ~ push(999999999999999999L)) ~ OWS)
+            DIGIT) ~ push(999999999999999999L)) ~ OWS)
 
   private def digitInt(c: Char): Int = c - '0'
 

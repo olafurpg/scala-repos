@@ -323,7 +323,7 @@ final case class ErrorFilter(throwable: Class[_],
     event match {
       case Error(cause, src, _, msg) if throwable isInstance cause ⇒
         (msg == null && cause.getMessage == null &&
-              cause.getStackTrace.length == 0) || doMatch(src, msg) ||
+          cause.getStackTrace.length == 0) || doMatch(src, msg) ||
           doMatch(src, cause.getMessage)
       case _ ⇒ false
     }

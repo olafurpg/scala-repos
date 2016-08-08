@@ -230,7 +230,7 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
   /** A homomorphism of lens categories */
   def partial: PLensFamily[A1, A2, B1, B2] =
     PLensFamily.plensFamily(a =>
-          Some(run(a)): Option[IndexedStore[B1, B2, A2]])
+      Some(run(a)): Option[IndexedStore[B1, B2, A2]])
 
   /** alias for `partial` */
   def unary_~ : PLensFamily[A1, A2, B1, B2] =
@@ -294,7 +294,7 @@ trait LensFamilyFunctions {
                                               (A1 \/ A1),
                                               (A2 \/ A2)] =
     lensFamily(q =>
-          IndexedStore(_ match {
+      IndexedStore(_ match {
         case -\/(l) => Store(_ => true, l)
         case \/-(r) => Store(_ => false, r)
       }, {
@@ -308,7 +308,7 @@ trait LensFamilyFunctions {
                  (A1, B1 \/ C1),
                  (A2, B2 \/ C2)] =
     lensFamily(e =>
-          IndexedStore({
+      IndexedStore({
         case (a, -\/(b)) => -\/(a, b)
         case (a, \/-(c)) => \/-(a, c)
       }, e match {
@@ -381,10 +381,8 @@ trait LensFunctions extends LensFamilyFunctions {
     lens(l => Store(NonEmptyList.nel(_, l.tail), l.head))
 
   def nelTailLens[A]: NonEmptyList[A] @> List[A] =
-    lens(
-        l =>
-          Store(ll => NonEmptyList.nel(l.head, IList.fromList(ll)),
-                l.tail.toList))
+    lens(l =>
+      Store(ll => NonEmptyList.nel(l.head, IList.fromList(ll)), l.tail.toList))
 
   /** Access the value at a particular key of a Map **/
   def mapVLens[K, V](k: K): Map[K, V] @> Option[V] =
@@ -412,7 +410,7 @@ trait LensFunctions extends LensFamilyFunctions {
 
   def predicateLens[A]: Store[A, Boolean] @> (A \/ A) =
     lens(q =>
-          Store(_ match {
+      Store(_ match {
         case -\/(l) => Store(_ => true, l)
         case \/-(r) => Store(_ => false, r)
       }, {
@@ -422,7 +420,7 @@ trait LensFunctions extends LensFamilyFunctions {
 
   def factorLens[A, B, C]: ((A, B) \/ (A, C)) @> (A, B \/ C) =
     lens(e =>
-          Store({
+      Store({
         case (a, -\/(b)) => -\/(a, b)
         case (a, \/-(c)) => \/-(a, c)
       }, e match {

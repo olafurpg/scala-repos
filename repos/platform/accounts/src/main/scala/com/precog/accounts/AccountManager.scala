@@ -97,7 +97,7 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
                 .format(accountId, token))
           M.point(
               -\/("Reset token %s does not match provided account %s"
-                    .format(tokenId, accountId)))
+                .format(tokenId, accountId)))
         } else {
           logger.debug("Located reset token " + token)
           findAccountById(token.accountId)

@@ -157,7 +157,7 @@ private[ml] object RandomForest extends Logging {
     val topNodes =
       Array.fill[LearningNode](numTrees)(LearningNode.emptyNode(nodeIndex = 1))
     Range(0, numTrees).foreach(treeIndex =>
-          nodeQueue.enqueue((treeIndex, topNodes(treeIndex))))
+      nodeQueue.enqueue((treeIndex, topNodes(treeIndex))))
 
     while (nodeQueue.nonEmpty) {
       // Collect some nodes to split, and choose features for each node (if subsampling).
@@ -226,7 +226,7 @@ private[ml] object RandomForest extends Logging {
           }
         } else {
           topNodes.map(rootNode =>
-                new DecisionTreeRegressionModel(rootNode.toNode, numFeatures))
+            new DecisionTreeRegressionModel(rootNode.toNode, numFeatures))
         }
     }
   }
@@ -972,7 +972,7 @@ private[ml] object RandomForest extends Logging {
 
       input
         .flatMap(point =>
-              continuousFeatures.map(idx => (idx, point.features(idx))))
+          continuousFeatures.map(idx => (idx, point.features(idx))))
         .groupByKey(numPartitions)
         .map {
           case (idx, samples) =>

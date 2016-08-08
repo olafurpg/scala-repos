@@ -471,11 +471,11 @@ object Menu extends DispatchSnippet {
         .map(Helpers.toBoolean) openOr false
 
     val text = ("a" #>
-          ((n: NodeSeq) =>
-             n match {
-               case e: Elem => e.child
-               case xs => xs
-             })).apply(_text)
+      ((n: NodeSeq) =>
+         n match {
+           case e: Elem => e.child
+           case xs => xs
+         })).apply(_text)
 
     for {
       name <- S.attr("name").toList

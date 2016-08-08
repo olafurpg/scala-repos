@@ -50,8 +50,8 @@ class ScalaStatementMover extends LineMover {
       siblings
         .filter(!_.isInstanceOf[PsiComment])
         .takeWhile(it =>
-              it.isInstanceOf[PsiWhiteSpace] || it.isInstanceOf[PsiComment] ||
-                it.isInstanceOf[ScImportStmt] || predicate(it))
+          it.isInstanceOf[PsiWhiteSpace] || it.isInstanceOf[PsiComment] ||
+            it.isInstanceOf[ScImportStmt] || predicate(it))
         .find(predicate)
         .map(rangeOf(_, editor))
     }
@@ -81,7 +81,7 @@ class ScalaStatementMover extends LineMover {
       .orElse(aim(classOf[ScMatchStmt], _ => false))
       .orElse(aim(classOf[ScTryStmt], _ => false))
       .orElse(aim(classOf[ScMethodCall], isControlStructureLikeCall)
-            .filter(p => isControlStructureLikeCall(p._1)))
+        .filter(p => isControlStructureLikeCall(p._1)))
 
     pair.foreach { it =>
       info.toMove = rangeOf(it._1, editor)
@@ -122,7 +122,7 @@ class ScalaStatementMover extends LineMover {
       .filter(p => p._1 == p._2 || p._1.parentsInFile.contains(p._2))
       .map(_._2)
       .find(it =>
-            editor.offsetToLogicalPosition(it.getTextOffset).line == line)
+        editor.offsetToLogicalPosition(it.getTextOffset).line == line)
   }
 
   private def edgeLeafsOf(

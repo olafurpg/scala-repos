@@ -1142,8 +1142,8 @@ class ExportsTest {
     import scala.language.reflectiveCalls
 
     val obj2 = getObj().asInstanceOf[{
-          val x1: String; var y1: String; def z1(): String
-        }]
+      val x1: String; var y1: String; def z1(): String
+    }]
 
     assertThrows(classOf[Throwable], obj2.x1)
     assertThrows(classOf[Throwable], obj2.y1)

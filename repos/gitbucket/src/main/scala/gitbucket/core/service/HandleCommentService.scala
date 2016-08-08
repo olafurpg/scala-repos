@@ -33,8 +33,8 @@ trait HandleCommentService {
           case "close" if (!issue.closed) =>
             true ->
               (Some("close") -> Some(
-                      if (issue.isPullRequest) recordClosePullRequestActivity _
-                      else recordCloseIssueActivity _))
+                  if (issue.isPullRequest) recordClosePullRequestActivity _
+                  else recordCloseIssueActivity _))
           case "reopen" if (issue.closed) =>
             false -> (Some("reopen") -> Some(recordReopenIssueActivity _))
         }.map {
@@ -119,7 +119,7 @@ trait HandleCommentService {
               f.toNotify(repository, issue, _) {
                 Notifier.msgComment(
                     s"${context.baseUrl}/${owner}/${name}/${if (issue.isPullRequest) "pull"
-                else "issues"}/${issue.issueId}#comment-${commentId.get}")
+                    else "issues"}/${issue.issueId}#comment-${commentId.get}")
               }
             }
             action foreach {

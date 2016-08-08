@@ -49,8 +49,7 @@ class AsyncProducerTest {
   val configs = props.map(KafkaConfig.fromProps)
   val brokerList = configs
     .map(c =>
-          org.apache.kafka.common.utils.Utils
-            .formatAddress(c.hostName, c.port))
+      org.apache.kafka.common.utils.Utils.formatAddress(c.hostName, c.port))
     .mkString(",")
 
   @Test

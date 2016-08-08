@@ -42,8 +42,8 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
 
         try {
           val cook30 = cookie.asInstanceOf[{
-                def setHttpOnly(b: Boolean): Unit
-              }]
+            def setHttpOnly(b: Boolean): Unit
+          }]
           cook30.setHttpOnly(bv)
         } catch {
           case e: Exception =>

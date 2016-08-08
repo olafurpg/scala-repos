@@ -127,7 +127,7 @@ object RunWorkflow extends Logging {
           if (deployMode == "cluster") {
             hdfs
               .makeQualified(new Path((engineLocation :+ variantJson.getName)
-                        .mkString(Path.SEPARATOR)))
+                .mkString(Path.SEPARATOR)))
               .toString
           } else {
             variantJson.getCanonicalPath

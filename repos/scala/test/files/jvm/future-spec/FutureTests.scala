@@ -127,15 +127,15 @@ class FutureTests extends MinimalScalaTest {
       val f = Future.successful(s)
 
       ECNotUsed(ec =>
-            f.onFailure({
+        f.onFailure({
           case _ => fail("onFailure should not have been called")
         })(ec))
       assert(ECNotUsed(ec =>
-                f.recover({
+        f.recover({
           case _ => fail("recover should not have been called")
         })(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.recoverWith({
+        f.recoverWith({
           case _ => fail("flatMap should not have been called")
         })(ec)) eq f)
       assert(
@@ -157,25 +157,23 @@ class FutureTests extends MinimalScalaTest {
              "Future.failed must be the same instance as Future.failed")
 
       ECNotUsed(ec =>
-            f.foreach(_ => fail("foreach should not have been called"))(ec))
+        f.foreach(_ => fail("foreach should not have been called"))(ec))
       ECNotUsed(ec =>
-            f.onSuccess({
+        f.onSuccess({
           case _ => fail("onSuccess should not have been called")
         })(ec))
       assert(ECNotUsed(ec =>
-                f.map(_ => fail("map should not have been called"))(ec)) eq f)
-      assert(
-          ECNotUsed(ec =>
-                f.flatMap(_ => fail("flatMap should not have been called"))(
-                    ec)) eq f)
+        f.map(_ => fail("map should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.filter(_ => fail("filter should not have been called"))(ec)) eq f)
+        f.flatMap(_ => fail("flatMap should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.collect({
+        f.filter(_ => fail("filter should not have been called"))(ec)) eq f)
+      assert(ECNotUsed(ec =>
+        f.collect({
           case _ => fail("collect should not have been called")
         })(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.zipWith(f)({ (_, _) =>
+        f.zipWith(f)({ (_, _) =>
           fail("zipWith should not have been called")
         })(ec)) eq f)
     }
@@ -231,49 +229,48 @@ class FutureTests extends MinimalScalaTest {
       assert(test.mapTo[String] eq test)
 
       ECNotUsed(ec =>
-            test.foreach(_ => fail("foreach should not have been called"))(ec))
+        test.foreach(_ => fail("foreach should not have been called"))(ec))
       ECNotUsed(ec =>
-            test.onSuccess({
+        test.onSuccess({
           case _ => fail("onSuccess should not have been called")
         })(ec))
       ECNotUsed(ec =>
-            test.onFailure({
+        test.onFailure({
           case _ => fail("onFailure should not have been called")
         })(ec))
       ECNotUsed(ec =>
-            test.onComplete({
+        test.onComplete({
           case _ => fail("onComplete should not have been called")
         })(ec))
       ECNotUsed(ec => test.transform(identity, identity)(ec) eq test)
       ECNotUsed(ec => test.transform(identity)(ec) eq test)
       ECNotUsed(ec =>
-            test.transformWith(_ =>
-                  fail("transformWith should not have been called"))(ec) eq test)
+        test.transformWith(_ =>
+          fail("transformWith should not have been called"))(ec) eq test)
       ECNotUsed(ec => test.map(identity)(ec) eq test)
-      ECNotUsed(
-          ec =>
-            test
-              .flatMap(_ => fail("flatMap should not have been called"))(ec) eq test)
       ECNotUsed(ec =>
-            test.filter(_ => fail("filter should not have been called"))(ec) eq test)
+        test.flatMap(_ => fail("flatMap should not have been called"))(ec) eq test)
       ECNotUsed(ec =>
-            test.collect({
+        test
+          .filter(_ => fail("filter should not have been called"))(ec) eq test)
+      ECNotUsed(ec =>
+        test.collect({
           case _ => fail("collect should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.recover({
+        test.recover({
           case _ => fail("recover should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.recoverWith({
+        test.recoverWith({
           case _ => fail("recoverWith should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.andThen({
+        test.andThen({
           case _ => fail("andThen should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.zipWith(test)({ (_, _) =>
+        test.zipWith(test)({ (_, _) =>
           fail("zipWith should not have been called")
         })(ec) eq test)
     }

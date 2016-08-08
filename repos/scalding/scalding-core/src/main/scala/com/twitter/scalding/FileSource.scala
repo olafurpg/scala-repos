@@ -172,8 +172,8 @@ object FileSource {
         //
         dir ->
           (dir, OrVal(SuccessFileFilter.accept(fileStatus.getPath) &&
-                    fileStatus.isFile),
-              OrVal(HiddenFileFilter.accept(fileStatus.getPath)))
+            fileStatus.isFile),
+          OrVal(HiddenFileFilter.accept(fileStatus.getPath)))
     }
 
     // OR by key
@@ -289,8 +289,8 @@ abstract class FileSource
           throw new InvalidSourceException(
               "[" + this.toString +
                 s"] Data is missing from: ${localPaths.filterNot { p =>
-              new java.io.File(p).exists
-            }}")
+                  new java.io.File(p).exists
+                }}")
         } else if (!files.exists(_.exists)) {
           throw new InvalidSourceException(
               "[" + this.toString + "] No good paths in: " +

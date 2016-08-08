@@ -40,7 +40,7 @@ trait ExecutionSpecification { self: SpecificationLike =>
   def mustExecute[A](expectedCount1: Int, expectedCount2: Int)(
       f: (ExecutionContext, ExecutionContext) => A): A = {
     mustExecute(expectedCount1)(ec1 =>
-          mustExecute(expectedCount2)(ec2 => f(ec1, ec2)))
+      mustExecute(expectedCount2)(ec2 => f(ec1, ec2)))
   }
 
   def mustExecute[A](expectedCount1: Int,
@@ -48,7 +48,7 @@ trait ExecutionSpecification { self: SpecificationLike =>
                      expectedCount3: Int)(
       f: (ExecutionContext, ExecutionContext, ExecutionContext) => A): A = {
     mustExecute(expectedCount1)(ec1 =>
-          mustExecute(expectedCount2)(ec2 =>
-                mustExecute(expectedCount3)(ec3 => f(ec1, ec2, ec3))))
+      mustExecute(expectedCount2)(ec2 =>
+        mustExecute(expectedCount3)(ec3 => f(ec1, ec2, ec3))))
   }
 }

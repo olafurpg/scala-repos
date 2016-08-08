@@ -232,7 +232,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
 
         if (canRewrite) {
           val localSlots: Vector[(Int, Type)] = boxKind.boxedTypes.map(tp =>
-                (getLocal(tp.getSize), tp))(collection.breakOut)
+            (getLocal(tp.getSize), tp))(collection.breakOut)
 
           // store boxed value(s) into localSlots
           val storeOps =
@@ -344,12 +344,12 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
                 extraction =>
                   extraction.postExtractionAdaptationOps(
                       boxKind.boxedTypes.head) match {
-                case Nil =>
-                  toDelete ++= extraction.allInsns
-                case ops =>
-                  toReplace(extraction.consumer) = ops
-                  toDelete ++= extraction.allInsns - extraction.consumer
-            })
+                    case Nil =>
+                      toDelete ++= extraction.allInsns
+                    case ops =>
+                      toReplace(extraction.consumer) = ops
+                      toDelete ++= extraction.allInsns - extraction.consumer
+                })
           } else {
             for (extraction <- allConsumers) {
               val valueIndex = boxKind.extractedValueIndex(extraction)
@@ -486,7 +486,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
         .boxProducers(prodCons)
         .filterNot(prod => creations.exists(_.producer == prod))
       newProds.forall(prod =>
-            boxKind.checkBoxCreation(prod, prodCons) match {
+        boxKind.checkBoxCreation(prod, prodCons) match {
           case Some(boxCreation) =>
             creations += boxCreation
             addBoxConsumers(boxCreation)
@@ -500,7 +500,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
         .boxConsumers(prodCons, ultimate = true)
         .filterNot(cons => consumers.exists(_.consumer == cons))
       newCons.forall(cons =>
-            boxKind.checkBoxConsumer(cons, prodCons) match {
+        boxKind.checkBoxConsumer(cons, prodCons) match {
           case Some(boxConsumer) =>
             consumers += boxConsumer
             addCreations(boxConsumer)

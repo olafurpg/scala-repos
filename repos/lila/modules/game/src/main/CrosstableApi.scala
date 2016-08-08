@@ -89,7 +89,7 @@ final class CrosstableApi(coll: Coll) {
                                BSONDocument(Game.BSONFields.winnerId -> true))
                            .sort(BSONDocument(Game.BSONFields.createdAt -> -1))
                            .cursor[BSONDocument](readPreference =
-                                 ReadPreference.secondaryPreferred)
+                             ReadPreference.secondaryPreferred)
                            .collect[List](maxGames)
                            .map {
                              _.flatMap { doc =>
@@ -110,7 +110,7 @@ final class CrosstableApi(coll: Coll) {
           crosstable <- gameColl
                          .aggregate(Match(selector),
                                     List(GroupField(Game.BSONFields.winnerId)(
-                                            "nb" -> SumValue(1))))
+                                        "nb" -> SumValue(1))))
                          .map(
                              _.documents.foldLeft(ctDraft) {
                                case (ct, obj) =>

@@ -130,7 +130,7 @@ object Reflector {
             val f = ls.next()
             val mod = f.getModifiers
             if (!(Modifier.isStatic(mod) || Modifier.isTransient(mod) ||
-                      Modifier.isVolatile(mod) || f.isSynthetic)) {
+                  Modifier.isVolatile(mod) || f.isSynthetic)) {
               val st = ManifestScalaType(f.getType, f.getGenericType match {
                 case p: ParameterizedType =>
                   p.getActualTypeArguments.toSeq.zipWithIndex map {

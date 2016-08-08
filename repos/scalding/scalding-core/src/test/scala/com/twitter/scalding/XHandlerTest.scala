@@ -27,7 +27,7 @@ class XHandlerTest extends WordSpec with Matchers {
       rxh.handlers.find(h => h(new AbstractMethodError)) should not be empty
       rxh.handlers.find(h => h(new NoClassDefFoundError)) should not be empty
       rxh.handlers.find(h =>
-            h(new ModeLoadException("dummy", new ClassNotFoundException))) should not be empty
+        h(new ModeLoadException("dummy", new ClassNotFoundException))) should not be empty
     }
     "be handled if exist in custom mapping" in {
       val cRxh = RichXHandler(

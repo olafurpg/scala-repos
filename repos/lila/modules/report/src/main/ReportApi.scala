@@ -26,11 +26,8 @@ private[report] final class ReportApi {
             if (by.id == UserRepo.lichessId)
               reportTube.coll.update(
                   selectRecent(user, reason),
-                  Json.obj(
-                      "$set" ->
-                        (reportTube
-                              .toMongo(report)
-                              .get - "processedBy" - "_id"))
+                  Json.obj("$set" ->
+                    (reportTube.toMongo(report).get - "processedBy" - "_id"))
               ) flatMap { res =>
                 (res.n == 0) ?? $insert(report)
               } else $insert(report)

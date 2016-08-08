@@ -101,8 +101,8 @@ object Test extends App {
 
   0 until maxLength foreach { length =>
     val keyValues = (0 until length map { _ =>
-          (R nextInt maxKey, R nextInt maxValue)
-        }).toList
+      (R nextInt maxKey, R nextInt maxValue)
+    }).toList
     val keys = keyValues map (_._2)
     testSet(immutable.BitSet(keys: _*), keys)
     testSet(immutable.TreeSet(keys: _*), keys)

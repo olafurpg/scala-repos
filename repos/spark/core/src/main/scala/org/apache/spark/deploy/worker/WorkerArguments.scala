@@ -128,18 +128,17 @@ private[worker] class WorkerArguments(args: Array[String], conf: SparkConf) {
     */
   def printUsageAndExit(exitCode: Int) {
     // scalastyle:off println
-    System.err.println(
-        "Usage: Worker [options] <master>\n" + "\n" +
-          "Master must be a URL of the form spark://hostname:port\n" + "\n" +
-          "Options:\n" + "  -c CORES, --cores CORES  Number of cores to use\n" +
-          "  -m MEM, --memory MEM     Amount of memory to use (e.g. 1000M, 2G)\n" +
-          "  -d DIR, --work-dir DIR   Directory to run apps in (default: SPARK_HOME/work)\n" +
-          "  -i HOST, --ip IP         Hostname to listen on (deprecated, please use --host or -h)\n" +
-          "  -h HOST, --host HOST     Hostname to listen on\n" +
-          "  -p PORT, --port PORT     Port to listen on (default: random)\n" +
-          "  --webui-port PORT        Port for web UI (default: 8081)\n" +
-          "  --properties-file FILE   Path to a custom Spark properties file.\n" +
-          "                           Default is conf/spark-defaults.conf.")
+    System.err.println("Usage: Worker [options] <master>\n" + "\n" +
+      "Master must be a URL of the form spark://hostname:port\n" + "\n" +
+      "Options:\n" + "  -c CORES, --cores CORES  Number of cores to use\n" +
+      "  -m MEM, --memory MEM     Amount of memory to use (e.g. 1000M, 2G)\n" +
+      "  -d DIR, --work-dir DIR   Directory to run apps in (default: SPARK_HOME/work)\n" +
+      "  -i HOST, --ip IP         Hostname to listen on (deprecated, please use --host or -h)\n" +
+      "  -h HOST, --host HOST     Hostname to listen on\n" +
+      "  -p PORT, --port PORT     Port to listen on (default: random)\n" +
+      "  --webui-port PORT        Port for web UI (default: 8081)\n" +
+      "  --properties-file FILE   Path to a custom Spark properties file.\n" +
+      "                           Default is conf/spark-defaults.conf.")
     // scalastyle:on println
     System.exit(exitCode)
   }

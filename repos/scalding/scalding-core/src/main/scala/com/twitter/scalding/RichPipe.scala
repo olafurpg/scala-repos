@@ -788,7 +788,7 @@ class RichPipe(val pipe: Pipe)
   def upstreamPipes: Set[Pipe] =
     Iterator
       .iterate(Seq(pipe))(pipes =>
-            for (p <- pipes; prev <- p.getPrevious) yield prev)
+        for (p <- pipes; prev <- p.getPrevious) yield prev)
       .takeWhile(_.length > 0)
       .flatten
       .toSet

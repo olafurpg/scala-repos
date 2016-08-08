@@ -35,7 +35,7 @@ class StackTraceTest {
              */
             val prefix = "org.scalajs.testsuite.library.StackTraceTest$"
             (elem.getClassName.startsWith(prefix + className) &&
-                elem.getMethodName == methodName)
+            elem.getMethodName == methodName)
           })
         }
     }

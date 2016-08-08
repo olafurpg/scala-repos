@@ -240,11 +240,9 @@ object TypeAdjuster extends ApplicationAdapter {
       rInfos: Set[ReplacementInfo]): Map[ReplacementInfo, ScImportsHolder] = {
     def findMaxHolders(infos: Set[ReplacementInfo])
       : Set[(ReplacementInfo, ScImportsHolder)] = {
-      val infosToHolders = infos.map(
-          info =>
-            info -> ScalaImportTypeFix.getImportHolder(
-                info.origTypeElem,
-                info.origTypeElem.getProject))
+      val infosToHolders = infos.map(info =>
+        info -> ScalaImportTypeFix
+          .getImportHolder(info.origTypeElem, info.origTypeElem.getProject))
       val holders = infosToHolders.map(_._2)
       val maxHolders = holders.filter(h => !holders.exists(_.isAncestorOf(h)))
       infosToHolders.map {

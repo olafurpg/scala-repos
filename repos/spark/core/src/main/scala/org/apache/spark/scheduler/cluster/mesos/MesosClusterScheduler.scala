@@ -233,7 +233,7 @@ private[spark] class MesosClusterScheduler(
         s.success = true
         s.driverState = "RUNNING"
         launchedDrivers(submissionId).mesosTaskStatus.foreach(state =>
-              s.message = state.toString)
+          s.message = state.toString)
       } else if (finishedDrivers.exists(
                      _.driverDescription.submissionId.equals(submissionId))) {
         s.success = true
@@ -271,20 +271,16 @@ private[spark] class MesosClusterScheduler(
         .find(_.submissionId.equals(submissionId))
         .map(d => new MesosDriverState("QUEUED", d))
         .orElse(launchedDrivers
-              .get(submissionId)
-              .map(d =>
-                    new MesosDriverState("RUNNING",
-                                         d.driverDescription,
-                                         Some(d))))
+          .get(submissionId)
+          .map(d =>
+            new MesosDriverState("RUNNING", d.driverDescription, Some(d))))
         .orElse(finishedDrivers
-              .find(_.driverDescription.submissionId.equals(submissionId))
-              .map(d =>
-                    new MesosDriverState("FINISHED",
-                                         d.driverDescription,
-                                         Some(d))))
+          .find(_.driverDescription.submissionId.equals(submissionId))
+          .map(d =>
+            new MesosDriverState("FINISHED", d.driverDescription, Some(d))))
         .orElse(pendingRetryDrivers
-              .find(_.submissionId.equals(submissionId))
-              .map(d => new MesosDriverState("RETRYING", d)))
+          .find(_.submissionId.equals(submissionId))
+          .map(d => new MesosDriverState("RETRYING", d)))
     }
   }
 

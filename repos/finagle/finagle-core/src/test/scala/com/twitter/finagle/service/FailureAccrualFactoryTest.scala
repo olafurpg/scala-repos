@@ -368,9 +368,8 @@ class FailureAccrualFactoryTest extends FunSuite with MockitoSugar {
     }
   }
 
-  test(
-      "a failing service should only be able to accept one request after " +
-        "being revived, then multiple requests after it successfully completes") {
+  test("a failing service should only be able to accept one request after " +
+    "being revived, then multiple requests after it successfully completes") {
     val h = new Helper(consecutiveFailures)
     import h._
 
@@ -766,7 +765,7 @@ class FailureAccrualFactoryTest extends FunSuite with MockitoSugar {
     // replaced
     Await.ready(
         s.make(ps +
-                FailureAccrualFactory.Replaced(ServiceFactoryWrapper.identity))
+            FailureAccrualFactory.Replaced(ServiceFactoryWrapper.identity))
           .toService(10))
     assert(
         !h.statsReceiver.counters.contains(Seq("failure_accrual", "removals")))

@@ -90,9 +90,9 @@ object DependencyResolver {
       origins: List[Origin],
       relPaths: Traversable[String]): Either[Problem, String] = {
     val candidates = (relPaths collect {
-          case relPath if ("/" + relPath).endsWith("/" + resourceName) =>
-            relPath
-        }).toList
+      case relPath if ("/" + relPath).endsWith("/" + resourceName) =>
+        relPath
+    }).toList
 
     candidates match {
       case relPath :: Nil =>
@@ -164,7 +164,7 @@ object DependencyResolver {
     @inline
     def hasConflict(x: FlatJSDependency, y: FlatJSDependency) =
       (x.commonJSName.isDefined && y.commonJSName.isDefined &&
-            (x.relPath == y.relPath ^ x.commonJSName == y.commonJSName))
+        (x.relPath == y.relPath ^ x.commonJSName == y.commonJSName))
 
     val conflicts = for {
       dep <- flatDeps if flatDeps.exists(hasConflict(dep, _))
@@ -180,7 +180,7 @@ object DependencyResolver {
     @inline
     def hasConflict(x: FlatJSDependency, y: FlatJSDependency) =
       (x.relPathMinified.isDefined && y.relPathMinified.isDefined &&
-            x.relPathMinified != y.relPathMinified)
+        x.relPathMinified != y.relPathMinified)
 
     val conflicts = for {
       (_, deps) <- byRelPath

@@ -94,9 +94,9 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
       "Java asScala" in withMaterializer { implicit m =>
         val sink = sum.toSink.mapMaterializedValue(
             new JFn[CompletionStage[Int], Future[Int]] {
-          def apply(f: CompletionStage[Int]): Future[Int] =
-            FutureConverters.toScala(f)
-        })
+              def apply(f: CompletionStage[Int]): Future[Int] =
+                FutureConverters.toScala(f)
+            })
 
         sawait(
             play.api.libs.streams

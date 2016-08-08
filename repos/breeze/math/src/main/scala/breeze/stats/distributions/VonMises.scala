@@ -104,10 +104,10 @@ object VonMises extends ExponentialFamily[VonMises, Double] {
       signum(cosineSum) * signum(sineSum) * atan(abs(sineSum / cosineSum))
     val mu =
       (muPart + {
-            if (cosineSum < 0) Pi
-            else if (cosineSum > 0 && sineSum < 0) 2 * Pi
-            else 0.0
-          }) % (2 * Pi)
+        if (cosineSum < 0) Pi
+        else if (cosineSum > 0 && sineSum < 0) 2 * Pi
+        else 0.0
+      }) % (2 * Pi)
 
     val t = sqrt(pow(cosineSum / stats.n, 2) + pow(sineSum / stats.n, 2))
     val k = (1.28 - 0.53 * pow(t, 2)) * tan(Pi / 2 * t)

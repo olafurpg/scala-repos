@@ -160,8 +160,8 @@ class AppDeployIntegrationTest
       appProxy(testBasePath / "app", "v1", instances = 1, withHealth = false)
 
     var appCount = (marathon
-          .metrics()
-          .entityJson \ "gauges" \ "service.mesosphere.marathon.app.count" \ "value")
+      .metrics()
+      .entityJson \ "gauges" \ "service.mesosphere.marathon.app.count" \ "value")
       .as[Int]
     appCount should be(0)
 
@@ -171,8 +171,8 @@ class AppDeployIntegrationTest
     Then("The app count metric should increase")
     result.code should be(201) // Created
     appCount = (marathon
-          .metrics()
-          .entityJson \ "gauges" \ "service.mesosphere.marathon.app.count" \ "value")
+      .metrics()
+      .entityJson \ "gauges" \ "service.mesosphere.marathon.app.count" \ "value")
       .as[Int]
     appCount should be(1)
   }

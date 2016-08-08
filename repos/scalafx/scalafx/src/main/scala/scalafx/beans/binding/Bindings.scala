@@ -194,7 +194,7 @@ trait Bindings {
     def choose[T](chooseExpression: ObservableValue[T, T]) =
       new ObjectConditionBuilder[T](
           whenBuilder.`then`(ObservableValue
-                .sfxObservableValue2jfxObjectValue[T](chooseExpression)))
+            .sfxObservableValue2jfxObjectValue[T](chooseExpression)))
     def choose[T](chooseExpression: jfxbv.ObservableObjectValue[T]) =
       new ObjectConditionBuilder[T](whenBuilder.`then`(chooseExpression))
     def choose[T](chooseExpression: T) =

@@ -132,23 +132,22 @@ class ZkClientTest extends WordSpec with MockitoSugar {
     def getChildren(path: String)(children: => Future[ZNode.Children]) {
       val cb =
         ArgumentCaptor.forClass(classOf[AsyncCallback.Children2Callback])
-      when(
-          zk.getChildren(
-                meq(path),
-                meq(false),
-                any[AsyncCallback.Children2Callback],
-                meq(null))) thenAnswer answer[AsyncCallback.Children2Callback](
-          2) { cbValue =>
-        children onSuccess { znode =>
-          cbValue.processResult(0,
-                                path,
-                                null,
-                                znode.children.map { _.name }.toList.asJava,
-                                znode.stat)
-        } onFailure {
-          case ke: KeeperException =>
-            cbValue.processResult(ke.code.intValue, path, null, null, null)
-        }
+      when(zk.getChildren(
+          meq(path),
+          meq(false),
+          any[AsyncCallback.Children2Callback],
+          meq(null))) thenAnswer answer[AsyncCallback.Children2Callback](2) {
+        cbValue =>
+          children onSuccess { znode =>
+            cbValue.processResult(0,
+                                  path,
+                                  null,
+                                  znode.children.map { _.name }.toList.asJava,
+                                  znode.stat)
+          } onFailure {
+            case ke: KeeperException =>
+              cbValue.processResult(ke.code.intValue, path, null, null, null)
+          }
       }
     }
 
@@ -266,17 +265,17 @@ class ZkClientTest extends WordSpec with MockitoSugar {
             zkClient
               .withRetries(3)
               .retrying { _ =>
-            i += 1
-            Future.exception(connectionLoss)
-          }
+                i += 1
+                Future.exception(connectionLoss)
+              }
               .onSuccess { _ =>
-            fail("Unexpected success")
-          }
+                fail("Unexpected success")
+              }
               .handle {
-            case e: KeeperException.ConnectionLossException =>
-              assert(e == connectionLoss)
-              assert(i == 4)
-          })
+                case e: KeeperException.ConnectionLossException =>
+                  assert(e == connectionLoss)
+                  assert(i == 4)
+              })
       }
 
       "not retry on success" in {
@@ -285,12 +284,12 @@ class ZkClientTest extends WordSpec with MockitoSugar {
             zkClient
               .withRetries(3)
               .retrying { _ =>
-            i += 1
-            Future.Done
-          }
+                i += 1
+                Future.Done
+              }
               .onSuccess { _ =>
-            assert(i == 1)
-          })
+                assert(i == 1)
+              })
       }
 
       "convert exceptions to Futures" in {
@@ -300,17 +299,17 @@ class ZkClientTest extends WordSpec with MockitoSugar {
             zkClient
               .withRetries(3)
               .retrying { _ =>
-            i += 1
-            throw rex
-          }
+                i += 1
+                throw rex
+              }
               .onSuccess { _ =>
-            fail("Unexpected success")
-          }
+                fail("Unexpected success")
+              }
               .handle {
-            case e: RuntimeException =>
-              assert(e == rex)
-              assert(i == 1)
-          })
+                case e: RuntimeException =>
+                  assert(e == rex)
+                  assert(i == 1)
+              })
       }
 
       "only retry when instructed to" in {
@@ -471,14 +470,12 @@ class ZkClientTest extends WordSpec with MockitoSugar {
           create(path + "/", data, mode = CreateMode.EPHEMERAL_SEQUENTIAL)(
               Future(path + "/0000"))
 
-          assert(
-              Await
-                .result(
-                    zkClient(path).create(data,
-                                          child = Some(""),
-                                          mode =
-                                            CreateMode.EPHEMERAL_SEQUENTIAL))
-                .path == path + "/0000")
+          assert(Await
+            .result(
+                zkClient(path).create(data,
+                                      child = Some(""),
+                                      mode = CreateMode.EPHEMERAL_SEQUENTIAL))
+            .path == path + "/0000")
         }
       }
     }
@@ -525,7 +522,7 @@ class ZkClientTest extends WordSpec with MockitoSugar {
 
         "error" in {
           exists(znode.path)(Future.exception(
-                  new KeeperException.NoNodeException(znode.path)))
+              new KeeperException.NoNodeException(znode.path)))
           Await.ready(znode.exists() map { _ =>
             fail("Unexpected success")
           } handle {
@@ -607,7 +604,7 @@ class ZkClientTest extends WordSpec with MockitoSugar {
             assert(offer.syncWait().get() == result)
 
             watch(znode.path)(Future.exception(
-                    new KeeperException.NoNodeException(znode.path)))(update)
+                new KeeperException.NoNodeException(znode.path)))(update)
             offer.sync()
             intercept[KeeperException.NoNodeException] {
               offer syncWait () get ()

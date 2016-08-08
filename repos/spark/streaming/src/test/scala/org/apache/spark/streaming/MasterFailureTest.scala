@@ -117,10 +117,8 @@ private[streaming] object MasterFailureTest extends Logging {
     logInfo("Output, size = " + output.size + "\n" + output)
 
     // Verify whether all the values in the output are among the expected output values
-    output.foreach(
-        o =>
-          assert(expectedOutput.contains(o),
-                 "Expected value " + o + " not found"))
+    output.foreach(o =>
+      assert(expectedOutput.contains(o), "Expected value " + o + " not found"))
 
     // Verify whether the last expected output value has been generated, there by
     // confirming that none of the inputs have been missed
@@ -331,10 +329,8 @@ private[streaming] object MasterFailureTest extends Logging {
     // scalastyle:on println
 
     // Match the output with the expected output
-    output.foreach(
-        o =>
-          assert(expectedOutput.contains(o),
-                 "Expected value " + o + " not found"))
+    output.foreach(o =>
+      assert(expectedOutput.contains(o), "Expected value " + o + " not found"))
   }
 
   /** Resets counter to prepare for the test */

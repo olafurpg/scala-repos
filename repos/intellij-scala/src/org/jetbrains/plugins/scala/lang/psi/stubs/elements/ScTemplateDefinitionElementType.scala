@@ -45,7 +45,7 @@ abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
     val isDepr =
       psi.isInstanceOf[ScTypeDefinition] && psi.getModifierList != null &&
         !psi.getModifierList.getAnnotations.forall(p =>
-              p match {
+          p match {
             case a: ScAnnotation => {
               val typeText = a.constructor.typeElement.getText
               typeText != "deprecated" && typeText != "scala.deprecated"

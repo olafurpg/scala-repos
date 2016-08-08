@@ -116,7 +116,7 @@ class CSRFAction(next: EssentialAction,
 
       // Once done, add it to the result
       next(requestWithNewToken).map(result =>
-            CSRFAction.addTokenToResponse(config, newToken, request, result))
+        CSRFAction.addTokenToResponse(config, newToken, request, result))
     } else {
       filterLogger.trace("[CSRF] No check necessary")
       next(request)
@@ -158,7 +158,7 @@ class CSRFAction(next: EssentialAction,
     Accumulator(
         Flow[ByteString]
           .transform(() =>
-                new BodyHandler(config, { body =>
+            new BodyHandler(config, { body =>
               if (extractor(body, tokenName).fold(false)(
                       tokenProvider.compareTokens(_, tokenFromHeader))) {
                 filterLogger.trace("[CSRF] Valid token found in body")
@@ -257,7 +257,7 @@ class CSRFAction(next: EssentialAction,
               val (endIndex, headers) = extractHeaders(nextCrlf + 2)
               endIndex ->
                 ((key.trim().toLowerCase(Locale.ENGLISH) -> value
-                          .trim()) :: headers)
+                  .trim()) :: headers)
           }
         }
       }
@@ -422,7 +422,7 @@ object CSRFAction {
                                        tokenSigner: CSRFTokenSigner) = {
     val tagToken = request.tags.get(Token.RequestTag)
     val cookieToken = config.cookieName.flatMap(cookie =>
-          request.cookies.get(cookie).map(_.value))
+      request.cookies.get(cookie).map(_.value))
     val sessionToken = request.session.get(config.tokenName)
     cookieToken orElse sessionToken orElse tagToken filter { token =>
       // return None if the token is invalid
@@ -675,7 +675,7 @@ case class CSRFAddToken @Inject()(config: CSRFConfig, crypto: CSRFTokenSigner) {
         // Once done, add it to the result
         import play.api.libs.iteratee.Execution.Implicits.trampoline
         wrapped(requestWithNewToken).map(result =>
-              CSRFAction.addTokenToResponse(config, newToken, request, result))
+          CSRFAction.addTokenToResponse(config, newToken, request, result))
       } else {
         wrapped(request)
       }

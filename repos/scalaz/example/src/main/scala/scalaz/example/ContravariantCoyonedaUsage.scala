@@ -52,7 +52,7 @@ object ContravariantCoyonedaUsage extends App {
 
   def parseCommaNum(s: String): Long \/ String =
     ("""-?[0-9,]+""".r findFirstIn s flatMap
-          (_.filter(_ != ',').parseLong.toOption)) <\/ s
+      (_.filter(_ != ',').parseLong.toOption)) <\/ s
 
   def caseInsensitively(s: String): String =
     s.toUpperCase.toLowerCase
@@ -210,7 +210,7 @@ object ContravariantCoyonedaUsage extends App {
     (ccord, i) <- decomposedSortKeys
   } yield
     (schwartzian[Vector[String], ccord.I](unstructuredData)(v =>
-          ccord.k(v(i)))(ccord.fi))
+      ccord.k(v(i)))(ccord.fi))
 
   // `I' is the “pivot”, how the function `k' result type and `fi'
   // order type relate to each other.  As seen above, this existential

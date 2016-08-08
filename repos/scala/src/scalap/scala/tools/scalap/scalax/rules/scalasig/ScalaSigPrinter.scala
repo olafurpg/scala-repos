@@ -73,7 +73,7 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
   def isCaseClassObject(o: ObjectSymbol): Boolean = {
     val TypeRefType(_, classSymbol: ClassSymbol, _) = o.infoType
     o.isFinal && (classSymbol.children.find(x =>
-          x.isCase && x.isInstanceOf[MethodSymbol]) match {
+      x.isCase && x.isInstanceOf[MethodSymbol]) match {
       case Some(_) => true
       case None => false
     })
@@ -251,8 +251,8 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
     printModifiers(m)
     if (m.isAccessor) {
       val indexOfSetter = m.parent.get.children.indexWhere(x =>
-            x.isInstanceOf[MethodSymbol] &&
-              x.asInstanceOf[MethodSymbol].name == n + "_$eq")
+        x.isInstanceOf[MethodSymbol] &&
+          x.asInstanceOf[MethodSymbol].name == n + "_$eq")
       print(if (indexOfSetter > 0) "var " else "val ")
     } else {
       print("def ")

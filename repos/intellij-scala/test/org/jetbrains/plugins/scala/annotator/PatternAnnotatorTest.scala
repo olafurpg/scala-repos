@@ -38,7 +38,7 @@ class PatternAnnotatorTest
       case p: ScPattern => p
     }
     patterns.foreach(p =>
-          annotator.annotatePattern(p, mock, highlightErrors = true))
+      annotator.annotatePattern(p, mock, highlightErrors = true))
     mock.annotations
   }
 
